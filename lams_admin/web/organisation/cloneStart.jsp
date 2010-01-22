@@ -16,6 +16,9 @@
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-ui/ui/ui.resizable.js"></script>
 <script language="JavaScript" type="text/javascript">
 	<!--
+	var staffLoaded, learnersLoaded = false;
+	var lessonsLoaded = {};
+
 	jQuery(document).ready(function() {
 		jQuery("#sourceGroupId").change(function() {
 			loadSubgroups(jQuery("#sourceGroupId").val());
@@ -46,19 +49,47 @@
 	}
 
 	function lessonDialog(lessonId) {
-		jQuery("#lessonDialog-"+lessonId).dialog({ modal: true });
+		if (lessonsLoaded[lessonId] == null || !lessonsLoaded[lessonId]) {
+			jQuery("#lessonDialog-"+lessonId).dialog({
+				autoOpen: false,
+				modal: true
+			});
+			lessonsLoaded[lessonId] = true;
+		}
+		jQuery("#lessonDialog-"+lessonId).dialog("open");
 		return false;
 	}
 
+	function initUserDialog(selector) {
+		jQuery(selector).dialog({
+			autoOpen: false,
+			modal: true, 
+			width: 500, 
+			buttons: { 
+				"<fmt:message key='label.ok' />": function() {
+					jQuery(this).dialog("close");
+				} 
+			} 
+		});
+	}
+
 	function staffDialog() {
-		jQuery("#staffDialog").load("<lams:LAMSURL/>/admin/clone.do", { method: "selectStaff", groupId: <c:out value="${org.organisationId}" /> });
-		jQuery("#staffDialog").dialog({ modal: true });
+		if (!staffLoaded) {
+			jQuery("#staffDialog").load("<lams:LAMSURL/>/admin/clone.do", { method: "selectStaff", groupId: <c:out value="${org.organisationId}" /> });
+			initUserDialog("#staffDialog");
+			staffLoaded = true;
+		}
+		jQuery("#staffDialog").dialog("open");
 		return false;
 	}
 
 	function learnerDialog() {
-		jQuery("#learnerDialog").load("<lams:LAMSURL/>/admin/clone.do", { method: "selectLearners", groupId: <c:out value="${org.organisationId}" /> });
-		jQuery("#learnerDialog").dialog({ modal: true });
+		if (!learnersLoaded) {
+			jQuery("#learnerDialog").load("<lams:LAMSURL/>/admin/clone.do", { method: "selectLearners", groupId: <c:out value="${org.organisationId}" /> });
+			initUserDialog("#learnerDialog");
+			learnersLoaded = true;
+		}
+		jQuery("#learnerDialog").dialog("open");
 		return false;
 	}
 
@@ -75,23 +106,11 @@
 		jQuery("input[name=learners]:checked").each(function() {
 			learners.push(jQuery(this).val());
 		});
-		/*
-		jQuery.post("<lams:LAMSURL/>/admin/clone.do", {
-			method: "clone",
-			groupId: <c:out value="${org.organisationId}" />,
-			'lessons[]': [ lessons.join(",") ],
-			'staff[]': [ staff.join(",") ],
-			'learners[]': [ learners.join(",") ],
-			addAllStaff: jQuery("#addAllStaff").is(":checked"),
-			addAllLearners: jQuery("#addAllLearners").is(":checked")
-		});
-		*/
 		jQuery("input[name=lessons]").val(lessons.join(","));
 		jQuery("input[name=staff]").val(staff.join(","));
 		jQuery("input[name=learners]").val(learners.join(","));
 		jQuery("input[name=addAllStaff]").val(jQuery("#addAllStaff").is(":checked"));
 		jQuery("input[name=addAllLearners]").val(jQuery("#addAllLearners").is(":checked"));
-		jQuery("#cloneForm").submit();
 		return true;
 	}
 	//-->
@@ -99,7 +118,7 @@
 
 <tiles:insert attribute="breadcrumbs" />
 
-<h1>Clone Lessons for <c:out value="${org.name}" /></h1>
+<h1><fmt:message key="title.clone.lessons.for"><fmt:param value="${org.name}" /></fmt:message></h1>
 
 <c:if test="${not empty errors}">
 	<p class="warning">
@@ -109,21 +128,21 @@
 	</p>
 </c:if>
 
-<h2>Choose group to clone lessons from</h2>
+<h2><fmt:message key="title.choose.group" /></h2>
 <div class="clone-box">
 	<p>
-		Group:
+		<fmt:message key="admin.course" />:
 		<select id="sourceGroupId">
 			<option value="">...</option>
 		</select>
 	</p>
 	<p class="padding-bottom">
-		Subgroup:
+		<fmt:message key="admin.class" />:
 		<select id="sourceSubgroupId">
 		</select>
 	</p>
 	<p>
-		<input type="submit" class="button" value="Choose" onclick="javascript:loadGroupAttributes(chosenGroup());">
+		<input type="submit" class="button" value="<fmt:message key="label.choose" />" onclick="javascript:loadGroupAttributes(chosenGroup());">
 	</p>
 </div>
 
@@ -135,40 +154,40 @@
 	<input type="hidden" name="learners">
 
 	<div style="display:none;" id="cloneOptionsDiv">
-		<h2>Select lessons</h2>
+		<h2><fmt:message key="title.select.lessons" /></h2>
 		<p class="clone-box" id="availableLessons"></p>
 		
-		<h2>Select staff</h2>
+		<h2><fmt:message key="title.select.staff" /></h2>
 		<div class="clone-box">
 			<p class="padding-bottom">
-				<input type="checkbox" id="addAllStaff" name="addAllStaff" checked="checked"> Add all monitors in this group to each lesson?
+				<input type="checkbox" id="addAllStaff" name="addAllStaff" checked="checked"> <fmt:message key="message.add.all.monitors" />
 			</p>
 			<p>
-				<a onclick="staffDialog();">Configure Staff</a>
+				<a onclick="staffDialog();"><fmt:message key="label.configure.staff" /></a>
 			</p>
 		</div>
 		
-		<h2>Select learners</h2>
+		<h2><fmt:message key="title.select.learners" /></h2>
 		<div class="clone-box">
 			<p class="padding-bottom">
-				<input type="checkbox" id="addAllLearners" name="addAllLearners" checked="checked"> Add all learners in this group to each lesson?
+				<input type="checkbox" id="addAllLearners" name="addAllLearners" checked="checked"> <fmt:message key="message.add.all.learners" />
 			</p>
 			<p>
-				<a onclick="learnerDialog();">Configure Learners</a>
+				<a onclick="learnerDialog();"><fmt:message key="label.configure.learners" /></a>
 			</p>
 		</div>
 		
 		<p style="float:right;">
-			<input type="submit" class="button" onclick="clone();" value="Clone">
+			<input type="submit" class="button" onclick="return clone();" value="<fmt:message key="label.clone" />">
 		</p>
 		<p class="padding-bottom"></p>
 	</div>
 	
-	<div id="staffDialog" style="display:none;">
+	<div id="staffDialog" title="<fmt:message key="label.configure.staff" />" style="display:none;">
 	
 	</div>
 	
-	<div id="learnerDialog" style="display:none;">
+	<div id="learnerDialog" title="<fmt:message key="label.configure.learners" />" style="display:none;">
 	
 	</div>
 

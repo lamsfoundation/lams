@@ -2,7 +2,7 @@
 
 <tiles:insert attribute="breadcrumbs" />
 
-<h1>Clone Lessons for <c:out value="${org.name}" /></h1>
+<h1><fmt:message key="title.clone.lessons.for"><fmt:param value="${org.name}" /></fmt:message></h1>
 
 <c:if test="${not empty errors}">
 	<p class="warning">
@@ -12,3 +12,12 @@
 	</p>
 </c:if>
 
+<p>
+	<fmt:message key="message.cloned.lessons"><fmt:param value="${result}" /></fmt:message>
+</p>
+
+<p align="center">
+	<input type="button" class="button" value="<fmt:message key="label.return.to.group" />" 
+		onclick="document.location='orgmanage.do?org=<c:out value="${org.organisationId}" />';"
+	>
+</p>

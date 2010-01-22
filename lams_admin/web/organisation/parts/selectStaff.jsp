@@ -1,18 +1,18 @@
 <%@ include file="/taglibs.jsp"%>
 
 <c:if test="${empty monitors}">
-	<p>This group has no monitors!  Please add some via the Add/Remove users screen.</p>
+	<p><fmt:message key="message.no.monitors" /></p>
 </c:if>
 
 <c:if test="${not empty monitors}">
-	<p>Check the box of each monitor to add as staff to each of the new lessons.</p>
+	<p><fmt:message key="message.check.to.add.monitor" /></p>
 
 	<table class="alternative-color">
 		<tr>
 			<th></th>
-			<th>Username</th>
-			<th>Name</th>
-			<th>Email</th>
+			<th><fmt:message key="admin.user.login" /></th>
+			<th><fmt:message key="admin.user.name" /></th>
+			<th><fmt:message key="admin.user.email" /></th>
 		</tr>
 		<c:forEach items="${monitors}" var="user">
 			<tr>

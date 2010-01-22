@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.admin.web.action;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -66,9 +65,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts:action-forward name="selectLearnersPart" path="/organisation/parts/selectLearners.jsp"
  * @struts:action-forward name="result" path=".clone-result"
  */
-public class CloneGroupAction extends Action {
+public class CloneLessonsAction extends Action {
 
-    private static final Logger log = Logger.getLogger(CloneGroupAction.class);
+    private static final Logger log = Logger.getLogger(CloneLessonsAction.class);
     private static IUserManagementService userManagementService;
     private static ILessonService lessonService;
     private static IMonitoringService monitoringService;
@@ -98,16 +97,16 @@ public class CloneGroupAction extends Action {
 	    } else if (StringUtils.equals(method, "clone")) {
 		return clone(mapping, form, request, response);
 	    }
-
-	    // default action
-	    Integer groupId = WebUtil.readIntParam(request, "groupId", false);
-	    request.setAttribute("org", userManagementService.findById(Organisation.class, groupId));
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    errors.add(e.getMessage());
 	}
 	request.setAttribute("errors", errors);
 
+	// default action
+	Integer groupId = WebUtil.readIntParam(request, "groupId", false);
+	request.setAttribute("org", userManagementService.findById(Organisation.class, groupId));
+	
 	return mapping.findForward("start");
     }
 
@@ -200,19 +199,12 @@ public class CloneGroupAction extends Action {
     public ActionForward clone(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws UserAccessDeniedException {
 
-	Enumeration e = request.getParameterNames();
-	while (e.hasMoreElements()) {
-	    String name = (String) e.nextElement();
-	    log.debug(name + "=" + request.getParameter(name));
-	}
-
-	// Integer sourceGroupId = WebUtil.readIntParam(request, "sourceGroupId", false);
 	Integer groupId = WebUtil.readIntParam(request, "groupId", false);
 	String lessons = request.getParameter("lessons");
 	String staff = request.getParameter("staff");
 	String learners = request.getParameter("learners");
-	Boolean addAllStaff = WebUtil.readBooleanParam(request, "addAllStaff");
-	Boolean addAllLearners = WebUtil.readBooleanParam(request, "addAllLearners");
+	Boolean addAllStaff = WebUtil.readBooleanParam(request, "addAllStaff", false);
+	Boolean addAllLearners = WebUtil.readBooleanParam(request, "addAllLearners", false);
 
 	String[] lessonIds = new String[0], staffIds = new String[0], learnerIds = new String[0];
 	if (StringUtils.isNotEmpty(lessons)) {
@@ -228,6 +220,7 @@ public class CloneGroupAction extends Action {
 	monitoringService = AdminServiceProxy.getMonitoringService(getServlet().getServletContext());
 	String error = null;
 	List<String> errors = new ArrayList<String>();
+	int result = 0;
 
 	Organisation group = (Organisation) userManagementService.findById(Organisation.class, groupId);
 	if (group != null) {
@@ -261,9 +254,11 @@ public class CloneGroupAction extends Action {
 						    .getUserID());
 
 				    // start Lessons
-				    // TODO user-specified creator
+				    // TODO user-specified creator; must be someone in staff group
 				    monitoringService
-					    .startLesson(newLesson.getLessonId(), Integer.valueOf(staffIds[0]));
+					    .startLesson(newLesson.getLessonId(), staffUsers.get(0).getUserId());
+				    
+				    result++;
 				} else {
 				    error = "No learners specified, can't create any Lessons.";
 				}
@@ -288,6 +283,7 @@ public class CloneGroupAction extends Action {
 	}
 	request.setAttribute("errors", errors);
 	request.setAttribute("org", group);
+	request.setAttribute("result", result);
 
 	return mapping.findForward("result");
     }
@@ -298,6 +294,16 @@ public class CloneGroupAction extends Action {
 	    Vector learnerVector = userManagementService.getUsersFromOrganisationByRole(groupId, Role.LEARNER, false,
 		    true);
 	    learnerUsers.addAll(learnerVector);
+	} else {
+	    User user = null;
+	    for (String l : learnerIds) {
+		user = (User) userManagementService.findById(User.class, Integer.parseInt(l));
+		if (user != null) {
+		    learnerUsers.add(user);
+		} else {
+		    log.error("Couldn't find User based on id=" + l);
+		}
+	    }
 	}
 	return learnerUsers;
     }
@@ -311,7 +317,7 @@ public class CloneGroupAction extends Action {
 	} else {
 	    User user = null;
 	    for (String s : staffIds) {
-		user = (User) userManagementService.findById(User.class, s);
+		user = (User) userManagementService.findById(User.class, Integer.parseInt(s));
 		if (user != null) {
 		    staffUsers.add(user);
 		} else {

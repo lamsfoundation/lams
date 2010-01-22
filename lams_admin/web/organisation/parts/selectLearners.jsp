@@ -1,18 +1,18 @@
 <%@ include file="/taglibs.jsp"%>
 
 <c:if test="${empty learners}">
-	<p>This group has no learners!  Please add some via the Add/Remove users screen.</p>
+	<p><fmt:message key="message.no.learners" /></p>
 </c:if>
 
 <c:if test="${not empty learners}">
-	<p>Check the box of each learner to add to each of the new lessons.</p>
+	<p><fmt:message key="message.check.to.add.learner" /></p>
 
 	<table class="alternative-color">
 		<tr>
 			<th></th>
-			<th>Username</th>
-			<th>Name</th>
-			<th>Email</th>
+			<th><fmt:message key="admin.user.login" /></th>
+			<th><fmt:message key="admin.user.name" /></th>
+			<th><fmt:message key="admin.user.email" /></th>
 		</tr>
 		<c:forEach items="${learners}" var="user">
 			<tr>

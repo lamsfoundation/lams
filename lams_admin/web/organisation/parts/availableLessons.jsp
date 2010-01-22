@@ -1,11 +1,11 @@
 <%@ include file="/taglibs.jsp"%>
 
 <c:if test="${empty lessons}">
-		There are no lessons to clone.
+		<fmt:message key="message.no.lessons" />
 </c:if>
 	
 <c:if test="${not empty lessons}">
-	<p>Check the box for each lesson to clone it.</p>
+	<p><fmt:message key="message.check.to.clone.lesson" /></p>
 	<ul>
 		<c:forEach items="${lessons}" var="lesson">
 			<li><input id="lessons" name="lessons" type="checkbox" value="<c:out value="${lesson.lessonId}" />" checked="checked" />
@@ -18,7 +18,7 @@
 			<p>
 				<c:out value="${lesson.lessonDescription}" />
 				<c:if test="${empty lesson.lessonDescription}">
-					(No lesson description)
+					(<fmt:message key="message.no.lesson.description" />)
 				</c:if>
 			</p>
 		</div>

@@ -2,7 +2,7 @@
 
 <tiles-definitions>
 	<definition name=".clone-result" path="/template.jsp">
-		<put name="title" value="Clone Lessons"/>
+		<put name="title" value="title.clone.lessons"/>
 		<put name="content" value=".clone-result-breadcrumbs" />	
 	</definition>
 	
@@ -11,7 +11,7 @@
 	</definition>
 
 	<definition name=".clone-start" path="/template.jsp">
-		<put name="title" value="Clone Lessons"/>
+		<put name="title" value="title.clone.lessons"/>
 		<put name="content" value=".clone-start-breadcrumbs" />	
 	</definition>
 	
