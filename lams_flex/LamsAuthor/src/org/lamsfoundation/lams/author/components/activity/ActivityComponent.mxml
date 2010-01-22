@@ -69,10 +69,7 @@
 				        	// Set the offset for dropping the activity to the local mouse position
 				        	activityComponent.mouseOffSetX = event.localX;
 				        	activityComponent.mouseOffSetY = event.localY;  
-				        	
-				        	this.setStyle('borderStyle', 'solid');
-							this.setStyle('borderColor', '#66CCFF');         
-				        	
+				        	     
 				        	DragManager.doDrag(activityComponent, ds, event);
 				        	setCenter();
 				        }
@@ -130,7 +127,6 @@
 			    systemManager.removeEventListener(MouseEvent.MOUSE_MOVE, systemManagerMouseMoveHandler, true);			
 			    systemManager.removeEventListener(MouseEvent.MOUSE_UP, systemManagerMouseUpHandler, true);
 			    systemManager.stage.removeEventListener(Event.MOUSE_LEAVE, stageMouseLeaveHandler);
-			    this.setStyle('borderStyle', 'none');
 			}
 			
 			private function systemManagerMouseMoveHandler(event:MouseEvent):void
