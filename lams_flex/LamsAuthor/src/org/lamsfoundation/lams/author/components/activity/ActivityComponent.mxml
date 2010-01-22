@@ -21,13 +21,18 @@
 			import mx.controls.Label;
 			import org.lamsfoundation.lams.author.components.transition.TransitionComponent;
 			
-			public var xpos:int;
-			public var ypos:int;
+			// Activity title label
 			public var title:Label;
 			
+			// Center position of the activity component
 			public var centerX:int;
 			public var centerY:int;
 			
+			// Point of mouse during drag
+			public var mouseOffSetX:int;
+			public var mouseOffSetY:int;
+			
+			// Transtitions
 			public var transitionIn:TransitionComponent
 			public var transitionOut:TransitionComponent;
 			
@@ -59,7 +64,15 @@
 				        
 				        if (activityComponent.isDragable) {
 				        	var ds:DragSource = new DragSource();
-				        	ds.addData(activityComponent, "img");               
+				        	ds.addData(activityComponent, "img"); 
+				        	
+				        	// Set the offset for dropping the activity to the local mouse position
+				        	activityComponent.mouseOffSetX = event.localX;
+				        	activityComponent.mouseOffSetY = event.localY;  
+				        	
+				        	this.setStyle('borderStyle', 'solid');
+							this.setStyle('borderColor', '#66CCFF');         
+				        	
 				        	DragManager.doDrag(activityComponent, ds, event);
 				        	setCenter();
 				        }
@@ -117,6 +130,7 @@
 			    systemManager.removeEventListener(MouseEvent.MOUSE_MOVE, systemManagerMouseMoveHandler, true);			
 			    systemManager.removeEventListener(MouseEvent.MOUSE_UP, systemManagerMouseUpHandler, true);
 			    systemManager.stage.removeEventListener(Event.MOUSE_LEAVE, stageMouseLeaveHandler);
+			    this.setStyle('borderStyle', 'none');
 			}
 			
 			private function systemManagerMouseMoveHandler(event:MouseEvent):void

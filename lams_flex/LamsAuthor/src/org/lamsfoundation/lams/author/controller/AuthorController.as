@@ -61,14 +61,15 @@ package org.lamsfoundation.lams.author.controller
 			var canvasBox:CanvasBox = Application.application.canvasArea.canvasBox;
 			
 			// Get the current mouse point, and convert it to co-ordinates in CanvasBox
-			var currentMousePoint:Point = new Point(UIComponent(event.currentTarget).mouseX, UIComponent(event.currentTarget).mouseY);
+			var comp:UIComponent = UIComponent(event.currentTarget);
+			var currentMousePoint:Point = new Point(comp.mouseX, comp.mouseY);
 			currentMousePoint = canvasBox.globalToLocal(currentMousePoint);
 			
 			if (event.dragInitiator is ActivityComponent) {
             	var activityComponent:ActivityComponent;
             	activityComponent = event.dragInitiator as ActivityComponent;
-            	activityComponent.x = currentMousePoint.x;
-          		activityComponent.y = currentMousePoint.y;
+            	activityComponent.x = currentMousePoint.x - activityComponent.mouseOffSetX;
+          		activityComponent.y = currentMousePoint.y - activityComponent.mouseOffSetY;
           		activityComponent.setCenter();
           		activityComponent.updateTransitionPositions();
             } else if (event.dragInitiator is LearningLibraryEntryComponent) {
