@@ -13,6 +13,7 @@
 
 	<mx:Script>
 		<![CDATA[
+			import mx.controls.Alert;
 			import mx.managers.DragManager;
 			import mx.core.DragSource;
 			import org.lamsfoundation.lams.author.util.Constants;
@@ -98,7 +99,12 @@
 	        protected function startDragging(event:MouseEvent):void {
 			 
 				if (transitionOut != null) {
-					parent.removeChild(transitionOut);
+					//parent.removeChild(transitionOut);
+					Alert.show(Application.application.dictionary.getLabelAndInsert("cv_invalid_trans_target_from_activity", [this.title.text]));
+					
+					// Return cursor state to normal
+	    			Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);			
+	    			return;	
 				}
 				
 				setCenter();
@@ -107,6 +113,7 @@
 
 				Application.application.uiState = Constants.UI_STATE_DRAWING;
 				transitionOut = new TransitionComponent();
+				transitionOut.fromActivity = this;
 				transitionOut.startX = centerX;
 				transitionOut.startY = centerY;
 				transitionOut.endX = centerX;

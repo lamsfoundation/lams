@@ -4,9 +4,12 @@ package org.lamsfoundation.lams.author.components.transition
 	
 	import flash.geom.Point;
 	
+	import org.lamsfoundation.lams.author.components.activity.ActivityComponent;
+	
 	public class TransitionComponent extends DrawingTool
 	{
-		
+		public var toActivity:ActivityComponent;
+		public var fromActivity:ActivityComponent;
 
 		public function TransitionComponent()
 		{

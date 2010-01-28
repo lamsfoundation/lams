@@ -4,6 +4,7 @@ package org.lamsfoundation.lams.author.controller
 	import flash.utils.Dictionary;
 	
 	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
 	import mx.core.Application;
 	import mx.core.UIComponent;
 	import mx.events.DragEvent;
@@ -12,6 +13,7 @@ package org.lamsfoundation.lams.author.controller
 	import org.lamsfoundation.lams.author.components.LearningLibraryEntryComponent;
 	import org.lamsfoundation.lams.author.components.activity.*;
 	import org.lamsfoundation.lams.author.components.toolbar.SystemActivityComponent;
+	import org.lamsfoundation.lams.author.components.transition.TransitionComponent;
 	import org.lamsfoundation.lams.author.events.TransitionEvent;
 	import org.lamsfoundation.lams.author.model.learninglibrary.LearningLibraryEntry;
 	import org.lamsfoundation.lams.author.util.Constants;
@@ -21,6 +23,8 @@ package org.lamsfoundation.lams.author.controller
 	{
 		
 		private var dictionaryFallback:XML;
+		
+	 	public var transitionArray:ArrayCollection = new ArrayCollection();
 		
 		public function AuthorController(){}
 		
@@ -42,15 +46,11 @@ package org.lamsfoundation.lams.author.controller
 	   			learningLibrary[learningLibraryEntry.learningLibraryID] = learningLibraryEntry;
 
 	   		}
-	   		
-   			
+	   		   			
    			// Set the application learning library
    			Application.application.learningLibrary = learningLibrary;
    			Application.application.canvasArea.compLearningLibrary.loadLearningLibrary();
    			//Application.application.canvasArea.compLearningLibrary2.loadLearningLibrary();
-			
-			
-			
 		}
 		
 		
@@ -144,14 +144,25 @@ package org.lamsfoundation.lams.author.controller
 	    			
 	    			var activityComponent:ActivityComponent = canvasBox.getChildAt(i) as ActivityComponent;
 	    			if (activityComponent.state == Constants.ACTIVITY_STATE_MOUSE_OVER && activityComponent.canAcceptTransitions) {
-	    				activityComponent.transitionIn = event.transition;	
-	    				event.sourceAcivityComponent.transitionOut = event.transition;
-	    				validTransition = true;		
+	    				
+	    				
+	    				var validationString:String = validateTransition(event, activityComponent);
+	    				if (validationString == "valid") {
+	    					validTransition = true;	
+	    					
+	    					// Apply the transition
+	    					transitionArray.addItem(event.transition);
+	    					activityComponent.transitionIn = event.transition;	
+	    					event.transition.toActivity = activityComponent;
+	    					event.sourceAcivityComponent.transitionOut = event.transition;
+	    					activityComponent.updateTransitionPositions();
+							event.sourceAcivityComponent.updateTransitionPositions();
+	    				} else {
+	    					Alert.show(validationString);
+	    				}
 	    				
 	    				// Return cursor state to normal
-						Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);
-						activityComponent.updateTransitionPositions();
-						event.sourceAcivityComponent.updateTransitionPositions();
+	    				Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);			
 	    				break;
 	    			}
 	    		}
@@ -176,21 +187,42 @@ package org.lamsfoundation.lams.author.controller
 		public function validateTransition(event:TransitionEvent, destActivity:ActivityComponent):String {
 			var canvasBox:CanvasBox = Application.application.canvasArea.canvasBox;
 			
+			// Check if the destination activity already has a transition
+			if (destActivity.transitionIn != null) {
+				return Application.application.dictionary.getLabelAndInsert("cv_invalid_trans_target_to_activity", [destActivity.title.text]);
+			}
 			
-			// Go through learning design and check if there is a transition circuit, or a branching error.
-			for each (var activity:UIComponent in canvasBox.getChildren()) {
-				if (activity is ActivityComponent) {
-					
-				}
+			// Check if there is a circuit
+			if (isLoopingLearningDesign(event.sourceAcivityComponent, destActivity)){
+				return Application.application.dictionary.getLabel("cv_invalid_trans_circular_sequence");
 			}
 			
 			return "valid";
 		}
 		
 		
-		
-		
-		
-		
+		/**
+		 * A recursive function that checks whether the learning design has a circuit in it 
+		 * as a result of adding a transition between the two activities
+		 *  
+		 * @param fromActivity the source of the transition
+		 * @param toActivity the destination of the transition
+		 * @return true if loop exists, false otherwise
+		 * 
+		 */
+		private function isLoopingLearningDesign(fromActivity:ActivityComponent, toActivity:ActivityComponent):Boolean{
+			
+			//var toTransitions = _cv.ddm.getTransitionsForActivityUIID(toAct)
+			if (toActivity.transitionOut != null){
+				var nextActivity:ActivityComponent = toActivity.transitionOut.toActivity;
+				if (nextActivity == fromActivity){
+					return true;
+				}else {
+					return isLoopingLearningDesign(fromActivity, nextActivity)
+				}
+			}else {
+				return false;
+			}
+		}
 	}
 }

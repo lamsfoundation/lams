@@ -139,5 +139,14 @@
 		<entry key="category_assessment_tooltip">
 			<name>Contains tools that you can use to assess and evaluate learning</name>
 		</entry>
+		<entry key="cv_invalid_trans_target_to_activity">
+			<name>A Transition to {0} already exist</name>
+		</entry>
+		<entry key="cv_invalid_trans_target_from_activity">
+			<name>A Transition from {0} already exist</name>
+		</entry>
+		<entry key="cv_invalid_trans_circular_sequence">
+			<name>You are not allowed to have a circular sequence</name>
+		</entry>
 	</language>
 </xml>
