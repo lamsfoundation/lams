@@ -29,12 +29,6 @@
 		}
 		
 		public function getLabel(s:String):String{
-			/* if(!isEmpty()){
-				return dictionaryXML.language.entry.(@key==s).name;
-			}
-			
-			return null; */
-			
 			if(!isEmpty()) {
 				var value:String = dictionaryXML.language.entry.(@key==s).name;
 				
