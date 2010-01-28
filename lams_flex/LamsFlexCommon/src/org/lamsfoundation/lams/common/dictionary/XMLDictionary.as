@@ -6,11 +6,15 @@
 	{
 		private var eventDispatcher:EventDispatcher;
 		private var dictionaryXML:XML;
+		private var fallbackXML:XML;
 		
-		public function XMLDictionary(xml:XML)
+		
+		public function XMLDictionary(xml:XML, fallbackXMLIn:XML = null)
 		{
 			eventDispatcher = new EventDispatcher();
 			dictionaryXML = new XML(xml);
+			
+			fallbackXML = new XML(fallbackXMLIn);
 			
 			eventDispatcher.dispatchEvent(new XMLDictionaryEvent(XMLDictionaryEvent.COMPLETE));
 		}
@@ -25,11 +29,27 @@
 		}
 		
 		public function getLabel(s:String):String{
-			if(!isEmpty()){
+			/* if(!isEmpty()){
 				return dictionaryXML.language.entry.(@key==s).name;
 			}
 			
-			return null;
+			return null; */
+			
+			if(!isEmpty()) {
+				var value:String = dictionaryXML.language.entry.(@key==s).name;
+				
+				// If we dont get a value, default to fallback
+				if ((value == null || value == "") && fallbackXML != null && fallbackXML.toString() != ""){
+					value = fallbackXML.language.entry.(@key==s).name;
+				} 
+				
+				// If a label has been found, return it, otherwise print an error string
+				if (!(value == null || value == "")) {
+					return value;
+				}
+			} 
+			
+			return "??" + s + "??";
 		}
 		
 		public function getLabelAndConcatenate(s:String, a:Array):String{

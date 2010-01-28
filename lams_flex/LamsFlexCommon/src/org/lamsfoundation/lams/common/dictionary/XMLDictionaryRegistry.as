@@ -12,14 +12,17 @@ package org.lamsfoundation.lams.common.dictionary
 		
 		private var _xmlDictionary:XMLDictionary;
 		private var keyRegistry:Array;
+		private var fallbackXML:XML;
 		
-		public function XMLDictionaryRegistry(value:XML)
+		public function XMLDictionaryRegistry(value:XML, fallbackXMLIn:XML=null)
 		{
+			fallbackXML = fallbackXMLIn;
 			xml = value;
+			
 		}
 		
 		public function set xml(value:XML):void {
-			_xmlDictionary = new XMLDictionary(value);
+			_xmlDictionary = new XMLDictionary(value, fallbackXML);
 			
 			this.dispatchEvent(new Event("updatedLabels"));
 			this.dispatchEvent(new Event("updatedLabelsReplace"));

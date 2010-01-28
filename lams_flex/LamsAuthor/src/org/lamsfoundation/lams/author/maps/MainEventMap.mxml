@@ -24,6 +24,9 @@
 			[Bindable]
 			private var dictionaryUrl:String;
 			
+			[Bindable]
+			private var dictionaryFallbackUrl:String;
+			
 			public function init():void {
 				
 				if (Application.application.TESTING) {
@@ -39,6 +42,7 @@
 					}
 				}	
 				
+				dictionaryFallbackUrl = "assets/languages/dictionary.xml";
 				dictionaryUrl = "assets/languages/" + Application.application.locale + ".xml";
 				
 			}
@@ -77,6 +81,13 @@
 			</resultHandlers>
 		</HTTPServiceInvoker>
 		
+		<!-- load dictionary fallback -->
+		<HTTPServiceInvoker instance="{dictionaryFallbackService}">
+			<resultHandlers>
+				<MethodInvoker generator="{AuthorController}" method="setDictionaryFallback" arguments="{resultObject}" />
+			</resultHandlers>
+		</HTTPServiceInvoker>
+		
 		<!-- load dictionary -->
 		<HTTPServiceInvoker instance="{dictionaryService}">
 			<resultHandlers>
@@ -102,6 +113,7 @@
 	<!-- _________________________________________________________________________________________ -->
 
 	<mx:HTTPService id="learningLibraryService" url="{learningLibraryUrl}" resultFormat="xml" />
+	<mx:HTTPService id="dictionaryFallbackService" url="{dictionaryFallbackUrl}" resultFormat="e4x" />
 	<mx:HTTPService id="dictionaryService" url="{dictionaryUrl}" resultFormat="e4x" />
         
 	

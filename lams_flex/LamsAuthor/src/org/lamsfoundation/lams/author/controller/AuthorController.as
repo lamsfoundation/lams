@@ -20,10 +20,9 @@ package org.lamsfoundation.lams.author.controller
 	public class AuthorController
 	{
 		
-		public function AuthorController()
-		{
-		}
+		private var dictionaryFallback:XML;
 		
+		public function AuthorController(){}
 		
 		/**
 		 * Sets the learningLibrary object on startup.
@@ -54,8 +53,13 @@ package org.lamsfoundation.lams.author.controller
 			
 		}
 		
+		
+		public function setDictionaryFallback(xml:XML):void {
+			dictionaryFallback = new XML(xml);
+		}
+		
 		public function setDictionary(xml:XML):void {
-			Application.application.dictionary = new XMLDictionaryRegistry(xml);
+			Application.application.dictionary = new XMLDictionaryRegistry(xml, dictionaryFallback);
 		}
 		
 		/**
