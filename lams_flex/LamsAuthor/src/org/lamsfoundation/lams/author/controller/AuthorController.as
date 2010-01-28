@@ -15,6 +15,7 @@ package org.lamsfoundation.lams.author.controller
 	import org.lamsfoundation.lams.author.events.TransitionEvent;
 	import org.lamsfoundation.lams.author.model.learninglibrary.LearningLibraryEntry;
 	import org.lamsfoundation.lams.author.util.Constants;
+	import org.lamsfoundation.lams.common.dictionary.XMLDictionaryRegistry;
 	
 	public class AuthorController
 	{
@@ -49,6 +50,12 @@ package org.lamsfoundation.lams.author.controller
    			Application.application.canvasArea.compLearningLibrary.loadLearningLibrary();
    			//Application.application.canvasArea.compLearningLibrary2.loadLearningLibrary();
 			
+			
+			
+		}
+		
+		public function setDictionary(xml:XML):void {
+			Application.application.dictionary = new XMLDictionaryRegistry(xml);
 		}
 		
 		/**

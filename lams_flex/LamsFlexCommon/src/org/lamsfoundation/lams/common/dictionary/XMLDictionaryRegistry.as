@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.common.dictionary
 			this.dispatchEvent(new Event("updatedLabelsReplace"));
 			this.dispatchEvent(new Event("updatedLabelsConcatentate"));
 			this.dispatchEvent(new Event("updatedLabelsInsert"));
-			
 			this.dispatchEvent(new Event("updatedValues"));
 		}
 		
@@ -36,7 +35,13 @@ package org.lamsfoundation.lams.common.dictionary
 		
 		[Bindable (event="updatedLabels")]
 		public function getLabel(key:String):String {
-			return _xmlDictionary.getLabel(key);
+			
+			if (_xmlDictionary.getLabel(key) != null && _xmlDictionary.getLabel(key) != "") {
+				return _xmlDictionary.getLabel(key);
+			} else {
+				return "??" + key + "??";
+			}
+			
 		}
 		
 		[Bindable (event="updatedLabelsReplace")] 

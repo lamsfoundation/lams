@@ -60,24 +60,29 @@
 		]]>
 	</mx:Script>
 	
-	<flexlib:WindowShade id="wsAll" tabChildren="{wsInformative.opened}" styleName="all" opened="false"
-      	label="All" width="100%" paddingLeft="10" paddingBottom="20"  shadowDirection="right">	
-    </flexlib:WindowShade>
+	<flexlib:WindowShade id="wsAll" tabChildren="{wsInformative.opened}" styleName="all" 
+		opened="false" width="100%" paddingLeft="10" paddingBottom="20"  shadowDirection="right"
+      	label="{Application.application.dictionary.getLabel('category_all')}"
+      	toolTip="{Application.application.dictionary.getLabel('category_all_tooltip')}" toolTipShow="{!wsAll.opened}"/>
 
 	<flexlib:WindowShade id="wsInformative" tabChildren="{wsInformative.opened}" styleName="informative" opened="false"
-      	label="Informative" width="100%" paddingLeft="10" paddingBottom="20" backgroundColor="#FFEEC8"  shadowDirection="right">	
-    </flexlib:WindowShade>
+      	width="100%" paddingLeft="10" paddingBottom="20" backgroundColor="#FFEEC8"  shadowDirection="right"
+      	label="{Application.application.dictionary.getLabel('category_informative')}"
+      	toolTip="{Application.application.dictionary.getLabel('category_informative_tooltip')}" toolTipShow="{!wsInformative.opened}"/>
      
     <flexlib:WindowShade id="wsReflective" tabChildren="{wsReflective.opened}" styleName="reflective" opened="false"
-      	label="Reflective" width="100%" paddingLeft="10" paddingBottom="20" backgroundColor="#DDFCB1" shadowDirection="right" >
-    </flexlib:WindowShade>
+      	width="100%" paddingLeft="10" paddingBottom="20" backgroundColor="#DDFCB1" shadowDirection="right"
+      	label="{Application.application.dictionary.getLabel('category_reflective')}"
+      	toolTip="{Application.application.dictionary.getLabel('category_reflective_tooltip')}" toolTipShow="{!wsReflective.opened}"/>
     
     <flexlib:WindowShade id="wsCollaborative" tabChildren="{wsCollaborative.opened}" styleName="collaborative" opened="false"
-      	label="Collaborative" width="100%" paddingLeft="10" paddingBottom="20" backgroundColor="#FFFDBE" shadowDirection="right" >
-    </flexlib:WindowShade>
+      	width="100%" paddingLeft="10" paddingBottom="20" backgroundColor="#FFFDBE" shadowDirection="right"
+    	label="{Application.application.dictionary.getLabel('category_collaborative')}"
+      	toolTip="{Application.application.dictionary.getLabel('category_collaborative_tooltip')}" toolTipShow="{!wsCollaborative.opened}"/>
     
     <flexlib:WindowShade id="wsAssessment" tabChildren="{wsAssessment.opened}" styleName="assessment" opened="false"
-      	label="Asessment" width="100%" paddingLeft="10" paddingBottom="20" backgroundColor="#E9E2F5" shadowDirection="right" > 
-    </flexlib:WindowShade>
-    
+      	width="100%" paddingLeft="10" paddingBottom="20" backgroundColor="#E9E2F5" shadowDirection="right" 
+    	label="{Application.application.dictionary.getLabel('category_assessment')}"
+      	toolTip="{Application.application.dictionary.getLabel('category_assessment_tooltip')}" toolTipShow="{!wsAssessment.opened}"/>
+      	
 </mx:VBox>

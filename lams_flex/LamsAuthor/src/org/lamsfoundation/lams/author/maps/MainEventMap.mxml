@@ -21,6 +21,9 @@
 			[Bindable]
 			private var learningLibraryUrl:String;
 			
+			[Bindable]
+			private var dictionaryUrl:String;
+			
 			public function init():void {
 				
 				if (Application.application.TESTING) {
@@ -29,11 +32,15 @@
 					if (Application.application.TESTING_LOCAL) {
 						testingUrl = Application.application.TESTING_URL;
 						learningLibraryUrl = testingUrl + "LearningLibraryDetails.xml";
+						
 					} else {
 						testingUrl = Application.application.lamsURL;
 						learningLibraryUrl = testingUrl + "authoring/author.do";
 					}
 				}	
+				
+				dictionaryUrl = "assets/languages/" + Application.application.locale + ".xml";
+				
 			}
 			
 		]]>
@@ -56,16 +63,24 @@
 	<Debugger level="{Debugger.ALL}" />
 	
 	<!-- FlexEvent.APPLICATION_COMPLETE ___________________________________________________________ -->
+	<!-- Loads learning library and dictionary files -->
 	<EventHandlers type="{FlexEvent.INITIALIZE}" debug="true" >
 		<ObjectBuilder id="authorController" generator="{AuthorController}"/>
 		
-		<!-- load dict data -->
+		<!-- load leearning library -->
 		<HTTPServiceInvoker instance="{learningLibraryService}">
 			<Request method="getAllLearningLibraryDetails"/>
 			<resultHandlers>
 				<MethodInvoker generator="{WDDXParser}" 
 					method="parseObject" arguments="{resultObject}" />
 				<MethodInvoker generator="{AuthorController}" method="setLearningLibrary" arguments="{[lastReturn]}" />
+			</resultHandlers>
+		</HTTPServiceInvoker>
+		
+		<!-- load dictionary -->
+		<HTTPServiceInvoker instance="{dictionaryService}">
+			<resultHandlers>
+				<MethodInvoker generator="{AuthorController}" method="setDictionary" arguments="{resultObject}" />
 			</resultHandlers>
 		</HTTPServiceInvoker>
 		
@@ -87,6 +102,7 @@
 	<!-- _________________________________________________________________________________________ -->
 
 	<mx:HTTPService id="learningLibraryService" url="{learningLibraryUrl}" resultFormat="xml" />
+	<mx:HTTPService id="dictionaryService" url="{dictionaryUrl}" resultFormat="e4x" />
         
 	
 </EventMap>

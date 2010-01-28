@@ -53,11 +53,7 @@
 	        	
 	        	var ds:DragSource = new DragSource();
 				var optionalActivity:OptionalActivityComponent = new OptionalActivityComponent();
-	        	
-	        	
-	        	//dragInitiator.x = UIComponent(event.currentTarget).mouseX;
-          		//dragInitiator.y = UIComponent(event.currentTarget).mouseY;
-          		//Application.application.addChild(dragInitiator);
+
           		ds.addData(optionalActivity, "img");  
           		DragManager.doDrag(dragInitiator, ds, event, optionalActivity, 25, 15, 1.00, false);
 	        }
@@ -87,55 +83,130 @@
 	            </menuitem>
 	        </mx:XMLList>
 	    </mx:MenuBar>
-	    <mx:Spacer width="5"></mx:Spacer>
-	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/new.png')" toolTip="New Learning Design"></mx:Button>
-	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/open.png')" toolTip="Open Learning Design"></mx:Button>
-	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/save.png')" toolTip="Save"></mx:Button>
-	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/copy.png')" toolTip="Copy Activity"></mx:Button>
-	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/paste.png')" toolTip="Paste Activity"></mx:Button>
-	    <mx:Button id="zoomInButton" height="25" width="27" icon="@Embed(source='assets/icons/zoom_in.png')" toolTip="Zoom In" click="doZoom(false)" enabled="false"></mx:Button>
-	    <mx:Button id="zoomOutButton" height="25" width="27" icon="@Embed(source='assets/icons/zoom_out.png')" toolTip="Zoom Out" click="doZoom(true)"></mx:Button>
-	    <mx:Button height="25" width="27" icon="@Embed(source='assets/icons/cursor.png')" toolTip="Normal Cursor" click="Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL)"></mx:Button>
-	    <mx:Spacer width="5"></mx:Spacer>
-	    <mx:Button height="25" icon="@Embed(source='assets/icons/transition.png')" label="Transition" click="Application.application.changeCursorState(Constants.CURSOR_STATE_TRANSITION)"></mx:Button>
-	    <mx:Button id="optionalButton" height="25" icon="@Embed(source='assets/icons/optional.png')" label="Optional" click="toggleDropDownMenu(optionalMenu)"></mx:Button>
-	    <mx:Button id="flowButton" height="25" icon="@Embed(source='assets/icons/flow.png')" label="Flow" click="toggleDropDownMenu(flowMenu)"></mx:Button>
-	    <mx:Button id="groupButton" height="25" icon="@Embed(source='assets/icons/group.png')" label="Group" click="toggleDropDownMenu(groupMenu)"></mx:Button>
-	    <mx:Button height="25" icon="@Embed(source='assets/icons/preview.png')" label="Preview"></mx:Button>
-	</mx:HBox>  
-	
-	  
 	    
-    <!--<mx:VBox id="flowMenu" 
-    	styleName="toolBar" visible="false" 
-    	verticalGap="5"  
-    	paddingTop="5" paddingBottom="5"  paddingLeft="5" paddingRight="5"
-    	>
-    	<mx:Button height="25" icon="@Embed(source='assets/icons/group.png')" label="Group"></mx:Button>
-    	<mx:Button height="25" icon="@Embed(source='assets/icons/preview.png')" label="Preview"></mx:Button>
-    </mx:VBox>-->
+	    <mx:Spacer width="5"></mx:Spacer>
+	    
+	    <mx:Button height="25" width="27" 
+	    	icon="@Embed(source='assets/icons/new.png')" 
+	    	toolTip="{Application.application.dictionary.getLabel('new_btn_tooltip')}"/>
+	    	
+	    <mx:Button height="25" width="27" 
+	    	icon="@Embed(source='assets/icons/open.png')" 
+	    	toolTip="{Application.application.dictionary.getLabel('open_btn_tooltip')}"/>
+	    
+	    <mx:Button height="25" width="27" 
+	    	icon="@Embed(source='assets/icons/save.png')" 
+	    	toolTip="{Application.application.dictionary.getLabel('save_btn_tooltip')}"/>
+	    	
+	    <mx:Button height="25" width="27" 
+	    	icon="@Embed(source='assets/icons/copy.png')" 
+	    	toolTip="{Application.application.dictionary.getLabel('copy_btn_tooltip')}"/>
+	    
+	    <mx:Button height="25" width="27" 
+	    	icon="@Embed(source='assets/icons/paste.png')" 
+	    	toolTip="{Application.application.dictionary.getLabel('paste_btn_tooltip')}"/>
+	    
+	    <mx:Button id="zoomInButton" height="25" width="27" enabled="false"
+	    	click="doZoom(false)"
+	    	icon="@Embed(source='assets/icons/zoom_in.png')" 
+	    	toolTip="{Application.application.dictionary.getLabel('zoom_in_btn_tooltip')}"/>
+	    	
+	    <mx:Button id="zoomOutButton" height="25" width="27" 
+	    	click="doZoom(true)"
+	    	icon="@Embed(source='assets/icons/zoom_out.png')" 
+	    	toolTip="{Application.application.dictionary.getLabel('zoom_out_btn_tooltip')}"/>
+	    		
+	    <mx:Button height="25" width="27" 
+	    	click="Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL)"
+	    	icon="@Embed(source='assets/icons/cursor.png')" 
+	    	toolTip="{Application.application.dictionary.getLabel('normal_cursor_btn_tooltip')}" />
+	    
+	    <mx:Spacer width="5"></mx:Spacer>
+	    
+	    <mx:Button height="25" icon="@Embed(source='assets/icons/transition.png')" 
+	    	label="{Application.application.dictionary.getLabel('trans_btn')}" toolTip="{Application.application.dictionary.getLabel('trans_btn_tooltip')}" 
+	    	click="Application.application.changeCursorState(Constants.CURSOR_STATE_TRANSITION)" />
+	    	
+	    <mx:Button id="optionalButton" height="25" 
+	    	click="toggleDropDownMenu(optionalMenu)"
+	    	icon="@Embed(source='assets/icons/optional.png')" 
+	    	label="{Application.application.dictionary.getLabel('optional_btn')}"
+	    	toolTip="{Application.application.dictionary.getLabel('optional_btn_tooltip')}" />
+	    	
+	    <mx:Button id="flowButton" height="25" 
+	    	click="toggleDropDownMenu(flowMenu)"
+	    	icon="@Embed(source='assets/icons/flow.png')" 
+	    	label="{Application.application.dictionary.getLabel('flow_btn')}"
+	    	toolTip="{Application.application.dictionary.getLabel('flow_btn_tooltip')}"/>
+	    
+	    
+	    <mx:Button id="groupButton" height="25" 
+	    	click="toggleDropDownMenu(groupMenu)"
+	    	icon="@Embed(source='assets/icons/group.png')" 
+	    	label="{Application.application.dictionary.getLabel('group_btn')}"
+	    	toolTip="{Application.application.dictionary.getLabel('group_btn_tooltip')}"/>
+	    	
+	    <mx:Button height="25" 
+	    	icon="@Embed(source='assets/icons/preview.png')" 
+	    	label="{Application.application.dictionary.getLabel('preview_btn')}"
+	    	toolTip="{Application.application.dictionary.getLabel('preview_btn_tooltip')}"/>
+	</mx:HBox>  
     
     
     <toolbar:ToolBarDropDown id="optionalMenu">
-    	<toolbar:SystemActivityComponent type="{Constants.SYTEM_ACTIVITY_TYPE_OPTIONAL}" height="25" icon="@Embed(source='assets/icons/optional.png')" label="Activity" click="mouseClick(event)"></toolbar:SystemActivityComponent>
-    	<mx:Button height="25" icon="@Embed(source='assets/icons/optional.png')" label="Sequence"></mx:Button>
-    	<mx:Button height="25" icon="@Embed(source='assets/icons/optional.png')" label="Support"></mx:Button>
+    	<toolbar:SystemActivityComponent type="{Constants.SYTEM_ACTIVITY_TYPE_OPTIONAL}" height="25" 
+    		click="mouseClick(event)"
+    		icon="@Embed(source='assets/icons/optional.png')" 
+    		label="{Application.application.dictionary.getLabel('optional_act_btn')}" 
+    		toolTip="{Application.application.dictionary.getLabel('optional_btn_tooltip')}"/>
+    	
+    	<mx:Button height="25" 
+    		icon="@Embed(source='assets/icons/optional.png')" 
+			label="{Application.application.dictionary.getLabel('optional_seq_btn')}" 
+    		toolTip="{Application.application.dictionary.getLabel('optional_seq_btn_tooltip')}"/>
+    		
+    	<mx:Button height="25" 
+    		icon="@Embed(source='assets/icons/optional.png')" 
+			label="{Application.application.dictionary.getLabel('support_act_btn')}" 
+    		toolTip="{Application.application.dictionary.getLabel('support_act_btn_tooltip')}"/>
+    		
     </toolbar:ToolBarDropDown>
     <mx:Binding destination="optionalMenu.x" source="optionalButton.x - 5" />
     <mx:Binding destination="optionalMenu.y" source="optionalButton.y + optionalButton.height" />
     
     <toolbar:ToolBarDropDown id="flowMenu">
-    	<mx:Button height="25" icon="@Embed(source='assets/icons/gate.png')" label="Gate"></mx:Button>
-    	<mx:Button height="25" icon="@Embed(source='assets/icons/branch.png')" label="Branch"></mx:Button>
-    	<mx:Button height="25" icon="@Embed(source='assets/icons/converge.png')" label="Converge"></mx:Button>
+    	<mx:Button height="25" 
+    		icon="@Embed(source='assets/icons/gate.png')" 
+    		label="{Application.application.dictionary.getLabel('gate_btn')}" 
+    		toolTip="{Application.application.dictionary.getLabel('gate_btn_tooltip')}"/>
+    	<mx:Button height="25" 
+    		icon="@Embed(source='assets/icons/branch.png')" 
+    		label="{Application.application.dictionary.getLabel('branch_btn')}"
+    		toolTip="{Application.application.dictionary.getLabel('branch_btn_tooltip')}"/>
+    		
+    	<mx:Button height="25" 
+    		icon="@Embed(source='assets/icons/converge.png')" 
+    		label="{Application.application.dictionary.getLabel('converge_btn')}"
+    		toolTip="{Application.application.dictionary.getLabel('converge_btn_tooltip')}"/>
     </toolbar:ToolBarDropDown>
     <mx:Binding destination="flowMenu.x" source="flowButton.x - 5" />
     <mx:Binding destination="flowMenu.y" source="flowButton.y + flowButton.height" />
     
     <toolbar:ToolBarDropDown id="groupMenu">
-    	<mx:Button height="25" icon="@Embed(source='assets/icons/group.png')" label="Random"></mx:Button>
-    	<mx:Button height="25" icon="@Embed(source='assets/icons/group.png')" label="Choose in Monitor"></mx:Button>
-    	<mx:Button height="25" icon="@Embed(source='assets/icons/group.png')" label="Learner's Choice"></mx:Button>
+    	<mx:Button height="25" 
+    		icon="@Embed(source='assets/icons/group.png')" 
+    		label="{Application.application.dictionary.getLabel('random_group_btn')}"
+    		toolTip="{Application.application.dictionary.getLabel('random_group_btn_tooltip')}"/>
+    		
+    	<mx:Button height="25" 
+    		icon="@Embed(source='assets/icons/group.png')" 
+    		label="{Application.application.dictionary.getLabel('monitor_group_btn')}"
+    		toolTip="{Application.application.dictionary.getLabel('monitor_group_btn_tooltip')}"/>
+    		
+    	<mx:Button height="25" 
+    		icon="@Embed(source='assets/icons/group.png')" 
+    		label="{Application.application.dictionary.getLabel('learner_group_btn')}"
+    		toolTip="{Application.application.dictionary.getLabel('learner_group_btn_tooltip')}"/>
     </toolbar:ToolBarDropDown>
     <mx:Binding destination="groupMenu.x" source="groupButton.x - 5" />
     <mx:Binding destination="groupMenu.y" source="groupButton.y + groupButton.height" />

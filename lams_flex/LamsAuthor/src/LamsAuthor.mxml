@@ -11,6 +11,7 @@
 
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.common.dictionary.XMLDictionaryRegistry;
 			import mx.core.Container;
 			import mx.controls.Button;
 			import mx.core.UIComponent;
@@ -27,6 +28,7 @@
 			public const TESTING_LOCAL:Boolean = true;	// If true use assets folder, else use localhost
 			public const TESTING_URL:String = "assets/test/default/";
 			public const TESTING_LAMS_URL:String = "http://localhost:8080/lams/";
+			public const TESTING_LOCALE:String = "en_AU";
 			
 			// LAMS URL
 			public var lamsURL:String;
@@ -40,10 +42,12 @@
 			// ui state
 			public var uiState:int = Constants.UI_STATE_NORMAL;
 			
-        	
-        	[Bindable]
-            [Embed("assets/icons/optional.png")]
-            public var optionalIcon:Class; 
+			// lang code default en_AU
+			public var locale:String = "en_AU";
+			
+			// dictionary
+			[Bindable]
+			public var dictionary:XMLDictionaryRegistry;
 			
 			private function preInit():void {
 				
@@ -51,6 +55,10 @@
 					lamsURL = TESTING_LAMS_URL;
 				} else {
 					lamsURL = Application.application.parameters.serverUrl;
+				}
+				
+				if (TESTING) {
+					locale = TESTING_LOCALE; 
 				}
 				
 				mainMap.init();

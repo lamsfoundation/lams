@@ -205,6 +205,7 @@
 			
 			private function mouseOut(event:MouseEvent):void {
 				this.setStyle('borderStyle', 'none');
+				this.state = Constants.ACTIVITY_STATE_NORMAL;
 			}
 			
 			public function updateTransitionPositions():void {
