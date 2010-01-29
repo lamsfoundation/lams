@@ -148,5 +148,12 @@
 		<entry key="cv_invalid_trans_circular_sequence">
 			<name>You are not allowed to have a circular sequence</name>
 		</entry>
+		
+		<entry key="pi_title">
+			<name>Properties</name>
+		</entry>
+		<entry key="pi_lbl_title">
+			<name>Title</name>
+		</entry>
 	</language>
 </xml>

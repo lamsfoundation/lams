@@ -4,6 +4,7 @@
 	mouseDown="mouseDown(event)"
 	mouseOver="mouseOver(event)" 
 	mouseOut="mouseOut(event)"
+	click="click(event)" 
 	>
 
 	<!--
@@ -53,6 +54,31 @@
 				title.height = 0;
 		    }
 		    
+		    // When you click on an activity, it becomes selected
+		    // And the properties box appears
+		    protected function click(event:MouseEvent):void {
+		    	this.setStyle('borderStyle', 'solid');
+				this.setStyle('borderColor', '#66CCFF');
+				this.state = Constants.ACTIVITY_STATE_SELECTED;
+				
+				if (Application.application.selectedActivity != null) {
+					Application.application.selectedActivity.deSelectActivity();
+				}
+				Application.application.selectedActivity = this;
+				
+				Application.application.canvasArea.propertyInspector.openPropertyInspector(this);
+				event.stopPropagation();
+		    }
+		    
+		    public function deSelectActivity():void {
+		    	this.setStyle('borderStyle', 'none');
+		    	this.state = Constants.ACTIVITY_STATE_NORMAL;
+		    	Application.application.selectedActivity = null;
+		    	Application.application.canvasArea.propertyInspector.closePropertyInspector();
+		    }
+		    
+		    
+		    
 			
 			// The mouseMove event handler for the Image control
 		    // initiates the drag-and-drop operation.
@@ -73,7 +99,7 @@
 				        	     
 				        	DragManager.doDrag(activityComponent, ds, event);
 				        	setCenter();
-				        }
+				        } 
 				        break;
 		        }
 		    }
@@ -158,40 +184,10 @@
 		    {
 		    	stopDragging();
 		    	
-		    	
 		    	var transitionEvent:TransitionEvent = new TransitionEvent(TransitionEvent.TRANSITION_EVENT);
 	    		transitionEvent.sourceAcivityComponent = this;
 	    		transitionEvent.transition = transitionOut;
-	    		//transitionEvent.localX = event.localX;
-	    		//transitionEvent.localY = event.localY;
 	    		Application.application.dispatchEvent(transitionEvent);
-		    	
-		    	
-		    	/* var validTransition:Boolean = false;
-		    	for (var i:int = 0; i < parent.numChildren; i++) {
-		    		
-		    		if (parent.getChildAt(i) is ActivityComponent) {
-		    			
-		    			var activityComponent:ActivityComponent = parent.getChildAt(i) as ActivityComponent;
-		    			if (activityComponent.state == Constants.ACTIVITY_STATE_MOUSE_OVER && activityComponent.canAcceptTransitions) {
-		    				activityComponent.transitionIn = transitionOut;	
-		    				validTransition = true;		
-		    			}
-		    		}
-		    	}
-		    	
-		    	if (!validTransition) {
-		    		transitionOut.graphics.clear();
-		    		parent.removeChild(transitionOut);
-		    		transitionOut = null;
-		    		
-		    		
-		    	}
-		    	else {
-		    		// Return cursor state to normal
-					Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);
-					updateTransitionPositions();
-		    	} */
 		    	
 		    }
 		    
@@ -211,8 +207,14 @@
 			}
 			
 			private function mouseOut(event:MouseEvent):void {
-				this.setStyle('borderStyle', 'none');
-				this.state = Constants.ACTIVITY_STATE_NORMAL;
+				
+				switch (state) {
+					case Constants.ACTIVITY_STATE_MOUSE_OVER:
+						this.setStyle('borderStyle', 'none');
+						this.state = Constants.ACTIVITY_STATE_NORMAL;
+						break;
+				}
+				
 			}
 			
 			public function updateTransitionPositions():void {

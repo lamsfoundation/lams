@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="vertical"
+	minHeight="100" minWidth="200"
+	right="20" top="60"
+	paddingBottom="2" paddingTop="2" paddingLeft="2" paddingRight="2"
+	shadowDirection="right"
+	backgroundColor="#C2D5FE" 
+	visible="false"
+	title="{Application.application.dictionary.getLabel('pi_title')}"
+	backgroundAlpha="0.2"
+	mouseOver="mouseOver(event)"
+	mouseOut="mouseOut(event)"
+>
+
+	<mx:Script>
+		<![CDATA[
+			import mx.binding.utils.BindingUtils;
+			import org.lamsfoundation.lams.author.components.activity.ActivityComponent;
+			import mx.core.Application;
+			import mx.managers.PopUpManager;
+			
+			public function openPropertyInspector(activity:ActivityComponent):void {
+				visible = true;
+				PopUpManager.addPopUp(this, this, false);
+				
+				BindingUtils.bindProperty(activityTitle, "text", activity.title, "text"); 
+				BindingUtils.bindProperty(activity.title, "text", activityTitle, "text"); 
+				
+			}
+			
+			public function closePropertyInspector():void {
+				visible = false;
+				PopUpManager.removePopUp(this);
+			}
+			
+			private function mouseOver(event:MouseEvent):void {
+				
+				this.setStyle("backgroundAlpha", 1);
+			}
+			
+			private function mouseOut(event:MouseEvent):void {
+				this.setStyle("backgroundAlpha", 0.2);
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:HBox>
+		<mx:Label text="{Application.application.dictionary.getLabel('pi_lbl_title')}" />
+		<mx:TextInput id="activityTitle"></mx:TextInput>
+			
+		
+		
+	</mx:HBox>
+
+</mx:Panel>

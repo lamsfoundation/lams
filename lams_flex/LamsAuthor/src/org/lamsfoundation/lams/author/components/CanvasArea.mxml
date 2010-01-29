@@ -7,88 +7,8 @@
 	
 	<mx:Script>
 		<![CDATA[
-			import mx.containers.Canvas;
 			import mx.core.Application;
-			import mx.controls.Label;
-			import mx.controls.Image;
-			import mx.core.Container;
-			import mx.core.UIComponent;
-			import mx.managers.DragManager;
-            import mx.core.DragSource;
-            import mx.events.DragEvent;
-            import flash.events.MouseEvent;
-            import mx.collections.ArrayCollection;
-            import org.lamsfoundation.lams.author.components.activity.*;
-            import mx.effects.Resize;
-            
-            
-            [Bindable]
-			public var learningDesign:ArrayCollection;
 			
-			/* private function toggleLearningLibrary():void{
-				compLearningLibrary.includeInLayout = !compLearningLibrary.includeInLayout;
-				compLearningLibrary.visible = !compLearningLibrary.visible;
-				
-				if (compLearningLibrary.visible) {
-					hideButton.label = "<";
-				} else {
-					hideButton.label = ">";
-				}
-		    } */
-		  	
-		  	/*	             
-           	// The dragEnter event handler for the Canvas container
-            // enables dropping.
-            private function dragEnterHandler(event:DragEvent):void {
-                if (event.dragSource.hasFormat("img"))
-                {
-                    DragManager.acceptDragDrop(Canvas(event.currentTarget));
-                }
-            }
-
-            // The dragDrop event handler for the Canvas container
-            // sets the Image control's position by 
-            // "dropping" it in its new location.
-            private function dragDropHandler(event:DragEvent):void {
-                
-                var image:Image;
-                
-                if (event.dragInitiator is ActivityComponent) {
-                	var activityComponent:ActivityComponent;
-                	activityComponent = event.dragInitiator as ActivityComponent;
-                	activityComponent.x = UIComponent(event.currentTarget).mouseX - 10;
-              		activityComponent.y = UIComponent(event.currentTarget).mouseY - 10;
-                } else {
-                	var learningLibraryComponent:LearningLibraryEntryComponent = event.dragInitiator as LearningLibraryEntryComponent;
-                	
-                	if (learningLibraryComponent.learningLibraryEntry.isCombined) {
-                		var combinedActivityComponent:CombinedActivityComponent = new CombinedActivityComponent();
-	                	combinedActivityComponent.learningLibraryEntry = learningLibraryComponent.learningLibraryEntry;
-	                	combinedActivityComponent.load()
-						combinedActivityComponent.x = UIComponent(event.currentTarget).mouseX;
-	              		combinedActivityComponent.y = UIComponent(event.currentTarget).mouseY;
-	                	canvasBox.addChild(combinedActivityComponent);
-                	} else {
-                		var toolActivityComponent:ToolActivityComponent = new ToolActivityComponent();
-	                	toolActivityComponent.tool = learningLibraryComponent.learningLibraryEntry.toolTemplates[0];
-	                	toolActivityComponent.load()
-						toolActivityComponent.x = UIComponent(event.currentTarget).mouseX;
-	              		toolActivityComponent.y = UIComponent(event.currentTarget).mouseY;
-	                	canvasBox.addChild(toolActivityComponent);
-                	}
-                }  
-                
-                                  
-            }*/ 
-            
-            /* private function maximizeLearningLibrary():void {
-	        	var effResize:Resize = new Resize();
-	        	effResize.stop();
-	            effResize.heightFrom = 0;
-	            effResize.heightTo = 12yy0;
-	            effResize.duration = 100;
-	            effResize.play([compLearningLibrary2]);
-	        }  */
 		]]>
 	</mx:Script>
 	
@@ -105,7 +25,10 @@
 	<mx:Canvas id="dragCanvas"
                height="100%" width="100%" >
                
-       <components:CanvasBox id="canvasBox" backgroundColor="#FFFFF8"  ></components:CanvasBox>
+		<components:CanvasBox id="canvasBox" backgroundColor="#FFFFF8"  ></components:CanvasBox>
+       
+		<components:PropertyInspector id="propertyInspector"
+   		/>
                
     </mx:Canvas>
                

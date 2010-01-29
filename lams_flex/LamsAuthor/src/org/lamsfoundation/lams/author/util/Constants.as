@@ -23,6 +23,7 @@ package org.lamsfoundation.lams.author.util
 	    public static const ACTIVITY_STATE_NORMAL:int = 1;
 	    public static const ACTIVITY_STATE_DRAWING:int = 2;
 	    public static const ACTIVITY_STATE_MOUSE_OVER:int = 3;
+	    public static const ACTIVITY_STATE_SELECTED:int = 4;
 	    
 	    
 	    public static const SYTEM_ACTIVITY_TYPE_OPTIONAL:int = 1;

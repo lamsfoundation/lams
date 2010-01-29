@@ -7,6 +7,8 @@
     borderStyle="solid"
     width="4000" height="3000"   
     x="0" y="0"
+    click="click(event)"
+    mouseDown="mouseDown(event)"
 	>
 	
 	<mx:Script>
@@ -45,55 +47,8 @@
             // sets the Image control's position by 
             // "dropping" it in its new location.
             private function dragDropHandler(event:DragEvent):void {
-                
-                
                 var dropActivityEvent:DropActivityEvent = new DropActivityEvent(DropActivityEvent.DROP_ACTIVITY_EVENT, event);
-                
-                Application.application.dispatchEvent(dropActivityEvent);
-                
-                /*  if (event.dragInitiator is ActivityComponent) {
-                	var activityComponent:ActivityComponent;
-                	activityComponent = event.dragInitiator as ActivityComponent;
-                	activityComponent.x = UIComponent(event.currentTarget).mouseX;
-              		activityComponent.y = UIComponent(event.currentTarget).mouseY;
-              		activityComponent.setCenter();
-              		activityComponent.updateTransitionPositions();
-                } else if (event.dragInitiator is LearningLibraryEntryComponent) {
-                	var learningLibraryComponent:LearningLibraryEntryComponent = event.dragInitiator as LearningLibraryEntryComponent;
-                	
-                	if (learningLibraryComponent.learningLibraryEntry.isCombined) {
-                		var combinedActivityComponent:CombinedActivityComponent = new CombinedActivityComponent();
-	                	combinedActivityComponent.learningLibraryEntry = learningLibraryComponent.learningLibraryEntry;
-	                	combinedActivityComponent.load()
-						combinedActivityComponent.x = UIComponent(event.currentTarget).mouseX;
-	              		combinedActivityComponent.y = UIComponent(event.currentTarget).mouseY;
-	                	this.addChild(combinedActivityComponent);
-	                	combinedActivityComponent.setCenter();
-                	} else {
-                		var toolActivityComponent:ToolActivityComponent = new ToolActivityComponent();
-	                	toolActivityComponent.tool = learningLibraryComponent.learningLibraryEntry.toolTemplates[0];
-	                	toolActivityComponent.load()
-						toolActivityComponent.x = UIComponent(event.currentTarget).mouseX;
-	              		toolActivityComponent.y = UIComponent(event.currentTarget).mouseY;
-	                	this.addChild(toolActivityComponent);
-	                	toolActivityComponent.setCenter();
-                	}
-                } else if (event.dragInitiator is SystemActivityComponent) {
-                	var systemActivityComponent:SystemActivityComponent = event.dragInitiator as SystemActivityComponent;
-                	
-                	switch (systemActivityComponent.type) {
-                		case Constants.SYTEM_ACTIVITY_TYPE_OPTIONAL:
-                			var optionalActivityComponent:OptionalActivityComponent = new OptionalActivityComponent();
-		                	optionalActivityComponent.x = UIComponent(event.currentTarget).mouseX;
-			              	optionalActivityComponent.y = UIComponent(event.currentTarget).mouseY;
-			              	this.addChild(optionalActivityComponent);
-		                	optionalActivityComponent.setCenter();
-                			break;
-                	}
-                }
-                
-                // Return cursor state to normal
-				Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);  */                    
+                Application.application.dispatchEvent(dropActivityEvent);           
             }
 			
 			public function doZoom(isOut:Boolean):void
@@ -123,6 +78,20 @@
 				}
 				
 				
+			}
+			
+			// Deselect the current activity
+			protected function click(event:MouseEvent):void {
+				if (Application.application.selectedActivity != null) {
+					Application.application.selectedActivity.deSelectActivity();
+				}
+			}
+			
+			protected function mouseDown(event:MouseEvent):void {
+				
+				if (Application.application.selectedActivity != null) {
+					Application.application.selectedActivity.deSelectActivity();
+				}
 			}
             
              

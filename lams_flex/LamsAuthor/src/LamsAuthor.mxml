@@ -11,6 +11,7 @@
 
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.components.activity.ActivityComponent;
 			import org.lamsfoundation.lams.common.dictionary.XMLDictionaryRegistry;
 			import mx.core.Container;
 			import mx.controls.Button;
@@ -44,6 +45,9 @@
 			
 			// lang code default en_AU
 			public var locale:String = "en_AU";
+			
+			// current selected activity
+			public var selectedActivity:ActivityComponent;
 			
 			// dictionary
 			[Bindable]
