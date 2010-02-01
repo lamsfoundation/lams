@@ -1,57 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" 
-	layout="vertical"
-	minHeight="100" minWidth="200"
-	right="20" top="60"
-	paddingBottom="2" paddingTop="2" paddingLeft="2" paddingRight="2"
-	shadowDirection="right"
-	backgroundColor="#C2D5FE" 
-	visible="false"
-	title="{Application.application.dictionary.getLabel('pi_title')}"
-	backgroundAlpha="0.2"
+	layout="absolute"
+	minHeight="60" minWidth="300"
+	right="0" top="60"
 	mouseOver="mouseOver(event)"
 	mouseOut="mouseOut(event)"
+	title="{Application.application.dictionary.getLabel('pi_title')}"
+	backgroundAlpha="0.2"
+	styleName="propertyInspectorUnselected"
+	visible="false"
 >
+	<mx:Style source="assets/css/propertyInspector.css" />
 
 	<mx:Script>
 		<![CDATA[
+			import mx.binding.utils.ChangeWatcher;
 			import mx.binding.utils.BindingUtils;
 			import org.lamsfoundation.lams.author.components.activity.ActivityComponent;
 			import mx.core.Application;
 			import mx.managers.PopUpManager;
 			
+			
+			private var changeWatcher1:ChangeWatcher;
+			private var changeWatcher2:ChangeWatcher;
+			
+			private var titleDisabledColors:Object;
+			
 			public function openPropertyInspector(activity:ActivityComponent):void {
 				visible = true;
 				PopUpManager.addPopUp(this, this, false);
 				
-				BindingUtils.bindProperty(activityTitle, "text", activity.title, "text"); 
-				BindingUtils.bindProperty(activity.title, "text", activityTitle, "text"); 
-				
+				// Capture the binding so it can be removed when the property inpector is closed (activity de-selected)
+				changeWatcher1 = BindingUtils.bindProperty(activityTitle, "text", activity.title, "text"); 
+				changeWatcher2 = BindingUtils.bindProperty(activity.title, "text", activityTitle, "text"); 
 			}
 			
 			public function closePropertyInspector():void {
 				visible = false;
 				PopUpManager.removePopUp(this);
-			}
-			
-			private function mouseOver(event:MouseEvent):void {
 				
-				this.setStyle("backgroundAlpha", 1);
+				// Free the bindings to the current selected activity if there are any
+				if (changeWatcher1 != null) {
+					changeWatcher1.unwatch();
+				}
+				if (changeWatcher2 != null) {
+					changeWatcher2.unwatch();
+				}
 			}
 			
+			// Enable the propertyInspector on mousOver
+			private function mouseOver(event:MouseEvent):void {
+				this.styleName = "propertyInspectorSelected";
+				setChildIndex(opacityLayer, 0);
+			}
+			
+			// Disable and white out the propertyInspector on mouseOut
 			private function mouseOut(event:MouseEvent):void {
-				this.setStyle("backgroundAlpha", 0.2);
+				this.styleName = "propertyInspectorUnselected"
+				setChildIndex(opacityLayer, this.getChildren().length -1);
+				focusManager.setFocus(dummy);
 			}
 			
 		]]>
 	</mx:Script>
 	
-	<mx:HBox>
-		<mx:Label text="{Application.application.dictionary.getLabel('pi_lbl_title')}" />
-		<mx:TextInput id="activityTitle"></mx:TextInput>
+	
+	
+	<mx:VBox height="100%" width="100%" >
+		<mx:Spacer height="3" />
+		<mx:Form id="propertiesForm" width="100%" height="100%" verticalGap="2" paddingTop="0">
 			
-		
-		
-	</mx:HBox>
-
+			<mx:FormItem label="{Application.application.dictionary.getLabel('pi_lbl_title')}" height="16" >
+            	<mx:TextInput id="activityTitle"/>
+       		</mx:FormItem>
+			<mx:FormItem label="next thing" height="16" >
+            	<mx:TextInput id="activityTitlxxx"/>
+       		</mx:FormItem>
+			<mx:FormItem visible="false" height="0">
+				<mx:TextInput id="dummy" />
+       		</mx:FormItem>
+		</mx:Form>
+	</mx:VBox>
+	<mx:Canvas id="opacityLayer" height="100%" width="100%" backgroundColor="white" backgroundAlpha="0.6" />
+	
 </mx:Panel>
