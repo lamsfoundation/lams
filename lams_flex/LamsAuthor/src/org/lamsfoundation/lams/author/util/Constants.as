@@ -19,7 +19,6 @@ package org.lamsfoundation.lams.author.util
 	    public static const UI_STATE_NORMAL:int = 1;
 	    public static const UI_STATE_DRAWING:int = 2;
 	    
-	    
 	    public static const ACTIVITY_STATE_NORMAL:int = 1;
 	    public static const ACTIVITY_STATE_DRAWING:int = 2;
 	    public static const ACTIVITY_STATE_MOUSE_OVER:int = 3;

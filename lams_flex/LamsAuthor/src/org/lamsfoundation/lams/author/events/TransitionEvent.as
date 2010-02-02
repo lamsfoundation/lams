@@ -6,7 +6,10 @@ package org.lamsfoundation.lams.author.events
 	
 	public class TransitionEvent extends AuthorEvent
 	{
-		public static const TRANSITION_EVENT:String = "transitionEvent";
+		public static const TRANSITION_COMPLETE:String = "transitionComplete";
+		public static const DELETE_TRANSITION:String = "deleteTransition";
+		
+		
 		public var sourceAcivityComponent:ActivityComponent;
 		public var transition:TransitionComponent;
 		public var localY:int;

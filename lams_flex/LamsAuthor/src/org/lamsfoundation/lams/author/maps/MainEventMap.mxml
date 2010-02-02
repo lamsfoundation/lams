@@ -57,13 +57,6 @@
       	</EventAnnouncer>
 	</EventHandlers>-->
 	
-	<!-- FlexEvent.PREINITIALIZE __________________________________________________________________ -->
-	
-<!--	<EventHandlers type="{FlexEvent.PREINITIALIZE}">
-		
-	</EventHandlers>
-	-->
-	
 	<Debugger level="{Debugger.ALL}" />
 	
 	<!-- FlexEvent.APPLICATION_COMPLETE ___________________________________________________________ -->
@@ -98,13 +91,23 @@
 	</EventHandlers>
 	
 	<!-- Event fires when a traniition finishes -->
-	<EventHandlers type="{TransitionEvent.TRANSITION_EVENT}">
+	<EventHandlers type="{TransitionEvent.TRANSITION_COMPLETE}">
 		<MethodInvoker generator="{AuthorController}" method="drawTransition" arguments="{[event]}" />
 	</EventHandlers>
 	
 	<!-- Event fires when you drop an activity directly on the canvas -->
 	<EventHandlers type="{DropActivityEvent.DROP_ACTIVITY_EVENT}">
 		<MethodInvoker generator="{AuthorController}" method="dropActivity" arguments="{[event]}" />
+	</EventHandlers>
+	
+	<!-- Event fires when you drop an activity into the bin -->
+	<EventHandlers type="{AuthorActivityEvent.DELETE_ACTIVITY_EVENT}">
+		<MethodInvoker generator="{AuthorController}" method="deleteActivity" arguments="{[event]}" />
+	</EventHandlers>
+	
+	<!-- Event fires when you drop a transitions into the bin -->
+	<EventHandlers type="{TransitionEvent.DELETE_TRANSITION}">
+		<MethodInvoker generator="{AuthorController}" method="deleteTransition" arguments="{[event]}" />
 	</EventHandlers>
 	
 	

@@ -14,6 +14,7 @@ package org.lamsfoundation.lams.author.controller
 	import org.lamsfoundation.lams.author.components.activity.*;
 	import org.lamsfoundation.lams.author.components.toolbar.SystemActivityComponent;
 	import org.lamsfoundation.lams.author.components.transition.TransitionComponent;
+	import org.lamsfoundation.lams.author.events.AuthorActivityEvent;
 	import org.lamsfoundation.lams.author.events.TransitionEvent;
 	import org.lamsfoundation.lams.author.model.learninglibrary.LearningLibraryEntry;
 	import org.lamsfoundation.lams.author.util.Constants;
@@ -224,5 +225,64 @@ package org.lamsfoundation.lams.author.controller
 				return false;
 			}
 		}
+		
+		
+		/**
+		 * This function is invoked when an activity is dragged into the bin
+		 * it deletes the activity and any related transitions
+		 * 
+		 * TODO: Check the state of the LD and set it to invalid if neccessary
+		 * 
+		 * @param event AuthorActivityEvent containing the acitvity object
+		 * 
+		 */
+		public function deleteActivity(event:AuthorActivityEvent):void {
+			var canvasBox:CanvasBox = Application.application.canvasArea.canvasBox;
+				
+			var activityComponent:ActivityComponent = event.activityComponent;
+			
+			// Remove transition in, if needed
+			if (activityComponent.transitionIn != null) {
+				canvasBox.removeChild(activityComponent.transitionIn);
+				transitionArray.removeItemAt(transitionArray.getItemIndex(activityComponent.transitionIn));
+				activityComponent.transitionIn.fromActivity.transitionOut = null;
+				activityComponent.transitionIn = null;				
+			}
+			
+			// Remove transition out if needed
+			if (activityComponent.transitionOut != null) {
+				canvasBox.removeChild(activityComponent.transitionOut);
+				transitionArray.removeItemAt(transitionArray.getItemIndex(activityComponent.transitionOut));
+				activityComponent.transitionOut.toActivity.transitionIn = null;
+				activityComponent.transitionOut = null;				
+			}
+			
+			// Remove activity
+			canvasBox.removeChild(activityComponent);
+			activityComponent = null;
+		}
+		
+		
+		/**
+		 * This function is invoked when a transition is dropped into the bin
+		 * it deletes the transition
+		 * 
+		 * TODO: Check the state of the LD and set it to invalid if neccessary
+		 * 
+		 * @param event the TransitionEvent
+		 */
+		public function deleteTransition(event:TransitionEvent): void {
+			var canvasBox:CanvasBox = Application.application.canvasArea.canvasBox;
+			
+			var transition:TransitionComponent = event.transition;
+			
+			transitionArray.removeItemAt(transitionArray.getItemIndex(transition));
+			transition.fromActivity.transitionOut = null;
+			transition.toActivity.transitionIn = null;
+			transition = null;
+			
+		}
+		
+		
 	}
 }

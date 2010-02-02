@@ -2,9 +2,15 @@ package org.lamsfoundation.lams.author.components.transition
 {
 	import com.dncompute.graphics.GraphicsUtil;
 	
+	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	
+	import mx.core.Application;
+	import mx.core.DragSource;
+	import mx.managers.DragManager;
+	
 	import org.lamsfoundation.lams.author.components.activity.ActivityComponent;
+	import org.lamsfoundation.lams.author.util.Constants;
 	
 	public class TransitionComponent extends DrawingTool
 	{
@@ -13,6 +19,7 @@ package org.lamsfoundation.lams.author.components.transition
 
 		public function TransitionComponent()
 		{
+			this.addEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
 		}
 		
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {
@@ -45,6 +52,17 @@ package org.lamsfoundation.lams.author.components.transition
 			}
 			
 		}
+		
+		// The mouseMove event handler for the Image control
+	    // initiates the drag-and-drop operation.
+	    private function mouseMove(event:MouseEvent):void 
+	    {                
+	        if (Application.application.cursorState == Constants.CURSOR_STATE_NORMAL) {
+	        	var ds:DragSource = new DragSource();
+	        	ds.addData(this, "img");    
+	        	DragManager.doDrag(this, ds, event, this);
+	        }
+	    }
 
 	}
 }

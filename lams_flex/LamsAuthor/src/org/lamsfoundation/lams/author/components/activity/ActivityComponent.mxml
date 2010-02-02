@@ -77,9 +77,6 @@
 		    	Application.application.canvasArea.propertyInspector.closePropertyInspector();
 		    }
 		    
-		    
-		    
-			
 			// The mouseMove event handler for the Image control
 		    // initiates the drag-and-drop operation.
 		    protected function mouseMove(event:MouseEvent):void 
@@ -95,7 +92,7 @@
 				        	
 				        	// Set the offset for dropping the activity to the local mouse position
 				        	activityComponent.mouseOffSetX = event.localX;
-				        	activityComponent.mouseOffSetY = event.localY;  
+				        	activityComponent.mouseOffSetY = event.localY; 
 				        	     
 				        	DragManager.doDrag(activityComponent, ds, event);
 				        	setCenter();
@@ -109,7 +106,7 @@
 		    	switch (Application.application.cursorState) {
 		    		case Constants.CURSOR_STATE_TRANSITION:
 			    		if (this.canStartTransitions) {
-			    			startDragging(event);
+			    			startTransition(event);
 			    		}
 			    		
 		    			break;	
@@ -122,7 +119,7 @@
 				centerY = y + height/2 -10;
 		    }
 		    
-	        protected function startDragging(event:MouseEvent):void {
+	        protected function startTransition(event:MouseEvent):void {
 			 
 				if (transitionOut != null) {
 					//parent.removeChild(transitionOut);
@@ -154,7 +151,7 @@
 			
 			}
 			
-			protected function stopDragging():void
+			protected function stopTransition():void
 			{
 			    Application.application.uiState = Constants.UI_STATE_NORMAL;
 			    systemManager.removeEventListener(MouseEvent.MOUSE_MOVE, systemManagerMouseMoveHandler, true);			
@@ -182,9 +179,9 @@
 		    */ 
 		    private function systemManagerMouseUpHandler(event:MouseEvent):void
 		    {
-		    	stopDragging();
+		    	stopTransition();
 		    	
-		    	var transitionEvent:TransitionEvent = new TransitionEvent(TransitionEvent.TRANSITION_EVENT);
+		    	var transitionEvent:TransitionEvent = new TransitionEvent(TransitionEvent.TRANSITION_COMPLETE);
 	    		transitionEvent.sourceAcivityComponent = this;
 	    		transitionEvent.transition = transitionOut;
 	    		Application.application.dispatchEvent(transitionEvent);
@@ -193,7 +190,7 @@
 		    
 		    private function stageMouseLeaveHandler(event:MouseEvent):void
 		    {
-		    	stopDragging();
+		    	stopTransition();
 		    }
 		    
 		    private function mouseOver(event:MouseEvent):void {

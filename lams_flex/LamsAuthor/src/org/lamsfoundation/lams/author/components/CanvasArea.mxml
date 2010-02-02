@@ -1,37 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:HBox 
+<mx:Canvas
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
 	xmlns:components="org.lamsfoundation.lams.author.components.*"
-	horizontalGap="0"
 	>
 	
 	<mx:Script>
 		<![CDATA[
 			import mx.core.Application;
-			
 		]]>
 	</mx:Script>
-	
-	
 	
 	<components:LearningLibrary id="compLearningLibrary"
 			height="{Application.application.height - 30}" width="190" verticalScrollPolicy="on"
 		/>	
-	<!--<mx:HBox id="canvasblock" height="100%" width="25" verticalAlign="middle" >
-		<mx:Button id="hideButton" label="&lt;" click="toggleLearningLibrary()" 
-			width="25" paddingLeft="0" textAlign="right" />
-	</mx:HBox>-->
 	
-	<mx:Canvas id="dragCanvas"
-               height="100%" width="100%" >
+	<mx:Canvas id="dragCanvas" height="100%" width="100%" left="190">
                
 		<components:CanvasBox id="canvasBox" backgroundColor="#FFFFF8"  ></components:CanvasBox>
        
 		<components:PropertyInspector id="propertyInspector"
    		/>
-               
+              
     </mx:Canvas>
-               
-	
-	
-</mx:HBox>
+    
+    <components:Bin bottom="20" right="20" />
+</mx:Canvas>
