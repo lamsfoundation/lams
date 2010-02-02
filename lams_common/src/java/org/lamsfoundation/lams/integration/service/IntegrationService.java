@@ -337,14 +337,11 @@ public class IntegrationService implements IIntegrationService {
 			+ serverMap.getServerid() + " - Unexpected return HTTP Status:" + httpConn.getResponseCode());
 
 	    InputStream is = url.openConnection().getInputStream();
-	    BufferedReader isReader = new BufferedReader(new InputStreamReader(is));
+	    BufferedReader isReader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 	    String str = isReader.readLine();
 	    if (str == null) {
 		throw new UserInfoFetchException("Fail to fetch user data from external server:"
 			+ serverMap.getServerid() + " - No data returned from external server");
-	    } else {
-	    	// LDEV-2468 read user data from ext server as UTF-8 
-	    	str = new String(str.getBytes(), "UTF-8");
 	    }
 
 	    return CSVUtil.parse(str);
