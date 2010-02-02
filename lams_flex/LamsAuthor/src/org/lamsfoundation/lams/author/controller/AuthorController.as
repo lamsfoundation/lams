@@ -153,6 +153,7 @@ package org.lamsfoundation.lams.author.controller
 	    					
 	    					// Apply the transition
 	    					transitionArray.addItem(event.transition);
+	    					event.sourceAcivityComponent.state = Constants.ACTIVITY_STATE_NORMAL;
 	    					activityComponent.transitionIn = event.transition;	
 	    					event.transition.toActivity = activityComponent;
 	    					event.sourceAcivityComponent.transitionOut = event.transition;
