@@ -1,4 +1,4 @@
-﻿/*
+/*
  * FCKeditor - The text editor for Internet - http://www.fckeditor.net
  * Copyright (C) 2003-2009 Frederico Caldeira Knabben
  *
@@ -85,10 +85,10 @@ BulletedList		: "Εισαγωγή/Διαγραφή Λίστας με Bullets",
 ShowTableBorders	: "Προβολή Ορίων Πίνακα",
 ShowDetails			: "Προβολή Λεπτομερειών",
 Style				: "Στυλ",
-FontFormat			: "Μορφή Γραμματοσειράς",
-Font				: "Γραμματοσειρά",
+FontFormat			: "Μορφή Γραμ.",
+Font				: "Γραμ.",
 FontSize			: "Μέγεθος",
-TextColor			: "Χρώμα Γραμμάτων",
+TextColor			: "Χρώμα Γραμ.",
 BGColor				: "Χρώμα Υποβάθρου",
 Source				: "HTML κώδικας",
 Find				: "Αναζήτηση",
