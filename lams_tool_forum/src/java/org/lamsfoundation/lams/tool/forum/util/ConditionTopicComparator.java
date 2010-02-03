@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.forum.util;
 
 import java.util.Comparator;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 
 /**
@@ -39,6 +40,20 @@ public class ConditionTopicComparator implements Comparator<Message> {
 
     public int compare(Message o1, Message o2) {
 	if (o1 != null && o2 != null) {
+	    // use same attributes to determine equality as Message.equals() method
+	    if (new EqualsBuilder()
+	      	//.append(o1.getUid(),o2.getUid())
+	      	.append(o1.getSubject(),o2.getSubject())
+	      	.append(o1.getBody(),o2.getBody())
+	      	.append(o1.getReplyNumber(),o2.getReplyNumber())
+	      	//.append(this.lastReplyDate,genericEntity.lastReplyDate)
+	      	//.append(this.created,genericEntity.created)
+	      	//.append(this.updated,genericEntity.updated)
+	      	.append(o1.getCreatedBy(),o2.getCreatedBy())
+	      	.append(o1.getModifiedBy(),o2.getModifiedBy())
+	      	.isEquals()) {
+		return 0;
+	    }
 	    return new DateComparator().compare(o1.getCreated(), o2.getCreated());
 	} else if (o1 != null) {
 	    return 1;

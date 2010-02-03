@@ -173,18 +173,20 @@ public class Message implements Cloneable{
 		if (!(o instanceof Message))
 			return false;
 		
-		final Message genericEntity = (Message) o;
+		Message genericEntity = (Message) o;
 
+		// uses same attributes to determine equality as 
+		// ConditionTopicComparator.compare()
       	return new EqualsBuilder()
-      	.append(this.uid,genericEntity.uid)
-      	.append(this.subject,genericEntity.subject)
-      	.append(this.body,genericEntity.body)
-      	.append(this.replyNumber,genericEntity.replyNumber)
-      	.append(this.lastReplyDate,genericEntity.lastReplyDate)
-      	.append(this.created,genericEntity.created)
-      	.append(this.updated,genericEntity.updated)
-      	.append(this.createdBy,genericEntity.createdBy)
-      	.append(this.modifiedBy,genericEntity.modifiedBy)
+      	//.append(this.uid,genericEntity.getUid())
+      	.append(this.subject,genericEntity.getSubject())
+      	.append(this.body,genericEntity.getBody())
+      	.append(this.replyNumber,genericEntity.getReplyNumber())
+      	//.append(this.lastReplyDate,genericEntity.lastReplyDate)
+      	//.append(this.created,genericEntity.created)
+      	//.append(this.updated,genericEntity.updated)
+      	.append(this.createdBy,genericEntity.getCreatedBy())
+      	.append(this.modifiedBy,genericEntity.getModifiedBy())
       	.isEquals();
 	}
 
