@@ -142,7 +142,7 @@ package org.lamsfoundation.lams.author.controller
 	                	monitorGroup.load();
 	                	monitorGroup.selectActivity();
             			break;
-            		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_RANDOM:
+            		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_LEARNER:
             			var learnerGroup:GroupActivityComponent = new LearnerGroupActivityComponent();
 	                	learnerGroup.x = currentMousePoint.x;
 		              	learnerGroup.y = currentMousePoint.y;

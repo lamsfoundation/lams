@@ -185,6 +185,15 @@
 	    <entry key="groupnaming_dlg_title_lbl">
 	      <name>Group Naming</name>
 	    </entry>
+	    <entry key="pi_group_naming_btn_lbl">
+	      <name>Name Groups</name>
+	    </entry>
+	    <entry key="view_students_before_selection">
+	      <name>View learners before selection?</name>
+	    </entry>
+	    <entry key="pi_equal_group_sizes">
+	      <name>Equal group sizes</name>
+	    </entry>
 		
 	</language>
 </xml>

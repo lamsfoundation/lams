@@ -242,10 +242,6 @@
 		   		}
 			}
 
-			// A method to be overidden by child activity components
-			public function getPropetyInspectorView():UIComponent {
-				return null;
-			}
 		]]>
 	</mx:Script>
 	

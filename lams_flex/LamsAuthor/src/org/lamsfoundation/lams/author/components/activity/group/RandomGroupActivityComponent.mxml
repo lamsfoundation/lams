@@ -3,21 +3,15 @@
 	<mx:Script>
 		<![CDATA[
 			import mx.core.UIComponent;
-			import mx.containers.FormItem;
-			import mx.containers.Form;
+			
 			public var numLearners:int = 1;
 			public var isLearnersPerGroup:Boolean = false;
-			
-			override public function getPropetyInspectorView():UIComponent {
-				//return form;
-				return null;
-			}
-			
-			public function get isNormalRandom():Boolean {
+
+			public function get isGroupNumber():Boolean {
 				return !isLearnersPerGroup;
 			}
 			
-			public function set isNormalRandom(boolean:Boolean):void {
+			public function set isGroupNumber(boolean:Boolean):void {
 				isLearnersPerGroup = !boolean;
 			}
 			

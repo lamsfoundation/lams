@@ -228,21 +228,17 @@
     		icon="@Embed(source='assets/icons/group.png')" 
     		label="{Application.application.dictionary.getLabel('random_group_btn')}" 
     		toolTip="{Application.application.dictionary.getLabel('random_group_btn_tooltip')}"/>
-    	
-    	
-    	<!--<mx:Button height="25" 
+
+    	<toolbar:SystemToolComponent type="{Constants.SYSTEM_ACTIVITY_TYPE_GROUP_MONITOR}" height="25" 
+    		click="mouseClick(event)"
     		icon="@Embed(source='assets/icons/group.png')" 
-    		label="{Application.application.dictionary.getLabel('random_group_btn')}"
-    		toolTip="{Application.application.dictionary.getLabel('random_group_btn_tooltip')}"/>-->
-    		
-    	<mx:Button height="25" 
-    		icon="@Embed(source='assets/icons/group.png')" 
-    		label="{Application.application.dictionary.getLabel('monitor_group_btn')}"
+    		label="{Application.application.dictionary.getLabel('monitor_group_btn')}" 
     		toolTip="{Application.application.dictionary.getLabel('monitor_group_btn_tooltip')}"/>
     		
-    	<mx:Button height="25" 
+    	<toolbar:SystemToolComponent type="{Constants.SYSTEM_ACTIVITY_TYPE_GROUP_LEARNER}" height="25" 
+    		click="mouseClick(event)"
     		icon="@Embed(source='assets/icons/group.png')" 
-    		label="{Application.application.dictionary.getLabel('learner_group_btn')}"
+    		label="{Application.application.dictionary.getLabel('learner_group_btn')}" 
     		toolTip="{Application.application.dictionary.getLabel('learner_group_btn_tooltip')}"/>
     </toolbar:ToolBarDropDown>
     <mx:Binding destination="groupMenu.x" source="groupButton.x - 5" />

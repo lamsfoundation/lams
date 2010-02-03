@@ -9,6 +9,11 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import mx.events.ListEventReason;
+			import mx.controls.TextInput;
+			import mx.events.ListEvent;
+			import mx.controls.Alert;
+			import mx.utils.StringUtil;
 			import mx.core.IFlexDisplayObject;
 			import mx.managers.PopUpManager;
 			import mx.binding.utils.BindingUtils;
@@ -39,10 +44,18 @@
 				PopUpManager.removePopUp(this);
 			}
 			
+			private function itemEditEnd(event:ListEvent):void {
+				var editor:TextInput = TextInput(event.currentTarget.itemEditorInstance);
+				if ((StringUtil.trim(editor.text)).length== 0){
+					event.preventDefault();
+					event.stopPropagation();
+				}
+			}
+			
 		]]>
 	</mx:Script>
 	<mx:Text text="{Application.application.dictionary.getLabel('groupnaming_dialog_instructions_lbl')}" />
-	<mx:List id="nameList" editable="true" width="100%" maxHeight="140"></mx:List>
+	<mx:List id="nameList" editable="true" itemEditEnd="itemEditEnd(event)" width="100%" maxHeight="140" ></mx:List>
 	<mx:Button label="OK" click="closeWindow()" />
 	 
 </Window>
