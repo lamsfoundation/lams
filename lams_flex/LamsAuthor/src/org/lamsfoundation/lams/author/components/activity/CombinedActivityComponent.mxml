@@ -20,6 +20,8 @@
 			
 			override public function load():void {
 				
+				super.load();
+				
 				var vbox:VBox = new VBox();
 				vbox.setConstraintValue("verticalAlign", "middle");
 				vbox.setConstraintValue("verticalGap", 0);
@@ -62,9 +64,9 @@
 				
 				this.addChild(vbox);
 				
-				title = new Label();
+				// Set the title
+				super.load();
    				title.text = learningLibraryEntry.title;
-   				this.addChild(title);
 				
 			}
 			

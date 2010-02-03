@@ -73,5 +73,15 @@
 		<entry key="category_assessment_tooltip">
 			<name>Contains tools that you can use to assess and evaluate learning</name>
 		</entry>
+		
+		<entry key="pi_random_group_activity">
+	      <name>Grouping - Random</name>
+	    </entry>
+	    <entry key="pi_monitor_group_activity">
+	      <name>Grouping - Choose in monitor</name>
+	    </entry>
+	    <entry key="pi_learner_group_activity">
+	      <name>Grouping - Learner's Choice</name>
+	    </entry>
 	</language>
 </xml>

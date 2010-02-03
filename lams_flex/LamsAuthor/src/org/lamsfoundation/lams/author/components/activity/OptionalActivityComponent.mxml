@@ -39,7 +39,6 @@
                 	activityComponent.canStartTransitions = false;
                 	activityComponent.canAcceptTransitions = false;
                 	activityComponent.disableTitle();
-                	//parent.removeChild(activityComponent);
                 	optionalArea.addChild(activityComponent);
                 	activities.addItem(activityComponent);
               		activityComponent.updateTransitionPositions();
@@ -48,12 +47,17 @@
                 // Return cursor state to normal
 				Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);                    
             }
+            
+           	override public function load():void {
+            	title = new Label();
+            	title.text = Application.application.dictionary.getLabel("grouping_act_title");
+            	this.disableTitle();
+				this.addChild(title);
+            }
 			
 		]]>
 	</mx:Script>
 	
-	
-
 	<mx:VBox id="vbox"
 		horizontalAlign="center"
 		paddingTop="5" paddingRight="5" paddingBottom="5" paddingLeft="5"
@@ -71,8 +75,4 @@
 		</mx:VBox>
 		
 	</mx:VBox>
-		
-		
-		
-
 </ActivityComponent>

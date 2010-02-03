@@ -18,8 +18,7 @@
                
 		<components:CanvasBox id="canvasBox" backgroundColor="#FFFFF8"  ></components:CanvasBox>
        
-		<components:PropertyInspector id="propertyInspector"
-   		/>
+		<components:PropertyInspector id="propertyInspector" right="20" top="60"/>
               
     </mx:Canvas>
     

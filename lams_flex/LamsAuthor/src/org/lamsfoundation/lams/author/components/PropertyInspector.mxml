@@ -1,38 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" 
 	layout="absolute"
-	minHeight="60" minWidth="300"
-	right="0" top="60"
-	mouseOver="mouseOver(event)"
-	mouseOut="mouseOut(event)"
+	minWidth="70"
+	rollOver="rollOver(event)"
+	rollOut="rollOut(event)"
 	title="{Application.application.dictionary.getLabel('pi_title')}"
-	backgroundAlpha="0.2"
 	styleName="propertyInspectorUnselected"
 	visible="false"
->
+	xmlns:group="org.lamsfoundation.lams.author.components.activity.group.*">
+	
 	<mx:Style source="assets/css/propertyInspector.css" />
 
 	<mx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.core.UIComponent;
+			import org.lamsfoundation.lams.author.components.activity.group.RandomGroupActivityComponent;
+			import org.lamsfoundation.lams.author.components.activity.group.GroupActivityComponent;
 			import mx.binding.utils.ChangeWatcher;
 			import mx.binding.utils.BindingUtils;
 			import org.lamsfoundation.lams.author.components.activity.ActivityComponent;
 			import mx.core.Application;
 			import mx.managers.PopUpManager;
 			
-			
-			private var changeWatcher1:ChangeWatcher;
-			private var changeWatcher2:ChangeWatcher;
+			private var changeWatcherArray:ArrayCollection = new ArrayCollection();
 			
 			private var titleDisabledColors:Object;
+			
+			[Bindable]
+			private var applicationCenter:Point = new Point();
 			
 			public function openPropertyInspector(activity:ActivityComponent):void {
 				visible = true;
 				PopUpManager.addPopUp(this, this, false);
 				
 				// Capture the binding so it can be removed when the property inpector is closed (activity de-selected)
-				changeWatcher1 = BindingUtils.bindProperty(activityTitle, "text", activity.title, "text"); 
-				changeWatcher2 = BindingUtils.bindProperty(activity.title, "text", activityTitle, "text"); 
+				changeWatcherArray.addItem(BindingUtils.bindProperty(activityTitle, "text", activity.title, "text"));
+				changeWatcherArray.addItem(BindingUtils.bindProperty(activity.title, "text", activityTitle, "text"));
+				
+				// Display particular ui components for the activity type
+				displayUIComponents(activity);
+				
+				applicationCenter.x = Application.application.width/2;
+				applicationCenter.y = Application.application.height/2;
 			}
 			
 			public function closePropertyInspector():void {
@@ -40,25 +50,58 @@
 				PopUpManager.removePopUp(this);
 				
 				// Free the bindings to the current selected activity if there are any
-				if (changeWatcher1 != null) {
-					changeWatcher1.unwatch();
-				}
-				if (changeWatcher2 != null) {
-					changeWatcher2.unwatch();
+				for each (var changeWatcher:ChangeWatcher in changeWatcherArray) {
+					changeWatcher.unwatch();
 				}
 			}
 			
-			// Enable the propertyInspector on mousOver
-			private function mouseOver(event:MouseEvent):void {
-				this.styleName = "propertyInspectorSelected";
-				setChildIndex(opacityLayer, 0);
+			// Enable the propertyInspector on rollOver
+			private function rollOver(event:MouseEvent):void {
+					this.styleName = "propertyInspectorSelected";
+					setChildIndex(opacityLayer, 0);
 			}
 			
-			// Disable and white out the propertyInspector on mouseOut
-			private function mouseOut(event:MouseEvent):void {
+			// Disable and white out the propertyInspector on rollOut
+			private function rollOut(event:MouseEvent):void {
 				this.styleName = "propertyInspectorUnselected"
 				setChildIndex(opacityLayer, this.getChildren().length -1);
 				focusManager.setFocus(dummy);
+			}
+			
+			private function displayUIComponents(activity:ActivityComponent):void {
+				this.currentState = "";
+				if (activity is RandomGroupActivityComponent) {
+					var randomGroupActivity:RandomGroupActivityComponent = activity as RandomGroupActivityComponent;
+					this.currentState = "randomActivity";
+					changeWatcherArray.addItem(BindingUtils.bindProperty(randomGroups, "selected", randomGroupActivity, "isNormalRandom"));
+					changeWatcherArray.addItem(BindingUtils.bindProperty(randomGroupActivity, "isNormalRandom", randomGroups, "selected"));
+					changeWatcherArray.addItem(BindingUtils.bindProperty(randomGroupsNum, "value", randomGroupActivity, "numGroups"));
+					changeWatcherArray.addItem(BindingUtils.bindProperty(activity, "numGroups", randomGroupsNum, "value"));
+					
+					changeWatcherArray.addItem(BindingUtils.bindProperty(randomLearners, "selected", randomGroupActivity, "isLearnersPerGroup"));
+					changeWatcherArray.addItem(BindingUtils.bindProperty(randomGroupActivity, "isLearnersPerGroup", randomLearners, "selected"));
+					changeWatcherArray.addItem(BindingUtils.bindProperty(randomLearnersNum, "value", randomGroupActivity, "numLearners"));
+					changeWatcherArray.addItem(BindingUtils.bindProperty(randomGroupActivity, "numLearners", randomLearnersNum, "value"));
+				}
+			}
+			
+			private function groupNumChange(event:Event):void {
+				if (Application.application.selectedActivity is GroupActivityComponent) {
+					var groupActivity:GroupActivityComponent = Application.application.selectedActivity as GroupActivityComponent;
+					if (groupActivity.numGroups > groupActivity.groupNames.length) {
+						groupActivity.groupNames.addItem(Application.application.dictionary.getLabel('group_btn') + " " + groupActivity.numGroups)
+					}
+					
+					if (groupActivity.numGroups < groupActivity.groupNames.length) {
+						groupActivity.groupNames.removeItemAt(groupActivity.groupNames.length - 1);
+					}
+				}
+				
+			}
+			
+			
+			private function openNameGroupsWindow():void {
+				nameGroupsWindow.openWindow();
 			}
 			
 		]]>
@@ -66,21 +109,51 @@
 	
 	
 	
-	<mx:VBox height="100%" width="100%" >
-		<mx:Spacer height="3" />
-		<mx:Form id="propertiesForm" width="100%" height="100%" verticalGap="2" paddingTop="0">
+	<mx:VBox id="vbox" height="100%" width="100%" horizontalAlign="center" verticalGap="2" paddingBottom="3" top="5">
+		<mx:Form id="propertiesForm" 
+			height="100%"  paddingTop="0" paddingBottom="0" 
+			textAlign="left" verticalGap="2" borderStyle="none">
 			
 			<mx:FormItem label="{Application.application.dictionary.getLabel('pi_lbl_title')}" height="16" >
-            	<mx:TextInput id="activityTitle"/>
-       		</mx:FormItem>
-			<mx:FormItem label="next thing" height="16" >
-            	<mx:TextInput id="activityTitlxxx"/>
+            	<mx:TextInput id="activityTitle" width="100" maxChars="256" />
        		</mx:FormItem>
 			<mx:FormItem visible="false" height="0">
 				<mx:TextInput id="dummy" />
        		</mx:FormItem>
+       		
 		</mx:Form>
+
 	</mx:VBox>
 	<mx:Canvas id="opacityLayer" height="100%" width="100%" backgroundColor="white" backgroundAlpha="0.6" />
 	
+	<mx:states>
+		<mx:State name="randomActivity">
+			<mx:AddChild relativeTo="{propertiesForm}" position="lastChild"  creationPolicy="all">
+				<mx:HRule width="100%" />
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{propertiesForm}" position="lastChild"  creationPolicy="all">   
+                <mx:FormItem label="{Application.application.dictionary.getLabel('pi_num_groups')}" height="22" direction="horizontal">
+                	<mx:RadioButton id="randomGroups" mouseOver="{null}" />
+					<mx:NumericStepper id="randomGroupsNum" change="groupNumChange(event)" enabled="{randomGroups.selected}" minimum="2"  maximum="10" height="22" width="40" fontSize="10" textAlign="center"/>
+				</mx:FormItem>
+            </mx:AddChild>
+			<mx:AddChild relativeTo="{propertiesForm}" position="lastChild"  creationPolicy="all">   
+                <mx:FormItem label="{Application.application.dictionary.getLabel('pi_num_learners')}" height="22" direction="horizontal">
+                	<mx:RadioButton id="randomLearners"/>
+					<mx:NumericStepper id="randomLearnersNum" enabled="{randomLearners.selected}" minimum="2"  maximum="10" height="22" width="40" fontSize="10" textAlign="center"/>
+				</mx:FormItem>
+            </mx:AddChild>
+            <mx:AddChild relativeTo="{vbox}" position="lastChild"  creationPolicy="all">   
+                	<mx:Button label="Name Groups" height="18" click="openNameGroupsWindow()"/>
+            </mx:AddChild>
+            
+            <mx:SetProperty target="{this}"
+            	name="title" value="{Application.application.dictionary.getLabel('pi_random_group_activity')}"/>
+
+		</mx:State>
+	</mx:states>
+	
+	
+	<group:NameGroupsWindow id="nameGroupsWindow"  includeInLayout="false" />
+
 </mx:Panel>

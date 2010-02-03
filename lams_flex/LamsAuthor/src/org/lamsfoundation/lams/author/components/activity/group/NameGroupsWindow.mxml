@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns="org.lamsfoundation.lams.author.components.util.*" 
+	visible="false"
+	minWidth="150"
+	title="{Application.application.dictionary.getLabel('groupnaming_dlg_title_lbl')}"
+	>
+	
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.core.IFlexDisplayObject;
+			import mx.managers.PopUpManager;
+			import mx.binding.utils.BindingUtils;
+			import mx.binding.utils.ChangeWatcher;
+			import mx.core.Application;
+			
+			private var changeWatcher1:ChangeWatcher;
+			private var changeWatcher2:ChangeWatcher;
+			
+			public function openWindow():void {
+				this.visible=true;
+				
+				var x:int = Application.application.applicationCenter.x;
+				
+				if (Application.application.selectedActivity is GroupActivityComponent) {
+					var groupActivity:GroupActivityComponent = Application.application.selectedActivity as GroupActivityComponent;
+					changeWatcher1 = BindingUtils.bindProperty(nameList, "dataProvider", groupActivity, "groupNames");
+					changeWatcher2 = BindingUtils.bindProperty(groupActivity, "groupNames", nameList, "dataProvider");
+				}
+				
+				PopUpManager.addPopUp(this, this, true);
+			}
+			
+			public function closeWindow():void {
+				this.visible=false;
+				changeWatcher1.unwatch();
+				changeWatcher2.unwatch();
+				PopUpManager.removePopUp(this);
+			}
+			
+		]]>
+	</mx:Script>
+	<mx:Text text="{Application.application.dictionary.getLabel('groupnaming_dialog_instructions_lbl')}" />
+	<mx:List id="nameList" editable="true" width="100%" maxHeight="140"></mx:List>
+	<mx:Button label="OK" click="closeWindow()" />
+	 
+</Window>

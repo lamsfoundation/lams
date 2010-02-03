@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ActivityComponent xmlns="org.lamsfoundation.lams.author.components.activity.*" xmlns:mx="http://www.adobe.com/2006/mxml"
+	horizontalScrollPolicy="off" horizontalAlign="center"
+	paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+	>
+	<mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.controls.Label;
+			import mx.core.Application;
+			
+			public var numGroups:Number = 2;
+			
+			[Bindable]
+			public var groupNames:ArrayCollection = new ArrayCollection();
+			
+			override public function load():void {
+            	this.title = new Label();
+            	title.text = Application.application.dictionary.getLabel("grouping_act_title");
+				this.addChild(title);
+				
+				groupNames.addItem(Application.application.dictionary.getLabel('group_btn') + " 1");
+				groupNames.addItem(Application.application.dictionary.getLabel('group_btn') + " 2");
+            }
+		]]>
+	</mx:Script>
+	
+	<mx:VBox verticalAlign="middle" horizontalAlign="center"
+		borderStyle="solid"
+		dropShadowEnabled="true"
+		shadowDirection="right"
+		cornerRadius="5"
+		backgroundColor="#C2D5FE"
+		height="40" width="50">
+		<mx:Image source="@Embed(source='assets/icons/group.png')" />
+	</mx:VBox>
+	
+	
+</ActivityComponent>

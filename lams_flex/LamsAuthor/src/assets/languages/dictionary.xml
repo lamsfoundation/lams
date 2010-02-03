@@ -155,5 +155,9 @@
 		<entry key="pi_lbl_title">
 			<name>Title</name>
 		</entry>
+		
+		<entry key="opt_activity_title">
+	      <name>Optional Activity</name>
+	    </entry>
 	</language>
 </xml>

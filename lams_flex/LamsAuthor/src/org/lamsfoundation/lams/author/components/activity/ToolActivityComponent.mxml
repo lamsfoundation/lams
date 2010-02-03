@@ -29,7 +29,7 @@
 				vbox.setStyle('borderStyle', 'solid');
 				vbox.setStyle('dropShadowEnabled', true);
 				vbox.setStyle('shadowDirection', "right");
-				vbox.setStyle('cornerRadius', '10');
+				vbox.setStyle('cornerRadius', 10);
 				vbox.height = 40;
 				vbox.width = 50;
 				
@@ -55,9 +55,10 @@
    				vbox.addChild(iconImage);
    				this.addChild(vbox);
    				
-   				title = new Label();
+   				// Set the activity title
+   				super.load();
    				title.text = tool.toolName;
-   				this.addChild(title);
+   				
    				
 			}
 			

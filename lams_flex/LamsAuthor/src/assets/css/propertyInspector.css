@@ -18,7 +18,7 @@
    	shadowDirection: right;
 	titleStyleName: "propertyInpsectorTitleUnselected";
 	vertical-gap: 0;
-	background-alpha: 0.2;
+	background-alpha: 0.05;
 }
 
 .propertyInpsectorTitleUnselected {
@@ -29,27 +29,26 @@
 .propertyInspectorSelected {
    	paddingLeft: 0; paddingRight: 0; paddingTop:0; paddingBottom:0;
    	borderStyle: solid;
-   	borderThicknessLeft: 0;
-   	borderThicknessTop: 0;
-   	borderThicknessBottom: 0;
-   	borderThicknessRight: 0;
+   	borderThicknessLeft: 0; borderThicknessTop: 0;borderThicknessBottom: 0; borderThicknessRight: 0;
    	roundedBottomCorners: true;
    	cornerRadius: 0;
    	headerHeight: 17;
-   	headerColors: #c2d5fe, #E7EEFF;
+   	/*headerColors: #c2d5fe, #E7EEFF;*/
+   	headerColors: #c2d5fe, #2359D6;
    	backgroundColor: #c2d5fe;
    	dropShadowEnabled: true;
    	shadowDistance: 0;
    	shadowDirection: right;
 	titleStyleName: "propertyInpsectorTitleSelected";
 	vertical-gap: 0;
-	background-alpha: 0.9;
+	background-alpha: 0.7;
 }
 
 .propertyInpsectorTitleSelected {
 	textAlign: center;
 	font-weight:bold;	
 }
+
 
 
    

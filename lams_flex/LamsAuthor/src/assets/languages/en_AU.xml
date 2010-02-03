@@ -157,5 +157,34 @@
 			<name>Title</name>
 		</entry>
 		
+		<entry key="opt_activity_title">
+	      <name>Optional Activity</name>
+	    </entry>
+	    <entry key="grouping_act_title">
+	      <name>Grouping</name>
+	    </entry>
+	    <entry key="pi_num_groups">
+	      <name>Number of groups</name>
+	    </entry>
+	    <entry key="pi_num_learners">
+	      <name>Number of learners</name>
+	    </entry>
+	    
+	    <entry key="pi_random_group_activity">
+	      <name>Grouping - Random</name>
+	    </entry>
+	    <entry key="pi_monitor_group_activity">
+	      <name>Grouping - Choose in monitor</name>
+	    </entry>
+	    <entry key="pi_learner_group_activity">
+	      <name>Grouping - Learner's Choice</name>
+	    </entry>
+	    <entry key="groupnaming_dialog_instructions_lbl">
+	      <name>Click on a name to change its value.</name>
+	    </entry>
+	    <entry key="groupnaming_dlg_title_lbl">
+	      <name>Group Naming</name>
+	    </entry>
+		
 	</language>
 </xml>

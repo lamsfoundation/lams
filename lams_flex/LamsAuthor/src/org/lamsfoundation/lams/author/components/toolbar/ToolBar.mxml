@@ -10,6 +10,11 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.components.activity.group.LearnerGroupActivityComponent;
+			import org.lamsfoundation.lams.author.components.activity.group.MonitorGroupActivityComponent;
+			import org.lamsfoundation.lams.author.components.activity.group.RandomGroupActivityComponent;
+			import org.lamsfoundation.lams.author.components.activity.group.GroupActivityComponent;
+			import org.lamsfoundation.lams.author.components.activity.ActivityComponent;
 			import org.lamsfoundation.lams.author.components.CanvasBox;
 			import mx.managers.DragManager;
 			import mx.core.UIComponent;
@@ -38,6 +43,12 @@
 				
 			}
 			
+			public function closeAllMenus():void {
+				optionalMenu.closeDropDown();
+				flowMenu.closeDropDown();
+				groupMenu.closeDropDown();
+			}
+			
 			public function doZoom(isOut:Boolean):void {
 				var canvasBox:CanvasBox = Application.application.canvasArea.canvasBox;
 				
@@ -49,13 +60,32 @@
 			
 			private function mouseClick(event:MouseEvent):void 
 	        {                
-	        	var dragInitiator:SystemActivityComponent = event.currentTarget as SystemActivityComponent;
+	        	var dragInitiator:SystemToolComponent = event.currentTarget as SystemToolComponent;
 	        	
 	        	var ds:DragSource = new DragSource();
-				var optionalActivity:OptionalActivityComponent = new OptionalActivityComponent();
-
-          		ds.addData(optionalActivity, "img");  
-          		DragManager.doDrag(dragInitiator, ds, event, optionalActivity, 25, 15, 1.00, false);
+	        	
+	        	var activityComponent:ActivityComponent;
+	        	
+	        	closeAllMenus();
+	        	
+	        	switch (dragInitiator.type) {
+	        		case Constants.SYSTEM_ACTIVITY_TYPE_OPTIONAL: 
+		        		activityComponent = new OptionalActivityComponent();
+	          			break;
+	          		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_RANDOM:
+		        		activityComponent = new RandomGroupActivityComponent();	
+	          			break;
+	          		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_MONITOR:
+		        		activityComponent = new MonitorGroupActivityComponent();	
+	          			break;
+	          		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_LEARNER:
+		        		activityComponent = new LearnerGroupActivityComponent();	
+	          			break;
+	        	}
+	        	
+	        	ds.addData(activityComponent, "img");  
+	          	DragManager.doDrag(dragInitiator, ds, event, activityComponent, 25, 15, 1.00, false);
+				
 	        }
 			
 		]]>
@@ -154,7 +184,7 @@
     
     
     <toolbar:ToolBarDropDown id="optionalMenu">
-    	<toolbar:SystemActivityComponent type="{Constants.SYTEM_ACTIVITY_TYPE_OPTIONAL}" height="25" 
+    	<toolbar:SystemToolComponent type="{Constants.SYSTEM_ACTIVITY_TYPE_OPTIONAL}" height="25" 
     		click="mouseClick(event)"
     		icon="@Embed(source='assets/icons/optional.png')" 
     		label="{Application.application.dictionary.getLabel('optional_act_btn')}" 
@@ -193,10 +223,17 @@
     <mx:Binding destination="flowMenu.y" source="flowButton.y + flowButton.height" />
     
     <toolbar:ToolBarDropDown id="groupMenu">
-    	<mx:Button height="25" 
+    	<toolbar:SystemToolComponent type="{Constants.SYSTEM_ACTIVITY_TYPE_GROUP_RANDOM}" height="25" 
+    		click="mouseClick(event)"
+    		icon="@Embed(source='assets/icons/group.png')" 
+    		label="{Application.application.dictionary.getLabel('random_group_btn')}" 
+    		toolTip="{Application.application.dictionary.getLabel('random_group_btn_tooltip')}"/>
+    	
+    	
+    	<!--<mx:Button height="25" 
     		icon="@Embed(source='assets/icons/group.png')" 
     		label="{Application.application.dictionary.getLabel('random_group_btn')}"
-    		toolTip="{Application.application.dictionary.getLabel('random_group_btn_tooltip')}"/>
+    		toolTip="{Application.application.dictionary.getLabel('random_group_btn_tooltip')}"/>-->
     		
     	<mx:Button height="25" 
     		icon="@Embed(source='assets/icons/group.png')" 

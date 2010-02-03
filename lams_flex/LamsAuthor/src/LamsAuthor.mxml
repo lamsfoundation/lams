@@ -49,6 +49,9 @@
 			// current selected activity
 			public var selectedActivity:ActivityComponent;
 			
+			[Bindable]
+			public var applicationCenter:Point = new Point();
+			
 			// dictionary
 			[Bindable]
 			public var dictionary:XMLDictionaryRegistry;
@@ -95,5 +98,8 @@
 	<components:CanvasArea height="100%" width="100%" id="canvasArea" top="30"></components:CanvasArea>
 	
 	<toolbar:ToolBar id="toolBar" width="100%" height="30"></toolbar:ToolBar>
+	
+	<mx:Binding destination="applicationCenter.x" source="this.width/2" />
+	<mx:Binding destination="applicationCenter.y" source="this.height/2" />
 	
 </mx:Application>

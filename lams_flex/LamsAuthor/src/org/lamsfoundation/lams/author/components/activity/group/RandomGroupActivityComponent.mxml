@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GroupActivityComponent xmlns="org.lamsfoundation.lams.author.components.activity.group.*" xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			import mx.core.UIComponent;
+			import mx.containers.FormItem;
+			import mx.containers.Form;
+			public var numLearners:int = 1;
+			public var isLearnersPerGroup:Boolean = false;
+			
+			override public function getPropetyInspectorView():UIComponent {
+				//return form;
+				return null;
+			}
+			
+			public function get isNormalRandom():Boolean {
+				return !isLearnersPerGroup;
+			}
+			
+			public function set isNormalRandom(boolean:Boolean):void {
+				isLearnersPerGroup = !boolean;
+			}
+			
+			
+		]]>
+	</mx:Script>
+	
+</GroupActivityComponent>

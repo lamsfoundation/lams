@@ -12,7 +12,11 @@ package org.lamsfoundation.lams.author.controller
 	import org.lamsfoundation.lams.author.components.CanvasBox;
 	import org.lamsfoundation.lams.author.components.LearningLibraryEntryComponent;
 	import org.lamsfoundation.lams.author.components.activity.*;
-	import org.lamsfoundation.lams.author.components.toolbar.SystemActivityComponent;
+	import org.lamsfoundation.lams.author.components.activity.group.GroupActivityComponent;
+	import org.lamsfoundation.lams.author.components.activity.group.LearnerGroupActivityComponent;
+	import org.lamsfoundation.lams.author.components.activity.group.MonitorGroupActivityComponent;
+	import org.lamsfoundation.lams.author.components.activity.group.RandomGroupActivityComponent;
+	import org.lamsfoundation.lams.author.components.toolbar.SystemToolComponent;
 	import org.lamsfoundation.lams.author.components.transition.TransitionComponent;
 	import org.lamsfoundation.lams.author.events.AuthorActivityEvent;
 	import org.lamsfoundation.lams.author.events.TransitionEvent;
@@ -84,6 +88,7 @@ package org.lamsfoundation.lams.author.controller
           		activityComponent.y = currentMousePoint.y - activityComponent.mouseOffSetY;
           		activityComponent.setCenter();
           		activityComponent.updateTransitionPositions();
+          		activityComponent.selectActivity();
             } else if (event.dragInitiator is LearningLibraryEntryComponent) {
             	var learningLibraryComponent:LearningLibraryEntryComponent = event.dragInitiator as LearningLibraryEntryComponent;
             	
@@ -95,6 +100,7 @@ package org.lamsfoundation.lams.author.controller
               		combinedActivityComponent.y = currentMousePoint.y
                 	canvasBox.addChild(combinedActivityComponent);
                 	combinedActivityComponent.setCenter();
+                	combinedActivityComponent.selectActivity();
             	} else {
             		var toolActivityComponent:ToolActivityComponent = new ToolActivityComponent();
                 	toolActivityComponent.tool = learningLibraryComponent.learningLibraryEntry.toolTemplates[0];
@@ -103,17 +109,47 @@ package org.lamsfoundation.lams.author.controller
               		toolActivityComponent.y = currentMousePoint.y;
                 	canvasBox.addChild(toolActivityComponent);
                 	toolActivityComponent.setCenter();
+                	toolActivityComponent.selectActivity();
             	}
-            } else if (event.dragInitiator is SystemActivityComponent) {
-            	var systemActivityComponent:SystemActivityComponent = event.dragInitiator as SystemActivityComponent;
+            } else if (event.dragInitiator is SystemToolComponent) {
+            	var systemToolComponent:SystemToolComponent = event.dragInitiator as SystemToolComponent;
             	
-            	switch (systemActivityComponent.type) {
-            		case Constants.SYTEM_ACTIVITY_TYPE_OPTIONAL:
-            			var optionalActivityComponent:OptionalActivityComponent = new OptionalActivityComponent();
+            	switch (systemToolComponent.type) {
+            		case Constants.SYSTEM_ACTIVITY_TYPE_OPTIONAL:
+            			var optionalActivityComponent:OptionalActivityComponent = new OptionalActivityComponent();       			
 	                	optionalActivityComponent.x = currentMousePoint.x;
 		              	optionalActivityComponent.y = currentMousePoint.y;
 		              	canvasBox.addChild(optionalActivityComponent);
 	                	optionalActivityComponent.setCenter();
+	                	optionalActivityComponent.load();
+	                	optionalActivityComponent.selectActivity();
+            			break;
+            		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_RANDOM:
+            			var randomGroup:RandomGroupActivityComponent = new RandomGroupActivityComponent();
+	                	randomGroup.x = currentMousePoint.x;
+		              	randomGroup.y = currentMousePoint.y;
+		              	canvasBox.addChild(randomGroup);
+	                	randomGroup.setCenter();
+	                	randomGroup.load();
+	                	randomGroup.selectActivity();
+            			break;
+            		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_MONITOR:
+            			var monitorGroup:MonitorGroupActivityComponent = new MonitorGroupActivityComponent();
+	                	monitorGroup.x = currentMousePoint.x;
+		              	monitorGroup.y = currentMousePoint.y;
+		              	canvasBox.addChild(monitorGroup);
+	                	monitorGroup.setCenter();
+	                	monitorGroup.load();
+	                	monitorGroup.selectActivity();
+            			break;
+            		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_RANDOM:
+            			var learnerGroup:GroupActivityComponent = new LearnerGroupActivityComponent();
+	                	learnerGroup.x = currentMousePoint.x;
+		              	learnerGroup.y = currentMousePoint.y;
+		              	canvasBox.addChild(learnerGroup);
+	                	learnerGroup.setCenter();
+	                	learnerGroup.load();
+	                	learnerGroup.selectActivity();
             			break;
             	}
             }
@@ -241,6 +277,8 @@ package org.lamsfoundation.lams.author.controller
 			var canvasBox:CanvasBox = Application.application.canvasArea.canvasBox;
 				
 			var activityComponent:ActivityComponent = event.activityComponent;
+			
+			activityComponent.deSelectActivity();
 			
 			// Remove transition in, if needed
 			if (activityComponent.transitionIn != null) {
