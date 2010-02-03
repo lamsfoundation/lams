@@ -44,6 +44,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.dao.IBaseDAO;
@@ -101,6 +103,7 @@ import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -2885,4 +2888,118 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		Organisation org = (Organisation) baseDAO.find(Organisation.class, organisationId);
 		return org.getName();
 	}
+	
+	/**
+     * Used in admin to clone lessons using the given lesson Ids (from another group) into the given group. Given staff
+     * and learner ids should already be members of the group.
+     * 
+     * @param lessonIds
+     * @param addAllStaff
+     * @param addAllLearners
+     * @param staffIds
+     * @param learnerIds
+     * @param group
+     * @return number of lessons created.
+     * @throws MonitoringServiceException
+     */
+    public int cloneLessons(String[] lessonIds, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
+	    String[] learnerIds, Organisation group) throws MonitoringServiceException {
+	int result = 0;
+	for (String l : lessonIds) {
+	    Lesson lesson = lessonService.getLesson(Long.valueOf(l));
+	    if (lesson != null) {
+		HttpSession ss = SessionManager.getSession();
+		if (ss != null) {
+		    UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		    if (userDto != null) {
+			if ((!addAllStaff && staffIds.length > 0) || addAllStaff) {
+			    // create staff LessonClass
+			    String staffGroupName = group.getName() + " Staff";
+			    List<User> staffUsers = createStaffGroup(group.getOrganisationId(), addAllStaff, staffIds);
+
+			    if ((!addAllLearners && learnerIds.length > 0) || addAllLearners) {
+				// create learner LessonClass for lesson
+				String learnerGroupName = group.getName() + " Learners";
+				List<User> learnerUsers = createLearnerGroup(group.getOrganisationId(), addAllLearners,
+					learnerIds);
+
+				// init Lesson with user as creator
+				Lesson newLesson = this.initializeLesson(lesson.getLessonName(), lesson
+					.getLessonDescription(), lesson.getLearnerExportAvailable(), lesson
+					.getLearningDesign().getLearningDesignId(), group.getOrganisationId(), userDto
+					.getUserID(), null, lesson.getLearnerPresenceAvailable(), lesson
+					.getLearnerImAvailable(), lesson.getLiveEditEnabled());
+
+				// save LessonClasses
+				newLesson = this
+					.createLessonClassForLesson(newLesson.getLessonId(), group, learnerGroupName,
+						learnerUsers, staffGroupName, staffUsers, userDto.getUserID());
+
+				// start Lessons
+				// TODO user-specified creator; must be someone in staff group
+				this.startLesson(newLesson.getLessonId(), staffUsers.get(0).getUserId());
+
+				result++;
+			    } else {
+				throw new MonitoringServiceException("No learners specified, can't create any Lessons.");
+			    }
+			} else {
+			    throw new MonitoringServiceException("No staff specified, can't create any Lessons.");
+			}
+		    } else {
+			throw new MonitoringServiceException("No UserDTO in session, can't create any Lessons.");
+		    }
+		}
+	    } else {
+		throw new MonitoringServiceException("Couldn't find Lesson based on id=" + l);
+	    }
+	}
+	return result;
+    }
+
+    /*
+     * Used in cloneLessons.
+     */
+    private List<User> createLearnerGroup(Integer groupId, Boolean addAllLearners, String[] learnerIds) {
+	List<User> learnerUsers = new ArrayList<User>();
+	if (addAllLearners) {
+	    Vector learnerVector = userManagementService.getUsersFromOrganisationByRole(groupId, Role.LEARNER, false,
+		    true);
+	    learnerUsers.addAll(learnerVector);
+	} else {
+	    User user = null;
+	    for (String l : learnerIds) {
+		user = (User) userManagementService.findById(User.class, Integer.parseInt(l));
+		if (user != null) {
+		    learnerUsers.add(user);
+		} else {
+		    log.error("Couldn't find User based on id=" + l);
+		}
+	    }
+	}
+	return learnerUsers;
+    }
+
+    /*
+     * Used in cloneLessons.
+     */
+    private List<User> createStaffGroup(Integer groupId, Boolean addAllStaff, String[] staffIds) {
+	List<User> staffUsers = new ArrayList<User>();
+	if (addAllStaff) {
+	    Vector staffVector = userManagementService.getUsersFromOrganisationByRole(groupId, Role.MONITOR, false,
+		    true);
+	    staffUsers.addAll(staffVector);
+	} else {
+	    User user = null;
+	    for (String s : staffIds) {
+		user = (User) userManagementService.findById(User.class, Integer.parseInt(s));
+		if (user != null) {
+		    staffUsers.add(user);
+		} else {
+		    log.error("Couldn't find User based on id=" + s);
+		}
+	    }
+	}
+	return staffUsers;
+    }
 }

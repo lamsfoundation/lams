@@ -42,7 +42,6 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
-import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 
 /**
@@ -881,4 +880,19 @@ public interface IMonitoringService {
 	/** Get Organisation Name */
 	public String getOrganisationName(Integer organisationId);
 	
+	/**
+     * Used in admin to clone lessons using the given lesson Ids (from another group) into the given group. Given staff
+     * and learner ids should already be members of the group.
+     * 
+     * @param lessonIds
+     * @param addAllStaff
+     * @param addAllLearners
+     * @param staffIds
+     * @param learnerIds
+     * @param group
+     * @return
+     * @throws MonitoringServiceException
+     */
+    public int cloneLessons(String[] lessonIds, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
+	    String[] learnerIds, Organisation group) throws MonitoringServiceException;
 }

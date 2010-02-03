@@ -30,7 +30,6 @@ import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -46,13 +45,10 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author jliew
@@ -106,7 +102,7 @@ public class CloneLessonsAction extends Action {
 	// default action
 	Integer groupId = WebUtil.readIntParam(request, "groupId", false);
 	request.setAttribute("org", userManagementService.findById(Organisation.class, groupId));
-	
+
 	return mapping.findForward("start");
     }
 
@@ -197,7 +193,7 @@ public class CloneLessonsAction extends Action {
     }
 
     public ActionForward clone(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws UserAccessDeniedException {
+	    HttpServletResponse response) throws Exception {
 
 	Integer groupId = WebUtil.readIntParam(request, "groupId", false);
 	String lessons = request.getParameter("lessons");
@@ -218,113 +214,20 @@ public class CloneLessonsAction extends Action {
 	}
 
 	monitoringService = AdminServiceProxy.getMonitoringService(getServlet().getServletContext());
-	String error = null;
-	List<String> errors = new ArrayList<String>();
 	int result = 0;
 
 	Organisation group = (Organisation) userManagementService.findById(Organisation.class, groupId);
 	if (group != null) {
-	    for (String l : lessonIds) {
-		Lesson lesson = lessonService.getLesson(Long.valueOf(l));
-		if (lesson != null) {
-		    HttpSession ss = SessionManager.getSession();
-		    if (ss != null) {
-			UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			if (userDto != null) {
-			    if ((!addAllStaff && staffIds.length > 0) || addAllStaff) {
-				// create staff LessonClass
-				String staffGroupName = group.getName() + " Staff";
-				List<User> staffUsers = createStaffGroup(groupId, addAllStaff, staffIds);
-
-				if ((!addAllLearners && learnerIds.length > 0) || addAllLearners) {
-				    // create learner LessonClass for lesson
-				    String learnerGroupName = group.getName() + " Learners";
-				    List<User> learnerUsers = createLearnerGroup(groupId, addAllLearners, learnerIds);
-
-				    // init Lesson with user as creator
-				    Lesson newLesson = monitoringService.initializeLesson(lesson.getLessonName(),
-					    lesson.getLessonDescription(), lesson.getLearnerExportAvailable(), lesson
-						    .getLearningDesign().getLearningDesignId(), groupId, userDto
-						    .getUserID(), null, lesson.getLearnerPresenceAvailable(), lesson
-						    .getLearnerImAvailable(), lesson.getLiveEditEnabled());
-
-				    // save LessonClasses
-				    newLesson = monitoringService.createLessonClassForLesson(newLesson.getLessonId(),
-					    group, learnerGroupName, learnerUsers, staffGroupName, staffUsers, userDto
-						    .getUserID());
-
-				    // start Lessons
-				    // TODO user-specified creator; must be someone in staff group
-				    monitoringService
-					    .startLesson(newLesson.getLessonId(), staffUsers.get(0).getUserId());
-				    
-				    result++;
-				} else {
-				    error = "No learners specified, can't create any Lessons.";
-				}
-			    } else {
-				error = "No staff specified, can't create any Lessons.";
-			    }
-			} else {
-			    error = "No UserDTO in session, can't create any Lessons.";
-			}
-		    }
-		} else {
-		    error = "Couldn't find Lesson based on id=" + l;
-		}
-	    }
+	    result = monitoringService
+		    .cloneLessons(lessonIds, addAllStaff, addAllLearners, staffIds, learnerIds, group);
 	} else {
-	    error = "Couldn't find Organisation based on id=" + groupId;
+	    throw new UserException("Couldn't find Organisation based on id=" + groupId);
 	}
 
-	if (error != null) {
-	    log.error(error);
-	    errors.add(error);
-	}
-	request.setAttribute("errors", errors);
 	request.setAttribute("org", group);
 	request.setAttribute("result", result);
 
 	return mapping.findForward("result");
     }
 
-    private List<User> createLearnerGroup(Integer groupId, Boolean addAllLearners, String[] learnerIds) {
-	List<User> learnerUsers = new ArrayList<User>();
-	if (addAllLearners) {
-	    Vector learnerVector = userManagementService.getUsersFromOrganisationByRole(groupId, Role.LEARNER, false,
-		    true);
-	    learnerUsers.addAll(learnerVector);
-	} else {
-	    User user = null;
-	    for (String l : learnerIds) {
-		user = (User) userManagementService.findById(User.class, Integer.parseInt(l));
-		if (user != null) {
-		    learnerUsers.add(user);
-		} else {
-		    log.error("Couldn't find User based on id=" + l);
-		}
-	    }
-	}
-	return learnerUsers;
-    }
-
-    private List<User> createStaffGroup(Integer groupId, Boolean addAllStaff, String[] staffIds) {
-	List<User> staffUsers = new ArrayList<User>();
-	if (addAllStaff) {
-	    Vector staffVector = userManagementService.getUsersFromOrganisationByRole(groupId, Role.MONITOR, false,
-		    true);
-	    staffUsers.addAll(staffVector);
-	} else {
-	    User user = null;
-	    for (String s : staffIds) {
-		user = (User) userManagementService.findById(User.class, Integer.parseInt(s));
-		if (user != null) {
-		    staffUsers.add(user);
-		} else {
-		    log.error("Couldn't find User based on id=" + s);
-		}
-	    }
-	}
-	return staffUsers;
-    }
 }
