@@ -49,6 +49,12 @@
 	font-weight:bold;	
 }
 
+.firstInGroup {
+	border-style: solid;
+	border-sides: top;
+	padding-top: 3px;	
+}
+
 
 
    
