@@ -2,9 +2,8 @@ package org.lamsfoundation.lams.common.ui.components
 {
     import flash.events.MouseEvent;
     
-    import mx.binding.utils.BindingUtils;
     import mx.containers.Panel;
-    import mx.controls.Button;
+    import mx.controls.LinkButton;
 
     [Event(name="buttonClick", type="flash.events.Event")]
 
@@ -21,7 +20,7 @@ package org.lamsfoundation.lams.common.ui.components
         [Bindable] public var buttonHeight:Number = 20;
         [Bindable] public var buttonIcon:Class;
 
-        public var mybtn:Button;
+        public var mybtn:LinkButton;
 
         public function ButtonPanel()
         {
@@ -34,7 +33,7 @@ package org.lamsfoundation.lams.common.ui.components
             
             if( ! buttonLabel ) return;
             
-            mybtn = new Button();
+            mybtn = new LinkButton();
             mybtn.label = buttonLabel;
             mybtn.width = buttonWidth;
             mybtn.height = buttonHeight;
