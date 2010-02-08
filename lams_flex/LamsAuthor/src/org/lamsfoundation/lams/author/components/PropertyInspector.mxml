@@ -26,12 +26,15 @@
 			import mx.binding.utils.ChangeWatcher;
 			import mx.binding.utils.BindingUtils;
 			import org.lamsfoundation.lams.author.components.activity.ActivityComponent;
+			import org.lamsfoundation.lams.author.components.activity.ToolActivityComponent;
 			import mx.core.Application;
 			import mx.managers.PopUpManager;
 			
 			private static const STATE_GROUP_RANDOM:String = "randomGroupActivity";
 			private static const STATE_GROUP_MONITOR:String = "monitorGroupActivity";
 			private static const STATE_GROUP_LEARNER:String = "learnerGroupActivity";
+			
+			private static const STATE_TOOL_ACTIVITY:String = "toolActivity";
 			
 			private var changeWatcherArray:ArrayCollection = new ArrayCollection();
 			
@@ -106,7 +109,13 @@
 			
 			private function displayUIComponents(activity:ActivityComponent):void {
 				this.currentState = "";
-				if (activity is RandomGroupActivityComponent) {
+				if (activity is ToolActivityComponent) {
+					this.currentState = STATE_TOOL_ACTIVITY;
+					var toolActivity:ToolActivityComponent = activity as ToolActivityComponent;
+					var groupings:ArrayCollection = toolActivity.allPossibleGroupings;
+					changeWatcherArray.addItem(BindingUtils.bindProperty(groupingCombo, "dataProvider", toolActivity, "allPossibleGroupings"));
+				
+				} else if (activity is RandomGroupActivityComponent) {
 					this.currentState = STATE_GROUP_RANDOM;
 					var randomGroupActivity:RandomGroupActivityComponent = activity as RandomGroupActivityComponent;
 					changeWatcherArray.addItem(BindingUtils.bindProperty(randomGroups, "selected", randomGroupActivity, "isGroupNumber"));
@@ -164,6 +173,14 @@
 				nameGroupsWindow.openWindow();
 			}
 			
+			private function getGroupingComboLabel(obj_data:Object):String {
+				if (obj_data is GroupActivityComponent) {
+					return (obj_data as GroupActivityComponent).title.text;
+				} else {
+					return "none";
+				}
+			}
+			
 		]]>
 	</mx:Script>
 
@@ -183,6 +200,7 @@
 	<mx:Canvas id="opacityLayer" height="100%" width="100%" backgroundColor="white" backgroundAlpha="0.6" />
 	
 	<states>
+		<!-- GROUP STATES -->
 		<mx:State name="{STATE_GROUP_RANDOM}">
 			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
 				<mx:GridRow height="22" styleName="firstInGroup">
@@ -304,6 +322,58 @@
             <mx:SetProperty target="{this}"
             	name="title" value="{Application.application.dictionary.getLabel('pi_learner_group_activity')}"/>
 			
+		</mx:State>
+		<!-- /GROUP STATES -->
+		
+		<mx:State name="{STATE_TOOL_ACTIVITY}">
+			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
+				<mx:GridRow styleName="firstInGroup">
+					<mx:GridItem  >
+						<mx:Label text="{Application.application.dictionary.getLabel('grouping_act_title')}" />
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:ComboBox id="groupingCombo" labelFunction="getGroupingComboLabel"  />
+					</mx:GridItem>
+				</mx:GridRow>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
+				<mx:GridRow>
+					<mx:GridItem  >
+						<mx:Label text="{Application.application.dictionary.getLabel('gradebook_output_type')}" />
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:ComboBox id="gradebookOutput" />
+					</mx:GridItem>
+				</mx:GridRow>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
+				<mx:GridRow height="22" >
+					<mx:GridItem >
+						<mx:Label text="{Application.application.dictionary.getLabel('pi_runoffline')}" />
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:CheckBox id="offlineActivity" />
+					</mx:GridItem>
+				</mx:GridRow>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
+				<mx:GridRow height="22" >
+					<mx:GridItem >
+						<mx:Label text="{Application.application.dictionary.getLabel('pi_define_monitor_cb_lbl')}" />
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:CheckBox id="defineInMonitor" />
+					</mx:GridItem>
+				</mx:GridRow>
+			</mx:AddChild>
+			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">   
+                <mx:GridRow height="18">
+                	<mx:GridItem colSpan="2" horizontalAlign="center"> 
+		                <mx:Button label="{Application.application.dictionary.getLabel('map_comptence_btn')}" 
+		                		height="18" />
+                	</mx:GridItem>
+                </mx:GridRow>
+            </mx:AddChild>
 		</mx:State>
 	</states>
 	

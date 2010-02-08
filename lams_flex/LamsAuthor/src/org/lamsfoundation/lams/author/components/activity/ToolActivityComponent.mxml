@@ -7,6 +7,8 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.components.activity.group.GroupActivityComponent;
+			import mx.collections.ArrayCollection;
 			import mx.core.Application;
 			import org.lamsfoundation.lams.author.model.learninglibrary.Tool;
 			import mx.containers.HBox;
@@ -20,6 +22,10 @@
 			
 			public var iconImage:Image;
 			public var tool:Tool;
+			
+			public var toolOutputDefinitions:ArrayCollection = new ArrayCollection();
+			
+			public var grouping:GroupActivityComponent;
 			
 			override public function load():void {
 				
@@ -62,6 +68,38 @@
    				
 			}
 			
+			
+			public function getToolOutputDefinitions():ArrayCollection {
+				return this.toolOutputDefinitions;
+			}
+			
+			public function get allPossibleGroupings():ArrayCollection {
+				
+				var ret:ArrayCollection = new ArrayCollection();
+				ret.addItem(new Object());
+				if (this.transitionIn != null){
+					ret = getGroupingsRecurse(this.transitionIn.fromActivity, new ArrayCollection());
+				}
+				return ret;
+				
+			}
+			
+			public function getGroupingsRecurse(activity:ActivityComponent, groupCollection:ArrayCollection):ArrayCollection {
+				
+				// If the current activity is a grouping activity, add it to the array
+				if (activity is GroupActivityComponent) {
+					groupCollection.addItem(activity);
+				}
+				
+				// Once we get back to the first activity, return
+				if (activity.transitionIn == null) {
+					return groupCollection;
+				}
+				
+				groupCollection.addAll(getGroupingsRecurse(activity.transitionIn.fromActivity, groupCollection));
+				
+				return groupCollection;
+			}
 			
 			
 		]]>

@@ -194,6 +194,17 @@
 	    <entry key="pi_equal_group_sizes">
 	      <name>Equal group sizes</name>
 	    </entry>
-		
+	    <entry key="gradebook_output_type">
+	      <name>Gradebook Output</name>
+	    </entry>
+	    <entry key="pi_runoffline">
+	      <name>Offline Activity</name>
+	    </entry>
+	    <entry key="pi_define_monitor_cb_lbl">
+	      <name>Define in Monitor</name>
+	    </entry>
+	    <entry key="map_comptence_btn">
+	      <name>Map to competencies</name>
+	    </entry>
 	</language>
 </xml>
