@@ -105,7 +105,7 @@ public abstract class AbstractExportPortfolioServlet extends HttpServlet {
 		directoryName = WebUtil.readStrParam(request, AttributeNames.PARAM_DIRECTORY_NAME); 
 		
 		//put the path together again, since the given directory was a relative one.
-		String absoluteDirectoryPath = FileUtil.TEMP_DIR + File.separator + directoryName;
+		String absoluteDirectoryPath = FileUtil.getTempDir() + File.separator + directoryName;
 	
 		if (log.isDebugEnabled()) {
 			log.debug("Directory name to store files is "+directoryName);

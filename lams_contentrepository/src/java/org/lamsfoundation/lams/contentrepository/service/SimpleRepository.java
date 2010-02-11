@@ -672,8 +672,8 @@ public class SimpleRepository implements IRepositoryAdmin {
 	 				if(toFileName == null){
 	 					IValue prop = node.getProperty(PropertyName.FILENAME);
 	 					toFileName = prop != null ? prop.getString() : null;
-	 					FileUtil.createDirectory(FileUtil.TEMP_DIR);
-	 					toFileName =  FileUtil.getFullPath(FileUtil.TEMP_DIR,toFileName); 
+	 					FileUtil.createDirectory(FileUtil.getTempDir());
+	 					toFileName =  FileUtil.getFullPath(FileUtil.getTempDir(),toFileName); 
 	 				}
 	 		    	ZipFileUtil.createZipFile(FileUtil.getFileName(toFileName),tempRoot,FileUtil.getFileDirectory(toFileName));
 	 		    }
@@ -707,8 +707,8 @@ public class SimpleRepository implements IRepositoryAdmin {
 		if(toFileName == null){
 			IValue prop = node.getProperty(PropertyName.FILENAME);
 			toFileName = prop != null ? prop.getString() : null;
-			FileUtil.createDirectory(FileUtil.TEMP_DIR);
-			toFileName =  FileUtil.getFullPath(FileUtil.TEMP_DIR,toFileName); 
+			FileUtil.createDirectory(FileUtil.getTempDir());
+			toFileName =  FileUtil.getFullPath(FileUtil.getTempDir(),toFileName); 
 		}
 		OutputStream os = new FileOutputStream(toFileName);
 		byte[] out  = new byte[8 * 1024];

@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.DesignDetailDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
+import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;

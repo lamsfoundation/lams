@@ -99,7 +99,7 @@ public class ExportDownloadServlet extends HttpServlet {
 	
 	private String constructAbsolutePath(String relativePath)
 	{
-		return FileUtil.TEMP_DIR + File.separator
+		return FileUtil.getTempDir() + File.separator
 			+ getDirname(relativePath) + File.separator 
 			+ ExportPortfolioConstants.EXPORT_TEMP_FILENAME;
 	}

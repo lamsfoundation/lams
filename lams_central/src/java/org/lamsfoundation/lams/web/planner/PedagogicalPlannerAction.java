@@ -1178,7 +1178,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    throws ServletException {
 	File designFile = null;
 	try {
-	    designFile = new File(FileUtil.TEMP_DIR, fileName);
+	    designFile = new File(FileUtil.getTempDir(), fileName);
 	    InputStream inputStream = getContentHandler().getFileNode(fileUuid).getFile();
 	    copyFileFromRepository(inputStream, designFile);
 	} catch (Exception e) {

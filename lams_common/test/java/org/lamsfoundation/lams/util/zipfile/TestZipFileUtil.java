@@ -307,7 +307,7 @@ public class TestZipFileUtil extends TestCase {
     public void testCreateZipFile2() throws FileUtilException, IOException, ZipFileUtilException
     {
         String directoryToZip = "ZipTestDirectory";
- 	   String directoryToPlaceZip = FileUtil.TEMP_DIR + File.separator + "ZipTmpDir";
+ 	   String directoryToPlaceZip = FileUtil.getTempDir() + File.separator + "ZipTmpDir";
  	   	String zipFileName= "testCreateZipFile.zip";	    	
  	   		    	
  	   	if (createTestDirectoryAndFiles(directoryToZip))

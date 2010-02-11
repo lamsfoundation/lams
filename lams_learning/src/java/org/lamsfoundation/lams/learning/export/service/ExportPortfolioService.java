@@ -326,7 +326,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 
 	    // for security reasons, append the relative directory name to the end of the export url instead of the
 	    // whole path
-	    String relativePath = activitySubDirectory.substring(FileUtil.TEMP_DIR.length() + 1, activitySubDirectory
+	    String relativePath = activitySubDirectory.substring(FileUtil.getTempDir().length() + 1, activitySubDirectory
 		    .length());
 
 	    // Some activities (parallel, optional, sequence) don't have export urls.

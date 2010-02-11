@@ -85,7 +85,6 @@ public class FileUtil {
     private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
 
     protected static final String prefix = "lamstmp_"; // protected rather than private to suit junit test
-    public static final String TEMP_DIR = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
 
     /**
      * Deleting a directory using File.delete() only works if the directory is
@@ -192,7 +191,7 @@ public class FileUtil {
      */
     public static String createTempDirectory(String suffix) throws FileUtilException {
 
-	String tempSysDirName = FileUtil.TEMP_DIR;
+	String tempSysDirName = getTempDir();
 	if (tempSysDirName == null) {
 	    throw new FileUtilException(
 		    "No temporary directory known to the server. [System.getProperty( \"java.io.tmpdir\" ) returns null. ]\n Cannot upload package.");
@@ -342,7 +341,7 @@ public class FileUtil {
 	// get dump directory name and make sure directory exists
 	String dumpDirectory = Configuration.get(ConfigurationKeys.LAMS_DUMP_DIR);
 	if (dumpDirectory == null) {
-	    dumpDirectory = FileUtil.TEMP_DIR;
+	    dumpDirectory = getTempDir();
 	}
 	createDirectory(dumpDirectory);
 
@@ -596,7 +595,7 @@ public class FileUtil {
 	FileUtil.log.info("Getting all temp zipfile expanded directories before " + date.toString()
 		+ " (server time) (" + newestDateToKeep + ")");
 
-	File tempSysDir = new File(FileUtil.TEMP_DIR);
+	File tempSysDir = new File(getTempDir());
 	File candidates[] = tempSysDir.listFiles(new TempDirectoryFilter(newestDateToKeep, FileUtil.log));
 	return candidates;
     }
@@ -966,4 +965,31 @@ public class FileUtil {
 	}
 	csv.close();
     }
+    
+    /**
+	* Gets the temp dir, creates if not exists, returns java system temp dir if inaccessible
+	* @return
+	*/
+	public static String getTempDir() {
+		                
+		String ret = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
+	 	File tempDir = new File(ret);
+	 	
+	 	// Create if not exists
+	 	if (!tempDir.exists()) {
+		 	boolean success = tempDir.mkdirs();
+		 	if (!success) {
+		 		log.error("Could not create temp directory: " + ret);
+		 		return System.getProperty("java.io.tmpdir");
+		 	}
+	 	}
+	 	
+	 	// Return java temp dir if not accessible
+	 	if (!tempDir.canWrite()) {
+	 		return System.getProperty("java.io.tmpdir");
+	 	} else {
+	 		return ret;
+	 	}
+	                
+	}
 }
