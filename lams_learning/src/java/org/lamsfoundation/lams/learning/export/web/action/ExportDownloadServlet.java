@@ -61,10 +61,12 @@ public class ExportDownloadServlet extends HttpServlet {
 	{
 	  	    
 	    String zipFilename = WebUtil.readStrParam(request, ExportPortfolioConstants.PARAM_FILE_LOCATION);
+	    zipFilename = new String(zipFilename.getBytes(), "UTF-8");
 	    
 	    /* Extract taken from org.lamsfoundation.lams.contentrepository.client.Download servlet */
 	    response.setContentType("application/x-download");
-		response.setHeader("Content-Disposition","attachment;filename=\""+getFilename(zipFilename)+"\"");
+	    String filename = FileUtil.encodeFilenameForDownload(request, getFilename(zipFilename));
+		response.setHeader("Content-Disposition","attachment;filename=\""+filename+"\"");
 		
 		InputStream in = new BufferedInputStream(new FileInputStream(new File(constructAbsolutePath(zipFilename)))); 
 		OutputStream out = response.getOutputStream();
