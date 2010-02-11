@@ -46,7 +46,7 @@
 	        	if (dragInitiator.learningLibraryEntry.isCombined) {
 	        		var combinedAactivityComponent:CombinedActivityComponent = new CombinedActivityComponent();
 	        		combinedAactivityComponent.learningLibraryEntry = dragInitiator.learningLibraryEntry
-	        		combinedAactivityComponent.load();
+	        		combinedAactivityComponent.load(0);
 					combinedAactivityComponent.x = UIComponent(event.currentTarget).mouseX;
           			combinedAactivityComponent.y = UIComponent(event.currentTarget).mouseY; 
           			ds.addData(combinedAactivityComponent, "img"); 
@@ -54,7 +54,7 @@
 	        	} else {
 	        		var toolActivityComponent:ToolActivityComponent = new ToolActivityComponent();
 	        		toolActivityComponent.tool = dragInitiator.learningLibraryEntry.toolTemplates[0];
-	        		toolActivityComponent.load();
+	        		toolActivityComponent.load(0);
 					toolActivityComponent.x = UIComponent(event.currentTarget).mouseX;
           			toolActivityComponent.y = UIComponent(event.currentTarget).mouseY;
           			ds.addData(toolActivityComponent, "img"); 

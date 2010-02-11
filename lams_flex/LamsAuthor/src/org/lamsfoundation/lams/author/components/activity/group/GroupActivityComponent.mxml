@@ -11,10 +11,13 @@
 			
 			public var numGroups:Number = 2;
 			
+			public var isNull:Boolean = false;
+			
 			[Bindable]
 			public var groupNames:ArrayCollection = new ArrayCollection();
 			
-			override public function load():void {
+			override public function load(UIID:int):void {
+            	super.load(UIID);
             	this.title = new Label();
             	title.text = Application.application.dictionary.getLabel("grouping_act_title");
 				this.addChild(title);
@@ -34,6 +37,5 @@
 		height="40" width="50">
 		<mx:Image source="@Embed(source='assets/icons/group.png')" />
 	</mx:VBox>
-	
 	
 </ActivityComponent>

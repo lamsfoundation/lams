@@ -14,6 +14,8 @@
 
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.components.activity.group.GroupActivityComponent;
+			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
 			import mx.controls.Alert;
 			import mx.managers.DragManager;
@@ -23,6 +25,10 @@
 			import org.lamsfoundation.lams.author.events.TransitionEvent;
 			import mx.controls.Label;
 			import org.lamsfoundation.lams.author.components.transition.TransitionComponent;
+			
+			// Activity UIID
+			[Bindable]
+			public var activityUIID:int;
 			
 			// Activity title label
 			public var title:Label;
@@ -39,6 +45,10 @@
 			public var transitionIn:TransitionComponent
 			public var transitionOut:TransitionComponent;
 			
+			// Grouping UUID 0 means no grouping
+			[Bindable]
+			public var groupingUIID:int = 0;
+			
 			// Activity states
 			public var isDragable:Boolean = true;
 			public var canStartTransitions:Boolean = true;  	// True if this activty can start transitions
@@ -46,9 +56,8 @@
 			public var state:int = Constants.ACTIVITY_STATE_NORMAL;
 			
 			// Function used to load a new activity 
-			public function load():void { 
-				title = new Label();
-				this.addChild(title);	
+			public function load(UIID:int):void { 
+				this.activityUIID = UIID;
 		    }
 		    
 		    public function disableTitle():void {
@@ -156,6 +165,11 @@
 				transitionOut.endY = centerY;
 				transitionOut.invalidateProperties();
 				
+				// deselect the currently selected activity
+				if (Application.application.selectedActivity != null) {
+					Application.application.selectedActivity.deSelectActivity();
+				}
+				
 				parent.addChild(transitionOut);
 				
 				systemManager.addEventListener(MouseEvent.MOUSE_MOVE, systemManagerMouseMoveHandler, true);
@@ -240,6 +254,35 @@
 		   			transitionIn.endY = centerY;
 		   			transitionIn.invalidateDisplayList();
 		   		}
+			}
+			
+			/**
+			 * Gets all the possible groupings for this activity
+			 * 
+			 * @return collection of all possible groupings for this activity
+			 */
+			public function get allPossibleGroupings():ArrayCollection {	
+				var ret:ArrayCollection = new ArrayCollection();
+				if (this.transitionIn != null){
+					var activity:ActivityComponent = this.transitionIn.fromActivity;
+					
+					while (true) {
+						if (activity is GroupActivityComponent) {
+							var entry:Object = new Object();
+							entry.activityUIID = activity.activityUIID;
+							entry.title = activity.title.text;
+							ret.addItem(entry);
+						}
+						
+						if (activity.transitionIn != null) {
+							activity = activity.transitionIn.fromActivity;
+						} else {
+							break;
+						}
+					}  
+				}
+				
+				return ret;
 			}
 
 		]]>

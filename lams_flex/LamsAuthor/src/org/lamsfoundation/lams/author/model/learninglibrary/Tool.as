@@ -15,6 +15,7 @@ package org.lamsfoundation.lams.author.model.learninglibrary
 	public class Tool
 	{
 		public var toolID:int;
+		public var defaultToolContentID:int;
 		public var toolName:String;
 		public var toolDisplayName:String;
 		public var toolSignature:String;
@@ -44,6 +45,7 @@ package org.lamsfoundation.lams.author.model.learninglibrary
 		public function Tool(dto:Object, learningLibraryIDIn:int)
 		{
 			this.toolID = parseInt(dto.toolID);
+			this.defaultToolContentID = parseInt(dto.toolContentID);
 			this.toolName = dto.activityTitle;
 			this.toolDisplayName = dto.toolDisplayName;
 			this.toolSignature = dto.toolSignature;

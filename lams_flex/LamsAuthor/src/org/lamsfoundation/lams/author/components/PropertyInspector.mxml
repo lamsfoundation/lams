@@ -17,6 +17,8 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.model.ToolOutputDefinition;
+			import mx.events.ListEvent;
 			import org.lamsfoundation.lams.author.components.activity.group.LearnerGroupActivityComponent;
 			import org.lamsfoundation.lams.author.components.activity.group.MonitorGroupActivityComponent;
 			import mx.collections.ArrayCollection;
@@ -35,6 +37,10 @@
 			private static const STATE_GROUP_LEARNER:String = "learnerGroupActivity";
 			
 			private static const STATE_TOOL_ACTIVITY:String = "toolActivity";
+			
+			public static const MIN_INPUT_WIDTH:int = 100;
+			public static const MAX_INPUT_WIDTH:int = 100;
+			
 			
 			private var changeWatcherArray:ArrayCollection = new ArrayCollection();
 			
@@ -57,8 +63,8 @@
 				PopUpManager.addPopUp(this, this, false);
 				
 				// Capture the binding so it can be removed when the property inpector is closed (activity de-selected)
-				changeWatcherArray.addItem(BindingUtils.bindProperty(activityTitle, "text", activity.title, "text"));
-				changeWatcherArray.addItem(BindingUtils.bindProperty(activity.title, "text", activityTitle, "text"));
+				changeWatcherArray.addItem(BindingUtils.bindProperty(titleInput, "text", activity.title, "text"));
+				changeWatcherArray.addItem(BindingUtils.bindProperty(activity.title, "text", titleInput, "text"));
 				
 				// Display particular ui components for the activity type
 				displayUIComponents(activity);
@@ -85,9 +91,14 @@
 			
 			// Disable and white out the propertyInspector on rollOut
 			private function rollOut(event:MouseEvent):void {
-				this.styleName = "propertyInspectorUnselected"
-				setChildIndex(opacityLayer, this.getChildren().length -1);
-				focusManager.hideFocus();
+
+				// Check the mouse is not still within the area of the propertyInspector
+				if (event.localX < 0 || event.localX > width || event.localY < 0 || event.localY > height){
+					this.styleName = "propertyInspectorUnselected"
+					setChildIndex(opacityLayer, this.getChildren().length -1);
+					focusManager.hideFocus();
+				}
+				
 			}
 			
 			// Minimise/Maxomise the property inspector
@@ -112,8 +123,16 @@
 				if (activity is ToolActivityComponent) {
 					this.currentState = STATE_TOOL_ACTIVITY;
 					var toolActivity:ToolActivityComponent = activity as ToolActivityComponent;
-					var groupings:ArrayCollection = toolActivity.allPossibleGroupings;
-					changeWatcherArray.addItem(BindingUtils.bindProperty(groupingCombo, "dataProvider", toolActivity, "allPossibleGroupings"));
+					
+					loadGroupsDropDown(toolActivity);
+					loadToolOutputDefs(toolActivity);
+					
+					changeWatcherArray.addItem(BindingUtils.bindProperty(runOffline, "selected", toolActivity, "runOffline"));
+					changeWatcherArray.addItem(BindingUtils.bindProperty(toolActivity, "runOffline", runOffline, "selected"));
+					
+					changeWatcherArray.addItem(BindingUtils.bindProperty(defineLater, "selected", toolActivity, "defineLater"));
+					changeWatcherArray.addItem(BindingUtils.bindProperty(toolActivity, "defineLater", defineLater, "selected"));
+
 				
 				} else if (activity is RandomGroupActivityComponent) {
 					this.currentState = STATE_GROUP_RANDOM;
@@ -154,6 +173,57 @@
 				
 			}
 			
+			private function loadGroupsDropDown(activityComponent:ActivityComponent):void {
+				currentAvailableGroups.removeAll();
+				
+				// Set a dummy null grouping so it can be binded to the combo box in the preoperty inspector
+				var nullGrouping:Object = new Object();
+				nullGrouping.title = Application.application.dictionary.getLabel("none_act_lbl");
+				nullGrouping.activityUIID = 0;			
+				currentAvailableGroups.addItem(nullGrouping);
+				currentAvailableGroups.addAll(activityComponent.allPossibleGroupings);
+				
+				groupingCombo.selectedItem = nullGrouping;
+				for each (var item:Object in currentAvailableGroups) {
+					if (activityComponent.groupingUIID == item.activityUIID) {
+						groupingCombo.selectedItem = item;
+					}
+				}
+			}
+			
+			private function loadToolOutputDefs(toolActivityComponent:ToolActivityComponent):void {
+
+				
+				var nullOutput:ToolOutputDefinition = new ToolOutputDefinition();;
+				nullOutput.description = Application.application.dictionary.getLabel("none_act_lbl");
+				
+				toolOutputDefs.removeAll();
+				toolOutputDefs.addItem(nullOutput);
+				toolOutputDefs.addAll(Application.application.mainMap.getToolOutputDefinitions(toolActivityComponent));
+
+				gradebookOutputCombo.selectedItem = nullOutput;
+				for each (var item:ToolOutputDefinition in toolOutputDefs) {
+					if (item.isEqual(toolActivityComponent.gradebookOutput)) {
+						gradebookOutputCombo.selectedItem = item;
+						break;
+					} 
+				}
+				
+			}
+			
+			private function groupChange(event:ListEvent):void {
+				Application.application.selectedActivity.groupingUIID = event.currentTarget.selectedItem.activityUIID;
+			}
+			
+			private function outputsChange(event:ListEvent):void {
+				
+				if (Application.application.selectedActivity is ToolActivityComponent) {
+					var toolActivity:ToolActivityComponent = Application.application.selectedActivity as ToolActivityComponent;
+					toolActivity.gradebookOutput = event.currentTarget.selectedItem;
+				}
+				 
+			}
+			
 			private function groupNumChange(event:Event):void {
 				if (Application.application.selectedActivity is GroupActivityComponent) {
 					var groupActivity:GroupActivityComponent = Application.application.selectedActivity as GroupActivityComponent;
@@ -168,19 +238,10 @@
 				
 			}
 			
-			
 			private function openNameGroupsWindow():void {
 				nameGroupsWindow.openWindow();
 			}
-			
-			private function getGroupingComboLabel(obj_data:Object):String {
-				if (obj_data is GroupActivityComponent) {
-					return (obj_data as GroupActivityComponent).title.text;
-				} else {
-					return "none";
-				}
-			}
-			
+
 		]]>
 	</mx:Script>
 
@@ -192,7 +253,15 @@
 					<mx:Label text="{Application.application.dictionary.getLabel('pi_lbl_title')}" height="22" />
 				</mx:GridItem>
 				<mx:GridItem>
-					<mx:TextInput id="activityTitle" width="100" maxChars="256" height="22"  />
+					<mx:TextInput id="titleInput" width="100" maxChars="256" height="22"  />
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow id="groupingGridRow">
+				<mx:GridItem>
+					<mx:Label text="{Application.application.dictionary.getLabel('grouping_act_title')}" />
+				</mx:GridItem>
+				<mx:GridItem>
+					<mx:ComboBox id="groupingCombo" change="groupChange(event)" labelField="title" dataProvider="{currentAvailableGroups}" width="{MIN_INPUT_WIDTH}" dropdownWidth="250"  />
 				</mx:GridItem>
 			</mx:GridRow>
 		</mx:Grid>
@@ -235,8 +304,9 @@
                 </mx:GridRow>
             </mx:AddChild>
 			
-            <mx:SetProperty target="{this}"
-            	name="title" value="{Application.application.dictionary.getLabel('pi_random_group_activity')}"/>
+            <mx:SetProperty target="{this}" name="title" value="{Application.application.dictionary.getLabel('pi_random_group_activity')}"/>
+            <mx:SetProperty target="{groupingGridRow}" name="visible" value="{false}"/>     
+            <mx:SetProperty target="{groupingGridRow}" name="includeInLayout" value="{false}"/>
 
 		</mx:State>
 		<mx:State name="{STATE_GROUP_MONITOR}">
@@ -259,8 +329,9 @@
                 </mx:GridRow>
             </mx:AddChild>
         	
-        	<mx:SetProperty target="{this}"
-            	name="title" value="{Application.application.dictionary.getLabel('pi_monitor_group_activity')}"/> 
+        	<mx:SetProperty target="{this}" name="title" value="{Application.application.dictionary.getLabel('pi_monitor_group_activity')}"/> 
+           	<mx:SetProperty target="{groupingGridRow}" name="visible" value="{false}"/>
+            <mx:SetProperty target="{groupingGridRow}" name="includeInLayout" value="{false}"/>
 		</mx:State>
 		<mx:State name="{STATE_GROUP_LEARNER}">
 			
@@ -319,30 +390,24 @@
                 </mx:GridRow>
             </mx:AddChild>
             
-            <mx:SetProperty target="{this}"
-            	name="title" value="{Application.application.dictionary.getLabel('pi_learner_group_activity')}"/>
+            <mx:SetProperty target="{this}" name="title" value="{Application.application.dictionary.getLabel('pi_learner_group_activity')}"/>	
+            <mx:SetProperty target="{groupingGridRow}" name="visible" value="{false}"/>
+            <mx:SetProperty target="{groupingGridRow}" name="includeInLayout" value="{false}"/>
 			
 		</mx:State>
 		<!-- /GROUP STATES -->
 		
 		<mx:State name="{STATE_TOOL_ACTIVITY}">
 			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
-				<mx:GridRow styleName="firstInGroup">
-					<mx:GridItem  >
-						<mx:Label text="{Application.application.dictionary.getLabel('grouping_act_title')}" />
-					</mx:GridItem>
-					<mx:GridItem>
-						<mx:ComboBox id="groupingCombo" labelFunction="getGroupingComboLabel"  />
-					</mx:GridItem>
-				</mx:GridRow>
+				
 			</mx:AddChild>
 			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
-				<mx:GridRow>
+				<mx:GridRow styleName="firstInGroup">
 					<mx:GridItem  >
 						<mx:Label text="{Application.application.dictionary.getLabel('gradebook_output_type')}" />
 					</mx:GridItem>
 					<mx:GridItem>
-						<mx:ComboBox id="gradebookOutput" />
+						<mx:ComboBox id="gradebookOutputCombo" dataProvider="{toolOutputDefs}" labelField="description" change="outputsChange(event)" width="{MIN_INPUT_WIDTH}" dropdownWidth="250"/>
 					</mx:GridItem>
 				</mx:GridRow>
 			</mx:AddChild>
@@ -352,7 +417,7 @@
 						<mx:Label text="{Application.application.dictionary.getLabel('pi_runoffline')}" />
 					</mx:GridItem>
 					<mx:GridItem>
-						<mx:CheckBox id="offlineActivity" />
+						<mx:CheckBox id="runOffline" />
 					</mx:GridItem>
 				</mx:GridRow>
 			</mx:AddChild>
@@ -362,7 +427,7 @@
 						<mx:Label text="{Application.application.dictionary.getLabel('pi_define_monitor_cb_lbl')}" />
 					</mx:GridItem>
 					<mx:GridItem>
-						<mx:CheckBox id="defineInMonitor" />
+						<mx:CheckBox id="defineLater" />
 					</mx:GridItem>
 				</mx:GridRow>
 			</mx:AddChild>
@@ -374,10 +439,15 @@
                 	</mx:GridItem>
                 </mx:GridRow>
             </mx:AddChild>
+            
+            <mx:SetProperty target="{this}" name="title" value="{Application.application.selectedActivity.title.text}"/>
 		</mx:State>
 	</states>
 	
 	
 	<group:NameGroupsWindow id="nameGroupsWindow"  includeInLayout="false" />
+	
+	<mx:ArrayCollection id="currentAvailableGroups" />
+	<mx:ArrayCollection id="toolOutputDefs" />
 
 </ButtonPanel>

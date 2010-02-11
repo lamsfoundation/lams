@@ -30,6 +30,8 @@ package org.lamsfoundation.lams.author.controller
 		private var dictionaryFallback:XML;
 		
 	 	public var transitionArray:ArrayCollection = new ArrayCollection();
+	 	
+	 	public var activities:Dictionary = new Dictionary();
 		
 		public function AuthorController(){}
 		
@@ -79,8 +81,9 @@ package org.lamsfoundation.lams.author.controller
 			// Get the current mouse point, and convert it to co-ordinates in CanvasBox
 			var comp:UIComponent = UIComponent(event.currentTarget);
 			var currentMousePoint:Point = new Point(comp.mouseX, comp.mouseY);
-			currentMousePoint = canvasBox.globalToLocal(currentMousePoint);
+			currentMousePoint = canvasBox.globalToLocal(currentMousePoint);	
 			
+			// This condition is true if the activity was already on the canvas
 			if (event.dragInitiator is ActivityComponent) {
             	var activityComponent:ActivityComponent;
             	activityComponent = event.dragInitiator as ActivityComponent;
@@ -89,70 +92,93 @@ package org.lamsfoundation.lams.author.controller
           		activityComponent.setCenter();
           		activityComponent.updateTransitionPositions();
           		activityComponent.selectActivity();
-            } else if (event.dragInitiator is LearningLibraryEntryComponent) {
-            	var learningLibraryComponent:LearningLibraryEntryComponent = event.dragInitiator as LearningLibraryEntryComponent;
+            } else {
+            	// Adding a new activity to the canvas
             	
-            	if (learningLibraryComponent.learningLibraryEntry.isCombined) {
-            		var combinedActivityComponent:CombinedActivityComponent = new CombinedActivityComponent();
-                	combinedActivityComponent.learningLibraryEntry = learningLibraryComponent.learningLibraryEntry;
-                	combinedActivityComponent.load()
-					combinedActivityComponent.x = currentMousePoint.x;
-              		combinedActivityComponent.y = currentMousePoint.y
-                	canvasBox.addChild(combinedActivityComponent);
-                	combinedActivityComponent.setCenter();
-                	combinedActivityComponent.selectActivity();
-            	} else {
-            		var toolActivityComponent:ToolActivityComponent = new ToolActivityComponent();
-                	toolActivityComponent.tool = learningLibraryComponent.learningLibraryEntry.toolTemplates[0];
-                	toolActivityComponent.load()
-					toolActivityComponent.x = currentMousePoint.x;
-              		toolActivityComponent.y = currentMousePoint.y;
-                	canvasBox.addChild(toolActivityComponent);
-                	toolActivityComponent.setCenter();
-                	toolActivityComponent.selectActivity();
-            	}
-            } else if (event.dragInitiator is SystemToolComponent) {
-            	var systemToolComponent:SystemToolComponent = event.dragInitiator as SystemToolComponent;
+            	// Get the next UIID
+				var nextActivityUIID:int = getNewUIID();
             	
-            	switch (systemToolComponent.type) {
-            		case Constants.SYSTEM_ACTIVITY_TYPE_OPTIONAL:
-            			var optionalActivityComponent:OptionalActivityComponent = new OptionalActivityComponent();       			
-	                	optionalActivityComponent.x = currentMousePoint.x;
-		              	optionalActivityComponent.y = currentMousePoint.y;
-		              	canvasBox.addChild(optionalActivityComponent);
-	                	optionalActivityComponent.setCenter();
-	                	optionalActivityComponent.load();
-	                	optionalActivityComponent.selectActivity();
-            			break;
-            		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_RANDOM:
-            			var randomGroup:RandomGroupActivityComponent = new RandomGroupActivityComponent();
-	                	randomGroup.x = currentMousePoint.x;
-		              	randomGroup.y = currentMousePoint.y;
-		              	canvasBox.addChild(randomGroup);
-	                	randomGroup.setCenter();
-	                	randomGroup.load();
-	                	randomGroup.selectActivity();
-            			break;
-            		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_MONITOR:
-            			var monitorGroup:MonitorGroupActivityComponent = new MonitorGroupActivityComponent();
-	                	monitorGroup.x = currentMousePoint.x;
-		              	monitorGroup.y = currentMousePoint.y;
-		              	canvasBox.addChild(monitorGroup);
-	                	monitorGroup.setCenter();
-	                	monitorGroup.load();
-	                	monitorGroup.selectActivity();
-            			break;
-            		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_LEARNER:
-            			var learnerGroup:GroupActivityComponent = new LearnerGroupActivityComponent();
-	                	learnerGroup.x = currentMousePoint.x;
-		              	learnerGroup.y = currentMousePoint.y;
-		              	canvasBox.addChild(learnerGroup);
-	                	learnerGroup.setCenter();
-	                	learnerGroup.load();
-	                	learnerGroup.selectActivity();
-            			break;
-            	}
+            	if (event.dragInitiator is LearningLibraryEntryComponent) {
+	            	var learningLibraryComponent:LearningLibraryEntryComponent = event.dragInitiator as LearningLibraryEntryComponent;
+	            	
+	            	// Get the current toolContentID then increment the global counter
+					var toolContentID:int = Application.application.nextToolContentID;
+					Application.application.nextToolContentID++;
+	            	
+	            	if (learningLibraryComponent.learningLibraryEntry.isCombined) {
+	            		
+	            		var act1UIID:int = getNewUIID();
+	            		var act2UIID:int = getNewUIID();
+	            		var combinedActivityComponent:CombinedActivityComponent = new CombinedActivityComponent();
+	                	combinedActivityComponent.toolContentID = toolContentID;
+	                	combinedActivityComponent.learningLibraryEntry = learningLibraryComponent.learningLibraryEntry;
+	                	combinedActivityComponent.loadCombined(nextActivityUIID, act1UIID, act2UIID)
+						combinedActivityComponent.x = currentMousePoint.x;
+	              		combinedActivityComponent.y = currentMousePoint.y
+	                	canvasBox.addChild(combinedActivityComponent);
+	                	combinedActivityComponent.setCenter();
+	                	combinedActivityComponent.selectActivity();
+	                	activities[nextActivityUIID] = combinedActivityComponent;
+	            	} else {
+	            		var toolActivityComponent:ToolActivityComponent = new ToolActivityComponent();
+	                	toolActivityComponent.toolContentID = toolContentID;
+	                	toolActivityComponent.tool = learningLibraryComponent.learningLibraryEntry.toolTemplates[0];
+	                	toolActivityComponent.load(nextActivityUIID)
+						toolActivityComponent.x = currentMousePoint.x;
+	              		toolActivityComponent.y = currentMousePoint.y;
+	                	canvasBox.addChild(toolActivityComponent);
+	                	toolActivityComponent.setCenter();
+	                	toolActivityComponent.selectActivity();
+	                	activities[nextActivityUIID] = toolActivityComponent;
+	            	}
+	            } else if (event.dragInitiator is SystemToolComponent) {
+	            	var systemToolComponent:SystemToolComponent = event.dragInitiator as SystemToolComponent;
+	            	
+	            	switch (systemToolComponent.type) {
+	            		case Constants.SYSTEM_ACTIVITY_TYPE_OPTIONAL:
+	            			var optionalActivityComponent:OptionalActivityComponent = new OptionalActivityComponent();       			
+		                	optionalActivityComponent.x = currentMousePoint.x;
+			              	optionalActivityComponent.y = currentMousePoint.y;
+			              	canvasBox.addChild(optionalActivityComponent);
+		                	optionalActivityComponent.setCenter();
+		                	optionalActivityComponent.load(nextActivityUIID);
+		                	optionalActivityComponent.selectActivity();
+		                	activities[nextActivityUIID] = optionalActivityComponent;
+	            			break;
+	            		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_RANDOM:
+	            			var randomGroup:RandomGroupActivityComponent = new RandomGroupActivityComponent();
+		                	randomGroup.x = currentMousePoint.x;
+			              	randomGroup.y = currentMousePoint.y;
+			              	canvasBox.addChild(randomGroup);
+		                	randomGroup.setCenter();
+		                	randomGroup.load(nextActivityUIID);
+		                	randomGroup.selectActivity();
+		                	activities[nextActivityUIID] = randomGroup;
+	            			break;
+	            		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_MONITOR:
+	            			var monitorGroup:MonitorGroupActivityComponent = new MonitorGroupActivityComponent();
+		                	monitorGroup.x = currentMousePoint.x;
+			              	monitorGroup.y = currentMousePoint.y;
+			              	canvasBox.addChild(monitorGroup);
+		                	monitorGroup.setCenter();
+		                	monitorGroup.load(nextActivityUIID);
+		                	monitorGroup.selectActivity();
+		                	activities[nextActivityUIID] = monitorGroup;
+	            			break;
+	            		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_LEARNER:
+	            			var learnerGroup:GroupActivityComponent = new LearnerGroupActivityComponent();
+		                	learnerGroup.x = currentMousePoint.x;
+			              	learnerGroup.y = currentMousePoint.y;
+			              	canvasBox.addChild(learnerGroup);
+		                	learnerGroup.setCenter();
+		                	learnerGroup.load(nextActivityUIID);
+		                	learnerGroup.selectActivity();
+		                	activities[nextActivityUIID] = learnerGroup;
+	            			break;
+	            	}
+	            }	
             }
+            
                 
             // Return cursor state to normal
 			Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);  
@@ -322,6 +348,10 @@ package org.lamsfoundation.lams.author.controller
 			
 		}
 		
-		
+		private function getNewUIID():int{
+			var UIID:int = Application.application.nextUIID;
+			Application.application.nextUIID++;
+			return UIID;
+		}
 	}
 }

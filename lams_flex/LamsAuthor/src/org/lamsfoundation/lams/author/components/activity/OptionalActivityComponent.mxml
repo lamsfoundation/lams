@@ -17,7 +17,7 @@
 			
 			public var minActivities:int;
 			public var maxActivities:int;
-			public var desription:String;
+			public var description:String;
 			
 			// The dragEnter event handler for the Canvas container
             // enables dropping.
@@ -48,7 +48,8 @@
 				Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);                    
             }
             
-           	override public function load():void {
+           	override public function load(UIID:int):void {
+            	super.load(UIID);
             	title = new Label();
             	title.text = Application.application.dictionary.getLabel("grouping_act_title");
             	this.disableTitle();

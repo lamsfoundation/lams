@@ -23,7 +23,6 @@
 			import org.lamsfoundation.lams.common.util.WDDXParser;
 			import flash.utils.Dictionary;
 			
-			
 			// If testing is set to true, load data from test directory
 			public const TESTING:Boolean = true;
 			public const TESTING_LOCAL:Boolean = true;	// If true use assets folder, else use localhost
@@ -49,12 +48,18 @@
 			// current selected activity
 			public var selectedActivity:ActivityComponent;
 			
+			// Next toolContentID 1 by default for testing
+			public var nextToolContentID:int = 1;
+			
 			[Bindable]
 			public var applicationCenter:Point = new Point();
 			
 			// dictionary
 			[Bindable]
 			public var dictionary:XMLDictionaryRegistry;
+			
+			// Determines the next UIID for each activity
+			public var nextUIID:int = 1;
 			
 			private function preInit():void {
 				

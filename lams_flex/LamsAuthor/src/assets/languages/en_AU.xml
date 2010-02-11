@@ -206,5 +206,8 @@
 	    <entry key="map_comptence_btn">
 	      <name>Map to competencies</name>
 	    </entry>
+	    <entry key="none_act_lbl">
+	      <name>None</name>
+	    </entry>
 	</language>
 </xml>
