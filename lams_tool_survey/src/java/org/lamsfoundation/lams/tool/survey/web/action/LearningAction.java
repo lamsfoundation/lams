@@ -343,7 +343,7 @@ public class LearningAction extends Action {
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, true);
-	if (userID != null) {
+	if (userID != null && userID != 0) {
 	    surveyLearner = service.getUserByIDAndSession(userID, sessionId);
 	    request.setAttribute(AttributeNames.PARAM_USER_ID, userID);
 	}
@@ -361,7 +361,7 @@ public class LearningAction extends Action {
 	List<SurveyAnswer> answerList = new ArrayList<SurveyAnswer>();
 	for (AnswerDTO question : surveyItemList) {
 	    if (question.getAnswer() != null) {
-		if (userID != null)
+		if (userID != null && userID != 0)
 		    question.getAnswer().setUser(surveyLearner);
 		answerList.add(question.getAnswer());
 	    }
