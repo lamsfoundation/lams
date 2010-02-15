@@ -23,6 +23,16 @@ package org.lamsfoundation.lams.common.util
 			return data.messageValue;
 		}
 		
+		public function parseObjectXML(xml:XML):Object {
+			if(xml == null)
+				return null;
+			
+			var data:Object = WDDX.fromWDDX(xml.toXMLString());
+			
+			
+			return data.messageValue;
+		}
+		
 		public function createWDDX(data:Object):XML {
 			if(data == null)
 				return null;
