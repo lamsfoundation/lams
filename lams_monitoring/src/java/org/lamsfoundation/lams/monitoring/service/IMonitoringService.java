@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -879,6 +880,8 @@ public interface IMonitoringService {
 
 	/** Get Organisation Name */
 	public String getOrganisationName(Integer organisationId);
+	
+	public void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson);
 	
 	/**
      * Used in admin to clone lessons using the given lesson Ids (from another group) into the given group. Given staff

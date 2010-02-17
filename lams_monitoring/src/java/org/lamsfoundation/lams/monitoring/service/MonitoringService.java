@@ -2043,7 +2043,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @throws LamsToolServiceException
      *             the exception when lams is talking to tool.
      */
-    private void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson) {
+    public void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson) {
 	if (activity.getApplyGrouping().equals(Boolean.FALSE) && activity.getParentBranch() == null) {
 	    activity.setToolSessions(new HashSet());
 	    try {

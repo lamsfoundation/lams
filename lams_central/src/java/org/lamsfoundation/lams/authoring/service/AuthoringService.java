@@ -952,6 +952,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 							.notifyToolToCopyContent(toolActivity, true, null);
 					toolActivity.setToolContentId(newContentId);
 
+					// LDEV-2510 init tool sessions for support activities added during live edit
+					monitoringService.initToolSessionIfSuitable(toolActivity, lesson);
 				} else {
 					Integer newMaxId = monitoringService.startSystemActivity(
 							activity, design.getMaxID(), now, lesson
