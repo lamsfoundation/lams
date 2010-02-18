@@ -295,7 +295,8 @@ CREATE TABLE lams_user (
  	 , timezone TINYINT
 	 , tutorials_disabled TINYINT(1) DEFAULT 0
 	 , first_login TINYINT(1) DEFAULT 1
-         , modified_date DATETIME
+     , modified_date DATETIME
+     , openid_url VARCHAR(255) UNIQUE
      , PRIMARY KEY (user_id)
      , INDEX (authentication_method_id)
      , CONSTRAINT FK_lams_user_1 FOREIGN KEY (authentication_method_id)
@@ -312,6 +313,7 @@ CREATE TABLE lams_user (
      , INDEX (locale_id)
      , CONSTRAINT FK_lams_user_6 FOREIGN KEY (locale_id)
                   REFERENCES lams_supported_locale (locale_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+     , INDEX idx_openid_url (openid_url)
 )TYPE=InnoDB;
 ALTER TABLE lams_user MODIFY COLUMN chat_id VARCHAR(255)
       COMMENT 'ID used for Jabber';
@@ -1145,4 +1147,10 @@ CREATE TABLE lams_planner_recent_learning_designs (
    , CONSTRAINT FK_lams_planner_recent_learning_designs_2 FOREIGN KEY (learning_design_id)
                   REFERENCES lams_learning_design (learning_design_id) ON DELETE CASCADE ON UPDATE CASCADE
    , PRIMARY KEY (user_id,learning_design_id)
+)TYPE=InnoDB;
+
+CREATE TABLE lams_openid_config (
+     config_key VARCHAR(20) NOT NULL UNIQUE
+   , config_value VARCHAR(255) NOT NULL
+   , PRIMARY KEY (uid)
 )TYPE=InnoDB;

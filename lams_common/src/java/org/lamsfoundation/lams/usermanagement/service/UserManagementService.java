@@ -1221,4 +1221,9 @@ public class UserManagementService implements IUserManagementService {
 		deleteAll(uos);
 		return uos.size();
 	}
+	
+	public User getUserDTOByOpenidURL(String openidURL) {
+		List results = baseDAO.findByProperty(User.class, "openidURL", openidURL);
+		return results.isEmpty() ? null : (User) results.get(0);
+	}
 }

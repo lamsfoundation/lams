@@ -403,6 +403,11 @@
         path="/pedagogical_planner/grouping.jsp"
         redirect="false"
       />
+      <forward
+        name="editAuthors"
+        path="/pedagogical_planner/editAuthors.jsp"
+        redirect="false"
+      />
     </action>
     <action
       path="/pedagogicalPlanner/grouping"
@@ -431,6 +436,11 @@
       <forward
         name="grouping"
         path="/pedagogical_planner/grouping.jsp"
+        redirect="false"
+      />
+      <forward
+        name="editAuthors"
+        path="/pedagogical_planner/editAuthors.jsp"
         redirect="false"
       />
     </action>

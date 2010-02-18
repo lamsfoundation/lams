@@ -138,6 +138,7 @@
 					<include name="lucene/*.jar" />
 					<include name="excel/*.jar" />
 					<include name="csv/*.jar" />
+					<include name="joid/*.jar" />
 				</patternset>
 			</fileset> 
 			<fileset dir="..">

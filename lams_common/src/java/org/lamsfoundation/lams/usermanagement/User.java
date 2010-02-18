@@ -176,6 +176,10 @@ public class User implements Serializable, Comparable {
     private Set<Long> recentlyModifiedLearningDesigns = new LinkedHashSet<Long>();
     
     private Date modifiedDate;
+    
+    /** persistent field */
+    private String openidURL;
+
 
     // ------- TIMEZONES (hardcoded, there is no need to put them into database --------------
 
@@ -932,5 +936,19 @@ public class User implements Serializable, Comparable {
     public void setModifiedDate(Date modifiedDate) {
         this.modifiedDate = modifiedDate;
     }
+
+    /**
+     * @hibernate.property column="openid_url" not-null="false"
+     * @return
+     */
+    public String getOpenidURL() {
+		return openidURL;
+	}
+
+	public void setOpenidURL(String openidURL) {
+		this.openidURL = openidURL;
+	}
+    
+    
 
 }

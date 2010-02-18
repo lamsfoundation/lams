@@ -22,10 +22,6 @@
       type="org.lamsfoundation.lams.admin.web.RegisterForm"
     />
     <form-bean
-      name="CacheActionForm"
-      type="org.lamsfoundation.lams.admin.web.CacheActionForm"
-    />
-    <form-bean
       name="OrgManageForm"
       type="org.lamsfoundation.lams.admin.web.form.OrgManageForm"
     />
@@ -34,16 +30,24 @@
       type="org.lamsfoundation.lams.admin.web.form.ImportV1ContentsForm"
     />
     <form-bean
-      name="ImportV1Form"
-      type="org.lamsfoundation.lams.admin.web.form.ImportV1Form"
-    />
-    <form-bean
       name="ImportExcelForm"
       type="org.lamsfoundation.lams.admin.web.ImportExcelForm"
     />
     <form-bean
+      name="openIDForm"
+      type="org.lamsfoundation.lams.admin.web.OpenIDConfigForm"
+    />
+    <form-bean
       name="themeForm"
       type="org.lamsfoundation.lams.admin.web.form.ThemeForm"
+    />
+    <form-bean
+      name="CacheActionForm"
+      type="org.lamsfoundation.lams.admin.web.CacheActionForm"
+    />
+    <form-bean
+      name="ImportV1Form"
+      type="org.lamsfoundation.lams.admin.web.form.ImportV1Form"
     />
 
    <form-bean name="OrganisationForm" type="org.apache.struts.action.DynaActionForm">
@@ -165,6 +169,308 @@
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
+      path="/orgmanage"
+      type="org.lamsfoundation.lams.admin.web.OrgManageAction"
+      name="OrgManageForm"
+      scope="request"
+      input=".orglist"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="orglist"
+        path=".orglist"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/usersearch"
+      type="org.lamsfoundation.lams.admin.web.UserSearchAction"
+      name="UserSearchForm"
+      scope="request"
+      input=".usersearchlist"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="usersearchlist"
+        path=".usersearchlist"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/libraryManage"
+      type="org.lamsfoundation.lams.admin.web.LibraryManageAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path=".librarylist"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/serverlist"
+      type="org.lamsfoundation.lams.admin.web.ServerListAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="serverlist"
+        path=".serverlist"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/user/searchsingle"
+      type="org.lamsfoundation.lams.admin.web.action.UserSearchSingleTermAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="basiclist"
+        path="/user/basiclist.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/cleanup"
+      type="org.lamsfoundation.lams.admin.web.action.CleanupTempFilesAction"
+      name="CleanupForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="cleanup"
+        path=".cleanup"
+        redirect="false"
+      />
+      <forward
+        name="sysadmin"
+        path="/sysadminstart.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/organisation"
+      type="org.lamsfoundation.lams.admin.web.OrganisationAction"
+      name="OrganisationForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="organisation"
+        path=".organisation"
+        redirect="false"
+      />
+      <forward
+        name="organisationCourseAdmin"
+        path=".organisationCourseAdmin"
+        redirect="false"
+      />
+      <forward
+        name="orglist"
+        path="/orgmanage.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/userroles"
+      type="org.lamsfoundation.lams.admin.web.UserRolesAction"
+      name="UserRolesForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="userrole"
+        path=".userrole"
+        redirect="false"
+      />
+      <forward
+        name="userlist"
+        path="/usermanage.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/config"
+      type="org.lamsfoundation.lams.admin.web.ConfigAction"
+      name="ConfigForm"
+      scope="request"
+      input=".editconfig"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="config"
+        path=".editconfig"
+        redirect="false"
+      />
+      <forward
+        name="ldap"
+        path=".ldap"
+        redirect="false"
+      />
+      <forward
+        name="sysadmin"
+        path="/sysadminstart.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/joblist"
+      type="org.lamsfoundation.lams.admin.web.ScheduledJobListAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="list"
+        path=".joblist"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/importuserresult"
+      type="org.lamsfoundation.lams.admin.web.action.ImportUserResultAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="importresult"
+        path=".importresult"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/user/basiclist"
+      type="org.lamsfoundation.lams.admin.web.action.UserBasicListAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="basiclist"
+        path="/user/basiclist.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/disabledmanage"
+      type="org.lamsfoundation.lams.admin.web.DisabledUserManageAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="disabledlist"
+        path=".disabledlist"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/cache"
+      type="org.lamsfoundation.lams.admin.web.CacheAction"
+      name="CacheActionForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="cache"
+        path=".cache"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/toolcontentlist"
+      type="org.lamsfoundation.lams.admin.web.ToolContentListAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="toolcontentlist"
+        path=".toolcontentlist"
+        redirect="false"
+      />
+      <forward
+        name="error"
+        path=".error"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/servermaintain"
+      type="org.lamsfoundation.lams.admin.web.ServerMaintainAction"
+      name="ServerOrgMapForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="servermaintain"
+        path=".servermaintain"
+        redirect="false"
+      />
+      <forward
+        name="serverlist"
+        path="/serverlist.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/userorg"
+      type="org.lamsfoundation.lams.admin.web.UserOrgAction"
+      name="UserOrgForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="userorg"
+        path=".userorg"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/clone"
+      type="org.lamsfoundation.lams.admin.web.action.CloneLessonsAction"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="start"
+        path=".clone-start"
+        redirect="false"
+      />
+      <forward
+        name="availableLessonsPart"
+        path="/organisation/parts/availableLessons.jsp"
+        redirect="false"
+      />
+      <forward
+        name="selectStaffPart"
+        path="/organisation/parts/selectStaff.jsp"
+        redirect="false"
+      />
+      <forward
+        name="selectLearnersPart"
+        path="/organisation/parts/selectLearners.jsp"
+        redirect="false"
+      />
+      <forward
+        name="result"
+        path=".clone-result"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/orgsave"
       type="org.lamsfoundation.lams.admin.web.OrgSaveAction"
       name="OrganisationForm"
@@ -190,36 +496,6 @@
       />
     </action>
     <action
-      path="/usersearch"
-      type="org.lamsfoundation.lams.admin.web.UserSearchAction"
-      name="UserSearchForm"
-      scope="request"
-      input=".usersearchlist"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="usersearchlist"
-        path=".usersearchlist"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/orgmanage"
-      type="org.lamsfoundation.lams.admin.web.OrgManageAction"
-      name="OrgManageForm"
-      scope="request"
-      input=".orglist"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="orglist"
-        path=".orglist"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/importv1contentssave"
       type="org.lamsfoundation.lams.admin.web.action.ImportV1ContentsSaveAction"
       name="ImportV1ContentsForm"
@@ -236,18 +512,6 @@
       <forward
         name="sysadmin"
         path="/sysadminstart.do"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/libraryManage"
-      type="org.lamsfoundation.lams.admin.web.LibraryManageAction"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path=".librarylist"
         redirect="false"
       />
     </action>
@@ -274,30 +538,6 @@
       <forward
         name="error"
         path=".error"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/serverlist"
-      type="org.lamsfoundation.lams.admin.web.ServerListAction"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="serverlist"
-        path=".serverlist"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/user/searchsingle"
-      type="org.lamsfoundation.lams.admin.web.action.UserSearchSingleTermAction"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="basiclist"
-        path="/user/basiclist.jsp"
         redirect="false"
       />
     </action>
@@ -333,25 +573,6 @@
       <forward
         name="results"
         path="/importuserresult.do"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/cleanup"
-      type="org.lamsfoundation.lams.admin.web.action.CleanupTempFilesAction"
-      name="CleanupForm"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="cleanup"
-        path=".cleanup"
-        redirect="false"
-      />
-      <forward
-        name="sysadmin"
-        path="/sysadminstart.do"
         redirect="false"
       />
     </action>
@@ -434,72 +655,6 @@
       <forward
         name="importv1"
         path="/importv1.do"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/userroles"
-      type="org.lamsfoundation.lams.admin.web.UserRolesAction"
-      name="UserRolesForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="userrole"
-        path=".userrole"
-        redirect="false"
-      />
-      <forward
-        name="userlist"
-        path="/usermanage.do"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/organisation"
-      type="org.lamsfoundation.lams.admin.web.OrganisationAction"
-      name="OrganisationForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="organisation"
-        path=".organisation"
-        redirect="false"
-      />
-      <forward
-        name="organisationCourseAdmin"
-        path=".organisationCourseAdmin"
-        redirect="false"
-      />
-      <forward
-        name="orglist"
-        path="/orgmanage.do"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/config"
-      type="org.lamsfoundation.lams.admin.web.ConfigAction"
-      name="ConfigForm"
-      scope="request"
-      input=".config"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="config"
-        path=".config"
-        redirect="false"
-      />
-      <forward
-        name="sysadmin"
-        path="/sysadminstart.do"
         redirect="false"
       />
     </action>
@@ -612,30 +767,6 @@
       />
     </action>
     <action
-      path="/joblist"
-      type="org.lamsfoundation.lams.admin.web.ScheduledJobListAction"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="list"
-        path=".joblist"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/importuserresult"
-      type="org.lamsfoundation.lams.admin.web.action.ImportUserResultAction"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="importresult"
-        path=".importresult"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/themeManagement"
       type="org.lamsfoundation.lams.admin.web.action.ThemeManagementAction"
       name="themeForm"
@@ -653,30 +784,6 @@
       <forward
         name="error"
         path=".error"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/user/basiclist"
-      type="org.lamsfoundation.lams.admin.web.action.UserBasicListAction"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="basiclist"
-        path="/user/basiclist.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/disabledmanage"
-      type="org.lamsfoundation.lams.admin.web.DisabledUserManageAction"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="disabledlist"
-        path=".disabledlist"
         redirect="false"
       />
     </action>
@@ -701,21 +808,6 @@
       />
     </action>
     <action
-      path="/cache"
-      type="org.lamsfoundation.lams.admin.web.CacheAction"
-      name="CacheActionForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="cache"
-        path=".cache"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/ldap"
       type="org.lamsfoundation.lams.admin.web.action.LdapConfigAction"
       unknown="false"
@@ -729,57 +821,6 @@
       <forward
         name="sysadmin"
         path="/sysadminstart.do"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/toolcontentlist"
-      type="org.lamsfoundation.lams.admin.web.ToolContentListAction"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="toolcontentlist"
-        path=".toolcontentlist"
-        redirect="false"
-      />
-      <forward
-        name="error"
-        path=".error"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/servermaintain"
-      type="org.lamsfoundation.lams.admin.web.ServerMaintainAction"
-      name="ServerOrgMapForm"
-      scope="request"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="servermaintain"
-        path=".servermaintain"
-        redirect="false"
-      />
-      <forward
-        name="serverlist"
-        path="/serverlist.do"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/importexcel"
-      type="org.lamsfoundation.lams.admin.web.ImportExcelAction"
-      name="ImportExcelForm"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="importexcel"
-        path=".importexcel"
         redirect="false"
       />
     </action>
@@ -815,6 +856,20 @@
       />
     </action>
     <action
+      path="/importexcel"
+      type="org.lamsfoundation.lams.admin.web.ImportExcelAction"
+      name="ImportExcelForm"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="importexcel"
+        path=".importexcel"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/usermanage"
       type="org.lamsfoundation.lams.admin.web.UserManageAction"
       unknown="false"
@@ -843,6 +898,26 @@
       <forward
         name="userorgrole"
         path="/userorgrole.do"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/openIDConfig"
+      type="org.lamsfoundation.lams.admin.web.OpenIDConfigAction"
+      name="openIDForm"
+      scope="request"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="config"
+        path="/openidConfig.jsp"
+        redirect="false"
+      />
+      <forward
+        name="sysadmin"
+        path="/sysadminstart.do"
         redirect="false"
       />
     </action>
@@ -892,20 +967,6 @@
       <forward
         name="usersearch"
         path="/usersearch.do"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/userorg"
-      type="org.lamsfoundation.lams.admin.web.UserOrgAction"
-      name="UserOrgForm"
-      scope="request"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="userorg"
-        path=".userorg"
         redirect="false"
       />
     </action>

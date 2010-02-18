@@ -38,9 +38,8 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 
 /**
- * When j_security_check authentication is successful the user is redirected to
- * the original requested URL. The LoginRequestValve is responsible for setting
- * the original request URL to trick j_security_check
+ * When j_security_check authentication is successful the user is redirected to the original requested URL. The
+ * LoginRequestValve is responsible for setting the original request URL to trick j_security_check
  * 
  * @author Anthony Xiao, Fei Yang
  */
@@ -50,8 +49,12 @@ public class LoginRequestValve extends ValveBase {
 
 	// Declare the constants
 	private static final String PARAM_USERID = "uid";
+	
+	private static final String PARAM_OPENID_URL = "openid_url";
 
 	private static final String LOGIN_REQUEST = "LoginRequest";
+
+	private static final String OPENID_REQUEST = "OpenIDServlet";
 
 	public void invoke(Request request, Response response) throws IOException, ServletException {
 		// Skip logging for non-HTTP requests and responses
@@ -72,13 +75,12 @@ public class LoginRequestValve extends ValveBase {
 			// Looking at response header to determine redirect location
 			boolean isLoginSuccessful = false;
 			String[] headerNames = response.getHeaderNames();
-			log.info("There are "+headerNames.length+" headers in the response");
+			log.info("There are " + headerNames.length + " headers in the response");
 			for (String name : headerNames) {
 				String[] values = response.getHeaderValues(name);
 				if (values.length > 0) {
 					log.info(name + " = " + values[0]);
-					if (name.toLowerCase().equals("location")
-							&& values[0].matches(".*" + Constants.FORM_ACTION + ".*")) {
+					if (name.toLowerCase().equals("location") && values[0].matches(".*" + Constants.FORM_ACTION + ".*")) {
 						isLoginSuccessful = true;
 					}
 				} else {
@@ -93,7 +95,7 @@ public class LoginRequestValve extends ValveBase {
 			} else {
 
 				HttpSession hses = hreq.getSession(false);
-				log.debug("Session Id - "+hses.getId());
+				log.debug("Session Id - " + hses.getId());
 				String userid = hreq.getParameter(PARAM_USERID);
 
 				// get the redirect url from RequestDispatcher
@@ -104,9 +106,8 @@ public class LoginRequestValve extends ValveBase {
 				// check required parameters
 				if (userid != null && redirect != null && hses != null) {
 					log.info("LOGIN REQUEST DETECTED - LOGIN SUCCESSFUL");
-					log.info("character encoding of the request - "
-							+ request.getCharacterEncoding());
-					//redirect = URLDecoder.decode(redirect, "US-ASCII");
+					log.info("character encoding of the request - " + request.getCharacterEncoding());
+					// redirect = URLDecoder.decode(redirect, "US-ASCII");
 					log.info("Redirect URL - " + redirect);
 					// create catalina internal session
 					Session session = request.getContext().getManager().findSession(hses.getId());
@@ -124,6 +125,49 @@ public class LoginRequestValve extends ValveBase {
 					session.setNote(Constants.FORM_REQUEST_NOTE, saved);
 				} else {
 					log.info("LOGIN REQUEST DETECTED - BUT MISSING REQUIRED PARAM");
+				}
+			}
+		} else if (hreq.getRequestURI().endsWith(OPENID_REQUEST)) {
+			boolean isLoginSuccessful = false;
+			String[] headerNames = response.getHeaderNames();
+			log.info("There are " + headerNames.length + " headers in the response");
+			for (String name : headerNames) {
+				String[] values = response.getHeaderValues(name);
+				if (values.length > 0) {
+					log.info(name + " = " + values[0]);
+					if (name.toLowerCase().equals("location") && values[0].matches(".*" + Constants.FORM_ACTION + ".*")) {
+						isLoginSuccessful = true;
+					}
+				} else {
+					log.info("empty header-" + name);
+				}
+			}
+
+			if (!isLoginSuccessful) {
+				log.info("OPENID REQUEST DETECTED - BUT NO LOGIN IS CARRIED OUT");
+			} else {
+
+				HttpSession hses = hreq.getSession(false);
+				log.debug("Session Id - " + hses.getId());
+
+				// check required parameters
+				if (hses != null) {
+					log.info("OPENID REQUEST DETECTED - LOGIN SUCCESSFUL");
+					
+					String relURL = request.getContextPath() + "/index.do";
+					log.debug("Redirect URL - " + relURL);
+					
+					// create catalina internal session
+					Session session = request.getContext().getManager().findSession(hses.getId());
+
+					// Create and populate a SavedRequest object for this request
+					SavedRequest saved = new SavedRequest();
+					saved.setRequestURI(relURL);
+
+					// Tomcat's FormAuthenticator looks at Constants.FORM_REQUEST_NOTEfor the redirect object
+					session.setNote(Constants.FORM_REQUEST_NOTE, saved);
+				} else {
+					log.error("LOGIN REQUEST DETECTED - BUT MISSING REQUIRED PARAM");
 				}
 			}
 		}

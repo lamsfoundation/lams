@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 
 /**
@@ -516,4 +517,14 @@ public interface IUserManagementService {
 	 * @return number of deleted rows.
 	 */
 	public int removeUserFromOtherGroups(Integer userId, Integer orgId);
+	
+	
+	/**
+	 * Returns the user dto for the given openidURL if one exists
+	 * used for sif openid login
+	 * 
+	 * @param openidURL
+	 * @return
+	 */
+	public User getUserDTOByOpenidURL(String openidURL);
 }

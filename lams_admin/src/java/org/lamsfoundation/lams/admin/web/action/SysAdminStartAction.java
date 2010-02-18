@@ -34,6 +34,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.dto.LinkBean;
+import org.lamsfoundation.lams.openid.OpenIDConfig;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
@@ -73,6 +74,11 @@ public class SysAdminStartAction extends Action {
 			links.add(new LinkBean("libraryManage.do", "sysadmin.library.management"));
 			links.add(new LinkBean("statistics.do", "admin.statistics.title"));
 			links.add(new LinkBean("themeManagement.do", "admin.themes.title"));
+			
+			OpenIDConfig openIDEnabled = (OpenIDConfig)service.findById(OpenIDConfig.class, OpenIDConfig.KEY_ENABLED);
+			if (openIDEnabled != null && Boolean.parseBoolean(openIDEnabled.getConfigValue()) == Boolean.TRUE) {
+				links.add(new LinkBean("openIDConfig.do", "admin.openid.title"));
+			}
 		} else if (request.isUserInRole(Role.AUTHOR_ADMIN)) {
 			LinkBean linkBean = new LinkBean("toolcontentlist.do", "sysadmin.tool.management");
 			links.add(linkBean);
