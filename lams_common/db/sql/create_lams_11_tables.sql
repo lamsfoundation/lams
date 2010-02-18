@@ -1152,5 +1152,5 @@ CREATE TABLE lams_planner_recent_learning_designs (
 CREATE TABLE lams_openid_config (
      config_key VARCHAR(20) NOT NULL UNIQUE
    , config_value VARCHAR(255) NOT NULL
-   , PRIMARY KEY (uid)
+   , PRIMARY KEY (config_key)
 )TYPE=InnoDB;
