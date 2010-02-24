@@ -1,0 +1,25 @@
+LAMS Signup
+
+Tested with LAMS 2.3.3 and LAMS 2.3.4.  Shouldn't require too much if any 
+modification to work with 2.4.
+
+Installation
+------------
+
+Drop jar and war into lams.ear.  Modify lams.ear/META-INF/application.xml and
+add the following;
+
+<module>
+        <web>
+            <web-uri>lams-signup.war</web-uri>
+            <context-root>/lams/signup</context-root>
+                </web>
+    </module>
+    <module>
+        <java>lams-signup.jar</java>
+    </module>
+    
+TODO
+----
+- full i18n
+- maintain pretty urls between POSTs

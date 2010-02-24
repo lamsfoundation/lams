@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+<project name="lams_signup" basedir=".">
+
+	<!-- import properties from the specified file -->
+	<property file="build.properties" />
+	<property file="../lams_build/common.properties" />
+	<property file="../lams_build/${osPropertiesName}.properties" />
+
+	<path id="all-libs">
+		<fileset dir="${sharedlib}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${j2eelibs}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="project.classpath">
+		<path refid="all-libs" />
+		<!-- Java CLASSPATH should be added as the last item -->
+		<!-- This property is supposed to be set in eclipse  -->
+		<pathelement location="${java.class.path}" />
+	</path>
+
+
+	<!-- ================================================================ -->
+	<!-- Preparations									                  -->
+	<!-- ================================================================ -->
+	<target name="preparedirs">
+		<mkdir dir="${build}" />
+		<mkdir dir="${build.classes.java}" />
+		<mkdir dir="${conf.webinf.dir}/classes" />
+		<mkdir dir="${build.lib}" />
+	</target>
+
+	<target name="clean" description="removes all class files">
+		<delete dir="${build.classes.java}" quiet="false" />
+		<delete dir="${build.lib}" quiet="false" />
+	</target>
+
+	<target name="compile.java" depends="clean,preparedirs" description="compile java sources">
+		<javac srcdir="${src.java.dir}" compiler="modern" destdir="${build.classes.java}" deprecation="on" debug="on">
+			<classpath>
+				<path refid="project.classpath" />
+			</classpath>
+		</javac>
+		<copy overwrite="yes" todir="${build.classes.java}">
+			<fileset dir="${src.java.dir}">
+				<include name="**/*.xml" />
+				<include name="**/*.sql" />
+			</fileset>
+		</copy>
+		<copy overwrite="yes" todir="${build.classes.java}/org/lamsfoundation/lams/tool/signup">
+			<fileset dir="${conf.language.dir}">
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- ================================================================ -->
+	<!-- Make jar archive for deployment        		    	          -->
+	<!-- ================================================================ -->
+	<target name="build-jar" depends="compile.java" description="creates jar file">
+		<delete file="${build.lib}/${product}.jar" />
+		<jar jarfile="${build.lib}/${product}.jar" manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
+			<fileset dir="${build.classes.java}">
+			</fileset>
+		</jar>
+	</target>
+	<!-- =================================================================== -->
+	<!-- Fails if XDoclet 1.2.x is not on classpath                          -->
+	<!-- =================================================================== -->
+	<target name="fail-if-no-xdoclet-1.2" unless="xdoclet-jars-installed">
+		<fail>
+			You must download several jar files before you can build
+			Middlegen. Execute the "download-deps" target. Then try to
+			build again.
+
+			If you are behind a proxy, you should define the properties
+			http.proxyHost and http.proxyPort. Example:
+
+			ant -Dhttp.proxyHost=foo.com -Dhttp.proxyPort=8080
+
+			It's also possible to download the jars manually.
+		</fail>
+	</target>
+
+
+	<!-- =================================================================== -->
+	<!-- Run xdoclet for hibernate                                           -->
+	<!-- =================================================================== -->
+
+	<taskdef name="webdoclet" classname="xdoclet.modules.web.WebDocletTask">
+		<classpath refid="all-libs" />
+	</taskdef>
+
+	<target name="webdoclet">
+		<webdoclet destdir="${generated.java}" force="${xdoclet.force}">
+
+			<fileset dir="${src.java.dir}">
+				<include name="**/*Action.java" />
+			</fileset>
+
+			<deploymentdescriptor servletspec="2.4" distributable="false" destdir="${conf.webinf.dir}" mergedir="${conf.xdoclet.dir}" sessiontimeout="${sessiontimeout}" />
+
+			<strutsconfigxml destdir="${conf.struts.dir}" mergedir="${conf.xdoclet.dir}" version="1.2" />
+		</webdoclet>
+	</target>
+
+	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
+	<!-- Make the war archive  for deployment             -->
+	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
+	<target name="build-war" depends="webdoclet,build-jar" description="creates war file">
+		<delete file="${build.lib}/${product}.war" />
+		<war warfile="${build.lib}/${product}.war" manifest="${conf.dir}/war/META-INF/MANIFEST.MF" webxml="${conf.webinf.dir}/web.xml">
+			<webinf dir="${conf.webinf.dir}">
+				<include name="*.xml" />
+				<include name="struts/*" />
+				<include name="struts/tlds/*" />
+				<include name="jstl/*" />
+				<include name="jstl/tlds/*" />
+				<include name="tags/*" />
+				<include name="lams.tld" />
+				<include name="lib/*" />
+				<exclude name="classes/**/*" />
+				<exclude name="web.xml" />
+			</webinf>
+			<fileset dir="${conf.web.dir}">
+				<include name="**/*.jsp" />
+			</fileset>
+		</war>
+	</target>
+
+	<target name="copy-tags" depends="" description="copy the lams.tld and the lams tags">
+		<copy todir="${conf.webinf.dir}" overwrite="yes" file="${tag.web.dir}/lams.tld" />
+		<copy todir="${conf.webinf.dir}/tags" overwrite="yes">
+			<fileset dir="${tag.web.dir}/tags">
+				<include name="*.tag" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- deploy-war : for convenience during development. Should be deployed via the master build -->
+	<target name="deploy-war" depends="build-war">
+		<!--copy file="${build.lib}/${product}.jar" todir="${jboss.deploy}" /-->
+		<copy file="${build.lib}/${product}.war" todir="${jboss.deploy}" />
+	</target>
+
+	<target name="deploy-jar" depends="build-jar">
+		<copy file="${build.lib}/${product}.jar" todir="${jboss.deploy}" />
+	</target>
+
+	<!-- explode-war : for convenience during development.  Explodes lams-learning.war in the lams.ear folder -->
+	<target name="explode-war" depends="" description="explode war package to a war folder">
+		<!-- rename war file to avoid name conflict -->
+		<move tofile="${jboss.deploy}/temp-${product}.war" file="${jboss.deploy}/${product}.war" />
+		<!-- explode the war -->
+		<unjar src="${jboss.deploy}/temp-${product}.war" dest="${jboss.deploy}/${product}.war" />
+		<!-- delete temp war file -->
+		<delete>
+			<fileset dir="${jboss.deploy}">
+				<include name="temp-${product}.war" />
+			</fileset>
+		</delete>
+	</target>
+
+	<target name="delete-exploded-war" description="delete exploded war folder">
+		<!-- delete old war folder tree -->
+		<delete quiet="true" includeemptydirs="true">
+			<fileset dir="${jboss.deploy}/${product}.war">
+				<include name="**" />
+			</fileset>
+		</delete>
+		<!-- if use explode tool target when jboss is running, explode may be failed and left the the temp folder. Here try to delete the temp folder -->
+		<delete quiet="true" includeemptydirs="true">
+			<fileset dir="${jboss.deploy}/temp-${product}.war">
+				<include name="**" />
+			</fileset>
+		</delete>
+	</target>
+
+	<!-- ================================= -->
+	<!--  target: synchronize-jsp          -->
+	<!--  ================================= -->
+	<target name="synchronize-deploy" description="copy non-java file into deploy folder - war must be expanded. Do not overwrite the web.xml">
+		<copy verbose="yes" todir="${jboss.deploy}/${product}.war">
+			<fileset dir="${conf.web.dir}">
+				<include name="**/*.*" />
+				<exclude name="WEB-INF/web.xml" />
+				<exclude name="WEB-INF/classes/**" />
+			</fileset>
+		</copy>
+	</target>
+
+</project>
