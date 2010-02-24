@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
 import java.net.URL;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CSVUtil;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -31,7 +33,7 @@ import org.verisign.joid.util.UrlUtils;
  * Accepts the openid_url param and used joid libraries to authenticate the user.
  * 
  * If the identity provider server authenticates the user, log them in through SSO
- *
+ * 
  */
 public class SIFOpenIDServlet extends HttpServlet {
 
@@ -42,13 +44,14 @@ public class SIFOpenIDServlet extends HttpServlet {
 	private static final String PARAM_OPENID_URL = "openid_url";
 	private static final String PARAM_ERROR_MSG = "errorMsg";
 
-	private static final String ERROR_NOT_ENABLED = "OpenID is not enabled for LAMS.";
-	private static final String ERROR_BLACKLISTED = "Your provider is not among the trusted providers, please use the portal for logging in.";
-	private static final String ERROR_NO_ID_PASSED = "Authentication failed, no user id was passed.";
-	private static final String ERROR_AUTH = "Authentication failed, there was an error during authentication, please contact the system administrator.";
-	private static final String ERROR_AUTH_LAMS = "Authentication failed, A user in LAMS did not exist for openid URL: ";
+	private static final String ERROR_KEY_NOT_ENABLED = "openid.not.enabled";
+	private static final String ERROR_KEY_BLACKLISTED = "openid.blacklisted";
+	private static final String ERROR_KEY_NO_ID_PASSED = "openid.no.id";
+	private static final String ERROR_KEY_AUTH = "openid.auth.error";
+	private static final String ERROR_KEY_AUTH_LAMS = "openid.auth.fail";
 
 	private IUserManagementService userService = null;
+	private MessageService messageService = null;
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -70,7 +73,7 @@ public class SIFOpenIDServlet extends HttpServlet {
 
 					// No user openid url passed and no session, return to portal
 					log.error("OpenID authentication failed, no value passed for the openid url");
-					redirectToPortal(response, ERROR_NO_ID_PASSED);
+					redirectToPortal(response, messageService.getMessage(ERROR_KEY_NO_ID_PASSED));
 
 				} else {
 					String returnURL = UrlUtils.getBaseUrl(request) + "/OpenIDServlet";
@@ -82,7 +85,7 @@ public class SIFOpenIDServlet extends HttpServlet {
 				loginUser(loggedInAs, request, response);
 			}
 		} else {
-			redirectToPortal(response, ERROR_NOT_ENABLED);
+			redirectToPortal(response, messageService.getMessage(ERROR_KEY_NOT_ENABLED));
 		}
 
 	}
@@ -100,7 +103,7 @@ public class SIFOpenIDServlet extends HttpServlet {
 			String trustRoot) throws IOException {
 		try {
 			String openidRedirectURL = OpenIdFilter.joid().getAuthUrl(userOpenIDURL, returnTo, trustRoot);
-			
+
 			// See if it is a trusted server, then redirect
 			if (isTrustedIdentityProvider(openidRedirectURL)) {
 				log.info("No session found for user with url: " + userOpenIDURL
@@ -108,14 +111,14 @@ public class SIFOpenIDServlet extends HttpServlet {
 				response.sendRedirect(openidRedirectURL);
 			} else {
 				log.error("Identity provider not permitted: " + userOpenIDURL);
-				redirectToPortal(response, ERROR_BLACKLISTED);
+				redirectToPortal(response, messageService.getMessage(ERROR_KEY_BLACKLISTED));
 			}
 		} catch (OpenIdException e) {
 			log.error("Problem getting openid url.", e);
-			redirectToPortal(response, ERROR_AUTH);
+			redirectToPortal(response, messageService.getMessage(ERROR_KEY_AUTH));
 		} catch (Exception e) {
 			log.error("Error sending redirect request.", e);
-			redirectToPortal(response, ERROR_AUTH);
+			redirectToPortal(response, messageService.getMessage(ERROR_KEY_AUTH));
 		}
 	}
 
@@ -183,7 +186,10 @@ public class SIFOpenIDServlet extends HttpServlet {
 			String lamsURL = "j_security_check?j_username=" + user.getLogin() + "&j_password=" + user.getPassword();
 			response.sendRedirect(lamsURL);
 		} else {
-			redirectToPortal(response, ERROR_AUTH_LAMS + userOpenIDURL);
+			// No user found in lams that corresponds to this openid URL
+			String[] msg = new String[1];
+			msg[0] = userOpenIDURL;
+			redirectToPortal(response, messageService.getMessage(ERROR_KEY_AUTH_LAMS, msg));
 		}
 	}
 
@@ -220,6 +226,11 @@ public class SIFOpenIDServlet extends HttpServlet {
 		if (userService == null) {
 			userService = (IUserManagementService) WebApplicationContextUtils.getRequiredWebApplicationContext(
 					getServletContext()).getBean("userManagementService");
+		}
+
+		if (messageService == null) {
+			messageService = (MessageService) WebApplicationContextUtils.getRequiredWebApplicationContext(
+					getServletContext()).getBean("centralMessageService");
 		}
 	}
 }
