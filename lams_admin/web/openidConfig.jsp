@@ -35,6 +35,11 @@
                           <html:text property="portalURL" size="50" maxlength="255"></html:text>
                         </td>
                     </tr>
+                    <tr height="20"> 
+                    </tr>
+                    <tr>
+                        <td colspan="2" ><fmt:message key="admin.openid.trustedidps.intructions" /></td>
+                    </tr>
                     <tr>
                         <td width="30%"><fmt:message key="admin.openid.trustedidps" /></td>
                         <td width="70%">
