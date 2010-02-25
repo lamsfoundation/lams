@@ -20,7 +20,6 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.verisign.joid.OpenIdException;
 import org.verisign.joid.consumer.OpenIdFilter;
@@ -166,9 +165,6 @@ public class SIFOpenIDServlet extends HttpServlet {
 	 */
 	private void loginUser(String userOpenIDURL, HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
-		if (userService == null) {
-			userService = getService();
-		}
 		User user = userService.getUserDTOByOpenidURL(userOpenIDURL);
 		if (user != null) {
 			HttpSession hses = request.getSession(true);
@@ -212,15 +208,6 @@ public class SIFOpenIDServlet extends HttpServlet {
 			portalURL += "?" + PARAM_ERROR_MSG + "=" + URLEncoder.encode(errorString, "UTF8");
 		}
 		response.sendRedirect(portalURL);
-	}
-
-	private IUserManagementService getService() {
-		if (userService == null) {
-			WebApplicationContext ctx = WebApplicationContextUtils
-					.getRequiredWebApplicationContext(getServletContext());
-			userService = (IUserManagementService) ctx.getBean("userManagementService");
-		}
-		return userService;
 	}
 
 	private void setService() {
