@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -208,7 +209,7 @@ public class SIFOpenIDServlet extends HttpServlet {
 				.get(ConfigurationKeys.SERVER_URL);
 
 		if (errorString != null && errorString.length() > 0) {
-			portalURL += "?" + PARAM_ERROR_MSG + "=" + errorString;
+			portalURL += "?" + PARAM_ERROR_MSG + "=" + URLEncoder.encode(errorString, "UTF8");
 		}
 		response.sendRedirect(portalURL);
 	}
