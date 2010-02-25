@@ -39,18 +39,5 @@ CREATE TABLE lams_data_flow (
 	, PRIMARY KEY (data_flow_object_id)
 )TYPE=InnoDB;
 
--- LDEV-2380 Add recently modified learning design list to Pedagogical Planner
-CREATE TABLE lams_planner_recent_learning_designs (
-     user_id  BIGINT(20) NOT NULL
-   , learning_design_id BIGINT(20) NOT NULL
-   , last_modified_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-   , CONSTRAINT FK_lams_planner_recent_learning_designs_1 FOREIGN KEY (user_id)
-                  REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
-   , CONSTRAINT FK_lams_planner_recent_learning_designs_2 FOREIGN KEY (learning_design_id)
-                  REFERENCES lams_learning_design (learning_design_id) ON DELETE CASCADE ON UPDATE CASCADE
-   , PRIMARY KEY (user_id,learning_design_id)
-)TYPE=InnoDB;
-
-
 COMMIT;
 SET AUTOCOMMIT = 1;
