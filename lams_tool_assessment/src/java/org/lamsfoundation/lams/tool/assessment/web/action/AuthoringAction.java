@@ -614,7 +614,7 @@ public class AuthoringAction extends Action {
 	questionForm.setSessionMapID(sessionMapID);
 	questionForm.setContentFolderID(contentFolderID);
 	questionForm.setDefaultGrade("1");
-	questionForm.setPenaltyFactor("0.1");
+	questionForm.setPenaltyFactor("0");
 	
 	List<AssessmentQuestionOption> optionList = new ArrayList<AssessmentQuestionOption>();
 	for (int i = 0; i < AssessmentConstants.INITIAL_OPTIONS_NUMBER; i++) {
