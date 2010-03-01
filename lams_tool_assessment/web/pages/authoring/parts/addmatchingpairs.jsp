@@ -132,7 +132,7 @@
 					<fmt:message key="label.authoring.basic.question.text" />
 				</div>
 				<lams:FCKEditor id="question" value="${formBean.question}"
-					contentFolderID="${formBean.contentFolderID}" width="622px">
+					contentFolderID="${formBean.contentFolderID}" width="715px">
 				</lams:FCKEditor>
 	
 				<div class="field-name space-top">
@@ -151,7 +151,7 @@
 					<fmt:message key="label.authoring.basic.general.feedback" />
 				</div>
 				<lams:FCKEditor id="generalFeedback" value="${formBean.generalFeedback}"
-					contentFolderID="${formBean.contentFolderID}" width="622px">
+					contentFolderID="${formBean.contentFolderID}" width="715px">
 				</lams:FCKEditor>				
 	
 				<div class="field-name space-top" >

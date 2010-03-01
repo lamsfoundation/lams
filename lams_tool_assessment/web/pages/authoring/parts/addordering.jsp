@@ -138,7 +138,7 @@
 					<fmt:message key="label.authoring.basic.question.text" />
 				</div>
 				<lams:FCKEditor id="question" value="${formBean.question}"
-					contentFolderID="${formBean.contentFolderID}" width="622px">
+					contentFolderID="${formBean.contentFolderID}" width="715px">
 				</lams:FCKEditor>
 				
 				<div class="field-name space-top">
@@ -157,7 +157,7 @@
 					<fmt:message key="label.authoring.basic.general.feedback" />
 				</div>
 				<lams:FCKEditor id="generalFeedback" value="${formBean.generalFeedback}"
-					contentFolderID="${formBean.contentFolderID}" width="622px"> 
+					contentFolderID="${formBean.contentFolderID}" width="715px"> 
 				</lams:FCKEditor>
 				
 				<br><br>
@@ -180,19 +180,19 @@
 			<div class="field-name " style="margin-top: 60px;">
 				<fmt:message key="label.authoring.choice.overall.feedback" />
 			</div>
-			<div style="margin-left: 30px; margin-top: 10px;">
+			<div style="margin-left: 23px; margin-top: 10px;">
 				<div class="field-name" >
 					<fmt:message key="label.authoring.choice.feedback.on.correct" />
 				</div>
 				<lams:FCKEditor id="feedbackOnCorrectOutsideForm" value="${formBean.feedbackOnCorrect}"
-					contentFolderID="${formBean.contentFolderID}" width="622px">
+					contentFolderID="${formBean.contentFolderID}" width="688px">
 				</lams:FCKEditor>
 				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.choice.feedback.on.incorrect" />
 				</div>
 				<lams:FCKEditor id="feedbackOnIncorrectOutsideForm" value="${formBean.feedbackOnIncorrect}"
-					contentFolderID="${formBean.contentFolderID}" width="622px">
+					contentFolderID="${formBean.contentFolderID}" width="688px">
 				</lams:FCKEditor>
 			</div>
 			<br><br>

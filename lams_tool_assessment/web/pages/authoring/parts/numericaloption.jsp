@@ -45,7 +45,7 @@
 	<tr>		
 		<td style="padding-left:10px; border-bottom:0px; background:none;" colspan="2">
 			<lams:FCKEditor id="optionFeedback${status.index}" value="${option.feedback}"
-				contentFolderID="${contentFolderID}" width="622">
+				contentFolderID="${contentFolderID}" width="642">
 			</lams:FCKEditor>		
 		</td>
 	</tr>	

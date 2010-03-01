@@ -11,7 +11,7 @@
 	<tr>		
 		<td style="padding-left:10px; border-bottom:0px; background:none;">	
 			<lams:FCKEditor id="optionString${status.index}" value="${option.optionString}"
-				contentFolderID="${contentFolderID}" width="622px">
+				contentFolderID="${contentFolderID}" width="642px">
 			</lams:FCKEditor>					
 		</td>									
 	</tr>
@@ -35,7 +35,7 @@
 	</tr>
 	<tr>		
 		<td style="padding-left:10px; padding-right:0px; border-bottom:0px; background:none;" width="622px">
-			<lams:STRUTS-textarea property="optionFeedback${status.index}" rows="3" cols="75" value="${option.feedback}"/>
+			<lams:STRUTS-textarea property="optionFeedback${status.index}" rows="3" cols="77" value="${option.feedback}"/>
 		</td>
 	</tr>	
 </table>

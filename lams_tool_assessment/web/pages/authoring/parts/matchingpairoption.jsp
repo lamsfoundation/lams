@@ -11,7 +11,7 @@
 	<tr>			
 		<td style="padding-left:10px; border-bottom:0px; background:none;">
 			<lams:FCKEditor id="optionQuestion${status.index}" value="${option.question}"
-				contentFolderID="${contentFolderID}" width="622">
+				contentFolderID="${contentFolderID}" width="642">
 			</lams:FCKEditor>				
 		</td>									
 	</tr>						
@@ -23,9 +23,9 @@
 		</td>
 	</tr>
 	<tr>			
-		<td style="padding-left:10px; border-bottom:0px; background:none;" width="622px">	
+		<td style="padding-left:10px; border-bottom:0px; background:none;" width="612px">	
 			<input type="text" name="optionString${status.index}"
-				id="optionString${status.index}" size="99" value="${option.optionString}">
+				id="optionString${status.index}" size="102" value="${option.optionString}">
 		</td>									
 	</tr>
 </table>
