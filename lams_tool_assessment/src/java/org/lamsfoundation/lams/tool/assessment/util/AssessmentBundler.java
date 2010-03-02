@@ -40,6 +40,8 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 
 public class AssessmentBundler extends Bundler {
+    
+    private static final char URL_SEPARATOR = '/';
 
     public AssessmentBundler() {
     }
@@ -88,16 +90,16 @@ public class AssessmentBundler extends Bundler {
 		"tree_minus.gif", "tree_plus.gif", "up.gif" };
 	
 	for (String imageName : imageNames) {
-	    String urlToConnectTo = getIncludesFolder() + "images" + File.separator + "jqGrid.basic.theme" + File.separator + imageName;
-	    String directoryToStoreFile = outputDirectory + File.separator + "javascript" + File.separator  + "images" + File.separator + "jqGrid.basic.theme";
+	    String urlToConnectTo = getIncludesFolder() + "images" + URL_SEPARATOR + "jqGrid.basic.theme" + URL_SEPARATOR + imageName;
+	    String directoryToStoreFile = outputDirectory + File. separator + "javascript" + File.separator  + "images" + File.separator + "jqGrid.basic.theme";
 	    HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, imageName, cookies);// cookies aren't really needed here.
 	}
 	
-	String urlToConnectTo = getIncludesFolder() + "javascript" + File.separator + "jquery.jqGrid.js";
+	String urlToConnectTo = getIncludesFolder() + "javascript" + URL_SEPARATOR + "jquery.jqGrid.js";
 	String directoryToStoreFile = outputDirectory + File.separator + "javascript";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.jqGrid.js", cookies); 
 
-	urlToConnectTo = getIncludesFolder() + "javascript" + File.separator + "jquery-1.2.6.pack.js";
+	urlToConnectTo = getIncludesFolder() + "javascript" + URL_SEPARATOR + "jquery-1.2.6.pack.js";
 	directoryToStoreFile = outputDirectory + File.separator + "javascript";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery-1.2.6.pack.js", cookies); 
 	
@@ -107,12 +109,12 @@ public class AssessmentBundler extends Bundler {
 		"grid.treegrid-min.js", "jquery.fmatter-min.js", "json2-min.js", "JsonXml-min.js" };
 	
 	for (String jsFileName : jsFileNames) {
-	    urlToConnectTo = getIncludesFolder() + "javascript" + File.separator + "jqGrid" + File.separator + "min" + File.separator + jsFileName;
+	    urlToConnectTo = getIncludesFolder() + "javascript" + URL_SEPARATOR + "jqGrid" + URL_SEPARATOR + "min" + URL_SEPARATOR + jsFileName;
 	    directoryToStoreFile = outputDirectory + File.separator + "javascript" + File.separator + "jqGrid" + File.separator + "min";
 	    HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, jsFileName, cookies);// cookies aren't really needed here.
 	}
 	
-	urlToConnectTo = getIncludesFolder() + "css" + File.separator + "jqGrid.grid.css";
+	urlToConnectTo = getIncludesFolder() + "css" + URL_SEPARATOR + "jqGrid.grid.css";
 	directoryToStoreFile = outputDirectory + File.separator + "javascript" + File.separator + "css";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jqGrid.grid.css", cookies); 
 
@@ -124,8 +126,12 @@ public class AssessmentBundler extends Bundler {
 	    log.error("Unable to get path to the LAMS Spreadsheet URL from the configuration table. Spreadsheet javascript files export failed");
 	    return "";
 	} else {
-	    spreadsheetUrlPath = spreadsheetUrlPath + File.separator + "tool" + File.separator
-		    + AssessmentConstants.TOOL_SIGNATURE + File.separator + "includes" + File.separator;
+	    if (!spreadsheetUrlPath.endsWith("/")) {
+		spreadsheetUrlPath += "/";
+	    }
+	    
+	    spreadsheetUrlPath = spreadsheetUrlPath + "tool" + URL_SEPARATOR
+		    + AssessmentConstants.TOOL_SIGNATURE + URL_SEPARATOR + "includes" + URL_SEPARATOR;
 	    return spreadsheetUrlPath;
 	}
     }
