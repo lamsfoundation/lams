@@ -545,7 +545,7 @@ public class LearningAction extends Action {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		if (answerString != null) {
 		    question.setAnswerBoolean(Boolean.parseBoolean(answerString));
-		    question.setAnswerString("not null");
+		    question.setAnswerString("answered");
 		}
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ESSAY) {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);

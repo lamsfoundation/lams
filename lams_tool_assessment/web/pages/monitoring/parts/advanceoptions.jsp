@@ -91,12 +91,12 @@
 	
 	<tr>
 		<td>
-			<fmt:message key="label.authoring.advance.allow.students.right.wrong.answers" />
+			<fmt:message key="label.authoring.advance.allow.students.right.answers" />
 		</td>
 		
 		<td>
 			<c:choose>
-				<c:when test="${assessment.allowRightWrongAnswersAfterQuestion == true}">
+				<c:when test="${assessment.allowRightAnswersAfterQuestion == true}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -105,6 +105,22 @@
 			</c:choose>	
 		</td>
 	</tr>
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advance.allow.students.wrong.answers" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${assessment.allowWrongAnswersAfterQuestion == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>	
 	<tr>
 		<td>
 			<fmt:message key="label.authoring.advance.allow.students.grades" />

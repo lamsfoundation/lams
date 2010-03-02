@@ -75,7 +75,9 @@ public class Assessment implements Cloneable {
 
     private boolean allowOverallFeedbackAfterQuestion;
     
-    private boolean allowRightWrongAnswersAfterQuestion;
+    private boolean allowRightAnswersAfterQuestion;
+    
+    private boolean allowWrongAnswersAfterQuestion;
     
     private boolean allowGradesAfterAttempt;
     
@@ -525,16 +527,30 @@ public class Assessment implements Cloneable {
     }
     
     /**
-     * @hibernate.property column="allow_right_wrong_answers"
+     * @hibernate.property column="allow_right_answers"
      * @return
      */
-    public boolean isAllowRightWrongAnswersAfterQuestion() {
-	return allowRightWrongAnswersAfterQuestion;
+    public boolean isAllowRightAnswersAfterQuestion() {
+	return allowRightAnswersAfterQuestion;
     }
 
-    public void setAllowRightWrongAnswersAfterQuestion(boolean allowRightWrongAnswersAfterQuestion) {
-	this.allowRightWrongAnswersAfterQuestion = allowRightWrongAnswersAfterQuestion;
+    public void setAllowRightAnswersAfterQuestion(boolean allowRightAnswersAfterQuestion) {
+	this.allowRightAnswersAfterQuestion = allowRightAnswersAfterQuestion;
     }
+    
+    /**
+     * @hibernate.property column="allow_wrong_answers"
+     * @return
+     */
+    public boolean isAllowWrongAnswersAfterQuestion() {
+	return allowWrongAnswersAfterQuestion;
+    }
+
+    public void setAllowWrongAnswersAfterQuestion(boolean allowWrongAnswersAfterQuestion) {
+	this.allowWrongAnswersAfterQuestion = allowWrongAnswersAfterQuestion;
+    }
+    
+    
     
     /**
      * @hibernate.property column="allow_grades_after_attempt"

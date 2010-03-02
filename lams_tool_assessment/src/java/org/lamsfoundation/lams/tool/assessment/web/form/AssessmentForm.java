@@ -76,7 +76,8 @@ public class AssessmentForm extends ActionForm {
 	    assessment.setAllowGradesAfterAttempt(false);
 	    assessment.setAllowOverallFeedbackAfterQuestion(false);
 	    assessment.setAllowQuestionFeedback(false);
-	    assessment.setAllowRightWrongAnswersAfterQuestion(false);
+	    assessment.setAllowRightAnswersAfterQuestion(false);
+	    assessment.setAllowWrongAnswersAfterQuestion(false);
 	    assessment.setDefineLater(false);
 	    assessment.setShuffled(false);
 	    assessment.setRunOffline(false);

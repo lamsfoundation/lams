@@ -6,14 +6,24 @@
 
 <table cellspacing="0" style="padding-bottom: 10px;">
 		<tr>
-			<c:if test="${finishedLock && assessment.allowRightWrongAnswersAfterQuestion}">
+			<c:if test="${finishedLock}">
 				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
-					<c:if test="${(question.correctAnswer) and (question.answerString != null)}">
-						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
+				
+					<c:if test="${(question.answerString != null) 
+							&& (assessment.allowRightAnswersAfterQuestion && (question.answerBoolean == question.correctAnswer) 
+							|| assessment.allowWrongAnswersAfterQuestion && (question.answerBoolean != question.correctAnswer)) }">
+					
+						<c:choose>
+							<c:when test="${question.correctAnswer}">
+								<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
+							</c:when>
+							<c:otherwise>
+								<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>" border="0">	
+							</c:otherwise>		
+						</c:choose>					
+					
 					</c:if>
-					<c:if test="${(! question.correctAnswer) and (question.answerString != null)}">
-						<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>"	border="0">	
-					</c:if>	
+						
 				</td>		
 			</c:if>			
 			<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; width: 5px; border-bottom:0px; ">
@@ -27,14 +37,23 @@
 			</td>
 		</tr>
 		<tr>
-			<c:if test="${finishedLock && assessment.allowRightWrongAnswersAfterQuestion}">
+			<c:if test="${finishedLock}">
 				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
-					<c:if test="${(!question.correctAnswer) and (question.answerString != null)}">
-						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
-					</c:if>
-					<c:if test="${(question.correctAnswer) and (question.answerString != null)}">
-						<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>"	border="0">	
-					</c:if>	
+				
+					<c:if test="${(question.answerString != null) 
+							&& (assessment.allowRightAnswersAfterQuestion && (question.answerBoolean == question.correctAnswer) 
+							|| assessment.allowWrongAnswersAfterQuestion && (question.answerBoolean != question.correctAnswer)) }">
+					
+						<c:choose>
+							<c:when test="${!question.correctAnswer}">
+								<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
+							</c:when>
+							<c:otherwise>
+								<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>" border="0">	
+							</c:otherwise>		
+						</c:choose>					
+					</c:if>				
+						
 				</td>		
 			</c:if>			
 			<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; width: 5px; border-bottom:0px; ">

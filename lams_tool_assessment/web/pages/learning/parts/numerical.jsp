@@ -6,16 +6,16 @@
 
 <table cellspacing="0" style="padding-bottom: 10px;">
 	<tr>
-		<c:if test="${finishedLock && assessment.allowRightWrongAnswersAfterQuestion}">
+		<c:if test="${finishedLock}">
 			<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
-				<c:choose>
-					<c:when	test="${question.mark > 0}">
-						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">
-					</c:when>
-					<c:otherwise>
-						<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>" border="0">
-					</c:otherwise>
-				</c:choose>				
+			
+				<c:if test="${assessment.allowRightAnswersAfterQuestion && (question.mark > 0)}">
+					<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
+				</c:if>			
+				<c:if test="${assessment.allowWrongAnswersAfterQuestion && !(question.mark > 0)}">
+					<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>" border="0">
+				</c:if>
+				
 			</td>		
 		</c:if>		
 		<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; ">

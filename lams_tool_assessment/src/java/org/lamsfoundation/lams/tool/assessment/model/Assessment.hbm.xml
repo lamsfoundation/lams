@@ -200,11 +200,19 @@
         />
 
         <property
-            name="allowRightWrongAnswersAfterQuestion"
+            name="allowRightAnswersAfterQuestion"
             type="boolean"
             update="true"
             insert="true"
-            column="allow_right_wrong_answers"
+            column="allow_right_answers"
+        />
+
+        <property
+            name="allowWrongAnswersAfterQuestion"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_wrong_answers"
         />
 
         <property

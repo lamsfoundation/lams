@@ -7,14 +7,16 @@
 <table cellspacing="0" style="padding-bottom: 10px;">
 	<c:forEach var="option" items="${question.questionOptions}">
 		<tr>
-			<c:if test="${finishedLock && assessment.allowRightWrongAnswersAfterQuestion}">
+			<c:if test="${finishedLock}">
 				<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; width: 7px;">
-					<c:if test="${(option.answerInt == option.uid)}">
+				
+					<c:if test="${assessment.allowRightAnswersAfterQuestion && (option.answerInt == option.uid)}">
 						<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">	
 					</c:if>
-					<c:if test="${(option.answerInt != -1) && (option.answerInt != option.uid)}">
-						<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>"	border="0">	
-					</c:if>	
+					<c:if test="${assessment.allowWrongAnswersAfterQuestion && (option.answerInt != -1) && (option.answerInt != option.uid)}">
+						<img src="<html:rewrite page='/includes/images/incompleteitem.gif'/>" border="0">	
+					</c:if>
+						
 				</td>		
 			</c:if>			
 			<td style="padding:5px 15px 2px; vertical-align:middle; background:none; border-bottom:0px; width: 40%;">

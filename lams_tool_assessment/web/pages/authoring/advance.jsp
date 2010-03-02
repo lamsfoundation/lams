@@ -64,10 +64,18 @@
 </p>
 
 <p>
-	<html:checkbox property="assessment.allowRightWrongAnswersAfterQuestion" styleClass="noBorder" styleId="allowRightWrongAnswersAfterQuestion">
+	<html:checkbox property="assessment.allowRightAnswersAfterQuestion" styleClass="noBorder" styleId="allowRightAnswersAfterQuestion">
 	</html:checkbox>
-	<label for="allowRightWrongAnswersAfterQuestion">
-		<fmt:message key="label.authoring.advance.allow.students.right.wrong.answers" />
+	<label for="allowRightAnswersAfterQuestion">
+		<fmt:message key="label.authoring.advance.allow.students.right.answers" />
+	</label>
+</p>
+
+<p>
+	<html:checkbox property="assessment.allowWrongAnswersAfterQuestion" styleClass="noBorder" styleId="allowWrongAnswersAfterQuestion">
+	</html:checkbox>
+	<label for="allowWrongAnswersAfterQuestion">
+		<fmt:message key="label.authoring.advance.allow.students.wrong.answers" />
 	</label>
 </p>
 
