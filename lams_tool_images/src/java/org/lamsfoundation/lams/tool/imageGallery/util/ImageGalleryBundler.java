@@ -42,6 +42,8 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 
 public class ImageGalleryBundler extends Bundler {
+    
+    private static final char URL_SEPARATOR = '/';
 
     public ImageGalleryBundler() {
     }
@@ -82,22 +84,22 @@ public class ImageGalleryBundler extends Bundler {
 	}
 	this.createDirectories(directories);
 
-	String urlToConnectTo = getImagesUrlDir() + File.separator + "javascript" + File.separator + "jquery.rating.1.1.js";
+	String urlToConnectTo = getImagesUrlDir() + "javascript" + URL_SEPARATOR + "jquery.rating.1.1.js";
 	String directoryToStoreFile = outputDirectory + File.separator + "javascript";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.rating.1.1.js", cookies); 
 	log.debug("Copying image from source: " + urlToConnectTo + "to desitnation: " + directoryToStoreFile);
 
-	urlToConnectTo = getImagesUrlDir() + File.separator + "javascript" + File.separator + "jquery-1.2.6.pack.js";
+	urlToConnectTo = getImagesUrlDir() + "javascript" + URL_SEPARATOR + "jquery-1.2.6.pack.js";
 	directoryToStoreFile = outputDirectory + File.separator + "javascript";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery-1.2.6.pack.js", cookies); 
 	log.debug("Copying image from source: " + urlToConnectTo + "to desitnation: " + directoryToStoreFile);
 	
-	urlToConnectTo = getImagesUrlDir() + File.separator + "css" + File.separator + "jquery.rating.css";
+	urlToConnectTo = getImagesUrlDir() + "css" + URL_SEPARATOR + "jquery.rating.css";
 	directoryToStoreFile = outputDirectory + File.separator + "css";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.rating.css", cookies); 
 	log.debug("Copying image from source: " + urlToConnectTo + "to desitnation: " + directoryToStoreFile);
 	
-	urlToConnectTo = getImagesUrlDir() + File.separator + "images" + File.separator + "star.gif";
+	urlToConnectTo = getImagesUrlDir() + "images" + URL_SEPARATOR + "star.gif";
 	directoryToStoreFile = outputDirectory + File.separator + "images";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "star.gif", cookies); 
 	log.debug("Copying image from source: " + urlToConnectTo + "to desitnation: " + directoryToStoreFile);
@@ -110,8 +112,12 @@ public class ImageGalleryBundler extends Bundler {
 	    log.error("Unable to get path to the LAMS ImageGallery URL from the configuration table. ImageGallery javascript files export failed");
 	    return "";
 	} else {
-	    imageGalleryUrlPath = imageGalleryUrlPath + File.separator + "tool" + File.separator
-		    + ImageGalleryConstants.TOOL_SIGNATURE + File.separator + "includes";
+	    if (!imageGalleryUrlPath.endsWith("/")) {
+		imageGalleryUrlPath += "/";
+	    }
+	    
+	    imageGalleryUrlPath = imageGalleryUrlPath + "tool" + URL_SEPARATOR
+		    + ImageGalleryConstants.TOOL_SIGNATURE + URL_SEPARATOR + "includes" + URL_SEPARATOR;
 	    return imageGalleryUrlPath;
 	}
     }
