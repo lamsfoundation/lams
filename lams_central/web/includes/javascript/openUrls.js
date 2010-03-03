@@ -64,7 +64,7 @@
 				}
 			else
 				{
-					if(authorWin && !authorWin.closed)
+					if(authorWin && !authorWin.closed && authorWin.location.pathname.indexOf('home.do?method=author') > -1)
 					{
 						//authorWin.location = 'home.do?method=author';
 						authorWin.focus();
@@ -84,7 +84,7 @@
 				}
 			else
 				{
-					if(authorWin && !authorWin.closed)
+					if(authorWin && !authorWin.closed && authorWin.location.pathname.indexOf('pedagogicalPlanner.do') > -1)
 					{
 						authorWin.focus();
 					}
