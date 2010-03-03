@@ -169,7 +169,7 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
   	    }
   	    return bos.toString();
   */	     	    	  
-  	    BufferedReader buff = new BufferedReader(new InputStreamReader(sis));
+  	    BufferedReader buff = new BufferedReader(new InputStreamReader(sis, "UTF-8"));
   	   
   	    StringBuffer tempStrBuf = new StringBuffer( tempContentLength>0 ? tempContentLength : 200 );
 		String tempStr;
