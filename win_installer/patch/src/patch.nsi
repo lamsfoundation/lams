@@ -48,11 +48,11 @@
 ;!insertmacro LineFind
 
 # constants
-!define VERSION "2.3.3"
-!define PREVIOUS_VERSION "2.3.2"
-!define LANGUAGE_PACK_VERSION "2009-11-18"
-!define LANGUAGE_PACK_VERSION_INT "20091118"
-!define DATE_TIME_STAMP "200911180000"
+!define VERSION "2.3.4"
+!define PREVIOUS_VERSION "2.3.3"
+!define LANGUAGE_PACK_VERSION "2010-03-04"
+!define LANGUAGE_PACK_VERSION_INT "20100304"
+!define DATE_TIME_STAMP "20100300000"
 ######################## Added in the extra .0 for 2.1 for constitency 
 !define SERVER_VERSION_NUMBER "${VERSION}.0.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
@@ -594,8 +594,10 @@ FunctionEnd
 ; Updating the the core lams jars/wars
 Function updateJarsWars
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear"
-    ;File "${SOURCE_LAMS_EAR}\*.*"
     File /r /x CVS ${ASSEMBLY}\*
+    
+    SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\ROOT.war"
+    File ${DOCUMENTS}\index.jsp
 FunctionEnd
 
 
