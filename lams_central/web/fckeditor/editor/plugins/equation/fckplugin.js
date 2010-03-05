@@ -68,7 +68,7 @@ FCKEquation.SetupImage = function( image, name )
 	var sName = name.match( /\\f([\[\$])(.*?)\\f[\]\$]/ );
 	var eq='';
 	
-	eq = escape(sName[2].replace(/\+/g,'&plus;'));
+	eq = escape(sName[2]);
 	if(sName[1]=='$') 
 	{	eq='\\inline&space;'+eq; }
 	else
@@ -150,7 +150,7 @@ if ( FCKBrowserInfo.IsIE )
 			{
 				var sName = aEquations[i].match( /\\f([\[\$])(.*?)\\f[\]\$]/ );
 				
-				var eq = escape(sName[2].replace(/\+/g,'&plus;'));
+				var eq = escape(sName[2]);
 				var extrastyle='';
       	if(sName[1]=='$') 
 				  eq='\\inline&space;'+eq;
