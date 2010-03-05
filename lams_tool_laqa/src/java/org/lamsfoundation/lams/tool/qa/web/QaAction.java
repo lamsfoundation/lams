@@ -1031,6 +1031,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
