@@ -2,6 +2,11 @@ Deployed Libraries
 
 Folder            Library                               Version                License                       Vendor                           Description
 
+aspirin           activation-1.1.1.jar 
+                  aspirin.jar                           0.8.03                 Apache 1.1 license                                             embeddable send-only SMTP server
+                  commons-pool-1.5.1.jar 
+                  dnsjava-2.0.6.jar 
+
 axis              axis-ant.jar                                                                                                                
                   axis.jar                                                                                                                    
                   jaxrpc.jar                                                                                                                  

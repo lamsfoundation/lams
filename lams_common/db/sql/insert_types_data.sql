@@ -317,4 +317,4 @@ INSERT INTO lams_openid_config(config_key, config_value) values ("portalURL", ""
 INSERT INTO lams_openid_config(config_key, config_value) values ("trustedIDPs", "");
 
 -- initialise db version
-INSERT INTO patches VALUES ('lams', 02040004, NOW(), 'F');
+INSERT INTO patches VALUES ('lams', 02040005, NOW(), 'F');

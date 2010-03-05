@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="WINDOWS-1250" standalone="no"?>
 <eclipse-userlibraries version="2">
     <library name="3rdParty" systemlibrary="false">
+    	<archive path="/lams_build/lib/aspirin/aspirin.jar" source="/lams_build/lib/aspirin/src/aspirin-src.zip"/>
         <archive path="/lams_build/lib/autopatch/tk-autopatch-1.2.0-b2-cvs.jar"/>
         <archive path="/lams_build/lib/autopatch/tk-discovery-1.0.0.jar"/>
         <archive javadoc="http://ws.apache.org/axis/java/apiDocs/" path="/lams_build/lib/axis/axis.jar"/>

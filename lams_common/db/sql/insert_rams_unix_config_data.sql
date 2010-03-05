@@ -17,6 +17,9 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('EARDir','/usr/local/jboss-5/server/default/deploy/rams.ear', 'config.ear.dir', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('InternalSMTPServer','true', 'config.use.internal.smtp.server', 'config.header.email', 'BOOLEAN', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('SMTPServer','', 'config.smtp.server', 'config.header.email', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 

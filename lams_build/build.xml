@@ -113,6 +113,7 @@
 				<patternset id="lib.jars">
 					<!--  the desired jars are nominated explicitly so -->
 					<!--  we don't release a build only one by accident -->
+					<include name="aspirin/*.jar" />
 					<include name="autopatch/*.jar" />
 					<include name="axis/*.jar" />
 					<include name="cglib/*.jar" />

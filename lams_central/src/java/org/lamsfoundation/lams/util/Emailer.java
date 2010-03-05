@@ -13,6 +13,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.log4j.Logger;
+import org.masukomi.aspirin.core.MailQue;
 
 /**
  * A class that handles emails
@@ -37,9 +38,14 @@ public class Emailer {
     public static void sendFromSupportEmail(String subject, String to, String body) throws AddressException,
 	    MessagingException {
 	String supportEmail = Configuration.get(ConfigurationKeys.LAMS_ADMIN_EMAIL);
-	String smtpServer = Configuration.get(ConfigurationKeys.SMTP_SERVER);
+	boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
 	Properties properties = new Properties();
-	properties.put("mail.smtp.host", smtpServer);
+	
+	if (! useInternalSMTPServer) {
+	    String smtpServer = Configuration.get(ConfigurationKeys.SMTP_SERVER);
+	    properties.put("mail.smtp.host", smtpServer);
+	}
+
 	send(subject, to, supportEmail, body, properties);
     }
 
@@ -52,9 +58,10 @@ public class Emailer {
      */
     public static Session getMailSession(Properties properties) {
 	Session session;
+	boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
 	String smtpAuthUser = Configuration.get(ConfigurationKeys.SMTP_AUTH_USER);
 	String smtpAuthPass = Configuration.get(ConfigurationKeys.SMTP_AUTH_PASSWORD);
-	if (smtpAuthUser != null && !smtpAuthUser.trim().equals("")) {
+	if (!useInternalSMTPServer && (smtpAuthUser != null) && !smtpAuthUser.trim().equals("")) {
 
 	    properties.setProperty("mail.smtp.submitter", smtpAuthUser);
 	    properties.setProperty("mail.smtp.auth", "true");
@@ -87,7 +94,15 @@ public class Emailer {
 	message.addRecipient(RecipientType.TO, new InternetAddress(to));
 	message.setSubject(subject);
 	message.setText(body);
-	Transport.send(message);
+	
+	boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
+	if (useInternalSMTPServer) {
+	    MailQue myMailQue = new MailQue();
+	    myMailQue.queMail(message);	    
+	} else {
+	    Transport.send(message);    
+	}
+
     }
 
 }
