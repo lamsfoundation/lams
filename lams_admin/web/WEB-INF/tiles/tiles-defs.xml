@@ -108,6 +108,11 @@
 		<put name="content" value="userrole.jsp" />	
 	</definition>
 	
+	<definition name=".emailuser" path="/template.jsp">
+		<put name="title" value="admin.user.management"/>
+		<put name="content" value="emailuser.jsp" />	
+	</definition>
+	
 	<definition name=".orglist" path="/template.jsp">
 		<put name="title" value="admin.organisation.management"/>
 		<put name="content" value="organisation/list.jsp" />	

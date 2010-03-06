@@ -1,5 +1,8 @@
 <%@ include file="/taglibs.jsp"%>
 
+<c:set var="useInternalSMTPServer"><lams:Configuration key="InternalSMTPServer"/></c:set>
+<c:set var="smtpServer"><lams:Configuration key="SMTPServer"/></c:set>
+
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-1.1.4.pack.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pack.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pager.js"></script>
@@ -82,6 +85,12 @@ if (jQuery.browser.msie) {
 				<a href="user.do?method=remove&userId=<c:out value="${user.userId}"/>"><fmt:message key="admin.user.delete"/></a>
 				&nbsp;
 				<a href="<lams:LAMSURL/>/loginas.do?login=<c:out value="${user.login}"/>"><fmt:message key="label.login.as"/></a>
+				
+				<c:if test="${(not empty user.email) && (useInternalSMTPServer || not empty smtpServer)}">
+					<a href="emailUser.do?method=composeMail&userId=<c:out value="${user.userId}"/>">
+						<fmt:message key="label.email"/>
+					</a>
+				</c:if>
 			</td>
 		</tr>
 	</c:forEach>
