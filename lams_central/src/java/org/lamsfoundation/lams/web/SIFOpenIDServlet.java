@@ -66,6 +66,8 @@ public class SIFOpenIDServlet extends HttpServlet {
 		// Check if the user is not already logged in
 		HttpSession session = request.getSession(true);
 		String loggedInAs = OpenIdFilter.getCurrentUser(session);
+		
+		Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 
 		if (openIDEnabled != null && Boolean.parseBoolean(openIDEnabled.getConfigValue())) {
 			if (loggedInAs == null) {
@@ -76,7 +78,7 @@ public class SIFOpenIDServlet extends HttpServlet {
 					redirectToPortal(response, messageService.getMessage(ERROR_KEY_NO_ID_PASSED));
 
 				} else {
-					String returnURL = UrlUtils.getBaseUrl(request) + "/OpenIDServlet";
+					String returnURL = UrlUtils.getBaseUrl(request) + "/OpenIDServlet?lessonID=" + lessonID;
 					sendAuthenticationRequest(response, userOpenIDURL, returnURL, UrlUtils.getBaseUrl(request));
 				}
 			} else {

@@ -21,7 +21,6 @@
 package org.lamsfoundation.lams.integration.security;
 
 import java.io.IOException;
-import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +35,8 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * When j_security_check authentication is successful the user is redirected to the original requested URL. The
@@ -149,12 +150,23 @@ public class LoginRequestValve extends ValveBase {
 
 				HttpSession hses = hreq.getSession(false);
 				log.debug("Session Id - " + hses.getId());
+				
+				Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 
 				// check required parameters
 				if (hses != null) {
 					log.info("OPENID REQUEST DETECTED - LOGIN SUCCESSFUL");
 					
-					String relURL = request.getContextPath() + "/index.do";
+					String relURL;
+					
+					if (lessonID != null) {
+						// Launch learner
+						relURL = request.getContextPath() + "/launchlearner.do?" + AttributeNames.PARAM_LESSON_ID +"=" + lessonID;
+					} else {
+						// Go to LAMS home
+						relURL = request.getContextPath() + "/index.do";
+					}
+					
 					log.debug("Redirect URL - " + relURL);
 					
 					// create catalina internal session
