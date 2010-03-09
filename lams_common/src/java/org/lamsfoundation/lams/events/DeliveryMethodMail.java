@@ -45,7 +45,7 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 	    sendFromSupportEmail(subject, email, message);
 	    return null;
 	} catch (Exception e) {
-	    return e.getMessage();
+	    return e.toString();
 	}
     }
 

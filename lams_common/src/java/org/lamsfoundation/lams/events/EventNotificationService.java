@@ -224,6 +224,8 @@ class EventNotificationService implements IEventNotificationService {
 				String.valueOf(System.currentTimeMillis()), null, subject, message);
 		String result = deliveryMethod.send(userId, subject, message);
 		if (result != null) {
+		    	EventNotificationService.log.warn(messageService.getMessage("mail.error.occurred.while.sending.message",
+		    		new Object[] { result }));		    
 			eventFailCopy.subscribe(userId, deliveryMethod, null);
 		}
 
@@ -260,6 +262,9 @@ class EventNotificationService implements IEventNotificationService {
 						for (Long id : userId) {
 							String result = deliveryMethod.send(id, subject, message);
 							if (result != null) {
+							    	EventNotificationService.log.warn(messageService.getMessage(
+							    		"mail.error.occurred.while.sending.message",
+							    		new Object[] { result }));							    
 								event.subscribe(id, deliveryMethod, null);
 							}
 						}
