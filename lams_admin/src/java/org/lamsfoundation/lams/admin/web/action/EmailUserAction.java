@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.admin.web.action;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,6 +57,7 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Emailer;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -129,7 +131,8 @@ public class EmailUserAction extends LamsDispatchAction {
 	
 	EmailUserAction.log.debug("Administrator " + administrator.getFirstName() + " " + administrator.getLastName()
 		+ " sent email to user " + user.getFirstName() + " " + user.getLastName() + ": \n[subject] " + subject + "\n[message] " + body);
-	eventNotificationService.sendMessage(new Long(userId), DeliveryMethodMail.getInstance(), subject, body);
+	Properties properties = new Properties();
+	Emailer.send(subject, user.getEmail(), administrator.getEmail(), body, properties);
 	
 	return mapping.findForward("usersearch");
     }
