@@ -38,14 +38,7 @@ public class Emailer {
     public static void sendFromSupportEmail(String subject, String to, String body) throws AddressException,
 	    MessagingException {
 	String supportEmail = Configuration.get(ConfigurationKeys.LAMS_ADMIN_EMAIL);
-	boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
 	Properties properties = new Properties();
-	
-	if (! useInternalSMTPServer) {
-	    String smtpServer = Configuration.get(ConfigurationKeys.SMTP_SERVER);
-	    properties.put("mail.smtp.host", smtpServer);
-	}
-
 	send(subject, to, supportEmail, body, properties);
     }
 
@@ -59,13 +52,16 @@ public class Emailer {
     public static Session getMailSession(Properties properties) {
 	Session session;
 	boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
+	if (! useInternalSMTPServer) {
+	    String smtpServer = Configuration.get(ConfigurationKeys.SMTP_SERVER);
+	    properties.put("mail.smtp.host", smtpServer);
+	}
+	
 	String smtpAuthUser = Configuration.get(ConfigurationKeys.SMTP_AUTH_USER);
 	String smtpAuthPass = Configuration.get(ConfigurationKeys.SMTP_AUTH_PASSWORD);
 	if (!useInternalSMTPServer && (smtpAuthUser != null) && !smtpAuthUser.trim().equals("")) {
-
 	    properties.setProperty("mail.smtp.submitter", smtpAuthUser);
 	    properties.setProperty("mail.smtp.auth", "true");
-
 	    SMTPAuthenticator auth = new SMTPAuthenticator(smtpAuthUser, smtpAuthPass);
 	    session = Session.getInstance(properties, auth);
 	} else {
