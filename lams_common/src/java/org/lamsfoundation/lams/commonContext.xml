@@ -465,6 +465,7 @@
 				<constructor-arg>
          		  <ref bean="scheduler"/>
         		</constructor-arg>
+        		<property name="messageService"><ref bean="commonMessageService"/></property>
 			</bean>	
 		</property>  
 		<property name="transactionAttributes">
