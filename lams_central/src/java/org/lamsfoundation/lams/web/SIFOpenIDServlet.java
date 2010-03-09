@@ -78,7 +78,10 @@ public class SIFOpenIDServlet extends HttpServlet {
 					redirectToPortal(response, messageService.getMessage(ERROR_KEY_NO_ID_PASSED));
 
 				} else {
-					String returnURL = UrlUtils.getBaseUrl(request) + "/OpenIDServlet?lessonID=" + lessonID;
+					String returnURL = UrlUtils.getBaseUrl(request) + "/OpenIDServlet";
+					if (lessonID != null) {
+						returnURL += "?lessonID=" + lessonID;
+					}
 					sendAuthenticationRequest(response, userOpenIDURL, returnURL, UrlUtils.getBaseUrl(request));
 				}
 			} else {
