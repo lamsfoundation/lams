@@ -124,15 +124,24 @@ public class EmailUserAction extends LamsDispatchAction {
 	
 	//String to = WebUtil.readStrParam(request, "to");
 	String subject = emailForm.getSubject();
-	String body = emailForm.getBody();
+	// strip HTML tags from body
+	String body = emailForm.getBody().replaceAll("<BR>", "\n").replaceAll("\\<.*?\\>", "");
 
 	HttpSession ss1 = SessionManager.getSession();
 	UserDTO administrator = (UserDTO) ss1.getAttribute(AttributeNames.USER);
 	
-	EmailUserAction.log.debug("Administrator " + administrator.getFirstName() + " " + administrator.getLastName()
-		+ " sent email to user " + user.getFirstName() + " " + user.getLastName() + ": \n[subject] " + subject + "\n[message] " + body);
+	String to = user.getEmail();
+	String toPerson = user.getFirstName() + " " + user.getLastName();
+
+	String from = administrator.getEmail();
+	String fromPerson = administrator.getFirstName() + " " + administrator.getLastName();
+	
+	
+	EmailUserAction.log.debug("Administrator " + fromPerson + " (" + from + ") " 
+			+ " sent email to user " + toPerson + "( " + to + ") " + ": \n[subject] " + subject + "\n[message] " + body);
 	Properties properties = new Properties();
-	Emailer.send(subject, user.getEmail(), administrator.getEmail(), body, properties);
+
+	Emailer.send(subject, to, toPerson, from, fromPerson, body, properties);
 	
 	return mapping.findForward("usersearch");
     }

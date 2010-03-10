@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.events;
 
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
 
 import javax.mail.MessagingException;
@@ -71,7 +72,7 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
      *                 if the operation failed
      */
     public void sendFromSupportEmail(String subject, String to, String body) throws AddressException,
-	    MessagingException {
+	    MessagingException, UnsupportedEncodingException {
 	Emailer.sendFromSupportEmail(subject, to, body);
     }
 
@@ -87,7 +88,7 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
      * @throws MessagingException
      *                 if the operation failed
      */
-    void notifyAdmin(String subject, String body) throws AddressException, MessagingException {
+    void notifyAdmin(String subject, String body) throws AddressException, MessagingException, UnsupportedEncodingException {
 	String adminEmail = Configuration.get("LamsSupportEmail");
 	if (!StringUtils.isEmpty(adminEmail)) {
 	    sendFromSupportEmail(subject, adminEmail, body);
