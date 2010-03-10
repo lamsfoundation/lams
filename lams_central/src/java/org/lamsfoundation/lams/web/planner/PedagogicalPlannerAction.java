@@ -840,6 +840,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 			getPedagogicalPlannerDAO().saveNodeRole(u.getUserID(), nodeUid, Role.ROLE_AUTHOR_ADMIN);
 		    } catch (Exception e) {
 			log.error("Error saving role for newly created root node: " + e.getMessage());
+			e.printStackTrace();
 		    }
 		}
 
