@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.planner.dto;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
+
 public class PedagogicalPlannerTemplateDTO {
     private String sequenceTitle;
     private Boolean sendInPortions;
@@ -33,15 +35,7 @@ public class PedagogicalPlannerTemplateDTO {
     private List<PedagogicalPlannerActivityDTO> activities;
     private Long learningDesignID;
     private Integer activitySupportingPlannerCount = 0;
-    private Long nodeUid;
-
-    public Long getNodeUid() {
-	return nodeUid;
-    }
-
-    public void setNodeUid(Long nodeUid) {
-	this.nodeUid = nodeUid;
-    }
+    private PedagogicalPlannerSequenceNode node;
 
     public String getSequenceTitle() {
 	return sequenceTitle;
@@ -98,4 +92,13 @@ public class PedagogicalPlannerTemplateDTO {
     public void setActivitySupportingPlannerCount(Integer activitySupportingPlannerCount) {
 	this.activitySupportingPlannerCount = activitySupportingPlannerCount;
     }
+    
+    public PedagogicalPlannerSequenceNode getNode() {
+	return node;
+    }
+
+    public void setNode(PedagogicalPlannerSequenceNode node) {
+	this.node = node;
+    }
+
 }

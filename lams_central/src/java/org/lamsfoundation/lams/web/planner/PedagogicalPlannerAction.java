@@ -358,13 +358,14 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	}
 	// create DTO for the whole design
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
+	PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 
 	PedagogicalPlannerTemplateDTO planner = new PedagogicalPlannerTemplateDTO();
 	planner.setActivitySupportingPlannerCount(activitySupportingPlannerCount);
 	planner.setSequenceTitle(learningDesign.getTitle());
 	planner.setActivities(activities);
 	planner.setLearningDesignID(learningDesign.getLearningDesignId());
-	planner.setNodeUid(nodeUid);
+	planner.setNode(node);
 
 	// Some additional options for submitting activity forms; should be moved to configuration file in the future
 	planner.setSendInPortions(false);
