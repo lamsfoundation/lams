@@ -80,16 +80,14 @@ if (jQuery.browser.msie) {
 				<c:out value="${user.email}"/>
 			</td>
 			<td>
-				<a href="user.do?method=edit&userId=<c:out value="${user.userId}"/>"><fmt:message key="admin.edit"/></a>
+				[<a href="user.do?method=edit&userId=<c:out value="${user.userId}"/>"><fmt:message key="admin.edit"/></a>]
 				&nbsp;
-				<a href="user.do?method=remove&userId=<c:out value="${user.userId}"/>"><fmt:message key="admin.user.delete"/></a>
+				[<a href="user.do?method=remove&userId=<c:out value="${user.userId}"/>"><fmt:message key="admin.user.delete"/></a>]
 				&nbsp;
-				<a href="<lams:LAMSURL/>/loginas.do?login=<c:out value="${user.login}"/>"><fmt:message key="label.login.as"/></a>
+				[<a href="<lams:LAMSURL/>/loginas.do?login=<c:out value="${user.login}"/>"><fmt:message key="label.login.as"/></a>]
 				
 				<c:if test="${(not empty user.email) && (useInternalSMTPServer || not empty smtpServer)}">
-					<a href="emailUser.do?method=composeMail&userId=<c:out value="${user.userId}"/>">
-						<fmt:message key="label.email"/>
-					</a>
+					[<a href="emailUser.do?method=composeMail&userId=<c:out value="${user.userId}"/>"><fmt:message key="label.email"/></a>]
 				</c:if>
 			</td>
 		</tr>
