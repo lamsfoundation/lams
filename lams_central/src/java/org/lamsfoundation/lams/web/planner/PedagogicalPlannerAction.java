@@ -365,7 +365,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	}
 	// create DTO for the whole design
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
-	PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
+	PedagogicalPlannerSequenceNode node = (nodeUid == null) ? null : getPedagogicalPlannerDAO().getByUid(nodeUid);
 
 	PedagogicalPlannerTemplateDTO planner = new PedagogicalPlannerTemplateDTO();
 	planner.setActivitySupportingPlannerCount(activitySupportingPlannerCount);
