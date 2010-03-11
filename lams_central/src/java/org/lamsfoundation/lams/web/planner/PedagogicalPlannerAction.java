@@ -32,6 +32,8 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -92,6 +94,7 @@ import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
@@ -101,6 +104,7 @@ import org.lamsfoundation.lams.planner.dto.PedagogicalPlannerSequenceNodeDTO;
 import org.lamsfoundation.lams.planner.dto.PedagogicalPlannerTemplateDTO;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -117,6 +121,8 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
+import org.lamsfoundation.lams.workspace.service.WorkspaceManagementService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -167,7 +173,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String PEDAGOGICAL_PLANNER_DAO_BEAN_NAME = "pedagogicalPlannerDAO";
     private static final String ACTIVITY_DAO_BEAN_NAME = "activityDAO";
 
-    // Keys of error messages used in this class. They are ment to be displayed for user.
+    // Keys of error messages used in this class. They are meant to be displayed for user.
     private static final String ERROR_KEY_TOOL_ERRORS = "error.planner.tools.";
     private static final String ERROR_KEY_NODE_TITLE_BLANK = "error.planner.node.title.blank";
     private static final String ERROR_KEY_REPOSITORY = "error.planner.repository";
@@ -212,6 +218,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String ENCODING_UTF_8 = "UTF-8";
     private static final String DIR_UPLOADED_NODE_SUFFIX = "_uploaded_node";
     private static final String EXPORT_NODE_ZIP_PREFIX = "lams_planner_node_";
+    private static final String PLANNER_FOLDER_NAME = "Preview Planner";
 
     private static final int FILE_COPY_BUFFER_SIZE = 1024;
 
@@ -1095,7 +1102,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     }
 
     /**
-     * Imports a zipped node. Thi method is based on a similar one for importing learning designs.
+     * Imports a zipped node. This method is based on a similar one for importing learning designs.
      * 
      * @param mapping
      * @param form
@@ -1204,10 +1211,13 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Long learningDesignID = null;
 	LearningDesign learningDesign = null;
 	List<String> learningDesignErrorMsgs = new ArrayList<String>();
-	// Extract the template
 
+	Integer workspaceFolderId = getWorkspaceFolderId(user.getUserId());
+	
+	// Extract the template	
 	try {
-	    Object[] ldResults = getExportService().importLearningDesign(designFile, user, null, toolsErrorMsgs, "");
+	    Object[] ldResults = getExportService().importLearningDesign(designFile, user,
+		    workspaceFolderId, toolsErrorMsgs, "");
 	    designFile.delete();
 	    learningDesignID = (Long) ldResults[0];
 	    learningDesignErrorMsgs = (List<String>) ldResults[1];
@@ -1243,6 +1253,32 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    return null;
 	}
 	return learningDesign;
+    }
+    
+    /**
+     * Returns id of WorkspaceFolder where imported learning designs can be stored.
+     */
+    private Integer getWorkspaceFolderId(Integer userID) {
+	String name = PLANNER_FOLDER_NAME;
+	WorkspaceFolder parentFolder = getUserManagementService().getRootOrganisation().getWorkspace()
+		.getDefaultFolder();
+	Integer workspaceFolderType = WorkspaceFolder.PUBLIC_SEQUENCES;
+
+	Map<String, Object> properties = new HashMap<String, Object>();
+	properties.put("name", name);
+	properties.put("parentWorkspaceFolder.workspaceFolderId", parentFolder.getWorkspaceFolderId());
+	properties.put("workspaceFolderType", workspaceFolderType);
+	List workspaceFolderList = userManagementService.findByProperties(WorkspaceFolder.class, properties);
+	
+	WorkspaceFolder workspaceFolder = null;
+	if (workspaceFolderList != null && workspaceFolderList.size() > 0) {
+	    workspaceFolder = (WorkspaceFolder) workspaceFolderList.get(0);
+	} else {
+	    workspaceFolder = new WorkspaceFolder(name, null, parentFolder, userID, new Date(), new Date(),
+		    WorkspaceFolder.PUBLIC_SEQUENCES);
+	    userManagementService.save(workspaceFolder);
+	}
+	return workspaceFolder.getWorkspaceFolderId();	
     }
 
     /**
@@ -1816,7 +1852,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	}
 	return PedagogicalPlannerAction.contentHandler;
     }
-
+ 
     private void writeOutFile(HttpServletResponse response, String zipFilePath) throws IOException {
 	InputStream in = null;
 	ServletOutputStream out = null;
