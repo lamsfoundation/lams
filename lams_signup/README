@@ -21,5 +21,6 @@ add the following;
     
 TODO
 ----
+- signup stats (already stored in SignupUser)
 - full i18n
 - maintain pretty urls between POSTs
