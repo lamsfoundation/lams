@@ -93,7 +93,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			function resizeIframe() {
 			    var width = $(window).width() - 160;
 			    var height = $(window).height();
-			    $('#contentFrame').css({'width': width + "px", 'height': height + "px"});
+			    $('#contentFrame').css({'width': width + "px", 'height': height + "px", 'position': 'fixed'});
 			    
 			    <c:if test="${param.presenceEnabledPatch}">
 			    	resizeChat();
