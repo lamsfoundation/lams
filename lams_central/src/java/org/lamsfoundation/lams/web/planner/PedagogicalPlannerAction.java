@@ -92,6 +92,7 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
+import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -107,6 +108,8 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+import org.lamsfoundation.lams.usermanagement.exception.UserException;
+import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.CentralToolContentHandler;
@@ -1201,20 +1204,15 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	HttpSession session = SessionManager.getSession();
-	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
-	User user = (User) getUserManagementService().findById(User.class, userDto.getUserID());
-	if (user == null) {
-	    throw new ServletException(PedagogicalPlannerAction.ERROR_USER_NOT_FOUND);
-	}
+	User user = getUser();
 	List<String> toolsErrorMsgs = new ArrayList<String>();
 	Long learningDesignID = null;
 	LearningDesign learningDesign = null;
 	List<String> learningDesignErrorMsgs = new ArrayList<String>();
-
+	
 	Integer workspaceFolderId = getWorkspaceFolderId(user.getUserId());
 	
-	// Extract the template	
+	// Extract the template
 	try {
 	    Object[] ldResults = getExportService().importLearningDesign(designFile, user,
 		    workspaceFolderId, toolsErrorMsgs, "");
@@ -1279,7 +1277,21 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    userManagementService.save(workspaceFolder);
 	}
 	return workspaceFolder.getWorkspaceFolderId();	
-    }
+    }    
+    
+    /**
+     * Returns current user stored in session.
+     * @throws ServletException 
+     */
+    private User getUser() throws ServletException {
+	HttpSession session = SessionManager.getSession();
+	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+	User user = (User) getUserManagementService().findById(User.class, userDto.getUserID());
+	if (user == null) {
+	    throw new ServletException(PedagogicalPlannerAction.ERROR_USER_NOT_FOUND);
+	}	
+	return user;
+    } 
 
     /**
      * Copies the template files from repository into the selected dir.
@@ -1535,11 +1547,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	return mapping.findForward(PedagogicalPlannerAction.FORWARD_GROUPING);
     }
 
-    private List<PedagogicalPlannerSequenceNodeDTO> getRecentlyModifiedLearnindDesignsAsNodes() {
+    private List<PedagogicalPlannerSequenceNodeDTO> getRecentlyModifiedLearnindDesignsAsNodes() throws ServletException {
 	// Add the recently modified learning design list, if it's the root node with no filtering
-	HttpSession session = SessionManager.getSession();
-	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
-	User user = (User) getUserManagementService().findById(User.class, userDto.getUserID());
+	User user = getUser();
 	// the list is sorted most-recently-edited-on-top (so by the timestamp descending)
 	Set<Long> recentLDs = user.getRecentlyModifiedLearningDesigns();
 	List<PedagogicalPlannerSequenceNodeDTO> recentNodes = new LinkedList<PedagogicalPlannerSequenceNodeDTO>();
@@ -1562,10 +1572,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      * 
      * @param learningDesignId
      */
-    private void updateRecentLearningDesignList(Long learningDesignId) {
-	HttpSession session = SessionManager.getSession();
-	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
-	User user = (User) getUserManagementService().findById(User.class, userDto.getUserID());
+    private void updateRecentLearningDesignList(Long learningDesignId) throws ServletException {
+	User user = getUser();
 	// the list is sorted most-recently-edited-on-top (so by the timestamp descending)
 	Set<Long> recentLDs = user.getRecentlyModifiedLearningDesigns();
 	boolean ldFound = false;
@@ -1589,6 +1597,42 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     }
 
     /*-------------------------- TEMPLATE BASE METHODS -----------------*/
+    
+    /**
+     * Copies LearningDesign to user's personal folder.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws ServletException 
+     * @throws IOException 
+     * @throws WorkspaceFolderException 
+     * @throws UserException 
+     * @throws LearningDesignException 
+     */
+    public ActionForward copyLearningDesign(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException, IOException, LearningDesignException, UserException, WorkspaceFolderException {
+	PedagogicalPlannerAction.log.debug("Copying LearningDesign to user's personal folder");
+
+	Long designID = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
+	LearningDesign originalDesign = getAuthoringService().getLearningDesign(designID);
+	if (originalDesign == null) {
+	    throw new LearningDesignException(getMessageService().getMessage("no.such.learningdesign.exist",
+		    new Object[] { designID }));
+	}	
+	User user = getUser();
+	WorkspaceFolder targetFolder = user.getWorkspace().getDefaultFolder();
+	Integer copyType = LearningDesign.COPY_TYPE_NONE;
+	boolean setOriginalDesign = false;
+	String newDesignName = originalDesign.getTitle();
+	String customCSV = null;
+	
+	getAuthoringService().copyLearningDesign(originalDesign, copyType, user, targetFolder, setOriginalDesign, newDesignName, customCSV);
+	
+	return null;
+    }    
 
     /**
      * Saves additional, non tool-bound template details - currently only the title.
@@ -1852,7 +1896,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	}
 	return PedagogicalPlannerAction.contentHandler;
     }
- 
+
     private void writeOutFile(HttpServletResponse response, String zipFilePath) throws IOException {
 	InputStream in = null;
 	ServletOutputStream out = null;

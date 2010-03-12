@@ -8,7 +8,7 @@
    var startPreviewUrl; //Url to start preview
    var learningDesignId; //ID of the design to open
    
-   var ACTION_DO_NOTHING = 0; //After successful submit do nothing
+   var ACTION_SAVE_AS_SEQUENCE = 0; //After successful submit save learning design in user's personal folder
    var ACTION_PREVIEW = 1; //After successful submit start preview
    var ACTION_OPEN_AUTHOR = 2; //After successful submit open full authoring
    var ACTION_EXPORT = 3; //After successful submit export the learning design 
@@ -22,7 +22,7 @@
     if (actionAfterCompleted==ACTION_PREVIEW){
     	startPreviewUrl=additionalParameter;
     }
-    else if (actionAfterCompleted==ACTION_OPEN_AUTHOR || actionAfterCompleted==ACTION_EXPORT){
+    else if (actionAfterCompleted==ACTION_SAVE_AS_SEQUENCE || actionAfterCompleted==ACTION_OPEN_AUTHOR || actionAfterCompleted==ACTION_EXPORT){
   	    learningDesignId=additionalParameter;
     }
     callAttemptedID++;
@@ -138,12 +138,24 @@
   	$('#pedagogicalPlannerBusy').hide();
   	if (sequenceDetailsValid &&  activitiesValid==activitiesResponded){
   	   	$('#pedagogicalPlannerInfoArea').show();
-  	   	if (actionAfterCompleted==ACTION_PREVIEW){
+	   	if (actionAfterCompleted==ACTION_SAVE_AS_SEQUENCE){
+	   	 	$.ajax({
+	   	 		url: saveDetailsUrl,
+	   	 		cache: false,
+	   	 		data: "method=copyLearningDesign&ldId="+learningDesignId
+	   	 	});	   		
+  	   	}  	  
+	   	else if (actionAfterCompleted==ACTION_PREVIEW){
   	   		startPreview(startPreviewUrl);
   	   	}
   	   	else if (actionAfterCompleted==ACTION_OPEN_AUTHOR){
   	   		 window.resizeTo(authoring_width,authoring_height);
-  	   		 document.location.href="home.do?method=author&learningDesignID="+learningDesignId;
+  	   		 $.ajax({
+	   	 		url: saveDetailsUrl,
+	   	 		cache: false,
+	   	 		data: "method=copyLearningDesign&ldId="+learningDesignId
+	   	 	});  	   		 
+  	   		document.location.href="home.do?method=author&learningDesignID="+learningDesignId;
   	   	}
   	   	else if (actionAfterCompleted==ACTION_EXPORT){
   	   		 document.getElementById("downloadFileDummyIframe").src="pedagogicalPlanner.do?method=exportTemplate&ldId="+learningDesignId;
