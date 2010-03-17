@@ -820,4 +820,15 @@ public class LessonService implements ILessonService {
     public List<Lesson> getActiveLessonsForLearner(Integer learnerId, Integer organisationId) {
 	return lessonDAO.getActiveLessonsForLearner(learnerId, organisationId);
     }
+    
+    /**
+     * @see org.lamsfoundation.lams.lesson.service.ILessonService#getLessonDetailsFromSessionID(java.lang.Long)
+     */
+    public LessonDetailsDTO getLessonDetailsFromSessionID(Long toolSessionID) {
+	Lesson lesson = this.lessonDAO.getLessonFromSessionID(toolSessionID);
+	if (lesson != null) {
+	    return lesson.getLessonDetails(); 
+	}
+	return null;
+    }
 }

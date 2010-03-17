@@ -55,6 +55,10 @@ import org.lamsfoundation.lams.usermanagement.User;
  * and will need to purge users who haven't done anything for a while - otherwise a user whose PC has crashed and then
  * never returns to a lesson will staying in the cache forever.
  */
+/**
+ * @author lfoxton
+ *
+ */
 public interface ILessonService {
 
     /** Get all the learners who have started the lesson. They may not be currently online. */
@@ -403,4 +407,13 @@ public interface ILessonService {
      * @return a List with all active lessons in it.
      */
     public List<Lesson> getActiveLessonsForLearner(final Integer learnerId, final Integer organisationId);
+    
+    
+    /**
+     * Gets lesson details for tools based on toolSessionID
+     * 
+     * @param sessionID
+     * @return
+     */
+    public LessonDetailsDTO getLessonDetailsFromSessionID(Long toolSessionID);
 }

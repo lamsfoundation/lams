@@ -33,227 +33,353 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
  * @author Manpreet Minhas
  */
 public class LessonDetailsDTO {
-	
-	private Long lessonID;
-	private String lessonName;
-	private String lessonDescription;
-	private Integer lessonStateID;
-	private Date createDateTime;
-	private Date startDateTime;
-	private String startDateTimeStr;
+
+    private Long lessonID;
+    private String lessonName;
+    private String lessonDescription;
+    private Integer lessonStateID;
+    private Date createDateTime;
+    private Date startDateTime;
+    private String startDateTimeStr;
     private Date scheduleStartDate;
     private String scheduleStartDateStr;
     private Date scheduleEndDate;
- 	private Long duration;	
-	private Integer organisationID;
-	private String organisationName;
-	private String organisationDescription;	
-	private Integer workspaceFolderID;	
-	private String contentFolderID;
-	private Long licenseID;
-	private String licenseText;	
-	private Long learningDesignID;
-	private Integer numberPossibleLearners;
-	private Integer numberStartedLearners;
-	private Boolean learnerExportAvailable;
-	private Boolean locked_for_edit;
-	private Boolean learnerPresenceAvailable;
-	private Boolean learnerImAvailable;
-	private Boolean liveEditEnabled;
-	
-	/** Create the DTO based on the lesson. Sets up all the fields except numberStartedLearners */
-	public LessonDetailsDTO(Lesson lesson){
-		this.lessonID = lesson.getLessonId();
-		this.lessonName = lesson.getLessonName();
-		this.lessonDescription = lesson.getLessonDescription();
+    private Long duration;
+    private Integer organisationID;
+    private String organisationName;
+    private String organisationDescription;
+    private Integer workspaceFolderID;
+    private String contentFolderID;
+    private Long licenseID;
+    private String licenseText;
+    private Long learningDesignID;
+    private Integer numberPossibleLearners;
+    private Integer numberStartedLearners;
+    private Boolean learnerExportAvailable;
+    private Boolean locked_for_edit;
+    private Boolean learnerPresenceAvailable;
+    private Boolean learnerImAvailable;
+    private Boolean liveEditEnabled;
+    private Boolean isPreview;
 
-		this.lessonStateID = lesson.getLessonStateId();
-		this.createDateTime = lesson.getCreateDateTime();
-		this.startDateTime = lesson.getStartDateTime();
-		this.startDateTimeStr = null;
-		this.scheduleStartDate = lesson.getScheduleStartDate();
-		//if(this.scheduleStartDate != null) {
-		//	this.scheduleStartDateStr = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL).format(this.scheduleStartDate);
-			
-		//} else {
-		this.scheduleStartDateStr = null;
-		//}
-		this.scheduleEndDate = lesson.getScheduleEndDate();
-		
-		this.duration = lesson.getLearningDesign().getDuration();
-		
-		this.organisationID = lesson.getOrganisation()!=null?
-							  lesson.getOrganisation().getOrganisationId():
-							  WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
-		
-        this.organisationName = lesson.getOrganisation()!=null?
-								lesson.getOrganisation().getName():
-								WDDXTAGS.STRING_NULL_VALUE;
-		
-		this.organisationDescription = lesson.getOrganisation()!=null?
-									   lesson.getOrganisation().getDescription():
-									   WDDXTAGS.STRING_NULL_VALUE;
-		
-		this.workspaceFolderID = lesson.getLearningDesign().getWorkspaceFolder()!=null?
-								 lesson.getLearningDesign().getWorkspaceFolder().getWorkspaceFolderId():
-								 WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
-		
-		this.contentFolderID = lesson.getLearningDesign().getContentFolderID()!=null?
-							   lesson.getLearningDesign().getContentFolderID():
-							   WDDXTAGS.STRING_NULL_VALUE;
-							   
-		this.licenseID = lesson.getLearningDesign().getLicense()!=null?
-						 lesson.getLearningDesign().getLicense().getLicenseID():
-					     WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
-		
-		this.licenseText = lesson.getLearningDesign().getLicenseText()!=null?
-						   lesson.getLearningDesign().getLicenseText():
-					       WDDXTAGS.STRING_NULL_VALUE;
-		
-		this.learningDesignID = lesson.getLearningDesign().getLearningDesignId();		
+    /**
+     * Create the DTO based on the lesson. Sets up all the fields except
+     * numberStartedLearners
+     */
+    public LessonDetailsDTO(Lesson lesson) {
+	this.lessonID = lesson.getLessonId();
+	this.lessonName = lesson.getLessonName();
+	this.lessonDescription = lesson.getLessonDescription();
 
-		Set allLearners = lesson.getAllLearners();
-		this.numberPossibleLearners = new Integer(allLearners !=null ? allLearners.size() : 0);
-		this.numberStartedLearners = new Integer(0);
+	this.lessonStateID = lesson.getLessonStateId();
+	this.createDateTime = lesson.getCreateDateTime();
+	this.startDateTime = lesson.getStartDateTime();
+	this.startDateTimeStr = null;
+	this.scheduleStartDate = lesson.getScheduleStartDate();
+	// if(this.scheduleStartDate != null) {
+	// this.scheduleStartDateStr =
+	// DateFormat.getDateTimeInstance(DateFormat.FULL,
+	// DateFormat.FULL).format(this.scheduleStartDate);
+
+	// } else {
+	this.scheduleStartDateStr = null;
+	// }
+	this.scheduleEndDate = lesson.getScheduleEndDate();
+
+	this.duration = lesson.getLearningDesign().getDuration();
+
+	this.organisationID = lesson.getOrganisation() != null ? lesson.getOrganisation().getOrganisationId() : WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+
+	this.organisationName = lesson.getOrganisation() != null ? lesson.getOrganisation().getName() : WDDXTAGS.STRING_NULL_VALUE;
+
+	this.organisationDescription = lesson.getOrganisation() != null ? lesson.getOrganisation().getDescription() : WDDXTAGS.STRING_NULL_VALUE;
+
+	this.workspaceFolderID = lesson.getLearningDesign().getWorkspaceFolder() != null ? lesson.getLearningDesign().getWorkspaceFolder()
+		.getWorkspaceFolderId() : WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+
+	this.contentFolderID = lesson.getLearningDesign().getContentFolderID() != null ? lesson.getLearningDesign().getContentFolderID()
+		: WDDXTAGS.STRING_NULL_VALUE;
+
+	this.licenseID = lesson.getLearningDesign().getLicense() != null ? lesson.getLearningDesign().getLicense().getLicenseID()
+		: WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+
+	this.licenseText = lesson.getLearningDesign().getLicenseText() != null ? lesson.getLearningDesign().getLicenseText() : WDDXTAGS.STRING_NULL_VALUE;
+
+	this.learningDesignID = lesson.getLearningDesign().getLearningDesignId();
+
+	Set allLearners = lesson.getAllLearners();
+	this.numberPossibleLearners = new Integer(allLearners != null ? allLearners.size() : 0);
+	this.numberStartedLearners = new Integer(0);
+
+	this.learnerExportAvailable = lesson.getLearnerExportAvailable();
+
+	this.learnerPresenceAvailable = lesson.getLearnerPresenceAvailable();
+	this.learnerImAvailable = lesson.getLearnerImAvailable();
+
+	this.liveEditEnabled = lesson.getLiveEditEnabled();
+
+	this.locked_for_edit = lesson.getLockedForEdit();
 	
-		this.learnerExportAvailable = lesson.getLearnerExportAvailable();
-		
-		this.learnerPresenceAvailable = lesson.getLearnerPresenceAvailable();
-		this.learnerImAvailable = lesson.getLearnerImAvailable();
-		
-		this.liveEditEnabled = lesson.getLiveEditEnabled();
-		
-		this.locked_for_edit = lesson.getLockedForEdit();
-	}	
-	public Date getScheduleEndDate() {
-		return scheduleEndDate;
-	}
-	public Date getScheduleStartDate() {
-		return scheduleStartDate;
-	}
-	public String getScheduleStartDateStr() {
-		return scheduleStartDateStr;
-	}
-	public void setScheduleStartDateStr(String scheduleStartDateStr) {
-		this.scheduleStartDateStr = scheduleStartDateStr;
-	}
-	
-	/**
-	 * @return Returns the createDateTime.
-	 */
-	public Date getCreateDateTime() {
-		return createDateTime!=null?createDateTime:WDDXTAGS.DATE_NULL_VALUE;
-	}
-	/**
-	 * @return Returns the duration.
-	 */
-	public Long getDuration() {
-		return duration!=null?duration:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
-	}
-	/**
-	 * @return Returns the learningDesignID.
-	 */
-	public Long getLearningDesignID() {
-		return learningDesignID!=null?learningDesignID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
-	}
-	/**
-	 * @return Returns the lessonID.
-	 */
-	public Long getLessonID() {
-		return lessonID!=null?lessonID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
-	}
-	/**
-	 * @return Returns the lessonStateID.
-	 */
-	public Integer getLessonStateID() {
-		return lessonStateID!=null?lessonStateID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
-	}
-	/**
-	 * @return Returns the licenseID.
-	 */
-	public Long getLicenseID() {
-		return licenseID!=null?licenseID:WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
-	}
-	/**
-	 * @return Returns the licenseText.
-	 */
-	public String getLicenseText() {
-		return licenseText!=null?licenseText:WDDXTAGS.STRING_NULL_VALUE;
-	}
-	/**
-	 * @return Returns the organisationDescription.
-	 */
-	public String getOrganisationDescription() {
-		return organisationDescription!=null?organisationDescription:WDDXTAGS.STRING_NULL_VALUE;
-	}
-	/**
-	 * @return Returns the organisationID.
-	 */
-	public Integer getOrganisationID() {
-		return organisationID!=null?organisationID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
-	}
-	/**
-	 * @return Returns the organisationName.
-	 */
-	public String getOrganisationName() {
-		return organisationName!=null?organisationName:WDDXTAGS.STRING_NULL_VALUE;
-	}
-	/**
-	 * @return Returns the startDateTime.
-	 */
-	public Date getStartDateTime() {
-		return startDateTime!=null?startDateTime:WDDXTAGS.DATE_NULL_VALUE;
-	}
-	
-	public String getStartDateTimeStr() {
-		return startDateTimeStr!=null?startDateTimeStr:WDDXTAGS.STRING_NULL_VALUE;
-	}
-	
-	public void setStartDateTimeStr(String startDateTimeStr) {
-		this.startDateTimeStr = startDateTimeStr;
-	}
-	
-	/**
-	 * @return Returns the workspaceFolderID.
-	 */
-	public Integer getWorkspaceFolderID() {
-		return workspaceFolderID!=null?workspaceFolderID:WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
-	}
-	/**
-	 * 
-	 * @return Returns the contentFolderID.
-	 */
-	public String getContentFolderID() {
-		return contentFolderID!=null?contentFolderID:WDDXTAGS.STRING_NULL_VALUE;
-	}
-	public Integer getNumberStartedLearners() {
-		return numberStartedLearners;
-	}
-	public void setNumberStartedLearners(Integer numberStartedLearners) {
-		this.numberStartedLearners = numberStartedLearners;
-	}
-	public String getLessonDescription() {
-		return lessonDescription;
-	}
-	public String getLessonName() {
-		return lessonName;
-	}
-	public Integer getNumberPossibleLearners() {
-		return numberPossibleLearners;
-	}
-	public Boolean getLearnerExportAvailable() {
-		return learnerExportAvailable;
-	}
-	public Boolean getLearnerPresenceAvailable() {
-		return learnerPresenceAvailable;
-	}
-	public Boolean getLearnerImAvailable() {
-		return learnerImAvailable;
-	}
-	public Boolean getLockedForEdit() {
-		return locked_for_edit;
-	}
-	public Boolean getLiveEditEnabled() {
-		return liveEditEnabled;
-	}
+	this.isPreview = lesson.isPreviewLesson();
+    }
+
+    public Date getScheduleEndDate() {
+	return scheduleEndDate;
+    }
+
+    public Date getScheduleStartDate() {
+	return scheduleStartDate;
+    }
+
+    public String getScheduleStartDateStr() {
+	return scheduleStartDateStr;
+    }
+
+    public void setScheduleStartDateStr(String scheduleStartDateStr) {
+	this.scheduleStartDateStr = scheduleStartDateStr;
+    }
+
+    /**
+     * @return Returns the createDateTime.
+     */
+    public Date getCreateDateTime() {
+	return createDateTime != null ? createDateTime : WDDXTAGS.DATE_NULL_VALUE;
+    }
+
+    /**
+     * @return Returns the duration.
+     */
+    public Long getDuration() {
+	return duration != null ? duration : WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+    }
+
+    /**
+     * @return Returns the learningDesignID.
+     */
+    public Long getLearningDesignID() {
+	return learningDesignID != null ? learningDesignID : WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+    }
+
+    /**
+     * @return Returns the lessonID.
+     */
+    public Long getLessonID() {
+	return lessonID != null ? lessonID : WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+    }
+
+    /**
+     * @return Returns the lessonStateID.
+     */
+    public Integer getLessonStateID() {
+	return lessonStateID != null ? lessonStateID : WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+    }
+
+    /**
+     * @return Returns the licenseID.
+     */
+    public Long getLicenseID() {
+	return licenseID != null ? licenseID : WDDXTAGS.NUMERIC_NULL_VALUE_LONG;
+    }
+
+    /**
+     * @return Returns the licenseText.
+     */
+    public String getLicenseText() {
+	return licenseText != null ? licenseText : WDDXTAGS.STRING_NULL_VALUE;
+    }
+
+    /**
+     * @return Returns the organisationDescription.
+     */
+    public String getOrganisationDescription() {
+	return organisationDescription != null ? organisationDescription : WDDXTAGS.STRING_NULL_VALUE;
+    }
+
+    /**
+     * @return Returns the organisationID.
+     */
+    public Integer getOrganisationID() {
+	return organisationID != null ? organisationID : WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+    }
+
+    /**
+     * @return Returns the organisationName.
+     */
+    public String getOrganisationName() {
+	return organisationName != null ? organisationName : WDDXTAGS.STRING_NULL_VALUE;
+    }
+
+    /**
+     * @return Returns the startDateTime.
+     */
+    public Date getStartDateTime() {
+	return startDateTime != null ? startDateTime : WDDXTAGS.DATE_NULL_VALUE;
+    }
+
+    public String getStartDateTimeStr() {
+	return startDateTimeStr != null ? startDateTimeStr : WDDXTAGS.STRING_NULL_VALUE;
+    }
+
+    public void setStartDateTimeStr(String startDateTimeStr) {
+	this.startDateTimeStr = startDateTimeStr;
+    }
+
+    /**
+     * @return Returns the workspaceFolderID.
+     */
+    public Integer getWorkspaceFolderID() {
+	return workspaceFolderID != null ? workspaceFolderID : WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER;
+    }
+
+    /**
+     * 
+     * @return Returns the contentFolderID.
+     */
+    public String getContentFolderID() {
+	return contentFolderID != null ? contentFolderID : WDDXTAGS.STRING_NULL_VALUE;
+    }
+
+    public Integer getNumberStartedLearners() {
+	return numberStartedLearners;
+    }
+
+    public void setNumberStartedLearners(Integer numberStartedLearners) {
+	this.numberStartedLearners = numberStartedLearners;
+    }
+
+    public String getLessonDescription() {
+	return lessonDescription;
+    }
+
+    public String getLessonName() {
+	return lessonName;
+    }
+
+    public Integer getNumberPossibleLearners() {
+	return numberPossibleLearners;
+    }
+
+    public Boolean getLearnerExportAvailable() {
+	return learnerExportAvailable;
+    }
+
+    public Boolean getLearnerPresenceAvailable() {
+	return learnerPresenceAvailable;
+    }
+
+    public Boolean getLearnerImAvailable() {
+	return learnerImAvailable;
+    }
+
+    public Boolean getLockedForEdit() {
+	return locked_for_edit;
+    }
+
+    public Boolean getLiveEditEnabled() {
+	return liveEditEnabled;
+    }
+
+    public Boolean getLocked_for_edit() {
+        return locked_for_edit;
+    }
+
+    public void setLocked_for_edit(Boolean locked_for_edit) {
+        this.locked_for_edit = locked_for_edit;
+    }
+
+    public Boolean getIsPreview() {
+        return isPreview;
+    }
+
+    public void setIsPreview(Boolean isPreview) {
+        this.isPreview = isPreview;
+    }
+
+    public void setLessonID(Long lessonID) {
+        this.lessonID = lessonID;
+    }
+
+    public void setLessonName(String lessonName) {
+        this.lessonName = lessonName;
+    }
+
+    public void setLessonDescription(String lessonDescription) {
+        this.lessonDescription = lessonDescription;
+    }
+
+    public void setLessonStateID(Integer lessonStateID) {
+        this.lessonStateID = lessonStateID;
+    }
+
+    public void setCreateDateTime(Date createDateTime) {
+        this.createDateTime = createDateTime;
+    }
+
+    public void setStartDateTime(Date startDateTime) {
+        this.startDateTime = startDateTime;
+    }
+
+    public void setScheduleStartDate(Date scheduleStartDate) {
+        this.scheduleStartDate = scheduleStartDate;
+    }
+
+    public void setScheduleEndDate(Date scheduleEndDate) {
+        this.scheduleEndDate = scheduleEndDate;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
+    }
+
+    public void setOrganisationID(Integer organisationID) {
+        this.organisationID = organisationID;
+    }
+
+    public void setOrganisationName(String organisationName) {
+        this.organisationName = organisationName;
+    }
+
+    public void setOrganisationDescription(String organisationDescription) {
+        this.organisationDescription = organisationDescription;
+    }
+
+    public void setWorkspaceFolderID(Integer workspaceFolderID) {
+        this.workspaceFolderID = workspaceFolderID;
+    }
+
+    public void setContentFolderID(String contentFolderID) {
+        this.contentFolderID = contentFolderID;
+    }
+
+    public void setLicenseID(Long licenseID) {
+        this.licenseID = licenseID;
+    }
+
+    public void setLicenseText(String licenseText) {
+        this.licenseText = licenseText;
+    }
+
+    public void setLearningDesignID(Long learningDesignID) {
+        this.learningDesignID = learningDesignID;
+    }
+
+    public void setNumberPossibleLearners(Integer numberPossibleLearners) {
+        this.numberPossibleLearners = numberPossibleLearners;
+    }
+
+    public void setLearnerExportAvailable(Boolean learnerExportAvailable) {
+        this.learnerExportAvailable = learnerExportAvailable;
+    }
+
+    public void setLearnerPresenceAvailable(Boolean learnerPresenceAvailable) {
+        this.learnerPresenceAvailable = learnerPresenceAvailable;
+    }
+
+    public void setLearnerImAvailable(Boolean learnerImAvailable) {
+        this.learnerImAvailable = learnerImAvailable;
+    }
+
+    public void setLiveEditEnabled(Boolean liveEditEnabled) {
+        this.liveEditEnabled = liveEditEnabled;
+    }
 }

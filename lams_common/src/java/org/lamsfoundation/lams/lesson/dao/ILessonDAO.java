@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -201,4 +202,12 @@ public interface ILessonDAO extends IBaseDAO {
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
     public List<User> getMonitorsByToolSessionId(Long sessionId);
+    
+    /**
+     * Gets lesson for tools based on toolSessionID
+     * 
+     * @param sessionID
+     * @return
+     */
+    public Lesson getLessonFromSessionID(Long toolSessionID);
 }

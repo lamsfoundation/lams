@@ -64,6 +64,8 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	    + Lesson.STARTED_STATE + " " + "and l.organisation.organisationId = ? " + " order by l.lessonName";
     private final static String LESSONS_BY_GROUP = "from " + Lesson.class.getName()
     	+ " where organisation.organisationId=? and lessonStateId <= 6";
+    private final static String LESSON_BY_SESSION_ID = "select lesson from Lesson lesson, ToolSession session where " +
+    		"session.lesson=lesson and session.toolSessionId=:toolSessionID";
 
     /**
      * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces an initialize.
@@ -343,5 +345,18 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	return this.getHibernateTemplate().findByNamedQueryAndNamedParam("monitorsByToolSessionId", "sessionId",
 		sessionId);
     }
-
+    
+    /**
+     * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonDetailsFromSessionID(java.lang.Long)
+     */
+    public Lesson getLessonFromSessionID(final Long toolSessionID) {
+	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
+	return (Lesson) hibernateTemplate.execute(new HibernateCallback() {
+	    public Object doInHibernate(Session session) throws HibernateException {
+		Query query = session.createQuery(LessonDAO.LESSON_BY_SESSION_ID);
+		query.setLong("toolSessionID", toolSessionID);
+		return query.uniqueResult();
+	    }
+	});
+    }
 }
