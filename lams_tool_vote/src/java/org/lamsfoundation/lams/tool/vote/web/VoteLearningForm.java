@@ -52,6 +52,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String toolContentID;
 	
 	protected String maxNominationCount;
+	protected String minNominationCount;
 	protected String allowTextEntry;
 	protected String showResults;
 	protected String lockOnFinish;
@@ -90,6 +91,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	protected String nominationsSubmited;
 	protected String revisitingUser;
 	protected String maxNominationCountReached;
+	protected String minNominationCountReached;
 	protected int 	 castVoteCount;
 	
 	protected Map     mapGeneralCheckedOptionsContent;
@@ -577,6 +579,18 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     public void setMaxNominationCount(String maxNominationCount) {
         this.maxNominationCount = maxNominationCount;
     }
+    /**
+     * @return Returns the minNominationCount.
+     */
+    public String getMinNominationCount() {
+        return minNominationCount;
+    }
+    /**
+     * @param minNominationCount The minNominationCount to set.
+     */
+    public void setMinNominationCount(String minNominationCount) {
+        this.minNominationCount = minNominationCount;
+    }    
 
     /**
      * @return Returns the nominationsSubmited.
@@ -641,6 +655,18 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     public void setMaxNominationCountReached(String maxNominationCountReached) {
         this.maxNominationCountReached = maxNominationCountReached;
     }
+    /**
+     * @return Returns the minNominationCountReached.
+     */
+    public String getMinNominationCountReached() {
+        return minNominationCountReached;
+    }
+    /**
+     * @param minNominationCountReached The minNominationCountReached to set.
+     */
+    public void setMinNominationCountReached(String minNominationCountReached) {
+        this.minNominationCountReached = minNominationCountReached;
+    }    
     
     /**
      * @return Returns the sbmtSuccess.

@@ -738,6 +738,11 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	voteAuthoringForm.setMaxNominationCount(maxNominationCount);
 	voteGeneralAuthoringDTO.setMaxNominationCount(maxNominationCount);
 
+        String minNominationCount=request.getParameter(MIN_NOMINATION_COUNT);
+        logger.debug("minNominationCount: " + minNominationCount);
+        voteAuthoringForm.setMinNominationCount(minNominationCount);
+        voteGeneralAuthoringDTO.setMinNominationCount(minNominationCount);
+
 	String reflect = request.getParameter("reflect");
 	VoteAction.logger.debug("reflect: " + reflect);
 	voteAuthoringForm.setReflect(reflect);

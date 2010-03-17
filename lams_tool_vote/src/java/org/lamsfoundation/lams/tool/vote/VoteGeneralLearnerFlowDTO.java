@@ -51,6 +51,8 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
     
     protected String maxNominationCountReached;
     
+    protected String minNominationCountReached;
+    
     protected String activityRunOffline;
     
     protected String toolSessionID;
@@ -62,6 +64,8 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
     protected String learningMode;
     
     protected String maxNominationCount;
+    
+    protected String minNominationCount;
 	
     protected String allowTextEntry;
 	
@@ -143,6 +147,18 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
     public void setMaxNominationCountReached(String maxNominationCountReached) {
         this.maxNominationCountReached = maxNominationCountReached;
     }
+    /**
+     * @return Returns the minNominationCountReached.
+     */
+    public String getMinNominationCountReached() {
+        return minNominationCountReached;
+    }
+    /**
+     * @param minNominationCountReached The minNominationCountReached to set.
+     */
+    public void setMinNominationCountReached(String minNominationCountReached) {
+        this.minNominationCountReached = minNominationCountReached;
+    }    
     /**
      * @return Returns the revisitingUser.
      */
@@ -253,6 +269,18 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
     public void setMaxNominationCount(String maxNominationCount) {
         this.maxNominationCount = maxNominationCount;
     }
+    /**
+     * @return Returns the minNominationCount.
+     */
+    public String getMinNominationCount() {
+        return minNominationCount;
+    }
+    /**
+     * @param minNominationCount The minNominationCount to set.
+     */
+    public void setMinNominationCount(String minNominationCount) {
+        this.minNominationCount = minNominationCount;
+    }    
     
     /**
      * @return Returns the toolContentID.

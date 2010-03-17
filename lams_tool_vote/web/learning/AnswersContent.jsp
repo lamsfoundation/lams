@@ -35,13 +35,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:head>
 	<html:base />
 	<lams:css />
-	<title><fmt:message key="activity.title" />
-	</title>
+	<title><fmt:message key="activity.title" />	</title>
 
 	<script language="JavaScript" type="text/JavaScript">
 
 	var noSelected = 0;
 	var maxVotes = <c:out value="${VoteLearningForm.maxNominationCount}"/>; 
+	var minVotes = <c:out value="${VoteLearningForm.minNominationCount}"/>; 
 	function updateCount(clickedObj){
 		var userEntry = 0;
 		<c:if test="${VoteLearningForm.allowTextEntry == true}">	
@@ -72,10 +72,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			}
 		</c:if>
 
-		if((noSelected + userEntry) > maxVotes){
+		var numberOfVotes = noSelected + userEntry;
+		if(numberOfVotes > maxVotes) {
 			alertTooManyVotes(maxVotes);
 			return false;
-		} else if((noSelected + userEntry) == 0){
+		} else if(numberOfVotes < minVotes) {
+			var msg = "<fmt:message key="error.minNominationCount.not.reached"/> " + minVotes + " <fmt:message key="label.nominations"/>";
+			alert(msg);
+			return false;			
+		} else if(numberOfVotes == 0) {
 			alert("<fmt:message key="error.empty.selection"/>");
 			return false;
 		} else {
@@ -115,20 +120,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="revisitingUser" />
 			<html:hidden property="previewOnly" />
 			<html:hidden property="maxNominationCount" />
+			<html:hidden property="minNominationCount" />
 			<html:hidden property="allowTextEntry" />
 			<html:hidden property="lockOnFinish" />
 			<html:hidden property="reportViewOnly" />
 			<html:hidden property="showResults" />
 
-			<c:if
-				test="${voteGeneralLearnerFlowDTO.activityRunOffline == 'true'}">
+			<c:if test="${voteGeneralLearnerFlowDTO.activityRunOffline == 'true'}">
 				<div class="warning">
 					<fmt:message key="label.learning.forceOfflineMessage" />
 				</div>
 			</c:if>
 
-			<c:if
-				test="${voteGeneralLearnerFlowDTO.maxNominationCountReached == 'true'}">
+			<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCountReached == 'true'}">
 				<div class="warning">
 					<fmt:message key="error.maxNominationCount.reached" />
 					<c:out value="${voteGeneralLearnerFlowDTO.maxNominationCount}" />
@@ -136,8 +140,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</div>
 			</c:if>
 
-			<c:if
-				test="${voteGeneralLearnerFlowDTO.activityRunOffline != 'true'}">
+			<c:if test="${voteGeneralLearnerFlowDTO.activityRunOffline != 'true'}">
 
 				<p>
 					<c:out value="${voteGeneralLearnerFlowDTO.activityInstructions}"

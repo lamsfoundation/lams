@@ -537,5 +537,21 @@
 			</fileset>
 		</delete>
 	</target>
-
+	
+	<!-- Debug target: Explode tool to ear folder for debug use  -->
+	<target name="delete-exploded-tool-folder" description="delete old tool exploded tool folder">
+		<!-- delete old war folder tree -->
+		<delete quiet="true" includeemptydirs="true">
+			<fileset dir="${jboss.deploy}/${product}.war">
+			    <include name="**"/>
+			</fileset>
+		</delete>
+		<!-- if use explode tool target when jboss is running, explode may be failed and left the the temp folder. Here try to delete the temp folder -->
+		<delete quiet="true" includeemptydirs="true">
+			<fileset dir="${jboss.deploy}/temp-${product}.war">
+			    <include name="**"/>
+			</fileset>
+		</delete>
+	</target>	
+	
 </project>

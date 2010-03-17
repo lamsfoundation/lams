@@ -389,6 +389,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	    request.setAttribute("lockOnFinish", voteContent.isLockOnFinish());
 	    request.setAttribute("allowText", voteContent.isAllowText());
 	    request.setAttribute("maxNominationCount", voteContent.getMaxNominationCount());
+	    request.setAttribute("minNominationCount", voteContent.getMinNominationCount());
 	    request.setAttribute("showResults", voteContent.isShowResults());
 	    request.setAttribute("reflect", voteContent.isReflect());
 	    request.setAttribute("reflectionSubject", voteContent.getReflectionSubject());

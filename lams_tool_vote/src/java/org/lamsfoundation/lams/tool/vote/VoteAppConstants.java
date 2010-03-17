@@ -64,6 +64,7 @@ public interface VoteAppConstants {
     public static final String LEARNER_PROGRESS = "learnerProgress";
     public static final String VOTE_NOMINATION_VIEWER = "voteNominationViewer";
     public static final String LEARNER_PROGRESS_USERID = "learnerProgressUserId";
+    public static final String MIN_NOMINATION_COUNT = "minNominationCount";
     public static final String MAX_NOMINATION_COUNT = "maxNominationCount";
     public static final String ALLOW_TEXT = "allowText";
     public static final String ALLOW_TEXT_ENTRY = "allowTextEntry";

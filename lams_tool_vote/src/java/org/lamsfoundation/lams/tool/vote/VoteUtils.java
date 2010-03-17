@@ -240,6 +240,13 @@ public abstract class VoteUtils implements VoteAppConstants {
 	        maxNomcount="0";
 	    voteAuthoringForm.setMaxNominationCount(maxNomcount);
 	    voteGeneralAuthoringDTO.setMaxNominationCount(maxNomcount);
+	    
+	    String minNomcount= defaultVoteContent.getMinNominationCount();
+	    logger.debug("minNomcount: " + minNomcount);
+	    if ((minNomcount == null) || minNomcount.equals(""))
+	    	minNomcount="0";
+	    voteAuthoringForm.setMinNominationCount(minNomcount);
+	    voteGeneralAuthoringDTO.setMinNominationCount(minNomcount);	    
 	}
 
 

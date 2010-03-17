@@ -672,6 +672,9 @@ public class AuthoringUtil implements VoteAppConstants {
 	String maxNomcount = voteAuthoringForm.getMaxNominationCount();
 	AuthoringUtil.logger.debug("maxNomcount: " + maxNomcount);
 
+        String minNomcount= voteAuthoringForm.getMinNominationCount();
+	logger.debug("minNomcount: " + minNomcount);
+	    
 	String richTextOfflineInstructions = (String) sessionMap.get(VoteAppConstants.OFFLINE_INSTRUCTIONS_KEY);
 	AuthoringUtil.logger.debug("richTextOfflineInstructions: " + richTextOfflineInstructions);
 
@@ -763,6 +766,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	    voteContent.setReflect(reflectBoolean);
 	    voteContent.setReflectionSubject(reflectionSubject);
 	    voteContent.setMaxNominationCount(maxNomcount);
+	    voteContent.setMinNominationCount(minNomcount);	    
 	    voteContent.setOnlineInstructions(richTextOnlineInstructions);
 	    voteContent.setOfflineInstructions(richTextOfflineInstructions);
 	    voteContent.setMaxExternalInputs(maxInputsShort);
@@ -1248,6 +1252,9 @@ public class AuthoringUtil implements VoteAppConstants {
 
 	String maxNomcount = voteAuthoringForm.getMaxNominationCount();
 	AuthoringUtil.logger.debug("maxNomcount: " + maxNomcount);
+	
+        String minNomcount= voteAuthoringForm.getMinNominationCount();
+        AuthoringUtil.logger.debug("minNomcount: " + minNomcount);	
 
 	String richTextOfflineInstructions = request.getParameter(VoteAppConstants.OFFLINE_INSTRUCTIONS);
 	String richTextOnlineInstructions = request.getParameter(VoteAppConstants.ONLINE_INSTRUCTIONS);
@@ -1257,7 +1264,7 @@ public class AuthoringUtil implements VoteAppConstants {
 
 	boolean setCommonContent = true;
 	if (lockOnFinish == null || allowTextEntry == null || showResults == null || reflect == null
-		|| reflectionSubject == null || maxNomcount == null)
+		|| reflectionSubject == null || maxNomcount == null || minNomcount == null)
 
 	{
 	    setCommonContent = false;
@@ -1337,6 +1344,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	    voteContent.setShowResults(showResultsBoolean);
 	    voteContent.setReflect(reflectBoolean);
 	    voteContent.setMaxNominationCount(maxNomcount);
+	    voteContent.setMinNominationCount(minNomcount);
 
 	    voteContent.setOnlineInstructions(richTextOnlineInstructions);
 	    voteContent.setOfflineInstructions(richTextOfflineInstructions);

@@ -6,6 +6,7 @@ CREATE TABLE tl_lavote11_content (
      , creation_date DATETIME
      , update_date DATETIME
      , maxNominationCount VARCHAR(20) NOT NULL DEFAULT '1'
+     , minNominationCount VARCHAR(20) NOT NULL DEFAULT '1'
      , allowText TINYINT(1) NOT NULL DEFAULT 0
      , reflect TINYINT(1) NOT NULL DEFAULT 0
      , created_by BIGINT(20) NOT NULL DEFAULT 0

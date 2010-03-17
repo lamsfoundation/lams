@@ -65,6 +65,7 @@ public class VoteGeneralAuthoringDTO implements Comparable
 	protected String showResults;
 	protected String lockOnFinish;
 	protected String maxNominationCount;
+	protected String minNominationCount;
 	
 	protected String editActivityEditMode;
 	protected Map mapOptionsContent;
@@ -123,6 +124,18 @@ public class VoteGeneralAuthoringDTO implements Comparable
     public void setMaxNominationCount(String maxNominationCount) {
         this.maxNominationCount = maxNominationCount;
     }
+    /**
+     * @return Returns the minNominationCount.
+     */
+    public String getMinNominationCount() {
+        return minNominationCount;
+    }
+    /**
+     * @param minNominationCount The minNominationCount to set.
+     */
+    public void setMinNominationCount(String minNominationCount) {
+        this.minNominationCount = minNominationCount;
+    }    
     /**
      * @return Returns the activeModule.
      */
@@ -542,6 +555,7 @@ public class VoteGeneralAuthoringDTO implements Comparable
             .append("showResults: ", showResults)
             .append("lockOnFinish: ", lockOnFinish)
             .append("maxNominationCount: ", maxNominationCount)
+            .append("minNominationCount: ", minNominationCount)
             .append("activityTitle: ", activityTitle)
             .append("activityInstructions: ", activityInstructions)
             .append("maxOptionIndex: ", maxOptionIndex)

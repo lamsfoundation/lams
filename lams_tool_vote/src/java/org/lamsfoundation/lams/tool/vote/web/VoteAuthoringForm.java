@@ -59,6 +59,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     protected String activeModule;
 
     protected String maxNominationCount;
+    protected String minNominationCount;
 
     protected String fileItem;
     protected String uuid;
@@ -201,6 +202,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	allowText = null;
 	showResults = null;
 	maxNominationCount = null;
+	minNominationCount=null;	
 
 	summaryMonitoring = null;
 	instructionsMonitoring = null;
@@ -888,6 +890,19 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     public void setMaxNominationCount(String maxNominationCount) {
 	this.maxNominationCount = maxNominationCount;
     }
+    
+    /**
+     * @return Returns the minNominationCount.
+     */
+    public String getMinNominationCount() {
+        return minNominationCount;
+    }
+    /**
+     * @param minNominationCount The minNominationCount to set.
+     */
+    public void setMinNominationCount(String minNominationCount) {
+        this.minNominationCount = minNominationCount;
+    }    
 
     /**
      * @return Returns the exceptionMaxNominationInvalid.
@@ -1037,7 +1052,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 		isDefineLater).append("toolContentID: ", toolContentID).append("allowText: ", allowText).append(
 		"showResults: ", showResults).append("lockOnFinish: ", lockOnFinish).append("reflect: ", reflect)
 		.append("defaultContentId: ", defaultContentId).append("defaultContentIdStr: ", defaultContentIdStr)
-		.append("maxNominationCount: ", maxNominationCount).append("defaultOptionContent: ",
+		.append("maxNominationCount: ", maxNominationCount).append("minNominationCount: ", minNominationCount).append("defaultOptionContent: ",
 			defaultOptionContent).append("activityTitle: ", activityTitle).append("activityInstructions: ",
 			activityInstructions).append("richTextOfflineInstructions: ", richTextOfflineInstructions)
 		.append("richTextOnlineInstructions: ", richTextOnlineInstructions).append("onlineInstructions: ",

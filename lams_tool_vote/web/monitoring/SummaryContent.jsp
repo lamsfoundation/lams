@@ -78,6 +78,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</td>
 	</tr>
 	
+	<tr>
+		<td>
+			<fmt:message key="label.minNomCount" />
+		</td>
+		<td>	
+			${minNominationCount}
+		</td>
+	</tr>	
 	
 	<tr>
 		<td>

@@ -37,33 +37,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </p>
 
 <p>
-	<html:checkbox property="allowText" value="1" styleClass="noBorder" styleId="allowText">
+	<html:checkbox property="allowText" value="1" styleClass="noBorder" styleId="allowText" onchange="changeMinMaxVotes(-1, -1);">
 	</html:checkbox>
 	<label for="allowText">
 		<fmt:message key="label.allowText" />
 	</label>
 </p>
 
-
 <p>
-	<fmt:message key="label.maxNomCount" />
-	<html:text property="maxNominationCount" size="8" maxlength="3" />
+	<fmt:message key="label.maxNomCount" />&nbsp;
+	<html:select property="maxNominationCount" styleId="maxNominationCount">
+	</html:select>	
 </p>
 
-<c:if test="${not empty voteGeneralAuthoringDTO.dataFlowObjectNames}">
-	<p>
-		<label for="maxInputs">
-		<fmt:message key="label.advanced.data.flow.limit" /></label>
-		<html:select property="maxInputs" styleId="maxInputs">
-			<html:option value="0" styleId="dataFlowLimitNoneOption">
-				<fmt:message key="label.advanced.data.flow.limit.none" />
-			</html:option>
-			<c:forEach begin="1" end="50" var="index">
-				<html:option value="${index}">${index}</html:option>
-			</c:forEach>
-		</html:select>
-	</p>
-</c:if>
+<p>
+	<fmt:message key="label.minNomCount" />&nbsp;&nbsp;
+	<html:select property="minNominationCount" styleId="minNominationCount">
+	</html:select>	
+</p>
 
 <p>
 	<html:checkbox property="showResults" value="1" styleClass="noBorder" styleId="showResults">
@@ -72,7 +63,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<fmt:message key="label.show.results" />
 	</label>
 </p>
-
 
 <p>
 	<html:checkbox property="reflect" value="1" styleClass="noBorder" styleId="reflect">

@@ -633,6 +633,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	voteLearningForm.setActivityInstructions(voteContent.getInstructions());
 	voteLearningForm.setActivityRunOffline(new Boolean(voteContent.isRunOffline()).toString());
 	voteLearningForm.setMaxNominationCount(voteContent.getMaxNominationCount());
+	voteLearningForm.setMinNominationCount(voteContent.getMinNominationCount());	
 	voteLearningForm.setAllowTextEntry(new Boolean(voteContent.isAllowText()).toString());
 	voteLearningForm.setShowResults(new Boolean(voteContent.isShowResults()).toString());
 	voteLearningForm.setLockOnFinish(new Boolean(voteContent.isLockOnFinish()).toString());
@@ -641,6 +642,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
 	voteGeneralLearnerFlowDTO.setActivityRunOffline(new Boolean(voteContent.isRunOffline()).toString());
 	voteGeneralLearnerFlowDTO.setMaxNominationCount(voteContent.getMaxNominationCount());
+	voteGeneralLearnerFlowDTO.setMinNominationCount(voteContent.getMinNominationCount());	
 	voteGeneralLearnerFlowDTO.setAllowTextEntry(new Boolean(voteContent.isAllowText()).toString());
 	voteGeneralLearnerFlowDTO.setLockOnFinish(new Boolean(voteContent.isLockOnFinish()).toString());
 	voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());

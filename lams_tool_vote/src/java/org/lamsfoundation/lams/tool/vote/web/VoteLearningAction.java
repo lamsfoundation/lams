@@ -218,6 +218,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	VoteUtils.cleanUpUserExceptions(request);
 	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
+	voteLearningForm.setMinNominationCountReached(new Boolean(false).toString());
 	return null;
     }
 
@@ -230,9 +231,11 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
+	voteLearningForm.setMinNominationCountReached(new Boolean(false).toString());
 
 	voteGeneralLearnerFlowDTO.setNominationsSubmited(new Boolean(false).toString());
 	voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(false).toString());
+	voteGeneralLearnerFlowDTO.setMinNominationCountReached(new Boolean(false).toString());
 
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	logger.debug("retrieving voteService from session: " + voteService);
@@ -309,9 +312,11 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
+	voteLearningForm.setMinNominationCountReached(new Boolean(false).toString());
 
 	voteGeneralLearnerFlowDTO.setNominationsSubmited(new Boolean(false).toString());
 	voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(false).toString());
+	voteGeneralLearnerFlowDTO.setMinNominationCountReached(new Boolean(false).toString());
 
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	logger.debug("retrieving voteService from session: " + voteService);
@@ -408,9 +413,11 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
+	voteLearningForm.setMinNominationCountReached(new Boolean(false).toString());
 
 	voteGeneralLearnerFlowDTO.setNominationsSubmited(new Boolean(false).toString());
 	voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(false).toString());
+	voteGeneralLearnerFlowDTO.setMinNominationCountReached(new Boolean(false).toString());
 
 	VoteSession voteSession = voteService.retrieveVoteSession(new Long(toolSessionID));
 	logger.debug("retrieving voteSession: " + voteSession);
@@ -448,9 +455,11 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
+	voteLearningForm.setMinNominationCountReached(new Boolean(false).toString());
 
 	voteGeneralLearnerFlowDTO.setNominationsSubmited(new Boolean(false).toString());
 	voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(false).toString());
+	voteGeneralLearnerFlowDTO.setMinNominationCountReached(new Boolean(false).toString());
 
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	logger.debug("retrieving voteService from session: " + voteService);
@@ -580,6 +589,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	String maxNominationCount = request.getParameter(MAX_NOMINATION_COUNT);
 	logger.debug("maxNominationCount: " + maxNominationCount);
 	voteLearningForm.setMaxNominationCount(maxNominationCount);
+	
+	String minNominationCount = request.getParameter(MIN_NOMINATION_COUNT);
+	logger.debug("minNominationCount: " + minNominationCount);
+	voteLearningForm.setMinNominationCount(minNominationCount);
 
 	String userEntry = request.getParameter(USER_ENTRY);
 	logger.debug("userEntry: " + userEntry);
@@ -590,9 +603,11 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	voteLearningForm.setNominationsSubmited(new Boolean(false).toString());
 	voteLearningForm.setMaxNominationCountReached(new Boolean(false).toString());
+	voteLearningForm.setMinNominationCountReached(new Boolean(false).toString());
 
 	voteGeneralLearnerFlowDTO.setNominationsSubmited(new Boolean(false).toString());
 	voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(false).toString());
+	voteGeneralLearnerFlowDTO.setMinNominationCountReached(new Boolean(false).toString());
 
 	Collection<String> voteDisplayOrderIds = voteLearningForm.votesAsCollection();
 	logger.debug("Checkbox votes " + voteDisplayOrderIds);
@@ -968,6 +983,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	String maxNominationCount = request.getParameter(MAX_NOMINATION_COUNT);
 	logger.debug("maxNominationCount: " + maxNominationCount);
 	voteLearningForm.setMaxNominationCount(maxNominationCount);
+	
+	String minNominationCount = request.getParameter(MIN_NOMINATION_COUNT);
+	logger.debug("minNominationCount: " + minNominationCount);
+	voteLearningForm.setMinNominationCount(minNominationCount);
 
 	String allowTextEntry = request.getParameter(ALLOW_TEXT_ENTRY);
 	logger.debug("allowTextEntry: " + allowTextEntry);

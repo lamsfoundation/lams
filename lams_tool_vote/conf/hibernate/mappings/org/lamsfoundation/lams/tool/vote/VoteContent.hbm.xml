@@ -150,6 +150,14 @@
         column="maxNominationCount"
         length="5"
     />
+    
+    <property
+        name="minNominationCount"
+        type="java.lang.String"
+        access="property"        
+        column="minNominationCount"
+        length="5"
+    />
 
    <property
         name="showResults"

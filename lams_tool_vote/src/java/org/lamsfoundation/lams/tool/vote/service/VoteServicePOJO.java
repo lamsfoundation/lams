@@ -96,8 +96,9 @@ import org.springframework.dao.DataAccessException;
  * 
  * @author Ozgur Demirtas
  * 
- * The POJO implementation of Voting service. All business logic of Voting tool is implemented in this class. It
- * translates the request from presentation layer and performs appropriate database operation.
+ * The POJO implementation of Voting service. All business logic of Voting tool
+ * is implemented in this class. It translates the request from presentation
+ * layer and performs appropriate database operation.
  * 
  */
 public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSessionManager,
@@ -1737,6 +1738,10 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    Integer maxCount = WDDXProcessor.convertToInteger(importValues,
 		    ToolContentImport102Manager.CONTENT_VOTE_MAXCHOOSE);
 	    toolContentObj.setMaxNominationCount(maxCount != null ? maxCount.toString() : "1");
+	    
+	    Integer minCount = WDDXProcessor.convertToInteger(importValues,
+			    ToolContentImport102Manager.CONTENT_VOTE_MINCHOOSE);
+		    toolContentObj.setMinNominationCount(minCount != null ? minCount.toString() : "1");	    
 
 	} catch (WDDXProcessorConversionException e) {
 	    VoteServicePOJO.logger.error("Unable to content for activity " + toolContentObj.getTitle()

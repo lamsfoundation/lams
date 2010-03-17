@@ -83,6 +83,8 @@ public class VoteContent implements Serializable {
 
     private String maxNominationCount;
 
+    private String minNominationCount;
+
     /** nullable persistent field */
     private boolean lockOnFinish;
 
@@ -120,10 +122,10 @@ public class VoteContent implements Serializable {
     /** full constructor */
     public VoteContent(Long voteContentId, String content, String title, String instructions, boolean defineLater,
 	    boolean runOffline, Date creationDate, Date updateDate, boolean allowText, boolean reflect,
-	    String reflectionSubject, String maxNominationCount, long createdBy, boolean lockOnFinish,
-	    boolean contentInUse, String offlineInstructions, String onlineInstructions, boolean showResults,
-	    Short maxExternalInputs, Short externalInputsAdded, Set voteQueContents, Set voteSessions,
-	    Set voteAttachments) {
+	    String reflectionSubject, String maxNominationCount, String minNominationCount, long createdBy,
+	    boolean lockOnFinish, boolean contentInUse, String offlineInstructions, String onlineInstructions,
+	    boolean showResults, Short maxExternalInputs, Short externalInputsAdded, Set voteQueContents,
+	    Set voteSessions, Set voteAttachments) {
 	this.voteContentId = voteContentId;
 	this.content = content;
 	this.title = title;
@@ -133,6 +135,7 @@ public class VoteContent implements Serializable {
 	this.creationDate = creationDate;
 	this.updateDate = updateDate;
 	this.maxNominationCount = maxNominationCount;
+	this.minNominationCount = minNominationCount;
 	this.allowText = allowText;
 	this.reflect = reflect;
 	this.reflectionSubject = reflectionSubject;
@@ -167,9 +170,9 @@ public class VoteContent implements Serializable {
      * mc session will be created after we copied tool content.
      * 
      * @param mc
-     *                the original mc content.
+     *            the original mc content.
      * @param newContentId
-     *                the new mc content id.
+     *            the new mc content id.
      * @return the new mc content object.
      */
     public static VoteContent newInstance(IToolContentHandler toolContentHandler, VoteContent vote, Long newContentId)
@@ -177,9 +180,10 @@ public class VoteContent implements Serializable {
 	VoteContent newContent = new VoteContent(newContentId, vote.getContent(), vote.getTitle(), vote
 		.getInstructions(), vote.isDefineLater(), vote.isRunOffline(), vote.getCreationDate(), vote
 		.getUpdateDate(), vote.isAllowText(), vote.isReflect(), vote.getReflectionSubject(), vote
-		.getMaxNominationCount(), vote.getCreatedBy(), vote.isLockOnFinish(), vote.isContentInUse(), vote
-		.getOfflineInstructions(), vote.getOnlineInstructions(), vote.isShowResults(), vote
-		.getMaxExternalInputs(), vote.getExternalInputsAdded(), new TreeSet(), new TreeSet(), new TreeSet());
+		.getMaxNominationCount(), vote.getMinNominationCount(), vote.getCreatedBy(), vote.isLockOnFinish(),
+		vote.isContentInUse(), vote.getOfflineInstructions(), vote.getOnlineInstructions(), vote
+			.isShowResults(), vote.getMaxExternalInputs(), vote.getExternalInputsAdded(), new TreeSet(),
+		new TreeSet(), new TreeSet());
 	newContent.setVoteQueContents(vote.deepCopyMcQueContent(newContent));
 	newContent.setVoteAttachments(vote.deepCopyMcAttachments(toolContentHandler, newContent));
 	newContent.setAssignedDataFlowObject(vote.getAssignedDataFlowObject());
@@ -320,7 +324,7 @@ public class VoteContent implements Serializable {
 
     /**
      * @param voteQueContents
-     *                The voteQueContents to set.
+     *            The voteQueContents to set.
      */
     public void setVoteQueContents(Set voteQueContents) {
 	this.voteQueContents = voteQueContents;
@@ -338,7 +342,7 @@ public class VoteContent implements Serializable {
 
     /**
      * @param voteSessions
-     *                The voteSessions to set.
+     *            The voteSessions to set.
      */
     public void setVoteSessions(Set voteSessions) {
 	this.voteSessions = voteSessions;
@@ -362,7 +366,7 @@ public class VoteContent implements Serializable {
 
     /**
      * @param voteAttachments
-     *                The voteAttachments to set.
+     *            The voteAttachments to set.
      */
     public void setVoteAttachments(Set voteAttachments) {
 	this.voteAttachments = voteAttachments;
@@ -377,7 +381,7 @@ public class VoteContent implements Serializable {
 
     /**
      * @param creationDate
-     *                The creationDate to set.
+     *            The creationDate to set.
      */
     public void setCreationDate(Date creationDate) {
 	this.creationDate = creationDate;
@@ -392,7 +396,7 @@ public class VoteContent implements Serializable {
 
     /**
      * @param content
-     *                The content to set.
+     *            The content to set.
      */
     public void setContent(String content) {
 	this.content = content;
@@ -407,7 +411,7 @@ public class VoteContent implements Serializable {
 
     /**
      * @param lockOnFinish
-     *                The lockOnFinish to set.
+     *            The lockOnFinish to set.
      */
     public void setLockOnFinish(boolean lockOnFinish) {
 	this.lockOnFinish = lockOnFinish;
@@ -422,7 +426,7 @@ public class VoteContent implements Serializable {
 
     /**
      * @param voteContentId
-     *                The voteContentId to set.
+     *            The voteContentId to set.
      */
     public void setVoteContentId(Long voteContentId) {
 	this.voteContentId = voteContentId;
@@ -437,7 +441,7 @@ public class VoteContent implements Serializable {
 
     /**
      * @param allowText
-     *                The allowText to set.
+     *            The allowText to set.
      */
     public void setAllowText(boolean allowText) {
 	this.allowText = allowText;
@@ -452,10 +456,25 @@ public class VoteContent implements Serializable {
 
     /**
      * @param maxNominationCount
-     *                The maxNominationCount to set.
+     *            The maxNominationCount to set.
      */
     public void setMaxNominationCount(String maxNominationCount) {
 	this.maxNominationCount = maxNominationCount;
+    }
+
+    /**
+     * @return Returns the minNominationCount.
+     */
+    public String getMinNominationCount() {
+	return minNominationCount;
+    }
+
+    /**
+     * @param minNominationCount
+     *            The minNominationCount to set.
+     */
+    public void setMinNominationCount(String minNominationCount) {
+	this.minNominationCount = minNominationCount;
     }
 
     /**
@@ -467,7 +486,7 @@ public class VoteContent implements Serializable {
 
     /**
      * @param reflect
-     *                The reflect to set.
+     *            The reflect to set.
      */
     public void setReflect(boolean reflect) {
 	this.reflect = reflect;
@@ -482,7 +501,7 @@ public class VoteContent implements Serializable {
 
     /**
      * @param reflectionSubject
-     *                The reflectionSubject to set.
+     *            The reflectionSubject to set.
      */
     public void setReflectionSubject(String reflectionSubject) {
 	this.reflectionSubject = reflectionSubject;

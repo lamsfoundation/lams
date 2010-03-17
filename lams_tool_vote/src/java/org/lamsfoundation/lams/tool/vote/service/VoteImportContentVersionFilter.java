@@ -44,4 +44,8 @@ public class VoteImportContentVersionFilter extends ToolContentVersionFilter{
 		this.addField(VoteContent.class, "showResults", true);
 	}
 
+	/** Version 2.3.4 added a minNominationCount column and this should default to "1". */
+	public void up20090726To20100309(){
+		this.addField(VoteContent.class, "minNominationCount", "1");
+	}
 }
