@@ -29,19 +29,33 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <c:set var="enableFlash"><lams:LearnerFlashEnabled/></c:set>
 <c:if test="${enableFlash}">
-<lams:Passon id="${activityForm.lessonID}"
-	progress="${activityForm.progressSummary}" />
+	<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}" />
 </c:if>
 
 <div id="content">
 
 	<h2>
-		<fmt:message key="message.lesson.finished" />
+		<fmt:message key="message.lesson.finished">
+			<fmt:param>
+				<lams:user property="firstName"/> <lams:user property="lastName"/>
+			</fmt:param>
+		</fmt:message>
 	</h2>
-	<p class="space-bottom">
-		<fmt:message key="message.lesson.finishedCont" />
+	
+	<p>
+		<fmt:message key="message.lesson.finishedCont">
+			<fmt:param>
+				<b>${lessonName}</b>
+			</fmt:param>
+		</fmt:message>
 	</p>
-
+	
+	<p class="align-right space-top">
+		<a href="#" class="button" onclick="JavaScript:window.print();">
+			<fmt:message key="label.print" />
+		</a>	
+	</p>
+	
 </div>
 <!--closes content-->
 

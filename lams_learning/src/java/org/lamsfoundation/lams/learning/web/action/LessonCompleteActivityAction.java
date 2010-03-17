@@ -50,21 +50,23 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
  */
 public class LessonCompleteActivityAction extends ActivityAction {
 
-    //---------------------------------------------------------------------
-    // Instance variables
-    //---------------------------------------------------------------------
-	
-	/** 
-	 * Gets an activity from the request (attribute) and forwards onto a
-	 * display action using the ActionMappings class. If no activity is
-	 * in request then use the current activity in learnerProgress.
-	 */
-	public ActionForward execute(ActionMapping mapping,
-	                             ActionForm actionForm,
-	                             HttpServletRequest request,
-	                             HttpServletResponse response) 
-	{
-		LearningWebUtil.setupProgressInRequest((ActivityForm)actionForm, request, LearningWebUtil.getLearnerProgress(request, getLearnerService()));
-		return mapping.findForward("lessonComplete");
-	}
+    // ---------------------------------------------------------------------
+    // Class level constants - session attributes
+    // ---------------------------------------------------------------------
+    public static final String PARAM_LESSON_NAME = "lessonName";
+
+    /**
+     * Gets an activity from the request (attribute) and forwards onto a display action using the ActionMappings class.
+     * If no activity is in request then use the current activity in learnerProgress.
+     */
+    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+	    HttpServletResponse response) {
+	ActivityForm activityForm = (ActivityForm) actionForm;
+	LearningWebUtil.setupProgressInRequest(activityForm, request, LearningWebUtil.getLearnerProgress(request,
+		getLearnerService()));
+	Long lessonID = activityForm.getLessonID();
+	String lessonName = getLearnerService().getLesson(lessonID).getLessonName();
+	request.setAttribute(LessonCompleteActivityAction.PARAM_LESSON_NAME, lessonName);
+	return mapping.findForward("lessonComplete");
+    }
 }
