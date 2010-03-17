@@ -39,6 +39,6 @@
 	-->
 	<init-param>
 		<param-name>ignorePaths</param-name>
-		<param-value>/login,/server,/echo,/servlet/authoring/storeLearningDesignDetails</param-value>
+		<param-value>/servlet/authoring/storeLearningDesignDetails</param-value>
 	</init-param>
 </filter>

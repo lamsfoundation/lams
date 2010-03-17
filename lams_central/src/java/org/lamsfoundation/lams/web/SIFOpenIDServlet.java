@@ -155,7 +155,7 @@ public class SIFOpenIDServlet extends HttpServlet {
 				}
 			}
 		} catch (Exception e) {
-			log.error("Error parsing trusted idps");
+			log.error("Error parsing trusted idps", e);
 		}
 		return false;
 	}

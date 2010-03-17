@@ -110,7 +110,7 @@
 
 <filter-mapping>
 	<filter-name>OpenIdFilter</filter-name>
-<url-pattern>/*</url-pattern>
+<url-pattern>/OpenIDServlet</url-pattern>
 </filter-mapping>
 
 <filter-mapping>
