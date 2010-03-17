@@ -83,6 +83,7 @@ public interface ToolContentImport102Manager {
 	
 	// Ranking tool tags
 	public static final String CONTENT_VOTE_MAXCHOOSE = "maxChoose";
+	public static final String CONTENT_VOTE_MINCHOOSE = "minChoose";
 	public static final String CONTENT_VOTE_METHOD = "voteMethod"; // equal vote or preferential
 	public static final String CONTENT_VOTE_NOMINATIONS = "nominations";
 	public static final String CONTENT_VOTE_ALLOW_POLL_NOMINATIONS = "nominatePollTime";  // allow nomination or not (Boolean)
