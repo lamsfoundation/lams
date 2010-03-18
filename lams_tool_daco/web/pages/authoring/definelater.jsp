@@ -20,12 +20,6 @@
         
         function init(){
             selectTab(1); //select the default tab;
-            
-            initEditor("Title");
-            initEditor("Instructions");
-            initEditor("OnlineInstruction");
-            initEditor("OfflineInstruction");
-            
         }     
         
         function doSelectTab(tabId) {
