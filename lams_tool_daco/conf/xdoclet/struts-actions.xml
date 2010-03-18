@@ -99,7 +99,7 @@
 <action path="/learning/start" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction" parameter="start"
 	name="recordForm" scope="request" validate="false">
 	<forward name="success" path="/pages/learning/learning.jsp" />
-	<forward name="defineLater" path="/pages/learning/definelater.jsp" />
+	<forward name="definelater" path="/pages/learning/definelater.jsp" />
 	<forward name="runOffline" path="/pages/learning/runoffline.jsp" />
 </action>
 <action path="/learning/finish" type="org.lamsfoundation.lams.tool.daco.web.action.LearningAction"
