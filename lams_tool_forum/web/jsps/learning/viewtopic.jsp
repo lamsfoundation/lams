@@ -34,7 +34,8 @@
 	</div>
 
 	<c:if test="${sessionMap.mode == 'author' || sessionMap.mode == 'learner'}">
-		<c:if test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply ne 0 and sessionMap.maximumReply ne 0)}">
+		<c:choose>
+		  <c:when test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply ne 0 and sessionMap.maximumReply ne 0)}">
 			<div class="info">
 				<fmt:message key="label.postingLimits.topic.reminder">
 					<fmt:param value="${sessionMap.minimumReply}" />
@@ -43,28 +44,26 @@
 					<fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
 				</fmt:message>
 			</div>
-		</c:if>
-		
-		<c:if test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply ne 0 or sessionMap.maximumReply eq 0)}">
-			<div class="info">
-				<fmt:message key="label.postingLimits.topic.reminder.max">
-					<fmt:param value="${sessionMap.minimumReply}" />
-					<fmt:param value="${numOfPosts}" />
-					<fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
-				</fmt:message>
-			</div>
-		</c:if>
-		
-		<c:if test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply eq 0 or sessionMap.maximumReply ne 0)}">
-			<div class="info">
-				<fmt:message key="label.postingLimits.topic.reminder.min">
-					<fmt:param value="${sessionMap.maximumReply}" />
-					<fmt:param value="${numOfPosts}" />
-					<fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
-				</fmt:message>
-			</div>
-		</c:if>
-		
+                  </c:when> 
+                  <c:when test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply ne 0 or sessionMap.maximumReply eq 0)}">
+                        <div class="info">
+                                <fmt:message key="label.postingLimits.topic.reminder.min">
+                                        <fmt:param value="${sessionMap.minimumReply}" />
+                                        <fmt:param value="${numOfPosts}" />
+                                        <fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
+                                </fmt:message>
+                        </div>
+                  </c:when> 
+                  <c:when test="${not sessionMap.allowNewTopics and (sessionMap.minimumReply eq 0 or sessionMap.maximumReply ne 0)}">
+                        <div class="info">
+                                <fmt:message key="label.postingLimits.topic.reminder.max">
+                                        <fmt:param value="${sessionMap.maximumReply}" />
+                                        <fmt:param value="${numOfPosts}" />
+                                        <fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
+                                </fmt:message>
+                        </div>
+                  </c:when>
+                </c:choose>
 	</c:if>
 	<br>
 	
