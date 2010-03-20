@@ -15,7 +15,7 @@
 	<fmt:message key="msg.cleanup.warning" /><br />
 	<input class="button" type="submit" value="Calculate" onClick="javascript:document.location='cleanup.do?action=refresh'" />
 	<ul>
-		<li><c:out value="<%= FileUtil.TEMP_DIR %>" />
+		<li><c:out value="<%= FileUtil.getTempDir() %>" />
 		<ul>
 			<li><%= TempDirectoryFilter.zip_prefix %>* : <c:out value="${zipTotal}" /><logic:empty name="zipTotal"><i><fmt:message key="label.unknown"/></i></logic:empty> KB
 			<li><%= TempDirectoryFilter.tmp_prefix %>* : <c:out value="${tmpTotal}" /><logic:empty name="tmpTotal"><i><fmt:message key="label.unknown"/></i></logic:empty> KB
