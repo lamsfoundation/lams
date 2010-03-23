@@ -16,6 +16,15 @@ package org.lamsfoundation.lams.author.components.transition
 	{
 		public var toActivity:ActivityComponent;
 		public var fromActivity:ActivityComponent;
+		
+		// This flag is set if when the transition is created, the source activty alread has an out transition
+		public var possibleBranch:Boolean = false;
+		
+		// A variable used in the controller for possible branch transitions
+		// Used to generate branch points where needed.
+		public var possibleFirstActivityInBranch:ActivityComponent = null;
+		
+		
 
 		public function TransitionComponent()
 		{

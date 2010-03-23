@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
-	mouseMove="mouseMove(event)"
 	mouseDown="mouseDown(event)"
 	mouseOver="mouseOver(event)" 
 	mouseOut="mouseOut(event)"
@@ -14,6 +13,9 @@
 
 	<mx:Script>
 		<![CDATA[
+			import mx.controls.Image;
+			import org.lamsfoundation.lams.author.util.AuthorUtil;
+			import org.lamsfoundation.lams.author.controller.AuthorController;
 			import org.lamsfoundation.lams.author.components.activity.group.GroupActivityComponent;
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
@@ -99,42 +101,48 @@
 		    	}
 		    }
 		    
-			// The mouseMove event handler for the Image control
-		    // initiates the drag-and-drop operation.
-		    protected function mouseMove(event:MouseEvent):void 
-		    {                
-		        switch (Application.application.cursorState) {
-		        	case Constants.CURSOR_STATE_NORMAL:
-		        		
-		        		var activityComponent:ActivityComponent = event.currentTarget as ActivityComponent;
-				        
-				        if (activityComponent.isDragable) {
-				        	var ds:DragSource = new DragSource();
-				        	ds.addData(activityComponent, "img"); 
-				        	
-				        	// Set the offset for dropping the activity to the local mouse position
-				        	activityComponent.mouseOffSetX = event.localX;
-				        	activityComponent.mouseOffSetY = event.localY; 
-				        	     
-				        	DragManager.doDrag(activityComponent, ds, event);
-				        	setCenter();
-				        } 
-				        break;
-		        }
-		    }
 
+			/**
+			 * The mouse down event handler
+			 * Initiates drag of activity as well as starting a transition 
+			 * depending on the cursor state
+			 */
 		    protected function mouseDown(event:MouseEvent):void {
+		    	setCenter();
 		    	
 		    	switch (Application.application.cursorState) {
 		    		case Constants.CURSOR_STATE_TRANSITION:
 			    		if (this.canStartTransitions) {
 			    			startTransition(event);
 			    		}
-			    		
-		    			break;	
+		    			break;
+		    		case Constants.CURSOR_STATE_NORMAL:
+		        		startDragging(event);
+				        break;	
 		    	}
-		    	
 		    }
+		    
+		    /**
+		    * Starts dragging the ActivityComponent
+		    * 
+		    */ 
+		    public function startDragging(event:MouseEvent):void {
+				var activityComponent:ActivityComponent = event.currentTarget as ActivityComponent;
+					        
+		        if (activityComponent.isDragable) {
+		        	var ds:DragSource = new DragSource();
+		        	//ds.addData(activityComponent, "img"); 
+		        	ds.addData( activityComponent.parent, 'dragParent' );
+					ds.addData( activityComponent, 'dragActivity' );
+					
+	                 
+		        	// Set the offset for dropping the activity to the local mouse position
+		        	activityComponent.mouseOffSetX = event.localX;
+		        	activityComponent.mouseOffSetY = event.localY; 
+		        	     
+		        	DragManager.doDrag(activityComponent, ds, event, AuthorUtil.getImage(activityComponent));
+		        } 
+			}
 		    
 		    public function setCenter():void {
 		    	centerX = x + height/2;
@@ -143,16 +151,20 @@
 		    
 	        protected function startTransition(event:MouseEvent):void {
 			 
-				if (transitionOut != null) {
-					//parent.removeChild(transitionOut);
-					Alert.show(Application.application.dictionary.getLabelAndInsert("cv_invalid_trans_target_from_activity", [this.title.text]));
-					
-					// Return cursor state to normal
-	    			Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);			
-	    			return;	
+				// Check if there is a pre-existing transition
+				var possibleBranch:Boolean = transitionOut != null;
+				var possibleFirstActivityInBranch:ActivityComponent = null;
+				if (possibleBranch) {
+					possibleFirstActivityInBranch = transitionOut.toActivity;
 				}
 				
-				setCenter();
+				if (transitionOut != null) {
+					//Alert.show(Application.application.dictionary.getLabelAndInsert("cv_invalid_trans_target_from_activity", [this.title.text]));
+					
+					// Return cursor state to normal
+	    			//Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);			
+	    			//return;	
+				} 
 				
 				state = Constants.ACTIVITY_STATE_DRAWING;
 
@@ -164,6 +176,9 @@
 				transitionOut.endX = centerX;
 				transitionOut.endY = centerY;
 				transitionOut.invalidateProperties();
+				transitionOut.possibleBranch = possibleBranch;
+				transitionOut.possibleFirstActivityInBranch = possibleFirstActivityInBranch;
+				
 				
 				// deselect the currently selected activity
 				if (Application.application.selectedActivity != null) {
@@ -209,9 +224,11 @@
 		    	stopTransition();
 		    	
 		    	var transitionEvent:TransitionEvent = new TransitionEvent(TransitionEvent.TRANSITION_COMPLETE);
-	    		transitionEvent.sourceAcivityComponent = this;
+	    		transitionEvent.sourceActivityComponent = this;
 	    		transitionEvent.transition = transitionOut;
 	    		Application.application.dispatchEvent(transitionEvent);
+	    		
+	    		AuthorController.instance.drawTransition(this, transitionOut);
 		    	
 		    }
 		    

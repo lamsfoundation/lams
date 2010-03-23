@@ -89,7 +89,7 @@
 		        		combinedAactivityComponent.load();
 						combinedAactivityComponent.x = UIComponent(event.currentTarget).mouseX;
 	          			combinedAactivityComponent.y = UIComponent(event.currentTarget).mouseY; 
-	          			ds.addData(combinedAactivityComponent, "img"); 
+	          			ds.addData(combinedAactivityComponent, "dragActivity"); 
 		            	DragManager.doDrag(dragInitiator, ds, event, combinedAactivityComponent, 25, 15, 1.00, false);   
 		        	} else {
 		        		var toolActivityComponent:ToolActivityComponent = new ToolActivityComponent();
@@ -97,7 +97,7 @@
 		        		toolActivityComponent.load();
 						toolActivityComponent.x = UIComponent(event.currentTarget).mouseX;
 	          			toolActivityComponent.y = UIComponent(event.currentTarget).mouseY;
-	          			ds.addData(toolActivityComponent, "img"); 
+	          			ds.addData(toolActivityComponent, "dragActivity"); 
 		            	DragManager.doDrag(dragInitiator, ds, event, toolActivityComponent, 25, 15, 1.00, false);   
 		        	}
 	        	}

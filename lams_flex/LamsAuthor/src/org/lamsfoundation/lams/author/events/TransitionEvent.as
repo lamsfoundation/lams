@@ -10,7 +10,7 @@ package org.lamsfoundation.lams.author.events
 		public static const DELETE_TRANSITION:String = "deleteTransition";
 		
 		
-		public var sourceAcivityComponent:ActivityComponent;
+		public var sourceActivityComponent:ActivityComponent;
 		public var transition:TransitionComponent;
 		public var localY:int;
 		public var localX:int;

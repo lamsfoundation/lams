@@ -9,6 +9,7 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.controller.AuthorController;
 			import mx.events.ListEventReason;
 			import mx.controls.TextInput;
 			import mx.events.ListEvent;

@@ -7,6 +7,7 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.controller.AuthorController;
 			import org.lamsfoundation.lams.author.util.Constants;
 			import mx.core.Application;
 			import mx.managers.DragManager;
@@ -22,7 +23,7 @@
 			// The dragEnter event handler for the Canvas container
             // enables dropping.
             private function dragEnterHandler(event:DragEvent):void {
-                if (event.dragSource.hasFormat("img"))
+                if (event.dragSource.hasFormat("dragActivity"))
                 {
                     DragManager.acceptDragDrop(VBox(event.currentTarget));
                 }

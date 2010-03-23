@@ -7,6 +7,7 @@ package org.lamsfoundation.lams.author.controller
 	import mx.controls.Alert;
 	import mx.core.Application;
 	import mx.core.UIComponent;
+	import mx.events.CloseEvent;
 	import mx.events.DragEvent;
 	
 	import org.lamsfoundation.lams.author.components.CanvasBox;
@@ -18,9 +19,8 @@ package org.lamsfoundation.lams.author.controller
 	import org.lamsfoundation.lams.author.components.activity.group.RandomGroupActivityComponent;
 	import org.lamsfoundation.lams.author.components.toolbar.SystemToolComponent;
 	import org.lamsfoundation.lams.author.components.transition.TransitionComponent;
-	import org.lamsfoundation.lams.author.events.AuthorActivityEvent;
-	import org.lamsfoundation.lams.author.events.TransitionEvent;
 	import org.lamsfoundation.lams.author.model.learninglibrary.LearningLibraryEntry;
+	import org.lamsfoundation.lams.author.util.AuthorUtil;
 	import org.lamsfoundation.lams.author.util.Constants;
 	import org.lamsfoundation.lams.common.dictionary.XMLDictionaryRegistry;
 	
@@ -29,11 +29,25 @@ package org.lamsfoundation.lams.author.controller
 		
 		private var dictionaryFallback:XML;
 		
+		private static var _instance:AuthorController;
+		
+		
 	 	public var transitionArray:ArrayCollection = new ArrayCollection();
 	 	
 	 	public var activities:Dictionary = new Dictionary();
 		
-		public function AuthorController(){}
+		public function AuthorController(){
+			if (_instance != null) {
+				throw new Error("This is a singleton, do not instantiate, instead use AuthorController.instance");
+			}
+		}
+		
+		public static function get instance():AuthorController {
+			if (_instance == null) {
+				_instance = new AuthorController();
+			}
+			return _instance;
+		}
 		
 		/**
 		 * Sets the learningLibrary object on startup.
@@ -57,7 +71,6 @@ package org.lamsfoundation.lams.author.controller
    			// Set the application learning library
    			Application.application.learningLibrary = learningLibrary;
    			Application.application.canvasArea.compLearningLibrary.loadLearningLibrary();
-   			//Application.application.canvasArea.compLearningLibrary2.loadLearningLibrary();
 		}
 		
 		
@@ -81,7 +94,7 @@ package org.lamsfoundation.lams.author.controller
 			// Get the current mouse point, and convert it to co-ordinates in CanvasBox
 			var comp:UIComponent = UIComponent(event.currentTarget);
 			var currentMousePoint:Point = new Point(comp.mouseX, comp.mouseY);
-			currentMousePoint = canvasBox.globalToLocal(currentMousePoint);	
+			//currentMousePoint = canvasBox.globalToLocal(currentMousePoint);	
 			
 			// This condition is true if the activity was already on the canvas
 			if (event.dragInitiator is ActivityComponent) {
@@ -124,8 +137,8 @@ package org.lamsfoundation.lams.author.controller
 	                	toolActivityComponent.toolContentID = toolContentID;
 	                	toolActivityComponent.tool = learningLibraryComponent.learningLibraryEntry.toolTemplates[0];
 	                	toolActivityComponent.load(nextActivityUIID)
-						toolActivityComponent.x = currentMousePoint.x;
-	              		toolActivityComponent.y = currentMousePoint.y;
+						toolActivityComponent.x = currentMousePoint.x  - toolActivityComponent.mouseOffSetX;
+	              		toolActivityComponent.y = currentMousePoint.y  - toolActivityComponent.mouseOffSetY;
 	                	canvasBox.addChild(toolActivityComponent);
 	                	toolActivityComponent.setCenter();
 	                	toolActivityComponent.selectActivity();
@@ -175,6 +188,16 @@ package org.lamsfoundation.lams.author.controller
 		                	learnerGroup.selectActivity();
 		                	activities[nextActivityUIID] = learnerGroup;
 	            			break;
+	            		case Constants.SYSTEM_ACTIVITY_TYPE_BRANCH:
+	            			var branchPoint:BranchPoint = new BranchPoint;
+	            			branchPoint.x = currentMousePoint.x;
+			              	branchPoint.y = currentMousePoint.y;
+			              	canvasBox.addChild(branchPoint);
+		                	branchPoint.setCenter();
+		                	branchPoint.load(nextActivityUIID);
+		                	branchPoint.selectActivity();
+		                	activities[nextActivityUIID] = branchPoint;
+	            			break;
 	            	}
 	            }	
             }
@@ -197,7 +220,7 @@ package org.lamsfoundation.lams.author.controller
 		 * 
 		 * @param event The transition event fired by the source activity
 		 */ 
-		public function drawTransition(event:TransitionEvent):void {
+		public function drawTransition(sourceActivityComponent:ActivityComponent, transition:TransitionComponent):void {
 			
 			var canvasBox:CanvasBox = Application.application.canvasArea.canvasBox;
 			var validTransition:Boolean = false;
@@ -205,26 +228,44 @@ package org.lamsfoundation.lams.author.controller
 		    		
 	    		if (canvasBox.getChildAt(i) is ActivityComponent) {
 	    			
-	    			var activityComponent:ActivityComponent = canvasBox.getChildAt(i) as ActivityComponent;
-	    			if (activityComponent.state == Constants.ACTIVITY_STATE_MOUSE_OVER && activityComponent.canAcceptTransitions) {
+	    			var destActivityComponent:ActivityComponent = canvasBox.getChildAt(i) as ActivityComponent;
+	    			if (destActivityComponent.state == Constants.ACTIVITY_STATE_MOUSE_OVER && destActivityComponent.canAcceptTransitions) {
 	    				
 	    				
-	    				var validationString:String = validateTransition(event, activityComponent);
-	    				if (validationString == "valid") {
-	    					validTransition = true;	
-	    					
-	    					// Apply the transition
-	    					transitionArray.addItem(event.transition);
-	    					event.sourceAcivityComponent.state = Constants.ACTIVITY_STATE_NORMAL;
-	    					activityComponent.transitionIn = event.transition;	
-	    					event.transition.toActivity = activityComponent;
-	    					event.sourceAcivityComponent.transitionOut = event.transition;
-	    					activityComponent.updateTransitionPositions();
-							event.sourceAcivityComponent.updateTransitionPositions();
-	    				} else {
-	    					Alert.show(validationString);
+	    				var validationString:String = validateTransition(transition, sourceActivityComponent, destActivityComponent);
+	    				
+	    				switch (validationString) {
+	    					case "valid": 
+		    					validTransition = true;	
+		    					
+		    					// Apply the transition
+		    					transitionArray.addItem(transition);
+		    					sourceActivityComponent.state = Constants.ACTIVITY_STATE_NORMAL;
+		    					destActivityComponent.transitionIn = transition;	
+		    					transition.toActivity = destActivityComponent;
+		    					sourceActivityComponent.transitionOut = transition;
+		    					destActivityComponent.updateTransitionPositions();
+								sourceActivityComponent.updateTransitionPositions();
+								break;
+							case "branchAttempt":
+								validTransition = true;	
+								Alert.show("Looks like your trying to create a branch. Do you want to generate a branch point?","",
+									Alert.OK|Alert.CANCEL,Application.application.canvasArea,
+									function clickListener(event:CloseEvent):void {
+										if (event.detail == Alert.OK) {
+											automaticallyGenerateBranch(transition, sourceActivityComponent, destActivityComponent);
+										} else {
+											Alert.show("no");
+										}
+									}
+									
+									,null,Alert.OK);
+								break;
+							default:
+								Alert.show(validationString);
+								break;
 	    				}
-	    				
+
 	    				// Return cursor state to normal
 	    				Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);			
 	    				break;
@@ -233,9 +274,9 @@ package org.lamsfoundation.lams.author.controller
 	    	}
 	    	
 	    	if (!validTransition) {
-	    		event.transition.graphics.clear();
-	    		canvasBox.removeChild(event.transition);
-	    		event.sourceAcivityComponent.transitionOut = null;
+	    		transition.graphics.clear();
+	    		canvasBox.removeChild(transition);
+	    		sourceActivityComponent.transitionOut = null;
 	    	}
 		}
 		
@@ -248,8 +289,13 @@ package org.lamsfoundation.lams.author.controller
 		 * @return "valid" if valid, otherwise the translated error message.
 		 * 
 		 */
-		public function validateTransition(event:TransitionEvent, destActivity:ActivityComponent):String {
+		public function validateTransition(transition:TransitionComponent, sourceActivity:ActivityComponent, destActivity:ActivityComponent):String {
 			var canvasBox:CanvasBox = Application.application.canvasArea.canvasBox;
+			
+			// Check if there is more than one transition coming our of the source activity
+			if (transition.possibleBranch) {
+				return "branchAttempt";
+			}
 			
 			// Check if the destination activity already has a transition
 			if (destActivity.transitionIn != null) {
@@ -257,7 +303,7 @@ package org.lamsfoundation.lams.author.controller
 			}
 			
 			// Check if there is a circuit
-			if (isLoopingLearningDesign(event.sourceAcivityComponent, destActivity)){
+			if (isLoopingLearningDesign(sourceActivity, destActivity)){
 				return Application.application.dictionary.getLabel("cv_invalid_trans_circular_sequence");
 			}
 			
@@ -289,6 +335,53 @@ package org.lamsfoundation.lams.author.controller
 			}
 		}
 		
+		private function automaticallyGenerateBranch(transition:TransitionComponent, sourceActivity:ActivityComponent, destActivity:ActivityComponent):void {
+			var canvasBox:CanvasBox = Application.application.canvasArea.canvasBox;
+			
+			var destActivity2:ActivityComponent = sourceActivity.transitionOut.possibleFirstActivityInBranch;
+			
+			// Remove old transitions
+        	deleteTransition(transition.possibleFirstActivityInBranch.transitionIn);
+        	deleteTransition(transition);
+			
+			var sourcePoint:Point = new Point(sourceActivity.centerX, sourceActivity.centerY);
+			
+			// Find midpoint between two dest activities
+			var midPoint:Point = AuthorUtil.getMidpoint(new Point(destActivity.x, destActivity.y),new Point(destActivity2.x, destActivity2.y));
+			
+			// Find point 30 pixels away from the source activity in the direction of the midpoint
+			// This is the point of the branch point
+			var resultPoint:Point = Point.interpolate(sourcePoint, midPoint, 0.5);
+			
+			var nextActivityUIID:int = getNewUIID();
+			
+			// Add the branch point to the canvas
+			var branchPoint:BranchPoint = new BranchPoint();
+        	canvasBox.addChild(branchPoint);
+        	branchPoint.x = resultPoint.x;
+          	branchPoint.y = resultPoint.y;
+          	
+        	branchPoint.load(nextActivityUIID);
+        	branchPoint.selectActivity();
+        	activities[nextActivityUIID] = branchPoint;	
+        	
+        	// Create the transition to the branch activity
+        	var transition:TransitionComponent = new TransitionComponent();
+        	canvasBox.addChild(transition);
+        	transition.startX = sourceActivity.centerX;
+        	transition.startY = sourceActivity.centerY;
+        	transition.endX = branchPoint.centerX;
+        	transition.endY = branchPoint.centerY;
+        	transition.toActivity = branchPoint;
+        	transition.fromActivity = sourceActivity;
+        	
+        	// link with activities
+        	sourceActivity.transitionOut = transition;
+        	branchPoint.transitionIn = transition;
+        	branchPoint.updateTransitionPositions();
+        	sourceActivity.updateTransitionPositions();
+        	
+		}
 		
 		/**
 		 * This function is invoked when an activity is dragged into the bin
@@ -296,14 +389,11 @@ package org.lamsfoundation.lams.author.controller
 		 * 
 		 * TODO: Check the state of the LD and set it to invalid if neccessary
 		 * 
-		 * @param event AuthorActivityEvent containing the acitvity object
+		 * @param activityComponent the acitvity object
 		 * 
 		 */
-		public function deleteActivity(event:AuthorActivityEvent):void {
-			var canvasBox:CanvasBox = Application.application.canvasArea.canvasBox;
-				
-			var activityComponent:ActivityComponent = event.activityComponent;
-			
+		public function deleteActivity(activityComponent:ActivityComponent):void {
+			var canvasBox:CanvasBox = Application.application.canvasArea.canvasBox;			
 			activityComponent.deSelectActivity();
 			
 			// Remove transition in, if needed
@@ -327,25 +417,31 @@ package org.lamsfoundation.lams.author.controller
 			activityComponent = null;
 		}
 		
-		
 		/**
 		 * This function is invoked when a transition is dropped into the bin
 		 * it deletes the transition
 		 * 
 		 * TODO: Check the state of the LD and set it to invalid if neccessary
 		 * 
-		 * @param event the TransitionEvent
+		 * @param transition
 		 */
-		public function deleteTransition(event:TransitionEvent): void {
+		public function deleteTransition(transition:TransitionComponent):void {
 			var canvasBox:CanvasBox = Application.application.canvasArea.canvasBox;
 			
-			var transition:TransitionComponent = event.transition;
-			
-			transitionArray.removeItemAt(transitionArray.getItemIndex(transition));
-			transition.fromActivity.transitionOut = null;
-			transition.toActivity.transitionIn = null;
-			transition = null;
-			
+			if (transition != null) {
+				if (transitionArray.getItemIndex(transition) != -1) {
+					transitionArray.removeItemAt(transitionArray.getItemIndex(transition));
+				}
+				if (transition.fromActivity != null) {
+					transition.fromActivity.transitionOut = null;
+				} 
+				if (transition.toActivity != null) {
+					transition.toActivity.transitionIn = null;
+				}
+				
+				canvasBox.removeChild(transition);
+				transition = null;
+			}
 		}
 		
 		private function getNewUIID():int{

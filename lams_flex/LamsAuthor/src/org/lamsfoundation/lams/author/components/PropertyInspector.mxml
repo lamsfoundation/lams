@@ -17,6 +17,7 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.controller.AuthorController;
 			import org.lamsfoundation.lams.author.model.ToolOutputDefinition;
 			import mx.events.ListEvent;
 			import org.lamsfoundation.lams.author.components.activity.group.LearnerGroupActivityComponent;
