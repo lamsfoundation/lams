@@ -1,7 +1,5 @@
 <%@ include file="/includes/taglibs.jsp"%>
-<c:set var="formBean"
-	value="<%=request
-									.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <!--  Basic Tab Content -->
 
@@ -39,6 +37,74 @@
 			elem.style.display="block";
 		}
 	}
+
+	function editTopic(topicIndex, sessionMapID){
+		var reqIDVar = new Date();
+		var url = "<c:url value="/authoring/editTopic.do?topicIndex="/>" + topicIndex +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+		showMessage(url);
+	}
+	//The panel of taskList list panel
+	var topicListTargetDiv = "messageListArea";
+	function deleteTopic(topicIndex, sessionMapID){
+		var	deletionConfirmed = confirm("<fmt:message key='label.authoring.basic.do.you.want.to.delete'></fmt:message>");
+		
+		if (deletionConfirmed) {
+			var url = "<c:url value="/authoring/deleteTopic.do"/>";
+		    var reqIDVar = new Date();
+			var param = "topicIndex=" + topicIndex +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+			deleteItemLoading();
+		    var myAjax = new Ajax.Updater(
+		    		topicListTargetDiv,
+			    	url,
+			    	{
+			    		method:'get',
+			    		parameters:param,
+			    		onComplete:deleteItemComplete,
+			    		evalScripts:true
+			    	}
+		    );
+ 		}
+		
+	}
+	function deleteItemLoading(){
+		showBusy(topicListTargetDiv);
+	}
+	function deleteItemComplete(){
+		hideBusy(topicListTargetDiv);
+	}
+	
+	function upTopic(topicIndex, sessionMapID){
+		var url = "<c:url value="/authoring/upTopic.do"/>";
+	    var reqIDVar = new Date();
+		var param = "topicIndex=" + topicIndex +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+		deleteItemLoading();
+	    var myAjax = new Ajax.Updater(
+	    		topicListTargetDiv,
+		    	url,
+		    	{
+		    		method:'get',
+		    		parameters:param,
+		    		onComplete:deleteItemComplete,
+		    		evalScripts:true
+		    	}
+	    );
+	}
+	function downTopic(topicIndex, sessionMapID){
+		var url = "<c:url value="/authoring/downTopic.do"/>";
+	    var reqIDVar = new Date();
+		var param = "topicIndex=" + topicIndex +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+		deleteItemLoading();
+	    var myAjax = new Ajax.Updater(
+	    		topicListTargetDiv,
+		    	url,
+		    	{
+		    		method:'get',
+		    		parameters:param,
+		    		onComplete:deleteItemComplete,
+		    		evalScripts:true
+		    	}
+	    );
+	}	
 </script>
 
 <table>

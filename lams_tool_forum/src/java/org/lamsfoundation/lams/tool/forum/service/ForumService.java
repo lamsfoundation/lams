@@ -38,6 +38,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.Map.Entry;
 
@@ -95,6 +96,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.TimestampDao;
 import org.lamsfoundation.lams.tool.forum.util.DateComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
+import org.lamsfoundation.lams.tool.forum.util.MessageDtoComparator;
 import org.lamsfoundation.lams.tool.forum.util.TopicComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -405,28 +407,23 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return getSortedMessageDTO(map);
     }
 
-    public List getRootTopics(Long sessionId) {
-	List topicsBySession = messageDao.getRootTopics(sessionId);
+    public List<MessageDTO> getRootTopics(Long sessionId) {
 	ForumToolSession session = getSessionBySessionId(sessionId);
 	if (session == null || session.getForum() == null) {
 	    ForumService.log.error("Failed on getting session by given sessionID:" + sessionId);
 	    throw new ForumException("Failed on getting session by given sessionID:" + sessionId);
 	}
 
-	// sorted by last post date
-	Message msg;
-	SortedMap<Date, Message> map = new TreeMap<Date, Message>(new DateComparator());
-	Iterator iter = topicsBySession.iterator();
-	while (iter.hasNext()) {
-	    msg = (Message) iter.next();
-	    if (ForumConstants.OLD_FORUM_STYLE) {
-		map.put(msg.getCreated(), msg);
-	    } else {
-		map.put(msg.getLastReplyDate(), msg);
-	    }
-	}
-	return MessageDTO.getMessageDTO(new ArrayList<Message>(map.values()));
+	List topicsBySession = messageDao.getRootTopics(sessionId);
+	List<MessageDTO> messageDTOs = MessageDTO.getMessageDTO(topicsBySession);
 
+	// sort by sequence id
+	Set topicSet = new TreeSet<MessageDTO>(new MessageDtoComparator());
+	topicSet.addAll(messageDTOs);
+	
+	topicsBySession.clear();
+	topicsBySession.addAll(topicSet);
+	return topicsBySession;
     }
 
     public int getTopicsNum(Long userID, Long sessionId) {

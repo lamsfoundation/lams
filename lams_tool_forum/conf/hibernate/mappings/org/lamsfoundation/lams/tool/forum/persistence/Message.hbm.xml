@@ -86,6 +86,14 @@
         />
 
         <property
+            name="sequenceId"
+            type="int"
+            update="true"
+            insert="true"
+            column="sequence_id"
+        />
+
+        <property
             name="isAuthored"
             type="boolean"
             update="true"

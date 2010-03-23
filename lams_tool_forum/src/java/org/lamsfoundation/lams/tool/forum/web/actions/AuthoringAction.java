@@ -71,6 +71,8 @@ import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.DateComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
+import org.lamsfoundation.lams.tool.forum.util.MessageComparator;
+import org.lamsfoundation.lams.tool.forum.util.MessageDtoComparator;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumPedagogicalPlannerForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
@@ -151,15 +153,18 @@ public class AuthoringAction extends Action {
 	if (param.equals("updateTopic")) {
 	    return updateTopic(mapping, form, request, response);
 	}
-	if (param.equals("viewTopic")) {
-	    return viewTopic(mapping, form, request, response);
-	}
 	if (param.equals("deleteTopic")) {
 	    return deleteTopic(mapping, form, request, response);
 	}
 	if (param.equals("deleteAttachment")) {
 	    return deleteAttachment(mapping, form, request, response);
 	}
+	if (param.equals("upTopic")) {
+	    return upTopic(mapping, form, request, response);
+	}
+	if (param.equals("downTopic")) {
+	    return downTopic(mapping, form, request, response);
+	}	
 	if (param.equals("initPedagogicalPlannerForm")) {
 	    return initPedagogicalPlannerForm(mapping, form, request, response);
 	}
@@ -209,7 +214,7 @@ public class AuthoringAction extends Action {
 	    if (forum == null) {
 		forum = forumService.getDefaultContent(contentId);
 		if (forum.getMessages() != null) {
-		    TreeMap map = new TreeMap(new DateComparator());
+		    List<Message> list = new ArrayList<Message>();
 		    // sorted by create date
 		    Iterator iter = forum.getMessages().iterator();
 		    while (iter.hasNext()) {
@@ -223,9 +228,9 @@ public class AuthoringAction extends Action {
 			    ForumUser fuser = new ForumUser(user, null);
 			    topic.setCreatedBy(fuser);
 			}
-			map.put(topic.getCreated(), topic);
+			list.add(topic);
 		    }
-		    topics = MessageDTO.getMessageDTO(new ArrayList(map.values()));
+		    topics = MessageDTO.getMessageDTO(list);
 		} else {
 		    topics = null;
 		}
@@ -263,7 +268,9 @@ public class AuthoringAction extends Action {
 	    topics = new ArrayList<MessageDTO>();
 	}
 
-	sessionMap.put(ForumConstants.AUTHORING_TOPICS_LIST, topics);
+	Set topicSet = new TreeSet<MessageDTO>(new MessageDtoComparator());
+	topicSet.addAll(topics);
+	sessionMap.put(ForumConstants.AUTHORING_TOPICS_LIST, topicSet);
 
 	// init condition set
 	SortedSet<ForumCondition> conditionSet = getForumConditionSet(sessionMap);
@@ -396,7 +403,7 @@ public class AuthoringAction extends Action {
 	    }
 
 	    // Handle message
-	    List topics = getTopicList(sessionMap);
+	    Set<MessageDTO> topics = getTopics(sessionMap);
 	    iter = topics.iterator();
 	    while (iter.hasNext()) {
 		MessageDTO dto = (MessageDTO) iter.next();
@@ -638,7 +645,7 @@ public class AuthoringAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(messageForm.getSessionMapID());
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 
-	List topics = getTopicList(sessionMap);
+	SortedSet topics = getTopics(sessionMap);
 	// get login user (author)
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
@@ -651,6 +658,13 @@ public class AuthoringAction extends Action {
 	message.setCreated(new Date());
 	message.setUpdated(new Date());
 	message.setLastReplyDate(new Date());
+	
+	int maxSeq = 1;
+	if (topics.size() > 0) {
+	    MessageDTO last = (MessageDTO) topics.last();
+	    maxSeq = last.getMessage().getSequenceId() + 1;
+	}
+	message.setSequenceId(maxSeq);
 
 	// check whether this user exist or not
 	ForumUser forumUser = forumService.getUserByID(new Long(user.getUserID().intValue()));
@@ -676,54 +690,9 @@ public class AuthoringAction extends Action {
 	}
 	message.setAttachments(attSet);
 
-	// save the new message into HttpSession
-	if (ForumConstants.OLD_FORUM_STYLE) {
-	    topics.add(MessageDTO.getMessageDTO(message));
-	} else {
-	    topics.add(0, MessageDTO.getMessageDTO(message));
-	}
+	topics.add(MessageDTO.getMessageDTO(message));
 
 	return mapping.findForward("success");
-    }
-
-    /**
-     * Diplay a special topic information. Only display author created root message content, even this topic already has
-     * some reply messages from learner in some cases.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws PersistenceException
-     */
-    public ActionForward viewTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws PersistenceException {
-
-	// get SessionMAP
-	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-
-	List topics = getTopicList(sessionMap);
-	String topicIndex = request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
-	int topicIdx = NumberUtils.stringToInt(topicIndex, -1);
-
-	// if topicIndex is empty, try to get it from Request Attribute again.
-	// This may be caused by reresh this page, back from edit page etc.
-	if (topicIdx == -1) {
-	    topicIndex = (String) request.getAttribute(ForumConstants.AUTHORING_TOPICS_INDEX);
-	    topicIdx = NumberUtils.stringToInt(topicIndex, -1);
-	}
-
-	if (topicIdx != -1) {
-	    MessageDTO topic = (MessageDTO) topics.get(topicIdx);
-	    request.setAttribute(ForumConstants.AUTHORING_TOPICS_INDEX, topicIndex);
-	    request.setAttribute(ForumConstants.AUTHORING_TOPIC, topic);
-	}
-
-	return mapping.findForward("success");
-
     }
 
     /**
@@ -743,12 +712,16 @@ public class AuthoringAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	List topics = getTopicList(sessionMap);
 	String topicIndex = request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 	int topicIdx = NumberUtils.stringToInt(topicIndex, -1);
 
 	if (topicIdx != -1) {
-	    Object obj = topics.remove(topicIdx);
+	    Set topics = getTopics(sessionMap);
+	    List<MessageDTO> rList = new ArrayList<MessageDTO>(topics);
+	    Object obj = rList.remove(topicIdx);
+	    topics.clear();
+	    topics.addAll(rList);
+	    // add to delList
 	    List delList = getDeletedTopicList(sessionMap);
 	    delList.add(obj);
 
@@ -793,11 +766,12 @@ public class AuthoringAction extends Action {
 	MessageForm msgForm = (MessageForm) form;
 	msgForm.setSessionMapID(sessionMapID);
 
-	List topics = getTopicList(sessionMap);
 	String topicIndex = request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 	int topicIdx = NumberUtils.stringToInt(topicIndex, -1);
 	if (topicIdx != -1) {
-	    MessageDTO topic = (MessageDTO) topics.get(topicIdx);
+	    Set topics = getTopics(sessionMap);
+	    List<MessageDTO> rList = new ArrayList<MessageDTO>(topics);
+	    MessageDTO topic = rList.get(topicIdx);	    
 	    if (topic != null) {
 		// check whehter the edit topic and the current user are same person, if not, forbidden to edit topic
 		if (topic.getMessage() != null && topic.getMessage().getCreatedBy() != null) {
@@ -838,8 +812,6 @@ public class AuthoringAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(messageForm.getSessionMapID());
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 
-	// get value from HttpSession
-	List topics = getTopicList(sessionMap);
 	// get param from HttpServletRequest
 	String topicIndex = request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 	int topicIdx = NumberUtils.stringToInt(topicIndex, -1);
@@ -847,7 +819,9 @@ public class AuthoringAction extends Action {
 	if (topicIdx != -1) {
 	    Message message = messageForm.getMessage();
 
-	    MessageDTO newMsg = (MessageDTO) topics.get(topicIdx);
+	    Set topics = getTopics(sessionMap);
+	    List<MessageDTO> rList = new ArrayList<MessageDTO>(topics);
+	    MessageDTO newMsg = rList.get(topicIdx);
 	    if (newMsg.getMessage() == null) {
 		newMsg.setMessage(new Message());
 	    }
@@ -894,6 +868,66 @@ public class AuthoringAction extends Action {
 	request.setAttribute("itemAttachment", null);
 	return mapping.findForward("success");
     }
+    
+    /**
+     * Move up current topic.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward upTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	return switchTopic(mapping, request, true);
+    }
+
+    /**
+     * Move down current topic.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward downTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	return switchTopic(mapping, request, false);
+    }
+
+    private ActionForward switchTopic(ActionMapping mapping, HttpServletRequest request, boolean up) {
+	// get back sessionMAP
+	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+
+	int itemIdx = NumberUtils.stringToInt(request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX), -1);
+	if (itemIdx != -1) {
+	    Set topics = getTopics(sessionMap);
+	    List<MessageDTO> rList = new ArrayList<MessageDTO>(topics);
+	    MessageDTO newMsg = rList.get(itemIdx);	    
+	    
+	    // get current and the target item, and switch their sequence
+	    MessageDTO item = (MessageDTO) rList.get(itemIdx);
+	    MessageDTO repItem;
+	    if (up) {
+		repItem = rList.get(--itemIdx);
+	    } else {
+		repItem = rList.get(++itemIdx);
+	    }
+	    int upSeqId = repItem.getMessage().getSequenceId();
+	    repItem.getMessage().setSequenceId(item.getMessage().getSequenceId());
+	    item.getMessage().setSequenceId(upSeqId);
+
+	    // put back list, it will be sorted again
+	    topics.clear();
+	    topics.addAll(rList);
+	}
+
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return mapping.findForward("success");
+    }
 
     // ******************************************************************************************************************
     // Private method for internal functions
@@ -927,8 +961,13 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private List getTopicList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, ForumConstants.AUTHORING_TOPICS_LIST);
+    private SortedSet<MessageDTO> getTopics(SessionMap sessionMap) {
+	SortedSet<MessageDTO> topics = (SortedSet<MessageDTO>) sessionMap.get(ForumConstants.AUTHORING_TOPICS_LIST);
+	if (topics == null) {
+	    topics = new TreeSet<MessageDTO>(new MessageDtoComparator());
+	    sessionMap.put(ForumConstants.AUTHORING_TOPICS_LIST, topics);
+	}
+	return topics;
     }
 
     /**
@@ -1010,7 +1049,7 @@ public class AuthoringAction extends Action {
 		}
 	    }
 	    if (!allowNewTopic) {
-		List topics = getTopicList(sessionMap);
+		Set topics = getTopics(sessionMap);
 		if (topics.size() == 0) {
 		    ActionMessage error = new ActionMessage("error.must.have.topic");
 		    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
@@ -1116,7 +1155,9 @@ public class AuthoringAction extends Action {
 	    String subject = null;
 	    Message message = null;
 	    List<Message> newTopics = new LinkedList<Message>();
-	    Iterator<Message> forumTopicIterator = forum.getMessages().iterator();
+	    Set<Message> forumTopics = new TreeSet<Message>(new MessageComparator());
+	    forumTopics.addAll(forum.getMessages());
+	    Iterator<Message> forumTopicIterator = forumTopics.iterator();
 	    Pattern regexPattern = Pattern.compile(ForumConstants.WORD_REGEX, ForumConstants.PATTERN_MATCHING_OPTIONS);
 
 	    Matcher matcher = null;
@@ -1165,6 +1206,16 @@ public class AuthoringAction extends Action {
 
 			message.setSubject(subject);
 			message.setBody(topic);
+
+			int maxSeq = 1;
+			SortedSet<Message> allTopics = new TreeSet<Message>(new MessageComparator()); 
+			allTopics.addAll(forum.getMessages());
+			allTopics.addAll(newTopics);
+			if (allTopics.size() > 0) {
+			    Message last = allTopics.last();
+			    maxSeq = last.getSequenceId() + 1;
+			}
+			message.setSequenceId(maxSeq);				
 
 			newTopics.add(message);
 			message.setForum(forum);

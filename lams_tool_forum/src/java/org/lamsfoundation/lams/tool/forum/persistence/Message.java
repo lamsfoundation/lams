@@ -38,59 +38,62 @@ import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 
 /**
  * @author conradb
- *
+ * 
  * @hibernate.class table="tl_lafrum11_message"
- *
+ * 
  */
-public class Message implements Cloneable{
-	
-	private static Logger log = Logger.getLogger(Message.class);
-	
-	private Long uid;
-	private String subject;
-	private String body;
-	private boolean isAuthored;
-	private boolean isAnonymous;
+public class Message implements Cloneable {
 
-	private Date created;
-	private Date updated;
-	private Date lastReplyDate;
-	private int replyNumber;
-	private boolean hideFlag;
+    private static Logger log = Logger.getLogger(Message.class);
 
-	private Message parent;
-	private ForumToolSession toolSession;
-	private Forum forum;
-	private ForumUser createdBy;
-	private ForumUser modifiedBy;
-	private Set attachments;
-	private ForumReport report;
-	private Set sessionClones;
+    private Long uid;
+    private String subject;
+    private String body;
+    private int sequenceId;
+    private boolean isAuthored;
+    private boolean isAnonymous;
 
-	private ForumToolContentHandler toolContentHandler;
-	
-	public Message(){
-		attachments = new TreeSet();
-		sessionClones = new HashSet();
-	}
-//  **********************************************************
-  	//		Function method for Message
-//  **********************************************************
-	public static Message newInstance(Message fromMsg,ForumToolContentHandler toolContentHandler){
-		Message toMsg = new Message();
-		fromMsg.toolContentHandler = toolContentHandler;
-		toMsg = (Message) fromMsg.clone();
-		return toMsg;
-	}
-	/**
-	 * <em>This method DOES NOT deep clone <code>Forum</code> to avoid dead loop in clone.</em>
-	 */
-  	public Object clone(){
-  		
-  		Message msg = null;
-  		try{
-  			msg = (Message) super.clone();
-  			msg.setUid(null);
+    private Date created;
+    private Date updated;
+    private Date lastReplyDate;
+    private int replyNumber;
+    private boolean hideFlag;
+
+    private Message parent;
+    private ForumToolSession toolSession;
+    private Forum forum;
+    private ForumUser createdBy;
+    private ForumUser modifiedBy;
+    private Set attachments;
+    private ForumReport report;
+    private Set sessionClones;
+
+    private ForumToolContentHandler toolContentHandler;
+
+    public Message() {
+	attachments = new TreeSet();
+	sessionClones = new HashSet();
+    }
+
+    // **********************************************************
+    // Function method for Message
+    // **********************************************************
+    public static Message newInstance(Message fromMsg, ForumToolContentHandler toolContentHandler) {
+	Message toMsg = new Message();
+	fromMsg.toolContentHandler = toolContentHandler;
+	toMsg = (Message) fromMsg.clone();
+	return toMsg;
+    }
+
+    /**
+     * <em>This method DOES NOT deep clone <code>Forum</code> to avoid dead loop in clone.</em>
+     */
+    public Object clone() {
+
+	Message msg = null;
+	try {
+	    msg = (Message) super.clone();
+	    msg.setUid(null);
   			//it is not necessary to deep clone following comment fields.
   			//don't  deep clone forum to avoid dead loop in clone
 //  			if(parent != null){
@@ -106,302 +109,315 @@ public class Message implements Cloneable{
 //  			}
 //  			if(modifiedBy != null)
 //  				msg.modifiedBy = (ForumUser) modifiedBy.clone();
-  			//clone attachment
-  			if(attachments != null){
-  				Iterator iter = attachments.iterator();
-  				Set set = new TreeSet();
-  				while(iter.hasNext()){
-  					Attachment file = (Attachment)iter.next();
-  					Attachment newFile = (Attachment) file.clone();
-  					// use common file node in repository
-  					set.add(newFile);
-  				}
-  				msg.attachments = set;
-  			}
-  			// do not clone the tool session data as cloning should be creating a "fresh" copy
-  			msg.sessionClones = new HashSet();
-		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + Forum.class + " failed");
+	    // clone attachment
+	    if (attachments != null) {
+		Iterator iter = attachments.iterator();
+		Set set = new TreeSet();
+		while (iter.hasNext()) {
+		    Attachment file = (Attachment) iter.next();
+		    Attachment newFile = (Attachment) file.clone();
+		    // use common file node in repository
+		    set.add(newFile);
 		}
-  		
-  		return msg;
-  	}
+		msg.attachments = set;
+	    }
+	    // do not clone the tool session data as cloning should be creating a "fresh" copy
+	    msg.sessionClones = new HashSet();
+	} catch (CloneNotSupportedException e) {
+	    log.error("When clone " + Forum.class + " failed");
+	}
+
+	return msg;
+    }
   	
-  	public Object updateClone(Message clone){
-  		
-  		clone.setBody(this.getBody());
-  		clone.setForum(this.getForum());
-  		clone.setHideFlag(this.isHideFlag());
-  		clone.setIsAnonymous(this.isAnonymous);
-  		clone.setIsAuthored(this.getIsAuthored());
-  		clone.setLastReplyDate(this.getLastReplyDate());
-  		clone.setModifiedBy(clone.getModifiedBy());
-  		clone.setReplyNumber(this.getReplyNumber());
-  		clone.setReport(this.getReport());
-  		clone.setSubject(this.getSubject());
-  		clone.setToolContentHandler(this.getToolContentHandler());
-  		clone.setUpdated(clone.getUpdated());
+    public Object updateClone(Message clone) {
+
+	clone.setBody(this.getBody());
+	clone.setForum(this.getForum());
+	clone.setSequenceId(this.getSequenceId());
+	clone.setHideFlag(this.isHideFlag());
+	clone.setIsAnonymous(this.isAnonymous);
+	clone.setIsAuthored(this.getIsAuthored());
+	clone.setLastReplyDate(this.getLastReplyDate());
+	clone.setModifiedBy(clone.getModifiedBy());
+	clone.setReplyNumber(this.getReplyNumber());
+	clone.setReport(this.getReport());
+	clone.setSubject(this.getSubject());
+	clone.setToolContentHandler(this.getToolContentHandler());
+	clone.setUpdated(clone.getUpdated());
  
-  		// Update the attachments. Easiest way is to recopy them - which does NOT copy them in the content repository.
-  		clone.getAttachments().clear();
-		if(attachments != null){
-			Iterator iter = attachments.iterator();
-			while(iter.hasNext()){
-				Attachment file = (Attachment)iter.next();
-				Attachment newFile = (Attachment) file.clone();
-				clone.getAttachments().add(newFile);
-  			}
- 		}
-  		
-  		return clone;
-  	}
-
-	/**
-	 * Updates the modification data for this entity.
-	 */
-	public void updateModificationData() {
-		long now = System.currentTimeMillis();
-		if (created == null) {
-			this.setCreated(new Date(now));
-		}
-		this.setUpdated(new Date(now));
+  	// Update the attachments. Easiest way is to recopy them - which does NOT copy them in the content repository.
+	clone.getAttachments().clear();
+	if (attachments != null) {
+	    Iterator iter = attachments.iterator();
+	    while (iter.hasNext()) {
+		Attachment file = (Attachment) iter.next();
+		Attachment newFile = (Attachment) file.clone();
+		clone.getAttachments().add(newFile);
+	    }
 	}
+
+	return clone;
+    }
+
+    /**
+     * Updates the modification data for this entity.
+     */
+    public void updateModificationData() {
+	long now = System.currentTimeMillis();
+	if (created == null) {
+	    this.setCreated(new Date(now));
+	}
+	this.setUpdated(new Date(now));
+    }
 	
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (!(o instanceof Message))
-			return false;
-		
-		Message genericEntity = (Message) o;
+    public boolean equals(Object o) {
+	if (this == o)
+	    return true;
+	if (!(o instanceof Message))
+	    return false;
 
-		// uses same attributes to determine equality as 
-		// ConditionTopicComparator.compare()
-      	return new EqualsBuilder()
-      	//.append(this.uid,genericEntity.getUid())
-      	.append(this.subject,genericEntity.getSubject())
-      	.append(this.body,genericEntity.getBody())
-      	.append(this.replyNumber,genericEntity.getReplyNumber())
-      	//.append(this.lastReplyDate,genericEntity.lastReplyDate)
-      	//.append(this.created,genericEntity.created)
-      	//.append(this.updated,genericEntity.updated)
-      	.append(this.createdBy,genericEntity.getCreatedBy())
-      	.append(this.modifiedBy,genericEntity.getModifiedBy())
-      	.isEquals();
-	}
+	Message genericEntity = (Message) o;
 
-	public int hashCode() {
-		return new HashCodeBuilder().append(uid)
-		.append(subject).append(body)
-		.append(created)
-		.append(updated).append(createdBy)
-		.append(modifiedBy)
-		.toHashCode();
-	}
-	
-//  **********************************************************
-  	//		get/set methods
-//  **********************************************************
-	/**
-	 * Returns the object's creation date
-	 *
-	 * @return date
-	 * @hibernate.property column="create_date"
-	 */
-	public Date getCreated() {
-      return created;
-	}
+	// uses same attributes to determine equality as
+	// ConditionTopicComparator.compare()
+	return new EqualsBuilder()
+		// .append(this.uid,genericEntity.getUid())
+		.append(this.subject, genericEntity.getSubject())
+		.append(this.body,genericEntity.getBody())
+		.append(this.replyNumber,genericEntity.getReplyNumber())
+		//.append(this.lastReplyDate,genericEntity.lastReplyDate)
+		//.append(this.created,genericEntity.created)
+		//.append(this.updated,genericEntity.updated)
+		.append(this.createdBy,genericEntity.getCreatedBy())
+		.append(this.modifiedBy,genericEntity.getModifiedBy())
+		.isEquals();
+    }
 
-	/**
-	 * Sets the object's creation date
-	 *
-	 * @param created
-	 */
-	public void setCreated(Date created) {
-	    this.created = created;
-	}
-	/**
-	 * Returns this topic last reply date
-	 *
-	 * @return date
-	 * @hibernate.property column="last_reply_date"
-	 */
-	public Date getLastReplyDate() {
-		return lastReplyDate;
-	}
+    public int hashCode() {
+	return new HashCodeBuilder().append(uid).append(subject).append(body).append(created).append(updated).append(
+		createdBy).append(modifiedBy).toHashCode();
+    }
 
-	public void setLastReplyDate(Date lastPostDate) {
-		this.lastReplyDate = lastPostDate;
-	}
-	/**
-	 * Returns the object's date of last update
-	 *
-	 * @return date updated
-	 * @hibernate.property column="update_date"
-	 */
-	public Date getUpdated() {
-        return updated;
-	}
+    // **********************************************************
+    // get/set methods
+    // **********************************************************
+    /**
+     * Returns the object's creation date
+     * 
+     * @return date
+     * @hibernate.property column="create_date"
+     */
+    public Date getCreated() {
+	return created;
+    }
 
-	/**
-	 * Sets the object's date of last update
-	 *
-	 * @param updated
-	 */
-	public void setUpdated(Date updated) {
-        this.updated = updated;
-	}
+    /**
+     * Sets the object's creation date
+     * 
+     * @param created
+     */
+    public void setCreated(Date created) {
+	this.created = created;
+    }
+
+    /**
+     * Returns this topic last reply date
+     * 
+     * @return date
+     * @hibernate.property column="last_reply_date"
+     */
+    public Date getLastReplyDate() {
+	return lastReplyDate;
+    }
+
+    public void setLastReplyDate(Date lastPostDate) {
+	this.lastReplyDate = lastPostDate;
+    }
+
+    /**
+     * Returns the object's date of last update
+     * 
+     * @return date updated
+     * @hibernate.property column="update_date"
+     */
+    public Date getUpdated() {
+	return updated;
+    }
+
+    /**
+     * Sets the object's date of last update
+     * 
+     * @param updated
+     */
+    public void setUpdated(Date updated) {
+	this.updated = updated;
+    }
 
     /**
      * @return Returns the userid of the user who created the Forum.
-     *
-     * @hibernate.many-to-one
-     * 		column="create_by"
-     *  	cascade="none"
-     *
+     * 
+     * @hibernate.many-to-one column="create_by" cascade="none"
+     * 
      */
     public ForumUser getCreatedBy() {
-        return createdBy;
+	return createdBy;
     }
 
     /**
-     * @param createdBy The userid of the user who created this Forum.
+     * @param createdBy
+     *            The userid of the user who created this Forum.
      */
     public void setCreatedBy(ForumUser createdBy) {
-        this.createdBy = createdBy;
+	this.createdBy = createdBy;
     }
 
-
     /**
-     * @hibernate.many-to-one
-     * 		column="modified_by"
-     * 		cascade="none"
+     * @hibernate.many-to-one column="modified_by" cascade="none"
      * 
      * @return Returns the userid of the user who modified the posting.
      */
     public ForumUser getModifiedBy() {
-        return modifiedBy;
+	return modifiedBy;
     }
 
     /**
-     * @param modifiedBy The userid of the user who modified the posting.
+     * @param modifiedBy
+     *            The userid of the user who modified the posting.
      */
     public void setModifiedBy(ForumUser modifiedBy) {
-        this.modifiedBy = modifiedBy;
+	this.modifiedBy = modifiedBy;
     }
 
     /**
      * @hibernate.id column="uid" generator-class="native"
      */
-	public Long getUid() {
-		return uid;
-	}
+    public Long getUid() {
+	return uid;
+    }
 
-	public void setUid(Long uuid) {
-		this.uid = uuid;
-	}
+    public void setUid(Long uuid) {
+	this.uid = uuid;
+    }
 
     /**
      * @return Returns the subject of the Message.
-     *
-     * @hibernate.property
-     * 		column="subject"
-     *
+     * 
+     * @hibernate.property column="subject"
+     * 
      */
     public String getSubject() {
-        return subject;
+	return subject;
     }
 
     /**
-     * @param subject The subject of the Message to be set.
+     * @param subject
+     *            The subject of the Message to be set.
      */
     public void setSubject(String subject) {
-        this.subject = subject;
+	this.subject = subject;
     }
 
-	/**
-	 * @return Returns the body of the Message.
-	 *
-	 * @hibernate.property 
-	 * 		column="body"
-     *      type="text"
-	 *  	 
-	 */
-	public String getBody() {
-		return body;
-	}
-	
-	/**
-	 * @param body The body of the Message to set.
-	 */
-	public void setBody(String body) {
-		this.body = body;
-	}
-
-	/**
-	 * @return Returns true if the Message was an Authored Message.
-	 *
-	 * @hibernate.property
-	 * 		column="is_authored"
-	 *
-	 */
-	public boolean getIsAuthored() {
-		return isAuthored;
-	}
-
-	/**
-	 * @param isAuthored Set isAuthored to true if Message was authored
-	 * 		otherwise set to false.
-	 */
-	public void setIsAuthored(boolean isAuthored) {
-		this.isAuthored = isAuthored;
-	}
-
-	/**
-	 * @return Returns whether the Message should be shown as an
-	 * 		Annonymous message.
-	 *
-	 * @hibernate.property 
-	 * 		column="is_anonymous"
-	 *  	 
-	 */
-	public boolean getIsAnonymous() {
-		return isAnonymous;
-	}
-	
-	/**
-	 * @param isAnonymous Indicates that the Message is to be shown
-	 * 			as an Annonymous message when set to true.
-	 */
-	public void setIsAnonymous(boolean isAnonymous) {
-		this.isAnonymous = isAnonymous;
-	}
+    /**
+     * @return Returns the body of the Message.
+     * 
+     * @hibernate.property column="body" type="text"
+     * 
+     */
+    public String getBody() {
+	return body;
+    }
 
     /**
-      * Gets the toolSession
-      *
-      * @hibernate.many-to-one cascade="none"
-      *	class="org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession"
-      *	              column="forum_session_uid"
-      *
-      */
-     public ForumToolSession getToolSession() {
-         return toolSession;
-     }
+     * @param body
+     *            The body of the Message to set.
+     */
+    public void setBody(String body) {
+	this.body = body;
+    }
 
+    /**
+     * Returns Message sequence number.
+     * 
+     * @return Message sequence number
+     * 
+     * @hibernate.property column="sequence_id"
+     */
+    public int getSequenceId() {
+	return sequenceId;
+    }
 
-	/**
-	 * @param toolSession The toolSession that this Message belongs to
+    /**
+     * Sets Message sequence number.
+     * 
+     * @param sequenceId
+     *            Message sequence number
+     */
+    public void setSequenceId(int sequenceId) {
+	this.sequenceId = sequenceId;
+    }
+
+    /**
+     * @return Returns true if the Message was an Authored Message.
+     * 
+     * @hibernate.property column="is_authored"
+     * 
+     */
+    public boolean getIsAuthored() {
+	return isAuthored;
+    }
+
+    /**
+     * @param isAuthored
+     *            Set isAuthored to true if Message was authored otherwise set to false.
+     */
+    public void setIsAuthored(boolean isAuthored) {
+	this.isAuthored = isAuthored;
+    }
+
+    /**
+     * @return Returns whether the Message should be shown as an Annonymous message.
+     * 
+     * @hibernate.property column="is_anonymous"
+     * 
+     */
+    public boolean getIsAnonymous() {
+	return isAnonymous;
+    }
+
+    /**
+     * @param isAnonymous
+     *            Indicates that the Message is to be shown as an Annonymous message when set to true.
+     */
+    public void setIsAnonymous(boolean isAnonymous) {
+	this.isAnonymous = isAnonymous;
+    }
+
+    /**
+     * Gets the toolSession
+     * 
+     * @hibernate.many-to-one cascade="none" class="org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession"
+     *                        column="forum_session_uid"
+     * 
+     */
+    public ForumToolSession getToolSession() {
+	return toolSession;
+    }
+
+    /**
+     * @param toolSession
+     *            The toolSession that this Message belongs to
      */
     public void setToolSession(ForumToolSession session) {
-         this.toolSession = session;
-     }
+	this.toolSession = session;
+    }
 
-	/**
-	 * @param parent The parent of this Message
+    /**
+     * @param parent
+     *            The parent of this Message
      */
     public void setParent(Message parent) {
-        this.parent = parent;
+	this.parent = parent;
     }
     /**
      * @hibernate.many-to-one column="parent_uid"
@@ -413,106 +429,100 @@ public class Message implements Cloneable{
     
     /**
      * @return a set of Attachments to this Message.
-     *
-     * @hibernate.set table="ATTACHMENT"
-     * inverse="false"
-     * lazy="false"
-     * cascade="all-delete-orphan"
+     * 
+     * @hibernate.set table="ATTACHMENT" inverse="false" lazy="false" cascade="all-delete-orphan"
      * @hibernate.collection-key column="message_uid"
-     * @hibernate.collection-one-to-many
-     * 			class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
-     *
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Attachment"
+     * 
      */
-	public Set getAttachments() {
-		return attachments;
-	}
+    public Set getAttachments() {
+	return attachments;
+    }
 
     /*
-	 * @param attachments The attachments to set.
+     * @param attachments The attachments to set.
      */
     public void setAttachments(Set attachments) {
-		this.attachments = attachments;
-	}
-    
-	/**
-	 * @hibernate.many-to-one column="forum_uid"
-	 * 			  cascade="none"
-	 * @return
-	 */
-	public Forum getForum() {
-		return forum;
-	}
+	this.attachments = attachments;
+    }
 
-	public void setForum(Forum forum) {
-		this.forum = forum;
-	}
-	
-	/**
-	 * @hibernate.property column="reply_number"
-	 * @return
-	 */
-	public int getReplyNumber() {
-		return replyNumber;
-	}
+    /**
+     * @hibernate.many-to-one column="forum_uid" cascade="none"
+     * @return
+     */
+    public Forum getForum() {
+	return forum;
+    }
 
-	public void setReplyNumber(int replyNumber) {
-		this.replyNumber = replyNumber;
-	}
-	/**
-	 * @hibernate.property column="hide_flag"
-	 * @return
-	 */
-	public boolean isHideFlag() {
-		return hideFlag;
-	}
+    public void setForum(Forum forum) {
+	this.forum = forum;
+    }
 
-	public void setHideFlag(boolean hideFlag) {
-		this.hideFlag = hideFlag;
-	}
-	/**
-	 * @hibernate.many-to-one column="report_id"
-	 * 			cascade="all"
-	 * @return
-	 */
-	public ForumReport getReport() {
-		return report;
-	}
-	public void setReport(ForumReport report) {
-		this.report = report;
-	}
-	
-	/**
+    /**
+     * @hibernate.property column="reply_number"
+     * @return
+     */
+    public int getReplyNumber() {
+	return replyNumber;
+    }
+
+    public void setReplyNumber(int replyNumber) {
+	this.replyNumber = replyNumber;
+    }
+
+    /**
+     * @hibernate.property column="hide_flag"
+     * @return
+     */
+    public boolean isHideFlag() {
+	return hideFlag;
+    }
+
+    public void setHideFlag(boolean hideFlag) {
+	this.hideFlag = hideFlag;
+    }
+
+    /**
+     * @hibernate.many-to-one column="report_id" cascade="all"
+     * @return
+     */
+    public ForumReport getReport() {
+	return report;
+    }
+
+    public void setReport(ForumReport report) {
+	this.report = report;
+    }
+
+    /**
      * @return the set of all messages cloned from this message. See getAuthoredParent().
-     *
+     * 
      * @hibernate.set cascade="all-delete-orphan" inverse="false"
      * @hibernate.collection-key column="authored_parent_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Message"
-     *
+     * 
      */
-	public Set getSessionClones() {
-		return sessionClones;
-	}
+    public Set getSessionClones() {
+	return sessionClones;
+    }
 
     /*
-	 * @param sessionClones The sessionClones to set.
+     * @param sessionClones The sessionClones to set.
      */
     public void setSessionClones(Set sessionClones) {
-		this.sessionClones = sessionClones;
-	}
+	this.sessionClones = sessionClones;
+    }
 
-
-    
     public String toString() {
-		return new ToStringBuilder(this).
-			append("uid",uid).
-			append("subject",subject).
-			append("body",body).toString();
-	}
-	public ForumToolContentHandler getToolContentHandler() {
-		return toolContentHandler;
-	}
-	public void setToolContentHandler(ForumToolContentHandler toolContentHandler) {
-		this.toolContentHandler = toolContentHandler;
-	}
+	return new ToStringBuilder(this).append("uid", uid).append("subject", subject).append("body", body).toString();
+    }
+
+    public ForumToolContentHandler getToolContentHandler() {
+	return toolContentHandler;
+    }
+
+    public void setToolContentHandler(ForumToolContentHandler toolContentHandler) {
+	this.toolContentHandler = toolContentHandler;
+    }
 
 }

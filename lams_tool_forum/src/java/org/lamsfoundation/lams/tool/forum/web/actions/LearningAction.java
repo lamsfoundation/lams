@@ -547,12 +547,19 @@ public class LearningAction extends Action {
 	SessionMap sessionMap = getSessionMap(request, messageForm);
 	Long forumId = (Long) sessionMap.get(ForumConstants.FORUM_ID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	List<MessageDTO> rootTopics = forumService.getRootTopics(sessionId);
 
 	Message message = messageForm.getMessage();
 	message.setIsAuthored(false);
 	message.setCreated(new Date());
 	message.setUpdated(new Date());
 	message.setLastReplyDate(new Date());
+	int maxSeq = 1;
+	if (rootTopics.size() > 0) {
+	    MessageDTO last = rootTopics.get(rootTopics.size() - 1);
+	    maxSeq = last.getMessage().getSequenceId() + 1;
+	}
+	message.setSequenceId(maxSeq);	
 	ForumUser forumUser = getCurrentUser(request, sessionId);
 	message.setCreatedBy(forumUser);
 	message.setModifiedBy(forumUser);
@@ -562,15 +569,14 @@ public class LearningAction extends Action {
 	forumService = getForumManager();
 	forumService.createRootTopic(forumId, sessionId, message);
 
+	rootTopics.add(MessageDTO.getMessageDTO(message));
 	// echo back current root topic to forum init page
-	List rootTopics = forumService.getRootTopics(sessionId);
 	request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 
 	saveUserTimestamp(message.getUid(), forumUser);
 
-	for (Iterator iterator = rootTopics.iterator(); iterator.hasNext();) {
-	    MessageDTO messageDTO = (MessageDTO) iterator.next();
+	for (MessageDTO messageDTO : rootTopics) {
 	    int numOfNewPosts = forumService.getNewMessagesNum(messageDTO.getMessage().getUid(), forumUser.getUid());
 	    if (numOfNewPosts == -1) {
 		messageDTO.setNewPostingsNum(messageDTO.getMessage().getReplyNumber() + 1);

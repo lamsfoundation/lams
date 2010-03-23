@@ -232,7 +232,7 @@ public interface IForumService {
      * @param sessionId
      * @return List of MessageDTO
      */
-    public List getRootTopics(Long sessionId);
+    public List<MessageDTO> getRootTopics(Long sessionId);
 
     /**
      * Get topics posted by author role. Note that the return type is DTO.

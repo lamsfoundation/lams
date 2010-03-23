@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ConditionTopicComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
+import org.lamsfoundation.lams.tool.forum.util.MessageDtoComparator;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumConditionForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -306,8 +307,13 @@ public class AuthoringConditionAction extends Action {
 	return list;
     }
 
-    private List<MessageDTO> getMessageDTOList(SessionMap sessionMap) {
-	return getListFromSession(sessionMap, ForumConstants.AUTHORING_TOPICS_LIST);
+    private SortedSet<MessageDTO> getMessageDTOList(SessionMap sessionMap) {
+	SortedSet<MessageDTO> topics = (SortedSet<MessageDTO>) sessionMap.get(ForumConstants.AUTHORING_TOPICS_LIST);
+	if (topics == null) {
+	    topics = new TreeSet<MessageDTO>(new MessageDtoComparator());
+	    sessionMap.put(ForumConstants.AUTHORING_TOPICS_LIST, topics);
+	}
+	return topics;
     }
 
     /**
@@ -366,7 +372,7 @@ public class AuthoringConditionAction extends Action {
 	String sessionMapID = conditionForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
-	List<MessageDTO> messageDTOs = getMessageDTOList(sessionMap);
+	Set<MessageDTO> messageDTOs = getMessageDTOList(sessionMap);
 
 	// Initialise the LabelValueBeans in the possibleOptions array.
 
@@ -413,7 +419,7 @@ public class AuthoringConditionAction extends Action {
 
 	Long[] selectedItems = form.getSelectedItems();
 	Set<Message> conditionTopics = new TreeSet<Message>(new ConditionTopicComparator());
-	List<MessageDTO> messageDTOs = getMessageDTOList(sessionMap);
+	Set<MessageDTO> messageDTOs = getMessageDTOList(sessionMap);
 
 	for (Long selectedItem : selectedItems) {
 	    for (MessageDTO messageDTO : messageDTOs) {

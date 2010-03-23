@@ -67,6 +67,7 @@ create table tl_lafrum11_message (
    modified_by bigint,
    subject varchar(255),
    body text,
+   sequence_id integer,
    is_authored smallint,
    is_anonymous smallint,
    forum_session_uid bigint,
@@ -155,7 +156,7 @@ INSERT INTO tl_lafrum11_forum (uid,title,instructions,online_instructions,offlin
  allow_new_topic,allow_upload,maximum_reply, minimum_reply,limited_input_flag,limited_of_chars,reflect_on_activity) 
 VALUES(1,"Forum","Instructions",null,null,${default_content_id},0,0,0,0,0,1,0,1,0,1,0,1,5000,0);
 
-INSERT INTO `tl_lafrum11_message` (`uid`, `create_date`, `last_reply_date`, `update_date`, `create_by`, `modified_by`, `subject`, `body`, `is_authored`, `is_anonymous`, `forum_session_uid`, `parent_uid`, `forum_uid`, `reply_number`, `hide_flag`, `report_id`) VALUES 
-  (1,NOW(),NOW(),NOW(),null,null,'Topic Heading','Topic message',1,0,NULL,NULL,1,0,0,NULL);
+INSERT INTO `tl_lafrum11_message` (`uid`, `create_date`, `last_reply_date`, `update_date`, `create_by`, `modified_by`, `subject`, `body`, `sequence_id`, `is_authored`, `is_anonymous`, `forum_session_uid`, `parent_uid`, `forum_uid`, `reply_number`, `hide_flag`, `report_id`) VALUES 
+  (1,NOW(),NOW(),NOW(),null,null,'Topic Heading','Topic message',1,1,0,NULL,NULL,1,0,0,NULL);
 
 SET FOREIGN_KEY_CHECKS=1;

@@ -26,12 +26,14 @@ package org.lamsfoundation.lams.tool.forum.web.forms;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
+import org.lamsfoundation.lams.tool.forum.util.MessageComparator;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 /**
@@ -72,7 +74,8 @@ public class ForumPedagogicalPlannerForm extends PedagogicalPlannerActivityForm 
 	    setInstructions(forum.getInstructions());
 
 	    topic = new ArrayList<String>();
-	    Set messages = forum.getMessages();
+	    Set<Message> messages = new TreeSet<Message>(new MessageComparator());
+	    messages.addAll(forum.getMessages());
 	    if (messages != null) {
 		int topicIndex = 0;
 		for (Message message : (Set<Message>) messages) {
