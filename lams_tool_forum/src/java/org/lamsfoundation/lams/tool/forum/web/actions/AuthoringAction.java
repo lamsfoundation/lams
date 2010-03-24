@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.forum.web.actions;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -35,7 +36,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -68,7 +68,6 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
-import org.lamsfoundation.lams.tool.forum.util.DateComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
 import org.lamsfoundation.lams.tool.forum.util.MessageComparator;
@@ -95,7 +94,8 @@ public class AuthoringAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, PersistenceException {
+	    HttpServletResponse response) throws IOException, ServletException, PersistenceException,
+	    IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
 	String param = mapping.getParameter();
 	// -----------------------Forum Author function ---------------------------
@@ -295,9 +295,12 @@ public class AuthoringAction extends Action {
      * @param request
      * @param response
      * @return
+     * @throws NoSuchMethodException 
+     * @throws InvocationTargetException 
+     * @throws IllegalAccessException 
      */
     public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
 	ToolAccessMode mode = getAccessMode(request);
 	ForumForm forumForm = (ForumForm) form;
@@ -316,7 +319,7 @@ public class AuthoringAction extends Action {
 	Forum forum = forumForm.getForum();
 	// get back tool content ID
 	forum.setContentId(forumForm.getToolContentID());
-	try {
+
 	    forumService = getForumManager();
 
 	    // *******************************Handle user*******************
@@ -392,17 +395,16 @@ public class AuthoringAction extends Action {
 	    // copy back
 	    forumPO.setAttachments(attPOSet);
 	    forum = forumService.updateForum(forumPO);
-
-	    // ********************************Handle topic*******************
+	    
 	    // delete message attachment
 	    List topicDeleteAttachmentList = getTopicDeletedAttachmentList(sessionMap);
 	    iter = topicDeleteAttachmentList.iterator();
 	    while (iter.hasNext()) {
 		Attachment delAtt = (Attachment) iter.next();
 		iter.remove();
-	    }
+	    }	    
 
-	    // Handle message
+	    // ********************************Handle topic*******************
 	    Set<MessageDTO> topics = getTopics(sessionMap);
 	    iter = topics.iterator();
 	    while (iter.hasNext()) {
@@ -424,28 +426,26 @@ public class AuthoringAction extends Action {
 		    forumService.deleteTopic(dto.getMessage().getUid());
 		}
 	    }
+	    
+	// ********************************Handle conditions (also delete conditions that don't contain any topics)****
+	Set<ForumCondition> conditionSet = new TreeSet<ForumCondition>(new TextSearchConditionComparator());
+	Set<ForumCondition> existingConditionSet = getForumConditionSet(sessionMap);
+	conditionSet.addAll(existingConditionSet);
+	forum.setConditions(conditionSet);
+	
+	List delConditions = getDeletedForumConditionList(sessionMap);
+	iter = delConditions.iterator();
+	while (iter.hasNext()) {
+	    ForumCondition condition = (ForumCondition) iter.next();
+	    iter.remove();
+	    forumService.deleteCondition(condition);
+	}	
 
-	    Set<ForumCondition> conditionSet = new TreeSet<ForumCondition>(new TextSearchConditionComparator());
-	    Set<ForumCondition> existingConditionSet = getForumConditionSet(sessionMap);
-	    conditionSet.addAll(existingConditionSet);
-	    forum.setConditions(conditionSet);
+	forum = forumService.updateForum(forum);
 
-	    forum = forumService.updateForum(forum);
-
-	    List delConditions = getDeletedForumConditionList(sessionMap);
-	    iter = delConditions.iterator();
-	    while (iter.hasNext()) {
-		ForumCondition condition = (ForumCondition) iter.next();
-		iter.remove();
-		forumService.deleteCondition(condition);
-	    }
-
-	    // initialize attachmentList again
-	    attachmentList = getAttachmentList(sessionMap);
-	    attachmentList.addAll(forum.getAttachments());
-	} catch (Exception e) {
-	    AuthoringAction.log.error(e);
-	}
+	// initialize attachmentList again
+	attachmentList = getAttachmentList(sessionMap);
+	attachmentList.addAll(forum.getAttachments());
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	if (mode.isAuthor()) {
@@ -718,12 +718,12 @@ public class AuthoringAction extends Action {
 	if (topicIdx != -1) {
 	    Set topics = getTopics(sessionMap);
 	    List<MessageDTO> rList = new ArrayList<MessageDTO>(topics);
-	    Object obj = rList.remove(topicIdx);
+	    MessageDTO item = rList.remove(topicIdx);
 	    topics.clear();
 	    topics.addAll(rList);
 	    // add to delList
 	    List delList = getDeletedTopicList(sessionMap);
-	    delList.add(obj);
+	    delList.add(item);
 
 	    SortedSet<ForumCondition> list = getForumConditionSet(sessionMap);
 	    Iterator<ForumCondition> conditionIter = list.iterator();
@@ -732,7 +732,7 @@ public class AuthoringAction extends Action {
 		ForumCondition condition = conditionIter.next();
 		Iterator<Message> topicIter = condition.getTopics().iterator();
 		while (topicIter.hasNext()) {
-		    if (topicIter.next() == obj) {
+		    if (topicIter.next() == item.getMessage()) {
 			topicIter.remove();
 		    }
 		}

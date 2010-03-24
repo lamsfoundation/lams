@@ -41,7 +41,7 @@ public class MessageDao extends HibernateDaoSupport {
 					+ " where is_authored = true and forum_uid=? order by create_date";
 	
 	private static final String SQL_QUERY_FIND_CHILDREN = "from " + Message.class.getName()
-					+ " where parent=?";
+					+ " where parent_uid=?";
 	
 	private static final String SQL_QUERY_BY_USER_SESSION = "from " + Message.class.getName() + " m "
 					+ " where m.createdBy.uid = ? and  m.toolSession.sessionId=?";
