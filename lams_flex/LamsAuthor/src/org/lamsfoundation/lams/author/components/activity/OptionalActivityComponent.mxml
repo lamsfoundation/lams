@@ -7,18 +7,13 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.model.activity.OptionalActivity;
 			import org.lamsfoundation.lams.author.controller.AuthorController;
 			import org.lamsfoundation.lams.author.util.Constants;
 			import mx.core.Application;
 			import mx.managers.DragManager;
 			import mx.events.DragEvent;
 			import mx.collections.ArrayCollection;
-			
-			public var activities:ArrayCollection = new ArrayCollection();
-			
-			public var minActivities:int;
-			public var maxActivities:int;
-			public var description:String;
 			
 			// The dragEnter event handler for the Canvas container
             // enables dropping.
@@ -39,23 +34,24 @@
                 	activityComponent = event.dragInitiator as ActivityComponent;
                 	activityComponent.canStartTransitions = false;
                 	activityComponent.canAcceptTransitions = false;
-                	activityComponent.disableTitle();
+                	//activityComponent.disableTitle();
                 	optionalArea.addChild(activityComponent);
-                	activities.addItem(activityComponent);
+                	//activities.addItem(activityComponent);
               		activityComponent.updateTransitionPositions();
                 } 
                 
                 // Return cursor state to normal
-				Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);                    
+				AuthorController.instance.changeCursorState(Constants.CURSOR_STATE_NORMAL);                    
             }
             
-           	override public function load(UIID:int):void {
-            	super.load(UIID);
-            	title = new Label();
-            	title.text = Application.application.dictionary.getLabel("grouping_act_title");
-            	this.disableTitle();
-				this.addChild(title);
-            }
+            [Bindable]
+			public function get activity():OptionalActivity {
+				return this._activity as OptionalActivity;
+			}
+			
+			public function set activity(activity:OptionalActivity):void {
+				this._activity = activity;
+			}
 			
 		]]>
 	</mx:Script>

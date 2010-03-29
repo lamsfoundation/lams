@@ -3,6 +3,7 @@
 	mouseDown="mouseDown(event)"
 	mouseOver="mouseOver(event)" 
 	mouseOut="mouseOut(event)"
+	mouseMove="mouseMove(event)"
 	click="click(event)" 
 	>
 
@@ -13,10 +14,12 @@
 
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.model.activity.Activity;
 			import mx.controls.Image;
 			import org.lamsfoundation.lams.author.util.AuthorUtil;
 			import org.lamsfoundation.lams.author.controller.AuthorController;
-			import org.lamsfoundation.lams.author.components.activity.group.GroupActivityComponent;
+			import org.lamsfoundation.lams.author.controller.TransitionController;
+			import org.lamsfoundation.lams.author.components.activity.group.GroupActivityComponent; 
 			import mx.collections.ArrayCollection;
 			import mx.core.UIComponent;
 			import mx.controls.Alert;
@@ -28,66 +31,42 @@
 			import mx.controls.Label;
 			import org.lamsfoundation.lams.author.components.transition.TransitionComponent;
 			
-			// Activity UIID
-			[Bindable]
-			public var activityUIID:int;
-			
-			// Activity title label
-			public var title:Label;
-			
-			// Center position of the activity component
-			public var centerX:int;
-			public var centerY:int;
+			[Bindable] protected var _activity:Activity;
 			
 			// Point of mouse during drag
 			public var mouseOffSetX:int;
 			public var mouseOffSetY:int;
+		
+			// Center position of the activity component
+			[Bindable] public var centerX:int;
+			[Bindable] public var centerY:int;
 			
-			// Transtitions
-			public var transitionIn:TransitionComponent
-			public var transitionOut:TransitionComponent;
+			// Transition components, need a reference so we can move the transitions with the component
+			public var transitionToComponent:TransitionComponent
+			public var transitionFromComponent:TransitionComponent;
 			
 			// Grouping UUID 0 means no grouping
-			[Bindable]
-			public var groupingUIID:int = 0;
+			//[Bindable] public var groupingUIID:int = 0;
 			
 			// Activity states
 			public var isDragable:Boolean = true;
 			public var canStartTransitions:Boolean = true;  	// True if this activty can start transitions
 			public var canAcceptTransitions:Boolean = true;		// True if this activty can accept transitions
-			public var state:int = Constants.ACTIVITY_STATE_NORMAL;
-			
-			// Function used to load a new activity 
-			public function load(UIID:int):void { 
-				this.activityUIID = UIID;
-		    }
-		    
-		    public function disableTitle():void {
-		    	toolTip = title.text;
-				title.visible = false;
-				title.height = 0;
-		    }
+			[Bindable] public var state:int = Constants.ACTIVITY_STATE_NORMAL;
 		    
 		    // When you click on an activity, it becomes selected
 		    // And the properties box appears
 		    protected function click(event:MouseEvent):void {
-		    	selectActivity();
+		    	AuthorController.instance.selectActivityComponent(this);
 				event.stopPropagation();
 		    }
 		    
 		    public function selectActivity():void {
-		    	
-		    	// check the activity is loaded.
-		    	if (title != null) {
+				// check the activity is loaded.
+		    	if (_activity.title != null) {
 		    		this.setStyle('borderStyle', 'solid');
 					this.setStyle('borderColor', '#66CCFF');
 					this.state = Constants.ACTIVITY_STATE_SELECTED;
-					
-					if (Application.application.selectedActivity != null) {
-						Application.application.selectedActivity.deSelectActivity();
-					}
-					Application.application.selectedActivity = this;
-					Application.application.canvasArea.propertyInspector.openPropertyInspector(this);
 		    	}
 		    }
 		    
@@ -95,30 +74,27 @@
 		    	this.setStyle('borderStyle', 'none');
 		    	this.state = Constants.ACTIVITY_STATE_NORMAL;
 		    	
-		    	if (Application.application.selectedActivity == this) {
-		    		Application.application.selectedActivity = null;
-		    		Application.application.canvasArea.propertyInspector.closePropertyInspector();
-		    	}
 		    }
 		    
+		 	/**
+		 	 * The mouseMove event starts a drag
+		 	 */ 
+		    protected function mouseMove(event:MouseEvent):void {
+		    	startDragging(event);
+		    }
 
 			/**
-			 * The mouse down event handler
-			 * Initiates drag of activity as well as starting a transition 
-			 * depending on the cursor state
+			 * The mouse down event handler starts a transition 
 			 */
 		    protected function mouseDown(event:MouseEvent):void {
 		    	setCenter();
 		    	
-		    	switch (Application.application.cursorState) {
+		    	switch (AuthorController.instance.cursorState) {
 		    		case Constants.CURSOR_STATE_TRANSITION:
 			    		if (this.canStartTransitions) {
-			    			startTransition(event);
+			    			TransitionController.instance.startTransition(event, this);
 			    		}
 		    			break;
-		    		case Constants.CURSOR_STATE_NORMAL:
-		        		startDragging(event);
-				        break;	
 		    	}
 		    }
 		    
@@ -129,13 +105,10 @@
 		    public function startDragging(event:MouseEvent):void {
 				var activityComponent:ActivityComponent = event.currentTarget as ActivityComponent;
 					        
-		        if (activityComponent.isDragable) {
+		        if (activityComponent.isDragable && AuthorController.instance.cursorState != Constants.CURSOR_STATE_TRANSITION) {
 		        	var ds:DragSource = new DragSource();
-		        	//ds.addData(activityComponent, "img"); 
-		        	ds.addData( activityComponent.parent, 'dragParent' );
 					ds.addData( activityComponent, 'dragActivity' );
-					
-	                 
+					 
 		        	// Set the offset for dropping the activity to the local mouse position
 		        	activityComponent.mouseOffSetX = event.localX;
 		        	activityComponent.mouseOffSetY = event.localY; 
@@ -145,106 +118,17 @@
 			}
 		    
 		    public function setCenter():void {
-		    	centerX = x + height/2;
-				centerY = y + height/2 -10;
+	    		centerX = x + width/2;
+				centerY = y + height/2;
 		    }
 		    
-	        protected function startTransition(event:MouseEvent):void {
-			 
-				// Check if there is a pre-existing transition
-				var possibleBranch:Boolean = transitionOut != null;
-				var possibleFirstActivityInBranch:ActivityComponent = null;
-				if (possibleBranch) {
-					possibleFirstActivityInBranch = transitionOut.toActivity;
-				}
-				
-				if (transitionOut != null) {
-					//Alert.show(Application.application.dictionary.getLabelAndInsert("cv_invalid_trans_target_from_activity", [this.title.text]));
-					
-					// Return cursor state to normal
-	    			//Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL);			
-	    			//return;	
-				} 
-				
-				state = Constants.ACTIVITY_STATE_DRAWING;
 
-				Application.application.uiState = Constants.UI_STATE_DRAWING;
-				transitionOut = new TransitionComponent();
-				transitionOut.fromActivity = this;
-				transitionOut.startX = centerX;
-				transitionOut.startY = centerY;
-				transitionOut.endX = centerX;
-				transitionOut.endY = centerY;
-				transitionOut.invalidateProperties();
-				transitionOut.possibleBranch = possibleBranch;
-				transitionOut.possibleFirstActivityInBranch = possibleFirstActivityInBranch;
-				
-				
-				// deselect the currently selected activity
-				if (Application.application.selectedActivity != null) {
-					Application.application.selectedActivity.deSelectActivity();
-				}
-				
-				parent.addChild(transitionOut);
-				
-				systemManager.addEventListener(MouseEvent.MOUSE_MOVE, systemManagerMouseMoveHandler, true);
-				systemManager.addEventListener(MouseEvent.MOUSE_UP, systemManagerMouseUpHandler, true);
-				systemManager.stage.addEventListener(Event.MOUSE_LEAVE, stageMouseLeaveHandler);
-			
-			}
-			
-			protected function stopTransition():void
-			{
-			    Application.application.uiState = Constants.UI_STATE_NORMAL;
-			    systemManager.removeEventListener(MouseEvent.MOUSE_MOVE, systemManagerMouseMoveHandler, true);			
-			    systemManager.removeEventListener(MouseEvent.MOUSE_UP, systemManagerMouseUpHandler, true);
-			    systemManager.stage.removeEventListener(Event.MOUSE_LEAVE, stageMouseLeaveHandler);
-			}
-			
-			private function systemManagerMouseMoveHandler(event:MouseEvent):void
-		    {
-		    	var pt:Point = new Point(event.stageX,event.stageY);
-		    	pt = parent.globalToLocal(pt);
-		    	
-		    	transitionOut.endX = pt.x;
-		    	transitionOut.endY = pt.y;
-		    	
-		    	transitionOut.invalidateDisplayList();
-		    }
-		    
-		   
-		    /**
-		    * This event fires at the end of a transition.
-		    * 
-		    * Needs to be handled by the controller as it changes the learningDesing state
-		    * 
-		    */ 
-		    private function systemManagerMouseUpHandler(event:MouseEvent):void
-		    {
-		    	stopTransition();
-		    	
-		    	var transitionEvent:TransitionEvent = new TransitionEvent(TransitionEvent.TRANSITION_COMPLETE);
-	    		transitionEvent.sourceActivityComponent = this;
-	    		transitionEvent.transition = transitionOut;
-	    		Application.application.dispatchEvent(transitionEvent);
-	    		
-	    		AuthorController.instance.drawTransition(this, transitionOut);
-		    	
-		    }
-		    
-		    private function stageMouseLeaveHandler(event:MouseEvent):void
-		    {
-		    	stopTransition();
-		    }
-		    
 		    private function mouseOver(event:MouseEvent):void {
-				
-				if (Application.application.uiState == Constants.UI_STATE_DRAWING && this.state != Constants.ACTIVITY_STATE_DRAWING && canAcceptTransitions) {
+				if (AuthorController.instance.uiState == Constants.UI_STATE_DRAWING && this.state != Constants.ACTIVITY_STATE_DRAWING && canAcceptTransitions) {
 					this.setStyle('borderStyle', 'solid');
 					this.setStyle('borderColor', '#66CCFF');
 					this.state = Constants.ACTIVITY_STATE_MOUSE_OVER;
 				}
-				
 			}
 			
 			private function mouseOut(event:MouseEvent):void {
@@ -260,16 +144,16 @@
 			
 			public function updateTransitionPositions():void {
 				this.setCenter();
-				if (transitionOut != null)
+				if (this.transitionFromComponent != null)
 		   		{
-		   			transitionOut.startX = centerX;
-		   			transitionOut.startY = centerY;
-		   			transitionOut.invalidateDisplayList();
+		   			this.transitionFromComponent.startX = centerX;
+		   			this.transitionFromComponent.startY = centerY;
+		   			this.transitionFromComponent.invalidateDisplayList();
 		   		} 
-		   		if (transitionIn != null) {
-		   			transitionIn.endX = centerX;
-		   			transitionIn.endY = centerY;
-		   			transitionIn.invalidateDisplayList();
+		   		if (this.transitionToComponent != null) {
+		   			this.transitionToComponent.endX = centerX;
+		   			this.transitionToComponent.endY = centerY;
+		   			this.transitionToComponent.invalidateDisplayList();
 		   		}
 			}
 			
@@ -279,31 +163,57 @@
 			 * @return collection of all possible groupings for this activity
 			 */
 			public function get allPossibleGroupings():ArrayCollection {	
-				var ret:ArrayCollection = new ArrayCollection();
+				/* var ret:ArrayCollection = new ArrayCollection();
 				if (this.transitionIn != null){
-					var activity:ActivityComponent = this.transitionIn.fromActivity;
+					var activityCmp:ActivityComponent = this.transitionIn.fromActivity;
 					
 					while (true) {
-						if (activity is GroupActivityComponent) {
+						if (activityCmp is GroupActivityComponent) {
 							var entry:Object = new Object();
-							entry.activityUIID = activity.activityUIID;
-							entry.title = activity.title.text;
+							entry.activity.activityUIID = activityCmp.activity.activityUIID;
+							entry.activity.title = activityCmp.activity.title;
 							ret.addItem(entry);
 						}
 						
-						if (activity.transitionIn != null) {
-							activity = activity.transitionIn.fromActivity;
+						if (activityCmp.transitionIn != null) {
+							activityCmp = activityCmp.transitionIn.fromActivity;
 						} else {
 							break;
 						}
 					}  
 				}
 				
-				return ret;
+				return ret; */
+				
+				return null;
+			}
+			
+			[Bindable]
+			public function get title():String {
+				return _activity.title;
+			}
+			
+			public function set title(title:String):void {
+				_activity.title = title;
+			}
+			
+			public function get activityTypeID():int {
+				return _activity.activityTypeID;
+			}
+			
+			/**
+			 * Returns the root activity object
+			 * This is required as AS3 has not concept of abstract methods.
+			 * So we need to be able to fetch this activity instance
+			 * Without knowing what activity type it is.
+			 */ 
+			public function get rootActivity():Activity {
+				return _activity;
 			}
 
 		]]>
 	</mx:Script>
 	
-	
+	<mx:Binding source="_activity.xCoord" destination="this.x" />
+	<mx:Binding source="_activity.yCoord" destination="this.y" />
 </mx:VBox>

@@ -10,6 +10,9 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.model.activity.ActivityFactory;
+			import org.lamsfoundation.lams.author.model.activity.Activity;
+			import org.lamsfoundation.lams.author.components.activity.ActivityComponentFactory;
 			import org.lamsfoundation.lams.author.controller.AuthorController;
 			import org.lamsfoundation.lams.author.components.activity.group.LearnerGroupActivityComponent;
 			import org.lamsfoundation.lams.author.components.activity.group.MonitorGroupActivityComponent;
@@ -65,11 +68,14 @@
 	        	
 	        	var ds:DragSource = new DragSource();
 	        	
-	        	var activityComponent:ActivityComponent;
+	        	
+	        	var activity:Activity = ActivityFactory.getSystemActivityInstance(dragInitiator, 0);
+	        	var activityComponent:ActivityComponent = ActivityComponentFactory.getActivityComponentInstance(activity);
+	        	
 	        	
 	        	closeAllMenus();
 	        	
-	        	switch (dragInitiator.type) {
+	        	/* switch (dragInitiator.activityTypeID) {
 	        		case Constants.SYSTEM_ACTIVITY_TYPE_OPTIONAL: 
 		        		activityComponent = new OptionalActivityComponent();
 	          			break;
@@ -82,7 +88,7 @@
 	          		case Constants.SYSTEM_ACTIVITY_TYPE_GROUP_LEARNER:
 		        		activityComponent = new LearnerGroupActivityComponent();	
 	          			break;
-	        	}
+	        	} */
 	        	
 	        	ds.addData(activityComponent, "dragActivity");  
 	          	DragManager.doDrag(dragInitiator, ds, event, activityComponent, 25, 15, 1.00, false);
@@ -147,7 +153,7 @@
 	    	toolTip="{Application.application.dictionary.getLabel('zoom_out_btn_tooltip')}"/>
 	    		
 	    <mx:Button height="25" width="27" 
-	    	click="Application.application.changeCursorState(Constants.CURSOR_STATE_NORMAL)"
+	    	click="AuthorController.instance.changeCursorState(Constants.CURSOR_STATE_NORMAL)"
 	    	icon="@Embed(source='assets/icons/cursor.png')" 
 	    	toolTip="{Application.application.dictionary.getLabel('normal_cursor_btn_tooltip')}" />
 	    
@@ -155,7 +161,7 @@
 	    
 	    <mx:Button height="25" icon="@Embed(source='assets/icons/transition.png')" 
 	    	label="{Application.application.dictionary.getLabel('trans_btn')}" toolTip="{Application.application.dictionary.getLabel('trans_btn_tooltip')}" 
-	    	click="Application.application.changeCursorState(Constants.CURSOR_STATE_TRANSITION)" />
+	    	click="AuthorController.instance.changeCursorState(Constants.CURSOR_STATE_TRANSITION)" />
 	    	
 	    <mx:Button id="optionalButton" height="25" 
 	    	click="toggleDropDownMenu(optionalMenu)"
@@ -184,7 +190,7 @@
     
     
     <toolbar:ToolBarDropDown id="optionalMenu">
-    	<toolbar:SystemToolComponent type="{Constants.SYSTEM_ACTIVITY_TYPE_OPTIONAL}" height="25" 
+    	<toolbar:SystemToolComponent activityTypeID="{Constants.ACTIVITY_TYPE_OPTIONAL_ACTIVITY}" height="25" 
     		click="mouseClick(event)"
     		icon="@Embed(source='assets/icons/optional.png')" 
     		label="{Application.application.dictionary.getLabel('optional_act_btn')}" 
@@ -209,7 +215,7 @@
     		icon="@Embed(source='assets/icons/gate.png')" 
     		label="{Application.application.dictionary.getLabel('gate_btn')}" 
     		toolTip="{Application.application.dictionary.getLabel('gate_btn_tooltip')}"/>
-    	<toolbar:SystemToolComponent type="{Constants.SYSTEM_ACTIVITY_TYPE_BRANCH}" height="25" 
+    	<toolbar:SystemToolComponent activityTypeID="{Constants.ACTIVITY_TYPE_BRANCHING_CHOSEN}" height="25" 
     		click="mouseClick(event)"
     		icon="@Embed(source='assets/icons/gate.png')" 
     		label="{Application.application.dictionary.getLabel('gate_btn')}" 
@@ -224,19 +230,19 @@
     <mx:Binding destination="flowMenu.y" source="flowButton.y + flowButton.height" />
     
     <toolbar:ToolBarDropDown id="groupMenu">
-    	<toolbar:SystemToolComponent type="{Constants.SYSTEM_ACTIVITY_TYPE_GROUP_RANDOM}" height="25" 
+    	<toolbar:SystemToolComponent activityTypeID="{Constants.ACTIVITY_TYPE_GROUPING}" groupingType="{Constants.GROUPING_TYPE_RANDOM}" height="25" 
     		click="mouseClick(event)"
     		icon="@Embed(source='assets/icons/group.png')" 
     		label="{Application.application.dictionary.getLabel('random_group_btn')}" 
     		toolTip="{Application.application.dictionary.getLabel('random_group_btn_tooltip')}"/>
 
-    	<toolbar:SystemToolComponent type="{Constants.SYSTEM_ACTIVITY_TYPE_GROUP_MONITOR}" height="25" 
+    	<toolbar:SystemToolComponent activityTypeID="{Constants.ACTIVITY_TYPE_GROUPING}" groupingType="{Constants.GROUPING_TYPE_TEACHER_CHOSEN}" height="25" 
     		click="mouseClick(event)"
     		icon="@Embed(source='assets/icons/group.png')" 
     		label="{Application.application.dictionary.getLabel('monitor_group_btn')}" 
     		toolTip="{Application.application.dictionary.getLabel('monitor_group_btn_tooltip')}"/>
     		
-    	<toolbar:SystemToolComponent type="{Constants.SYSTEM_ACTIVITY_TYPE_GROUP_LEARNER}" height="25" 
+    	<toolbar:SystemToolComponent activityTypeID="{Constants.ACTIVITY_TYPE_GROUPING}" groupingType="{Constants.GROUPING_TYPE_STUDENT_CHOICE}" height="25" 
     		click="mouseClick(event)"
     		icon="@Embed(source='assets/icons/group.png')" 
     		label="{Application.application.dictionary.getLabel('learner_group_btn')}" 

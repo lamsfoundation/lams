@@ -5,24 +5,29 @@ package org.lamsfoundation.lams.author.components.transition
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	
-	import mx.core.Application;
 	import mx.core.DragSource;
+	import mx.core.UIComponent;
 	import mx.managers.DragManager;
 	
-	import org.lamsfoundation.lams.author.components.activity.ActivityComponent;
+	import org.lamsfoundation.lams.author.controller.AuthorController;
+	import org.lamsfoundation.lams.author.model.transition.Transition;
 	import org.lamsfoundation.lams.author.util.Constants;
 	
-	public class TransitionComponent extends DrawingTool
+	public class TransitionComponent extends UIComponent
 	{
-		public var toActivity:ActivityComponent;
-		public var fromActivity:ActivityComponent;
+		public var transition:Transition;
+		public var startX:Number;
+		public var startY:Number;
+		
+		public var endX:Number;
+		public var endY:Number;
 		
 		// This flag is set if when the transition is created, the source activty alread has an out transition
 		public var possibleBranch:Boolean = false;
 		
 		// A variable used in the controller for possible branch transitions
 		// Used to generate branch points where needed.
-		public var possibleFirstActivityInBranch:ActivityComponent = null;
+		//public var possibleFirstActivityInBranch:ActivityComponent = null;
 		
 		
 
@@ -66,12 +71,21 @@ package org.lamsfoundation.lams.author.components.transition
 	    // initiates the drag-and-drop operation.
 	    private function mouseMove(event:MouseEvent):void 
 	    {                
-	        if (Application.application.cursorState == Constants.CURSOR_STATE_NORMAL) {
+	        if (AuthorController.instance.cursorState == Constants.CURSOR_STATE_NORMAL) {
 	        	var ds:DragSource = new DragSource();
-	        	ds.addData(this, "img");    
-	        	DragManager.doDrag(this, ds, event, this);
+	        	ds.addData(this, "dragTransition");    
+	        	DragManager.doDrag(this, ds, event, this.getImageForDrag());
 	        }
 	    }
-
+	    
+	    public function getImageForDrag():TransitionComponent{
+	    	var ret:TransitionComponent = new TransitionComponent();
+	    	ret.endX = this.endX;
+	    	ret.endY = this.endY;
+	    	ret.startX = this.startX;
+	    	ret.startY = this.startY;
+	    	ret.invalidateDisplayList();
+	    	return ret;
+	    }
 	}
 }

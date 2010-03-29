@@ -3,6 +3,7 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.controller.AuthorControllerInitiator;
 			import org.lamsfoundation.lams.author.util.TestingConstants;
 			import org.lamsfoundation.lams.author.model.ToolOutputDefinition;
 			import mx.controls.Alert;
@@ -57,12 +58,12 @@
 			}
 			
 			private var wddxParser:WDDXParser = new WDDXParser();
-			public function getToolOutputDefinitions(toolActivity:ToolActivityComponent):ArrayCollection {
+			public function getToolOutputDefinitions(toolActivityComponent:ToolActivityComponent):ArrayCollection {
 				var toolContentID:int;
-				if (toolActivity.toolContentID == 0) {
-					toolContentID = toolActivity.tool.defaultToolContentID;
+				if (toolActivityComponent.toolContentID == 0) {
+					toolContentID = toolActivityComponent.activity.tool.defaultToolContentID;
 				} else {
-					toolContentID = toolActivity.toolContentID;
+					toolContentID = toolActivityComponent.activity.toolContentID;
 				}
 				
 				var xmlString:String;
@@ -106,28 +107,28 @@
 	<!-- FlexEvent.APPLICATION_COMPLETE ___________________________________________________________ -->
 	<!-- Loads learning library and dictionary files -->
 	<EventHandlers type="{FlexEvent.INITIALIZE}" debug="true" >
-		<ObjectBuilder id="authorController" generator="{AuthorController}"/>
+		<ObjectBuilder id="authorController" generator="{AuthorControllerInitiator}"/>
 		
 		<!-- load leearning library -->
 		<HTTPServiceInvoker instance="{learningLibraryService}">
 			<Request method="getAllLearningLibraryDetails"/>
 			<resultHandlers>
 				<MethodInvoker generator="{WDDXParser}" method="parseObject" arguments="{resultObject}" />
-				<MethodInvoker generator="{AuthorController}" method="setLearningLibrary" arguments="{[lastReturn]}" />
+				<MethodInvoker generator="{AuthorControllerInitiator}" method="setLearningLibrary" arguments="{[lastReturn]}" />
 			</resultHandlers>
 		</HTTPServiceInvoker>
 		
 		<!-- load dictionary fallback -->
 		<HTTPServiceInvoker instance="{dictionaryFallbackService}">
 			<resultHandlers>
-				<MethodInvoker generator="{AuthorController}" method="setDictionaryFallback" arguments="{resultObject}" />
+				<MethodInvoker generator="{AuthorControllerInitiator}" method="setDictionaryFallback" arguments="{resultObject}" />
 			</resultHandlers>
 		</HTTPServiceInvoker>
 		
 		<!-- load dictionary -->
 		<HTTPServiceInvoker instance="{dictionaryService}">
 			<resultHandlers>
-				<MethodInvoker generator="{AuthorController}" method="setDictionary" arguments="{resultObject}" />
+				<MethodInvoker generator="{AuthorControllerInitiator}" method="setDictionary" arguments="{resultObject}" />
 			</resultHandlers>
 		</HTTPServiceInvoker>
 		

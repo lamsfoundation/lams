@@ -3,6 +3,8 @@ package org.lamsfoundation.lams.author.model.learninglibrary
 	import mx.collections.ArrayCollection;
 	import mx.core.Application;
 	
+	import org.lamsfoundation.lams.author.util.Constants;
+	
 	
 	/**
 	 * This class contains the information for each tool so it doesnt need to be stored
@@ -19,7 +21,7 @@ package org.lamsfoundation.lams.author.model.learninglibrary
 		public var toolName:String;
 		public var toolDisplayName:String;
 		public var toolSignature:String;
-		public var activityCategoryID:int;
+		[Bindable] public var activityCategoryID:int;
 		public var description:String;
 		public var authoringURL:String;
 		public var monitoringURL:String;
@@ -32,8 +34,10 @@ package org.lamsfoundation.lams.author.model.learninglibrary
 		public var supportsOutputs:Boolean;
 		public var valid:Boolean;
 		public var groupingSupportType:int;
-		public var libraryActivityUIImage:String;
+		[Bindable] public var libraryActivityUIImage:String;
 		public var toolOutputDefinitions:ArrayCollection;
+		[Bindable] public var bgColour:uint;
+		public var activityTypeID:int;
 		
 		// For tool adapter tools
 		public var mappedServers:ArrayCollection;		// List of allowable servers to show this tool for
@@ -63,6 +67,7 @@ package org.lamsfoundation.lams.author.model.learninglibrary
 			this.valid = Boolean(dto.valid);
 			this.groupingSupportType = parseInt(dto.groupingSupportType);
 			this.libraryActivityUIImage = dto.libraryActivityUIImage;
+			this.activityTypeID = dto.activityTypeID;
 			
 			toolOutputDefinitions = new ArrayCollection();
 			
@@ -76,6 +81,9 @@ package org.lamsfoundation.lams.author.model.learninglibrary
 			} else {
 				libraryActivityUIImage = Application.application.lamsURL + libraryActivityUIImage;
 			}
+			
+			// Work out the bg colour based on the activityCategoryID
+			this.bgColour = Constants.TOOL_CATEGORY_COLOURS[activityCategoryID];
 		}
 	}
 }

@@ -8,6 +8,8 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.util.Constants;
+			import org.lamsfoundation.lams.author.model.activity.CombinedActivity;
 			import mx.containers.VBox;
 			import mx.core.Application;
 			import mx.controls.Label;
@@ -16,67 +18,30 @@
 			
 			public var toolActivityComponent1:ToolActivityComponent;
 			public var toolActivityComponent2:ToolActivityComponent;
-			public var learningLibraryEntry:LearningLibraryEntry;
-			public var toolContentID:int;
 			
-			public function loadCombined(UIIDCombined:int, UIIDActivity1:int, UIIDActivity2:int):void {
-				
-				super.load(UIIDCombined);
-				
-				var vbox:VBox = new VBox();
-				vbox.setConstraintValue("verticalAlign", "middle");
-				vbox.setConstraintValue("verticalGap", 0);
-				vbox.setConstraintValue("horizontalAlign", "center");
-				vbox.setStyle('borderStyle', 'solid');
-				vbox.setStyle('dropShadowEnabled', true);
-				vbox.setStyle('shadowDirection', "right");
-				vbox.setStyle('cornerRadius', '10');
-				vbox.setStyle('backgroundColor', '#C2D5FE');
-				vbox.setStyle('paddingTop', 6);
-				vbox.setStyle('paddingBottom', 4);
-				vbox.horizontalScrollPolicy = "off";
-				vbox.height = 120;
-				vbox.minWidth = 100;
-				
-				var tool1:Tool = learningLibraryEntry.toolTemplates[1];
-				var tool2:Tool = learningLibraryEntry.toolTemplates[2];
-				
-				if (tool1 != null) {
-					toolActivityComponent1 = new ToolActivityComponent();
-					toolActivityComponent1.tool = learningLibraryEntry.toolTemplates[1];
-					toolActivityComponent1.load(UIIDActivity1);
-					toolActivityComponent1.isDragable = false;
-					toolActivityComponent1.canStartTransitions = false;
-					toolActivityComponent1.canAcceptTransitions = false;
-					toolActivityComponent1.disableTitle()
-					vbox.addChild(toolActivityComponent1);
-				}
-				
-				if (tool1 != null) {
-					toolActivityComponent2 = new ToolActivityComponent();
-					toolActivityComponent2.tool = learningLibraryEntry.toolTemplates[2];
-					toolActivityComponent2.load(UIIDActivity2);
-					toolActivityComponent2.isDragable = false;
-					toolActivityComponent2.canStartTransitions = false;
-					toolActivityComponent2.canAcceptTransitions = false;
-					toolActivityComponent2.disableTitle()
-					vbox.addChild(toolActivityComponent2);
-				}
-				
-				this.addChild(vbox);
-				
-				// Set the title
-				title = new Label();
-   				title.text = learningLibraryEntry.title;
-				this.addChild(title);
+			[Bindable] private var bgColour:uint;
+			
+			[Bindable] private var bgColour1:uint;
+			[Bindable] private var bgColour2:uint;
+
+			[Bindable]
+			public function get activity():CombinedActivity {
+				return this._activity as CombinedActivity;
 			}
 			
+			public function set activity(activity:CombinedActivity):void {
+				this._activity = activity;
+			}
 		]]>
 	</mx:Script>
 	
-	
-	
-	
-	
-	
+	<mx:VBox id="vbox" verticalAlign="middle" horizontalAlign="center" borderStyle="solid"
+		dropShadowEnabled="true" shadowDirection="right" cornerRadius="10" minWidth="70" minHeight="50"
+		backgroundColor="#C2D5FE" paddingTop="3" paddingBottom="3" paddingLeft="5" paddingRight="5"
+		verticalGap="0"
+		>
+		<ToolActivityComponent activity="{activity.toolActivity1}" isTitleShown="false" />
+		<ToolActivityComponent activity="{activity.toolActivity2}" isTitleShown="false" />
+		<mx:Label id="lblTitle" text="{activity.title}"/>
+	</mx:VBox>
 </ActivityComponent>

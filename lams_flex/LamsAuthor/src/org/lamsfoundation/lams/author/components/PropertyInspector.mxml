@@ -17,6 +17,7 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import org.lamsfoundation.lams.author.util.AuthorUtil;
 			import org.lamsfoundation.lams.author.controller.AuthorController;
 			import org.lamsfoundation.lams.author.model.ToolOutputDefinition;
 			import mx.events.ListEvent;
@@ -32,18 +33,13 @@
 			import org.lamsfoundation.lams.author.components.activity.ToolActivityComponent;
 			import mx.core.Application;
 			import mx.managers.PopUpManager;
-			
-			private static const STATE_GROUP_RANDOM:String = "randomGroupActivity";
-			private static const STATE_GROUP_MONITOR:String = "monitorGroupActivity";
-			private static const STATE_GROUP_LEARNER:String = "learnerGroupActivity";
-			
-			private static const STATE_TOOL_ACTIVITY:String = "toolActivity";
+		
 			
 			public static const MIN_INPUT_WIDTH:int = 100;
 			public static const MAX_INPUT_WIDTH:int = 100;
 			
+			[Bindable] private var selectedActivityComponent:ActivityComponent;
 			
-			private var changeWatcherArray:ArrayCollection = new ArrayCollection();
 			
 			private var titleDisabledColors:Object;
 			
@@ -57,18 +53,10 @@
 			[Bindable]
 			[Embed("assets/icons/maximise.png")] 
 			private var maximiseIcon:Class;
-			
-			
-			public function openPropertyInspector(activity:ActivityComponent):void {
+						
+			public function openPropertyInspector():void {
 				visible = true;
 				PopUpManager.addPopUp(this, this, false);
-				
-				// Capture the binding so it can be removed when the property inpector is closed (activity de-selected)
-				changeWatcherArray.addItem(BindingUtils.bindProperty(titleInput, "text", activity.title, "text"));
-				changeWatcherArray.addItem(BindingUtils.bindProperty(activity.title, "text", titleInput, "text"));
-				
-				// Display particular ui components for the activity type
-				displayUIComponents(activity);
 				
 				applicationCenter.x = Application.application.width/2;
 				applicationCenter.y = Application.application.height/2;
@@ -77,11 +65,6 @@
 			public function closePropertyInspector():void {
 				visible = false;
 				PopUpManager.removePopUp(this);
-				
-				// Free the bindings to the current selected activity if there are any
-				for each (var changeWatcher:ChangeWatcher in changeWatcherArray) {
-					changeWatcher.unwatch();
-				}
 			}
 			
 			// Enable the propertyInspector on rollOver
@@ -102,7 +85,7 @@
 				
 			}
 			
-			// Minimise/Maxomise the property inspector
+			// Minimise/Maximise the property inspector
 			private function toggleMininmiseMaximise():void {
 				if (vbox.visible) {
 					this.vbox.visible = false;
@@ -118,337 +101,40 @@
 					this.mybtn.setStyle("icon", minimiseIcon);
 				}
 			}
-			
-			private function displayUIComponents(activity:ActivityComponent):void {
-				this.currentState = "";
-				if (activity is ToolActivityComponent) {
-					this.currentState = STATE_TOOL_ACTIVITY;
-					var toolActivity:ToolActivityComponent = activity as ToolActivityComponent;
-					
-					loadGroupsDropDown(toolActivity);
-					loadToolOutputDefs(toolActivity);
-					
-					changeWatcherArray.addItem(BindingUtils.bindProperty(runOffline, "selected", toolActivity, "runOffline"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(toolActivity, "runOffline", runOffline, "selected"));
-					
-					changeWatcherArray.addItem(BindingUtils.bindProperty(defineLater, "selected", toolActivity, "defineLater"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(toolActivity, "defineLater", defineLater, "selected"));
-
-				
-				} else if (activity is RandomGroupActivityComponent) {
-					this.currentState = STATE_GROUP_RANDOM;
-					var randomGroupActivity:RandomGroupActivityComponent = activity as RandomGroupActivityComponent;
-					changeWatcherArray.addItem(BindingUtils.bindProperty(randomGroups, "selected", randomGroupActivity, "isGroupNumber"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(randomGroupActivity, "isGroupNumber", randomGroups, "selected"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(randomGroupsNum, "value", randomGroupActivity, "numGroups"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(activity, "numGroups", randomGroupsNum, "value"));
-					
-					changeWatcherArray.addItem(BindingUtils.bindProperty(randomLearners, "selected", randomGroupActivity, "isLearnersPerGroup"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(randomGroupActivity, "isLearnersPerGroup", randomLearners, "selected"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(randomLearnersNum, "value", randomGroupActivity, "numLearners"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(randomGroupActivity, "numLearners", randomLearnersNum, "value"));
-				}  else if (activity is MonitorGroupActivityComponent) {
-					this.currentState = STATE_GROUP_MONITOR;
-					var monitorGroupActivity:MonitorGroupActivityComponent = activity as MonitorGroupActivityComponent;
-					changeWatcherArray.addItem(BindingUtils.bindProperty(monitorGroupsNum, "value", monitorGroupActivity, "numLearners"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(monitorGroupActivity, "numLearners", monitorGroupsNum, "value"));
-				} else if (activity is LearnerGroupActivityComponent) {
-					this.currentState = STATE_GROUP_LEARNER;
-					var learnerGroupActivity:LearnerGroupActivityComponent = activity as LearnerGroupActivityComponent;
-					changeWatcherArray.addItem(BindingUtils.bindProperty(learnerGroups, "selected", learnerGroupActivity, "isGroupNumber"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(learnerGroupActivity, "isGroupNumber", learnerGroups, "selected"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(learnerGroupsNum, "value", learnerGroupActivity, "numGroups"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(activity, "numGroups", learnerGroupsNum, "value"));
-					
-					changeWatcherArray.addItem(BindingUtils.bindProperty(learnerLearners, "selected", learnerGroupActivity, "isLearnersPerGroup"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(learnerGroupActivity, "isLearnersPerGroup", learnerLearners, "selected"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(learnerLearnersNum, "value", learnerGroupActivity, "numLearners"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(learnerGroupActivity, "numLearners", learnerLearnersNum, "value")); 
-					
-					changeWatcherArray.addItem(BindingUtils.bindProperty(learnerViewBefore, "selected", learnerGroupActivity, "isViewLearnersBeforeSelction"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(learnerGroupActivity, "isViewLearnersBeforeSelction", learnerViewBefore, "selected"));
-					
-					changeWatcherArray.addItem(BindingUtils.bindProperty(equalGroupSizes, "selected", learnerGroupActivity, "isEqualGroupSizes"));
-					changeWatcherArray.addItem(BindingUtils.bindProperty(learnerGroupActivity, "isEqualGroupSizes", equalGroupSizes, "selected"));
-				} 
-				
-			}
-			
-			private function loadGroupsDropDown(activityComponent:ActivityComponent):void {
-				currentAvailableGroups.removeAll();
-				
-				// Set a dummy null grouping so it can be binded to the combo box in the preoperty inspector
-				var nullGrouping:Object = new Object();
-				nullGrouping.title = Application.application.dictionary.getLabel("none_act_lbl");
-				nullGrouping.activityUIID = 0;			
-				currentAvailableGroups.addItem(nullGrouping);
-				currentAvailableGroups.addAll(activityComponent.allPossibleGroupings);
-				
-				groupingCombo.selectedItem = nullGrouping;
-				for each (var item:Object in currentAvailableGroups) {
-					if (activityComponent.groupingUIID == item.activityUIID) {
-						groupingCombo.selectedItem = item;
-					}
-				}
-			}
-			
-			private function loadToolOutputDefs(toolActivityComponent:ToolActivityComponent):void {
-
-				
-				var nullOutput:ToolOutputDefinition = new ToolOutputDefinition();;
-				nullOutput.description = Application.application.dictionary.getLabel("none_act_lbl");
-				
-				toolOutputDefs.removeAll();
-				toolOutputDefs.addItem(nullOutput);
-				toolOutputDefs.addAll(Application.application.mainMap.getToolOutputDefinitions(toolActivityComponent));
-
-				gradebookOutputCombo.selectedItem = nullOutput;
-				for each (var item:ToolOutputDefinition in toolOutputDefs) {
-					if (item.isEqual(toolActivityComponent.gradebookOutput)) {
-						gradebookOutputCombo.selectedItem = item;
-						break;
-					} 
-				}
-				
-			}
-			
-			private function groupChange(event:ListEvent):void {
-				Application.application.selectedActivity.groupingUIID = event.currentTarget.selectedItem.activityUIID;
-			}
-			
-			private function outputsChange(event:ListEvent):void {
-				
-				if (Application.application.selectedActivity is ToolActivityComponent) {
-					var toolActivity:ToolActivityComponent = Application.application.selectedActivity as ToolActivityComponent;
-					toolActivity.gradebookOutput = event.currentTarget.selectedItem;
-				}
-				 
-			}
-			
-			private function groupNumChange(event:Event):void {
-				if (Application.application.selectedActivity is GroupActivityComponent) {
-					var groupActivity:GroupActivityComponent = Application.application.selectedActivity as GroupActivityComponent;
-					if (groupActivity.numGroups > groupActivity.groupNames.length) {
-						groupActivity.groupNames.addItem(Application.application.dictionary.getLabel('group_btn') + " " + groupActivity.numGroups)
-					}
-					
-					if (groupActivity.numGroups < groupActivity.groupNames.length) {
-						groupActivity.groupNames.removeItemAt(groupActivity.groupNames.length - 1);
-					}
-				}
-				
-			}
-			
-			private function openNameGroupsWindow():void {
-				nameGroupsWindow.openWindow();
-			}
-
 		]]>
 	</mx:Script>
-
+	
+	<mx:Binding destination="selectedActivityComponent" source="AuthorController.instance.selectedActivityComponent" />
+	<mx:Binding destination="selectedActivityComponent.title" source="txtTitle.text" />
+	
 	<mx:VBox id="vbox" height="100%" width="100%" 
 		horizontalAlign="center" verticalGap="2" paddingBottom="3" paddingLeft="2" paddingRight="2" top="5">
 		<mx:Grid id="grid" verticalGap="4">
-			<mx:GridRow height="16">
-				<mx:GridItem  >
+			<mx:GridRow height="16" visible="{selectedActivityComponent != null}" 
+				includeInLayout="{selectedActivityComponent != null}">
+				<mx:GridItem>
 					<mx:Label text="{Application.application.dictionary.getLabel('pi_lbl_title')}" height="22" />
 				</mx:GridItem>
 				<mx:GridItem>
-					<mx:TextInput id="titleInput" width="100" maxChars="256" height="22"  />
+					<mx:TextInput id="txtTitle" width="100" maxChars="256" height="22" 
+						text="{selectedActivityComponent.title}" />
 				</mx:GridItem>
 			</mx:GridRow>
-			<mx:GridRow id="groupingGridRow">
+			<!--<mx:GridRow id="groupingGridRow" visible="{AuthorUtil.activitySupportsGrouping(selectedActivityComponent.activityTypeID)}" 
+				includeInLayout="{AuthorUtil.activitySupportsGrouping(selectedActivityComponent.activityTypeID)}">
 				<mx:GridItem>
 					<mx:Label text="{Application.application.dictionary.getLabel('grouping_act_title')}" />
 				</mx:GridItem>
 				<mx:GridItem>
 					<mx:ComboBox id="groupingCombo" change="groupChange(event)" labelField="title" dataProvider="{currentAvailableGroups}" width="{MIN_INPUT_WIDTH}" dropdownWidth="250"  />
 				</mx:GridItem>
-			</mx:GridRow>
+			</mx:GridRow>-->
 		</mx:Grid>
 	</mx:VBox>
 	<mx:Canvas id="opacityLayer" height="100%" width="100%" backgroundColor="white" backgroundAlpha="0.6" />
 	
-	<states>
-		<!-- GROUP STATES -->
-		<mx:State name="{STATE_GROUP_RANDOM}">
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
-				<mx:GridRow height="22" styleName="firstInGroup">
-					<mx:GridItem  >
-						<mx:Label text="{Application.application.dictionary.getLabel('pi_num_groups')}" />
-					</mx:GridItem>
-					<mx:GridItem>
-						<mx:RadioButton id="randomGroups" mouseOver="{null}" />
-						<mx:NumericStepper id="randomGroupsNum" change="groupNumChange(event)" enabled="{randomGroups.selected}" minimum="2" height="22" width="40" fontSize="10" textAlign="center"/>
-					</mx:GridItem>
-				</mx:GridRow>
-			</mx:AddChild>
-
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
-				<mx:GridRow height="22">
-					<mx:GridItem  >
-						<mx:Label text="{Application.application.dictionary.getLabel('pi_num_learners')}" />
-					</mx:GridItem>
-					<mx:GridItem> 
-						<mx:RadioButton id="randomLearners"/>
-						<mx:NumericStepper id="randomLearnersNum" enabled="{randomLearners.selected}" minimum="1" height="22" width="40" fontSize="10" textAlign="center"/>
-					</mx:GridItem>
-				</mx:GridRow>
-			</mx:AddChild>
-						
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">   
-                <mx:GridRow height="18"  visible="{randomGroups.selected}" includeInLayout="{randomGroups.selected}">
-                	<mx:GridItem colSpan="2" horizontalAlign="center"> 
-		                <mx:Button label="{Application.application.dictionary.getLabel('pi_group_naming_btn_lbl')}" 
-		                		height="18" click="openNameGroupsWindow()" />
-                	</mx:GridItem>
-                </mx:GridRow>
-            </mx:AddChild>
-			
-            <mx:SetProperty target="{this}" name="title" value="{Application.application.dictionary.getLabel('pi_random_group_activity')}"/>
-            <mx:SetProperty target="{groupingGridRow}" name="visible" value="{false}"/>     
-            <mx:SetProperty target="{groupingGridRow}" name="includeInLayout" value="{false}"/>
-
-		</mx:State>
-		<mx:State name="{STATE_GROUP_MONITOR}">
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
-				<mx:GridRow height="22" styleName="firstInGroup">
-					<mx:GridItem  >
-						<mx:Label text="{Application.application.dictionary.getLabel('pi_num_groups')}" />
-					</mx:GridItem>
-					<mx:GridItem>
-						<mx:NumericStepper id="monitorGroupsNum" change="groupNumChange(event)"  minimum="2" height="22" width="40" fontSize="10" textAlign="center"/>					</mx:GridItem>
-				</mx:GridRow>
-			</mx:AddChild>
-			
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">   
-                <mx:GridRow height="18">
-                	<mx:GridItem colSpan="2" horizontalAlign="center"> 
-		                <mx:Button label="{Application.application.dictionary.getLabel('pi_group_naming_btn_lbl')}" 
-		                		height="18" click="openNameGroupsWindow()" />
-                	</mx:GridItem>
-                </mx:GridRow>
-            </mx:AddChild>
-        	
-        	<mx:SetProperty target="{this}" name="title" value="{Application.application.dictionary.getLabel('pi_monitor_group_activity')}"/> 
-           	<mx:SetProperty target="{groupingGridRow}" name="visible" value="{false}"/>
-            <mx:SetProperty target="{groupingGridRow}" name="includeInLayout" value="{false}"/>
-		</mx:State>
-		<mx:State name="{STATE_GROUP_LEARNER}">
-			
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
-				<mx:GridRow height="22" styleName="firstInGroup">
-					<mx:GridItem  >
-						<mx:Label text="{Application.application.dictionary.getLabel('pi_num_groups')}" />
-					</mx:GridItem>
-					<mx:GridItem>
-						<mx:RadioButton id="learnerGroups" mouseOver="{null}" />
-						<mx:NumericStepper id="learnerGroupsNum" change="groupNumChange(event)" enabled="{learnerGroups.selected}" minimum="2" height="22" width="40" fontSize="10" textAlign="center"/>
-					</mx:GridItem>
-				</mx:GridRow>
-			</mx:AddChild>
-			
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
-				<mx:GridRow height="22">
-					<mx:GridItem  >
-						<mx:Label text="{Application.application.dictionary.getLabel('pi_num_learners')}" />
-					</mx:GridItem>
-					<mx:GridItem> 
-						<mx:RadioButton id="learnerLearners"/>
-						<mx:NumericStepper id="learnerLearnersNum" enabled="{learnerLearners.selected}" minimum="1" height="22" width="40" fontSize="10" textAlign="center"/>
-					</mx:GridItem>
-				</mx:GridRow>
-			</mx:AddChild>
-			
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
-				<mx:GridRow height="16">
-					<mx:GridItem  >
-						<mx:Label text="{Application.application.dictionary.getLabel('view_students_before_selection')}" />
-					</mx:GridItem>
-					<mx:GridItem> 
-						<mx:CheckBox id="learnerViewBefore"/>					
-					</mx:GridItem>
-				</mx:GridRow>
-			</mx:AddChild>
-			
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
-				<mx:GridRow height="16" enabled="{learnerGroups.selected}" visible="{learnerGroups.selected}" includeInLayout="{learnerGroups.selected}">
-					<mx:GridItem  >
-						<mx:Label text="{Application.application.dictionary.getLabel('pi_equal_group_sizes')}" />
-					</mx:GridItem>
-					<mx:GridItem> 
-						<mx:CheckBox id="equalGroupSizes" />				
-					</mx:GridItem>
-				</mx:GridRow>
-			</mx:AddChild>
-			
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">   
-                <mx:GridRow height="18" visible="{learnerGroups.selected}"	includeInLayout="{learnerGroups.selected}">
-                	<mx:GridItem colSpan="2" horizontalAlign="center"> 
-		                <mx:Button label="{Application.application.dictionary.getLabel('pi_group_naming_btn_lbl')}" 
-		                		height="18" click="openNameGroupsWindow()" />
-                	</mx:GridItem>
-                </mx:GridRow>
-            </mx:AddChild>
-            
-            <mx:SetProperty target="{this}" name="title" value="{Application.application.dictionary.getLabel('pi_learner_group_activity')}"/>	
-            <mx:SetProperty target="{groupingGridRow}" name="visible" value="{false}"/>
-            <mx:SetProperty target="{groupingGridRow}" name="includeInLayout" value="{false}"/>
-			
-		</mx:State>
-		<!-- /GROUP STATES -->
-		
-		<mx:State name="{STATE_TOOL_ACTIVITY}">
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
-				
-			</mx:AddChild>
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
-				<mx:GridRow styleName="firstInGroup">
-					<mx:GridItem  >
-						<mx:Label text="{Application.application.dictionary.getLabel('gradebook_output_type')}" />
-					</mx:GridItem>
-					<mx:GridItem>
-						<mx:ComboBox id="gradebookOutputCombo" dataProvider="{toolOutputDefs}" labelField="description" change="outputsChange(event)" width="{MIN_INPUT_WIDTH}" dropdownWidth="250"/>
-					</mx:GridItem>
-				</mx:GridRow>
-			</mx:AddChild>
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
-				<mx:GridRow height="22" >
-					<mx:GridItem >
-						<mx:Label text="{Application.application.dictionary.getLabel('pi_runoffline')}" />
-					</mx:GridItem>
-					<mx:GridItem>
-						<mx:CheckBox id="runOffline" />
-					</mx:GridItem>
-				</mx:GridRow>
-			</mx:AddChild>
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">
-				<mx:GridRow height="22" >
-					<mx:GridItem >
-						<mx:Label text="{Application.application.dictionary.getLabel('pi_define_monitor_cb_lbl')}" />
-					</mx:GridItem>
-					<mx:GridItem>
-						<mx:CheckBox id="defineLater" />
-					</mx:GridItem>
-				</mx:GridRow>
-			</mx:AddChild>
-			<mx:AddChild relativeTo="{grid}" position="lastChild"  creationPolicy="all">   
-                <mx:GridRow height="18">
-                	<mx:GridItem colSpan="2" horizontalAlign="center"> 
-		                <mx:Button label="{Application.application.dictionary.getLabel('map_comptence_btn')}" 
-		                		height="18" />
-                	</mx:GridItem>
-                </mx:GridRow>
-            </mx:AddChild>
-            
-            <mx:SetProperty target="{this}" name="title" value="{Application.application.selectedActivity.title.text}"/>
-		</mx:State>
-	</states>
-	
-	
-	<group:NameGroupsWindow id="nameGroupsWindow"  includeInLayout="false" />
-	
 	<mx:ArrayCollection id="currentAvailableGroups" />
 	<mx:ArrayCollection id="toolOutputDefs" />
+	
 
 </ButtonPanel>

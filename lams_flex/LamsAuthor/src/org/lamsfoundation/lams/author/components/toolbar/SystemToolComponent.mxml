@@ -4,7 +4,11 @@
 	<mx:Script>
 		<![CDATA[
 			
-			public var type:int;
+			// Identifiest the type of system activity
+			public var activityTypeID:int;
+			
+			// This is just fro grouping, 
+			public var groupingType:int;
 			
 		]]>
 	</mx:Script>

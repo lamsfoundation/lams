@@ -11,6 +11,7 @@ package org.lamsfoundation.lams.author.model.learninglibrary
 		public var toolTemplates:ArrayCollection;
 		public var category:int;
 		public var icon:String;
+		public var activityTypeID:int;
 		
 		// For combined tools
 		public var isCombined:Boolean;
@@ -35,6 +36,7 @@ package org.lamsfoundation.lams.author.model.learninglibrary
 			if (toolTemplates.getItemAt(0) != null){
 				this.title = toolTemplates.getItemAt(0).toolName;
 				this.icon = toolTemplates.getItemAt(0).libraryActivityUIImage;
+				this.activityTypeID = parseInt(toolTemplates.getItemAt(0).activityTypeID);
 			} 
 			
 			if (toolTemplates.length == 3) {

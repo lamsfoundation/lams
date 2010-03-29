@@ -20,65 +20,32 @@
 			import mx.controls.Label;
 			import org.lamsfoundation.lams.author.model.learninglibrary.LearningLibraryEntry;
 			import org.lamsfoundation.lams.author.util.Constants;
-			
-			
-			public var iconImage:Image;
-			public var tool:Tool;
+			import org.lamsfoundation.lams.author.model.activity.ToolActivity;
 			
 			public var toolContentID:int = 0;
 			
-			[Bindable]
-			public var gradebookOutput:ToolOutputDefinition;
+			[Bindable] public var isTitleShown:Boolean = true;
+			
+			[Bindable] public var bgColour:uint;
 			
 			[Bindable]
-			public var runOffline:Boolean;
-			
-			[Bindable]
-			public var defineLater:Boolean;
-			
-			override public function load(UIID:int):void {
-				
-				super.load(UIID);
-				
-				var vbox:VBox = new VBox();
-				vbox.setConstraintValue("verticalAlign", "middle");
-				vbox.setConstraintValue("horizontalAlign", "center");
-				vbox.setStyle('borderStyle', 'solid');
-				vbox.setStyle('dropShadowEnabled', true);
-				vbox.setStyle('shadowDirection', "right");
-				vbox.setStyle('cornerRadius', 10);
-				vbox.height = 40;
-				vbox.width = 50;
-				
-   				switch (tool.activityCategoryID) {
-	   				case Constants.TOOL_CATEGORY_ASSESSMENT:
-	   					vbox.setStyle("backgroundColor", "#E9E2F5");
-	   					break;
-	   				case Constants.TOOL_CATEGORY_INFORMATIVE:
-	   					vbox.setStyle("backgroundColor", "#FFEEC8");
-	   					break;
-	   				case Constants.TOOL_CATEGORY_REFLECTIVE:
-	   					vbox.setStyle("backgroundColor", "#DDFCB1");
-	   					break;
-	   				case Constants.TOOL_CATEGORY_COLLABORATIVE:
-	   					vbox.setStyle("backgroundColor", "#FFFDBE");
-	   					break;
-   				}
-
-   				iconImage = new Image();
-   				iconImage.height = 30;
-   				iconImage.width = 30;
-   				iconImage.source = tool.libraryActivityUIImage;
-   				vbox.addChild(iconImage);
-   				this.addChild(vbox);
-   				
-   				// Set the activity title
-   				title = new Label();
-   				title.text = tool.toolName;
-				this.addChild(title);
+			public function get activity():ToolActivity {
+				return this._activity as ToolActivity;
 			}
 			
-			
+			public function set activity(activity:ToolActivity):void {
+				this._activity = activity;
+			}
 		]]>
 	</mx:Script>
+	<mx:VBox id="vbox" verticalAlign="middle" horizontalAlign="center" borderStyle="solid"
+		dropShadowEnabled="true" shadowDirection="right" cornerRadius="10" minWidth="60" minHeight="50"
+		backgroundColor="{activity.tool.bgColour}" paddingTop="3" paddingBottom="3" paddingLeft="5" paddingRight="5"
+		verticalGap="0" toolTip="{(isTitleShown)? undefined : activity.title}"
+		>
+		<mx:Image id="iconImage" width="30" height="30" source="{activity.tool.libraryActivityUIImage}" />
+		<mx:Label id="lblTitle" text="{activity.title}" visible="{isTitleShown}" includeInLayout="{isTitleShown}"/>
+	</mx:VBox>
+	
+	
 </ActivityComponent>

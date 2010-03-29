@@ -36,12 +36,6 @@
 			// Learning library xml
 			public var learningLibrary:Dictionary;
 			
-			// State of cursor transition/help/dataflow etc...
-			public var cursorState:int = Constants.CURSOR_STATE_NORMAL;
-			
-			// ui state
-			public var uiState:int = Constants.UI_STATE_NORMAL;
-			
 			// lang code default en_AU
 			public var locale:String = "en_AU";
 			
@@ -75,25 +69,6 @@
 				
 				mainMap.init();
 			}
-		
-			
-			[Embed("assets/icons/transition.png")]
-            public var transitionCursor:Class;
-
-			public function changeCursorState(state:int):void{
-				cursorState = state;
-				CursorManager.removeCursor(CursorManager.currentCursorID);
-				switch (cursorState) {
-					case Constants.CURSOR_STATE_NORMAL:
-						break;
-					case Constants.CURSOR_STATE_TRANSITION:
-						CursorManager.setCursor(transitionCursor);
-						break;
-				}
-			
-			
-			}
-		
 		]]>
 	</mx:Script>
 

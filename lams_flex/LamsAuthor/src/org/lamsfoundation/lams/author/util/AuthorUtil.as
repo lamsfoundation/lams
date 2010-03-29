@@ -1,7 +1,7 @@
 package org.lamsfoundation.lams.author.util
 {
-	import flash.display.BitmapData;
 	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
@@ -41,6 +41,16 @@ package org.lamsfoundation.lams.author.util
 			var image:Image = new Image();
 	        image.source = new Bitmap(getBitmapData(target));
 			return image;
+	   	}
+	   	
+	   	public static function activitySupportsGrouping(activityTypeID:int):Boolean {
+	   		return activityTypeID != Constants.ACTIVITY_TYPE_GATE_CONDITION &&
+	   			activityTypeID != Constants.ACTIVITY_TYPE_GATE_PERMISSION &&
+	   			activityTypeID != Constants.ACTIVITY_TYPE_GATE_SCHEDULE &&
+	   			activityTypeID != Constants.ACTIVITY_TYPE_GATE_SYNCH &&
+	   			activityTypeID != Constants.ACTIVITY_TYPE_GATE_SYSTEM &&
+	   			activityTypeID != Constants.ACTIVITY_TYPE_GROUPING &&
+	   			activityTypeID != Constants.ACTIVITY_TYPE_REFERENCE;
 	   	}
 
 	}
