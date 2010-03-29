@@ -694,4 +694,28 @@ INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organis
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (238,85,5);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (239,85,2);
 
+-- es_MX
+-- need a new workspace_id and the name changes for each user.
+insert into lams_workspace_folder(workspace_folder_id,parent_folder_id,name,user_id,create_date_time,last_modified_date_time,lams_workspace_folder_type_id)
+values(39,null,'Mexican Workspace',39,now(),now(),1);
+insert into lams_workspace (workspace_id, default_fld_id, name) values (39,39,'Mexican Test');
+
+insert into lams_user(user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,city,state,country,
+day_phone,evening_phone,mobile_phone,fax,email,disabled_flag,create_date,authentication_method_id,workspace_id, flash_theme_id,html_theme_id,locale_id)
+values(39,'mexico','mexico','Dr','Mexico','Test','39','Mexico Ave',null,'Mexico City',null,'Mexico',
+'0211111111','0211111112','0411111111','0211111113','mexico@example.com',0,'20100329',1,39,1,2,29);
+
+-- need a new user_organisation_id for each row, user_id must match user_id created in the lams_user
+-- belongs to course Playpen, Class Everybody
+INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (86, 2, 39);
+INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (87, 3, 39);
+
+-- need a new user_organisation_role_id for each row, use the same role_ids (3,5,2) for author, learner, teacher
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (240,86,3);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (241,86,5);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (242,86,2);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (243,87,4);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (244,87,5);
+INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (245,87,2);
+
 update lams_user set password=SHA1(password) where user_id>8;
