@@ -679,7 +679,7 @@ insert into lams_workspace (workspace_id, default_fld_id, name) values (38,38,'S
 insert into lams_user(user_id,login,password,title,first_name,last_name,address_line_1,address_line_2,address_line_3,city,state,country,
 day_phone,evening_phone,mobile_phone,fax,email,disabled_flag,create_date,authentication_method_id,workspace_id, flash_theme_id,html_theme_id,locale_id)
 values(38,'slovenian','slovenian','Dr','Slovenian','Test','38','Slovenia Ave',null,'Ljubljana',null,'Slovenija',
-'0211111111','0211111112','0411111111','0211111113','slovenian@example.com',0,'20100309',1,37,1,2,27);
+'0211111111','0211111112','0411111111','0211111113','slovenian@example.com',0,'20100309',1,37,1,2,28);
 
 -- need a new user_organisation_id for each row, user_id must match user_id created in the lams_user
 -- belongs to course Playpen, Class Everybody
