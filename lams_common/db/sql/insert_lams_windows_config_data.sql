@@ -53,16 +53,16 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('AuthoringActivitiesColour', 'true', 'config.authoring.activities.colour', 'config.header.look.feel', 'BOOLEAN', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('AuthoringClientVersion','2.4.@datetimestamp@', 'config.authoring.client.version', 'config.header.versions', 'STRING', 1);
+values ('AuthoringClientVersion','2.4.0.@datetimestamp@', 'config.authoring.client.version', 'config.header.versions', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('MonitorClientVersion','2.4.@datetimestamp@', 'config.monitor.client.version', 'config.header.versions', 'STRING', 1);
+values ('MonitorClientVersion','2.4.0.@datetimestamp@', 'config.monitor.client.version', 'config.header.versions', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('LearnerClientVersion','2.4.@datetimestamp@', 'config.learner.client.version', 'config.header.versions', 'STRING', 1);
+values ('LearnerClientVersion','2.4.0.@datetimestamp@', 'config.learner.client.version', 'config.header.versions', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('ServerVersionNumber','2.4.@datetimestamp@', 'config.server.version.number', 'config.header.versions', 'STRING', 1);
+values ('ServerVersionNumber','2.4.0.@datetimestamp@', 'config.server.version.number', 'config.header.versions', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('ServerLanguage','en_AU', 'config.server.language', 'config.header.look.feel', 'STRING', 1);
