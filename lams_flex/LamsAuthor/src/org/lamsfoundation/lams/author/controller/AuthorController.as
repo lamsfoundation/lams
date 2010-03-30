@@ -114,7 +114,7 @@ package org.lamsfoundation.lams.author.controller
 			// Get the current mouse point, and convert it to co-ordinates in CanvasBox
 			var comp:UIComponent = UIComponent(event.currentTarget);
 			var currentMousePoint:Point = new Point(comp.mouseX, comp.mouseY);
-			//currentMousePoint = canvasBox.globalToLocal(currentMousePoint);	
+			//currentMousePoint = canvasBox.localToGlobal(currentMousePoint);	
 			
 			// This condition is true if the activity was already on the canvas
 			if (event.dragInitiator is ActivityComponent) {
@@ -123,17 +123,20 @@ package org.lamsfoundation.lams.author.controller
           		activityComponent.rootActivity.xCoord = currentMousePoint.x - activityComponent.mouseOffSetX;
 	           	activityComponent.rootActivity.yCoord = currentMousePoint.y - activityComponent.mouseOffSetY;
 	           	activityComponent.setCenter();
+	           	activityComponent.visible = true;
 				activityComponent.updateTransitionPositions();
           		selectActivityComponent(activityComponent);
             } else if (event.dragInitiator is LearningLibraryEntryComponent || event.dragInitiator is SystemToolComponent) {
             	// Adding a new activity to the canvas
             	
+            	var learningLibraryEntryComponent:LearningLibraryEntryComponent = event.dragInitiator as LearningLibraryEntryComponent
+            	
             	// Get the next UIID
 				var nextActivityUIID:int = generateUIID();
 				
-				var newActivityComponent:ActivityComponent = ActivityComponentFactory.getActivityComponentInstanceFromDrag(event.dragInitiator, nextActivityUIID);
-	           	newActivityComponent.rootActivity.xCoord = currentMousePoint.x;
-	           	newActivityComponent.rootActivity.yCoord = currentMousePoint.y
+				var newActivityComponent:ActivityComponent = ActivityComponentFactory.getActivityComponentInstanceFromDrag(learningLibraryEntryComponent, nextActivityUIID);
+	           	newActivityComponent.rootActivity.xCoord = currentMousePoint.x - learningLibraryEntryComponent.mouseOffSetX;
+	           	newActivityComponent.rootActivity.yCoord = currentMousePoint.y - learningLibraryEntryComponent.mouseOffSetY;
 	            canvasBox.addChild(newActivityComponent);
 	            selectActivityComponent(newActivityComponent);
 	            activities[nextActivityUIID] = newActivityComponent.rootActivity;	

@@ -24,6 +24,10 @@
 			public var iconImage:Image;
 			public var title:Label;
 			public var learningLibraryEntry:LearningLibraryEntry;
+			
+			// Point of mouse during drag
+			public var mouseOffSetX:int;
+			public var mouseOffSetY:int;
 					
 			public function load(learningLibraryEntry:LearningLibraryEntry):void {
 				this.learningLibraryEntry = learningLibraryEntry;
@@ -43,14 +47,20 @@
 	        	var dragInitiator:LearningLibraryEntryComponent = event.currentTarget as LearningLibraryEntryComponent;
 	        	var ds:DragSource = new DragSource();
 	        	
-	        	var learningLibraryEntry:LearningLibraryEntry = dragInitiator.learningLibraryEntry
+	        	var learningLibraryEntry:LearningLibraryEntry = dragInitiator.learningLibraryEntry;
+	        	
+	        	// Need to get stage coords and convert since localX,Y is returning wrong values
+	        	var point:Point = new Point(event.stageX, event.stageY);
+	        	point = this.globalToLocal(point);
 	        	
 	        	var activity:Activity = ActivityFactory.getActivityInstance(learningLibraryEntry, 0);
 	        	var activityComponent:ActivityComponent = ActivityComponentFactory.getActivityComponentInstance(activity);
 	        	activityComponent.initialize();
+	        	dragInitiator.mouseOffSetX = 40;
+	        	dragInitiator.mouseOffSetY = 30;
 	        	
 	        	ds.addData(activityComponent, "dragActivity"); 
-	            DragManager.doDrag(dragInitiator, ds, event, activityComponent, 25, 15, 1.00, true);
+	            DragManager.doDrag(dragInitiator, ds, event, activityComponent, - point.x + 40, - point.y + 30, 1.00, true);
 	        }
 		]]>
 	</mx:Script>

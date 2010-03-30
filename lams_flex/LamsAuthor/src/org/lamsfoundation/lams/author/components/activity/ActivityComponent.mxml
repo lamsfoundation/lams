@@ -4,6 +4,7 @@
 	mouseOver="mouseOver(event)" 
 	mouseOut="mouseOut(event)"
 	mouseMove="mouseMove(event)"
+	dragComplete="dragComplete(event)"
 	click="click(event)" 
 	>
 
@@ -80,7 +81,8 @@
 		 	 * The mouseMove event starts a drag
 		 	 */ 
 		    protected function mouseMove(event:MouseEvent):void {
-		    	startDragging(event);
+		    	//startDragging(event);
+		    	this.updateTransitionPositions();
 		    }
 
 			/**
@@ -95,6 +97,10 @@
 			    			TransitionController.instance.startTransition(event, this);
 			    		}
 		    			break;
+		    		case Constants.CURSOR_STATE_NORMAL: {
+		    			AuthorController.instance.selectActivityComponent(this);
+		    			startDragging(event);
+		    		}
 		    	}
 		    }
 		    
@@ -103,19 +109,38 @@
 		    * 
 		    */ 
 		    public function startDragging(event:MouseEvent):void {
+				// Can't do a drag if the mouse isn't down
+				if (!(event.type == MouseEvent.MOUSE_DOWN ||
+					  event.type == MouseEvent.CLICK ||
+					  DragManager.isDragging ||
+					  event.buttonDown))
+				{
+					return;
+				}
+				
 				var activityComponent:ActivityComponent = event.currentTarget as ActivityComponent;
 					        
 		        if (activityComponent.isDragable && AuthorController.instance.cursorState != Constants.CURSOR_STATE_TRANSITION) {
 		        	var ds:DragSource = new DragSource();
 					ds.addData( activityComponent, 'dragActivity' );
 					 
+		        	// Need to get stage coords and convert since localX,Y is returning wrong values
+		        	var point:Point = new Point(event.stageX, event.stageY);
+		        	point = this.globalToLocal(point);
+		        	
 		        	// Set the offset for dropping the activity to the local mouse position
-		        	activityComponent.mouseOffSetX = event.localX;
-		        	activityComponent.mouseOffSetY = event.localY; 
-		        	     
-		        	DragManager.doDrag(activityComponent, ds, event, AuthorUtil.getImage(activityComponent));
+		        	activityComponent.mouseOffSetX = point.x;
+		        	activityComponent.mouseOffSetY = point.y; 
+		        	
+		        	DragManager.doDrag(activityComponent, ds, event, AuthorUtil.getImage(activityComponent), 0, 0, 1.0, false);
+		        	activityComponent.visible = false;    
 		        } 
 			}
+			
+			protected function dragComplete(event:MouseEvent):void {
+		    	var dragInitiator:ActivityComponent = event.currentTarget as ActivityComponent; 
+		    	dragInitiator.visible = true;     
+		    }
 		    
 		    public function setCenter():void {
 	    		centerX = x + width/2;
