@@ -60,7 +60,7 @@
 		horizontalAlign="center"
 		paddingTop="5" paddingRight="5" paddingBottom="5" paddingLeft="5"
 		backgroundColor="#C2D5FE" verticalGap="2"
-    	borderStyle="solid" cornerRadius="10" dropShadowEnabled="true" shadowDirection="right"
+    	borderStyle="solid" cornerRadius="4" dropShadowEnabled="true" shadowDirection="right"
 		minWidth="90" minHeight="100"
 		dragEnter="dragEnterHandler(event);" 
     	dragDrop="dragDropHandler(event);" 

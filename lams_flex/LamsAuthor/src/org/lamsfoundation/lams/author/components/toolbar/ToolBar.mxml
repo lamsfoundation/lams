@@ -90,8 +90,15 @@
 	          			break;
 	        	} */
 	        	
+	        	// Need to get stage coords and convert since localX,Y is returning wrong values
+	        	var point:Point = new Point(event.stageX, event.stageY);
+	        	point = dragInitiator.globalToLocal(point);
+	        	
+	        	dragInitiator.mouseOffSetX = 40;
+	        	dragInitiator.mouseOffSetY = 30;
+	        	
 	        	ds.addData(activityComponent, "dragActivity");  
-	          	DragManager.doDrag(dragInitiator, ds, event, activityComponent, 25, 15, 1.00, false);
+	          	DragManager.doDrag(dragInitiator, ds, event, activityComponent, - point.x + 40, - point.y + 30, 1.00, false);
 	        }
 			
 		]]>

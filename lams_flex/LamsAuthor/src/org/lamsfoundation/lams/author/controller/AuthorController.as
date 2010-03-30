@@ -13,7 +13,6 @@ package org.lamsfoundation.lams.author.controller
 	import org.lamsfoundation.lams.author.components.LearningLibraryEntryComponent;
 	import org.lamsfoundation.lams.author.components.activity.*;
 	import org.lamsfoundation.lams.author.components.toolbar.SystemToolComponent;
-	import org.lamsfoundation.lams.author.components.transition.TransitionComponent;
 	import org.lamsfoundation.lams.author.model.activity.GroupActivity;
 	import org.lamsfoundation.lams.author.model.learninglibrary.LearningLibraryEntry;
 	import org.lamsfoundation.lams.author.util.Constants;
@@ -129,14 +128,24 @@ package org.lamsfoundation.lams.author.controller
             } else if (event.dragInitiator is LearningLibraryEntryComponent || event.dragInitiator is SystemToolComponent) {
             	// Adding a new activity to the canvas
             	
-            	var learningLibraryEntryComponent:LearningLibraryEntryComponent = event.dragInitiator as LearningLibraryEntryComponent
-            	
             	// Get the next UIID
 				var nextActivityUIID:int = generateUIID();
 				
-				var newActivityComponent:ActivityComponent = ActivityComponentFactory.getActivityComponentInstanceFromDrag(learningLibraryEntryComponent, nextActivityUIID);
-	           	newActivityComponent.rootActivity.xCoord = currentMousePoint.x - learningLibraryEntryComponent.mouseOffSetX;
-	           	newActivityComponent.rootActivity.yCoord = currentMousePoint.y - learningLibraryEntryComponent.mouseOffSetY;
+	           	// Get the offset point to place the activity
+	           	var point:Point = new Point(0,0);
+	           	if (event.dragInitiator is LearningLibraryEntryComponent) {
+	           		var learningLibraryEntryComponent:LearningLibraryEntryComponent = event.dragInitiator as LearningLibraryEntryComponent
+	           		point.x = learningLibraryEntryComponent.mouseOffSetX
+	           		point.y = learningLibraryEntryComponent.mouseOffSetY;
+	           	} else {
+	           		var systemToolComponent:SystemToolComponent = event.dragInitiator as SystemToolComponent
+	           		point.x = systemToolComponent.mouseOffSetX
+	           		point.y = systemToolComponent.mouseOffSetY;
+	           	}
+	           	
+	           	var newActivityComponent:ActivityComponent = ActivityComponentFactory.getActivityComponentInstanceFromDrag(event.dragInitiator, nextActivityUIID);
+	           	newActivityComponent.rootActivity.xCoord = currentMousePoint.x - point.x;
+	           	newActivityComponent.rootActivity.yCoord = currentMousePoint.y - point.y;
 	            canvasBox.addChild(newActivityComponent);
 	            selectActivityComponent(newActivityComponent);
 	            activities[nextActivityUIID] = newActivityComponent.rootActivity;	

@@ -36,7 +36,7 @@
 	</mx:Script>
 	
 	<mx:VBox id="vbox" verticalAlign="middle" horizontalAlign="center" borderStyle="solid"
-		dropShadowEnabled="true" shadowDirection="right" cornerRadius="10" minWidth="70" minHeight="50"
+		dropShadowEnabled="true" shadowDirection="right" cornerRadius="4" minWidth="70" minHeight="50"
 		backgroundColor="#C2D5FE" paddingTop="3" paddingBottom="3" paddingLeft="5" paddingRight="5"
 		verticalGap="0"
 		>

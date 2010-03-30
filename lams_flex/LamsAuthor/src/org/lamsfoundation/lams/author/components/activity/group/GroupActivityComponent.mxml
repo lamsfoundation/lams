@@ -25,7 +25,7 @@
 		borderStyle="solid"
 		dropShadowEnabled="true"
 		shadowDirection="right"
-		cornerRadius="10"
+		cornerRadius="4"
 		backgroundColor="#C2D5FE"
 		minHeight="50" minWidth="60">
 		<mx:Image source="@Embed(source='assets/icons/group.png')" />

@@ -132,7 +132,7 @@
 		        	activityComponent.mouseOffSetX = point.x;
 		        	activityComponent.mouseOffSetY = point.y; 
 		        	
-		        	DragManager.doDrag(activityComponent, ds, event, AuthorUtil.getImage(activityComponent), 0, 0, 1.0, false);
+		        	DragManager.doDrag(activityComponent, ds, event, AuthorUtil.getImage(activityComponent.getChildAt(0)), 0, 0, 1.0, false);
 		        	activityComponent.visible = false;    
 		        } 
 			}

@@ -10,6 +10,10 @@
 			// This is just fro grouping, 
 			public var groupingType:int;
 			
+			// Point of mouse during drag
+			public var mouseOffSetX:int;
+			public var mouseOffSetY:int;
+			
 		]]>
 	</mx:Script>
 </mx:Button>
