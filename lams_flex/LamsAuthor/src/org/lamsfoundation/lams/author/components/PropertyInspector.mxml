@@ -120,15 +120,16 @@
 						text="{selectedActivityComponent.title}" />
 				</mx:GridItem>
 			</mx:GridRow>
-			<!--<mx:GridRow id="groupingGridRow" visible="{AuthorUtil.activitySupportsGrouping(selectedActivityComponent.activityTypeID)}" 
-				includeInLayout="{AuthorUtil.activitySupportsGrouping(selectedActivityComponent.activityTypeID)}">
+			<mx:GridRow id="groupingGridRow" 
+				visible="{AuthorController.activitySupportsGrouping(selectedActivityComponent.activityTypeID, selectedActivityComponent.rootActivity)}" 
+				includeInLayout="{groupingGridRow.visible}">
 				<mx:GridItem>
 					<mx:Label text="{Application.application.dictionary.getLabel('grouping_act_title')}" />
 				</mx:GridItem>
 				<mx:GridItem>
-					<mx:ComboBox id="groupingCombo" change="groupChange(event)" labelField="title" dataProvider="{currentAvailableGroups}" width="{MIN_INPUT_WIDTH}" dropdownWidth="250"  />
+					<!--<mx:ComboBox id="groupingCombo" dropdownWidth="250" labelField="title" dataProvider="{currentAvailableGroups}" width="{MIN_INPUT_WIDTH}"   />-->
 				</mx:GridItem>
-			</mx:GridRow>-->
+			</mx:GridRow>
 		</mx:Grid>
 	</mx:VBox>
 	<mx:Canvas id="opacityLayer" height="100%" width="100%" backgroundColor="white" backgroundAlpha="0.6" />

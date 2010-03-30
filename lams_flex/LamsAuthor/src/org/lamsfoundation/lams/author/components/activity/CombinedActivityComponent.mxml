@@ -41,8 +41,9 @@
 		backgroundColor="#C2D5FE" paddingTop="3" paddingBottom="3" paddingLeft="5" paddingRight="5"
 		verticalGap="0" dropShadowEnabled="{this != AuthorController.instance.selectedActivityComponent}"
 		>
-		<ToolActivityComponent activity="{activity.toolActivity1}" isTitleShown="false" />
-		<ToolActivityComponent activity="{activity.toolActivity2}" isTitleShown="false" />
-		<mx:Label id="lblTitle" text="{activity.title}"/>
+		<ToolActivityComponent activity="{activity.toolActivity1}" isTitleShown="false" isDragable="false"/>
+		<mx:Spacer height="2" />
+		<ToolActivityComponent activity="{activity.toolActivity2}" isTitleShown="false" isDragable="false"/>
+		<mx:Text id="txtTitle" text="{activity.title}" textAlign="center" maxWidth="70"/>
 	</mx:VBox>
 </ActivityComponent>

@@ -40,13 +40,14 @@
 		]]>
 	</mx:Script>
 	<mx:VBox id="vbox" verticalAlign="middle" horizontalAlign="center" borderStyle="solid"
-		shadowDirection="right" cornerRadius="4" minWidth="60" minHeight="50"
+		shadowDirection="right" cornerRadius="4" minWidth="70" minHeight="50"
 		backgroundColor="{activity.tool.bgColour}" paddingTop="3" paddingBottom="3" paddingLeft="5" paddingRight="5"
 		verticalGap="0" toolTip="{(isTitleShown)? undefined : activity.title}" 
 		dropShadowEnabled="{!(this.state == Constants.ACTIVITY_STATE_MOUSE_OVER || this.state == Constants.ACTIVITY_STATE_SELECTED)}"
 		>
 		<mx:Image id="iconImage" width="30" height="30" source="{activity.tool.libraryActivityUIImage}" />
-		<mx:Label id="lblTitle" text="{activity.title}" visible="{isTitleShown}" includeInLayout="{isTitleShown}"/>
+		<mx:Text id="txtTitle" text="{activity.title}" textAlign="center" maxWidth="80" 
+			visible="{this.isTitleShown}" includeInLayout="{this.isTitleShown}"/>
 	</mx:VBox>
 	
 	

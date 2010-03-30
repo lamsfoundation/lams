@@ -13,8 +13,11 @@ package org.lamsfoundation.lams.author.controller
 	import org.lamsfoundation.lams.author.components.LearningLibraryEntryComponent;
 	import org.lamsfoundation.lams.author.components.activity.*;
 	import org.lamsfoundation.lams.author.components.toolbar.SystemToolComponent;
+	import org.lamsfoundation.lams.author.model.activity.Activity;
 	import org.lamsfoundation.lams.author.model.activity.GroupActivity;
+	import org.lamsfoundation.lams.author.model.activity.ToolActivity;
 	import org.lamsfoundation.lams.author.model.learninglibrary.LearningLibraryEntry;
+	import org.lamsfoundation.lams.author.util.AuthorUtil;
 	import org.lamsfoundation.lams.author.util.Constants;
 	import org.lamsfoundation.lams.common.dictionary.XMLDictionaryRegistry;
 	
@@ -31,6 +34,8 @@ package org.lamsfoundation.lams.author.controller
 	 	public var activities:Dictionary = new Dictionary();
 	 	
 	 	[Bindable] public var selectedActivityComponent:ActivityComponent;
+	 	
+	 	[Embed("assets/icons/transition.png")] public var transitionCursor:Class;
 	 	
 	 	
 	 	// Reference to all activity components via UIID (key)
@@ -253,8 +258,7 @@ package org.lamsfoundation.lams.author.controller
 			} */
 		}
 		
-		[Embed("assets/icons/transition.png")]
-        public var transitionCursor:Class;
+		
 
 		public function changeCursorState(state:int):void{
 			cursorState = state;
@@ -267,5 +271,18 @@ package org.lamsfoundation.lams.author.controller
 					break;
 			}
 		}
+		
+		public static function activitySupportsGrouping(activityTypeID:int, activity:Activity):Boolean {
+	   		if (AuthorUtil.activitySupportsGrouping(activityTypeID)) {
+	   			if (activity is ToolActivity) {
+	   				return (activity as ToolActivity).groupingEnabled;
+	   			} else {
+	   				return true;
+	   			}
+	   		} else {
+	   			return false;
+	   		}
+	   		
+	   	}
 	}
 }

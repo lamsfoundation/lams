@@ -17,6 +17,8 @@ package org.lamsfoundation.lams.author.model.activity
 		public var useDefaultToolOutput:Boolean;
 		
 		[Bindable] public var tool:Tool;
+		
+		public var groupingEnabled:Boolean = true; // Non persistent, used for property inspector
 
 		function ToolActivity(activityUIID:Number){
 			super(activityUIID);

@@ -99,8 +99,9 @@
 			    		}
 		    			break;
 		    		case Constants.CURSOR_STATE_NORMAL: {
-		    			AuthorController.instance.selectActivityComponent(this);
 		    			startDragging(event);
+		    			AuthorController.instance.selectActivityComponent(this);
+		    			event.stopPropagation();
 		    		}
 		    	}
 		    }

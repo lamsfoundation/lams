@@ -78,12 +78,14 @@ package org.lamsfoundation.lams.author.model.activity
     		var toolActivity1:ToolActivity = new ToolActivity(tool1UIID);
 			toolActivity1.tool = learningLibraryEntry.toolTemplates[1];
     		toolActivity1.title = toolActivity1.tool.toolName;
+    		toolActivity1.groupingEnabled = false;
     		combinedActivity.toolActivity1 = toolActivity1;
     		
     		// Create toolactivity 2
     		var toolActivity2:ToolActivity = new ToolActivity(tool1UIID);
 			toolActivity2.tool = learningLibraryEntry.toolTemplates[2];
     		toolActivity2.title = toolActivity2.tool.toolName;
+    		toolActivity2.groupingEnabled = false;
     		combinedActivity.toolActivity2 = toolActivity2;
     		
     		return combinedActivity;
