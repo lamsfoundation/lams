@@ -2,7 +2,7 @@
 <ActivityComponent 
 	xmlns="org.lamsfoundation.lams.author.components.activity.*" 
 	xmlns:mx="http://www.adobe.com/2006/mxml"
-	paddingTop="5" paddingRight="5" paddingBottom="5" paddingLeft="5"
+	paddingTop="3" paddingLeft="3" paddingRight="3" paddingBottom="3"
 	>
 	
 	<mx:Script>
@@ -60,10 +60,11 @@
 		horizontalAlign="center"
 		paddingTop="5" paddingRight="5" paddingBottom="5" paddingLeft="5"
 		backgroundColor="#C2D5FE" verticalGap="2"
-    	borderStyle="solid" cornerRadius="4" dropShadowEnabled="true" shadowDirection="right"
+    	borderStyle="solid" cornerRadius="4" shadowDirection="right"
 		minWidth="90" minHeight="100"
 		dragEnter="dragEnterHandler(event);" 
-    	dragDrop="dragDropHandler(event);" 
+    	dragDrop="dragDropHandler(event);"
+    	dropShadowEnabled="{this != AuthorController.instance.selectedActivityComponent}" 
 		>
 		<mx:Label text="Optional" fontWeight="bold" />
 		

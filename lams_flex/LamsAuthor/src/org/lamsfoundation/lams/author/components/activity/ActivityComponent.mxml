@@ -5,7 +5,7 @@
 	mouseOut="mouseOut(event)"
 	mouseMove="mouseMove(event)"
 	dragComplete="dragComplete(event)"
-	click="click(event)" 
+	click="click(event)"
 	>
 
 	<!--
@@ -65,14 +65,15 @@
 		    public function selectActivity():void {
 				// check the activity is loaded.
 		    	if (_activity.title != null) {
-		    		this.setStyle('borderStyle', 'solid');
-					this.setStyle('borderColor', '#66CCFF');
+		    		//this.setStyle('borderStyle', 'solid');
+					//this.setStyle('borderColor', '#66CCFF');
+					this.setStyle('backgroundColor', '#6699FF');
 					this.state = Constants.ACTIVITY_STATE_SELECTED;
 		    	}
 		    }
 		    
 		    public function deSelectActivity():void {
-		    	this.setStyle('borderStyle', 'none');
+		    	this.setStyle('backgroundColor', undefined);
 		    	this.state = Constants.ACTIVITY_STATE_NORMAL;
 		    	
 		    }
@@ -132,7 +133,7 @@
 		        	activityComponent.mouseOffSetX = point.x;
 		        	activityComponent.mouseOffSetY = point.y; 
 		        	
-		        	DragManager.doDrag(activityComponent, ds, event, AuthorUtil.getImage(activityComponent.getChildAt(0)), 0, 0, 1.0, false);
+		        	DragManager.doDrag(activityComponent, ds, event, AuthorUtil.getImage(activityComponent.getChildAt(0)), -3, -3, 1.0, false);
 		        	activityComponent.visible = false;    
 		        } 
 			}
@@ -150,8 +151,7 @@
 
 		    private function mouseOver(event:MouseEvent):void {
 				if (AuthorController.instance.uiState == Constants.UI_STATE_DRAWING && this.state != Constants.ACTIVITY_STATE_DRAWING && canAcceptTransitions) {
-					this.setStyle('borderStyle', 'solid');
-					this.setStyle('borderColor', '#66CCFF');
+					this.setStyle('backgroundColor', '#6699FF');
 					this.state = Constants.ACTIVITY_STATE_MOUSE_OVER;
 				}
 			}
@@ -160,7 +160,7 @@
 				
 				switch (state) {
 					case Constants.ACTIVITY_STATE_MOUSE_OVER:
-						this.setStyle('borderStyle', 'none');
+						this.setStyle('backgroundColor', undefined);
 						this.state = Constants.ACTIVITY_STATE_NORMAL;
 						break;
 				}

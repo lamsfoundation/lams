@@ -82,9 +82,7 @@
 			
 			// Deselect the current activity
 			protected function click(event:MouseEvent):void {
-				if (event.currentTarget is ActivityComponent) {
-					AuthorController.instance.deSelectActivityComponent();
-				}
+				AuthorController.instance.deSelectActivityComponent();
 			}
              
 		]]>
