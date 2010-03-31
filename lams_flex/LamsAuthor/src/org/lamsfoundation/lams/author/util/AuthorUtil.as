@@ -8,6 +8,9 @@ package org.lamsfoundation.lams.author.util
 	
 	import mx.controls.Image;
 	
+	import org.lamsfoundation.lams.author.model.activity.Activity;
+	import org.lamsfoundation.lams.author.model.activity.ToolActivity;
+	
 	public class AuthorUtil
 	{
 		public function AuthorUtil(){}
@@ -43,15 +46,31 @@ package org.lamsfoundation.lams.author.util
 			return image;
 	   	}
 	   	
-	   	public static function activitySupportsGrouping(activityTypeID:int):Boolean {
-	   		return activityTypeID != Constants.ACTIVITY_TYPE_GATE_CONDITION &&
+	   	public static function activitySupportsGrouping(activity:Activity):Boolean {
+	   		var activityTypeID:int = activity.activityTypeID;
+	   		if (activityTypeID != Constants.ACTIVITY_TYPE_GATE_CONDITION &&
 	   			activityTypeID != Constants.ACTIVITY_TYPE_GATE_PERMISSION &&
 	   			activityTypeID != Constants.ACTIVITY_TYPE_GATE_SCHEDULE &&
 	   			activityTypeID != Constants.ACTIVITY_TYPE_GATE_SYNCH &&
 	   			activityTypeID != Constants.ACTIVITY_TYPE_GATE_SYSTEM &&
 	   			activityTypeID != Constants.ACTIVITY_TYPE_GROUPING &&
-	   			activityTypeID != Constants.ACTIVITY_TYPE_REFERENCE;
+	   			activityTypeID != Constants.ACTIVITY_TYPE_REFERENCE) {
+	   			if (activity is ToolActivity) {
+	   				return (activity as ToolActivity).groupingEnabled;
+	   			} else {
+	   				return true;
+	   			}
+	   		} else {
+	   			return false;
+	   		}
 	   	}
+	   		
+	   		
+	   		
+	   		
+	   		
+	   		
+	   	
 
 	}
 }

@@ -7,10 +7,9 @@
 	<mx:Script>
 		<![CDATA[
 			import org.lamsfoundation.lams.author.controller.AuthorController;
-			import org.lamsfoundation.lams.author.model.activity.GroupActivity;
+			import org.lamsfoundation.lams.author.model.activity.group.GroupActivity;
 			
-			[Bindable]
-			public function get activity():GroupActivity {
+			[Bindable] public function get activity():GroupActivity {
 				return this._activity as GroupActivity;
 			}
 			

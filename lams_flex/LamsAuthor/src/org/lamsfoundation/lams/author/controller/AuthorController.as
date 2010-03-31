@@ -14,10 +14,8 @@ package org.lamsfoundation.lams.author.controller
 	import org.lamsfoundation.lams.author.components.activity.*;
 	import org.lamsfoundation.lams.author.components.toolbar.SystemToolComponent;
 	import org.lamsfoundation.lams.author.model.activity.Activity;
-	import org.lamsfoundation.lams.author.model.activity.GroupActivity;
-	import org.lamsfoundation.lams.author.model.activity.ToolActivity;
+	import org.lamsfoundation.lams.author.model.activity.group.GroupActivity;
 	import org.lamsfoundation.lams.author.model.learninglibrary.LearningLibraryEntry;
-	import org.lamsfoundation.lams.author.util.AuthorUtil;
 	import org.lamsfoundation.lams.author.util.Constants;
 	import org.lamsfoundation.lams.common.dictionary.XMLDictionaryRegistry;
 	
@@ -216,39 +214,32 @@ package org.lamsfoundation.lams.author.controller
 			
 			
 			// Make a null grouping for this activity
-			var nullGrouping:GroupActivity = new GroupActivity(0, 1);
-			nullGrouping.title = Application.application.dictionary.getLabel("none_act_lbl");
-			currentAvailableGroups.addItem(nullGrouping);			
-			currentAvailableGroups.addAll(activityComponent.allPossibleGroupings);
+			var nullGrouping:GroupActivity = GroupActivity.nullGroupActivity;
+			currentAvailableGroups.addItem(nullGrouping);
+			
+			// Traverse the previous activities to see if one is a group activity
+			if (activityComponent != null) {
+				var activity:Activity = activityComponent.rootActivity;
+				if (activity.transitionTo != null){
+					var prevActivity:Activity = activity.transitionTo.fromActivity;
+				
+					while (true) {
+						if (prevActivity is GroupActivity) {
+							currentAvailableGroups.addItem(prevActivity);
+						}
+						
+						if (prevActivity.transitionTo != null) {
+							prevActivity = prevActivity.transitionTo.fromActivity
+						} else {
+							break;
+						}
+					}  
+				}
+				
+				
+			}
 			
 			return currentAvailableGroups;
-			
-			// TODO: Need to traverse the learning design array to find any previous activities
-			// that are grouping activities
-			
-			
-			/* 
-			var activity:Activity = activityComponent.rootActivity;
-			
-			if (activity.transitionIn != null){
-				var activityCmp:ActivityComponent = this.transitionIn.fromActivity;
-				
-				while (true) {
-					if (activityCmp is GroupActivityComponent) {
-						var entry:Object = new Object();
-						entry.activity.activityUIID = activityCmp.activity.activityUIID;
-						entry.activity.title = activityCmp.activity.title;
-						ret.addItem(entry);
-					}
-					
-					if (activityCmp.transitionIn != null) {
-						activityCmp = activityCmp.transitionIn.fromActivity;
-					} else {
-						break;
-					}
-				}  
-			} */
-			
 			
 			/* groupingCombo.selectedItem = nullGrouping;
 			for each (var item:Object in currentAvailableGroups) {
@@ -271,18 +262,5 @@ package org.lamsfoundation.lams.author.controller
 					break;
 			}
 		}
-		
-		public static function activitySupportsGrouping(activityTypeID:int, activity:Activity):Boolean {
-	   		if (AuthorUtil.activitySupportsGrouping(activityTypeID)) {
-	   			if (activity is ToolActivity) {
-	   				return (activity as ToolActivity).groupingEnabled;
-	   			} else {
-	   				return true;
-	   			}
-	   		} else {
-	   			return false;
-	   		}
-	   		
-	   	}
 	}
 }

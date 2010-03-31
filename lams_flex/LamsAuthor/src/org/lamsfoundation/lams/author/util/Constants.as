@@ -50,7 +50,7 @@ package org.lamsfoundation.lams.author.util
 		// Grouping type
 		public static const GROUPING_TYPE_RANDOM:int = 1;
 		public static const GROUPING_TYPE_TEACHER_CHOSEN:int = 2;
-		public static const GROUPING_TYPE_STUDENT_CHOICE:int = 3;
+		public static const GROUPING_TYPE_LEARNER_CHOICE:int = 3;
 		
 		// Transition type
 		public static const TRANSITION_TYPE_NORMAL:int = 1;

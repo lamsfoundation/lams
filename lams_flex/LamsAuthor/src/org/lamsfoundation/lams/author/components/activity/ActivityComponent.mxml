@@ -223,8 +223,12 @@
 				_activity.title = title;
 			}
 			
-			public function get activityTypeID():int {
+			[Bindable] public function get activityTypeID():int {
 				return _activity.activityTypeID;
+			}
+			
+			public function set activityTypeID(activityTypeID:int):void {
+				_activity.activityTypeID = activityTypeID;
 			}
 			
 			/**
@@ -233,8 +237,12 @@
 			 * So we need to be able to fetch this activity instance
 			 * Without knowing what activity type it is.
 			 */ 
-			public function get rootActivity():Activity {
+			[Bindable]public function get rootActivity():Activity {
 				return _activity;
+			}
+			
+			public function set rootActivity(activity:Activity):void {
+				this._activity = activity;
 			}
 
 		]]>

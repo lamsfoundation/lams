@@ -249,7 +249,7 @@
     		label="{Application.application.dictionary.getLabel('monitor_group_btn')}" 
     		toolTip="{Application.application.dictionary.getLabel('monitor_group_btn_tooltip')}"/>
     		
-    	<toolbar:SystemToolComponent activityTypeID="{Constants.ACTIVITY_TYPE_GROUPING}" groupingType="{Constants.GROUPING_TYPE_STUDENT_CHOICE}" height="25" 
+    	<toolbar:SystemToolComponent activityTypeID="{Constants.ACTIVITY_TYPE_GROUPING}" groupingType="{Constants.GROUPING_TYPE_LEARNER_CHOICE}" height="25" 
     		click="mouseClick(event)"
     		icon="@Embed(source='assets/icons/group.png')" 
     		label="{Application.application.dictionary.getLabel('learner_group_btn')}" 

@@ -1,7 +1,11 @@
 package org.lamsfoundation.lams.author.model.activity
 {
+	import mx.core.Application;
+	
 	import org.lamsfoundation.lams.author.components.toolbar.SystemToolComponent;
 	import org.lamsfoundation.lams.author.controller.AuthorController;
+	import org.lamsfoundation.lams.author.model.activity.group.Group;
+	import org.lamsfoundation.lams.author.model.activity.group.GroupActivity;
 	import org.lamsfoundation.lams.author.model.learninglibrary.LearningLibraryEntry;
 	import org.lamsfoundation.lams.author.util.Constants;
 	
@@ -54,6 +58,14 @@ package org.lamsfoundation.lams.author.model.activity
 			}
 		}
 		
+		/**
+		 * Create a tool activity instane
+		 * 
+		 * @param learningLibraryEntry the corresponding LearningLibraryEntry for the ToolActivity
+		 * @param UIID the activityUIID for the toolActivity
+		 * @return 
+		 * 
+		 */
 		private static function getToolActivityInstance(learningLibraryEntry:LearningLibraryEntry, UIID:int):ToolActivity {
 			var toolActivity:ToolActivity = new ToolActivity(UIID);
     		toolActivity.tool = learningLibraryEntry.toolTemplates[0];
@@ -91,11 +103,43 @@ package org.lamsfoundation.lams.author.model.activity
     		return combinedActivity;
 		}
 		
+		/**
+		 * Create a groupActivity instance, with a null grouping and
+		 * two default groups
+		 * 
+		 * @param systemToolComponent
+		 * @param UIID
+		 * @return 
+		 * 
+		 */
 		private static function getGroupActivityInstance(systemToolComponent:SystemToolComponent, UIID:int):GroupActivity {
 			var groupActivity:GroupActivity = new GroupActivity(UIID, systemToolComponent.groupingType);
+			
+			// Create two default groups for the groupActivity
+			var group1UIID:int = UIID;
+    		var group2UIID:int = UIID;
+    		if (UIID != 0) {
+    			// this is a canvas instance, need new uuids
+    			group1UIID = AuthorController.instance.generateUIID();
+    			group2UIID = AuthorController.instance.generateUIID();
+    		}
+    		var group1:Group = new Group(group1UIID, UIID, Application.application.dictionary.getLabel('group_btn') + " 1", 1);
+			var group2:Group = new Group(group2UIID, UIID, Application.application.dictionary.getLabel('group_btn') + " 2", 2);
+			
+			// Add groups to the group activity
+			groupActivity.groups.addItem(group1);
+			groupActivity.groups.addItem(group2);
 			return groupActivity;
 		}
 		
+		/**
+		 * Create an optional activity instance
+		 * 
+		 * @param systemToolComponent
+		 * @param UIID
+		 * @return 
+		 * 
+		 */
 		private static function getOptionalActivityInstance(systemToolComponent:SystemToolComponent, UIID:int):OptionalActivity {
 			var optionalActivity:OptionalActivity = new OptionalActivity(UIID);
 			return optionalActivity;

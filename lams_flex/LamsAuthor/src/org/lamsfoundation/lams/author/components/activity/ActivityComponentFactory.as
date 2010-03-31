@@ -9,7 +9,7 @@ package org.lamsfoundation.lams.author.components.activity
 	import org.lamsfoundation.lams.author.model.activity.Activity;
 	import org.lamsfoundation.lams.author.model.activity.ActivityFactory;
 	import org.lamsfoundation.lams.author.model.activity.CombinedActivity;
-	import org.lamsfoundation.lams.author.model.activity.GroupActivity;
+	import org.lamsfoundation.lams.author.model.activity.group.GroupActivity;
 	import org.lamsfoundation.lams.author.model.activity.OptionalActivity;
 	import org.lamsfoundation.lams.author.model.activity.ToolActivity;
 	import org.lamsfoundation.lams.author.util.Constants;

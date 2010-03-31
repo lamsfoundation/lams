@@ -1,5 +1,6 @@
 ﻿package org.lamsfoundation.lams.author.model.activity
 {
+	import org.lamsfoundation.lams.author.model.activity.group.GroupActivity;
 	import org.lamsfoundation.lams.author.model.transition.Transition;
 	
 	public class Activity
@@ -20,7 +21,7 @@
 		public var activityID:Number;
 		[Bindable] public var activityUIID:int;
 		public var activityCategoryID:Number;
-		public var activityTypeID:Number;
+		[Bindable] public var activityTypeID:int;
 		public var learningLibraryID:Number;
 		public var learningDesignID:Number;
 		public var parentActivityID:Number;		
@@ -38,11 +39,11 @@
 		public var groupingSupportType:Number;	// Possibly not needed because of Tool object	
 		
 		// Activity state
-		public var runOffline:Boolean;
+		[Bindable] public var runOffline:Boolean;
 		public var applyGrouping:Boolean;
 		public var stopAfterActivity:Boolean;
 		public var readOnly:Boolean;
-		public var defineLater:Boolean;
+		[Bindable] public var defineLater:Boolean;
 		public var isActivitySelected:String		// Not found in wddx xml
 			
 		// Not found in wddx xml

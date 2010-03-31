@@ -194,6 +194,18 @@
 	    <entry key="pi_equal_group_sizes">
 	      <name>Equal group sizes</name>
 	    </entry>
+	    <entry key="pi_group_type">
+	      <name>Grouping type</name>
+	    </entry>
+	    <entry key="random_grp_lbl">
+	      <name>Random</name>
+	    </entry>
+	    <entry key="chosen_grp_lbl">
+	      <name>Choose in Monitor</name>
+	    </entry>
+	    <entry key="learner_choice_grp_lbl">
+	      <name>Learner's choice</name>
+	    </entry>
 		
 	</language>
 </xml>
