@@ -69,9 +69,8 @@ public class ConfigurationItem implements Serializable {
     	this.required = required;
     }
 
-    /** 
-     * @hibernate.id type="java.lang.String" length="30"
-     *             	 column="config_key"      
+    /**
+     * @hibernate.id generator-class="assigned" type="java.lang.String" length="30" column="config_key"
      */
     public String getKey() {
         return this.key;
@@ -94,7 +93,7 @@ public class ConfigurationItem implements Serializable {
     }
 
     /** 
-     * @hibernate.property column="description" length="255"
+     * @hibernate.property column="description_key" length="255"
      */
 	public String getDescriptionKey() {
 		return descriptionKey;

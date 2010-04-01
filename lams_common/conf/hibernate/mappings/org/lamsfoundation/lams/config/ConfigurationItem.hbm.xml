@@ -17,11 +17,20 @@
             type="java.lang.String"
             length="30"
         >
+            <generator class="assigned">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-ConfigurationItem.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
         </id>
 
         <property
             name="value"
             type="java.lang.String"
+            update="true"
+            insert="true"
             column="config_value"
             length="255"
             not-null="false"
@@ -30,6 +39,8 @@
         <property
             name="descriptionKey"
             type="java.lang.String"
+            update="true"
+            insert="true"
             column="description_key"
             length="255"
         />
@@ -37,6 +48,8 @@
         <property
             name="headerName"
             type="java.lang.String"
+            update="true"
+            insert="true"
             column="header_name"
             length="255"
         />
@@ -44,16 +57,27 @@
         <property
             name="format"
             type="java.lang.String"
+            update="true"
+            insert="true"
             column="format"
             length="30"
         />
-        
-        <property name="required" 
-        	type="java.lang.Boolean" 
-        	column="required" 
-        	not-null="true">
-    </property>
-        
+
+        <property
+            name="required"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
+            column="required"
+            not-null="true"
+        />
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-ConfigurationItem.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
     </class>
 
 </hibernate-mapping>
