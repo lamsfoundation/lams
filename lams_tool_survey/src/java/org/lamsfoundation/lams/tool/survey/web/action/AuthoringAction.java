@@ -210,14 +210,9 @@ public class AuthoringAction extends Action {
 
 	    while (conditionIter.hasNext()) {
 		SurveyCondition condition = conditionIter.next();
-		Iterator<SurveyQuestion> questionIter = condition.getQuestions().iterator();
-		while (questionIter.hasNext()) {
-		    if (questionIter.next() == item) {
-			questionIter.remove();
-		    }
-		}
-		if (condition.getQuestions().isEmpty()) {
-		    conditionIter.remove();
+		Set<SurveyQuestion> questions = condition.getQuestions();
+		if (questions.contains(item)) {
+		    questions.remove(item);
 		}
 	    }
 	}
@@ -613,8 +608,8 @@ public class AuthoringAction extends Action {
 
 	// copy back
 	surveyPO.setAttachments(attPOSet);
+	
 	// ************************* Handle survey questions *******************
-	// Handle survey items
 	Set questionList = new LinkedHashSet();
 	SortedSet topics = getSurveyItemList(sessionMap);
 	iter = topics.iterator();
@@ -627,7 +622,7 @@ public class AuthoringAction extends Action {
 	    }
 	}
 	surveyPO.setQuestions(questionList);
-	// delete instructino file from database.
+	// delete instruction file from database.
 	List delSurveyItemList = getDeletedSurveyItemList(sessionMap);
 	iter = delSurveyItemList.iterator();
 	while (iter.hasNext()) {
@@ -638,22 +633,29 @@ public class AuthoringAction extends Action {
 	    }
 	}
 
-	Set<SurveyCondition> conditionSet = new TreeSet<SurveyCondition>(new TextSearchConditionComparator());
-	Set<SurveyCondition> existingConditionSet = getSurveyConditionSet(sessionMap);
-	conditionSet.addAll(existingConditionSet);
+	// ******************************** Handle conditions ****************
+	Set<SurveyCondition> conditionSet = getSurveyConditionSet(sessionMap);
+	
+	// delete conditions that don't contain any questions
+	Iterator<SurveyCondition> conditionIter = conditionSet.iterator();
+	while (conditionIter.hasNext()) {
+	    SurveyCondition condition = conditionIter.next();
+	    if (condition.getQuestions().isEmpty()) {
+		conditionIter.remove();
+	    }
+	}
 	surveyPO.setConditions(conditionSet);
-
-	// **********************************************
-	// finally persist surveyPO again
-	service.saveOrUpdateSurvey(surveyPO);
-
+	
 	List delConditionList = getDeletedSurveyConditionList(sessionMap);
 	iter = delConditionList.iterator();
 	while (iter.hasNext()) {
 	    SurveyCondition condition = (SurveyCondition) iter.next();
 	    iter.remove();
 	    service.deleteCondition(condition);
-	}
+	}	
+
+	// finally persist surveyPO again
+	service.saveOrUpdateSurvey(surveyPO);
 
 	// initialize attachmentList again
 	attachmentList = getAttachmentList(sessionMap);

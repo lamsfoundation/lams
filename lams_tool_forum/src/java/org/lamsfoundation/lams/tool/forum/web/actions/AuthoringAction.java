@@ -404,7 +404,7 @@ public class AuthoringAction extends Action {
 		iter.remove();
 	    }	    
 
-	    // ********************************Handle topic*******************
+	    // **************************** Handle topic *********************
 	    Set<MessageDTO> topics = getTopics(sessionMap);
 	    iter = topics.iterator();
 	    while (iter.hasNext()) {
@@ -427,10 +427,17 @@ public class AuthoringAction extends Action {
 		}
 	    }
 	    
-	// ********************************Handle conditions (also delete conditions that don't contain any topics)****
-	Set<ForumCondition> conditionSet = new TreeSet<ForumCondition>(new TextSearchConditionComparator());
-	Set<ForumCondition> existingConditionSet = getForumConditionSet(sessionMap);
-	conditionSet.addAll(existingConditionSet);
+	// ******************************** Handle conditions ****************
+	Set<ForumCondition> conditionSet = getForumConditionSet(sessionMap);
+	
+	// delete conditions that don't contain any topics
+	Iterator<ForumCondition> conditionIter = conditionSet.iterator();
+	while (conditionIter.hasNext()) {
+	    ForumCondition condition = conditionIter.next();
+	    if (condition.getTopics().isEmpty()) {
+		conditionIter.remove();
+	    }
+	}
 	forum.setConditions(conditionSet);
 	
 	List delConditions = getDeletedForumConditionList(sessionMap);
@@ -730,14 +737,9 @@ public class AuthoringAction extends Action {
 
 	    while (conditionIter.hasNext()) {
 		ForumCondition condition = conditionIter.next();
-		Iterator<Message> topicIter = condition.getTopics().iterator();
-		while (topicIter.hasNext()) {
-		    if (topicIter.next() == item.getMessage()) {
-			topicIter.remove();
-		    }
-		}
-		if (condition.getTopics().isEmpty()) {
-		    conditionIter.remove();
+		Set<Message> topicList = condition.getTopics();
+		if (topicList.contains(item.getMessage())) {
+		    topicList.remove(item.getMessage());
 		}
 	    }
 	}
