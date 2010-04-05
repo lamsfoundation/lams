@@ -124,7 +124,7 @@ public abstract class LamsAuthoringFinishAction extends Action {
 	    nextUrl = WebUtil.appendParameterToURL(nextUrl, RE_EDIT_URL, URLEncoder.encode(reeditUrl, "UTF-8"));
 	    response.sendRedirect(nextUrl);
 	}
-	if (StringUtils.equals(action, CANCEL_ACTION) || StringUtils.equals(ToolAccessMode.TEACHER.toString(), modeStr)) {
+	if (StringUtils.equals(action, CANCEL_ACTION) && StringUtils.equals(ToolAccessMode.TEACHER.toString(), modeStr)) {
 	    String signature = request.getParameter(TOOL_SIGNATURE);
 	    Long toolContentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
