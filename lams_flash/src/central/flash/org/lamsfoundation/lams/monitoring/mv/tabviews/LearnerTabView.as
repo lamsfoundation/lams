@@ -552,7 +552,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 			
 			ACT_X = newActivity_mc._x + newActivity_mc._width;
 			
-		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONS_WITH_SEQUENCES_TYPE || a.isBranchingActivity()){
+		} else if(a.activityTypeID==Activity.PARALLEL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONAL_ACTIVITY_TYPE || a.activityTypeID==Activity.OPTIONS_WITH_SEQUENCES_TYPE || a.activityTypeID==Activity.REFERENCE_ACTIVITY_TYPE || a.isBranchingActivity()){
 			var children:Array = mm.getMonitor().ddm.getComplexActivityChildren(a.activityUIID);
 			newActivity_mc = _activityLayer_mc.createChildAtDepth("LearnerComplexActivity", _activityLayer_mc.getNextHighestDepth(),{_activity:a,_children:children,_controller:mc,_view:ltv, _x:ACT_X, _y:ACT_Y+40, learner:learner});
 			
