@@ -495,6 +495,11 @@ class MonitorController extends AbstractController {
 		JsPopup.getInstance().launchPopupWindow(exp_url, 'ExportPortfolio', 410, 640, true, true, false, false, false);
 	}
 
+	private function openInstantMessaging():Void {
+		var im_url:String = _root.serverURL+"learning/lessonChat.jsp?lessonID="+_root.lessonID+"&presenceEnabledPatch="+_monitorModel.getSequence().learnerPresenceAvailable+"&presenceImEnabled="+_monitorModel.getSequence().learnerImAvailable;
+		JsPopup.getInstance().launchPopupWindow(im_url, 'IMpopup', 570, 796, true, true, false, false, false);
+	}
+
 	private function openJournalEntries():Void{
 		var journals_url:String = _root.serverURL+"learning/notebook.do?method=viewAllJournals&lessonID="+_root.lessonID;
 		JsPopup.getInstance().launchPopupWindow(journals_url, 'JournalEntries', 570, 796, true, true, false, false, false);
@@ -517,6 +522,8 @@ class MonitorController extends AbstractController {
 			_monitorModel.setDialogOpen("LM_DIALOG");
 		} else if(tgt.indexOf("viewLearners_btn") != -1){
 			_monitorModel.setDialogOpen("VM_DIALOG");
+		} else if(tgt.indexOf("learners_openIM_btn") != -1) {
+			openInstantMessaging();
 		} else if(tgt.indexOf("start_btn") != -1){
 			_monitorModel.getMonitor().startLesson(false, _root.lessonID);
 		} else if(tgt.indexOf("viewAllTimeChart_btn") != -1){

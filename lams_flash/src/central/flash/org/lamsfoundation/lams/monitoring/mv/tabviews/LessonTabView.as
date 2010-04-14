@@ -126,6 +126,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 	//Button
 	private var viewLearners_btn:Button;
 	private var editClass_btn:Button;
+	private var learners_openIM_btn:Button;
 	private var statusApply_btn:Button;
 	private var schedule_btn:Button;
 	private var start_btn:Button;
@@ -262,6 +263,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		
 		editClass_btn.addEventListener("click", _monitorController);
 		viewLearners_btn.addEventListener("click", _monitorController);
+		learners_openIM_btn.addEventListener("click", _monitorController);
 		schedule_btn.addEventListener("click", Delegate.create(this, scheduleLessonStart));
 		start_btn.addEventListener("click", _monitorController);
 		statusApply_btn.addEventListener("click", Proxy.create(this, changeStatus));
@@ -398,6 +400,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		scheduleTime._y = scheduleTime._y - 30
 		viewLearners_btn._y = viewLearners_btn._y - 30
 		editClass_btn._y = editClass_btn._y - 30
+		learners_openIM_btn._y = learners_openIM_btn._y - 30
 		changeStatus_cmb._y = changeStatus_cmb._y - 30
 		statusApply_btn._y = statusApply_btn._y - 30
 		schedule_btn._y = schedule_btn._y - 30
@@ -439,6 +442,8 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 			learner_eim_cb.enabled = false;
 			learner_eim_cb.selected = false;
 		}
+		
+		learners_openIM_btn._visible = learner_eim_cb.selected;
 	}
 	
 	private function populateStatusList(stateID:Number):Void{
@@ -812,6 +817,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		//Button
 		viewLearners_btn.label = Dictionary.getValue('ls_manage_learners_btn');
 		editClass_btn.label = Dictionary.getValue('ls_manage_editclass_btn');
+		learners_openIM_btn.label = Dictionary.getValue('ls_manage_openim_btn');
 		statusApply_btn.label = Dictionary.getValue('ls_manage_apply_btn');
 		schedule_btn.label = Dictionary.getValue('ls_manage_schedule_btn');
 		start_btn.label = Dictionary.getValue('ls_manage_start_btn');
@@ -879,9 +885,12 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 				}
 			}
 			else if (r == "presenceAvailable") {
+				mm.getSequence().learnerPresenceAvailable = learner_epres_cb.selected;
+				
 				if (learner_epres_cb.selected) {
 					Application.getInstance().getComms().getRequest('Presence.do?method=createXmppRoom&lessonId=' + _root.lessonID, Proxy.create(this, createRoomResponseHandler), false);
 					Cursor.showCursor(ApplicationParent.C_DEFAULT);
+					
 					learner_eim_cb.enabled = true;
 					
 					var msg:String = Dictionary.getValue('ls_confirm_presence_enabled') ;
@@ -891,15 +900,22 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 					learner_eim_cb.enabled = false;
 					learner_eim_cb.selected = false;
 					
+					learners_openIM_btn._visible  = false;
+					mm.getSequence().learnerImAvailable = false;
+					
 					var msg:String = Dictionary.getValue('ls_confirm_presence_disabled') ;
 					LFMessage.showMessageAlert(msg);
 				}
 			}
 			else if (r == "presenceImAvailable") {
+				learners_openIM_btn._visible = learner_eim_cb.selected;
+				
+				mm.getSequence().learnerImAvailable = learner_eim_cb.selected;
+				
 				if (learner_eim_cb.selected) {
 					var msg:String = Dictionary.getValue('ls_confirm_presence_im_enabled') ;
 					LFMessage.showMessageAlert(msg);
-
+					
 				}else {
 					var msg:String = Dictionary.getValue('ls_confirm_presence_im_disabled') ;
 					LFMessage.showMessageAlert(msg);
@@ -950,6 +966,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		styleObj = _tm.getStyleObject('button');
 		viewLearners_btn.setStyle('styleName',styleObj);
 		editClass_btn.setStyle('styleName',styleObj);
+		learners_openIM_btn.setStyle('styleName',styleObj);
 		schedule_btn.setStyle('styleName',styleObj);
 		start_btn.setStyle('styleName',styleObj);
 		statusApply_btn.setStyle('styleName',styleObj);
