@@ -45,8 +45,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<p>
 		<fmt:message key="message.lesson.finishedCont">
 			<fmt:param>
-				<b>${lessonName}</b>
+				<b>${learnerprogress.lesson.lessonName}</b>
 			</fmt:param>
+			<fmt:param>
+				 <lams:Date value="${learnerprogress.finishDate}" style="short"/>
+			</fmt:param>			
 		</fmt:message>
 	</p>
 	
