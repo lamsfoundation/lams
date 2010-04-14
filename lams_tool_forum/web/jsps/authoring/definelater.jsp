@@ -3,6 +3,8 @@
 <%@ page import="java.util.HashSet"%>
 <%@ page import="java.util.Set"%>
 
+<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
+
 <%Set tabs = new HashSet();
 			tabs.add("authoring.tab.basic");
 			pageContext.setAttribute("tabs", tabs);
