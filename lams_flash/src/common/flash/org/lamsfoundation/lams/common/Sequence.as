@@ -55,6 +55,7 @@ class Sequence {
 	
 	// sequence dates
 	private var _seqCreatedDate:Date;
+	private var _seqCreatedDateStr:String;
 	private var _seqStartDate:Date;
 	private var _seqStartDateStr:String;
 	private var _seqScheduleStartDate:Date;
@@ -145,6 +146,7 @@ class Sequence {
 		_learningDesignID = dto.learningDesignID;
 		
 		_seqCreatedDate = dto.createDateTime;
+		_seqCreatedDateStr = dto.createDateTimeStr;
 		_seqStartDate = dto.startDateTime;
 		_seqStartDateStr = dto.startDateTimeStr;
 		_seqScheduleStartDate = dto.scheduleStartDate;
@@ -312,7 +314,9 @@ class Sequence {
 		return _seqCreatedDate;
 	}
 	
-	
+	public function get createdatestr():String {
+		return _seqCreatedDateStr;
+	}
 	
 	public function setStartDateTime(seqStartDate:Date){
 		_seqStartDate = seqStartDate;

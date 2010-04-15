@@ -496,7 +496,7 @@ class MonitorController extends AbstractController {
 	}
 
 	private function openInstantMessaging():Void {
-		var im_url:String = _root.serverURL+"learning/lessonChat.jsp?lessonID="+_root.lessonID+"&presenceEnabledPatch="+_monitorModel.getSequence().learnerPresenceAvailable+"&presenceImEnabled="+_monitorModel.getSequence().learnerImAvailable;
+		var im_url:String = _root.serverURL+"learning/lessonChat.jsp?lessonID="+_root.lessonID+"&presenceEnabledPatch="+_monitorModel.getSequence().learnerPresenceAvailable+"&presenceImEnabled="+_monitorModel.getSequence().learnerImAvailable+"&createDateTime="+_monitorModel.getSequence().createdatestr;
 		JsPopup.getInstance().launchPopupWindow(im_url, 'IMpopup', 570, 796, true, true, false, false, false);
 	}
 
