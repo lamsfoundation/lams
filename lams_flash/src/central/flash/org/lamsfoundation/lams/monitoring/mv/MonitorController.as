@@ -445,7 +445,7 @@ class MonitorController extends AbstractController {
 					
 				} else {
 					if(ca instanceof LearnerIcon) LearnerIcon(ca).viewLearner(URLToSend);
-					else JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
+					else JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, true, false, false);
 				}
 			} else {
 				
@@ -458,7 +458,7 @@ class MonitorController extends AbstractController {
 						_monitorModel.getMonitor().openComplexView(ca);
 					} else {
 						if(ca instanceof LearnerIcon) LearnerIcon(ca).viewLearner(URLToSend);
-						else JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 720, 900, true, true, false, false, false);
+						else JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 720, 900, true, true, true, false, false);
 					}
 					
 			}
@@ -487,7 +487,7 @@ class MonitorController extends AbstractController {
 	private function viewClassTimeChart():Void {
 		var classTimeChart_url:String = _root.serverURL+"monitoring/monitoring.do?method=viewTimeChart&lessonID="+_root.lessonID;
 		Debugger.log("classTimeChart_url: "+classTimeChart_url, Debugger.GEN, "viewClassTimeChart", "MonitorController");
-		JsPopup.getInstance().launchPopupWindow(classTimeChart_url, 'ClassTimeChart', 600, 800, true, true, false, false, false);
+		JsPopup.getInstance().launchPopupWindow(classTimeChart_url, 'ClassTimeChart', 600, 800, true, true, true, false, false);
 	}
 	
 	private function exportClassPortfolio():Void{
@@ -496,13 +496,13 @@ class MonitorController extends AbstractController {
 	}
 
 	private function openInstantMessaging():Void {
-		var im_url:String = _root.serverURL+"learning/lessonChat.jsp?lessonID="+_root.lessonID+"&presenceEnabledPatch="+_monitorModel.getSequence().learnerPresenceAvailable+"&presenceImEnabled="+_monitorModel.getSequence().learnerImAvailable+"&createDateTime="+_monitorModel.getSequence().createdatestr;
+		var im_url:String = _root.serverURL+"learning/lessonChat.jsp?lessonID="+_root.lessonID+"&presenceEnabledPatch="+_monitorModel.getSequence().learnerPresenceAvailable+"&presenceImEnabled="+_monitorModel.getSequence().learnerImAvailable+"&presenceShown=true&createDateTime="+_monitorModel.getSequence().createdatestr;
 		JsPopup.getInstance().launchPopupWindow(im_url, 'IMpopup', 570, 796, true, true, false, false, false);
 	}
 
 	private function openJournalEntries():Void{
 		var journals_url:String = _root.serverURL+"learning/notebook.do?method=viewAllJournals&lessonID="+_root.lessonID;
-		JsPopup.getInstance().launchPopupWindow(journals_url, 'JournalEntries', 570, 796, true, true, false, false, false);
+		JsPopup.getInstance().launchPopupWindow(journals_url, 'JournalEntries', 570, 796, true, true, true, false, false);
 	}
 	
 	private function openEditOnFly():Void{

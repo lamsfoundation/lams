@@ -218,7 +218,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 		if(_activity != null) {
 			if(learner != null) {
 				var _URLToSend = (URLToSend != null) ? URLToSend : _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+_activity.activityID+'&userID='+learner.getLearnerId()+'&lessonID='+_root.lessonID;
-				JsPopup.getInstance().launchPopupWindow(_URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
+				JsPopup.getInstance().launchPopupWindow(_URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, true, false, false);
 			}
 		}
 	}

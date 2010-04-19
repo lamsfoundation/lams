@@ -297,7 +297,7 @@ class LearnersDialog extends MovieClip implements Dialog{
 			var learner:Progress = Progress(learner_dgd.selectedItem);
 			if(learner != null) {
 				var URLToSend = _root.serverURL+_root.monitoringURL+'getLearnerActivityURL&activityID='+currentActivity.activityID+'&userID='+learner.getLearnerId()+'&lessonID='+_root.lessonID;
-				JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, false, false, false);
+				JsPopup.getInstance().launchPopupWindow(URLToSend, 'MonitorLearnerActivity', 600, 800, true, true, true, false, false);
 			}
 		}
 	}

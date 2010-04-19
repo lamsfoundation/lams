@@ -718,7 +718,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		Debugger.log("contributeEntry.text: " + requiredTaskList[listCount].contributeEntryText.text , Debugger.MED, "drawContributeActivity", "LessonTabView");
 		
 		requiredTaskList[listCount].goContribute.onRelease = function (){
-			JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 600, 800, true, true, false, false, false);
+			JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 600, 800, true, true, true, false, false);
 		}
 						
 		requiredTaskList[listCount].goContribute.onRollOver = Proxy.create(this,this['showToolTip'], requiredTaskList[listCount].goContribute, "goContribute_btn_tooltip", reqTasks_scp._y+requiredTaskList[listCount]._y+requiredTaskList[listCount]._height, reqTasks_scp._x);

@@ -245,7 +245,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.TodoTabView extends Abstrac
 				todoTaskList[listCount].goContribute._x = this._width-50;
 				
 				todoTaskList[listCount].goContribute.onRelease = function (){
-					JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 398, 570, true, true, false, false, false);
+					JsPopup.getInstance().launchPopupWindow(o.taskURL, 'ContributeActivity', 398, 570, true, true, true, false, false);
 				}
 				
 				todoTaskList[listCount].goContribute.setStyle("fontSize", "9"); 
