@@ -1,0 +1,64 @@
+<%-- 
+Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+License Information: http://lamsfoundation.org/licensing/lams/2.0/
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License version 2 as 
+  published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+  USA
+
+  http://www.gnu.org/licenses/gpl.txt
+--%>
+
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ taglib uri="tags-bean" prefix="bean"%> 
+<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<lams:html>
+	<lams:head>
+		<lams:css/>
+        <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
+		
+		<script type="text/javascript">
+			var tb_pathToImage = "<lams:LAMSURL/>/images/loadingAnimation.gif";
+			
+			function resizeFrame() {
+			    var height = $(window).height();
+
+			    <c:if test="${param.presenceEnabledPatch}">
+			    	resizeChat();
+			    </c:if>
+			}
+			
+			window.onresize = resizeFrame;
+		</script>
+		
+		<title><fmt:message key="learner.im.title"/></title>
+	</lams:head>
+
+	<body class="stripes" onload="resizeFrame()">
+		<%
+			String jabberServer = Configuration.get(ConfigurationKeys.XMPP_DOMAIN);
+		%>
+		<c:set var="presenceUrl" scope="request"><%=jabberServer%></c:set>
+		<c:if test="${param.presenceEnabledPatch}">
+		    <%@ include file="/includes/presenceChat.jsp" %>
+		</c:if>
+	 </body>
+
+</lams:html>

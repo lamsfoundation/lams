@@ -54,6 +54,12 @@ function createContextMenu(tag){
 }
 
 /* ******* Helper Functions ******* */
+
+function setPresenceShown(b) {
+	if(b != null)
+		presenceShown = b;
+}
+
 // resizes chat window
 function resizeChat(){
 	// refresh the window height

@@ -14,14 +14,14 @@
 				// populated from jsp
 				var lamsUrl = "<lams:LAMSURL/>";
 				var xmppServlet = lamsUrl + "Presence.do";
-				var presenceEnabled = "${param.presenceEnabled}";
+				var presenceEnabled = "${param.presenceEnabledPatch}";
 				var presenceImEnabled = "${param.presenceImEnabled}";
-				var presenceUrl = "${param.presenceUrl}";
+				var presenceUrl = "${requestScope.presenceUrl}";
 				var userId = "<lams:user property="userID"/>";
 				var nickname = "<lams:user property="firstName"/>" + " " + "<lams:user property="lastName"/>";
 				
 				var HTTPBASE = lamsUrl + "JHB";
-				var roomName = "${param.lessonID}" + "${param.createDateTime}";
+				var roomName = "${param.lessonID}" + "_" + "${param.createDateTime}";
 				
 				// labels
 				var presenceLabel = "<fmt:message key='label.presence'/>";
@@ -39,7 +39,11 @@
 						<c:if test="${param.presenceEnabledPatch}">
 							// make visible
 							$("#presenceChat").removeClass("startHidden");
-						
+
+							$("div#presenceChatRoster ul").click(function() {
+								handlePresenceClick();
+							});
+								
 							// create chat tabs
 							$("#presenceChatTabs").tabs({ scrollable: true });
 							
@@ -63,6 +67,9 @@
 								var messageArea = $("#" + tagToMessageArea(tag));
 								messageArea.attr("scrollTop", messageArea.attr("scrollHeight"));
 							});
+
+							setPresenceShown("${param.presenceShown}");
+							
 						</c:if>
 						
 						// create roster tab
@@ -120,8 +127,8 @@
 				</c:if>
 				<%-- always pop the roster --%>
 				<div id="presenceChatRoster">
-					<ul onclick="javascript:handlePresenceClick()">
-				        <li><a href="#presenceUserListings" onclick="javascript:handlePresenceClick()">
+					<ul>
+				        <li><a href="#presenceUserListings" class="userListings" onclick="javascript:handlePresenceClick()">
 				        	<span>
 				        		<table border="0" cellpadding="5" cellspacing="0" class="tabLabelTable">
 				        			<tr>

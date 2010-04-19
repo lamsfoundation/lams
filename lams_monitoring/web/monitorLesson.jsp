@@ -114,7 +114,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				}
 			}
 			if(found == false) {
-				pWins.push(window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar));
+				pWins.push(window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars="+scrollbar+",status="+status+",menubar="+menubar+", toolbar="+toolbar));
 			}
 		}
 		
