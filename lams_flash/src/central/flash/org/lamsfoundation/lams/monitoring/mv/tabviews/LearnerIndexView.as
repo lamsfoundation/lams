@@ -101,7 +101,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerIndexView extends Ab
 	function LearnerIndexView(){
 		Debugger.log("LearnerIndexView Constructor", Debugger.CRITICAL, "LearnerIndexView", "LearnerIndexView");
 		_tm = ThemeManager.getInstance();
-		_tip = new ToolTip();
+		_tip = new ToolTip(_tm);
 		
 		nextPosition = 0;
 		btnWidth = 40;

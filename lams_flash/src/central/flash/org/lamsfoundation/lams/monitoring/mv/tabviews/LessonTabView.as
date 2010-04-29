@@ -155,7 +155,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LessonTabView extends Abstr
 		
 		_app = ApplicationParent.getInstance();
 		_tm = ThemeManager.getInstance();
-		_tip = new ToolTip();
+		_tip = new ToolTip(_tm);
 		
 		//Init for event delegation
         mx.events.EventDispatcher.initialize(this);

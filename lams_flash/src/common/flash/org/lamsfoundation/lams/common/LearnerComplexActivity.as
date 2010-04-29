@@ -144,7 +144,7 @@ class LearnerComplexActivity extends MovieClip implements ICanvasActivity
 		_visible = false;
 		
 		_tm = ThemeManager.getInstance();
-		_tip = new ToolTip();
+		_tip = new ToolTip(_tm);
 		
 		_visibleHeight = container_pnl._height;
 		_visibleWidth = container_pnl._width;

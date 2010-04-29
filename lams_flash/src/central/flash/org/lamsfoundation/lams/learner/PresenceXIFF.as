@@ -118,7 +118,7 @@ class Presence extends MovieClip {
         EventDispatcher.initialize(this);
 		
 		_tm = ThemeManager.getInstance();
-		_tip = new ToolTip();
+		_tip = new ToolTip(_tm);
 		_dictionary = Dictionary.getInstance();
 		_dictionary.addEventListener('init',Proxy.create(this,setLabels));
 		regNecessaryFields = new Object();

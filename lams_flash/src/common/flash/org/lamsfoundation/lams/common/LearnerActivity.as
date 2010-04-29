@@ -123,7 +123,7 @@ class LearnerActivity extends MovieClip {
 		Debugger.log("learner:"+ learner,4,'Constructor','LearnerActivity');
 		
 		_tm = ThemeManager.getInstance();
-		_tip = new ToolTip();
+		_tip = new ToolTip(_tm);
 		
 		_dcStartTime = new Date().getTime();
 		 

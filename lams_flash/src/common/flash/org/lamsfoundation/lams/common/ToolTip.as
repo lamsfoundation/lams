@@ -23,8 +23,17 @@
 
 import mx.managers.*
 import mx.controls.*
+import org.lamsfoundation.lams.common.style.*
+import org.lamsfoundation.lams.common.util.Debugger
 
 class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
+	// Theme Manager
+	private static var TOOLTIP_TM_SO:String = "ToolTip";
+	private static var TOOLTIPSHAD_TM_SO:String = "ToolTipShadow";
+	var _tm:ThemeManager;
+	var _tooltip_so:Object;
+	var _tooltip_shad_so:Object;
+	
 	// The button to display the ToolTip on
 	var btn:Button;
 	var ttHolder:MovieClip;
@@ -51,6 +60,7 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 	var tiptext:TextFormat;
 	var tiptextshadow:TextFormat;
 	
+	//  color defaults
 	var backgroundcolour:Number = 0xF5EFC0;
 	var bordercolour:Number = 0x666666;
 
@@ -65,7 +75,17 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 	// All of the tooltips properties have default values except the actual message to  display 
 	// in the tip. Because of this, only the message is required to be sent to the constructor.
 	
-	public function ToolTip(){
+	public function ToolTip(tm:ThemeManager){
+		_tm = (tm != undefined || tm != null) ? tm : ThemeManager.getInstance();
+		_tooltip_so = _tm.getStyleObject(TOOLTIP_TM_SO);
+		_tooltip_shad_so = _tm.getStyleObject(TOOLTIPSHAD_TM_SO);
+		
+		if(_tooltip_so != null) {
+			// set style color options
+			backgroundcolour = _tooltip_so.getStyle('backgroundColor');
+			bordercolour = _tooltip_so.getStyle('borderColor');
+		}
+		
 		textFormat = formatText();
 	}
 	
@@ -157,14 +177,27 @@ class org.lamsfoundation.lams.common.ToolTip extends MovieClip {
 	private function formatText():Object{
 		var FObj:Object = new Object();
 		var TipText:TextFormat = new TextFormat();
-		TipText.color = 0x333333;
-		TipText.font = "Verdana";
-		TipText.size = 9;
-
 		var TipTextShadow:TextFormat = new TextFormat();
-		TipTextShadow.color = 0xECE9D8;
-		TipTextShadow.font = "Verdana";
-		TipTextShadow.size = 9;
+		
+		if(_tooltip_so != null) {
+			TipText.color = _tooltip_so.getStyle('color');
+			TipText.font = String(_tooltip_so.getStyle('fontFamily'));
+			TipText.size = Number(_tooltip_so.getStyle('fontSize'));
+		} else {
+			TipText.color = 0x333333;
+			TipText.font = "Verdana";
+			TipText.size = 9;
+		}
+		
+		if(_tooltip_shad_so != null) {
+			TipTextShadow.color = _tooltip_shad_so.getStyle('color');
+			TipTextShadow.font = String(_tooltip_shad_so.getStyle('fontFamily'));
+			TipTextShadow.size = Number(_tooltip_shad_so.getStyle('fontSize'));
+		} else {
+			TipTextShadow.color = 0xECE9D8;
+			TipTextShadow.font = "Verdana";
+			TipTextShadow.size = 9;
+		}
 		
 		FObj.tiptext = TipText
 		FObj.tiptextshadow = TipTextShadow

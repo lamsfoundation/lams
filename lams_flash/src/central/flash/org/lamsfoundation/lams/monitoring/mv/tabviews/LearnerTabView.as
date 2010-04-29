@@ -109,7 +109,7 @@ class org.lamsfoundation.lams.monitoring.mv.tabviews.LearnerTabView extends Abst
 		_learnerTabView = this;
 		_learnerTabViewContainer_mc = this;
 		_tm = ThemeManager.getInstance();
-		_tip = new ToolTip();
+		_tip = new ToolTip(_tm);
 		
         //Init for event delegation
         mx.events.EventDispatcher.initialize(this);

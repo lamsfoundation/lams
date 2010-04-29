@@ -96,7 +96,7 @@ class ToolbarView extends AbstractView {
         mx.events.EventDispatcher.initialize(this);  
 		_tm = ThemeManager.getInstance();
 		_dictionary = Dictionary.getInstance();
-		_tip = new ToolTip();
+		_tip = new ToolTip(_tm);
 	}
     
     /**

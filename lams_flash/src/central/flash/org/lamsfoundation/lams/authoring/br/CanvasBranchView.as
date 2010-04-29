@@ -110,7 +110,7 @@ class org.lamsfoundation.lams.authoring.br.CanvasBranchView extends CommonCanvas
 		currentActivity_y = null;
 		
 		_tm = ThemeManager.getInstance();
-		_tip = new ToolTip();
+		_tip = new ToolTip(_tm);
 		
 		defaultSequenceActivity = null;
 		fingerprint = null;

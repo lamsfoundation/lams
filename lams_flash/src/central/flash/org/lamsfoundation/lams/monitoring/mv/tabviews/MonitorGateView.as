@@ -74,7 +74,7 @@ import mx.controls.*;
 		_monitorGateView = this;
 	
 		_tm = ThemeManager.getInstance();
-		_tip = new ToolTip();
+		_tip = new ToolTip(_tm);
 		
 		this._visible = false;		
 		
