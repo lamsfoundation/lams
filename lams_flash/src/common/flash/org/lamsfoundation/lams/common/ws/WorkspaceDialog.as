@@ -77,6 +77,7 @@ class WorkspaceDialog extends MovieClip{
     private var viewLicense_btn:Button;
 	
 	private var dateModified_lbl:Label;
+	private var authorOwner_lbl:Label;
 	
 	
     private var fm:FocusManager;            //Reference to focus manager
@@ -154,6 +155,7 @@ class WorkspaceDialog extends MovieClip{
 		name_lbl.text = Dictionary.getValue('ws_dlg_filename');
         description_lbl.text = Dictionary.getValue('ws_dlg_description');
 		dateModified_lbl._visible = false;
+		authorOwner_lbl._visible = false;
 		
 		//Set the text for buttons
 		ok_btn.label = Dictionary.getValue('ws_dlg_ok_button');
@@ -666,6 +668,7 @@ class WorkspaceDialog extends MovieClip{
 		var styleObj = themeManager.getStyleObject('label');
         name_lbl.setStyle('styleName', styleObj);
 		dateModified_lbl.setStyle('styleName', styleObj);
+		authorOwner_lbl.setStyle('stleName', styleObj);
 		
 		styleObj = themeManager.getStyleObject('button');
 		new_btn.setStyle('styleName',styleObj);
@@ -1084,9 +1087,13 @@ class WorkspaceDialog extends MovieClip{
 			if(node.attributes.data.resourceType == _workspaceModel.RT_LD) {
 				dateModified_lbl.text = Dictionary.getValue('ws_dlg_date_modified_lbl', [node.attributes.data.formattedLastModifiedDateTime]);
 				dateModified_lbl._visible = true;
+				authorOwner_lbl.text = Dictionary.getValue('ws_dlg_author_owner_lbl', [node.attributes.data.author]);
+				authorOwner_lbl._visible = true;
 			} else {
 				dateModified_lbl.text = "";
 				dateModified_lbl._visible = false;
+				authorOwner_lbl.text = "";
+				authorOwner_lbl._visible = false;
 			}
 			
 		}
