@@ -68,7 +68,7 @@ class org.lamsfoundation.lams.monitoring.mv.PlusIcon extends MovieClip {
 		_tm = ThemeManager.getInstance();
 		app = ApplicationParent.getInstance();
 		
-		toolTip = new ToolTip();
+		toolTip = new ToolTip(_tm);
 		
 		if(_activity != undefined)
 			init();

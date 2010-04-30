@@ -72,7 +72,7 @@ class org.lamsfoundation.lams.monitoring.mv.LearnerIcon extends MovieClip {
 	
 	function LearnerIcon(){
 		_tm = ThemeManager.getInstance();
-		toolTip = new ToolTip();
+		toolTip = new ToolTip(_tm);
 		
 		//Get reference to application and design data model
 		app = ApplicationParent.getInstance();

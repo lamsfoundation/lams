@@ -76,7 +76,7 @@ class ToolkitView extends AbstractView {
         EventDispatcher.initialize(this);     
 		_tm = ThemeManager.getInstance();
 		_dictionary = Dictionary.getInstance();
-		_tip = new ToolTip();
+		_tip = new ToolTip(_tm);
 		_dictionary.addEventListener('init',Proxy.create(this,setupLabels));
 		_toolkitLoaded = false;
 		//Debugger.log('Running',4,'Constructor','ToolkitView');

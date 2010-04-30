@@ -134,7 +134,7 @@ class org.lamsfoundation.lams.monitoring.mv.MonitorView extends AbstractView{
 	function MonitorView(){
 		_monitorView = this;
 		_tm = ThemeManager.getInstance();
-		_tip = new ToolTip();
+		_tip = new ToolTip(_tm);
 		
 		lessonTabLoaded = false;
 		monitorTabLoaded = false;
