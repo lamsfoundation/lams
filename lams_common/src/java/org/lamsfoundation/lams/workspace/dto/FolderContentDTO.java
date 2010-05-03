@@ -57,7 +57,7 @@ public class FolderContentDTO {
 	public Long licenseID; // applicable for designs only
 	public String licenseText; // applicable for designs only
 	public Boolean readOnly; // applicable for designs only
-	
+	public String author;
 	public FolderContentDTO(){
 		
 	}
@@ -91,6 +91,7 @@ public class FolderContentDTO {
 		this.licenseText = design.getLicenseText();
 		this.versionDetails = null;
 		this.readOnly = design.getReadOnly();
+		this.author = design.getUser().getFullName();
 	}
 	public FolderContentDTO(WorkspaceFolder workspaceFolder, Integer permissionCode, User user){
 		this.name = workspaceFolder.getName();
@@ -209,6 +210,14 @@ public class FolderContentDTO {
 
 	public void setReadOnly(Boolean readOnly) {
 		this.readOnly = readOnly;
+	}
+	
+	public String getAuthor() {
+		return this.author;
+	}
+	
+	public void setAuthor(String author) {
+		this.author = author;
 	}
 	
 	private String formatLastModifiedDateTime(TimeZone tz) {
