@@ -290,10 +290,6 @@ INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_cod
 VALUES (26, 'tr', 'TR', 'Türkçe', 'LTR', 'tr');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
 VALUES (27, 'ca', 'ES', 'Català', 'LTR', 'ca');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (28, 'sl', 'SI', 'Slovenščina', 'LTR', 'sl');
-INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
-VALUES (29, 'es', 'MX', 'Español (Mexico)', 'LTR', 'es');
 
 -- which current tool supports the old 1.0.x tools?
 INSERT INTO lams_tool_import_support VALUES (1, 'lafrum11', 'messageboard');
@@ -321,4 +317,4 @@ INSERT INTO lams_openid_config(config_key, config_value) values ("portalURL", ""
 INSERT INTO lams_openid_config(config_key, config_value) values ("trustedIDPs", "");
 
 -- initialise db version
-INSERT INTO patches VALUES ('lams', 02040005, NOW(), 'F');
+INSERT INTO patches VALUES ('lams', 02040006, NOW(), 'F');

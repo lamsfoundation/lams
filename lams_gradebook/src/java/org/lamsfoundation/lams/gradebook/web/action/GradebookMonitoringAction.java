@@ -23,6 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.gradebook.web.action;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 
 import javax.servlet.ServletOutputStream;
@@ -58,316 +59,321 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author lfoxton
  * 
- * Handles the monitor interfaces for gradebook
+ *         Handles the monitor interfaces for gradebook
  * 
- * This is where marking for an activity/lesson takes place
+ *         This is where marking for an activity/lesson takes place
  * 
  * 
- * @struts.action path="/gradebookMonitoring" parameter="dispatch"
- *                scope="request" name="monitoringForm" validate="false"
+ * @struts.action path="/gradebookMonitoring" parameter="dispatch" scope="request"
+ *                name="monitoringForm" validate="false"
  * 
  * @struts:action-forward name="monitorgradebook" path="/gradebookMonitor.jsp"
- * @struts:action-forward name="monitorcoursegradebook"
- *                        path="/gradebookCourseMonitor.jsp"
+ * @struts:action-forward name="monitorcoursegradebook" path="/gradebookCourseMonitor.jsp"
  * @struts:action-forward name="error" path=".error"
  * @struts:action-forward name="message" path=".message"
  */
 public class GradebookMonitoringAction extends LamsDispatchAction {
 
-    private static Logger logger = Logger.getLogger(GradebookMonitoringAction.class);
+	private static Logger logger = Logger.getLogger(GradebookMonitoringAction.class);
 
-    private static IGradebookService gradebookService;
-    private static IUserManagementService userService;
-    private static ILessonService lessonService;
+	private static IGradebookService gradebookService;
+	private static IUserManagementService userService;
+	private static ILessonService lessonService;
 
-    @SuppressWarnings("unchecked")
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
+	@SuppressWarnings("unchecked")
+	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
 
-	try {
-	    initServices();
-	    Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    logger.debug("request monitorGradebook for lesson: " + lessonId.toString());
-	    UserDTO user = getUser();
-	    if (user == null) {
-		logger.error("User missing from session. ");
-		return mapping.findForward("error");
-	    } else {
-		Lesson lesson = lessonId != null ? lessonService.getLesson(lessonId) : null;
-		if (lesson == null) {
-		    logger.error("Lesson " + lessonId + " does not exist. Unable to monitor lesson");
-		    return mapping.findForward("error");
+		try {
+			initServices();
+			Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+			logger.debug("request monitorGradebook for lesson: " + lessonId.toString());
+			UserDTO user = getUser();
+			if (user == null) {
+				logger.error("User missing from session. ");
+				return mapping.findForward("error");
+			} else {
+				Lesson lesson = lessonId != null ? lessonService.getLesson(lessonId) : null;
+				if (lesson == null) {
+					logger.error("Lesson " + lessonId + " does not exist. Unable to monitor lesson");
+					return mapping.findForward("error");
+				}
+
+				if (lesson.getLessonClass() == null || !lesson.getLessonClass().isStaffMember(getRealUser(user))) {
+					logger.error("User " + user.getLogin()
+							+ " is not a monitor in the requested lesson. Cannot access the lesson for monitor.");
+					return displayMessage(mapping, request, "error.authorisation");
+				}
+
+				logger.debug("user is staff");
+
+				boolean marksReleased = lesson.getMarksReleased() != null && lesson.getMarksReleased();
+
+				LessonDetailsDTO lessonDetatilsDTO = lesson.getLessonDetails();
+				request.setAttribute("lessonDetails", lessonDetatilsDTO);
+				request.setAttribute("marksReleased", marksReleased);
+
+				return mapping.findForward("monitorgradebook");
+			}
+		} catch (Exception e) {
+			logger.error("Failed to load gradebook monitor", e);
+			return mapping.findForward("error");
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public ActionForward courseMonitor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+
+		try {
+			initServices();
+			Integer oranisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+
+			logger.debug("request monitorGradebook for organisation: " + oranisationID.toString());
+			UserDTO user = getUser();
+			if (user == null) {
+				logger.error("User missing from session. ");
+				return mapping.findForward("error");
+			} else {
+
+				Organisation organisation = (Organisation) userService.findById(Organisation.class, oranisationID);
+				if (organisation == null) {
+					logger.error("Organisation " + oranisationID + " does not exist. Unable to load gradebook");
+					return mapping.findForward("error");
+				}
+
+				// Validate whether this user is a monitor for this organisation
+				if (!userService.isUserInRole(user.getUserID(), oranisationID, Role.MONITOR)) {
+					logger.error("User " + user.getLogin()
+							+ " is not a monitor in the requested course. Cannot access the course for gradebook.");
+					return displayMessage(mapping, request, "error.authorisation");
+				}
+
+				logger.debug("user is staff");
+
+				request.setAttribute("organisationID", oranisationID);
+				request.setAttribute("organisationName", organisation.getName());
+
+				return mapping.findForward("monitorcoursegradebook");
+			}
+		} catch (Exception e) {
+			logger.error("Failed to load gradebook monitor", e);
+			return mapping.findForward("error");
+		}
+	}
+
+	/**
+	 * Updates a user's mark or feedback for an entire lesson
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward updateUserLessonGradebookData(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		initServices();
+		Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+		Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_ID);
+		String markStr = WebUtil.readStrParam(request, GradebookConstants.PARAM_MARK, true);
+		String feedback = WebUtil.readStrParam(request, GradebookConstants.PARAM_FEEDBACK, true);
+		Lesson lesson = lessonService.getLesson(lessonID);
+		User learner = (User) userService.findById(User.class, userID);
+
+		if (lesson != null || learner != null) {
+
+			if (markStr != null && !markStr.equals("")) {
+				Double mark = Double.parseDouble(markStr);
+				gradebookService.updateUserLessonGradebookMark(lesson, learner, mark);
+			}
+
+			if (feedback != null) {
+				gradebookService.updateUserLessonGradebookFeedback(lesson, learner, feedback);
+			}
+
+		} else {
+			logger.error("No lesson could be found for: " + lessonID);
+		}
+		return null;
+	}
+
+	/**
+	 * Updates a user's mark or feedback for an activity, then aggregates their total lesson mark
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward updateUserActivityGradebookData(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		initServices();
+		Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+
+		GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
+
+		Long activityID = null;
+		Integer userID = null;
+
+		// Fetch the id based on which grid it came from
+		if (view == GBGridView.MON_ACTIVITY) {
+			String rowID = WebUtil.readStrParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+
+			// Splitting the rowID param to get the activity/group id pair
+			String[] split = rowID.split("_");
+			if (split.length == 2) {
+				activityID = Long.parseLong(split[0]);
+			} else {
+				activityID = Long.parseLong(rowID);
+			}
+
+			userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_ID);
+
+		} else if (view == GBGridView.MON_USER) {
+			activityID = WebUtil.readLongParam(request, GradebookConstants.PARAM_ID);
+			userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
 		}
 
-		if (lesson.getLessonClass() == null || !lesson.getLessonClass().isStaffMember(getRealUser(user))) {
-		    logger.error("User " + user.getLogin()
-			    + " is not a monitor in the requested lesson. Cannot access the lesson for monitor.");
-		    return displayMessage(mapping, request, "error.authorisation");
-		}
+		String markStr = WebUtil.readStrParam(request, GradebookConstants.PARAM_MARK, true);
+		String feedback = WebUtil.readStrParam(request, GradebookConstants.PARAM_FEEDBACK, true);
 
-		logger.debug("user is staff");
+		Activity activity = (Activity) userService.findById(Activity.class, activityID);
+		User learner = (User) userService.findById(User.class, userID);
+		Lesson lesson = lessonService.getLesson(lessonID);
+
+		if (lesson != null && activity != null && learner != null && activity.isToolActivity()) {
+
+			if (markStr != null && !markStr.equals("")) {
+				Double mark = Double.parseDouble(markStr);
+				gradebookService.updateUserActivityGradebookMark(lesson, learner, activity, mark, true);
+			}
+
+			if (feedback != null) {
+				gradebookService.updateUserActivityGradebookFeedback(activity, learner, feedback);
+			}
+
+		} else {
+			logger.error("Lesson or activity missing for lesson: " + lessonID + "and activity: " + activityID);
+		}
+		return null;
+	}
+
+	/**
+	 * Toggles the release mark flag for a lesson
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward toggleReleaseMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		initServices();
+		Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+
+		Lesson lesson = lessonService.getLesson(lessonID);
 
 		boolean marksReleased = lesson.getMarksReleased() != null && lesson.getMarksReleased();
+		if (!marksReleased) {
 
-		LessonDetailsDTO lessonDetatilsDTO = lesson.getLessonDetails();
-		request.setAttribute("lessonDetails", lessonDetatilsDTO);
-		request.setAttribute("marksReleased", marksReleased);
-
-		return mapping.findForward("monitorgradebook");
-	    }
-	} catch (Exception e) {
-	    logger.error("Failed to load gradebook monitor", e);
-	    return mapping.findForward("error");
-	}
-    }
-
-    @SuppressWarnings("unchecked")
-    public ActionForward courseMonitor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	try {
-	    initServices();
-	    Integer oranisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-
-	    logger.debug("request monitorGradebook for organisation: " + oranisationID.toString());
-	    UserDTO user = getUser();
-	    if (user == null) {
-		logger.error("User missing from session. ");
-		return mapping.findForward("error");
-	    } else {
-
-		Organisation organisation = (Organisation) userService.findById(Organisation.class, oranisationID);
-		if (organisation == null) {
-		    logger.error("Organisation " + oranisationID + " does not exist. Unable to load gradebook");
-		    return mapping.findForward("error");
+			// If marks not released, set a new release date
+			lesson.setReleaseDate(new Date());
 		}
 
-		// Validate whether this user is a monitor for this organisation
-		if (!userService.isUserInRole(user.getUserID(), oranisationID, Role.MONITOR)) {
-		    logger.error("User " + user.getLogin()
-			    + " is not a monitor in the requested course. Cannot access the course for gradebook.");
-		    return displayMessage(mapping, request, "error.authorisation");
+		lesson.setMarksReleased(!marksReleased);
+
+		userService.save(lesson);
+
+		writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, "success");
+		return null;
+	}
+
+	public ActionForward exportExcelLessonGradebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+
+		initServices();
+
+		Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+		Lesson lesson = lessonService.getLesson(lessonID);
+
+		if (lesson != null) {
+			String fileName = lesson.getLessonName().replaceAll(" ", "_") + ".xls";
+
+			response.setContentType("application/x-download");
+			response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+			logger.debug("Exporting to a spreadsheet gradebook lesson: " + lessonID);
+			ServletOutputStream out = response.getOutputStream();
+
+			LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+
+			ExcelCell[][] summaryData = gradebookService.getSummaryDataForExcel(lesson);
+			dataToExport.put(gradebookService.getMessage("gradebook.export.lesson.summary"), summaryData);
+
+			ExcelCell[][] activityData = gradebookService.getActivityViewDataForExcel(lesson);
+			dataToExport.put(gradebookService.getMessage("gradebook.gridtitle.activitygrid"), activityData);
+
+			ExcelCell[][] userData = gradebookService.getUserViewDataForExcel(lesson);
+			dataToExport.put(gradebookService.getMessage("gradebook.export.learner.view"), userData);
+
+			GradebookUtil.exportGradebookLessonToExcel(out, gradebookService.getMessage("gradebook.export.dateheader"),
+					dataToExport);
+
+		} else {
+			throw new Exception("Attempt to retrieve gradebook data for null lesson");
 		}
-
-		logger.debug("user is staff");
-
-		request.setAttribute("organisationID", oranisationID);
-		request.setAttribute("organisationName", organisation.getName());
-
-		return mapping.findForward("monitorcoursegradebook");
-	    }
-	} catch (Exception e) {
-	    logger.error("Failed to load gradebook monitor", e);
-	    return mapping.findForward("error");
-	}
-    }
-
-    /**
-     * Updates a user's mark or feedback for an entire lesson
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
-     */
-    public ActionForward updateUserLessonGradebookData(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws Exception {
-	initServices();
-	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_ID);
-	String markStr = WebUtil.readStrParam(request, GradebookConstants.PARAM_MARK, true);
-	String feedback = WebUtil.readStrParam(request, GradebookConstants.PARAM_FEEDBACK, true);
-	Lesson lesson = lessonService.getLesson(lessonID);
-	User learner = (User) userService.findById(User.class, userID);
-
-	if (lesson != null || learner != null) {
-
-	    if (markStr != null && !markStr.equals("")) {
-		Double mark = Double.parseDouble(markStr);
-		gradebookService.updateUserLessonGradebookMark(lesson, learner, mark);
-	    }
-
-	    if (feedback != null) {
-		gradebookService.updateUserLessonGradebookFeedback(lesson, learner, feedback);
-	    }
-
-	} else {
-	    logger.error("No lesson could be found for: " + lessonID);
-	}
-	return null;
-    }
-
-    /**
-     * Updates a user's mark or feedback for an activity, then aggregates their
-     * total lesson mark
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
-     */
-    public ActionForward updateUserActivityGradebookData(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws Exception {
-	initServices();
-	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-
-	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
-
-	Long activityID = null;
-	Integer userID = null;
-
-	// Fetch the id based on which grid it came from
-	if (view == GBGridView.MON_ACTIVITY) {
-	    String rowID = WebUtil.readStrParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-
-	    // Splitting the rowID param to get the activity/group id pair
-	    String[] split = rowID.split("_");
-	    if (split.length == 2) {
-		activityID = Long.parseLong(split[0]);
-	    } else {
-		activityID = Long.parseLong(rowID);
-	    }
-
-	    userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_ID);
-
-	} else if (view == GBGridView.MON_USER) {
-	    activityID = WebUtil.readLongParam(request, GradebookConstants.PARAM_ID);
-	    userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
+		return null;
 	}
 
-	String markStr = WebUtil.readStrParam(request, GradebookConstants.PARAM_MARK, true);
-	String feedback = WebUtil.readStrParam(request, GradebookConstants.PARAM_FEEDBACK, true);
-
-	Activity activity = (Activity) userService.findById(Activity.class, activityID);
-	User learner = (User) userService.findById(User.class, userID);
-	Lesson lesson = lessonService.getLesson(lessonID);
-
-	if (lesson != null && activity != null && learner != null && activity.isToolActivity()) {
-
-	    if (markStr != null && !markStr.equals("")) {
-		Double mark = Double.parseDouble(markStr);
-		gradebookService.updateUserActivityGradebookMark(lesson, learner, activity, mark, true);
-	    }
-
-	    if (feedback != null) {
-		gradebookService.updateUserActivityGradebookFeedback(activity, learner, feedback);
-	    }
-
-	} else {
-	    logger.error("Lesson or activity missing for lesson: " + lessonID + "and activity: " + activityID);
+	private UserDTO getUser() {
+		HttpSession ss = SessionManager.getSession();
+		return (UserDTO) ss.getAttribute(AttributeNames.USER);
 	}
-	return null;
-    }
 
-    /**
-     * Toggles the release mark flag for a lesson
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
-     */
-    public ActionForward toggleReleaseMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-	initServices();
-	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-
-	Lesson lesson = lessonService.getLesson(lessonID);
-
-	boolean marksReleased = lesson.getMarksReleased() != null && lesson.getMarksReleased();
-
-	lesson.setMarksReleased(!marksReleased);
-	userService.save(lesson);
-
-	writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, "success");
-	return null;
-    }
-
-    public ActionForward exportExcelLessonGradebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	initServices();
-
-	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	Lesson lesson = lessonService.getLesson(lessonID);
-
-	if (lesson != null) {
-	    String fileName = lesson.getLessonName().replaceAll(" ", "_") + ".xls";
-	    
-	    response.setContentType("application/x-download");
-	    response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-	    logger.debug("Exporting to a spreadsheet gradebook lesson: " + lessonID);
-	    ServletOutputStream out = response.getOutputStream();
-	    
-	    LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
-	    
-	    ExcelCell[][] summaryData = gradebookService.getSummaryDataForExcel(lesson);
-	    dataToExport.put(gradebookService.getMessage("gradebook.export.lesson.summary"), summaryData);
-	    
-	    ExcelCell[][] activityData = gradebookService.getActivityViewDataForExcel(lesson);
-	    dataToExport.put(gradebookService.getMessage("gradebook.gridtitle.activitygrid"), activityData);
-	    
-	    ExcelCell[][] userData = gradebookService.getUserViewDataForExcel(lesson);
-	    dataToExport.put(gradebookService.getMessage("gradebook.export.learner.view"), userData);
-	    
-	    GradebookUtil.exportGradebookLessonToExcel(out, gradebookService.getMessage("gradebook.export.dateheader"), dataToExport);
-
-	} else {
-	    throw new Exception("Attempt to retrieve gradebook data for null lesson");
+	private User getRealUser(UserDTO dto) {
+		return getUserService().getUserByLogin(dto.getLogin());
 	}
-	return null;
-    }
 
-    private UserDTO getUser() {
-	HttpSession ss = SessionManager.getSession();
-	return (UserDTO) ss.getAttribute(AttributeNames.USER);
-    }
-
-    private User getRealUser(UserDTO dto) {
-	return getUserService().getUserByLogin(dto.getLogin());
-    }
-
-    private ActionForward displayMessage(ActionMapping mapping, HttpServletRequest req, String messageKey) {
-	req.setAttribute("messageKey", messageKey);
-	return mapping.findForward("message");
-    }
-
-    private void initServices() {
-	getUserService();
-	getLessonService();
-	getGradebookService();
-    }
-
-    private IUserManagementService getUserService() {
-	if (userService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
-	    userService = (IUserManagementService) ctx.getBean("userManagementService");
+	private ActionForward displayMessage(ActionMapping mapping, HttpServletRequest req, String messageKey) {
+		req.setAttribute("messageKey", messageKey);
+		return mapping.findForward("message");
 	}
-	return userService;
-    }
 
-    private ILessonService getLessonService() {
-	if (lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
-	    lessonService = (ILessonService) ctx.getBean("lessonService");
+	private void initServices() {
+		getUserService();
+		getLessonService();
+		getGradebookService();
 	}
-	return lessonService;
-    }
 
-    private IGradebookService getGradebookService() {
-	if (gradebookService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
-	    gradebookService = (IGradebookService) ctx.getBean("gradebookService");
+	private IUserManagementService getUserService() {
+		if (userService == null) {
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+					.getServletContext());
+			userService = (IUserManagementService) ctx.getBean("userManagementService");
+		}
+		return userService;
 	}
-	return gradebookService;
-    }
+
+	private ILessonService getLessonService() {
+		if (lessonService == null) {
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+					.getServletContext());
+			lessonService = (ILessonService) ctx.getBean("lessonService");
+		}
+		return lessonService;
+	}
+
+	private IGradebookService getGradebookService() {
+		if (gradebookService == null) {
+			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+					.getServletContext());
+			gradebookService = (IGradebookService) ctx.getBean("gradebookService");
+		}
+		return gradebookService;
+	}
 }
