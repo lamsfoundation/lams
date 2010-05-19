@@ -642,6 +642,7 @@ CREATE TABLE lams_lesson (
      , locked_for_edit TINYINT DEFAULT 0
 	 , marks_released TINYINT DEFAULT 0
      , version INTEGER DEFAULT 1
+     , release_date DATETIME
      , PRIMARY KEY (lesson_id)
      , INDEX (learning_design_id)
      , CONSTRAINT FK_lams_lesson_1_1 FOREIGN KEY (learning_design_id)
@@ -656,6 +657,7 @@ CREATE TABLE lams_lesson (
      , CONSTRAINT FK_lams_lesson_4 FOREIGN KEY (lesson_state_id)
                   REFERENCES lams_lesson_state (lesson_state_id)
      , INDEX (class_grouping_id)
+     , INDEX idx_release_date (release_date)
      , CONSTRAINT FK_lams_lesson_5 FOREIGN KEY (class_grouping_id)
                   REFERENCES lams_grouping (grouping_id)
 )TYPE=InnoDB;
