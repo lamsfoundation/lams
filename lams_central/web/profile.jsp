@@ -5,7 +5,11 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ page import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod" %>
+<%@ page import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod" 
+		 import="org.lamsfoundation.lams.util.Configuration" 
+		 import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+		 
+<c:set var="showAllMyLessonLink"><%=Configuration.get(ConfigurationKeys.SHOW_ALL_MY_LESSON_LINK)%></c:set>
 
 <script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-1.1.4.pack.js"></script>
 <c:if test="${not empty collapsedOrgDTOs}">
@@ -47,9 +51,11 @@
 				href="index.do?state=active&tab=portrait"><fmt:message
 				key="title.portrait.change.screen" /></a></li>
 				
-			<li class="no-list-type"><a
-				href="index.do?state=active&tab=lessons"><fmt:message
-				key="title.all.my.lessons" /></a></li>
+			<c:if test="${showAllMyLessonLink}">				
+				<li class="no-list-type"><a
+					href="index.do?state=active&tab=lessons"><fmt:message
+					key="title.all.my.lessons" /></a></li>
+			</c:if>				
 		</ul>
 
 		</td>

@@ -140,6 +140,8 @@ public class ConfigurationKeys {
     public static String LAMS_COMMUNITY_ENABLE = "LAMS_Community_enable";
 
     public static String ALLOW_EDIT_ON_FLY = "AllowLiveEdit";
+    
+    public static String SHOW_ALL_MY_LESSON_LINK = "ShowAllMyLessonLink";
 
     public static String LDAP_PROVISIONING_ENABLED = "LDAPProvisioningEnabled";
 
