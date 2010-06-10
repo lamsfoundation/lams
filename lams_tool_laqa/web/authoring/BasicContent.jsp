@@ -64,11 +64,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         submitMonitoringMethod('removeQuestion');
 	}
 	
-	function resizeIframe(heightOffSet, widthOffSet)
+	function resizeIframe(heightOffSet)
 	{
 		var iframe = document.getElementById("messageArea");
 		iframe.style.height = parseInt(iframe.style.height) + heightOffSet + "px";
-		iframe.style.width = parseInt(iframe.style.width) + widthOffSet + "px";
 	}
 
 </script>
