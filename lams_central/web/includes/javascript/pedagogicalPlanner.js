@@ -138,12 +138,15 @@
   	$('#pedagogicalPlannerBusy').hide();
   	if (sequenceDetailsValid &&  activitiesValid==activitiesResponded){
   	   	$('#pedagogicalPlannerInfoArea').show();
+  	   	
 	   	if (actionAfterCompleted==ACTION_SAVE_AS_SEQUENCE){
 	   	 	$.ajax({
 	   	 		url: saveDetailsUrl,
 	   	 		cache: false,
 	   	 		data: "method=copyLearningDesign&ldId="+learningDesignId
-	   	 	});	   		
+	   	 	});
+	   	 	
+	   	 	if (requestSrc != "") $("#saveSequenceDialog").dialog('open');
   	   	}  	  
 	   	else if (actionAfterCompleted==ACTION_PREVIEW){
   	   		startPreview(startPreviewUrl);
@@ -154,8 +157,12 @@
 	   	 		url: saveDetailsUrl,
 	   	 		cache: false,
 	   	 		data: "method=copyLearningDesign&ldId="+learningDesignId
-	   	 	});  	   		 
-  	   		document.location.href="home.do?method=author&learningDesignID="+learningDesignId;
+	   	 	});
+  	   		 
+  	   		var openAuthorURL = "home.do?method=author&learningDesignID=" + learningDesignId;
+  	   		if (requestSrc != "") openAuthorURL += "&requestSrc=" + requestSrc;
+  	   		if (notifyCloseURL != "") openAuthorURL += "&notifyCloseURL=" + notifyCloseURL;
+  	   		document.location.href = openAuthorURL;
   	   	}
   	   	else if (actionAfterCompleted==ACTION_EXPORT){
   	   		 document.getElementById("downloadFileDummyIframe").src="pedagogicalPlanner.do?method=exportTemplate&ldId="+learningDesignId;
@@ -176,6 +183,12 @@
   
   function closePlanner(text){
 	 if (text==null || confirm(text)){
+		 
+		// refresh the parent window
+		if (notifyCloseURL != "") {
+			window.parent.opener.location.href = notifyCloseURL;
+		}
+
 	 	window.close();
   	 }
   }

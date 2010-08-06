@@ -236,7 +236,11 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     // Tutorial video page string for recognising which page the video was started from
     private static final String PAGE_STRING_START_PLANNER = "StPed";
-
+    
+    // Parameters
+    public static final String PARAM_REQUEST_SRC = "requestSrc";
+    public static final String PARAM_NOTIFY_CLOSE_URL = "notifyCloseURL";
+    
     static {
 	PedagogicalPlannerAction.filterLanguageMap.put("en", "English");
 	PedagogicalPlannerAction.filterLanguageMap.put("nl", "Dutch");
@@ -275,6 +279,16 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	request.setAttribute(AttributeNames.ATTR_PAGE_STR, PedagogicalPlannerAction.PAGE_STRING_START_PLANNER);
 	request.setAttribute(AttributeNames.ATTR_SHOW_TUTORIAL, showTutorial);
 	request.setAttribute(AttributeNames.ATTR_DO_NOT_SHOW_AGAIN, doNotShowAgain);
+	
+	//process requestSrc and notifyCloseURL parameters (if any)
+	String requestSrc = request.getParameter(PARAM_REQUEST_SRC);
+	if (StringUtils.isNotBlank(requestSrc)) {
+	    request.getSession().setAttribute(PARAM_REQUEST_SRC, requestSrc);
+	}
+	String notifyCloseURL = request.getParameter(PARAM_NOTIFY_CLOSE_URL);
+	if (StringUtils.isNotBlank(notifyCloseURL)) {
+	    request.getSession().setAttribute(PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
+	}
 
 	return openSequenceNode(mapping, form, request, response);
     }
@@ -321,6 +335,17 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    // If anything goes wrong, errors will be displayed at top. This approach is used widely in this action.
 	    return openSequenceNode(mapping, form, request, (Long) null);
 	}
+	
+	//process requestSrc and notifyCloseURL parameters (if any)
+	String requestSrc = request.getParameter(PARAM_REQUEST_SRC);
+	if (StringUtils.isNotBlank(requestSrc)) {
+	    request.getSession().setAttribute(PARAM_REQUEST_SRC, requestSrc);
+	}
+	String notifyCloseURL = request.getParameter(PARAM_NOTIFY_CLOSE_URL);
+	if (StringUtils.isNotBlank(notifyCloseURL)) {
+	    request.getSession().setAttribute(PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
+	}
+	
 	return mapping.findForward(PedagogicalPlannerAction.FORWARD_TEMPLATE);
     }
 
