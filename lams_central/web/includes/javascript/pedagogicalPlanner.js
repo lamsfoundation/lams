@@ -146,6 +146,7 @@
 	   	 		data: "method=copyLearningDesign&ldId="+learningDesignId
 	   	 	});
 	   	 	
+	   	 	//offers to close PedPlanner and open modified sequence
 	   	 	if (requestSrc != "") $("#saveSequenceDialog").dialog('open');
   	   	}  	  
 	   	else if (actionAfterCompleted==ACTION_PREVIEW){
