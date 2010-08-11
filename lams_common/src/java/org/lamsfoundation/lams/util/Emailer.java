@@ -116,7 +116,7 @@ public class Emailer {
 		message.setFrom(new InternetAddress(from, fromPerson));
 		message.addRecipient(RecipientType.TO, new InternetAddress(to, toPerson));
 		message.setSubject(subject);
-		message.setText(body, "text/plain");
+		message.setText(body);
 
 		boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
 		if (useInternalSMTPServer) {
