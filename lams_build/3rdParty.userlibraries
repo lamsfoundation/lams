@@ -6,6 +6,16 @@
         <archive path="/lams_build/lib/autopatch/tk-discovery-1.0.0.jar"/>
         <archive javadoc="http://ws.apache.org/axis/java/apiDocs/" path="/lams_build/lib/axis/axis.jar"/>
         <archive path="/lams_build/lib/axis/jaxrpc.jar"/>
+        <archive path="/lams_build/lib/batik/batik-anim.jar"/>
+        <archive path="/lams_build/lib/batik/batik-bridge.jar"/>
+        <archive path="/lams_build/lib/batik/batik-css.jar"/>
+        <archive path="/lams_build/lib/batik/batik-dom.jar"/>
+        <archive path="/lams_build/lib/batik/batik-ext.jar"/>
+        <archive path="/lams_build/lib/batik/batik-gvt.jar"/>
+        <archive path="/lams_build/lib/batik/batik-parser.jar"/>
+        <archive path="/lams_build/lib/batik/batik-svg-dom.jar"/>
+        <archive path="/lams_build/lib/batik/batik-util.jar"/>
+        <archive path="/lams_build/lib/batik/batik-xml.jar"/>
         <archive path="/lams_build/lib/cglib/cglib_jboss404GA.jar"/>
         <archive path="/lams_build/lib/dom4j/dom4j-1.5.2.jar"/>
         <archive path="/lams_build/lib/ehcache/ehcache-1.2.jar"/>
@@ -83,6 +93,8 @@
         <archive javadoc="http://java.sun.com/products/jsp/jstl/1.1/docs/api/" path="/lams_build/lib/j2ee/jstl.jar"/>
         <archive path="/lams_build/lib/fckeditor/FCKeditor-2.4.1.jar"/>
         <archive path="/lams_build/lib/concurrent/concurrent-1.3.4.jar"/>
+        <archive path="/lams_build/lib/xml-commons/xml-apis.jar"/>
+        <archive path="/lams_build/lib/xml-commons/xml-apis-ext.jar"/>
         <archive path="/lams_build/lib/xstream/xstream-1.1.jar"/>
         <archive path="/lams_build/lib/xstream/jmock-2004-03-19.jar"/>
         <archive path="/lams_build/lib/xstream/joda-time-0.98.jar"/>

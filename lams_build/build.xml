@@ -116,6 +116,7 @@
 					<include name="aspirin/*.jar" />
 					<include name="autopatch/*.jar" />
 					<include name="axis/*.jar" />
+					<include name="batik/*.jar" />
 					<include name="cglib/*.jar" />
 					<include name="dom4j/*.jar" />
 					<include name="fckeditor/*.jar" />
@@ -133,7 +134,8 @@
 					<include name="spring/*.jar" />
 					<include name="struts/*.jar" />
 					<include name="wddx/*.jar" />
-					<include name="concurrent/*.jar" />					
+					<include name="concurrent/*.jar" />	
+					<include name="xml-commons/*.jar" />
 					<include name="xstream/*.jar" />		
 					<include name="flagstone/*.jar" />
 					<include name="lucene/*.jar" />

@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.learningdesign.service;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -64,6 +65,8 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -138,6 +141,7 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.VersionUtil;
+import org.lamsfoundation.lams.util.svg.SVGGenerator;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.springframework.beans.BeansException;
@@ -182,6 +186,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     public static final String TOOL_FILE_NAME = "tool.xml";
 
     public static final String TOOL_FAILED_FILE_NAME = "export_failed.xml";
+    
+    public static final String SVG_IMAGE_FILE_NAME = "learning_design.svg";
 
     private static final String ERROR_TOOL_NOT_FOUND = "error.import.matching.tool.not.found";
 
@@ -656,6 +662,21 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    XStream designXml = new XStream();
 	    designXml.toXML(ldDto, ldFile);
 	    ldFile.close();
+	    
+	    //generate SVG image
+	    if (format != ExportToolContentService.PACKAGE_FORMAT_IMS) {
+		String svgFileName = FileUtil.getFullPath(contentDir, ExportToolContentService.SVG_IMAGE_FILE_NAME);
+		Writer svgFile = new OutputStreamWriter(new FileOutputStream(svgFileName), "UTF-8");
+		SVGGenerator svgGenerator = SVGGenerator.getInstance();
+		svgGenerator.generateSvg(ldDto);
+		OutputFormat outputFormat = new OutputFormat(svgGenerator.getSVGDocument());
+		outputFormat.setLineWidth(65);
+		outputFormat.setIndenting(true);
+		outputFormat.setIndent(2);
+		XMLSerializer serializer = new XMLSerializer(svgFile, outputFormat);
+		serializer.serialize(svgGenerator.getSVGDocument());
+		svgFile.close();
+	    }
 
 	    log.debug("Learning design xml export success");
 
@@ -699,6 +720,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    throw new ExportToolContentException(e);
 	} catch (IOException e) {
 	    log.error("IOException:", e);
+	    throw new ExportToolContentException(e);
+	} catch (JDOMException e) {
+	    log.error("JDOMException:", e);
 	    throw new ExportToolContentException(e);
 	}
     }
