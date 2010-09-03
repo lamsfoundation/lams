@@ -29,6 +29,8 @@ public class SVGConstants {
     public static final String SVG_NAMESPACE = "http://www.w3.org/2000/svg";//SVGDOMImplementation.SVG_NAMESPACE_URI;
     public static final String SVG_NAMESPACE_XLINK = "http://www.w3.org/1999/xlink";
     
+    public static final String ROOT_ELEMENT_ID = "rootElement";
+    
     // canvas dimensions
     public static final String CANVAS_DEFAULT_WIDTH = "100%";
     public static final String CANVAS_DEFAULT_HEIGHT = "100%";

@@ -60,13 +60,17 @@ import org.w3c.dom.svg.SVGDocument;
 public class SVGGenerator extends SVGConstants{
     
     private SVGDocument doc;
+    private String width = null;
+    private String height = null;
+    private Double scale = null;
     
     /**
      * Sets up Svg root and defs. 
      */    
-    private void initializeSvgDocument(String scale, String width, String height) {
+    private void initializeSvgDocument() {
 	String canvasWidth = (width == null) ? CANVAS_DEFAULT_WIDTH : width;
-	String canvasGeigth = (height == null) ? CANVAS_DEFAULT_HEIGHT : height;
+	String canvasHeigth = (height == null) ? CANVAS_DEFAULT_HEIGHT : height;
+	Double scale = (this.scale == null) ? 1 : this.scale;
 	
         // Create an SVG document.
         DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
@@ -74,8 +78,8 @@ public class SVGGenerator extends SVGConstants{
         // Get the root element (the 'svg' element).
         Element svgRoot = doc.getDocumentElement();
         // Set the width and height attributes on the root 'svg' element.
-        svgRoot.setAttributeNS(null, "width", CANVAS_DEFAULT_WIDTH);
-        svgRoot.setAttributeNS(null, "height", CANVAS_DEFAULT_HEIGHT);
+        svgRoot.setAttributeNS(null, "width", canvasWidth);
+        svgRoot.setAttributeNS(null, "height", canvasHeigth);
         svgRoot.setAttributeNS(null, "xmlns", SVG_NAMESPACE);
         svgRoot.setAttributeNS(null, "xmlns:xlink", SVG_NAMESPACE_XLINK);
         
@@ -94,8 +98,20 @@ public class SVGGenerator extends SVGConstants{
 	defs.appendChild(marker);
 	Element path = doc.createElementNS(SVG_NAMESPACE, "path");
 	path.setAttributeNS(null, "d", "M 0 0 L 10 5 L 0 10 z");
-	marker.appendChild(path);	
+	marker.appendChild(path);
+	
+	// Create root g element
+	Element g = doc.createElementNS(SVG_NAMESPACE, "g");
+	g.setAttributeNS(null, "id", ROOT_ELEMENT_ID);
+	g.setAttributeNS(null, "transform", "scale(" + scale + " ," + scale + ")");
+	svgRoot.appendChild(g);
 
+    }
+    
+    public void setSVGDocumentParameters(String width, String height, Double scale) {
+	this.width = width;
+	this.height = height;
+	this.scale = scale;
     }
     
     public SVGDocument getSVGDocument() {
@@ -110,7 +126,7 @@ public class SVGGenerator extends SVGConstants{
      * @throws IOException
      */
     public void generateSvg(LearningDesignDTO learningDesign) throws JDOMException, IOException {
-	initializeSvgDocument("0.5", null, null);
+	initializeSvgDocument();
 
         //initialize all tree nodes
         ArrayList<AuthoringActivityDTO> activities = learningDesign.getActivities();
@@ -134,7 +150,7 @@ public class SVGGenerator extends SVGConstants{
         }
 	
         //**************** Draw transitions********************************************************
-        Element svgRoot = doc.getDocumentElement();
+        Element svgRoot = doc.getElementById(ROOT_ELEMENT_ID);
         ArrayList<TransitionDTO> transitions = learningDesign.getTransitions();
         for (TransitionDTO transition : transitions) {
             
@@ -234,7 +250,7 @@ public class SVGGenerator extends SVGConstants{
 	String parentID = (activity.getParentActivityID() == null) ? "0" : activity.getParentActivityID().toString();
 	g.setAttributeNS(null, "parentID", parentID);
 	// Attach the g element to the root 'svg' element.
-	Element svgRoot = doc.getDocumentElement();
+	Element svgRoot = doc.getElementById(ROOT_ELEMENT_ID);
 	svgRoot.appendChild(g);
 
 	int x = node.getActivityCoordinates().x;
