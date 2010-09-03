@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.util.svg;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
-
 /**
  * @author Andrey Balan
  */

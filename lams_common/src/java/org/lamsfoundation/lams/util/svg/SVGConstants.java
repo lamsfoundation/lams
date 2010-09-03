@@ -58,5 +58,7 @@ public class SVGConstants {
     //distance between points in branching activity
     public static final int BRANCHING_STEP = 15;
     
+    // css
+    public static final String CSS_CONTAINER = "fill:#A9C8FD;stroke:#E1F0FD;stroke-width:2.2;opacity:1";
 
 }

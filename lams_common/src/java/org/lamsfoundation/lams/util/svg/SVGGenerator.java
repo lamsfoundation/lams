@@ -23,9 +23,8 @@ package org.lamsfoundation.lams.util.svg;
 
 /* $Id$ */
 
+import java.awt.Dimension;
 import java.awt.geom.Point2D;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,8 +32,6 @@ import java.util.Iterator;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.commons.lang.StringUtils;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
 import org.jdom.JDOMException;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
@@ -108,6 +105,13 @@ public class SVGGenerator extends SVGConstants{
 	return doc;
     }
     
+    /**
+     * Generates SVG image based on learning design provided.
+     * 
+     * @param learningDesign
+     * @throws JDOMException
+     * @throws IOException
+     */
     public void generateSvg(LearningDesignDTO learningDesign) throws JDOMException, IOException {
 
         //initialize all tree nodes
@@ -196,10 +200,13 @@ public class SVGGenerator extends SVGConstants{
 	if (activity != null) {
 	    createActivity(node);
 	    
-	    //in case of branching activity don't traverse child activities
+	    //in case of branching activity OR child of optional sequence activity OR optional actvity
+	    //don't traverse child activities
 	    if (activity.getActivityTypeID().equals(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE)
 		    || activity.getActivityTypeID().equals(Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
-		    || activity.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE)) {
+		    || activity.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE)
+		    || node.isOptionalSequenceActivityChild()
+		    || node.isOptionalActivityChild()) {
 		return;
 	    }
 	}
@@ -245,12 +252,38 @@ public class SVGGenerator extends SVGConstants{
 	Integer height = node.getActivityDimension().height;	
 	String text = activity.getActivityTitle();
 
-	// if this is a stop gate we need to draw an octogon instead
-	if (activity.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE) 
+	// if this activity is a children of a sequence activity, if it is, then we need to change its size
+	if (node.isOptionalSequenceActivityChild()) {
+	    ActivityTreeNode parentNode = (ActivityTreeNode) node.getParent();
+	    AuthoringActivityDTO grandParentActivity = parentNode.getParentActivity();
+	    x += (grandParentActivity.getxCoord() == null) ? 0 : grandParentActivity.getxCoord();
+	    y += (grandParentActivity.getyCoord() == null) ? 0 : grandParentActivity.getyCoord();
+	    
+	    //create activity's rectangle
+	    createRectangle(node, x, y, g);
+
+	    createImage(node, x, y, g);
+
+	// this activity is a children of an optional activity
+	} else if (node.isOptionalActivityChild()) {
+
+	    //create activity's rectangle
+	    createRectangle(node, x, y, g);
+
+	    // Create text label
+	    if (text != null) {
+		int xText = x + (width / 2);
+		int yText = y + (height / 2) + 18;
+		createText("TextElement-" + activityId, xText, yText, null, "middle", "11.4", "Verdana", null, text, g);
+	    }
+	
+	    createImage(node, x, y, g);
+	    
+	} else if (activity.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.SCHEDULE_GATE_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.PERMISSION_GATE_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.CONDITION_GATE_ACTIVITY_TYPE)) {
-	    // don't care about SYSTEM_GATE_ACTIVITY_TYPE
+	    // if this is a stop gate we need to draw an octogon instead (and don't care about SYSTEM_GATE_ACTIVITY_TYPE)
 	    x += 8;
 	    y -= 2;
 
@@ -260,7 +293,7 @@ public class SVGGenerator extends SVGConstants{
 	    }
 
 	    Element polygon = doc.createElementNS(SVG_NAMESPACE, "polygon");
-	    polygon.setAttributeNS(null, "style", "fill:red;stroke:#000000;stroke-width:0.5px");
+	    polygon.setAttributeNS(null, "style", node.getActivityCss());
 	    polygon.setAttributeNS(null, "points", finalProportions);
 	    g.appendChild(polygon);
 
@@ -278,30 +311,16 @@ public class SVGGenerator extends SVGConstants{
 	} else if (activity.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE)) {
 	    // This is a parallel activity
 
-	    String style = "stroke:black;stroke-width:1;opacity:1;fill:#d0defd";
-	    
 	    // if the parallel is grouped, show it
 	    if (activity.getApplyGrouping()) {
-		createGroupingEffect("grouping-" + activityId, x, y, width, height, style, g);
+		createGroupingEffect(node, x, y, g);
 	    }
 	    
-	    //TODO may be switch to using the following operators...    createRectangle(null, x, y, width, height, style, g);
-	    Element parallelContainer = doc.createElementNS(SVG_NAMESPACE, "rect");
-	    parallelContainer.setAttributeNS(null, "x", Integer.toString(x));
-	    parallelContainer.setAttributeNS(null, "y", Integer.toString(y));
-	    parallelContainer.setAttributeNS(null, "width", Integer.toString(width));
-	    parallelContainer.setAttributeNS(null, "height", Integer.toString(height));
-	    parallelContainer.setAttributeNS(null, "style", style);
-	    g.appendChild(parallelContainer);
+	    //Create parallelContainer
+	    createRectangle(node, x, y, g);
 	    
-	    Element parallelHeader = doc.createElementNS(SVG_NAMESPACE, "rect");
-	    parallelHeader.setAttributeNS(null, "x", Integer.toString(x +4));
-	    parallelHeader.setAttributeNS(null, "y", Integer.toString(y +5));
-	    parallelHeader.setAttributeNS(null, "width", Integer.toString(width -8));
-	    parallelHeader.setAttributeNS(null, "height", Integer.toString(23));
-	    parallelHeader.setAttributeNS(null, "style", "fill:#A9C8FD;stroke:#E1F0FD;stroke-width:2.2;opacity:1");
-	    g.appendChild(parallelHeader);
-
+	    createActvityHeader(node, x, y, g);
+	    
 	    if (StringUtils.isNotEmpty(text)) {
 		createText("TextElement-" + activityId, x +9, y +19, null, "start", "12", "Arial", "fill:#828990", text, g);
 	    }
@@ -311,21 +330,13 @@ public class SVGGenerator extends SVGConstants{
 		|| activity.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE)) {
 	    // This is a branching activity
 
-	    // Given that for now all parallel activities are just two activities, we can hard code the width and height
-	    String style = "stroke:black;stroke-width:1;opacity:1;fill:#d0defd";
-	    
 	    // if the parallel is grouped, show it
 	    if (activity.getApplyGrouping()) {
-		createGroupingEffect("grouping-" + activityId, x, y, width, height, style, g);
+		createGroupingEffect(node, x, y, g);
 	    }
 	    
-	    Element branchingContainer = doc.createElementNS(SVG_NAMESPACE, "rect");
-	    branchingContainer.setAttributeNS(null, "x", Integer.toString(x));
-	    branchingContainer.setAttributeNS(null, "y", Integer.toString(y));
-	    branchingContainer.setAttributeNS(null, "width", Integer.toString(width));
-	    branchingContainer.setAttributeNS(null, "height", Integer.toString(height));
-	    branchingContainer.setAttributeNS(null, "style", style);
-	    g.appendChild(branchingContainer);
+	    //Create branchingContainer
+	    createRectangle(node, x, y, g);
 	    
 	    int startingPointX = x + 26;
 	    int startingPointY = y + 40;
@@ -413,85 +424,33 @@ public class SVGGenerator extends SVGConstants{
 	} else if (activity.getActivityTypeID().equals(Activity.OPTIONS_WITH_SEQUENCES_TYPE)) {
 	    // This is an optional sequence
 	    
-	    Element optionalContainer = doc.createElementNS(SVG_NAMESPACE, "rect");
-	    optionalContainer.setAttributeNS(null, "x", Integer.toString(x));
-	    optionalContainer.setAttributeNS(null, "y", Integer.toString(y));
-	    optionalContainer.setAttributeNS(null, "width", Integer.toString(width));
-	    optionalContainer.setAttributeNS(null, "height", Integer.toString(height));
-	    optionalContainer.setAttributeNS(null, "style", "opacity:1;fill:#d0defd");
-	    g.appendChild(optionalContainer);
-
-	    Element optionalHeader = doc.createElementNS(SVG_NAMESPACE, "rect");
-	    optionalHeader.setAttributeNS(null, "x", Integer.toString(x +4));
-	    optionalHeader.setAttributeNS(null, "y", Integer.toString(y +5));
-	    optionalHeader.setAttributeNS(null, "width", Integer.toString(width -8));
-	    optionalHeader.setAttributeNS(null, "height", Integer.toString(CONTAINER_HEADER_HEIGHT));
-	    optionalHeader.setAttributeNS(null, "style", "fill:#A9C8FD;stroke:#E1F0FD;stroke-width:2.2;opacity:1");
-	    g.appendChild(optionalHeader);
+	    //Create optionalContainer
+	    createRectangle(node, x, y, g);
+	    
+	    createActvityHeader(node, x, y, g);
 
 	    if (StringUtils.isNotEmpty(text)) {
 		createText("TextElement-" + activityId, x +9, y +19, null, "start", "12", "Arial", "fill:#828990", text, g);
 	    }
 	    
-	    int optionalSequencesSize = node.getChildCount();
-	    createText("Children-" + activityId, x +9, y +19*2+1, null, "start", "11", "Arial", "fill:#828990", optionalSequencesSize + " - Sequences", g);
+	    createText("Children-" + activityId, x +9, y +19*2+1, null, "start", "11", "Arial", "fill:#828990", node.getChildCount() + " - Sequences", g);
 
 	} else if (activity.getActivityTypeID().equals(Activity.SEQUENCE_ACTIVITY_TYPE)) {	
 	    // This is a sequence within an optional
 	    
-	    ActivityTreeNode parentNode = (ActivityTreeNode) node.getParent();
-	    int indexInSiblings = parentNode.getIndex(node) % 6;
-	    String color;
-	    switch (indexInSiblings) {
-	    case 1:
-		color = "BCD0FF";
-		break;
-	    case 2:
-		color = "C7F9AE";
-		break;
-	    case 3:
-		color = "FFEDC3";
-		break;
-	    case 4:
-		color = "EDDDF9";
-		break;
-	    case 5:
-		color = "E9E9E9";
-		break;
-	    default:
-		color = "FFFFB3";
-	    }
-		
-	    Element sequenceContainer = doc.createElementNS(SVG_NAMESPACE, "rect");
-	    sequenceContainer.setAttributeNS(null, "x", Integer.toString(x));
-	    sequenceContainer.setAttributeNS(null, "y", Integer.toString(y));
-	    sequenceContainer.setAttributeNS(null, "width", Integer.toString(width));
-	    sequenceContainer.setAttributeNS(null, "height", Integer.toString(height));
-	    sequenceContainer.setAttributeNS(null, "style", "stroke:#E1F0FD;stroke-width:.4;opacity:1;fill:#" + color);
-	    g.appendChild(sequenceContainer);
+	    //Create sequenceContainer
+	    createRectangle(node, x, y, g);
 	    
 	} else if (activity.getActivityTypeID().equals(Activity.OPTIONS_ACTIVITY_TYPE)) {
 	    // This is an optional activity
 		
 	    int childActivitiesSize = node.getChildCount();
 
-	    // Create rect
-	    Element optionalContainer = doc.createElementNS(SVG_NAMESPACE, "rect");
-	    optionalContainer.setAttributeNS(null, "x", Integer.toString(x));
-	    optionalContainer.setAttributeNS(null, "y", Integer.toString(y));
-	    optionalContainer.setAttributeNS(null, "width", Integer.toString(width));
-	    optionalContainer.setAttributeNS(null, "height", Integer.toString(height));
-	    optionalContainer.setAttributeNS(null, "style", "opacity:1;fill:#d0defd");
-	    g.appendChild(optionalContainer);
-
-	    Element optionalHeader = doc.createElementNS(SVG_NAMESPACE, "rect");
-	    optionalHeader.setAttributeNS(null, "x", Integer.toString(x + 4));
-	    optionalHeader.setAttributeNS(null, "y", Integer.toString(y + 5));
-	    optionalHeader.setAttributeNS(null, "width", Integer.toString(width - 8));
-	    optionalHeader.setAttributeNS(null, "height", Integer.toString(CONTAINER_HEADER_HEIGHT));
-	    optionalHeader.setAttributeNS(null, "style", "fill:#A9C8FD;stroke:#E1F0FD;stroke-width:2.2;opacity:1");
-	    g.appendChild(optionalHeader);
+	    // Create optionalContainer
+	    createRectangle(node, x, y, g);
 	    
+	    createActvityHeader(node, x, y, g);
+
 	    if (StringUtils.isNotEmpty(text)) {
 		createText("TextElement-" + activityId, x +9, y +19, null, "start", "12", "Arial", "fill:#828990", text, g);
 	    }
@@ -500,22 +459,11 @@ public class SVGGenerator extends SVGConstants{
 
 	} else if (activity.getActivityTypeID().equals(Activity.FLOATING_ACTIVITY_TYPE)) {
 	    // This is a support activity
-	    
-	    Element supportContainer = doc.createElementNS(SVG_NAMESPACE, "rect");
-	    supportContainer.setAttributeNS(null, "x", Integer.toString(x));
-	    supportContainer.setAttributeNS(null, "y", Integer.toString(y));
-	    supportContainer.setAttributeNS(null, "width", Integer.toString(width));
-	    supportContainer.setAttributeNS(null, "height", Integer.toString(height));
-	    supportContainer.setAttributeNS(null, "style", "opacity:1;fill:#d0defd");
-	    g.appendChild(supportContainer);
 
-	    Element supportHeader = doc.createElementNS(SVG_NAMESPACE, "rect");
-	    supportHeader.setAttributeNS(null, "x", Integer.toString(x +4));
-	    supportHeader.setAttributeNS(null, "y", Integer.toString(y +5));
-	    supportHeader.setAttributeNS(null, "width", Integer.toString(width -8));
-	    supportHeader.setAttributeNS(null, "height", Integer.toString(CONTAINER_HEADER_HEIGHT));
-	    supportHeader.setAttributeNS(null, "style", "fill:#A9C8FD;stroke:#E1F0FD;stroke-width:2.2;opacity:1");
-	    g.appendChild(supportHeader);
+	    // Create supportContainer
+	    createRectangle(node, x, y, g);
+	    
+	    createActvityHeader(node, x, y, g);
 
 	    if (StringUtils.isNotEmpty(text)) {
 		createText("TextElement-" + activityId, x +9, y +19, null, "start", "12", "Arial", "fill:#828990", text, g);
@@ -527,31 +475,13 @@ public class SVGGenerator extends SVGConstants{
 	} else {
 	    // This is a tool activity
 		
-	    // if this activity is a children of a sequence activity, if it is, then we need to change its size
-	    if (node.isOptionalSequenceActivityChild()) {
-		ActivityTreeNode parentNode = (ActivityTreeNode) node.getParent();
-		AuthoringActivityDTO grandParentActivity = parentNode.getParentActivity();
-		x += (grandParentActivity.getxCoord() == null) ?  0 : grandParentActivity.getxCoord();
-		y += (grandParentActivity.getyCoord() == null) ?  0 : grandParentActivity.getyCoord();
-		text = null;
-	    }
-	    
-	    String style = "stroke:black;stroke-width:0.8;opacity:1" + node.getActivityColor();
-
 	    // if activity uses a grouping we need to add a second rect layer to show that it's grouped
 	    if (activity.getApplyGrouping()) {
-		createGroupingEffect("grouping-" + activityId, x, y, width, height, style, g);
+		createGroupingEffect(node, x, y, g);
 	    }
 
-	    // Create rect
-	    Element activityRectangle = doc.createElementNS(SVG_NAMESPACE, "rect");
-	    activityRectangle.setAttributeNS(null, "id", "act" + activityId);
-	    activityRectangle.setAttributeNS(null, "x", Integer.toString(x));
-	    activityRectangle.setAttributeNS(null, "y", Integer.toString(y));
-	    activityRectangle.setAttributeNS(null, "width", width.toString());
-	    activityRectangle.setAttributeNS(null, "height", height.toString());
-	    activityRectangle.setAttributeNS(null, "style", style);
-	    g.appendChild(activityRectangle);
+	    //create activity's rectangle
+	    createRectangle(node, x, y, g);
 
 	    // Create text label
 	    if (text != null) {
@@ -560,63 +490,59 @@ public class SVGGenerator extends SVGConstants{
 		createText("TextElement-" + activityId, xText, yText, null, "middle", "11.4", "Verdana", null, text, g);
 	    }
 
-	    // Create image
-	    int imageX = x + (width / 2) - 15;
-	    int imageY = y + (height / 2) - 22;
-	    if (node.isOptionalSequenceActivityChild()) {
-		imageX += 2;
-		imageY += 7;
-	    }
-	    String imagePath = activity.getLibraryActivityUIImage();
-	    // if png_filename is empty then this is a grouping act:
-	    String imageFileName;
-	    if (StringUtils.isBlank(imagePath)) {
-		imageFileName = "icon_grouping.png";
-	    } else {
-		imageFileName = FileUtil.getFileName(imagePath);
-		imageFileName = imageFileName.replaceFirst(".swf$", ".png");
-	    }
-	    imageFileName = "http://lamscommunity.org/lamscentral/images/acts/" + imageFileName;
-	    Element imageNode = doc.createElementNS(SVG_NAMESPACE, "image");
-	    imageNode.setAttributeNS(null, "id", "image-" + activityId);
-	    imageNode.setAttributeNS(null, "x", Integer.toString(imageX));
-	    imageNode.setAttributeNS(null, "y", Integer.toString(imageY));
-	    imageNode.setAttributeNS(SVG_NAMESPACE_XLINK, "xlink:href", imageFileName);
-	    imageNode.setAttributeNS(null, "width", Integer.toString(30));
-	    imageNode.setAttributeNS(null, "height", Integer.toString(30));
-	    g.appendChild(imageNode);
+	    createImage(node, x, y, g);
 	}
 
     }
     
-    private void createRectangle(String id, double x, double y, Integer width, Integer height, String style, Element g) {
-
+    //**************** Auxiliary methods for creating svg components ********************************************************
+    
+    private void createRectangle(ActivityTreeNode node, double x, double y, Element g) {
+	AuthoringActivityDTO activity = node.getActivity();
+	Dimension dimension = node.getActivityDimension();
+	String style = node.getActivityCss();
+	
 	if (style == null) {
 	    style = "";
 	}
 	
 	Element rectangle = doc.createElementNS(SVG_NAMESPACE, "rect");
-	if (id != null) {	
-	    rectangle.setAttributeNS(null, "id", id);
+	if (activity.getActivityTypeID().equals(Activity.TOOL_ACTIVITY_TYPE)) {	
+	    rectangle.setAttributeNS(null, "id", "act" + activity.getActivityID());
 	}
 	rectangle.setAttributeNS(null, "x", Double.toString(x));
 	rectangle.setAttributeNS(null, "y", Double.toString(y));
-	rectangle.setAttributeNS(null, "width", Double.toString(width));
-	rectangle.setAttributeNS(null, "height", Double.toString(height));
+	rectangle.setAttributeNS(null, "width", Double.toString(dimension.width));
+	rectangle.setAttributeNS(null, "height", Double.toString(dimension.height));
 	rectangle.setAttributeNS(null, "style", style);
+	g.appendChild(rectangle);
+    }
+    
+    private void createActvityHeader(ActivityTreeNode node, double x, double y, Element g) {
+	AuthoringActivityDTO activity = node.getActivity();
+	Dimension dimension = node.getActivityDimension();
+	double height = (activity.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE)) ? 23 : CONTAINER_HEADER_HEIGHT; 
+	
+	Element rectangle = doc.createElementNS(SVG_NAMESPACE, "rect");
+	rectangle.setAttributeNS(null, "x", Double.toString(x +4));
+	rectangle.setAttributeNS(null, "y", Double.toString(y +5));
+	rectangle.setAttributeNS(null, "width", Double.toString(dimension.width -8));
+	rectangle.setAttributeNS(null, "height", Double.toString(height));
+	rectangle.setAttributeNS(null, "style", SVGConstants.CSS_CONTAINER);
 	g.appendChild(rectangle);
     }    
     
-    private void createGroupingEffect(String id, double x, double y, double width, double height, String style,
-	    Element g) {
-
-	Element groupingRectangle = doc.createElementNS(SVG_NAMESPACE, "rect");
+    private void createGroupingEffect(ActivityTreeNode node, double x, double y, Element g) {
+	AuthoringActivityDTO activity = node.getActivity();
+	Dimension dimension = node.getActivityDimension();
+	String style = node.getActivityCss();
 	
-	groupingRectangle.setAttributeNS(null, "id", id);
+	Element groupingRectangle = doc.createElementNS(SVG_NAMESPACE, "rect");
+	groupingRectangle.setAttributeNS(null, "id", "grouping-" + activity.getActivityID());
 	groupingRectangle.setAttributeNS(null, "x", Double.toString(x + 4));
 	groupingRectangle.setAttributeNS(null, "y", Double.toString(y + 4));
-	groupingRectangle.setAttributeNS(null, "width", Double.toString(width));
-	groupingRectangle.setAttributeNS(null, "height",Double.toString( height));
+	groupingRectangle.setAttributeNS(null, "width", Double.toString(dimension.width));
+	groupingRectangle.setAttributeNS(null, "height",Double.toString(dimension.height));
 	groupingRectangle.setAttributeNS(null, "style", style + ";stroke:#3b3b3b;stroke-width:3");
 	
 	g.appendChild(groupingRectangle);
@@ -661,47 +587,59 @@ public class SVGGenerator extends SVGConstants{
 	g.appendChild(textNode);
     }
     
-    public static void main(String[] args) throws JDOMException, IOException {
+    /**
+     * Creates image for a tool.
+     * 
+     * @param node
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     * @param text
+     * @param g
+     */
+    private void createImage(ActivityTreeNode node, int x, int y, Element g) {
+
+	AuthoringActivityDTO activity = node.getActivity();
+	Dimension dimension = node.getActivityDimension();
 	
-	if (args.length != 1) {
-	    System.err.println("Usage: java SVGGenerator fullFilePath");
-	    System.exit(1);
+	// Create image
+	int imageX = x + (dimension.width / 2) - 15;
+	int imageY = y + (dimension.height / 2) - 22;
+	if (node.isOptionalSequenceActivityChild()) {
+	    imageX += 2;
+	    imageY += 7;
 	}
-	
-	String fullFilePath = args[0];
-	
-	// import learning design
-	LearningDesignDTO learningDesign = (LearningDesignDTO) FileUtil.getObjectFromXML(null, fullFilePath);
-	
-        SVGGenerator svgGenerator = SVGGenerator.getInstance();
-        svgGenerator.generateSvg(learningDesign);
-        
-//        // Stream out svg document to display
-//        OutputFormat format = new OutputFormat(svgGenerator.getSVGDocument());
-//        format.setLineWidth(65);
-//        format.setIndenting(true);
-//        format.setIndent(2);
-//        Writer out = new StringWriter();
-//        XMLSerializer serializer = new XMLSerializer(out, format);
-//        serializer.serialize(svgGenerator.getSVGDocument());
-//        System.out.println(out.toString());
-        
-        OutputFormat format = new OutputFormat(svgGenerator.getSVGDocument());
-        format.setLineWidth(65);
-        format.setIndenting(true);
-        format.setIndent(2);
-	// Create file
-        String svgFileName = FileUtil.getFileName(fullFilePath);
-        String fileExtension = FileUtil.getFileExtension(svgFileName);
-        svgFileName = svgFileName.replaceFirst(fileExtension + "$", "svg");
-        String svgFileFullPath = FileUtil.getFullPath(FileUtil.getFileDirectory(fullFilePath), svgFileName);
-	FileWriter fstream = new FileWriter(svgFileFullPath);
-	BufferedWriter out = new BufferedWriter(fstream);
-        XMLSerializer serializer = new XMLSerializer(out, format);
-        serializer.serialize(svgGenerator.getSVGDocument());
-        System.out.println("Creating a file " + svgFileFullPath );
-	// Close the output stream
-	out.close();
+	String imagePath = activity.getLibraryActivityUIImage();
+	// if png_filename is empty then this is a grouping act:
+	String imageFileName;
+	if (! StringUtils.isBlank(imagePath)) {
+	    imageFileName = FileUtil.getFileName(imagePath);
+	    imageFileName = imageFileName.replaceFirst(".swf$", ".png");
+	} else if (activity.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE)
+		|| activity.getActivityTypeID().equals(Activity.SCHEDULE_GATE_ACTIVITY_TYPE)
+		|| activity.getActivityTypeID().equals(Activity.PERMISSION_GATE_ACTIVITY_TYPE)
+		|| activity.getActivityTypeID().equals(Activity.CONDITION_GATE_ACTIVITY_TYPE)) { 
+	    imageFileName = "stop.png";
+    	} else if (activity.getActivityTypeID().equals(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE)
+		|| activity.getActivityTypeID().equals(Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
+		|| activity.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE)) { 
+	    imageFileName = "icon_branching.png";
+    	} else if (activity.getActivityTypeID().equals(Activity.OPTIONS_WITH_SEQUENCES_TYPE)
+		|| activity.getActivityTypeID().equals(Activity.OPTIONS_ACTIVITY_TYPE)) { 
+	    imageFileName = "icon_optional.png";
+    	} else {
+	    imageFileName = "icon_grouping.png";
+	}
+	imageFileName = "http://lamscommunity.org/lamscentral/images/acts/" + imageFileName;
+	Element imageNode = doc.createElementNS(SVG_NAMESPACE, "image");
+	imageNode.setAttributeNS(null, "id", "image-" + activity.getActivityID());
+	imageNode.setAttributeNS(null, "x", Integer.toString(imageX));
+	imageNode.setAttributeNS(null, "y", Integer.toString(imageY));
+	imageNode.setAttributeNS(SVG_NAMESPACE_XLINK, "xlink:href", imageFileName);
+	imageNode.setAttributeNS(null, "width", Integer.toString(30));
+	imageNode.setAttributeNS(null, "height", Integer.toString(30));
+	g.appendChild(imageNode);
     }
     
 }

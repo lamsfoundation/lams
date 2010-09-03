@@ -74,6 +74,27 @@ public class ActivityTreeNode extends DefaultMutableTreeNode {
     }    
     
     /**
+     * Checks whether activity is a children of an optional activity
+     * 
+     * @param node
+     * @return
+     */
+    public boolean isOptionalActivityChild() {
+	boolean isOptionalActivityChild = false;
+	
+	AuthoringActivityDTO activity = getActivity();
+	if ((activity.getParentActivityID() != null)) {
+	    ActivityTreeNode parentNode = (ActivityTreeNode) parent;
+	    AuthoringActivityDTO parentActivity = parentNode.getActivity();
+	    if (parentActivity.getActivityTypeID().equals(Activity.OPTIONS_ACTIVITY_TYPE)) {
+		isOptionalActivityChild = true;
+	    }
+	}
+	
+	return isOptionalActivityChild;
+    }
+    
+    /**
      * Checks whether activity is a children of an optional sequence activity
      * 
      * @param node
@@ -84,15 +105,15 @@ public class ActivityTreeNode extends DefaultMutableTreeNode {
 	
 	AuthoringActivityDTO activity = (AuthoringActivityDTO) userObject;
 	if ((activity.getParentActivityID() != null)) {
-	    DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) parent;
-	    AuthoringActivityDTO parentActivity = (AuthoringActivityDTO) parentNode.getUserObject();
+	    ActivityTreeNode parentNode = (ActivityTreeNode) parent;
+	    AuthoringActivityDTO parentActivity = parentNode.getActivity();
 	    if (parentActivity.getActivityTypeID().equals(Activity.SEQUENCE_ACTIVITY_TYPE)) {
 		isOptionalSequenceActivityChild = true;
 	    }
 	}
 	
 	return isOptionalSequenceActivityChild;
-    }
+    }    
     
     /**
      * Checks whether activity is a children of an optional sequence activity
@@ -127,6 +148,78 @@ public class ActivityTreeNode extends DefaultMutableTreeNode {
 	return color;
     }
     
+    public String getActivityCss() {
+	AuthoringActivityDTO activity = (AuthoringActivityDTO) userObject;
+	final String STROKE_CSS = "stroke:black;stroke-width:1;opacity:1;";
+	
+	String style;
+	switch (activity.getActivityTypeID()) {
+	// this is a gate activity
+	case Activity.SYNCH_GATE_ACTIVITY_TYPE:
+	case Activity.SCHEDULE_GATE_ACTIVITY_TYPE:
+	case Activity.PERMISSION_GATE_ACTIVITY_TYPE:
+	case Activity.CONDITION_GATE_ACTIVITY_TYPE:
+	    if (isOptionalSequenceActivityChild()||isOptionalActivityChild()) {
+		style = STROKE_CSS + "fill:#d0defd";;
+	    } else {
+		style = "fill:red;stroke:#000000;stroke-width:0.5px";
+	    }
+	    break;
+	    
+	// This is a parallel activity OR branching activity
+	case Activity.PARALLEL_ACTIVITY_TYPE:
+	case Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE:
+	case Activity.GROUP_BRANCHING_ACTIVITY_TYPE:
+	case Activity.TOOL_BRANCHING_ACTIVITY_TYPE:
+	    style = STROKE_CSS + "fill:#d0defd";
+	    break;
+	    
+	// This is a sequence within an optional    
+	case Activity.SEQUENCE_ACTIVITY_TYPE:
+	    ActivityTreeNode parentNode = (ActivityTreeNode) getParent();
+	    int indexInSiblings = parentNode.getIndex(this) % 6;
+	    String color;
+	    switch (indexInSiblings) {
+	    case 1:
+		color = "BCD0FF";
+		break;
+	    case 2:
+		color = "C7F9AE";
+		break;
+	    case 3:
+		color = "FFEDC3";
+		break;
+	    case 4:
+		color = "EDDDF9";
+		break;
+	    case 5:
+		color = "E9E9E9";
+		break;
+	    default:
+		color = "FFFFB3";
+	    }	    
+	    style = "stroke:#E1F0FD;stroke-width:.4;opacity:1;fill:#" + color;
+	    break;
+	    
+	// This is an optional sequence OR optional activity OR support activity
+	case Activity.OPTIONS_WITH_SEQUENCES_TYPE:
+	case Activity.OPTIONS_ACTIVITY_TYPE:
+	case Activity.FLOATING_ACTIVITY_TYPE:
+	    style = "fill:#d0defd;";
+	    if (isOptionalSequenceActivityChild()||isOptionalActivityChild()) {
+		style += STROKE_CSS;
+	    }
+	    break;
+	    
+	// This is a tool activity    
+	default:
+	    style = STROKE_CSS + getActivityColor();
+	    break;
+	}
+
+	return style;	
+    }
+    
     public Dimension getActivityDimension() {
 	AuthoringActivityDTO activity = (AuthoringActivityDTO) userObject;
 	int childrenSize = getChildCount();
@@ -135,58 +228,75 @@ public class ActivityTreeNode extends DefaultMutableTreeNode {
 	// activity to draw the transition accordingly.
         int width;
         int height;
-	if (activity.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE)
-		|| activity.getActivityTypeID().equals(Activity.SCHEDULE_GATE_ACTIVITY_TYPE)
-		|| activity.getActivityTypeID().equals(Activity.PERMISSION_GATE_ACTIVITY_TYPE)
-		|| activity.getActivityTypeID().equals(Activity.CONDITION_GATE_ACTIVITY_TYPE)) {
-	    // this is a gate activity
-	    width = SVGConstants.GATE_WIDTH;
-	    height = SVGConstants.GATE_HEIGHT;
+        // if this activity is a children of a sequence activity, if it is, then we need to change its size
+	if (isOptionalSequenceActivityChild()) {
+	    width = SVGConstants.TOOL_INSIDE_OPTIONAL_WIDTH;
+	    height = 43;
 	    
-	} else if (activity.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE)) {
-	    // This is a parallel activity
-	    // Given that for now all parallel activities are just two activities, we can hard code the width and height
-	    width = SVGConstants.PARALLEL_OR_OPTIONS_ACTIVITY_WIDTH;
-	    height = SVGConstants.PARALLEL_ACTIVITY_HEIGHT;	
-	    
-	} else if (activity.getActivityTypeID().equals(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE)
-		|| activity.getActivityTypeID().equals(Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
-		|| activity.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE)) {
-	    // This is a branching activity
-	    width = SVGConstants.BRANCHING_ACTIVITY_WIDTH;
-	    height = SVGConstants.BRANCHING_ACTIVITY_HEIGHT;	    
-	    
-	} else if (activity.getActivityTypeID().equals(Activity.OPTIONS_WITH_SEQUENCES_TYPE)) {
-	    // This is an optional sequence
-	    width = getOptionalSequenceActivityWidth();
-	    height = (57 * childrenSize) + 49;
-	    
-	} else if (activity.getActivityTypeID().equals(Activity.SEQUENCE_ACTIVITY_TYPE)) {
-	    // This is a sequence within an optional
-	    ActivityTreeNode parentNode = (ActivityTreeNode) getParent();
-	    width = parentNode.getOptionalSequenceActivityWidth() -8;
-	    height = SVGConstants.TOOL_HEIGHT + 3;	    
-	    
-	} else if (activity.getActivityTypeID().equals(Activity.OPTIONS_ACTIVITY_TYPE)) {
-	    // This is an optional activity	    
-	    width = SVGConstants.PARALLEL_OR_OPTIONS_ACTIVITY_WIDTH;
-	    height = SVGConstants.OPTIONS_ACTIVITY_HEIGHT_MULTIPLIER * childrenSize
-		    + SVGConstants.OPTIONS_ACTIVITY_HEIGHT_ADD;
-	    
-	} else if (activity.getActivityTypeID().equals(Activity.FLOATING_ACTIVITY_TYPE)) {
-	    // This is a support activity	
-	    width = (SVGConstants.TOOL_WIDTH +7) * childrenSize + 11;	    
-	    height = SVGConstants.OPTIONS_ACTIVITY_HEIGHT_MULTIPLIER + SVGConstants.OPTIONS_ACTIVITY_HEIGHT_ADD;
-	    
-	} else {
-	    // This is a tool activity
+	// if this activity is a children of an optional activity	    
+	} else if (isOptionalActivityChild()) {
 	    width = SVGConstants.TOOL_WIDTH;
 	    height = SVGConstants.TOOL_HEIGHT;
-	    
-	    // if this activity is a children of a sequence activity, if it is, then we need to change its size
-	    if (isOptionalSequenceActivityChild()) {
-		width = SVGConstants.TOOL_INSIDE_OPTIONAL_WIDTH;
-		height = 43;		
+
+	} else {
+	    switch (activity.getActivityTypeID()) {
+	    // this is a gate activity
+	    case Activity.SYNCH_GATE_ACTIVITY_TYPE:
+	    case Activity.SCHEDULE_GATE_ACTIVITY_TYPE:
+	    case Activity.PERMISSION_GATE_ACTIVITY_TYPE:
+	    case Activity.CONDITION_GATE_ACTIVITY_TYPE:
+		width = SVGConstants.GATE_WIDTH;
+		height = SVGConstants.GATE_HEIGHT;
+		break;
+
+	    // This is a parallel activity
+	    case Activity.PARALLEL_ACTIVITY_TYPE:
+		// Given that for now all parallel activities are just two activities, we can hard code the width and
+		// height
+		width = SVGConstants.PARALLEL_OR_OPTIONS_ACTIVITY_WIDTH;
+		height = SVGConstants.PARALLEL_ACTIVITY_HEIGHT;
+		break;
+
+	    // This is a branching activity
+	    case Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE:
+	    case Activity.GROUP_BRANCHING_ACTIVITY_TYPE:
+	    case Activity.TOOL_BRANCHING_ACTIVITY_TYPE:
+		width = SVGConstants.BRANCHING_ACTIVITY_WIDTH;
+		height = SVGConstants.BRANCHING_ACTIVITY_HEIGHT;
+		break;
+
+	    // This is an optional sequence
+	    case Activity.OPTIONS_WITH_SEQUENCES_TYPE:
+		width = getOptionalSequenceActivityWidth();
+		height = (57 * childrenSize) + 49;
+		break;
+
+	    // This is a sequence within an optional
+	    case Activity.SEQUENCE_ACTIVITY_TYPE:
+		ActivityTreeNode parentNode = (ActivityTreeNode) getParent();
+		width = parentNode.getOptionalSequenceActivityWidth() - 8;
+		height = SVGConstants.TOOL_HEIGHT + 3;
+		break;
+
+	    // This is an optional activity
+	    case Activity.OPTIONS_ACTIVITY_TYPE:
+		width = SVGConstants.PARALLEL_OR_OPTIONS_ACTIVITY_WIDTH;
+		height = SVGConstants.OPTIONS_ACTIVITY_HEIGHT_MULTIPLIER * childrenSize
+			+ SVGConstants.OPTIONS_ACTIVITY_HEIGHT_ADD;
+		break;
+
+	    // This is a support activity
+	    case Activity.FLOATING_ACTIVITY_TYPE:
+		width = (SVGConstants.TOOL_WIDTH + 7) * childrenSize + 11;
+		height = SVGConstants.OPTIONS_ACTIVITY_HEIGHT_MULTIPLIER + SVGConstants.OPTIONS_ACTIVITY_HEIGHT_ADD;
+		break;
+
+	    // This is a tool activity
+	    default:
+		width = SVGConstants.TOOL_WIDTH;
+		height = SVGConstants.TOOL_HEIGHT;
+
+		break;
 	    }
 	}
 
