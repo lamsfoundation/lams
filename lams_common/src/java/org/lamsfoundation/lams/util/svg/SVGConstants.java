@@ -30,8 +30,8 @@ public class SVGConstants {
     public static final String SVG_NAMESPACE_XLINK = "http://www.w3.org/1999/xlink";
     
     // canvas dimensions
-    public static final int CANVAS_WIDTH = 1024;
-    public static final int CANVAS_HEIGHT = 768;
+    public static final String CANVAS_DEFAULT_WIDTH = "100%";
+    public static final String CANVAS_DEFAULT_HEIGHT = "100%";
     
     // gate dimensions
     public static final int GATE_WIDTH = 30;

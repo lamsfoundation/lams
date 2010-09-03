@@ -52,7 +52,7 @@ import org.w3c.dom.svg.SVGDocument;
          f.getContentPane().add(canvas);
          canvas.setSVGDocument(svgGenerator.getSVGDocument());
          f.pack();
-         f.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
+         f.setSize(CANVAS_DEFAULT_WIDTH, CANVAS_DEFAULT_HEIGHT);
          f.setVisible(true); 
  * 
  * @author Andrey Balan
@@ -61,23 +61,21 @@ public class SVGGenerator extends SVGConstants{
     
     private SVGDocument doc;
     
-    private SVGGenerator(SVGDocument svgGDocument) {
-	doc = svgGDocument;
-    }
-    
     /**
      * Sets up Svg root and defs. 
      */    
-    public static SVGGenerator getInstance() {
+    private void initializeSvgDocument(String scale, String width, String height) {
+	String canvasWidth = (width == null) ? CANVAS_DEFAULT_WIDTH : width;
+	String canvasGeigth = (height == null) ? CANVAS_DEFAULT_HEIGHT : height;
 	
         // Create an SVG document.
         DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
-        SVGDocument doc = (SVGDocument) impl.createDocument(SVG_NAMESPACE, "svg", null);
+        doc = (SVGDocument) impl.createDocument(SVG_NAMESPACE, "svg", null);
         // Get the root element (the 'svg' element).
         Element svgRoot = doc.getDocumentElement();
         // Set the width and height attributes on the root 'svg' element.
-        svgRoot.setAttributeNS(null, "width", Integer.toString(CANVAS_WIDTH));
-        svgRoot.setAttributeNS(null, "height", Integer.toString(CANVAS_HEIGHT));
+        svgRoot.setAttributeNS(null, "width", CANVAS_DEFAULT_WIDTH);
+        svgRoot.setAttributeNS(null, "height", CANVAS_DEFAULT_HEIGHT);
         svgRoot.setAttributeNS(null, "xmlns", SVG_NAMESPACE);
         svgRoot.setAttributeNS(null, "xmlns:xlink", SVG_NAMESPACE_XLINK);
         
@@ -97,8 +95,7 @@ public class SVGGenerator extends SVGConstants{
 	Element path = doc.createElementNS(SVG_NAMESPACE, "path");
 	path.setAttributeNS(null, "d", "M 0 0 L 10 5 L 0 10 z");
 	marker.appendChild(path);	
-		
-	return new SVGGenerator(doc);
+
     }
     
     public SVGDocument getSVGDocument() {
@@ -113,6 +110,7 @@ public class SVGGenerator extends SVGConstants{
      * @throws IOException
      */
     public void generateSvg(LearningDesignDTO learningDesign) throws JDOMException, IOException {
+	initializeSvgDocument("0.5", null, null);
 
         //initialize all tree nodes
         ArrayList<AuthoringActivityDTO> activities = learningDesign.getActivities();

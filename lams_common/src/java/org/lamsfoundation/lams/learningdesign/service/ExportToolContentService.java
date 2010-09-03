@@ -667,7 +667,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    if (format != ExportToolContentService.PACKAGE_FORMAT_IMS) {
 		String svgFileName = FileUtil.getFullPath(contentDir, ExportToolContentService.SVG_IMAGE_FILE_NAME);
 		Writer svgFile = new OutputStreamWriter(new FileOutputStream(svgFileName), "UTF-8");
-		SVGGenerator svgGenerator = SVGGenerator.getInstance();
+		SVGGenerator svgGenerator = new SVGGenerator();
 		svgGenerator.generateSvg(ldDto);
 		OutputFormat outputFormat = new OutputFormat(svgGenerator.getSVGDocument());
 		outputFormat.setLineWidth(65);
