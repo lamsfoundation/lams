@@ -7,18 +7,22 @@
 	<property file="../lams_build/${osPropertiesName}.properties" />
 
 	<path id="all-libs">
-			<fileset dir="${sharedlib}">
-				<include name="**/*.jar"/>
-			</fileset>
-			<fileset dir="${j2eelibs}">
-					<include name="**/*.jar"/>
-			</fileset>
+		<fileset dir="${sharedlib}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${j2eelibs}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="./lib">
+			<include name="*.jar"/>
+		</fileset>		
 	</path>
 
 	<path id="project.classpath">
 		<path refid="all-libs" />
 		<!-- Java CLASSPATH should be added as the last item -->
 		<!-- This property is supposed to be set in eclipse  -->
+		<pathelement location="${java.class.path}" />
 		<pathelement location="${java.class.path}" />
 	</path>	
 	
@@ -67,6 +71,7 @@
 			<zipfileset src="${sharedlib}/spring/spring.jar"/>
 			<zipfileset src="${j2eelibs}/hibernate-core.jar" />
 			<zipfileset src="${j2eelibs}/log4j.jar"/>
+			<zipfileset src="./lib/commons-cli-1.2.jar"/>
 			
 			<manifest>
 				<attribute name="Main-Class" value="org.lamsfoundation.lams.svg.CommanLineSVGGenerator" />
