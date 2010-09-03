@@ -51,7 +51,7 @@ public class CommanLineSVGGenerator {
 	String fullFilePath = args[0];
 	LearningDesignDTO learningDesign = (LearningDesignDTO) FileUtil.getObjectFromXML(null, fullFilePath);
 	
-	SVGGenerator svgGenerator = SVGGenerator.getInstance();
+	SVGGenerator svgGenerator = new SVGGenerator();
         svgGenerator.generateSvg(learningDesign);
         
 //        // Stream out svg document to display
