@@ -61,7 +61,7 @@ public class CommanLineSVGGenerator {
 	
 	if (! cl.hasOption("file")) {
 	    HelpFormatter f = new HelpFormatter();
-	    f.printHelp("OptionsTip", options);
+	    f.printHelp("java -jar lams-svggenerator.jar", options);
 	    System.exit(1);
 	}
 
@@ -75,7 +75,7 @@ public class CommanLineSVGGenerator {
 		scale = Double.valueOf(scaleStr);
 	    } catch (NumberFormatException e) {
 		HelpFormatter f = new HelpFormatter();
-		f.printHelp("OptionsTip", options);
+		f.printHelp("java -jar lams-svggenerator.jar", options);
 		System.exit(1);
 	    }
 	}
