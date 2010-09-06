@@ -634,14 +634,14 @@ public class SVGGenerator extends SVGConstants{
 		|| activity.getActivityTypeID().equals(Activity.SCHEDULE_GATE_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.PERMISSION_GATE_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.CONDITION_GATE_ACTIVITY_TYPE)) { 
-	    imageFileName = "stop.png";
+	    imageFileName = "icon_gate.png";
     	} else if (activity.getActivityTypeID().equals(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE)) { 
 	    imageFileName = "icon_branching.png";
     	} else if (activity.getActivityTypeID().equals(Activity.OPTIONS_WITH_SEQUENCES_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.OPTIONS_ACTIVITY_TYPE)) { 
-	    imageFileName = "icon_optional.png";
+	    imageFileName = "icon_urlcontentmessageboard.png";
     	} else {
 	    imageFileName = "icon_grouping.png";
 	}
