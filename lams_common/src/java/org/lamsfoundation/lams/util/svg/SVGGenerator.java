@@ -29,11 +29,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.TreeSet;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.commons.lang.StringUtils;
 import org.jdom.JDOMException;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityDTOOrderComparator;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
@@ -369,7 +371,9 @@ public class SVGGenerator extends SVGConstants{
 	    startingPoint.setAttributeNS(null, "style", "fill:#000000");
 	    g.appendChild(startingPoint);
 	    
-	    Iterator<ActivityTreeNode> sequenceNodeIterator = node.getChildren().iterator();
+	    TreeSet<ActivityTreeNode> sequenceNodes = new TreeSet<ActivityTreeNode>(new ActivityTreeNodeComparator());
+	    sequenceNodes.addAll(node.getChildren());
+	    Iterator<ActivityTreeNode> sequenceNodeIterator = sequenceNodes.iterator();
 	    for (int sequenceIndex = -1; sequenceNodeIterator.hasNext() && (sequenceIndex < 4); sequenceIndex++) {
 		ActivityTreeNode sequenceNode = sequenceNodeIterator.next();
 		double previousActivityPointX = startingPointX + BRANCHING_ACTIVITY_POINT/2;
