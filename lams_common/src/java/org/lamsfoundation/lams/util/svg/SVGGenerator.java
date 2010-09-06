@@ -159,8 +159,9 @@ public class SVGGenerator extends SVGConstants{
 	    Point2D fromIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(fromActivity, toActivity);
 	    Point2D toIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(toActivity, fromActivity);            
             
-            //skip optional sequence's childs
-            if (fromActivity.isOptionalSequenceActivityChild()) {
+            //skip optional sequence's childs and lines between overlapped activities
+            if (fromActivity.isOptionalSequenceActivityChild() 
+        	    || (fromIntersection == null) || (toIntersection == null)) {
         	continue;
             }            
 	    
