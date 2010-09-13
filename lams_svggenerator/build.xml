@@ -49,16 +49,7 @@
 		<jar jarfile="${build.lib}/${product}.jar" manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
 			<zipfileset dir="${build.classes.java}" prefix="" />
 			
-			<zipfileset src="${sharedlib}/batik/batik-anim.jar"/>
-			<zipfileset src="${sharedlib}/batik/batik-bridge.jar"/>
-			<zipfileset src="${sharedlib}/batik/batik-css.jar"/>
-			<zipfileset src="${sharedlib}/batik/batik-dom.jar"/>
-			<zipfileset src="${sharedlib}/batik/batik-ext.jar"/>
-			<zipfileset src="${sharedlib}/batik/batik-gvt.jar"/>
-			<zipfileset src="${sharedlib}/batik/batik-parser.jar"/>
-			<zipfileset src="${sharedlib}/batik/batik-svg-dom.jar"/>
-			<zipfileset src="${sharedlib}/batik/batik-util.jar"/>
-			<zipfileset src="${sharedlib}/batik/batik-xml.jar"/>
+			<zipfileset src="${sharedlib}/batik/batik-1.7.jar"/>
 			<zipfileset src="${sharedlib}/xml-commons/xml-apis.jar"/>
 			<zipfileset src="${sharedlib}/xml-commons/xml-apis-ext.jar"/>
 			<zipfileset src="${sharedlib}/httpunit/xercesImpl.jar"/>
@@ -77,6 +68,26 @@
 				<attribute name="Main-Class" value="org.lamsfoundation.lams.svg.CommanLineSVGGenerator" />
 			</manifest>			
 			
+		</jar>
+	</target>
+	
+	<target name="create.single.batik.jar" description="creates a single batik jar out of all required batik jars">
+		<delete file="${build.lib}/batik-1.7.jar" failonerror="false"/>
+		<jar jarfile="${build.lib}/batik-1.7.jar" manifest="${conf.dir}/batikjar/META-INF/MANIFEST.MF">
+			<zipfileset src="./lib/batik-anim.jar"/>
+			<zipfileset src="./lib/batik-awt-util.jar"/>
+			<zipfileset src="./lib/batik-bridge.jar"/>
+			<zipfileset src="./lib/batik-codec.jar"/>
+			<zipfileset src="./lib/batik-css.jar"/>
+			<zipfileset src="./lib/batik-dom.jar"/>
+			<zipfileset src="./lib/batik-ext.jar"/>
+			<zipfileset src="./lib/batik-gvt.jar"/>
+			<zipfileset src="./lib/batik-parser.jar"/>
+			<zipfileset src="./lib/batik-script.jar"/>
+			<zipfileset src="./lib/batik-svg-dom.jar"/>
+			<zipfileset src="./lib/batik-transcoder.jar"/>
+			<zipfileset src="./lib/batik-util.jar"/>
+			<zipfileset src="./lib/batik-xml.jar"/>
 		</jar>
 	</target>
 </project>
