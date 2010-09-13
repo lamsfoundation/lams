@@ -26,16 +26,25 @@ package org.lamsfoundation.lams.util.svg;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.lang.StringUtils;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
 import org.jdom.JDOMException;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ActivityDTOOrderComparator;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
@@ -48,31 +57,22 @@ import org.w3c.dom.svg.SVGDocument;
 /**
  * Generates SVG document based on exported learning design's xml file.
  * 
- *       To be able to see resulted SVG image in swing component use the following lines. 
-         JSVGCanvas canvas = new JSVGCanvas();
-         JFrame f = new JFrame();
-         f.getContentPane().add(canvas);
-         canvas.setSVGDocument(svgGenerator.getSVGDocument());
-         f.pack();
-         f.setSize(CANVAS_DEFAULT_WIDTH, CANVAS_DEFAULT_HEIGHT);
-         f.setVisible(true); 
- * 
  * @author Andrey Balan
  */
 public class SVGGenerator extends SVGConstants{
     
+    public final static int OUTPUT_FORMAT_SVG  = 1;
+    public final static int OUTPUT_FORMAT_PNG  = 2;
+    public final static int OUTPUT_FORMAT_SYSTEM_OUT  = 3;
+    
     private SVGDocument doc;
-    private String width = null;
-    private String height = null;
-    private Double scale = null;
+    private Integer adjustedDocumentWidth = null;
     
     /**
      * Sets up Svg root and defs. 
      */    
     private void initializeSvgDocument() {
-	String canvasWidth = (width == null) ? CANVAS_DEFAULT_WIDTH : width;
-	String canvasHeigth = (height == null) ? CANVAS_DEFAULT_HEIGHT : height;
-	Double scale = (this.scale == null) ? 1 : this.scale;
+	
 	
         // Create an SVG document.
         DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
@@ -80,8 +80,6 @@ public class SVGGenerator extends SVGConstants{
         // Get the root element (the 'svg' element).
         Element svgRoot = doc.getDocumentElement();
         // Set the width and height attributes on the root 'svg' element.
-        svgRoot.setAttributeNS(null, "width", canvasWidth);
-        svgRoot.setAttributeNS(null, "height", canvasHeigth);
         svgRoot.setAttributeNS(null, "xmlns", SVG_NAMESPACE);
         svgRoot.setAttributeNS(null, "xmlns:xlink", SVG_NAMESPACE_XLINK);
         
@@ -105,19 +103,11 @@ public class SVGGenerator extends SVGConstants{
 	// Create root g element
 	Element g = doc.createElementNS(SVG_NAMESPACE, "g");
 	g.setAttributeNS(null, "id", ROOT_ELEMENT_ID);
-	g.setAttributeNS(null, "transform", "scale(" + scale + " ," + scale + ")");
 	svgRoot.appendChild(g);
-
     }
     
-    public void setSVGDocumentParameters(String width, String height, Double scale) {
-	this.width = width;
-	this.height = height;
-	this.scale = scale;
-    }
-    
-    public SVGDocument getSVGDocument() {
-	return doc;
+    public void adjustDocumentWidth(Integer width) {
+	this.adjustedDocumentWidth = width;
     }
     
     /**
@@ -127,7 +117,7 @@ public class SVGGenerator extends SVGConstants{
      * @throws JDOMException
      * @throws IOException
      */
-    public void generateSvg(LearningDesignDTO learningDesign) throws JDOMException, IOException {
+    public void generateSvgDom(LearningDesignDTO learningDesign) throws JDOMException, IOException {
 	initializeSvgDocument();
 
         //initialize all tree nodes
@@ -200,6 +190,8 @@ public class SVGGenerator extends SVGConstants{
         //**************** Draw activities ********************************************************
         //tree traverse
         treeTraverse(root);
+        
+        setUpDocumentWidthHeight(allNodes.values());
     }
     
     /**
@@ -510,6 +502,128 @@ public class SVGGenerator extends SVGConstants{
 	    }
 
 	    createImage(node, x, y, g);
+	}
+
+    }
+    
+    /**
+     * Returns estimated width and height of the whole SVG document.
+     * 
+     * @param nodes
+     * @param x
+     * @param y
+     * @param g
+     * @return
+     */
+    private void setUpDocumentWidthHeight(Collection<ActivityTreeNode> nodes) {
+	int maxX = 0;
+	int maxY = 0;
+	for (ActivityTreeNode node : nodes) {
+	    Dimension dimension = node.getActivityDimension();
+	    
+	    int rightestActivityPoint = node.getActivityCoordinates().x + dimension.width;
+	    if (rightestActivityPoint > maxX) {
+		maxX = rightestActivityPoint;
+	    }
+	    int bottomActivityPoint = node.getActivityCoordinates().y + dimension.height;
+	    if (bottomActivityPoint > maxY) {
+		maxY = bottomActivityPoint;
+	    }
+	}
+	
+	int minX = Integer.MAX_VALUE;
+	int minY = Integer.MAX_VALUE;
+	for (ActivityTreeNode node : nodes) {
+	    AuthoringActivityDTO activity = node.getActivity();
+	    if (activity.getParentActivityID() == null) {
+		int leftActivityPoint = activity.getxCoord().intValue();
+		if (leftActivityPoint < minX) {
+		    minX = leftActivityPoint;
+		}
+		int topActivityPoint = activity.getyCoord().intValue();
+		if (topActivityPoint < minY) {
+		    minY = topActivityPoint;
+		}
+	    }
+	}
+	
+        Element svg = doc.getDocumentElement();
+        
+	//Removes padding of the SVG image.
+        minX--;
+        minY--;
+        int width = maxX - minX +5;
+        int height = maxY - minY +5;
+        svg.setAttributeNS(null, "viewBox", minX + " " + minY + " " + Integer.toString(width) + " " + Integer.toString(height));
+        
+        // adjust width and height to adjustedDocumentWidth
+        if ((adjustedDocumentWidth != null) && adjustedDocumentWidth < width) {
+            double scale = (double) adjustedDocumentWidth / (double) width;
+            width = adjustedDocumentWidth;
+            height *= scale; 
+        }
+        
+        //Sets the width and height
+        svg.setAttributeNS(null, "width", Integer.toString(width));
+        svg.setAttributeNS(null, "height", Integer.toString(height));
+    }
+    
+    /**
+     * Stream out SVG document into specified outputStream.
+     * 
+     * @param outputStream stream where we put resulted data. It can be null in case of RESULT_TYPE_DISPLAY
+     * @param resultType one of SVGGenerator's constants: either RESULT_TYPE_SVG or RESULT_TYPE_PNG or RESULT_TYPE_DISPLAY
+     * 
+     * @throws TranscoderException
+     * @throws IOException
+     */
+    public void streamOutDocument(OutputStream outputStream, int resultType) throws TranscoderException, IOException {
+	
+	switch (resultType) {
+	case OUTPUT_FORMAT_SVG:
+	    OutputFormat format = new OutputFormat(doc);
+	    format.setLineWidth(65);
+	    format.setIndenting(true);
+	    format.setIndent(2);
+
+	    XMLSerializer serializer = new XMLSerializer(outputStream, format);
+	    serializer.serialize(doc);
+	    outputStream.flush();
+	    outputStream.close();
+	    break;
+	    
+	case OUTPUT_FORMAT_PNG:
+	    PNGTranscoder transcoder = new PNGTranscoder();
+	    // Set the transcoder input and output.
+	    TranscoderInput input = new TranscoderInput(doc);
+	    TranscoderOutput output = new TranscoderOutput(outputStream);
+
+	    // Perform the transcoding.
+	    transcoder.transcode(input, output);
+	    outputStream.flush();
+	    outputStream.close();
+	    break;
+	    
+//	// to see resulted SVG image in swing component     
+//	case OUTPUT_FORMAT_DISPLAY:	    
+//	    JSVGCanvas canvas = new JSVGCanvas();
+//	    JFrame f = new JFrame();
+//	    f.getContentPane().add(canvas);
+//	    canvas.setSVGDocument(doc);
+//	    f.pack();
+//	    f.setSize(CANVAS_DEFAULT_WIDTH, CANVAS_DEFAULT_HEIGHT);
+//	    f.setVisible(true);
+//	    break;	    
+	    
+	default:
+	    OutputFormat format2 = new OutputFormat(doc);
+	    format2.setLineWidth(65);
+	    format2.setIndenting(true);
+	    format2.setIndent(2);
+	    Writer out = new StringWriter();
+	    XMLSerializer serializer2 = new XMLSerializer(out, format2);
+	    serializer2.serialize(doc);
+	    System.out.println(out.toString());
 	}
 
     }

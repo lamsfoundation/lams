@@ -23,7 +23,6 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.util.svg;
 
-import java.io.Serializable;
 import java.util.Comparator;
 
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;

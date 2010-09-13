@@ -32,8 +32,8 @@ public class SVGConstants {
     public static final String ROOT_ELEMENT_ID = "rootElement";
     
     // canvas dimensions
-    public static final String CANVAS_DEFAULT_WIDTH = "100%";
-    public static final String CANVAS_DEFAULT_HEIGHT = "100%";
+    public static final int CANVAS_DEFAULT_WIDTH = 1024;
+    public static final int CANVAS_DEFAULT_HEIGHT = 768;
     
     // gate dimensions
     public static final int GATE_WIDTH = 30;
