@@ -14,13 +14,17 @@ axis              axis-ant.jar
                   wsdl4j-1.5.1.jar                      1.5.1                                                IBM                              JWSDL
 
 batik             batik-anim.jar
-                  batik-bridge.jar
+                  batik-awt-util.jar
+                  batik-bridge.jar.
+                  batik-codec.jar
                   batik-css.jar
                   batik-dom.jar
                   batik-ext.jar
                   batik-gvt.jar
                   batik-parser.jar
+                  batik-script.jar
                   batik-svg-dom.jar
+                  batik-transcoder.jar
                   batik-util.jar
                   batik-xml.jar                         1.7                    Apache License 2.0            Apache                          toolkit for manipulating images in the Scalable Vector Graphics (SVG) format
 
