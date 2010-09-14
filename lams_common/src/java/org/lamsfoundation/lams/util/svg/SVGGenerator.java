@@ -73,7 +73,6 @@ public class SVGGenerator extends SVGConstants{
      */    
     private void initializeSvgDocument() {
 	
-	
         // Create an SVG document.
         DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
         doc = (SVGDocument) impl.createDocument(SVG_NAMESPACE, "svg", null);
@@ -108,6 +107,18 @@ public class SVGGenerator extends SVGConstants{
     
     public void adjustDocumentWidth(Integer width) {
 	this.adjustedDocumentWidth = width;
+    }
+    
+    public Dimension getDocumentWidthHeight() {
+	
+        Element svg = doc.getDocumentElement();
+        String widthStr = svg.getAttributeNS(null, "width");
+        String heightStr = svg.getAttributeNS(null, "height");
+        
+        int width = Integer.parseInt(widthStr);
+        int height = Integer.parseInt(heightStr);
+        
+        return new Dimension(width, height);
     }
     
     /**
@@ -169,8 +180,8 @@ public class SVGGenerator extends SVGConstants{
 	    
 	    double a = (toIntersection.getX() - fromIntersection.getX());
 	    double b = (toIntersection.getY() - fromIntersection.getY());
-	    double yArrowShift = 5* b/Math.sqrt(a*a + b*b);
-	    double xArrowShift = 5* a/Math.sqrt(a*a + b*b);
+	    double yArrowShift = (a*a + b*b == 0) ? 0 : 5* b/Math.sqrt(a*a + b*b);
+	    double xArrowShift = (a*a + b*b == 0) ? 0 : 5* a/Math.sqrt(a*a + b*b);
 	    // Create the arrowhead	    
 	    Element arrowhead = doc.createElementNS(SVG_NAMESPACE, "line");
 	    arrowhead.setAttributeNS(null, "id", "arrowhead_" + transition.getFromActivityID() + "_to_" + transition.getToActivityID());
@@ -536,11 +547,11 @@ public class SVGGenerator extends SVGConstants{
 	for (ActivityTreeNode node : nodes) {
 	    AuthoringActivityDTO activity = node.getActivity();
 	    if (activity.getParentActivityID() == null) {
-		int leftActivityPoint = activity.getxCoord().intValue();
+		int leftActivityPoint = node.getActivityCoordinates().x;
 		if (leftActivityPoint < minX) {
 		    minX = leftActivityPoint;
 		}
-		int topActivityPoint = activity.getyCoord().intValue();
+		int topActivityPoint = node.getActivityCoordinates().y;
 		if (topActivityPoint < minY) {
 		    minY = topActivityPoint;
 		}
