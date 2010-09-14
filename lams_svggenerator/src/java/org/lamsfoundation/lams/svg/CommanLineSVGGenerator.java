@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.svg;
 
 /* $Id$ */
 
+import java.awt.Dimension;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -82,6 +83,7 @@ public class CommanLineSVGGenerator {
 	SVGGenerator svgGenerator = new SVGGenerator();
 	svgGenerator.adjustDocumentWidth(width);
 	svgGenerator.generateSvgDom(learningDesign);
+	Dimension imageDimension = svgGenerator.getDocumentWidthHeight();
 
 	// Create output file
 	String fileName = FileUtil.getFileName(fullFilePath);
@@ -101,6 +103,7 @@ public class CommanLineSVGGenerator {
 	OutputStream pngOutputStream = new FileOutputStream(pngOutputPath);
 	svgGenerator.streamOutDocument(pngOutputStream, SVGGenerator.OUTPUT_FORMAT_PNG);
 	System.out.println("Creating a file " + pngOutputPath);
+	System.out.println("Image size: " + imageDimension.width + "*" + imageDimension.height);
 	
     }
 
