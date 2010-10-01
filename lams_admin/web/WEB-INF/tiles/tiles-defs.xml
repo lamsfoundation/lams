@@ -191,4 +191,14 @@
 		<put name="items" value="/config/items.jsp"/>
 	</definition>
 	
+	<definition name=".timezoneManagement" path="/template.jsp">
+		<put name="title" value="admin.timezone.title"/>
+		<put name="content" value="timezoneManagement.jsp"/>
+	</definition>	
+	
+	<definition name=".timezoneServerManagement" path="/template.jsp">
+		<put name="title" value="admin.servertimezone.title"/>
+		<put name="content" value="timezoneServerManagement.jsp"/>
+	</definition>
+	
 </tiles-definitions>

@@ -678,7 +678,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startLessonOnSchedule(long
      *      , Date, User)
      */
-    public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId, Integer timeZoneIdx) {
+    public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId, String timeZoneId) {
 
 	// we get the lesson just created
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -708,10 +708,11 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	TimeZone tz = TimeZone.getDefault();
 	TimeZone selectedTz;
 	
-	if(timeZoneIdx != null)
-		selectedTz = TimeZone.getTimeZone(User.timezoneList[timeZoneIdx]);
-	else
-		selectedTz = TimeZone.getTimeZone(User.timezoneList[user.getTimeZone()]);
+	if (timeZoneId != null) {
+	    selectedTz = TimeZone.getTimeZone(timeZoneId);
+	} else {
+	    selectedTz = TimeZone.getTimeZone(user.getTimeZone());
+	}
 	
 	Date tzStartLessonDate = DateUtil.convertFromTimeZoneToDefault(selectedTz, startDate);
 
@@ -1449,7 +1450,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	LessonDetailsDTO dto = lessonService.getLessonDetails(lessonID);
 
 	Locale userLocale = new Locale(user.getLocale().getLanguageIsoCode(), user.getLocale().getCountryIsoCode());
-	TimeZone tz = TimeZone.getTimeZone(User.timezoneList[user.getTimeZone()]);
+	TimeZone tz = TimeZone.getTimeZone(user.getTimeZone());
 	
 	DateFormat indfm = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", userLocale);
 	

@@ -39,6 +39,7 @@ DROP TABLE IF EXISTS lams_planner_nodes;
 DROP TABLE IF EXISTS lams_progress_attempted;
 DROP TABLE IF EXISTS lams_progress_completed;
 DROP TABLE IF EXISTS lams_role;
+DROP TABLE IF EXISTS lams_timezone;
 DROP TABLE IF EXISTS lams_tool;
 DROP TABLE IF EXISTS lams_tool_content;
 DROP TABLE IF EXISTS lams_tool_session;

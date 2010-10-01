@@ -30,6 +30,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +45,11 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
+import org.lamsfoundation.lams.timezone.Timezone;
+import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
+import org.lamsfoundation.lams.timezone.service.ITimezoneService;
+import org.lamsfoundation.lams.timezone.util.TimezoneComparator;
+import org.lamsfoundation.lams.timezone.util.TimezoneDTOComparator;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -98,6 +104,8 @@ public class MonitoringAction extends LamsDispatchAction
 	public static final String NUM_DELETED = "numDeleted";
 	
 	private static IAuditService auditService;
+	
+	private static ITimezoneService timezoneService;
 
 	private Integer getUserId() {
 		HttpSession ss = SessionManager.getSession();
@@ -276,9 +284,9 @@ public class MonitoringAction extends LamsDispatchAction
         	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
     		Date startDate = DateUtil.convertFromLAMSFlashFormat(dateStr);
     		
-    		Integer timeZoneIdx = WebUtil.readIntParam(request, MonitoringConstants.PARAM_SCHEDULE_TIME_ZONE_IDX, true);
+    		String timeZoneId = WebUtil.readStrParam(request, MonitoringConstants.PARAM_SCHEDULE_TIME_ZONE_IDX, true);
     		
-    		monitoringService.startLessonOnSchedule(lessonId,startDate,getUserId(),timeZoneIdx);
+    		monitoringService.startLessonOnSchedule(lessonId,startDate,getUserId(),timeZoneId);
     		flashMessage = new FlashMessage("startOnScheduleLesson",Boolean.TRUE);
     	}catch (Exception e) {
 			flashMessage = handleException(e, "startOnScheduleLesson", monitoringService);
@@ -767,16 +775,22 @@ public class MonitoringAction extends LamsDispatchAction
 		}
 		
 		if(module.equals("wizard")) {
-			String ids[] = User.timezoneList;
-			int idx = 0;
-			for(String id: ids) {
-				languageOutput += "<entry key='timezoneID" + idx + "'><name>" + id + "</name><data>" + TimeZone.getTimeZone(id).getRawOffset() + "</data></entry>";
-				idx++;
-			}
-			
-			if(orgName != null) {
-				languageOutput += "<entry key='orgName'><name>" + orgName + "</name></entry>";
-			}
+		    //sort timezones
+		    TreeSet<Timezone> timezones = new TreeSet<Timezone>(new TimezoneComparator());
+		    timezones.addAll(getTimezoneService().getDefaultTimezones());
+
+        	    int i = 0;
+        	    for (Timezone timezone : timezones) {
+        		TimeZone timeZone = TimeZone.getTimeZone(timezone.getTimezoneId());
+        		languageOutput += "<entry key='timezoneID" + i++ + "'>" + 
+        			"<name>" + timezone.getTimezoneId() + " - " + timeZone.getDisplayName() + "</name>" + 
+        			"<data>" + TimeZone.getTimeZone(timezone.getTimezoneId()).getRawOffset() + "</data>" + 
+        			"</entry>";
+        	    }
+        
+        	    if (orgName != null) {
+        		languageOutput += "<entry key='orgName'><name>" + orgName + "</name></entry>";
+        	    }
 		}
 		
 		languageOutput += "</language></xml>";
@@ -1047,6 +1061,20 @@ public class MonitoringAction extends LamsDispatchAction
 		}
 		return auditService;
 	}
+	
+    /**
+     * Get TimezoneService bean.
+     * 
+     * @return
+     */
+    private ITimezoneService getTimezoneService() {
+	if (timezoneService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    timezoneService = (ITimezoneService) ctx.getBean("timezoneService");
+	}
+	return timezoneService;
+    }	
     
 	/**
      * Set whether or not the export portfolio button is available in learner. Expects parameters lessonID

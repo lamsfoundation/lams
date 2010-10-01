@@ -110,7 +110,7 @@ public class User implements Serializable, Comparable {
     private SupportedLocale locale;
 
     /** persistent field */
-    private Short timeZone;
+    private String timeZone;
 
     /** persistent field */
     private Date createDate;
@@ -179,14 +179,6 @@ public class User implements Serializable, Comparable {
     
     /** persistent field */
     private String openidURL;
-
-
-    // ------- TIMEZONES (hardcoded, there is no need to put them into database --------------
-
-    public static String[] timezoneList = new String[] { "GMT-12", "GMT-11", "GMT-10", "GMT-9", "GMT-8", "GMT-7",
-	    "GMT-6", "GMT-5", "GMT-4", "GMT-3:30", "GMT-3", "GMT-2", "GMT-1", "GMT", "GMT+1", "GMT+2", "GMT+3",
-	    "GMT+3:30", "GMT+4", "GMT+4:30", "GMT+5", "GMT+5:30", "GMT+5:45", "GMT+6", "GMT+7", "GMT+8", "GMT+9",
-	    "GMT+9:30", "GMT+10", "GMT+11", "GMT+12" };
 
     /** full constructor */
     public User(String login, String password, String title, String firstName, String lastName, String addressLine1,
@@ -688,7 +680,7 @@ public class User implements Serializable, Comparable {
 		    .getFckLanguageMapping();
 	}
 
-	TimeZone tz = TimeZone.getTimeZone(User.timezoneList[getTimeZone()]);
+	TimeZone timeZone = TimeZone.getTimeZone(getTimeZone());
 
 	Set<String> tutorialPages = pagesWithDisabledTutorials == null || pagesWithDisabledTutorials.isEmpty() ? null
 		: pagesWithDisabledTutorials;
@@ -696,7 +688,7 @@ public class User implements Serializable, Comparable {
 	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
 		new CSSThemeBriefDTO(flashTheme), new CSSThemeBriefDTO(htmlTheme),
 		// TimeZone.getTimeZone("Australia/Sydney"),
-		tz, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, enableFlash,
+		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, enableFlash,
 		lamsCommunityToken, lamsCommunityUsername,
 		(tutorialsDisabled == null ? false : true),  // assume tutorials enabled if not set 
 		tutorialPages, 
@@ -839,38 +831,19 @@ public class User implements Serializable, Comparable {
     }
 
     /**
-     * Returns user's time zone. If NULL, returns server default time zone. If server default time zone is not in the
-     * list of supported time zones, returns GMT.
+     * Returns user's time zone. If NULL, returns server default time zone. 
      * 
-     * @hibernate.property column="timezone"
+     * @hibernate.property column="timezone" length="255"
      * 
      */
-    public Short getTimeZone() {
+    public String getTimeZone() {
 	if (timeZone == null) {
-	    TimeZone defaultTimeZone = TimeZone.getDefault();
-	    int defaultRawOffset = defaultTimeZone.getRawOffset();
-	    // initial index of GMT time zone, but later it is verified
-	    short fallbackTimeZone = 13;
-	    for (short timeZoneIndex = 0; timeZoneIndex < User.timezoneList.length; timeZoneIndex++) {
-		TimeZone candidateTimeZone = TimeZone.getTimeZone(User.timezoneList[timeZoneIndex]);
-		if (defaultRawOffset == candidateTimeZone.getRawOffset()) {
-		    // we found a time zone from the list which has the same offset as the server's one
-		    timeZone = timeZoneIndex;
-		    break;
-		} else if (candidateTimeZone.getRawOffset() == 0) {
-		    // we found GMT time zone; it will be used if server default time zone is not in the list
-		    fallbackTimeZone = timeZoneIndex;
-		}
-	    }
-	    if (timeZone == null) {
-		timeZone = fallbackTimeZone;
-	    }
+	    timeZone = TimeZone.getDefault().getID();
 	}
 	return timeZone;
     }
 
-    public void setTimeZone(Short timeZone) {
-
+    public void setTimeZone(String timeZone) {
 	this.timeZone = timeZone;
     }
 

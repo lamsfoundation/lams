@@ -455,6 +455,7 @@ Ant build file.
 			<fileset dir="${src.java.dir}">
 				<include name="**/ConfigurationItem.java" />
 				<include name="**/Registration.java" />
+				<include name="**/Timezone.java" />
 			</fileset>
 			<hibernate version="3.0" />
 		</hibernatedoclet>

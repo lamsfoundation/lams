@@ -209,11 +209,11 @@ public interface IMonitoringService {
      *            the lesson start date and time.
      * @param userId
      *            checks that the user is a staff member for this lesson
-     * @param timeZoneIdx
-     * 			  the index of the TimeZone to use for the start date
+     * @param timeZoneId
+     * 			  Timezone id to use for the start date
      * @see org.lamsfoundation.lams.monitoring.service#startLesson(long)
      */
-    public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId, Integer timeZoneIdx) throws UserAccessDeniedException;
+    public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId, String timeZoneId) throws UserAccessDeniedException;
 
     /**
      * Finish a lesson on schedule datetime.

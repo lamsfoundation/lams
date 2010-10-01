@@ -145,6 +145,11 @@
 	<form-property name="method" type="java.lang.String" />
 </form-bean>
 
+<form-bean name="TimezoneForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="selected" type="java.lang.String[]" />
+	<form-property name="method" type="java.lang.String" />
+</form-bean>
+
 <form-bean name="CleanupForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="numDays" type="java.lang.Integer" />
 </form-bean>
@@ -446,6 +451,32 @@
       <forward
         name="basiclist"
         path="/user/basiclist.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/timezonemanagement"
+      type="org.lamsfoundation.lams.admin.web.action.TimezoneManagementAction"
+      name="TimezoneForm"
+      scope="request"
+      input=".config"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="timezoneManagement"
+        path=".timezoneManagement"
+        redirect="false"
+      />
+      <forward
+        name="timezoneServerManagement"
+        path="/timezoneServerManagement.jsp"
+        redirect="false"
+      />
+      <forward
+        name="sysadmin"
+        path="/sysadminstart.do"
         redirect="false"
       />
     </action>

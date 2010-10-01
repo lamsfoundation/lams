@@ -83,7 +83,7 @@ public class FolderContentDTO {
 		this.description = design.getDescription();
 		this.creationDateTime = design.getCreateDateTime();
 		this.lastModifiedDateTime = design.getLastModifiedDateTime();
-		this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(User.timezoneList[user.getTimeZone()]));
+		this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(user.getTimeZone()));
 		this.resourceType = DESIGN;
 		this.resourceID = design.getLearningDesignId();
 		this.permissionCode = permissionCode;
@@ -98,7 +98,7 @@ public class FolderContentDTO {
 		this.description = "Folder";
 		this.creationDateTime = workspaceFolder.getCreationDate();
 		this.lastModifiedDateTime = workspaceFolder.getLastModifiedDate();
-		this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(User.timezoneList[user.getTimeZone()]));
+		this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(user.getTimeZone()));
 		this.resourceType = FOLDER;
 		this.resourceTypeID = new Long(workspaceFolder.getWorkspaceFolderType().intValue());
 		this.resourceID = new Long(workspaceFolder.getWorkspaceFolderId().intValue());
@@ -112,7 +112,7 @@ public class FolderContentDTO {
 		this.description = workspaceFolderContent.getDescription();
 		this.creationDateTime = workspaceFolderContent.getCreateDate();
 		this.lastModifiedDateTime = workspaceFolderContent.getLastModified();
-		this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(User.timezoneList[user.getTimeZone()]));
+		this.formattedLastModifiedDateTime = formatLastModifiedDateTime(TimeZone.getTimeZone(user.getTimeZone()));
 		this.resourceID = workspaceFolderContent.getFolderContentID();
 		this.permissionCode = permissionCode;		
 		if(workspaceFolderContent.getContentTypeID().equals(WorkspaceFolderContent.CONTENT_TYPE_FILE))

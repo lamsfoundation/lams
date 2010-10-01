@@ -132,9 +132,9 @@
 		<td class="align-right"><fmt:message key="label.timezone.title"/>:</td>
 		<td>
 			<html:select property="timeZone" disabled="${!profileEditEnabled}" >
-				<c:forEach begin="0" end="30" var="index">
-					<html:option value="${index}">
-						<fmt:message key="label.timezone.${index}"/>
+				<c:forEach items="${timezoneDtos}" var="timezoneDto">
+					<html:option value="${timezoneDto.timeZoneId}">
+						${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
 					</html:option>
 				</c:forEach>	
 			</html:select>
@@ -320,7 +320,7 @@
 		<td class="align-right"><fmt:message key="label.timezone.title"/>:</td>
 		<td>
 			<c:set var="timeZone"><bean:write name="UserForm" property="timeZone" /></c:set>
-			<fmt:message key="label.timezone.${timeZone}"/>
+			${timeZone}"
 		</td>
 	</tr>
 	<tr>

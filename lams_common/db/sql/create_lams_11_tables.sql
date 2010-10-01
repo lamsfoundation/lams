@@ -292,7 +292,7 @@ CREATE TABLE lams_user (
      , enable_flash TINYINT(1) DEFAULT 1
 	 , lams_community_token VARCHAR(255)
  	 , lams_community_username VARCHAR(255)
- 	 , timezone TINYINT
+ 	 , timezone VARCHAR(255)
 	 , tutorials_disabled TINYINT(1) DEFAULT 0
 	 , first_login TINYINT(1) DEFAULT 1
      , modified_date DATETIME
@@ -968,6 +968,13 @@ CREATE TABLE lams_configuration (
      , format VARCHAR(30)
      , required TINYINT NOT NULL DEFAULT 0
      , PRIMARY KEY (config_key)
+)TYPE=InnoDB;
+
+CREATE TABLE lams_timezone (
+	   id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , timezone_id VARCHAR(255) NOT NULL
+     , server_timezone TINYINT DEFAULT 0
+     , PRIMARY KEY (id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_user_organisation_collapsed (

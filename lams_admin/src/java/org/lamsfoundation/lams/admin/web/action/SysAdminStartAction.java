@@ -74,6 +74,7 @@ public class SysAdminStartAction extends Action {
 			links.add(new LinkBean("libraryManage.do", "sysadmin.library.management"));
 			links.add(new LinkBean("statistics.do", "admin.statistics.title"));
 			links.add(new LinkBean("themeManagement.do", "admin.themes.title"));
+			links.add(new LinkBean("timezonemanagement.do", "admin.timezone.title"));
 			
 			OpenIDConfig openIDEnabled = (OpenIDConfig)service.findById(OpenIDConfig.class, OpenIDConfig.KEY_ENABLED);
 			if (openIDEnabled != null && Boolean.parseBoolean(openIDEnabled.getConfigValue()) == Boolean.TRUE) {

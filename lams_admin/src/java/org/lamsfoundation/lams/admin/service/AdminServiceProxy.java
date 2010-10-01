@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.statistics.service.IStatisticsService;
 import org.lamsfoundation.lams.themes.service.IThemeService;
+import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.LdapService;
 import org.lamsfoundation.lams.util.Configuration;
@@ -58,6 +59,7 @@ public class AdminServiceProxy {
 	private static ILessonService lessonService;
 	private static IMonitoringService monitoringService;
 	private static IEventNotificationService eventNotificationService;
+	private static ITimezoneService timezoneService;
 	
 	public static final IUserManagementService getService(ServletContext servletContext) {
 		if (manageService == null) {
@@ -148,4 +150,11 @@ public class AdminServiceProxy {
         WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
         return wac.getBean(serviceName);
     }
+    
+    	public static final ITimezoneService getTimezoneService(ServletContext servletContext) {
+	        if (timezoneService == null) {
+	            timezoneService = (ITimezoneService)getDomainService(servletContext, "timezoneService");
+	        }
+	        return timezoneService;
+	}
 }

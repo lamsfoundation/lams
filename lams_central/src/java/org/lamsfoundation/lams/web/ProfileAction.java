@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,6 +47,10 @@ import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.service.IThemeService;
+import org.lamsfoundation.lams.timezone.Timezone;
+import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
+import org.lamsfoundation.lams.timezone.service.ITimezoneService;
+import org.lamsfoundation.lams.timezone.util.TimezoneDTOComparator;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
@@ -88,6 +94,8 @@ public class ProfileAction extends LamsDispatchAction {
     private static ICoreLearnerService learnerService;
 
     private static IThemeService themeService;
+    
+    private static ITimezoneService timezoneService;
 
     public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -261,6 +269,17 @@ public class ProfileAction extends LamsDispatchAction {
 	}
 	userForm.set("userFlashTheme", userSelectedFlashTheme);
 
+        List<Timezone> availableTimeZones = getTimezoneService().getDefaultTimezones();
+        TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<TimezoneDTO>(new TimezoneDTOComparator());
+        for (Timezone availableTimeZone : availableTimeZones) {
+            String timezoneId = availableTimeZone.getTimezoneId();
+            TimezoneDTO timezoneDto = new TimezoneDTO();
+            timezoneDto.setTimeZoneId(timezoneId);
+            timezoneDto.setDisplayName(TimeZone.getTimeZone(timezoneId).getDisplayName());
+            timezoneDtos.add(timezoneDto);
+        }
+        request.setAttribute("timezoneDtos", timezoneDtos);
+
 	return mapping.findForward("edit");
     }
 
@@ -292,4 +311,13 @@ public class ProfileAction extends LamsDispatchAction {
 	}
 	return themeService;
     }
+    
+    private ITimezoneService getTimezoneService() {
+	if (timezoneService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    timezoneService = (ITimezoneService) ctx.getBean("timezoneService");
+	}
+	return timezoneService;
+    }    
 }

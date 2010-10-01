@@ -89,6 +89,12 @@
 	<form-property name="method" type="java.lang.String" />
 </form-bean>
 
+<form-bean name="TimezoneForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="selected" type="java.lang.String[]" />
+	<form-property name="method" type="java.lang.String" />
+</form-bean>
+
+
 <form-bean name="CleanupForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="numDays" type="java.lang.Integer" />
 </form-bean>

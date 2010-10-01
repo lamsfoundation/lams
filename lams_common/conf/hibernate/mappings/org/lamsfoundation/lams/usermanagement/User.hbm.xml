@@ -474,17 +474,18 @@
         <column name="locale_id" />
     </many-to-one>
     
-        <property
+    <property
         name="timeZone"
-        type="java.lang.Short"
+        type="java.lang.String"
         column="timezone"
+        length="64"
     >
         <meta attribute="field-description">
-        name="timeZone"
-        type="java.lang.Short"
-        column="timezone"
+           @hibernate.property
+            column="timezone"
+            length="64"
         </meta>    
-    </property>
+    </property>    
     
     <property
         name="portraitUuid"
