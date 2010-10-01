@@ -85,6 +85,7 @@ public class UserAction extends LamsDispatchAction {
     private IUserManagementService service;
     private MessageService messageService;
     private static IThemeService themeService;
+    private static ITimezoneService timezoneService;    
     private static List<SupportedLocale> locales;
     private static List<AuthenticationMethod> authenticationMethods;
 
@@ -98,6 +99,9 @@ public class UserAction extends LamsDispatchAction {
 	if (themeService == null) {
 	    themeService = AdminServiceProxy.getThemeService(getServlet().getServletContext());
 	}
+	if (timezoneService == null) {
+	    timezoneService = AdminServiceProxy.getTimezoneService(getServlet().getServletContext());
+	}	
     }
 
     public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -217,6 +221,18 @@ public class UserAction extends LamsDispatchAction {
 	    }
 	}
 	userForm.set("orgId", (org == null ? null : org.getOrganisationId()));
+		
+	// Get all available time zones
+	List<Timezone> availableTimeZones = timezoneService.getDefaultTimezones();
+	TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<TimezoneDTO>(new TimezoneDTOComparator());
+	for (Timezone availableTimeZone : availableTimeZones) {
+	    String timezoneId = availableTimeZone.getTimezoneId();
+	    TimezoneDTO timezoneDto = new TimezoneDTO();
+	    timezoneDto.setTimeZoneId(timezoneId);
+	    timezoneDto.setDisplayName(TimeZone.getTimeZone(timezoneId).getDisplayName());
+	    timezoneDtos.add(timezoneDto);
+	}
+	request.setAttribute("timezoneDtos", timezoneDtos);
 
 	// for breadcrumb links
 	if (org != null) {
