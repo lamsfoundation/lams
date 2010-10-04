@@ -69,6 +69,8 @@ import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -106,6 +108,7 @@ public class LearnerService implements ICoreLearnerService {
     private static HashMap<Integer, Long> syncMap = new HashMap<Integer, Long>();
     protected MessageService messageService;
     private IGradebookService gradebookService;
+    private ILogEventService logEventService;
 
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Constructor injection
@@ -207,6 +210,10 @@ public class LearnerService implements ICoreLearnerService {
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }
+    
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
+    }  
 
     // ---------------------------------------------------------------------
     // Service Methods
@@ -598,6 +605,9 @@ public class LearnerService implements ICoreLearnerService {
 	    }
 	}
 	// }
+	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_FINISH, learnerId, activity.getLearningDesign()
+		.getLearningDesignId(), progress.getLesson().getLessonId(), activity.getActivityId());
+	
 	return nextLearnerProgress;
     }
 

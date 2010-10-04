@@ -85,5 +85,40 @@ UPDATE lams_user SET timezone='Australia/Sydney' WHERE timezone='28';
 UPDATE lams_user SET timezone='Etc/GMT-11' WHERE timezone='29';
 UPDATE lams_user SET timezone='Pacific/Auckland' WHERE timezone='30';
 
+-- LDEV-2550
+
+DROP TABLE IF EXISTS lams_log_event;
+CREATE TABLE lams_log_event (
+       id BIGINT(20) NOT NULL AUTO_INCREMENT
+     , log_event_type_id INT(5) NOT NULL
+     , user_id BIGINT(20) NOT NULL
+     , occurred_date_time DATETIME NOT NULL
+     , learning_design_id BIGINT(20)
+     , lesson_id BIGINT(20)
+     , activity_id BIGINT(20)
+     , PRIMARY KEY (id)
+     , INDEX (occurred_date_time)
+     , CONSTRAINT FK_lams_event_log_1 FOREIGN KEY (log_event_type_id)
+                  REFERENCES lams_log_event_type (log_event_type_id)
+	 , INDEX (user_id)                  
+     , CONSTRAINT FK_lams_event_log_2 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id)           
+     , CONSTRAINT FK_lams_event_log_3 FOREIGN KEY (learning_design_id)
+                  REFERENCES lams_learning_design (learning_design_id)
+     , CONSTRAINT FK_lams_event_log_4 FOREIGN KEY (lesson_id)
+                  REFERENCES lams_lesson (lesson_id)
+     , CONSTRAINT FK_lams_event_log_5 FOREIGN KEY (activity_id)
+                  REFERENCES lams_learning_activity (activity_id)
+)TYPE=InnoDB;
+
+DELETE FROM lams_log_event_type;
+INSERT INTO lams_log_event_type VALUES (1, 'TYPE_TEACHER_LEARNING_DESIGN_CREATE');
+INSERT INTO lams_log_event_type VALUES (2, 'TYPE_TEACHER_LESSON_CREATE');
+INSERT INTO lams_log_event_type VALUES (3, 'TYPE_TEACHER_LESSON_START');
+INSERT INTO lams_log_event_type VALUES (4, 'TYPE_TEACHER_LESSON_CHANGE_STATE');
+INSERT INTO lams_log_event_type VALUES (5, 'TYPE_LEARNER_ACTIVITY_START');
+INSERT INTO lams_log_event_type VALUES (6, 'TYPE_LEARNER_ACTIVITY_FINISH');
+
+
 COMMIT;
 SET AUTOCOMMIT = 1;

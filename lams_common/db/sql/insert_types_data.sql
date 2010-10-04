@@ -130,12 +130,12 @@ INSERT INTO lams_grouping_support_type VALUES (1 ,'NONE');
 INSERT INTO lams_grouping_support_type VALUES (2 ,'OPTIONAL');
 INSERT INTO lams_grouping_support_type VALUES (3 ,'REQUIRED');
 
-INSERT INTO lams_log_event_type VALUES (1, 'LEARNER_LESSON_START');
-INSERT INTO lams_log_event_type VALUES (2, 'LEARNER_LESSON_FINISH');
-INSERT INTO lams_log_event_type VALUES (3, 'LEARNER_LESSON_EXIT');
-INSERT INTO lams_log_event_type VALUES (4, 'LEARNER_LESSON_RESUME');
-INSERT INTO lams_log_event_type VALUES (5, 'LEARNER_ACTIVITY_START');
-INSERT INTO lams_log_event_type VALUES (6, 'LEARNER_ACTIVITY_FINISH');
+INSERT INTO lams_log_event_type VALUES (1, 'TYPE_TEACHER_LEARNING_DESIGN_CREATE');
+INSERT INTO lams_log_event_type VALUES (2, 'TYPE_TEACHER_LESSON_CREATE');
+INSERT INTO lams_log_event_type VALUES (3, 'TYPE_TEACHER_LESSON_START');
+INSERT INTO lams_log_event_type VALUES (4, 'TYPE_TEACHER_LESSON_CHANGE_STATE');
+INSERT INTO lams_log_event_type VALUES (5, 'TYPE_LEARNER_ACTIVITY_START');
+INSERT INTO lams_log_event_type VALUES (6, 'TYPE_LEARNER_ACTIVITY_FINISH');
 
 INSERT INTO lams_wkspc_fld_content_type VALUES (1,'FILE');
 INSERT INTO lams_wkspc_fld_content_type VALUES (2,'PACKAGE');

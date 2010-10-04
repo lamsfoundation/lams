@@ -39,6 +39,8 @@ import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.ParallelWaitActivity;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
@@ -53,6 +55,7 @@ public class ProgressEngine {
     protected Logger log = Logger.getLogger(ProgressEngine.class);
 
     private IActivityDAO activityDAO;
+    private ILogEventService logEventService;
 
     /**
      * Method determines next step for a learner based on the activity they have
@@ -222,6 +225,10 @@ public class ProgressEngine {
 	    }
 	}
 
+	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_START, progress.getUser().getUserId(), activity
+		.getLearningDesign().getLearningDesignId(), progress.getLesson().getLessonId(), activity
+		.getActivityId());
+	
 	// update activity 
 	activityDAO.insertOrUpdate(activity);
     }
@@ -409,5 +416,9 @@ public class ProgressEngine {
     public void setActivityDAO(IActivityDAO activityDAO) {
 	this.activityDAO = activityDAO;
     }
+    
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
+    }    
 
 }

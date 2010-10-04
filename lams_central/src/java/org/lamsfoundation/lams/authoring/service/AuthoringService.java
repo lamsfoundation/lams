@@ -78,6 +78,8 @@ import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
 import org.lamsfoundation.lams.planner.dao.PedagogicalPlannerDAO;
@@ -156,6 +158,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	protected IMonitoringService monitoringService;
 
 	protected IWorkspaceManagementService workspaceManagementService;
+
+	protected ILogEventService logEventService;
 
 	protected ToolContentIDGenerator contentIDGenerator;
 
@@ -331,6 +335,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 			IWorkspaceManagementService workspaceManagementService) {
 		this.workspaceManagementService = workspaceManagementService;
 	}
+
+        public void setLogEventService(ILogEventService logEventService) {
+    		this.logEventService = logEventService;
+        }    
 
 	/**
 	 * @param contentIDGenerator
@@ -1846,6 +1854,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 					.getCopyTypeID(), customCSV);
 
 		}
+		
+		logEventService.logEvent(LogEvent.TYPE_TEACHER_LEARNING_DESIGN_CREATE, userID, design.getLearningDesignId(), null, null);
 
 		return design.getLearningDesignId();
 	}

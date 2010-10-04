@@ -69,6 +69,8 @@
 				
 				<value>classpath:org/lamsfoundation/lams/events/Event.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/events/Subscription.hbm.xml</value>
+
+				<value>classpath:org/lamsfoundation/lams/logevent/LogEvent.hbm.xml</value>
 				
 				<value>classpath:org/lamsfoundation/lams/config/ConfigurationItem.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/config/Registration.hbm.xml</value>
@@ -499,6 +501,25 @@
 		</property>
 	</bean>
 	
+	<!-- Log Event notification Service -->
+	
+	<bean id="logEventService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.logevent.service.LogEventService">
+				<property name="logEventDAO"><ref local="logEventDAO"/></property>
+				<property name="userManagementService"><ref local="userManagementService"/></property>
+			</bean>	
+		</property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRED</prop>
+				<prop key="logEvent">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>	
+	
 	<!--  Configuration service -->
 	<bean id="configurationService" class="org.lamsfoundation.lams.util.Configuration">
 		<property name="configurationDAO"><ref bean="configurationDAO" /></property>
@@ -569,6 +590,11 @@
 	<bean id="eventDAO" class="org.lamsfoundation.lams.events.dao.hibernate.EventDAOHibernate">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
+	
+	<!--  LogEvent service related beans -->
+	<bean id="logEventDAO" class="org.lamsfoundation.lams.logevent.dao.hibernate.LogEventDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>		
 	
 	<!-- Core Notebook related beans -->
 	<bean id="notebookEntryDAO" class="org.lamsfoundation.lams.notebook.dao.hibernate.NotebookEntryDAO">

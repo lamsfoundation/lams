@@ -877,16 +877,26 @@ CREATE TABLE lams_cr_node_version_property (
 )TYPE=InnoDB;
 
 CREATE TABLE lams_log_event (
-       log_event_id BIGINT(20) NOT NULL AUTO_INCREMENT
+       id BIGINT(20) NOT NULL AUTO_INCREMENT
      , log_event_type_id INT(5) NOT NULL
-     , user_id BIGINT(20)
-     , timestamp DATETIME NOT NULL
-     , ref_id BIGINT(20)
-     , message VARCHAR(255)
-     , PRIMARY KEY (log_event_id)
-     , INDEX (log_event_type_id)
+     , user_id BIGINT(20) NOT NULL
+     , occurred_date_time DATETIME NOT NULL
+     , learning_design_id BIGINT(20)
+     , lesson_id BIGINT(20)
+     , activity_id BIGINT(20)
+     , PRIMARY KEY (id)
+     , INDEX (occurred_date_time)
      , CONSTRAINT FK_lams_event_log_1 FOREIGN KEY (log_event_type_id)
                   REFERENCES lams_log_event_type (log_event_type_id)
+	 , INDEX (user_id)                  
+     , CONSTRAINT FK_lams_event_log_2 FOREIGN KEY (user_id)
+                  REFERENCES lams_user (user_id)           
+     , CONSTRAINT FK_lams_event_log_3 FOREIGN KEY (learning_design_id)
+                  REFERENCES lams_learning_design (learning_design_id)
+     , CONSTRAINT FK_lams_event_log_4 FOREIGN KEY (lesson_id)
+                  REFERENCES lams_lesson (lesson_id)
+     , CONSTRAINT FK_lams_event_log_5 FOREIGN KEY (activity_id)
+                  REFERENCES lams_learning_activity (activity_id)
 )TYPE=InnoDB;
 
 CREATE TABLE lams_workspace_folder_content (

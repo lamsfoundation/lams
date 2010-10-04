@@ -78,6 +78,8 @@ import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
+import org.lamsfoundation.lams.logevent.LogEvent;
+import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.LearnerProgressBatchDTO;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -184,6 +186,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     private MessageService messageService;
 
     private AuditService auditService;
+    
+    private ILogEventService logEventService;
 
     /** Message keys */
     private static final String FORCE_COMPLETE_STOP_MESSAGE_ACTIVITY_DONE = "force.complete.stop.message.activity.done";
@@ -342,6 +346,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     public void setAuditService(AuditService auditService) {
 	this.auditService = auditService;
     }
+    
+    public void setLogEventService(ILogEventService logEventService) {
+	this.logEventService = logEventService;
+    }      
 
     // ---------------------------------------------------------------------
     // Service Methods
@@ -422,9 +430,13 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
 
 	User user = userID != null ? (User) baseDAO.find(User.class, userID) : null;
-	return initializeLesson(lessonName, lessonDescription, learnerExportAvailable, originalLearningDesign, user,
+	Lesson initializedLesson = initializeLesson(lessonName, lessonDescription, learnerExportAvailable, originalLearningDesign, user,
 		runSeqFolder, LearningDesign.COPY_TYPE_LESSON, customCSV, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
-
+	
+	Long initializedLearningDesignId = initializedLesson.getLearningDesign().getLearningDesignId();
+	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CREATE, userID, initializedLearningDesignId, initializedLesson.getLessonId(), null);
+	
+	return initializedLesson;
     }
 
     /**
@@ -852,6 +864,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	if (MonitoringService.log.isDebugEnabled()) {
 	    MonitoringService.log.debug("=============Lesson " + lessonId + " started===============");
 	}
+	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_START, userId, null, lessonId, null);
     }
 
     /**
@@ -1052,6 +1065,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	requestedLesson.setPreviousLessonStateId(requestedLesson.getLessonStateId());
 	requestedLesson.setLessonStateId(status);
 	lessonDAO.updateLesson(requestedLesson);
+	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, requestedLesson.getUser().getUserId(),
+		null, requestedLesson.getLessonId(), null);
     }
 
     /**
@@ -1090,6 +1105,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    requestedLesson.setPreviousLessonStateId(currentStatus);
 	}
 	lessonDAO.updateLesson(requestedLesson);
+	
+	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CHANGE_STATE, requestedLesson.getUser().getUserId(),
+		null, requestedLesson.getLessonId(), null);	
     }
 
     /**
