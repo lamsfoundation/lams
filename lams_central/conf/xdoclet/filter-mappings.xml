@@ -25,7 +25,7 @@
 
 <filter-mapping>
 	<filter-name>SystemSessionFilter</filter-name>
-	<url-pattern>/fckeditor/*</url-pattern>
+	<url-pattern>/ckeditor/*</url-pattern>
 </filter-mapping>
 
 <filter-mapping>
@@ -65,7 +65,7 @@
 
 <filter-mapping>
 	<filter-name>hibernateFilter</filter-name>
-	<url-pattern>/fckeditor/*</url-pattern>
+	<url-pattern>/ckeditor/*</url-pattern>
 </filter-mapping>
 
 <filter-mapping>
@@ -105,7 +105,7 @@
 
 <filter-mapping>
 	<filter-name>LocaleFilter</filter-name>
-	<url-pattern>/fckeditor/*</url-pattern>
+	<url-pattern>/ckeditor/*</url-pattern>
 </filter-mapping>
 
 <filter-mapping>

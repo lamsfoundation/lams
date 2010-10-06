@@ -179,13 +179,7 @@
 		    <taglib-uri>tags-xml</taglib-uri>
 		    <taglib-location>/WEB-INF/jstl/tlds/x.tld</taglib-location>
 		  </taglib>
-		<!--  ======================================================== -->	
-		<!--   Customized Tag Library -->
-		<!--  ======================================================== -->	
-		<taglib>
-		    <taglib-uri>fck-editor</taglib-uri>
-		    <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
-		</taglib>
+
 		<!--  ======================================================== -->	
 		<!--   LAMS Tag Library -->
 		<!--  ======================================================== -->	

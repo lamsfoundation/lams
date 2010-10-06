@@ -45,11 +45,11 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
 <lams:css />
-<link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
+<link href="${lams}css/ckeditor_style.css" rel="stylesheet" type="text/css">
 
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-<script type="text/javascript" src="${lams}fckeditor/fckeditor.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/fckcontroller.js"></script>
+<script type="text/javascript" src="${lams}fckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/ckcontroller.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 <script type="text/javascript" src="${tool}includes/javascript/xmlrequest.js"></script>
 

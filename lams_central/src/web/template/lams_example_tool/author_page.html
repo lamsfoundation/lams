@@ -199,21 +199,21 @@ MM_reloadPage(true);
 </table>
 </div>
 
-<h2>FCK Editor</h2>
-			<script type="text/javascript">
-<!--
-// Automatically calculates the editor base path based on the _samples directory.
-// This is usefull only for these samples. A real application should use something like this:
-// oFCKeditor.BasePath = '/fckeditor/' ;	// '/fckeditor/' is the default value.
-var sBasePath = "/FCKeditor/";
+<h2>CK Editor</h2>
+<textarea id="FCKeditor1" name="FCKeditor1" cols="8" rows="40">This is some <strong>sample text</strong>. You are using <a href="http://www.ckeditor.com/">CKeditor</a>.</textarea>
 
-var oFCKeditor = new FCKeditor( 'FCKeditor1' ) ;
-oFCKeditor.BasePath	= sBasePath ;
-oFCKeditor.Height	= 300 ;
-oFCKeditor.Value	= 'This is some <strong>sample text<\/strong>. You are using <a href="http://www.fckeditor.net/">FCKeditor<\/a>.' ;
-oFCKeditor.Create() ;
-//-->
-			</script>
+<script type="text/javascript" src="/ckeditor/ckeditor.js"></script>
+<script type="text/javascript">
+//Automatically calculates the editor base path based on the _samples directory.
+//This is usefull only for these samples. A real application should use something like this:
+//oFCKeditor.BasePath = '/ckeditor/' ;	// '/ckeditor/' is the default value.
+
+	CKEDITOR.basePath = "/ckeditor/";
+	
+	CKEDITOR.replace( "FCKeditor1", {
+			height                        : "300"
+	});
+</script>
 
 
 <hr>

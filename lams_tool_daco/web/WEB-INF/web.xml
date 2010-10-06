@@ -146,7 +146,7 @@
 	
 	<servlet-mapping>
 	    <servlet-name>Connector</servlet-name>
-	    <url-pattern>/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+	    <url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 	</servlet-mapping>
 	
 	<servlet-mapping>
@@ -198,13 +198,6 @@
 		    <taglib-uri>tags-xml</taglib-uri>
 		    <taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
 		  </taglib>
-		<!--  ======================================================== -->	
-		<!--   FCKEditor Tag Library -->
-		<!--  ======================================================== -->	
-		<taglib>
-		    <taglib-uri>fck-editor</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/fckeditor/FCKeditor.tld</taglib-location>
-		</taglib>
 		<!--  ======================================================== -->	
 		<!--   Customized Tag Library -->
 		<!--  ======================================================== -->	

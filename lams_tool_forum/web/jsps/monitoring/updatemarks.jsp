@@ -68,9 +68,9 @@
 			<td colspan="2">
 				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />		
 				<span  class="field-name"><fmt:message key="lable.topic.title.comment" /><BR></span>
-				<lams:FCKEditor id="comment"
+				<lams:CKEditor id="comment"
 					value="${formBean.comment}"
-					toolbarSet="Default-Learner"></lams:FCKEditor>
+					toolbarSet="DefaultLearner"></lams:CKEditor>
 			</td>
 		</tr>
 		<tr>

@@ -14,20 +14,20 @@
   <form-beans>
 
     <form-bean
-      name="monitoringForm"
-      type="org.lamsfoundation.lams.tool.wiki.web.forms.MonitoringForm"
-    />
-    <form-bean
-      name="learningForm"
-      type="org.lamsfoundation.lams.tool.wiki.web.forms.LearningForm"
-    />
-    <form-bean
       name="pedagogicalPlannerForm"
       type="org.lamsfoundation.lams.tool.wiki.web.forms.WikiPedagogicalPlannerForm"
     />
     <form-bean
       name="authoringForm"
       type="org.lamsfoundation.lams.tool.wiki.web.forms.AuthoringForm"
+    />
+    <form-bean
+      name="monitoringForm"
+      type="org.lamsfoundation.lams.tool.wiki.web.forms.MonitoringForm"
+    />
+    <form-bean
+      name="learningForm"
+      type="org.lamsfoundation.lams.tool.wiki.web.forms.LearningForm"
     />
 
   </form-beans>
@@ -45,6 +45,28 @@
 
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
+    <action
+      path="/clearsession"
+      type="org.lamsfoundation.lams.tool.wiki.web.actions.ClearSessionAction"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
+      path="/pedagogicalPlanner"
+      type="org.lamsfoundation.lams.tool.wiki.web.actions.PedagogicalPlannerAction"
+      name="pedagogicalPlannerForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="/pages/authoring/pedagogicalPlannerForm.jsp"
+        redirect="false"
+      />
+    </action>
     <action
       path="/learning"
       type="org.lamsfoundation.lams.tool.wiki.web.actions.LearningAction"
@@ -116,13 +138,6 @@
       />
     </action>
     <action
-      path="/clearsession"
-      type="org.lamsfoundation.lams.tool.wiki.web.actions.ClearSessionAction"
-      unknown="false"
-      validate="false"
-    >
-    </action>
-    <action
       path="/authoring"
       type="org.lamsfoundation.lams.tool.wiki.web.actions.AuthoringAction"
       name="authoringForm"
@@ -149,21 +164,6 @@
       <forward
         name="message_page"
         path="tiles:/generic/message"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/pedagogicalPlanner"
-      type="org.lamsfoundation.lams.tool.wiki.web.actions.PedagogicalPlannerAction"
-      name="pedagogicalPlannerForm"
-      scope="request"
-      parameter="dispatch"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path="/pages/authoring/pedagogicalPlannerForm.jsp"
         redirect="false"
       />
     </action>

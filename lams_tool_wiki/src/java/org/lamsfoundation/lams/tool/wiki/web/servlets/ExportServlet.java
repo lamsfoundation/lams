@@ -65,7 +65,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * This servlet does export portfolio for teachers and students
  * 
  * @author lfoxton
- *
+ * 
  */
 public class ExportServlet extends AbstractExportPortfolioServlet {
 
@@ -78,9 +78,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     private IWikiService wikiService;
 
     /**
-     * This is the doGet method, it determines whether this is a student or 
-     * teacher then does the appropriate export
+     * This is the doGet method, it determines whether this is a student or teacher then does the appropriate export
      */
+    @Override
     protected String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
 
@@ -100,9 +100,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		doTeacherExport(request, response, directoryName, basePath, cookies);
 	    }
 	} catch (WikiException e) {
-	    logger.error("Cannot perform export for wiki tool.");
+	    ExportServlet.logger.error("Cannot perform export for wiki tool.");
 	} catch (IOException e) {
-	    logger.error("Cannot perform export for wiki tool.");
+	    ExportServlet.logger.error("Cannot perform export for wiki tool.");
 	}
 
 	// writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp",
@@ -114,10 +114,11 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     /**
      * Do an offline export
      */
+    @Override
     protected String doOfflineExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
 	if (toolContentID == null && toolSessionID == null) {
-	    logger.error("Tool content Id or and session Id are null. Unable to activity title");
+	    ExportServlet.logger.error("Tool content Id or and session Id are null. Unable to activity title");
 	} else {
 	    if (wikiService == null) {
 		wikiService = WikiServiceProxy.getWikiService(getServletContext());
@@ -128,8 +129,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		content = wikiService.getWikiByContentId(toolContentID);
 	    } else {
 		WikiSession session = wikiService.getSessionBySessionId(toolSessionID);
-		if (session != null)
+		if (session != null) {
 		    content = session.getWiki();
+		}
 	    }
 	    if (content != null) {
 		activityTitle = content.getTitle();
@@ -139,8 +141,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     }
 
     /**
-     * Do export for learners, outputs the wiki pages into one page
-     * which seperates each page into divs which are displayed onclick
+     * Do export for learners, outputs the wiki pages into one page which seperates each page into divs which are
+     * displayed onclick
      * 
      * @param request
      * @param response
@@ -153,12 +155,12 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     private void doLearnerExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    String basePath, Cookie[] cookies) throws WikiException, IOException {
 
-	logger.debug("doExportLearner: toolContentID:" + toolSessionID);
+	ExportServlet.logger.debug("doExportLearner: toolContentID:" + toolSessionID);
 
 	// check if toolContentID available
 	if (toolSessionID == null) {
 	    String error = "Tool Session ID is missing. Unable to continue";
-	    logger.error(error);
+	    ExportServlet.logger.error(error);
 	    throw new WikiException(error);
 	}
 
@@ -182,9 +184,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	    // Update image links
 	    WikiPageContentDTO contentDTO = wikiPageDTO.getCurrentWikiContentDTO();
-	    contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID(), Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH)));
+	    contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID(),
+		    Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH)));
 	    wikiPageDTO.setCurrentWikiContentDTO(contentDTO);
-	    
+
 	    wikiPageDTOs.add(wikiPageDTO);
 	}
 	request.getSession().setAttribute(WikiConstants.ATTR_WIKI_PAGES, wikiPageDTOs);
@@ -196,7 +199,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	request.getSession()
 		.setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE, new WikiPageDTO(wikiSession.getMainPage()));
 
-	// bundle all user uploaded content and FCKEditor smileys with the
+	// bundle all user uploaded content and CKEditor smileys with the
 	// package
 	ImageBundler imageBundler = new ImageBundler(directoryName, wikiSession.getContentFolderID());
 	imageBundler.bundleImages();
@@ -222,8 +225,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     }
 
     /**
-     * Exports for teacher, does a main file and a file for each session so that 
-     * each session can have its own wiki page
+     * Exports for teacher, does a main file and a file for each session so that each session can have its own wiki page
+     * 
      * @param request
      * @param response
      * @param directoryName
@@ -235,12 +238,12 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     private void doTeacherExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    String basePath, Cookie[] cookies) throws WikiException, IOException {
 
-	logger.debug("doExportTeacher: toolContentID:" + toolContentID);
+	ExportServlet.logger.debug("doExportTeacher: toolContentID:" + toolContentID);
 
 	// check if toolContentID available
 	if (toolContentID == null) {
 	    String error = "Tool Content ID is missing. Unable to continue";
-	    logger.error(error);
+	    ExportServlet.logger.error(error);
 	    throw new WikiException(error);
 	}
 
@@ -283,9 +286,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		// Update image links
 		WikiPageContentDTO contentDTO = wikiPageDTO.getCurrentWikiContentDTO();
-		contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID(), Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH)));
+		contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID(),
+			Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH)));
 		wikiPageDTO.setCurrentWikiContentDTO(contentDTO);
-		
+
 		wikiPageDTOs.add(wikiPageDTO);
 	    }
 	    request.getSession().setAttribute(WikiConstants.ATTR_WIKI_PAGES, wikiPageDTOs);
@@ -298,14 +302,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    request.getSession().setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE,
 		    new WikiPageDTO(wikiSession.getMainPage()));
 
-	    // bundle all user uploaded content and FCKEditor smileys with the
+	    // bundle all user uploaded content and CKEditor smileys with the
 	    // package
 	    ImageBundler imageBundler = new ImageBundler(directoryName, wikiSession.getContentFolderID());
 	    imageBundler.bundleImages();
 
-	    writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName, wikiSession
-		    .getSessionId()
-		    + ".html", cookies);
+	    writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName,
+		    wikiSession.getSessionId() + ".html", cookies);
 
 	    // Set the mode
 	    request.getSession().setAttribute(WikiConstants.ATTR_MODE, ToolAccessMode.TEACHER);
@@ -313,34 +316,33 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     }
 
     /**
-     * Goes through the content and changes the references to images so they can 
-     * be referenced locally
+     * Goes through the content and changes the references to images so they can be referenced locally
+     * 
      * @param body
      * @param contentFolderID
      * @return
      */
     private String replaceImageFolderLinks(String body, String contentFolderID, String lamsOrRams) {
-	String fckeditorpath = "/" + lamsOrRams + "/www/secure/" + contentFolderID;
-	String newfckeditorpath = "./" + contentFolderID;
-	
-	String fckeditorsmiley = "/" + lamsOrRams + "/fckeditor/editor/images/smiley";
-	String newfckeditorsmiley = "./fckeditor/editor/images/smiley";
-	
+	String ckeditorpath = "/" + lamsOrRams + "/www/secure/" + contentFolderID;
+	String newckeditorpath = "./" + contentFolderID;
+
+	String ckeditorsmiley = "/" + lamsOrRams + "/ckeditor/images/smiley";
+	String newckeditorsmiley = "./ckeditor/images/smiley";
 
 	// The pattern matches control characters
-	Pattern p = Pattern.compile(fckeditorpath);
+	Pattern p = Pattern.compile(ckeditorpath);
 	Matcher m = p.matcher("");
 
-	Pattern p2 = Pattern.compile(fckeditorsmiley);
+	Pattern p2 = Pattern.compile(ckeditorsmiley);
 	Matcher m2 = p2.matcher("");
 
-	// Replace the p matching pattern with the newfckeditorpath
+	// Replace the p matching pattern with the newckeditorpath
 	m.reset(body);
-	String result = m.replaceAll(newfckeditorpath);
+	String result = m.replaceAll(newckeditorpath);
 
 	m2.reset(result);
-	result = m2.replaceAll(newfckeditorsmiley);
-	
+	result = m2.replaceAll(newckeditorsmiley);
+
 	return result;
     }
 

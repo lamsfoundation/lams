@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <title>sample tool</title>
-<script type="text/javascript" src="/FCKeditor/fckeditor.js"></script>
+<script type="text/javascript" src="/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="../js/tabcontroller.js"></script>
 <!-- this is the custom CSS for hte tool -->
 <link href="css/tool_custom.css" rel="stylesheet" type="text/css">
@@ -277,18 +277,18 @@ END new tab comments, see also ../tabController.js for additional changes requir
   </tr>
 </table>
 </div>
-<h2>FCK Editor</h2>
-			<script type="text/javascript">
-<!--
+<h2>CK Editor</h2>
+<textarea id="FCKeditor1" name="FCKeditor1" cols="8" rows="40">This is some <strong>sample text</strong>. You are using <a href="http://www.ckeditor.com/">CKeditor</a>.</textarea>
 
-	var oFCKeditor = new FCKeditor( 'FCKeditor1' ) ;
-	oFCKeditor.BasePath	= "/FCKeditor/";
-	oFCKeditor.Height	= 300;
-	oFCKeditor.Value	= 'This is some <strong>sample text<\/strong>. You are using <a href="http://www.fckeditor.net/">FCKeditor<\/a>.' ;
-	oFCKeditor.Create() ;
-//-->
-			</script>
+<script type="text/javascript" src="/ckeditor/ckeditor.js"></script>
+<script type="text/javascript">
 
+	CKEDITOR.basePath = "/ckeditor/";
+	
+	CKEDITOR.replace( "FCKeditor1", {
+			height                        : "300"
+	});
+</script>
 
 <hr>
 <a href="javascript:;" class="button">Cancel</a>

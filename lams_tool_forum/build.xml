@@ -297,7 +297,6 @@
 				<include name="*.xml"/>
 				<include name="struts/*"/>
 				<include name="tags/*"/>
-				<include name="fckeditor/*"/>
 				<exclude name="web.xml"/>
 			</webinf>
 			<fileset dir="${conf.web.dir}">

@@ -33,9 +33,9 @@
 	</tr>
 	<tr>		
 		<td style="padding-left:10px; padding-right:0px; border-bottom:0px; background:none;">
-			<lams:FCKEditor id="optionFeedback${status.index}" value="${option.feedback}"
+			<lams:CKEditor id="optionFeedback${status.index}" value="${option.feedback}"
 				contentFolderID="${contentFolderID}" width="642px">
-			</lams:FCKEditor>		
+			</lams:CKEditor>		
 		</td>
 	</tr>	
 </table>

@@ -24,8 +24,8 @@
 			</c:set>
 				</c:if>
 
-				<lams:FCKEditor id="heading" value="${headingText}"
-					contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
+				<lams:CKEditor id="heading" value="${headingText}"
+					contentFolderID="${sessionMap.contentFolderID}"></lams:CKEditor>
 
 				<div class="small-space-top">
 

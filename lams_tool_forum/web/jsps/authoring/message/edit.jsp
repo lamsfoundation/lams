@@ -45,8 +45,8 @@
 				value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 			<div class="small-space-bottom">
-				<lams:FCKEditor id="message.body" value="${formBean.message.body}"
-					contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
+				<lams:CKEditor id="message.body" value="${formBean.message.body}"
+					contentFolderID="${sessionMap.contentFolderID}"></lams:CKEditor>
 				<html:errors property="message.body" />
 			</div>
 			

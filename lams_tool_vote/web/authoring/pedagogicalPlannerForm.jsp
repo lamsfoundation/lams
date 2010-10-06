@@ -20,7 +20,7 @@
 			padding: 0px;
 		}
 		
-		table#nominationTable td.FCKcell {
+		table#nominationTable td.CKcell {
 			padding: 10px 0px 0px 5px;
 		}
 		
@@ -45,15 +45,15 @@
   		}
   		
   		function prepareFormData(){
-			//FCKeditor content is not submitted when sending by jQuery; we need to do this
-			var content = FCKeditorAPI.GetInstance('instructions').GetXHTML();
+			//CKeditor content is not submitted when sending by jQuery; we need to do this
+			var content = CKEDITOR.instances.instructions.getData();
 			document.getElementById("instructions").value=content;
 			
 			var nominationIndex = 0;
 			do{
 				var nomination = document.getElementById("nomination["+nominationIndex+"]");
 				if (nomination!=null){
-					var content = FCKeditorAPI.GetInstance("nomination["+nominationIndex+"]").GetXHTML();
+					var content = CKEDITOR.instances["nomination["+nominationIndex+"]"].getData();
 					nomination.value=content;
 					nominationIndex++;
 				}
@@ -61,7 +61,7 @@
 		}
 		
 		function clearEntry(nominationIndex){
-			FCKeditorAPI.GetInstance("nomination["+nominationIndex+"]").SetHTML("");
+			CKEDITOR.instances["nomination["+nominationIndex+"]"].setData("");
 		}
   	</script>
 </lams:head>
@@ -75,25 +75,25 @@
 		
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		<h4 class="space-left"><fmt:message key="label.authoring.instructions"/></h4>
-		<lams:FCKEditor id="instructions"
+		<lams:CKEditor id="instructions"
 			value="${formBean.instructions}"
 			contentFolderID="${formBean.contentFolderID}"
-               toolbarSet="Custom-Pedplanner" height="150px"
+               toolbarSet="CustomPedplanner" height="150px"
                width="750px" displayExpanded="false">
-		</lams:FCKEditor>
+		</lams:CKEditor>
 		
 		<c:if test="${formBean.nominationCount ne 0}">
 			<h4 class="space-left space-top"><fmt:message key="label.vote.nominations"/></h4>
 			<table id="nominationTable" cellpadding="0" cellspacing="0">
 				<c:forEach var="nominationIndex"  begin="1" end="${formBean.nominationCount}" >
 					<tr>
-						<td class="FCKcell">
-							<lams:FCKEditor id="nomination[${nominationIndex-1}]"
+						<td class="CKcell">
+							<lams:CKEditor id="nomination[${nominationIndex-1}]"
 								value="${formBean.nominationList[nominationIndex-1]}"
 								contentFolderID="${formBean.contentFolderID}"
-				                toolbarSet="Custom-Pedplanner" height="150px"
+				                toolbarSet="CustomPedplanner" height="150px"
 				                width="705px" displayExpanded="false">
-							</lams:FCKEditor>
+							</lams:CKEditor>
 						</td>
 						<td>
 							<img class="clearEntry" src="<lams:LAMSURL/>images/icons/cross.png"

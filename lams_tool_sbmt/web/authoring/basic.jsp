@@ -17,10 +17,10 @@
 			<div class="field-name">
 				<fmt:message key="label.authoring.basic.instruction"></fmt:message>
 			</div>
-			<lams:FCKEditor id="instructions"
+			<lams:CKEditor id="instructions"
 				value="${formBean.instructions}"
 				contentFolderID="${formBean.contentFolderID}">
-			</lams:FCKEditor>
+			</lams:CKEditor>
 		</td>
 	</tr>
 </table>

@@ -4,9 +4,9 @@
 <c:choose>
 	<c:when test="${sessionMap.allowRichEditor}">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<lams:FCKEditor id="message.body"
+		<lams:CKEditor id="message.body"
 				value="${formBean.message.body}"
-				toolbarSet="Default-Learner"></lams:FCKEditor>
+				toolbarSet="DefaultLearner"></lams:CKEditor>
 	</c:when>
 	<c:otherwise>
 		<%-- Does not user general tag becuase this field need keep compatible with FCKEditor's content --%>

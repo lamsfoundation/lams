@@ -165,11 +165,11 @@
 				<div class="field-name">
 					<fmt:message key="label.wiki.body"></fmt:message>
 				</div>
-				<lams:FCKEditor id="wikiBody"
+				<lams:CKEditor id="wikiBody"
 					value="${currentWikiPage.currentWikiContentDTO.body}"
 					contentFolderID="${sessionMap.contentFolderID}"
-					toolbarSet="Custom-Wiki" height="400px">
-				</lams:FCKEditor>
+					toolbarSet="CustomWiki" height="400px">
+				</lams:CKEditor>
 			</td>
 		</tr>
 		<tr>
@@ -207,10 +207,10 @@
 				<div class="field-name">
 					<fmt:message key="label.wiki.body"></fmt:message>
 				</div>
-				<lams:FCKEditor id="newPageWikiBody" value="" height="400px"
+				<lams:CKEditor id="newPageWikiBody" value="" height="400px"
 					contentFolderID="${sessionMap.contentFolderID}"
-					toolbarSet="Custom-Wiki">
-				</lams:FCKEditor>
+					toolbarSet="CustomWiki">
+				</lams:CKEditor>
 			</td>
 		</tr>
 		<tr>
@@ -266,6 +266,16 @@
 		
 	}
 	
+	function submitWiki(dispatch)
+	{
+		document.getElementById("dispatch").value=dispatch;
+		document.getElementById("authoringForm").submit();
+	}
+	
+	CKEDITOR.on('instanceCreated', function(editorInstance)
+	{
+		editorInstance.wikiLinkArray = wikiLinkArray;
+	});
 
 	function doEditOrAdd(dispatch)
 	{
@@ -283,7 +293,7 @@
 		
 		if (title == null || trim(title).length == 0)
 		{
-			alert("<fmt:message key="label.wiki.add.title.required"></fmt:message>");
+			alert("<fmt:message key='label.wiki.add.title.required'></fmt:message>");
 			return;
 		}
 		
@@ -296,7 +306,7 @@
 			
 			if (trim(title) == wikiLinkArray[i])
 			{
-				alert("<fmt:message key="label.wiki.add.title.exists"><fmt:param>" + title + "</fmt:param></fmt:message>");
+				alert("<fmt:message key='label.wiki.add.title.exists'><fmt:param>" + title + "</fmt:param></fmt:message>");
 				return;
 			}
 		}
@@ -305,17 +315,7 @@
 		document.getElementById("title").value = trim(title);
 		submitWiki(dispatch);
 	}
-	
-	function submitWiki(dispatch)
-	{
-		document.getElementById("dispatch").value=dispatch;
-		document.getElementById("authoringForm").submit();
-	}
-	
-	function FCKeditor_OnComplete(editorInstance) 
-	{ 	
-		editorInstance.wikiLinkArray = wikiLinkArray;
-	}
+
 	
 -->
 </script>

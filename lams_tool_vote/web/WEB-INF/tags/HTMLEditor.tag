@@ -30,7 +30,6 @@
 	 */
 %>
 <%@ tag body-content="empty"%>
-<%@ taglib uri="fck-editor" prefix="FCK"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
@@ -46,16 +45,27 @@
 			<c:set var="language">
 				<lams:user property="localeLanguage" />
 			</c:set>
-
-			<FCK:editor id="FCKeditor1" basePath="/lams/fckeditor/"
-				imageBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Image&amp;Connector=connectors/jsp/connector"
-				linkBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector"
-				flashBrowserURL="/FCKeditor/editor/filemanager/browser/default/browser.html?Type=Flash&amp;Connector=connectors/jsp/connector"
-				imageUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Image"
-				linkUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=File"
-				flashUploadURL="/FCKeditor/editor/filemanager/upload/simpleuploader?Type=Flash"
-				defaultLanguage="${language}" autoDetectLanguage="false">
-			</FCK:editor>
+			<c:set var="basePath"><lams:LAMSURL/>ckeditor/</c:set>
+			
+			<textarea id="FCKeditor1" name="FCKeditor1" cols="8" rows="40"></textarea>
+			
+			<script type="text/javascript" src="${basePath}ckeditor.js"></script>
+			<script type="text/javascript">
+			
+				CKEDITOR.basePath = "${basePath}";
+				
+				CKEDITOR.replace( "FCKeditor1", {
+						language                      : "${language}",
+						defaultLangugage              : "en",
+						filebrowserBrowseUrl          : "${basePath}filemanager/browser/default/browser.html?Type=File&Connector=connectors/jsp/connector",
+						filebrowserUploadUrl          : "${basePath}filemanager/upload/simpleuploader?Type=File",
+						filebrowserImageBrowseUrl     : "${basePath}filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector",
+						filebrowserImageUploadUrl     : "${basePath}filemanager/upload/simpleuploader?Type=Image",
+						filebrowserImageBrowseLinkUrl : "${basePath}filemanager/browser/default/browser.html?Connector=connectors/jsp/connector",
+						filebrowserFlashBrowseUrl     : "${basePath}filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector",
+						filebrowserFlashUploadUrl     : "${basePath}filemanager/upload/simpleuploader?Type=Flash"
+				});
+			</script>
 		</div>
 		<div style="text-align: center">
 			<a href="#"

@@ -36,7 +36,7 @@ public class WebUtil {
     private static final String HTML_TAG_REGEX = "\\<.*?>";
     /**
      * A regular expression pattern that matches end-of-line and space tags. If needed, BR tags can be extented to
-     * <code>(?:<BR>|<br>|<BR />|<br />)</code> . Right now FCKeditor creates only the first option.
+     * <code>(?:<BR>|<br>|<BR />|<br />)</code> . Right now CKeditor creates only the first option.
      */
     private static final String SPACE_TAG_REGEX = "(?:<BR>)|(?:&nbsp;)|(?:</div><div>)";
 
@@ -439,7 +439,7 @@ public class WebUtil {
     }
 
     /**
-     * Strips HTML tags and leave "pure" text. Useful for FCKeditor created text.
+     * Strips HTML tags and leave "pure" text. Useful for CKeditor created text.
      * 
      * @param text
      *                string to process

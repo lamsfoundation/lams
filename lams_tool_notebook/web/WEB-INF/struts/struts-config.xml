@@ -22,12 +22,12 @@
       type="org.lamsfoundation.lams.tool.notebook.web.forms.MonitoringForm"
     />
     <form-bean
-      name="notebookConditionForm"
-      type="org.lamsfoundation.lams.tool.notebook.web.forms.NotebookConditionForm"
-    />
-    <form-bean
       name="authoringForm"
       type="org.lamsfoundation.lams.tool.notebook.web.forms.AuthoringForm"
+    />
+    <form-bean
+      name="notebookConditionForm"
+      type="org.lamsfoundation.lams.tool.notebook.web.forms.NotebookConditionForm"
     />
     <form-bean
       name="learningForm"
@@ -50,31 +50,6 @@
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
-      path="/learning"
-      type="org.lamsfoundation.lams.tool.notebook.web.actions.LearningAction"
-      name="learningForm"
-      scope="request"
-      parameter="dispatch"
-      unknown="false"
-      validate="true"
-    >
-      <forward
-        name="notebook"
-        path="tiles:/learning/main"
-        redirect="false"
-      />
-      <forward
-        name="runOffline"
-        path="tiles:/learning/runOffline"
-        redirect="false"
-      />
-      <forward
-        name="defineLater"
-        path="tiles:/learning/defineLater"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/monitoring"
       type="org.lamsfoundation.lams.tool.notebook.web.actions.MonitoringAction"
       name="monitoringForm"
@@ -93,13 +68,6 @@
         path="tiles:/monitoring/notebook_display"
         redirect="false"
       />
-    </action>
-    <action
-      path="/clearsession"
-      type="org.lamsfoundation.lams.tool.notebook.web.actions.ClearSessionAction"
-      unknown="false"
-      validate="false"
-    >
     </action>
     <action
       path="/authoring"
@@ -135,6 +103,38 @@
         path="/pages/authoring/pedagogicalPlannerForm.jsp"
         redirect="false"
       />
+    </action>
+    <action
+      path="/learning"
+      type="org.lamsfoundation.lams.tool.notebook.web.actions.LearningAction"
+      name="learningForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="notebook"
+        path="tiles:/learning/main"
+        redirect="false"
+      />
+      <forward
+        name="runOffline"
+        path="tiles:/learning/runOffline"
+        redirect="false"
+      />
+      <forward
+        name="defineLater"
+        path="tiles:/learning/defineLater"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/clearsession"
+      type="org.lamsfoundation.lams.tool.notebook.web.actions.ClearSessionAction"
+      unknown="false"
+      validate="false"
+    >
     </action>
 
    <action path="/authoring/newConditionInit"

@@ -85,9 +85,9 @@
 						<tr>
 							<td colspan="2">
 								<span  class="field-name"><fmt:message key="label.learner.comments" /><BR></span>
-								<lams:FCKEditor id="comments"
+								<lams:CKEditor id="comments"
 									value="${fileInfo.comments}"
-									toolbarSet="Default-Learner"></lams:FCKEditor>
+									toolbarSet="DefaultLearner"></lams:CKEditor>
 							</td>
 						</tr>
 						<tr>

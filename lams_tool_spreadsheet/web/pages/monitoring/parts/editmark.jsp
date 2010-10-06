@@ -35,7 +35,7 @@
 			</div>
 
 			<div class="small-space-bottom" >
-				<lams:FCKEditor id="comments" value="${formBean.comments}" contentFolderID="${sessionMap.contentFolderID}" />
+				<lams:CKEditor id="comments" value="${formBean.comments}" contentFolderID="${sessionMap.contentFolderID}" />
 			</div>
 			
 		</html:form>

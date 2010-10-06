@@ -23,7 +23,6 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.notebook.selenium;
 
-
 import junit.framework.TestSuite;
 
 import org.lamsfoundation.lams.selenium.AbstractSeleniumTestCase;
@@ -32,60 +31,63 @@ import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 
 public class TestNotebook extends AbstractSeleniumTestCase {
 
+    @Override
     protected String getToolSignature() {
 	return NotebookConstants.TOOL_SIGNATURE;
     }
 
+    @Override
     protected String getLearningDesignName() {
 	return "bueno";
     }
 
     public static TestSuite suite() {
-	String[] testSequence = {"testAuthoring", "testCreateNewLesson", "testLearning", "testMonitoring"};
+	String[] testSequence = { "testAuthoring", "testCreateNewLesson", "testLearning", "testMonitoring" };
 	return new SeleniumTestSuite(TestNotebook.class, testSequence);
     }
 
     public void testAuthoring() throws Exception {
 	loginToLams();
 	setUpAuthoring();
-	
-	assertEquals("Notebook", selenium.getTitle());
 
-	selenium.type("title", "leave your comment2222");
-	selenium.runScript("FCKeditorAPI.GetInstance(\"instructions\").SetHTML(\"invent a new way of using Flash\")");
-	selenium.click("tab-middle-link-2");
-	selenium.click("lockOnFinished");
-	selenium.click("tab-middle-link-3");
-	selenium.type("onlineInstruction__lamstextarea", "online instructions");
-	
-	storeLearningDesign();	
+	assertEquals("Notebook", AbstractSeleniumTestCase.selenium.getTitle());
+
+	AbstractSeleniumTestCase.selenium.type("title", "leave your comment2222");
+	AbstractSeleniumTestCase.selenium
+		.runScript("CKEDITOR.instances[\"instructions\").setData(\"invent a new way of using Flash\")");
+	AbstractSeleniumTestCase.selenium.click("tab-middle-link-2");
+	AbstractSeleniumTestCase.selenium.click("lockOnFinished");
+	AbstractSeleniumTestCase.selenium.click("tab-middle-link-3");
+	AbstractSeleniumTestCase.selenium.type("onlineInstruction__lamstextarea", "online instructions");
+
+	storeLearningDesign();
     }
-    
+
     public void testCreateNewLesson() throws Exception {
-	createNewLesson();	
+	createNewLesson();
     }
 
     public void testLearning() throws Exception {
 	setUpLearning();
-	assertEquals("Notebook", selenium.getTitle());
-	assertEquals("LAMS Learner", selenium.isElementPresent("//a[@id='finishButton']"));
-	selenium.type("entryText", "have fun");
-	selenium.click("//a[@id='finishButton']/span");
+	assertEquals("Notebook", AbstractSeleniumTestCase.selenium.getTitle());
+	assertEquals("LAMS Learner", AbstractSeleniumTestCase.selenium.isElementPresent("//a[@id='finishButton']"));
+	AbstractSeleniumTestCase.selenium.type("entryText", "have fun");
+	AbstractSeleniumTestCase.selenium.click("//a[@id='finishButton']/span");
 	waitForLearning();
-	
-	assertTrue(selenium.isTextPresent("Congratulations"));
-	assertFalse(selenium.isElementPresent("entryText"));
+
+	assertTrue(AbstractSeleniumTestCase.selenium.isTextPresent("Congratulations"));
+	assertFalse(AbstractSeleniumTestCase.selenium.isElementPresent("entryText"));
 	tearDownLearning();
 
 	setUpLearning();
-	assertTrue(selenium.isTextPresent("Congratulations"));
-	assertFalse(selenium.isElementPresent("entryText"));
+	assertTrue(AbstractSeleniumTestCase.selenium.isTextPresent("Congratulations"));
+	assertFalse(AbstractSeleniumTestCase.selenium.isElementPresent("entryText"));
     }
 
     public void testMonitoring() {
 	setUpMonitoring();
-	
-	assertEquals("Notebook", selenium.getTitle());
+
+	assertEquals("Notebook", AbstractSeleniumTestCase.selenium.getTitle());
     }
 
 }

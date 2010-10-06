@@ -38,8 +38,8 @@
 				<c:if test="${not empty formBean.message}">
 					<c:set var="body" value="${formBean.message.body}"/>
 				</c:if>
-				<lams:FCKEditor id="message.body" value="${body}"
-					contentFolderID="${sessionMap.contentFolderID}"></lams:FCKEditor>
+				<lams:CKEditor id="message.body" value="${body}"
+					contentFolderID="${sessionMap.contentFolderID}"></lams:CKEditor>
 				<html:errors property="message.body" />
 			</div>
 

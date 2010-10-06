@@ -59,10 +59,10 @@
 		    		},
 		    		debug: true,
      			    submitHandler: function(form) {
-		    			$("#question").val(FCKeditorAPI.GetInstance("question").GetXHTML());
-		    			$("#generalFeedback").val(FCKeditorAPI.GetInstance("generalFeedback").GetXHTML());
-		    			$("#feedbackOnCorrect").val(FCKeditorAPI.GetInstance("feedbackOnCorrect").GetXHTML());
-		    			$("#feedbackOnIncorrect").val(FCKeditorAPI.GetInstance("feedbackOnIncorrect").GetXHTML());
+		    			$("#question").val(CKEDITOR.instances.question.getData());
+		    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
+		    			$("#feedbackOnCorrect").val(CKEDITOR.instances.feedbackOnCorrect.getData());
+		    			$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrect.getData());
 		    			
 		    	    	var options = { 
 		    	    		target:  parent.jQuery('#questionListArea'), 
@@ -110,9 +110,9 @@
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.question.text" />
 				</div>
-				<lams:FCKEditor id="question" value="${formBean.question}"
+				<lams:CKEditor id="question" value="${formBean.question}"
 					contentFolderID="${formBean.contentFolderID}" width="715px">
-				</lams:FCKEditor>
+				</lams:CKEditor>
 				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.default.question.grade" />
@@ -129,9 +129,9 @@
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.general.feedback" />
 				</div>
-				<lams:FCKEditor id="generalFeedback" value="${formBean.generalFeedback}"
+				<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}"
 					contentFolderID="${formBean.contentFolderID}" width="715px">
-				</lams:FCKEditor>
+				</lams:CKEditor>
 	
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.true.false.correct.answer" />
@@ -144,16 +144,16 @@
 				<div class="field-name space-top" >
 					<fmt:message key="label.authoring.true.false.feedback.on.true" />
 				</div>
-				<lams:FCKEditor id="feedbackOnCorrect" value="${formBean.feedbackOnCorrect}"
+				<lams:CKEditor id="feedbackOnCorrect" value="${formBean.feedbackOnCorrect}"
 					contentFolderID="${formBean.contentFolderID}" width="715px">
-				</lams:FCKEditor>
+				</lams:CKEditor>
 				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.true.false.feedback.on.false" />
 				</div>
-				<lams:FCKEditor id="feedbackOnIncorrect" value="${formBean.feedbackOnIncorrect}"
+				<lams:CKEditor id="feedbackOnIncorrect" value="${formBean.feedbackOnIncorrect}"
 					contentFolderID="${formBean.contentFolderID}" width="715px">
-				</lams:FCKEditor>				
+				</lams:CKEditor>				
 			</html:form>
 			
 			<br><br>

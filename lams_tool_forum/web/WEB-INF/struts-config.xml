@@ -18,24 +18,24 @@
       type="org.lamsfoundation.lams.tool.forum.web.forms.ForumForm"
     />
     <form-bean
-      name="forumConditionForm"
-      type="org.lamsfoundation.lams.tool.forum.web.forms.ForumConditionForm"
-    />
-    <form-bean
       name="markForm"
       type="org.lamsfoundation.lams.tool.forum.web.forms.MarkForm"
     />
     <form-bean
-      name="pedagogicalPlannerForm"
-      type="org.lamsfoundation.lams.tool.forum.web.forms.ForumPedagogicalPlannerForm"
+      name="reflectionForm"
+      type="org.lamsfoundation.lams.tool.forum.web.forms.ReflectionForm"
     />
     <form-bean
       name="messageForm"
       type="org.lamsfoundation.lams.tool.forum.web.forms.MessageForm"
     />
     <form-bean
-      name="reflectionForm"
-      type="org.lamsfoundation.lams.tool.forum.web.forms.ReflectionForm"
+      name="pedagogicalPlannerForm"
+      type="org.lamsfoundation.lams.tool.forum.web.forms.ForumPedagogicalPlannerForm"
+    />
+    <form-bean
+      name="forumConditionForm"
+      type="org.lamsfoundation.lams.tool.forum.web.forms.ForumConditionForm"
     />
 
    <form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm" />
@@ -143,14 +143,6 @@
 			parameter="deleteTopic">
 			<forward name="success" path="/jsps/authoring/message/topiclist.jsp" />
 		</action>
-		<action path="/authoring/viewTopic"
-			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
-			name="messageForm" 
-			validate="false"
-			parameter="viewTopic"
-			scope="request">
-			<forward name="success" path="/jsps/authoring/message/view.jsp" />
-		</action>
 		<action path="/authoring/editTopic"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="messageForm" 
@@ -174,6 +166,16 @@
 			scope="request">
 			<forward name="success" path="/jsps/authoring/message/topiclist.jsp" />
 		</action>
+		<action path="/authoring/upTopic"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			parameter="upTopic">
+			<forward name="success" path="/jsps/authoring/message/topiclist.jsp" />
+		</action>
+		<action path="/authoring/downTopic"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
+			parameter="downTopic">
+			<forward name="success" path="/jsps/authoring/message/topiclist.jsp" />
+		</action>		
 		<action path="/authoring/initPedagogicalPlannerForm"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction"
 			name="pedagogicalPlannerForm" 

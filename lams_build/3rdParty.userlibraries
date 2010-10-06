@@ -82,7 +82,7 @@
         <archive path="/lams_build/lib/xdoclet/xdoclet-wsee-module-1.2.3.jar"/>
         <archive path="/lams_build/lib/xdoclet/xdoclet-xdoclet-module-1.2.3.jar"/>
         <archive javadoc="http://java.sun.com/products/jsp/jstl/1.1/docs/api/" path="/lams_build/lib/j2ee/jstl.jar"/>
-        <archive path="/lams_build/lib/fckeditor/FCKeditor-2.4.1.jar"/>
+        <archive path="/lams_build/lib/fckeditor/fckeditor-java-core-2.6.jar"/>
         <archive path="/lams_build/lib/concurrent/concurrent-1.3.4.jar"/>
         <archive path="/lams_build/lib/xml-commons/xml-apis.jar"/>
         <archive path="/lams_build/lib/xml-commons/xml-apis-ext.jar"/>

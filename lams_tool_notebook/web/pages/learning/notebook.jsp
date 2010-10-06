@@ -80,9 +80,9 @@
 			<c:when test="${contentEditable}">
 				<c:choose>
 					<c:when test="${notebookDTO.allowRichEditor}">
-						<lams:FCKEditor id="entryText" value="${lrnForm.entryText}"
-							toolbarSet="Default-Learner">
-						</lams:FCKEditor>
+						<lams:CKEditor id="entryText" value="${lrnForm.entryText}"
+							toolbarSet="DefaultLearner">
+						</lams:CKEditor>
 					</c:when>
 
 					<c:otherwise>

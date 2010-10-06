@@ -312,11 +312,11 @@
 						<div class="field-name">
 							<fmt:message key="label.wiki.body"></fmt:message>
 						</div>
-						<lams:FCKEditor id="wikiBody"
+						<lams:CKEditor id="wikiBody"
 							value="${currentWikiPage.currentWikiContentDTO.body}"
-							contentFolderID="${contentFolderID}" toolbarSet="Custom-Wiki"
+							contentFolderID="${contentFolderID}" toolbarSet="CustomWiki"
 							height="400px">
-						</lams:FCKEditor>
+						</lams:CKEditor>
 					</td>
 				</tr>
 				<tr>
@@ -349,9 +349,9 @@
 							<fmt:message key="label.wiki.body"></fmt:message>
 						</div>
 						
-						<lams:FCKEditor id="newPageWikiBody" value="" height="400px"
-							contentFolderID="${contentFolderID}" toolbarSet="Custom-Wiki">
-						</lams:FCKEditor>
+						<lams:CKEditor id="newPageWikiBody" value="" height="400px"
+							contentFolderID="${contentFolderID}" toolbarSet="CustomWiki">
+						</lams:CKEditor>
 					</td>
 				</tr>
 				<tr>
@@ -436,7 +436,7 @@
 		
 		if (title == null || trim(title).length == 0)
 		{
-			alert("<fmt:message key="label.wiki.add.title.required"></fmt:message>");
+			alert("<fmt:message key='label.wiki.add.title.required'></fmt:message>");
 			return;
 		}
 		
@@ -449,7 +449,7 @@
 			
 			if (trim(title) == wikiLinkArray[i])
 			{
-				alert("<fmt:message key="label.wiki.add.title.exists"><fmt:param>" + title + "</fmt:param></fmt:message>");
+				alert("<fmt:message key='label.wiki.add.title.exists'><fmt:param>" + title + "</fmt:param></fmt:message>");
 				return;
 			}
 		}
@@ -464,13 +464,18 @@
 		document.getElementById("dispatch").value=dispatch;
 		document.getElementById("learningForm").submit();
 	}
-	
+
+
 	function hideToolbarItem(editorInstance, itemName) {
-		toolbarItem = editorInstance.EditorWindow.parent.FCKToolbarItems.LoadedItems[itemName]._UIButton.MainElement;
-		toolbarItem.style.display = 'none';
+		
+		editorInstance.ui.items[itemName].setState(CKEDITOR.TRISTATE_DISABLED);
+		/*
+			toolbarItem = editorInstance.EditorWindow.parent.FCKToolbarItems.LoadedItems[itemName]._UIButton.MainElement;
+			toolbarItem.style.display = 'none';
+		*/
 	}
-	
-	function FCKeditor_OnComplete(editorInstance) 
+
+	CKEDITOR.on('instanceCreated',function (editorInstance) 
 	{ 	
 		if (!${wikiDTO.allowLearnerAttachImages}) {	
 			hideToolbarItem(editorInstance, 'Image');
@@ -480,7 +485,7 @@
 		}
 		
 		editorInstance.wikiLinkArray = wikiLinkArray;
-	}
+	});
 	
 	function refreshPage()
 	{

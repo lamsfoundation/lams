@@ -124,9 +124,9 @@
 			<div class="field-name">
 				<fmt:message key="label.authoring.basic.description"></fmt:message>
 			</div>
-			<lams:FCKEditor id="taskList.instructions"
+			<lams:CKEditor id="taskList.instructions"
 				value="${formBean.taskList.instructions}"
-				contentFolderID="${formBean.contentFolderID}"></lams:FCKEditor>
+				contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
 		</td>
 	</tr>
 

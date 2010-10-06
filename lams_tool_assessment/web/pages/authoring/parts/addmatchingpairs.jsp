@@ -43,7 +43,7 @@
 		    			fake: {
 		    				required: function(element) {
 				    			$("[name^=optionQuestion]").each(function() {
-									this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
+									this.value = CKEDITOR.instances[this.name].getData();
 				    			});		    				
 		    		        	return $("input[name^=optionQuestion]:filled").length < 1;
 			    		    }
@@ -76,8 +76,8 @@
 		    		debug: true,
      			    submitHandler: function(form) {
 		    			$("#optionList").val($("#optionForm").serialize(true));
-		    			$("#question").val(FCKeditorAPI.GetInstance("question").GetXHTML());
-		    			$("#generalFeedback").val(FCKeditorAPI.GetInstance("generalFeedback").GetXHTML());
+		    			$("#question").val(CKEDITOR.instances.question.getData());
+		    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
 		    			
 		    	    	var options = { 
 		    	    		target:  parent.jQuery('#questionListArea'), 
@@ -131,9 +131,9 @@
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.question.text" />
 				</div>
-				<lams:FCKEditor id="question" value="${formBean.question}"
+				<lams:CKEditor id="question" value="${formBean.question}"
 					contentFolderID="${formBean.contentFolderID}" width="715px">
-				</lams:FCKEditor>
+				</lams:CKEditor>
 	
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.default.question.grade" />
@@ -150,9 +150,9 @@
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.general.feedback" />
 				</div>
-				<lams:FCKEditor id="generalFeedback" value="${formBean.generalFeedback}"
+				<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}"
 					contentFolderID="${formBean.contentFolderID}" width="715px">
-				</lams:FCKEditor>				
+				</lams:CKEditor>				
 	
 				<div class="field-name space-top" >
 					<fmt:message key="label.authoring.basic.shuffle.the.choices" />

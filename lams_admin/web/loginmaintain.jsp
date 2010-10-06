@@ -1,6 +1,5 @@
 <%@ include file="/taglibs.jsp"%>
 <%@ taglib uri="tags-lams" prefix="lams" %>
-<%@ taglib uri="fck-editor" prefix="fck"%>
 
 <h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 </h4>
@@ -16,21 +15,11 @@
 <p><fmt:message key="sysadmin.login.text"/></p>
 
 <div align="center"> 
-<c:set var="basePath"><lams:LAMSURL/>/fckeditor/</c:set>
-<fck:editor instanceName="news" basePath="${basePath}" width = "95%">
-    <jsp:attribute name="value"><bean:write name="LoginMaintainForm" property="news" filter="false" /></jsp:attribute>
-    <jsp:body>
-		<fck:config 
-			imageBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/-1/"
-			linkBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&CurrentFolder=/-1/"
-			flashBrowserURL="${basePath}editor/filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/-1/"
-			imageUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/-1/"
-			linkUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=File&CurrentFolder=/-1/"
-			flashUploadURL="${basePath}editor/filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/-1/"
-			defaultLanguage="${language}" 
-			autoDetectLanguage="false" />		
-	</jsp:body>
-</fck:editor>
+
+<lams:CKEditor id="news" value="<bean:write name="LoginMaintainForm" property="news" filter="false" />"
+	contentFolderID="-1" width="95%">
+</lams:CKEditor>
+
 </div>
 <br />
 <p align="center">

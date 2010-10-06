@@ -43,7 +43,7 @@
 		    			hasOptionFilled: {
 		    				required: function(element) {
 				    			$("[name^=optionString]").each(function() {
-									this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
+									this.value = CKEDITOR.instances[this.name].getData();
 				    			});		    				
 		    		        	return $("input[name^=optionString]:filled").length < 1;
 			    		    }			    		    
@@ -87,14 +87,14 @@
 		    		debug: true,
      			    submitHandler: function(form) {
 		    			$("[name^=optionString]").each(function() {
-							this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
+							this.value = CKEDITOR.instances[this.name].getData();
 		    			});
 		    			$("#optionList").val($("#optionForm").serialize(true));
-		    			$("#question").val(FCKeditorAPI.GetInstance("question").GetXHTML());
-		    			$("#generalFeedback").val(FCKeditorAPI.GetInstance("generalFeedback").GetXHTML());
-		    			$("#feedbackOnCorrect").val(FCKeditorAPI.GetInstance("feedbackOnCorrectOutsideForm").GetXHTML());
-		    			$("#feedbackOnPartiallyCorrect").val(FCKeditorAPI.GetInstance("feedbackOnPartiallyCorrectOutsideForm").GetXHTML());
-		    			$("#feedbackOnIncorrect").val(FCKeditorAPI.GetInstance("feedbackOnIncorrectOutsideForm").GetXHTML());
+		    			$("#question").val(CKEDITOR.instances.question.getData());
+		    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());
+		    			$("#feedbackOnCorrect").val(CKEDITOR.instances.feedbackOnCorrectOutsideForm.getData());
+		    			$("#feedbackOnPartiallyCorrect").val(CKEDITOR.instances.feedbackOnPartiallyCorrectOutsideForm.getData());
+		    			$("#feedbackOnIncorrect").val(CKEDITOR.instances.feedbackOnIncorrectOutsideForm.getData());
 		    			
 		    	    	var options = { 
 		    	    		target:  parent.jQuery('#questionListArea'), 
@@ -147,9 +147,9 @@
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.question.text" />
 				</div>
-				<lams:FCKEditor id="question" value="${formBean.question}"
+				<lams:CKEditor id="question" value="${formBean.question}"
 					contentFolderID="${formBean.contentFolderID}" width="715px">
-				</lams:FCKEditor>
+				</lams:CKEditor>
 				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.default.question.grade" />
@@ -166,9 +166,9 @@
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.general.feedback" />
 				</div>
-				<lams:FCKEditor id="generalFeedback" value="${formBean.generalFeedback}"
+				<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}"
 					contentFolderID="${formBean.contentFolderID}" width="715px"> 
-				</lams:FCKEditor>
+				</lams:CKEditor>
 	
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.choice.one.multiple.answers" />
@@ -208,23 +208,23 @@
 				<div class="field-name" >
 					<fmt:message key="label.authoring.choice.feedback.on.correct" />
 				</div>
-				<lams:FCKEditor id="feedbackOnCorrectOutsideForm" value="${formBean.feedbackOnCorrect}"
+				<lams:CKEditor id="feedbackOnCorrectOutsideForm" value="${formBean.feedbackOnCorrect}"
 					contentFolderID="${formBean.contentFolderID}" width="688px">
-				</lams:FCKEditor>
+				</lams:CKEditor>
 				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.choice.feedback.on.partially.correct" />
 				</div>
-				<lams:FCKEditor id="feedbackOnPartiallyCorrectOutsideForm" value="${formBean.feedbackOnPartiallyCorrect}"
+				<lams:CKEditor id="feedbackOnPartiallyCorrectOutsideForm" value="${formBean.feedbackOnPartiallyCorrect}"
 					contentFolderID="${formBean.contentFolderID}" width="688px">
-				</lams:FCKEditor>
+				</lams:CKEditor>
 				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.choice.feedback.on.incorrect" />
 				</div>
-				<lams:FCKEditor id="feedbackOnIncorrectOutsideForm" value="${formBean.feedbackOnIncorrect}"
+				<lams:CKEditor id="feedbackOnIncorrectOutsideForm" value="${formBean.feedbackOnIncorrect}"
 					contentFolderID="${formBean.contentFolderID}" width="688px">
-				</lams:FCKEditor>
+				</lams:CKEditor>
 			</div>
 			<br><br>
 			

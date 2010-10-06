@@ -21,8 +21,6 @@
  */
 package org.lamsfoundation.lams.tool.forum.selenium;
 
-import java.util.Map;
-
 import junit.framework.TestSuite;
 
 import org.jfree.util.Log;
@@ -33,8 +31,7 @@ import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 /**
  * Tests for forum tool
  * 
- * NOTE: For the learner and monitor tests, you must have already run the
- * testAuthor and startLesson tests at least once
+ * NOTE: For the learner and monitor tests, you must have already run the testAuthor and startLesson tests at least once
  * 
  * @author lfoxton
  * 
@@ -60,16 +57,18 @@ public class TestForum extends AbstractSeleniumTestCase {
     private static final String TOPIC4_TITLE = "Learner Topic";
     private static final String TOPIC4_MESSAGE = "Created in learner";
 
+    @Override
     protected String getToolSignature() {
 	return ForumConstants.TOOL_SIGNATURE;
     }
 
+    @Override
     protected String getLearningDesignName() {
-	return LEARNING_DESIGN_TITLE;
+	return TestForum.LEARNING_DESIGN_TITLE;
     }
-    
+
     public static TestSuite suite() {
-	String[] testSequence = {"testAuthor", "testStartLesson", "testLearner", "testMonitor"};
+	String[] testSequence = { "testAuthor", "testStartLesson", "testLearner", "testMonitor" };
 	return new SeleniumTestSuite(TestForum.class, testSequence);
     }
 
@@ -84,26 +83,28 @@ public class TestForum extends AbstractSeleniumTestCase {
 	    setUpAuthoring();
 
 	    // check the author page has loaded the default content
-	    assertTrue("Default content is not present", selenium.isTextPresent(DEFAULT_TOPIC));
+	    assertTrue("Default content is not present",
+		    AbstractSeleniumTestCase.selenium.isTextPresent(TestForum.DEFAULT_TOPIC));
 
-	    selenium.type("forum.title", TITLE);
-	    selenium.runScript("FCKeditorAPI.GetInstance(\"forum.instructions\").SetHTML(\"" + DESCRIPTION + "\")");
+	    AbstractSeleniumTestCase.selenium.type("forum.title", TestForum.TITLE);
+	    AbstractSeleniumTestCase.selenium.runScript("CKEDITOR.instances[\"forum.instructions\").setData(\""
+		    + TestForum.DESCRIPTION + "\")");
 
 	    // Edit the topic of the default thread
-	    testEditTopic(DEFAULT_TOPIC, TOPIC1_TITLE, TOPIC1_MESSAGE1);
+	    testEditTopic(TestForum.DEFAULT_TOPIC, TestForum.TOPIC1_TITLE, TestForum.TOPIC1_MESSAGE1);
 
 	    // Test adding a new topic
-	    testCreateTopic(TOPIC2_TITLE, TOPIC2_MESSAGE1);
+	    testCreateTopic(TestForum.TOPIC2_TITLE, TestForum.TOPIC2_MESSAGE1);
 
 	    // Test deleting a topic
-	    testCreateTopic(TOPIC3_TITLE, TOPIC3_MESSAGE1);
-	    testRemoveTopic(TOPIC3_TITLE);
+	    testCreateTopic(TestForum.TOPIC3_TITLE, TestForum.TOPIC3_MESSAGE1);
+	    testRemoveTopic(TestForum.TOPIC3_TITLE);
 
 	    // Testing other tabs
-	    selenium.click("tab-middle-link-2");
-	    selenium.click("lockWhenFinished");
-	    selenium.click("allowUpload");
-	    selenium.click("limitedInput");
+	    AbstractSeleniumTestCase.selenium.click("tab-middle-link-2");
+	    AbstractSeleniumTestCase.selenium.click("lockWhenFinished");
+	    AbstractSeleniumTestCase.selenium.click("allowUpload");
+	    AbstractSeleniumTestCase.selenium.click("limitedInput");
 
 	    // TODO: Test conditions tab
 
@@ -132,16 +133,16 @@ public class TestForum extends AbstractSeleniumTestCase {
     public void testLearner() {
 	try {
 	    setUpLearning();
-	    assertEquals("LAMS Learner", selenium.isElementPresent("//a[@id='finishButton']"));
+	    assertEquals("LAMS Learner", AbstractSeleniumTestCase.selenium.isElementPresent("//a[@id='finishButton']"));
 
 	    // Testing a simple reply to a post
-	    testReplyToFirstPost(TOPIC2_TITLE, REPLY_TITLE1, REPLY_MESSAGE1);
+	    testReplyToFirstPost(TestForum.TOPIC2_TITLE, TestForum.REPLY_TITLE1, TestForum.REPLY_MESSAGE1);
 
 	    // Testing an edit of a post
-	    testEditFirstPost(TOPIC2_TITLE, TOPIC2_TITLE, EDIT_MESSAGE1);
+	    testEditFirstPost(TestForum.TOPIC2_TITLE, TestForum.TOPIC2_TITLE, TestForum.EDIT_MESSAGE1);
 
 	    // Testing creating a topic
-	    testCreateTopicLearner(TOPIC4_TITLE, TOPIC4_MESSAGE);
+	    testCreateTopicLearner(TestForum.TOPIC4_TITLE, TestForum.TOPIC4_MESSAGE);
 	} catch (Exception e) {
 	    Log.error(e);
 	    fail(e.getMessage());
@@ -154,7 +155,7 @@ public class TestForum extends AbstractSeleniumTestCase {
     public void testMonitor() {
 	try {
 	    setUpMonitoring();
-	    
+
 	    // TODO: Work out how to access the forum page, which is opened in a _blank page
 
 	} catch (Exception e) {
@@ -176,30 +177,32 @@ public class TestForum extends AbstractSeleniumTestCase {
     private void testEditTopic(String title, String newTitle, String message) {
 
 	// Check the topic exists
-	assertTrue("Topic does not exist", selenium.isTextPresent(title));
+	assertTrue("Topic does not exist", AbstractSeleniumTestCase.selenium.isTextPresent(title));
 
 	// Open the iframe for editing the topic
-	selenium.click("//a[text()='" + title + "']");
-	selenium.waitForFrameToLoad("messageArea", "30000");
-	selenium.selectFrame("messageArea");
+	AbstractSeleniumTestCase.selenium.click("//a[text()='" + title + "']");
+	AbstractSeleniumTestCase.selenium.waitForFrameToLoad("messageArea", "30000");
+	AbstractSeleniumTestCase.selenium.selectFrame("messageArea");
 
 	// Edit the topic
-	selenium.click("//a[text()='Edit']");
-	selenium.waitForFrameToLoad("messageArea", "30000");
-	selenium.type("message.subject", newTitle);
-	selenium.runScript("FCKeditorAPI.GetInstance(\"message.body\").SetHTML(\"" + message + "\")");
+	AbstractSeleniumTestCase.selenium.click("//a[text()='Edit']");
+	AbstractSeleniumTestCase.selenium.waitForFrameToLoad("messageArea", "30000");
+	AbstractSeleniumTestCase.selenium.type("message.subject", newTitle);
+	AbstractSeleniumTestCase.selenium
+		.runScript("CKEDITOR.instances[\"message.body\").setData(\"" + message + "\")");
 
 	// TODO: Add tests for attaching files
 
 	// Save the changes
-	selenium.click("//a[@class='button-add-item']");
-	selenium.waitForFrameToLoad("messageArea", "30000");
+	AbstractSeleniumTestCase.selenium.click("//a[@class='button-add-item']");
+	AbstractSeleniumTestCase.selenium.waitForFrameToLoad("messageArea", "30000");
 
 	// Return to the top frame
-	selenium.selectFrame("relative=top");
+	AbstractSeleniumTestCase.selenium.selectFrame("relative=top");
 
 	// Testing that the topic was successfully edited
-	assertTrue("Topic not successfully edited: " + newTitle, selenium.isTextPresent(newTitle));
+	assertTrue("Topic not successfully edited: " + newTitle,
+		AbstractSeleniumTestCase.selenium.isTextPresent(newTitle));
     }
 
     /**
@@ -211,25 +214,26 @@ public class TestForum extends AbstractSeleniumTestCase {
     private void testCreateTopic(String title, String message) {
 
 	// Open the iframe for editing the topic
-	selenium.click("//a[text()=' Create a new topic ']");
-	selenium.waitForFrameToLoad("messageArea", "30000");
-	selenium.selectFrame("messageArea");
+	AbstractSeleniumTestCase.selenium.click("//a[text()=' Create a new topic ']");
+	AbstractSeleniumTestCase.selenium.waitForFrameToLoad("messageArea", "30000");
+	AbstractSeleniumTestCase.selenium.selectFrame("messageArea");
 
-	// Add the topic 
-	selenium.type("message.subject", title);
-	selenium.runScript("FCKeditorAPI.GetInstance(\"message.body\").SetHTML(\"" + message + "\")");
+	// Add the topic
+	AbstractSeleniumTestCase.selenium.type("message.subject", title);
+	AbstractSeleniumTestCase.selenium
+		.runScript("CKEDITOR.instances[\"message.body\").setData(\"" + message + "\")");
 
 	// TODO: Add tests for attaching files
 
 	// Save the changes
-	selenium.click("//a[@class='button-add-item']");
-	selenium.waitForFrameToLoad("messageArea", "30000");
+	AbstractSeleniumTestCase.selenium.click("//a[@class='button-add-item']");
+	AbstractSeleniumTestCase.selenium.waitForFrameToLoad("messageArea", "30000");
 
 	// Return to the top frame
-	selenium.selectFrame("relative=top");
+	AbstractSeleniumTestCase.selenium.selectFrame("relative=top");
 
 	// Testing that the topic was successfully edited
-	assertTrue("Topic not successfully added: " + title, selenium.isTextPresent(title));
+	assertTrue("Topic not successfully added: " + title, AbstractSeleniumTestCase.selenium.isTextPresent(title));
     }
 
     /**
@@ -239,27 +243,27 @@ public class TestForum extends AbstractSeleniumTestCase {
      */
     private void testRemoveTopic(String title) {
 	// Check the topic exists
-	assertTrue("Topic does not exist", selenium.isTextPresent(title));
+	assertTrue("Topic does not exist", AbstractSeleniumTestCase.selenium.isTextPresent(title));
 
 	// Open the iframe for editing the topic
-	selenium.click("//a[text()='" + title + "']");
-	selenium.waitForFrameToLoad("messageArea", "30000");
-	selenium.selectFrame("messageArea");
+	AbstractSeleniumTestCase.selenium.click("//a[text()='" + title + "']");
+	AbstractSeleniumTestCase.selenium.waitForFrameToLoad("messageArea", "30000");
+	AbstractSeleniumTestCase.selenium.selectFrame("messageArea");
 
 	// Click the delete button
-	selenium.click("//a[text()='Delete']");
-	selenium.waitForFrameToLoad("messageArea", "30000");
+	AbstractSeleniumTestCase.selenium.click("//a[text()='Delete']");
+	AbstractSeleniumTestCase.selenium.waitForFrameToLoad("messageArea", "30000");
 
 	// Return to the top frame
-	selenium.selectFrame("relative=top");
+	AbstractSeleniumTestCase.selenium.selectFrame("relative=top");
 
 	// Testing that the topic was successfully edited
-	assertFalse("Topic not successfully removed: " + title, selenium.isTextPresent(title));
+	assertFalse("Topic not successfully removed: " + title, AbstractSeleniumTestCase.selenium.isTextPresent(title));
     }
 
     private void returnToTopicList() {
-	selenium.click("//input[@name='backToForum']");
-	selenium.waitForPageToLoad("30000");
+	AbstractSeleniumTestCase.selenium.click("//input[@name='backToForum']");
+	AbstractSeleniumTestCase.selenium.waitForPageToLoad("30000");
     }
 
     /**
@@ -271,27 +275,27 @@ public class TestForum extends AbstractSeleniumTestCase {
      */
     private void testReplyToFirstPost(String topic, String title, String message) {
 	// Check the topic exists
-	assertTrue("Topic does not exist: " + topic, selenium.isTextPresent(topic));
+	assertTrue("Topic does not exist: " + topic, AbstractSeleniumTestCase.selenium.isTextPresent(topic));
 
 	// Open the iframe for editing the topic
-	selenium.click("//a[text()='<b>" + topic + "</b>' or text()='" + topic + "']");
-	selenium.waitForPageToLoad("30000");
+	AbstractSeleniumTestCase.selenium.click("//a[text()='<b>" + topic + "</b>' or text()='" + topic + "']");
+	AbstractSeleniumTestCase.selenium.waitForPageToLoad("30000");
 
 	// Select the last post to reply to
-	selenium.click("//a[text()='Reply']");
+	AbstractSeleniumTestCase.selenium.click("//a[text()='Reply']");
 
 	// Check the reply has opened
-	assertTrue("Reply form did not open.", selenium.isTextPresent("Reply Message"));
+	assertTrue("Reply form did not open.", AbstractSeleniumTestCase.selenium.isTextPresent("Reply Message"));
 
 	// Do the reply
-	selenium.type("message.subject", title);
-	selenium.type("message.body__textarea", message);
-	selenium.click("//input[@type='submit']");
-	selenium.waitForPageToLoad("30000");
+	AbstractSeleniumTestCase.selenium.type("message.subject", title);
+	AbstractSeleniumTestCase.selenium.type("message.body__textarea", message);
+	AbstractSeleniumTestCase.selenium.click("//input[@type='submit']");
+	AbstractSeleniumTestCase.selenium.waitForPageToLoad("30000");
 
 	// Test the reply has been posted
-	assertTrue("Reply did not appear: " + title, selenium.isTextPresent(title));
-	assertTrue("Reply did not appear: " + message, selenium.isTextPresent(message));
+	assertTrue("Reply did not appear: " + title, AbstractSeleniumTestCase.selenium.isTextPresent(title));
+	assertTrue("Reply did not appear: " + message, AbstractSeleniumTestCase.selenium.isTextPresent(message));
 
 	// Return to the topic list
 	returnToTopicList();
@@ -306,35 +310,34 @@ public class TestForum extends AbstractSeleniumTestCase {
      */
     private void testEditFirstPost(String topic, String title, String message) {
 	// Check the topic exists
-	assertTrue("Topic does not exist: " + topic, selenium.isTextPresent(topic));
+	assertTrue("Topic does not exist: " + topic, AbstractSeleniumTestCase.selenium.isTextPresent(topic));
 
 	// Open the iframe for editing the topic
-	selenium.click("//a[text()='<b>" + topic + "</b>' or text()='" + topic + "']");
-	selenium.waitForPageToLoad("30000");
+	AbstractSeleniumTestCase.selenium.click("//a[text()='<b>" + topic + "</b>' or text()='" + topic + "']");
+	AbstractSeleniumTestCase.selenium.waitForPageToLoad("30000");
 
 	// Select the last post to reply to
-	selenium.click("//a[text()='Edit']");
+	AbstractSeleniumTestCase.selenium.click("//a[text()='Edit']");
 
 	// Check the edit has opened
-	assertTrue("Edit form did not open.", selenium.isTextPresent("Edit Message"));
+	assertTrue("Edit form did not open.", AbstractSeleniumTestCase.selenium.isTextPresent("Edit Message"));
 
 	// Do the reply
-	selenium.type("message.subject", title);
-	selenium.type("message.body__textarea", message);
-	selenium.click("//input[@type='submit']");
-	selenium.waitForPageToLoad("30000");
+	AbstractSeleniumTestCase.selenium.type("message.subject", title);
+	AbstractSeleniumTestCase.selenium.type("message.body__textarea", message);
+	AbstractSeleniumTestCase.selenium.click("//input[@type='submit']");
+	AbstractSeleniumTestCase.selenium.waitForPageToLoad("30000");
 
 	// Test the reply has been posted
-	assertTrue("Reply did not appear: " + title, selenium.isTextPresent(title));
-	assertTrue("Reply did not appear: " + message, selenium.isTextPresent(message));
+	assertTrue("Reply did not appear: " + title, AbstractSeleniumTestCase.selenium.isTextPresent(title));
+	assertTrue("Reply did not appear: " + message, AbstractSeleniumTestCase.selenium.isTextPresent(message));
 
 	// Return to the topic list
 	returnToTopicList();
     }
 
     /**
-     * Tests creating a new topic for learner, requires topic not already
-     * created
+     * Tests creating a new topic for learner, requires topic not already created
      * 
      * @param title
      * @param message
@@ -342,21 +345,21 @@ public class TestForum extends AbstractSeleniumTestCase {
     private void testCreateTopicLearner(String title, String message) {
 
 	// Skip the test if the topic has already been created - ie a previously passed test
-	if (!selenium.isTextPresent(title)) {
+	if (!AbstractSeleniumTestCase.selenium.isTextPresent(title)) {
 	    // Click the new topic link
-	    selenium.click("//input[@name='newtopic']");
-	    selenium.waitForPageToLoad("30000");
+	    AbstractSeleniumTestCase.selenium.click("//input[@name='newtopic']");
+	    AbstractSeleniumTestCase.selenium.waitForPageToLoad("30000");
 
-	    // Add the topic 
-	    selenium.type("message.subject", title);
-	    selenium.type("message.body__textarea", message);
+	    // Add the topic
+	    AbstractSeleniumTestCase.selenium.type("message.subject", title);
+	    AbstractSeleniumTestCase.selenium.type("message.body__textarea", message);
 
 	    // Save the changes
-	    selenium.click("//input[@type='submit']");
-	    selenium.waitForPageToLoad("30000");
+	    AbstractSeleniumTestCase.selenium.click("//input[@type='submit']");
+	    AbstractSeleniumTestCase.selenium.waitForPageToLoad("30000");
 
 	    // Testing that the topic was successfully edited
-	    assertTrue("Topic not successfully added: " + title, selenium.isTextPresent(title));
+	    assertTrue("Topic not successfully added: " + title, AbstractSeleniumTestCase.selenium.isTextPresent(title));
 	}
 
     }

@@ -14,12 +14,16 @@
   <form-beans>
 
     <form-bean
-      name="authoringForm"
-      type="org.lamsfoundation.lams.tool.scribe.web.forms.AuthoringForm"
+      name="pedagogicalPlannerForm"
+      type="org.lamsfoundation.lams.tool.scribe.web.forms.ScribePedagogicalPlannerForm"
     />
     <form-bean
       name="learningForm"
       type="org.lamsfoundation.lams.tool.scribe.web.forms.LearningForm"
+    />
+    <form-bean
+      name="authoringForm"
+      type="org.lamsfoundation.lams.tool.scribe.web.forms.AuthoringForm"
     />
     <form-bean
       name="monitoringForm"
@@ -75,6 +79,11 @@
         redirect="false"
       />
       <forward
+        name="waitForScribe"
+        path="tiles:/learning/waitForScribe"
+        redirect="false"
+      />
+      <forward
         name="notebook"
         path="tiles:/learning/notebook"
         redirect="false"
@@ -94,6 +103,28 @@
         path="tiles:/learning/instructions"
         redirect="false"
       />
+    </action>
+    <action
+      path="/pedagogicalPlanner"
+      type="org.lamsfoundation.lams.tool.scribe.web.actions.PedagogicalPlannerAction"
+      name="pedagogicalPlannerForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="/pages/authoring/pedagogicalPlannerForm.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/clearsession"
+      type="org.lamsfoundation.lams.tool.scribe.web.actions.ClearSessionAction"
+      unknown="false"
+      validate="false"
+    >
     </action>
     <action
       path="/authoring"
@@ -144,13 +175,6 @@
         path="tiles:/monitoring/notebook"
         redirect="false"
       />
-    </action>
-    <action
-      path="/clearsession"
-      type="org.lamsfoundation.lams.tool.scribe.web.actions.ClearSessionAction"
-      unknown="false"
-      validate="false"
-    >
     </action>
 
     <!-- If you have non XDoclet actions, define them in a file called struts-actions.xml and place it in your merge directory. -->

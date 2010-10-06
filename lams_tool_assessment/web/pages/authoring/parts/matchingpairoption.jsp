@@ -10,9 +10,9 @@
 	</tr>
 	<tr>			
 		<td style="padding-left:10px; border-bottom:0px; background:none;">
-			<lams:FCKEditor id="optionQuestion${status.index}" value="${option.question}"
+			<lams:CKEditor id="optionQuestion${status.index}" value="${option.question}"
 				contentFolderID="${contentFolderID}" width="642">
-			</lams:FCKEditor>				
+			</lams:CKEditor>				
 		</td>									
 	</tr>						
 	<tr>

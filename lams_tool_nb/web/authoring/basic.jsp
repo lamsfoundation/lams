@@ -14,8 +14,8 @@
 			<div class="field-name">
 				<fmt:message key="basic.content"></fmt:message>
 			</div>
-			<lams:FCKEditor id="content" value="${NbAuthoringForm.content}"
-				contentFolderID="${NbAuthoringForm.contentFolderID}"></lams:FCKEditor>
+			<lams:CKEditor id="content" value="${NbAuthoringForm.content}"
+				contentFolderID="${NbAuthoringForm.contentFolderID}"></lams:CKEditor>
 		</td>
 	</tr>
 </table>

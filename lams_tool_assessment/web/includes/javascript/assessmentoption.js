@@ -67,15 +67,15 @@
 	function prepareFCKEditorsForAjaxSubmit(){
 		if ((questionType == 1) ||  (questionType == 7)) {
 			$("[name^=optionString]").each(function() {
-				this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
+				this.value = CKEDITOR.instances[this.name].getData();
 			});
 		} else if (questionType == 2) {
 			$("[name^=optionQuestion]").each(function() {
-				this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
+				this.value = CKEDITOR.instances[this.name].getData();
 			});
 		} else if ((questionType == 3) || (questionType == 4)) {
 			$("[name^=optionFeedback]").each(function() {
-				this.value = FCKeditorAPI.GetInstance(this.name).GetXHTML();
+				this.value = CKEDITOR.instances[this.name].getData();
 			});
 		}
 	}

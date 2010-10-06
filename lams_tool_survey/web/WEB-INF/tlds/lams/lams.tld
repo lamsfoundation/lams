@@ -431,8 +431,8 @@
        <path>/WEB-INF/tags/TabName.tag</path>
    	</tag-file>
    	<tag-file>
-       <name>FCKEditor</name>
-       <path>/WEB-INF/tags/FCKEditor.tag</path>
+       <name>CKEditor</name>
+       <path>/WEB-INF/tags/CKEditor.tag</path>
    	</tag-file>
    	<tag-file>
        <name>AuthoringButton</name>

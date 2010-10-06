@@ -14,12 +14,16 @@
   <form-beans>
 
     <form-bean
-      name="NbPedagogicalPlannerForm"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.NbPedagogicalPlannerForm"
-    />
-    <form-bean
       name="NbMonitoringForm"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringForm"
+    />
+    <form-bean
+      name="NbAuthoringForm"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringForm"
+    />
+    <form-bean
+      name="NbPedagogicalPlannerForm"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbPedagogicalPlannerForm"
     />
     <form-bean
       name="NbLearnerForm"
@@ -28,10 +32,6 @@
     <form-bean
       name="NbExportForm"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbExportForm"
-    />
-    <form-bean
-      name="NbAuthoringForm"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringForm"
     />
 
     <!--
@@ -58,59 +58,6 @@
 
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
-    <action
-      path="/starter/learner"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerStarterAction"
-      name="NbLearnerForm"
-      scope="request"
-      parameter="mode"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="displayLearnerContent"
-        path=".learnerContent"
-        redirect="false"
-      />
-      <forward
-        name="displayMessage"
-        path=".message"
-        redirect="false"
-      />
-      <forward
-        name="defineLater"
-        path=".defineLater"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/clearsession"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.ClearSessionAction"
-      unknown="false"
-      validate="false"
-    >
-    </action>
-    <action
-      path="/authoring"
-      type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction"
-      name="NbAuthoringForm"
-      scope="request"
-      input="/author_page.jsp"
-      parameter="method"
-      unknown="false"
-      validate="true"
-    >
-      <forward
-        name="authoringContent"
-        path="/authoring/authoring.jsp"
-        redirect="false"
-      />
-      <forward
-        name="displayMessage"
-        path=".message"
-        redirect="false"
-      />
-    </action>
     <action
       path="/exportPortfolio"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbExportAction"
@@ -169,6 +116,38 @@
       />
     </action>
     <action
+      path="/starter/learner"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbLearnerStarterAction"
+      name="NbLearnerForm"
+      scope="request"
+      parameter="mode"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="displayLearnerContent"
+        path=".learnerContent"
+        redirect="false"
+      />
+      <forward
+        name="displayMessage"
+        path=".message"
+        redirect="false"
+      />
+      <forward
+        name="defineLater"
+        path=".defineLater"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/clearsession"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.ClearSessionAction"
+      unknown="false"
+      validate="false"
+    >
+    </action>
+    <action
       path="/pedagogicalPlanner"
       type="org.lamsfoundation.lams.tool.noticeboard.web.NbPedagogicalPlannerAction"
       name="NbPedagogicalPlannerForm"
@@ -180,6 +159,27 @@
       <forward
         name="success"
         path="/authoring/pedagogicalPlannerForm.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/authoring"
+      type="org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction"
+      name="NbAuthoringForm"
+      scope="request"
+      input="/author_page.jsp"
+      parameter="method"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="authoringContent"
+        path="/authoring/authoring.jsp"
+        redirect="false"
+      />
+      <forward
+        name="displayMessage"
+        path=".message"
         redirect="false"
       />
     </action>

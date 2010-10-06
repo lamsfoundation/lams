@@ -22,8 +22,9 @@ function changeDiv(divId)
 
 function cancelAdd(){
 	document.getElementById("newPageTitle").value="";
-	var fckEditor = FCKeditorAPI.GetInstance("newPageWikiBody");
-	fckEditor.EditorDocument.body.innerHTML = "";
+	var ckEditor = CKEDITOR.instances["newPageWikiBody"];
+	// fckEditor.EditorDocument.body.innerHTML = "";
+	ckEditor.setData("");
 }
 
 function changeWikiPage(pageName){

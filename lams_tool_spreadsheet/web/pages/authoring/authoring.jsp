@@ -41,7 +41,7 @@
         }
         
     </script>
-	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
+	<!-- ******************** END CK Editor related javascript & HTML ********************** -->
 
  
 </lams:head>

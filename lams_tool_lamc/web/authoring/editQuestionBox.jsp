@@ -203,9 +203,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<fmt:message key="label.edit.question"></fmt:message>
 			</div>
 
-			<lams:FCKEditor id="newQuestion"
+			<lams:CKEditor id="newQuestion"
 				value="${mcGeneralAuthoringDTO.editableQuestionText}"
-				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
+				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
 
 			<%@ include file="/authoring/candidateAnswersList.jsp"%>
 

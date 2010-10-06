@@ -51,7 +51,7 @@
 				</div>
 				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 				<div class="small-space-bottom" >
-					<lams:FCKEditor id="description" value="${formBean.description}" contentFolderID="${sessionMap.contentFolderID}" />
+					<lams:CKEditor id="description" value="${formBean.description}" contentFolderID="${sessionMap.contentFolderID}" />
 				</div>
 			</html:form>			
 			<br>

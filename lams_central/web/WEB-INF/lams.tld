@@ -13,56 +13,28 @@
 
    <tag>
 
-      <description>Output the Server URL as defined in the lams.xml configuration file.</description>
-      <display-name>LAMS URL</display-name>
+      <description>Output the basic URL for the current webapp. e.g. http://server/lams/tool/nb11/</description>
+      <display-name>Base URL for the current web app</display-name>
       <icon>    
       </icon>
-      <name>LAMSURL</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.LAMSURLTag</tag-class>
+      <name>WebAppURL</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.WebAppURLTag</tag-class>
       <body-content>empty</body-content>
 
    </tag>
    <tag>
 
-      <description>Converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
-      <display-name>Converts text from \n or \r\n to &lt;BR&gt; before rendering</display-name>
+      <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
+      <display-name>generate unique ID</display-name>
       <icon>    
       </icon>
-      <name>out</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.MultiLinesOutputTag</tag-class>
+      <name>generateID</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.GenerateIDTag</tag-class>
       <body-content>empty</body-content>
 
       <attribute>
-         <description>Converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
-         <name>value</name>
-         <required>true</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
-      <attribute>
-         <description>Converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
-         <name>escapeHtml</name>
-         <required>false</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
-
-   </tag>
-   <tag>
-
-      <description>Render html tag with direction and language</description>
-      <display-name>Render html tag with direction and language</display-name>
-      <icon>    
-      </icon>
-      <name>html</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.HtmlTag</tag-class>
-      <body-content>JSP</body-content>
-
-      <attribute>
-         <description>Render html tag with direction and language</description>
-         <name>xhtml</name>
+         <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
+         <name>id</name>
          <required>false</required>
 
            <rtexprvalue>true</rtexprvalue>
@@ -92,17 +64,28 @@
    </tag>
    <tag>
 
-      <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
-      <display-name>generate unique ID</display-name>
+      <description>Output the Server URL as defined in the lams.xml configuration file.</description>
+      <display-name>LAMS URL</display-name>
       <icon>    
       </icon>
-      <name>generateID</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.GenerateIDTag</tag-class>
+      <name>LAMSURL</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.LAMSURLTag</tag-class>
       <body-content>empty</body-content>
 
+   </tag>
+   <tag>
+
+      <description>Render html tag with direction and language</description>
+      <display-name>Render html tag with direction and language</display-name>
+      <icon>    
+      </icon>
+      <name>html</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.HtmlTag</tag-class>
+      <body-content>JSP</body-content>
+
       <attribute>
-         <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
-         <name>id</name>
+         <description>Render html tag with direction and language</description>
+         <name>xhtml</name>
          <required>false</required>
 
            <rtexprvalue>true</rtexprvalue>
@@ -112,13 +95,30 @@
    </tag>
    <tag>
 
-      <description>Output the basic URL for the current webapp. e.g. http://server/lams/tool/nb11/</description>
-      <display-name>Base URL for the current web app</display-name>
+      <description>Converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+      <display-name>Converts text from \n or \r\n to &lt;BR&gt; before rendering</display-name>
       <icon>    
       </icon>
-      <name>WebAppURL</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.WebAppURLTag</tag-class>
+      <name>out</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.MultiLinesOutputTag</tag-class>
       <body-content>empty</body-content>
+
+      <attribute>
+         <description>Converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+         <name>value</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Converts text from \n or \r\n to &lt;BR&gt; before rendering</description>
+         <name>escapeHtml</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
 
    </tag>
    <tag>
@@ -187,26 +187,6 @@
    </tag>
    <tag>
 
-      <description>Output details from the shared session UserDTO object</description>
-      <display-name>user details</display-name>
-      <icon>    
-      </icon>
-      <name>user</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.UserTag</tag-class>
-      <body-content>empty</body-content>
-
-      <attribute>
-         <description>Output details from the shared session UserDTO object</description>
-         <name>property</name>
-         <required>true</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
-
-   </tag>
-   <tag>
-
       <description>Output stylesheet based on the user preferences.</description>
       <display-name>User's chosen stylesheet</display-name>
       <icon>    
@@ -227,6 +207,26 @@
          <description>Output stylesheet based on the user preferences.</description>
          <name>style</name>
          <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Output details from the shared session UserDTO object</description>
+      <display-name>user details</display-name>
+      <icon>    
+      </icon>
+      <name>user</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.UserTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Output details from the shared session UserDTO object</description>
+         <name>property</name>
+         <required>true</required>
 
            <rtexprvalue>true</rtexprvalue>
 
@@ -431,8 +431,8 @@
        <path>/WEB-INF/tags/TabName.tag</path>
    	</tag-file>
    	<tag-file>
-       <name>FCKEditor</name>
-       <path>/WEB-INF/tags/FCKEditor.tag</path>
+       <name>CKEditor</name>
+       <path>/WEB-INF/tags/CKEditor.tag</path>
    	</tag-file>
    	<tag-file>
        <name>AuthoringButton</name>

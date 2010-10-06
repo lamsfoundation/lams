@@ -18,8 +18,8 @@
 	
 	<script type="text/javascript">
 	function prepareFormData(){
-		//FCKeditor content is not submitted when sending by jQuery; we need to do this
-		var content = FCKeditorAPI.GetInstance('wikiBody').GetXHTML();
+		//CKeditor content is not submitted when sending by jQuery; we need to do this
+		var content = CKEDITOR.instances('wikiBody').getData();
 		document.getElementById("wikiBody").value=content;
 	}
 	</script>
@@ -43,12 +43,12 @@
 		<h4 class="space-left"><fmt:message key="label.wiki.body" /></h4>
 		
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-		<lams:FCKEditor id="wikiBody"
+		<lams:CKEditor id="wikiBody"
 			value="${formBean.wikiBody}"
 			contentFolderID="${formBean.contentFolderID}"
-			toolbarSet="Custom-Pedplanner" height="150px"
-			width="760px" displayExpanded="false">
-		</lams:FCKEditor>
+			toolbarSet="CustomPedplanner" height="150px"
+			width="750px" displayExpanded="false">
+		</lams:CKEditor>
 	</html:form>
 </body>
 </lams:html>

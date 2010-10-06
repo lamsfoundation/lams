@@ -65,12 +65,11 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * @author mtruong
  * 
- * MainExportServlet is responsible for calling the export service, which is
- * responsible for calling all tools to do its export. The main page will be
- * generated after all tools have completed its export. At the time of writing,
- * the html for the main page is done manually. All of the outputs of the export
- * will be zipped up and placed in the temporary export directory. The relative
- * path of the file location of this zip file is returned.
+ *         MainExportServlet is responsible for calling the export service, which is responsible for calling all tools
+ *         to do its export. The main page will be generated after all tools have completed its export. At the time of
+ *         writing, the html for the main page is done manually. All of the outputs of the export will be zipped up and
+ *         placed in the temporary export directory. The relative path of the file location of this zip file is
+ *         returned.
  * 
  */
 public class MainExportServlet extends HttpServlet {
@@ -80,15 +79,15 @@ public class MainExportServlet extends HttpServlet {
     private static final long serialVersionUID = 7788509831929373666L;
     private String exportTmpDir;
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 	    IOException {
 	doGet(request, response);
     }
 
     /**
-     * If it is running from the learner interface then can use the userID from
-     * the user object If running from the monitoring interface, the learner's
-     * userID is supplied by the request parameters.
+     * If it is running from the learner interface then can use the userID from the user object If running from the
+     * monitoring interface, the learner's userID is supplied by the request parameters.
      * 
      * @return userID
      */
@@ -102,10 +101,11 @@ public class MainExportServlet extends HttpServlet {
 	return userId;
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 	    IOException, ExportPortfolioException {
 
-	log.debug("Doing export portfolio");
+	MainExportServlet.log.debug("Doing export portfolio");
 	Portfolio portfolios = null;
 	Long lessonID = null;
 	String role = null;
@@ -113,8 +113,7 @@ public class MainExportServlet extends HttpServlet {
 	String exportFilename = "";
 
 	/**
-	 * Get the cookies that were sent along with this request, then pass it
-	 * onto export service
+	 * Get the cookies that were sent along with this request, then pass it onto export service
 	 */
 	Cookie[] cookies = request.getCookies();
 
@@ -123,18 +122,20 @@ public class MainExportServlet extends HttpServlet {
 
 	String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);
 
-	if (log.isDebugEnabled()) {
+	if (MainExportServlet.log.isDebugEnabled()) {
 	    int numCookies = cookies != null ? cookies.length : 0;
-	    log.debug("Export portfolio: mode " + mode + " # cookies " + new Integer(numCookies).toString());
+	    MainExportServlet.log.debug("Export portfolio: mode " + mode + " # cookies "
+		    + new Integer(numCookies).toString());
 	}
 
 	if (mode.equals(ToolAccessMode.LEARNER.toString())) {
-	    // TODO check if the user id is coming from the request then the current user should have monitoring privilege
+	    // TODO check if the user id is coming from the request then the current user should have monitoring
+	    // privilege
 	    Integer userId = getLearnerUserID(request);
 	    lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
 
 	    if ((role = WebUtil.readStrParam(request, AttributeNames.PARAM_ROLE, true)) != null) {
-		accessMode = (role.equals(ToolAccessMode.TEACHER.toString())) ? ToolAccessMode.TEACHER : null;
+		accessMode = role.equals(ToolAccessMode.TEACHER.toString()) ? ToolAccessMode.TEACHER : null;
 	    }
 
 	    portfolios = exportService.exportPortfolioForStudent(userId, lessonID, true, accessMode, cookies);
@@ -143,7 +144,7 @@ public class MainExportServlet extends HttpServlet {
 	    exportFilename = ExportPortfolioConstants.EXPORT_LEARNER_PREFIX + " " + portfolios.getLessonName() + " "
 		    + learnerLogin + ".zip";
 	} else if (mode.equals(ToolAccessMode.TEACHER.toString())) {
-	    //done in the monitoring environment
+	    // done in the monitoring environment
 	    lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
 	    portfolios = exportService.exportPortfolioForTeacher(lessonID, cookies);
 	    exportFilename = ExportPortfolioConstants.EXPORT_TEACHER_PREFIX + " " + portfolios.getLessonName() + ".zip";
@@ -155,53 +156,51 @@ public class MainExportServlet extends HttpServlet {
 
 	    exportService.generateMainPage(request, portfolios, cookies);
 
-	    if (portfolios.getNotebookPortfolios() != null)
-		if (portfolios.getNotebookPortfolios().length > 0)
+	    if (portfolios.getNotebookPortfolios() != null) {
+		if (portfolios.getNotebookPortfolios().length > 0) {
 		    exportService.generateNotebookPage(request, portfolios, cookies);
+		}
+	    }
 
-	    //correct all image links in created htmls.
-	    replaceImageFolderLinks(portfolios.getContentFolderID(), Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH));
+	    // correct all image links in created htmls.
+	    replaceImageFolderLinks(portfolios.getContentFolderID(),
+		    Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH));
 
-	    //bundle the stylesheet with the package
+	    // bundle the stylesheet with the package
 	    CSSBundler bundler = new CSSBundler(request, cookies, exportTmpDir, exportService.getUserThemes());
 	    bundler.bundleStylesheet();
 
-	    //bundle all user uploaded content and FCKEditor smileys with the package
+	    // bundle all user uploaded content and CKEditor smileys with the package
 	    ImageBundler imageBundler = new ImageBundler(exportTmpDir, portfolios.getContentFolderID());
 	    imageBundler.bundleImages();
 
 	    // zip up the contents of the temp export folder using a constant name
 	    String exportZipDir = exportService.zipPortfolio(ExportPortfolioConstants.EXPORT_TEMP_FILENAME,
 		    exportTmpDir);
-	    /*			-- Used for testing timeout  change the export url in exportWaitingPage to  
-	    			-- String exportUrl = learning_root + "portfolioExport?" + request.getQueryString()+"&sleep=1800000";
-	    			-- to pause for 30 mins. 
-	    			Integer sleeptime = WebUtil.checkInteger("sleep", request.getParameter("sleep"), true);
-	    			if ( sleeptime != null ) {
-	    				log.debug("Testing timeouts. Sleeping for "+sleeptime/1000+" seconds");
-	    				try {
-	    					Thread.sleep(sleeptime);
-	    				} catch (InterruptedException e) {
-	    					log.error("Sleep interrupted",e);
-	    				}
-	    			}
-	    */
-	    // return the relative (to server's temp dir) filelocation of the 
+	    /*
+	     * -- Used for testing timeout change the export url in exportWaitingPage to -- String exportUrl =
+	     * learning_root + "portfolioExport?" + request.getQueryString()+"&sleep=1800000"; -- to pause for 30 mins.
+	     * Integer sleeptime = WebUtil.checkInteger("sleep", request.getParameter("sleep"), true); if ( sleeptime !=
+	     * null ) { log.debug("Testing timeouts. Sleeping for "+sleeptime/1000+" seconds"); try {
+	     * Thread.sleep(sleeptime); } catch (InterruptedException e) { log.error("Sleep interrupted",e); } }
+	     */
+	    // return the relative (to server's temp dir) filelocation of the
 	    // zip file so that it can be picked up in exportWaitingPage.jsp
 	    PrintWriter out = response.getWriter();
 	    out.print(URLEncoder.encode(exportZipDir + File.separator + exportFilename, "UTF-8"));
 	} else {
-	    //redirect the request to another page.
+	    // redirect the request to another page.
 	}
 
     }
 
     /**
-     * Corrects links in all html files in temporary directory and its
-     * subdirectories.
+     * Corrects links in all html files in temporary directory and its subdirectories.
      * 
-     * @param contentFolderI 32-character content folder name
-     * @param lamsOrRams "/rams" if we are running rams and "/lams" otherwise
+     * @param contentFolderI
+     *            32-character content folder name
+     * @param lamsOrRams
+     *            "/rams" if we are running rams and "/lams" otherwise
      */
     private void replaceImageFolderLinks(String contentFolderID, String lamsOrRams) {
 	File tempDir = new File(exportTmpDir);
@@ -209,10 +208,10 @@ public class MainExportServlet extends HttpServlet {
 	// finds all the html extension files
 	Collection jspFiles = FileUtils.listFiles(tempDir, new String[] { "html" }, true);
 
-	// iterates thru the collection and sends this 
+	// iterates thru the collection and sends this
 	for (Iterator it = jspFiles.iterator(); it.hasNext();) {
 	    Object element = it.next();
-	    log.debug("Correcting links in file " + element.toString());
+	    MainExportServlet.log.debug("Correcting links in file " + element.toString());
 	    replaceImageFolderLinks(element.toString(), contentFolderID, lamsOrRams);
 	}
     }
@@ -220,41 +219,44 @@ public class MainExportServlet extends HttpServlet {
     /**
      * Corrects links in current particular html file.
      * 
-     * @param filename filename
-     * @param contentFolderID 32-character content folder name
-     * @param lamsOrRams "rams/" if we are running rams and "lams/" otherwise
+     * @param filename
+     *            filename
+     * @param contentFolderID
+     *            32-character content folder name
+     * @param lamsOrRams
+     *            "rams/" if we are running rams and "lams/" otherwise
      */
     private void replaceImageFolderLinks(String filename, String contentFolderID, String lamsOrRams) {
 	try {
 	    // String to find
-	    String fckeditorpath = "/" + lamsOrRams + "/www/secure/" + contentFolderID;
-		String fckeditorrecpath = "../" + contentFolderID + "/Recordings";
-	    String fckeditorsmiley = "/" + lamsOrRams + "/fckeditor/editor/images/smiley";
-	    String fckeditorvr = "/" + lamsOrRams + "/fckeditor/editor/plugins/videorecorder";
+	    String ckeditorpath = "/" + lamsOrRams + "/www/secure/" + contentFolderID;
+	    String ckeditorrecpath = "../" + contentFolderID + "/Recordings";
+	    String ckeditorsmiley = "/" + lamsOrRams + "/ckeditor/images/smiley";
+	    String ckeditorvr = "/" + lamsOrRams + "/ckeditor/plugins/videorecorder";
 
 	    // Replacing string
-	    String newfckeditorpath = "../" + contentFolderID;
-	    String newfckeditorrecpath = "../../../../" + contentFolderID + "/Recordings";
-	    String newfckeditorsmiley = "../fckeditor/editor/images/smiley";
-	    String newfckeditorvr = "../fckeditor/editor/plugins/videorecorder";
+	    String newckeditorpath = "../" + contentFolderID;
+	    String newckeditorrecpath = "../../../../" + contentFolderID + "/Recordings";
+	    String newckeditorsmiley = "../ckeditor/images/smiley";
+	    String newckeditorvr = "../ckeditor/plugins/videorecorder";
 
 	    File fin = new File(filename);
-	    //Open and input stream
+	    // Open and input stream
 	    FileInputStream fis = new FileInputStream(fin);
 
 	    BufferedReader in = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
 
 	    // The pattern matches control characters
-	    Pattern p = Pattern.compile(fckeditorpath);
+	    Pattern p = Pattern.compile(ckeditorpath);
 	    Matcher m = p.matcher("");
 
-	    Pattern p2 = Pattern.compile(fckeditorrecpath);
+	    Pattern p2 = Pattern.compile(ckeditorrecpath);
 	    Matcher m2 = p2.matcher("");
-	    
-	    Pattern p3 = Pattern.compile(fckeditorsmiley);
+
+	    Pattern p3 = Pattern.compile(ckeditorsmiley);
 	    Matcher m3 = p3.matcher("");
-	    
-	    Pattern p4 = Pattern.compile(fckeditorvr);
+
+	    Pattern p4 = Pattern.compile(ckeditorvr);
 	    Matcher m4 = p4.matcher("");
 
 	    String aLine = null;
@@ -263,21 +265,21 @@ public class MainExportServlet extends HttpServlet {
 	    while ((aLine = in.readLine()) != null) {
 		m.reset(aLine);
 
-		// Replace the p matching pattern with the newfckeditorpath
-		String firstpass = m.replaceAll(newfckeditorpath);
+		// Replace the p matching pattern with the newckeditorpath
+		String firstpass = m.replaceAll(newckeditorpath);
 
-		// Replace the p2 matching patterns with the newfckeditorrecpath
+		// Replace the p2 matching patterns with the newckeditorrecpath
 		m2.reset(firstpass);
-		String secondpass = m2.replaceAll(newfckeditorrecpath);
+		String secondpass = m2.replaceAll(newckeditorrecpath);
 
-		// Replace the p2 matching patterns with the newfckeditorsmiley
+		// Replace the p2 matching patterns with the newckeditorsmiley
 		m3.reset(secondpass);
-		String thirdpass = m3.replaceAll(newfckeditorsmiley);
-		
-		// Replace the p3 matching patterns with the newfckeditorvr
+		String thirdpass = m3.replaceAll(newckeditorsmiley);
+
+		// Replace the p3 matching patterns with the newckeditorvr
 		m4.reset(thirdpass);
-		String result = m4.replaceAll(newfckeditorvr);
-		
+		String result = m4.replaceAll(newckeditorvr);
+
 		output = output + result + "\n";
 	    }
 	    in.close();
@@ -292,8 +294,8 @@ public class MainExportServlet extends HttpServlet {
 	    out.newLine();
 	    out.close();
 	} catch (IOException e) {
-	    log.error("Unable to correct imagefolder links in file " + filename, e);
+	    MainExportServlet.log.error("Unable to correct imagefolder links in file " + filename, e);
 	}
     }
-   
+
 }

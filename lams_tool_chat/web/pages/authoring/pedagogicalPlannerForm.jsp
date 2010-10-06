@@ -8,8 +8,8 @@
 	
 	<script type="text/javascript">
 	function prepareFormData(){
-		//FCKeditor content is not submitted when sending by jQuery; we need to do this
-		var content = FCKeditorAPI.GetInstance('instructions').GetXHTML();
+		//CKeditor content is not submitted when sending by jQuery; we need to do this
+		var content = CKEDITOR.instances.instructions.getData();
 		document.getElementById("instructions").value=content;
 	}
 	</script>
@@ -24,12 +24,12 @@
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
 		
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-		<lams:FCKEditor id="instructions"
+		<lams:CKEditor id="instructions"
 			value="${formBean.instructions}"
 			contentFolderID="${formBean.contentFolderID}"
-            toolbarSet="Custom-Pedplanner" height="190px"
-            width="760px" displayExpanded="false">
-		</lams:FCKEditor>
+            toolbarSet="CustomPedplanner" height="190px"
+            width="750px" displayExpanded="false">
+		</lams:CKEditor>
 	</html:form>
 </body>
 </lams:html>

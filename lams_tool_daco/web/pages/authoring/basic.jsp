@@ -87,7 +87,7 @@
 	<tr>
 		<td colspan="2">
 		<div class="field-name"><fmt:message key="label.authoring.basic.instruction"></fmt:message></div>
-		<lams:FCKEditor id="daco.instructions" value="${formBean.daco.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:FCKEditor></td>
+		<lams:CKEditor id="daco.instructions" value="${formBean.daco.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor></td>
 	</tr>
 </table>
 <!-- Dropdown menu for choosing a question type -->

@@ -66,7 +66,7 @@ import org.lamsfoundation.lams.util.FileUtil;
  *                         value = "swf|fla"    
  * @web.servlet-init-param name = "DeniedExtensionsFlash"
  *                         value = "" 
- * @web:servlet-mapping url-pattern="/fckeditor/editor/filemanager/upload/simpleuploader"
+ * @web:servlet-mapping url-pattern="/ckeditor/filemanager/upload/simpleuploader"
  * 
  */
 

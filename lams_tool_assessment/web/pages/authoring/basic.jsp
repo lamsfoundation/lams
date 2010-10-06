@@ -90,9 +90,9 @@
 			<div class="field-name">
 				<fmt:message key="label.authoring.basic.instruction"></fmt:message>
 			</div>
-			<lams:FCKEditor id="assessment.instructions" value="${formBean.assessment.instructions}"
+			<lams:CKEditor id="assessment.instructions" value="${formBean.assessment.instructions}"
 				contentFolderID="${formBean.contentFolderID}">
-			</lams:FCKEditor>
+			</lams:CKEditor>
 		</td>
 	</tr>
 

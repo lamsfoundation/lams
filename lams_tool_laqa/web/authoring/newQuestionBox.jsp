@@ -110,7 +110,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                         if (aMenu.selectedIndex > 0) {
                             var obj = document.getElementById("newQuestion");
                             obj.value += aMenu.options[aMenu.selectedIndex].text;
-                            var oEditor = FCKeditorAPI.GetInstance("newQuestion");
+                            var oEditor = CKEDITOR.instances["newQuestion"];
                             oEditor.InsertHtml(aMenu.options[aMenu.selectedIndex].text);
                         } 
                     }
@@ -192,9 +192,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                 <fmt:message key="label.add.new.question"></fmt:message>
             </div>
 
-            <lams:FCKEditor id="newQuestion"
+            <lams:CKEditor id="newQuestion"
                 value="${qaGeneralAuthoringDTO.editableQuestionText}"
-                contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
+                contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
 
             <div class="field-name space-top">
                 <fmt:message key="label.feedback"></fmt:message>

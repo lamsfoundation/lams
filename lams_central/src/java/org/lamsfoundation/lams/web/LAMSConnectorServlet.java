@@ -89,7 +89,7 @@ import org.w3c.dom.Node;
  * @web.servlet-init-param name = "debug"
  *                         value = "true"
  *                                                 
- * @web:servlet-mapping url-pattern="/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector"
+ * @web:servlet-mapping url-pattern="/ckeditor/filemanager/browser/default/connectors/jsp/connector"
 
  */
 

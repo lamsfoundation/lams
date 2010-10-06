@@ -63,10 +63,6 @@
 		<!--  ======================================================== -->	
 		<!--   Customized Tag Library -->
 		<!--  ======================================================== -->	
-		<taglib>
-		    <taglib-uri>fck-editor</taglib-uri>
-		    <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
-		</taglib>
 		
 		 <taglib>
 		   <taglib-uri>tags-lams</taglib-uri>

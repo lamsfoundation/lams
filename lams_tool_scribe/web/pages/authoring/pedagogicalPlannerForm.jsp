@@ -35,12 +35,12 @@
   			});
   		}
   		function prepareFormData(){
-			//FCKeditor content is not submitted when sending by jQuery; we need to do this
+			//CKeditor content is not submitted when sending by jQuery; we need to do this
 			var headingIndex = 0;
 			do{
 				var heading = document.getElementById("heading["+headingIndex+"]");
 				if (heading!=null){
-					var content = FCKeditorAPI.GetInstance("heading["+headingIndex+"]").GetXHTML();
+					var content = CKEDITOR.instances["heading["+headingIndex+"]"].getData();
 					heading.value=content;
 					headingIndex++;
 				}
@@ -64,12 +64,12 @@
 				<h4 class="space-left"><fmt:message key="label.authoring.basic.heading"/></h4>
 				<c:forEach var="headingIndex"  begin="1" end="${formBean.headingCount}" >
 					<div class="FCKdiv">
-						<lams:FCKEditor id="heading[${headingIndex-1}]"
+						<lams:CKEditor id="heading[${headingIndex-1}]"
 							value="${formBean.headingList[headingIndex-1]}"
 							contentFolderID="${formBean.contentFolderID}"
-			                toolbarSet="Custom-Pedplanner" height="150px"
-			                width="760px" displayExpanded="false">
-						</lams:FCKEditor>
+			                toolbarSet="CustomPedplanner" height="150px"
+			                width="750px" displayExpanded="false">
+						</lams:CKEditor>
 					</div>
 				</c:forEach>
 			</c:otherwise>

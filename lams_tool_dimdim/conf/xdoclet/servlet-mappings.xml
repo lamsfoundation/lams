@@ -6,7 +6,7 @@
 <!--  FCKEditor Connector Configuration -->
 <servlet-mapping>
 	<servlet-name>Connector</servlet-name>
-	<url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+	<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 </servlet-mapping>
 
 <servlet-mapping>

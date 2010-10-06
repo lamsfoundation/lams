@@ -126,9 +126,9 @@
 			<div class="field-name">
 				<fmt:message key="label.authoring.basic.instruction"></fmt:message>
 			</div>
-			<lams:FCKEditor id="survey.instructions"
+			<lams:CKEditor id="survey.instructions"
 				value="${formBean.survey.instructions}"
-				contentFolderID="${formBean.contentFolderID}"></lams:FCKEditor>
+				contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
 		</td>
 	</tr>
 

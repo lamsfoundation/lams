@@ -14,20 +14,20 @@
   <form-beans>
 
     <form-bean
-      name="pedagogicalPlannerForm"
-      type="org.lamsfoundation.lams.tool.chat.web.forms.ChatPedagogicalPlannerForm"
-    />
-    <form-bean
-      name="monitoringForm"
-      type="org.lamsfoundation.lams.tool.chat.web.forms.MonitoringForm"
-    />
-    <form-bean
       name="authoringForm"
       type="org.lamsfoundation.lams.tool.chat.web.forms.AuthoringForm"
     />
     <form-bean
       name="chatConditionForm"
       type="org.lamsfoundation.lams.tool.chat.web.forms.ChatConditionForm"
+    />
+    <form-bean
+      name="monitoringForm"
+      type="org.lamsfoundation.lams.tool.chat.web.forms.MonitoringForm"
+    />
+    <form-bean
+      name="pedagogicalPlannerForm"
+      type="org.lamsfoundation.lams.tool.chat.web.forms.ChatPedagogicalPlannerForm"
     />
     <form-bean
       name="learningForm"
@@ -69,36 +69,6 @@
       />
     </action>
     <action
-      path="/learning"
-      type="org.lamsfoundation.lams.tool.chat.web.actions.LearningAction"
-      name="learningForm"
-      scope="request"
-      parameter="dispatch"
-      unknown="false"
-      validate="true"
-    >
-      <forward
-        name="learning"
-        path="tiles:/learning/main"
-        redirect="false"
-      />
-      <forward
-        name="runOffline"
-        path="tiles:/learning/runOffline"
-        redirect="false"
-      />
-      <forward
-        name="defineLater"
-        path="tiles:/learning/defineLater"
-        redirect="false"
-      />
-      <forward
-        name="notebook"
-        path="tiles:/learning/notebook"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/monitoring"
       type="org.lamsfoundation.lams.tool.chat.web.actions.MonitoringAction"
       name="monitoringForm"
@@ -125,6 +95,36 @@
       <forward
         name="notebook"
         path="tiles:/monitoring/notebook"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/learning"
+      type="org.lamsfoundation.lams.tool.chat.web.actions.LearningAction"
+      name="learningForm"
+      scope="request"
+      parameter="dispatch"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="learning"
+        path="tiles:/learning/main"
+        redirect="false"
+      />
+      <forward
+        name="runOffline"
+        path="tiles:/learning/runOffline"
+        redirect="false"
+      />
+      <forward
+        name="defineLater"
+        path="tiles:/learning/defineLater"
+        redirect="false"
+      />
+      <forward
+        name="notebook"
+        path="tiles:/learning/notebook"
         redirect="false"
       />
     </action>

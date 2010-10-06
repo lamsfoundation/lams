@@ -46,16 +46,16 @@
   			});
   		}
   		function prepareFormData(){
-			//FCKeditor content is not submitted when sending by jQuery; we need to do this
+			//SCKeditor content is not submitted when sending by jQuery; we need to do this
 			
-			var instructions = FCKeditorAPI.GetInstance('instructions').GetXHTML();
+			var instructions = CKEDITOR.instances.instructions.getData();
 			document.getElementById("instructions").value=instructions;
 			
 			var topicIndex = 0;
 			do{
 				var topic = document.getElementById("topic["+topicIndex+"]");
 				if (topic!=null){
-					var content = FCKeditorAPI.GetInstance("topic["+topicIndex+"]").GetXHTML();
+					var content = CKEDITOR.instances["topic["+topicIndex+"]"].getData();
 					topic.value=content;
 					topicIndex++;
 				}
@@ -63,7 +63,7 @@
 		}
 		
 		function clearEntry(topicIndex){
-			FCKeditorAPI.GetInstance("topic["+topicIndex+"]").SetHTML("");
+			CKEDITOR.instances["topic["+topicIndex+"]"].setData("");
 		}
   	</script>
 </lams:head>
@@ -78,24 +78,24 @@
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		
 		<h4 class="space-left"><fmt:message key="label.instructions"/></h4>
-		<lams:FCKEditor id="instructions"
+		<lams:CKEditor id="instructions"
 			value="${formBean.instructions}"
 			contentFolderID="${formBean.contentFolderID}"
-               toolbarSet="Custom-Pedplanner" height="150px"
+               toolbarSet="CustomPedplanner" height="150px"
                width="750px" displayExpanded="false">
-		</lams:FCKEditor>
+		</lams:CKEditor>
 		
 		<h4 class="space-left small-space-top"><fmt:message key="label.planner.topic"/></h4>
 		<table id="topicTable" cellpadding="0" cellspacing="0">
 			<c:forEach var="topicIndex" begin="1" end="${formBean.topicCount}">
 				<tr>
 					<td class="FCKcell">
-						<lams:FCKEditor id="topic[${topicIndex-1}]"
+						<lams:CKEditor id="topic[${topicIndex-1}]"
 							value="${formBean.topicList[topicIndex-1]}"
 							contentFolderID="${formBean.contentFolderID}"
-			                toolbarSet="Custom-Pedplanner" height="150px"
+			                toolbarSet="CustomPedplanner" height="150px"
 			                width="705px" displayExpanded="false">
-						</lams:FCKEditor>
+						</lams:CKEditor>
 					</td>
 					<td>
 						<img class="clearEntry" src="<lams:LAMSURL/>images/icons/cross.png"

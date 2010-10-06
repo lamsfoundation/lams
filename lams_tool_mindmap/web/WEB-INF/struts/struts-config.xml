@@ -14,12 +14,12 @@
   <form-beans>
 
     <form-bean
-      name="pedagogicalPlannerForm"
-      type="org.lamsfoundation.lams.tool.mindmap.web.forms.MindmapPedagogicalPlannerForm"
-    />
-    <form-bean
       name="monitoringForm"
       type="org.lamsfoundation.lams.tool.mindmap.web.forms.MonitoringForm"
+    />
+    <form-bean
+      name="pedagogicalPlannerForm"
+      type="org.lamsfoundation.lams.tool.mindmap.web.forms.MindmapPedagogicalPlannerForm"
     />
     <form-bean
       name="learningForm"

@@ -14,12 +14,16 @@
   <form-beans>
 
     <form-bean
-      name="SbmtAuthoringForm"
-      type="org.lamsfoundation.lams.tool.sbmt.form.AuthoringForm"
-    />
-    <form-bean
       name="SbmtPedagogicalPlannerForm"
       type="org.lamsfoundation.lams.tool.sbmt.form.SubmitFilesPedagogicalPlannerForm"
+    />
+    <form-bean
+      name="sbmtMarkForm"
+      type="org.lamsfoundation.lams.tool.sbmt.form.MarkForm"
+    />
+    <form-bean
+      name="SbmtAuthoringForm"
+      type="org.lamsfoundation.lams.tool.sbmt.form.AuthoringForm"
     />
     <form-bean
       name="learnerForm"
@@ -28,10 +32,6 @@
     <form-bean
       name="reflectionForm"
       type="org.lamsfoundation.lams.tool.sbmt.form.ReflectionForm"
-    />
-    <form-bean
-      name="sbmtMarkForm"
-      type="org.lamsfoundation.lams.tool.sbmt.form.MarkForm"
     />
 
 <form-bean name="SbmtMonitoringForm" type="org.apache.struts.action.DynaActionForm">
@@ -69,47 +69,6 @@
   <!-- ========== Action Mapping Definitions =================================== -->
    <action-mappings>
     <action
-      path="/learner"
-      type="org.lamsfoundation.lams.tool.sbmt.web.LearnerAction"
-      name="learnerForm"
-      scope="request"
-      input="/learner/sbmtlearner.jsp"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path="/learner/sbmtlearner.jsp"
-        redirect="false"
-      />
-      <forward
-        name="defineLater"
-        path="/learner/definelater.jsp"
-        redirect="false"
-      />
-      <forward
-        name="runOffline"
-        path="/learner/runoffline.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/pedagogicalPlanner"
-      type="org.lamsfoundation.lams.tool.sbmt.web.SubmitFilesPedagogicalPlannerAction"
-      name="SbmtPedagogicalPlannerForm"
-      scope="request"
-      parameter="dispatch"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="success"
-        path="/authoring/pedagogicalPlannerForm.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/monitoring"
       type="org.lamsfoundation.lams.tool.sbmt.web.MonitoringAction"
       name="SbmtMonitoringForm"
@@ -121,11 +80,6 @@
       <forward
         name="listMark"
         path="/monitoring/mark/mark.jsp"
-        redirect="false"
-      />
-      <forward
-        name="updateMark"
-        path="/monitoring/mark/updatemark.jsp"
         redirect="false"
       />
       <forward
@@ -146,6 +100,27 @@
       <forward
         name="viewReflect"
         path="/monitoring/notebook.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/authoring"
+      type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction"
+      name="SbmtAuthoringForm"
+      scope="request"
+      input="/authoring/authoring.jsp"
+      parameter="dispatch"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="success"
+        path="/authoring/authoring.jsp"
+        redirect="false"
+      />
+      <forward
+        name="instructionFileList"
+        path="/authoring/parts/instructionfilelist.jsp"
         redirect="false"
       />
     </action>
@@ -175,23 +150,43 @@
       />
     </action>
     <action
-      path="/authoring"
-      type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction"
-      name="SbmtAuthoringForm"
+      path="/pedagogicalPlanner"
+      type="org.lamsfoundation.lams.tool.sbmt.web.SubmitFilesPedagogicalPlannerAction"
+      name="SbmtPedagogicalPlannerForm"
       scope="request"
-      input="/authoring/authoring.jsp"
       parameter="dispatch"
       unknown="false"
-      validate="true"
+      validate="false"
     >
       <forward
         name="success"
-        path="/authoring/authoring.jsp"
+        path="/authoring/pedagogicalPlannerForm.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
+      path="/learner"
+      type="org.lamsfoundation.lams.tool.sbmt.web.LearnerAction"
+      name="learnerForm"
+      scope="request"
+      input="/learner/sbmtlearner.jsp"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="success"
+        path="/learner/sbmtlearner.jsp"
         redirect="false"
       />
       <forward
-        name="instructionFileList"
-        path="/authoring/parts/instructionfilelist.jsp"
+        name="defineLater"
+        path="/learner/definelater.jsp"
+        redirect="false"
+      />
+      <forward
+        name="runOffline"
+        path="/learner/runoffline.jsp"
         redirect="false"
       />
     </action>

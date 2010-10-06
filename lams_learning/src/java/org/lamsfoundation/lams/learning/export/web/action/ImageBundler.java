@@ -47,7 +47,7 @@ public class ImageBundler extends Bundler {
 
     private static Logger log = Logger.getLogger(ImageBundler.class);
     private static String[] miscImages = new String[] { "dash.gif", "cross.gif", "error.jpg", "spacer.gif", "tick.gif",
-	    "tree_closed.gif", "tree_open.gif" , "help.jpg"};
+	    "tree_closed.gif", "tree_open.gif", "help.jpg" };
 
     Map<String, File> filesToCopy = null;
     List<String> directoriesRequired = null;
@@ -70,7 +70,7 @@ public class ImageBundler extends Bundler {
 
 	String lamsEarDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
 	if (lamsEarDir == null) {
-	    log
+	    ImageBundler.log
 		    .error("Unable to get path to the LAMS ear from the configuration file - the exported portfolios will be missing User generated content and FCKEditor smileys.");
 	} else {
 	    lamsWwwPath = lamsEarDir + File.separator + "lams-www.war";
@@ -79,7 +79,7 @@ public class ImageBundler extends Bundler {
     }
 
     /**
-     * Bundle all images and files uploaded by user, also FCKEditor smileys.
+     * Bundle all images and files uploaded by user, also CKEditor smileys.
      * 
      * @throws IOException
      */
@@ -87,7 +87,7 @@ public class ImageBundler extends Bundler {
 
 	// Copy contentFolder
 	if (lamsWwwPath != null) {
-	    log.debug("Copying user generated content from path " + lamsWwwPath);
+	    ImageBundler.log.debug("Copying user generated content from path " + lamsWwwPath);
 
 	    File contentFolderDir = new File(lamsWwwPath + File.separatorChar + "secure" + File.separatorChar
 		    + contentFolderId);
@@ -97,19 +97,19 @@ public class ImageBundler extends Bundler {
 		File destDir = new File(outputDirectory + File.separatorChar + contentFolderId);
 		FileUtils.copyDirectory(contentFolderDir, destDir);
 	    } else {
-		log.debug("Folder for contentFolderId:" + contentFolderId + "doesn't exist");
+		ImageBundler.log.debug("Folder for contentFolderId:" + contentFolderId + "doesn't exist");
 	    }
 	}
 
 	File central = new File(lamsCentralPath);
 	if (lamsCentralPath != null && central.canRead() && central.isDirectory()) {
-	    log.debug("Copying FCKeditor smileys from path " + lamsCentralPath);
+	    ImageBundler.log.debug("Copying CKeditor smileys from path " + lamsCentralPath);
 	    // build up a list of images to copy
-	    setupFCKEditorSmileysList();
+	    setupCKEditorSmileysList();
 
 	    // build up a list of the misc images to copy
 	    setupMiscImages();
-	    
+
 	    // build up a list of things to add for vr to work
 	    setupVideoRecorderExport();
 	}
@@ -122,18 +122,18 @@ public class ImageBundler extends Bundler {
     }
 
     /**
-     * Creates list of FCKEditor smiley files that should be exported.
+     * Creates list of CKEditor smiley files that should be exported.
      */
-    private void setupFCKEditorSmileysList() {
-	String imageDirectory = lamsCentralPath + File.separatorChar + "fckeditor" + File.separatorChar + "editor"
-		+ File.separatorChar + "images" + File.separatorChar + "smiley" + File.separatorChar + "msn";
-	String outputImageDirectory = outputDirectory + File.separatorChar + "fckeditor" + File.separatorChar
-		+ "editor" + File.separatorChar + "images" + File.separatorChar + "smiley" + File.separatorChar + "msn";
+    private void setupCKEditorSmileysList() {
+	String imageDirectory = lamsCentralPath + File.separatorChar + "ckeditor" + File.separatorChar + "images"
+		+ File.separatorChar + "smiley" + File.separatorChar + "msn";
+	String outputImageDirectory = outputDirectory + File.separatorChar + "ckeditor" + File.separatorChar + "images"
+		+ File.separatorChar + "smiley" + File.separatorChar + "msn";
 	directoriesRequired.add(outputImageDirectory);
 
 	File dir = new File(imageDirectory);
 	if (!dir.canRead() || !dir.isDirectory()) {
-	    log.debug("Unable to read image directory " + dir.getAbsolutePath());
+	    ImageBundler.log.debug("Unable to read image directory " + dir.getAbsolutePath());
 	} else {
 	    File[] files = dir.listFiles();
 	    for (File imageFile : files) {
@@ -151,41 +151,42 @@ public class ImageBundler extends Bundler {
 
 	directoriesRequired.add(outputImageDirectory);
 
-	for (String imageName : miscImages) {
+	for (String imageName : ImageBundler.miscImages) {
 	    String inputFilename = imageDirectory + File.separatorChar + imageName;
 	    String outputFilename = outputImageDirectory + File.separatorChar + imageName;
 
 	    File image = new File(inputFilename);
 	    if (!image.canRead() || image.isDirectory()) {
-		log.error("Unable to copy image " + inputFilename
+		ImageBundler.log.error("Unable to copy image " + inputFilename
 			+ " as file does not exist or cannot be read as a file.");
 	    } else {
 		filesToCopy.put(outputFilename, image);
 	    }
 	}
     }
-    
+
     /**
      * Adds VideoRecorder stuff to be exported
      */
     private void setupVideoRecorderExport() {
-    	String vrDirectory = lamsCentralPath + File.separatorChar + "fckeditor" + File.separatorChar + "editor"
-		+ File.separatorChar + "plugins" + File.separatorChar + "videorecorder";
-    	
-    	String outputVrDirectory = outputDirectory + File.separatorChar + "fckeditor" + File.separatorChar
-		+ "editor" + File.separatorChar + "plugins" + File.separatorChar + "videorecorder";
-	
-		directoriesRequired.add(outputVrDirectory);
-	
-		File dir = new File(vrDirectory);
-		if (!dir.canRead() || !dir.isDirectory()) {
-		    log.debug("Unable to read vr directory " + dir.getAbsolutePath());
-		} else {
-		    File[] files = dir.listFiles();
-		    for (File file : files) {
-		    	if(!file.isDirectory())
-		    		filesToCopy.put(outputVrDirectory + File.separatorChar + file.getName(), file);
-		    }
+	String vrDirectory = lamsCentralPath + File.separatorChar + "ckeditor" + File.separatorChar + "plugins"
+		+ File.separatorChar + "videorecorder";
+
+	String outputVrDirectory = outputDirectory + File.separatorChar + "ckeditor" + File.separatorChar + "plugins"
+		+ File.separatorChar + "videorecorder";
+
+	directoriesRequired.add(outputVrDirectory);
+
+	File dir = new File(vrDirectory);
+	if (!dir.canRead() || !dir.isDirectory()) {
+	    ImageBundler.log.debug("Unable to read vr directory " + dir.getAbsolutePath());
+	} else {
+	    File[] files = dir.listFiles();
+	    for (File file : files) {
+		if (!file.isDirectory()) {
+		    filesToCopy.put(outputVrDirectory + File.separatorChar + file.getName(), file);
 		}
+	    }
+	}
     }
 }

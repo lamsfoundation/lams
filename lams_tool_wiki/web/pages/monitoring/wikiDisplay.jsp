@@ -188,11 +188,11 @@
 					<div class="field-name">
 						<fmt:message key="label.wiki.body"></fmt:message>
 					</div>
-					<lams:FCKEditor id="wikiBody"
+					<lams:CKEditor id="wikiBody"
 						value="${currentWikiPage.currentWikiContentDTO.body}"
-						contentFolderID="${contentFolderID}" toolbarSet="Custom-Wiki"
+						contentFolderID="${contentFolderID}" toolbarSet="CustomWiki"
 						height="400px">
-					</lams:FCKEditor>
+					</lams:CKEditor>
 				</td>
 			</tr>
 			<tr>
@@ -231,9 +231,9 @@
 					<div class="field-name">
 						<fmt:message key="label.wiki.body"></fmt:message>
 					</div>
-					<lams:FCKEditor id="newPageWikiBody" value="" height="400px"
-						contentFolderID="${contentFolderID}" toolbarSet="Custom-Wiki">
-					</lams:FCKEditor>
+					<lams:CKEditor id="newPageWikiBody" value="" height="400px"
+						contentFolderID="${contentFolderID}" toolbarSet="CustomWiki">
+					</lams:CKEditor>
 				</td>
 			</tr>
 			<tr>
@@ -335,7 +335,7 @@
 		
 		if (title == null || trim(title).length == 0)
 		{
-			alert("<fmt:message key="label.wiki.add.title.required"></fmt:message>");
+			alert("<fmt:message key='label.wiki.add.title.required'></fmt:message>");
 			return;
 		}
 		
@@ -348,7 +348,7 @@
 			
 			if (trim(title) == wikiLinkArray[i])
 			{
-				alert("<fmt:message key="label.wiki.add.title.exists"><fmt:param>" + title + "</fmt:param></fmt:message>");
+				alert("<fmt:message key='label.wiki.add.title.exists'><fmt:param>" + title + "</fmt:param></fmt:message>");
 				return;
 			}
 		}
@@ -364,7 +364,7 @@
 		document.getElementById("monitoringForm").submit();
 	}
 	
-	function FCKeditor_OnComplete(editorInstance) 
+	CKEDITOR.on('instanceCreated',function (editorInstance) 
 	{ 	
 		editorInstance.wikiLinkArray = wikiLinkArray;
 	}

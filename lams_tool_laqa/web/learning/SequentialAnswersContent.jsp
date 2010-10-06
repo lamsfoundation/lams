@@ -23,7 +23,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="fck-editor" prefix="FCK"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <c:set var="lams">
@@ -55,9 +54,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<c:choose>
 				<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
-					<lams:FCKEditor id="answer" value="${generalLearnerFlowDTO.currentAnswer}"
-						toolbarSet="Default-Learner">
-					</lams:FCKEditor>
+					<lams:CKEditor id="answer" value="${generalLearnerFlowDTO.currentAnswer}"
+						toolbarSet="DefaultLearner">
+					</lams:CKEditor>
 				</c:when>
 	
 				<c:otherwise>

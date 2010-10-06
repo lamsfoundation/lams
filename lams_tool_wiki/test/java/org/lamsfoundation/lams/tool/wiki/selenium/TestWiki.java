@@ -208,7 +208,7 @@ public class TestWiki extends AbstractSeleniumTestCase {
 
 	// Set the  wiki title and body, then save
 	selenium.type("title", title);
-	selenium.runScript("FCKeditorAPI.GetInstance(\"wikiBody\").SetHTML(\"" + body + "\")");
+	selenium.runScript("CKEDITOR.instances[\"wikiBody\"].setData(\"" + body + "\")");
 	selenium.runScript("doEditOrAdd('editPage')");
 	selenium.waitForPageToLoad("30000");
 
@@ -225,7 +225,7 @@ public class TestWiki extends AbstractSeleniumTestCase {
 
 	// Set the  wiki title and body, then save
 	selenium.type("newPageTitle", title);
-	selenium.runScript("FCKeditorAPI.GetInstance(\"newPageWikiBody\").SetHTML(\"" + body + "\")");
+	selenium.runScript("CKEDITOR.instances[\"newPageWikiBody\"].setData(\"" + body + "\")");
 	selenium.runScript("doEditOrAdd('addPage')");
 	selenium.waitForPageToLoad("30000");
 

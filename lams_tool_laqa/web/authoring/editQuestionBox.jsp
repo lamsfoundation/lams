@@ -60,9 +60,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<fmt:message key="label.edit.question"></fmt:message>
 			</div>
 
-			<lams:FCKEditor id="newQuestion"
+			<lams:CKEditor id="newQuestion"
 				value="${qaGeneralAuthoringDTO.editableQuestionText}"
-				contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
+				contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
 
 			<div class="field-name space-top">
 				<fmt:message key="label.feedback"></fmt:message>

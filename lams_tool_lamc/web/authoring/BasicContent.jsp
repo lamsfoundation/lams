@@ -83,9 +83,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<div class="field-name">
 				<fmt:message key="label.authoring.instructions.col"></fmt:message>
 			</div>
-			<lams:FCKEditor id="instructions"
+			<lams:CKEditor id="instructions"
 				value="${mcGeneralAuthoringDTO.activityInstructions}"
-				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
+				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
 		</td>
 	</tr>
 </table>

@@ -5,7 +5,7 @@
 
 <servlet-mapping>
     <servlet-name>Connector</servlet-name>
-    <url-pattern>/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+    <url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 </servlet-mapping>
 
 

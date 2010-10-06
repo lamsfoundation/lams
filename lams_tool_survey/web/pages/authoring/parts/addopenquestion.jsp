@@ -40,9 +40,9 @@
 				<fmt:message key="label.question" />
 			</div>
 
-			<lams:FCKEditor id="question.description"
+			<lams:CKEditor id="question.description"
 				value="${formBean.question.description}"
-				contentFolderID="${formBean.contentFolderID}"></lams:FCKEditor>
+				contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
 
 			<div class="space-top">
 				<html:checkbox property="question.optional" styleClass="noBorder"

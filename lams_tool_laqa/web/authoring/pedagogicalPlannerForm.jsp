@@ -46,12 +46,12 @@
   		}
   		
   		function prepareFormData(){
-			//FCKeditor content is not submitted when sending by jQuery; we need to do this
+			//CKeditor content is not submitted when sending by jQuery; we need to do this
 			var questionIndex = 0;
 			do{
 				var question = document.getElementById("question["+questionIndex+"]");
 				if (question!=null){
-					var content = FCKeditorAPI.GetInstance("question["+questionIndex+"]").GetXHTML();
+					var content = CKEDITOR.instances["question["+questionIndex+"]"].getData();
 					question.value=content;
 					questionIndex++;
 				}
@@ -59,7 +59,7 @@
 		}
 		
 		function clearEntry(questionIndex){
-			FCKeditorAPI.GetInstance("question["+questionIndex+"]").SetHTML("");
+			CKEDITOR.instances["question["+questionIndex+"]"].setData("");
 		}
   	</script>
 </lams:head>
@@ -77,12 +77,12 @@
 			<c:forEach var="questionIndex"  begin="1" end="${formBean.questionCount}">
 				<tr>
 					<td class="FCKcell">
-						<lams:FCKEditor id="question[${questionIndex-1}]"
+						<lams:CKEditor id="question[${questionIndex-1}]"
 							value="${formBean.questionList[questionIndex-1]}"
 							contentFolderID="${formBean.contentFolderID}"
-		 	   	            toolbarSet="Custom-Pedplanner" height="150px"
+		 	   	            toolbarSet="CustomPedplanner" height="150px"
 		  	              width="705px" displayExpanded="false">
-						</lams:FCKEditor>
+						</lams:CKEditor>
 						</td>
 					<td>
 						<img class="clearEntry" src="<lams:LAMSURL/>images/icons/cross.png"

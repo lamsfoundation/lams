@@ -67,9 +67,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<div class="field-name">
 							<fmt:message key="label.add.new.nomination"></fmt:message>
 						</div>
-						<lams:FCKEditor id="newNomination"
+						<lams:CKEditor id="newNomination"
 							value="${voteGeneralAuthoringDTO.editableNominationText}"
-							contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"></lams:FCKEditor>
+							contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
 					</td>
 				</tr>
 			</table>				

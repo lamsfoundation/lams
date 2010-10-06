@@ -62,7 +62,7 @@ function enableFCKEditor(){
 	//alert('enableFCKEditor');
 	// This is a hack for Gecko... it stops editing when the editor is hidden.
 	if ( !document.all ){
-		var oEditor = FCKeditorAPI.GetInstance( 'FCKeditor1' ) ;
+		var oEditor = CKEDITOR.instances[ 'FCKeditor1' ] ;
 		
 		if (  oEditor.EditMode == FCK_EDITMODE_WYSIWYG )
 		{

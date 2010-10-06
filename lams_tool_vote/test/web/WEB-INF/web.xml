@@ -134,7 +134,7 @@ http://www.gnu.org/licenses/gpl.txt
 	</servlet>
 
 
-<!--  FCKEditor Connector Configuration -->
+<!--  CKEditor Connector Configuration -->
 	<servlet>
 		<servlet-name>Connector</servlet-name>
 		<servlet-class>net.fckeditor.connector.ConnectorServlet</servlet-class>
@@ -171,7 +171,7 @@ http://www.gnu.org/licenses/gpl.txt
 
 	<servlet-mapping>
 	    <servlet-name>Connector</servlet-name>
-	    <url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+	    <url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
 	</servlet-mapping>
    
     <error-page>
@@ -258,10 +258,6 @@ http://www.gnu.org/licenses/gpl.txt
 		<!--  ======================================================== -->	
 		<!--   Customized Tag Library -->
 		<!--  ======================================================== -->	
-		<taglib>
-		    <taglib-uri>fck-editor</taglib-uri>
-		    <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
-		</taglib>
 		 <taglib>
 		   <taglib-uri>tags-lams</taglib-uri>
 		   <taglib-location>/WEB-INF/lams.tld</taglib-location>

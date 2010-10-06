@@ -9,7 +9,7 @@
 		<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; ">
 			<c:choose>
 				<c:when test="${question.allowRichEditor && !finishedLock}">
-					<lams:FCKEditor id="question${status.index}" value="${question.answerString}" toolbarSet="Default-Learner"></lams:FCKEditor>
+					<lams:CKEditor id="question${status.index}" value="${question.answerString}" toolbarSet="DefaultLearner"></lams:CKEditor>
 				</c:when>
 				<c:when test="${question.allowRichEditor && finishedLock}">
 					${question.answerString}
