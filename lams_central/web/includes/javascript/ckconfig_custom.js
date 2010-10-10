@@ -35,7 +35,7 @@ CKEDITOR.config.toolbar_CustomPedplanner = [
 
 
 CKEDITOR.config.contentsCss = CKEDITOR.basePath + '../css/defaultHTML_learner.css' ;
-// CKEDITOR.config.skin = 'office2003' ;
+CKEDITOR.config.skin = 'office2003' ;
 CKEDITOR.config.disableNativeSpellChecker = false;
 CKEDITOR.config.browserContextMenuOnCtrl = true;
 // CKEDITOR.config.DefaultLinkTarget = "_blank";
