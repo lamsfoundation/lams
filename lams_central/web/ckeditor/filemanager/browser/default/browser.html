@@ -75,6 +75,7 @@ function GetUrlParam( paramName )
 
 var oConnector = new Object() ;
 oConnector.CurrentFolder	= '/' ;
+oConnector.DesignFolder     = GetUrlParam( 'CurrentFolder' );
 
 var sConnUrl = GetUrlParam( 'Connector' ) ;
 document.CKEditorFuncNum = GetUrlParam( 'CKEditorFuncNum');
@@ -99,7 +100,9 @@ oConnector.SendCommand = function( command, params, callBackFunction )
 {
 	var sUrl = this.ConnectorUrl + 'Command=' + command ;
 	sUrl += '&Type=' + this.ResourceType ;
-	sUrl += '&CurrentFolder=' + encodeURIComponent( this.CurrentFolder ) ;
+//	sUrl += '&CurrentFolder=' + encodeURIComponent( this.CurrentFolder ) ;
+    sUrl += '&CurrentFolder=' + encodeURIComponent( oConnector.CurrentFolder ) ;
+ 	sUrl += '&DesignFolder=' + encodeURIComponent( oConnector.DesignFolder );
 
 	if ( params ) sUrl += '&' + params ;
 

@@ -47,7 +47,8 @@ oListManager.GetFolderRowHtml = function( folderName, folderPath )
 {
 	// Build the link to view the folder.
 	var sLink = '<a href="#" onclick="OpenFolder(\'' + ProtectPath( folderPath ) + '\');return false;">' ;
-
+	var dLink = '<a href="#" onclick="DeleteFolder(\'' + folderName + '\');return false;">' 
+	
 	return '<tr>' +
 			'<td width="16">' +
 				sLink +
@@ -56,14 +57,19 @@ oListManager.GetFolderRowHtml = function( folderName, folderPath )
 				sLink +
 				folderName +
 				'<\/a>' +
-		'<\/td><\/tr>' ;
+				'<\/td><td align="right" nowrap>' +
+				 dLink +
+				 '<img alt="delete" src="images/trash.gif" width="20" height="19" border="0">' +
+				 '<\/a>' +
+		         '<\/td><\/tr>' ;
 }
 
 oListManager.GetFileRowHtml = function( fileName, fileUrl, fileSize )
 {
 	// Build the link to view the folder.
 	var sLink = '<a href="#" onclick="OpenFile(\'' + ProtectPath( fileUrl ) + '\');return false;">' ;
-
+	var dLink = '<a href="#" onclick="DeleteFile(\'' + fileName + '\');return false;">' ;
+	
 	// Get the file icon.
 	var sIcon = oIcons.GetIcon( fileName ) ;
 
@@ -78,7 +84,25 @@ oListManager.GetFileRowHtml = function( fileName, fileUrl, fileSize )
 			'<\/td><td align="right" nowrap>&nbsp;' +
 				fileSize +
 				' KB' +
-		'<\/td><\/tr>' ;
+				'<\/td><td align="right" nowrap>' +
+ 	  	  	 	dLink +
+ 	  	  	 	'<img alt="delete" src="images/trash.gif" width="20" height="19" border="0">' +
+ 	  	  	 	'<\/a>' +
+ 	  	  	 	'<\/td><\/tr>' ;
+}
+
+function confirmDelete(name) {
+	return confirm("Delete '" + name + "' ?");
+}
+
+function DeleteFile( fileName ) {
+	if(confirmDelete(fileName))
+	 	 oConnector.SendCommand( 'DeleteFile', 'fileName=' + encodeURIComponent( fileName ), Refresh ) ;
+}
+
+function DeleteFolder( folderName ) {
+	 if(confirmDelete(folderName))
+	 	  oConnector.SendCommand( 'DeleteFolder', 'folderName=' + encodeURIComponent( folderName ), Refresh ) ;
 }
 
 function OpenFolder( folderPath )
