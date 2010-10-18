@@ -638,7 +638,7 @@ public class MonitoringAction extends Action {
 	if (assessmentQuestionResult != null) {
 	    switch (assessmentQuestionResult.getAssessmentQuestion().getType()) {
 	    case AssessmentConstants.QUESTION_TYPE_ESSAY:
-		return assessmentQuestionResult.getAnswerString();
+		return removeHTMLTags(assessmentQuestionResult.getAnswerString());
 	    case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
 		return getOptionResponse(assessmentQuestionResult, AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS);
 	    case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
