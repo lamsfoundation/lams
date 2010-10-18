@@ -30,7 +30,7 @@ CKEDITOR.config.toolbar_CustomWiki = [
 
 CKEDITOR.config.toolbar_CustomPedplanner = [
 					      ['Source','-','FitWindow','Preview','PasteWord','Bold','Italic','Underline', '-','OrderedList','UnorderedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyFull','TextColor','BGColor','Equation'], 
-	['Image','Link','Table','Smiley','FontName','FontSize']
+	['Image','Link','Table','Smiley','FontName','FontSize','WikiLink']
 ] ;
 
 
@@ -46,5 +46,6 @@ CKEDITOR.config.enterMode = 'div' ;
 // CKEDITOR.plugins.add('movieplayer') ;
 // CKEDITOR.plugins.add('videorecorder') ;
 // CKEDITOR.plugins.add('paint') ;
-// CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/') ;
-// CKEDITOR.config.extraPlugins = 'equation,movieplayer,videorecorder,paint,wikilink' ;
+CKEDITOR.plugins.addExternal('WikiLink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js') ;
+//CKEDITOR.config.extraPlugins = 'equation,movieplayer,videorecorder,paint,wikilink' ;
+CKEDITOR.config.extraPlugins = 'WikiLink' ;

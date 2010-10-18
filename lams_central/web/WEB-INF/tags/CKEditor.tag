@@ -33,6 +33,21 @@
 </c:if>
 
 <script type="text/javascript">
+
+	/* Beacuse we're using Prototype, jQuery and CKEditor, some situations
+	   are impossible to resolve without manually rewritting functions
+	   
+	CKEDITOR.tools.indexOf = function( array, entry ) 
+	{ 
+		for ( var i = 0, len = array.length ; i < len ; i++ ) 
+		{ 
+			if ( array[ i ] == entry ) 
+				return i; 
+		} 
+		return -1; 
+	};
+	
+	*/
 	CKEDITOR.basePath = "${ckEditorBasePath}";
 	
 	CKEDITOR.replace( "${id}", {
