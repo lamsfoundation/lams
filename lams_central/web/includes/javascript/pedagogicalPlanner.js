@@ -162,7 +162,11 @@
   	   		 
   	   		var openAuthorURL = "home.do?method=author&learningDesignID=" + learningDesignId;
   	   		if (requestSrc != "") openAuthorURL += "&requestSrc=" + requestSrc;
-  	   		if (notifyCloseURL != "") openAuthorURL += "&notifyCloseURL=" + notifyCloseURL;
+  	   		if (notifyCloseURL != "") {
+  	   			//to prevent losing of query parameters change '&' into '%26'
+  	   			notifyCloseURL = notifyCloseURL.replace (/&/g, '%26');
+  	   			openAuthorURL += "&notifyCloseURL=" + notifyCloseURL;
+  	   		}
   	   		document.location.href = openAuthorURL;
   	   	}
   	   	else if (actionAfterCompleted==ACTION_EXPORT){
