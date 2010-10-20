@@ -110,19 +110,23 @@ public class Emailer {
 	public static void send(String subject, String to, String toPerson, String from, String fromPerson, String body, Properties mailServerConfig)
 	throws AddressException, MessagingException, UnsupportedEncodingException {
 
-		Session session = getMailSession(mailServerConfig);
-		MimeMessage message = new MimeMessage(session);
+	    	Session session = getMailSession(mailServerConfig);
+	    	boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
 		
+		MimeMessage message = new MimeMessage(session);
 		message.setFrom(new InternetAddress(from, fromPerson));
 		message.addRecipient(RecipientType.TO, new InternetAddress(to, toPerson));
-		message.setSubject(subject);
-		message.setText(body);
-
-		boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
 		if (useInternalSMTPServer) {
+			message.setSubject(subject);
+			message.setText(body);
+		    
 			MailQue myMailQue = new MailQue();
 			myMailQue.queMail(message);	    
 		} else {
+			message.setSubject(subject, "UTF-8");
+			message.setText(body, "UTF-8");
+			message.addHeader("Content-Type", "text/plain; charset=UTF-8");
+		    
 			Transport.send(message);    
 		}
 
