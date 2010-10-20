@@ -72,7 +72,7 @@
 		</tr>
 	</c:if>		
 		
-	<c:forEach var="file" items="${taskList.offlineFileList}">
+	<c:forEach var="file" items="${formBean.attachmentsList}">
 		<c:if test="${not file.onlineFile}">
 			<tr >
 				<td width="7%" style="padding-left: 30px;">			
