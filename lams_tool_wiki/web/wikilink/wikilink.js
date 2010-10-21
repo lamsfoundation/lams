@@ -87,5 +87,11 @@ function triggerOK(ev)
 		return;
 	}
 	
-	CK.insertHtml( '<a href="' + wikiUrl + '">' + linkAlias + '</a>' );
+	// workaround for FF "security feature" clearing malicious code
+	// to be inserted in contenteditable secitions
+	var escapedWikiUrl = 'mediaembedInsertData|---' + escape(wikiUrl) + '---|mediaembedInsertData';
+	CK.insertHtml( '<a href="' + escapedWikiUrl + '">' + linkAlias + '</a>' );
+	var updatedEditorData = CK.getData();
+	var cleanEditorData = updatedEditorData.replace(escapedWikiUrl,wikiUrl);
+	CK.setData(cleanEditorData);
 }
