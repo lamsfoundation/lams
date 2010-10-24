@@ -48,6 +48,7 @@
 			filebrowserImageUploadUrl     : "$ckEditorBasePath}filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/${contentFolderID}/",
 			filebrowserImageBrowseLinkUrl : "$ckEditorBasePath}filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/",
 			filebrowserFlashBrowseUrl     : "$ckEditorBasePath}filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/",
-			filebrowserFlashUploadUrl     : "$ckEditorBasePath}filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/${contentFolderID}/"
+			filebrowserFlashUploadUrl     : "$ckEditorBasePath}filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/${contentFolderID}/",
+			contentFolderID				  : "${contentFolderID}"
 	});
 </script>
