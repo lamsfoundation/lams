@@ -56,18 +56,23 @@ import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+import org.lamsfoundation.lams.events.DeliveryMethodMail;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -158,6 +163,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private IGradebookService gradebookService;
 
     private IEventNotificationService eventNotificationService;
+    
+    private ILessonService lessonService;
+    
+    private IActivityDAO activityDAO;
+    
     private Random generator = new Random();
 
     // ---------------------------------------------------------------------
@@ -1295,6 +1305,14 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	this.gradebookService = gradebookService;
     }
 
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
+    }
+    
+    public void setActivityDAO(IActivityDAO activityDAO) {
+	this.activityDAO = activityDAO;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -1352,6 +1370,43 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
      */
     public void saveTimestamp(Timestamp timestamp) {
 	timestampDao.saveOrUpdate(timestamp);
+    }
+    
+    public void sendNotificationsOnNewPosting(Long forumId, Long sessionId, Message message) {
+	Forum forum = getForum(forumId);
+	ForumUser postAuthor = message.getCreatedBy();
+	String fullName = postAuthor.getLastName() + " " + postAuthor.getFirstName();
+	ToolSession toolSession = toolService.getToolSession(sessionId);
+	Long activityId = toolSession.getToolActivity().getActivityId();
+	ToolActivity activity = (ToolActivity) activityDAO.getActivityByActivityId(activityId, ToolActivity.class);
+	
+	if (forum.isNotifyLearnersOnForumPosting()) {
+	    List<User> learners = lessonService.getLearnersHaveAttemptedActivity(activity);
+	    if (learners != null && !learners.isEmpty()) {
+		ArrayList<Long> learnerIds = new ArrayList<Long>();
+		for (User learner : learners) {
+		    learnerIds.add(learner.getUserId().longValue());
+		}
+		
+		getEventNotificationService().sendMessage(learnerIds.toArray(new Long[0]), DeliveryMethodMail.getInstance(),
+			getLocalisedMessage("event.newposting.subject", new Object[] { forum.getTitle() }),
+			getLocalisedMessage("event.newposting.body", new Object[] { fullName, message.getBody() }));
+	    }
+	}
+	
+	if (forum.isNotifyTeachersOnForumPosting()) {
+	    List<User> monitoringUsers = lessonService.getMonitorsByToolSessionId(sessionId);
+	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
+		ArrayList<Long> monitoringUsersIds = new ArrayList<Long>();
+		for (User monitoringUser : monitoringUsers) {
+		    monitoringUsersIds.add(monitoringUser.getUserId().longValue());
+		}
+
+		getEventNotificationService().sendMessage(monitoringUsersIds.toArray(new Long[0]), DeliveryMethodMail.getInstance(),
+			getLocalisedMessage("event.newposting.subject", new Object[] { forum.getTitle() }),
+			getLocalisedMessage("event.newposting.body", new Object[] { fullName, message.getBody() }));
+	    }
+	}
     }
 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {

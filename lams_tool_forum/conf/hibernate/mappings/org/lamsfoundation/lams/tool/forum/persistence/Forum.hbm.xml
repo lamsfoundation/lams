@@ -253,6 +253,22 @@
         />
 
         <property
+            name="notifyLearnersOnForumPosting"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="notify_learners_on_forum_posting"
+        />
+
+        <property
+            name="notifyTeachersOnForumPosting"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="notify_teachers_on_forum_posting"
+        />
+
+        <property
             name="notifyLearnersOnMarkRelease"
             type="boolean"
             update="true"

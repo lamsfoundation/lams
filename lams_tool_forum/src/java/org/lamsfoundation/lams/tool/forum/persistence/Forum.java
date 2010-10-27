@@ -101,8 +101,12 @@ public class Forum implements Cloneable {
     private boolean reflectOnActivity;
 
     private String reflectInstructions;
-
+    
     private boolean notifyLearnersOnMarkRelease;
+    
+    private boolean notifyLearnersOnForumPosting;
+
+    private boolean notifyTeachersOnForumPosting;
 
     // conditions
     private Set<ForumCondition> conditions = new TreeSet<ForumCondition>(new TextSearchConditionComparator());
@@ -592,6 +596,30 @@ public class Forum implements Cloneable {
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
 	this.reflectOnActivity = reflectOnActivity;
+    }
+    
+    /**
+     * @hibernate.property column="notify_learners_on_forum_posting"
+     * @return
+     */
+    public boolean isNotifyLearnersOnForumPosting() {
+	return notifyLearnersOnForumPosting;
+    }
+
+    public void setNotifyLearnersOnForumPosting(boolean notifyLearnersOnForumPosting) {
+	this.notifyLearnersOnForumPosting = notifyLearnersOnForumPosting;
+    }
+    
+    /**
+     * @hibernate.property column="notify_teachers_on_forum_posting"
+     * @return
+     */
+    public boolean isNotifyTeachersOnForumPosting() {
+	return notifyTeachersOnForumPosting;
+    }
+
+    public void setNotifyTeachersOnForumPosting(boolean notifyTeachersOnForumPosting) {
+	this.notifyTeachersOnForumPosting = notifyTeachersOnForumPosting;
     }
 
     /**

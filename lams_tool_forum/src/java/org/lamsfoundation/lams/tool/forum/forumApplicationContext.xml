@@ -133,6 +133,12 @@
 		<property name="gradebookService">
 			<ref bean="gradebookService" />
 		</property>
+		<property name="lessonService">
+			<ref bean="lessonService"/>
+		</property>
+		<property name="activityDAO">
+			<ref bean="activityDAO"/>
+		</property>		
 	</bean>
 
 	<bean id="forumService"

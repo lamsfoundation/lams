@@ -50,6 +50,22 @@
 	<html:text property="forum.limitedChar" styleId="limitedChar" />
 </p>
 
+<p style="margin-bottom: 15px;"><fmt:message key="label.authoring.advanced.send.emails.to" /> </p>
+<p style="margin-left: 60px; ">
+	<html:checkbox property="forum.notifyLearnersOnForumPosting" styleId="notifyLearnersOnForumPosting" styleClass="noBorder">
+	</html:checkbox>
+	<label for="notifyLearnersOnForumPosting">
+		<fmt:message key="label.authoring.advanced.learners" />
+	</label>
+</p>
+<p style="margin-left: 60px;">
+	<html:checkbox property="forum.notifyTeachersOnForumPosting" styleId="notifyTeachersOnForumPosting" styleClass="noBorder">
+	</html:checkbox>
+	<label for="notifyTeachersOnForumPosting">
+		<fmt:message key="label.authoring.advanced.teachers" />
+	</label>
+</p>
+
 <p>
 	<html:checkbox property="forum.notifyLearnersOnMarkRelease" styleId="notifyLearnersOnMarkRelease"
 		styleClass="noBorder">

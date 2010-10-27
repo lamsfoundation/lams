@@ -431,4 +431,6 @@ public interface IForumService {
     public String createTextSearchConditionName(Collection<ForumCondition> existingConditions);
 
     public void deleteCondition(ForumCondition condition) throws PersistenceException;
+    
+    void sendNotificationsOnNewPosting(Long forumId, Long sessionId, Message message);
 }

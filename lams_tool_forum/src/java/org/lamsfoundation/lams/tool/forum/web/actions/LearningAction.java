@@ -586,7 +586,10 @@ public class LearningAction extends Action {
 
 	    messageDTO.setLastTopicDate(forumService.getLastTopicDate(messageDTO.getMessage().getUid()));
 	}
-
+	
+	// notify learners and teachers
+	forumService.sendNotificationsOnNewPosting(forumId, sessionId, message);
+	
 	return mapping.findForward("success");
     }
 
@@ -693,6 +696,10 @@ public class LearningAction extends Action {
 
 	// Saving or updating user timestamp
 	saveUserTimestamp(rootTopicId, forumUser);
+	
+	// notify learners and teachers
+	Long forumId = (Long) sessionMap.get(ForumConstants.FORUM_ID);
+	forumService.sendNotificationsOnNewPosting(forumId, sessionId, message);
 
 	return mapping.findForward("success");
     }
