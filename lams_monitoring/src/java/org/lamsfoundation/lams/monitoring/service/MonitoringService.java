@@ -469,6 +469,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	// Make all efforts to make sure it has a title
 	String title = lessonName != null ? lessonName : copiedLearningDesign.getTitle();
 	title = title != null ? title : "Unknown Lesson";
+	//truncate title
+	if (title.length() > 254) {
+	    title = title.substring(0, 254);
+	}
 
 	Lesson lesson = createNewLesson(title, lessonDescription, user, learnerExportAvailable, copiedLearningDesign,
 		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
