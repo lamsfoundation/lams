@@ -49,7 +49,7 @@
 	<p>&nbsp;</p>
 
 	<H2><c:out value="${formBean.title}" escapeXml="false" /></H2>
-	<p><c:out value="${formBean.content}" escapeXml="false" /></p>
+	<p><c:out value="${formBean.basicContent}" escapeXml="false" /></p>
 
 	<H2><fmt:message key="titleHeading.statistics"/></H2>
 	<%@ include file="m_Statistics.jsp"%>

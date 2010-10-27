@@ -43,7 +43,7 @@ public class NbExportForm extends ActionForm {
     static Logger logger = Logger.getLogger(NbExportForm.class.getName());
     
     private String title;
-	private String content;
+	private String basicContent;
 	
 	private String toolContentID;
 	private String toolSessionID;
@@ -68,14 +68,14 @@ public class NbExportForm extends ActionForm {
     /**
      * @return Returns the content.
      */
-    public String getContent() {
-        return content;
+    public String getBasicContent() {
+        return basicContent;
     }
     /**
-     * @param content The content to set.
+     * @param basicContent The content to set.
      */
-    public void setContent(String content) {
-        this.content = content;
+    public void setBasicContent(String basicContent) {
+        this.basicContent = basicContent;
     }
     /**
      * @return Returns the mode.
@@ -142,7 +142,7 @@ public class NbExportForm extends ActionForm {
     {
         this.mode = null;
         this.title = null;
-        this.content = null;
+        this.basicContent = null;
         this.toolContentID = null;
         this.toolSessionID = null;
         this.userID = null;
@@ -151,6 +151,6 @@ public class NbExportForm extends ActionForm {
     public void populateForm(NoticeboardContent content)
     {
         setTitle(content.getTitle());
-        setContent(content.getContent());
+        setBasicContent(content.getContent());
     }
 }

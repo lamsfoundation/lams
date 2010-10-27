@@ -23,7 +23,7 @@
 	</h1>
 
 	<p>
-		<c:out value="${NbLearnerForm.content}" escapeXml="false" />
+		<c:out value="${NbLearnerForm.basicContent}" escapeXml="false" />
 	</p>
 
 	<html:form action="/learner" target="_self"

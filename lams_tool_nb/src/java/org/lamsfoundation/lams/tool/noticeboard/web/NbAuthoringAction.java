@@ -147,7 +147,7 @@ public class NbAuthoringAction extends LamsDispatchAction {
 			nbForm.setToolContentID(contentId.toString());
 			nbForm.setContentFolderID(contentFolderId);
 			nbForm.setTitle(nb.getTitle());
-			nbForm.setContent(nb.getContent());
+			nbForm.setBasicContent(nb.getContent());
 			nbForm.setOnlineInstructions(nb.getOnlineInstructions());
 			nbForm.setOfflineInstructions(nb.getOfflineInstructions());
 			

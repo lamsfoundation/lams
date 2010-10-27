@@ -68,7 +68,7 @@ public class NbMonitoringForm extends ActionForm {
 
 	/* Only valid when form just set up by Java. Values are not returned from jsp page */
 	private String title;
-	private String content;
+	private String basicContent;
 	private String onlineInstructions;
 	private String offlineInstructions;
 	private String contentEditable;
@@ -125,8 +125,8 @@ public class NbMonitoringForm extends ActionForm {
 		this.currentTab = currentTab;
 	}
  
-	public String getContent() {
-		return content;
+	public String getBasicContent() {
+		return basicContent;
 	}
 
 	public String getOfflineInstructions() {
@@ -144,8 +144,8 @@ public class NbMonitoringForm extends ActionForm {
 	public String getContentEditable() {
 		return contentEditable;
 	}
-	public void setContent(String content) {
-		this.content = content;
+	public void setBasicContent(String basicContent) {
+		this.basicContent = basicContent;
 	}
 	public void setContentEditable(String contentEditable) {
 		this.contentEditable = contentEditable;

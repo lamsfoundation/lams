@@ -107,7 +107,7 @@ public class NbPedagogicalPlannerAction extends LamsDispatchAction {
 	NbPedagogicalPlannerForm plannerForm = (NbPedagogicalPlannerForm) form;
 	ActionMessages errors = plannerForm.validate();
 	if (errors.isEmpty()) {
-	    String content = plannerForm.getContent();
+	    String content = plannerForm.getBasicContent();
 	    Long toolContentID = plannerForm.getToolContentID();
 	    NoticeboardContent noticeboard = getNoticeboardService().retrieveNoticeboard(toolContentID);
 	    noticeboard.setContent(content);

@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
  *              type="org.lamsfoundation.lams.tool.noticeboard.web.NbPedagogicalPlannerForm"
  */
 public class NbPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
-    private String content;
+    private String basicContent;
     private String contentFolderID;
 
     public String getContentFolderID() {
@@ -42,18 +42,18 @@ public class NbPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	this.contentFolderID = contentFolderID;
     }
 
-    public String getContent() {
-	return content;
+    public String getBasicContent() {
+	return basicContent;
     }
 
-    public void setContent(String instructions) {
-	content = instructions;
+    public void setBasicContent(String instructions) {
+	basicContent = instructions;
     }
 
     public void fillForm(NoticeboardContent noticeboard) {
 	if (noticeboard != null) {
 	    String content = noticeboard.getContent();
-	    setContent(content);
+	    setBasicContent(content);
 	    setToolContentID(noticeboard.getNbContentId());
 	}
     }

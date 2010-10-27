@@ -105,7 +105,7 @@ public class NbMonitoringAction extends LamsDispatchAction {
 		NoticeboardContent content = nbService.retrieveNoticeboard(toolContentId);
 
     	monitorForm.setTitle(content.getTitle());
-    	monitorForm.setContent(content.getContent());
+    	monitorForm.setBasicContent(content.getContent());
     	monitorForm.setOnlineInstructions(content.getOnlineInstructions());
     	monitorForm.setOfflineInstructions(content.getOfflineInstructions());
 		monitorForm.setAttachmentsList(NbWebUtil.setupAttachmentList(nbService, content));

@@ -20,7 +20,7 @@
 			</h1>
 
 				<p>
-					<c:out value="${NbExportForm.content}" escapeXml="false" />
+					<c:out value="${NbExportForm.basicContent}" escapeXml="false" />
 				</p>
 				
 			<c:if test="${learner}">

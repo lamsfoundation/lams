@@ -70,7 +70,7 @@ public class NbAuthoringForm extends ActionForm {
 	static Logger logger = Logger.getLogger(NbAuthoringForm.class.getName());
 
 	private String title;
-	private String content;
+	private String basicContent;
 	private String onlineInstructions;
 	private String offlineInstructions;
 	
@@ -146,14 +146,14 @@ public class NbAuthoringForm extends ActionForm {
 	/**
 	 * @return Returns the content.
 	 */
-	public String getContent() {
-		return content;
+	public String getBasicContent() {
+		return basicContent;
 	}
 	/**
-	 * @param content The content to set.
+	 * @param basicContent The content to set.
 	 */
-	public void setContent(String content) {
-		this.content = content;
+	public void setBasicContent(String basicContent) {
+		this.basicContent = basicContent;
 	}
 	/**
 	 * @return Returns the title.
@@ -262,7 +262,7 @@ public class NbAuthoringForm extends ActionForm {
 	public void populateFormWithNbContentValues(NoticeboardContent nbContent)
 	{
 		setTitle(nbContent.getTitle());
-		setContent(nbContent.getContent());
+		setBasicContent(nbContent.getContent());
 		setOnlineInstructions(nbContent.getOnlineInstructions());
 		setOfflineInstructions(nbContent.getOfflineInstructions());
 		setReflectOnActivity(nbContent.getReflectOnActivity());
@@ -272,7 +272,7 @@ public class NbAuthoringForm extends ActionForm {
 	public void copyValuesIntoNbContent(NoticeboardContent nbContent)
 	{
 		nbContent.setTitle(getTitle());
-	    nbContent.setContent(getContent());
+	    nbContent.setContent(getBasicContent());
 	    if (defineLater == null || defineLater.length() == 0) {
 	    	// ie. If defineLater is null or empty, this means we are in authoring
 			nbContent.setOnlineInstructions(getOnlineInstructions());

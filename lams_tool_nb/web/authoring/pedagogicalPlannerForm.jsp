@@ -9,8 +9,8 @@
 	<script type="text/javascript">
 		function prepareFormData(){
 			//CKeditor content is not submitted when sending by jQuery; we need to do this
-			var content = CKEDITOR.instances.content.getData();
-			document.getElementById("content").value=content;
+			var basicContent = CKEDITOR.instances.basicContent.getData();
+			document.getElementById("basicContent").value=basicContent;
 		}
 	</script>
 </lams:head>
@@ -23,8 +23,8 @@
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
 		
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-		<lams:CKEditor id="content"
-			value="${formBean.content}"
+		<lams:CKEditor id="basicContent"
+			value="${formBean.basicContent}"
 			contentFolderID="${formBean.contentFolderID}"
                toolbarSet="CustomPedplanner" height="190px"
                width="750px" displayExpanded="false">

@@ -46,7 +46,7 @@ public class NbLearnerForm extends ActionForm{
     
     private String title;
     
-    private String content;
+    private String basicContent;
     
     private String toolSessionID;
     
@@ -73,14 +73,14 @@ public class NbLearnerForm extends ActionForm{
     /**
      * @return Returns the content.
      */
-    public String getContent() {
-        return content;
+    public String getBasicContent() {
+        return basicContent;
     }
     /**
-     * @param content The content to set.
+     * @param basicContent The content to set.
      */
-    public void setContent(String content) {
-        this.content = content;
+    public void setBasicContent(String basicContent) {
+        this.basicContent = basicContent;
     }
     /**
      * @return Returns the title.
@@ -110,7 +110,7 @@ public class NbLearnerForm extends ActionForm{
     
     public void reset()
 	{
-		this.content = null;
+		this.basicContent = null;
 		this.title = null;
 		this.toolSessionID = null;
 		this.method = null;
@@ -121,7 +121,7 @@ public class NbLearnerForm extends ActionForm{
     public void copyValuesIntoForm(NoticeboardContent content, boolean readOnly, String mode)
     {
         setTitle(content.getTitle());
-        setContent(content.getContent());
+        setBasicContent(content.getContent());
         setMode(mode);
         setReadOnly(new Boolean(readOnly));
     }

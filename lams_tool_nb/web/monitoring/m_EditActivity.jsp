@@ -20,7 +20,7 @@
 					<fmt:message key="basic.content" />
 				</td>
 				<td>
-					<c:out value="${formBean.content}" escapeXml="false" />
+					<c:out value="${formBean.basicContent}" escapeXml="false" />
 				</td>
 			</tr>
 </table>
