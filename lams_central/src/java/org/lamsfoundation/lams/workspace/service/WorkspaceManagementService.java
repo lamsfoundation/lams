@@ -598,9 +598,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		}
 	}
 	public WorkspaceFolder createFolder(Integer parentFolderID, String name, Integer userID) throws UserException,WorkspaceFolderException{
-		WorkspaceFolder parentFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,parentFolderID);		
-		User user =null;
-		Workspace workspace =null;		
+		WorkspaceFolder parentFolder = (WorkspaceFolder)baseDAO.find(WorkspaceFolder.class,parentFolderID);
 		
 		if(parentFolder!=null){			
 			
@@ -613,17 +611,17 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 					break;
 			}
 			
-			user =  (User)baseDAO.find(User.class,userID);
+			//set type of the new workspaceFolder
+			Integer newWorkspaceFolderType = parentFolder.getWorkspaceFolderType().equals(WorkspaceFolder.PUBLIC_SEQUENCES) 
+				? WorkspaceFolder.PUBLIC_SEQUENCES 
+				: WorkspaceFolder.NORMAL;
+			
+			User user =  (User)baseDAO.find(User.class,userID);
 			if(user!=null){
-				workspace = user.getWorkspace();
-				WorkspaceFolder workspaceFolder = new WorkspaceFolder(name,
-																	  workspace.getWorkspaceId(),
-																	  parentFolder,
-																	  userID,
-																	  new Date(),
-																	  new Date(),
-																	  WorkspaceFolder.NORMAL);
-				baseDAO.insert(workspaceFolder);
+			    	Workspace workspace = user.getWorkspace();
+                		WorkspaceFolder workspaceFolder = new WorkspaceFolder(name, workspace.getWorkspaceId(), parentFolder,
+                			userID, new Date(), new Date(), newWorkspaceFolderType);
+                		baseDAO.insert(workspaceFolder);
 				return workspaceFolder;	
 			}else
 				throw new UserException(messageService.getMessage("no.such.user",new Object[]{userID}));
