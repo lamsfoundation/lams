@@ -43,13 +43,12 @@ public class QaMonitoredAnswersDTO implements Comparable {
     private String questionUid;
 
     private String question;
+    
+    private String feedback;
 
     private Map questionAttempts;
 
     /**
-     * 
-     * /**
-     * 
      * @return Returns the question.
      */
     public String getQuestion() {
@@ -58,10 +57,26 @@ public class QaMonitoredAnswersDTO implements Comparable {
 
     /**
      * @param question
-     *                The question to set.
+     *            The question to set.
      */
     public void setQuestion(String question) {
 	this.question = question;
+    }
+    
+    /**
+     * 
+     * @return Returns the feedback.
+     */
+    public String getFeedback() {
+	return feedback;
+    }
+
+    /**
+     * @param feedback
+     *                The feedback to set.
+     */
+    public void setFeedback(String feedback) {
+	this.feedback = feedback;
     }
 
     /**

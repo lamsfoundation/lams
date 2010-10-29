@@ -34,17 +34,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div id="content">
 
-		<h1>
-			<c:choose>
-				<c:when test="${(portfolioExportMode == 'learner')}">
-					<fmt:message key="label.export.learner" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.export.teacher" />
-				</c:otherwise>
-			</c:choose>
-		</h1>
-
+		<h1>${generalLearnerFlowDTO.activityTitle} </h1>
+			
+		<h1>${generalLearnerFlowDTO.activityInstructions} </h1>
 
 		<c:if
 			test="${(userExceptionNoToolSessions == 'true') and (portfolioExportMode != 'learner')}">
@@ -52,7 +44,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<fmt:message key="error.noLearnerActivity" />
 			</p>
 		</c:if>
-
 
 		<!-- LEARNER EXPORT -->
 
@@ -68,6 +59,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<strong> <fmt:message key="label.question" /> : </strong>
 							<c:out value="${currentDto.question}" escapeXml="false" />
 						</p>
+						
+						<c:if test="${not empty currentDto.feedback}">
+							<p>
+								<strong> <fmt:message key="label.feedback" /> : </strong>
+								<c:out value="${currentDto.feedback}" escapeXml="false" />
+							</p>
+						</c:if>
 
 						<table cellspacing="0" class="alternative-color">
 							<tr>
@@ -146,6 +144,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 						<strong> <fmt:message key="label.question" /> : </strong>
 						<c:out value="${currentDto.question}" escapeXml="false" />
+						
+						<c:if test="${not empty currentDto.feedback}">
+							<strong> <fmt:message key="label.feedback" /> : </strong>
+							<c:out value="${currentDto.feedback}" escapeXml="false" />
+						</c:if>
 
 						<table cellspacing="0" class="alternative-color">
 							<tr>

@@ -210,6 +210,7 @@ public class MonitoringUtil implements QaAppConstants {
 		QaMonitoredAnswersDTO qaMonitoredAnswersDTO = new QaMonitoredAnswersDTO();
 		qaMonitoredAnswersDTO.setQuestionUid(qaQueContent.getUid().toString());
 		qaMonitoredAnswersDTO.setQuestion(qaQueContent.getQuestion());
+		qaMonitoredAnswersDTO.setFeedback(qaQueContent.getFeedback());
 		qaMonitoredAnswersDTO.setSessionName(sessionName);
 
 		logger.debug("using allUsersData to retrieve users data: " + isUserNamesVisible);
@@ -502,6 +503,7 @@ public class MonitoringUtil implements QaAppConstants {
 			QaMonitoredAnswersDTO qaMonitoredAnswersDTO = new QaMonitoredAnswersDTO();
 			qaMonitoredAnswersDTO.setQuestionUid(qaQueContent.getUid().toString());
 			qaMonitoredAnswersDTO.setQuestion(qaQueContent.getQuestion());
+			qaMonitoredAnswersDTO.setFeedback(qaQueContent.getFeedback());
 			qaMonitoredAnswersDTO.setSessionId(currentSessionId);
 			qaMonitoredAnswersDTO.setSessionName(currentSessionName);
 
