@@ -110,10 +110,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.Globals;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -123,6 +127,7 @@ import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
+import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
@@ -130,6 +135,7 @@ import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -185,36 +191,65 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	Map mapAnswers = new TreeMap(new QaComparator());
 	Map mapAnswersPresentable = new TreeMap(new QaComparator());
 	Map mapFeedback = new TreeMap(new QaComparator());
+	
+	String destination = INDIVIDUAL_LEARNER_RESULTS;
+	ActionMessages errors = new ActionMessages();
+
+	String httpSessionID = qaLearningForm.getHttpSessionID();
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	
 	/* if the listing mode is QUESTION_LISTING_MODE_COMBINED populate  the answers here*/
 	if (questionListingMode.equalsIgnoreCase(QUESTION_LISTING_MODE_COMBINED)) {
-	    logger.debug("the listing mode is combined.");
+	    
 	    for (int questionIndex = INITIAL_QUESTION_COUNT.intValue(); questionIndex <= intTotalQuestionCount; questionIndex++) {
 		String answer = request.getParameter("answer" + questionIndex);
 		String answerPresentable = QaUtils.replaceNewLines(answer);
 
-		mapAnswers.put(new Long(questionIndex).toString(), answer);
-		mapAnswersPresentable.put(new Long(questionIndex).toString(), answerPresentable);
+		String questionIndexString = new Integer(questionIndex).toString();
+		mapAnswers.put(questionIndexString, answer);
+		mapAnswersPresentable.put(questionIndexString, answerPresentable);
+		
+		Map<String,QaQuestionContentDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
+		QaQuestionContentDTO dto = questionContentMap.get(questionIndexString);
+		if ( dto.isRequired() && isEmpty(answer)) {
+		    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", questionIndexString));
+		    destination = LOAD_LEARNER;
+		}
 	    }
+	    saveErrors(request, errors);
+
 	} else {
-	    logger.debug("the listing mode is sequential");
-	    if (totalQuestionCount.equals("1")) {
+	    // processing the last question in sequential mode
+/*	    if (totalQuestionCount.equals("1")) {
 		String answerPresentable = QaUtils.replaceNewLines(qaLearningForm.getAnswer());
 
-		mapAnswers.put(new Long(1).toString(), qaLearningForm.getAnswer());
-		mapAnswersPresentable.put(new Long(1).toString(), answerPresentable);
-	    } else {
-		logger.debug("the listing mode is sequential and there are multiple questions");
-		logger.debug("populating mapAnswers...");
+		mapAnswers.put("1", qaLearningForm.getAnswer());
+		mapAnswersPresentable.put("1", answerPresentable);
+
+		Map<String,QaQuestionContentDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
+		QaQuestionContentDTO dto = questionContentMap.get("1");
+		if ( dto.isRequired() && isEmpty(answerPresentable)) {
+		    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", "1"));
+		    destination = LOAD_LEARNER;
+		}
+
+	    } else { */
 		mapAnswers = populateAnswersMap(qaLearningForm, request, generalLearnerFlowDTO, true, true);
-
-		String httpSessionID = qaLearningForm.getHttpSessionID();
-
-		SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
 
 		mapAnswersPresentable = (Map) sessionMap.get(MAP_ALL_RESULTS_KEY);
 		mapAnswersPresentable = MonitoringUtil.removeNewLinesMap(mapAnswersPresentable);
-	    }
 
+		// only need to check the final question as the others will have been checked when the user clicked next.
+		Map<String,QaQuestionContentDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
+		int numQuestions = questionContentMap.size();
+		String finalQuestionIndex = new Integer(numQuestions).toString();
+		QaQuestionContentDTO dto = questionContentMap.get(finalQuestionIndex);
+		if ( dto.isRequired() && isEmpty((String)mapAnswersPresentable.get(finalQuestionIndex))) {
+		    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", finalQuestionIndex));
+		    destination = LOAD_LEARNER;
+		}
+/*	    } */
+	    
 	}
 
 	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
@@ -222,7 +257,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	generalLearnerFlowDTO.setMapAnswersPresentable(mapAnswersPresentable);
 
 	/*mapAnswers will be used in the viewAllAnswers screen*/
-	SessionMap sessionMap = new SessionMap();
+	if ( sessionMap == null ) 
+	    sessionMap = new SessionMap();
+	
 	sessionMap.put(MAP_ALL_RESULTS_KEY, mapAnswers);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
@@ -242,8 +279,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
 	qaLearningForm.resetAll();
-	logger.debug("fwd'ing to." + INDIVIDUAL_LEARNER_RESULTS);
-	return (mapping.findForward(INDIVIDUAL_LEARNER_RESULTS));
+	return (mapping.findForward(destination));
     }
 
     /**
@@ -281,7 +317,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 
-	Map mapQuestions = new TreeMap(new QaComparator());
+	Map<String, QaQuestionContentDTO> mapQuestions = new TreeMap();
 	Map mapAnswers = new TreeMap(new QaComparator());
 
 	generalLearnerFlowDTO.setCurrentQuestionIndex(new Integer(1));
@@ -368,8 +404,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		int displayOrder = qaQueContent.getDisplayOrder();
 		if (displayOrder != 0) {
 		    ++questionCount;
-
-		    mapQuestions.put(new Integer(displayOrder).toString(), qaQueContent.getQuestion());
+		    QaQuestionContentDTO questionDTO = new QaQuestionContentDTO(qaQueContent);
+		    mapQuestions.put(questionDTO.getDisplayOrder(), questionDTO);
 
 		    if (qaQueUsr != null) {
 			List listUserAttempts = qaService
@@ -382,7 +418,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 			Iterator itAttempts = listUserAttempts.iterator();
 			while (itAttempts.hasNext()) {
 			    QaUsrResp qaUsrResp = (QaUsrResp) itAttempts.next();
-			    mapAnswersFromDb.put(new Integer(questionCount).toString(), qaUsrResp.getAnswer());
+			    mapAnswersFromDb.put(questionDTO.getDisplayOrder(), qaUsrResp.getAnswer());
 			}
 		    }
 		}
@@ -736,10 +772,20 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	return (mapping.findForward(LOAD_LEARNER));
     }
 
+    /** 
+     * Get the answer from the form and copy into DTO. Set up the next question. If the current question is
+     * required and the answer is blank, then just persist the error and don't change questions. 
+     * @param form
+     * @param request
+     * @param generalLearnerFlowDTO
+     * @param getNextQuestion
+     * @param learnerDone
+     * @return
+     */
     public Map populateAnswersMap(ActionForm form, HttpServletRequest request,
 	    GeneralLearnerFlowDTO generalLearnerFlowDTO, boolean getNextQuestion, boolean learnerDone) {
 	logger.debug("learnerDone: " + learnerDone);
-	logger.debug("getNextQuestion: " + getNextQuestion);
+	logger.debug("nextQuestionOffet: " + getNextQuestion);
 	QaLearningForm qaLearningForm = (QaLearningForm) form;
 
 	String httpSessionID = qaLearningForm.getHttpSessionID();
@@ -756,7 +802,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	if (mapAnswers == null)
 	    mapAnswers = new TreeMap(new QaComparator());
 
-	logger.debug("getting answer for question: " + currentQuestionIndex + "as: " + qaLearningForm.getAnswer());
+	String newAnswer = qaLearningForm.getAnswer();
+	logger.debug("getting answer for question: " + currentQuestionIndex + "as: " + newAnswer);
 	logger.debug("mapSequentialAnswers size:" + mapSequentialAnswers.size());
 
 	if (mapSequentialAnswers.size() >= new Integer(currentQuestionIndex).intValue()) {
@@ -764,23 +811,30 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		    + currentQuestionIndex);
 	    mapSequentialAnswers.remove(new Long(currentQuestionIndex).toString());
 	}
-	mapSequentialAnswers.put(new Long(currentQuestionIndex).toString(), qaLearningForm.getAnswer());
+	mapSequentialAnswers.put(new Long(currentQuestionIndex).toString(), newAnswer);
 
-	mapAnswers.put(currentQuestionIndex, qaLearningForm.getAnswer());
+	mapAnswers.put(currentQuestionIndex, newAnswer);
 
+	int nextQuestionOffset =  getNextQuestion ? 1 : -1;
+
+	// is this question required and are they trying to go to the next question? 
+	// if so, check if the answer is blank and generate an error if it is blank.
+	Map<String,QaQuestionContentDTO> questionContentMap = generalLearnerFlowDTO.getMapQuestionContentLearner();
+	QaQuestionContentDTO dto = questionContentMap.get(currentQuestionIndex);
+	if ( getNextQuestion && dto.isRequired() && isEmpty(newAnswer)) {
+	    ActionMessages errors = new ActionMessages();
+	    errors.add(Globals.ERROR_KEY, new ActionMessage("error.required", currentQuestionIndex));
+	    saveErrors(request, errors);
+	    nextQuestionOffset = 0;
+	}
+	
 	sessionMap.put(MAP_ALL_RESULTS_KEY, mapAnswers);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
 	generalLearnerFlowDTO.setHttpSessionID(sessionMap.getSessionID());
 	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
-	int intCurrentQuestionIndex = new Integer(currentQuestionIndex).intValue();
-	logger.debug("intCurrentQuestionIndex:" + intCurrentQuestionIndex);
-
-	if (getNextQuestion)
-	    intCurrentQuestionIndex++;
-	else
-	    intCurrentQuestionIndex--;
+	int intCurrentQuestionIndex = new Integer(currentQuestionIndex).intValue() + nextQuestionOffset;
 
 	LearningUtil learningUtil = new LearningUtil();
 	logger.debug("current map size:" + mapSequentialAnswers.size());
@@ -817,6 +871,15 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	return mapSequentialAnswers;
     }
 
+    /** Is this string empty? Need to strip out all HTML tags first otherwise an empty DIV might look like a valid answer 
+     * Smileys and math functions only put in an img tag so explicitly look for that. */
+    private boolean isEmpty(String answer) {
+	if  ( answer.indexOf("<img") > -1 || answer.indexOf("<IMG") > -1 ) 
+	    return false;
+	else
+	    return StringUtils.isBlank(WebUtil.removeHTMLtags(answer));
+    }
+    
     /**
      * moves to the previous question and modifies the map ActionForward
      * getPreviousQuestion(ActionMapping mapping, ActionForm form,
@@ -1155,4 +1218,5 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	logger.debug("fwd'ing to: " + NOTEBOOK);
 	return (mapping.findForward(NOTEBOOK));
     }
+    
 }
