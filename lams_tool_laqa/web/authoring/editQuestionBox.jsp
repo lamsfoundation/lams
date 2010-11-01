@@ -65,6 +65,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
 
 			<div class="field-name space-top">
+				<html:checkbox property="required" value="1" styleId="required"
+					styleClass="noBorder">
+				</html:checkbox>
+				<label for="required">
+					<fmt:message key="label.required.desc" />
+				</label>
+			</div>
+
+			<div class="field-name space-top">
+				<html:checkbox property="required" value="1" styleId="required"
+					styleClass="noBorder">
+				</html:checkbox>
+				<label for="required">
+					<fmt:message key="label.required.desc" />
+				</label>
+			</div>
+
+			<div class="field-name space-top">
 				<fmt:message key="label.feedback"></fmt:message>
 			</div>
 			<lams:STRUTS-textarea property="feedback" rows="3" cols="75"/>

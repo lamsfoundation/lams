@@ -53,8 +53,6 @@ public class GeneralMonitoringDTO implements Comparable
     
     protected String editResponse;
     
-    
-    protected Map mapQuestionContent;
     protected String defaultQuestionContent;
     
     protected String onlineInstructions;
@@ -76,7 +74,6 @@ public class GeneralMonitoringDTO implements Comparable
             .append("activityTitle: ", activityTitle)
             .append("activityInstructions: ", activityInstructions)
             .append("editResponse: ", editResponse)
-            .append("mapQuestionContent: ", mapQuestionContent)
             .append("defaultQuestionContent: ", defaultQuestionContent)
             .append("countAllUsers: ", countAllUsers)
             .append("countSessionComplete: ", countSessionComplete)
@@ -145,18 +142,6 @@ public class GeneralMonitoringDTO implements Comparable
      */
     public void setEditResponse(String editResponse) {
         this.editResponse = editResponse;
-    }
-    /**
-     * @return Returns the mapQuestionContent.
-     */
-    public Map getMapQuestionContent() {
-        return mapQuestionContent;
-    }
-    /**
-     * @param mapQuestionContent The mapQuestionContent to set.
-     */
-    public void setMapQuestionContent(Map mapQuestionContent) {
-        this.mapQuestionContent = mapQuestionContent;
     }
     /**
      * @return Returns the defaultQuestionContent.

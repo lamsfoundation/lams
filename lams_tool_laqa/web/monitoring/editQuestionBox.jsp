@@ -73,6 +73,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</td>
 				</tr>
 				 
+				<tr>
+					<td>
+					<div class="field-name">
+						<html:checkbox property="required" value="1" styleId="required"
+							styleClass="noBorder">
+						</html:checkbox>
+						<label for="required">
+							<fmt:message key="label.required.desc" />
+						</label>
+					</div>
+					</td>
+				</tr>
 
 				<tr>
 					<td>

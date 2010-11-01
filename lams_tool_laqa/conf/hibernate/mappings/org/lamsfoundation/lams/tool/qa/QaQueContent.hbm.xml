@@ -54,6 +54,16 @@
             length="65535"
         />
 
+	    <property
+	        name="required"
+	        type="boolean"
+	        access="property"
+	        column="answer_required"
+	   >
+	   </property>
+
+
+
         <many-to-one
             name="qaContent"
             class="org.lamsfoundation.lams.tool.qa.QaContent"

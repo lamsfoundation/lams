@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
+import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
@@ -90,11 +91,11 @@ public class LearningUtil implements QaAppConstants {
 	generalLearnerFlowDTO.setUserNameVisible(new Boolean(qaContent.isUsernameVisible()).toString());
 	generalLearnerFlowDTO.setShowOtherAnswers(new Boolean(qaContent.isShowOtherAnswers()).toString());
 	generalLearnerFlowDTO.setActivityOffline(new Boolean(qaContent.isRunOffline()).toString());
-
+	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(qaContent.isAllowRichEditor()).toString());
+	
 	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(qaContent.getQaQueContents().size()));
 
-	Map mapQuestions = new TreeMap(new QaComparator());
-	Map mapFeedback = new TreeMap(new QaComparator());
+	Map<String, QaQuestionContentDTO> mapQuestions = new TreeMap();
 
 	Iterator contentIterator = qaContent.getQaQueContents().iterator();
 	while (contentIterator.hasNext()) {
@@ -105,18 +106,12 @@ public class LearningUtil implements QaAppConstants {
 		    /*
 		     *  add the question to the questions Map in the displayOrder
 		     */
-		    mapQuestions.put(new Integer(displayOrder).toString(), qaQueContent.getQuestion());
-
-		    String feedback = qaQueContent.getFeedback();
-		    if (feedback == null)
-			feedback = "";
-
-		    mapFeedback.put(new Integer(displayOrder).toString(), feedback.trim());
+		    QaQuestionContentDTO questionDTO = new QaQuestionContentDTO(qaQueContent);
+		    mapQuestions.put(questionDTO.getDisplayOrder(), questionDTO );
 		}
 	    }
 	}
 
-	generalLearnerFlowDTO.setMapFeedback(mapFeedback);
 	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
 	return generalLearnerFlowDTO;
     }

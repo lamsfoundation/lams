@@ -56,6 +56,7 @@ CREATE TABLE tl_laqa11_que_content (
      , feedback TEXT
      , display_order INT(5) DEFAULT 1
      , qa_content_id BIGINT(20)
+     , answer_required TINYINT(1) NOT NULL DEFAULT 0
      , PRIMARY KEY (uid)
      , INDEX (qa_content_id)
      , CONSTRAINT FK_tl_laqa11_que_content_1 FOREIGN KEY (qa_content_id)

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -178,17 +179,14 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
 	Iterator queIterator = qaContent.getQaQueContents().iterator();
 	while (queIterator.hasNext()) {
-	    QaQuestionContentDTO qaQuestionContentDTO = new QaQuestionContentDTO();
 
 	    QaQueContent qaQueContent = (QaQueContent) queIterator.next();
 	    if (qaQueContent != null) {
-		qaQuestionContentDTO.setQuestion(qaQueContent.getQuestion());
-		qaQuestionContentDTO.setDisplayOrder(new Integer(qaQueContent.getDisplayOrder()).toString());
-		qaQuestionContentDTO.setFeedback(qaQueContent.getFeedback());
+		QaQuestionContentDTO qaQuestionContentDTO = new QaQuestionContentDTO(qaQueContent);
 		listQuestionContentDTO.add(qaQuestionContentDTO);
 	    }
 	}
-	
+
 	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 

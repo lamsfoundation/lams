@@ -91,11 +91,11 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     private String addSingleQuestion;
     private String editableQuestionIndex;
     private String feedback;
+    private boolean required;
     private String editQuestionBoxRequest;
 
     protected String defineLaterInEditMode;
     protected String defaultContentIdStr;
-    protected Map mapQuestionContent;
     protected IQaService qaService;
     
     protected boolean allowRichEditor;
@@ -164,6 +164,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.lockWhenFinished = OPTION_OFF;
 	this.reflect = OPTION_OFF;
 	this.allowRichEditor = false;
+	this.required = false;
     }
 
     public String toString() {
@@ -720,21 +721,6 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     }
 
     /**
-     * @return Returns the mapQuestionContent.
-     */
-    public Map getMapQuestionContent() {
-	return mapQuestionContent;
-    }
-
-    /**
-     * @param mapQuestionContent
-     *                The mapQuestionContent to set.
-     */
-    public void setMapQuestionContent(Map mapQuestionContent) {
-	this.mapQuestionContent = mapQuestionContent;
-    }
-
-    /**
      * @return Returns the defineLaterInEditMode.
      */
     public String getDefineLaterInEditMode() {
@@ -890,5 +876,13 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     public void setAllowRichEditor(boolean allowRichEditor) {
         this.allowRichEditor = allowRichEditor;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
     }
 }

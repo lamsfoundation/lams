@@ -116,7 +116,7 @@ public class QaPedagogicalPlannerAction extends LamsDispatchAction {
 		    } else {
 			QaQueContent qaQueContent = new QaQueContent();
 			qaQueContent.setDisplayOrder(questionIndex + 1);
-			qaQueContent.setIsOptional(false);
+			qaQueContent.setRequired(false);
 			qaQueContent.setQaContent(qaContent);
 			qaQueContent.setQaContentId(qaContent.getQaContentId());
 			qaQueContent.setQuestion(question);

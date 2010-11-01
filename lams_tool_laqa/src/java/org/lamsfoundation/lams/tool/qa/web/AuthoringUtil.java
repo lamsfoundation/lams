@@ -107,24 +107,21 @@ public class AuthoringUtil implements QaAppConstants {
 	while (listIterator.hasNext()) {
 	    QaQuestionContentDTO qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
 	    queIndex++;
-	    QaQuestionContentDTO tempNode = new QaQuestionContentDTO();
-
+	    QaQuestionContentDTO tempNode = null;
+	   
 	    if (!qaQuestionContentDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())
 		    && !qaQuestionContentDTO.getDisplayOrder().equals(new Integer(replacedNodeIndex).toString())) {
 		AuthoringUtil.logger.debug("normal copy ");
-		tempNode.setQuestion(qaQuestionContentDTO.getQuestion());
-		tempNode.setDisplayOrder(qaQuestionContentDTO.getDisplayOrder());
-		tempNode.setFeedback(qaQuestionContentDTO.getFeedback());
+		tempNode = new QaQuestionContentDTO(qaQuestionContentDTO.getQuestion(),
+			qaQuestionContentDTO.getDisplayOrder(),	qaQuestionContentDTO.getFeedback(), qaQuestionContentDTO.isRequired());
 	    } else if (qaQuestionContentDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())) {
 		AuthoringUtil.logger.debug("move type 1 ");
-		tempNode.setQuestion(replacedNode.getQuestion());
-		tempNode.setDisplayOrder(replacedNode.getDisplayOrder());
-		tempNode.setFeedback(replacedNode.getFeedback());
+		tempNode = new QaQuestionContentDTO(replacedNode.getQuestion(),
+			replacedNode.getDisplayOrder(),replacedNode.getFeedback(), replacedNode.isRequired());
 	    } else if (qaQuestionContentDTO.getDisplayOrder().equals(new Integer(replacedNodeIndex).toString())) {
 		AuthoringUtil.logger.debug("move type 1 ");
-		tempNode.setQuestion(mainNode.getQuestion());
-		tempNode.setDisplayOrder(mainNode.getDisplayOrder());
-		tempNode.setFeedback(mainNode.getFeedback());
+		tempNode = new QaQuestionContentDTO(mainNode.getQuestion(),
+			mainNode.getDisplayOrder(), mainNode.getFeedback(), mainNode.isRequired());
 	    }
 
 	    listFinalQuestionContentDTO.add(tempNode);
@@ -161,35 +158,7 @@ public class AuthoringUtil implements QaAppConstants {
 	}
 	return null;
     }
-
-    protected static Map extractMapQuestionContent(List listQuestionContentDTO) {
-	Map mapQuestionContent = new TreeMap(new QaComparator());
-
-	Iterator listIterator = listQuestionContentDTO.iterator();
-	int queIndex = 0;
-	while (listIterator.hasNext()) {
-	    QaQuestionContentDTO qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
-	    queIndex++;
-	    AuthoringUtil.logger.debug("Populating question map with key=" + queIndex + " value=" + qaQuestionContentDTO.getQuestion());
-	    mapQuestionContent.put(new Integer(queIndex).toString(), qaQuestionContentDTO.getQuestion());
-	}
-	return mapQuestionContent;
-    }
-
-    protected static Map extractMapFeedback(List listQuestionContentDTO) {
-	Map mapFeedbackContent = new TreeMap(new QaComparator());
-
-	Iterator listIterator = listQuestionContentDTO.iterator();
-	int queIndex = 0;
-	while (listIterator.hasNext()) {
-	    QaQuestionContentDTO qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
-	    queIndex++;
-	    AuthoringUtil.logger.debug("Populating feedback map with key=" + queIndex + " value=" + qaQuestionContentDTO.getFeedback());
-	    mapFeedbackContent.put(new Integer(queIndex).toString(), qaQuestionContentDTO.getFeedback());
-	}
-	return mapFeedbackContent;
-    }
-
+    
     protected static Map reorderQuestionContentMap(Map mapQuestionContent) {
 	Map mapFinalQuestionContent = new TreeMap(new QaComparator());
 
@@ -224,6 +193,7 @@ public class AuthoringUtil implements QaAppConstants {
 	    AuthoringUtil.logger.debug("displayOrder:" + displayOrder);
 
 	    String feedback = qaQuestionContentDTO.getFeedback();
+	    boolean required = qaQuestionContentDTO.isRequired();
 
 	    AuthoringUtil.logger.debug("displayOrder versus excludeQuestionIndex :" + displayOrder + " versus "
 		    + excludeQuestionIndex);
@@ -235,6 +205,7 @@ public class AuthoringUtil implements QaAppConstants {
 		    qaQuestionContentDTO.setQuestion(question);
 		    qaQuestionContentDTO.setDisplayOrder(new Integer(queIndex).toString());
 		    qaQuestionContentDTO.setFeedback(feedback);
+		    qaQuestionContentDTO.setRequired(required);
 
 		    listFinalQuestionContentDTO.add(qaQuestionContentDTO);
 		}
@@ -253,10 +224,9 @@ public class AuthoringUtil implements QaAppConstants {
 	    QaQuestionContentDTO qaQuestionContentDTO = (QaQuestionContentDTO) listIterator.next();
 	    
 	    String question = qaQuestionContentDTO.getQuestion();
-
 	    String displayOrder = qaQuestionContentDTO.getDisplayOrder();
-
-	    String feedback = qaQuestionContentDTO.getFeedback();
+	    String feedback = qaQuestionContentDTO.getFeedback();   
+	    boolean required = qaQuestionContentDTO.isRequired();
 
 	    if (question != null && !question.equals("")) {
 		++queIndex;
@@ -264,6 +234,7 @@ public class AuthoringUtil implements QaAppConstants {
 		qaQuestionContentDTO.setQuestion(question);
 		qaQuestionContentDTO.setDisplayOrder(new Integer(queIndex).toString());
 		qaQuestionContentDTO.setFeedback(feedback);
+		qaQuestionContentDTO.setRequired(required);
 
 		listFinalQuestionContentDTO.add(qaQuestionContentDTO);
 	    }
@@ -286,21 +257,22 @@ public class AuthoringUtil implements QaAppConstants {
 	    ++queIndex;
 
 	    String question = qaQuestionContentDTO.getQuestion();
-
 	    String displayOrder = qaQuestionContentDTO.getDisplayOrder();
-
 	    String feedback = qaQuestionContentDTO.getFeedback();
-
+	    boolean required = qaQuestionContentDTO.isRequired(); 
+	    
 	    if (displayOrder.equals(editableQuestionIndex)) {
 		qaQuestionContentDTO.setQuestion(qaQuestionContentDTONew.getQuestion());
 		qaQuestionContentDTO.setDisplayOrder(qaQuestionContentDTONew.getDisplayOrder());
 		qaQuestionContentDTO.setFeedback(qaQuestionContentDTONew.getFeedback());
+		qaQuestionContentDTO.setRequired(required);
 
 		listFinalQuestionContentDTO.add(qaQuestionContentDTO);
 	    } else {
 		qaQuestionContentDTO.setQuestion(question);
 		qaQuestionContentDTO.setDisplayOrder(displayOrder);
 		qaQuestionContentDTO.setFeedback(feedback);
+		qaQuestionContentDTO.setRequired(required);
 
 		listFinalQuestionContentDTO.add(qaQuestionContentDTO);
 
@@ -333,7 +305,7 @@ public class AuthoringUtil implements QaAppConstants {
 	}
     }
 
-    public QaContent saveOrUpdateQaContent(Map mapQuestionContent, Map mapFeedback, IQaService qaService,
+    public QaContent saveOrUpdateQaContent(List<QaQuestionContentDTO> listQuestionContentDTO, IQaService qaService,
 	    QaAuthoringForm qaAuthoringForm, HttpServletRequest request, QaContent qaContent, String strToolContentID,
 	    Set<QaCondition> conditions) {
 	UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
@@ -452,7 +424,7 @@ public class AuthoringUtil implements QaAppConstants {
 	}
 
 	qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	qaContent = createQuestionContent(mapQuestionContent, mapFeedback, qaService, qaContent, conditions);
+	qaContent = createQuestionContent(listQuestionContentDTO, qaService, qaContent, conditions);
 
 	qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
 
@@ -480,7 +452,7 @@ public class AuthoringUtil implements QaAppConstants {
      * @param qaService
      * @param qaAuthoringForm
      */
-    public void removeRedundantQuestions(Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm,
+    public void removeRedundantQuestions(List<QaQuestionContentDTO>listQuestionContentDTO, IQaService qaService, QaAuthoringForm qaAuthoringForm,
 	    HttpServletRequest request, String toolContentID) {
 	AuthoringUtil.logger.debug("removing unused entries... ");
 	AuthoringUtil.logger.debug("toolContentID:  " + toolContentID);
@@ -501,23 +473,10 @@ public class AuthoringUtil implements QaAppConstants {
 
 		AuthoringUtil.logger.info("Checking whether to remove question with id=" + queContent.getUid() + ", displayOrder=" + queContent.getDisplayOrder() + ", question=" + queContent.getQuestion());
 		entryUsed = false;
-		Iterator itMap = mapQuestionContent.entrySet().iterator();
 		int displayOrder = 0;
-		while (itMap.hasNext()) {
+		for ( QaQuestionContentDTO questionDTO : listQuestionContentDTO ) {
 		    ++displayOrder;
-
-		    entryUsed = false;
-		    Map.Entry pairs = (Map.Entry) itMap.next();
-		    AuthoringUtil.logger.debug("using the pair: " + pairs.getKey() + " = " + pairs.getValue());
-		    /*
-		    if (pairs.getValue().toString().length() != 0) {
-			if (mapIndex == displayOrder) {
-			    entryUsed = true;
-			    break;
-			}
-		    }
-		    */
-		    if (StringUtils.equals(queContent.getQuestion(), pairs.getValue().toString())) {
+		    if (StringUtils.equals(queContent.getQuestion(), questionDTO.getQuestion())) {
 			entryUsed = true;
 			break;
 		    }
@@ -549,37 +508,27 @@ public class AuthoringUtil implements QaAppConstants {
      * their displayOrder fields haven't been updated yet.  Note also that the given
      * mapQuestionContent maps question numbers to question strings.
      */
-    protected QaContent createQuestionContent(Map mapQuestionContent, Map mapFeedback, IQaService qaService,
+    protected QaContent createQuestionContent(List<QaQuestionContentDTO> listQuestionContentDTO, IQaService qaService,
 	    QaContent qaContent, Set<QaCondition> conditions) {
-	AuthoringUtil.logger.debug("createQuestionContent: ");
-	AuthoringUtil.logger.debug("content uid is: " + qaContent.getUid());
-	List questions = qaService.retrieveQaQueContentsByToolContentId(qaContent.getUid().longValue());
+	AuthoringUtil.logger.debug("createQuestionContent: content uid is: " + qaContent.getUid());
 
-	Iterator itMap = mapQuestionContent.entrySet().iterator();
 	int displayOrder = 0;
-	while (itMap.hasNext()) {
-	    Map.Entry pairs = (Map.Entry) itMap.next();
+	for ( QaQuestionContentDTO questionContentDTO : listQuestionContentDTO ) {
 	    
 	    // LDEV-2526 Assuming here that removed questions exist in mapQuestionContent, but that the value is empty
 	    // (this whole thing needs a rewrite).  If empty, do not attempt to persist it.
-	    if (StringUtils.isNotBlank(pairs.getValue().toString())) {
-		AuthoringUtil.logger.info("Persisting question with key=" + pairs.getKey() + " and value=" + pairs.getValue());
+	    // LDEV-2524 Partial rewrite - removed the old question and feedback maps and just use the original list.
+	    // Overriding the displayOrder with a new displayOrder.
+	    String questionText = questionContentDTO.getQuestion();
+	    if (StringUtils.isNotBlank(questionText)) {
+		AuthoringUtil.logger.info("Persisting question with key=" + questionText);
 	    
-		//++displayOrder;
-		displayOrder = new Integer(pairs.getKey().toString());
+		++displayOrder;
 		
-		String currentFeedback = (String) mapFeedback.get(new Integer(displayOrder).toString());
-
-		//QaQueContent existingQaQueContent = qaService.getQuestionContentByDisplayOrder(new Long(displayOrder),
-		//	qaContent.getUid());
-		QaQueContent existingQaQueContent = qaService.getQuestionContentByQuestionText(pairs.getValue()
-			    .toString(), qaContent.getUid());
-
+		QaQueContent existingQaQueContent = qaService.getQuestionContentByQuestionText(questionText, qaContent.getUid());
 		if (existingQaQueContent == null) {
-		    //QaQueContent duplicateQaQueContent = qaService.getQuestionContentByQuestionText(pairs.getValue()
-			//    .toString(), qaContent.getUid());
-		    QaQueContent queContent = new QaQueContent(pairs.getValue().toString(), displayOrder, currentFeedback,
-				qaContent, null, null);
+		    QaQueContent queContent = new QaQueContent(questionText, displayOrder, questionContentDTO.getFeedback(),
+			    	questionContentDTO.isRequired(), qaContent, null, null);
 		    qaContent.getQaQueContents().add(queContent);
 		    queContent.setQaContent(qaContent);
 
@@ -587,11 +536,10 @@ public class AuthoringUtil implements QaAppConstants {
 		    qaService.createQaQue(queContent);
 		} else {
 
-		    String existingQuestion = existingQaQueContent.getQuestion();
-
-		    existingQaQueContent.setQuestion(pairs.getValue().toString());
-		    existingQaQueContent.setFeedback(currentFeedback);
+		    existingQaQueContent.setQuestion(questionText);
+		    existingQaQueContent.setFeedback(questionContentDTO.getFeedback());
 		    existingQaQueContent.setDisplayOrder(displayOrder);
+		    existingQaQueContent.setRequired(questionContentDTO.isRequired());
 		    AuthoringUtil.logger.info("Updating question with id=" + existingQaQueContent.getUid() + ", question=" + existingQaQueContent.getQuestion() + ", displayOrder=" + existingQaQueContent.getDisplayOrder());
 		    qaService.saveOrUpdateQaQueContent(existingQaQueContent);
 		}
@@ -601,18 +549,11 @@ public class AuthoringUtil implements QaAppConstants {
 	return qaContent;
     }
 
-    public static boolean checkDuplicateQuestions(List listQuestionContentDTO, String newQuestion) {
+    public static boolean checkDuplicateQuestions(List<QaQuestionContentDTO> listQuestionContentDTO, String newQuestion) {
 	AuthoringUtil.logger.debug("checkDuplicateQuestions: ");
-
-	Map mapQuestionContent = extractMapQuestionContent(listQuestionContentDTO);
-
-	Iterator itMap = mapQuestionContent.entrySet().iterator();
-	while (itMap.hasNext()) {
-	    Map.Entry pairs = (Map.Entry) itMap.next();
-	    if (pairs.getValue() != null && !pairs.getValue().equals("")) {
-		if (pairs.getValue().equals(newQuestion)) {
-		    return true;
-		}
+	for (QaQuestionContentDTO questionDTO : listQuestionContentDTO ) {
+	    if ( questionDTO.getQuestion() != null && questionDTO.getQuestion().equals(newQuestion) ) {
+		return true;
 	    }
 	}
 	return false;
@@ -628,7 +569,7 @@ public class AuthoringUtil implements QaAppConstants {
      * @param qaAuthoringForm
      * @param qaContent
      */
-    public void reOrganizeDisplayOrder(Map mapQuestionContent, IQaService qaService, QaAuthoringForm qaAuthoringForm,
+    public void reOrganizeDisplayOrder(IQaService qaService, QaAuthoringForm qaAuthoringForm,
 	    QaContent qaContent) {
 	if (qaContent != null) {
 	    AuthoringUtil.logger.debug("content uid: " + qaContent.getUid());

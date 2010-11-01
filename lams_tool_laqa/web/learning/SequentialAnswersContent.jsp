@@ -44,8 +44,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<p>
 				<strong><fmt:message key="label.question" /> <c:out
 						value="${questionEntry.key}" />:</strong>
-				<br>
-				<c:out value="${questionEntry.value}" escapeXml="false" />
+				<c:if test="${questionEntry.value.required}">
+					<fmt:message key="label.required" />
+				</c:if>
+			<br>
+				<c:out value="${questionEntry.value.question}" escapeXml="false" />
 			</p>
 
 			<p>

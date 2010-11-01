@@ -86,11 +86,6 @@ public abstract class QaUtils implements QaAppConstants {
     public static void setFormProperties(HttpServletRequest request, IQaService qaService,
 	    QaAuthoringForm qaAuthoringForm, QaGeneralAuthoringDTO qaGeneralAuthoringDTO, String strToolContentID,
 	    String defaultContentIdStr, String activeModule, SessionMap sessionMap, String httpSessionID) {
-	logger.debug("setFormProperties: ");
-	logger.debug("using strToolContentID: " + strToolContentID);
-	logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
-	logger.debug("using activeModule: " + activeModule);
-	logger.debug("using httpSessionID: " + httpSessionID);
 
 	qaAuthoringForm.setHttpSessionID(httpSessionID);
 	qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
@@ -104,27 +99,22 @@ public abstract class QaUtils implements QaAppConstants {
 	qaGeneralAuthoringDTO.setActiveModule(activeModule);
 
 	String synchInMonitor = request.getParameter(SYNC_IN_MONITOR);
-	logger.debug("synchInMonitor: " + synchInMonitor);
 	qaAuthoringForm.setSynchInMonitor(synchInMonitor);
 	qaGeneralAuthoringDTO.setSynchInMonitor(synchInMonitor);
 
 	String usernameVisible = request.getParameter(USERNAME_VISIBLE);
-	logger.debug("usernameVisible: " + usernameVisible);
 	qaAuthoringForm.setUsernameVisible(usernameVisible);
 	qaGeneralAuthoringDTO.setUsernameVisible(usernameVisible);
 
 	String showOtherAnswers = request.getParameter("showOtherAnswers");
-	logger.debug("showOtherAnswers: " + showOtherAnswers);
 	qaAuthoringForm.setShowOtherAnswers(showOtherAnswers);
 	qaGeneralAuthoringDTO.setShowOtherAnswers(showOtherAnswers);
 
 	String questionsSequenced = request.getParameter(QUESTIONS_SEQUENCED);
-	logger.debug("questionsSequenced: " + questionsSequenced);
 	qaAuthoringForm.setQuestionsSequenced(questionsSequenced);
 	qaGeneralAuthoringDTO.setQuestionsSequenced(questionsSequenced);
 
 	String lockWhenFinished = request.getParameter("lockWhenFinished");
-	logger.debug("lockWhenFinished: " + lockWhenFinished);
 	qaAuthoringForm.setLockWhenFinished(lockWhenFinished);
 	qaGeneralAuthoringDTO.setLockWhenFinished(lockWhenFinished);
 
@@ -156,7 +146,6 @@ public abstract class QaUtils implements QaAppConstants {
 	HttpSession ss = SessionManager.getSession();
 	/* get back login user DTO */
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	logger.debug(logger + " " + "QaUtils" + " Current user id: " + user.getUserID());
 	return user.getUserID().intValue();
     }
 

@@ -93,9 +93,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected Map mapQuestions;
 
-    protected Map mapFeedback;
-
-    protected Map mapQuestionContentLearner;
+    protected Map<String,QaQuestionContentDTO> mapQuestionContentLearner;
 
     protected List listMonitoredAnswersContainerDTO;
 
@@ -163,7 +161,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
     /**
      * @return Returns the mapQuestionContentLearner.
      */
-    public Map getMapQuestionContentLearner() {
+    public Map<String,QaQuestionContentDTO> getMapQuestionContentLearner() {
 	return mapQuestionContentLearner;
     }
 
@@ -171,7 +169,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
      * @param mapQuestionContentLearner
      *                The mapQuestionContentLearner to set.
      */
-    public void setMapQuestionContentLearner(Map mapQuestionContentLearner) {
+    public void setMapQuestionContentLearner(Map<String,QaQuestionContentDTO> mapQuestionContentLearner) {
 	this.mapQuestionContentLearner = mapQuestionContentLearner;
     }
 
@@ -288,7 +286,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 			mapAnswers).append("mapQuestions: ", mapQuestions).append("mapQuestionContentLearner: ",
 			mapQuestionContentLearner).append("listMonitoredAnswersContainerDTO: ",
 			listMonitoredAnswersContainerDTO).append("currentMonitoredToolSession: ",
-			currentMonitoredToolSession).append("mapFeedback: ", mapFeedback).toString();
+			currentMonitoredToolSession).toString();
     }
 
     /**
@@ -589,21 +587,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
      */
     public void setUserName(String userName) {
 	this.userName = userName;
-    }
-
-    /**
-     * @return Returns the mapFeedback.
-     */
-    public Map getMapFeedback() {
-	return mapFeedback;
-    }
-
-    /**
-     * @param mapFeedback
-     *                The mapFeedback to set.
-     */
-    public void setMapFeedback(Map mapFeedback) {
-	this.mapFeedback = mapFeedback;
     }
 
     /**

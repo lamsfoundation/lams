@@ -22,6 +22,7 @@
  */
 
 /* $$Id$$ */
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa;
 
 /**
@@ -34,7 +35,6 @@ public interface QaAppConstants {
     public static final long DEFAULT_QUE_CONTENT_ID = 1;
     public static final String ERROR_QAAPPLICATION = "error.exception.QaApplication";
     public static final String TOOL_CONTENT_ID = "toolContentID";
-    public static final String MAP_QUESTION_CONTENT_KEY = "mapQuestionContentKey";
     public static final String ATTACHMENT_LIST_KEY = "attachmentListKey";
     public static final String DELETED_ATTACHMENT_LIST_KEY = "deletedAttachmentListKey";
     public static final String ONLINE_INSTRUCTIONS_KEY = "onlineInstructionsKey";

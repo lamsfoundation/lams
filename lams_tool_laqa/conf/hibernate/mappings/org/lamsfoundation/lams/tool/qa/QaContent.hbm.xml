@@ -185,7 +185,7 @@
             lazy="true"
             inverse="true"
             cascade="all"
-            sort="natural"
+            order-by="display_order"
         >
               <key
                   column="qa_content_id"

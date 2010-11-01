@@ -89,7 +89,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<strong><fmt:message key="label.question" /> <c:out
 								value="${questionEntry.key}" />:</strong>
 						<br>
-						<c:out value="${questionEntry.value}" escapeXml="false" />
+						<c:out value="${questionEntry.value.question}" escapeXml="false" />
 					</p>
 
 					<c:forEach var="answerEntry"
@@ -112,20 +112,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:forEach>
 
 
-					<c:forEach var="feedbackEntry"
-						items="${generalLearnerFlowDTO.mapFeedback}">
-						<c:if
-							test="${(feedbackEntry.value != '') && (feedbackEntry.value != null) }">
-							<c:if test="${feedbackEntry.key == questionEntry.key}">
-
-								<span class="field-name"> <fmt:message
-										key="label.feedback" />: </span>
-
-								<c:out value="${feedbackEntry.value}" escapeXml="false" />
-
-							</c:if>
-						</c:if>
-					</c:forEach>
+					<c:if test="${(questionEntry.value.feedback != '') && (questionEntry.value.feedback != null) }">
+							<span class="field-name"> <fmt:message
+									key="label.feedback" />: </span>
+							<c:out value="${questionEntry.value.feedback}" escapeXml="false" />
+					</c:if>
 
 				</div>
 

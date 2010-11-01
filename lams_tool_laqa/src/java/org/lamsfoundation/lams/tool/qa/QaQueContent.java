@@ -62,6 +62,8 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
 
     private String feedback;
 
+    private boolean required;
+    
     /** nullable persistent field */
     private org.lamsfoundation.lams.tool.qa.QaContent qaContent;
 
@@ -76,9 +78,6 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
 
     /** Struts form convenience field */
     private String otherResponse;
-
-    /** nullable persistent field */
-    private boolean isOptional;
 
     /** nullable persistent field */
     private Long qaContentId;
@@ -98,11 +97,12 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
 	this.qaUsrResps = qaUsrResps;
     }
 
-    public QaQueContent(String question, int displayOrder, String feedback,
+    public QaQueContent(String question, int displayOrder, String feedback, boolean required,
 	    org.lamsfoundation.lams.tool.qa.QaContent qaContent, Set qaQueUsers, Set qaUsrResps) {
 	this.question = question;
 	this.displayOrder = displayOrder;
 	this.feedback = feedback;
+	this.required = required;
 	this.qaContent = qaContent;
 	this.qaQueUsers = qaQueUsers;
 	this.qaUsrResps = qaUsrResps;
@@ -130,7 +130,7 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
      */
     public static QaQueContent newInstance(QaQueContent queContent, QaContent newQaContent) {
 	QaQueContent newQueContent = new QaQueContent(queContent.getQuestion(), queContent.getDisplayOrder(),
-		queContent.getFeedback(), newQaContent, new TreeSet(), new TreeSet());
+		queContent.getFeedback(), queContent.isRequired(), newQaContent, new TreeSet(), new TreeSet());
 	return newQueContent;
     }
 
@@ -162,12 +162,28 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
     }
 
     /**
+     * @param required
+     * Does this question have to be answered.
+     */
+    public void setRequired(boolean required) {
+	this.required = required;
+    }
+
+    /**
+     * @return Does this question have to be answered.
+     */
+    public boolean isRequired() {
+	return required;
+    }
+
+    /**
      * @param displayOrder
      *                The displayOrder to set.
      */
     public void setDisplayOrder(int displayOrder) {
 	this.displayOrder = displayOrder;
     }
+
 
     /**
      * @return Returns the qaContent.
@@ -263,18 +279,6 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
     }
 
     /**
-     * @hibernate.property column="isOptional" length="1"
-     * 
-     */
-    public boolean getIsOptional() {
-	return isOptional;
-    }
-
-    public void setIsOptional(boolean isOptional) {
-	this.isOptional = isOptional;
-    }
-
-    /**
      * Validate whether there is a response available for current question. This
      * method only validate struts convient field at the moment.
      * 
@@ -316,7 +320,7 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
     }
 
     public int compareTo(Object o) {
-	QaQueContent queContent = (QaQueContent) o;
+	//QaQueContent queContent = (QaQueContent) o;
 
 	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
 	/*
@@ -353,14 +357,6 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
      */
     public void setUid(Long uid) {
 	this.uid = uid;
-    }
-
-    /**
-     * @param isOptional
-     *                The isOptional to set.
-     */
-    public void setOptional(boolean isOptional) {
-	this.isOptional = isOptional;
     }
 
     /**

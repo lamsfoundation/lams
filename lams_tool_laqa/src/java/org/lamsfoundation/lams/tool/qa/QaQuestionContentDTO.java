@@ -36,11 +36,26 @@ public class QaQuestionContentDTO implements Comparable {
     private String question;
     private String displayOrder;
     private String feedback;
+    private boolean required;
 
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("question:", question).append("feedback:", feedback).append(
-		"displayOrder:", displayOrder).toString();
+		"displayOrder:", displayOrder).append("required:", Boolean.toString(required)).toString();
+    }
+
+    public QaQuestionContentDTO(QaQueContent que) {
+	this.question = que.getQuestion();
+	this.displayOrder = new Integer(que.getDisplayOrder()).toString();
+	this.feedback = que.getFeedback() != null ? que.getFeedback() : " ";
+	this.required = que.isRequired();
+    }
+
+    public QaQuestionContentDTO(String question, String displayOrder, String feedback, boolean required) {
+	this.question = question;
+	this.displayOrder = displayOrder;
+	this.feedback = feedback;
+	this.required = required;
     }
 
     public int compareTo(Object o) {
@@ -97,6 +112,22 @@ public class QaQuestionContentDTO implements Comparable {
     public void setQuestion(String question) {
 	this.question = question;
     }
+
+    /**
+     * @return Is this question required?
+     */
+    public boolean isRequired() {
+	return required;
+    }
+
+    /**
+     * @param required
+     * Is this question required
+     */
+    public void setRequired(boolean required) {
+	this.required = required;
+    }
+
 
     @Override
     public boolean equals(Object o) {

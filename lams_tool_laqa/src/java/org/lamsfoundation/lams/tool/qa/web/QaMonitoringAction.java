@@ -100,6 +100,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -674,19 +675,14 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	Iterator queIterator = qaContent.getQaQueContents().iterator();
 	while (queIterator.hasNext()) {
-	    QaQuestionContentDTO qaQuestionContentDTO = new QaQuestionContentDTO();
-
 	    QaQueContent qaQueContent = (QaQueContent) queIterator.next();
 	    if (qaQueContent != null) {
-		qaQuestionContentDTO.setQuestion(qaQueContent.getQuestion());
-		qaQuestionContentDTO.setDisplayOrder(new Integer(qaQueContent.getDisplayOrder()).toString());
-		qaQuestionContentDTO.setFeedback(qaQueContent.getFeedback());
+		QaQuestionContentDTO qaQuestionContentDTO = new QaQuestionContentDTO(qaQueContent);
 		listQuestionContentDTO.add(qaQuestionContentDTO);
 	    }
 	}
 	
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = (QaGeneralAuthoringDTO) request
@@ -2147,18 +2143,11 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	QaMonitoringAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	
-
-	Map mapQuestionContent = AuthoringUtil.extractMapQuestionContent(listQuestionContentDTO);
-	
-
-	Map mapFeedback = AuthoringUtil.extractMapFeedback(listQuestionContentDTO);
-	
 
 	ActionMessages errors = new ActionMessages();
-	QaMonitoringAction.logger.debug("mapQuestionContent size: " + mapQuestionContent.size());
+	QaMonitoringAction.logger.debug("listQuestionContentDTO size: " + listQuestionContentDTO.size());
 
-	if (mapQuestionContent.size() == 0) {
+	if (listQuestionContentDTO.size() == 0) {
 	    ActionMessage error = new ActionMessage("questions.none.submitted");
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 	}
@@ -2180,7 +2169,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
-	qaGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
 	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO: " + qaGeneralAuthoringDTO);
 
 	QaMonitoringAction.logger.debug("qaGeneralAuthoringDTO now: " + qaGeneralAuthoringDTO);
@@ -2202,11 +2190,11 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    /*
 	     * to remove deleted entries in the questions table based on mapQuestionContent
 	     */
-	    authoringUtil.removeRedundantQuestions(mapQuestionContent, qaService, qaAuthoringForm, request,
+	    authoringUtil.removeRedundantQuestions(listQuestionContentDTO, qaService, qaAuthoringForm, request,
 		    strToolContentID);
 	    QaMonitoringAction.logger.debug("end of removing unused entries... ");
 
-	    qaContent = authoringUtil.saveOrUpdateQaContent(mapQuestionContent, mapFeedback, qaService,
+	    qaContent = authoringUtil.saveOrUpdateQaContent(listQuestionContentDTO, qaService,
 		    qaAuthoringForm, request, qaContentTest, strToolContentID, null);
 	    
 
@@ -2220,7 +2208,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    }
 	    
 
-	    authoringUtil.reOrganizeDisplayOrder(mapQuestionContent, qaService, qaAuthoringForm, qaContent);
+	    authoringUtil.reOrganizeDisplayOrder(qaService, qaAuthoringForm, qaContent);
 
 	    QaMonitoringAction.logger.debug("strToolContentID: " + strToolContentID);
 	    QaUtils.setDefineLater(request, false, strToolContentID, qaService);
@@ -2254,8 +2242,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaGeneralAuthoringDTO.setSbmtSuccess(new Integer(1).toString());
 
 	qaAuthoringForm.resetUserAction();
-	qaGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
-
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
@@ -2380,10 +2366,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 
 	String newQuestion = request.getParameter("newQuestion");
-	
-
 	String feedback = request.getParameter("feedback");
-	
+	String required = request.getParameter("required");
+	boolean requiredBoolean = false;
+	if (required != null && required.equalsIgnoreCase("1")) {
+	    requiredBoolean = true;
+	}
 
 	String editableQuestionIndex = request.getParameter("editableQuestionIndex");
 	QaMonitoringAction.logger.debug("editableQuestionIndex: " + editableQuestionIndex);
@@ -2415,6 +2403,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		    qaQuestionContentDTO.setQuestion(newQuestion);
 		    qaQuestionContentDTO.setFeedback(feedback);
 		    qaQuestionContentDTO.setDisplayOrder(editableQuestionIndex);
+		    qaQuestionContentDTO.setRequired(requiredBoolean);
 
 		    listQuestionContentDTO = AuthoringUtil.reorderUpdateListQuestionContentDTO(listQuestionContentDTO,
 			    qaQuestionContentDTO, editableQuestionIndex);
@@ -2444,6 +2433,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 		qaQuestionContentDTO.setQuestion(newQuestion);
 		qaQuestionContentDTO.setFeedback(feedback);
 		qaQuestionContentDTO.setDisplayOrder(editableQuestionIndex);
+		qaQuestionContentDTO.setRequired(requiredBoolean);
 
 		listQuestionContentDTO = AuthoringUtil.reorderUpdateListQuestionContentDTO(listQuestionContentDTO,
 			qaQuestionContentDTO, editableQuestionIndex);
@@ -2600,10 +2590,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 
 	String newQuestion = request.getParameter("newQuestion");
-	
-
 	String feedback = request.getParameter("feedback");
-	
+	String required = request.getParameter("required");
+	boolean requiredBoolean = false;
+	if (required != null && required.equalsIgnoreCase("1")) {
+	    requiredBoolean = true;
+	}
 
 	int listSize = listQuestionContentDTO.size();
 	
@@ -2613,11 +2605,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    QaMonitoringAction.logger.debug("duplicates: " + duplicates);
 
 	    if (!duplicates) {
-		QaQuestionContentDTO qaQuestionContentDTO = new QaQuestionContentDTO();
-		qaQuestionContentDTO.setDisplayOrder(new Long(listSize + 1).toString());
-		qaQuestionContentDTO.setFeedback(feedback);
-		qaQuestionContentDTO.setQuestion(newQuestion);
-
+		QaQuestionContentDTO qaQuestionContentDTO = new QaQuestionContentDTO(newQuestion, 
+			new Long(listSize + 1).toString(), feedback, requiredBoolean);
 		listQuestionContentDTO.add(qaQuestionContentDTO);
 		
 	    } else {

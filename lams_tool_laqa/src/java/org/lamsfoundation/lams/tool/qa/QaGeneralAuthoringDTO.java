@@ -66,7 +66,6 @@ public class QaGeneralAuthoringDTO implements Comparable {
     protected String httpSessionID;
     protected String requestedModule;
     protected String isDefineLater;
-    protected Map mapQuestionContent;
 
     protected List attachmentList;
     protected List deletedAttachmentList;
@@ -93,7 +92,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
 		.append("editActivityEditMode: ", editActivityEditMode)
 		.append("reflectionSubject: ", reflectionSubject).append("requestedModule: ", requestedModule).append(
 			"isDefineLater: ", isDefineLater).append("monitoredContentInUse: ", monitoredContentInUse)
-		.append("mapQuestionContent: ", mapQuestionContent).append("attachmentList: ", attachmentList).append(
+		.append("attachmentList: ", attachmentList).append(
 			"deletedAttachmentList: ", deletedAttachmentList).append("sbmtSuccess: ", sbmtSuccess).append(
 			"userExceptionQuestionsDuplicate: ", userExceptionQuestionsDuplicate).toString();
     }
@@ -171,21 +170,6 @@ public class QaGeneralAuthoringDTO implements Comparable {
      */
     public void setDeletedAttachmentList(List deletedAttachmentList) {
 	this.deletedAttachmentList = deletedAttachmentList;
-    }
-
-    /**
-     * @return Returns the mapQuestionContent.
-     */
-    public Map getMapQuestionContent() {
-	return mapQuestionContent;
-    }
-
-    /**
-     * @param mapQuestionContent
-     *                The mapQuestionContent to set.
-     */
-    public void setMapQuestionContent(Map mapQuestionContent) {
-	this.mapQuestionContent = mapQuestionContent;
     }
 
     /**

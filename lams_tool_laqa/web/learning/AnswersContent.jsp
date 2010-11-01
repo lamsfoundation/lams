@@ -93,8 +93,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="questionIndex" />
 			<html:hidden property="totalQuestionCount" />
 
-
-			<html:errors />
+			<logic:messagesPresent>
+				<p class="warning">
+				  	<html:messages id="error" message="false"> 
+            			<c:out value="${error}" escapeXml="false"/><BR> 
+         			</html:messages> 
+				</p>
+			</logic:messagesPresent>
 
 			<c:if test="${generalLearnerFlowDTO.activityOffline == 'true'}">
 				<h3>

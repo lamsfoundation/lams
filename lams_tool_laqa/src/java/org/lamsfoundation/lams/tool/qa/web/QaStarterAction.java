@@ -125,6 +125,7 @@ package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -188,9 +189,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-
-	Map mapQuestionContent = new TreeMap(new QaComparator());
-	QaStarterAction.logger.debug("mapQuestionContent: " + mapQuestionContent);
 
 	qaAuthoringForm.resetRadioBoxes();
 
@@ -319,7 +317,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    /* fetch default content */
 	    defaultContentIdStr = qaAuthoringForm.getDefaultContentIdStr();
 	    QaStarterAction.logger.debug("defaultContentIdStr:" + defaultContentIdStr);
-	    qaContent = retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, new Long(
+	    qaContent = retrieveContent(request, mapping, qaAuthoringForm, new Long(
 		    defaultContentIdStr).longValue(), true, qaService, qaGeneralAuthoringDTO, sessionMap);
 
 	    QaStarterAction.logger.debug("post retrive content :" + sessionMap);
@@ -336,7 +334,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		QaStarterAction.logger.debug("add error.content.inUse to ActionMessages.");
 		return mapping.findForward(QaAppConstants.ERROR_LIST);
 	    }
-	    qaContent = retrieveContent(request, mapping, qaAuthoringForm, mapQuestionContent, new Long(
+	    qaContent = retrieveContent(request, mapping, qaAuthoringForm, new Long(
 		    strToolContentID).longValue(), false, qaService, qaGeneralAuthoringDTO, sessionMap);
 
 	    QaStarterAction.logger.debug("post retrive content :" + sessionMap);
@@ -369,17 +367,9 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	String destination = QaUtils.getDestination(sourceMcStarter, requestedModule);
 	QaStarterAction.logger.debug("destination: " + destination);
 
-	Map mapQuestionContentLocal = qaGeneralAuthoringDTO.getMapQuestionContent();
-	
-
-	
-	sessionMap.put(QaAppConstants.MAP_QUESTION_CONTENT_KEY, mapQuestionContent);
-
 	QaStarterAction.logger.debug("persisting sessionMap into session: " + sessionMap);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
-	
-	
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	return mapping.findForward(destination);
@@ -389,7 +379,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
      * retrives the existing content information from the db and prepares the
      * data for presentation purposes. ActionForward
      * retrieveExistingContent(HttpServletRequest request, ActionMapping
-     * mapping, QaAuthoringForm qaAuthoringForm, Map mapQuestionContent, long
+     * mapping, QaAuthoringForm qaAuthoringForm, long
      * toolContentID)
      * 
      * @param request
@@ -400,7 +390,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
      * @return ActionForward
      */
     protected QaContent retrieveContent(HttpServletRequest request, ActionMapping mapping,
-	    QaAuthoringForm qaAuthoringForm, Map mapQuestionContent, long toolContentID, boolean isDefaultContent,
+	    QaAuthoringForm qaAuthoringForm, long toolContentID, boolean isDefaultContent,
 	    IQaService qaService, QaGeneralAuthoringDTO qaGeneralAuthoringDTO, SessionMap sessionMap) {
 	
 	QaStarterAction.logger.debug("toolContentID: " + toolContentID);
@@ -447,52 +437,38 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, qaGeneralAuthoringDTO.getActivityTitle());
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, qaGeneralAuthoringDTO.getActivityInstructions());
 
-	List listQuestionContentDTO = new LinkedList();
+	List<QaQuestionContentDTO> listQuestionContentDTO = new LinkedList();
 
 	/*
 	 * get the existing question content
 	 */
-	QaStarterAction.logger.debug("setting content data from the db");
-	mapQuestionContent.clear();
+	boolean isFirst = false;
 	Iterator queIterator = qaContent.getQaQueContents().iterator();
-	Long mapIndex = new Long(1);
-	
 	while (queIterator.hasNext()) {
-	    QaQuestionContentDTO qaQuestionContentDTO = new QaQuestionContentDTO();
 
 	    QaQueContent qaQueContent = (QaQueContent) queIterator.next();
 	    if (qaQueContent != null) {
-		
-		
-		
-
-		mapQuestionContent.put(mapIndex.toString(), qaQueContent.getQuestion());
-
-		qaQuestionContentDTO.setQuestion(qaQueContent.getQuestion());
-		qaQuestionContentDTO.setDisplayOrder(new Integer(qaQueContent.getDisplayOrder()).toString());
-		qaQuestionContentDTO.setFeedback(qaQueContent.getFeedback());
+		QaQuestionContentDTO qaQuestionContentDTO = new QaQuestionContentDTO(qaQueContent);
 		listQuestionContentDTO.add(qaQuestionContentDTO);
 		/**
 		 * make the first entry the default(first) one for jsp
 		 */
-		if (mapIndex.longValue() == 1) {
+		if (isFirst) {
 		    qaGeneralAuthoringDTO.setDefaultQuestionContent(qaQueContent.getQuestion());
+		    isFirst = false;
 		}
-		mapIndex = new Long(mapIndex.longValue() + 1);
 	    }
 	}
 	
 
-	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(mapQuestionContent.size()));
-
-	
+	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	SortedSet<QaCondition> conditionSet = new TreeSet<QaCondition>(new TextSearchConditionComparator());
 	for (QaCondition condition : qaContent.getConditions()) {
 	    conditionSet.add(condition);
-	    for (QaQuestionContentDTO dto : (List<QaQuestionContentDTO>) listQuestionContentDTO) {
+	    for (QaQuestionContentDTO dto : listQuestionContentDTO) {
 		for (QaQueContent question : condition.getQuestions()) {
 		    if (dto.getDisplayOrder().equals(String.valueOf(question.getDisplayOrder()))) {
 			condition.temporaryQuestionDTOSet.add(dto);
@@ -508,11 +484,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
 	}
 
-	
-	qaGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
-
-	
-	
 	qaGeneralAuthoringDTO.setOnlineInstructions(qaContent.getOnlineInstructions());
 	qaGeneralAuthoringDTO.setOfflineInstructions(qaContent.getOfflineInstructions());
 

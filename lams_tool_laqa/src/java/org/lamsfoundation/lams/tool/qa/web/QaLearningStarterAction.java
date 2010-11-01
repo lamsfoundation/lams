@@ -52,6 +52,7 @@ import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
+import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
@@ -171,7 +172,8 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 
 	/* holds the question contents for a given tool session and relevant content */
-	Map mapQuestions = new TreeMap(new QaComparator());
+	Map mapQuestionStrings = new TreeMap(new QaComparator());
+	Map mapQuestions = new TreeMap<String,QaQuestionContentDTO>();
 
 	/*holds the answers */
 	Map mapAnswers = new TreeMap(new QaComparator());
@@ -318,11 +320,15 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		    /*
 		     *  add the question to the questions Map in the displayOrder
 		     */
-		    mapQuestions.put(new Integer(displayOrder).toString(), qaQueContent.getQuestion());
+		    QaQuestionContentDTO questionDTO = new QaQuestionContentDTO(qaQueContent);
+		    mapQuestions.put(questionDTO.getDisplayOrder(), questionDTO);
+
+		    mapQuestionStrings.put(new Integer(displayOrder).toString(), qaQueContent.getQuestion());
+		    
 		}
 	    }
 	}
-	generalLearnerFlowDTO.setMapQuestions(mapQuestions);
+	generalLearnerFlowDTO.setMapQuestions(mapQuestionStrings);
 	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
 
 	Iterator itMapQuestions = mapQuestions.entrySet().iterator();
