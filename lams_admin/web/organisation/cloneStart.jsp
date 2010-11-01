@@ -14,6 +14,8 @@
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-ui/ui/ui.core.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-ui/ui/ui.dialog.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-ui/ui/ui.resizable.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pack.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pager.js"></script>
 <script language="JavaScript" type="text/javascript">
 	<!--
 	var staffLoaded, learnersLoaded = false;
