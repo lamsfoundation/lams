@@ -129,7 +129,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <p>
 	<iframe
-		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px';"
+		onload="javascript:this.style.height=eval(this.contentWindow.document.body.scrollHeight+300)+'px';"
 		id="messageArea" name="messageArea"
 		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
 		scrolling="no">
