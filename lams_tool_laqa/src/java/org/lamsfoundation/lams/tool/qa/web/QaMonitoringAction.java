@@ -100,7 +100,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -120,6 +120,7 @@ import org.lamsfoundation.lams.tool.qa.EditActivityDTO;
 import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.GeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
+import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
@@ -2186,16 +2187,16 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	QaContent qaContent = qaContentTest;
 	if (errors.isEmpty()) {
-	    QaMonitoringAction.logger.debug("errors is empty: " + errors);
 	    /*
-	     * to remove deleted entries in the questions table based on mapQuestionContent
+	     * removes deleted entries in the questions table based on mapQuestionContent
 	     */
 	    authoringUtil.removeRedundantQuestions(listQuestionContentDTO, qaService, qaAuthoringForm, request,
 		    strToolContentID);
-	    QaMonitoringAction.logger.debug("end of removing unused entries... ");
+	    
+	    Set<QaCondition> conditionSet = (Set<QaCondition>) sessionMap.get(QaAppConstants.ATTR_CONDITION_SET);
 
 	    qaContent = authoringUtil.saveOrUpdateQaContent(listQuestionContentDTO, qaService,
-		    qaAuthoringForm, request, qaContentTest, strToolContentID, null);
+		    qaAuthoringForm, request, qaContentTest, strToolContentID, conditionSet);
 	    
 
 	    long defaultContentID = 0;
@@ -2206,7 +2207,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    if (qaContent != null) {
 		qaGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
 	    }
-	    
 
 	    authoringUtil.reOrganizeDisplayOrder(qaService, qaAuthoringForm, qaContent);
 

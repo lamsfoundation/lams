@@ -424,7 +424,7 @@ public class AuthoringUtil implements QaAppConstants {
 	}
 
 	qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
-	qaContent = createQuestionContent(listQuestionContentDTO, qaService, qaContent, conditions);
+	qaContent = createQuestionContent(listQuestionContentDTO, qaService, qaContent);
 
 	qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
 
@@ -509,7 +509,7 @@ public class AuthoringUtil implements QaAppConstants {
      * mapQuestionContent maps question numbers to question strings.
      */
     protected QaContent createQuestionContent(List<QaQuestionContentDTO> listQuestionContentDTO, IQaService qaService,
-	    QaContent qaContent, Set<QaCondition> conditions) {
+	    QaContent qaContent) {
 	AuthoringUtil.logger.debug("createQuestionContent: content uid is: " + qaContent.getUid());
 
 	int displayOrder = 0;
