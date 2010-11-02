@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.eucm.lams.tool.eadventure.model.EadventureItemVisitLog"
+        table="tl_eueadv10_item_log"
+    >
+
+        <id
+            name="uid"
+            column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-EadventureItemVisitLog.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="accessDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="access_date"
+        />
+
+        <many-to-one
+            name="eadventure"
+            class="org.eucm.lams.tool.eadventure.model.Eadventure"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="eadventure_item_uid"
+        />
+
+        <many-to-one
+            name="user"
+            class="org.eucm.lams.tool.eadventure.model.EadventureUser"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="user_uid"
+        />
+
+        <property
+            name="complete"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="complete"
+        />
+
+        <property
+            name="sessionId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="session_id"
+        />
+
+        <set
+            name="eadventureVars"
+            lazy="true"
+            inverse="true"
+            cascade="all"
+            sort="unsorted"
+            order-by="create_date desc"
+        >
+
+            <key
+                column="visit_log_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.eucm.lams.tool.eadventure.model.EadventureVars"
+            />
+
+        </set>
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-EadventureItemVisitLog.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
+</hibernate-mapping>
