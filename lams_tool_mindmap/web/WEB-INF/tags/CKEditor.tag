@@ -33,22 +33,32 @@
 </c:if>
 
 <script type="text/javascript">
-	CKEDITOR.basePath = "$ckEditorBasePath}";
+	function initializeCKEditor(){
+		
+		CKEDITOR.basePath = "${ckEditorBasePath}";
 	
-	CKEDITOR.replace( "${id}", {
-			width                         : "${width}",
-			height                        : "${height}",
-			toolbar                       : "${toolbarSet}",
-			language                      : "${language}",
-			defaultLangugage              : "en",
-			toolbarStartupExpanded        : ${displayExpanded},
-			filebrowserBrowseUrl          : "$ckEditorBasePath}filemanager/browser/default/browser.html?Type=File&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/",
-			filebrowserUploadUrl          : "$ckEditorBasePath}filemanager/upload/simpleuploader?Type=File&CurrentFolder=/${contentFolderID}/",
-			filebrowserImageBrowseUrl     : "$ckEditorBasePath}filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/",
-			filebrowserImageUploadUrl     : "$ckEditorBasePath}filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/${contentFolderID}/",
-			filebrowserImageBrowseLinkUrl : "$ckEditorBasePath}filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/",
-			filebrowserFlashBrowseUrl     : "$ckEditorBasePath}filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/",
-			filebrowserFlashUploadUrl     : "$ckEditorBasePath}filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/${contentFolderID}/",
-			contentFolderID				  : "${contentFolderID}"
-	});
+		if (CKEDITOR.instances["${id}"]) {
+			CKEDITOR.remove(CKEDITOR.instances["${id}"]);
+		}
+	    
+		CKEDITOR.replace( "${id}", {
+				width                         : "${width}",
+				height                        : "${height}",
+				toolbar                       : "${toolbarSet}",
+				language                      : "${language}",
+				defaultLangugage              : "en",
+				toolbarStartupExpanded        : ${displayExpanded},
+				filebrowserBrowseUrl          : "${ckEditorBasePath}filemanager/browser/default/browser.html?Type=File&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/",
+				filebrowserUploadUrl          : "${ckEditorBasePath}filemanager/upload/simpleuploader?Type=File&CurrentFolder=/${contentFolderID}/",
+				filebrowserImageBrowseUrl     : "${ckEditorBasePath}filemanager/browser/default/browser.html?Type=Image&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/",
+				filebrowserImageUploadUrl     : "${ckEditorBasePath}filemanager/upload/simpleuploader?Type=Image&CurrentFolder=/${contentFolderID}/",
+				filebrowserImageBrowseLinkUrl : "${ckEditorBasePath}filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/",
+				filebrowserFlashBrowseUrl     : "${ckEditorBasePath}filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/${contentFolderID}/",
+				filebrowserFlashUploadUrl     : "${ckEditorBasePath}filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/${contentFolderID}/",
+				contentFolderID				  : "${contentFolderID}"
+		});
+	}
+	
+	// run when page is loaded or explicitly after ajax form submit
+	initializeCKEditor();
 </script>

@@ -116,6 +116,11 @@
 	  	 if (activity.contentWindow.fillForm){
 	  	 	activity.contentWindow.fillForm();
 	  	 }
+	  	 
+	  	 // reeavaluate script initializing the CKEditor instance
+	  	 if (activity.contentWindow.initializeCKEditor){
+		  	activity.contentWindow.initializeCKEditor();
+		 }
   	 }
    }
    
