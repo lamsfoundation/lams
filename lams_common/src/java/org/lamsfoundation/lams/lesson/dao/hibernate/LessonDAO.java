@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -289,14 +290,24 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#getLessonsByOrgAndUserWithCompletedFlag(Integer, Integer,
      *      boolean)
      */
-    public List getLessonsByOrgAndUserWithCompletedFlag(final Integer userId, final Integer orgId, final boolean isStaff) {
+    public List getLessonsByOrgAndUserWithCompletedFlag(final Integer userId, final Integer orgId, final Integer userRole) {
 	List dtos = null;
 
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 	dtos = (List) hibernateTemplate.execute(new HibernateCallback() {
 	    public Object doInHibernate(Session session) throws HibernateException {
-		Query query = session.getNamedQuery(isStaff ? "staffLessonsByOrgAndUserWithCompletedFlag"
-			: "learnerLessonsByOrgAndUserWithCompletedFlag");
+		
+		String queryName;
+		if (Role.ROLE_MONITOR.equals(userRole)) {
+		    queryName = "staffLessonsByOrgAndUserWithCompletedFlag";
+		} else if (Role.ROLE_LEARNER.equals(userRole)) {
+		    queryName = "learnerLessonsByOrgAndUserWithCompletedFlag";
+		} else {
+		    // in case of Role.ROLE_GROUP_MANAGER
+		    queryName = "allLessonsByOrgAndUserWithCompletedFlag";
+		}
+		
+		Query query = session.getNamedQuery(queryName);
 		query.setInteger("userId", userId.intValue());
 		query.setInteger("orgId", orgId.intValue());
 		List result = query.list();

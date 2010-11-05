@@ -253,7 +253,8 @@ public class HomeAction extends DispatchAction {
 		    return mapping.findForward("error");
 		}
 
-		if (lesson.getLessonClass() == null || !lesson.getLessonClass().isStaffMember(getRealUser(user))) {
+		if (lesson.getLessonClass() == null || !lesson.getLessonClass().isStaffMember(getRealUser(user))
+			&& !req.isUserInRole(Role.GROUP_MANAGER)) {
 		    log.error("learner: User " + user.getLogin()
 			    + " is not a learner in the requested lesson. Cannot access the lesson.");
 		    return displayMessage(mapping, req, "error.authorisation");

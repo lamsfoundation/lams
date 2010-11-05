@@ -343,11 +343,11 @@ public interface ILessonService {
      * 
      * @param userId user's id
      * @param orgId  org's id
-     * @param isStaff return lessons where user is staff, or where user is learner
+     * @param userRole return lessons where user is learner or monitor. or returns all lessons in case of group manager
      * @return map of lesson beans used in the index page
      */
     public Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId,
-	    boolean isStaff);
+	    Integer userRole);
 
     /**
      * 

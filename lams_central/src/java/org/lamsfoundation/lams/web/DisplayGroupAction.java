@@ -257,7 +257,7 @@ public class DisplayGroupAction extends Action {
 
 	// iterate through user's lessons where they are learner
 	Map<Long, IndexLessonBean> map = getLessonService().getLessonsByOrgAndUserWithCompletedFlag(userId, orgId,
-		false);
+		Role.ROLE_LEARNER);
 	for (IndexLessonBean bean : map.values()) {
 	    List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
 	    String url = null;
@@ -288,9 +288,11 @@ public class DisplayGroupAction extends Action {
 	// Getting the parent organisation if applicable
 	Organisation parent = org.getParentOrganisation();
 
-	// iterate through user's lessons where they are staff, and add staff links to the beans in the map.
+	// iterate through user's lessons where they are staff (or simply through all lessons in case of Group_Manager),
+	// and add staff links to the beans in the map.
+	Integer userRole = (contains(roles, Role.ROLE_GROUP_MANAGER)) ? Role.ROLE_GROUP_MANAGER : Role.ROLE_MONITOR;
 	Map<Long, IndexLessonBean> staffMap = getLessonService().getLessonsByOrgAndUserWithCompletedFlag(userId, orgId,
-		true);
+		userRole);
 	for (IndexLessonBean bean : staffMap.values()) {
 	    if (map.containsKey(bean.getId())) {
 		bean = map.get(bean.getId());

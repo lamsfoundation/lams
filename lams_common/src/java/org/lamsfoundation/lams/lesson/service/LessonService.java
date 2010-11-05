@@ -762,9 +762,9 @@ public class LessonService implements ILessonService {
     }
 
     public Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId,
-	    boolean isStaff) {
+	    Integer userRole) {
 	TreeMap<Long, IndexLessonBean> map = new TreeMap<Long, IndexLessonBean>();
-	List list = lessonDAO.getLessonsByOrgAndUserWithCompletedFlag(userId, orgId, isStaff);
+	List list = lessonDAO.getLessonsByOrgAndUserWithCompletedFlag(userId, orgId, userRole);
 	if (list != null) {
 	    Iterator iterator = list.iterator();
 	    while (iterator.hasNext()) {

@@ -282,6 +282,21 @@
 			AND g.group_id = gi.staff_group_id
 	</sql-query>
 	
+	<sql-query name="allLessonsByOrgAndUserWithCompletedFlag">
+		<return-scalar column="lesson_id" type="long" />
+		<return-scalar column="name" type="string" />
+		<return-scalar column="description" type="string" />
+		<return-scalar column="lesson_state_id" type="integer" />
+		<return-scalar column="lesson_completed_flag" type="boolean" />
+		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag
+		  FROM (lams_lesson l, lams_learning_design ld)
+		    LEFT JOIN lams_learner_progress lp ON lp.user_id = :userId AND lp.lesson_id = l.lesson_id
+		  WHERE l.learning_design_id = ld.learning_design_id
+		    AND ld.copy_type_id != 3
+			AND l.organisation_id = :orgId
+			AND l.lesson_state_id != 7
+	</sql-query>
+	
 	<sql-query name="lessonsByOrgAndUserWithChildOrgs">
  		<return alias="lesson" class="org.lamsfoundation.lams.lesson.Lesson" />
  		SELECT DISTINCT {lesson.*}

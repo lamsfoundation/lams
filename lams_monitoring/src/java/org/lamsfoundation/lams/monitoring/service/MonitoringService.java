@@ -87,6 +87,7 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
@@ -361,8 +362,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     /**
-     * Checks whether the user is a staff member for the lesson or the creator
-     * of the lesson. If not, throws a UserAccessDeniedException exception
+     * Checks whether the user is a staff member for the lesson, the creator
+     * of the lesson or simply a group manager. If not, throws a UserAccessDeniedException exception
      */
     private void checkOwnerOrStaffMember(Integer userId, Lesson lesson, String actionDescription) {
 	User user = (User) baseDAO.find(User.class, userId);
@@ -371,7 +372,13 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    return;
 	}
 
-	if (lesson == null || lesson.getLessonClass() == null || !lesson.getLessonClass().isStaffMember(user)) {
+	Organisation course = lesson.getOrganisation();
+	if (OrganisationType.CLASS_TYPE.equals(course.getOrganisationType().getOrganisationTypeId())) {
+	    course = course.getParentOrganisation();
+	}
+	boolean isUserGroupManager = userManagementService.isUserInRole(userId, course.getOrganisationId(), Role.GROUP_MANAGER);
+	
+	if (lesson == null || lesson.getLessonClass() == null || !lesson.getLessonClass().isStaffMember(user) && !isUserGroupManager) {
 	    throw new UserAccessDeniedException("User " + userId + " may not " + actionDescription + " for lesson "
 		    + lesson.getLessonId());
 	}

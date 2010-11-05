@@ -159,14 +159,16 @@ public interface ILessonDAO extends IBaseDAO {
     public Lesson getLessonForActivity(final long activityId);
 
     /**
-     * Gets all non-removed lessons for a user in an org; set isStaff flag whether you want lessons where user is in the
-     * staff list, or just in the learner list.
+     * Gets all non-removed lessons for a user in an org; set userRole parameter to learner if you want lessons where user is in the
+     * learner list, or to monitor if in the staff list.
      * 
      * @param userId a user id that identifies the user.
      * @param orgId an org id that identifies the organisation.
+     * @param userRole return lessons where user is learner or monitor. or returns all lessons in case of group manager
+     * 
      * @return a List containing a list of tuples containing lesson details and the lesson completed flag for the user.
      */
-    public List getLessonsByOrgAndUserWithCompletedFlag(final Integer userId, final Integer orgId, final boolean isStaff);
+    public List getLessonsByOrgAndUserWithCompletedFlag(final Integer userId, final Integer orgId, final Integer userRole);
     
     /**
      * Gets all non-removed lessons for a user in a group including sub-groups 
