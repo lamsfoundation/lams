@@ -44,7 +44,7 @@ CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.config.enterMode = 'div' ;
 CKEDITOR.plugins.addExternal('WikiLink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js') ;
 //CKEDITOR.config.extraPlugins = 'equation,movieplayer,videorecorder,paint,wikilink' ;
-CKEDITOR.config.extraPlugins = 'videorecorder,WikiLink,equation_html' ;
+CKEDITOR.config.extraPlugins = 'videorecorder,WikiLink,equation_html,paint' ;
 
 // ---- Additional scripts -----
 // Hides editor instaces until they are fully initialized
