@@ -14,8 +14,7 @@ CKEDITOR.plugins.add('WikiLink',
                    title : editor.lang.wikilink.WikiLinkToolTip
                 }
              );
-             var current = editor.name;
-             var cmd = editor.addCommand('WikiLink', {exec:showDialogPlugin});
+             editor.addCommand('WikiLink', {exec:showDialogPlugin});
              CKEDITOR.dialog.addIframe(
                 'WikiLink',
                 'WikiLink',
