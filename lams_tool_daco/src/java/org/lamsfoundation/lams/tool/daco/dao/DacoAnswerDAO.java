@@ -17,13 +17,11 @@ public interface DacoAnswerDAO extends DAO {
     List<QuestionSummaryDTO> getQuestionSummaries(Long userUid, List<QuestionSummaryDTO> blankSummary);
 
     /**
-     * Gets the number of records in the group.
+     * Gets the number of records entered by user.
      * 
      * @param sessionId
      *                session ID of the group
-     * @return number of records in that group
+     * @return number of records for that user
      */
-    Integer getGroupRecordCount(Long sessionId);
-
     Integer getUserRecordCount(Long userId, Long sessionId);
 }

@@ -390,7 +390,13 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     }
 
     public Integer getGroupRecordCount(Long sessionId) {
-	return dacoAnswerDao.getGroupRecordCount(sessionId);
+	List<DacoUser> users = dacoUserDao.getBySessionId(sessionId);
+	
+	Integer groupRecordCount = 0;
+	for (DacoUser user: users) {
+	    groupRecordCount += dacoAnswerDao.getUserRecordCount(user.getUserId(), sessionId);
+	}
+	return groupRecordCount;
     }
 
     public Integer getGroupRecordCount(MonitoringSummarySessionDTO monitoringSummary) {

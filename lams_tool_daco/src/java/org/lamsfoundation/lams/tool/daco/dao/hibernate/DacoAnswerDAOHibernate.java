@@ -39,9 +39,6 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
     private static final String FIND_ANSWER_COUNT = "SELECT COUNT(*) FROM " + DacoAnswer.class.getName()
 	    + " AS a WHERE a.question.uid=? AND a.answer IS NOT NULL";
 
-    private static final String FIND_TOTAL_RECORD_COUNT = "SELECT COUNT (DISTINCT a.recordId) FROM "
-	    + DacoAnswer.class.getName() + " AS a WHERE a.user.session.sessionId=?";
-
     private static final String FIND_USER_RECORD_COUNT = "SELECT COUNT (DISTINCT a.recordId) FROM "
 	    + DacoAnswer.class.getName() + " AS a WHERE a.user.userId=:userId AND a.user.session.sessionId=:sessionId";
 
@@ -155,11 +152,6 @@ public class DacoAnswerDAOHibernate extends BaseDAOHibernate implements DacoAnsw
 	    row[fieldNumber] = String.valueOf(objectRow[fieldNumber]);
 	}
 	return row;
-    }
-
-    public Integer getGroupRecordCount(Long sessionId) {
-	return ((Number) getHibernateTemplate().find(DacoAnswerDAOHibernate.FIND_TOTAL_RECORD_COUNT, sessionId).get(0))
-		.intValue();
     }
 
     public Integer getUserRecordCount(Long userId, Long sessionId) {
