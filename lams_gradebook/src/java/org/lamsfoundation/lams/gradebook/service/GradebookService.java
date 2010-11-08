@@ -723,6 +723,52 @@ public class GradebookService implements IGradebookService {
 	}
 	return data;
     }
+    
+    /**
+     * @see org.lamsfoundation.lams.gradebook.service.IGradebookService#getSummaryDataForExcel(org.lamsfoundation.lams.lesson.Lesson)
+     */
+    @SuppressWarnings("unchecked")
+    public ExcelCell[][] getCourseDataForExcel(Integer userId, Integer organisationId) {
+	// The entire data list
+	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+	
+	List<Lesson> lessons = lessonService.getLessonsByGroupAndUser(userId, organisationId);
+	for (Lesson lesson : lessons) {
+
+	    // Adding the user lesson marks to the summary----------------------
+	    ExcelCell[] lessonTitle = new ExcelCell[1];
+	    lessonTitle[0] = new ExcelCell(messageService.getMessage("gradebook.exportcourse.lesson", new Object[] {lesson.getLessonName()}), true);
+	    rowList.add(lessonTitle);
+
+	    // Fetching the user data
+	    ArrayList<GBUserGridRowDTO> userRows = getGBUserRowsForLesson(lesson);
+
+	    // Setting up the user marks table
+	    ExcelCell[] userTitleRow = new ExcelCell[5];
+	    userTitleRow[0] = new ExcelCell(getMessage("gradebook.exportcourse.learner.name"), true);
+	    userTitleRow[1] = new ExcelCell(getMessage("gradebook.exportcourse.progress"), true);
+	    userTitleRow[2] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
+	    userTitleRow[3] = new ExcelCell(getMessage("gradebook.exportcourse.lessonFeedback"), true);
+	    userTitleRow[4] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
+	    rowList.add(userTitleRow);
+
+	    for (GBUserGridRowDTO userRow : userRows) {
+		// Adding the user data for the lesson
+		ExcelCell[] userDataRow = new ExcelCell[5];
+		userDataRow[0] = new ExcelCell(userRow.getRowName(), false);
+		userDataRow[1] = new ExcelCell(userRow.getStatus(), false);
+		userDataRow[2] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
+		userDataRow[3] = new ExcelCell(userRow.getFeedback(), false);
+		userDataRow[4] = new ExcelCell(userRow.getMark(), false);
+		rowList.add(userDataRow);
+	    }
+
+	    rowList.add(GradebookService.EMPTY_ROW);
+	    rowList.add(GradebookService.EMPTY_ROW);
+	}
+	
+	return rowList.toArray(new ExcelCell[][] {});
+    }
 
     /**
      * @see org.lamsfoundation.lams.gradebook.service.IGradebookService#updateActivityMark(java.lang.Double,

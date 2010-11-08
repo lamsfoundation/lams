@@ -183,6 +183,13 @@
 				</fmt:message>
 			</h1>
 			<br />
+			
+			<a href="<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelCourseGradebook&organisationID=${organisationID}">
+				<fmt:message key="gradebook.export.excel.1" />
+			</a> <fmt:message key="gradebook.export.excel.2" />
+			<br />
+			<br />
+			
 			<div style="width: 700px; margin-left: 10px; margin-right: 10px;">
 				<table id="organisationGrid" class="scroll"></table>
 				<div id="organisationGridPager" class="scroll"></div>

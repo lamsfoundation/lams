@@ -294,6 +294,9 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 		return null;
 	}
 
+	/**
+	 * Exports Lesson Gradebook into excel.
+	 */
 	public ActionForward exportExcelLessonGradebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
 
@@ -329,6 +332,39 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 		}
 		return null;
 	}
+	
+    /**
+     * Exports Course Gradebook into excel.
+     */
+    public ActionForward exportExcelCourseGradebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	initServices();
+	Integer oranisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+	User user = getRealUser(getUser());
+
+	Organisation organisation = (Organisation) userService.findById(Organisation.class, oranisationID);
+	if (organisation == null || user == null) {
+	    logger.error("Organisation " + oranisationID + " does not exist or user is null. Unable to load gradebook");
+	    return mapping.findForward("error");
+	}
+	
+	Integer organisationId = organisation.getOrganisationId();
+	logger.debug("Exporting to a spreadsheet course: " + organisationId);
+
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	ExcelCell[][] summaryData = gradebookService.getCourseDataForExcel(user.getUserId(), organisationId);
+	dataToExport.put(gradebookService.getMessage("gradebook.exportcourse.course.summary"), summaryData);
+
+	String fileName = organisation.getName().replaceAll(" ", "_") + ".xls";
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);	
+	ServletOutputStream out = response.getOutputStream();
+	GradebookUtil.exportGradebookLessonToExcel(out, gradebookService.getMessage("gradebook.export.dateheader"),
+		dataToExport);
+
+	return null;
+    }
 
 	private UserDTO getUser() {
 		HttpSession ss = SessionManager.getSession();

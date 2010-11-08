@@ -206,5 +206,14 @@ public interface IGradebookService {
      * @return
      */
     public ExcelCell[][] getSummaryDataForExcel(Lesson lesson);
+    
+    /**
+     * Get the summary data for course for an excel export
+     * 
+     * @param userId
+     * @param organisationId
+     * @return
+     */
+    ExcelCell[][] getCourseDataForExcel(Integer userId, Integer organisationId);
 }
  
