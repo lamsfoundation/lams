@@ -16,7 +16,19 @@ CKEDITOR.plugins.add('paint',
 	             );
 	             
 	             editor.addCommand('Paint canvas', {exec:showDialogPlugin});
-	             editor.on('dblclick',onImageDoubleClick);
+	             
+	             editor.paintStartingImage = "";
+	             
+	     		 editor.on( 'doubleclick', function( evt ) {
+	     					var element = evt.data.element;
+	     					if ( element.is('img') && element.getAttribute('class') == "ckeditor_paint" ){
+	     						evt.stop();
+	     						evt.editor.paintStartingImage = element.getAttribute('src');
+	     						evt.editor.execCommand('Paint canvas');
+	     					}
+	     				}, null, null, 1);
+	             
+	             
 	             
 	             CKEDITOR.dialog.addIframe(
 	            	editor.lang.Paint.DialogName,
@@ -32,12 +44,5 @@ CKEDITOR.plugins.add('paint',
 	    );
 
 function showDialogPlugin(e){
-	e.openDialog(editor.lang.Paint.DialogName);
-}
-
-function onImageDoubleClick (ev){
-	if(ev.scopeObj.getAttribute('class') == "ckeditor_paint"){
-		ev.scopeObj.paintStartingImage = ev.scopeObj.src;
-		ev.scopeObj.execCommand('Paint canvas');
-	}
+	e.openDialog(e.lang.Paint.DialogName);
 }
