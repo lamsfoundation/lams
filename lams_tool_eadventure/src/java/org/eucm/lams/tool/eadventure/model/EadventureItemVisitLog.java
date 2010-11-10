@@ -48,6 +48,10 @@ public class EadventureItemVisitLog {
 	public EadventureItemVisitLog(){
 	    eadventureVars = new HashSet();
 	}
+	
+	
+	
+	
 	/**
 	 * @hibernate.property column="access_date"
 	 * @return
@@ -116,9 +120,9 @@ public class EadventureItemVisitLog {
 	 * 
 	 * 
 	 * @hibernate.set lazy="true"
-	 *                inverse="true"
+	 *                inverse="false"
 	 *                cascade="all"
-	 *                order-by="create_date desc"
+	 *                
 	 * @hibernate.collection-key column="visit_log_uid"
 	 * @hibernate.collection-one-to-many class="org.eucm.lams.tool.eadventure.model.EadventureVars"
 	 * 

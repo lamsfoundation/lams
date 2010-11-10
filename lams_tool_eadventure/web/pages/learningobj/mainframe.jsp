@@ -54,7 +54,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	        //-->
 	  </script>
 </lams:head>
-<frameset cols="25%,75%" rows="*">
+<frameset cols="0%,100%" rows="*">
 	<frame src="navigatortree.jsp?sessionMapID=${param.sessionMapID}" name="navigatorFrame" marginheight="0"  scrolling="YES">
 	<frame src="defaultcontent.jsp" name="contentFrame" marginheight="0" scrolling="YES">
 	

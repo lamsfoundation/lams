@@ -1031,7 +1031,6 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	    }
 	    
 	    
-	    
 	    eadventureDao.saveObject(toolContentObj);
 	    
 	    
@@ -1051,7 +1050,7 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
      * @throws EadventureApplicationException
      */
     
-    @Override
+  //  @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
 	Eadventure content = getEadventureByContentId(toolContentId);
 	if (content == null) {
@@ -1459,6 +1458,7 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 		if (condition != null) {
 		    	EadventureItemVisitLog visitLog = eadventureItemVisitDao.getEadventureItemLog(eadventure.getUid(), userUid);
 		    	Set eadV = visitLog.getEadventureVars();
+		    if (eadV.isEmpty()){
 		    	List eadventureVars = new ArrayList<EadventureVars>( eadV);
 		    	//TODO comprobar si no lo tengo que meter con comparator para que salga en orden
 			Iterator<EadventureExpression> it = condition.getEadListExpression().iterator();
@@ -1494,6 +1494,10 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 					break;
 				}
 			}
+		    }else {
+		    	//There aren't vars set for this user and session
+		    	result=false;
+		    }
 		} else {
 			//there is no such a condition
 			result = false;
@@ -1504,12 +1508,14 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	
 	private boolean checkExpression(EadventureExpression expr, List eadventureVars){
 	    EadventureVars firstVar = getVarByName(expr.getFirstOp().getName(),eadventureVars);
+	    firstVar.setType(expr.getFirstOp().getType());
 	    EadventureVars secVar = null;
 	    String operator = expr.getExpresionOp();
 	    String value = expr.getValueIntroduced();
-	    if (expr.getVarIntroduced()!=null)
+	    if (expr.getVarIntroduced()!=null){
 		 secVar = getVarByName(expr.getVarIntroduced().getName(),eadventureVars);
-		
+		 secVar.setType(expr.getVarIntroduced().getType());
+	    }
 	    if (secVar==null)
 		return evalExpr(firstVar.getType(), firstVar.getValue(), value, operator); 
 	    else
@@ -1558,7 +1564,7 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 
     
     //TODO IMPORRRRRRRRRRRRRRRTANTE!!!!!!!!!!!!!!! el parámetro toolContentID que estamos pasando es realmente toolSessionID!!!!
-    @Override
+    //@Override
     public boolean setAppletInput(String name, String value, String userId, String toolContentID) {
 	//TODO restart when  
 	EadventureServiceImpl.log.error("EEEEEEEEEEEEEEEEEE " + name);
@@ -1594,19 +1600,19 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
        return changeButton;
     }
 
-    @Override
+    //@Override
     public void setReportInput(String name, String value, String userId, String toolSessionID) {
 	// TODO Auto-generated method stub
 	
     }
 
-    @Override
+    //@Override
     public EadventureItemVisitLog getEadventureItemLog(Long itemUid, Long userId) {
 	
 	return eadventureItemVisitDao.getEadventureItemLog(itemUid, userId);
     }
 
-    @Override
+   // @Override
     public EadventureVars getEadventureVars(Long itemVisitLogID, String name) {
 	return eadventureVarsDao.getEadventureVars(itemVisitLogID, name);
     }
