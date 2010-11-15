@@ -189,7 +189,7 @@
             name="sessionClones"
             lazy="false"
             inverse="false"
-            cascade="all-delete-orphan"
+            cascade="none"
             sort="unsorted"
         >
 

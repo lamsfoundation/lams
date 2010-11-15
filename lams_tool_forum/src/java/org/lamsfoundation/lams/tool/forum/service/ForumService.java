@@ -300,8 +300,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     public void deleteTopic(Long topicUid) throws PersistenceException {
-	List children = messageDao.getChildrenTopics(topicUid);
+	Message topic = messageDao.getById(topicUid);
+	
 	// cascade delete children topic by recursive
+	List children = messageDao.getChildrenTopics(topicUid);
 	if (children != null) {
 	    Iterator iter = children.iterator();
 	    while (iter.hasNext()) {
@@ -309,6 +311,12 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		this.deleteTopic(msg.getUid());
 	    }
 	}
+	
+	// recursively delete clones
+	for (Message clone : (Set<Message>) topic.getSessionClones()) {
+	    this.deleteTopic(clone.getUid());
+	}
+	
 	messageSeqDao.deleteByTopicId(topicUid);
 	messageDao.delete(topicUid);
     }
@@ -708,7 +716,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 
 	Forum toContent = Forum.newInstance(fromContent, toContentId, forumToolContentHandler);
-	forumDao.saveOrUpdate(toContent);
 
 	// save topics in this forum, only save the author created topic!!! and reset its reply number to zero.
 	Set topics = toContent.getMessages();
@@ -729,6 +736,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		createRootTopic(toContent.getUid(), (ForumToolSession) null, msg);
 	    }
 	}
+	
+	forumDao.saveOrUpdate(toContent);
 
     }
 

@@ -497,7 +497,7 @@ public class Message implements Cloneable {
     /**
      * @return the set of all messages cloned from this message. See getAuthoredParent().
      * 
-     * @hibernate.set cascade="all-delete-orphan" inverse="false"
+     * @hibernate.set cascade="none" inverse="false"
      * @hibernate.collection-key column="authored_parent_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Message"
      * 
