@@ -6,7 +6,7 @@
 	<c:set var="result" value="${sessionMap.assessmentResult}" />	
 </c:if>
 
-<div id="orderingArea">
+<div id="orderingArea${question.uid}">
 	<div style="padding: 10px 15px 7px; font-style: italic">
 		<fmt:message key="label.learning.ordering.sort.answers" />
 	</div>

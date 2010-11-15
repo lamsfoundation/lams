@@ -118,8 +118,9 @@
 			document.location.href ="<c:url value='/learning/resubmit.do?sessionMapID=${sessionMapID}'/>";
 			return false;			
 		}		
-		var orderingArea = "#orderingArea";
+
 		function upOption(questionUid, idx){
+			var orderingArea = "#orderingArea" + questionUid;
 			var url = "<c:url value="/learning/upOption.do"/>";
 			$(orderingArea).load(
 					url,
@@ -131,6 +132,7 @@
 			);
 		}
 		function downOption(questionUid, idx){
+			var orderingArea = "#orderingArea" + questionUid;
 			var url = "<c:url value="/learning/downOption.do"/>";
 			$(orderingArea).load(
 					url,
