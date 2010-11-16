@@ -655,9 +655,7 @@ public class AuthoringEadventureConditionAction extends Action {
 		
 		 SortedSet<EadventureExpression> expressionList = getEadventureExpressionList(sessionMap);
 		 List<EadventureExpression> exprList = new ArrayList(expressionList);
-		 String description = new String();
 		 java.util.Iterator<EadventureExpression> it = exprList.iterator();
-		 List<EadventureParam> params = this.getEadventureParamList(sessionMap);
 		 // prepare the data structures to send to jsp
 		 ArrayList<ExpressionInfo> expressionsInfo = new ArrayList<ExpressionInfo>();
 		 while(it.hasNext()){
@@ -679,8 +677,9 @@ public class AuthoringEadventureConditionAction extends Action {
 		 }
 		 
 		sessionMap.put(EadventureConstants.ATTR_EXPRS_INFO, expressionsInfo);
-		sessionMap.put(EadventureConstants.ATTR_EXPRS_INFO, expressionsInfo);
-		sessionMap.put(EadventureConstants.ATTR_EXPRS_INFO, expressionsInfo);
+		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap); 
+		request.setAttribute(EadventureConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+		
 	   
 	   return mapping.findForward(EadventureConstants.SUCCESS);
    }

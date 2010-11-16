@@ -586,9 +586,17 @@ public class AuthoringAction extends Action {
 	
 	//TODO mirar si merece la pena llevar el form por sessionMap?¿?¿?
 	//Eadventure eadventure = eadventureForm.getEadventure();
-	Eadventure eadventure = ((EadventureForm)sessionMap.get(EadventureConstants.ATTR_RESOURCE_FORM)).getEadventure();
+	Eadventure eadventure =  ((EadventureForm)sessionMap.get(EadventureConstants.ATTR_RESOURCE_FORM)).getEadventure();
+	//TODO fix this...
+	eadventure.setInstructions(eadventureForm.getEadventure().getInstructions()); 
+	eadventure.setDefineComplete(eadventureForm.getEadventure().isDefineComplete());
+	eadventure.setDefineLater(eadventureForm.getEadventure().isDefineLater());
+	eadventure.setLockWhenFinished(eadventureForm.getEadventure().getLockWhenFinished());
+	eadventure.setReflectOnActivity(eadventureForm.getEadventure().isReflectOnActivity());
+	eadventure.setReflectInstructions(eadventureForm.getEadventure().getReflectInstructions());
+	eadventure.setTitle(eadventureForm.getEadventure().getTitle());
 	
-
+	
 	ActionMessages errors = validate(eadventureForm, mapping, request);
 	String file  = eadventure.getFileName();
 	if (file==null||file.equals(""))

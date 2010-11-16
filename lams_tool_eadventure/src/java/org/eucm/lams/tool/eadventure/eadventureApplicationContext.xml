@@ -130,6 +130,9 @@
 		<property name="eventNotificationService">
 			<ref bean="eventNotificationService"/>
 		</property>   
+		<property name="gradebookService">
+			<ref bean="gradebookService" />
+		</property>
 		<property name="lessonService">
    			<ref bean="lessonService"/>
    		</property>

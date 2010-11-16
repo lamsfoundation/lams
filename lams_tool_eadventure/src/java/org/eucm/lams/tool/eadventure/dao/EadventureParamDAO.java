@@ -32,6 +32,8 @@ public interface EadventureParamDAO extends DAO {
     
     public List<EadventureParam> getEadventureParamByEadContentId(Long contentId);
     
+    public String getEadventureParamTypeByNameAndEadContentID(String name, Long contentId);
+    
     void delete(EadventureParam param);
     
 }

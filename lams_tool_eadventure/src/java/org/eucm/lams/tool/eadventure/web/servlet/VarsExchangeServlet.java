@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.eucm.lams.tool.eadventure.EadventureConstants;
 import org.eucm.lams.tool.eadventure.service.EadventureServiceProxy;
 import org.eucm.lams.tool.eadventure.service.IEadventureService;
 import org.eucm.lams.tool.eadventure.util.EadventureToolContentHandler; 
@@ -78,7 +79,7 @@ public class VarsExchangeServlet extends HttpServlet {
 			String[] strings = deriveIdFile(pathString);
 			boolean changeButton = service.setAppletInput(strings[2], echo, strings[0], strings[1]);
 			// echo it to the applet
-			if(echo.equals("true")&&strings[2].equals("completed")&&changeButton) {
+			if(echo.equals("true")&&strings[2].equals(EadventureConstants.VAR_NAME_COMPLETED)&&changeButton) {
 			    // Send the order to applet for it change the visibility of the finish button
 			    response.setContentType("application/x-java-serialized-object");
 			    PrintWriter out = response.getWriter();    

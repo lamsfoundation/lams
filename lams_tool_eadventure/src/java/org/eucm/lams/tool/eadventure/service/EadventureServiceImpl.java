@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -169,6 +170,8 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
     private IEventNotificationService eventNotificationService;
 
     private ILessonService lessonService;
+    
+    private IGradebookService gradebookService;
 
     private EadventureOutputFactory eadventureOutputFactory;
     
@@ -1438,6 +1441,14 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	this.eadventureOutputFactory = eadventureOutputFactory;
     }
     
+    public void setGradebookService(IGradebookService gradebookService) {
+    	this.gradebookService = gradebookService;
+      }
+    
+    public IGradebookService getGradebookService() {
+    	return gradebookService;
+      }
+    
     
     /** 
 	 * {@inheritDoc}
@@ -1458,7 +1469,7 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 		if (condition != null) {
 		    	EadventureItemVisitLog visitLog = eadventureItemVisitDao.getEadventureItemLog(eadventure.getUid(), userUid);
 		    	Set eadV = visitLog.getEadventureVars();
-		    if (eadV.isEmpty()){
+		    if (!eadV.isEmpty()){
 		    	List eadventureVars = new ArrayList<EadventureVars>( eadV);
 		    	//TODO comprobar si no lo tengo que meter con comparator para que salga en orden
 			Iterator<EadventureExpression> it = condition.getEadListExpression().iterator();
@@ -1508,7 +1519,7 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	
 	private boolean checkExpression(EadventureExpression expr, List eadventureVars){
 	    EadventureVars firstVar = getVarByName(expr.getFirstOp().getName(),eadventureVars);
-	    firstVar.setType(expr.getFirstOp().getType());
+//	    firstVar.setType(expr.getFirstOp().getType());
 	    EadventureVars secVar = null;
 	    String operator = expr.getExpresionOp();
 	    String value = expr.getValueIntroduced();
@@ -1516,10 +1527,14 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 		 secVar = getVarByName(expr.getVarIntroduced().getName(),eadventureVars);
 		 secVar.setType(expr.getVarIntroduced().getType());
 	    }
+	    // when tries to check a var that has not been send by the game
+	    if (firstVar!=null){
 	    if (secVar==null)
-		return evalExpr(firstVar.getType(), firstVar.getValue(), value, operator); 
+	    	return evalExpr(new String(firstVar.getType()), new String(firstVar.getValue()), value, operator); 
 	    else
-		return evalExpr(firstVar.getType(), firstVar.getValue(), secVar.getValue(), operator);
+	    	return evalExpr(firstVar.getType(), firstVar.getValue(), secVar.getValue(), operator);
+	    } else
+	    	return false;
 	}
 	
 	private boolean evalExpr(String type, String firstValue, String secondValue, String op){
@@ -1532,17 +1547,17 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 		return firstValue.equals(secondValue);
 	    }else if (type.equals("integer")){
 		if (op.equals("=="))
-		    return Integer.getInteger(firstValue) == Integer.getInteger(secondValue);
+		    return Integer.parseInt(firstValue) == Integer.parseInt(secondValue);
 		else if (op.equals("!="))
-		    return Integer.getInteger(firstValue) != Integer.getInteger(secondValue);
+		    return Integer.parseInt(firstValue) != Integer.parseInt(secondValue);
 		else if (op.equals(">"))
-		    return Integer.getInteger(firstValue) > Integer.getInteger(secondValue);
+			return  Integer.parseInt(firstValue) > Integer.parseInt(secondValue);
 		else if (op.equals("<"))
-		    return Integer.getInteger(firstValue) < Integer.getInteger(secondValue);
+		    return Integer.parseInt(firstValue) < Integer.parseInt(secondValue);
 		else if (op.equals(">="))
-		    return Integer.getInteger(firstValue) >= Integer.getInteger(secondValue);
+		    return Integer.parseInt(firstValue) >= Integer.parseInt(secondValue);
 		else if (op.equals("<="))
-		    return Integer.getInteger(firstValue) <= Integer.getInteger(secondValue);
+		    return Integer.parseInt(firstValue) <= Integer.parseInt(secondValue);
 		 
 		    
 	    }
@@ -1577,24 +1592,24 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	//TODO Ahora recuperamos la session para sacar el EAD!!! pero añadir el toolContentId para que sea mas sencillo!!!
 	//TODO user va a sobrar!! con el userID que ya se nos pasa por parámetro vamos sobraos!!					
 	//EadventureUser user = eadventureUserDao.getUserByUserIDAndContentID(Long.parseLong(userId), Long.parseLong(toolContentID));
-	EadventureUser user = eadventureUserDao.getUserByUserIDAndSessionID(Long.parseLong(userId), Long.parseLong(toolContentID));
+	//EadventureUser user = eadventureUserDao.getUserByUserIDAndSessionID(Long.parseLong(userId), Long.parseLong(toolContentID));
 	    //eadventureUserDao.getUserByUserIDAndSessionID(Long.parseLong(userId), Long.parseLong(toolSessionID));
-	EadventureServiceImpl.log.error("USER ID "+ user.getUserId());
+	EadventureServiceImpl.log.error("USER ID "+ userId);
 	EadventureSession eadSession = eadventureSessionDao.getSessionBySessionId( Long.parseLong(toolContentID));
 	//Eadventure ead = eadventureDao.getByContentId(Long.parseLong(toolContentID));
-	EadventureItemVisitLog log = eadventureItemVisitDao.getEadventureItemLog(eadSession.getEadventure().getUid(), user.getUserId());
+	EadventureItemVisitLog log = eadventureItemVisitDao.getEadventureItemLog(eadSession.getEadventure().getUid(), Long.parseLong(userId));
 	EadventureVars var = eadventureVarsDao.getEadventureVars(log.getUid(), name);
 	if (var==null){
 	    var = new EadventureVars();
 	    var.setName(name);
 	    var.setVisitLog(log);
-	    //TODO ver el type
-	    //var.setType(type);
+	    //Get the type from the params list
+	    var.setType(eadventureParamDao.getEadventureParamTypeByNameAndEadContentID(name, eadSession.getEadventure().getUid()));
 	}
 	var.setValue(value);
 	this.eadventureVarsDao.saveObject(var);
 	boolean changeButton = eadSession.getEadventure().isDefineComplete()&!log.isComplete();
-	if (name.equals("completed")&&value.equals("true")&&changeButton)
+	if (name.equals(EadventureConstants.VAR_NAME_COMPLETED)&&value.equals("true")&&changeButton)
 	    setItemComplete(eadSession.getEadventure().getUid(), Long.parseLong(userId), eadSession.getSessionId());
 	
        return changeButton;

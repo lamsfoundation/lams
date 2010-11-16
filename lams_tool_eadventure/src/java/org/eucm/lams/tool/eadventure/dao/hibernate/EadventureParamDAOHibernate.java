@@ -32,8 +32,8 @@ import org.eucm.lams.tool.eadventure.model.EadventureVars;
 public class EadventureParamDAOHibernate extends BaseDAOHibernate implements EadventureParamDAO {
 
     
-    private static final String FIND_BY_ITEM_AND_NAME = "from " + EadventureParam.class.getName()
-	+ " as r where r.visitLog.uid = ? and r.name =?";
+    private static final String FIND_BY_PARAM_NAME= "from " + EadventureParam.class.getName()
+	+ " as r where r.eadventure_uid = ? and r.name =?";
 
     
     private static final String FIND_BY_EAD = "from " + EadventureParam.class.getName()
@@ -46,11 +46,22 @@ public class EadventureParamDAOHibernate extends BaseDAOHibernate implements Ead
 		return null;
 	
 	return list;
-}
+    }
+
     
     public void delete(EadventureParam param){
 	this.getHibernateTemplate().delete(param);
     }
+
+	public String getEadventureParamTypeByNameAndEadContentID(String name,
+			Long contentId) {
+		
+		List list = getHibernateTemplate().find(FIND_BY_PARAM_NAME,new Object[]{contentId,name});
+		if(list == null || list.size() ==0)
+			return null;
+		
+		return ((EadventureParam)list.get(0)).getType();
+	}
     
     
 }

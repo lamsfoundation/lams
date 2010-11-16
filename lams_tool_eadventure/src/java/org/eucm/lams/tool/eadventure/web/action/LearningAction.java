@@ -215,15 +215,8 @@ public class LearningAction extends Action {
 	
 	// check define complete
 	boolean isDefineComplete= false;
-	if (eadventure.isDefineComplete()){
-	    List<EadventureParam> params = service.getEadventureParamByContentId(eadventure.getUid());
-	
-	    for (EadventureParam param:params){
-		if (param.getName().equals("completed")){
+	if (eadventure.isDefineComplete()){	  
 		    isDefineComplete=true;
-		    break;
-		}    
-	    }
 	}
 	
 	

@@ -51,9 +51,11 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public class EadventureOutputFactory extends OutputFactory {
 
     
-    protected final static String OUTPUT_NAME_LEARNER_TOTAL_SCORE = "learner.score";
-    protected final static String OUTPUT_NAME_LEARNER_TIME_TAKEN = "learner.time.taken";
-    protected final static String OUTPUT_NAME_LEARNER_COMPLETED = "learner.completed";
+	// don't translate these strings 
+    protected final static String OUTPUT_NAME_LEARNER_TOTAL_SCORE = EadventureConstants.VAR_NAME_SCORE;
+    protected final static String OUTPUT_NAME_LEARNER_TOTAL_TIME = EadventureConstants.VAR_NAME_TOTAL_TIME;
+    protected final static String OUTPUT_NAME_LEARNER_REAL_TIME = EadventureConstants.VAR_NAME_REAL_TIME;
+    protected final static String OUTPUT_NAME_LEARNER_COMPLETED = EadventureConstants.VAR_NAME_COMPLETED;
     protected final static String OUTPUT_NAME_TOOL_CONDITION = "tool.condition";
     
     @Override
@@ -62,23 +64,24 @@ public class EadventureOutputFactory extends OutputFactory {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 	
 	ToolOutputDefinition definition =null;
+	// add default outputs
+	definition =  buildRangeDefinition(OUTPUT_NAME_LEARNER_TOTAL_SCORE, new Long(0), new Long(0), true );
+	definitionMap.put(OUTPUT_NAME_LEARNER_TOTAL_SCORE, definition);
+	definition =  buildBooleanOutputDefinition(OUTPUT_NAME_LEARNER_COMPLETED);
+	definitionMap.put(OUTPUT_NAME_LEARNER_COMPLETED, definition);
+	definition =  buildRangeDefinition(OUTPUT_NAME_LEARNER_TOTAL_TIME, new Long(0), new Long(0), false );
+	definitionMap.put(OUTPUT_NAME_LEARNER_TOTAL_TIME, definition);
+	definition =  buildRangeDefinition(OUTPUT_NAME_LEARNER_REAL_TIME, new Long(0), new Long(0), false );
+	definitionMap.put(OUTPUT_NAME_LEARNER_REAL_TIME, definition);
+	
 	Eadventure ead = (Eadventure)toolContentObject;
+	//TODO cambiar por ead.getParamsWithoutDeafault();
 	 Set<EadventureParam> eadParams = ead.getParams();
-	    for (EadventureParam param : eadParams){
+	    for (EadventureParam param : eadParams){        
 		String text;
-		if (param.getType().equals("score")){
-		    definition =  buildRangeDefinition(param.getName(),new Long(0), null );
-		    definition.setDescription(param.getName());	
-		} else if (param.getType().equals("game-completed")){
-		    definition =  buildBooleanOutputDefinition(param.getName());
-		    definition.setDescription(param.getName());	
-		} else if (param.getType().equals("total-time")){
-		    definition =  buildRangeDefinition(param.getName(),new Long(0), null );
-		    definition.setDescription(param.getName());	
-		} else if (param.getType().equals("real-time")){
-		    definition =  buildRangeDefinition(param.getName(),new Long(0), null );
-		    definition.setDescription(param.getName());	
-		} else if (param.getType().equals(EadventureConstants.PARAMS_TYPE_BOOLEAN)){
+		// skip default outputs
+		if (isDefaultOutput(param.getType())){
+		if (param.getType().equals(EadventureConstants.PARAMS_TYPE_BOOLEAN)){
 		  definition =  buildBooleanOutputDefinition(param.getName());
 		  definition.setDescription(getI18NText("output.desc.learner.user.defined", false) + param.getName());	
 		}else if (param.getType().equals(EadventureConstants.PARAMS_TYPE_INTEGER)){
@@ -89,7 +92,8 @@ public class EadventureOutputFactory extends OutputFactory {
 		    definition.setDescription(getI18NText("output.desc.learner.user.defined", false) + param.getName());
 		}
 		definitionMap.put(param.getName(), definition);
-	    }
+		}
+		}
 	    
 		
 		//add the conditions defined at authoring
@@ -120,6 +124,14 @@ public class EadventureOutputFactory extends OutputFactory {
 	    
 	    
 	return definitionMap;
+    }
+    
+    private boolean isDefaultOutput(String output){ 
+    	if (output.equals(OUTPUT_NAME_LEARNER_TOTAL_SCORE)||output.equals(OUTPUT_NAME_LEARNER_TOTAL_TIME )||
+    			output.equals(OUTPUT_NAME_LEARNER_REAL_TIME)||output.equals(OUTPUT_NAME_LEARNER_COMPLETED)){
+    		return true;
+    	} else
+    		return false;
     }
     
    
@@ -172,9 +184,11 @@ public class EadventureOutputFactory extends OutputFactory {
 
 		if (name.equals(OUTPUT_NAME_LEARNER_TOTAL_SCORE)) {
 		    return getTotalScore(eadventureService, learnerId, ead,session.getSessionId());
-		} else if (name.equals(OUTPUT_NAME_LEARNER_TIME_TAKEN)) {
-		   return getTimeTaken(eadventureService, learnerId, ead,session.getSessionId());
-		} else if (name.equals(OUTPUT_NAME_LEARNER_TOTAL_SCORE)) {
+		} else if (name.equals(OUTPUT_NAME_LEARNER_TOTAL_TIME)) {
+		   return getTotalTime(eadventureService, learnerId, ead,session.getSessionId());
+		} else if (name.equals(OUTPUT_NAME_LEARNER_REAL_TIME)) {
+		   return getRealTime(eadventureService, learnerId, ead,session.getSessionId());
+		} else if (name.equals(OUTPUT_NAME_LEARNER_COMPLETED)) {
 		    return getCompleted(eadventureService, learnerId, ead,session.getSessionId());
 		} else if (name.startsWith(OUTPUT_NAME_TOOL_CONDITION)) {
 		    boolean check;
@@ -244,7 +258,7 @@ public class EadventureOutputFactory extends OutputFactory {
 	if (log==null)
 	    return new ToolOutput(OUTPUT_NAME_LEARNER_TOTAL_SCORE, getI18NText(
 			OUTPUT_NAME_LEARNER_TOTAL_SCORE, true), 0);
-	EadventureVars var = eadventureService.getEadventureVars(log.getUid(), EadventureConstants.VAR_NAME_SCORE);
+	EadventureVars var = eadventureService.getEadventureVars(log.getUid(), OUTPUT_NAME_LEARNER_TOTAL_SCORE);
 	
 	float totalScore = (var == null||var.getValue()==null) ? 0 : Integer.parseInt(var.getValue());
 	
@@ -257,21 +271,43 @@ public class EadventureOutputFactory extends OutputFactory {
      * Get time taken for a user. Will always return a ToolOutput object.
      */
     
-    private ToolOutput getTimeTaken(IEadventureService eadventureService, Long learnerId, Eadventure ead, Long sessionId){
+    private ToolOutput getTotalTime(IEadventureService eadventureService, Long learnerId, Eadventure ead, Long sessionId){
 	
 	EadventureUser user = eadventureService.getUserByIDAndSession(learnerId, sessionId);
 	
 	    //eadventureService.getUserByIDAndContent(learnerId, ead.getContentId());
 	EadventureItemVisitLog log = eadventureService.getEadventureItemLog(ead.getUid(), user.getUserId());
 	if (log==null)
-	    return new ToolOutput(OUTPUT_NAME_LEARNER_TIME_TAKEN, getI18NText(
-		    OUTPUT_NAME_LEARNER_TIME_TAKEN, true), 0);
-	EadventureVars var = eadventureService.getEadventureVars(log.getUid(), EadventureConstants.VAR_NAME_TIME_TAKEN);
+	    return new ToolOutput(OUTPUT_NAME_LEARNER_TOTAL_TIME, getI18NText(
+	    		OUTPUT_NAME_LEARNER_TOTAL_TIME, true), 0);
+	EadventureVars var = eadventureService.getEadventureVars(log.getUid(), OUTPUT_NAME_LEARNER_TOTAL_TIME);
 	
 	float totalTime = (var == null||var.getValue()==null) ? 0 : Integer.parseInt(var.getValue());
 	
-	return new ToolOutput(OUTPUT_NAME_LEARNER_TIME_TAKEN, getI18NText(
-		OUTPUT_NAME_LEARNER_TIME_TAKEN, true), totalTime);
+	return new ToolOutput(OUTPUT_NAME_LEARNER_TOTAL_TIME, getI18NText(
+		OUTPUT_NAME_LEARNER_TOTAL_TIME, true), totalTime);
+	
+    }
+    
+    /**
+     * Get time taken for a user. Will always return a ToolOutput object.
+     */
+    
+    private ToolOutput getRealTime(IEadventureService eadventureService, Long learnerId, Eadventure ead, Long sessionId){
+	
+	EadventureUser user = eadventureService.getUserByIDAndSession(learnerId, sessionId);
+	
+	    //eadventureService.getUserByIDAndContent(learnerId, ead.getContentId());
+	EadventureItemVisitLog log = eadventureService.getEadventureItemLog(ead.getUid(), user.getUserId());
+	if (log==null)
+	    return new ToolOutput(OUTPUT_NAME_LEARNER_REAL_TIME, getI18NText(
+	    		OUTPUT_NAME_LEARNER_REAL_TIME, true), 0);
+	EadventureVars var = eadventureService.getEadventureVars(log.getUid(), OUTPUT_NAME_LEARNER_REAL_TIME);
+	
+	float totalTime = (var == null||var.getValue()==null) ? 0 : Integer.parseInt(var.getValue());
+	
+	return new ToolOutput(OUTPUT_NAME_LEARNER_REAL_TIME, getI18NText(
+		OUTPUT_NAME_LEARNER_REAL_TIME, true), totalTime);
 	
     }
     
@@ -288,7 +324,7 @@ public class EadventureOutputFactory extends OutputFactory {
 	if (log==null)
 	    return new ToolOutput(OUTPUT_NAME_LEARNER_COMPLETED, getI18NText(
 		    OUTPUT_NAME_LEARNER_COMPLETED, true), 0);
-	EadventureVars var = eadventureService.getEadventureVars(log.getUid(), EadventureConstants.VAR_NAME_COMPLETED);
+	EadventureVars var = eadventureService.getEadventureVars(log.getUid(), OUTPUT_NAME_LEARNER_COMPLETED);
 	
 	boolean totalScore = (var == null||var.getValue()==null) ? false : Boolean.parseBoolean(var.getValue());
 	

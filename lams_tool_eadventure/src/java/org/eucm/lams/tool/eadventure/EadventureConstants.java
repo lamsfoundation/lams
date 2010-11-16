@@ -269,6 +269,7 @@ public class EadventureConstants {
     public final static String VAR_NAME_SCORE = "score";
     public final static String VAR_NAME_REPORT = "report";
     public final static String VAR_NAME_COMPLETED =  "game-completed";
-    public final static String VAR_NAME_TIME_TAKEN = "total-time";
+    public final static String VAR_NAME_TOTAL_TIME = "total-time";
+    public final static String VAR_NAME_REAL_TIME = "real-time";
 
 }
