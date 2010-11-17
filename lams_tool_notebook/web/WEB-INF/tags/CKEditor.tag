@@ -25,7 +25,7 @@
 	<c:set var="width" value="100%" />
 </c:if>
 
-<textarea id="${id}" name="${id}" cols="40" rows="6" style="display: none">${value}</textarea>
+<textarea id="${id}" name="${id}" style="display: none; height: 0px;">${value}</textarea>
 
 <c:if test="${empty ckEditorBasePath}">
 	<c:set scope="request" var="ckEditorBasePath"><lams:LAMSURL/>ckeditor/</c:set>
