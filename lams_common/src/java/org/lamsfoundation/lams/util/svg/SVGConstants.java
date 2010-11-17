@@ -29,6 +29,9 @@ public class SVGConstants {
     public static final String SVG_NAMESPACE = "http://www.w3.org/2000/svg";//SVGDOMImplementation.SVG_NAMESPACE_URI;
     public static final String SVG_NAMESPACE_XLINK = "http://www.w3.org/1999/xlink";
     
+    public static final String PATH_TO_LAMSCOMMUNITY_SVG_IMAGES = "http://lamscommunity.org/lamscentral/images/acts/";
+    public static final String PATH_TO_LAMS_CENTRAL_SVG_IMAGES = "/lams-central.war/images/svg/";
+    
     public static final String ROOT_ELEMENT_ID = "rootElement";
     
     // canvas dimensions

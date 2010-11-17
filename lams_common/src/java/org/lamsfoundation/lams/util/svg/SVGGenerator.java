@@ -48,10 +48,13 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.SVGDocument;
 
 /**
@@ -69,46 +72,17 @@ public class SVGGenerator extends SVGConstants{
     private Integer adjustedDocumentWidth = null;
     
     /**
-     * Sets up Svg root and defs. 
-     */    
-    private void initializeSvgDocument() {
-	
-        // Create an SVG document.
-        DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
-        doc = (SVGDocument) impl.createDocument(SVG_NAMESPACE, "svg", null);
-        // Get the root element (the 'svg' element).
-        Element svgRoot = doc.getDocumentElement();
-        // Set the width and height attributes on the root 'svg' element.
-        svgRoot.setAttributeNS(null, "xmlns", SVG_NAMESPACE);
-        svgRoot.setAttributeNS(null, "xmlns:xlink", SVG_NAMESPACE_XLINK);
-        
-        //create arrow definition
-	Element defs = doc.createElementNS(SVG_NAMESPACE, "defs");
-	svgRoot.appendChild(defs);
-	Element marker = doc.createElementNS(SVG_NAMESPACE, "marker");
-	marker.setAttributeNS(null, "id", "Triangle");
-	marker.setAttributeNS(null, "viewBox", "0 0 10 10");
-	marker.setAttributeNS(null, "refX", "0");
-	marker.setAttributeNS(null, "refY", "5");
-	marker.setAttributeNS(null, "markerUnits", "strokeWidth");
-	marker.setAttributeNS(null, "markerWidth", "6");
-	marker.setAttributeNS(null, "markerHeight", "5");
-	marker.setAttributeNS(null, "orient", "auto");
-	defs.appendChild(marker);
-	Element path = doc.createElementNS(SVG_NAMESPACE, "path");
-	path.setAttributeNS(null, "d", "M 0 0 L 10 5 L 0 10 z");
-	marker.appendChild(path);
-	
-	// Create root g element
-	Element g = doc.createElementNS(SVG_NAMESPACE, "g");
-	g.setAttributeNS(null, "id", ROOT_ELEMENT_ID);
-	svgRoot.appendChild(g);
-    }
-    
+     * Adjusts resulted SVG with user-specific width
+     * 
+     * @param width user specific width
+     */
     public void adjustDocumentWidth(Integer width) {
 	this.adjustedDocumentWidth = width;
     }
     
+    /**
+     * @return actual width and height of resulted image
+     */
     public Dimension getDocumentWidthHeight() {
 	
         Element svg = doc.getDocumentElement();
@@ -119,6 +93,84 @@ public class SVGGenerator extends SVGConstants{
         int height = Integer.parseInt(heightStr);
         
         return new Dimension(width, height);
+    }
+    
+    /**
+     * Stream out SVG document into specified outputStream.
+     * 
+     * @param outputStream stream where we put resulted data. It can be null in case of RESULT_TYPE_DISPLAY
+     * @param resultType one of SVGGenerator's constants: either RESULT_TYPE_SVG or RESULT_TYPE_PNG or RESULT_TYPE_DISPLAY
+     * 
+     * @throws TranscoderException
+     * @throws IOException
+     */
+    public void streamOutDocument(OutputStream outputStream, int resultType) throws TranscoderException, IOException {
+	
+	switch (resultType) {
+	case OUTPUT_FORMAT_SVG:
+	    OutputFormat format = new OutputFormat(doc);
+	    format.setLineWidth(65);
+	    format.setIndenting(true);
+	    format.setIndent(2);
+
+	    XMLSerializer serializer = new XMLSerializer(outputStream, format);
+	    serializer.serialize(doc);
+	    outputStream.flush();
+	    outputStream.close();
+	    break;
+	    
+	case OUTPUT_FORMAT_PNG:
+	    //modify image references to be pointed to local images (LDEV-2603)
+	    NodeList imageNodes = doc.getElementsByTagNameNS(SVG_NAMESPACE, "image");
+	    final String FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES = "file:///" + Configuration.get(ConfigurationKeys.LAMS_EAR_DIR).replaceAll("\\\\", "/") + "/lams-central.war/images/svg/";
+	    for (int i = 0; i < imageNodes.getLength(); i++) {
+		Element imageNode = (Element) imageNodes.item(i);
+		String imageFileName = imageNode.getAttributeNS(SVG_NAMESPACE_XLINK, "href");
+		imageFileName = imageFileName.replaceFirst(PATH_TO_LAMSCOMMUNITY_SVG_IMAGES, FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES);
+		imageNode.setAttributeNS(SVG_NAMESPACE_XLINK, "xlink:href", imageFileName);
+	    }
+	    
+	    PNGTranscoder transcoder = new PNGTranscoder();
+	    // Set the transcoder input and output.
+	    TranscoderInput input = new TranscoderInput(doc);
+	    TranscoderOutput output = new TranscoderOutput(outputStream);
+
+	    // Perform the transcoding.
+	    transcoder.transcode(input, output);
+	    outputStream.flush();
+	    outputStream.close();
+	    
+	    //roll back all image references for later use
+	    for (int i = 0; i < imageNodes.getLength(); i++) {
+		Element imageNode = (Element) imageNodes.item(i);
+		String imageFileName = imageNode.getAttributeNS(SVG_NAMESPACE_XLINK, "href");
+		imageFileName = imageFileName.replaceFirst(FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES, PATH_TO_LAMSCOMMUNITY_SVG_IMAGES);
+		imageNode.setAttributeNS(SVG_NAMESPACE_XLINK, "xlink:href", imageFileName);
+	    }
+	    break;
+	    
+//	// to see resulted SVG image in swing component     
+//	case OUTPUT_FORMAT_DISPLAY:	    
+//	    JSVGCanvas canvas = new JSVGCanvas();
+//	    JFrame f = new JFrame();
+//	    f.getContentPane().add(canvas);
+//	    canvas.setSVGDocument(doc);
+//	    f.pack();
+//	    f.setSize(CANVAS_DEFAULT_WIDTH, CANVAS_DEFAULT_HEIGHT);
+//	    f.setVisible(true);
+//	    break;	    
+	    
+	default:
+	    OutputFormat format2 = new OutputFormat(doc);
+	    format2.setLineWidth(65);
+	    format2.setIndenting(true);
+	    format2.setIndent(2);
+	    Writer out = new StringWriter();
+	    XMLSerializer serializer2 = new XMLSerializer(out, format2);
+	    serializer2.serialize(doc);
+	    System.out.println(out.toString());
+	}
+
     }
     
     /**
@@ -203,6 +255,43 @@ public class SVGGenerator extends SVGConstants{
         treeTraverse(root);
         
         setUpDocumentWidthHeight(allNodes.values());
+    }
+    
+    /**
+     * Sets up Svg root and defs. 
+     */    
+    private void initializeSvgDocument() {
+	
+        // Create an SVG document.
+        DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
+        doc = (SVGDocument) impl.createDocument(SVG_NAMESPACE, "svg", null);
+        // Get the root element (the 'svg' element).
+        Element svgRoot = doc.getDocumentElement();
+        // Set the width and height attributes on the root 'svg' element.
+        svgRoot.setAttributeNS(null, "xmlns", SVG_NAMESPACE);
+        svgRoot.setAttributeNS(null, "xmlns:xlink", SVG_NAMESPACE_XLINK);
+        
+        //create arrow definition
+	Element defs = doc.createElementNS(SVG_NAMESPACE, "defs");
+	svgRoot.appendChild(defs);
+	Element marker = doc.createElementNS(SVG_NAMESPACE, "marker");
+	marker.setAttributeNS(null, "id", "Triangle");
+	marker.setAttributeNS(null, "viewBox", "0 0 10 10");
+	marker.setAttributeNS(null, "refX", "0");
+	marker.setAttributeNS(null, "refY", "5");
+	marker.setAttributeNS(null, "markerUnits", "strokeWidth");
+	marker.setAttributeNS(null, "markerWidth", "6");
+	marker.setAttributeNS(null, "markerHeight", "5");
+	marker.setAttributeNS(null, "orient", "auto");
+	defs.appendChild(marker);
+	Element path = doc.createElementNS(SVG_NAMESPACE, "path");
+	path.setAttributeNS(null, "d", "M 0 0 L 10 5 L 0 10 z");
+	marker.appendChild(path);
+	
+	// Create root g element
+	Element g = doc.createElementNS(SVG_NAMESPACE, "g");
+	g.setAttributeNS(null, "id", ROOT_ELEMENT_ID);
+	svgRoot.appendChild(g);
     }
     
     /**
@@ -579,66 +668,6 @@ public class SVGGenerator extends SVGConstants{
         svg.setAttributeNS(null, "height", Integer.toString(height));
     }
     
-    /**
-     * Stream out SVG document into specified outputStream.
-     * 
-     * @param outputStream stream where we put resulted data. It can be null in case of RESULT_TYPE_DISPLAY
-     * @param resultType one of SVGGenerator's constants: either RESULT_TYPE_SVG or RESULT_TYPE_PNG or RESULT_TYPE_DISPLAY
-     * 
-     * @throws TranscoderException
-     * @throws IOException
-     */
-    public void streamOutDocument(OutputStream outputStream, int resultType) throws TranscoderException, IOException {
-	
-	switch (resultType) {
-	case OUTPUT_FORMAT_SVG:
-	    OutputFormat format = new OutputFormat(doc);
-	    format.setLineWidth(65);
-	    format.setIndenting(true);
-	    format.setIndent(2);
-
-	    XMLSerializer serializer = new XMLSerializer(outputStream, format);
-	    serializer.serialize(doc);
-	    outputStream.flush();
-	    outputStream.close();
-	    break;
-	    
-	case OUTPUT_FORMAT_PNG:
-	    PNGTranscoder transcoder = new PNGTranscoder();
-	    // Set the transcoder input and output.
-	    TranscoderInput input = new TranscoderInput(doc);
-	    TranscoderOutput output = new TranscoderOutput(outputStream);
-
-	    // Perform the transcoding.
-	    transcoder.transcode(input, output);
-	    outputStream.flush();
-	    outputStream.close();
-	    break;
-	    
-//	// to see resulted SVG image in swing component     
-//	case OUTPUT_FORMAT_DISPLAY:	    
-//	    JSVGCanvas canvas = new JSVGCanvas();
-//	    JFrame f = new JFrame();
-//	    f.getContentPane().add(canvas);
-//	    canvas.setSVGDocument(doc);
-//	    f.pack();
-//	    f.setSize(CANVAS_DEFAULT_WIDTH, CANVAS_DEFAULT_HEIGHT);
-//	    f.setVisible(true);
-//	    break;	    
-	    
-	default:
-	    OutputFormat format2 = new OutputFormat(doc);
-	    format2.setLineWidth(65);
-	    format2.setIndenting(true);
-	    format2.setIndent(2);
-	    Writer out = new StringWriter();
-	    XMLSerializer serializer2 = new XMLSerializer(out, format2);
-	    serializer2.serialize(doc);
-	    System.out.println(out.toString());
-	}
-
-    }
-    
     //**************** Auxiliary methods for creating svg components ********************************************************
     
     private void createRectangle(ActivityTreeNode node, double x, double y, Element g) {
@@ -775,7 +804,7 @@ public class SVGGenerator extends SVGConstants{
     	} else {
 	    imageFileName = "icon_grouping.png";
 	}
-	imageFileName = "http://lamscommunity.org/lamscentral/images/acts/" + imageFileName;
+	imageFileName = PATH_TO_LAMSCOMMUNITY_SVG_IMAGES + imageFileName;
 	Element imageNode = doc.createElementNS(SVG_NAMESPACE, "image");
 	imageNode.setAttributeNS(null, "id", "image-" + activity.getActivityID());
 	imageNode.setAttributeNS(null, "x", Integer.toString(imageX));
