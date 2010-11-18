@@ -194,6 +194,40 @@
 	
 	<tr>
 		<td>
+			<fmt:message key="label.authoring.advanced.send.emails.to" /> <fmt:message key="label.authoring.advanced.learners" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${forum.notifyLearnersOnForumPosting == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advanced.send.emails.to" /> <fmt:message key="label.authoring.advanced.teachers" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${forum.notifyTeachersOnForumPosting == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
 			<fmt:message key="label.authoring.advanced.notify.mark.release" />
 		</td>
 		
