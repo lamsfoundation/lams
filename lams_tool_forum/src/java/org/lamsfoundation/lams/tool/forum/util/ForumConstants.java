@@ -59,6 +59,8 @@ public interface ForumConstants {
     public static final String AUTHORING_TOPIC_THREAD = "topicThread";
 
     public static final String AUTHORING_TOPIC = "topic";
+    
+    public static final String AUTHORING_FORUM = "forum";
 
     public static final String DEFAULT_TITLE = "Forum";
 

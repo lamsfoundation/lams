@@ -243,6 +243,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    while (iter.hasNext()) {
 		Message clone = (Message) iter.next();
 		message.updateClone(clone);
+		messageDao.saveOrUpdate(clone);
 	    }
 	}
 

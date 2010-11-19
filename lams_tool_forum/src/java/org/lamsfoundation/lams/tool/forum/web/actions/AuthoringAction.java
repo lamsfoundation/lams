@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
@@ -257,6 +258,8 @@ public class AuthoringAction extends Action {
 
 	    // tear down PO to normal object using clone() method
 	    forumForm.setForum((Forum) forum.clone());
+	    
+	    sessionMap.put(ForumConstants.AUTHORING_FORUM, forum);
 	} catch (Exception e) {
 	    AuthoringAction.log.error(e);
 	    return mapping.findForward("error");
@@ -410,7 +413,7 @@ public class AuthoringAction extends Action {
 	    while (iter.hasNext()) {
 		MessageDTO dto = (MessageDTO) iter.next();
 		if (dto.getMessage() != null) {
-		    // This flushs user UID info to message if this user is a new user.
+		    // This flushes user UID info to message if this user is a new user.
 		    dto.getMessage().setCreatedBy(forumUser);
 		    dto.getMessage().setModifiedBy(forumUser);
 		    forumService.createRootTopic(forum.getUid(), null, dto.getMessage());
@@ -696,6 +699,18 @@ public class AuthoringAction extends Action {
 	    attSet.add(att);
 	}
 	message.setAttachments(attSet);
+	
+	// create clones of this topic (appropriate only for editing in monitoring)
+	Forum forum = (Forum) sessionMap.get(ForumConstants.AUTHORING_FORUM);
+	if (forum != null) {
+	    List<ForumToolSession> toolSessions = forumService.getSessionsByContentId(forum.getContentId());
+	    for (ForumToolSession toolSession : toolSessions) {
+		Message newMsg = Message.newInstance(message, forum.getToolContentHandler());
+		newMsg.setToolSession(toolSession);
+		newMsg.setAttachments(new TreeSet());
+		message.getSessionClones().add(newMsg);
+	    }
+	}
 
 	topics.add(MessageDTO.getMessageDTO(message));
 
