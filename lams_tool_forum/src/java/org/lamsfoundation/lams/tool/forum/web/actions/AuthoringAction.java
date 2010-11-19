@@ -708,6 +708,8 @@ public class AuthoringAction extends Action {
 		Message newMsg = Message.newInstance(message, forum.getToolContentHandler());
 		newMsg.setToolSession(toolSession);
 		newMsg.setAttachments(new TreeSet());
+		newMsg.setModifiedBy(null);
+		newMsg.setCreatedBy(null);		
 		message.getSessionClones().add(newMsg);
 	    }
 	}
