@@ -603,12 +603,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	    for (AssessmentResult result : results) {
 		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
-		    if (questionResult.getFinishDate() == null) {
-			if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
-			    questionResult.setFinishDate(result.getFinishDate());
-			    questionResultsForSummary.add(questionResult);
-			    break;
-			}
+		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
+			questionResult.setFinishDate(result.getFinishDate());
+			questionResultsForSummary.add(questionResult);
+			break;
 		    }
 		}
 
