@@ -549,6 +549,7 @@ public class LearningAction extends Action {
 		}
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ESSAY) {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+		answerString = answerString.replaceAll("[\n\r\f]", "");
 		question.setAnswerString(answerString);
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 	    }
