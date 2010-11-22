@@ -25,6 +25,10 @@
 	<c:set var="width" value="100%" />
 </c:if>
 
+<c:if test="${empty height}">
+	<c:set var="height" value="100px" />
+</c:if>
+
 <textarea id="${id}" name="${id}" style="display: none; height: 0px;">${value}</textarea>
 
 <c:if test="${empty ckEditorBasePath}">

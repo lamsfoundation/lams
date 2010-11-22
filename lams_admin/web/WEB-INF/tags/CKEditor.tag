@@ -1,4 +1,7 @@
-<%@ taglib uri="tags-core" prefix="c"%>
+
+<c:if test="${empty height}">
+	<c:set var="height" value="100px" />
+</c:if><%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <%@ attribute name="id" required="true" rtexprvalue="true"%>
