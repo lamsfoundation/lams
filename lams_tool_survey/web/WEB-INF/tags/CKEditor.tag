@@ -22,7 +22,7 @@
 </c:if>
 
 <c:if test="${empty width}">
-	<c:set var="width" value="100%" />
+	<c:set var="width" value="750px" />
 </c:if>
 
 <c:if test="${empty height}">
