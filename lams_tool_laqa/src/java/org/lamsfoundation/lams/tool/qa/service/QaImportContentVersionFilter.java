@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.qa.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 
 /**
  * Import filter class for different versions of Q&A content.
@@ -38,5 +39,10 @@ public class QaImportContentVersionFilter extends ToolContentVersionFilter {
 	// Change name to suit the version you give the tool.
 	this.addField(QaContent.class, "lockWhenFinished", new Boolean(true));
 	this.addField(QaContent.class, "showOtherAnswers", new Boolean(true));
+    }
+    
+    public void up20081126To20101022() {
+	this.removeField(QaQueContent.class, "isOptional");
+	this.addField(QaQueContent.class, "required", new Boolean(false));
     }
 }
