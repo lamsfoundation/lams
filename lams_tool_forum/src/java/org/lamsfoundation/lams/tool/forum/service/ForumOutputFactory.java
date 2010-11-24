@@ -71,14 +71,19 @@ public class ForumOutputFactory extends OutputFactory {
 		ToolOutputDefinition chosenTopicAnswersDefinition = buildComplexOutputDefinition(
 			ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, topicDatesToAnswersClass);
 		Forum forum = (Forum) toolContentObject;
+		
 		// adding all existing conditions
 		chosenTopicAnswersDefinition
 			.setDefaultConditions(new ArrayList<BranchCondition>(forum.getConditions()));
+		
 		// if no conditions were created in the tool instance, a default condition is added;
 		if (chosenTopicAnswersDefinition.getDefaultConditions().isEmpty() && !forum.getMessages().isEmpty()) {
+		    
 		    ForumCondition defaultCondition = createDefaultTopicDateToAnswersCondition(forum);
-		    forum.getConditions().add(defaultCondition);
-		    chosenTopicAnswersDefinition.getDefaultConditions().add(defaultCondition);
+		    if (defaultCondition != null) {
+			forum.getConditions().add(defaultCondition);
+			chosenTopicAnswersDefinition.getDefaultConditions().add(defaultCondition);
+		    }
 		}
 		chosenTopicAnswersDefinition.setShowConditionNameOnly(true);
 		definitionMap.put(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, chosenTopicAnswersDefinition);
@@ -225,16 +230,17 @@ public class ForumOutputFactory extends OutputFactory {
      * @return default Forum condition
      */
     protected ForumCondition createDefaultTopicDateToAnswersCondition(Forum forum) {
-
-	if (forum.getMessages().isEmpty()) {
-	    return null;
-	}
+	
 	Set<Message> messages = new HashSet<Message>();
 	for (Message message : (Set<Message>) forum.getMessages()) {
 	    if (message.getIsAuthored()) {
 		messages.add(message);
 		break;
 	    }
+	}
+	
+	if (messages.isEmpty()) {
+	    return null;
 	}
 
 	String name = buildConditionName(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, forum.getContentId()
