@@ -57,6 +57,8 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CSVUtil;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 
@@ -281,6 +283,7 @@ public class IntegrationService implements IIntegrationService {
 	user.setCreateDate(new Date());
 	user.setDisabledFlag(false);
 	user.setLocale(LanguageUtil.getSupportedLocale(userData[13], userData[12]));
+	user.setEnableFlash(Configuration.getAsBoolean(ConfigurationKeys.FLASH_ENABLE));
 	user.setFlashTheme(service.getDefaultFlashTheme());
 	user.setHtmlTheme(service.getDefaultHtmlTheme());
 	service.save(user);

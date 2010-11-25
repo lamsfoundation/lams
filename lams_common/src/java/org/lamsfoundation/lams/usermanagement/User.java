@@ -180,74 +180,9 @@ public class User implements Serializable, Comparable {
     /** persistent field */
     private String openidURL;
 
-    /** full constructor */
-    public User(String login, String password, String title, String firstName, String lastName, String addressLine1,
-	    String addressLine2, String addressLine3, String city, String state, String postcode, String country,
-	    String dayPhone, String eveningPhone, String mobilePhone, String fax, String email, Boolean disabledFlag,
-	    Date createDate, Workspace workspace, AuthenticationMethod authenticationMethod,
-	    Theme flashTheme, Theme htmlTheme, Set userOrganisations, String chatId,
-	    Set learnerProgresses, Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons,
-	    Long portraitUuid, Boolean changePassword, Boolean enableFlash, String lamsCommunityToken) {
-	this.login = login;
-	this.password = password;
-	this.title = title;
-	this.firstName = firstName;
-	this.lastName = lastName;
-	this.addressLine1 = addressLine1;
-	this.addressLine2 = addressLine2;
-	this.addressLine3 = addressLine3;
-	this.city = city;
-	this.state = state;
-	this.postcode = postcode;
-	this.country = country;
-	this.dayPhone = dayPhone;
-	this.eveningPhone = eveningPhone;
-	this.mobilePhone = mobilePhone;
-	this.fax = fax;
-	this.email = email;
-	this.disabledFlag = disabledFlag;
-	this.createDate = createDate;
-	this.workspace = workspace;
-	this.authenticationMethod = authenticationMethod;
-	this.flashTheme = flashTheme;
-	this.htmlTheme = htmlTheme;
-	this.chatId = chatId;
-	this.userOrganisations = userOrganisations;
-	this.learnerProgresses = learnerProgresses;
-	this.userToolSessions = userToolSessions;
-	this.userGroups = userGroups;
-	this.learningDesigns = learningDesigns;
-	this.lessons = lessons;
-	this.portraitUuid = portraitUuid;
-	this.changePassword = changePassword;
-	this.enableFlash = enableFlash;
-	this.lamsCommunityToken = lamsCommunityToken;
-    }
-
     /** default constructor */
     public User() {
 	changePassword = false;
-	enableFlash = true;
-    }
-
-    /** minimal constructor */
-    public User(String login, String password, Boolean disabledFlag, Date createDate, Workspace workspace,
-	    AuthenticationMethod authenticationMethod, Set userOrganisations, Set learnerProgresses,
-	    Set userToolSessions, Set userGroups, Set learningDesigns, Set lessons) {
-	this.login = login;
-	this.password = password;
-	this.disabledFlag = disabledFlag;
-	this.createDate = createDate;
-	this.workspace = workspace;
-	this.authenticationMethod = authenticationMethod;
-	this.userOrganisations = userOrganisations;
-	this.learnerProgresses = learnerProgresses;
-	this.userToolSessions = userToolSessions;
-	this.userGroups = userGroups;
-	this.learningDesigns = learningDesigns;
-	this.lessons = lessons;
-	changePassword = false;
-	enableFlash = true;
     }
 
     /**

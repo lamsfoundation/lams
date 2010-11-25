@@ -54,6 +54,8 @@ import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -241,6 +243,7 @@ public class ImportV1ContentsSaveAction extends Action {
 		newUser.setPassword(HashUtil.sha1(user.getLogin()));
 		newUser.setChangePassword(true);
 		
+		newUser.setEnableFlash(Configuration.getAsBoolean(ConfigurationKeys.FLASH_ENABLE));
 		newUser.setFlashTheme(service.getDefaultFlashTheme());
 		newUser.setHtmlTheme(service.getDefaultHtmlTheme());
 		newUser.setDisabledFlag(false);
