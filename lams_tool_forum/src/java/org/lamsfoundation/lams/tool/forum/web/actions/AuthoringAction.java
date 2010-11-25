@@ -429,21 +429,29 @@ public class AuthoringAction extends Action {
 		    forumService.deleteTopic(dto.getMessage().getUid());
 		}
 	    }
-	    
+
 	// ******************************** Handle conditions ****************
-	Set<ForumCondition> conditionSet = getForumConditionSet(sessionMap);
-	
+	Set<ForumCondition> conditions = getForumConditionSet(sessionMap);
+	List delConditions = getDeletedForumConditionList(sessionMap);
+
 	// delete conditions that don't contain any topics
-	Iterator<ForumCondition> conditionIter = conditionSet.iterator();
+	Iterator<ForumCondition> conditionIter = conditions.iterator();
 	while (conditionIter.hasNext()) {
 	    ForumCondition condition = conditionIter.next();
 	    if (condition.getTopics().isEmpty()) {
 		conditionIter.remove();
+		delConditions.add(condition);
+
+		// reorder remaining conditions
+		for (ForumCondition otherCondition : conditions) {
+		    if (otherCondition.getOrderId() > condition.getOrderId()) {
+			otherCondition.setOrderId(otherCondition.getOrderId() - 1);
+		    }
+		}
 	    }
 	}
-	forum.setConditions(conditionSet);
-	
-	List delConditions = getDeletedForumConditionList(sessionMap);
+	forum.setConditions(conditions);
+
 	iter = delConditions.iterator();
 	while (iter.hasNext()) {
 	    ForumCondition condition = (ForumCondition) iter.next();

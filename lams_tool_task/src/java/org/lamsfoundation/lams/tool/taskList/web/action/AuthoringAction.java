@@ -397,12 +397,10 @@ public class AuthoringAction extends Action {
 		service.deleteTaskListAttachment(delAtt.getUid());
 	    }// end remove from persist value
 	}
-
 	// copy back
 	taskListPO.setAttachments(attPOSet);
+	
 	// ************************* Handle taskList items *******************
-
-	// Handle taskList items
 	Set itemList = new LinkedHashSet();
 	SortedSet<TaskListItem> items = getTaskListItemList(sessionMap);
 	for (TaskListItem item : items) {
@@ -414,22 +412,30 @@ public class AuthoringAction extends Action {
 	}
 	taskListPO.setTaskListItems(itemList);
 
-	// Handle taskList conditions. Also delete conditions that don't contain any taskLIstItems.
-	SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
-	SortedSet<TaskListCondition> conditionListWithoutEmptyElements = new TreeSet<TaskListCondition>(conditionList);
-	List delTaskListConditionList = getDeletedTaskListConditionList(sessionMap);
-	for (TaskListCondition condition : conditionList) {
+	// ************************* Handle taskList conditions *******************
+	SortedSet<TaskListCondition> conditions = getTaskListConditionList(sessionMap);
+	SortedSet<TaskListCondition> conditionListWithoutEmptyElements = new TreeSet<TaskListCondition>(conditions);
+	List delConditions = getDeletedTaskListConditionList(sessionMap);
+	
+	for (TaskListCondition condition : conditions) {
 	    if (condition.getTaskListItems().size() == 0) {
 		conditionListWithoutEmptyElements.remove(condition);
-		delTaskListConditionList.add(condition);
+		delConditions.add(condition);
+		
+		//reorder remaining conditions
+		for (TaskListCondition otherCondition : conditionListWithoutEmptyElements) {
+		    if (otherCondition.getSequenceId() > condition.getSequenceId()) {
+			otherCondition.setSequenceId(otherCondition.getSequenceId() - 1);
+		    }
+		}
 	    }
 	}
-	conditionList.clear();
-	conditionList.addAll(conditionListWithoutEmptyElements);
-	taskListPO.setConditions(conditionList);
+	conditions.clear();
+	conditions.addAll(conditionListWithoutEmptyElements);
+	taskListPO.setConditions(conditions);
 
 	// delete TaskListConditions from database.
-	iter = delTaskListConditionList.iterator();
+	iter = delConditions.iterator();
 	while (iter.hasNext()) {
 	    TaskListCondition condition = (TaskListCondition) iter.next();
 	    iter.remove();
@@ -442,8 +448,8 @@ public class AuthoringAction extends Action {
 	// delete TaskListItems from database. This should be done after
 	// TaskListConditions have been deleted from the database. This is due
 	// to prevent errors with foreign keys.
-	List delTaskListItemList = getDeletedTaskListItemList(sessionMap);
-	iter = delTaskListItemList.iterator();
+	List delTaskListItems = getDeletedTaskListItemList(sessionMap);
+	iter = delTaskListItems.iterator();
 	while (iter.hasNext()) {
 	    TaskListItem item = (TaskListItem) iter.next();
 	    iter.remove();

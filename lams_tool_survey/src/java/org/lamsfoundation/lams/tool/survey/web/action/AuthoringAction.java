@@ -634,20 +634,29 @@ public class AuthoringAction extends Action {
 	}
 
 	// ******************************** Handle conditions ****************
-	Set<SurveyCondition> conditionSet = getSurveyConditionSet(sessionMap);
+	Set<SurveyCondition> conditions = getSurveyConditionSet(sessionMap);
+	List delConditions = getDeletedSurveyConditionList(sessionMap);
 	
 	// delete conditions that don't contain any questions
-	Iterator<SurveyCondition> conditionIter = conditionSet.iterator();
+	Iterator<SurveyCondition> conditionIter = conditions.iterator();
 	while (conditionIter.hasNext()) {
 	    SurveyCondition condition = conditionIter.next();
 	    if (condition.getQuestions().isEmpty()) {
 		conditionIter.remove();
+		delConditions.add(condition);
+		
+		//reorder remaining conditions
+		for (SurveyCondition otherCondition : conditions) {
+		    if (otherCondition.getOrderId() > condition.getOrderId()) {
+			otherCondition.setOrderId(otherCondition.getOrderId() - 1);
+		    }
+		}
 	    }
 	}
-	surveyPO.setConditions(conditionSet);
-	
-	List delConditionList = getDeletedSurveyConditionList(sessionMap);
-	iter = delConditionList.iterator();
+	surveyPO.setConditions(conditions);
+
+	//permanently remove conditions from DB
+	iter = delConditions.iterator();
 	while (iter.hasNext()) {
 	    SurveyCondition condition = (SurveyCondition) iter.next();
 	    iter.remove();
