@@ -25,6 +25,15 @@ package org.lamsfoundation.lams.planner.dto;
 
 public class PedagogicalPlannerActivityDTO {
     private String pedagogicalPlannerUrl;
+    private String authorUrl;
+    public String getAuthorUrl() {
+        return authorUrl;
+    }
+
+    public void setAuthorUrl(String authorUrl) {
+        this.authorUrl = authorUrl;
+    }
+
     private String toolIconUrl;
     private String title;
     private String type;
@@ -58,9 +67,11 @@ public class PedagogicalPlannerActivityDTO {
     }
 
     public PedagogicalPlannerActivityDTO(String type, String title, Boolean supportsPlanner,
-	    String pedagogicalPlannerUrl, String toolIconUrl, String checkEditingAdviceUrl, String editingAdviceUrl) {
+	    String pedagogicalPlannerUrl, String authorUrl, String toolIconUrl, String checkEditingAdviceUrl,
+	    String editingAdviceUrl) {
 	this.supportsPlanner = supportsPlanner;
 	this.pedagogicalPlannerUrl = pedagogicalPlannerUrl;
+	this.authorUrl = authorUrl;
 	this.toolIconUrl = toolIconUrl;
 	this.checkEditingAdviceUrl = checkEditingAdviceUrl;
 	this.editingAdviceUrl = editingAdviceUrl;

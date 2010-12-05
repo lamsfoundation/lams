@@ -230,17 +230,34 @@
 	  }
   }
   
-  function collapseActivity(id){
+  function collapseActivity(id, action){
 	  $('.collapsible'+id).hide();
 	  $('#activity'+id).hide('slow', function () {
-		  $('#activityCollapsedSpan'+id).show('slow');
+		  $('#activity'+action+'Span'+id).show('slow');
 	  });
   }
   
-  function expandActivity(id){
-	  $('#activityCollapsedSpan'+id).hide('slow', function () {
+  function expandActivity(id, action){
+	  $('#activity'+action+'Span'+id).hide('slow', function () {
 		  $('#activity'+id).show('slow', function (){
 			  $('.collapsible'+id).show();
 		  });
 	  });
   }
+  
+  function openActivityAuthor(id, url, title) {
+	  collapseActivity(id, 'Edit');
+	  
+	  var wd = window.open(url,title,'resizable,width=930,height=700,scrollbars');
+	  var watchClose = setInterval(function() {
+		        if (wd.closed) {
+		            clearTimeout(watchClose);
+		            $('#activity'+id)[0].contentWindow.location.reload(true);
+		            expandActivity(id, 'Edit');
+		        }
+		}, 500);
+	  
+	  if (window.focus) {
+		  wd.window.focus();
+	  }
+  }  

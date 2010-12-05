@@ -95,7 +95,6 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
@@ -124,8 +123,6 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
-import org.lamsfoundation.lams.workspace.service.WorkspaceManagementService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -444,10 +441,16 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    ToolActivity toolActivity = (ToolActivity) activity;
 	    // Every tool has an URL that leads to Action that returns proper tool form to use
 	    String pedagogicalPlannerUrl = toolActivity.getTool().getPedagogicalPlannerUrl();
+	    String authorUrl = toolActivity.getTool().getAuthorUrl() + PedagogicalPlannerAction.CHAR_QUESTION_MARK
+		    + AttributeNames.PARAM_TOOL_CONTENT_ID + PedagogicalPlannerAction.CHAR_EQUALS
+		    + toolActivity.getToolContentId() + PedagogicalPlannerAction.CHAR_AMPERSAND
+		    + AttributeNames.PARAM_CONTENT_FOLDER_ID + PedagogicalPlannerAction.CHAR_EQUALS
+		    + learningDesign.getContentFolderID();
+
 	    if (pedagogicalPlannerUrl == null) {
 		// if there is no URL, the tool does not support the planner
 		addedDTO = new PedagogicalPlannerActivityDTO(toolActivity.getTool().getToolDisplayName(), activity
-			.getTitle(), false, PedagogicalPlannerAction.PATH_ACTIVITY_NO_PLANNER_SUPPORT, activity
+			.getTitle(), false, authorUrl, PedagogicalPlannerAction.PATH_ACTIVITY_NO_PLANNER_SUPPORT, activity
 			.getLibraryActivityUiImage(), null, null);
 	    } else {
 		// add some required parameters
@@ -456,10 +459,10 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		pedagogicalPlannerUrl += AttributeNames.PARAM_TOOL_CONTENT_ID + PedagogicalPlannerAction.CHAR_EQUALS
 			+ toolActivity.getToolContentId();
 		// Looks heavy, but we just build URLs for DTO - see that class the meaning of constructor parameters
-		addedDTO = new PedagogicalPlannerActivityDTO(toolActivity.getTool().getToolDisplayName(), activity
-			.getTitle(), true, pedagogicalPlannerUrl + PedagogicalPlannerAction.CHAR_AMPERSAND
-			+ AttributeNames.PARAM_CONTENT_FOLDER_ID + PedagogicalPlannerAction.CHAR_EQUALS
-			+ learningDesign.getContentFolderID(), activity.getLibraryActivityUiImage(),
+		addedDTO = new PedagogicalPlannerActivityDTO(toolActivity.getTool().getToolDisplayName(),
+			activity.getTitle(), true, pedagogicalPlannerUrl + PedagogicalPlannerAction.CHAR_AMPERSAND
+				+ AttributeNames.PARAM_CONTENT_FOLDER_ID + PedagogicalPlannerAction.CHAR_EQUALS
+				+ learningDesign.getContentFolderID(), authorUrl, activity.getLibraryActivityUiImage(),
 			pedagogicalPlannerUrl + PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_COMMAND
 				+ PedagogicalPlannerAction.CHAR_EQUALS + AttributeNames.COMMAND_CHECK_EDITING_ADVICE
 				+ PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_ACTIVITY_INDEX
@@ -475,13 +478,14 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    .getSystemTool().getPedagogicalPlannerUrl()
 		    + PedagogicalPlannerAction.CHAR_AMPERSAND
 		    + AttributeNames.PARAM_TOOL_CONTENT_ID
-		    + PedagogicalPlannerAction.CHAR_EQUALS + groupingActivity.getCreateGrouping().getGroupingId(),
+		    + PedagogicalPlannerAction.CHAR_EQUALS
+		    + groupingActivity.getCreateGrouping().getGroupingId(), null,
 		    PedagogicalPlannerAction.IMAGE_PATH_GROUPING, null, null);
 	    activities.add(addedDTO);
 	} else if (activity.isGateActivity()) {
 	    // gate is not supported, but takes its image from a differen spot
 	    addedDTO = new PedagogicalPlannerActivityDTO(null, activity.getTitle(), false,
-		    PedagogicalPlannerAction.PATH_ACTIVITY_NO_PLANNER_SUPPORT,
+		    PedagogicalPlannerAction.PATH_ACTIVITY_NO_PLANNER_SUPPORT, null,
 		    PedagogicalPlannerAction.IMAGE_PATH_GATE, null, null);
 	    activities.add(addedDTO);
 	} else if (activity.isBranchingActivity()) {
@@ -508,7 +512,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 			    + PedagogicalPlannerAction.CHAR_QUESTION_MARK + CentralConstants.PARAM_FORM_MESSAGE
 			    + PedagogicalPlannerAction.CHAR_EQUALS
 			    + getMessageService().getMessage(CentralConstants.RESOURCE_KEY_BRANCH_EMPTY);
-		    addedDTO = new PedagogicalPlannerActivityDTO(null, null, false, path, null, null, null);
+		    addedDTO = new PedagogicalPlannerActivityDTO(null, null, false, path, null, null, null, null);
 		    addedDTO.setParentActivityTitle(activity.getTitle());
 		    addedDTO.setGroup(branch);
 		    addedDTO.setDefaultBranch(defaultBranch);
@@ -597,8 +601,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	} else {
 	    // If unknown/unsupported activity
 	    addedDTO = new PedagogicalPlannerActivityDTO(null, activity.getTitle(), false,
-		    PedagogicalPlannerAction.PATH_ACTIVITY_NO_PLANNER_SUPPORT, activity.getLibraryActivityUiImage(),
-		    null, null);
+		    PedagogicalPlannerAction.PATH_ACTIVITY_NO_PLANNER_SUPPORT, null,
+		    activity.getLibraryActivityUiImage(), null, null);
 	    activities.add(addedDTO);
 	}
 	return addedDTO;
