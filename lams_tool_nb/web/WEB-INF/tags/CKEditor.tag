@@ -30,7 +30,7 @@
 </c:if>
 
 <div style="width: ${width}">
-	<textarea id="${id}" name="${id}" style="display: none; height: 0px;">${value}</textarea>
+	<textarea id="${id}" name="${id}" style="display: none; visibility: hidden; height: 0px;">${value}</textarea>
 </div>
 
 <c:if test="${empty ckEditorBasePath}">
