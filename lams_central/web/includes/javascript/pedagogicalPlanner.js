@@ -231,10 +231,7 @@
   }
   
   function collapseActivity(id){
-	  $('#buttonCollapse'+id).hide();
-	  $('#activityType'+id).hide();
-	  $('#activityIcon'+id).hide();
-	  $('#editingAdvice'+id).hide();
+	  $('.collapsible'+id).hide();
 	  $('#activity'+id).hide('slow', function () {
 		  $('#activityCollapsedSpan'+id).show('slow');
 	  });
@@ -243,10 +240,7 @@
   function expandActivity(id){
 	  $('#activityCollapsedSpan'+id).hide('slow', function () {
 		  $('#activity'+id).show('slow', function (){
-			  $('#editingAdvice'+id).show();
-			  $('#activityType'+id).show();
-			  $('#activityIcon'+id).show();
-			  $('#buttonCollapse'+id).show();
+			  $('.collapsible'+id).show();
 		  });
 	  });
   }
