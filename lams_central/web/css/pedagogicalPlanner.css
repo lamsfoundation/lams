@@ -161,13 +161,14 @@ h3.group4{
 #content a.editing-advice-button {
 	display: none;
 	font-size: smaller;
-	margin: 0px 0px 0px 660px;
+	margin: 0px 0px 0px 663px;
 	background: url('../images/css/editing_advice.png') no-repeat 0px 0px;
 	color: #666;
 	padding: 5px 12px 6px 30px;
 	text-decoration: none;
 	border-right:1px solid #d2d2d2;
 	border-bottom: 0px;
+	line-height: 20px;
 }
 
 a#tutorialVideoHref {
@@ -184,5 +185,14 @@ a#tutorialVideoHref:hover {
 }
 
 img#tutorialVideoImg {
+	border: none;
+}
+
+#content a.activityButton {
+	border: none;
+	text-decoration: none;
+}
+
+#content a.activityButton img{
 	border: none;
 }
