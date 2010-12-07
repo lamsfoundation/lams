@@ -51,8 +51,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *                name="monitoringForm" validate="false"
  * 
  * @struts.action-forward name="success" path="tiles:/monitoring/main"
- * @struts.action-forward name="notebook_display"
- *                        path="tiles:/monitoring/notebook_display"
+ * @struts.action-forward name="notebookDisplay" path="tiles:/monitoring/notebookDisplay"
  * 
  */
 public class MonitoringAction extends LamsDispatchAction {
@@ -107,7 +106,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 		request.setAttribute("userDTO", userDTO);
 
-		return mapping.findForward("notebook_display");
+		return mapping.findForward("notebookDisplay");
 	}
 	
 	/**

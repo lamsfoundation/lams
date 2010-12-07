@@ -22,10 +22,6 @@
 
 <tiles-definitions>
 	<!--  Begin: Layouts -->
-	<definition name="tiles:/layout:default" path="/layouts/defaultLayout.jsp">
-		<put name="header" value="tiles:/header:default" />
-		<put name="body" value="" />
-	</definition>
 
 	<definition name="tiles:/layout:tab" path="/layouts/tabLayout.jsp">
 		<put name="header" value="tiles:/header:default" />
@@ -48,26 +44,6 @@
 		<put name="headItems" value="/common/empty.jsp" type="page" />
 	</definition>
 	<!-- End: Headers -->
-
-
-	<!-- Begin: Generic -->
-	<!-- 
-		<definition name="tiles:/error" extends="tiles:layout">
-		<put name="body" value="/includes/error.jsp"/>
-		</definition>
-		
-		
-		<definition name="tiles:/blank" extends="tiles:layout">
-		<put name="body" value="/includes/blank.jsp"/>
-		</definition>
-	-->
-	<definition name="tiles:/generic/message" extends="tiles:/layout:default">
-		<put name="pageTitleKey" value="pageTitle.authoring" />
-		<put name="header" value="tiles:/header:default" />
-		<put name="body" value="/common/message.jsp"></put>
-	</definition>
-	<!-- End: Generic -->
-
 
 	<!-- Begin: Authoring -->
 	<definition name="tiles:/authoring/main" extends="tiles:/layout:tab">
@@ -104,10 +80,9 @@
 		<put name="body" value="/pages/monitoring/monitoring.jsp" />
 	</definition>
 	
-	<definition name="tiles:/monitoring/notebook_display" extends="tiles:/layout:default">
-		<put name="pageTitleKey" value="pageTitle.monitoring" />
+	<definition name="tiles:/monitoring/notebookDisplay" path="/pages/monitoring/notebookDisplay.jsp">
 		<put name="header" value="tiles:/header:monitoring/main" type="definition" />
-		<put name="body" value="/pages/monitoring/notebookDisplay.jsp" />	
+		<put name="pageTitleKey" value="pageTitle.monitoring" />
 	</definition>
 
 	<definition name="tiles:/header:monitoring/main" extends="tiles:/header:default">

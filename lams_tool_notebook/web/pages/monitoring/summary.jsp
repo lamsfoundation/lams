@@ -1,4 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
+<link rel="stylesheet" href="<lams:LAMSURL/>/css/thickbox.css" type="text/css" media="screen">
+
+<script type="text/javascript">
+	var tb_pathToImage = "<lams:LAMSURL/>/images/loadingAnimation.gif";
+</script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox-compressed.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
 <!--
@@ -105,9 +112,9 @@
 						</c:when>
 
 						<c:otherwise>
-							<a
-								href="./monitoring.do?dispatch=showNotebook&amp;userUID=${user.uid}">
-								<fmt:message key="label.view" /> </a>
+							<a href="./monitoring.do?dispatch=showNotebook&amp;userUID=${user.uid}&keepThis=true&TB_iframe=true&height=260&width=800" class="thickbox" title="<fmt:message key='heading.notebookEntry' />">
+								<fmt:message key="label.view" /> 
+							</a>
 						</c:otherwise>
 					</c:choose>
 
