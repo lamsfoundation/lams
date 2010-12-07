@@ -178,14 +178,6 @@ public class MonitoringAction extends Action {
     private ActionForward init(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	// perform the actions for all the tabs.
-	doTabs(mapping, form, request, response);
-
-	return mapping.findForward("load");
-    }
-
-    private ActionForward doTabs(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
 	//set back tool content ID
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
@@ -195,10 +187,12 @@ public class MonitoringAction extends Action {
 
 	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
 
-	this.summary(mapping, form, request, response);
-	this.viewInstructions(mapping, form, request, response);
-	this.viewActivity(mapping, form, request, response, toolContentID);
-	this.statistic(mapping, form, request, response);
+	// perform the actions for all the tabs.
+	summary(request);
+	viewInstructions(request);
+	viewActivity(request);
+	statistic(request);
+
 	return mapping.findForward("load");
     }
 
@@ -212,8 +206,7 @@ public class MonitoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    private void summary(HttpServletRequest request) {
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	forumService = getForumService();
@@ -271,8 +264,6 @@ public class MonitoringAction extends Action {
 
 	// request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 	request.setAttribute("sessionUserMap", sessionUsersMap);
-	return mapping.findForward("success");
-
     }
 
     /**
@@ -408,24 +399,13 @@ public class MonitoringAction extends Action {
     /**
      * View activity for content.
      * 
-     * @param mapping
-     * @param form
      * @param request
-     * @param response
-     * @return
      */
-    private ActionForward viewActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, Long toolContentID) {
-
+    private void viewActivity(HttpServletRequest request) {
+	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	
 	forumService = getForumService();
 	Forum forum = forumService.getForumByContentId(toolContentID);
-	// if can not find out forum, echo back error message
-	if (forum == null) {
-	    ActionErrors errors = new ActionErrors();
-	    errors.add("activity.globel", new ActionMessage("error.fail.get.forum"));
-	    this.addErrors(request, errors);
-	    return mapping.getInputForward();
-	}
 	String title = forum.getTitle();
 	String instruction = forum.getInstructions();
 
@@ -433,37 +413,22 @@ public class MonitoringAction extends Action {
 	request.setAttribute(ForumConstants.PAGE_EDITABLE, new Boolean(isForumEditable));
 	request.setAttribute("title", title);
 	request.setAttribute("instruction", instruction);
-	return mapping.findForward("success");
     }
 
     /**
      * View instruction information for a content.
      * 
-     * @param mapping
-     * @param form
      * @param request
-     * @param response
-     * @return
      */
-    private ActionForward viewInstructions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    private void viewInstructions(HttpServletRequest request) {
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	forumService = getForumService();
 	Forum forum = forumService.getForumByContentId(toolContentID);
-	// if can not find out forum, echo back error message
-	if (forum == null) {
-	    ActionErrors errors = new ActionErrors();
-	    errors.add("instruction.globel", new ActionMessage("error.fail.get.forum"));
-	    this.addErrors(request, errors);
-	    return mapping.getInputForward();
-	}
-
 	ForumForm forumForm = new ForumForm();
 	forumForm.setForum(forum);
 
 	request.setAttribute("forumBean", forumForm);
-	return mapping.findForward("success");
     }
 
     /**
@@ -477,6 +442,16 @@ public class MonitoringAction extends Action {
      */
     private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+	statistic(request);
+	return mapping.findForward("success");
+    }
+    
+    /**
+     * Performs all necessary actions for showing statistic page.
+     * 
+     * @param request
+     */
+    private void statistic(HttpServletRequest request) {
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	forumService = getForumService();
@@ -527,7 +502,6 @@ public class MonitoringAction extends Action {
 	request.setAttribute("topicList", sessionTopicsMap);
 	request.setAttribute("markAverage", sessionAvaMarkMap);
 	request.setAttribute("totalMessage", sessionTotalMsgMap);
-	return mapping.findForward("success");
     }
 
     /**
