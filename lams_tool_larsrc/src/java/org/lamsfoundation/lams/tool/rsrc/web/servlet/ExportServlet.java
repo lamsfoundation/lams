@@ -231,10 +231,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     private void saveFileToLocal(List<Summary> list, String directoryName) {
     	handler = getToolContentHandler();
 		for (Summary summary : list) {
-			//for learning object, it just display "No offlice pakcage avaliable" information.
+			//for learning object, it just display "No offline package available" information.
 			if(summary.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT 
-				|| summary.getItemType() == ResourceConstants.RESOURCE_TYPE_URL)
-				continue;
+				|| summary.getItemType() == ResourceConstants.RESOURCE_TYPE_URL
+				|| summary.getItemType() == 0){
+			    continue;
+			}
+				
 			try{
 				int idx= 1;
 				String userName = summary.getUsername();
