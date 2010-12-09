@@ -740,7 +740,7 @@ public class MonitoringAction extends Action {
      * @return
      */
     private String removeHTMLTags(String string) {
-	return string.replaceAll("\\<.*?>", "").replaceAll("&nbsp;", " ");
+	return (string == null) ? "" : string.replaceAll("\\<.*?>", "").replaceAll("&nbsp;", " ");
     }
 
 }
