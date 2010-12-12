@@ -53,7 +53,10 @@
   					}
  				},
   				success: function(responseText){
-  					$('#body').html(responseText.substring(responseText.search(/<body/i)));
+ 	  				var bodyTag = '<body';
+ 	  				var selectedBody = responseText.substring(responseText.search(bodyTag) + 1);
+ 	  				selectedBody = selectedBody.substring(selectedBody.search(bodyTag));
+  					$('#body').html(selectedBody);
   				}
   			});
   		}
@@ -117,7 +120,7 @@
 						</td>
 						<td>
 							<img class="clearEntry" src="<lams:LAMSURL/>images/icons/cross.png"
-								title="<fmt:message key="msg.planner.clear.entry" />"
+								title="<fmt:message key="label.authoring.basic.resource.delete" />"
 								onclick="javascript:clearEntry(${itemIndex-1})" />
 						</td>
 					</tr>

@@ -1261,15 +1261,18 @@ public class AuthoringAction extends Action {
 	    String title = null;
 	    ResourceItem resourceItem = null;
 	    List<ResourceItem> newItems = new LinkedList<ResourceItem>();
-	    Set<ResourceItem> resourceItems = taskList.getResourceItems();
+	    // we need a copy for later Hibernate-bound processing
+	    LinkedList<ResourceItem> resourceItems = new LinkedList<ResourceItem>(taskList.getResourceItems());
 	    Iterator<ResourceItem> taskListItemIterator = resourceItems.iterator();
-	    // We need to reverse the order, since the items are delivered
-	    // newest-first
-	    LinkedList<ResourceItem> reversedResourceItems = new LinkedList<ResourceItem>();
-	    while (taskListItemIterator.hasNext()) {
-		reversedResourceItems.addFirst(taskListItemIterator.next());
-	    }
-	    taskListItemIterator = reversedResourceItems.iterator();
+	    /*
+	      Not the case anymore (why?):
+	      We need to reverse the order, since the items are delivered newest-first
+	      LinkedList<ResourceItem> reversedResourceItems = new LinkedList<ResourceItem>();
+	      while (taskListItemIterator.hasNext()) {
+	      	reversedResourceItems.addFirst(taskListItemIterator.next());
+	      }
+	      taskListItemIterator = reversedResourceItems.iterator();
+	     */
 	    do {
 		title = plannerForm.getTitle(itemIndex);
 		if (StringUtils.isEmpty(title)) {
@@ -1307,11 +1310,12 @@ public class AuthoringAction extends Action {
 			FormFile file = plannerForm.getFile(itemIndex);
 			resourceItem.setUrl(null);
 			IResourceService service = getResourceService();
-			if (file != null) {
+			if (file != null && !StringUtils.isEmpty(file.getFileName())) {
 			    try {
 				if (hasFile) {
 				    // delete the old file
-				    service.deleteFromRepository(resourceItem.getFileUuid(), resourceItem.getFileVersionId());
+				    service.deleteFromRepository(resourceItem.getFileUuid(),
+					    resourceItem.getFileVersionId());
 				}
 				service.uploadResourceItemFile(resourceItem, file);
 			    } catch (Exception e) {
@@ -1322,11 +1326,11 @@ public class AuthoringAction extends Action {
 				plannerForm.setValid(false);
 				return mapping.findForward(ResourceConstants.SUCCESS);
 			    }
+			    plannerForm.setFileName(itemIndex, resourceItem.getFileName());
+			    plannerForm.setFileUuid(itemIndex, resourceItem.getFileUuid());
+			    plannerForm.setFileVersion(itemIndex, resourceItem.getFileVersionId());
+			    plannerForm.setFile(itemIndex, null);
 			}
-			plannerForm.setFileName(itemIndex, resourceItem.getFileName());
-			plannerForm.setFileUuid(itemIndex, resourceItem.getFileUuid());
-			plannerForm.setFileVersion(itemIndex, resourceItem.getFileVersionId());
-			plannerForm.setFile(itemIndex, null);
 		    }
 		    itemIndex++;
 		}
@@ -1340,9 +1344,9 @@ public class AuthoringAction extends Action {
 		taskListItemIterator.remove();
 		getResourceService().deleteResourceItem(resourceItem.getUid());
 	    }
-	    reversedResourceItems.addAll(newItems);
+	    resourceItems.addAll(newItems);
 
-	    taskList.getResourceItems().addAll(reversedResourceItems);
+	    taskList.getResourceItems().addAll(resourceItems);
 	    getResourceService().saveOrUpdateResource(taskList);
 	} else {
 	    saveErrors(request, errors);

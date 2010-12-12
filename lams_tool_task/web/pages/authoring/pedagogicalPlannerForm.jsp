@@ -40,7 +40,10 @@
   			$('#pedagogicalPlannerForm').ajaxSubmit({
   				url: "<c:url value='/authoring/createPedagogicalPlannerItem.do' />",
   				success: function(responseText){
-  					$('#body').html(responseText.substring(responseText.search(/<body/i)));
+ 	  				var bodyTag = '<body';
+ 	  				var selectedBody = responseText.substring(responseText.search(bodyTag) + 1);
+ 	  				selectedBody = selectedBody.substring(selectedBody.search(bodyTag));
+  					$('#body').html(selectedBody);
   				}
   			});
   		}
