@@ -37,31 +37,10 @@
 </c:if>
 
 <script type="text/javascript">
-
-	/* Beacuse we're using Prototype, jQuery and CKEditor, some situations
-	   are impossible to resolve without manually rewritting functions
-	   
-	CKEDITOR.tools.indexOf = function( array, entry ) 
-	{ 
-		for ( var i = 0, len = array.length ; i < len ; i++ ) 
-		{ 
-			if ( array[ i ] == entry ) 
-				return i; 
-		} 
-		return -1; 
-	};
-	
-	*/
-	
 	function initializeCKEditor(){
-		
 		CKEDITOR.basePath = "${ckEditorBasePath}";
-
-		if (CKEDITOR.instances["${id}"]) {
-			CKEDITOR.remove(CKEDITOR.instances["${id}"]);
-		}
 	    
-		CKEDITOR.replace( "${id}", {
+		var instance = CKEDITOR.replace( "${id}", {
 				width                         : "${width}",
 				height                        : "${height}",
 				toolbar                       : "${toolbarSet}",
@@ -77,8 +56,20 @@
 				filebrowserFlashUploadUrl     : "${ckEditorBasePath}filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/${contentFolderID}/",
 				contentFolderID				  : "${contentFolderID}"
 		});
+		instance.initializeFunction = initializeCKEditor;
+		return instance;
 	}
-
-	// run when page is loaded or explicitly after ajax form submit
+	
+	// run when page is loaded
 	initializeCKEditor();
+
+	function reinitializeCKEditorInstances(){
+		for (var instanceId in CKEDITOR.instances){
+			var instance = CKEDITOR.instances[instanceId];
+			var initializeFunction = instance.initializeFunction;
+			CKEDITOR.remove(instance);
+			instance = initializeFunction();
+			instance.initializeFunction = initializeFunction;
+		}
+	}
 </script>

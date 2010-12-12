@@ -29,9 +29,7 @@
 	<c:set var="height" value="100px" />
 </c:if>
 
-<div style="width: ${width}">
-	<textarea id="${id}" name="${id}" style="display: none; visibility: hidden; height: 0px;">${value}</textarea>
-</div>
+<textarea id="${id}" name="${id}" style="display: none; visibility: hidden; height: 0px;">${value}</textarea>
 
 <c:if test="${empty ckEditorBasePath}">
 	<c:set scope="request" var="ckEditorBasePath"><lams:LAMSURL/>ckeditor/</c:set>
@@ -40,14 +38,9 @@
 
 <script type="text/javascript">
 	function initializeCKEditor(){
-		
 		CKEDITOR.basePath = "${ckEditorBasePath}";
-	
-		if (CKEDITOR.instances["${id}"]) {
-			CKEDITOR.remove(CKEDITOR.instances["${id}"]);
-		}
 	    
-		CKEDITOR.replace( "${id}", {
+		var instance = CKEDITOR.replace( "${id}", {
 				width                         : "${width}",
 				height                        : "${height}",
 				toolbar                       : "${toolbarSet}",
@@ -63,8 +56,20 @@
 				filebrowserFlashUploadUrl     : "${ckEditorBasePath}filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/${contentFolderID}/",
 				contentFolderID				  : "${contentFolderID}"
 		});
+		instance.initializeFunction = initializeCKEditor;
+		return instance;
 	}
 	
-	// run when page is loaded or explicitly after ajax form submit
+	// run when page is loaded
 	initializeCKEditor();
+
+	function reinitializeCKEditorInstances(){
+		for (var instanceId in CKEDITOR.instances){
+			var instance = CKEDITOR.instances[instanceId];
+			var initializeFunction = instance.initializeFunction;
+			CKEDITOR.remove(instance);
+			instance = initializeFunction();
+			instance.initializeFunction = initializeFunction;
+		}
+	}
 </script>
