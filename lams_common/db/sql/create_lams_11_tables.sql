@@ -520,6 +520,9 @@ CREATE TABLE lams_learning_activity (
      , stop_after_activity TINYINT NOT NULL DEFAULT 0
 	 , transition_to_id BIGINT(20)
 	 , transition_from_id BIGINT(20)
+	 , planner_collapsed TINYINT(1) DEFAULT 0
+	 , planner_expanded TINYINT(1) DEFAULT 0
+	 , planner_hidden TINYINT(1) DEFAULT 0
      , PRIMARY KEY (activity_id)
      , INDEX (learning_library_id)
      , CONSTRAINT FK_lams_learning_activity_7 FOREIGN KEY (learning_library_id)

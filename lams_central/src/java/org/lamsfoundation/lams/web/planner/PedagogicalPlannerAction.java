@@ -158,9 +158,15 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     // Several chars and strings used for building HTML requests
     private static final String CHAR_QUESTION_MARK = "?";
     private static final String CHAR_AMPERSAND = "&";
-    private static final char CHAR_EQUALS = '=';
+    private static final String CHAR_EQUALS = "=";
+    private static final String REGEX_DOT = "\\.";
     private static final String STRING_OK = "OK";
-
+    
+    private static final String ACTIVITY_METADATA_PREFIX = "activity";
+    private static final String ACTIVITY_METADATA_HIDDEN = "Hidden";
+    private static final String ACTIVITY_METADATA_EXPANDED = "Expanded";
+    private static final String ACTIVITY_METADATA_COLLAPSED = "Collapsed"; 
+    
     // Services used in the class, injected by Spring
     private static IUserManagementService userManagementService;
     private static IExportToolContentService exportService;
@@ -449,44 +455,63 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	    if (pedagogicalPlannerUrl == null) {
 		// if there is no URL, the tool does not support the planner
-		addedDTO = new PedagogicalPlannerActivityDTO(toolActivity.getTool().getToolDisplayName(), activity
-			.getTitle(), false, authorUrl, PedagogicalPlannerAction.PATH_ACTIVITY_NO_PLANNER_SUPPORT, activity
-			.getLibraryActivityUiImage(), null, null);
+		addedDTO = new PedagogicalPlannerActivityDTO(false,
+			PedagogicalPlannerAction.PATH_ACTIVITY_NO_PLANNER_SUPPORT);
+		addedDTO.setType(toolActivity.getTool().getToolDisplayName());
+		addedDTO.setTitle(activity.getTitle());
+		addedDTO.setAuthorUrl(authorUrl);
+		addedDTO.setToolIconUrl(activity.getLibraryActivityUiImage());
+		addedDTO.setToolContentId(toolActivity.getToolContentId());
+		addedDTO.setCollapsed(toolActivity.getPlannerCollapsed());
+		addedDTO.setExpanded(toolActivity.getPlannerExpanded());
+		addedDTO.setHidden(toolActivity.getPlannerHidden());
 	    } else {
 		// add some required parameters
 		pedagogicalPlannerUrl += pedagogicalPlannerUrl.contains(PedagogicalPlannerAction.CHAR_QUESTION_MARK) ? PedagogicalPlannerAction.CHAR_AMPERSAND
 			: PedagogicalPlannerAction.CHAR_QUESTION_MARK;
 		pedagogicalPlannerUrl += AttributeNames.PARAM_TOOL_CONTENT_ID + PedagogicalPlannerAction.CHAR_EQUALS
 			+ toolActivity.getToolContentId();
+		
 		// Looks heavy, but we just build URLs for DTO - see that class the meaning of constructor parameters
-		addedDTO = new PedagogicalPlannerActivityDTO(toolActivity.getTool().getToolDisplayName(),
-			activity.getTitle(), true, pedagogicalPlannerUrl + PedagogicalPlannerAction.CHAR_AMPERSAND
-				+ AttributeNames.PARAM_CONTENT_FOLDER_ID + PedagogicalPlannerAction.CHAR_EQUALS
-				+ learningDesign.getContentFolderID(), authorUrl, activity.getLibraryActivityUiImage(),
-			pedagogicalPlannerUrl + PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_COMMAND
-				+ PedagogicalPlannerAction.CHAR_EQUALS + AttributeNames.COMMAND_CHECK_EDITING_ADVICE
-				+ PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_ACTIVITY_INDEX
-				+ PedagogicalPlannerAction.CHAR_EQUALS + (activities.size() + 1), pedagogicalPlannerUrl
-				+ PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_COMMAND
-				+ PedagogicalPlannerAction.CHAR_EQUALS + AttributeNames.COMMAND_GET_EDITING_ADVICE);
+		addedDTO = new PedagogicalPlannerActivityDTO(true, pedagogicalPlannerUrl
+			+ PedagogicalPlannerAction.CHAR_AMPERSAND + AttributeNames.PARAM_CONTENT_FOLDER_ID
+			+ PedagogicalPlannerAction.CHAR_EQUALS + learningDesign.getContentFolderID());
+		addedDTO.setType(toolActivity.getTool().getToolDisplayName());
+		addedDTO.setTitle(activity.getTitle());
+		addedDTO.setAuthorUrl(authorUrl);
+		addedDTO.setToolIconUrl(activity.getLibraryActivityUiImage());
+		addedDTO.setCheckEditingAdviceUrl(pedagogicalPlannerUrl + PedagogicalPlannerAction.CHAR_AMPERSAND
+			+ AttributeNames.PARAM_COMMAND + PedagogicalPlannerAction.CHAR_EQUALS
+			+ AttributeNames.COMMAND_CHECK_EDITING_ADVICE + PedagogicalPlannerAction.CHAR_AMPERSAND
+			+ AttributeNames.PARAM_ACTIVITY_INDEX + PedagogicalPlannerAction.CHAR_EQUALS
+			+ (activities.size() + 1));
+		addedDTO.setEditingAdviceUrl(pedagogicalPlannerUrl + PedagogicalPlannerAction.CHAR_AMPERSAND
+			+ AttributeNames.PARAM_COMMAND + PedagogicalPlannerAction.CHAR_EQUALS
+			+ AttributeNames.COMMAND_GET_EDITING_ADVICE);
+		addedDTO.setToolContentId(toolActivity.getToolContentId());
+		addedDTO.setCollapsed(toolActivity.getPlannerCollapsed());
+		addedDTO.setExpanded(toolActivity.getPlannerExpanded());
+		addedDTO.setHidden(toolActivity.getPlannerHidden());
 	    }
 	    activities.add(addedDTO);
 	} else if (activity.isGroupingActivity()) {
 	    // grouping is managed by this action class;
 	    GroupingActivity groupingActivity = (GroupingActivity) activity;
-	    addedDTO = new PedagogicalPlannerActivityDTO(null, activity.getTitle(), true, groupingActivity
-		    .getSystemTool().getPedagogicalPlannerUrl()
+	    addedDTO = new PedagogicalPlannerActivityDTO(true, groupingActivity.getSystemTool()
+		    .getPedagogicalPlannerUrl()
 		    + PedagogicalPlannerAction.CHAR_AMPERSAND
 		    + AttributeNames.PARAM_TOOL_CONTENT_ID
 		    + PedagogicalPlannerAction.CHAR_EQUALS
-		    + groupingActivity.getCreateGrouping().getGroupingId(), null,
-		    PedagogicalPlannerAction.IMAGE_PATH_GROUPING, null, null);
+		    + groupingActivity.getCreateGrouping().getGroupingId());
+	    addedDTO.setTitle(activity.getTitle());
+	    addedDTO.setToolIconUrl(PedagogicalPlannerAction.IMAGE_PATH_GROUPING);
 	    activities.add(addedDTO);
 	} else if (activity.isGateActivity()) {
 	    // gate is not supported, but takes its image from a differen spot
-	    addedDTO = new PedagogicalPlannerActivityDTO(null, activity.getTitle(), false,
-		    PedagogicalPlannerAction.PATH_ACTIVITY_NO_PLANNER_SUPPORT, null,
-		    PedagogicalPlannerAction.IMAGE_PATH_GATE, null, null);
+	    addedDTO = new PedagogicalPlannerActivityDTO(false,
+		    PedagogicalPlannerAction.PATH_ACTIVITY_NO_PLANNER_SUPPORT);
+	    addedDTO.setTitle(activity.getTitle());
+	    addedDTO.setToolIconUrl(PedagogicalPlannerAction.IMAGE_PATH_GATE);
 	    activities.add(addedDTO);
 	} else if (activity.isBranchingActivity()) {
 	    // Planner does not support branching inside branching/options
@@ -512,7 +537,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 			    + PedagogicalPlannerAction.CHAR_QUESTION_MARK + CentralConstants.PARAM_FORM_MESSAGE
 			    + PedagogicalPlannerAction.CHAR_EQUALS
 			    + getMessageService().getMessage(CentralConstants.RESOURCE_KEY_BRANCH_EMPTY);
-		    addedDTO = new PedagogicalPlannerActivityDTO(null, null, false, path, null, null, null, null);
+		    addedDTO = new PedagogicalPlannerActivityDTO(false, path);
 		    addedDTO.setParentActivityTitle(activity.getTitle());
 		    addedDTO.setGroup(branch);
 		    addedDTO.setDefaultBranch(defaultBranch);
@@ -600,9 +625,10 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    addedDTO.setLastNestedActivity(true);
 	} else {
 	    // If unknown/unsupported activity
-	    addedDTO = new PedagogicalPlannerActivityDTO(null, activity.getTitle(), false,
-		    PedagogicalPlannerAction.PATH_ACTIVITY_NO_PLANNER_SUPPORT, null,
-		    activity.getLibraryActivityUiImage(), null, null);
+	    addedDTO = new PedagogicalPlannerActivityDTO(false,
+		    PedagogicalPlannerAction.PATH_ACTIVITY_NO_PLANNER_SUPPORT);
+	    addedDTO.setTitle(activity.getTitle());
+	    addedDTO.setToolIconUrl(activity.getLibraryActivityUiImage());
 	    activities.add(addedDTO);
 	}
 	return addedDTO;
@@ -1688,6 +1714,39 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	} else {
 	    LearningDesign learningDesign = getAuthoringService().getLearningDesign(learningDesignID);
 	    learningDesign.setTitle(sequenceTitle);
+	    
+	    // parse activity metadata, which is in form "activity<tool_content_id>.<field_name>=<value)&..."
+	    String activityMetadataString = WebUtil.readStrParam(request, CentralConstants.PARAM_ACTIVITY_METADATA,
+		    true);
+	    if (!StringUtils.isEmpty(activityMetadataString)) {
+		String[] activityMetadataEntries = activityMetadataString.split(CHAR_AMPERSAND);
+		for (String activityMetadataEntry : activityMetadataEntries) {
+		    String[] keyAndValue = activityMetadataEntry.split(CHAR_EQUALS);
+		    String[] keyParts = keyAndValue[0].split(REGEX_DOT);
+		    String toolContentIdString = keyParts[0].substring(ACTIVITY_METADATA_PREFIX.length());
+		    Long toolContentId = Long.parseLong(toolContentIdString);
+		    for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
+			if (activity.isToolActivity()) {
+			    activity = getActivityDAO().getActivityByActivityId(activity.getActivityId());
+			    ToolActivity toolActivity = (ToolActivity) activity;
+			    if (toolContentId.equals(toolActivity.getToolContentId())) {
+				String fieldName = keyParts[1];
+				String value = keyAndValue[1];
+				// recognise fields and set properties
+				if (ACTIVITY_METADATA_COLLAPSED.equalsIgnoreCase(fieldName)) {
+				    toolActivity.setPlannerCollapsed(Boolean.parseBoolean(value));
+				} else if (ACTIVITY_METADATA_EXPANDED.equalsIgnoreCase(fieldName)) {
+				    toolActivity.setPlannerExpanded(Boolean.parseBoolean(value));
+				} else if (ACTIVITY_METADATA_HIDDEN.equalsIgnoreCase(fieldName)) {
+				    toolActivity.setPlannerHidden(Boolean.parseBoolean(value));
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	    
+	    learningDesign.setLastModifiedDateTime(new Date());
 	    getAuthoringService().saveLearningDesign(learningDesign);
 	    writeAJAXResponse(response, PedagogicalPlannerAction.STRING_OK + responseSuffix);
 	}

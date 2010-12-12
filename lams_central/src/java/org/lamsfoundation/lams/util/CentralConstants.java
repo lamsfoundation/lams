@@ -136,6 +136,8 @@ public class CentralConstants {
     public static final String PARAM_CALL_ATTEMPTED_ID = "callAttemptedID";
 
     public static final String PARAM_SEQUENCE_TITLE = "sequenceTitle";
+    
+    public static final String PARAM_ACTIVITY_METADATA = "activityMetadataField";
 
     public static final String PARAM_FORM_MESSAGE = "formMessage";
 

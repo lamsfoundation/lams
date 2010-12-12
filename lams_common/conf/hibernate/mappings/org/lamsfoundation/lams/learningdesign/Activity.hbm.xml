@@ -199,7 +199,11 @@
                  <!-- bi-directional many-to-one association to Tool-->
                  <many-to-one name="tool" class="org.lamsfoundation.lams.tool.Tool" lazy="false" >
                  	<column name="tool_id" not-null="false"/>
-                 </many-to-one>                 
+                 </many-to-one>
+                 
+                <property name="plannerCollapsed" type="java.lang.Boolean" column="planner_collapsed" length="1"/>
+				<property name="plannerExpanded" type="java.lang.Boolean" column="planner_expanded" length="1"/>
+				<property name="plannerHidden" type="java.lang.Boolean" column="planner_hidden" length="1"/>                 
 			</subclass>
 			
 			<subclass name="org.lamsfoundation.lams.learningdesign.GroupingActivity" discriminator-value="2">

@@ -7,6 +7,9 @@
    var actionAfterCompleted; //What action should be called if all activities were saved successfully
    var startPreviewUrl; //Url to start preview
    var learningDesignId; //ID of the design to open
+   var initialActivityHeight = null;
+   var activityMetadataFields = [ 'Collapsed', 'Expanded', 'Hidden' ];
+   var initialExpandAttempts = [];
    
    var ACTION_SAVE_AS_SEQUENCE = 0; //After successful submit save learning design in user's personal folder
    var ACTION_PREVIEW = 1; //After successful submit start preview
@@ -14,6 +17,7 @@
    var ACTION_EXPORT = 3; //After successful submit export the learning design 
    var END_HEAD_REGEX_PATTERN = new RegExp('</head','i'); //Regex to find "head" element in a html pages
    var FILE_ELEMENT_NAME = "file[";
+   var INITIAL_EXPAND_MAX_ATTEMPTS = 10;
        
    // Submit all activities
    function submitAll(action,additionalParameter){
@@ -33,10 +37,24 @@
     $('#pedagogicalPlannerInfoArea').hide();
     $('#pedagogicalPlannerBusy').show();
     
+    var activityMetadataString = '';
+	for ( var activityIndex = 1; activityIndex <= activityCount; activityIndex++) {
+		var toolContentId = $('#activityToolContentId' + activityIndex).val();
+		for ( var keyIndex in activityMetadataFields) {
+			var key = activityMetadataFields[keyIndex];
+			var metadataValue = $('#activity' + key + activityIndex).val();
+			if (metadataValue != '') {
+				activityMetadataString += 'activity' + toolContentId + '.'
+						+ key + '=' + metadataValue + '&';
+			}
+		}
+	}
+	activityMetadataString = activityMetadataString.slice(0, -1);
+	$('#activityMetadataField').val(activityMetadataString);
     
     $('#callAttemptedID').val(callAttemptedID);
  	var param = $("#sequenceDetailsForm").serialize();
- 	
+
  	//Since sequence title is not an activity, it has to be submitted different way
  	$.ajax({
  		url: saveDetailsUrl,
@@ -49,8 +67,9 @@
      //we calculate delay before the form should be submitted
      var effectiveDelay = sendInPortions ? Math.floor((activityIndex - 1) / activitiesPerPortion) * submitDelay : 0;
      //each tool will implement an interface that will provide a simplified authoring page with form named "pedagogicalPlannerForm"
-     $('#activity'+activityIndex).contents().find('#callID').val(callAttemptedID);
-     $('#activity'+activityIndex).contents().find('#activityOrderNumber').val(activityIndex);
+     var innerDocument = $('#activity'+activityIndex).contents();
+     innerDocument.find('#callID').val(callAttemptedID);
+     innerDocument.find('#activityOrderNumber').val(activityIndex);
      setTimeout("submitActivityForm("+activityIndex+");",effectiveDelay);
     }
    }
@@ -88,7 +107,7 @@
   	 var activityIndex = $(responseText).find('#activityOrderNumber').val();
  	 var callID = $(responseText).find('#callID').val();
  	 var valid =  $(responseText).find('#valid').val();
- 	 
+//     alert(activityIndex + " / " + callID + " / " + valid);
 	 //Check if we are processing the current call 
   	 if (callID>activityCallRetrievedID){
   	 	//clear old data
@@ -118,8 +137,8 @@
 	  	 }
 	  	 
 	  	 // reeavaluate script initializing the CKEditor instance
-	  	 if (activity.contentWindow.initializeCKEditor){
-		  	activity.contentWindow.initializeCKEditor();
+	  	 if (activity.contentWindow.reinitializeCKEditorInstances){
+		  	activity.contentWindow.reinitializeCKEditorInstances();
 		 }
   	 }
    }
@@ -235,14 +254,34 @@
 	  $('#activity'+id).hide('slow', function () {
 		  $('#activity'+action+'Span'+id).show('slow');
 	  });
+	  $('#activityCollapsed'+id).val('true');
   }
   
-  function expandActivity(id, action){
+  function uncollapseActivity(id, action){
 	  $('#activity'+action+'Span'+id).hide('slow', function () {
 		  $('#activity'+id).show('slow', function (){
 			  $('.collapsible'+id).show();
 		  });
 	  });
+	  $('#activityCollapsed'+id).val('false');
+  }
+  
+  
+  
+  function expandActivity(id){
+	 var activity = $('#activity'+id);
+	 var currentHeight = activity.height();
+	 var targetHeight =  activity[0].contentDocument.height;
+	 var expanded = 'true';
+	 if (initialActivityHeight == null){
+		 initialActivityHeight = currentHeight;
+	 } else if (initialActivityHeight != currentHeight) {
+		 targetHeight = initialActivityHeight;
+		 expanded = 'false';
+	 }
+
+	 $('#activityExpanded'+id).val(expanded);
+	 activity.height(targetHeight);
   }
   
   function openActivityAuthor(id, url, title) {
@@ -253,11 +292,34 @@
 		        if (wd.closed) {
 		            clearTimeout(watchClose);
 		            $('#activity'+id)[0].contentWindow.location.reload(true);
-		            expandActivity(id, 'Edit');
+		            uncollapseActivity(id, 'Edit');
 		        }
 		}, 500);
 	  
 	  if (window.focus) {
 		  wd.window.focus();
 	  }
-  }  
+  }
+  
+  function initialDelayedExpand(id){
+	initialExpandAttempts[id] = 0;
+	
+	/* we can not just expand it as soon as document is loaded
+	   CKEditor is loaded asynchronously and stretches the iframe afterwards
+	   Below is one (not the best) solution - periodically check if iframe grew:
+       if yes, adjust the hieght; if no, eventually stop */
+	
+	var watchLoaded = setInterval(function() {
+		var activity = $('#activity'+id);
+		var currentHeight = activity.height();
+		var targetHeight =  activity[0].contentDocument.height;	
+		if (targetHeight > currentHeight) {
+		   initialExpandAttempts[id] = 0;
+		   expandActivity(id);
+		} else if (initialExpandAttempts[id] > INITIAL_EXPAND_MAX_ATTEMPTS){
+		   clearTimeout(watchLoaded);
+		} else {
+		   initialExpandAttempts[id] += 1;
+		}
+	}, 2000);
+  }

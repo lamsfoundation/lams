@@ -45,7 +45,11 @@ public class PedagogicalPlannerActivityDTO {
     private Boolean lastNestedActivity = false;
     private Boolean defaultBranch = false;
     private Short complexActivityType;
-
+    private Long toolContentId;
+    private Boolean hidden = false;
+    private Boolean collapsed = false;
+    private Boolean expanded = false;
+    
     public static final short TYPE_BRANCHING_ACTIVITY = 1;
     public static final short TYPE_OPTIONAL_ACTIVITY = 2;
     public static final short TYPE_PARALLEL_ACTIVITY = 3;
@@ -66,17 +70,21 @@ public class PedagogicalPlannerActivityDTO {
 	pedagogicalPlannerUrl = toolSignature;
     }
 
-    public PedagogicalPlannerActivityDTO(String type, String title, Boolean supportsPlanner,
-	    String pedagogicalPlannerUrl, String authorUrl, String toolIconUrl, String checkEditingAdviceUrl,
-	    String editingAdviceUrl) {
+    public PedagogicalPlannerActivityDTO(
+//	    String type, String title,
+	    Boolean supportsPlanner,
+	    String pedagogicalPlannerUrl
+//	    , String authorUrl, String toolIconUrl, String checkEditingAdviceUrl,
+//	    String editingAdviceUrl
+	    ) {
 	this.supportsPlanner = supportsPlanner;
 	this.pedagogicalPlannerUrl = pedagogicalPlannerUrl;
-	this.authorUrl = authorUrl;
-	this.toolIconUrl = toolIconUrl;
-	this.checkEditingAdviceUrl = checkEditingAdviceUrl;
-	this.editingAdviceUrl = editingAdviceUrl;
-	this.title = title;
-	this.type = type;
+//	this.authorUrl = authorUrl;
+//	this.toolIconUrl = toolIconUrl;
+//	this.checkEditingAdviceUrl = checkEditingAdviceUrl;
+//	this.editingAdviceUrl = editingAdviceUrl;
+//	this.title = title;
+//	this.type = type;
 
     }
 
@@ -158,5 +166,37 @@ public class PedagogicalPlannerActivityDTO {
 
     public void setComplexActivityType(Short complexActivityType) {
 	this.complexActivityType = complexActivityType;
+    }
+
+    public Boolean getHidden() {
+        return hidden;
+    }
+
+    public void setHidden(Boolean hidden) {
+        this.hidden = hidden;
+    }
+
+    public Boolean getCollapsed() {
+        return collapsed;
+    }
+
+    public void setCollapsed(Boolean collapsed) {
+        this.collapsed = collapsed;
+    }
+
+    public Boolean getExpanded() {
+        return expanded;
+    }
+
+    public void setExpanded(Boolean expanded) {
+        this.expanded = expanded;
+    }
+
+    public Long getToolContentId() {
+        return toolContentId;
+    }
+
+    public void setToolContentId(Long toolContentId) {
+        this.toolContentId = toolContentId;
     }
 }

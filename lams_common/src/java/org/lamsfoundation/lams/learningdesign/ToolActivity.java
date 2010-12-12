@@ -52,7 +52,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
     /** Holds value of property toolContentId. */
     private Long toolContentId;
-
+    
     /** Holds value of property tool. */
     private Tool tool;
 
@@ -64,6 +64,21 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     private Set<ActivityEvaluation> activityEvaluations;
 
     private Set<GradebookUserActivity> gradebookUserActivities;
+
+    /**
+     * Holds value of property plannerCollapsed. Tells whether the activity should be collapsed in Pedagogical Planner
+     */
+    private Boolean plannerCollapsed;
+
+    /**
+     * Holds value of property plannerCollapsed. Tells whether the activity should be expanded in Pedagogical Planner
+     */
+    private Boolean plannerExpanded;
+
+    /**
+     * Holds value of property plannerCollapsed. Tells whether the activity should be hidden in Pedagogical Planner
+     */
+    private Boolean plannerHidden;
 
     /** full constructor */
     public ToolActivity(Long activityId, Integer id, String description, String title, Integer xcoord, Integer ycoord,
@@ -339,5 +354,29 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
     public void setGradebookUserActivities(Set<GradebookUserActivity> gradebookUserActivities) {
 	this.gradebookUserActivities = gradebookUserActivities;
+    }
+
+    public Boolean getPlannerCollapsed() {
+        return plannerCollapsed;
+    }
+
+    public void setPlannerCollapsed(Boolean plannerCollapsed) {
+        this.plannerCollapsed = plannerCollapsed;
+    }
+
+    public Boolean getPlannerExpanded() {
+        return plannerExpanded;
+    }
+
+    public void setPlannerExpanded(Boolean plannerExpanded) {
+        this.plannerExpanded = plannerExpanded;
+    }
+
+    public Boolean getPlannerHidden() {
+        return plannerHidden;
+    }
+
+    public void setPlannerHidden(Boolean plannerHidden) {
+        this.plannerHidden = plannerHidden;
     }
 }
