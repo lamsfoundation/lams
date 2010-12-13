@@ -3,6 +3,7 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="assessment" value="${sessionMap.assessment}"/>
+<c:set var="isShrinkToFit" value="${(145 + fn:length(assessment.questions)*80) < 630}"/>
 
 <script type="text/javascript">
 	<!--	
@@ -13,7 +14,7 @@
 				datatype: "local",
 				height: 'auto',
 				width: 630,
-				shrinkToFit: false,
+				shrinkToFit: ${isShrinkToFit},
 				
 			   	colNames:['#',
 						'userId',
@@ -35,7 +36,6 @@
 			   		{name:'total',index:'total', width:50,align:"right",sorttype:"float", formatter:'number', formatoptions:{decimalPlaces: 2}}		
 			   	],
 			   	
-			   	imgpath:  pathToImageFolder + "jqGrid.basic.theme", 
 			   	multiselect: false,
 			   	caption: "${summary.sessionName}",
 			   	ondblClickRow: function(rowid) {
@@ -86,24 +86,16 @@
    	   	     		
    	   	     		total:"<fmt:formatNumber value='${assessmentResult.grade}' maxFractionDigits='3'/>"
    	   	   	    });
-	        </c:forEach>		
-
-			<c:choose>
-				<c:when	test="${(fn:length(assessment.questions) * 4.5) <= 30}">
-					<c:set var="width" value="${630 + (fn:length(assessment.questions) * 4.5) mod 30}"/>
-				</c:when>
-				<c:otherwise>
-					<c:set var="width" value="${670}"/>
-				</c:otherwise>
-			</c:choose>
+	        </c:forEach>
 	        
 			jQuery("#userSummary${summary.sessionId}").jqGrid({
 				datatype: "local",
 				gridstate:"hidden",
 				//hiddengrid:true,
 				height: 90,
-				width: ${width},
+				width: 630,
 				shrinkToFit: true,
+				scrollOffset: 0,
 				caption: "<fmt:message key="label.monitoring.summary.learner.summary" />",
 			   	colNames:['#',
 						'questionResultUid',
@@ -118,8 +110,6 @@
 	  			   		{name:'response', index:'response', width:200, sortable:false},
 	  			   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4} }
 			   	],
-			   	
-			   	imgpath:  pathToImageFolder + "jqGrid.basic.theme", 
 			   	multiselect: false,
 
 				cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
@@ -144,7 +134,8 @@
   						return {questionResultUid:questionResultUid};		  				  		
   				  	}
   				}
-			}).hideCol("questionResultUid");	
+			}).hideCol("questionResultUid");
+			
 			
 		</c:forEach>
 

@@ -8,7 +8,7 @@
 	function addOption(){
 		var url= addOptionUrl;
 		var contentFolderID= $("#contentFolderID").val();
-		prepareFCKEditorsForAjaxSubmit();
+		prepareOptionEditorsForAjaxSubmit();
 		var optionList = $("#optionForm").serialize(true);
 		$(optionTargetDiv).load(
 			url,
@@ -22,7 +22,7 @@
 	function removeOption(idx){
  		var url= removeOptionUrl;
 		var contentFolderID= $("#contentFolderID").val();
-		prepareFCKEditorsForAjaxSubmit();
+		prepareOptionEditorsForAjaxSubmit();
  		var optionList = $("#optionForm").serialize(true);
 		$(optionTargetDiv).load(
 				url,
@@ -37,7 +37,7 @@
 	function upOption(idx){
  		var url= upOptionUrl;
 		var contentFolderID= $("#contentFolderID").val();
- 		prepareFCKEditorsForAjaxSubmit();
+		prepareOptionEditorsForAjaxSubmit();
  		var optionList = $("#optionForm").serialize(true);
 		$(optionTargetDiv).load(
 				url,
@@ -52,7 +52,7 @@
 	function downOption(idx){
  		var url= downOptionUrl;
 		var contentFolderID= $("#contentFolderID").val(); 	
- 		prepareFCKEditorsForAjaxSubmit();
+		prepareOptionEditorsForAjaxSubmit();
  		var optionList = $("#optionForm").serialize(true);
 		$(optionTargetDiv).load(
 				url,
@@ -61,23 +61,37 @@
 					questionType: questionType,
 					optionIndex: idx,
 					optionList: optionList 
+				},
+				function(){
+					//alert("The last 25 entries in the feed have been loaded");
+					//reinitializeCKEditorInstances();
+					//alert("haha");
 				}
 		);
 	}
-	function prepareFCKEditorsForAjaxSubmit(){
+	
+	//in order to be able to use option's value, copy it from ckeditor to textarea
+	function prepareOptionEditorsForAjaxSubmit(){
 		if ((questionType == 1) ||  (questionType == 7)) {
-			$("[name^=optionString]").each(function() {
-				this.value = CKEDITOR.instances[this.name].getData();
+			$("textarea[name^=optionString]").each(function() {
+				prepareOptionEditorForAjaxSubmit(this);
 			});
+			
 		} else if (questionType == 2) {
 			$("[name^=optionQuestion]").each(function() {
-				this.value = CKEDITOR.instances[this.name].getData();
+				prepareOptionEditorForAjaxSubmit(this);
 			});
+			
 		} else if ((questionType == 3) || (questionType == 4)) {
 			$("[name^=optionFeedback]").each(function() {
-				this.value = CKEDITOR.instances[this.name].getData();
+				prepareOptionEditorForAjaxSubmit(this);
 			});
 		}
+	}
+	function prepareOptionEditorForAjaxSubmit(ckeditor){
+		var ckeditorData = CKEDITOR.instances[ckeditor.name].getData();
+		//skip out empty values
+		ckeditor.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;
 	}
 	
 

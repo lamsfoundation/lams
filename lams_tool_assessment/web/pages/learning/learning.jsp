@@ -31,7 +31,7 @@
 	
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.countdown.css'/>" />
 
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>"></script> 
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.4.2.min.js'/>"></script> 
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.countdown.js'/>"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.blockUI.js'/>"></script>
 	<script type="text/javascript">

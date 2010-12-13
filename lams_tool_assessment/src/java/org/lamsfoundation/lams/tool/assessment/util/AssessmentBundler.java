@@ -73,50 +73,46 @@ public class AssessmentBundler extends Bundler {
      */
     private void bundleViaHTTP(HttpServletRequest request, Cookie[] cookies, String outputDirectory)
 	    throws MalformedURLException, FileNotFoundException, IOException {
-	String[] directoriesNames = { "jqGrid" + File.separator + "min",
-		"images" + File.separator + "jqGrid.basic.theme", "css" };
+	String[] directoriesNames = {"images" + File.separator + "jquery-ui-redmond-theme", "css" };
 	List<String> directories = new ArrayList<String>();
 	for (String directoryName : directoriesNames) {
 	    directories.add(outputDirectory + File.separator + "javascript" + File.separator + directoryName);
 	}
 	this.createDirectories(directories);
 
-	String[] imageNames = new String[] { "cd_run.gif", "dirty.gif", "down.gif",
-		"find.gif", "first.gif", "folder.png", "grid-blue-ft.gif", "grid-blue-hd.gif", "headerbg.gif",
-		"headerleft.gif", "headerright.gif", "ico-close.gif", "last.gif", "line3.gif",
-		"loading.gif", "minus.gif", "next.gif", "nochild.gif", "off-first.gif", "off-last.gif", "off-next.gif",
-		"off-prev.gif", "plus.gif", "prev.gif", "refresh.gif", "resize.gif", "row_add.gif", "row_delete.gif",
-		"row_edit.gif", "sort_asc.gif", "sort_desc.gif", "spacer.gif", "tab_close-on.gif", "tree_leaf.gif",
-		"tree_minus.gif", "tree_plus.gif", "up.gif" };
+	String[] imageNames = new String[] { "ui-bg_flat_0_aaaaaa_40x100.png", "ui-bg_flat_55_fbec88_40x100.png",
+		"ui-bg_glass_75_d0e5f5_1x400.png", "ui-bg_glass_85_dfeffc_1x400.png",
+		"ui-bg_glass_95_fef1ec_1x400.png", "ui-bg_gloss-wave_55_5c9ccc_500x100.png",
+		"ui-bg_inset-hard_100_f5f8f9_1x100.png", "ui-bg_inset-hard_100_fcfdfd_1x100.png",
+		"ui-icons_217bc0_256x240.png", "ui-icons_2e83ff_256x240.png", "ui-icons_469bdd_256x240.png",
+		"ui-icons_6da8d5_256x240.png", "ui-icons_cd0a0a_256x240.png", "ui-icons_d8e7f3_256x240.png",
+		"ui-icons_f9bd01_256x240.png" };
 	
 	for (String imageName : imageNames) {
-	    String urlToConnectTo = getIncludesFolder() + "images" + URL_SEPARATOR + "jqGrid.basic.theme" + URL_SEPARATOR + imageName;
-	    String directoryToStoreFile = outputDirectory + File. separator + "javascript" + File.separator  + "images" + File.separator + "jqGrid.basic.theme";
+	    String urlToConnectTo = getIncludesFolder() + "images" + URL_SEPARATOR + "jquery-ui-redmond-theme" + URL_SEPARATOR + imageName;
+	    String directoryToStoreFile = outputDirectory + File. separator + "javascript" + File.separator  + "images" + File.separator + "jquery-ui-redmond-theme";
 	    HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, imageName, cookies);// cookies aren't really needed here.
 	}
 	
-	String urlToConnectTo = getIncludesFolder() + "javascript" + URL_SEPARATOR + "jquery.jqGrid.js";
+	String urlToConnectTo = getIncludesFolder() + "javascript" + URL_SEPARATOR + "grid.locale-en.js";
 	String directoryToStoreFile = outputDirectory + File.separator + "javascript";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.jqGrid.js", cookies); 
-
-	urlToConnectTo = getIncludesFolder() + "javascript" + URL_SEPARATOR + "jquery-1.2.6.pack.js";
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "grid.locale-en.js", cookies); 
+	
+	urlToConnectTo = getIncludesFolder() + "javascript" + URL_SEPARATOR + "jquery.jqGrid.min.js";
 	directoryToStoreFile = outputDirectory + File.separator + "javascript";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery-1.2.6.pack.js", cookies); 
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.jqGrid.min.js", cookies); 
+
+	urlToConnectTo = getIncludesFolder() + "javascript" + URL_SEPARATOR + "jquery-1.4.2.min.js";
+	directoryToStoreFile = outputDirectory + File.separator + "javascript";
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery-1.4.2.min.js", cookies); 
 	
-	String[] jsFileNames = new String[] { "grid.locale-en-min.js", "grid.base-min.js", "grid.celledit-min.js", "grid.common-min.js",
-		"grid.custom-min.js", "grid.formedit-min.js", "grid.import-min.js", "grid.inlinedit-min.js",
-		"grid.postext-min.js", "grid.setcolumns-min.js", "grid.subgrid-min.js", "grid.tbltogrid-min.js",
-		"grid.treegrid-min.js", "jquery.fmatter-min.js", "json2-min.js", "JsonXml-min.js" };
-	
-	for (String jsFileName : jsFileNames) {
-	    urlToConnectTo = getIncludesFolder() + "javascript" + URL_SEPARATOR + "jqGrid" + URL_SEPARATOR + "min" + URL_SEPARATOR + jsFileName;
-	    directoryToStoreFile = outputDirectory + File.separator + "javascript" + File.separator + "jqGrid" + File.separator + "min";
-	    HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, jsFileName, cookies);// cookies aren't really needed here.
-	}
-	
-	urlToConnectTo = getIncludesFolder() + "css" + URL_SEPARATOR + "jqGrid.grid.css";
+	urlToConnectTo = getIncludesFolder() + "css" + URL_SEPARATOR + "jquery-ui-1.8.6.custom.css";
 	directoryToStoreFile = outputDirectory + File.separator + "javascript" + File.separator + "css";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jqGrid.grid.css", cookies); 
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery-ui-1.8.6.custom.css", cookies); 
+	
+	urlToConnectTo = getIncludesFolder() + "css" + URL_SEPARATOR + "ui.jqgrid.css";
+	directoryToStoreFile = outputDirectory + File.separator + "javascript" + File.separator + "css";
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "ui.jqgrid.css", cookies); 
 
     }
 
@@ -126,12 +122,12 @@ public class AssessmentBundler extends Bundler {
 	    log.error("Unable to get path to the LAMS Spreadsheet URL from the configuration table. Spreadsheet javascript files export failed");
 	    return "";
 	} else {
+	    
 	    if (!spreadsheetUrlPath.endsWith("/")) {
 		spreadsheetUrlPath += "/";
 	    }
-	    
-	    spreadsheetUrlPath = spreadsheetUrlPath + "tool" + URL_SEPARATOR
-		    + AssessmentConstants.TOOL_SIGNATURE + URL_SEPARATOR + "includes" + URL_SEPARATOR;
+	    spreadsheetUrlPath = spreadsheetUrlPath + "tool" + URL_SEPARATOR + AssessmentConstants.TOOL_SIGNATURE
+		    + URL_SEPARATOR + "includes" + URL_SEPARATOR;
 	    return spreadsheetUrlPath;
 	}
     }

@@ -10,12 +10,11 @@
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 		<c:set var="assessment" value="${sessionMap.assessment}"/>
 		
-		<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jqGrid.grid.css'/>" />
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>"></script>
-		<script type="text/javascript"> 
-			var pathToJsFolder = "<html:rewrite page='/includes/javascript/'/>"; 
-		</script>
-	 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.jqGrid.js'/>"></script>
+		<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery-ui-1.8.6.custom.css'/>" />
+		<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/ui.jqgrid.css'/>" />
+		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.4.2.min.js'/>"></script>
+		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/grid.locale-en.js'/>"></script>
+	 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.jqGrid.min.js'/>"></script>
 
   	    <script>
   	    	<!--
@@ -45,7 +44,6 @@
 	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4} }		
 	  				   	],
 	  				   	
-	  				   	imgpath:  "<html:rewrite page='/includes/images/'/>" + "jqGrid.basic.theme", 
 	  				   	multiselect: false,
 	  				   	caption: "${question.title}",
 	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',

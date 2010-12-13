@@ -66,7 +66,7 @@
 		var newQuestionInitHref = "${newQuestionInitUrl}&questionType=" + questionType + "&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true";
 		$("#newQuestionInitHref").attr("href", newQuestionInitHref)
 	};
-	function refreshThickbox(){   
+	function refreshThickbox(){
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
 		imgLoader = new Image();// preload image
 		imgLoader.src = tb_pathToImage;

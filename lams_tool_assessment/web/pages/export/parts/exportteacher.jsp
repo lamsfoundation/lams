@@ -8,12 +8,11 @@
 		<c:set var="questionSummaryList" value="${sessionMap.questionSummaryList}"/>
 		<c:set var="assessment" value="${sessionMap.assessment}"/>
 		
-		<link rel="stylesheet" type="text/css" href="./javascript/css/jqGrid.grid.css" />
-		<script type="text/javascript" src="./javascript/jquery-1.2.6.pack.js"></script>
-		<script type="text/javascript"> 
-			var pathToJsFolder = "./javascript/"; 
-		</script>
-	 	<script type="text/javascript" src="./javascript/jquery.jqGrid.js"></script>
+		<link rel="stylesheet" type="text/css" href="./javascript/css/jquery-ui-1.8.6.custom.css" />
+		<link rel="stylesheet" type="text/css" href="./javascript/css/ui.jqgrid.css" />
+		<script type="text/javascript" src="./javascript/jquery-1.4.2.min.js"></script>
+		<script type="text/javascript" src="./javascript/grid.locale-en.js"></script>
+	 	<script type="text/javascript" src="./javascript/jquery.jqGrid.min.js"></script>
 
   	    <script>
   			<!--	
@@ -43,7 +42,6 @@
 	  				   		{name:'total',index:'total', width:50,align:"right",sorttype:"float"}		
 	  				   	],
 	  				   	
-	  				   	imgpath:  "./javascript/images/jqGrid.basic.theme", 
 	  				   	multiselect: false,
 	  				   	caption: "${summary.sessionName}"
 	  				});
@@ -91,7 +89,6 @@
 		  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4} }		
 		  				   	],
 		  				   	
-		  				   	imgpath:   "./javascript/images/jqGrid.basic.theme", 
 		  				   	multiselect: false,
 		  				   	caption: "<fmt:message key='label.monitoring.question.summary.group' /> ${session.sessionName}"
 								/*  resetSelection() doesn't work in this version

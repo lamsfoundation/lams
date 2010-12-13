@@ -31,7 +31,7 @@
 		<c:forEach var="assessmentResult" items="${summary.assessmentResults}" varStatus="status">
 				<tr>
 					<td>
-						${status.index}
+						${status.index + 1}
 					</td>				
 					<td>
 						${assessmentResult.user.firstName} ${assessmentResult.user.lastName}

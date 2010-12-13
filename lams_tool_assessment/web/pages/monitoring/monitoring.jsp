@@ -8,16 +8,16 @@
 	<lams:head>
 		<%@ include file="/common/tabbedheader.jsp" %>
 		<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
-		<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jqGrid.grid.css'/>" />
+		<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery-ui-1.8.6.custom.css'/>" />
+		<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/ui.jqgrid.css'/>" />
  
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>"></script>
-				 
-		<script type="text/javascript"> 
+		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.4.2.min.js'/>"></script>
+ 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/grid.locale-en.js'/>"></script>
+ 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.jqGrid.min.js'/>"></script>
+ 		<script type="text/javascript"> 
 			var pathToImageFolder = "<lams:LAMSURL/>images/";
-			var pathToJsFolder = "<html:rewrite page='/includes/javascript/'/>"; 
 		</script>
  		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>
-	 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.jqGrid.js'/>"></script>
 	 	
 		<script>
 			var initialTabId = "${initialTabId}";

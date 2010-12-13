@@ -1,7 +1,8 @@
 <%@ include file="/common/taglibs.jsp"%>
 <script type="text/javascript">
 	<!--
-	function masterDetailLoadUp(){   
+	function masterDetailLoadUp(){
+			jQuery("#userSummary${assessmentResult.sessionId}").setGridParam({scrollOffset: 18});
  	        <c:forEach var="questionResult" items="${assessmentResult.questionResults}" varStatus="i">
 	       		<c:set var="question" value="${questionResult.assessmentQuestion}"/>
  	        	var responseStr = "";
@@ -12,8 +13,9 @@
  	   	   			title:"${questionResult.assessmentQuestion.title}",
  	   	   			response:responseStr,
  	   	   			grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
- 	   	   	    });
+ 	   	   	    });	
 	        </c:forEach>
+	        jQuery("#userSummary${assessmentResult.sessionId}").setGridWidth("629");
 	};	  	   	  
 	masterDetailLoadUp();
 	-->	
