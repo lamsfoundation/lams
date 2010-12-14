@@ -42,10 +42,10 @@
 		    			},
 		    			hasOptionFilled: {
 		    				required: function(element) {
-				    			$("[name^=optionString]").each(function() {
+				    			$("textarea[name^=optionString]").each(function() {
 									this.value = CKEDITOR.instances[this.name].getData();
 				    			});		    				
-		    		        	return $("input[name^=optionString]:filled").length < 1;
+		    		        	return $("textarea[name^=optionString]:filled").length < 1;
 			    		    }			    		    
 	    			    }
 		    		},

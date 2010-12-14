@@ -42,10 +42,10 @@
 		    			},
 		    			fake: {
 		    				required: function(element) {
-				    			$("[name^=optionQuestion]").each(function() {
+				    			$("textarea[name^=optionQuestion]").each(function() {
 									this.value = CKEDITOR.instances[this.name].getData();
 				    			});		    				
-		    		        	return $("input[name^=optionQuestion]:filled").length < 1;
+		    		        	return $("textarea[name^=optionQuestion]:filled").length < 1;
 			    		    }
 	    			    }
 		    		},

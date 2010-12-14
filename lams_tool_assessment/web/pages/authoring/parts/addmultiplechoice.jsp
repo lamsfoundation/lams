@@ -42,16 +42,18 @@
 		    			},
 		    			hasOptionFilled: {
 		    				required: function(element) {
-				    			$("[name^=optionString]").each(function() {
-									this.value = CKEDITOR.instances[this.name].getData();
-				    			});		    				
-		    		        	return $("input[name^=optionString]:filled").length < 1;
+				    			prepareOptionEditorsForAjaxSubmit();
+		    		        	return $("textarea[name^=optionString]:filled").length < 1;
 			    		    }			    		    
 	    			    },
 	    			    hasOneHundredGrade: {
 		    				required: function(element) {
-	    			    		return ($("select[name^='optionGrade'][value='1.0']").length < 1) && !eval($("#multipleAnswersAllowed").val());
-			    		    }			    		    
+		    					var hasOneHundredGrade = false;
+		    					$("select[name^='optionGrade']").each(function() {
+		    						hasOneHundredGrade = hasOneHundredGrade || (this.value == '1.0');
+		    					});
+	    			    		return !hasOneHundredGrade && !eval($("#multipleAnswersAllowed").val());
+			    		    }		    		    
 	    			    }
 		    		},
 		    		messages: {
@@ -86,9 +88,7 @@
 		    		},
 		    		debug: true,
      			    submitHandler: function(form) {
-		    			$("[name^=optionString]").each(function() {
-							this.value = CKEDITOR.instances[this.name].getData();
-		    			});
+     			    	prepareOptionEditorsForAjaxSubmit();
 		    			$("#optionList").val($("#optionForm").serialize(true));
 		    			$("#question").val(CKEDITOR.instances.question.getData());
 		    			$("#generalFeedback").val(CKEDITOR.instances.generalFeedback.getData());

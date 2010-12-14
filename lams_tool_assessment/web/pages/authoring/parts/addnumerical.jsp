@@ -61,7 +61,11 @@
 	    			    },
 	    			    hasOneHundredGrade: {
 		    				required: function(element) {
-	    			    		return $("select[name^='optionGrade'][value='1.0']").length < 1;
+		    					var hasOneHundredGrade = false;
+		    					$("select[name^='optionGrade']").each(function() {
+		    						hasOneHundredGrade = hasOneHundredGrade || (this.value == '1.0');
+		    					});
+	    			    		return !hasOneHundredGrade;
 			    		    }			    		    
 	    			    },
 	    			    allAcceptedErrorsPositive: {
