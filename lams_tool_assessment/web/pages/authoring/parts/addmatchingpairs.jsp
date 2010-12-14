@@ -42,9 +42,7 @@
 		    			},
 		    			fake: {
 		    				required: function(element) {
-				    			$("textarea[name^=optionQuestion]").each(function() {
-									this.value = CKEDITOR.instances[this.name].getData();
-				    			});		    				
+		    					prepareOptionEditorsForAjaxSubmit();	    				
 		    		        	return $("textarea[name^=optionQuestion]:filled").length < 1;
 			    		    }
 	    			    }

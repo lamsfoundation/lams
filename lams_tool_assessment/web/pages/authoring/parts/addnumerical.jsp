@@ -138,9 +138,7 @@
 		    		},
 		    		debug: true,
      			    submitHandler: function(form) {
-		    			$("[name^=optionFeedback]").each(function() {
-							this.value = CKEDITOR.instances[this.name].getData();
-		    			});
+     			    	prepareOptionEditorsForAjaxSubmit();
 		    			$("#optionList").val($("#optionForm").serialize(true));
 		    			$("#unitList").val($("#unitForm").serialize(true));
 		    			$("#question").val(CKEDITOR.instances.question.getData());
