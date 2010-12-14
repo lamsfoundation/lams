@@ -120,7 +120,7 @@ public class Assessment implements Cloneable {
      * 
      */
     public Assessment() {
-	attachments = new TreeSet(new SequencableComparator());
+	attachments = new TreeSet();
 	questions = new TreeSet(new SequencableComparator());
 	overallFeedbacks = new TreeSet(new SequencableComparator());
     }
@@ -179,7 +179,7 @@ public class Assessment implements Cloneable {
 	    // clone attachment
 	    if (attachments != null) {
 		Iterator iter = attachments.iterator();
-		Set set = new TreeSet(new SequencableComparator());
+		Set set = new TreeSet();
 		while (iter.hasNext()) {
 		    AssessmentAttachment file = (AssessmentAttachment) iter.next();
 		    AssessmentAttachment newFile = (AssessmentAttachment) file.clone();

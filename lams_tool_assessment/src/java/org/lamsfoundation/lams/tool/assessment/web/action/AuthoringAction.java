@@ -356,15 +356,11 @@ public class AuthoringAction extends Action {
 	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
 
 	// current attachemnt in authoring instruction tab.
-	Iterator iter = attachmentList.iterator();
-	while (iter.hasNext()) {
-	    AssessmentAttachment newAtt = (AssessmentAttachment) iter.next();
-	    attPOSet.add(newAtt);
-	}
+	attPOSet.addAll(attachmentList);
 	attachmentList.clear();
 
 	// deleted attachment. 2 possible types: one is persist another is non-persist before.
-	iter = deleteAttachmentList.iterator();
+	Iterator iter = deleteAttachmentList.iterator();
 	while (iter.hasNext()) {
 	    AssessmentAttachment delAtt = (AssessmentAttachment) iter.next();
 	    iter.remove();

@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
  * @hibernate.class table="tl_laasse10_attachment"
  * 
  */
-public class AssessmentAttachment implements Cloneable {
+public class AssessmentAttachment implements Cloneable, Comparable {
     private static final Logger log = Logger.getLogger(AssessmentAttachment.class);
 
     private Long uid;
@@ -78,6 +78,16 @@ public class AssessmentAttachment implements Cloneable {
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(fileVersionId).append(fileName).append(fileType)
 		.append(created).toHashCode();
+    }
+    
+    @Override
+    public int compareTo(Object o) {
+	if ((o != null) && o instanceof AssessmentAttachment) {
+	    AssessmentAttachment anotherAtt = (AssessmentAttachment) o;
+	    return (int) (fileUuid - anotherAtt.getFileUuid());
+	} else {
+	    return 1;
+	}
     }
 
     // **********************************************************
@@ -151,4 +161,5 @@ public class AssessmentAttachment implements Cloneable {
     public void setCreated(Date created) {
 	this.created = created;
     }
+
 }
