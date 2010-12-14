@@ -17,6 +17,9 @@
 				{
 					questionIndex: idx, 
 					sessionMapID: sessionMapID
+				},
+				function(){
+					refreshThickbox();
 				}
 			);
 		};
@@ -28,6 +31,9 @@
 				{
 					questionIndex: idx, 
 					sessionMapID: sessionMapID
+				},
+				function(){
+					refreshThickbox();
 				}
 		);
 	}
@@ -38,6 +44,9 @@
 				{
 					questionIndex: idx, 
 					sessionMapID: sessionMapID
+				},
+				function(){
+					refreshThickbox();
 				}
 		);
 	}
