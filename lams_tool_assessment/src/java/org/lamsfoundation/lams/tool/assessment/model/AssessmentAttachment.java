@@ -80,7 +80,6 @@ public class AssessmentAttachment implements Cloneable, Comparable {
 		.append(created).toHashCode();
     }
     
-    @Override
     public int compareTo(Object o) {
 	if ((o != null) && o instanceof AssessmentAttachment) {
 	    AssessmentAttachment anotherAtt = (AssessmentAttachment) o;
