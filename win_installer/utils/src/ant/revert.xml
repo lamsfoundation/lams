@@ -5,7 +5,7 @@
 	<property file="revert.properties" />
 	<target name="revert-db">
 		<sql driver="com.mysql.jdbc.Driver" 
-			classpath="${EARDIR}/mysql-connector-java-3.1.12-bin.jar" 
+			classpath="${EARDIR}/mysql-connector-java-5.0.8-bin.jar"" 
 			url="jdbc:mysql://localhost/${DB_NAME}?characterEncoding=UTF-8" 
 			userid="${DB_USER}" 
 			password="${DB_PASS}"

@@ -96,7 +96,7 @@ Section backup
     
     DetailPrint 'Dumping database to: $BACKUP_DIR'
     setoutpath "$BACKUP_DIR"
-    Strcpy $4 '"$MYSQL_DIR\bin\mysqldump" -r "$BACKUP_DIR\dump.sql" $DB_NAME -u $DB_USER -p$DB_PASS'
+    Strcpy $4 '"$MYSQL_DIR\bin\mysqldump" --hex-blob -r "$BACKUP_DIR\dump.sql" $DB_NAME -u $DB_USER -p$DB_PASS'
     DetailPrint $4
     nsExec::ExecToStack $4
     Pop $0
