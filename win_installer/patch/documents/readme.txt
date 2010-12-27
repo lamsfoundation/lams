@@ -1,10 +1,10 @@
-LAMS 2.3.4 - Learning Activity Management System
+LAMS 2.3.5 - Learning Activity Management System
 ----------------------------------------------
 
-This is a patch update from LAMS 2.3.3 to 2.3.4, this version does not do a 
-full install, you must install LAMS 2.3.3 first.
+This is a patch update from LAMS 2.3.4 to 2.3.5, this version does not do a 
+full install, you must install LAMS 2.3.4 first.
 
-For release notes goto: http://goo.gl/1WTt
+For release notes goto: http://goo.gl/HzgWM
 
 NOTE TO SYSADMINS: If you are doing an upgrade and your users report problems in 
 authoring, they may need to clear their browser cache. If you have a user see 

@@ -3,7 +3,7 @@
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  *
- * This program is free software; you can redistribute it and/or modify
+ * This program is free software; you can redistributef it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
  *
@@ -48,19 +48,19 @@
 ;!insertmacro LineFind
 
 # constants
-!define VERSION "2.3.4"
-!define PREVIOUS_VERSION "2.3.3"
-!define LANGUAGE_PACK_VERSION "2010-03-04"
-!define LANGUAGE_PACK_VERSION_INT "20100304"
-!define DATE_TIME_STAMP "20100300000"
+!define VERSION "2.3.5"
+!define PREVIOUS_VERSION "2.3.4"
+!define LANGUAGE_PACK_VERSION "2010-12-23"
+!define LANGUAGE_PACK_VERSION_INT "20101223"
+!define DATE_TIME_STAMP "20101200000"
 ######################## Added in the extra .0 for 2.1 for constitency 
 !define SERVER_VERSION_NUMBER "${VERSION}.0.${DATE_TIME_STAMP}"
 !define BASE_VERSION "2.0"
-!define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
+!define SOURCE_JBOSS_HOME "C:\jboss-4.0.2"  ; location of jboss where lams was deployed
 !define SOURCE_LAMS_EAR "${SOURCE_JBOSS_HOME}\server\default\deploy\lams.ear\"
 !define SOURCE_JBOSS_LIB "${SOURCE_JBOSS_HOME}\server\default\lib"
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
-!define BUILD_REPOSITORY "D:\repository"
+!define BUILD_REPOSITORY "C:\repository"
 
 # project directories
 !define BASE_DIR "..\..\"
@@ -157,9 +157,8 @@ Var LAMS_REPOSITORY     ; path to repository on user's box
 Var WILDFIRE_DOMAIN     ; wildfire URL
 Var WILDFIRE_USER       ; wildfire username
 Var WILDFIRE_PASS       ; wildfie password
-
-;Var RETAIN_DIR          ; path to directory to retain files on uninstall
-;Var RETAIN_FILES        ; bool value to devide whether to retain files
+Var TOOL_SIG            ; tool signature used for tool deployer
+Var TOOL_DIR            ; tool directory used for tool deployer
 Var TIMESTAMP           ; timestamp
 Var BACKUP              ; bool value to determine whether the updater will backup
 
@@ -198,6 +197,10 @@ SectionGroup "LAMS ${VERSION} Patch (Requires LAMS 2.0)" update
         ; Updating the the core lams jars/wars
         call updateJarsWars
         
+		File "${ANT}\update-deploy-tools.xml"
+
+		call deployEadventureTool
+		
         setoutpath $INSTDIR
         File /a "${DOCUMENTS}\license.txt"
         File /a "${DOCUMENTS}\license-wrapper.txt"
@@ -566,8 +569,8 @@ Function backupLams
             
             DetailPrint 'Dumping database to: $INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak'
             setoutpath "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak"
-            Strcpy $4 '"$MYSQL_DIR\bin\mysqldump" -r "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak\dump.sql" $DB_NAME -u $DB_USER -p$DB_PASS'
-            DetailPrint $4
+            Strcpy $4 '"$MYSQL_DIR\bin\mysqldump" --hex-blob -r "$INSTDIR-${PREVIOUS_VERSION}-$TIMESTAMP.bak\dump.sql" $DB_NAME -u $DB_USER -p$DB_PASS'
+            DetailPrint $4o
             nsExec::ExecToStack $4
             Pop $0
             Pop $1
@@ -596,8 +599,36 @@ Function updateJarsWars
     SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\lams.ear"
     File /r /x CVS ${ASSEMBLY}\*
     
-    SetoutPath "$INSTDIR\jboss-4.0.2\server\default\deploy\jbossweb-tomcat55.sar\ROOT.war"
-    File ${DOCUMENTS}\index.jsp
+FunctionEnd
+
+Function deployEadventureTool
+
+    call generateToolProperties
+    
+    # Creating all tool packages, and copying to temp/lams
+    call createNewToolPackages
+    
+    /*
+    # Copying tool-specific build.property files
+    call copyToolBuildProperties
+    
+    # Get the jars and wars required for each tool
+    call extractToolJars
+    */
+    
+    # Get the java libraries needed for the tool deployer
+    Detailprint "Copying tool deployer files to $TEMP\lams\lib"
+    SetOutPath "$TEMP\lams\lib"
+    File "..\..\lams_build\deploy-tool\lib\*.jar"
+	
+	SetOutPath "$TEMP\lams\"
+	File "ant\update-deploy-tools.xml"
+    
+    strcpy $TOOL_SIG "eueadv10"
+    strcpy $TOOL_DIR "lams_tool_eadventure"
+	call filterDeployXML
+    call deployTool
+
 FunctionEnd
 
 
@@ -609,3 +640,141 @@ Function WriteRegEntries
     WriteRegStr HKLM "${REG_HEAD}" "language_pack" "${VERSION}"
 FunctionEnd
 
+; Additions for LAMS 2.3.5 Patch 
+; Deploy e-Adventure tool
+
+# Running the ant scripts to create deploy.xml for the normal tools 
+# Tool created depends on the value of $TOOL_SIG
+Function filterDeployXML
+    # Running the ant scripts to create deploy.xml for the normal tools 
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-create-deploy-package-$TOOL_SIG.log -buildfile $TEMP\lams\update-deploy-tools.xml -propertyfile $TEMP\lams\$TOOL_SIG\build.properties create-deploy-package'
+    DetailPrint $0
+    nsExec::ExecToStack $0
+    Pop $0 ; return code, 0=success, error=fail
+    Pop $1 ; console output
+    ${if} $0 == "error"
+    ${orif} $0 == 1
+        goto error
+    ${endif}
+    DetailPrint "Result: $1"
+    push "$INSTDIR\update-logs\ant-create-deploy-package-$TOOL_SIG.log"
+    push "FAILED"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    StrCmp $3 yes 0 +2
+        goto error
+    
+
+    goto done
+    error:
+        DetailPrint "Ant create-tools-package failed, check update-logs for details"
+        MessageBox MB_OK|MB_ICONSTOP "Ant create-tools-package failed, check update-logs for details$\r$\nError:$\r$\n$\r$\n$1"
+        Abort "LAMS configuration failed."
+    done:
+FunctionEnd
+
+Function deployTool
+    # Running the ant scripts to create deploy.xml for the normal tools 
+    strcpy $0 '$INSTDIR\apache-ant-1.6.5\bin\newAnt.bat -logfile $INSTDIR\update-logs\ant-deploy-tool-$TOOL_SIG.log -buildfile $TEMP\lams\update-deploy-tools.xml -propertyfile $TEMP\lams\$TOOL_SIG\build.properties deploy-tool'
+    DetailPrint $0
+    nsExec::ExecToStack $0
+    Pop $0 ; return code, 0=success, error=fail
+    Pop $1 ; console output
+    DetailPrint "Result: $1"
+    ${if} $0 == "fail"
+    ${orif} $0 == 1
+        goto error
+    ${endif}
+    push "$INSTDIR\update-logs\ant-deploy-tool-$TOOL_SIG.log"
+    push "FAILED"
+    Call FileSearch
+    Pop $0 #Number of times found throughout
+    Pop $3 #Found at all? yes/no
+    Pop $2 #Number of lines found in
+    StrCmp $3 yes 0 +2
+        goto error
+    
+    goto done
+    error:
+        DetailPrint "Ant deploy-tool failed, check update-logs for details"
+        MessageBox MB_OK|MB_ICONSTOP "Ant deploy-tool failed, check update-logs for details$\r$\nError:$\r$\n$\r$\n$1"
+        Abort "LAMS configuration failed."
+    done:
+FunctionEnd
+
+# Creates tool packages for new tools so they can be deployed by the tool deployer
+Function createNewToolPackages
+    
+    # Creating 2.3.5 tool package for e-adventures
+    ############################################################################
+    
+    # Adding the eadventure package -------------------------------------------
+  
+    strcpy $1 "$TEMP\lams\eueadv10"
+    
+    SetoutPath "$1"
+    File "${BASE_PROJECT_DIR}\lams_tool_eadventure\build.properties"
+    
+    SetoutPath "$1\build\deploy\"
+    File "${BASE_PROJECT_DIR}\lams_tool_eadventure\build\lib\*.jar"
+    File "${BASE_PROJECT_DIR}\lams_tool_eadventure\build\lib\*.war"
+    File "${BASE_PROJECT_DIR}\lams_tool_eadventure\build\deploy\*.xml"
+    
+    SetoutPath "$1\build\deploy\sql"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_eadventure\build\deploy\sql\*"
+    
+    SetoutPath "$1\build\deploy\language"
+    File /r "${BASE_PROJECT_DIR}\lams_tool_eadventure\build\deploy\language\*.properties"
+
+FunctionEnd
+
+# generates a properties file for all tools
+Function generateToolProperties
+        
+    # generate a properties file 
+    ClearErrors
+    FileOpen $0 $TEMP\lams\tools.properties w
+    IfErrors 0 +2
+        goto error
+        
+    # convert '\' to '/' for Ant's benefit
+    Push $TEMP
+    Push "\"
+    Call StrSlash
+    Pop $2
+    FileWrite $0 "temp=$2/$\r$\n"
+            
+    Push $INSTDIR
+    Push "\"
+    Call StrSlash
+    Pop $2
+    
+    FileWrite $0 "instdir=$2/$\r$\n"
+    FileWrite $0 "basetooldir=$${temp}/lams/$${signature}$\r$\n"
+    FileWrite $0 "build=$${basetooldir}/build/$\r$\n"
+    FileWrite $0 "build.deploy=$${build}/deploy$\r$\n"
+    FileWrite $0 "build.lib=$${build}/deploy/lib/$\r$\n"
+    FileWrite $0 "db.scripts=$${build.deploy}/sql/$\r$\n"
+    FileWrite $0 "db.name=$DB_NAME$\r$\n"
+    FileWrite $0 "db.username=$DB_USER$\r$\n"
+    FileWrite $0 "db.password=$DB_PASS$\r$\n"
+    FileWrite $0 "db.Driver=com.mysql.jdbc.Driver$\r$\n"
+    FileWrite $0 "db.urlDeployXML=jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull&amp;autoReconnect=true&amp;useUnicode=true$\r$\n"
+    FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$DB_NAME?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useUnicode=true$\r$\n"
+    ;FileWrite $0 "db.url=jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$${db.name}?characterEncoding=utf8$\r$\n"
+    FileWrite $0 "conf.language.dir=$${build.deploy}/language/$\r$\n"
+    FileWrite $0 "jboss.deploy=$${instdir}/jboss-4.0.2/server/default/deploy/lams.ear/$\r$\n"
+    FileWrite $0 "deploy.tool.dir=$${temp}/lams/$\r$\n"
+    FileWrite $0 "toolContext=/lams/tool/$${signature}$\r$\n"
+    FileWrite $0 "product=lams-tool-$${signature}$\r$\n"
+    
+    goto done
+    error:
+        DetailPrint "File writing to $TEMP\lams\tools.properties failed."
+        MessageBox MB_OK|MB_ICONSTOP "LAMS configuration failed.  File write error to $TEMP\lams\tools.properties.$\r$\nError:$\r$\n$\r$\n$1"
+        Abort "LAMS configuration failed."
+    done: 
+        
+FunctionEnd
