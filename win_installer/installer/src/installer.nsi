@@ -34,17 +34,18 @@
 !insertmacro LineFind
 
 # constants
-!define VERSION "2.1 RC1"
-!define LANGUAGE_PACK_VERSION "2008-03-15"
-!define LANGUAGE_PACK_VERSION_INT "20080315"
-!define DATE_TIME_STAMP "200803151000"
-!define SERVER_VERSION_NUMBER "2.0.99.200803121303"
-!define BASE_VERSION "2.0"
-!define SOURCE_JBOSS_HOME "D:\jboss-4.0.2"  ; location of jboss where lams was deployed
+!define VERSION "2.3.5"
+!define LANGUAGE_PACK_VERSION "2010-12-15"
+!define LANGUAGE_PACK_VERSION_INT "20101215"
+!define DATE_TIME_STAMP "201012151000"
+!define SERVER_VERSION_NUMBER "2.3.5.201012151303"
+!define BASE_VERSION "2.3"
+!define SOURCE_JBOSS_HOME "C:\jboss-4.0.2"  ; location of jboss where lams was deployed
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
 !define BASE_DEV_DIR "..\..\"
 !define BUILD "..\..\build\"
 !define DATABASE "..\..\database\"
+!define DEFAULT_REPOSITORY "..\..\repository\"
 
 # installer settings
 !define MUI_ICON "..\graphics\lams2.ico"
@@ -52,7 +53,7 @@
 Name "LAMS ${VERSION}"
 ;BrandingText "LAMS ${VERSION} -- built on ${__TIMESTAMP__}"
 BrandingText "LAMS ${VERSION} -- built on ${__DATE__} ${__TIME__}"
-OutFile "${BUILD}\LAMS-2.1-RC1.exe"
+OutFile "${BUILD}\LAMS-2.3.5.exe"
 InstallDir "C:\lams"
 InstallDirRegKey HKLM "${REG_HEAD}" ""
 LicenseForceSelection radiobuttons "I Agree" "I Do Not Agree" 
@@ -64,10 +65,7 @@ InstProgressFlags smooth
 
 # set welcome page
 !define MUI_WELCOMEPAGE_TITLE "LAMS ${VERSION} Install Wizard"
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of LAMS ${VERSION}.\r\n\r\n\
-    LAMS 2.1 RC1 has been released for users to explore the new Branching features coming in LAMS 2.1.\r\n\r\n\
-    Do NOT use this installer to set up production server for LAMS.\r\n\r\n\  
-    You cannot use this installer to upgrade an existing copy of LAMS 2.0.\r\n\r\n\ 
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of LAMS ${VERSION}.\r\n\r\n\ 
     Please ensure you have a copy of MySQL 5.x installed and running, and Java JDK version 1.5.x. or 1.6.x\r\n\r\n\
     Click Next to continue."
 
@@ -198,8 +196,10 @@ SectionGroup /e "LAMS ${VERSION} Full Install" fullInstall
         
         CreateDirectory "$INSTDIR\dump"
         CreateDirectory "$LAMS_REPOSITORY"
-        
-        # Log mode is set to INFO in this template
+		SetOutPath "$LAMS_REPOSITORY"
+		File /r "${DEFAULT_REPOSITORY}\*"
+		
+		# Log mode is set to INFO in this template
         SetOutPath "$INSTDIR\jboss-4.0.2\server\default\conf"
         File /a "..\conf\log4j.xml"
         
@@ -574,6 +574,7 @@ Function DeployConfig
     SetOutPath $INSTDIR
     File /r "${BASE_DEV_DIR}\apache-ant-1.6.5"
     File /r "${BASE_DEV_DIR}\zip"
+		
     SetOutPath $TEMP
     File "build.xml"
     File "..\templates\mysql-ds.xml"
@@ -845,6 +846,7 @@ Function WriteRegEntries
     WriteRegStr HKLM "${REG_HEAD}" "dir_jdk" $JDK_DIR
     WriteRegStr HKLM "${REG_HEAD}" "dir_mysql" "$MYSQL_DIR\"
     WriteRegStr HKLM "${REG_HEAD}" "mysql_host" "$MYSQL_HOST"
+	WriteRegStr HKLM "${REG_HEAD}" "mysql_port" "3306"
     WriteRegStr HKLM "${REG_HEAD}" "dir_inst" $INSTDIR
     WriteRegStr HKLM "${REG_HEAD}" "dir_repository" $LAMS_REPOSITORY
     WriteRegStr HKLM "${REG_HEAD}" "version" "${VERSION}"
@@ -1156,7 +1158,7 @@ Section "Uninstall"
         ; DUMP the database file into the retained install directory 
            
         CreateDirectory "$RETAIN_DIR" 
-        Strcpy $4 "$0\bin\mysqldump -r $WINTEMP\lams\backup\lamsDump.sql $1 -u $2 -p$3"
+        Strcpy $4 "$0\bin\mysqldump --hex-blob-r $WINTEMP\lams\backup\lamsDump.sql $1 -u $2 -p$3"
         nsExec::ExecToStack $4
         Pop $8
         Pop $9
