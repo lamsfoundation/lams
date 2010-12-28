@@ -15,7 +15,7 @@ Ant build file.
 	<!-- =================================================================== -->
 	<target name="create-db"
 		description="Create LAMS db in mysql">
-		<sql driver="${db.driver}" url="${db.mysql.url}" userid="root"
+		<sql driver="${db.driver}" url="jdbc:mysql://${db.host}/mysql?characterEncoding=utf8" userid="root"
 				password="${db.root.password}"  encoding="${db.encoding}">
 			<classpath>
 				<pathelement location="${db.driver.jar}"/>
@@ -25,7 +25,7 @@ Ant build file.
 	</target>
 	<target name="insert-data"
 		description="insert data to mysql" depends="create-db">
-		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+		<sql driver="${db.driver}" url="jdbc:mysql://${db.host}/${db.name}?characterEncoding=utf8" userid="${db.username}"
 		     password="${db.password}"  encoding="${db.encoding}" keepformat="true" 
 		     onerror="abort">
 			<classpath>
