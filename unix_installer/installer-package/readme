@@ -1,11 +1,11 @@
-LAMS 2.3  - Learning Activity Management System Installer
+LAMS 2.3.5  - Learning Activity Management System Installer
 --------------------------------------------------------------------------------
 
-This is an installer package for 2.3. Please read this 
+This is an installer package for 2.3.5. Please read this 
 document carefully before installing. Please also ensure that you have read
 and understood the terms of the license agreement.
 
-For release notes goto: http://wiki.lamsfoundation.org/display/lams/2.3
+For release notes 
 
 CONTENTS
 ========
@@ -29,7 +29,7 @@ properly. These are listed below
 
 JDK 1.5 or 1.6
 JBOSS-4.0.2 (Must be 4.0.2, newer and older versions have problems running LAMS)
-MySql 5.0.x (Running)
+MySql 5.0.x or 5.1.x (Running)
 Wildfire (Running - Required if you want to use chat tools)
 ANT - Included in this package
 
@@ -237,7 +237,7 @@ To backup your LAMS installation manually, simply follow the following steps
 4) Dump the database by executing the following command. Fill in your own 
 backup directory
 
-<sqldir>/mysqldump -u<dbuser> -p<dbpassword> <dbname> > <backupdir>/dump.sql
+<sqldir>/mysqldump --hex-blob -u<dbuser> -p<dbpassword> <dbname> > <backupdir>/dump.sql
 
 
 9. Web Resources
