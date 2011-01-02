@@ -1,75 +1,81 @@
-LAMS 2.3.1 is released under the GPL license detailed below.  This package
+LAMS 2.3.5 is released under the GPL license detailed below.  This package
 also includes other libraries/packages, whose respective licenses are
 detailed below.
 
 Library/Package				License
 --------------------------------------------------------------------------------
-antlr.jar				Antlr 3 License
+aspirin.jar				Apache License 2.0
+batik-1.7.ja				Apache License 2.0
+dnsjava-2.0.6.jar				BSD License
+wrapper.jar				Silver Egg Techology License (see license-wrapper.txt)
+antlr.jar					Antlr 3 License
 axis-ant.jar 				Apache License 2.0
-axis.jar				Apache License 2.0
+axis.jar					Apache License 2.0
 cglib-nodep-2.1_2.jar			Apache License 2.0
 cglib_jboss404GA.jar			Apache License 2.0
 commons-beanutils.jar			Apache License 2.0
 commons-codec-1.3.jar			Apache License 2.0
 commons-collections.jar			Apache License 2.0
 commons-digester.jar			Apache License 2.0
-commons-discovery-0.2.jar		Apache Software License 1.1
+commons-discovery-0.2.jar			Apache Software License 1.1
 commons-fileupload.jar			Apache Software License 1.1
 commons-lang-2.0.jar			Apache Software License 1.1
 commons-logging.jar			Apache License 2.0
 commons-validator.jar			Apache License 2.0
-FCKeditor-2.3.jar			CDL Closed Distribution License
+FCKeditor-2.3.jar				CDL Closed Distribution License
 gnujaxp.jar				GNU General Public License
 hibernate3.jar				GNU General Public License
 jakarta-oro.jar				Apache Software License 1.1
-jaxrpc.jar				GNU Lesser General Public Licence
+jaxrpc.jar					CDDL (Common Development and 
+					Distribution License 1.0)
+JBoss 4.0.2				GNU Lesser General Public Licence
 jboss-cache.jar				GNU Lesser General Public Licence
-jboss-common.jar			GNU Lesser General Public Licence
+jboss-common.jar				GNU Lesser General Public Licence
 jboss-jmx.jar				GNU Lesser General Public Licence
-jboss-system.jar			GNU Lesser General Public Licence
-jcommon-1.0.0.jar			GNU Lesser General Public Licence
-jdom.jar				Jdom Jar License
-jfreechart-1.0.1.jar			GNU Lesser General Public Licence
+jboss-system.jar				GNU Lesser General Public Licence
+jcommon-1.0.0.jar				GNU Lesser General Public Licence
+jdom.jar					Jdom Jar License
+jfreechart-1.0.1.jar				GNU Lesser General Public Licence
 jgroups.jar				GNU Lesser General Public Licence
 jmock-2003-03-19.jar			jMock Project License
-joda-time-0.98.jar			Joda Software License 1.0
+joda-time-0.98.jar				Joda Software License 1.0
 jsMath					Apache License 2.0
-jstl.jar				JSTL License 1.1
-log4j-1.2.13.jar			Apache Software License 1.1
+jstl.jar					JSTL License 1.1
+log4j-1.2.13.jar				Apache Software License 1.1
 mysql-connector-				(CDDL Common Development and 
-  java-5.0.8-bin-jar	    		Distribution License 1.0)
+  java-3.1.12-bin-jar	    		Distribution License 1.0)
 odmg-3.0.jar				ODMG 2.0 
 poi-2.5.1-final				Apache Software License 1.1
   -20040804.jar		
 quartz.jar				Apache License 2.0
 saaj.jar					(CDDL Common Development and 
 					Distribution License 1.0)
-smack.jar				Apache License 2.0
+smack.jar					Apache License 2.0
 smackx.jar				Apache License 2.0
-spring.jar				Apache License 2.0
+spring.jar					Apache License 2.0
 standard.jar				Apache License 2.0
 struts-el.jar				Apache License 2.0
-struts.jar				Apache License 2.0	
-wddx.jar				GNU General Public License
-wsdl4j-1.5.1.jar			CPL Common Public License 0.5 
-xml-writer-0.2.jar			XML-Write License
+struts.jar					Apache License 2.0	
+wddx.jar					GNU General Public License
+wsdl4j-1.5.1.jar				CPL Common Public License 0.5 
+xml-writer-0.2.jar				XML-Write License
 xom-1.0.b3.jar				GNU Lesser General Public License
 xpp3-1.1.3.4d_b4.jar			XPP3 License
 xstream-1.1.jar				xstream Licanse
 
-SHARE RECOURCES LIBRARY LICENSES
+SHARE RESOURCES LIBRARY LICENSES
 castor-0.9.5.3-xml.jar			Castor License
-jdom.jar				Jdom Jar License
+jdom.jar					Jdom Jar License
 moonunitsrc.jar				Reload License
 reload-diva.jar				Reload License
-reload-editor.jar			Reload License
+reload-editor.jar				Reload License
 reload-jdom.jar				Reload License
-reload-moonunit.jar			Reload License
+reload-moonunit.jar				Reload License
 xercesImpl.jar 				Apache Software License 1.1
 xml-apis.jar 				Apache Software License 1.1
 jaxen-full.jar 				Jaxen Jar License (The Werken 
 					Company)
-sax.jar 				Public Domain
+sax.jar 					Public Domain
 saxpath.jar				Jaxen Jar License (The Werken 
 					Company)
 --------------------------------------------------------------------------------
@@ -1256,25 +1262,25 @@ Closed Distribution License (CDL)
 Agreement
 IMPORTANT - READ CAREFULLY: This End-User License Agreement ("EULA") is a legal
 agreement between you (either an individual or a single entity) and FREDERICO 
-CALDEIRA KNABBEN (the "Owner") covering your use of FCKeditor (the ï¿½Softwareï¿½). 
+CALDEIRA KNABBEN (the "Owner") covering your use of FCKeditor (the “Software”). 
 Be sure to read the following agreement before using the Software.
 TERMS AND CONDITIONS
-1. This EULA uses the GNU Lesser General Public License (ï¿½LGPLï¿½) as its base.
+1. This EULA uses the GNU Lesser General Public License (”LGPL”) as its base.
 Agreeing to this license you are also agreeing to be bound to the LGPL license 
 terms, limited to the changes defined in this EULA. The terms defined in this 
 EULA override any term present in the LGPL license that conflicts with the EULA.
 2. GRANT OF LICENSE. The Owner grants you the right to use the Software and any
 related supplements or add-on components published by the Owner, unless 
-explicitly specified, on your one specific product (ï¿½Productï¿½) with the 
+explicitly specified, on your one specific product (“Product”) with the 
 following special rights: there is no need to distribute the LGPL license with 
 the Product and no reference to it have to be done; no references to the 
 Software have to be done in any file distributed with the Product; the source 
-code of the Software doesnï¿½t have to be distributed along with the Product; you 
+code of the Software doesn’t have to be distributed along with the Product; you 
 can remove any file from the Software when integrating it with the Product. It
 is agreed that in exchange for the license set forth herein, you will pay a 
 one-time license fee of US$750 (Seven Hundred and Fifty U.S. Dollars).
 3. LICENSE VALIDITY. This EULA is valid only if the Product is a work that uses 
-the Software, and doesnï¿½t go in competition with the Software in the 
+the Software, and doesn’t go in competition with the Software in the 
 marketplace. Whenever this license looses its validity, the LGPL license takes 
 its place.
 4. RESERVATION OF RIGHTS AND OWNERSHIP. The Owner reserves all rights not
@@ -1294,7 +1300,7 @@ best of Owner's knowledge the Software does not infringe upon the intellectual
 property rights of any third party and that he did not receive any notice 
 regarding any alleged infringement thereof.
 7. DISCLAIMER OF WARRANTIES. The Software and its related material are provided 
-ï¿½AS ISï¿½ and without warranty of any kind and the Owner expressly disclaims all 
+“AS IS” and without warranty of any kind and the Owner expressly disclaims all 
 other warranties, expressed or implied, including, but not limited to, the 
 implied warranties of merchantability and fitness for a particular purpose.
 8. EXCLUSION OF INCIDENTAL, CONSEQUENTIAL AND CERTAIN OTHER DAMAGES.
@@ -1473,7 +1479,7 @@ COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
             3.4. Application of Additional Terms.
             You may not offer or impose any terms on any Covered
             Software in Source Code form that alters or restricts the
-            applicable version of this License or the recipientsï¿½
+            applicable version of this License or the recipientsÕ
             rights hereunder. You may choose to offer, and to charge a
             fee for, warranty, support, indemnity or liability
             obligations to one or more recipients of Covered Software.
@@ -1492,7 +1498,7 @@ COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
             different from this License, provided that You are in
             compliance with the terms of this License and that the
             license for the Executable form does not attempt to limit
-            or alter the recipientï¿½s rights in the Source Code form
+            or alter the recipientÕs rights in the Source Code form
             from the rights set forth in this License. If You
             distribute the Covered Software in Executable form under a
             different license, You must make it absolutely clear that
@@ -1594,7 +1600,7 @@ COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
       COMMERCIAL DAMAGES OR LOSSES, EVEN IF SUCH PARTY SHALL HAVE BEEN
       INFORMED OF THE POSSIBILITY OF SUCH DAMAGES. THIS LIMITATION OF
       LIABILITY SHALL NOT APPLY TO LIABILITY FOR DEATH OR PERSONAL
-      INJURY RESULTING FROM SUCH PARTYï¿½S NEGLIGENCE TO THE EXTENT
+      INJURY RESULTING FROM SUCH PARTYÕS NEGLIGENCE TO THE EXTENT
       APPLICABLE LAW PROHIBITS SUCH LIMITATION. SOME JURISDICTIONS DO
       NOT ALLOW THE EXCLUSION OR LIMITATION OF INCIDENTAL OR
       CONSEQUENTIAL DAMAGES, SO THIS EXCLUSION AND LIMITATION MAY NOT
@@ -1602,7 +1608,7 @@ COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
       8. U.S. GOVERNMENT END USERS.
       The Covered Software is a "commercial item, as that term is
       defined in 48 C.F.R. 2.101 (Oct. 1995), consisting of "commercial
-      computer software (as that term is defined at 48 C.F.R. ï¿½
+      computer software (as that term is defined at 48 C.F.R. ¤
       252.227-7014(a)(1)) and "commercial computer software
       documentation" as such terms are used in 48 C.F.R. 12.212 (Sept.
       1995). Consistent with 48 C.F.R. 12.212 and 48 C.F.R. 227.7202-1
@@ -1619,12 +1625,12 @@ COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
       governed by the law of the jurisdiction specified in a notice
       contained within the Original Software (except to the extent
       applicable law, if any, provides otherwise), excluding such
-      jurisdictionï¿½s conflict-of-law provisions. Any litigation
+      jurisdictionÕs conflict-of-law provisions. Any litigation
       relating to this License shall be subject to the jurisdiction of
       the courts located in the jurisdiction and venue specified in a
       notice contained within the Original Software, with the losing
       party responsible for costs, including, without limitation, court
-      costs and reasonable attorneysï¿½ fees and expenses. The
+      costs and reasonable attorneysÕ fees and expenses. The
       application of the United Nations Convention on Contracts for the
       International Sale of Goods is expressly excluded. Any law or
       regulation which provides that the language of a contract shall
