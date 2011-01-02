@@ -25,7 +25,7 @@
 # Usage: sudo ./install.sh 
 	
 # The version of this lams installer
-LAMS_VERSION=2.3
+LAMS_VERSION=2.3.5
 MYSQL_VERSION_STR=5.
 JAVA_REQ_VERSION=1.5
 # Transform the required version string into a number that can be used in comparisons
@@ -444,13 +444,6 @@ mkdir -p ${DEFAULT_DIR}/lib
 #fi
 
 
-cp $JBOSS_DIR/server/all/lib/jgroups.jar $JBOSS_DIR/server/all/lib/jboss-cache.jar ${DEFAULT_DIR}/lib
-cp assembly/lams-session.jar  assembly/lams-valve.jar assembly/jgroups.jar assembly/jboss-cache.jar assembly/jboss-serialization.jar ${DEFAULT_DIR}/lib
-if [  "$?" -ne  "0" ]
-        then
-        echo "\nInstall Failed. Problem while configuring JBoss, please ensure you have the correct version of JBoss (4.0.2).\n\n"
-        installfailed
-fi
 
 
 printf "Copying lams.properties to /etc.\n"	
