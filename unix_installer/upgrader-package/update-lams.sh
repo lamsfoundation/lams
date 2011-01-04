@@ -83,10 +83,10 @@ fi
 . ./lams.properties
 
 # The version of this LAMS updater
-LAMS_VERSION=2.3
-LAMS_SERVER_VERSION=2.3.0.200905220000
-LAMS_LANGUAGE_VERSION=2009-05-22
-REQ_LAMS_VERSION=2.2
+LAMS_VERSION=2.3.5
+LAMS_SERVER_VERSION=2.3.5.201012150000
+LAMS_LANGUAGE_VERSION=2010-12-15
+REQ_LAMS_VERSION=2.3.4
 
 # Checking that the lams.properties points to a lams installation
 if [ ! -r "$JBOSS_DIR/server/default/deploy/lams.ear/lams.jar" ]
@@ -175,7 +175,7 @@ checkMysql()
     printf "Checking LAMS database...\n"
         
 
-    $JAVA_HOME/bin/java -cp .:bin/:assembly/lams.ear/mysql-connector-java-5.0.8-bin.jar checkmysql "$DB_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION" 
+    $JAVA_HOME/bin/java -cp .:bin/:$JBOSS_DIR/server/default/deploy/lams.ear/mysql-connector-java-5.0.8-bin.jar checkmysql "$DB_URL" "$DB_USER" "$DB_PASS" "$REQ_LAMS_VERSION" 
     if [  "$?" -ne  "0" ]
     then
     	installfailed
@@ -184,48 +184,6 @@ checkMysql()
 
 }
 
-#getMysqlHost()
-#{
-#    SQL_HOST=""
-#       SQL_URL=""
-#        continue=""
-#        printf "Please enter the location of your MySql Host (Default: localhost)\n> "
-#        read SQL_HOST
-#        if [ -z "$SQL_HOST" ]
-#    then    
-#                SQL_HOST=localhost
-#    fi
-#
-#        SQL_URL="jdbc:mysql://$SQL_HOST/$DB_NAME?characterEncoding=utf8&autoReconnect=true"
-#
-#        printf "\nAll LAMS database update connections will be done through: \n$SQL_URL.\n"
-#        printf "Is this correct? (y)es, (n)o, (q)uit.\n> "
-#        read continue
-#
-#        case $continue in
-#       q)
-#                printf "\nTo set up MySql on a separate server, follow the instructions in the readme.\n\n"
-#                printf "LAMS update aborted by user.\n\n"
-#                installexit
-#                ;;
-#        y)
-#    
-#        # append SQL_HOST and SQL_URL to lams.properties
-#        echo "# Updater-generated properties, used instead of default localhost" >> lams.properties
-#        echo "SQL_HOST=$SQL_HOST" >> lams.properties
-#        echo "SQL_URL=jdbc:mysql://${SQL_HOST}/${DB_NAME}?characterEncoding=utf8&autoReconnect=true" >> lams.properties
-#        printf "\n"
-#        ;;
-#    n)
-#                printf "\n"
-#                getMysqlHost
-#                ;;
-#        *)
-#                printf "\nPlease enter your MySql host and then enter (y).\n"
-#                getMysqlHost
-#                ;;
-#        esac
-#}
 
 checklams()
 {
@@ -291,26 +249,45 @@ backup()
         printf "2) Backup $LAMS_DIR\n"
         printf "3) Backup /etc/lams2\n"
         printf "4) Dump the database by executing the following command. Fill in your own backup \ndirectory.\n"
-        printf "> $sqldir/mysqldump -u$dbuser -p$dbpass $dbname > (backup dir)/dump.sql\n"
+        printf "> ${SQL_DIR}/mysqldump --hex-blob -u$DB_USER -p$DB_PASS $DB_NAME > (backup dir)/dump.sql\n"
         installexit 
         ;;
     y)
-        
-        
-        $JDK_DIR/bin/java -cp bin backup
+	DAY=`date +%d-%m-%Y`
+	BACKUP_DIR=${LAMS_DIR}/backup-${DAY}
+        printf "\nCreating directory: ${BACKUP_DIR} to store the backup \n"
+	mkdir -p ${BACKUP_DIR}
         if [  "$?" -ne  "0" ]
         then
-                echo "Update failed, Failed to backup LAMS."
+                echo "\nCan't create backup directory. Problem with permissions?"
                 installfailed
         fi
 
-        chmod 755 bin/lamsdump.sql
-        bin/lamsdump.sql
+        printf "\n  - Backing up JBoss... (this might take some minutes) "
+	cp -pr ${JBOSS_DIR} ${BACKUP_DIR}
         if [  "$?" -ne  "0" ]
         then
-                echo "Update failed, problem dumping database for backup."
+                echo "\nFailed to create backup for JBoss. Is LAMS still running? Make sure it's stopped before running upgrade or check that you are running the upgrade script as root."
                 installfailed
         fi
+
+        printf "\n  - Backing up LAMS Repository"
+	cp -pr ${LAMS_DIR}/repository ${BACKUP_DIR}
+        if [  "$?" -ne  "0" ]
+        then
+                echo "\nFailed to create backup for LAMS Repository."
+                installfailed
+        fi
+
+        printf "\n  - Backing up MySQL LAMS Database: $DB_NAME"
+	${SQL_DIR}/mysqldump --hex-blob -u$DB_USER -p$DB_PASS $DB_NAME > ${BACKUP_DIR}/dump.sql
+        if [  "$?" -ne  "0" ]
+        then
+                echo "\nFailed to backup the MySQL LAMS database. Check the user and password details."
+                installfailed
+        fi
+	
+        printf "\nDone with backup. Visit ${BACKUP_DIR} if want to revert to it\n"
 
         ;;
     n) 
@@ -341,7 +318,7 @@ printf "\n1) Backup $JBOSS_DIR\n"
 printf "2) Backup $LAMS_DIR\n"
 printf "3) Backup /etc/lams2\n"
 printf "4) Dump the database by executing the following command. Fill in your own backup \ndirectory.\n"
-printf "> $sqldir/mysqldump -u$DB_USER -p$DB_PASS $DB_NAME > (backup dir)/dump.sql\n"
+printf "> ${SQL_DIR}/mysqldump --hex-blob -u$DB_USER -p$DB_PASS $DB_NAME > (backup dir)/dump.sql\n"
 printf "\n--------------------------------------------------------------------------------\n\n"
 
 #getMysqlHost
@@ -350,10 +327,12 @@ checklams
 backup
 
 
+printf "\nDeleting JBoss tmp and work folders....\n"
+rm -rf $JBOSS_DIR/server/default/deploy/tmp
+rm -rf $JBOSS_DIR/server/default/deploy/work
+
 printf "\nUpdating lams.ear with new jars and wars...\n"
-cp -r assembly/lams.ear/*.jar $EAR_DIR > log/update-files.log
-cp -r assembly/lams.ear/*.war $EAR_DIR >> log/update-files.log
-cp -r assembly/lams-session.jar assembly/lams-valve.jar $DEFAULT_DIR/lib >> log/update-files.log
+cp -pvr assembly/lams.ear/* $EAR_DIR > log/update-files.log
 
 printf "\nBeginning ant scripts, check log/install.log for install log. This may take a few minutes...\n"
 ant/bin/ant -logfile log/install.log -buildfile ant-scripts/update-lams.xml update-lams
@@ -362,16 +341,6 @@ if [  "$?" -ne  "0" ]
         echo "Update failed, check the log/install.log file for details."
         installfailed
 fi
-
-# Slimming JBoss -- ONLY FOR 2.3 UPGRADE, REMOVE FOR NEXT RELEASE
-echo "Slimming JBoss"
-ant/bin/ant -buildfile ant-scripts/update-lams.xml -logfile log/slim-jboss.log slim-jboss
-if [  "$?" -ne  "0" ]
-        then
-        echo "Install Failed. Problem while slimming jboss, check log/slim-jboss.log for details."
-        installfailed
-fi
-
 
 # Checking the log to see if there was any failures from the tool deployer (invoked in update-lams.xml)
 failed=`grep FAILED log/*`

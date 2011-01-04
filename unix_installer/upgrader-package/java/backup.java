@@ -30,7 +30,7 @@ public class backup
 		{
 			System.out.println("Copying files from " + jbossdir + "/ to " + backupdir + "/jboss-4.0.2/ ...");
 			copyFiles(jbossdir + "/", backupdir+"/jboss-4.0.2/");
-			copyFiles(etcdir + "/", backupdir+"/ectlams2/");
+			copyFiles(etcdir + "/", backupdir+"/etc-lams2/");
 			copyFiles(repositoryDir + "/", backupdir+"/repository/");
 			System.out.println("Done.\n");
 		}
@@ -201,7 +201,7 @@ public class backup
 		try
 		{
 			FileWriter outfile = new FileWriter("bin/lamsdump.sql");
-			outfile.write(mysqldir+ "/mysqldump -u" +dbuser+ " -p" +dbpass+ " -h" +dbhost+ " -P" +dbport+
+			outfile.write(mysqldir+ "/mysqldump --hex-blob -u" +dbuser+ " -p" +dbpass+ " -h" +dbhost+ " -P" +dbport+
 					" " +dbname+ " > " +backupdir+ "/dump.sql");
 			outfile.close();
 		}
