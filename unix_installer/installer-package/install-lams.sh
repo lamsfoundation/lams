@@ -382,6 +382,8 @@ printf "\nDatabase Created.\n\n"
 # Copying the main lams files
 printf "Copying lams.ear directory to ${DEFAULT_DIR}/deploy.\n"
 cp -r assembly/lams.ear ${DEFAULT_DIR}/deploy
+cp -f assembly/lams-valve.jar ${DEFAULT_DIR}/deploy/lib
+cp -f assembly/lams-session.jar ${DEFAULT_DIR}/deploy/lib
 
 printf "\nDone.\n\n"
 if [  "$?" -ne  "0" ]
