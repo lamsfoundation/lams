@@ -333,7 +333,12 @@ rm -rf $JBOSS_DIR/server/default/deploy/work
 
 printf "\nUpdating lams.ear with new jars and wars...\n"
 cp -pvr assembly/lams.ear/* $EAR_DIR > log/update-files.log
-cp -f assembly/lams-valve.jar assembly/lams-session.jar $JBOSS_DIR/server/default/lib
+if [  "$?" -ne  "0" ]
+then
+    echo "\nThere has been an error while updating your LAMS server. Check on the update-files.log in the log folder."
+    installfailed
+fi
+cp -f assembly/lams.ear/lams-valve.jar assembly/lams.ear/lams-session.jar $JBOSS_DIR/server/default/lib
 
 printf "\nBeginning ant scripts, check log/install.log for install log. This may take a few minutes...\n"
 ant/bin/ant -logfile log/install.log -buildfile ant-scripts/update-lams.xml update-lams
