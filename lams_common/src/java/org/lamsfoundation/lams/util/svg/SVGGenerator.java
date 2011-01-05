@@ -122,7 +122,7 @@ public class SVGGenerator extends SVGConstants{
 	case OUTPUT_FORMAT_PNG:
 	    //modify image references to be pointed to local images (LDEV-2603)
 	    NodeList imageNodes = doc.getElementsByTagNameNS(SVG_NAMESPACE, "image");
-	    final String FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES = "file:///" + Configuration.get(ConfigurationKeys.LAMS_EAR_DIR).replaceAll("\\\\", "/") + "/lams-central.war/images/svg/";
+	    final String FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES = "file://" + Configuration.get(ConfigurationKeys.LAMS_EAR_DIR).replaceAll("\\\\", "/") + "/lams-central.war/images/svg/";
 	    for (int i = 0; i < imageNodes.getLength(); i++) {
 		Element imageNode = (Element) imageNodes.item(i);
 		String imageFileName = imageNode.getAttributeNS(SVG_NAMESPACE_XLINK, "href");
