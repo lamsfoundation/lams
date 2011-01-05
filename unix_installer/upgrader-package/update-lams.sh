@@ -29,11 +29,11 @@ if [[ "$(uname)" = "SunOS" ]]
 then
     # This is SunOS
     CP_ATT=" -pr"
-    SU-ATT=" -s"
+    DU_ATT=" -s"
 else
    # This is Linux/MacOSX
-    CP_ATT=" -pr"
-    SU-ATT=" -s"
+    CP_ATT=" -pvr"
+    DU_ATT=" -chs"
 fi
 
 	
