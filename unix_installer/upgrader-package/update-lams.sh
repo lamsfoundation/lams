@@ -22,6 +22,20 @@
 #   Updater shell script for LAMS
 
 # Usage: sudo ./update-lams.sh
+
+# Check the Unix OS version and set the attributes for 
+# the copy and the du commands accordingly
+if [[ "$(uname)" = "SunOS" ]] 
+then
+    # This is SunOS
+    CP_ATT=" -pr"
+    SU-ATT=" -s"
+else
+   # This is Linux/MacOSX
+    CP_ATT=" -pr"
+    SU-ATT=" -s"
+fi
+
 	
 JAVA_REQ_VERSION=1.5
 
@@ -234,7 +248,7 @@ backup()
     printf "\nDo you wish to automatically backup lams before updating? (Recommended. NOTE: Requires MySql to be installed locally)\n"
     printf "Please check the below directories are correct before running this backup. If they are not, quit the installer and backup LAMS manually.\n"
     printf "The space required to backup your LAMS installation:\n"
-    du -chs $LAMS_DIR $JBOSS_DIR
+    du ${DU_ATT} $LAMS_DIR $JBOSS_DIR
     printf "(y)es I wish to backup LAMS.\n"
     printf "(n)o I have already backed up LAMS, I am ready to update.\n"
     printf "(q)uit.\n"
@@ -332,7 +346,8 @@ rm -rf $JBOSS_DIR/server/default/deploy/tmp
 rm -rf $JBOSS_DIR/server/default/deploy/work
 
 printf "\nUpdating lams.ear with new jars and wars...\n"
-cp -pvr assembly/lams.ear/* $EAR_DIR > log/update-files.log
+
+cp ${CP_ATT} assembly/lams.ear/* $EAR_DIR > log/update-files.log
 if [  "$?" -ne  "0" ]
 then
     echo "\nThere has been an error while updating your LAMS server. Check on the update-files.log in the log folder."
