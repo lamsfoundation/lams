@@ -1,0 +1,119 @@
+<?php
+
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+
+/**
+ * Prints a particular instance of lamslesson
+ *
+ * You can have a rather longer description of the file as well,
+ * if you like, and it can span multiple lines.
+ *
+ * @package   mod_lamslesson
+ * @copyright 2011 LAMS Foundation - Ernie Ghiglione (ernieg@lamsfoundation.org) 
+ * @license  http://www.gnu.org/licenses/gpl-2.0.html GNU GPL v2
+ */
+
+/// (Replace lamslesson with the name of your module and remove this line)
+
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(__FILE__).'/lib.php');
+
+$id = optional_param('id', 0, PARAM_INT); // course_module ID, or
+$n  = optional_param('n', 0, PARAM_INT);  // lamslesson instance ID - it should be named as the first character of the module
+
+if ($id) {
+    $cm         = get_coursemodule_from_id('lamslesson', $id, 0, false, MUST_EXIST);
+    $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $lamslesson  = $DB->get_record('lamslesson', array('id' => $cm->instance), '*', MUST_EXIST);
+} elseif ($n) {
+    $lamslesson  = $DB->get_record('lamslesson', array('id' => $n), '*', MUST_EXIST);
+    $course     = $DB->get_record('course', array('id' => $lamslesson->course), '*', MUST_EXIST);
+    $cm         = get_coursemodule_from_instance('lamslesson', $lamslesson->id, $course->id, false, MUST_EXIST);
+} else {
+    print_error('You must specify a course_module ID or an instance ID');
+}
+
+require_login($course, true, $cm);
+
+$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$locale = lamslesson_get_locale($course->id);
+
+add_to_log($course->id, 'lamslesson', 'view', "view.php?id=$cm->id", $lamslesson->name, $cm->id);
+
+/// Print the page header
+
+$PAGE->set_url('/mod/lamslesson/view.php', array('id' => $cm->id));
+$PAGE->set_title($lamslesson->name);
+$PAGE->set_heading($course->shortname);
+$PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'lamslesson')));
+
+
+// Main page
+$options_html = '';
+$canmanage = has_capability('mod/lamslesson:manage', $context);
+
+// Log the lamslesson view.
+add_to_log($course->id, "lamslesson", "view lamslesson", "view.php?id=$cm->id", "$lamslesson->id", $cm->id);
+        
+// Get raw data
+//print("ID:" . $cm->instance);
+//$lessons = $DB->get_records('lamslesson', 'id', $cm->instance);
+
+
+// Check capabilities
+
+$canparticipate = has_capability('mod/lamslesson:participate', $context);
+if ($canparticipate) {
+  
+  if ($canmanage) {
+    
+  }
+  
+}
+
+
+// Output starts here
+echo $OUTPUT->header();
+
+// Main LAMS region
+echo $OUTPUT->heading($lamslesson->name);
+echo $OUTPUT->box_start('generalbox', 'instructions');
+echo '<p>';
+echo format_module_intro('lamslesson', $lamslesson, $cm->id);
+echo '</p>';
+echo '<br>';
+echo '<span class="notifytiny">' . get_string('lastmodified', 'lamslesson') . ": " .  userdate($lamslesson->timemodified) .'</span>';
+echo $OUTPUT->box_end();
+
+echo $OUTPUT->box_start('generalbox', 'intro');
+if ($canparticipate) {
+  $learnerurl = lamslesson_get_url($USER->username, $locale['lang'], $locale['country'], $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_LEARNER_METHOD);
+  echo '<p align="center">';
+  echo $OUTPUT->action_link($learnerurl, get_string('openlesson', 'lamslesson'), new popup_action('click', $learnerurl, '', array('height' => 600, 'width' => 996)));
+  echo '</p>';
+}
+if ($canmanage) {
+    $monitorurl = lamslesson_get_url($USER->username, $locale['lang'], $locale['country'], $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_MONITOR_METHOD);
+  echo '<p align="center">';
+  echo $OUTPUT->action_link($monitorurl, get_string('openmonitor', 'lamslesson'), new popup_action('click', $monitorurl, '', array('height' => 600, 'width' => 996)));
+  echo '</p>';
+}
+echo $OUTPUT->box_end();
+// echo html_writer::table($table);
+//print_table($table);
+// Finish the page
+echo $OUTPUT->footer();
