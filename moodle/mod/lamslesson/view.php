@@ -27,8 +27,6 @@
  * @license  http://www.gnu.org/licenses/gpl-2.0.html GNU GPL v2
  */
 
-/// (Replace lamslesson with the name of your module and remove this line)
-
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 
@@ -70,21 +68,13 @@ $canmanage = has_capability('mod/lamslesson:manage', $context);
 add_to_log($course->id, "lamslesson", "view lamslesson", "view.php?id=$cm->id", "$lamslesson->id", $cm->id);
         
 // Get raw data
-//print("ID:" . $cm->instance);
+
 //$lessons = $DB->get_records('lamslesson', 'id', $cm->instance);
 
 
 // Check capabilities
 
 $canparticipate = has_capability('mod/lamslesson:participate', $context);
-if ($canparticipate) {
-  
-  if ($canmanage) {
-    
-  }
-  
-}
-
 
 // Output starts here
 echo $OUTPUT->header();
@@ -96,24 +86,71 @@ echo '<p>';
 echo format_module_intro('lamslesson', $lamslesson, $cm->id);
 echo '</p>';
 echo '<br>';
-echo '<span class="notifytiny">' . get_string('lastmodified', 'lamslesson') . ": " .  userdate($lamslesson->timemodified) .'</span>';
+echo '<div class="smalltext">' . get_string('lastmodified', 'lamslesson') . ": " .  userdate($lamslesson->timemodified) .'</div>';
 echo $OUTPUT->box_end();
 
 echo $OUTPUT->box_start('generalbox', 'intro');
 if ($canparticipate) {
   $learnerurl = lamslesson_get_url($USER->username, $locale['lang'], $locale['country'], $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_LEARNER_METHOD);
-  echo '<p align="center">';
+  echo '<div class="centerlink">';
   echo $OUTPUT->action_link($learnerurl, get_string('openlesson', 'lamslesson'), new popup_action('click', $learnerurl, '', array('height' => 600, 'width' => 996)));
-  echo '</p>';
+  echo '</div>';
 }
 if ($canmanage) {
     $monitorurl = lamslesson_get_url($USER->username, $locale['lang'], $locale['country'], $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_MONITOR_METHOD);
-  echo '<p align="center">';
+  echo '<div class="centerlink">';
   echo $OUTPUT->action_link($monitorurl, get_string('openmonitor', 'lamslesson'), new popup_action('click', $monitorurl, '', array('height' => 600, 'width' => 996)));
-  echo '</p>';
+  echo '</div>';
+
+
 }
+
 echo $OUTPUT->box_end();
-// echo html_writer::table($table);
-//print_table($table);
-// Finish the page
+
+// Once we have progress info ready
+$progress = lamslesson_get_student_progress($USER->username,$lamslesson->lesson_id, $course->id);
+
+// Progress details
+
+
+// If the user has attempted at least 1 activity, then we present the
+// progress information
+if ($progress['attemptedActivities'] > 0 && $canparticipate && $progress['lessonComplete'] == 0) {
+  echo $OUTPUT->box_start('generalbox', 'intro');
+  echo '<div class="progress-header">' . get_string('yourprogress','lamslesson') . '</div>';
+  echo '<p>';
+  echo  get_string('lessonincompleted','lamslesson') . ' ';
+  echo '</p>';
+  echo '<p>';
+  echo get_string('youhavecompleted','lamslesson') . ' ' . $progress['activitiesCompleted'] . ' ' .get_string('outof','lamslesson'). ' ' .$progress['activityCount'] . ' ' . get_string('activities','lamslesson') . '<span class="super">[*]</span>';
+  echo '</p>';
+  echo '<div class="smalltext"><span class="super">*</span> ' . get_string('ymmv','lamslesson') . '</div>';
+  echo $OUTPUT->box_end();
+}
+
+// If lesson is completed 
+if ($progress['lessonComplete'] == 'true') {
+  echo $OUTPUT->box_start('generalbox', 'intro');
+  $moodle_completion = lamslesson_get_moodle_completion($course,$cm);
+
+  // First let's update the moodle completion accordingly
+  // if in Moodle it shows that it hasn't been completed.
+  if ($moodle_completion->completionstate == 0){ 
+    lamslesson_set_as_completed($cm,$course,$lamslesson);
+  }
+  echo '<div class="progress-header">' . get_string('lessoncompleted','lamslesson') . ' ' . $OUTPUT->pix_icon('i/tick_green_big', get_string('lessoncompleted','lamslesson')) . '</div>';
+  echo $OUTPUT->box_end();
+}
+
+/*
+print($progress['activitiesCompleted']);
+print($progress['activityCount']);
+print($progress['attemptedActivities']);
+print($progress['lessonComplete']);
+*/
+
 echo $OUTPUT->footer();
+
+/// Mark as viewed
+// lamslesson_set_as_completed($cm, $course, $lamslesson);
+
