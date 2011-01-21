@@ -53,6 +53,8 @@ define('LAMSLESSON_PARAM_LSID', 'lsid');
 define('LAMSLESSON_PARAM_AUTHOR_METHOD', 'author');
 define('LAMSLESSON_PARAM_MONITOR_METHOD', 'monitor');
 define('LAMSLESSON_PARAM_LEARNER_METHOD', 'learner');
+define('LAMSLESSON_PARAM_SINGLE_PROGRESS_METHOD', 'singleStudentProgress');
+define('LAMSLESSON_PARAM_PROGRESS_METHOD', 'studentProgress');
 define('LAMSLESSON_PARAM_CUSTOM_CSV', 'customCSV');
 define('LAMSLESSON_LD_SERVICE', '/services/xml/LearningDesignRepository');
 define('LAMSLESSON_LESSON_MANAGER', '/services/xml/LessonManager');
@@ -317,22 +319,19 @@ function lamslesson_process_array($array) {
   if (empty($array['@']['resourceId'])) {
     // it's a folder
     $folder_name = preg_replace("/'/", "$1\'", $array['@']['name']);
-    $output .= "{type:'Text', label:'" . $folder_name . "',id:'0'";
+    $output .= "{type:'Text', label:'" . $folder_name . "',id:0";
     
     if (empty($array['#']['LearningDesign']) && empty($array['#']['Folder'])) {
-      $output .= ", children: [{type:'HTML', html:'<i>-" . get_string('empty', 'lamslesson') . "-</i>', id:'0'}]}";
+      $output .= ",expanded:0,children:[{type:'HTML',html:'<i>-" . get_string('empty', 'lamslesson') . "-</i>', id:0}]}";
       return $output;
     } else {
-      $output .= ", children: [";
+      $output .= ",children:[";
     }
 
     if (!empty($array['#']['LearningDesign'])) {
       $lds = $array['#']['LearningDesign'];
       for($i=0; $i<sizeof($lds); $i++) {
 	$output .= "," . lamslesson_process_sequence($lds[$i]) ;
-	if ($i < sizeof($lds)-1) {
-	  //$output .= ",";
-	}
       }
     }
 
@@ -349,7 +348,7 @@ function lamslesson_process_array($array) {
 	}
       }
     }
-    $output .= "]} ";
+    $output .= "]}";
   }
   return $output;
 }
@@ -357,7 +356,7 @@ function lamslesson_process_array($array) {
 function lamslesson_process_sequence($xml_node) {
   $output = '';
   $ld_name = preg_replace("/'/", "$1\'", $xml_node['@']['name']);
-  $output .= "{type:'Text', label:'" . $ld_name . "', id:'" . $xml_node['@']['resourceId'] . "'}";
+  $output .= "{type:'Text',label:'" . $ld_name . "',id:'" . $xml_node['@']['resourceId'] . "'}";
   return $output;
 }
 
@@ -603,4 +602,85 @@ function lamslesson_get_course_userids($lamslessonid, $context=NULL) {
 	$userids = array_keys($users);  // turn list of id-backed objects into list of ids
 	return $userids;
 }
+
+
+
+/*
+ * Gets all the student progress for a lesson in one go
+ * 
+ */
+function lamslesson_get_student_progress($username,$ldid,$courseid) {
+  global $CFG;
+  if (!isset($CFG->lamslesson_serverid, $CFG->lamslesson_serverkey) || $CFG->lamslesson_serverid == "") {
+    print_error(get_string('notsetup', 'lamslesson'));
+    return NULL;
+  }
+    
+  $datetime =    date("F d,Y g:i a");
+  $datetime_encoded = urlencode($datetime);
+
+  $plaintext = $datetime.$username.$CFG->lamslesson_serverid.$CFG->lamslesson_serverkey;
+  $hashvalue = sha1(strtolower($plaintext));
+
+  $request = "$CFG->lamslesson_serverurl" . LAMSLESSON_LESSON_MANAGER . "?method=" . LAMSLESSON_PARAM_SINGLE_PROGRESS_METHOD . "&serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . $hashvalue ."&lsId=" . $ldid . "&courseId=" . $courseid . "&progressUser=" . $username . "&username=" . $username;
+  
+  // GET call to LAMS
+  
+  $xml = file_get_contents($request);
+
+  $xml_array = xmlize($xml);
+
+  $response = $xml_array['LessonProgress']['#'];
+  $learnerProgress = $response['LearnerProgress']['0'];
+  
+  //   print_r($learnerProgress['@']['activitiesCompleted']);
+  // die();
+
+
+  return $learnerProgress['@'];
+}
+
+
+//returns the moodle completion state for a user)
+function lamslesson_get_moodle_completion($course,$cm) {
+
+  $completion = new completion_info($course);
+  return $completion->get_data($cm);
+
+}
+
+function lamslesson_set_as_completed($cm,$course,$lamslesson) {
+  // Update completion state
+  $completion = new completion_info($course);
+  if ($completion->is_enabled($cm) && $lamslesson->completionfinish) {
+    lamslesson_set_completion_state($cm,$completion,COMPLETION_COMPLETE);
+  }
+}
+
+function lamslesson_set_as_incomplete($cm,$course,$lamslesson) {
+  // Update completion state
+  $completion = new completion_info($course);
+  if ($completion->is_enabled($cm) && $lamslesson->completionfinish) {
+    lamslesson_set_completion_state($cm,$completion,COMPLETION_INCOMPLETE);
+  }
+}
+
+function lamslesson_set_completion_state($cm,$completion,$state) {
+  //Update completion state
+
+  switch ($state) {
+  case COMPLETION_COMPLETE: 
+    
+    $completion->update_state($cm, COMPLETION_COMPLETE);
+    break;
+
+  default:
+    $completion->update_state($cm, COMPLETION_INCOMPLETE);
+    break;
+  }
+      
+
+}
+
+
 

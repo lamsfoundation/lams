@@ -146,11 +146,14 @@ var tree;
 tree = new YAHOO.widget.TreeView("treeDiv",[
 $lds
 					    ]);
+// expand only the first two nodes
+tree.getNodeByIndex(1).expand(true);
+tree.getNodeByIndex(2).expand(true);
 tree.render();
-tree.expandAll();
 tree.subscribe('clickEvent',function(oArgs) {
     selectSequence(oArgs.node.data.id, oArgs.node.label);
   });
+
 
 
 </script>
@@ -181,4 +184,16 @@ $html = $authorbutton . $html;
       }
       return $errors;
     }
+
+    function add_completion_rules() {
+        $mform =& $this->_form;
+
+        $mform->addElement('checkbox', 'completionfinish', '', get_string('completionfinish', 'lamslesson'));
+        return array('completionfinish');
+    }
+
+    function completion_rule_enabled($data) {
+        return !empty($data['completionfinish']);
+    }
+
 }
