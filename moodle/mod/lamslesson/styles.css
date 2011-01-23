@@ -4,6 +4,11 @@
 .path-mod-lamslesson .progress-header {text-align:center;font-weight: bold;padding-top: 5px; padding-bottom:5px;}
 .path-mod-lamslesson .super {position:relative;bottom:0.5em;color:red;font-size:0.8em;}
 
+/* Button styles */
+#authorbutton a {padding-left: 2.25em;background: url([[pix:i/admin]]) 5% 50% no-repeat;}
+#learnerbutton a {padding-left: 2.25em;background: url([[pix:t/go]]) 8% 50% no-repeat;}
+#monitorbutton a {padding-left: 2.25em;background: url([[pix:a/search]]) 5% 50% no-repeat;}
+
 /* Copyright (c) 2006 Yahoo! Inc. All rights reserved. 
 This file is from:
 http://developer.yahoo.com/yui/examples/treeview/assets/css/folders/tree.css

@@ -99,9 +99,11 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 //-->
 </script>
 
-<p align="center">
-    <input type="submit" value="$openauthorlabel" onclick="openAuthor('$authorurl','author','location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=700,resizable',0)">
-</p>
+<div class="centerlink">
+    <span id="authorbutton" class="yui-button yui-link-button"><span class="first-child">
+    <a onclick="openAuthor('$authorurl','author','location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=700,resizable',0)" href="#">$openauthorlabel</a>
+    </span></span>
+</div>
 XXX;
 	}
     

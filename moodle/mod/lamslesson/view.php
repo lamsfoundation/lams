@@ -59,7 +59,6 @@ $PAGE->set_title($lamslesson->name);
 $PAGE->set_heading($course->shortname);
 $PAGE->set_button(update_module_button($cm->id, $course->id, get_string('modulename', 'lamslesson')));
 
-
 // Main page
 $options_html = '';
 $canmanage = has_capability('mod/lamslesson:manage', $context);
@@ -93,13 +92,17 @@ echo $OUTPUT->box_start('generalbox', 'intro');
 if ($canparticipate) {
   $learnerurl = lamslesson_get_url($USER->username, $locale['lang'], $locale['country'], $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_LEARNER_METHOD);
   echo '<div class="centerlink">';
+  echo '<span id="learnerbutton" class="yui-button yui-link-button"><span class="first-child"> ';
   echo $OUTPUT->action_link($learnerurl, get_string('openlesson', 'lamslesson'), new popup_action('click', $learnerurl, '', array('height' => 600, 'width' => 996)));
+  echo '</span></span>';
   echo '</div>';
 }
 if ($canmanage) {
     $monitorurl = lamslesson_get_url($USER->username, $locale['lang'], $locale['country'], $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_MONITOR_METHOD);
   echo '<div class="centerlink">';
+  echo '<span id="monitorbutton" class="yui-button yui-link-button"><span class="first-child"> ';
   echo $OUTPUT->action_link($monitorurl, get_string('openmonitor', 'lamslesson'), new popup_action('click', $monitorurl, '', array('height' => 600, 'width' => 996)));
+  echo '</span></span>';
   echo '</div>';
 
 
@@ -141,6 +144,7 @@ if ($progress['lessonComplete'] == 'true') {
   echo '<div class="progress-header">' . get_string('lessoncompleted','lamslesson') . ' ' . $OUTPUT->pix_icon('i/tick_green_big', get_string('lessoncompleted','lamslesson')) . '</div>';
   echo $OUTPUT->box_end();
 }
+
 
 /*
 print($progress['activitiesCompleted']);
