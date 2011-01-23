@@ -29,6 +29,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$PAGE->requires->yui2_lib('yahoo-dom-event');
+$PAGE->requires->yui2_lib('treeview');
+
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 class mod_lamslesson_mod_form extends moodleform_mod {
@@ -101,8 +104,6 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 </p>
 XXX;
 	}
-
-
     
     $mform->addElement('hidden', 'sequence_id');
     $mform->setType('sequence_id', PARAM_INT);
@@ -115,13 +116,6 @@ XXX;
 
     // html "chuck" for YUI tree
     $html = <<<XXX
-     <!-- Combo-handled YUI CSS files: -->
-     <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.2r1/build/fonts/fonts-min.css" /> 
-     <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.2r1/build/treeview/assets/skins/sam/treeview.css" /> 
-     <script type="text/javascript" src="http://yui.yahooapis.com/2.8.2r1/build/yahoo-dom-event/yahoo-dom-event.js"></script> 
-     <script type="text/javascript" src="http://yui.yahooapis.com/2.8.2r1/build/treeview/treeview-min.js"></script> 
-     <!--bring in the folder-style CSS for the TreeView Control--> 
-     <link rel="stylesheet" type="text/css" href="http://developer.yahoo.com/yui/examples/treeview/assets/css/folders/tree.css"> 
      <script type="text/javascript">
        <!--
        function selectSequence(obj, name){
