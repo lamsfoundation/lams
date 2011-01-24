@@ -31,7 +31,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $PAGE->requires->yui2_lib('yahoo-dom-event');
 $PAGE->requires->yui2_lib('treeview');
-
+$PAGE->requires->yui2_lib('event');
+$PAGE->requires->yui2_lib('connection');
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 class mod_lamslesson_mod_form extends moodleform_mod {
@@ -67,43 +68,67 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 	$locale = lamslesson_get_locale($COURSE->id);
 	$canmanage = has_capability('mod/lamslesson:manage', $context);
 
-    //-- Open URL button
+    //-- Open Author & Preview URL buttons
 
 	// Check whether this person has the right permissions to see the open button. 
 	if ($canmanage) {
 
 	  $customcsv = "$USER->username,$COURSE->id,$CFG->lamslesson_serverid";
 	  $authorurl = lamslesson_get_url($USER->username, $locale['lang'], $locale['country'], 0, $COURSE->id, $COURSE->fullname, $COURSE->timecreated, LAMSLESSON_PARAM_AUTHOR_METHOD, $customcsv);
+
+	  $previewurl = $CFG->wwwroot.'/mod/lamslesson/preview.php?';
+	  $popupoptions = LAMSLESSON_POPUP_OPTIONS;
 	  $openauthorlabel = get_string('openauthor', 'lamslesson');
+	  $openpreviewlabel = get_string('previewthislesson', 'lamslesson');
 
 	  // html "chunk" for open Author button 
-	  $authorbutton = <<<XXX
+	  $authorpreviewbutton = <<<XXX
 <script language="javascript" type="text/javascript">
 <!--
-		var authorWin = null;
-		function openAuthor(url,name,options,fullscreen) {
-                url = url + "&requestSrc=" + escape("$CFG->lamslesson_requestsource");
-                url = url + "&notifyCloseURL=" + escape(window.location.href);
-                if(authorWin && !authorWin.closed){
-                        authorWin.focus();
-                }else{
-                        authorWin = window.open(url,name,options);
-                        if (fullscreen) {
-                                authorWin.moveTo(0,0);
-                                authorWin.resizeTo(screen.availWidth,screen.availHeight);
-                        }
-                        authorWin.focus();
-                }
-                return false;
-        }
-//-->
-</script>
+	  var authorWin = null;
+	  var previewWin = null;
+	  var options = '$popupoptions';
+	  
+	  function openAuthor(url,name,fullscreen) {
+	    url = url + "&requestSrc=" + escape("$CFG->lamslesson_requestsource");
+	    url = url + "&notifyCloseURL=" + escape(window.location.href);
+	    if(authorWin && !authorWin.closed){
+	      authorWin.focus();
+	    }else{
+	      authorWin = window.open(url,name,options);
+	      if (fullscreen) {
+		authorWin.moveTo(0,0);
+		authorWin.resizeTo(screen.availWidth,screen.availHeight);
+	      }
+	      authorWin.focus();
+	    }
+	    return false;
+	  }
 
+	  function openPreview(url,name,fullscreen) {
+
+	    url = url + "&ldId=" + document.getElementsByName("sequence_id")[0].value;
+	    url = url + "&course=" + $COURSE->id;
+	    previewWin = window.open(url,name,options);
+	    if (fullscreen) {
+	      previewWin.moveTo(0,0);
+	      previewWin.resizeTo(screen.availWidth,screen.availHeight);
+	    }
+	    previewWin.focus();
+	    return false;
+	  }
+	  
+	  //-->
+</script>
 <div class="centerlink">
     <span id="authorbutton" class="yui-button yui-link-button"><span class="first-child">
-    <a onclick="openAuthor('$authorurl','author','location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=700,resizable',0)" href="#">$openauthorlabel</a>
+    <a onclick="openAuthor('$authorurl','author',0)" href="#nogo">$openauthorlabel</a>
+    </span></span>
+    <span id="previewbutton" style="visibility:hidden;" class="yui-button yui-link-button"><span class="first-child">
+    <a onclick="openPreview('$previewurl','preview',0)" href="#nogo">$openpreviewlabel</a>
     </span></span>
 </div>
+
 XXX;
 	}
     
@@ -130,6 +155,9 @@ XXX;
 	    if (document.getElementsByName("name")[0].value == '') {
 	      document.getElementsByName("name")[0].value = name;
 	    }
+	    document.getElementById('previewbutton').style.visibility='visible';
+	  } else {
+	    document.getElementById('previewbutton').style.visibility='hidden';
 	  }
       }
 
@@ -157,7 +185,7 @@ tree.subscribe('clickEvent',function(oArgs) {
 XXX;
 
     // Now we put the two html chunks together
-$html = $authorbutton . $html; 
+$html = $authorpreviewbutton . $html; 
 
         $mform->addElement('header', 'selectsequence', get_string('selectsequence', 'lamslesson'));
 
