@@ -5,9 +5,10 @@
 .path-mod-lamslesson .super {position:relative;bottom:0.5em;color:red;font-size:0.8em;}
 
 /* Button styles */
-#authorbutton a {padding-left: 2.25em;background: url([[pix:i/admin]]) 5% 50% no-repeat;}
-#learnerbutton a {padding-left: 2.25em;background: url([[pix:t/go]]) 8% 50% no-repeat;}
-#monitorbutton a {padding-left: 2.25em;background: url([[pix:a/search]]) 5% 50% no-repeat;}
+#authorbutton a {text-decoration:none;padding-left: 2.25em;background: url([[pix:i/admin]]) 5% 50% no-repeat;}
+#learnerbutton a {text-decoration:none;padding-left: 2.25em;background: url([[pix:t/go]]) 8% 50% no-repeat;}
+#monitorbutton a {text-decoration:none;padding-left: 2.25em;background: url([[pix:a/search]]) 5% 50% no-repeat;}
+#previewbutton a {text-decoration:none;padding-left: 2.25em;background: url([[pix:a/search]]) 5% 50% no-repeat;}
 
 /* Copyright (c) 2006 Yahoo! Inc. All rights reserved. 
 This file is from:

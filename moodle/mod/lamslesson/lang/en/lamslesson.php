@@ -77,7 +77,8 @@ $string['restcalldefault'] = 'Call to LAMS failed: received an HTTP status of: $
 $string['restcallfail'] = 'Call to LAMS failed: received no response or connection was refused. Please check that you have the correct LAMS server URL and that it is online.';
 
 $string['sequencenotselected'] = 'You must select a sequence to proceed.';
-
+$string['previewthislesson'] = 'Preview this lesson';
+$string['disablepopupblocker'] = 'It seems that you have a pop-up blocker that is preventing the preview window to be displayed. Please disable the pop-up blocker to preview'
 // view.php
 
 $string['nolessons'] = 'There are no LAMS lessons yet in this instance.';

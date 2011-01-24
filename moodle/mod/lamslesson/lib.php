@@ -53,11 +53,13 @@ define('LAMSLESSON_PARAM_LSID', 'lsid');
 define('LAMSLESSON_PARAM_AUTHOR_METHOD', 'author');
 define('LAMSLESSON_PARAM_MONITOR_METHOD', 'monitor');
 define('LAMSLESSON_PARAM_LEARNER_METHOD', 'learner');
+define('LAMSLESSON_PARAM_PREVIEW_METHOD', 'preview');
 define('LAMSLESSON_PARAM_SINGLE_PROGRESS_METHOD', 'singleStudentProgress');
 define('LAMSLESSON_PARAM_PROGRESS_METHOD', 'studentProgress');
 define('LAMSLESSON_PARAM_CUSTOM_CSV', 'customCSV');
 define('LAMSLESSON_LD_SERVICE', '/services/xml/LearningDesignRepository');
 define('LAMSLESSON_LESSON_MANAGER', '/services/xml/LessonManager');
+define('LAMSLESSON_POPUP_OPTIONS', 'location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=700,resizable');
 
 /**
  * If you for some reason need to use global variables instead of constants, do not forget to make them
@@ -374,7 +376,7 @@ function lamslesson_add_lesson($form) {
     // start the lesson
     $form->lesson_id = lamslesson_get_lesson(
         $USER->username, $form->sequence_id, $form->course, 
-        $form->name, $form->intro,
+        $form->name, $form->intro, 'start',
         $locale['country'], $locale['lang'], $form->customCSV
     );
 
@@ -479,8 +481,8 @@ function lamslesson_get_members($form) {
  * @param string $lang The Language's ISO code
  * @return int lesson id
  */
-function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$country,$lang,$customcsv='') {
-  //echo "enter lamslesson_get_lesson<BR>";
+function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$method,$country,$lang,$customcsv='') {
+
   global $CFG, $USER;
   if (!isset($CFG->lamslesson_serverid, $CFG->lamslesson_serverkey) || $CFG->lamslesson_serverid == "") {
     print_error(get_string('notsetup', 'lamslesson'));
@@ -498,7 +500,7 @@ function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$country,$
   $title = urlencode($title);
   $desc = urlencode($desc);
 
-  $request = "$CFG->lamslesson_serverurl" . LAMSLESSON_LESSON_MANAGER . "?method=start&serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . $hashvalue . "&username=" . $username . "&ldId=" . $ldid . "&courseId=" . $courseid . "&title=" . $title . "&desc=" . $desc . "&country=" . $country . "&lang=" . $lang;
+  $request = "$CFG->lamslesson_serverurl" . LAMSLESSON_LESSON_MANAGER . "?method=" . $method . "&serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . $hashvalue . "&username=" . $username . "&ldId=" . $ldid . "&courseId=" . $courseid . "&title=" . $title . "&desc=" . $desc . "&country=" . $country . "&lang=" . $lang;
 
   // GET call to LAMS
   $xml = file_get_contents($request);
@@ -543,7 +545,7 @@ function lamslesson_fill_lesson($username,$lsid,$courseid,$country,$lang,$learne
  * URL redirects LAMS to learner or monitor interface depending on method.
  */
 function lamslesson_get_url($username, $lang, $country, $lessonid, $courseid, $coursename, $coursecreatedate, $method, $customcsv='') {
-    global $CFG, $LAMS2CONSTANTS;
+    global $CFG;
 
     // append month/year to course name
     $coursename = $coursename.' '.date('n/Y', $coursecreatedate);
