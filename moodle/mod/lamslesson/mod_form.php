@@ -31,17 +31,27 @@ defined('MOODLE_INTERNAL') || die();
 
 $PAGE->requires->yui2_lib('yahoo-dom-event');
 $PAGE->requires->yui2_lib('treeview');
-$PAGE->requires->yui2_lib('event');
-$PAGE->requires->yui2_lib('connection');
+
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 class mod_lamslesson_mod_form extends moodleform_mod {
 
     function definition() {
       global $COURSE, $USER, $CFG;
+
         $mform =& $this->_form;
 
-//-------------------------------------------------------------------------------
+        if (!empty($this->_instance)) {
+	  $sequence_id = $this->current->sequence_id;
+	  $currentsequence = get_string('currentsequence','lamslesson');
+	  $updatewarning =  get_string('updatewarning','lamslesson');
+	} else {
+	  $sequence_id = 0;
+	  $currentsequence = '';
+	  $updatewarning = '';
+	}
+
+    //-------------------------------------------------------------------------------
     /// Adding the "general" fieldset, where all the common settings are showed
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
@@ -120,12 +130,12 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 	  
 	  //-->
 </script>
-<div class="centerlink">
-    <span id="authorbutton" class="yui-button yui-link-button"><span class="first-child">
-    <a onclick="openAuthor('$authorurl','author',0)" href="#nogo">$openauthorlabel</a>
-    </span></span>
+<div id="buttons" style="float:right;">
     <span id="previewbutton" style="visibility:hidden;" class="yui-button yui-link-button"><span class="first-child">
     <a onclick="openPreview('$previewurl','preview',0)" href="#nogo">$openpreviewlabel</a>
+    </span></span>
+    <span id="authorbutton" class="yui-button yui-link-button"><span class="first-child">
+    <a onclick="openAuthor('$authorurl','author',0)" href="#nogo">$openauthorlabel</a>
     </span></span>
 </div>
 
@@ -140,6 +150,8 @@ XXX;
 
     // display user's lams workspace
     $lds = lamslesson_get_sequences_rest($USER->username, $COURSE->id, $COURSE->fullname, $COURSE->timecreated, $USER->country, $USER->lang) ;
+
+    
 
     // html "chuck" for YUI tree
     $html = <<<XXX
@@ -165,6 +177,7 @@ XXX;
      </script>
 
 <div id="treeDiv"></div>
+<div id="updatesequence"></div>
 <script type="text/javascript">
 var tree;
 tree = new YAHOO.widget.TreeView("treeDiv",[
@@ -173,13 +186,20 @@ $lds
 // expand only the first two nodes
 tree.getNodeByIndex(1).expand(true);
 tree.getNodeByIndex(2).expand(true);
+
+if ($sequence_id > 0) {
+  var node = tree.getNodeByProperty('id', $sequence_id);
+  var sequenceName = node.label;
+  var updateDiv = document.createElement('div');
+  updateDiv.setAttribute('class','note');
+  updateDiv.setAttribute('id','currentsequence');
+  updateDiv.innerHTML = '<p>$updatewarning</p><strong>$currentsequence ' + sequenceName +'</strong>';
+  document.getElementById('updatesequence').appendChild(updateDiv);
+}
 tree.render();
 tree.subscribe('clickEvent',function(oArgs) {
     selectSequence(oArgs.node.data.id, oArgs.node.label);
   });
-
-
-
 </script>
 
 XXX;
@@ -190,14 +210,13 @@ $html = $authorpreviewbutton . $html;
         $mform->addElement('header', 'selectsequence', get_string('selectsequence', 'lamslesson'));
 
         $mform->addElement('static', 'sequencemessage', '', $html);
-	
+
 //-------------------------------------------------------------------------------
         // add standard elements, common to all modules
         $this->standard_coursemodule_elements();
 //-------------------------------------------------------------------------------
         // add standard buttons, common to all modules
         $this->add_action_buttons();
-
     }
 	
     function validation($data) {

@@ -3,6 +3,7 @@
 .path-mod-lamslesson .centerlink {text-align:center;padding-top: 15px; padding-bottom:5px;}
 .path-mod-lamslesson .progress-header {text-align:center;font-weight: bold;padding-top: 5px; padding-bottom:5px;}
 .path-mod-lamslesson .super {position:relative;bottom:0.5em;color:red;font-size:0.8em;}
+.path-mod-lamslesson .note {border:solid 1px #DEDEDE;background:#FFFFCC url([[pix:t/stop]]) 8px 16px no-repeat;color:#222222;padding:10px;text-align:center;}
 
 /* Button styles */
 #authorbutton a {text-decoration:none;padding-left: 2.25em;background: url([[pix:i/admin]]) 5% 50% no-repeat;}
