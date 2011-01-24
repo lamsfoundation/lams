@@ -100,11 +100,14 @@ function lamslesson_add_instance($lamslesson) {
 function lamslesson_update_instance($lamslesson) {
     global $DB;
 
+    //Get first the original record and check whether the sequence_id has changed of not
+    $originallamslesson  = $DB->get_record('lamslesson', array('id' => $lamslesson->instance));
     $lamslesson->timemodified = time();
     $lamslesson->id = $lamslesson->instance;
 
-    # You may have to add extra stuff in here #
-    lamslesson_add_lesson($lamslesson);
+    if ($originallamslesson->sequence_id != $lamslesson->sequence_id) {
+      lamslesson_add_lesson($lamslesson);
+    }
 
     return $DB->update_record('lamslesson', $lamslesson);
 }
