@@ -214,6 +214,10 @@ $html = $authorpreviewbutton . $html;
 //-------------------------------------------------------------------------------
 	$this->standard_grading_coursemodule_elements();
 
+	// set the default grade to 'No Grade' so it doesn't record
+	// anything on gradebook unless specifically set.
+	$mform->setDefault('grade', 0);
+
         // add standard elements, common to all modules
         $this->standard_coursemodule_elements();
 //-------------------------------------------------------------------------------
