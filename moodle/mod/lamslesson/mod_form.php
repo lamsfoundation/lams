@@ -212,6 +212,8 @@ $html = $authorpreviewbutton . $html;
         $mform->addElement('static', 'sequencemessage', '', $html);
 
 //-------------------------------------------------------------------------------
+	$this->standard_grading_coursemodule_elements();
+
         // add standard elements, common to all modules
         $this->standard_coursemodule_elements();
 //-------------------------------------------------------------------------------

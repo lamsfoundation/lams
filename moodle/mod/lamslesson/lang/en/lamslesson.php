@@ -43,6 +43,11 @@ $string['selectsequence'] = 'Select sequence';
 $string['availablesequences'] = 'Sequences';
 $string['openauthor'] = 'Author new LAMS lessons';
 
+// Capabilities
+$string['lamslesson:manage'] = 'Manage lessons';
+$string['lamslesson:participate'] = 'Participate in lessons';
+
+
 // Admin interface
 $string['adminheader'] = 'LAMS Server Configuration';
 $string['admindescription'] = 'Configure your LAMS server settings. Make <strong>sure</strong> that the values you enter here correspond with the once you already entered in your LAMS server. Otherwise the integration might not work.';
@@ -98,3 +103,5 @@ $string['lessonincompleted'] = 'Lesson is not yet completed';
 $string['lessoncompleted'] = 'You have completed this lesson';
 $string['activities'] = 'activities';
 $string['ymmv'] = 'Total activities depend on your learning path.';
+$string['yourmarkis'] = 'Your final mark/grade is:';
+$string['outofmark'] = 'out of';
