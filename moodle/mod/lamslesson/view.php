@@ -141,20 +141,66 @@ if ($progress['lessonComplete'] == 'true') {
   if ($moodle_completion->completionstate == 0){ 
     lamslesson_set_as_completed($cm,$course,$lamslesson);
   }
+
   echo '<div class="progress-header">' . get_string('lessoncompleted','lamslesson') . ' ' . $OUTPUT->pix_icon('i/tick_green_big', get_string('lessoncompleted','lamslesson')) . '</div>';
+
+
+  // Does this lesson has to record a score in Moodle?
+  if ($lamslesson->grade != 0) {
+    // Now let's get the score from LAMS and add it into gradebook
+    // Getting result from LAMS
+
+    $results = lamslesson_get_outputs($USER->username,'en','AU',$lamslesson->lesson_id,$cm->course,LAMSLESSON_OUTPUT_METHOD,$USER->username);
+
+    // Get the outputs from the activities
+    $learneroutputs = $results['ToolOutputs']['#']['LearnerOutput'];
+    $activityoutputs = $learneroutputs['0']['#']['Activity'];
+    
+    $maxresult = 0;
+    $userresult = 0;
+    
+    // Calculate max and user results (if they exist)
+    
+    foreach ($activityoutputs as $k => $v){
+      // If activities don't have or produce any output then we just ignore them
+      if (!empty($v['#'])) {
+	foreach ($v['#']['ToolOutput'] as $k2 => $v2) {
+	  $activityoutputname = $v2['@']['name'];
+	  // The only numeric outputs we get from LAMS are for the MCQ and Assessment activities
+	  // learner.total.score = Assessment 
+	  // learner.mark = MCQ
+	  if ($activityoutputname == 'learner.mark' || $activityoutputname == 'learner.total.score') {
+	    $actname = $v2['@']['name'];
+	    $actmaxresult = $v2['@']['marksPossible'];
+	    $actuserresult = $v2['@']['output'];
+	    $userresult += $actuserresult;
+	    $maxresult += $actmaxresult;
+	    
+	  }
+	}
+      }
+    
+    }
+
+  
+    // If there's outputs from LAMS, then we process them and add them to the gradebook
+    if (!$maxresult == 0) {
+  
+      //print("Max total result: " . $maxresult . "<br> User total result: " . $userresult . " " . $lamslesson->grade);
+
+      // Now calculate the percentage and then multiply it by the lamslesson grade. 
+      $gradebookmark = ($userresult / $maxresult) *  $lamslesson->grade;
+      echo '<div class="centerlink">' . get_string('yourmarkis', 'lamslesson') . ' ' . round($gradebookmark, 2) . ' ' . get_string('outofmark', 'lamslesson') . ' ' . $lamslesson->grade . '.</div>';
+      
+      // Put this into gradebook
+  
+      lamslesson_update_grades($lamslesson, $USER->id, $gradebookmark);
+
+    }
+  }
   echo $OUTPUT->box_end();
+
 }
 
-
-/*
-print($progress['activitiesCompleted']);
-print($progress['activityCount']);
-print($progress['attemptedActivities']);
-print($progress['lessonComplete']);
-*/
-
 echo $OUTPUT->footer();
-
-/// Mark as viewed
-// lamslesson_set_as_completed($cm, $course, $lamslesson);
 

@@ -60,6 +60,7 @@ define('LAMSLESSON_PARAM_CUSTOM_CSV', 'customCSV');
 define('LAMSLESSON_LD_SERVICE', '/services/xml/LearningDesignRepository');
 define('LAMSLESSON_LESSON_MANAGER', '/services/xml/LessonManager');
 define('LAMSLESSON_POPUP_OPTIONS', 'location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=700,resizable');
+define('LAMSLESSON_OUTPUT_METHOD', 'toolOutputsUser');
 
 /**
  * If you for some reason need to use global variables instead of constants, do not forget to make them
@@ -86,7 +87,11 @@ function lamslesson_add_instance($lamslesson) {
 
     # You may have to add extra stuff in here #
 
-    return $DB->insert_record('lamslesson', $lamslesson);
+    $lamslesson->id = $DB->insert_record('lamslesson', $lamslesson);
+
+    lamslesson_grade_item_update($lamslesson);
+
+    return $lamslesson->id;
 }
 
 /**
@@ -543,6 +548,39 @@ function lamslesson_fill_lesson($username,$lsid,$courseid,$country,$lang,$learne
   return file_get_contents($request);
 }
 
+function lamslesson_get_outputs($username, $lang, $country, $lessonid, $courseid, $method,$foruser) {
+  global $CFG;
+
+  $datetime = date('F d,Y g:i a');
+  $plaintext = trim($datetime)
+    .trim($username)
+    .trim($CFG->lamslesson_serverid)
+    .trim($CFG->lamslesson_serverkey);
+  $hash = sha1(strtolower($plaintext));
+  $request = $CFG->lamslesson_serverurl. LAMSLESSON_LESSON_MANAGER 
+    .'?serverId='.$CFG->lamslesson_serverid
+    .'&courseId='.$courseid
+    .'&username='.$username
+    .'&datetime='.urlencode(strtolower($datetime))
+    .'&hashValue='.$hash
+    .'&lang='.$lang
+    .'&country='.$country
+    .'&method='.$method
+    .'&lsId='.$lessonid
+    .'&outputsUser='.$foruser;
+
+  // GET call to LAMS
+
+  $xml = file_get_contents($request);
+
+  $xml_array = xmlize($xml);
+
+  return $xml_array;
+
+
+}
+
+
 /**
  * Return URL to join a LAMS lesson as a learner or staff depending on method.
  * URL redirects LAMS to learner or monitor interface depending on method.
@@ -638,10 +676,6 @@ function lamslesson_get_student_progress($username,$ldid,$courseid) {
   $response = $xml_array['LessonProgress']['#'];
   $learnerProgress = $response['LearnerProgress']['0'];
   
-  //   print_r($learnerProgress['@']['activitiesCompleted']);
-  // die();
-
-
   return $learnerProgress['@'];
 }
 
@@ -687,5 +721,101 @@ function lamslesson_set_completion_state($cm,$completion,$state) {
 
 }
 
+/**
+ * @param string $feature FEATURE_xx constant for requested feature
+ * @return mixed True if module supports feature, null if doesn't know
+ */
+function lamslesson_supports($feature) {
+    switch($feature) {
+        case FEATURE_GROUPS:                  return true;
+        case FEATURE_GROUPINGS:               return true;
+        case FEATURE_GROUPMEMBERSONLY:        return true;
+        case FEATURE_MOD_INTRO:               return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
+        case FEATURE_COMPLETION_HAS_RULES:    return false;
+        case FEATURE_GRADE_HAS_GRADE:         return true;
+        case FEATURE_GRADE_OUTCOMES:          return true;
+        case FEATURE_RATE:                    return false;
+        case FEATURE_BACKUP_MOODLE2:          return false;
 
+        default: return null;
+    }
+}
+
+
+/**
+ * Create/update grade item for given lamslesson
+ *
+ * @global object
+ * @uses GRADE_TYPE_NONE
+ * @uses GRADE_TYPE_VALUE
+ * @uses GRADE_TYPE_SCALE
+ * @param object $lamslesson object with extra cmidnumber
+ * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
+ * @return int 0 if ok
+ */
+function lamslesson_grade_item_update($lamslesson, $grades=NULL) {
+    global $CFG;
+    if (!function_exists('grade_update')) { //workaround for buggy PHP versions
+        require_once($CFG->libdir.'/gradelib.php');
+    }
+
+    $params = array('itemname'=>$lamslesson->name);
+
+    if ($lamslesson->grade > 0 ) {
+        $params['gradetype'] = GRADE_TYPE_VALUE;
+        $params['grademax']   = $lamslesson->grade;
+        $params['grademin']   = 0;
+    } else {
+      $params['gradetype']  = GRADE_TYPE_NONE;
+    }
+
+    if ($grades  === 'reset') {
+        $params['reset'] = true;
+        $grades = NULL;
+    }
+
+    
+    return grade_update('mod/lamslesson', $lamslesson->course, 'mod', 'lamslesson', $lamslesson->id, 0, $grades, $params);
+}
+
+/**
+ * Delete grade item for given lamslesson
+ *
+ * @global object
+ * @param object $lamslesson object
+ * @return object grade_item
+ */
+function lamslesson_grade_item_delete($lamslesson) {
+    global $CFG;
+    require_once($CFG->libdir.'/gradelib.php');
+
+    return grade_update('mod/lamslesson', $lamslesson->course, 'mod', 'lamslesson', $lamslesson->id, 0, NULL, array('deleted'=>1));
+}
+
+/**
+ * Update grades in central gradebook
+ *
+ * @global stdclass
+ * @global object
+ * @param object $lamslesson
+ * @param int $userid specific user only, 0 means all
+ */
+function lamslesson_update_grades($lamslesson, $userid, $usermark) {
+    global $CFG, $DB;
+    require_once($CFG->libdir.'/gradelib.php');
+
+    if ($lamslesson->grade == 0) {
+        lamslesson_grade_item_update($lamslesson);
+
+    } else if ($userid) {
+        $grade = new stdClass();
+        $grade->userid   = $userid;
+        $grade->rawgrade = $usermark;
+        lamslesson_grade_item_update($lamslesson, $grade);
+
+    } else {
+        lamslesson_grade_item_update($lamslesson);
+    }
+}
 
