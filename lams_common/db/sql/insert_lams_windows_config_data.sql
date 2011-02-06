@@ -106,6 +106,9 @@ values ('AllowLiveEdit','true', 'config.allow.live.edit', 'config.header.feature
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('ShowAllMyLessonLink','true', 'config.show.all.my.lesson.link', 'config.header.features', 'BOOLEAN', 1);
 
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+values ('DisplayPrintButton','true', 'config.display.print.button', 'config.header.features', 'BOOLEAN', 1);
+
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LDAPProvisioningEnabled','false', 'config.ldap.provisioning.enabled', 'config.header.ldap', 'BOOLEAN', 1);
 

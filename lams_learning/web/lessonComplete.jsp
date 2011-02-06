@@ -28,6 +28,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <c:set var="enableFlash"><lams:LearnerFlashEnabled/></c:set>
+<c:set var="displayPrintButton"><lams:Configuration key="DisplayPrintButton"/></c:set>
+
 <c:if test="${enableFlash}">
 	<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}" />
 </c:if>
@@ -53,11 +55,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</fmt:message>
 	</p>
 	
-	<p class="align-right space-top">
-		<a href="#" class="button" onclick="JavaScript:window.print();">
-			<fmt:message key="label.print" />
-		</a>	
-	</p>
+	<c:if test="${displayPrintButton}">
+		<p class="align-right space-top">
+			<a href="#" class="button" onclick="JavaScript:window.print();">
+				<fmt:message key="label.print" />
+			</a>	
+		</p>
+	</c:if>
 	
 </div>
 <!--closes content-->
