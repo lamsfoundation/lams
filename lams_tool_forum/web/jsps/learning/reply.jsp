@@ -4,7 +4,7 @@
 	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}"/>
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
-	
+	<c:set var="originalMessage" value="${sessionMap.originalMessage}"/>
 	
 	<div id="content">
 	

@@ -604,21 +604,22 @@ public class LearningAction extends Action {
      */
     private ActionForward newReplyTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	String sessionMapID = request.getParameter(ForumConstants.ATTR_SESSION_MAP_ID);
-
 	MessageForm msgForm = (MessageForm) form;
+	String sessionMapID = request.getParameter(ForumConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = getSessionMap(request, msgForm);
 	msgForm.setSessionMapID(sessionMapID);
 
 	Long parentId = WebUtil.readLongParam(request, ForumConstants.ATTR_PARENT_TOPIC_ID);
+	sessionMap.put(ForumConstants.ATTR_PARENT_TOPIC_ID, parentId);
+	
 	// get parent topic, it can decide default subject of reply.
 	MessageDTO topic = getTopic(parentId);
-
 	if (topic != null && topic.getMessage() != null) {
 	    String reTitle = topic.getMessage().getSubject();
 
 	    MessageDTO originalMessage = MessageDTO.getMessageDTO(topic.getMessage());
 
-	    request.setAttribute(ForumConstants.ATTR_ORIGINAL_MESSAGE, originalMessage);
+	    sessionMap.put(ForumConstants.ATTR_ORIGINAL_MESSAGE, originalMessage);
 
 	    // echo back current topic subject to web page
 	    if (reTitle != null && !reTitle.trim().startsWith("Re:")) {
@@ -627,9 +628,7 @@ public class LearningAction extends Action {
 		msgForm.getMessage().setSubject(reTitle);
 	    }
 	}
-	SessionMap sessionMap = getSessionMap(request, msgForm);
-	sessionMap.put(ForumConstants.ATTR_PARENT_TOPIC_ID, parentId);
-
+	
 	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
 	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
 	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
