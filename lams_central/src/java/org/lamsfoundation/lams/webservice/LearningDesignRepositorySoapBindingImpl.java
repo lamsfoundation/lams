@@ -179,6 +179,7 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 		ContentTreeNode root = new ContentTreeNode(rootFolder);
 		FolderContentDTO userFolder = service.getUserWorkspaceFolder(userId);
 		root.addChild(buildContentTreeNode(userFolder, userId, mode));
+		
 		FolderContentDTO dummyOrgFolder = new FolderContentDTO(msgService
 				.getMessage("organisations"), msgService.getMessage("folder"), null, null,
 				FolderContentDTO.FOLDER, new Long(WorkspaceAction.ORG_FOLDER_ID.longValue()),
@@ -193,6 +194,12 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
 			dummyOrgNode.addChild(buildContentTreeNode(orgFolder, userId, mode));
 		}
 		root.addChild(dummyOrgNode);
+		
+		FolderContentDTO publicFolder = service.getPublicWorkspaceFolder(userId);
+		if (publicFolder != null) {
+		    	root.addChild(buildContentTreeNode(publicFolder, userId, mode));
+		}
+		
 		return root;
 	}
 
