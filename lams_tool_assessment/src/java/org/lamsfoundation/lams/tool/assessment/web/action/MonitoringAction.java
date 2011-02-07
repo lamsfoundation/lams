@@ -117,6 +117,8 @@ public class MonitoringAction extends Action {
 	assessment.toDTO();
 
 	// cache into sessionMap
+	boolean isGroupedActivity = service.isGroupedActivity(contentId);
+	sessionMap.put(AssessmentConstants.ATTR_IS_GROUPED_ACTIVITY, isGroupedActivity);
 	sessionMap.put(AssessmentConstants.ATTR_SUMMARY_LIST, summaryList);
 	sessionMap.put(AssessmentConstants.PAGE_EDITABLE, assessment.isContentInUse());
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);

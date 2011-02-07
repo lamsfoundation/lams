@@ -204,9 +204,11 @@
 	
 		<c:forEach var="summary" items="${summaryList}" varStatus="status">
 			<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
-				<div style="padding-bottom: 5px; font-size: small;">
-					<B><fmt:message key="monitoring.label.group" /></B> ${summary.sessionName}
-				</div>
+				<c:if test="${sessionMap.isGroupedActivity}">
+					<div style="padding-bottom: 5px; font-size: small;">
+						<B><fmt:message key="monitoring.label.group" /></B> ${summary.sessionName}
+					</div>
+				</c:if>
 				
 				<table id="list${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 				<div style="margin-top: 10px;">

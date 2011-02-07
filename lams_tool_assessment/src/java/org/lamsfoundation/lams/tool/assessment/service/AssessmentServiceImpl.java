@@ -816,6 +816,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public String getMessage(String key) {
 	return messageService.getMessage(key);
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     // *****************************************************************************
     // set methods for Spring Bean

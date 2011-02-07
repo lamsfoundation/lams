@@ -191,6 +191,8 @@ public class AssessmentConstants {
     public static final String ATTR_USER = "user";
     
     public static final String ATTR_QUESTION_NUMBERING_OFFSET = "questionNumberingOffset";
+    
+    public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 
     // error message keys
     public static final String ERROR_MSG_QUESTION_NAME_BLANK = "error.question.name.blank";

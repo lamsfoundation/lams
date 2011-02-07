@@ -253,6 +253,8 @@ public interface IAssessmentService {
      * @return
      */
     public String getMessage(String key);
+    
+    boolean isGroupedActivity(long toolContentID);
 }
 
 
