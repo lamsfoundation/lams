@@ -119,6 +119,9 @@ INSERT INTO lams_log_event_type VALUES (4, 'TYPE_TEACHER_LESSON_CHANGE_STATE');
 INSERT INTO lams_log_event_type VALUES (5, 'TYPE_LEARNER_ACTIVITY_START');
 INSERT INTO lams_log_event_type VALUES (6, 'TYPE_LEARNER_ACTIVITY_FINISH');
 
+-- LDEV-2639 Make print button in LAMS learner optional 
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)  
+values ('DisplayPrintButton','false', 'config.display.print.button', 'config.header.features', 'BOOLEAN', 1);
 
 COMMIT;
 SET AUTOCOMMIT = 1;
