@@ -89,7 +89,7 @@ echo '<div class="smalltext">' . get_string('lastmodified', 'lamslesson') . ": "
 echo $OUTPUT->box_end();
 
 echo $OUTPUT->box_start('generalbox', 'intro');
-if ($canparticipate) {
+if ($canparticipate || $canmanage) {
   $learnerurl = lamslesson_get_url($USER->username, $locale['lang'], $locale['country'], $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_LEARNER_METHOD);
   echo '<div class="centerlink">';
   echo '<span id="learnerbutton" class="yui-button yui-link-button"><span class="first-child"> ';
