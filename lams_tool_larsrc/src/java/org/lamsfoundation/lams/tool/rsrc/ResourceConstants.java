@@ -121,6 +121,8 @@ public class ResourceConstants {
     public static final String ATTR_INSTRUCTIONS = "instructions";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
+    
+    public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 
     // error message keys
     public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";

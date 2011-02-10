@@ -808,6 +808,10 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    return null;
 	}
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     // *****************************************************************************
     // set methods for Spring Bean

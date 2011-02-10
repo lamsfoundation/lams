@@ -585,6 +585,10 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	}
 	return node;
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     /**
      * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and

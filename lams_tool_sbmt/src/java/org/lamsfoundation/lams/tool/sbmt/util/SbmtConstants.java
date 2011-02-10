@@ -73,6 +73,8 @@ public class SbmtConstants {
     public static final Object ATTR_ARRIVE_LIMIT = "arriveLimit";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
+    
+    public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 
     public static final String EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE = "notify_learners_on_mark_release";
 

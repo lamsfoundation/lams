@@ -97,9 +97,11 @@
 	
 	<c:forEach var="session" items="${dto.sessionDTOs}">
 	
-		<h2>
-			${session.sessionName}
-		</h2>
+		<c:if test="${isGroupedActivity}">
+			<h2>
+				${session.sessionName}
+			</h2>
+		</c:if>
 	
 		<table cellpadding="0">
 			<tr>

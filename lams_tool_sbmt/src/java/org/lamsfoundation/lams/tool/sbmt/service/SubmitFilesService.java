@@ -983,6 +983,10 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	}
 	return learners;
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     /* ===============Methods implemented from ToolContentImport102Manager =============== */
 

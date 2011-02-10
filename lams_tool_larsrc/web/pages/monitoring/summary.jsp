@@ -155,16 +155,24 @@
 		<c:forEach var="item" items="${group}" varStatus="status">
 			<%-- display group name on first row--%>
 			<c:if test="${status.first}">
-				<tr>
-					<td colspan="5">
-						<B><fmt:message key="monitoring.label.group" /> ${item.sessionName}</B> 
-						<SPAN style="font-size: 12px;"> 
-							<c:if test="${firstGroup.index==0}">
+				<c:if test="${sessionMap.isGroupedActivity}">
+					<tr>
+						<td colspan="5">
+							<B><fmt:message key="monitoring.label.group" /> ${item.sessionName}</B> 
+						</td>
+					</tr>
+				</c:if>
+				
+				<c:if test="${firstGroup.index==0}">
+					<tr>
+						<td colspan="5">
+							<SPAN style="font-size: 12px;"> 
 								<fmt:message key="monitoring.summary.note" />
-							</c:if> 
-						</SPAN>
-					</td>
-				</tr>
+							</SPAN>
+						</td>
+					</tr>
+				</c:if> 
+				
 				<tr>
 					<th width="18%" align="center">
 						<fmt:message key="monitoring.label.type" />

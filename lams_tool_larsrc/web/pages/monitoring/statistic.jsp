@@ -16,9 +16,14 @@
 			<c:if test="${status.index == 0}">
 				<tr>
 					<td colspan="4">
-						<B><fmt:message key="monitoring.label.group" /> ${item.sessionName}</B> <SPAN style="font-size: 12px;"> <c:if test="${firstGroup.index==0}">
+						<c:if test="${sessionMap.isGroupedActivity}">
+							<B><fmt:message key="monitoring.label.group" /> ${item.sessionName}</B> 
+						</c:if>
+						<SPAN style="font-size: 12px;"> 
+							<c:if test="${firstGroup.index==0}">
 								<fmt:message key="monitoring.summary.note" />
-							</c:if> </SPAN>
+							</c:if> 
+						</SPAN>
 					</td>
 				</tr>
 				<tr>

@@ -100,6 +100,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute("contentFolderID", contentFolderID);
 	request.setAttribute("toolContentID", toolContentID);
 	request.setAttribute("pixlrImageFolderURL", PixlrConstants.LAMS_WWW_PIXLR_FOLDER_URL);
+	request.setAttribute("isGroupedActivity", pixlrService.isGroupedActivity(toolContentID));
 	return mapping.findForward("success");
     }
 

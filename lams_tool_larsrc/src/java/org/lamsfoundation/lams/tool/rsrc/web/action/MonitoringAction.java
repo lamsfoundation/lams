@@ -162,6 +162,7 @@ public class MonitoringAction extends Action {
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE, resource);
 	sessionMap.put(ResourceConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(ResourceConstants.ATTR_REFLECT_LIST, relectList);
+	sessionMap.put(ResourceConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
 	return mapping.findForward(ResourceConstants.SUCCESS);
     }
 

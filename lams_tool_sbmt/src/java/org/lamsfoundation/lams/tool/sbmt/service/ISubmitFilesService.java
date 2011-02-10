@@ -310,4 +310,12 @@ public interface ISubmitFilesService {
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
     List<User> getMonitorsByToolSessionId(Long sessionId);
+    
+    /**
+     * Returns whether activity is grouped and therefore it is expected more than one tool session.
+     * 
+     * @param toolContentID
+     * @return
+     */
+    boolean isGroupedActivity(long toolContentID);
 }

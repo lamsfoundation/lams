@@ -4,11 +4,14 @@
 	<c:set var="sessionName" value="${element.key.sessionName}" />
 	<c:set var="statistic" value="${element.value}" />
 	<table cellpadding="0">
-		<tr>
-			<th colspan="2">
-				<fmt:message key="label.session.name" />: <c:out value="${sessionName}" />
-			</th>
-		</tr>
+		<c:if test="${isGroupedActivity}">
+			<tr>
+				<th colspan="2">
+					<fmt:message key="label.session.name" />: <c:out value="${sessionName}" />
+				</th>
+			</tr>
+		</c:if>
+		
 		<tr>
 			<td>
 				<fmt:message key="monitoring.statistic.marked" />

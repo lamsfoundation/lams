@@ -122,6 +122,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	AuthoringDTO authorDto = new AuthoringDTO(persistContent);
 	request.setAttribute(SbmtConstants.AUTHORING_DTO, authorDto);
 	request.setAttribute(SbmtConstants.PAGE_EDITABLE, persistContent.isContentInUse());
+	request.setAttribute(SbmtConstants.ATTR_IS_GROUPED_ACTIVITY, submitFilesService.isGroupedActivity(contentID));
 
 	DynaActionForm smbtMonitoringForm = (DynaActionForm) form;
 	// smbtMonitoringForm.set("currentTab", WebUtil.readStrParam(request, AttributeNames.PARAM_CURRENT_TAB,true));

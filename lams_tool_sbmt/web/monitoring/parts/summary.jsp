@@ -197,14 +197,17 @@
 	<c:set var="sessionDto" value="${element.key}" />
 	<c:set var="userlist" value="${element.value}" />
 	<table cellpadding="0">
-		<tr>
-			<th colspan="3">
-				<h2>
-				<fmt:message key="label.session.name" /> : 
-				<c:out value="${sessionDto.sessionName}" />
-				</h2>
-			</th>
-		</tr>
+		<c:if test="${isGroupedActivity}">
+			<tr>
+				<th colspan="3">
+					<h2>
+						<fmt:message key="label.session.name" /> : 
+						<c:out value="${sessionDto.sessionName}" />
+					</h2>
+				</th>
+			</tr>
+		</c:if>
+		
 		<c:forEach var="user" items="${userlist}" varStatus="status">
 			<c:if test="${status.first}">
 				<tr>
