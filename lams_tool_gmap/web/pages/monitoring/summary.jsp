@@ -259,7 +259,15 @@
 	
 	<c:forEach var="session" items="${dto.sessionDTOs}">
 		<div id="reflectionDiv${session.sessionID}" style="display:none;">
-		<h1>${session.sessionName} <fmt:message key="heading.reflection"></fmt:message></h1><br />
+		
+		<h1>
+			<c:if test="${isGroupedActivity}">
+				${session.sessionName}
+			</c:if>	
+			<fmt:message key="heading.reflection"></fmt:message>
+		</h1>
+		<br />
+		
 		
 		<table class="alternative-color">
 		<c:forEach var="user" items="${session.userDTOs}">

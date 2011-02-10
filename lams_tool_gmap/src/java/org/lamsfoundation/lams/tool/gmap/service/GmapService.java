@@ -590,6 +590,10 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	    GmapService.logger.debug("MarkerXML string was empty");
 	}
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     /**
      * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and

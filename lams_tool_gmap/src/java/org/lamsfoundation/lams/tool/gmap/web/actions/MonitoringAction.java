@@ -117,6 +117,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    request.setAttribute(GmapConstants.ATTR_GMAP_KEY, gmapKey.getConfigValue());
 	}
 
+	boolean isGroupedActivity = gmapService.isGroupedActivity(toolContentID);
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
 	request.setAttribute("gmapDTO", gmapDT0);
 	request.setAttribute("contentFolderID", contentFolderID);
 	return mapping.findForward("success");
