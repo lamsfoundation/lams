@@ -699,6 +699,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     // ***************************************************************************************************************
     // ToolContentManager and ToolSessionManager methods

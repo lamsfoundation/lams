@@ -614,6 +614,10 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 	    throw new DimdimException("Login failed." + e.getMessage());
 	}
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     /*
      * ===============Methods implemented from ToolContentImport102Manager ===============

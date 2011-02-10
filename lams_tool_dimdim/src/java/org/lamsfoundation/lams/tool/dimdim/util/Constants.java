@@ -38,6 +38,7 @@ public final class Constants {
     public static final String ATTR_SESSION_MAP = "sessionMap";
     public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";
     public static final String ATTR_USER_DTO = "userDTO";
+    public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 
     // Configuration key
     public static final String CFG_SERVER_URL = "server_url";

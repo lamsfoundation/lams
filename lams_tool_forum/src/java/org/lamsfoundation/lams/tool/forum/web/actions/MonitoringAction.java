@@ -262,6 +262,8 @@ public class MonitoringAction extends Action {
 	    sessionUsersMap.put(sessionDto, dtoList);
 	}
 
+	boolean isGroupedActivity = forumService.isGroupedActivity(toolContentID);
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
 	// request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 	request.setAttribute("sessionUserMap", sessionUsersMap);
     }

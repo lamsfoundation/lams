@@ -51,9 +51,11 @@
 
 	<c:forEach var="session" items="${dto.sessionDTOs}">
 	
-		<h1>
-			${session.sessionName}
-		</h1>
+		<c:if test="${isGroupedActivity}">
+			<h1>
+				${session.sessionName}
+			</h1>
+		</c:if>
 	
 		<h2>
 			<fmt:message key="monitor.summary.dimdimSettings" />

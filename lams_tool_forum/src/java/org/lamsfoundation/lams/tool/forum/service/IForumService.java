@@ -433,4 +433,12 @@ public interface IForumService {
     public void deleteCondition(ForumCondition condition) throws PersistenceException;
     
     void sendNotificationsOnNewPosting(Long forumId, Long sessionId, Message message);
+    
+    /**
+     * Returns whether activity is grouped and therefore it is expected more than one tool session.
+     * 
+     * @param toolContentID
+     * @return
+     */
+    boolean isGroupedActivity(long toolContentID);
 }

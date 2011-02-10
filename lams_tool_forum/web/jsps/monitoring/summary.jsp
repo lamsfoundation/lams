@@ -281,18 +281,21 @@
 	<c:set var="userlist" value="${element.value}" />
 
 	<table cellpadding="0">
-		<tr><td colspan="3">
-			<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
-			<span id="messageArea"></span>
-		</td>
-		</tr>	
 		<tr>
-			<td colspan="3" >
-				<h2>
-					<fmt:message key="message.session.name" />:	<c:out value="${toolSessionDto.sessionName}" />
-				</h2>
+			<td colspan="3">
+				<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
+				<span id="messageArea"></span>
 			</td>
 		</tr>
+		<c:if test="${isGroupedActivity}">	
+			<tr>
+				<td colspan="3" >
+					<h2>
+						<fmt:message key="message.session.name" />:	<c:out value="${toolSessionDto.sessionName}" />
+					</h2>
+				</td>
+			</tr>
+		</c:if>
 	</table>
 	<table cellpadding="0">
 		<c:forEach var="user" items="${userlist}" varStatus="status">
