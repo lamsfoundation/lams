@@ -550,13 +550,15 @@ public class LearningAction extends Action {
 
     private void validateAnswers(HttpServletRequest request, AnswerDTO question, ActionErrors errors,
 	    SurveyAnswer answer) {
+	boolean isAnswerEmpty = (answer.getChoices() == null && StringUtils.isBlank(answer.getAnswerText()));
+	
 	// for mandatory questions, answer can not be null.
-	if (!question.isOptional() && answer == null) {
+	if (!question.isOptional() && isAnswerEmpty) {
 	    errors.add(SurveyConstants.ERROR_MSG_KEY + question.getUid(), new ActionMessage(
 		    SurveyConstants.ERROR_MSG_MANDATORY_QUESTION));
 	}
 	if (question.getType() == SurveyConstants.QUESTION_TYPE_SINGLE_CHOICE && question.isAppendText()
-		&& answer != null) {
+		&& !isAnswerEmpty) {
 	    // for single choice, user only can choose one option or open text (if it has)
 	    if (!StringUtils.isBlank(answer.getAnswerChoices()) && !StringUtils.isBlank(answer.getAnswerText())) {
 		errors.add(SurveyConstants.ERROR_MSG_KEY + question.getUid(), new ActionMessage(
@@ -569,9 +571,6 @@ public class LearningAction extends Action {
 
 	String[] choiceList = request.getParameterValues(SurveyConstants.PREFIX_QUESTION_CHOICE + question.getUid());
 	String textEntry = request.getParameter(SurveyConstants.PREFIX_QUESTION_TEXT + question.getUid());
-	if (choiceList == null && StringUtils.isBlank(textEntry)) {
-	    return null;
-	}
 
 	SurveyAnswer answer = question.getAnswer();
 	if (answer == null) {
