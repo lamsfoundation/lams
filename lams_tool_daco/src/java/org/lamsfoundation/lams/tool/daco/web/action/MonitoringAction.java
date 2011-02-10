@@ -163,6 +163,8 @@ public class MonitoringAction extends Action {
 	sessionMap.put(DacoConstants.ATTR_MONITORING_SUMMARY, monitoringSummaryList);
 
 	if (newSession) {
+	    boolean isGroupedActivity = service.isGroupedActivity(contentId);
+	    sessionMap.put(DacoConstants.ATTR_IS_GROUPED_ACTIVITY, isGroupedActivity);
 	    sessionMap.put(DacoConstants.ATTR_DACO, daco);
 	    sessionMap.put(AttributeNames.PARAM_TOOL_CONTENT_ID, contentId);
 	    sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,

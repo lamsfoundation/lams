@@ -142,11 +142,13 @@
 				</c:if>
 			</tr>
 			<c:forEach var="sessionSummary" items="${monitoringSummary}">
-				<tr>
-					<td colspan="4" style="font-weight: bold; text-align: center">
-						<fmt:message key="label.monitoring.group" />: ${sessionSummary.sessionName}
-					</td>
-				</tr>
+				<c:if test="${sessionMap.isGroupedActivity}">
+					<tr>
+						<td colspan="4" style="font-weight: bold; text-align: center">
+							<fmt:message key="label.monitoring.group" />: ${sessionSummary.sessionName}
+						</td>
+					</tr>
+				</c:if>
 				<c:forEach var="user" items="${sessionSummary.users}">
 					<tr>
 						<td>

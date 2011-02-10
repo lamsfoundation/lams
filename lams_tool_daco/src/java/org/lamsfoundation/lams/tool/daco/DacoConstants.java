@@ -193,6 +193,8 @@ public class DacoConstants {
     public static final String ATTR_QUESTION_SUMMARIES = "questionSummaries";
 
     public static final String ATTR_TOTAL_RECORD_COUNT = "totalRecordCount";
+    
+    public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 
     // error message keys
     public static final String ERROR_MSG_DESC_BLANK = "error.question.desc.blank";

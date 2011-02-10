@@ -660,6 +660,10 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	}
 	return learnerService.completeToolSession(toolSessionId, learnerId);
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     // *******************************************************************************
     // ToolContentManager, ToolSessionManager methods

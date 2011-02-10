@@ -314,4 +314,6 @@ public interface IDacoService {
      * @return
      */
     public int getRecordNum(Long userID, Long sessionId);
+    
+    boolean isGroupedActivity(long toolContentID);
 }
