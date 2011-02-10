@@ -705,6 +705,10 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
 	return node;
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     // *****************************************************************************
     // set methods for Spring Bean

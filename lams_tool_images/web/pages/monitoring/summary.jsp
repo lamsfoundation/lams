@@ -177,9 +177,12 @@
 
 <c:forEach var="group" items="${summaryList}">
 
-	<h1>
-		<fmt:message key="monitoring.label.group" /> ${group[0].sessionName}	
-	</h1>
+	<c:if test="${sessionMap.isGroupedActivity}">
+		<h1>
+			<fmt:message key="monitoring.label.group" /> ${group[0].sessionName}	
+		</h1>
+	</c:if>
+	
 	<h2 style="color:black; margin-left: 20px;">
 		<fmt:message key="label.monitoring.summary.overall.summary" />	
 	</h2>

@@ -81,6 +81,7 @@ public class ImageGalleryConstants {
     public static final String ATTR_CONTENT_FOLDER_ID = "contentFolderID";
     public static final String ATTR_MEDIUM_IMAGE_DIMENSIONS = "mediumImageDimensions";
     public static final String ATTR_THUMBNAIL_IMAGE_DIMENSIONS = "thumbnailImageDimensions";
+    public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
     
     // error message keys
     public static final String ERROR_MSG_NOT_ALLOWED_FORMAT = "error.resource.image.not.alowed.format";

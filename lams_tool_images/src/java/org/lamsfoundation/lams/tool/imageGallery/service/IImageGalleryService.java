@@ -391,4 +391,12 @@ public interface IImageGalleryService {
     IEventNotificationService getEventNotificationService();
 
     public List<User> getMonitorsByToolSessionId(Long sessionId);
+    
+    /**
+     * Returns whether activity is grouped and therefore it is expected more than one tool session.
+     * 
+     * @param toolContentID
+     * @return
+     */
+    boolean isGroupedActivity(long toolContentID);
 }

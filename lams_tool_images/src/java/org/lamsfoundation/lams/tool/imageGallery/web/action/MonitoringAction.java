@@ -50,7 +50,6 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
@@ -146,8 +145,10 @@ public class MonitoringAction extends Action {
 	imageGallery.toDTO();
 
 	Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(contentId, false);
+	boolean isGroupedActivity = service.isGroupedActivity(contentId);
 
-	// cache into sessionMap
+	// cache into sessionMap	
+	sessionMap.put(ImageGalleryConstants.ATTR_IS_GROUPED_ACTIVITY, isGroupedActivity);
 	sessionMap.put(ImageGalleryConstants.ATTR_SUMMARY_LIST, groupList);
 	sessionMap.put(ImageGalleryConstants.PAGE_EDITABLE, imageGallery.isContentInUse());
 	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE, imageGallery);
