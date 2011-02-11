@@ -670,6 +670,10 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    throws RepositoryCheckedException {
 	return nbToolContentHandler.uploadFile(istream, filename, contentType, fileType);
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     /* ===============Methods implemented from ToolContentManager =============== */
 

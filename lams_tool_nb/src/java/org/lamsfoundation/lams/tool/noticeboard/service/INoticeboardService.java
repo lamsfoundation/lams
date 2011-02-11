@@ -330,4 +330,12 @@ public interface INoticeboardService {
 	public void updateEntry(NotebookEntry notebookEntry);
     
     public List getUsersBySession(Long sessionId);
+    
+    /**
+     * Returns whether activity is grouped and therefore it is expected more than one tool session.
+     * 
+     * @param toolContentID
+     * @return
+     */
+    boolean isGroupedActivity(long toolContentID);
 }

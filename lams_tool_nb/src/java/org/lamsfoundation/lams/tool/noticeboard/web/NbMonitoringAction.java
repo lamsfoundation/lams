@@ -149,6 +149,9 @@ public class NbMonitoringAction extends LamsDispatchAction {
         }
         monitorForm.setGroupStatsMap(map);
         
+        boolean isGroupedActivity = nbService.isGroupedActivity(toolContentId);
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
+        
         // Set reflection statistics, if reflection is set
         request.setAttribute("reflectOnActivity", content.getReflectOnActivity());
         request.setAttribute("reflectInstructions", content.getReflectInstructions());
