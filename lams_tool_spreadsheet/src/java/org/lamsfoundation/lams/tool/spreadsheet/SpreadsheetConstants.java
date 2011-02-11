@@ -70,6 +70,7 @@ public class SpreadsheetConstants {
 	public static final String ATTR_TITLE = "title";
 	public static final String ATTR_INSTRUCTIONS = "instructions";
 	public static final String ATTR_USER_FINISHED = "userFinished";
+	public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 	
 	//error message keys
 	public static final String ERROR_MSG_MARKS_BLANK = "error.summary.marks.blank";

@@ -133,6 +133,7 @@ public class MonitoringAction extends Action {
 		sessionMap.put(SpreadsheetConstants.ATTR_REFLECT_LIST, reflectList);
 		sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
 				AttributeNames.PARAM_CONTENT_FOLDER_ID));
+		sessionMap.put(SpreadsheetConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
 
 		return mapping.findForward(SpreadsheetConstants.SUCCESS);
 	}
@@ -148,8 +149,11 @@ public class MonitoringAction extends Action {
 	public ActionForward doStatistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-		List<StatisticDTO> statisticList = getSpreadsheetService().getStatistics(contentId);
+		ISpreadsheetService service = getSpreadsheetService();
+		
+		List<StatisticDTO> statisticList = service.getStatistics(contentId);
 		request.setAttribute(SpreadsheetConstants.ATTR_STATISTIC_LIST, statisticList);
+		request.setAttribute(SpreadsheetConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
 
 		return mapping.findForward(SpreadsheetConstants.SUCCESS);
 	}

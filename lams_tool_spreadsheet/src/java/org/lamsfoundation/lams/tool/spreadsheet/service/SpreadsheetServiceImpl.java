@@ -509,6 +509,10 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	    }
 	}
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     // *****************************************************************************
     // private methods

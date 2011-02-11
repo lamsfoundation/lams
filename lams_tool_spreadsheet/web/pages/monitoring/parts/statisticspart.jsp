@@ -2,11 +2,13 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:forEach var="statistic" items="${statisticList}">
 	<table cellpadding="0">
-		<tr>
-			<th colspan="2">
-				<fmt:message key="label.monitoring.statistics.session.name" /> <c:out value="${statistic.sessionName}" />
-			</th>
-		</tr>
+		<c:if test="${isGroupedActivity}">
+			<tr>
+				<th colspan="2">
+					<fmt:message key="label.monitoring.statistics.session.name" /> <c:out value="${statistic.sessionName}" />
+				</th>
+			</tr>
+		</c:if>
 		<tr>
 			<td>
 				<fmt:message key="label.monitoring.statistics.marked" />

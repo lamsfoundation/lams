@@ -11,10 +11,15 @@
 
 <div id="summaryList2">
 	<c:forEach var="summary" items="${summaryList}" varStatus="firstGroup">
-		<h1><fmt:message key="monitoring.label.group" /> ${summary.sessionName}	</h1>
+		<c:if test="${sessionMap.isGroupedActivity}">
+			<h1>
+				<fmt:message key="monitoring.label.group" /> ${summary.sessionName}	
+			</h1>
+		</c:if>
+		
 		<h2 style="color:black; margin-left: 20px;"><fmt:message key="label.monitoring.summary.overall.summary" />	</h2>
+		
 		<table cellpadding="0" class="alternative-color" >
-	
 			<tr>
 				<th width="60%" align="left">
 					<fmt:message key="label.monitoring.summary.learner" />
