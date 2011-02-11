@@ -701,6 +701,10 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     public void updateEntry(NotebookEntry notebookEntry) {
 	coreNotebookService.updateEntry(notebookEntry);
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     // *****************************************************************************
     // Set methods for Spring Bean

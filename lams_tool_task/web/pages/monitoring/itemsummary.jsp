@@ -75,7 +75,9 @@
 			
 			
 			<c:forEach var="groupSummary" items="${itemSummary.groupSummaries}">
-				<h1><fmt:message key="monitoring.label.group" /> ${groupSummary.sessionName}	</h1>
+				<c:if test="${isGroupedActivity}">
+					<h1><fmt:message key="monitoring.label.group" /> ${groupSummary.sessionName}	</h1>
+				</c:if>
 				
 				<table cellpadding="0" class="alternative-color" >
 			

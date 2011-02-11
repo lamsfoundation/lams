@@ -85,6 +85,7 @@ public class TaskListConstants {
 	public static final String ATTR_TASK_LIST_ITEM_UID = "taskListItemUid";
 	public static final String ATTR_USER_LOGIN = "userLogin";
 	public static final String ATTR_TASK_LIST_ITEM_DTOS = "itemDTOs";
+	public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 	
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";

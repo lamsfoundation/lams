@@ -138,10 +138,17 @@
 
 <c:forEach var="summary" items="${summaryList}">
 
-	<h1><fmt:message key="monitoring.label.group" /> ${summary.sessionName}	</h1>
-	<h2 style="color:black; margin-left: 20px;"><fmt:message key="label.monitoring.summary.overall.summary" />	</h2>
+	<c:if test="${sessionMap.isGroupedActivity}">
+		<h1>
+			<fmt:message key="monitoring.label.group" /> ${summary.sessionName}	
+		</h1>
+	</c:if>
+	
+	<h2 style="color:black; margin-left: 20px;">
+		<fmt:message key="label.monitoring.summary.overall.summary" />
+	</h2>
+	
 	<table cellpadding="0" class="alternative-color" >
-		
 		<tr>
 			<th width="30%" style="background-repeat: repeat">
 				<fmt:message key="label.monitoring.summary.user" />

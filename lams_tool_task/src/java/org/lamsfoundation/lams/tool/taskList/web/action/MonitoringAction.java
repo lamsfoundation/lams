@@ -103,6 +103,7 @@ public class MonitoringAction extends Action {
 		sessionMap.put(TaskListConstants.ATTR_RESOURCE, taskList);
 		sessionMap.put(TaskListConstants.ATTR_TOOL_CONTENT_ID, contentId);
 		sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,WebUtil.readStrParam(request,AttributeNames.PARAM_CONTENT_FOLDER_ID));
+		sessionMap.put(TaskListConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
 		
 		return mapping.findForward(TaskListConstants.SUCCESS);
 	}
@@ -115,6 +116,7 @@ public class MonitoringAction extends Action {
 		ItemSummary ItemSummary = service.getItemSummary(contentId, taskListItemId, false);
 		
 		request.setAttribute(TaskListConstants.ATTR_ITEM_SUMMARY, ItemSummary);
+		request.setAttribute(TaskListConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
 		return mapping.findForward(TaskListConstants.SUCCESS);
 	}
 	

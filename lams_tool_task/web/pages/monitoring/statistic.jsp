@@ -10,7 +10,9 @@
 
 <c:forEach var="summary" items="${summaryList}">
 	<%-- display group name on first row--%>
-	<h1><fmt:message key="monitoring.label.group" /> ${summary.sessionName}	</h1>	
+	<c:if test="${sessionMap.isGroupedActivity}">
+		<h1><fmt:message key="monitoring.label.group" /> ${summary.sessionName}	</h1>	
+	</c:if>
 		
 	<table cellspacing="3">
 		<tr>

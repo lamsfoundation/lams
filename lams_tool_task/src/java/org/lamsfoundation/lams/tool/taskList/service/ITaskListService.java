@@ -361,5 +361,13 @@ public interface ITaskListService {
 	 */
 	ItemSummary getItemSummary(Long contentId, Long taskListItemUid, boolean isExportProcessing);
 	
+        /**
+         * Returns whether activity is grouped and therefore it is expected more than one tool session.
+         * 
+         * @param toolContentID
+         * @return
+         */
+        boolean isGroupedActivity(long toolContentID);
+	
 }
 
