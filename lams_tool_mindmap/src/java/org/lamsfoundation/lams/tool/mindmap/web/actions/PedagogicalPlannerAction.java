@@ -25,12 +25,10 @@
 package org.lamsfoundation.lams.tool.mindmap.web.actions;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -74,32 +72,11 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	MindmapPedagogicalPlannerForm plannerForm = (MindmapPedagogicalPlannerForm) form;
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Mindmap mindmap = getMindmapService().getMindmapByContentId(toolContentID);
-	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
-	if (command == null) {
-	    plannerForm.fillForm(mindmap);
-	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	    plannerForm.setContentFolderID(contentFolderId);
-	    return mapping.findForward(MindmapConstants.SUCCESS);
-	} else {
-	    try {
-		String onlineInstructions = mindmap.getOnlineInstructions();
-		response.setContentType("text/html;charset=utf-8");
-		PrintWriter writer = response.getWriter();
+	plannerForm.fillForm(mindmap);
+	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	plannerForm.setContentFolderID(contentFolderId);
+	return mapping.findForward(MindmapConstants.SUCCESS);
 
-		if (AttributeNames.COMMAND_CHECK_EDITING_ADVICE.equals(command)) {
-		    Integer activityIndex = WebUtil.readIntParam(request, AttributeNames.PARAM_ACTIVITY_INDEX);
-		    String responseText = (StringUtils.isEmpty(mindmap.getOnlineInstructions()) ? "NO" : "OK") + '&'
-			    + activityIndex;
-		    writer.print(responseText);
-
-		} else if (AttributeNames.COMMAND_GET_EDITING_ADVICE.equals(command)) {
-		    writer.print(onlineInstructions);
-		}
-	    } catch (IOException e) {
-		PedagogicalPlannerAction.logger.error(e);
-	    }
-	    return null;
-	}
     }
 
     public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,

@@ -100,7 +100,7 @@
 	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		
-		<html:hidden property="toolContentID" />
+		<html:hidden property="toolContentID" styleId="toolContentID" />
 		<html:hidden property="valid" styleId="valid" />
 		<html:hidden property="callID" styleId="callID" />
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />

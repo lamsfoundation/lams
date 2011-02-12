@@ -34,7 +34,7 @@
 	</logic:messagesPresent>	
 	
 	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
-		<html:hidden property="toolContentID" />
+		<html:hidden property="toolContentID" styleId="toolContentID" />
 		<html:hidden property="valid" styleId="valid" />
 		<html:hidden property="callID" styleId="callID" />
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />

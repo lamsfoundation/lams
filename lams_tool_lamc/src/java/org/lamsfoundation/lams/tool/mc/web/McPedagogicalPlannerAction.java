@@ -25,7 +25,6 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -69,33 +68,12 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 	    HttpServletResponse response) {
 	McPedagogicalPlannerForm plannerForm = (McPedagogicalPlannerForm) form;
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McContent qaContent = getMcService().retrieveMc(toolContentID);
-	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
-	if (command == null) {
-	    plannerForm.fillForm(qaContent, getMcService());
-	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	    plannerForm.setContentFolderID(contentFolderId);
-	    return mapping.findForward(McAppConstants.SUCCESS);
-	} else {
-	    try {
-		String onlineInstructions = qaContent.getOnlineInstructions();
-		response.setContentType("text/html;charset=utf-8");
-		PrintWriter writer = response.getWriter();
+	McContent mcContent = getMcService().retrieveMc(toolContentID);
+	plannerForm.fillForm(mcContent, getMcService());
+	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	plannerForm.setContentFolderID(contentFolderId);
+	return mapping.findForward(McAppConstants.SUCCESS);
 
-		if (AttributeNames.COMMAND_CHECK_EDITING_ADVICE.equals(command)) {
-		    Integer activityIndex = WebUtil.readIntParam(request, AttributeNames.PARAM_ACTIVITY_INDEX);
-		    String responseText = (StringUtils.isEmpty(qaContent.getOnlineInstructions()) ? "NO" : "OK") + '&'
-			    + activityIndex;
-		    writer.print(responseText);
-
-		} else if (AttributeNames.COMMAND_GET_EDITING_ADVICE.equals(command)) {
-		    writer.print(onlineInstructions);
-		}
-	    } catch (IOException e) {
-		McPedagogicalPlannerAction.logger.error(e);
-	    }
-	    return null;
-	}
     }
 
     public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,

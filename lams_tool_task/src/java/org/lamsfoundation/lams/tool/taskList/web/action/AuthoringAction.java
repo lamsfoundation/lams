@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.taskList.web.action;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1064,31 +1063,8 @@ public class AuthoringAction extends Action {
 	TaskListPedagogicalPlannerForm plannerForm = (TaskListPedagogicalPlannerForm) form;
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	TaskList taskList = getTaskListService().getTaskListByContentId(toolContentID);
-	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
-	if (command == null) {
-	    plannerForm.fillForm(taskList);
-	    return mapping.findForward("success");
-	} else {
-	    try {
-		String onlineInstructions = taskList.getOnlineInstructions();
-		response.setContentType("text/html;charset=utf-8");
-		PrintWriter writer = response.getWriter();
-
-		if (AttributeNames.COMMAND_CHECK_EDITING_ADVICE.equals(command)) {
-		    Integer activityIndex = WebUtil.readIntParam(request, AttributeNames.PARAM_ACTIVITY_INDEX);
-		    String responseText = (StringUtils.isEmpty(taskList.getOnlineInstructions()) ? "NO" : "OK") + '&'
-			    + activityIndex;
-		    writer.print(responseText);
-
-		} else if (AttributeNames.COMMAND_GET_EDITING_ADVICE.equals(command)) {
-		    writer.print(onlineInstructions);
-		}
-	    } catch (IOException e) {
-		AuthoringAction.log.error(e);
-	    }
-	    return null;
-	}
-
+	plannerForm.fillForm(taskList);
+	return mapping.findForward("success");
     }
 
     public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,

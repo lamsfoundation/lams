@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.rsrc.web.action;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
@@ -1217,36 +1216,15 @@ public class AuthoringAction extends Action {
 	return errors;
     }
 
-    public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 	ResourcePedagogicalPlannerForm plannerForm = (ResourcePedagogicalPlannerForm) form;
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Resource taskList = getResourceService().getResourceByContentId(toolContentID);
-	String command = WebUtil.readStrParam(request, AttributeNames.PARAM_COMMAND, true);
-	if (command == null) {
-	    plannerForm.fillForm(taskList);
-	    String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	    plannerForm.setContentFolderID(contentFolderId);
-	    return mapping.findForward(ResourceConstants.SUCCESS);
-	} else {
-	    try {
-		String onlineInstructions = taskList.getOnlineInstructions();
-		response.setContentType("text/html;charset=utf-8");
-		PrintWriter writer = response.getWriter();
-
-		if (AttributeNames.COMMAND_CHECK_EDITING_ADVICE.equals(command)) {
-		    Integer activityIndex = WebUtil.readIntParam(request, AttributeNames.PARAM_ACTIVITY_INDEX);
-		    String responseText = (StringUtils.isEmpty(taskList.getOnlineInstructions()) ? "NO" : "OK") + '&' + activityIndex;
-		    writer.print(responseText);
-
-		} else if (AttributeNames.COMMAND_GET_EDITING_ADVICE.equals(command)) {
-		    writer.print(onlineInstructions);
-		}
-	    } catch (IOException e) {
-		AuthoringAction.log.error(e);
-	    }
-	    return null;
-	}
-
+	plannerForm.fillForm(taskList);
+	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	plannerForm.setContentFolderID(contentFolderId);
+	return mapping.findForward(ResourceConstants.SUCCESS);
     }
 
     public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
