@@ -50,6 +50,11 @@ public abstract class PedagogicalPlannerActivityForm extends ActionForm {
      * Set when submitting form in base.jsp page.
      */
     private Integer callID;
+    
+    /**
+     * Only to save. It is loaded straight from the tool.
+     */
+    private String editingAdvice;
 
     public Long getToolContentID() {
 	return toolContentID;
@@ -98,5 +103,13 @@ public abstract class PedagogicalPlannerActivityForm extends ActionForm {
 
     public void setActivityOrderNumber(Integer activityOrderNumber) {
 	this.activityOrderNumber = activityOrderNumber;
+    }
+
+    public String getEditingAdvice() {
+        return editingAdvice;
+    }
+
+    public void setEditingAdvice(String editingAdvice) {
+        this.editingAdvice = editingAdvice;
     }
 }

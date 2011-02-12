@@ -98,6 +98,7 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
+import org.lamsfoundation.lams.learningdesign.PlannerActivityMetadata;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
@@ -2383,14 +2384,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     private Transition getTransition(TransitionDTO transDto, Map<Long, Activity> activityMapper) {
 
 	Transition trans = null;
+	if (transDto == null) {
+	    return trans;
+	}
 	if (transDto.getTransitionType() != null
 		&& transDto.getTransitionType().equals(Transition.DATA_TRANSITION_TYPE)) {
 	    trans = new DataTransition();
 	} else {
 	    trans = new Transition();
-	}
-	if (transDto == null) {
-	    return trans;
 	}
 
 	trans.setDescription(transDto.getDescription());
@@ -2471,6 +2472,11 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		((ToolActivity) act).setTool(content.getTool());
 		((ToolActivity) act).setToolContentId(content.getToolContentId());
 		((ToolActivity) act).setToolSessions(null);
+	    }
+	    if (actDto.getPlannerMetadataDTO() != null) {
+		PlannerActivityMetadata plannerMetadata = actDto.getPlannerMetadataDTO().toPlannerMetadata();
+		plannerMetadata.setActivity(((ToolActivity) act));
+		((ToolActivity) act).setPlannerMetadata(plannerMetadata);
 	    }
 	    break;
 	case Activity.GROUPING_ACTIVITY_TYPE:

@@ -16,6 +16,7 @@ DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 		<mapping resource="org/lamsfoundation/lams/lesson/Lesson.hbm.xml"/>
 		<mapping resource="org/lamsfoundation/lams/learningdesign/Transition.hbm.xml"/>
 		<mapping resource="org/lamsfoundation/lams/learningdesign/Activity.hbm.xml"/>
+		<mapping resource="org/lamsfoundation/lams/learningdesign/PlannerActivityMetadata.hbm.xml"/>
 		<mapping resource="org/lamsfoundation/lams/learningdesign/Competence.hbm.xml"/>
 		<mapping resource="org/lamsfoundation/lams/gradebook/GradeBookUserLesson.hbm.xml"/>
 		<mapping resource="org/lamsfoundation/lams/learningdesign/BranchActivityEntry.hbm.xml"/>

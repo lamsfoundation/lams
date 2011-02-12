@@ -37,18 +37,16 @@ public class PedagogicalPlannerActivityDTO {
     private String toolIconUrl;
     private String title;
     private String type;
-    private String editingAdviceUrl;
-    private String checkEditingAdviceUrl;
     private Boolean supportsPlanner;
     private Short group;
     private String parentActivityTitle;
     private Boolean lastNestedActivity = false;
     private Boolean defaultBranch = false;
     private Short complexActivityType;
-    private Long toolContentId;
     private Boolean hidden = false;
     private Boolean collapsed = false;
     private Boolean expanded = false;
+    private String editingAdvice;
     
     public static final short TYPE_BRANCHING_ACTIVITY = 1;
     public static final short TYPE_OPTIONAL_ACTIVITY = 2;
@@ -110,22 +108,6 @@ public class PedagogicalPlannerActivityDTO {
 
     public void setType(String type) {
 	this.type = type;
-    }
-
-    public String getEditingAdviceUrl() {
-	return editingAdviceUrl;
-    }
-
-    public void setEditingAdviceUrl(String editingAdviceUrl) {
-	this.editingAdviceUrl = editingAdviceUrl;
-    }
-
-    public String getCheckEditingAdviceUrl() {
-	return checkEditingAdviceUrl;
-    }
-
-    public void setCheckEditingAdviceUrl(String checkEditingAdviceUrl) {
-	this.checkEditingAdviceUrl = checkEditingAdviceUrl;
     }
 
     public Short getGroup() {
@@ -192,11 +174,11 @@ public class PedagogicalPlannerActivityDTO {
         this.expanded = expanded;
     }
 
-    public Long getToolContentId() {
-        return toolContentId;
+    public String getEditingAdvice() {
+        return editingAdvice;
     }
 
-    public void setToolContentId(Long toolContentId) {
-        this.toolContentId = toolContentId;
+    public void setEditingAdvice(String editingAdvice) {
+        this.editingAdvice = editingAdvice;
     }
 }

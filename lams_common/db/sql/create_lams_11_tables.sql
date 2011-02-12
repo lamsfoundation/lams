@@ -520,9 +520,6 @@ CREATE TABLE lams_learning_activity (
      , stop_after_activity TINYINT NOT NULL DEFAULT 0
 	 , transition_to_id BIGINT(20)
 	 , transition_from_id BIGINT(20)
-	 , planner_collapsed TINYINT(1) DEFAULT 0
-	 , planner_expanded TINYINT(1) DEFAULT 0
-	 , planner_hidden TINYINT(1) DEFAULT 0
      , PRIMARY KEY (activity_id)
      , INDEX (learning_library_id)
      , CONSTRAINT FK_lams_learning_activity_7 FOREIGN KEY (learning_library_id)
@@ -560,6 +557,16 @@ CREATE TABLE lams_learning_activity (
      , INDEX (system_tool_id)
      , CONSTRAINT FK_lams_learning_activity_14 FOREIGN KEY (system_tool_id)
                   REFERENCES lams_system_tool (system_tool_id)
+)TYPE=InnoDB;
+
+CREATE TABLE lams_planner_activity_metadata (
+       activity_id BIGINT(20) NOT NULL
+	 , collapsed TINYINT(1) DEFAULT 0
+	 , expanded TINYINT(1) DEFAULT 0
+	 , hidden TINYINT(1) DEFAULT 0
+	 , editing_advice VARCHAR(255)
+     , CONSTRAINT FK_lams_planner_metadata_primary FOREIGN KEY (activity_id)
+                  REFERENCES lams_learning_activity (activity_id) ON DELETE CASCADE ON UPDATE CASCADE
 )TYPE=InnoDB;
 
 CREATE TABLE lams_input_activity (
@@ -1093,8 +1100,7 @@ CREATE TABLE lams_planner_nodes (
 	title VARCHAR(255) NOT NULL,
 	brief_desc TEXT,
 	full_desc TEXT,
-	file_uuid  BIGINT(20) UNSIGNED,
-	file_name VARCHAR(255),
+	ld_id  BIGINT(20),
 	PRIMARY KEY (uid),
 	UNIQUE KEY (parent_uid, order_id),
 	CONSTRAINT FK_lams_planner_node_parent FOREIGN KEY (parent_uid)

@@ -64,21 +64,8 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     private Set<ActivityEvaluation> activityEvaluations;
 
     private Set<GradebookUserActivity> gradebookUserActivities;
-
-    /**
-     * Holds value of property plannerCollapsed. Tells whether the activity should be collapsed in Pedagogical Planner
-     */
-    private Boolean plannerCollapsed;
-
-    /**
-     * Holds value of property plannerCollapsed. Tells whether the activity should be expanded in Pedagogical Planner
-     */
-    private Boolean plannerExpanded;
-
-    /**
-     * Holds value of property plannerCollapsed. Tells whether the activity should be hidden in Pedagogical Planner
-     */
-    private Boolean plannerHidden;
+    
+    private PlannerActivityMetadata plannerMetadata;
 
     /** full constructor */
     public ToolActivity(Long activityId, Integer id, String description, String title, Integer xcoord, Integer ycoord,
@@ -164,6 +151,12 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	    }
 	}
 	newToolActivity.setGradebookUserActivities(newGradebookUserActivities);
+
+	if (this.plannerMetadata != null) {
+	    PlannerActivityMetadata plannerMetadata = this.plannerMetadata.clone();
+	    plannerMetadata.setActivity(newToolActivity);
+	    newToolActivity.setPlannerMetadata(plannerMetadata);
+	}
 
 	return newToolActivity;
     }
@@ -356,27 +349,11 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	this.gradebookUserActivities = gradebookUserActivities;
     }
 
-    public Boolean getPlannerCollapsed() {
-        return plannerCollapsed;
+    public PlannerActivityMetadata getPlannerMetadata() {
+        return plannerMetadata;
     }
 
-    public void setPlannerCollapsed(Boolean plannerCollapsed) {
-        this.plannerCollapsed = plannerCollapsed;
-    }
-
-    public Boolean getPlannerExpanded() {
-        return plannerExpanded;
-    }
-
-    public void setPlannerExpanded(Boolean plannerExpanded) {
-        this.plannerExpanded = plannerExpanded;
-    }
-
-    public Boolean getPlannerHidden() {
-        return plannerHidden;
-    }
-
-    public void setPlannerHidden(Boolean plannerHidden) {
-        this.plannerHidden = plannerHidden;
+    public void setPlannerMetadata(PlannerActivityMetadata plannerMetadata) {
+        this.plannerMetadata = plannerMetadata;
     }
 }

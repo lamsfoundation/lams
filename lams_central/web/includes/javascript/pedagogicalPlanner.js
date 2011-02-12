@@ -8,10 +8,10 @@
    var startPreviewUrl; //Url to start preview
    var learningDesignId; //ID of the design to open
    var initialActivityHeight = null;
-   var activityMetadataFields = [ 'Collapsed', 'Expanded', 'Hidden' ];
+   var activityMetadataFields = [ 'Collapsed', 'Expanded', 'Hidden', 'EditingAdvice' ];
    var initialExpandAttempts = [];
    
-   var ACTION_SAVE_AS_SEQUENCE = 0; //After successful submit save learning design in user's personal folder
+   var ACTION_DO_NOTHING = 0; //After successful submit do nothing
    var ACTION_PREVIEW = 1; //After successful submit start preview
    var ACTION_OPEN_AUTHOR = 2; //After successful submit open full authoring
    var ACTION_EXPORT = 3; //After successful submit export the learning design 
@@ -26,7 +26,7 @@
     if (actionAfterCompleted==ACTION_PREVIEW){
     	startPreviewUrl=additionalParameter;
     }
-    else if (actionAfterCompleted==ACTION_SAVE_AS_SEQUENCE || actionAfterCompleted==ACTION_OPEN_AUTHOR || actionAfterCompleted==ACTION_EXPORT){
+    else if (actionAfterCompleted==ACTION_DO_NOTHING || actionAfterCompleted==ACTION_OPEN_AUTHOR || actionAfterCompleted==ACTION_EXPORT){
   	    learningDesignId=additionalParameter;
     }
     callAttemptedID++;
@@ -37,15 +37,18 @@
     $('#pedagogicalPlannerInfoArea').hide();
     $('#pedagogicalPlannerBusy').show();
     
+    // Iterate over metadata fields and serialize them in a custom way
     var activityMetadataString = '';
 	for ( var activityIndex = 1; activityIndex <= activityCount; activityIndex++) {
-		var toolContentId = $('#activityToolContentId' + activityIndex).val();
-		for ( var keyIndex in activityMetadataFields) {
-			var key = activityMetadataFields[keyIndex];
-			var metadataValue = $('#activity' + key + activityIndex).val();
-			if (metadataValue != '') {
-				activityMetadataString += 'activity' + toolContentId + '.'
-						+ key + '=' + metadataValue + '&';
+		var toolContentIdObject = $('#activity' + activityIndex).contents().find('#toolContentID');
+		if (toolContentIdObject.length > 0) {
+			for ( var keyIndex in activityMetadataFields) {
+				var key = activityMetadataFields[keyIndex];
+				var metadataValue = $('#activity' + key + activityIndex).val();
+				if (metadataValue != '') {
+					activityMetadataString += 'activity' + toolContentIdObject.val() + '.'
+							+ key + '=' + metadataValue + '&';
+				}
 			}
 		}
 	}
@@ -69,6 +72,7 @@
      //each tool will implement an interface that will provide a simplified authoring page with form named "pedagogicalPlannerForm"
      var innerDocument = $('#activity'+activityIndex).contents();
      innerDocument.find('#callID').val(callAttemptedID);
+
      innerDocument.find('#activityOrderNumber').val(activityIndex);
      setTimeout("submitActivityForm("+activityIndex+");",effectiveDelay);
     }
@@ -163,29 +167,24 @@
   	if (sequenceDetailsValid &&  activitiesValid==activitiesResponded){
   	   	$('#pedagogicalPlannerInfoArea').show();
   	   	
-	   	if (actionAfterCompleted==ACTION_SAVE_AS_SEQUENCE){
-	   	 	$.ajax({
-	   	 		url: saveDetailsUrl,
-	   	 		cache: false,
-	   	 		data: "method=copyLearningDesign&ldId="+learningDesignId
-	   	 	});
-	   	 	
-	   	 	//offers to close PedPlanner and open modified sequence
-	   	 	if (requestSrc != "") $("#saveSequenceDialog").dialog('open');
-  	   	}  	  
+	   	if (actionAfterCompleted == ACTION_DO_NOTHING) {
+				// the design in now in user's folder,
+				// so we don't need to move it again
+				$("#copyMode").val("editCurrent");
+				// offers to close PedPlanner and open modified sequence
+				if (requestSrc != "") {
+					$("#saveSequenceDialog").dialog('open');
+				}
+			}  	  
 	   	else if (actionAfterCompleted==ACTION_PREVIEW){
   	   		startPreview(startPreviewUrl);
   	   	}
   	   	else if (actionAfterCompleted==ACTION_OPEN_AUTHOR){
-  	   		 window.resizeTo(authoring_width,authoring_height);
-  	   		 $.ajax({
-	   	 		url: saveDetailsUrl,
-	   	 		cache: false,
-	   	 		data: "method=copyLearningDesign&ldId="+learningDesignId
-	   	 	});
-  	   		 
+  	   		window.resizeTo(authoring_width,authoring_height);
   	   		var openAuthorURL = "home.do?method=author&learningDesignID=" + learningDesignId;
-  	   		if (requestSrc != "") openAuthorURL += "&requestSrc=" + requestSrc;
+  	   		if (requestSrc != "") {
+  	   			openAuthorURL += "&requestSrc=" + requestSrc;
+  	   		}
   	   		if (notifyCloseURL != "") {
   	   			//to prevent losing of query parameters change '&' into '%26'
   	   			notifyCloseURL = notifyCloseURL.replace (/&/g, '%26');
@@ -228,8 +227,8 @@
   		}
   	 }
   
-  function onRemoveFileCheckboxChange(){
-  	 document.getElementById("fileInputArea").style.display = document.getElementById("removeFile").checked ? "none" : "block";	
+  function onRemoveTemplateCheckboxChange(){
+  	 document.getElementById("fileInputArea").style.display = document.getElementById("removeTemplate").checked ? "none" : "block";	
   }
   
   function onNodeTypeChange(){
@@ -271,7 +270,7 @@
   function expandActivity(id){
 	 var activity = $('#activity'+id);
 	 var currentHeight = activity.height();
-	 var targetHeight =  activity[0].contentDocument.height;
+	 var targetHeight =  activity[0].contentDocument.height + 150;
 	 var expanded = 'true';
 	 if (initialActivityHeight == null){
 		 initialActivityHeight = currentHeight;

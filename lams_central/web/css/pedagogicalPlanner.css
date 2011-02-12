@@ -58,12 +58,6 @@ div#pedagogicalPlannerErrorArea{
 	width: 60%;
 }
 
-a.editingAdvice{
-	display: none;
-	font-size: smaller;
-	margin: 0px 0px 0px 660px;
-}
-
 td.branchFirstActivity {
 	border-bottom: thick blue solid;
 	text-align: center;
@@ -159,7 +153,6 @@ h3.group4{
 }
 
 #content a.editing-advice-button {
-	display: none;
 	font-size: smaller;
 	margin: 0px 0px 0px 663px;
 	background: url('../images/css/editing_advice.png') no-repeat 0px 0px;
@@ -169,6 +162,7 @@ h3.group4{
 	border-right:1px solid #d2d2d2;
 	border-bottom: 0px;
 	line-height: 20px;
+	cursor: pointer;
 }
 
 a#tutorialVideoHref {

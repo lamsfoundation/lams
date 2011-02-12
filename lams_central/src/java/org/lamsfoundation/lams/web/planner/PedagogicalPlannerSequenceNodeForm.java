@@ -37,9 +37,8 @@ public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
     private String briefDescription;
     private String fullDescription;
     private FormFile file;
-    private Boolean removeFile;
+    private Boolean removeTemplate;
     private String nodeType = PedagogicalPlannerSequenceNodeForm.NODE_TYPE_SUBNODES;
-    private Long fileUuid;
 
     public Long getUid() {
 	return uid;
@@ -89,12 +88,12 @@ public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
 	this.file = file;
     }
 
-    public Boolean getRemoveFile() {
-	return removeFile;
+    public Boolean getRemoveTemplate() {
+	return removeTemplate;
     }
 
-    public void setRemoveFile(Boolean removeFile) {
-	this.removeFile = removeFile;
+    public void setRemoveTemplate(Boolean removeFile) {
+	this.removeTemplate = removeFile;
     }
 
     public String getNodeType() {
@@ -111,13 +110,5 @@ public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
 
     public void setContentFolderId(String contentFolderId) {
 	this.contentFolderId = contentFolderId;
-    }
-
-    public Long getFileUuid() {
-	return fileUuid;
-    }
-
-    public void setFileUuid(Long fileUuid) {
-	this.fileUuid = fileUuid;
     }
 }

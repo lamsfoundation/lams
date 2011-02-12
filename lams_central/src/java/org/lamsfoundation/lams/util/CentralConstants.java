@@ -168,6 +168,8 @@ public class CentralConstants {
     public static final String CENTRAL_TOOL_CONTENT_HANDLER_BEAN_NAME = "centralToolContentHandler";
 
     public static final String PARAM_EDIT = "edit";
+    
+    public static final String PARAM_COPY_MODE= "copyMode";
 
     public static final String USER_MANAGEMENT_SERVICE_BEAN_NAME = "userManagementService";
 

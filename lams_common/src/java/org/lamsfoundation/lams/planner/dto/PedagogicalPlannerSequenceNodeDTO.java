@@ -43,7 +43,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
     private String title;
     private String briefDescription;
     private String fullDescription;
-    private String fileName;
+    private String learningDesignTitle;
     private Boolean locked;
     private List<PedagogicalPlannerSequenceNodeDTO> subnodes;
     private Long parentUid;
@@ -70,7 +70,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
 	title = node.getTitle();
 	briefDescription = node.getBriefDescription();
 	fullDescription = node.getFullDescription();
-	fileName = node.getFileName();
+	learningDesignTitle = node.getLearningDesignTitle();
 	locked = node.getLocked();
 	if (node.getParent() != null) {
 	    parentUid = node.getParent().getUid();
@@ -87,7 +87,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
 		    subnodeDTO.setFullDescription(PedagogicalPlannerSequenceNodeDTO.FULL_DESCRIPTION_NOT_EMPTY);
 		}
 		subnodeDTO.setLocked(subnode.getLocked());
-		subnodeDTO.setFileName(subnode.getFileName());
+		subnodeDTO.setLearningDesignTitle(subnode.getLearningDesignTitle());
 		subnodeDTO.setUid(subnode.getUid());
 		if (u != null) {
 		    subnodeDTO.setDisplayAddRemoveEditorsLink(isSysadmin || dao.isEditor(u.getUserID(), subnode.getUid(), Role.ROLE_AUTHOR_ADMIN));
@@ -129,12 +129,12 @@ public class PedagogicalPlannerSequenceNodeDTO {
 	this.fullDescription = fullDescription;
     }
 
-    public String getFileName() {
-	return fileName;
+    public String getLearningDesignTitle() {
+	return learningDesignTitle;
     }
 
-    public void setFileName(String fileName) {
-	this.fileName = fileName;
+    public void setLearningDesignTitle(String fileName) {
+	this.learningDesignTitle = fileName;
     }
 
     public List<PedagogicalPlannerSequenceNodeDTO> getSubnodes() {

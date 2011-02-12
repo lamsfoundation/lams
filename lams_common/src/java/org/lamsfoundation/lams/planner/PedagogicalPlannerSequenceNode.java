@@ -19,8 +19,8 @@ public class PedagogicalPlannerSequenceNode {
     private String title;
     private String briefDescription;
     private String fullDescription;
-    private Long fileUuid;
-    private String fileName;
+    private Long learningDesignId;
+    private String learningDesignTitle;
     private Boolean locked = false;
 
     /**
@@ -89,17 +89,17 @@ public class PedagogicalPlannerSequenceNode {
     public void setFullDescription(String fullDescription) {
 	this.fullDescription = fullDescription;
     }
-
+    
     /**
-     * @hibernate.property column="file_name"
+     * @hibernate.property formula="( SELECT ld.title FROM lams_learning_design ld WHERE ld.learning_design_id = ld_id )"
      * @return
      */
-    public String getFileName() {
-	return fileName;
+    public String getLearningDesignTitle() {
+	return learningDesignTitle;
     }
 
-    public void setFileName(String fileName) {
-	this.fileName = fileName;
+    public void setLearningDesignTitle(String learningDesignTitle) {
+	this.learningDesignTitle = learningDesignTitle;
     }
 
     public void setUid(Long uid) {
@@ -133,15 +133,15 @@ public class PedagogicalPlannerSequenceNode {
     }
 
     /**
-     * @hibernate.property column="file_uuid"
+     * @hibernate.property column="ld_id"
      * @return
      */
-    public Long getFileUuid() {
-	return fileUuid;
+    public Long getLearningDesignId() {
+	return learningDesignId;
     }
 
-    public void setFileUuid(Long fileUuid) {
-	this.fileUuid = fileUuid;
+    public void setLearningDesignId(Long id) {
+	this.learningDesignId = id;
     }
 
     /**
@@ -155,5 +155,6 @@ public class PedagogicalPlannerSequenceNode {
     public void setContentFolderId(String contentFolderId) {
 	this.contentFolderId = contentFolderId;
     }
+
 
 }
