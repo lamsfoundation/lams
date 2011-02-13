@@ -472,7 +472,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    int i = 0;
 	    for (AssessmentQuestionOption option : question.getQuestionOptions()) {
 		if (option.getUid() == correctOptionList.get(i++).getUid()) {
-		    mark += maxMarkForCorrectAnswer * maxMark;
+		    mark += maxMarkForCorrectAnswer;
 		}
 	    }
 	}
