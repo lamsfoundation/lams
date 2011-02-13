@@ -231,6 +231,15 @@
   	 document.getElementById("fileInputArea").style.display = document.getElementById("removeTemplate").checked ? "none" : "block";	
   }
   
+  function onTeachersEditCopyCheckboxChange() {
+	if (document.getElementById("teachersEditCopy").checked) {
+		$('#teachersEditOriginal').attr('disabled', false);
+	} else {
+		$('#teachersEditOriginal').attr('disabled', true);
+		$('#teachersEditOriginal').attr('checked', false);
+	}
+  }
+  
   function onNodeTypeChange(){
   	 document.getElementById("fileArea").style.display = document.getElementById("hasSubnodesType").checked ? "none" : "block";
   }

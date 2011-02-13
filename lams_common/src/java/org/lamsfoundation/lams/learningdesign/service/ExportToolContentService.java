@@ -98,7 +98,6 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
-import org.lamsfoundation.lams.learningdesign.PlannerActivityMetadata;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
@@ -123,6 +122,7 @@ import org.lamsfoundation.lams.learningdesign.dto.ToolOutputBranchActivityEntryD
 import org.lamsfoundation.lams.learningdesign.dto.ToolOutputGateActivityEntryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
 import org.lamsfoundation.lams.lesson.LessonClass;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityMetadata;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolAdapterContentManager;
@@ -2474,7 +2474,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		((ToolActivity) act).setToolSessions(null);
 	    }
 	    if (actDto.getPlannerMetadataDTO() != null) {
-		PlannerActivityMetadata plannerMetadata = actDto.getPlannerMetadataDTO().toPlannerMetadata();
+		PedagogicalPlannerActivityMetadata plannerMetadata = actDto.getPlannerMetadataDTO().toPlannerMetadata();
 		plannerMetadata.setActivity(((ToolActivity) act));
 		((ToolActivity) act).setPlannerMetadata(plannerMetadata);
 	    }

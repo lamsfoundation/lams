@@ -49,7 +49,9 @@ public class PedagogicalPlannerSequenceNodeDTO {
     private Long parentUid;
     // which existing LD to open
     private Long learningDesignId;
-
+    private Boolean editCopyPermitted;
+    private Boolean editOriginalPermitted;
+    
     // Not node-bound variables, but simply attributes used in JSP page
     private Boolean edit = false;
     private Boolean createSubnode = false;
@@ -58,6 +60,8 @@ public class PedagogicalPlannerSequenceNodeDTO {
     // for the list on the main screen
     private List<PedagogicalPlannerSequenceNodeDTO> recentlyModifiedNodes;
     private Boolean displayAddRemoveEditorsLink = true;
+    
+    
 
     private static final String FULL_DESCRIPTION_NOT_EMPTY = "FULL";
 
@@ -65,7 +69,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
     }
     
     public PedagogicalPlannerSequenceNodeDTO(PedagogicalPlannerSequenceNode node,
-	    Set<PedagogicalPlannerSequenceNode> subnodes, Boolean isSysadmin, PedagogicalPlannerDAO dao) {
+	    Set<PedagogicalPlannerSequenceNode> subnodes, boolean isSysAdmin, PedagogicalPlannerDAO dao) {
 	uid = node.getUid();
 	title = node.getTitle();
 	briefDescription = node.getBriefDescription();
@@ -75,10 +79,16 @@ public class PedagogicalPlannerSequenceNodeDTO {
 	if (node.getParent() != null) {
 	    parentUid = node.getParent().getUid();
 	}
+	// viewing for everyone is the default setting
+	editCopyPermitted = node.getTeachersPermissions() == null
+		|| node.getTeachersPermissions() > PedagogicalPlannerSequenceNode.PERMISSION_NONE;
+	editOriginalPermitted = node.getTeachersPermissions() != null
+		&& node.getTeachersPermissions() > PedagogicalPlannerSequenceNode.PERMISSION_VIEW;
+
 	this.subnodes = new LinkedList<PedagogicalPlannerSequenceNodeDTO>();
 	if (subnodes != null) {
 	    HttpSession s = SessionManager.getSession();
-	    UserDTO u = (UserDTO) s.getAttribute(AttributeNames.USER);
+	    UserDTO user = (UserDTO) s.getAttribute(AttributeNames.USER);
 	    for (PedagogicalPlannerSequenceNode subnode : subnodes) {
 		PedagogicalPlannerSequenceNodeDTO subnodeDTO = new PedagogicalPlannerSequenceNodeDTO();
 		subnodeDTO.setTitle(subnode.getTitle());
@@ -89,8 +99,16 @@ public class PedagogicalPlannerSequenceNodeDTO {
 		subnodeDTO.setLocked(subnode.getLocked());
 		subnodeDTO.setLearningDesignTitle(subnode.getLearningDesignTitle());
 		subnodeDTO.setUid(subnode.getUid());
-		if (u != null) {
-		    subnodeDTO.setDisplayAddRemoveEditorsLink(isSysadmin || dao.isEditor(u.getUserID(), subnode.getUid(), Role.ROLE_AUTHOR_ADMIN));
+		// viewing for everyone is the default setting
+		subnodeDTO.setEditCopyPermitted(subnode.getTeachersPermissions() == null
+			|| subnode.getTeachersPermissions() > PedagogicalPlannerSequenceNode.PERMISSION_NONE);
+		subnodeDTO.setEditOriginalPermitted(subnode.getTeachersPermissions() != null
+			&& subnode.getTeachersPermissions() > PedagogicalPlannerSequenceNode.PERMISSION_VIEW);
+		boolean subnodeHasRole = isSysAdmin
+			|| (user != null && dao.isEditor(user.getUserID(), subnode.getUid(), Role.ROLE_AUTHOR_ADMIN));
+		subnodeDTO.setHasRole(subnodeHasRole);
+		if (user != null) {
+		    subnodeDTO.setDisplayAddRemoveEditorsLink(subnodeHasRole);
 		}
 		this.subnodes.add(subnodeDTO);
 	    }
@@ -223,5 +241,21 @@ public class PedagogicalPlannerSequenceNodeDTO {
 
     public void setDisplayAddRemoveEditorsLink(Boolean displayAddRemoveEditorsLink) {
         this.displayAddRemoveEditorsLink = displayAddRemoveEditorsLink;
+    }
+
+    public Boolean getEditCopyPermitted() {
+        return editCopyPermitted;
+    }
+
+    public void setEditCopyPermitted(Boolean editCopyPermitted) {
+        this.editCopyPermitted = editCopyPermitted;
+    }
+
+    public Boolean getEditOriginalPermitted() {
+        return editOriginalPermitted;
+    }
+
+    public void setEditOriginalPermitted(Boolean editOriginalPermitted) {
+        this.editOriginalPermitted = editOriginalPermitted;
     }
 }

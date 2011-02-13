@@ -21,17 +21,20 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.learningdesign;
+package org.lamsfoundation.lams.planner;
 
 import java.io.Serializable;
 
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+
 /**
  * Holds additional information about activities used in Pedagogical Planner only.
+ * 
  * @author Marcin Cieslak
- * @hibernate.class
+ * @hibernate.class table="lams_planner_activity_metadata"
  */
-public class PlannerActivityMetadata implements Serializable, Cloneable {
-    
+public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneable {
+
     private Long id;
 
     private ToolActivity activity;
@@ -56,8 +59,8 @@ public class PlannerActivityMetadata implements Serializable, Cloneable {
      */
     private String editingAdvice;
 
-    public PlannerActivityMetadata clone() {
-	PlannerActivityMetadata plannerMetadata = new PlannerActivityMetadata();
+    public PedagogicalPlannerActivityMetadata clone() {
+	PedagogicalPlannerActivityMetadata plannerMetadata = new PedagogicalPlannerActivityMetadata();
 	plannerMetadata.setCollapsed(this.collapsed);
 	plannerMetadata.setExpanded(this.expanded);
 	plannerMetadata.setHidden(this.getHidden());
@@ -65,13 +68,28 @@ public class PlannerActivityMetadata implements Serializable, Cloneable {
 	return plannerMetadata;
     }
 
-    public void copyProperties(PlannerActivityMetadata source) {
+    public void copyProperties(PedagogicalPlannerActivityMetadata source) {
 	this.collapsed = source.collapsed;
 	this.expanded = source.expanded;
 	this.hidden = source.hidden;
 	this.editingAdvice = source.editingAdvice;
     }
 
+    /**
+     * @hibernate.id column="activity_id" generator-class="foreign" type="java.lang.Long"
+     * @hibernate.generator-param name="property" value="activity"
+     */
+    public Long getId() {
+	return id;
+    }
+
+    public void setId(Long id) {
+	this.id = id;
+    }
+
+    /**
+     * @hibernate.property column="collapsed" type="java.lang.Boolean" length="1"
+     */
     public Boolean getCollapsed() {
 	return collapsed;
     }
@@ -80,6 +98,9 @@ public class PlannerActivityMetadata implements Serializable, Cloneable {
 	this.collapsed = plannerCollapsed;
     }
 
+    /**
+     * @hibernate.property column="expanded" type="java.lang.Boolean" length="1"
+     */
     public Boolean getExpanded() {
 	return expanded;
     }
@@ -88,6 +109,9 @@ public class PlannerActivityMetadata implements Serializable, Cloneable {
 	this.expanded = plannerExpanded;
     }
 
+    /**
+     * @hibernate.property column="hidden" type="java.lang.Boolean" length="1"
+     */
     public Boolean getHidden() {
 	return hidden;
     }
@@ -96,6 +120,9 @@ public class PlannerActivityMetadata implements Serializable, Cloneable {
 	this.hidden = plannerHidden;
     }
 
+    /**
+     * @hibernate.property column="editing_advice" type="java.lang.String" length="255"
+     */
     public String getEditingAdvice() {
 	return editingAdvice;
     }
@@ -104,19 +131,15 @@ public class PlannerActivityMetadata implements Serializable, Cloneable {
 	this.editingAdvice = editingAdvice;
     }
 
+    /**
+     * @hibernate.one-to-one constrained="true" foreign-key="FK_lams_planner_metadata_primary"
+     * @return
+     */
     public ToolActivity getActivity() {
 	return activity;
     }
 
     public void setActivity(ToolActivity activity) {
 	this.activity = activity;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 }

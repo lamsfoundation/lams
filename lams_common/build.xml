@@ -436,7 +436,7 @@ Ant build file.
 				
 				<include name="**/LogEvent.java" />
 				
-				<include name="**/PedagogicalPlannerSequenceNode.java" />
+				<include name="**/PedagogicalPlanner*.java" />
 				
 				<include name="**/DataFlowObject.java" />
 			</fileset>

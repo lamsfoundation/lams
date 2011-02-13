@@ -69,11 +69,11 @@
         />
 
         <property
-            name="fileName"
+            name="learningDesignTitle"
             type="java.lang.String"
-            update="true"
-            insert="true"
-            column="file_name"
+            formula="( SELECT ld.title FROM lams_learning_design ld WHERE ld.learning_design_id = ld_id )"
+            update="false"
+            insert="false"
         />
 
         <set
@@ -104,11 +104,11 @@
         />
 
         <property
-            name="fileUuid"
+            name="learningDesignId"
             type="java.lang.Long"
             update="true"
             insert="true"
-            column="file_uuid"
+            column="ld_id"
         />
 
         <property
@@ -117,6 +117,14 @@
             update="true"
             insert="true"
             column="content_folder_id"
+        />
+
+        <property
+            name="teachersPermissions"
+            type="java.lang.Short"
+            update="true"
+            insert="true"
+            column="teachers_permissions"
         />
 
         <!--

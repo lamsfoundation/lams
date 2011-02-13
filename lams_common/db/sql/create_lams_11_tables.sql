@@ -1101,6 +1101,7 @@ CREATE TABLE lams_planner_nodes (
 	brief_desc TEXT,
 	full_desc TEXT,
 	ld_id  BIGINT(20),
+	teachers_permissions TINYINT UNSIGNED,
 	PRIMARY KEY (uid),
 	UNIQUE KEY (parent_uid, order_id),
 	CONSTRAINT FK_lams_planner_node_parent FOREIGN KEY (parent_uid)

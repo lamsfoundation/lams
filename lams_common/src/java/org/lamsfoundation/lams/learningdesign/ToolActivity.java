@@ -36,6 +36,7 @@ import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.learningdesign.strategy.ToolActivityStrategy;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.LessonClass;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityMetadata;
 import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.Tool;
@@ -65,7 +66,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
     private Set<GradebookUserActivity> gradebookUserActivities;
     
-    private PlannerActivityMetadata plannerMetadata;
+    private PedagogicalPlannerActivityMetadata plannerMetadata;
 
     /** full constructor */
     public ToolActivity(Long activityId, Integer id, String description, String title, Integer xcoord, Integer ycoord,
@@ -153,7 +154,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	newToolActivity.setGradebookUserActivities(newGradebookUserActivities);
 
 	if (this.plannerMetadata != null) {
-	    PlannerActivityMetadata plannerMetadata = this.plannerMetadata.clone();
+	    PedagogicalPlannerActivityMetadata plannerMetadata = this.plannerMetadata.clone();
 	    plannerMetadata.setActivity(newToolActivity);
 	    newToolActivity.setPlannerMetadata(plannerMetadata);
 	}
@@ -349,11 +350,11 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	this.gradebookUserActivities = gradebookUserActivities;
     }
 
-    public PlannerActivityMetadata getPlannerMetadata() {
+    public PedagogicalPlannerActivityMetadata getPlannerMetadata() {
         return plannerMetadata;
     }
 
-    public void setPlannerMetadata(PlannerActivityMetadata plannerMetadata) {
+    public void setPlannerMetadata(PedagogicalPlannerActivityMetadata plannerMetadata) {
         this.plannerMetadata = plannerMetadata;
     }
 }

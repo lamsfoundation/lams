@@ -39,6 +39,8 @@ public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
     private FormFile file;
     private Boolean removeTemplate;
     private String nodeType = PedagogicalPlannerSequenceNodeForm.NODE_TYPE_SUBNODES;
+    private Boolean teachersEditCopy;
+    private Boolean teachersEditOriginal;
 
     public Long getUid() {
 	return uid;
@@ -110,5 +112,21 @@ public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
 
     public void setContentFolderId(String contentFolderId) {
 	this.contentFolderId = contentFolderId;
+    }
+
+    public Boolean getTeachersEditCopy() {
+        return teachersEditCopy;
+    }
+
+    public void setTeachersEditCopy(Boolean teachersEditCopy) {
+        this.teachersEditCopy = teachersEditCopy;
+    }
+
+    public Boolean getTeachersEditOriginal() {
+        return teachersEditOriginal;
+    }
+
+    public void setTeachersEditOriginal(Boolean teachersEditOriginal) {
+        this.teachersEditOriginal = teachersEditOriginal;
     }
 }

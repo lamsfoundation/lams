@@ -9,7 +9,10 @@ import java.util.Set;
  * 
  */
 public class PedagogicalPlannerSequenceNode {
-
+    public static final short PERMISSION_NONE = 0;
+    public static final short PERMISSION_VIEW = 1;
+    public static final short PERMISSION_EDIT = 2;
+    
     // --------- persistent fields -------------
     private Long uid;
     private PedagogicalPlannerSequenceNode parent;
@@ -22,6 +25,7 @@ public class PedagogicalPlannerSequenceNode {
     private Long learningDesignId;
     private String learningDesignTitle;
     private Boolean locked = false;
+    private Short teachersPermissions = 1;
 
     /**
      * @hibernate.id column="uid" generator-class="native" type="java.lang.Long"
@@ -122,7 +126,6 @@ public class PedagogicalPlannerSequenceNode {
 
     /**
      * @hibernate.property column="locked"
-     * @return
      */
     public Boolean getLocked() {
 	return locked;
@@ -134,7 +137,6 @@ public class PedagogicalPlannerSequenceNode {
 
     /**
      * @hibernate.property column="ld_id"
-     * @return
      */
     public Long getLearningDesignId() {
 	return learningDesignId;
@@ -146,7 +148,6 @@ public class PedagogicalPlannerSequenceNode {
 
     /**
      * @hibernate.property column="content_folder_id"
-     * @return
      */
     public String getContentFolderId() {
 	return contentFolderId;
@@ -155,6 +156,15 @@ public class PedagogicalPlannerSequenceNode {
     public void setContentFolderId(String contentFolderId) {
 	this.contentFolderId = contentFolderId;
     }
+    
+    /**
+     * @hibernate.property column="teachers_permissions"
+     */
+    public Short getTeachersPermissions() {
+        return teachersPermissions;
+    }
 
-
+    public void setTeachersPermissions(Short teachersPermissions) {
+        this.teachersPermissions = teachersPermissions;
+    }
 }

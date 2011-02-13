@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.learningdesign.dto;
 
 import java.io.Serializable;
 
-import org.lamsfoundation.lams.learningdesign.PlannerActivityMetadata;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityMetadata;
 
 /**
  * Holds additional information about activities used in Pedagogical Planner only.
@@ -68,15 +68,15 @@ public class PlannerActivityMetadataDTO implements Serializable, Cloneable {
 
     }
 
-    public PlannerActivityMetadataDTO(PlannerActivityMetadata source) {
+    public PlannerActivityMetadataDTO(PedagogicalPlannerActivityMetadata source) {
 	this.collapsed = source.getCollapsed();
 	this.expanded = source.getExpanded();
 	this.hidden = source.getHidden();
 	this.editingAdvice = source.getEditingAdvice();
     }
 
-    public PlannerActivityMetadata toPlannerMetadata() {
-	PlannerActivityMetadata plannerMetadata = new PlannerActivityMetadata();
+    public PedagogicalPlannerActivityMetadata toPlannerMetadata() {
+	PedagogicalPlannerActivityMetadata plannerMetadata = new PedagogicalPlannerActivityMetadata();
 	plannerMetadata.setCollapsed(this.collapsed);
 	plannerMetadata.setExpanded(this.expanded);
 	plannerMetadata.setHidden(this.hidden);
