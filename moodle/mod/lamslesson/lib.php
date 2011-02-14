@@ -548,8 +548,8 @@ function lamslesson_fill_lesson($username,$lsid,$courseid,$country,$lang,$learne
   return file_get_contents($request);
 }
 
-function lamslesson_get_outputs($username, $lang, $country, $lessonid, $courseid, $method,$foruser) {
-  global $CFG;
+function lamslesson_get_lams_outputs($username,$lamslesson,$foruser) {
+  global $CFG, $DB;
 
   $datetime = date('F d,Y g:i a');
   $plaintext = trim($datetime)
@@ -559,27 +559,68 @@ function lamslesson_get_outputs($username, $lang, $country, $lessonid, $courseid
   $hash = sha1(strtolower($plaintext));
   $request = $CFG->lamslesson_serverurl. LAMSLESSON_LESSON_MANAGER 
     .'?serverId='.$CFG->lamslesson_serverid
-    .'&courseId='.$courseid
+    .'&courseId='.$lamslesson->course
     .'&username='.$username
     .'&datetime='.urlencode(strtolower($datetime))
     .'&hashValue='.$hash
-    .'&lang='.$lang
-    .'&country='.$country
-    .'&method='.$method
-    .'&lsId='.$lessonid
+    .'&lang=en'
+    .'&country=AU'
+    .'&method='.LAMSLESSON_OUTPUT_METHOD
+    .'&lsId='.$lamslesson->lesson_id
     .'&outputsUser='.$foruser;
 
   // GET call to LAMS
 
   $xml = file_get_contents($request);
 
-  $xml_array = xmlize($xml);
+  $results = xmlize($xml);
 
-  return $xml_array;
+  // Get the outputs from the activities
+  $learneroutputs = $results['ToolOutputs']['#']['LearnerOutput'];
+  $activityoutputs = $learneroutputs['0']['#']['Activity'];
+  
+  $maxresult = 0;
+  $userresult = 0;
+  
+  // Calculate max and user results (if they exist)
+  
+  foreach ($activityoutputs as $k => $v){
+    // If activities don't have or produce any output then we just ignore them
+    if (!empty($v['#'])) {
+      foreach ($v['#']['ToolOutput'] as $k2 => $v2) {
+	$activityoutputname = $v2['@']['name'];
+	// The only numeric outputs we get from LAMS are for the MCQ and Assessment activities
+	// learner.total.score = Assessment 
+	// learner.mark = MCQ
+	if ($activityoutputname == 'learner.mark' || $activityoutputname == 'learner.total.score') {
+	  $actname = $v2['@']['name'];
+	  $actmaxresult = $v2['@']['marksPossible'];
+	  $actuserresult = $v2['@']['output'];
+	  $userresult += $actuserresult;
+	  $maxresult += $actmaxresult;
+	  
+	}
+      }
+    }
+    
+  }
 
+  
+  // If there's outputs from LAMS, then we process them and add them to the gradebook
+  if (!$maxresult == 0) {
+      
+    // Now calculate the percentage and then multiply it by the lamslesson grade. 
+    $gradebookmark = ($userresult / $maxresult) *  $lamslesson->grade;
+    
+    // Put this into gradebook
+    $user = $DB->get_record('user', array('username'=>$foruser));
+    lamslesson_update_grades($lamslesson, $user->id, $gradebookmark);
 
+    return $gradebookmark;
+      
+  }
+    
 }
-
 
 /**
  * Return URL to join a LAMS lesson as a learner or staff depending on method.
