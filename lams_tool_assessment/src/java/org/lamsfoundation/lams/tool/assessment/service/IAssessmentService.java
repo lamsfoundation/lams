@@ -254,6 +254,12 @@ public interface IAssessmentService {
      */
     public String getMessage(String key);
     
+    /**
+     * Returns whether activity is grouped and therefore it is expected more than one tool session.
+     * 
+     * @param toolContentID
+     * @return
+     */
     boolean isGroupedActivity(long toolContentID);
 }
 

@@ -382,6 +382,7 @@ public class LearningAction extends Action {
 	
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, false);
 	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, 1);
+	sessionMap.put(AssessmentConstants.ATTR_QUESTION_NUMBERING_OFFSET, 1);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);	
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
