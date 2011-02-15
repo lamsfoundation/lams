@@ -113,6 +113,7 @@ public class MonitoringAction extends WikiPageAction {
 	
 	request.setAttribute(WikiConstants.ATTR_WIKI_DTO, wikiDT0);
 	request.setAttribute(WikiConstants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
+	request.setAttribute(WikiConstants.ATTR_IS_GROUPED_ACTIVITY, wikiService.isGroupedActivity(toolContentID));
 	return mapping.findForward("success");
     }
 
@@ -167,6 +168,7 @@ public class MonitoringAction extends WikiPageAction {
 
 	WikiSession wikiSession = wikiService.getSessionBySessionId(toolSessionId);
 	WikiSessionDTO sessionDTO = new WikiSessionDTO(wikiSession);
+	Long toolContentId = wikiSession.getWiki().getToolContentId();
 
 	// Add all the user notebook entries to the session dto
 	for (WikiUserDTO userDTO : sessionDTO.getUserDTOs()) {
@@ -218,6 +220,7 @@ public class MonitoringAction extends WikiPageAction {
 	}
 	request.setAttribute(WikiConstants.ATTR_WIKI_PAGE_CONTENT_HISTORY, currentWikiPageHistoryDTOs);
 	request.setAttribute(WikiConstants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
+	request.setAttribute(WikiConstants.ATTR_IS_GROUPED_ACTIVITY, wikiService.isGroupedActivity(toolContentId));
 
 	return mapping.findForward("wiki_display");
     }

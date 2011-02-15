@@ -804,6 +804,10 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     public void setAuditService(IAuditService auditService) {
 	this.auditService = auditService;
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     private NodeKey processFile(FormFile file, String type) {
 	NodeKey node = null;

@@ -18,9 +18,11 @@
 	<html:hidden property="historyPageContentId" styleId="historyPageContentId" />
 	
 	<div id="wikimenu" style="margin-right:75px;">
-		<h4>
-			${sessionDTO.sessionName}
-		</h4>
+		<c:if test="${isGroupedActivity}">
+			<h4>
+				${sessionDTO.sessionName}
+			</h4>
+		</c:if>
 		<br />
 		<div id="breadcrumb" style="float: left; width: 50%;">
 			<c:if test="${currentWikiPage.title != mainWikiPage.title}">
