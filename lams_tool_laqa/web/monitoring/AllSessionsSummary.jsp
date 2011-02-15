@@ -25,10 +25,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 		<c:set var="sessionName" scope="request" value="${groupDto.sessionName}"/>
 			  	 		<c:set var="groupData" scope="request" value="${groupDto.groupData}"/>
 			  	 		
-			  	 		<tr>
-			  	 			<td> <b> <fmt:message key="group.label"/> : </b> <c:out value="${sessionName}"/> </td>
-			  	 		</tr>
-			  	 		
+			  	 		<c:if test="${isGroupedActivity}">
+				  	 		<tr>
+				  	 			<td> <b> <fmt:message key="group.label"/> : </b> <c:out value="${sessionName}"/> </td>
+				  	 		</tr>
+			  	 		</c:if>
 									  	 		
 			  	 		
 			  	 		

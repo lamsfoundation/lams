@@ -165,7 +165,9 @@ public class SurveyConstants {
     public static final String ATTR_SURVEY = "survey";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
-
+    
+    public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
+    
     // POSITION
     public static int POSITION_INSIDE = 0;
 

@@ -219,6 +219,9 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	}
 
 	MonitoringUtil.buildQaStatsDTO(request, qaService, qaContent);
+	
+	boolean isGroupedActivity = qaService.isGroupedActivity(new Long(toolContentID));
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
 
 	request.setAttribute("currentMonitoredToolSession", "All");
 	MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);

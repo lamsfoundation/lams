@@ -817,6 +817,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	MonitoringUtil.buildQaStatsDTO(request, qaService, qaContent);
 	MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
+	
+	boolean isGroupedActivity = qaService.isGroupedActivity(new Long(strToolContentID));
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
 
 	return mapping.findForward(QaAppConstants.LOAD_MONITORING);
     }

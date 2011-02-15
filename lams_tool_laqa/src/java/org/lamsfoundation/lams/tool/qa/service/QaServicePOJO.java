@@ -1441,6 +1441,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    return list.get(0);
 	}
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     /**
      * @return Returns the cred.

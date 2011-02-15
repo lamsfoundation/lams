@@ -356,4 +356,12 @@ public interface IQaService {
     public void deleteAllWizardCategories();
 
     public void removeQuestionsFromCache(QaContent qaContent);
+    
+    /**
+     * Returns whether activity is grouped and therefore it is expected more than one tool session.
+     * 
+     * @param toolContentID
+     * @return
+     */
+    boolean isGroupedActivity(long toolContentID);
 }

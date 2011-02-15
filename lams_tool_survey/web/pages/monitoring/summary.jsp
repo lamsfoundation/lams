@@ -134,12 +134,14 @@
 			<%-- display group name on first row--%>
 			<c:if test="${queStatus.first}">
 				<table cellpadding="0"  class="alternative-color">
-				<tr>
-					<td colspan="2">
-						<B><fmt:message key="monitoring.label.group" /> ${surveySession.sessionName}</B> 
-					</td>
-				</tr>
-				<%-- End group title display --%>
+					<c:if test="${sessionMap.isGroupedActivity}">
+						<tr>
+							<td colspan="2">
+								<B><fmt:message key="monitoring.label.group" /> ${surveySession.sessionName}</B> 
+							</td>
+						</tr>
+					</c:if>
+					<%-- End group title display --%>
 			</c:if>
 			<tr>
 				<th class="first" colspan="2">

@@ -254,7 +254,9 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		mcGeneralMonitoringDTO.setSummaryToolSessions(populateToolSessions(mcContent));
 		mcGeneralMonitoringDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
 		logger.debug("existing mcContent:" + mcContent);
-
+		
+		boolean isGroupedActivity = mcService.isGroupedActivity(new Long(toolContentID));
+		request.setAttribute("isGroupedActivity", isGroupedActivity);
 
 		/*setting editable screen properties*/
 		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();

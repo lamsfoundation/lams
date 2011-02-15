@@ -547,6 +547,10 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
 	return summary;
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     // *****************************************************************************
     // private methods

@@ -1560,6 +1560,10 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	mcUploadedFileDAO.saveUploadFile(mcUploadedFile);
 	McServicePOJO.logger.debug("persisted mcUploadedFile: " + mcUploadedFile);
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     /**
      * @return Returns the logger.

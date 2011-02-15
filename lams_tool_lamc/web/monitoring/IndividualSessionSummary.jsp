@@ -34,10 +34,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 						<c:if test="${currentSessionId == currentMonitoredToolSession}"> 			
 						
-				  	 		<tr>
-						 		<td NOWRAP colspan=2 > <b>  <fmt:message key="group.label"/>: </b>
-						 		<c:out value="${currentSessionName}"/>  </td>
-							</tr>
+							<c:if test="${isGroupedActivity}">
+					  	 		<tr>
+							 		<td NOWRAP colspan=2 > <b>  <fmt:message key="group.label"/>: </b>
+							 		<c:out value="${currentSessionName}"/>  </td>
+								</tr>
+							</c:if>
 						
 				  	 		<tr>
 								 <td NOWRAP valign=top class="align-left"> <b> <fmt:message key="label.user"/>  </b> </td>

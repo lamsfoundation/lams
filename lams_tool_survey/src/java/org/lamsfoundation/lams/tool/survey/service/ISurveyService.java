@@ -322,4 +322,12 @@ public interface ISurveyService {
     public String createConditionName(Collection<SurveyCondition> existingConditions);
 
     public void deleteCondition(SurveyCondition condition);
+    
+    /**
+     * Returns whether activity is grouped and therefore it is expected more than one tool session.
+     * 
+     * @param toolContentID
+     * @return
+     */
+    boolean isGroupedActivity(long toolContentID);
 }

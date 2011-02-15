@@ -151,7 +151,8 @@ public class MonitoringAction extends Action {
 	sessionMap.put(SurveyConstants.ATTR_SURVEY, survey);
 	sessionMap.put(AttributeNames.PARAM_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(SurveyConstants.ATTR_REFLECT_LIST, relectList);
-
+	sessionMap.put(SurveyConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
+	
 	return mapping.findForward(SurveyConstants.SUCCESS);
     }
 

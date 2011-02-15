@@ -28,11 +28,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			  	 		<c:set var="currentSessionId" scope="request" value="${sessionMarksDto.sessionId}"/>
 			  	 		<c:set var="mapUserMarksDto" scope="request" value="${sessionMarksDto.userMarks}"/>
 
-						<tr>
-					 		<td NOWRAP colspan=2 > <b> <fmt:message key="group.label"/> : </b>
-					 		<c:out value="${sessionMarksDto.sessionName}"/>  </td>
-						</tr>
-
+						<c:if test="${isGroupedActivity}">
+							<tr>
+						 		<td NOWRAP colspan=2 > <b> <fmt:message key="group.label"/> : </b>
+						 		<c:out value="${sessionMarksDto.sessionName}"/>  </td>
+							</tr>
+						</c:if>
 
 			  	 		<tr>
 							 <td NOWRAP valign=top class="align-left"> <b> <fmt:message key="label.user"/> </b> </td>  

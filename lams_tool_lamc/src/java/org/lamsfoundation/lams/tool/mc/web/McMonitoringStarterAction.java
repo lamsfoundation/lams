@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,7 +41,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.tool.mc.EditActivityDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
@@ -258,6 +256,9 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    request.setAttribute("reflect", mcContent.isReflect());
 	    request.setAttribute("reflectionSubject", mcContent.getReflectionSubject());
 	    request.setAttribute("passMark", mcContent.getPassMark());
+	    
+	    boolean isGroupedActivity = mcService.isGroupedActivity(new Long(toolContentID));
+	    request.setAttribute("isGroupedActivity", isGroupedActivity);
 
 	    // The edit activity code needs a session map
 	    SessionMap sessionMap = new SessionMap();

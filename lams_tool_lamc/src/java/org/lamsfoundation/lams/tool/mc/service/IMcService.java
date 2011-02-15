@@ -258,6 +258,14 @@ public interface IMcService
      * @return top mark, lowest mark, average mark in that order
      */
     public Integer[] getMarkStatistics(McSession mcSession);
+    
+    /**
+     * Returns whether activity is grouped and therefore it is expected more than one tool session.
+     * 
+     * @param toolContentID
+     * @return
+     */
+    boolean isGroupedActivity(long toolContentID);
      
 }
 
