@@ -260,6 +260,9 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 	VoteMonitoringAction.logger.debug("SELECTION_CASE: " + request.getAttribute(VoteAppConstants.SELECTION_CASE));
 	request.setAttribute(VoteAppConstants.CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
+	
+	boolean isGroupedActivity = voteService.isGroupedActivity(new Long(toolContentID));
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
 
 	voteGeneralMonitoringDTO.setCurrentMonitoredToolSession(currentMonitoredToolSession);
 	voteMonitoringForm.setSbmtSuccess(new Boolean(false).toString());

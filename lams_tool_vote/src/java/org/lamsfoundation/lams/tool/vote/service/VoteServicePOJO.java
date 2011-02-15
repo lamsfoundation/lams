@@ -1665,6 +1665,10 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	voteUploadedFileDAO.cleanUploadedFilesMetaData();
 	VoteServicePOJO.logger.debug("files meta data has been cleaned up");
     }
+    
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
 
     /**
      * Get the definitions for possible output for an activity, based on the toolContentId. Currently we have one

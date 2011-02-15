@@ -121,10 +121,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						
 						<c:forEach var="currentDto" items="${voteGeneralMonitoringDTO.listVoteAllSessionsDTO}">
 						
-								<tr>
-							 		<td  colspan=2 > <b>  <fmt:message key="label.groupName"/> </b>
-							 		<c:out value="${currentDto.sessionName}"/>  </td>
-								</tr>
+								<c:if test="${isGroupedActivity}">
+									<tr>
+								 		<td  colspan=2 > <b>  <fmt:message key="label.groupName"/> </b>
+								 		<c:out value="${currentDto.sessionName}"/>  </td>
+									</tr>
+								</c:if>
 						
 								<tr> <td  colspan=2> 									
 						  	 		<c:set var="currentSessionId" scope="request" value="${currentDto.sessionId}"/>

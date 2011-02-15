@@ -367,6 +367,9 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(),
 		    voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO,
 		    getMessageService());
+	    
+	    boolean isGroupedActivity = voteService.isGroupedActivity(new Long(voteLearningForm.getToolContentID()));
+		request.setAttribute("isGroupedActivity", isGroupedActivity);
 
 	    VoteLearningStarterAction.logger.debug("fwd'ing to: " + VoteAppConstants.EXIT_PAGE);
 	    return mapping.findForward(VoteAppConstants.EXIT_PAGE);

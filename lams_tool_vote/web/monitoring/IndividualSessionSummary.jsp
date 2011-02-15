@@ -117,9 +117,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</c:if> 
 						</c:if> 
 
-						<tr>
-					 		<td  colspan=2 > <b>  <fmt:message key="label.groupName"/> </b><c:out value="${voteGeneralMonitoringDTO.groupName}"/>  </td>
-						</tr>
+						<c:if test="${isGroupedActivity}">
+							<tr>
+						 		<td  colspan=2 > <b>  <fmt:message key="label.groupName"/> </b><c:out value="${voteGeneralMonitoringDTO.groupName}"/>  </td>
+							</tr>
+						</c:if>
 
 	  					<tr>
 					 		<td > <b>  <fmt:message key="label.total.students"/> </b> </td>
