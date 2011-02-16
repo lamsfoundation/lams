@@ -103,11 +103,6 @@
         	var myForm = $("#answers");
         	myForm.attr("action", "<c:url value='/learning/nextPage.do?sessionMapID=${sessionMapID}&pageNumber='/>" + pageNumber + "&secondsLeft=" + secondsLeft);
         	myForm.submit();
-		}		
-		function finishTest(){
-        	var myForm = $("#answers");
-        	myForm.attr("action", "<c:url value='/learning/finishTest.do?sessionMapID=${sessionMapID}'/>");
-        	myForm.submit();
 		}
 		function submitAll(){
         	var myForm = $("#answers");
@@ -239,10 +234,7 @@
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-right">
 				<c:choose>
-					<c:when	test="${not finishedLock}">
-						<html:button property="finishTest" onclick="return finishTest();" styleClass="button">
-							<fmt:message key="label.learning.finish.test" />
-						</html:button>					
+					<c:when	test="${not finishedLock}">					
 						<html:button property="submitAll" onclick="return submitAll();" styleClass="button">
 							<fmt:message key="label.learning.submit.all" />
 						</html:button>	

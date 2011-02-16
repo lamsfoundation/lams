@@ -91,9 +91,6 @@ public class LearningAction extends Action {
 	if (param.equals("submitAll")) {
 	    return submitAll(mapping, form, request, response);
 	}
-	if (param.equals("finishTest")) {
-	    return finishTest(mapping, form, request, response);
-	}
 	if (param.equals("resubmit")) {
 	    return resubmit(mapping, form, request, response);
 	}	
@@ -320,41 +317,6 @@ public class LearningAction extends Action {
 	boolean isResubmitAllowed = ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0));// && !user.isSessionFinished();
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed);
 	
-	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, true);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	return mapping.findForward(AssessmentConstants.SUCCESS);
-    }    
-    
-    /**
-     * Display same entire authoring page content from HttpSession variable.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
-     */
-    private ActionForward finishTest(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	preserveUserAnswers(request);
-	processUserAnswers(sessionMap);
-	loadupResultMarks(sessionMap);
-	
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	IAssessmentService service = getAssessmentService();
-	try {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = new Long(user.getUserID().longValue());
-	    service.finishToolSession(sessionId, userID);
-	} catch (AssessmentApplicationException e) {
-	    LearningAction.log.error("Failed finishing tool session:" + e.getMessage());
-	}
-	
-	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, false);
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, true);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
