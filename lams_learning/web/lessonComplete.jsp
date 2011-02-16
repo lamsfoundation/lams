@@ -71,4 +71,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </div>
 <!--closes footer-->
 
-
+<c:if test="${not empty lessonFinishUrl}">
+	<iframe width="0" height="0" src="${lessonFinishUrl}"></iframe>
+</c:if>

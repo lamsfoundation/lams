@@ -24,14 +24,19 @@
 /* $$Id$$ */	
 package org.lamsfoundation.lams.learning.web.action;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 
@@ -49,15 +54,33 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
  * ----------------XDoclet Tags--------------------
  */
 public class LessonCompleteActivityAction extends ActivityAction {
+    
+    private static IntegrationService integrationService = null;
 
     /**
      * Gets an activity from the request (attribute) and forwards onto a display action using the ActionMappings class.
      * If no activity is in request then use the current activity in learnerProgress.
      */
     public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-	    HttpServletResponse response) {
-	LearningWebUtil.setupProgressInRequest((ActivityForm) actionForm, request, LearningWebUtil.getLearnerProgress(request,
-		getLearnerService()));
+	    HttpServletResponse response) throws UnsupportedEncodingException {
+	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, getLearnerService());
+	LearningWebUtil.setupProgressInRequest((ActivityForm) actionForm, request, learnerProgress);
+	
+	//checks for lessonFinishUrl parameter
+	String lessonFinishCallbackUrl = getIntegrationService().getLessonFinishCallbackUrl(learnerProgress.getUser(),
+		learnerProgress.getLesson());
+	if (lessonFinishCallbackUrl != null) {
+	    request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
+	}
+	
 	return mapping.findForward("lessonComplete");
+    }
+    
+    private IntegrationService getIntegrationService() {
+	if (integrationService == null) {
+	    integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
+		    getServlet().getServletContext()).getBean("integrationService");
+	}
+	return integrationService;
     }
 }
