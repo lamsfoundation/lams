@@ -68,5 +68,12 @@ public interface ILamsToolService
     
     public ToolSession getToolSession(Long toolSessionId);
     
+    /**
+     * Allows the tool to ask whether or not the activity is grouped and therefore it should expect more than one tool
+     * session.
+     * 
+     * @param toolContentID
+     * @return
+     */
     public Boolean isGroupedActivity(long toolContentID);
 }
