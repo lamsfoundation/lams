@@ -111,6 +111,7 @@ public class CloneLessonsAction extends Action {
 	    HttpServletResponse response) throws Exception {
 
 	response.addHeader("Cache-Control", "no-cache");
+	response.addHeader("content-type", "text/html; charset=UTF-8");
 
 	List groups = userManagementService.getOrganisationsByTypeAndStatus(OrganisationType.COURSE_TYPE,
 		OrganisationState.ACTIVE);
@@ -130,6 +131,7 @@ public class CloneLessonsAction extends Action {
 	Integer groupId = WebUtil.readIntParam(request, "groupId", true);
 
 	response.addHeader("Cache-Control", "no-cache");
+	response.addHeader("content-type", "text/html; charset=UTF-8");
 
 	if (groupId != null) {
 	    HashMap<String, Object> properties = new HashMap<String, Object>();
