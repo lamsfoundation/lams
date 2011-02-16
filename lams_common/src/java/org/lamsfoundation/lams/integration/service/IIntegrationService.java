@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.integration.service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
@@ -30,6 +31,8 @@ import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * <p>
@@ -86,4 +89,14 @@ public interface IIntegrationService {
 	void saveExtServerToolAdapterMap(ExtServerToolAdapterMap map); 
 	
 	void deleteExtServerToolAdapterMap(ExtServerToolAdapterMap map);
+	
+	/**
+	 * Checks whether the lesson was created from extServer and returns lessonFinishCallbackUrl if it's not blank.
+	 * 
+	 * @param user
+	 * @param lesson
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException;
 }

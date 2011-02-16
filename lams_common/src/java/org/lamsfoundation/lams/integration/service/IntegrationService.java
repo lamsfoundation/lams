@@ -27,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,12 +42,14 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
+import org.lamsfoundation.lams.integration.ExtServerLessonMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
@@ -412,5 +415,68 @@ public class IntegrationService implements IIntegrationService {
 
     public ExtServerOrgMap getExtServerOrgMap(Integer sid) {
 	return (ExtServerOrgMap) service.findById(ExtServerOrgMap.class, sid);
+    }
+    
+    public void createExtServerLessonMap(Long lessonId, ExtServerOrgMap extServer) {
+	ExtServerLessonMap map = new ExtServerLessonMap();
+	map.setLessonId(lessonId);
+	map.setExtServer(extServer);
+	service.save(map);
+    }
+    
+    public String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException {
+	// the callback url must contain %username%, %lessonid%, %timestamp% and %hash% eg:
+	// "http://test100.ics.mq.edu.au/webapps/lams-plglamscontent-bb_bb60/UserData?uid=%username%&lessonid=%lessonid%&ts=%timestamp%&hash=%hash%";
+	// where %username%, %lessonid%, %timestamp% and %hash% will be replaced with their real values
+	String lessonFinishCallbackUrl = null;
+	
+	if (lesson != null) {
+	    Long lessonId = lesson.getLessonId();
+	    ExtServerLessonMap extServerLesson = getExtServerLessonMap(lessonId);
+	    // checks whether the lesson was created from extServer and whether it has lessonFinishCallbackUrl setting
+	    if (extServerLesson != null && StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
+		ExtServerOrgMap serverMap = extServerLesson.getExtServer();
+
+		ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(serverMap, user);
+		if (extUserUseridMap != null) {
+		    String extUsername = extUserUseridMap.getExtUsername();
+
+		    // construct real lessonFinishCallbackUrl
+		    lessonFinishCallbackUrl = serverMap.getLessonFinishUrl();
+		    String timestamp = Long.toString(new Date().getTime());
+		    String hash = hash(serverMap, extUsername, timestamp);
+		    String encodedExtUsername = URLEncoder.encode(extUsername, "UTF8");
+
+		    // set the values for the parameters
+		    lessonFinishCallbackUrl = lessonFinishCallbackUrl.replaceAll("%username%", encodedExtUsername)
+			    .replaceAll("%lessonid%", lessonId.toString()).replaceAll("%timestamp%", timestamp)
+			    .replaceAll("%hash%", hash);
+		    log.debug(lessonFinishCallbackUrl);
+		}
+	    }
+	}
+
+	 return lessonFinishCallbackUrl;
+    }
+    
+    private ExtServerLessonMap getExtServerLessonMap(Long lessonId) {
+	List list = service.findByProperty(ExtServerLessonMap.class, "lessonId", lessonId);
+	if (list == null || list.size() == 0) {
+	    return null;
+	} else {
+	    return (ExtServerLessonMap) list.get(0);
+	}
+    }
+    
+    private ExtUserUseridMap getExistingExtUserUseridMap(ExtServerOrgMap serverMap, User user) {
+	Map<String, Object> properties = new HashMap<String, Object>();
+	properties.put("extServerOrgMap.sid", serverMap.getSid());
+	properties.put("user.userId", user.getUserId());
+	List list = service.findByProperties(ExtUserUseridMap.class, properties);
+	if (list == null || list.size() == 0) {
+	    return null;
+	} else {
+	    return (ExtUserUseridMap) list.get(0);
+	}
     }
 }
