@@ -58,6 +58,10 @@
 		<td><fmt:message key="sysadmin.timeoutUrl" />:</td>
 		<td><html:text property="timeoutUrl" size="70"/> *</td>
 	</tr>
+	<tr>
+		<td><fmt:message key="sysadmin.lessonFinishUrl" />:</td>
+		<td><html:text property="lessonFinishUrl" size="70"/></td>
+	</tr>
 </table>
 <div align="center">
 	<html:submit styleClass="button"><fmt:message key="admin.save" /></html:submit>
