@@ -79,6 +79,7 @@
 				<value>classpath:org/lamsfoundation/lams/integration/ExtCourseClassMap.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/integration/ExtUserUseridMap.hbm.xml</value>
 				<value>classpath:org/lamsfoundation/lams/integration/ExtServerToolAdapterMap.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/integration/ExtServerLessonMap.hbm.xml</value>
 				
 				<value>classpath:org/lamsfoundation/lams/planner/PedagogicalPlannerSequenceNode.hbm.xml</value>
 				

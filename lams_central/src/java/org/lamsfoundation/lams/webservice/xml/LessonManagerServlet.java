@@ -310,6 +310,9 @@ public class LessonManagerServlet extends HttpServlet {
 	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. start lesson
 	    LessonManagerServlet.monitoringService.startLesson(lesson.getLessonId(), userMap.getUser().getUserId());
+	    
+	    //store information which extServer has started the lesson
+	    integrationService.createExtServerLessonMap(lesson.getLessonId(), serverMap);
 
 	    return lesson.getLessonId();
 	} catch (Exception e) {

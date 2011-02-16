@@ -39,6 +39,9 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 
     /** persistent field */
     private String timeoutUrl;
+    
+    /** persistent field */
+    private String lessonFinishUrl;
 
     /** persistent field */
     private Boolean disabled;
@@ -199,6 +202,18 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 
     public void setTimeoutUrl(String timeoutUrl) {
 	this.timeoutUrl = timeoutUrl;
+    }
+    
+    /**
+     * @hibernate.property column="lesson_finish_url" length="65535" not-null="false"
+     * 
+     */
+    public String getLessonFinishUrl() {
+	return this.lessonFinishUrl;
+    }
+
+    public void setLessonFinishUrl(String lessonFinishUrl) {
+	this.lessonFinishUrl = lessonFinishUrl;
     }
 
     /**

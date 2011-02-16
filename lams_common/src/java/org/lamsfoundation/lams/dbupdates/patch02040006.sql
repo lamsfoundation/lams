@@ -123,5 +123,19 @@ INSERT INTO lams_log_event_type VALUES (6, 'TYPE_LEARNER_ACTIVITY_FINISH');
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)  
 values ('DisplayPrintButton','false', 'config.display.print.button', 'config.header.features', 'BOOLEAN', 1);
 
+-- LDEV-2628 Report instant completion
+ALTER TABLE lams_ext_server_org_map ADD COLUMN lesson_finish_url text DEFAULT NULL;
+
+CREATE TABLE lams_ext_server_lesson_map (
+  uid BIGINT(20) NOT NULL auto_increment,
+  lesson_id BIGINT(20) NOT NULL,
+  ext_server_org_map_id int(11) NOT NULL,
+  PRIMARY KEY  (uid),
+  UNIQUE KEY `lesson_id` (`lesson_id`),
+  CONSTRAINT lams_ext_server_lesson_map_fk1 FOREIGN KEY (ext_server_org_map_id) REFERENCES lams_ext_server_org_map (sid) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT lams_ext_server_lesson_map_fk2 FOREIGN KEY (lesson_id) REFERENCES lams_lesson (lesson_id) ON DELETE CASCADE ON UPDATE CASCADE
+) TYPE=InnoDB;
+
+
 COMMIT;
 SET AUTOCOMMIT = 1;
