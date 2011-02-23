@@ -136,6 +136,18 @@ CREATE TABLE lams_ext_server_lesson_map (
   CONSTRAINT lams_ext_server_lesson_map_fk2 FOREIGN KEY (lesson_id) REFERENCES lams_lesson (lesson_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) TYPE=InnoDB;
 
+-- LDEV-2642 and LDEV-2646 Move metadata to separate table. Use LD ID rather than ZIPed file for template.
+CREATE TABLE lams_planner_activity_metadata (
+       activity_id BIGINT(20) NOT NULL
+	 , collapsed TINYINT(1) DEFAULT 0
+	 , expanded TINYINT(1) DEFAULT 0
+	 , hidden TINYINT(1) DEFAULT 0
+	 , editing_advice VARCHAR(255)
+     , CONSTRAINT FK_lams_planner_metadata_primary FOREIGN KEY (activity_id)
+                  REFERENCES lams_learning_activity (activity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)TYPE=InnoDB;
+
+ALTER TABLE lams_planner_nodes DROP COLUMN file_uuid, DROP COLUMN file_name, ADD COLUMN ld_id BIGINT(20), ADD COLUMN teachers_permissions TINYINT UNSIGNED;
 
 COMMIT;
 SET AUTOCOMMIT = 1;
