@@ -52,6 +52,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
     protected String onlineInstructions;
     protected String offlineInstructions;
     protected String usernameVisible;
+    protected String allowRateAnswers;
     protected String showOtherAnswers;
     protected String reflect;
     protected String synchInMonitor;
@@ -78,23 +79,25 @@ public class QaGeneralAuthoringDTO implements Comparable {
     protected String editableQuestionFeedback;
 
     public String toString() {
-	return new ToStringBuilder(this).append("toolContentID: ", toolContentID).append("contentFolderID: ",
-		contentFolderID).append("httpSessionID: ", httpSessionID).append("currentTab: ", currentTab).append(
-		"activeModule: ", activeModule).append("defineLaterInEditMode: ", defineLaterInEditMode).append(
-		"showAuthoringTabs: ", showAuthoringTabs).append("monitoringOriginatedDefineLater: ",
-		monitoringOriginatedDefineLater).append("targetMode: ", targetMode).append("defaultQuestionContent: ",
-		defaultQuestionContent).append("defaultContentIdStr: ", defaultContentIdStr).append("activityTitle: ",
-		activityTitle).append("activityInstructions: ", activityInstructions).append("reflect: ", reflect)
+	return new ToStringBuilder(this).append("toolContentID: ", toolContentID)
+		.append("contentFolderID: ", contentFolderID).append("httpSessionID: ", httpSessionID)
+		.append("currentTab: ", currentTab).append("activeModule: ", activeModule)
+		.append("defineLaterInEditMode: ", defineLaterInEditMode)
+		.append("showAuthoringTabs: ", showAuthoringTabs)
+		.append("monitoringOriginatedDefineLater: ", monitoringOriginatedDefineLater)
+		.append("targetMode: ", targetMode).append("defaultQuestionContent: ", defaultQuestionContent)
+		.append("defaultContentIdStr: ", defaultContentIdStr).append("activityTitle: ", activityTitle)
+		.append("activityInstructions: ", activityInstructions).append("reflect: ", reflect)
 		.append("onlineInstructions: ", onlineInstructions)
 		.append("offlineInstructions: ", offlineInstructions).append("usernameVisible: ", usernameVisible)
-		.append("showOtherAnswers: ", showOtherAnswers).append("synchInMonitor: ", synchInMonitor).append(
-			"questionsSequenced: ", questionsSequenced).append("lockWhenFinished: ", lockWhenFinished)
-		.append("editActivityEditMode: ", editActivityEditMode)
-		.append("reflectionSubject: ", reflectionSubject).append("requestedModule: ", requestedModule).append(
-			"isDefineLater: ", isDefineLater).append("monitoredContentInUse: ", monitoredContentInUse)
-		.append("attachmentList: ", attachmentList).append(
-			"deletedAttachmentList: ", deletedAttachmentList).append("sbmtSuccess: ", sbmtSuccess).append(
-			"userExceptionQuestionsDuplicate: ", userExceptionQuestionsDuplicate).toString();
+		.append("allowRateAnswers: ", allowRateAnswers).append("showOtherAnswers: ", showOtherAnswers)
+		.append("synchInMonitor: ", synchInMonitor).append("questionsSequenced: ", questionsSequenced)
+		.append("lockWhenFinished: ", lockWhenFinished).append("editActivityEditMode: ", editActivityEditMode)
+		.append("reflectionSubject: ", reflectionSubject).append("requestedModule: ", requestedModule)
+		.append("isDefineLater: ", isDefineLater).append("monitoredContentInUse: ", monitoredContentInUse)
+		.append("attachmentList: ", attachmentList).append("deletedAttachmentList: ", deletedAttachmentList)
+		.append("sbmtSuccess: ", sbmtSuccess)
+		.append("userExceptionQuestionsDuplicate: ", userExceptionQuestionsDuplicate).toString();
     }
 
     /**
@@ -450,7 +453,22 @@ public class QaGeneralAuthoringDTO implements Comparable {
     public void setUsernameVisible(String usernameVisible) {
 	this.usernameVisible = usernameVisible;
     }
+    
+    /**
+     * @return Returns the allowRateAnswers.
+     */
+    public String getAllowRateAnswers() {
+	return allowRateAnswers;
+    }
 
+    /**
+     * @param allowRateAnswers
+     *                The allowRateAnswers to set.
+     */
+    public void setAllowRateAnswers(String allowRateAnswers) {
+	this.allowRateAnswers = allowRateAnswers;
+    }
+    
     /**
      * @return Returns the currentTab.
      */

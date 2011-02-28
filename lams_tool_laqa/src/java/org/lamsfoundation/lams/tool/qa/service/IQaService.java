@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
+import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
@@ -364,4 +365,9 @@ public interface IQaService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+        
+    AverageRatingDTO rateResponse(Long responseId, Long userId, Long toolSessionID, float rating);
+    
+    AverageRatingDTO getAverageRatingDTOByResponse(Long responseId);
+
 }

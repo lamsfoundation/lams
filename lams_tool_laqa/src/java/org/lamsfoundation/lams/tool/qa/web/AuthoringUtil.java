@@ -316,6 +316,8 @@ public class AuthoringUtil implements QaAppConstants {
 	String synchInMonitor = request.getParameter(QaAppConstants.SYNC_IN_MONITOR);
 
 	String usernameVisible = request.getParameter(QaAppConstants.USERNAME_VISIBLE);
+	
+	String allowRateQuestions = request.getParameter(QaAppConstants.ALLOW_RATE_ANSWERS);
 
 	String showOtherAnswers = request.getParameter("showOtherAnswers");
 
@@ -344,6 +346,7 @@ public class AuthoringUtil implements QaAppConstants {
 	boolean synchInMonitorBoolean = false;
 	boolean lockWhenFinishedBoolean = false;
 	boolean usernameVisibleBoolean = false;
+	boolean allowRateQuestionsBoolean = false;
 	boolean showOtherAnswersBoolean = false;
 	boolean reflectBoolean = false;
 	boolean allowRichEditorBoolean = false;
@@ -362,6 +365,10 @@ public class AuthoringUtil implements QaAppConstants {
 
 	if (usernameVisible != null && usernameVisible.equalsIgnoreCase("1")) {
 	    usernameVisibleBoolean = true;
+	}
+	
+	if (allowRateQuestions != null && allowRateQuestions.equalsIgnoreCase("1")) {
+	    allowRateQuestionsBoolean = true;
 	}
 
 	if (showOtherAnswers != null && showOtherAnswers.equalsIgnoreCase("1")) {
@@ -406,6 +413,7 @@ public class AuthoringUtil implements QaAppConstants {
 	    qaContent.setOnlineInstructions(richTextOnlineInstructions);
 	    qaContent.setOfflineInstructions(richTextOfflineInstructions);
 	    qaContent.setUsernameVisible(usernameVisibleBoolean);
+	    qaContent.setAllowRateAnswers(allowRateQuestionsBoolean);
 	    qaContent.setShowOtherAnswers(showOtherAnswersBoolean);
 	    qaContent.setQuestionsSequenced(questionsSequencedBoolean);
 	    qaContent.setLockWhenFinished(lockWhenFinishedBoolean);

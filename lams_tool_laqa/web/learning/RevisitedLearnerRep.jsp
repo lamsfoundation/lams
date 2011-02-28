@@ -33,14 +33,30 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html>
 <lams:head>
 	<html:base />
-	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
+	
+	<lams:css />
+	<link rel="stylesheet" href="<html:rewrite page='/includes/css/jRating.jquery.css'/>"  type="text/css" />
+	<link rel="stylesheet" href="<html:rewrite page='/includes/css/ratingStars.css'/>"  type="text/css" />
 
+	<script type="text/javascript"> 
+		var pathToImageFolder = "<html:rewrite page='/images/'/>"; 
+	</script>
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.js'/>"></script>
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jRating.jquery.js'/>"></script>
 	<script language="JavaScript" type="text/JavaScript">
+	
+	  	$(document).ready(function(){
+		    $(".ratingStars").jRating({
+		    	rateMax : 5,
+		    	isDisabled : true
+			});
+		 });	
+	
 		function submitLearningMethod(actionMethod) 
 		{
 			if (actionMethod == 'endLearning') {
-				document.getElementById("finishButton").disabled = true;
+				$("#finishButton").attr("disabled", true);
 			}
 			document.QaLearningForm.method.value=actionMethod; 
 			document.QaLearningForm.submit();
@@ -154,6 +170,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<c:when test="${userData.visible == 'true'}">
 														<c:out value="${userData.responsePresentable}"
 															escapeXml="false" />
+														<jsp:include page="parts/ratingStars.jsp" />	
 													</c:when>
 													<c:otherwise>
 														<i><fmt:message key="label.hidden"/></i>
@@ -333,6 +350,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<c:when test="${userData.visible == 'true'}">
 														<c:out value="${userData.responsePresentable}"
 															escapeXml="false" />
+														<jsp:include page="parts/ratingStars.jsp" />	
 													</c:when>
 													<c:otherwise>
 														<i><fmt:message key="label.hidden"/></i>

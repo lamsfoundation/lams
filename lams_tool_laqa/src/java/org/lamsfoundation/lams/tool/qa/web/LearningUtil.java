@@ -92,6 +92,7 @@ public class LearningUtil implements QaAppConstants {
 	generalLearnerFlowDTO.setShowOtherAnswers(new Boolean(qaContent.isShowOtherAnswers()).toString());
 	generalLearnerFlowDTO.setActivityOffline(new Boolean(qaContent.isRunOffline()).toString());
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(qaContent.isAllowRichEditor()).toString());
+	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 	
 	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(qaContent.getQaQueContents().size()));
 

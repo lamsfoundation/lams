@@ -39,12 +39,29 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:html>
 	<lams:head>
 	<title><fmt:message key="activity.title" /></title>
-
 	<%@ include file="/common/tabbedheader.jsp"%>
-	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
+	
+	<link rel="stylesheet" href="<html:rewrite page='/includes/css/jRating.jquery.css'/>"  type="text/css" />
+	<link rel="stylesheet" href="<html:rewrite page='/includes/css/ratingStars.css'/>"  type="text/css" />
+	<style media="screen,projection" type="text/css">
+		.ratingStarsDiv {padding-right: 15px;}
+	</style>
+	
+	<script type="text/javascript"> 
+		var pathToImageFolder = "<html:rewrite page='/images/'/>"; 
+	</script>
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.js'/>"></script>
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jRating.jquery.js'/>"></script>
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script language="JavaScript" type="text/JavaScript">
+	
+	  	$(document).ready(function(){
+		    $(".ratingStars").jRating({
+		    	rateMax : 5,
+		    	isDisabled : true
+			});
+		 });
 
 		function submitMonitoringMethod(actionMethod) 
 		{

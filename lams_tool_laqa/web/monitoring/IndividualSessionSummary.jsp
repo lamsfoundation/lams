@@ -83,7 +83,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																<c:if test="${userData.visible != 'true' }"> 			
 													                         <i><fmt:message key="label.response.hidden"/> </i> 
 																</c:if> 								
-																 <c:out value="${userData.responsePresentable}" escapeXml="false"/> 
+																 <c:out value="${userData.responsePresentable}" escapeXml="false"/>
+																 <jsp:include page="../learning/parts/ratingStars.jsp" /> 
 															 </td>
 														</tr>
 													</c:if>
@@ -173,7 +174,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																	<c:if test="${userData.visible != 'true' }"> 			
 														                         <i><fmt:message key="label.response.hidden"/> </i> 
 																	</c:if> 								
-																	 <c:out value="${userData.responsePresentable}" escapeXml="false"/> 
+																	 <c:out value="${userData.responsePresentable}" escapeXml="false"/>
+																	 <jsp:include page="../learning/parts/ratingStars.jsp" /> 
 																 </td>
 															</tr>
 															

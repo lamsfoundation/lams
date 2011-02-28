@@ -74,6 +74,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     protected String monitoringReportTitle;
     protected String endLearningMessage;
     protected String usernameVisible;
+    protected String allowRateAnswers;
     protected String showOtherAnswers;
     protected String questionsSequenced;
     protected String lockWhenFinished;
@@ -160,6 +161,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     public void resetRadioBoxes() {
 	this.synchInMonitor = OPTION_OFF;
 	this.usernameVisible = OPTION_OFF;
+	this.allowRateAnswers = OPTION_OFF;
 	this.questionsSequenced = OPTION_OFF;
 	this.lockWhenFinished = OPTION_OFF;
 	this.reflect = OPTION_OFF;
@@ -168,16 +170,17 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     }
 
     public String toString() {
-	return new ToStringBuilder(this).append("Listing current QaAuthoringForm properties: ").append(
-		"toolContentID: ", toolContentID).append("currentTab: ", currentTab).append("activeModule: ",
-		activeModule).append("defaultContentIdStr: ", defaultContentIdStr).append("title: ", title).append(
-		"instructions: ", instructions).append("reportTitle: ", reportTitle).append("monitoringReportTitle: ",
-		monitoringReportTitle).append("endLearningMessage: ", endLearningMessage).append(
-		"onlineInstructions: ", onlineInstructions).append("offlineInstructions: ", offlineInstructions)
-		.append("usernameVisible: ", usernameVisible).append("showOtherAnswers: ", showOtherAnswers).append(
-			"synchInMonitor: ", synchInMonitor).append("questionsSequenced: ", questionsSequenced).append(
-			"lockWhenFinished: ", lockWhenFinished).append("reflect: ", reflect).append(
-			"defineLaterInEditMode: ", defineLaterInEditMode).toString();
+	return new ToStringBuilder(this).append("Listing current QaAuthoringForm properties: ")
+		.append("toolContentID: ", toolContentID).append("currentTab: ", currentTab)
+		.append("activeModule: ", activeModule).append("defaultContentIdStr: ", defaultContentIdStr)
+		.append("title: ", title).append("instructions: ", instructions).append("reportTitle: ", reportTitle)
+		.append("monitoringReportTitle: ", monitoringReportTitle)
+		.append("endLearningMessage: ", endLearningMessage).append("onlineInstructions: ", onlineInstructions)
+		.append("offlineInstructions: ", offlineInstructions).append("usernameVisible: ", usernameVisible)
+		.append("allowRateAnswers: ", allowRateAnswers).append("showOtherAnswers: ", showOtherAnswers)
+		.append("synchInMonitor: ", synchInMonitor).append("questionsSequenced: ", questionsSequenced)
+		.append("lockWhenFinished: ", lockWhenFinished).append("reflect: ", reflect)
+		.append("defineLaterInEditMode: ", defineLaterInEditMode).toString();
     }
 
     /**
@@ -433,6 +436,21 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setUsernameVisible(String usernameVisible) {
 	this.usernameVisible = usernameVisible;
+    }
+    
+    /**
+     * @return Returns the allowRateAnswers.
+     */
+    public String getAllowRateAnswers() {
+	return allowRateAnswers;
+    }
+
+    /**
+     * @param allowRateAnswers
+     *                The allowRateAnswers to set.
+     */
+    public void setAllowRateAnswers(String allowRateAnswers) {
+	this.allowRateAnswers = allowRateAnswers;
     }
 
     /**

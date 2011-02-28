@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.tool.qa.QaStatsDTO;
 import org.lamsfoundation.lams.tool.qa.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
+import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 
 /**
@@ -320,6 +321,8 @@ public class MonitoringUtil implements QaAppConstants {
 	Map mapMonitoredUserContainerDTO = new TreeMap(new QaStringComparator());
 	List listMonitoredUserContainerDTO = new LinkedList();
 	Iterator itUsers = listUsers.iterator();
+	
+	QaContent qaContent = qaService.getQaContentBySessionId(sessionId);
 
 	while (itUsers.hasNext()) {
 	    QaQueUsr qaQueUsr = (QaQueUsr) itUsers.next();
@@ -356,6 +359,14 @@ public class MonitoringUtil implements QaAppConstants {
 
 			qaMonitoredUserDTO.setQuestionUid(questionUid);
 			qaMonitoredUserDTO.setVisible(new Boolean(qaUsrResp.isVisible()).toString());
+			
+			//set averageRating 
+			if (qaContent.isAllowRateAnswers()) {
+			    AverageRatingDTO averageRating = qaService.getAverageRatingDTOByResponse(qaUsrResp.getResponseId());
+			    qaMonitoredUserDTO.setAverageRating(averageRating.getRating());
+			    qaMonitoredUserDTO.setNumberOfVotes(averageRating.getNumberOfVotes());
+			}
+			
 			listMonitoredUserContainerDTO.add(qaMonitoredUserDTO);
 		    }
 		}

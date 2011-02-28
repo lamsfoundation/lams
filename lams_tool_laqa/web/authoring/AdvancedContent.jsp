@@ -20,23 +20,52 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
+<script language="JavaScript" type="text/JavaScript">
+	/**
+	 * Processes mouse click event on showOtherAnswers ckeckbox
+	 */
+	function doShowOtherAnswers() {
+		document.QaAuthoringForm.usernameVisible.disabled = ! eval(document.QaAuthoringForm.usernameVisible.disabled); 
+		document.QaAuthoringForm.allowRateAnswers.disabled = ! eval(document.QaAuthoringForm.allowRateAnswers.disabled);
+		if (document.QaAuthoringForm.showOtherAnswers.checked) {
+			document.QaAuthoringForm.usernameVisible.checked = true;
+		} else {
+			document.QaAuthoringForm.usernameVisible.checked = false;
+			document.QaAuthoringForm.allowRateAnswers.checked = false;
+		}		
+	}	
+</script>
+
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+
 <p class="small-space-top">
-	<html:checkbox property="showOtherAnswers" value="1" styleId="showOtherAnswers" onclick="updateUsernameVisible(this);"
+	<html:checkbox property="showOtherAnswers" value="1" styleId="showOtherAnswers" onclick="doShowOtherAnswers();"
 		styleClass="noBorder">
 	</html:checkbox>
 	<label for="showOtherAnswers">
 		<fmt:message key="label.learner.answer" />
 	</label>
+</p>
 
-	<br>	
-	&nbsp&nbsp<html:checkbox property="usernameVisible" value="1" styleId="usernameVisible"
-		styleClass="noBorder">
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<html:checkbox property="usernameVisible" value="1" styleId="usernameVisible" styleClass="noBorder" 
+			disabled="${formBean.showOtherAnswers == 0}">
 	</html:checkbox>
 	<label for="usernameVisible">
 		<fmt:message key="label.show.names" />
 	</label>
 </p>
 
+<p>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<html:checkbox property="allowRateAnswers" value="1" styleId="allowRateAnswers" styleClass="noBorder" 
+			disabled="${formBean.showOtherAnswers == 0}">
+	</html:checkbox>
+	<label for="allowRateAnswers">
+		<fmt:message key="label.authoring.allow.rate.answers" />
+	</label>
+</p>
 
 <p>
 	<html:checkbox property="reflect" value="1" styleClass="noBorder" styleId="reflect">

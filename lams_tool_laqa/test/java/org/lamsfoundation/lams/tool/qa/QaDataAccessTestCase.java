@@ -140,6 +140,7 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
     	qa.setCreationDate(new Date(System.currentTimeMillis()));
     	qa.setCreatedBy(0);
         qa.setUsernameVisible(false);
+        qa.setAllowRateAnswers(false);
         qa.setDefineLater(false);
         qa.setSynchInMonitor(false);
         qa.setOnlineInstructions("");

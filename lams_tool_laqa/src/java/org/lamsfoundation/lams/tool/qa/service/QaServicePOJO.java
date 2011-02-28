@@ -77,6 +77,7 @@ import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
+import org.lamsfoundation.lams.tool.qa.ResponseRating;
 import org.lamsfoundation.lams.tool.qa.dao.IQaConfigItemDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueContentDAO;
@@ -85,6 +86,8 @@ import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUploadedFileDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaWizardDAO;
+import org.lamsfoundation.lams.tool.qa.dao.IResponseRatingDAO;
+import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -128,6 +131,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     private IQaSessionDAO qaSessionDAO;
     private IQaQueUsrDAO qaQueUsrDAO;
     private IQaUsrRespDAO qaUsrRespDAO;
+    private IResponseRatingDAO qaResponseRatingDAO;
     private IQaUploadedFileDAO qaUploadedFileDAO;
 
     private IToolContentHandler qaToolContentHandler = null;
@@ -998,6 +1002,28 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    throw new ToolException("toolContentID is missing");
 	}
     }
+    
+    public AverageRatingDTO rateResponse(Long responseId, Long userId, Long toolSessionID, float rating) {
+	QaQueUsr imageGalleryUser = this.getQaUserBySession(userId, toolSessionID);
+	ResponseRating responseRating = qaResponseRatingDAO.getRatingByResponseAndUser(responseId, userId);
+	QaUsrResp response = qaUsrRespDAO.getAttemptByUID(responseId);	
+
+	//persist ResponseRating changes in DB
+	if (responseRating == null) { // add
+	    responseRating = new ResponseRating();
+	    responseRating.setUser(imageGalleryUser);
+	    responseRating.setResponse(response);
+	}
+	responseRating.setRating(rating);
+	qaResponseRatingDAO.saveObject(responseRating);
+	
+	//to make available new changes be visible in jsp page
+	return qaResponseRatingDAO.getAverageRatingDTOByResponse(responseId);
+    }
+    
+    public AverageRatingDTO getAverageRatingDTOByResponse(Long responseId) {
+	return qaResponseRatingDAO.getAverageRatingDTOByResponse(responseId);
+    }
 
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
@@ -1551,6 +1577,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     public void setQaUsrRespDAO(IQaUsrRespDAO qaUsrRespDAO) {
 	this.qaUsrRespDAO = qaUsrRespDAO;
+    } 
+    
+    public void setQaResponseRatingDAO(IResponseRatingDAO responseRatingDAO) {
+	this.qaResponseRatingDAO = responseRatingDAO;
     }
 
     /**
@@ -1572,6 +1602,13 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      */
     public IQaUsrRespDAO getQaUsrRespDAO() {
 	return qaUsrRespDAO;
+    }
+    
+    /**
+     * @return Returns the IResponseRatingDAO.
+     */
+    public IResponseRatingDAO getQaResponseRatingDAO() {
+	return qaResponseRatingDAO;
     }
 
     /**
@@ -1660,6 +1697,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	// in LAMS 2.0
 	toolContentObj.setLockWhenFinished(true);
 	toolContentObj.setShowOtherAnswers(true);
+	toolContentObj.setAllowRateAnswers(false);
 
 	Boolean bool;
 	try {

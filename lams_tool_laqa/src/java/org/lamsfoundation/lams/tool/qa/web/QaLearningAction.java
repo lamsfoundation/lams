@@ -118,6 +118,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -131,6 +133,8 @@ import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaUtils;
+import org.lamsfoundation.lams.tool.qa.ResponseRating;
+import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -270,6 +274,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
+	
+	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 
 	boolean showOtherAnswers = qaContent.isShowOtherAnswers();
 	generalLearnerFlowDTO.setShowOtherAnswers(new Boolean(showOtherAnswers).toString());
@@ -353,6 +359,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
+	
+	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 
 	/*
 	 * Learning mode requires this setting for jsp to generate the user's report 
@@ -571,6 +579,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
+	
+	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 
 	HttpSession ss = SessionManager.getSession();
 	/* get back login user DTO */
@@ -690,6 +700,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
+	
+	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 
 	HttpSession ss = SessionManager.getSession();
 	/* get back login user DTO */
@@ -924,6 +936,40 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	qaLearningForm.resetAll();
 	return (mapping.findForward(LOAD_LEARNER));
     }
+    
+    /**
+     * Rates answers submitted by other learners. 
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws JSONException 
+     * @throws IOException
+     * @throws ServletException
+     * @throws ToolException
+     */
+    public ActionForward rateResponse(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	
+	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
+	
+	float rating = Float.parseFloat((String) request.getParameter("rate"));
+	Long responseId = WebUtil.readLongParam(request, "idBox");
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	Long userId = new Long(user.getUserID().intValue());
+	
+	AverageRatingDTO averageRatingDTO = qaService.rateResponse(responseId, userId, toolSessionID, rating);
+	
+	JSONObject JSONObject = new JSONObject();
+	JSONObject.put("averageRating", averageRatingDTO.getRating());
+	JSONObject.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
+	response.setContentType("application/x-json");
+	response.getWriter().print(JSONObject);
+	return null;
+    }
 
     /**
      * finishes the user's tool activity endLearning(HttpServletRequest request,
@@ -1073,6 +1119,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
+	
+	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 
 	NotebookEntry notebookEntry = qaService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
 		MY_SIGNATURE, new Integer(userID));

@@ -107,6 +107,9 @@ public class QaContent implements Serializable {
 
     /** nullable persistent field */
     private boolean usernameVisible;
+    
+    /** nullable persistent field */
+    private boolean allowRateAnswers;
 
     /** nullable persistent field */
     private boolean synchInMonitor;
@@ -138,9 +141,9 @@ public class QaContent implements Serializable {
     public QaContent(Long qaContentId, String content, String title, String instructions, String reportTitle,
 	    String monitoringReportTitle, String offlineInstructions, String onlineInstructions, long createdBy,
 	    boolean defineLater, boolean runOffline, boolean questionsSequenced, boolean usernameVisible,
-	    boolean synchInMonitor, boolean lockWhenFinished, boolean contentLocked, boolean showOtherAnswers,
-	    boolean reflect, String reflectionSubject, Date creationDate, Date updateDate, Set qaQueContents,
-	    Set qaSessions, Set qaUploadedFiles, Set<QaCondition> conditions, boolean allowRichEditor) {
+	    boolean allowRateAnswers, boolean synchInMonitor, boolean lockWhenFinished, boolean contentLocked,
+	    boolean showOtherAnswers, boolean reflect, String reflectionSubject, Date creationDate, Date updateDate,
+	    Set qaQueContents, Set qaSessions, Set qaUploadedFiles, Set<QaCondition> conditions, boolean allowRichEditor) {
 	this.qaContentId = qaContentId;
 	this.content = content;
 	this.title = title;
@@ -154,6 +157,7 @@ public class QaContent implements Serializable {
 	this.runOffline = runOffline;
 	this.questionsSequenced = questionsSequenced;
 	this.usernameVisible = usernameVisible;
+	this.allowRateAnswers = allowRateAnswers;
 	this.synchInMonitor = synchInMonitor;
 	this.lockWhenFinished = lockWhenFinished;
 	this.contentLocked = contentLocked;
@@ -183,13 +187,13 @@ public class QaContent implements Serializable {
      */
     public static QaContent newInstance(IToolContentHandler toolContentHandler, QaContent qa, Long newContentId)
 	    throws ItemNotFoundException, RepositoryCheckedException {
-	QaContent newContent = new QaContent(newContentId, qa.getContent(), qa.getTitle(), qa.getInstructions(), qa
-		.getReportTitle(), qa.getMonitoringReportTitle(), qa.getOfflineInstructions(), qa
-		.getOnlineInstructions(), qa.getCreatedBy(), qa.isDefineLater(), qa.isRunOffline(), qa
-		.isQuestionsSequenced(), qa.isUsernameVisible(), qa.isSynchInMonitor(), qa.isLockWhenFinished(), qa
-		.isContentLocked(), qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(), qa
-		.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(), new TreeSet(),
-		new TreeSet<QaCondition>(new TextSearchConditionComparator()), qa.isAllowRichEditor());
+	QaContent newContent = new QaContent(newContentId, qa.getContent(), qa.getTitle(), qa.getInstructions(),
+		qa.getReportTitle(), qa.getMonitoringReportTitle(), qa.getOfflineInstructions(),
+		qa.getOnlineInstructions(), qa.getCreatedBy(), qa.isDefineLater(), qa.isRunOffline(),
+		qa.isQuestionsSequenced(), qa.isUsernameVisible(), qa.isAllowRateAnswers(), qa.isSynchInMonitor(),
+		qa.isLockWhenFinished(), qa.isContentLocked(), qa.isShowOtherAnswers(), qa.isReflect(),
+		qa.getReflectionSubject(), qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(),
+		new TreeSet(), new TreeSet<QaCondition>(new TextSearchConditionComparator()), qa.isAllowRichEditor());
 
 	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
 
@@ -293,7 +297,8 @@ public class QaContent implements Serializable {
     public String toString() {
 	return new ToStringBuilder(this).append("qaContentId:", getQaContentId()).append("qa title:", getTitle())
 		.append("qa instructions:", getInstructions()).append("creator user id", getCreatedBy()).append(
-			"username_visible:", isUsernameVisible()).append("defineLater", isDefineLater()).append(
+			"username_visible:", isUsernameVisible()).append(
+				"allow to rate answers:", isAllowRateAnswers()).append("defineLater", isDefineLater()).append(
 			"offline_instructions:", getOfflineInstructions()).append("online_instructions:",
 			getOnlineInstructions()).append("report_title: ", getReportTitle()).append(
 			"reflection subject: ", getReflectionSubject())
@@ -447,6 +452,21 @@ public class QaContent implements Serializable {
      */
     public void setUsernameVisible(boolean usernameVisible) {
 	this.usernameVisible = usernameVisible;
+    }
+    
+    /**
+     * @return Returns the allowRateAnswers.
+     */
+    public boolean isAllowRateAnswers() {
+	return allowRateAnswers;
+    }
+
+    /**
+     * @param allowRateAnswers
+     *                The allowRateAnswers to set.
+     */
+    public void setAllowRateAnswers(boolean allowRateAnswers) {
+	this.allowRateAnswers = allowRateAnswers;
     }
 
     /**

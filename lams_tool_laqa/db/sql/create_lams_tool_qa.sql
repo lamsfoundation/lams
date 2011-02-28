@@ -8,6 +8,7 @@ CREATE TABLE tl_laqa11_content (
      , reflect TINYINT(1) NOT NULL DEFAULT 0
      , questions_sequenced TINYINT(1) NOT NULL DEFAULT 0
      , username_visible TINYINT(1) NOT NULL DEFAULT 0
+     , allow_rate_answers TINYINT(1) NOT NULL DEFAULT 0
      , created_by BIGINT(20) NOT NULL DEFAULT 0
      , run_offline TINYINT(1) DEFAULT 0
      , define_later TINYINT(1) NOT NULL DEFAULT 0
@@ -79,6 +80,20 @@ CREATE TABLE tl_laqa11_usr_resp (
      , INDEX (qa_que_content_id)
      , CONSTRAINT FK_tl_laqa11_usr_resp_2 FOREIGN KEY (qa_que_content_id)
                   REFERENCES tl_laqa11_que_content (uid)
+)TYPE=InnoDB;
+
+CREATE TABLE tl_laqa11_response_rating (
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+     , rating float
+     , user_id BIGINT(20) NOT NULL
+     , response_id BIGINT(20) NOT NULL
+     , PRIMARY KEY (uid)
+     , INDEX (user_id)
+     , CONSTRAINT FK_tl_laqa11_response_rating_1 FOREIGN KEY (user_id)
+                  REFERENCES tl_laqa11_que_usr (uid)
+     , INDEX (response_id)
+     , CONSTRAINT FK_tl_laqa11_response_rating_2 FOREIGN KEY (response_id)
+                  REFERENCES tl_laqa11_usr_resp (response_id)
 )TYPE=InnoDB;
 
 CREATE TABLE tl_laqa11_uploadedfile (

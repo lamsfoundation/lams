@@ -105,6 +105,10 @@ public abstract class QaUtils implements QaAppConstants {
 	String usernameVisible = request.getParameter(USERNAME_VISIBLE);
 	qaAuthoringForm.setUsernameVisible(usernameVisible);
 	qaGeneralAuthoringDTO.setUsernameVisible(usernameVisible);
+	
+	String allowRateAnswers = request.getParameter(ALLOW_RATE_ANSWERS);
+	qaAuthoringForm.setAllowRateAnswers(allowRateAnswers);
+	qaGeneralAuthoringDTO.setAllowRateAnswers(allowRateAnswers);
 
 	String showOtherAnswers = request.getParameter("showOtherAnswers");
 	qaAuthoringForm.setShowOtherAnswers(showOtherAnswers);

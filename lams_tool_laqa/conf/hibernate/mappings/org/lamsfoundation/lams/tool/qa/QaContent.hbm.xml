@@ -110,6 +110,15 @@
         column="username_visible"
         length="1"
     />
+    
+    
+    <property
+        name="allowRateAnswers"
+        type="boolean"
+        access="property"        
+        column="allow_rate_answers"
+        length="1"
+    />
 
  
     <property

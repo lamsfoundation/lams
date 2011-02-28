@@ -212,9 +212,8 @@
 				<include name="images/**" />
 				<include name="common/*" />
 				<include name="layout/*" />
-				<include name="includes/*" />
-				<include name="includes/jsp/*" />
-				<include name="learning/*" />
+				<include name="includes/**" />
+				<include name="learning/**" />
 				<include name="monitoring/*" />
 				<include name="admin/*" />
 			</fileset>

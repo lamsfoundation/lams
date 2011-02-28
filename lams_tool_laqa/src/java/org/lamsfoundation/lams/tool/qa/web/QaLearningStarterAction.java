@@ -443,7 +443,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	logger.debug("lockWhenFinished: " + lockWhenFinished);
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
-	
+	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 
 	String sessionStatus = qaSession.getSession_status();
 	logger.debug("sessionStatus: " + sessionStatus);
