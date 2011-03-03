@@ -57,7 +57,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script language="JavaScript" type="text/JavaScript">
 	
 	  	$(document).ready(function(){
-		    $(".ratingStars").jRating({
+		    $(".ratingStarsDisabled").jRating({
 		    	rateMax : 5,
 		    	isDisabled : true
 			});

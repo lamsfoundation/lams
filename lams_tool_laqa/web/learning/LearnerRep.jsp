@@ -58,6 +58,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			    	jError('Error : please retry');
 			  	}
 			});
+		    $(".ratingStarsDisabled").jRating({
+		    	rateMax : 5,
+		    	isDisabled : true
+		    });
 		 });
 	
 		function submitLearningMethod(actionMethod) 
@@ -132,6 +136,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<p>
 												<c:out value="${userData.responsePresentable}" escapeXml="false" />
 											</p>
+											<jsp:include page="parts/ratingStarsDisabled.jsp" />
 										</c:if>
 								</c:if>								
 							</c:forEach>
@@ -283,6 +288,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 												<c:out value="${userData.responsePresentable}"
 													escapeXml="false" />
 											</p>
+											<jsp:include page="parts/ratingStarsDisabled.jsp" />
 										</c:if>
 								</c:if>								
 							</c:forEach>

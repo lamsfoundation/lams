@@ -47,7 +47,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script language="JavaScript" type="text/JavaScript">
 	
 	  	$(document).ready(function(){
-		    $(".ratingStars").jRating({
+		    $(".ratingStarsDisabled").jRating({
 		    	rateMax : 5,
 		    	isDisabled : true
 			});
@@ -121,8 +121,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<p>
 												<c:out value="${userData.responsePresentable}"
 													escapeXml="false" />
-		
 											</p>
+											<jsp:include page="parts/ratingStarsDisabled.jsp" />
 										</c:if>
 								</c:if>								
 							</c:forEach>
@@ -170,7 +170,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<c:when test="${userData.visible == 'true'}">
 														<c:out value="${userData.responsePresentable}"
 															escapeXml="false" />
-														<jsp:include page="parts/ratingStars.jsp" />	
+														<jsp:include page="parts/ratingStarsDisabled.jsp" />	
 													</c:when>
 													<c:otherwise>
 														<i><fmt:message key="label.hidden"/></i>
@@ -291,8 +291,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<p>
 												<c:out value="${userData.responsePresentable}"
 													escapeXml="false" />
-		
 											</p>
+											<jsp:include page="parts/ratingStarsDisabled.jsp" />
 										</c:if>
 								</c:if>								
 							</c:forEach>
@@ -350,7 +350,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<c:when test="${userData.visible == 'true'}">
 														<c:out value="${userData.responsePresentable}"
 															escapeXml="false" />
-														<jsp:include page="parts/ratingStars.jsp" />	
+														<jsp:include page="parts/ratingStarsDisabled.jsp" />	
 													</c:when>
 													<c:otherwise>
 														<i><fmt:message key="label.hidden"/></i>
