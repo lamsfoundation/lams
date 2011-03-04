@@ -47,10 +47,22 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script language="JavaScript" type="text/JavaScript">
 	
 	  	$(document).ready(function(){
+		    $(".ratingStars").jRating({
+		    	phpPath : "<c:url value='/learning.do'/>?method=rateResponse&toolSessionID=" + $("#toolSessionID").val(),
+		    	rateMax : 5,
+		    	decimalLength : 1,
+			  	onSuccess : function(data, responseUid){
+			    	$("#averageRating" + responseUid).html(data.averageRating);
+			    	$("#numberOfVotes" + responseUid).html(data.numberOfVotes);
+				},
+			  	onError : function(){
+			    	jError('Error : please retry');
+			  	}
+			});
 		    $(".ratingStarsDisabled").jRating({
 		    	rateMax : 5,
 		    	isDisabled : true
-			});
+		    });
 		 });	
 	
 		function submitLearningMethod(actionMethod) 
@@ -170,7 +182,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<c:when test="${userData.visible == 'true'}">
 														<c:out value="${userData.responsePresentable}"
 															escapeXml="false" />
-														<jsp:include page="parts/ratingStarsDisabled.jsp" />	
+														<jsp:include page="parts/ratingStars.jsp" />	
 													</c:when>
 													<c:otherwise>
 														<i><fmt:message key="label.hidden"/></i>
@@ -350,7 +362,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<c:when test="${userData.visible == 'true'}">
 														<c:out value="${userData.responsePresentable}"
 															escapeXml="false" />
-														<jsp:include page="parts/ratingStarsDisabled.jsp" />	
+														<jsp:include page="parts/ratingStars.jsp" />	
 													</c:when>
 													<c:otherwise>
 														<i><fmt:message key="label.hidden"/></i>
