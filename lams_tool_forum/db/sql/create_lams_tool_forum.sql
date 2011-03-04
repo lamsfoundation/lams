@@ -7,6 +7,7 @@ drop table if exists tl_lafrum11_forum_user;
 drop table if exists tl_lafrum11_message;
 drop table if exists tl_lafrum11_message_seq;
 drop table if exists tl_lafrum11_report;
+drop table if exists tl_lafrum11_message_rating;
 drop table if exists tl_lafrum11_tool_session;
 drop table if exists tl_lafrum11_timestamp;
 create table tl_lafrum11_attachment (
@@ -38,7 +39,8 @@ create table tl_lafrum11_forum (
    allow_edit smallint,
    allow_rich_editor smallint,
    allow_new_topic smallint, 
-   allow_upload smallint, 
+   allow_upload smallint,
+   allow_rate_messages smallint,
    maximum_reply integer, 
    minimum_reply integer,
    limited_of_chars integer,
@@ -94,6 +96,19 @@ create table tl_lafrum11_report (
    release_date datetime,
    mark float,
    primary key (uid)
+)TYPE=InnoDB;
+CREATE TABLE tl_lafrum11_message_rating (
+       uid BIGINT(20) NOT NULL AUTO_INCREMENT
+     , rating float
+     , user_id BIGINT(20) NOT NULL
+     , message_id BIGINT(20) NOT NULL
+     , PRIMARY KEY (uid)
+     , INDEX (user_id)
+     , CONSTRAINT FK_tl_lafrum11_message_rating_1 FOREIGN KEY (user_id)
+                  REFERENCES tl_lafrum11_forum_user (uid)
+     , INDEX (message_id)
+     , CONSTRAINT FK_tl_lafrum11_message_rating_2 FOREIGN KEY (message_id)
+                  REFERENCES tl_lafrum11_message (uid)
 )TYPE=InnoDB;
 create table tl_lafrum11_tool_session (
    uid bigint not null auto_increment,
@@ -155,8 +170,8 @@ alter table tl_lafrum11_timestamp add index ForumUserFK (forum_user_uid), add co
 alter table tl_lafrum11_timestamp add index MessageFK (message_uid), add constraint MessageFK foreign key (message_uid) references tl_lafrum11_message (uid);
 
 INSERT INTO tl_lafrum11_forum (uid,title,instructions,online_instructions,offline_instructions,content_id,allow_anonym,run_offline,lock_on_finished,content_in_use,define_later,allow_edit,allow_rich_editor,
- allow_new_topic,allow_upload,maximum_reply, minimum_reply,limited_input_flag,limited_of_chars,notify_learners_on_forum_posting,notify_teachers_on_forum_posting,reflect_on_activity) 
-VALUES(1,"Forum","Instructions",null,null,${default_content_id},0,0,0,0,0,1,0,1,0,1,0,1,5000,0,0,0);
+ allow_new_topic,allow_upload,allow_rate_messages,maximum_reply, minimum_reply,limited_input_flag,limited_of_chars,notify_learners_on_forum_posting,notify_teachers_on_forum_posting,reflect_on_activity) 
+VALUES(1,"Forum","Instructions",null,null,${default_content_id},0,0,0,0,0,1,0,1,0,0,1,0,1,5000,0,0,0);
 
 INSERT INTO `tl_lafrum11_message` (`uid`, `create_date`, `last_reply_date`, `update_date`, `create_by`, `modified_by`, `subject`, `body`, `sequence_id`, `is_authored`, `is_anonymous`, `forum_session_uid`, `parent_uid`, `forum_uid`, `reply_number`, `hide_flag`, `report_id`) VALUES 
   (1,NOW(),NOW(),NOW(),null,null,'Topic Heading','Topic message',1,1,0,NULL,NULL,1,0,0,NULL);

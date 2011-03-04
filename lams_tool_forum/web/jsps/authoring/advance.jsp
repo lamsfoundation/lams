@@ -23,6 +23,15 @@
 </p>
 
 <p>
+	<html:checkbox property="forum.allowRateMessages" styleClass="noBorder"
+		styleId="allowRateMessages">
+	</html:checkbox>
+	<label for="allowRateMessages">
+		<fmt:message key="label.authoring.advance.allow.rate.postings" />
+	</label>
+</p>
+
+<p>
 	<html:checkbox property="forum.allowUpload" styleClass="noBorder"
 		styleId="allowUpload">
 	</html:checkbox>

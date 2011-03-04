@@ -221,6 +221,14 @@
         />
 
         <property
+            name="allowRateMessages"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_rate_messages"
+        />
+
+        <property
             name="maximumReply"
             type="int"
             update="true"

@@ -46,6 +46,10 @@ public class MessageDTO {
 	private String comment;
 	private boolean released;
 	
+	//rating fields
+	private String averageRating;
+	private String numberOfVotes;
+	
 	// number of posts the learner has made in this topic.
 	// used when this message is a root topic.
 	private int numOfPosts;   
@@ -180,6 +184,22 @@ public class MessageDTO {
 
 	public void setReleased(boolean isReleased) {
 		this.released = isReleased;
+	}
+	
+	public String getAverageRating() {
+	    return averageRating;
+	}
+	
+	public void setAverageRating(String averageRating) {
+	    this.averageRating = averageRating;
+	}
+	
+	public String getNumberOfVotes() {
+	    return numberOfVotes;
+	}
+	
+	public void setNumberOfVotes(String numberOfVotes) {
+	    this.numberOfVotes = numberOfVotes;
 	}
 
 	public String getAttachmentLocalUrl() {

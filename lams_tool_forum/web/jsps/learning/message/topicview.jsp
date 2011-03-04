@@ -96,16 +96,26 @@
 			<tr>
 				<td>
 					<div class="right-buttons">
+						<!--  Rating stars -->
+						<c:choose>
+							<c:when test='${(sessionMap.mode == "teacher") || msgDto.isAuthor || sessionMap.finishedLock}'>
+								<%@ include file="/jsps/learning/rating/ratingStarsDisabled.jsp"%>
+							</c:when>
+							<c:otherwise>
+								<%@ include file="/jsps/learning/rating/ratingStars.jsp"%>
+							</c:otherwise>
+						</c:choose>
+					
 						<!--  Hide/Unhide Button -->
 						<c:if test='${sessionMap.mode == "teacher"}'>
 							<c:set var="updateMark">
 								<html:rewrite
 									page="/monitoring/editMark.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&updateMode=viewForum&hideReflection=${sessionMap.hideReflection}" />
 							</c:set>
-						
 							<html:link href="${updateMark}" styleClass="button">
 								<fmt:message key="lable.topic.title.mark" />
 							</html:link>
+							
 							<!--  call the hide action -->
 							<c:choose>
 								<c:when test="${hidden}">

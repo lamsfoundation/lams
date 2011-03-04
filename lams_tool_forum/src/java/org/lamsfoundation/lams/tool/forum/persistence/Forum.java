@@ -67,6 +67,8 @@ public class Forum implements Cloneable {
     private boolean allowNewTopic;
 
     private boolean allowUpload;
+    
+    private boolean allowRateMessages;
 
     private int maximumReply;
 
@@ -549,6 +551,19 @@ public class Forum implements Cloneable {
     public void setAllowUpload(boolean allowUpload) {
 	this.allowUpload = allowUpload;
     }
+    
+    /**
+     * @hibernate.property column="allow_rate_messages"
+     * @return
+     */
+    public boolean isAllowRateMessages() {
+	return allowRateMessages;
+    }
+
+    public void setAllowRateMessages(boolean allowRateMessages) {
+	this.allowRateMessages = allowRateMessages;
+    }
+    
 
     /**
      * @hibernate.property column="maximum_reply"

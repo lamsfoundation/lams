@@ -47,6 +47,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -54,6 +56,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.forum.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
@@ -126,7 +129,10 @@ public class LearningAction extends Action {
 	if (param.equals("updateMessageHideFlag")) {
 	    return updateMessageHideFlag(mapping, form, request, response);
 	}
-
+	if (param.equals("rateMessage")) {
+		return rateMessage(mapping, form, request, response);
+	}
+	
 	// ================ Reflection =======================
 	if (param.equals("newReflection")) {
 	    return newReflection(mapping, form, request, response);
@@ -206,6 +212,7 @@ public class LearningAction extends Action {
 	sessionMap.put(ForumConstants.ATTR_USER_FINISHED, forumUser.isSessionFinished());
 	sessionMap.put(ForumConstants.ATTR_ALLOW_EDIT, forum.isAllowEdit());
 	sessionMap.put(ForumConstants.ATTR_ALLOW_UPLOAD, forum.isAllowUpload());
+	sessionMap.put(ForumConstants.ATTR_ALLOW_RATE_MESSAGES, forum.isAllowRateMessages());
 	sessionMap.put(ForumConstants.ATTR_ALLOW_NEW_TOPICS, forum.isAllowNewTopic());
 	sessionMap.put(ForumConstants.ATTR_ALLOW_RICH_EDITOR, allowRichEditor);
 	sessionMap.put(ForumConstants.ATTR_LIMITED_CHARS, new Integer(allowNumber));
@@ -883,6 +890,40 @@ public class LearningAction extends Action {
 		ForumConstants.ATTR_SESSION_MAP_ID));
 
 	return mapping.findForward("success");
+    }
+    
+    /**
+     * Rates postings submitted by other learners.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws JSONException
+     * @throws IOException
+     * @throws ServletException
+     * @throws ToolException
+     */
+    public ActionForward rateMessage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+
+	forumService = getForumManager();
+
+	float rating = Float.parseFloat((String) request.getParameter("rate"));
+	Long responseId = WebUtil.readLongParam(request, "idBox");
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	Long userId = new Long(user.getUserID().intValue());
+
+	AverageRatingDTO averageRatingDTO = forumService.rateMessage(responseId, userId, toolSessionID, rating);
+
+	JSONObject JSONObject = new JSONObject();
+	JSONObject.put("averageRating", averageRatingDTO.getRating());
+	JSONObject.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
+	response.setContentType("application/x-json");
+	response.getWriter().print(JSONObject);
+	return null;
     }
 
     // ==========================================================================================

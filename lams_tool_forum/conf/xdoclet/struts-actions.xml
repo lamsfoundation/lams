@@ -275,6 +275,11 @@
 			scope="request">
 			<forward name="success" path="tiles:/learning/forum/viewTopic" />
 		</action>	
+		
+		<action path="/learning/rateMessage"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"
+			parameter="rateMessage" scope="request">
+		</action>
 				
 		<action path="/learning/finish"
 			type="org.lamsfoundation.lams.tool.forum.web.actions.LearningAction"

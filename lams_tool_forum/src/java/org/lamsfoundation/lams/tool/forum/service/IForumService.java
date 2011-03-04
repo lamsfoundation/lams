@@ -31,6 +31,7 @@ import java.util.List;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.forum.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
@@ -441,4 +442,9 @@ public interface IForumService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    AverageRatingDTO rateMessage(Long messageId, Long userId, Long toolSessionID, float rating);
+    
+    AverageRatingDTO getAverageRatingDTOByMessage(Long responseId);
+
 }

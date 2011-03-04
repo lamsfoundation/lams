@@ -118,6 +118,7 @@ public class ForumForm extends ActionForm {
     	forum.setLockWhenFinished(false);
     	forum.setAllowNewTopic(false);
     	forum.setAllowUpload(false);
+    	forum.setAllowRateMessages(false);
     	forum.setReflectOnActivity(false);
     }
     //-------------------------get/set methods----------------

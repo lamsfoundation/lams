@@ -78,6 +78,7 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.forum.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.AttachmentDao;
@@ -93,6 +94,8 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUserDao;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageDao;
+import org.lamsfoundation.lams.tool.forum.persistence.MessageRating;
+import org.lamsfoundation.lams.tool.forum.persistence.MessageRatingDAO;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeqDao;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
@@ -132,6 +135,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private TimestampDao timestampDao;
 
     private MessageSeqDao messageSeqDao;
+    
+    private MessageRatingDAO messageRatingDao;
 
     private ForumUserDao forumUserDao;
 
@@ -588,6 +593,28 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	currentUser.setSessionFinished(true);
 	forumUserDao.save(currentUser);
     }
+    
+    public AverageRatingDTO rateMessage(Long messageId, Long userId, Long toolSessionID, float rating) {
+	ForumUser imageGalleryUser = getUserByUserAndSession(userId, toolSessionID);
+	MessageRating messageRating = messageRatingDao.getRatingByMessageAndUser(messageId, userId);
+	Message message = messageDao.getById(messageId);	
+
+	//persist MessageRating changes in DB
+	if (messageRating == null) { // add
+	    messageRating = new MessageRating();
+	    messageRating.setUser(imageGalleryUser);
+	    messageRating.setMessage(message);
+	}
+	messageRating.setRating(rating);
+	messageRatingDao.saveObject(messageRating);
+	
+	//to make available new changes be visible in jsp page
+	return messageRatingDao.getAverageRatingDTOByMessage(messageId);
+    }
+    
+    public AverageRatingDTO getAverageRatingDTOByMessage(Long messageId) {
+	return messageRatingDao.getAverageRatingDTOByMessage(messageId);
+    }
 
     // ***************************************************************************************************************
     // Private methods
@@ -599,13 +626,23 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private List getSortedMessageDTO(SortedMap<MessageSeq, Message> map) {
 	Iterator iter;
 	MessageSeq msgSeq;
+	Message message;
 	List<MessageDTO> msgDtoList = new ArrayList<MessageDTO>();
 	iter = map.entrySet().iterator();
 	while (iter.hasNext()) {
 	    Map.Entry entry = (Entry) iter.next();
 	    msgSeq = (MessageSeq) entry.getKey();
-	    MessageDTO dto = MessageDTO.getMessageDTO((Message) entry.getValue());
+	    message = (Message) entry.getValue();
+	    MessageDTO dto = MessageDTO.getMessageDTO(message);
 	    dto.setLevel(msgSeq.getMessageLevel());
+	    
+	    //set averageRating 
+	    if (message.getForum().isAllowRateMessages()) {
+		AverageRatingDTO averageRating = getAverageRatingDTOByMessage(message.getUid());
+		dto.setAverageRating(averageRating.getRating());
+		dto.setNumberOfVotes(averageRating.getNumberOfVotes());
+	    }
+	    
 	    msgDtoList.add(dto);
 	}
 	return msgDtoList;
@@ -1038,6 +1075,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    toolContentObj.setAllowNewTopic(Boolean.TRUE);
 	    toolContentObj.setAllowRichEditor(Boolean.FALSE);
 	    toolContentObj.setAllowUpload(Boolean.TRUE); // this is the default value
+	    toolContentObj.setAllowRateMessages(Boolean.FALSE); // this is the default value
 	    toolContentObj.setContentId(toolContentId);
 	    toolContentObj.setContentInUse(Boolean.FALSE);
 	    toolContentObj.setCreated(now);
@@ -1229,6 +1267,14 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     public void setMessageSeqDao(MessageSeqDao messageSeqDao) {
 	this.messageSeqDao = messageSeqDao;
+    }
+    
+    public MessageRatingDAO getMessageRatingDao() {
+	return messageRatingDao;
+    }
+
+    public void setMessageRatingDao(MessageRatingDAO messageRatingDao) {
+	this.messageRatingDao = messageRatingDao;
     }
 
     public ForumToolSessionDao getForumToolSessionDao() {

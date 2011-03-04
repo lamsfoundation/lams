@@ -71,10 +71,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     	<put name="body" value="/jsps/learning/definelater.jsp"/>
 	</definition>
 	
-	<definition name="tiles:/learning/forum/viewTopic" extends="tiles:learner:layout">
-    	<put name="pageTitleKey" value="title.message.view.topic"/>
-    	<put name="body" value="/jsps/learning/viewtopic.jsp"/>
-	</definition>
+	<definition name="tiles:/learning/forum/viewTopic" path="/jsps/learning/viewtopic.jsp" />
 	
     <definition name="tiles:/learning/forum/newTopic" extends="tiles:learner:layout">
     	<put name="pageTitleKey" value="title.message.add"/>

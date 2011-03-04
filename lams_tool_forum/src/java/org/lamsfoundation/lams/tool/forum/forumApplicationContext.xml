@@ -53,6 +53,12 @@
 			<ref bean="coreSessionFactory" />
 		</property>
 	</bean>
+	<bean id="messageRatingDao"
+		class="org.lamsfoundation.lams.tool.forum.persistence.MessageRatingDAO">
+		<property name="sessionFactory">
+			<ref bean="coreSessionFactory" />
+		</property>
+	</bean>
 	<bean id="forumToolSessionDao"
 		class="org.lamsfoundation.lams.tool.forum.persistence.ForumToolSessionDao">
 		<property name="sessionFactory">
@@ -91,6 +97,9 @@
 		<property name="messageSeqDao">
 			<ref local="messageSeqDao" />
 		</property>
+		<property name="messageRatingDao">
+			<ref local="messageRatingDao" />
+		</property>	
 		<property name="timestampDao">
 			<ref local="timestampDao" />
 		</property>
@@ -161,6 +170,7 @@
 				<prop key="replyTopic">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="saveTimestamp">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="releaseMarksForSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+				<prop key="rateMessage">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<prop key="finishUserSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
 				<!--  Tool Content Manager and Tool Session Manager calls -->
 				<prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
