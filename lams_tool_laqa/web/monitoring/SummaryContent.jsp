@@ -90,6 +90,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</td>
 	</tr>
 	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.allow.rate.answers" />
+		</td>
+		<td>
+			<c:choose>
+				<c:when test="${allowRateAnswers}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
 	
 	<tr>
 		<td>

@@ -591,6 +591,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	// setting up the advanced summary for LDEV-1662
 	request.setAttribute("showOtherAnswers", qaContent.isShowOtherAnswers());
 	request.setAttribute("usernameVisible", qaContent.isUsernameVisible());
+	request.setAttribute("allowRateAnswers", qaContent.isAllowRateAnswers());
 	request.setAttribute("questionsSequenced", qaContent.isQuestionsSequenced());
 	request.setAttribute("lockWhenFinished", qaContent.isLockWhenFinished());
 	request.setAttribute("reflect", qaContent.isReflect());
