@@ -86,7 +86,7 @@
         <archive path="/lams_build/lib/concurrent/concurrent-1.3.4.jar"/>
         <archive path="/lams_build/lib/xml-commons/xml-apis.jar"/>
         <archive path="/lams_build/lib/xml-commons/xml-apis-ext.jar"/>
-        <archive path="/lams_build/lib/xstream/xstream-1.1.jar"/>
+        <archive path="/lams_build/lib/xstream/xstream-1.1.3.jar"/>
         <archive path="/lams_build/lib/xstream/jmock-2004-03-19.jar"/>
         <archive path="/lams_build/lib/xstream/joda-time-0.98.jar"/>
         <archive path="/lams_build/lib/xstream/stax-1.1.1-dev.jar"/>

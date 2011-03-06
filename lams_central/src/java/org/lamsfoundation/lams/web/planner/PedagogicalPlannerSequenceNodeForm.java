@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.web.planner;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
 
 public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
     public final static String NODE_TYPE_SUBNODES = "subnodes";
@@ -39,8 +40,74 @@ public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
     private FormFile file;
     private Boolean removeTemplate;
     private String nodeType = PedagogicalPlannerSequenceNodeForm.NODE_TYPE_SUBNODES;
-    private Boolean teachersEditCopy;
-    private Boolean teachersEditOriginal;
+
+    private Boolean permitEditorViewTemplate;
+    private Boolean permitEditorModifyTemplate;
+    private Boolean permitEditorReplaceTemplate;
+    private Boolean permitEditorRemoveTemplate;
+
+    private Boolean permitTeacherViewTemplate;
+    private Boolean permitTeacherEditCopy;
+    private Boolean permitTeacherPreview;
+    private Boolean permitTeacherViewCopyInFullAuthor;
+    private Boolean permitTeacherExportCopy;
+    private Boolean permitTeacherSaveCopy;
+
+    /**
+     * Set checkbox values according to compacted form of node permissions; set defaults if NULL
+     */
+    public void setPermissions(Integer nodePermissions) {
+	//
+	permitEditorViewTemplate = nodePermissions == null
+		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_VIEW) != 0;
+	permitEditorModifyTemplate = nodePermissions == null
+		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_MODIFY) != 0;
+	permitEditorReplaceTemplate = nodePermissions != null
+		&& (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REPLACE) != 0;
+	permitEditorRemoveTemplate = nodePermissions != null
+		&& (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REMOVE) != 0;
+
+	permitTeacherViewTemplate = nodePermissions == null
+		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_VIEW) != 0;
+	permitTeacherEditCopy = nodePermissions == null
+		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_COPY) != 0;
+	permitTeacherPreview = nodePermissions == null
+		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_PREVIEW) != 0;
+	permitTeacherViewCopyInFullAuthor = nodePermissions == null
+		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_VIEW_IN_FULL_AUTHOR) != 0;
+	permitTeacherExportCopy = nodePermissions == null
+		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_EXPORT) != 0;
+	permitTeacherSaveCopy = nodePermissions == null
+		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_SAVE) != 0;
+    }
+
+    /**
+     * Get compacted node permissions according to checkbox settings.
+     */
+    public int getPermissions() {
+	int permissions = 0;
+	permissions += Boolean.TRUE.equals(permitEditorViewTemplate) ? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_VIEW
+		: 0;
+	permissions += Boolean.TRUE.equals(permitEditorModifyTemplate) ? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_MODIFY
+		: 0;
+	permissions += Boolean.TRUE.equals(permitEditorReplaceTemplate) ? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REPLACE
+		: 0;
+	permissions += Boolean.TRUE.equals(permitEditorRemoveTemplate) ? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REMOVE
+		: 0;
+	permissions += Boolean.TRUE.equals(permitTeacherViewTemplate) ? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_VIEW
+		: 0;
+	permissions += Boolean.TRUE.equals(permitTeacherEditCopy) ? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_COPY
+		: 0;
+	permissions += Boolean.TRUE.equals(permitTeacherPreview) ? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_PREVIEW
+		: 0;
+	permissions += Boolean.TRUE.equals(permitTeacherViewCopyInFullAuthor) ? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_VIEW_IN_FULL_AUTHOR
+		: 0;
+	permissions += Boolean.TRUE.equals(permitTeacherExportCopy) ? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_EXPORT
+		: 0;
+	permissions += Boolean.TRUE.equals(permitTeacherSaveCopy) ? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_SAVE
+		: 0;
+	return permissions;
+    }
 
     public Long getUid() {
 	return uid;
@@ -114,19 +181,83 @@ public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
 	this.contentFolderId = contentFolderId;
     }
 
-    public Boolean getTeachersEditCopy() {
-        return teachersEditCopy;
+    public Boolean getPermitEditorViewTemplate() {
+	return permitEditorViewTemplate;
     }
 
-    public void setTeachersEditCopy(Boolean teachersEditCopy) {
-        this.teachersEditCopy = teachersEditCopy;
+    public void setPermitEditorViewTemplate(Boolean permitEditorViewTemplate) {
+	this.permitEditorViewTemplate = permitEditorViewTemplate;
     }
 
-    public Boolean getTeachersEditOriginal() {
-        return teachersEditOriginal;
+    public Boolean getPermitEditorModifyTemplate() {
+	return permitEditorModifyTemplate;
     }
 
-    public void setTeachersEditOriginal(Boolean teachersEditOriginal) {
-        this.teachersEditOriginal = teachersEditOriginal;
+    public void setPermitEditorModifyTemplate(Boolean permitEditorEditTemplate) {
+	this.permitEditorModifyTemplate = permitEditorEditTemplate;
+    }
+
+    public Boolean getPermitEditorReplaceTemplate() {
+	return permitEditorReplaceTemplate;
+    }
+
+    public void setPermitEditorReplaceTemplate(Boolean permitEditorReplaceTemplate) {
+	this.permitEditorReplaceTemplate = permitEditorReplaceTemplate;
+    }
+
+    public Boolean getPermitEditorRemoveTemplate() {
+	return permitEditorRemoveTemplate;
+    }
+
+    public void setPermitEditorRemoveTemplate(Boolean permitEditorRemoveTemplate) {
+	this.permitEditorRemoveTemplate = permitEditorRemoveTemplate;
+    }
+
+    public Boolean getPermitTeacherViewTemplate() {
+	return permitTeacherViewTemplate;
+    }
+
+    public void setPermitTeacherViewTemplate(Boolean permitTeacherViewTemplate) {
+	this.permitTeacherViewTemplate = permitTeacherViewTemplate;
+    }
+
+    public Boolean getPermitTeacherEditCopy() {
+	return permitTeacherEditCopy;
+    }
+
+    public void setPermitTeacherEditCopy(Boolean permitTeacherEditCopy) {
+	this.permitTeacherEditCopy = permitTeacherEditCopy;
+    }
+
+    public Boolean getPermitTeacherPreview() {
+	return permitTeacherPreview;
+    }
+
+    public void setPermitTeacherPreview(Boolean permitTeacherPreview) {
+	this.permitTeacherPreview = permitTeacherPreview;
+    }
+
+    public Boolean getPermitTeacherViewCopyInFullAuthor() {
+	return permitTeacherViewCopyInFullAuthor;
+    }
+
+    public void setPermitTeacherViewCopyInFullAuthor(Boolean permitTeacherViewCopyInFullAuthor) {
+	this.permitTeacherViewCopyInFullAuthor = permitTeacherViewCopyInFullAuthor;
+    }
+
+    public Boolean getPermitTeacherExportCopy() {
+	return permitTeacherExportCopy;
+    }
+
+    public void setPermitTeacherExportCopy(Boolean permitTeacherExportCopy) {
+	this.permitTeacherExportCopy = permitTeacherExportCopy;
+    }
+
+    public Boolean getPermitTeacherSaveCopy() {
+	return permitTeacherSaveCopy;
+    }
+
+    public void setPermitTeacherSaveCopy(Boolean permitTeacherSaveCopy) {
+	this.permitTeacherSaveCopy = permitTeacherSaveCopy;
     }
 }

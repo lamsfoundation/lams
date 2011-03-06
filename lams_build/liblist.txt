@@ -98,7 +98,7 @@ xstream           jmock-2004-03-19.jar
                   xml-writer-0.2.jar                    0.2                                                                                   
                   xom-1.0b3.jar                         1.0b3                                                                                 
                   xpp3-1.1.3.4d_b4_min.jar              1.1.3.4d_b4_min                                                                       
-                  xstream-1.1.jar                       1.1                                                                                   
+                  xstream-1.1.3.jar                       1.1.3                                                                                  
 
 
 

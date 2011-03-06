@@ -1101,11 +1101,14 @@ CREATE TABLE lams_planner_nodes (
 	brief_desc TEXT,
 	full_desc TEXT,
 	ld_id  BIGINT(20),
-	teachers_permissions TINYINT UNSIGNED,
+	user_id BIGINT(20),
+	permissions INTEGER,
 	PRIMARY KEY (uid),
 	UNIQUE KEY (parent_uid, order_id),
 	CONSTRAINT FK_lams_planner_node_parent FOREIGN KEY (parent_uid)
-	               REFERENCES lams_planner_nodes(uid) ON DELETE CASCADE ON UPDATE CASCADE
+	               REFERENCES lams_planner_nodes(uid) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT FK_lams_planner_node_user FOREIGN KEY (user_id)
+	               REFERENCES lams_user(user_id) ON DELETE SET NULL ON UPDATE SET NULL
 )TYPE=InnoDB; 
 
 CREATE TABLE lams_activity_evaluation (

@@ -75,9 +75,9 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.FileException;
+import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -92,6 +92,7 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
+import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -315,11 +316,11 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	LearningDesign learningDesign = null;
 	// either get the design ID or we don't know it and need to extract it from the node
 	Long learningDesignId = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID, true);
-	boolean isOpenPermitted = true;
+	boolean isEditor = true;
 	PedagogicalPlannerSequenceNode node = null;
 	if (learningDesignId == null && nodeUid != null) {
-	    // we are opening a LD from node, so check is we are allowed to do it
-	    isOpenPermitted = hasRole(request, nodeUid);
+	    // we are opening a LD from a certain node, so check is we are allowed to do it
+	    isEditor = isEditor(request, nodeUid);
 	    node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	    learningDesignId = node.getLearningDesignId();
 	}
@@ -327,8 +328,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	if (learningDesignId != null) {
 	    String copyMode = WebUtil.readStrParam(request, CentralConstants.PARAM_COPY_MODE, true);
 	    if (StringUtils.isBlank(copyMode) || COPY_MODE_EDIT_CURRENT.equalsIgnoreCase(copyMode)) {
-		if (!isOpenPermitted
-			&& (node != null && node.getTeachersPermissions() != null && node.getTeachersPermissions() < PedagogicalPlannerSequenceNode.PERMISSION_EDIT)) {
+		// make sure user has priviledges
+		if (!isEditor
+			|| (node != null && node.getPermissions() != null && (node.getPermissions() & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_MODIFY) == 0)) {
 		    log.debug("Unauthorised attempt to openExistingTemplate (original)");
 		    throw new UserAccessDeniedException();
 		}
@@ -336,8 +338,11 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		learningDesign = getAuthoringService().getLearningDesign(learningDesignId);
 		copyMode = COPY_MODE_EDIT_CURRENT;
 	    } else if (COPY_MODE_MAKE_COPY.equalsIgnoreCase(copyMode)) {
-		if (!isOpenPermitted
-			&& (node != null && node.getTeachersPermissions() != null && node.getTeachersPermissions() < PedagogicalPlannerSequenceNode.PERMISSION_VIEW)) {
+		if (isEditor ? node != null && node.getPermissions() != null
+			&& (node.getPermissions() & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_VIEW) == 0
+			: node != null
+				&& node.getPermissions() != null
+				&& (node.getPermissions() & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_COPY) == 0) {
 		    log.debug("Unauthorised attempt to openExistingTemplate (copy)");
 		    throw new UserAccessDeniedException();
 		}
@@ -416,14 +421,28 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	}
 	// create DTO for the whole design
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
-	PedagogicalPlannerSequenceNode node = (nodeUid == null) ? null : getPedagogicalPlannerDAO().getByUid(nodeUid);
-
+	
 	PedagogicalPlannerTemplateDTO planner = new PedagogicalPlannerTemplateDTO();
 	planner.setActivitySupportingPlannerCount(activitySupportingPlannerCount);
 	planner.setSequenceTitle(learningDesign.getTitle());
 	planner.setActivities(activities);
 	planner.setLearningDesignID(learningDesign.getLearningDesignId());
-	planner.setNode(node);
+
+	if (nodeUid != null) {
+	    PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
+	    if (node != null) {
+		boolean isEditor = isEditor(request, nodeUid);
+		Integer nodePermissions = node.getPermissions();
+		planner.setPermissions(nodePermissions, isEditor);
+		
+		// set it here rather than in JSP page
+		if (StringUtils.isBlank(node.getFullDescription())) {
+		    planner.setNodeUid(node.getParent().getUid());
+		} else {
+		    planner.setNodeUid(node.getUid());
+		}
+	    }
+	}
 
 	// Some additional options for submitting activity forms; should be moved to configuration file in the future
 	planner.setSendInPortions(false);
@@ -759,7 +778,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	// Only certain roles can open the editor
 	boolean isSysAdmin = request.isUserInRole(Role.SYSADMIN);
-	boolean hasRole = isSysAdmin || hasRole(request, nodeUid);
+	boolean hasRole = isSysAdmin || isEditor(request, nodeUid);
 	Boolean edit = WebUtil.readBooleanParam(request, CentralConstants.PARAM_EDIT, false);
 	edit &= hasRole;
 
@@ -812,7 +831,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Boolean importNode = WebUtil.readBooleanParam(request, CentralConstants.PARAM_IMPORT_NODE, false);
 	dto.setCreateSubnode(createSubnode);
 	dto.setEdit(edit);
-	dto.setHasRole(hasRole);
+	dto.setIsEditor(hasRole);
 	dto.setImportNode(importNode);
 	dto.setTitlePath(titlePath);
 
@@ -832,8 +851,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    // Whole node tree share the same content folder ID
 		    nodeForm.setContentFolderId(node.getContentFolderId());
 		}
-		nodeForm.setTeachersEditCopy(dto.getEditCopyPermitted());
-		nodeForm.setTeachersEditOriginal(dto.getEditOriginalPermitted());
+		// set the default permissions
+		nodeForm.setPermissions(null);
 	    } else if (!importNode) {
 		// We fill the form with necessary data
 		nodeForm.setNodeType(node.getLearningDesignId() == null ? PedagogicalPlannerSequenceNodeForm.NODE_TYPE_SUBNODES
@@ -842,8 +861,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		nodeForm.setTitle(dto.getTitle());
 		nodeForm.setBriefDescription(dto.getBriefDescription());
 		nodeForm.setFullDescription(dto.getFullDescription());
-		nodeForm.setTeachersEditCopy(dto.getEditCopyPermitted());
-		nodeForm.setTeachersEditOriginal(dto.getEditOriginalPermitted());
+		nodeForm.setPermissions(node.getPermissions());
 	    }
 	}
 	return mapping.findForward(PedagogicalPlannerAction.FORWARD_SEQUENCE_CHOOSER);
@@ -878,13 +896,14 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		newRootNode = true;
 	    }
 	    node.setOrder(getPedagogicalPlannerDAO().getNextOrderId(parentUid));
+	    node.setUser(getUser());
 	} else {
 	    // It's an existing node
 	    node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	    nodeUid = node.getUid();
 	}
 
-	if (!hasRole(request, nodeUid)) {
+	if (!isEditor(request, nodeUid)) {
 	    log.debug("Unauthorised attempt to saveSequenceNode");
 	    throw new UserAccessDeniedException();
 	}
@@ -895,10 +914,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	String briefDescription = nodeForm.getBriefDescription();
 	String fullDescription = nodeForm.getFullDescription();
 	String nodeType = nodeForm.getNodeType();
-	short teachersPermissions = Boolean.TRUE.equals(nodeForm.getTeachersEditCopy()) ? Boolean.TRUE.equals(nodeForm
-		.getTeachersEditOriginal()) ? PedagogicalPlannerSequenceNode.PERMISSION_EDIT
-		: PedagogicalPlannerSequenceNode.PERMISSION_VIEW : PedagogicalPlannerSequenceNode.PERMISSION_NONE;
-
+	int nodePermissions = nodeForm.getPermissions();
+	
 	ActionMessages errors = validateNodeForm(node, nodeForm);
 	if (errors.isEmpty()) {
 
@@ -906,7 +923,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    node.setBriefDescription(briefDescription);
 	    node.setFullDescription(fullDescription);
 	    node.setContentFolderId(nodeForm.getContentFolderId());
-	    node.setTeachersPermissions(teachersPermissions);
+	    node.setPermissions(nodePermissions);
 
 	    // Different properties are set, depending on node type: with subnodes or template
 	    if (PedagogicalPlannerSequenceNodeForm.NODE_TYPE_SUBNODES.equals(nodeForm.getNodeType())
@@ -918,24 +935,40 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		node.setLearningDesignId(null);
 		node.setLearningDesignTitle(null);
 	    } else if (nodeForm.getFile() != null && nodeForm.getFile().getFileSize() > 0) {
+		// file has been uploaded, so copy it to file system and import LD
 		FormFile file = nodeForm.getFile();
 		InputStream inputStream = file.getInputStream();
-		String fileName = file.getFileName();
+		File sourceFile = new File(FileUtil.getTempDir(), file.getFileName());
 
-		LearningDesign learningDesign = importLearningDesign(inputStream, fileName, errors);
-		updateRecentLearningDesignList(learningDesign.getLearningDesignId());
-		
-		node.setLearningDesignId(learningDesign.getLearningDesignId());
-		node.setLearningDesignTitle(learningDesign.getTitle());
-
-		// If there were subnodes, we delete them now
-		Iterator<PedagogicalPlannerSequenceNode> subnodeIter = node.getSubnodes().iterator();
-		while (subnodeIter.hasNext()) {
-		    PedagogicalPlannerSequenceNode subnode = subnodeIter.next();
-		    subnodeIter.remove();
-		    getPedagogicalPlannerDAO().removeNode(subnode);
+		try {
+		    copyFileFromStream(inputStream, sourceFile);
+		} catch (Exception e) {
+		    PedagogicalPlannerAction.log.error(e, e);
+		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+			    PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
 		}
+		if (!sourceFile.exists() || sourceFile.isDirectory()) {
+		    PedagogicalPlannerAction.log.error(PedagogicalPlannerAction.ERROR_NOT_PROPER_FILE);
+		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+			    PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
+		}
+		if (errors.isEmpty()) {
+		    LearningDesign learningDesign = importLearningDesign(sourceFile, errors);
+		    if (errors.isEmpty()) {
+			updateRecentLearningDesignList(learningDesign.getLearningDesignId());
 
+			node.setLearningDesignId(learningDesign.getLearningDesignId());
+			node.setLearningDesignTitle(learningDesign.getTitle());
+
+			// If there were subnodes, we delete them now
+			Iterator<PedagogicalPlannerSequenceNode> subnodeIter = node.getSubnodes().iterator();
+			while (subnodeIter.hasNext()) {
+			    PedagogicalPlannerSequenceNode subnode = subnodeIter.next();
+			    subnodeIter.remove();
+			    getPedagogicalPlannerDAO().removeNode(subnode);
+			}
+		    }
+		}
 	    }
 
 	    getPedagogicalPlannerDAO().saveOrUpdateNode(node);
@@ -970,8 +1003,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    nodeForm.setBriefDescription(briefDescription);
 	    nodeForm.setFullDescription(fullDescription);
 	    nodeForm.setNodeType(nodeType);
-	    nodeForm.setTeachersEditCopy(teachersPermissions > PedagogicalPlannerSequenceNode.PERMISSION_NONE);
-	    nodeForm.setTeachersEditOriginal(teachersPermissions > PedagogicalPlannerSequenceNode.PERMISSION_VIEW);
+	    nodeForm.setPermissions(nodePermissions);
 	    if (createSubnode) {
 		PedagogicalPlannerSequenceNodeDTO dto = (PedagogicalPlannerSequenceNodeDTO) request
 			.getAttribute(CentralConstants.ATTR_NODE);
@@ -1051,7 +1083,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	Long parentUid = node.getParent() == null ? null : node.getParent().getUid();
 	
-	if (hasRole(request, nodeUid)) {
+	if (isEditor(request, nodeUid)) {
 	    PedagogicalPlannerAction.log.debug("Removing sequence node with UID" + nodeUid);
 	    getPedagogicalPlannerDAO().removeNode(node);
 	} else {
@@ -1146,9 +1178,10 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      * @throws FileUtilException
      * @throws IOException
      * @throws RepositoryCheckedException
+     * @throws ExportToolContentException 
      */
     private String exportNode(Long nodeUid) throws ZipFileUtilException, FileUtilException, IOException,
-	    RepositoryCheckedException {
+	    RepositoryCheckedException, ExportToolContentException {
 	if (nodeUid != null) {
 
 	    String rootDir = FileUtil.createTempDirectory(PedagogicalPlannerAction.EXPORT_NODE_FOLDER_SUFFIX);
@@ -1162,6 +1195,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	    // exporting XML
 	    XStream designXml = new XStream();
+	    // do not serialize node's owner
+	    designXml.omitField(PedagogicalPlannerSequenceNode.class, "user");
 	    designXml.toXML(node, nodeFile);
 	    nodeFile.close();
 
@@ -1211,7 +1246,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     public ActionForward importNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 
-	if (!hasRole(request, null)) {
+	if (!isEditor(request, null)) {
 	    log.debug("Unauthorised access to importNode");
 	    throw new UserAccessDeniedException();
 	}
@@ -1254,7 +1289,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 		// Upload the template files back into the repository
 		File templateDir = new File(rootPath, PedagogicalPlannerAction.DIR_TEMPLATES);
-		importSubnodeTemplates(node, templateDir);
+		importSubnodeTemplates(node, templateDir, errors);
 
 		// The imported node is added as the last one
 		Integer order = getPedagogicalPlannerDAO().getNextOrderId(null);
@@ -1272,7 +1307,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     }
 
     /**
-     * Imports a learning design for edit/preview template purposes.
+     * Imports a learning design to bind it with a certain node.
      * 
      * @param fileUuid
      * @param fileName
@@ -1280,23 +1315,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
      * @return
      * @throws ServletException
      */
-    private LearningDesign importLearningDesign(InputStream inputStream, String fileName, ActionMessages errors)
+    private LearningDesign importLearningDesign(File sourceFile, ActionMessages errors)
 	    throws ServletException {
-	File designFile = null;
-	try {
-	    designFile = new File(FileUtil.getTempDir(), fileName);
-	    copyFileFromStream(inputStream, designFile);
-	} catch (Exception e) {
-	    PedagogicalPlannerAction.log.error(e, e);
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
-	    return null;
-	}
-	if (!designFile.exists() || designFile.isDirectory()) {
-	    PedagogicalPlannerAction.log.error(PedagogicalPlannerAction.ERROR_NOT_PROPER_FILE);
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PedagogicalPlannerAction.ERROR_KEY_FILE_OPEN));
-	    return null;
-	}
-
 	User user = getUser();
 	List<String> toolsErrorMsgs = new ArrayList<String>();
 	Long learningDesignID = null;
@@ -1309,9 +1329,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	
 	// Extract the template
 	try {
-	    Object[] ldResults = getExportService().importLearningDesign(designFile, user,
+	    Object[] ldResults = getExportService().importLearningDesign(sourceFile, user,
 		    workspaceFolderId, toolsErrorMsgs, "");
-	    designFile.delete();
+	    sourceFile.delete();
 	    learningDesignID = (Long) ldResults[0];
 	    learningDesignErrorMsgs = (List<String>) ldResults[1];
 	    toolsErrorMsgs = (List<String>) ldResults[2];
@@ -1389,15 +1409,16 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     } 
 
     /**
-     * Copies the template files from repository into the selected dir.
+     * Export the subnodes' templates into the selected dir.
      * 
      * @param node
      * @param outputDir
+     * @throws ExportToolContentException
      * @throws RepositoryCheckedException
      * @throws IOException
      */
-    private void exportSubnodeTemplates(PedagogicalPlannerSequenceNode node, File outputDir)
-	    throws RepositoryCheckedException, IOException {
+    private void exportSubnodeTemplates(PedagogicalPlannerSequenceNode node, File outputDir) throws IOException,
+	    RepositoryCheckedException, ExportToolContentException {
 	if (node != null) {
 	    if (node.getLearningDesignId() == null) {
 		if (node.getSubnodes() != null) {
@@ -1406,45 +1427,60 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		    }
 		}
 	    } else {
-		File uuidDir = new File(outputDir, node.getLearningDesignId().toString());
-		uuidDir.mkdirs();
-		File targetFile = new File(uuidDir, node.getLearningDesignTitle());
-		InputStream inputStream = getContentHandler().getFileNode(node.getLearningDesignId()).getFile();
-		PedagogicalPlannerAction.log.debug("Preparing for zipping the template file: " + node.getLearningDesignTitle());
+
+		List<String> toolsErrorMsgs = new ArrayList<String>();
+		String exportedLdFilePath = getExportService().exportLearningDesign(node.getLearningDesignId(),
+			toolsErrorMsgs, 1, null);
+		if (!toolsErrorMsgs.isEmpty()) {
+		    StringBuffer errorMessages = new StringBuffer();
+		    for (String error : toolsErrorMsgs) {
+			errorMessages.append(error);
+		    }
+		    throw new ExportToolContentException(errorMessages.toString());
+		}
+		FileInputStream inputStream = new FileInputStream(exportedLdFilePath);
+
+		File ldIdDir = new File(outputDir, node.getLearningDesignId().toString());
+		ldIdDir.mkdirs();
+		File targetFile = new File(ldIdDir, node.getLearningDesignTitle() + FILE_EXTENSION_ZIP);
+
+		PedagogicalPlannerAction.log.debug("Preparing for zipping the template file: "
+			+ node.getLearningDesignTitle());
 		copyFileFromStream(inputStream, targetFile);
 	    }
 	}
     }
 
     /**
-     * Uploads the templates back into repository. Also sets all the nodes' UIDs to NULL.
+     * Imports back the subnodes' templates. Also sets all the nodes' UIDs to NULL.
      * 
      * @param node
      * @param inputDir
-     * @throws RepositoryCheckedException
-     * @throws IOException
+     * @throws ServletException
      */
-    private void importSubnodeTemplates(PedagogicalPlannerSequenceNode node, File inputDir)
-	    throws RepositoryCheckedException, IOException {
+    private void importSubnodeTemplates(PedagogicalPlannerSequenceNode node, File inputDir, ActionMessages errors)
+	    throws ServletException {
 	if (node != null) {
 	    node.setUid(null);
-
+	    User user = getUser();
+	    node.setUser(user);
+	    
 	    if (node.getLearningDesignId() == null) {
 		if (node.getSubnodes() != null) {
 		    for (PedagogicalPlannerSequenceNode subnode : node.getSubnodes()) {
-			importSubnodeTemplates(subnode, inputDir);
+			importSubnodeTemplates(subnode, inputDir, errors);
 			subnode.setParent(node);
 		    }
 		}
 	    } else {
-		File uuidDir = new File(inputDir, node.getLearningDesignId().toString());
-		File file = new File(uuidDir, node.getLearningDesignTitle());
-		InputStream inputStream = new FileInputStream(file);
-		String fileName = node.getLearningDesignTitle();
-		PedagogicalPlannerAction.log.debug("Uploading into repository a template file: " + fileName);
-		NodeKey nodeKey = getContentHandler().uploadFile(inputStream, fileName,
-			CentralConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD, IToolContentHandler.TYPE_OFFLINE);
-		node.setLearningDesignId(nodeKey.getUuid());
+		File ldIdDir = new File(inputDir, node.getLearningDesignId().toString());
+		String fileName = node.getLearningDesignTitle() + FILE_EXTENSION_ZIP;
+		File sourceFile = new File(ldIdDir, fileName);
+		PedagogicalPlannerAction.log.debug("Importing a template file: " + fileName);
+		LearningDesign learningDesign = importLearningDesign(sourceFile, errors);
+
+		node.setLearningDesignId(learningDesign.getLearningDesignId());
+		node.setLearningDesignTitle(learningDesign.getTitle());
 	    }
 	}
     }
@@ -1850,7 +1886,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws Exception {
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
 
-	if (hasRole(request, nodeUid)) {
+	if (isEditor(request, nodeUid)) {
 	    List existingUsers = getPedagogicalPlannerDAO().getNodeUsers(nodeUid, Role.ROLE_AUTHOR_ADMIN);
 
 	    Integer orgId = getUserManagementService().getRootOrganisation().getOrganisationId();
@@ -1899,7 +1935,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Integer userId = WebUtil.readIntParam(request, CentralConstants.PARAM_USER_ID, false);
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
 	
-	if (hasRole(request, nodeUid)) {
+	if (isEditor(request, nodeUid)) {
 	    getPedagogicalPlannerDAO().saveNodeRole(userId, nodeUid, Role.ROLE_AUTHOR_ADMIN);
 	} else {
 	    log.debug("Unauthorised attempt to add editor to node.");
@@ -1913,7 +1949,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Integer userId = WebUtil.readIntParam(request, CentralConstants.PARAM_USER_ID, false);
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, false);
 	
-	if (hasRole(request, nodeUid)) {
+	if (isEditor(request, nodeUid)) {
 	    getPedagogicalPlannerDAO().removeNodeRole(userId, nodeUid, Role.ROLE_AUTHOR_ADMIN);
 	} else {
 	    log.debug("Unauthorised attempt to remove editor from node.");
@@ -1925,7 +1961,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     /*------------------------ COMMON METHODS --------------------*/
 
     // only these roles can edit nodes and give this role on this node to others
-    private Boolean hasRole(HttpServletRequest request, Long nodeUid) {
+    private Boolean isEditor(HttpServletRequest request, Long nodeUid) {
 	if (request.isUserInRole(Role.SYSADMIN)) {
 	    // sysadmins have all permission
 	    return true;

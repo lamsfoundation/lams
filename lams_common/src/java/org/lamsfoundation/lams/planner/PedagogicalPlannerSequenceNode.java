@@ -3,16 +3,29 @@ package org.lamsfoundation.lams.planner;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.lamsfoundation.lams.usermanagement.User;
+
 /**
  * @hibernate.class table="lams_planner_nodes"
  * @author Marcin Cieslak
  * 
  */
 public class PedagogicalPlannerSequenceNode {
-    public static final short PERMISSION_NONE = 0;
-    public static final short PERMISSION_VIEW = 1;
-    public static final short PERMISSION_EDIT = 2;
+    // user bit encoding to compact permissions into a single integer
+    public static final int PERMISSION_EDITOR_VIEW = 1;
+    public static final int PERMISSION_EDITOR_MODIFY = 1 << 1;
+    public static final int PERMISSION_EDITOR_REPLACE = 1 << 2;
+    public static final int PERMISSION_EDITOR_REMOVE = 1 << 3;
+    public static final int PERMISSION_TEACHER_VIEW = 1 << 4;
+    public static final int PERMISSION_TEACHER_COPY = 1 << 5;
+    public static final int PERMISSION_TEACHER_PREVIEW = 1 << 6;
+    public static final int PERMISSION_TEACHER_VIEW_IN_FULL_AUTHOR = 1 << 7;
+    public static final int PERMISSION_TEACHER_EXPORT = 1 << 8;
+    public static final int PERMISSION_TEACHER_SAVE = 1 << 9;
     
+    public static final int PERMISSION_DEFAULT_SETTING = PERMISSION_EDITOR_VIEW + PERMISSION_EDITOR_MODIFY
+	    + PERMISSION_TEACHER_VIEW + PERMISSION_TEACHER_COPY + PERMISSION_TEACHER_PREVIEW
+	    + PERMISSION_TEACHER_VIEW_IN_FULL_AUTHOR + PERMISSION_TEACHER_EXPORT + PERMISSION_TEACHER_SAVE;
     // --------- persistent fields -------------
     private Long uid;
     private PedagogicalPlannerSequenceNode parent;
@@ -25,7 +38,8 @@ public class PedagogicalPlannerSequenceNode {
     private Long learningDesignId;
     private String learningDesignTitle;
     private Boolean locked = false;
-    private Short teachersPermissions = 1;
+    private User user;
+    private Integer permissions = PERMISSION_DEFAULT_SETTING;
 
     /**
      * @hibernate.id column="uid" generator-class="native" type="java.lang.Long"
@@ -158,13 +172,24 @@ public class PedagogicalPlannerSequenceNode {
     }
     
     /**
-     * @hibernate.property column="teachers_permissions"
+     * @hibernate.property column="permissions"
      */
-    public Short getTeachersPermissions() {
-        return teachersPermissions;
+    public Integer getPermissions() {
+        return permissions;
     }
 
-    public void setTeachersPermissions(Short teachersPermissions) {
-        this.teachersPermissions = teachersPermissions;
+    public void setPermissions(Integer permissions) {
+        this.permissions = permissions;
+    }
+
+    /**
+     * @hibernate.many-to-one column="user_id" foreign-key="FK_lams_planner_node_user"
+     */
+    public User getUser() {
+	return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

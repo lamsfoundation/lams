@@ -227,16 +227,54 @@
   		}
   	 }
   
-  function onRemoveTemplateCheckboxChange(){
-  	 document.getElementById("fileInputArea").style.display = document.getElementById("removeTemplate").checked ? "none" : "block";	
+  function onRemoveTemplateCheckboxChange() {
+	if ($('#fileInputArea').length > 0) {
+		document.getElementById("fileInputArea").style.display = document
+				.getElementById("removeTemplate").checked ? "none" : "block";
+	}
   }
   
-  function onTeachersEditCopyCheckboxChange() {
-	if (document.getElementById("teachersEditCopy").checked) {
-		$('#teachersEditOriginal').attr('disabled', false);
-	} else {
-		$('#teachersEditOriginal').attr('disabled', true);
-		$('#teachersEditOriginal').attr('checked', false);
+  function onPermissionsCheckboxChange() {
+	if ($('#fileInputArea').length > 0) {
+		// some permissions require other to be set
+		if ($('#permitEditorViewTemplate').attr('checked') == false) {
+			$('#permitEditorModifyTemplate').attr('checked', false);
+			$('#permitEditorReplaceTemplate').attr('checked', false);
+			$('#permitEditorRemoveTemplate').attr('checked', false);
+
+			$('#permitEditorModifyTemplate').attr('disabled', true);
+			$('#permitEditorReplaceTemplate').attr('disabled', true);
+			$('#permitEditorRemoveTemplate').attr('disabled', true);
+		} else {
+			$('#permitEditorModifyTemplate').attr('disabled', false);
+			$('#permitEditorReplaceTemplate').attr('disabled', false);
+			$('#permitEditorRemoveTemplate').attr('disabled', false);
+		}
+
+		if ($('#permitTeacherViewTemplate').attr('checked') == false) {
+			$('#permitTeacherEditCopy').attr('checked', false);
+			$('#permitTeacherPreview').attr('checked', false);
+
+			$('#permitTeacherEditCopy').attr('disabled', true);
+			$('#permitTeacherPreview').attr('disabled', true);
+		} else {
+			$('#permitTeacherEditCopy').attr('disabled', false);
+			$('#permitTeacherPreview').attr('disabled', false);
+		}
+
+		if ($('#permitTeacherEditCopy').attr('checked') == false) {
+			$('#permitTeacherViewCopyInFullAuthor').attr('checked', false);
+			$('#permitTeacherExportCopy').attr('checked', false);
+			$('#permitTeacherSaveCopy').attr('checked', false);
+
+			$('#permitTeacherViewCopyInFullAuthor').attr('disabled', true);
+			$('#permitTeacherExportCopy').attr('disabled', true);
+			$('#permitTeacherSaveCopy').attr('disabled', true);
+		} else {
+			$('#permitTeacherViewCopyInFullAuthor').attr('disabled', false);
+			$('#permitTeacherExportCopy').attr('disabled', false);
+			$('#permitTeacherSaveCopy').attr('disabled', false);
+		}
 	}
   }
   

@@ -35,7 +35,26 @@ public class PedagogicalPlannerTemplateDTO {
     private List<PedagogicalPlannerActivityDTO> activities;
     private Long learningDesignID;
     private Integer activitySupportingPlannerCount = 0;
-    private PedagogicalPlannerSequenceNode node;
+    private Long nodeUid;
+    
+    private Boolean isEditor = false;
+    private Boolean permitPreview = true;
+    private Boolean permitViewInFullAuthor =true ;
+    private Boolean permitExport = true;
+    private Boolean permitSave = true;
+
+    public void setPermissions(Integer nodePermissions, boolean isEditor) {
+	// set permissions the view is based on
+	this.isEditor = isEditor;
+	permitPreview = isEditor || nodePermissions == null
+		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_PREVIEW) != 0;
+	permitViewInFullAuthor = isEditor || nodePermissions == null
+		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_VIEW_IN_FULL_AUTHOR) != 0;
+	permitExport = isEditor || nodePermissions == null
+		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_EXPORT) != 0;
+	permitSave = isEditor || nodePermissions == null
+		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_SAVE) != 0;
+    }
 
     public String getSequenceTitle() {
 	return sequenceTitle;
@@ -92,13 +111,52 @@ public class PedagogicalPlannerTemplateDTO {
     public void setActivitySupportingPlannerCount(Integer activitySupportingPlannerCount) {
 	this.activitySupportingPlannerCount = activitySupportingPlannerCount;
     }
-    
-    public PedagogicalPlannerSequenceNode getNode() {
-	return node;
+
+    public Long getNodeUid() {
+        return nodeUid;
     }
 
-    public void setNode(PedagogicalPlannerSequenceNode node) {
-	this.node = node;
+    public void setNodeUid(Long nodeUid) {
+        this.nodeUid = nodeUid;
     }
 
+    public Boolean getIsEditor() {
+        return isEditor;
+    }
+
+    public void setIsEditor(Boolean isEditor) {
+        this.isEditor = isEditor;
+    }
+
+    public Boolean getPermitPreview() {
+        return permitPreview;
+    }
+
+    public void setPermitPreview(Boolean permitTeacherPreview) {
+        this.permitPreview = permitTeacherPreview;
+    }
+
+    public Boolean getPermitViewInFullAuthor() {
+        return permitViewInFullAuthor;
+    }
+
+    public void setPermitViewInFullAuthor(Boolean permitTeacherViewCopyInFullAuthor) {
+        this.permitViewInFullAuthor = permitTeacherViewCopyInFullAuthor;
+    }
+
+    public Boolean getPermitExport() {
+        return permitExport;
+    }
+
+    public void setPermitExport(Boolean permitTeacherExportCopy) {
+        this.permitExport = permitTeacherExportCopy;
+    }
+
+    public Boolean getPermitSave() {
+        return permitSave;
+    }
+
+    public void setPermitSave(Boolean permitTeacherSaveCopy) {
+        this.permitSave = permitTeacherSaveCopy;
+    }
 }
