@@ -28,6 +28,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><fmt:message key="label.exportPortfolio" />
 	</title>
 	<lams:css localLinkPath="../" />
+	<link rel="stylesheet" href="./css/jRating.jquery.css"  type="text/css" />
+	<link rel="stylesheet" href="./css/ratingStars.css"  type="text/css" />
+	<style media="screen,projection" type="text/css">
+		.ratingStarsDiv {padding-top: 24px; padding-bottom: 2px;}
+	</style>
+
+	<script type="text/javascript"> 
+		var pathToImageFolder = "./images/"; 
+	</script>
+	<script type="text/javascript" src="./javascript/jquery.js"></script>
+	<script type="text/javascript" src="./javascript/jRating.jquery.js"></script>
+	<script language="JavaScript" type="text/JavaScript">
+	  	$(document).ready(function(){
+		    $(".ratingStarsDisabled").jRating({
+		    	rateMax : 5,
+		    	isDisabled : true
+			});		    
+		 });
+	</script>
 </lams:head>
 
 <body class="stripes">
@@ -106,6 +125,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														test="${generalLearnerFlowDTO.userUid == userData.queUsrId or userData.visible == 'true'}">
 														<c:out value="${userData.responsePresentable}"
 															escapeXml="false" />
+														<jsp:include page="../learning/parts/ratingStarsDisabled.jsp" />
 													</c:when>
 													<c:otherwise>
 														<i><fmt:message key="label.hidden" /> </i>
@@ -189,6 +209,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													</c:if>
 													<c:out value="${userData.responsePresentable}"
 														escapeXml="false" />
+													<jsp:include page="../learning/parts/ratingStarsDisabled.jsp" />
 												</td>
 											</tr>
 

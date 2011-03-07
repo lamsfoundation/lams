@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.tool.qa.util.QaBundler;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 
 /**
@@ -64,6 +65,15 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	    learner(request, response, directoryName, cookies);
 	} else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
 	    teacher(request, response, directoryName, cookies);
+	}
+	
+	// Attempting to export required images
+	try {
+	    QaBundler qaBundler = new QaBundler();
+	    qaBundler.bundle(request, cookies, directoryName);
+	    
+	} catch (Exception e) {
+	    logger.error("Could not export Q&A javascript files, some files may be missing in export portfolio", e);
 	}
 
 	writeResponseToFile(basePath + "/export/exportportfolio.jsp", directoryName, FILENAME, cookies);
