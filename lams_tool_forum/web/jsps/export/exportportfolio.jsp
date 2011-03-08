@@ -12,6 +12,22 @@
 
 <lams:head>
 	<lams:css localLinkPath="../"/>
+	<link rel="stylesheet" href="./css/jRating.jquery.css"  type="text/css" />
+	<link rel="stylesheet" href="./css/ratingStars.css"  type="text/css" />
+
+	<script type="text/javascript"> 
+		var pathToImageFolder = "./images/"; 
+	</script>
+	<script type="text/javascript" src="./javascript/jquery.js"></script>
+	<script type="text/javascript" src="./javascript/jRating.jquery.js"></script>
+	<script language="JavaScript" type="text/JavaScript">
+	  	$(document).ready(function(){
+		    $(".ratingStarsDisabled").jRating({
+		    	rateMax : 5,
+		    	isDisabled : true
+			});		    
+		 });
+	</script>
 </lams:head>
 
 <body class="stripes">
@@ -112,6 +128,15 @@
 											<c:out value="${msgDto.comment}" escapeXml="false" />
 										</c:otherwise>
 									</c:choose>
+								</td>
+							</tr>
+						</c:if>
+						<c:if test="${sessionMap.allowRateMessages}">
+							<tr>
+								<td>
+									<div class="right-buttons">
+										<%@ include file="/jsps/learning/rating/ratingStarsDisabled.jsp"%>
+									</div>
 								</td>
 							</tr>
 						</c:if>

@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.service.ForumServiceProxy;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
+import org.lamsfoundation.lams.tool.forum.util.ForumBundler;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -126,6 +127,15 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
 			teacher(request,response,directoryName,cookies,sessionMap);
 		}
 		
+		// Attempting to export required images
+		try {
+		    ForumBundler forumBundler = new ForumBundler();
+		    forumBundler.bundle(request, cookies, directoryName);
+		    
+		} catch (Exception e) {
+		    logger.error("Could not export Q&A javascript files, some files may be missing in export portfolio", e);
+		}
+		
 		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
 		writeResponseToFile(basePath+"/jsps/export/exportportfolio.jsp?sessionMapID="+sessionMap.getSessionID()
 				,directoryName,FILENAME,cookies);
@@ -175,6 +185,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
         sessionTopicMap.put(session.getSessionName(), pair);
         
 		sessionMap.put(ForumConstants.ATTR_TOOL_CONTENT_TOPICS, sessionTopicMap);
+		sessionMap.put(ForumConstants.ATTR_ALLOW_RATE_MESSAGES, content.isAllowRateMessages());
 		
 		// Set forum title 
 		sessionMap.put(ForumConstants.ATTR_FORUM_TITLE, content.getTitle());
@@ -225,6 +236,7 @@ public class ExportServlet  extends AbstractExportPortfolioServlet {
     		topicsByUser.put(session.getSessionName(), pair);	
         }
         sessionMap.put(ForumConstants.ATTR_TOOL_CONTENT_TOPICS,topicsByUser);
+        sessionMap.put(ForumConstants.ATTR_ALLOW_RATE_MESSAGES, content.isAllowRateMessages());
         
         // Set forum title 
 		sessionMap.put(ForumConstants.ATTR_FORUM_TITLE, content.getTitle());
