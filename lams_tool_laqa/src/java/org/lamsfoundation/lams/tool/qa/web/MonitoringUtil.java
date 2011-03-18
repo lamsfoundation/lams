@@ -328,7 +328,7 @@ public class MonitoringUtil implements QaAppConstants {
 	return false;
     }
 
-    public static void buildQaStatsDTO(HttpServletRequest request, IQaService qaService, QaContent qaContent) {
+    private static void buildQaStatsDTO(HttpServletRequest request, IQaService qaService, QaContent qaContent) {
 	QaStatsDTO qaStatsDTO = new QaStatsDTO();
 
 	int countSessionComplete = 0;
@@ -360,15 +360,19 @@ public class MonitoringUtil implements QaAppConstants {
 	request.setAttribute(QA_STATS_DTO, qaStatsDTO);
     }
 
-    public static void generateGroupsSessionData(HttpServletRequest request, IQaService qaService, QaContent qaContent,
-	    boolean forExport) {
+    public static void setUpMonitoring(HttpServletRequest request, IQaService qaService, QaContent qaContent) {
+	
+	// setting up the advanced summary for LDEV-1662
+	request.setAttribute(QaAppConstants.ATTR_CONTENT, qaContent);
+	
+	boolean isGroupedActivity = qaService.isGroupedActivity(qaContent.getQaContentId());
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
 
+	buildQaStatsDTO(request, qaService, qaContent);
+	
+	//generateGroupsSessionData
 	List listAllGroupsDTO = buildGroupBasedSessionData(request, qaContent, qaService);
-
 	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
-
-	if (forExport)
-	    request.getSession().setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
     }
 
     public static List buildGroupBasedSessionData(HttpServletRequest request, QaContent qaContent, IQaService qaService) {

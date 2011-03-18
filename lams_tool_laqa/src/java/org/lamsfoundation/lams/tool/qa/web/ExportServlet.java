@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.tool.qa.web;
 
+import java.util.List;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -152,8 +154,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
     }
 
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
-	logger.debug("starting teacher mode...");
-
 	IQaService qaService = QaServiceProxy.getQaService(getServletContext());
 
 	if (toolContentID == null) {
@@ -171,23 +171,21 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	}
 
 	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-	logger.debug("start refreshSummaryData for teacher mode.");
-
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(content);
 	qaMonitoringAction.refreshSummaryData(request, content, qaService, true, false, null, null,
 		generalLearnerFlowDTO, false, "All");
-
 	generalLearnerFlowDTO = (GeneralLearnerFlowDTO) request.getAttribute(GENERAL_LEARNER_FLOW_DTO);
 
 	request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
-
 	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
 
 	qaMonitoringAction.prepareReflectionData(request, content, qaService, null, true, "All");
 
 	request.setAttribute("currentMonitoredToolSession", "All");
-	MonitoringUtil.generateGroupsSessionData(request, qaService, content, true);
-
-	logger.debug("ending teacher mode: ");
+	
+	//generateGroupsSessionData
+	List listAllGroupsDTO = MonitoringUtil.buildGroupBasedSessionData(request, content, qaService);
+	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
+	request.getSession().setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
     }
 }

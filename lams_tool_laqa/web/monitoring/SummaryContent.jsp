@@ -21,14 +21,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp"%>
 <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
-<script type="text/javascript">
-<!--
-	function test()
-	{
-			}
-//-->
-</script>	
-
 <h1>
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
 
@@ -40,23 +32,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <div class="monitoring-advanced" id="advancedDiv" style="display:none">
 <table class="alternative-color">
-
-	<tr>
-		<td>
-			<fmt:message key="label.lockWhenFinished" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${lockWhenFinished}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
 	
 	<tr>
 		<td>
@@ -64,7 +39,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</td>
 		<td>
 			<c:choose>
-				<c:when test="${showOtherAnswers}">
+				<c:when test="${content.showOtherAnswers}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -80,7 +55,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</td>
 		<td>	
 			<c:choose>
-				<c:when test="${usernameVisible}">
+				<c:when test="${content.usernameVisible}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -96,7 +71,53 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</td>
 		<td>
 			<c:choose>
-				<c:when test="${allowRateAnswers}">
+				<c:when test="${content.allowRateAnswers}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>	
+	
+	<tr>
+		<td>
+			<fmt:message key="monitor.summary.td.addNotebook" />
+		</td>	
+		<td>
+			<c:choose>
+				<c:when test="${content.reflect}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	 		
+	<c:choose>
+		<c:when test="${content.reflect}">
+			<tr>
+				<td>
+					<fmt:message key="monitor.summary.td.notebookInstructions" />
+				</td>	
+				<td>
+					${content.reflectionSubject}
+				</td>
+			</tr>
+		</c:when>
+	</c:choose>
+	
+	<tr>
+		<td>
+			<fmt:message key="radiobox.questionsSequenced" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${content.questionsSequenced}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -108,32 +129,37 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<tr>
 		<td>
-			<fmt:message key="monitor.summary.td.addNotebook" />
-		</td>	
+			<fmt:message key="label.lockWhenFinished" />
+		</td>
+		
 		<td>
 			<c:choose>
-				<c:when test="${reflect}">
+				<c:when test="${content.lockWhenFinished}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
 					<fmt:message key="label.off" />
 				</c:otherwise>
-			</c:choose>
+			</c:choose>	
 		</td>
 	</tr>
-	 		
-	<c:choose>
-		<c:when test="${reflect}">
-			<tr>
-				<td>
-					<fmt:message key="monitor.summary.td.notebookInstructions" />
-				</td>	
-				<td>
-					${reflectionSubject}
-				</td>
-			</tr>
-		</c:when>
-	</c:choose>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.allowRichEditor" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${content.allowRichEditor}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
 </table>
 </div>	
 	

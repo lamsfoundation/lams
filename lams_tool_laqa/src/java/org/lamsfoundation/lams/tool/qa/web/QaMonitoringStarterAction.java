@@ -118,17 +118,11 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	generalMonitoringDTO.setContentFolderID(contentFolderID);
 
 	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-	logger.debug("calling initSummaryContent.");
 	qaMonitoringAction.initSummaryContent(mapping, form, request, response);
-	logger.debug("calling initInstructionsContent.");
 	qaMonitoringAction.initInstructionsContent(mapping, form, request, response);
-	logger.debug("calling initStatsContent.");
 	qaMonitoringAction.initStatsContent(mapping, form, request, response, generalMonitoringDTO);
-	
 
 	String toolContentID = qaMonitoringForm.getToolContentID();
-	logger.debug("toolContentID: " + toolContentID);
-
 	QaContent qaContent = qaService.getQa(new Long(toolContentID).longValue());
 
 	/*true means there is at least 1 response*/
@@ -217,15 +211,9 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
 	}
 
-	MonitoringUtil.buildQaStatsDTO(request, qaService, qaContent);
-	
-	boolean isGroupedActivity = qaService.isGroupedActivity(new Long(toolContentID));
-	request.setAttribute("isGroupedActivity", isGroupedActivity);
-
 	request.setAttribute("currentMonitoredToolSession", "All");
-	MonitoringUtil.generateGroupsSessionData(request, qaService, qaContent, false);
+	MonitoringUtil.setUpMonitoring(request, qaService, qaContent);
 
-	logger.debug("fwding to : " + LOAD_MONITORING);
 	return (mapping.findForward(LOAD_MONITORING));
     }
 
@@ -243,33 +231,22 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
     public boolean initialiseMonitoringData(ActionMapping mapping, QaMonitoringForm qaMonitoringForm,
 	    HttpServletRequest request, HttpServletResponse response, IQaService qaService,
 	    GeneralMonitoringDTO generalMonitoringDTO) {
-	logger.debug("start initializing  monitoring data...");
 	generalMonitoringDTO.setEditResponse(new Boolean(false).toString());
 	generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 
 	String toolContentID = qaMonitoringForm.getToolContentID();
-	logger.debug("toolContentID:" + toolContentID);
-
 	QaContent qaContent = qaService.getQa(new Long(toolContentID).longValue());
-
 	if (qaContent == null) {
 	    QaUtils.cleanUpSessionAbsolute(request);
 	    return false;
 	}
 
 	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-	logger.debug("refreshing summary data...");
-
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
-	
-
 	qaMonitoringAction.refreshSummaryData(request, qaContent, qaService, true, false, null, null,
 		generalLearnerFlowDTO, false, "All");
-
-	logger.debug("refreshing stats data...");
 	qaMonitoringAction.refreshStatsData(request, qaMonitoringForm, qaService, generalMonitoringDTO);
 
-	logger.debug("end initialising  monitoring data...");
 	return true;
     }
 
