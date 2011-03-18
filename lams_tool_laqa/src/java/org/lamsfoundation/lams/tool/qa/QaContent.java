@@ -124,7 +124,7 @@ public class QaContent implements Serializable {
     private Date updateDate;
 
     /** persistent field */
-    private Set qaQueContents;
+    private Set<QaQuestion> qaQuestions;
 
     /** persistent field */
     private Set qaSessions;
@@ -166,7 +166,7 @@ public class QaContent implements Serializable {
 	this.reflectionSubject = reflectionSubject;
 	this.creationDate = creationDate;
 	this.updateDate = updateDate;
-	this.qaQueContents = qaQueContents;
+	this.qaQuestions = qaQueContents;
 	this.qaSessions = qaSessions;
 	this.qaUploadedFiles = qaUploadedFiles;
 	this.conditions = conditions;
@@ -195,7 +195,7 @@ public class QaContent implements Serializable {
 		qa.getReflectionSubject(), qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(),
 		new TreeSet(), new TreeSet<QaCondition>(new TextSearchConditionComparator()), qa.isAllowRichEditor());
 
-	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
+	newContent.setQaQuestions(qa.deepCopyQaQueContent(newContent));
 
 	newContent.setQaUploadedFiles(qa.deepCopyQaAttachments(toolContentHandler, newContent));
 	newContent.setConditions(qa.deepCopyConditions(newContent));
@@ -204,9 +204,9 @@ public class QaContent implements Serializable {
 
     public Set deepCopyQaQueContent(QaContent newQaContent) {
 	Set newQaQueContent = new TreeSet();
-	for (Iterator i = this.getQaQueContents().iterator(); i.hasNext();) {
-	    QaQueContent queContent = (QaQueContent) i.next();
-	    newQaQueContent.add(QaQueContent.newInstance(queContent, newQaContent));
+	for (Iterator i = this.getQaQuestions().iterator(); i.hasNext();) {
+	    QaQuestion queContent = (QaQuestion) i.next();
+	    newQaQueContent.add(QaQuestion.newInstance(queContent, newQaContent));
 	}
 	return newQaQueContent;
     }
@@ -241,15 +241,15 @@ public class QaContent implements Serializable {
 	return new TreeSet();
     }
 
-    public Set getQaQueContents() {
-	if (qaQueContents == null) {
-	    setQaQueContents(new TreeSet());
+    public Set<QaQuestion> getQaQuestions() {
+	if (qaQuestions == null) {
+	    setQaQuestions(new TreeSet<QaQuestion>());
 	}
-	return qaQueContents;
+	return qaQuestions;
     }
 
-    public void setQaQueContents(Set qaQueContents) {
-	this.qaQueContents = qaQueContents;
+    public void setQaQuestions(Set<QaQuestion> qaQueContents) {
+	this.qaQuestions = qaQueContents;
     }
 
     public Set getQaSessions() {

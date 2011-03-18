@@ -36,13 +36,14 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.contentrepository.ItemExistsException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
@@ -67,12 +68,11 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
+import org.lamsfoundation.lams.tool.qa.QaQuestion;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
@@ -80,22 +80,24 @@ import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
 import org.lamsfoundation.lams.tool.qa.ResponseRating;
 import org.lamsfoundation.lams.tool.qa.dao.IQaConfigItemDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
-import org.lamsfoundation.lams.tool.qa.dao.IQaQueContentDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQueUsrDAO;
+import org.lamsfoundation.lams.tool.qa.dao.IQaQuestionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaSessionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUploadedFileDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaWizardDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IResponseRatingDAO;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
+import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -114,9 +116,7 @@ import org.springframework.dao.DataAccessException;
  */
 
 public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager,
-	QaAppConstants
-
-{
+	QaAppConstants {
     static Logger logger = Logger.getLogger(QaServicePOJO.class.getName());
 
     private final String repositoryUser = "laqa11";
@@ -126,7 +126,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     private ICredentials cred;
 
     private IQaContentDAO qaDAO;
-    private IQaQueContentDAO qaQueContentDAO;
+    private IQaQuestionDAO qaQuestionDAO;
 
     private IQaSessionDAO qaSessionDAO;
     private IQaQueUsrDAO qaQueUsrDAO;
@@ -148,26 +148,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     private Random generator = new Random();
 
-    public void configureContentRepository() throws QaApplicationException {
-	cred = new SimpleCredentials(repositoryUser, repositoryId);
-	QaServicePOJO.logger.debug("retrieved cred: " + cred);
-	try {
-	    repositoryService.createCredentials(cred);
-	    repositoryService.addWorkspace(cred, repositoryWorkspace);
-	} catch (ItemExistsException ie) {
-	    QaServicePOJO.logger.warn("Tried to configure repository but it "
-		    + " appears to be already configured. Exception thrown by repository being ignored. ", ie);
-	} catch (RepositoryCheckedException e) {
-	    String error = "Error occured while trying to configure repository." + " Unable to recover from error: "
-		    + e.getMessage();
-	    QaServicePOJO.logger.error(error, e);
-	    throw new QaApplicationException(error, e);
-	}
-    }
-
-    public QaServicePOJO() {
-    }
-
     public void createQa(QaContent qaContent) throws QaApplicationException {
 	try {
 	    qaDAO.saveQa(qaContent);
@@ -176,19 +156,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public QaContent getQaContentByUID(Long uid) throws QaApplicationException {
+    public QaContent getQa(long toolContentID) throws QaApplicationException {
 	try {
-	    return qaDAO.getQaContentByUID(uid);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is getting qa content by uid: "
-		    + e.getMessage(), e);
-	}
-
-    }
-
-    public QaContent retrieveQa(long toolContentID) throws QaApplicationException {
-	try {
-	    return qaDAO.getQaById(toolContentID);
+	    return qaDAO.getQaByContentId(toolContentID);
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException("Exception occured when lams is loading qa content: " + e.getMessage(), e);
 	}
@@ -204,21 +174,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     }
 
-    /**
-     * returns null if not found
-     */
-    public QaContent loadQa(long toolContentID) throws QaApplicationException {
-	try {
-	    return qaDAO.loadQaById(toolContentID);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is loading qa content: " + e.getMessage(), e);
-	}
-    }
-
-    public QaQueContent getQuestionContentByQuestionText(final String question, Long contentUid)
+    public QaQuestion getQuestionContentByQuestionText(final String question, Long contentUid)
 	    throws QaApplicationException {
 	try {
-	    return qaQueContentDAO.getQuestionContentByQuestionText(question, contentUid);
+	    return qaQuestionDAO.getQuestionContentByQuestionText(question, contentUid);
 
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException("Exception occured when lams is getting qa content by question text: "
@@ -226,10 +185,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public QaQueContent getQuestionContentByDisplayOrder(Long displayOrder, Long contentUid)
+    public QaQuestion getQuestionByContentAndDisplayOrder(Long displayOrder, Long contentUid)
 	    throws QaApplicationException {
 	try {
-	    return qaQueContentDAO.getQuestionContentByDisplayOrder(displayOrder, contentUid);
+	    return qaQuestionDAO.getQuestionByDisplayOrder(displayOrder, contentUid);
 
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException("Exception occured when lams is getting qa content by question text: "
@@ -237,9 +196,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public void saveOrUpdateQaQueContent(QaQueContent qaQueContent) throws QaApplicationException {
+    public void saveOrUpdateQaQueContent(QaQuestion qaQuestion) throws QaApplicationException {
 	try {
-	    qaQueContentDAO.saveOrUpdateQaQueContent(qaQueContent);
+	    qaQuestionDAO.saveOrUpdateQaQueContent(qaQuestion);
 
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException("Exception occured when lams is updating qa content by question: "
@@ -248,9 +207,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     }
 
-    public void createQaQue(QaQueContent qaQueContent) throws QaApplicationException {
+    public void createQaQue(QaQuestion qaQuestion) throws QaApplicationException {
 	try {
-	    qaQueContentDAO.createQueContent(qaQueContent);
+	    qaQuestionDAO.createQueContent(qaQuestion);
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException("Exception occured when lams is creating qa content: " + e.getMessage(), e);
 	}
@@ -273,15 +232,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public String getSessionNameById(long qaSessionId) throws QaApplicationException {
-	try {
-	    return qaSessionDAO.getSessionNameById(qaSessionId);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is getting session name: " + e.getMessage(),
-		    e);
-	}
-    }
-
     public List getSessionsFromContent(QaContent qaContent) throws QaApplicationException {
 	try {
 	    return qaSessionDAO.getSessionsFromContent(qaContent);
@@ -291,15 +241,25 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public void createQaQueUsr(QaQueUsr qaQueUsr) throws QaApplicationException {
+    public QaQueUsr createUser(Long toolSessionID) throws QaApplicationException {
 	try {
-	    qaQueUsrDAO.createUsr(qaQueUsr);
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    Long userId = toolUser.getUserID().longValue();
+	    String userName = toolUser.getLogin();
+	    String fullName = toolUser.getFirstName() + " " + toolUser.getLastName();
+	    QaSession qaSession = getSessionById(toolSessionID.longValue());
+
+	    QaQueUsr user = new QaQueUsr(userId, userName, fullName, qaSession, new TreeSet());
+	    qaQueUsrDAO.createUsr(user);
+	    
+	    return user;
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException("Exception occured when lams is creating qa QueUsr: " + e.getMessage(), e);
 	}
     }
 
-    public QaQueUsr getQaUserBySession(final Long queUsrId, final Long qaSessionId) throws QaApplicationException {
+    public QaQueUsr getUserByIdAndSession(final Long queUsrId, final Long qaSessionId) throws QaApplicationException {
 	try {
 	    return qaQueUsrDAO.getQaUserBySession(queUsrId, qaSessionId);
 	} catch (DataAccessException e) {
@@ -325,33 +285,13 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId)
+    public QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long qaQueContentId)
 	    throws QaApplicationException {
 	try {
-	    return qaUsrRespDAO.getAttemptsForUserAndQuestionContent(queUsrId, qaQueContentId);
+	    return qaUsrRespDAO.getResponseByUserAndQuestion(queUsrId, qaQueContentId);
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException(
 		    "Exception occured when lams is getting qa qaUsrRespDAO by user id and que content id: "
-			    + e.getMessage(), e);
-	}
-    }
-
-    public QaUsrResp getAttemptByUID(Long uid) throws QaApplicationException {
-	try {
-	    return qaUsrRespDAO.getAttemptByUID(uid);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is getting response by uid: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public void removeAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId)
-	    throws QaApplicationException {
-	try {
-	    qaUsrRespDAO.removeAttemptsForUserAndQuestionContent(queUsrId, qaQueContentId);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException(
-		    "Exception occured when lams is removing attempts by queUsrId and qaQueContentId: "
 			    + e.getMessage(), e);
 	}
     }
@@ -361,6 +301,38 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    qaUsrRespDAO.updateUserResponse(resp);
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException("Exception occured when lams is updating response" + e.getMessage(), e);
+	}
+    }
+    
+    public void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder) {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userId = new Long(toolUser.getUserID().longValue());
+	QaQueUsr user = getUserByIdAndSession(userId, new Long(toolSessionID));
+
+	QaSession session = getSessionById(new Long(toolSessionID));
+	QaContent qaContent = session.getQaContent();
+	//set content in use
+	if (!qaContent.isContentLocked()) {
+	    qaContent.setContentLocked(true);
+	    updateQa(qaContent);
+	}
+	
+	QaQuestion question = getQuestionByContentAndDisplayOrder(new Long(questionDisplayOrder),
+		qaContent.getUid());
+
+	QaUsrResp response = getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
+	// if response doesn't exist
+	if (response == null) {
+	    response = new QaUsrResp(newAnswer, new Date(System.currentTimeMillis()), "", question, user, true);
+	    createQaUsrResp(response);
+
+	// if answer has changed
+	} else if (!newAnswer.equals(response.getAnswer())) {
+	    response.setAnswer(newAnswer);
+	    response.setAttemptTime(new Date(System.currentTimeMillis()));
+	    response.setTimezone("");
+	    updateUserResponse(response);
 	}
     }
 
@@ -389,22 +361,12 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public QaUsrResp retrieveQaUsrResp(long responseId) throws QaApplicationException {
+    public QaUsrResp getResponseById(Long responseId) throws QaApplicationException {
 	try {
-	    QaUsrResp qaUsrResp = qaUsrRespDAO.retrieveQaUsrResp(responseId);
-	    return qaUsrResp;
+	    return qaUsrRespDAO.getResponseById(responseId);
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException("Exception occured when lams is loading qa qaUsrResp: " + e.getMessage(),
 		    e);
-	}
-
-    }
-
-    public void updateQaUsrResp(QaUsrResp qaUsrResp) throws QaApplicationException {
-	try {
-	    qaUsrRespDAO.updateUserResponse(qaUsrResp);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is updating qa UsrResp: " + e.getMessage(), e);
 	}
     }
 
@@ -417,24 +379,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public int countSessionComplete() throws QaApplicationException {
-	try {
-	    return qaSessionDAO.countSessionComplete();
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is counting complete sessions"
-		    + e.getMessage(), e);
-	}
-    }
-
-    public QaQueContent retrieveQaQue(long qaQueContentId) throws QaApplicationException {
-	try {
-	    return qaQueContentDAO.getQaQueById(qaQueContentId);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is loading qa question content: "
-		    + e.getMessage(), e);
-	}
-    }
-
     public QaSession retrieveQaSession(long qaSessionId) throws QaApplicationException {
 	try {
 	    return qaSessionDAO.getQaSessionById(qaSessionId);
@@ -443,9 +387,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public QaSession retrieveQaSessionOrNullById(long qaSessionId) throws QaApplicationException {
+    public QaSession getSessionById(long qaSessionId) throws QaApplicationException {
 	try {
-	    return qaSessionDAO.getQaSessionOrNullById(qaSessionId);
+	    return qaSessionDAO.getQaSessionById(qaSessionId);
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException("Exception occured when lams is loading qa session : " + e.getMessage(), e);
 	}
@@ -456,14 +400,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    return qaDAO.getQaBySession(new Long(qaSessionId));
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException("Exception occured when lams is loading qa: " + e.getMessage(), e);
-	}
-    }
-
-    public List retrieveQaQueContentsByToolContentId(long qaContentId) throws QaApplicationException {
-	try {
-	    return qaQueContentDAO.getQaQueContentsByContentId(qaContentId);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is loading qa que usr: " + e.getMessage(), e);
 	}
     }
 
@@ -485,33 +421,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public void deleteQa(QaContent qa) throws QaApplicationException {
-	try {
-	    qaDAO.deleteQa(qa);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is deleting" + " the qa content: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public void deleteQaById(Long qaId) throws QaApplicationException {
-	try {
-	    qaDAO.removeQaById(qaId);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is deleting" + " the qa content: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public void deleteQaSession(QaSession QaSession) throws QaApplicationException {
-	try {
-	    qaSessionDAO.deleteQaSession(QaSession);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is deleting" + " the qa session: "
-		    + e.getMessage(), e);
-	}
-    }
-
     public void removeUserResponse(QaUsrResp resp) throws QaApplicationException {
 	try {
 	    auditService.logChange(QaAppConstants.MY_SIGNATURE, resp.getQaQueUser().getQueUsrId(), resp.getQaQueUser()
@@ -527,7 +436,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      * logs hiding of a user entered vote
      */
     public void hideResponse(QaUsrResp qaUsrResp) throws QaApplicationException {
-	auditService.logHideEntry(QaAppConstants.MY_SIGNATURE, qaUsrResp.getQueUsrId(), qaUsrResp.getQaQueUser()
+	auditService.logHideEntry(QaAppConstants.MY_SIGNATURE, qaUsrResp.getQaQueUser().getQueUsrId(), qaUsrResp.getQaQueUser()
 		.getUsername(), qaUsrResp.getAnswer());
     }
 
@@ -535,26 +444,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      * logs showing of a user entered vote
      */
     public void showResponse(QaUsrResp qaUsrResp) throws QaApplicationException {
-	auditService.logShowEntry(QaAppConstants.MY_SIGNATURE, qaUsrResp.getQueUsrId(), qaUsrResp.getQaQueUser()
+	auditService.logShowEntry(QaAppConstants.MY_SIGNATURE, qaUsrResp.getQaQueUser().getQueUsrId(), qaUsrResp.getQaQueUser()
 		.getUsername(), qaUsrResp.getAnswer());
-    }
-
-    public void deleteUsrRespByQueId(Long qaQueId) throws QaApplicationException {
-	try {
-	    qaUsrRespDAO.removeUserResponseByQaQueId(qaQueId);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException(
-		    "Exception occured when lams is deleting" + " the resp: " + e.getMessage(), e);
-	}
-    }
-
-    public void deleteQaQueUsr(QaQueUsr qaQueUsr) throws QaApplicationException {
-	try {
-	    qaQueUsrDAO.deleteQaQueUsr(qaQueUsr);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException(
-		    "Exception occured when lams is deleting" + " the user: " + e.getMessage(), e);
-	}
     }
 
     public List retrieveQaUploadedFiles(QaContent qa) throws QaApplicationException {
@@ -575,151 +466,58 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public int countTotalNumberOfUserResponsed(QaContent qa) throws QaApplicationException {
-	try {
-	    return qaDAO.countUserResponsed(qa);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured in [countTotalNumberOfUserResponsed]: "
-		    + e.getMessage(), e);
-	}
-    }
-
     public List getAllQuestionEntries(final Long uid) throws QaApplicationException {
 	try {
-	    return qaQueContentDAO.getAllQuestionEntries(uid.longValue());
+	    return qaQuestionDAO.getAllQuestionEntries(uid.longValue());
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException("Exception occured when lams is getting by uid  qa question content: "
 		    + e.getMessage(), e);
 	}
     }
 
-    public List getAllQuestionEntriesSorted(final long qaContentId) throws QaApplicationException {
+    public List getAllQuestionEntriesSorted(final long contentUid) throws QaApplicationException {
 	try {
-	    return qaQueContentDAO.getAllQuestionEntriesSorted(qaContentId);
+	    return qaQuestionDAO.getAllQuestionEntriesSorted(contentUid);
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException("Exception occured when lams is getting all question entries: "
 		    + e.getMessage(), e);
 	}
     }
 
-    public void removeQaQueContent(QaQueContent qaQueContent) throws QaApplicationException {
+    public void removeQaQueContent(QaQuestion qaQuestion) throws QaApplicationException {
 	try {
-	    qaQueContentDAO.removeQaQueContent(qaQueContent);
+	    qaQuestionDAO.removeQaQueContent(qaQuestion);
 	} catch (DataAccessException e) {
 	    throw new QaApplicationException("Exception occured when lams is removing question content: "
 		    + e.getMessage(), e);
 	}
     }
 
-    public User getCurrentUserData(String username) throws QaApplicationException {
-	try {
-	    QaServicePOJO.logger.debug("getCurrentUserData: " + username);
-	    /*
-	     * this will return null if the username not found
-	     */
-	    User user = userManagementService.getUserByLogin(username);
-	    if (user == null) {
-		QaServicePOJO.logger.debug("No user with the username: " + username + " exists.");
-		throw new QaApplicationException("No user with that username exists.");
-	    }
-	    return user;
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Unable to find current user information" + " Root Cause: ["
-		    + e.getMessage() + "]", e);
-	}
-    }
-
-    public void saveQaContent(QaContent qa) throws QaApplicationException {
-	try {
-	    qaDAO.saveQa(qa);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is saving" + " the qa content: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public QaQueUsr retrieveQaQueUsr(long qaQaQueUsrId) throws QaApplicationException {
-	try {
-	    return qaQueUsrDAO.getQaQueUsrById(qaQaQueUsrId);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is loading qa que usr: " + e.getMessage(), e);
-	}
-    }
-
-    public int countSessionUser(QaSession qaSession) throws QaApplicationException {
-	try {
-	    return qaQueUsrDAO.countSessionUser(qaSession);
-	} catch (DataAccessException e) {
-	    throw new QaApplicationException("Exception occured when lams is counting users in  the session "
-		    + e.getMessage(), e);
-	}
-    }
-
     /**
-     * checks the paramter content in the user responses table boolean studentActivityOccurredGlobal(QaContent
-     * qaContent) throws QaApplicationException
+     * checks the paramter content in the user responses table 
      * 
      * @param qa
      * @return boolean
      * @throws QaApplicationException
      */
-    public boolean studentActivityOccurredGlobal(QaContent qaContent) throws QaApplicationException {
+    public boolean isStudentActivityOccurredGlobal(QaContent qaContent) throws QaApplicationException {
+	int countResponses = 0;
 	if (qaContent != null) {
-	    Iterator questionIterator = qaContent.getQaQueContents().iterator();
-	    while (questionIterator.hasNext()) {
-		QaQueContent qaQueContent = (QaQueContent) questionIterator.next();
-		Iterator responsesIterator = qaQueContent.getQaUsrResps().iterator();
-		while (responsesIterator.hasNext()) {
-		    return true;
-		}
-	    }
+	    countResponses = qaUsrRespDAO.getCountResponsesByQaContent(qaContent.getQaContentId());
 	}
-	return false;
+	return countResponses > 0;
     }
 
     /**
-     * counts the number of sessions marked INCOMPLETE for a content int countIncompleteSession(QaContent qa) throws
-     * QaApplicationException
+     * gets called ONLY when a lesson is being created in monitoring mode.
+     * Should create the new content(toContent) based on what the author has
+     * created her content with. In q/a tool's case that is content + question's
+     * content but not user responses. The deep copy should go only as far as
+     * default content (or author created content) already goes.
+     * ToolContentManager CONTRACT
      * 
-     * @param qa
-     * @return int
-     * @throws QaApplicationException
-     */
-    public int countIncompleteSession(QaContent qa) throws QaApplicationException {
-	QaServicePOJO.logger.debug("qaContentId: " + qa.getQaContentId());
-	int countIncompleteSession = qaSessionDAO.countSessionIncomplete();
-	QaServicePOJO.logger.debug("countIncompleteSession: " + countIncompleteSession);
-	return countIncompleteSession;
-    }
-
-    /**
-     * checks the parameter content in the tool sessions table. find out if any student has ever used (logged in through
-     * the url and replied) to this content return true even if you have only one content passed as parameter referenced
-     * in the tool sessions table
-     * 
-     * boolean studentActivityOccurred(QaContent qa) throws QaApplicationException
-     * 
-     * @param qa
-     * @return boolean
-     * @throws QaApplicationException
-     */
-    public boolean studentActivityOccurred(QaContent qa) throws QaApplicationException {
-	QaServicePOJO.logger.debug("qaContentId: " + qa.getQaContentId());
-	int countStudentActivity = qaSessionDAO.studentActivityOccurred(qa);
-	QaServicePOJO.logger.debug("countIncompleteSession: " + countStudentActivity);
-	if (countStudentActivity > 0) {
-	    return true;
-	}
-	return false;
-    }
-
-    /**
-     * gets called ONLY when a lesson is being created in monitoring mode. Should create the new content(toContent)
-     * based on what the author has created her content with. In q/a tool's case that is content + question's content
-     * but not user responses. The deep copy should go only as far as default content (or author created content)
-     * already goes. ToolContentManager CONTRACT
-     * 
-     * similar to public void removeToolContent(Long toolContentID) gets called by Container+Flash
+     * similar to public void removeToolContent(Long toolContentID) gets called
+     * by Container+Flash
      * 
      */
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException
@@ -750,7 +548,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	QaServicePOJO.logger.debug("final - copyToolContent using ids: " + fromContentId + " and " + toContentId);
 
 	try {
-	    QaContent fromContent = qaDAO.loadQaById(fromContentId.longValue());
+	    QaContent fromContent = qaDAO.getQaByContentId(fromContentId.longValue());
 
 	    if (fromContent == null) {
 		QaServicePOJO.logger.debug("fromContent is null.");
@@ -766,7 +564,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 			    + QaAppConstants.MY_SIGNATURE + " Can't continue!");
 		}
 
-		fromContent = qaDAO.loadQaById(fromContentId.longValue());
+		fromContent = qaDAO.getQaByContentId(fromContentId.longValue());
 	    }
 	    if (fromContentId.equals(defaultContentId) && fromContent != null && fromContent.getConditions().isEmpty()) {
 		fromContent.getConditions().add(
@@ -793,64 +591,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * setAsForceCompleteSession(Long toolSessionId) throws QaApplicationException update the tool session status to
-     * COMPLETE for this tool session
-     * 
-     * @param Long
-     *                toolSessionId
-     */
-    public void setAsForceCompleteSession(Long toolSessionId) throws QaApplicationException {
-	QaServicePOJO.logger
-		.debug("Request for setAsForceCompleteSession has come for toolSessionId: " + toolSessionId);
-
-	QaSession qaSession = retrieveQaSessionOrNullById(toolSessionId.longValue());
-	qaSession.setSession_status(QaSession.COMPLETED);
-	updateQaSession(qaSession);
-	QaServicePOJO.logger.debug("updated  qaSession to COMPLETED : ");
-    }
-
-    /**
-     * setAsForceComplete(Long userId) throws QaApplicationException update the tool session status to COMPLETE for this
-     * user
-     * 
-     * @param userId
-     */
-    public void setAsForceComplete(Long userId) throws QaApplicationException {
-	QaServicePOJO.logger.debug("request for setAsForceComplete has come for userId: " + userId);
-	QaQueUsr qaQueUsr = loadQaQueUsr(userId);
-
-	if (qaQueUsr != null) {
-	    QaSession qaSession = qaQueUsr.getQaSession();
-	    if (qaSession != null) {
-		Long usersToolSessionId = qaSession.getQaSessionId();
-		QaServicePOJO.logger.debug("retrieved  tool session has tool session id : " + usersToolSessionId);
-
-		qaSession = retrieveQaSessionOrNullById(usersToolSessionId.longValue());
-		qaSession.setSession_status(QaSession.COMPLETED);
-		updateQaSession(qaSession);
-		QaServicePOJO.logger.debug("updated  qaSession to COMPLETED");
-		QaContent qaContent = qaSession.getQaContent();
-		QaServicePOJO.logger.debug("qaSession uses qaContentId : " + qaContent.getQaContentId());
-
-		int countIncompleteSession = countIncompleteSession(qaContent);
-		QaServicePOJO.logger.debug("qaSession countIncompleteSession : " + countIncompleteSession);
-
-		if (countIncompleteSession == 0) {
-		    qaContent.setContentLocked(false);
-		    updateQa(qaContent);
-		}
-	    } else {
-		QaServicePOJO.logger.debug("WARNING!: retrieved qaSession is null.");
-		throw new QaApplicationException("Fail to setAsForceComplete" + " based on null qaSession.");
-	    }
-	} else {
-	    QaServicePOJO.logger.debug("WARNING!: retrieved qaQueUsr is null.");
-	    throw new QaApplicationException("Fail to setAsForceComplete" + " based on null qaQueUsr.");
-	}
-    }
-
-    /**
-     * setAsDefineLater(Long toolContentID) throws DataMissingException, ToolException
+     * setAsDefineLater(Long toolContentID) throws DataMissingException,
+     * ToolException
      * 
      * @param toolContentID
      *                return void
@@ -861,7 +603,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    QaServicePOJO.logger.debug("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
 	    throw new DataMissingException("toolContentID is missing");
 	}
-	QaContent qaContent = qaDAO.loadQaById(toolContentID.longValue());
+	QaContent qaContent = qaDAO.getQaByContentId(toolContentID.longValue());
 	if (qaContent == null) {
 	    QaServicePOJO.logger.debug("throwing DataMissingException: WARNING!: retrieved qaContent is null.");
 	    throw new DataMissingException("qaContent is missing");
@@ -883,7 +625,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    QaServicePOJO.logger.debug("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
 	    throw new DataMissingException("toolContentID is missing");
 	}
-	QaContent qaContent = qaDAO.loadQaById(toolContentID.longValue());
+	QaContent qaContent = qaDAO.getQaByContentId(toolContentID.longValue());
 	if (qaContent == null) {
 	    QaServicePOJO.logger.debug("throwing DataMissingException: WARNING!: retrieved qaContent is null.");
 	    throw new DataMissingException("qaContent is missing");
@@ -893,83 +635,18 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * 
-     * removeToolContent(Long toolContentID) gets automatically called only in monitoring mode when the author chooses
-     * to delete a lesson.
-     * 
-     * The idea is to remove content + its relevant sessions + in q/a tools's case the question's content from the db.
-     * ToolContentManager CONTRACT this gets called automatically by Flash when a deletion is detected in the tool
-     * interface.
-     */
-    public void removeToolContent(Long toolContentID) {
-	QaServicePOJO.logger.debug("start of removeToolContent with toolContentID: " + toolContentID);
-
-	QaContent qaContent = qaDAO.loadQaById(toolContentID.longValue());
-
-	if (qaContent != null) {
-	    Iterator sessionIterator = qaContent.getQaSessions().iterator();
-	    while (sessionIterator.hasNext()) {
-		QaSession qaSession = (QaSession) sessionIterator.next();
-
-		Iterator sessionUsersIterator = qaSession.getQaQueUsers().iterator();
-		while (sessionUsersIterator.hasNext()) {
-		    QaQueUsr qaQueUsr = (QaQueUsr) sessionUsersIterator.next();
-
-		    Iterator sessionUsersResponsesIterator = qaQueUsr.getQaUsrResps().iterator();
-		    while (sessionUsersResponsesIterator.hasNext()) {
-			QaUsrResp qaUsrResp = (QaUsrResp) sessionUsersResponsesIterator.next();
-			removeUserResponse(qaUsrResp);
-			QaServicePOJO.logger.debug("removed qaUsrResp : " + qaUsrResp.getQueUsrId());
-		    }
-		}
-	    }
-
-	    QaServicePOJO.logger.debug("removed all existing responses of toolContent with toolContentID:"
-		    + toolContentID);
-	    qaDAO.removeQa(toolContentID);
-	}
-    }
-
-    public void removeQuestions(Long toolContentID) throws QaApplicationException {
-	QaContent qaContent = qaDAO.loadQaById(toolContentID.longValue());
-	qaContent.setQaQueContents(new TreeSet());
-
-	if (qaContent != null) {
-	    Iterator sessionIterator = qaContent.getQaSessions().iterator();
-	    while (sessionIterator.hasNext()) {
-		QaSession qaSession = (QaSession) sessionIterator.next();
-
-		Iterator sessionUsersIterator = qaSession.getQaQueUsers().iterator();
-		while (sessionUsersIterator.hasNext()) {
-		    QaQueUsr qaQueUsr = (QaQueUsr) sessionUsersIterator.next();
-
-		    Iterator sessionUsersResponsesIterator = qaQueUsr.getQaUsrResps().iterator();
-		    while (sessionUsersResponsesIterator.hasNext()) {
-			QaUsrResp qaUsrResp = (QaUsrResp) sessionUsersResponsesIterator.next();
-			removeUserResponse(qaUsrResp);
-		    }
-		}
-	    }
-	}
-    }
-
-    /**
-     * removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException, ToolException
-     * Will need an update on the core tool signature: reason : when qaContent is null throw an exception
+     * removeToolContent(Long toolContentID, boolean removeSessionData) throws
+     * SessionDataExistsException, ToolException Will need an update on the core
+     * tool signature: reason : when qaContent is null throw an exception
      * 
      */
     public void removeToolContent(Long toolContentID, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
-	QaServicePOJO.logger.debug("start of: removeToolContent(Long toolContentID, boolean removeSessionData");
-	QaServicePOJO.logger.debug("start of removeToolContent with toolContentID: " + toolContentID
-		+ "removeSessionData: " + removeSessionData);
-
 	if (toolContentID == null) {
-	    QaServicePOJO.logger.debug("toolContentID is null");
 	    throw new ToolException("toolContentID is missing");
 	}
 
-	QaContent qaContent = qaDAO.loadQaById(toolContentID.longValue());
+	QaContent qaContent = qaDAO.getQaByContentId(toolContentID.longValue());
 
 	if (qaContent != null) {
 	    Iterator sessionIterator = qaContent.getQaSessions().iterator();
@@ -989,13 +666,11 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		    while (sessionUsersResponsesIterator.hasNext()) {
 			QaUsrResp qaUsrResp = (QaUsrResp) sessionUsersResponsesIterator.next();
 			removeUserResponse(qaUsrResp);
-			QaServicePOJO.logger.debug("removed qaUsrResp : " + qaUsrResp.getResponseId());
 		    }
 		}
 	    }
 
-	    QaServicePOJO.logger.debug("removed all existing responses of toolContent with toolContentID:"
-		    + toolContentID);
+	    //removed all existing responses of toolContent with toolContentID
 	    qaDAO.removeQa(toolContentID);
 	} else {
 	    QaServicePOJO.logger.debug("Warning!!!, We should have not come here. qaContent is null.");
@@ -1004,9 +679,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
     
     public AverageRatingDTO rateResponse(Long responseId, Long userId, Long toolSessionID, float rating) {
-	QaQueUsr imageGalleryUser = this.getQaUserBySession(userId, toolSessionID);
+	QaQueUsr imageGalleryUser = this.getUserByIdAndSession(userId, toolSessionID);
 	ResponseRating responseRating = qaResponseRatingDAO.getRatingByResponseAndUser(responseId, userId);
-	QaUsrResp response = qaUsrRespDAO.getAttemptByUID(responseId);	
+	QaUsrResp response = qaUsrRespDAO.getResponseById(responseId);	
 
 	//persist ResponseRating changes in DB
 	if (responseRating == null) { // add
@@ -1035,10 +710,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      */
 
     public void exportToolContent(Long toolContentID, String rootPath) throws DataMissingException, ToolException {
-	QaContent toolContentObj = qaDAO.getQaById(toolContentID);
+	QaContent toolContentObj = qaDAO.getQaByContentId(toolContentID);
 	if (toolContentObj == null) {
 	    long defaultToolContentId = toolService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
-	    toolContentObj = retrieveQa(defaultToolContentId);
+	    toolContentObj = getQa(defaultToolContentId);
 	    if (toolContentObj != null && toolContentObj.getConditions().isEmpty()) {
 		toolContentObj.getConditions().add(
 			getQaOutputFactory().createDefaultComplexUserAnswersCondition(toolContentObj));
@@ -1055,12 +730,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
 	    // don't export following fields value
 	    toolContentObj.setQaSessions(null);
-	    Set<QaQueContent> questions = toolContentObj.getQaQueContents();
-	    for (QaQueContent question : questions) {
+	    Set<QaQuestion> questions = toolContentObj.getQaQuestions();
+	    for (QaQuestion question : questions) {
 		question.setQaQueUsers(null);
 		question.setQaContent(null);
-		question.setQaUsrResps(null);
-		question.setUserResponses(null);
 	    }
 	    Set<QaUploadedFile> files = toolContentObj.getQaUploadedFiles();
 	    for (QaUploadedFile file : files) {
@@ -1106,8 +779,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    toolContentObj.setCreatedBy(newUserUid);
 
 	    // set back the tool content
-	    Set<QaQueContent> questions = toolContentObj.getQaQueContents();
-	    for (QaQueContent question : questions) {
+	    Set<QaQuestion> questions = toolContentObj.getQaQuestions();
+	    for (QaQuestion question : questions) {
 		question.setQaContent(toolContentObj);
 	    }
 	    Set<QaUploadedFile> files = toolContentObj.getQaUploadedFiles();
@@ -1130,10 +803,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException {
-	QaContent qaContent = qaDAO.getQaById(toolContentId);
+	QaContent qaContent = qaDAO.getQaByContentId(toolContentId);
 	if (qaContent == null) {
 	    long defaultToolContentId = toolService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
-	    qaContent = retrieveQa(defaultToolContentId);
+	    qaContent = getQa(defaultToolContentId);
 	    if (qaContent != null && qaContent.getConditions().isEmpty()) {
 		qaContent.getConditions().add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(qaContent));
 	    }
@@ -1150,7 +823,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      */
     protected boolean existsSession(long toolSessionId) {
 	QaServicePOJO.logger.debug("toolSessionId: " + toolSessionId);
-	QaSession qaSession = retrieveQaSessionOrNullById(toolSessionId);
+	QaSession qaSession = getSessionById(toolSessionId);
 	QaServicePOJO.logger.debug("qaSession: " + qaSession);
 
 	if (qaSession == null) {
@@ -1197,7 +870,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
 	QaServicePOJO.logger.debug("final toolSessionId and toolContentID: " + toolSessionId + " " + toolContentID);
 
-	QaContent qaContent = qaDAO.loadQaById(toolContentID.longValue());
+	QaContent qaContent = qaDAO.getQaByContentId(toolContentID.longValue());
 
 	if (qaContent == null) {
 	    QaServicePOJO.logger.debug("qaContent is null.");
@@ -1215,7 +888,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 			+ QaAppConstants.MY_SIGNATURE + " Can't continue!");
 	    }
 
-	    qaContent = qaDAO.loadQaById(toolContentID.longValue());
+	    qaContent = qaDAO.getQaByContentId(toolContentID.longValue());
 	    if (qaContent.getConditions().isEmpty()) {
 		qaContent.getConditions().add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(qaContent));
 	    }
@@ -1245,7 +918,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
 	QaSession qaSession = null;
 	try {
-	    qaSession = retrieveQaSessionOrNullById(toolSessionId.longValue());
+	    qaSession = getSessionById(toolSessionId.longValue());
 	} catch (QaApplicationException e) {
 	    throw new DataMissingException("error retrieving qaSession: " + e);
 	} catch (Exception e) {
@@ -1259,7 +932,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
 	try {
 	    qaSessionDAO.deleteQaSession(qaSession);
-	    QaServicePOJO.logger.debug("qaSession " + qaSession.getUid() + " has been deleted successfully.");
+	    QaServicePOJO.logger.debug("qaSession " + qaSession.getQaSessionId() + " has been deleted successfully.");
 	} catch (QaApplicationException e) {
 	    throw new ToolException("error deleting qaSession:" + e);
 	}
@@ -1286,11 +959,11 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    throw new DataMissingException("learnerId is missing");
 	}
 
-	QaSession qaSession = retrieveQaSessionOrNullById(toolSessionId.longValue());
+	QaSession qaSession = getSessionById(toolSessionId.longValue());
 	qaSession.setSession_end_date(new Date(System.currentTimeMillis()));
 	qaSession.setSession_status(QaAppConstants.COMPLETED);
 	updateQaSession(qaSession);
-	QaServicePOJO.logger.debug("tool session has been marked COMPLETE: " + qaSession.getUid());
+	QaServicePOJO.logger.debug("tool session has been marked COMPLETE: " + qaSession.getQaSessionId());
 
 	try {
 	    String nextUrl = learnerService.completeToolSession(toolSessionId, learnerId);
@@ -1353,17 +1026,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	QaServicePOJO.logger.debug("tool default contentId : " + contentId);
 	return contentId;
-    }
-
-    public QaQueContent getToolDefaultQuestionContent(long contentId) throws QaApplicationException {
-	QaServicePOJO.logger.debug("before attempting retrieving QaQueContent with contentId : " + contentId);
-	QaQueContent qaQueContent = qaQueContentDAO.getToolDefaultQuestionContent(contentId);
-	return qaQueContent;
-    }
-
-    public List getToolSessionsForContent(QaContent qa) {
-	List listToolSessionIds = qaSessionDAO.getToolSessionsForContent(qa);
-	return listToolSessionIds;
     }
 
     /**
@@ -1524,10 +1186,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     /**
-     * @return Returns the qaQueContentDAO.
+     * @return Returns the qaQuestionDAO.
      */
-    public IQaQueContentDAO getQaQueContentDAO() {
-	return qaQueContentDAO;
+    public IQaQuestionDAO getQaQuestionDAO() {
+	return qaQuestionDAO;
     }
 
     /**
@@ -1563,8 +1225,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	this.qaDAO = qaDAO;
     }
 
-    public void setQaQueContentDAO(IQaQueContentDAO qaQueContentDAO) {
-	this.qaQueContentDAO = qaQueContentDAO;
+    public void setQaQuestionDAO(IQaQuestionDAO qaQuestionDAO) {
+	this.qaQuestionDAO = qaQuestionDAO;
     }
 
     public void setQaSessionDAO(IQaSessionDAO qaSessionDAO) {
@@ -1717,12 +1379,12 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	// setQaSessions(Set qaSessions);
 
 	// set up question from body
-	QaQueContent question = new QaQueContent();
+	QaQuestion question = new QaQuestion();
 	String content = WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY));
 	question.setQuestion(content);
 	question.setDisplayOrder(1);
 	question.setQaContent(toolContentObj);
-	toolContentObj.getQaQueContents().add(question);
+	toolContentObj.getQaQuestions().add(question);
 
 	qaDAO.saveOrUpdateQa(toolContentObj);
 
@@ -1736,7 +1398,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
 	QaContent qaContent = null;
 	if (toolContentId != null) {
-	    qaContent = loadQa(toolContentId.longValue());
+	    qaContent = getQa(toolContentId.longValue());
 	}
 	if (qaContent == null) {
 	    throw new DataMissingException("Unable to set reflective data titled " + title
@@ -1792,10 +1454,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     public QaContent getQaContentBySessionId(Long sessionId) {
-	QaSession session = qaSessionDAO.getQaSessionOrNullById(sessionId);
+	QaSession session = qaSessionDAO.getQaSessionById(sessionId);
 	// to skip CGLib problem
 	Long contentId = session.getQaContent().getQaContentId();
-	QaContent qaContent = qaDAO.getQaById(contentId);
+	QaContent qaContent = qaDAO.getQaByContentId(contentId);
 	return qaContent;
     }
 

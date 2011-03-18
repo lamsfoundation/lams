@@ -80,7 +80,7 @@
 
    <many-to-one
             name="qaQueContent"
-            class="org.lamsfoundation.lams.tool.qa.QaQueContent"
+            class="org.lamsfoundation.lams.tool.qa.QaQuestion"
             not-null="true"            
             cascade="none"
             outer-join="auto"

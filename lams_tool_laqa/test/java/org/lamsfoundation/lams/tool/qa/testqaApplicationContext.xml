@@ -78,7 +78,7 @@
 		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
 	</bean>
 	
-	<bean id="qaQueContentDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQueContentDAO">
+	<bean id="qaQueContentDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQuestionDAO">
 		<property name="sessionFactory"><ref local="qaSessionFactory"/></property>
 	</bean>
 	

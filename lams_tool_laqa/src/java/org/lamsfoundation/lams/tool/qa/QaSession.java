@@ -75,9 +75,6 @@ public class QaSession implements Serializable, Comparable, Nullable {
     /** persistent field */
     private Set qaQueUsers;
 
-    /** persistent field */
-    private Long qaContentId;
-
     public QaSession() {
     };
 
@@ -183,14 +180,6 @@ public class QaSession implements Serializable, Comparable, Nullable {
 
     public boolean isNull() {
 	return false;
-    }
-
-    public Long getQaContentId() {
-	return qaContentId;
-    }
-
-    public void setQaContentId(Long qaContentId) {
-	this.qaContentId = qaContentId;
     }
 
     public Long getUid() {

@@ -26,14 +26,6 @@
     </property>
     
     <property
-            name="hidden"
-            type="boolean"
-            access="property"
-            column="hidden"
-   >
-   </property>
-    
-    <property
         name="attemptTime"
         type="java.util.Date"
         column="attempt_time"
@@ -57,30 +49,9 @@
     >
     </property>
 
-
-    <property
-        name="queUsrId"
-        type="java.lang.Long"
-        column="que_usr_id"
-        update="false"
-        insert="false"
-    >
-    </property>
-
-
-    <property
-        name="qaQueContentId"
-        type="java.lang.Long"
-        column="qa_que_content_id"
-        update="false"
-        insert="false"
-    >
-    </property>
-
-
    <many-to-one
-            name="qaQueContent"
-            class="org.lamsfoundation.lams.tool.qa.QaQueContent"
+            name="qaQuestion"
+            class="org.lamsfoundation.lams.tool.qa.QaQuestion"
             not-null="true"            
             cascade="none"
             outer-join="auto"

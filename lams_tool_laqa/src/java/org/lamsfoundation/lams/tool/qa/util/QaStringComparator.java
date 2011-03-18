@@ -20,55 +20,33 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.util;
+
+import java.io.Serializable;
+import java.util.Comparator;
+
+import org.apache.log4j.Logger;
 
 /**
- * <p>
- * This exception wraps all basic exception occured in the q/a tool. It is not
- * suppose to be try and catched in any level. The struts should be taking care
- * of handling this exception.
- * </p>
- * 
  * @author Ozgur Demirtas
  * 
+ * A comparator implementation that can be used as a constructor to collections.
+ * The TreeMap in the web layer makes use of it.
+ * 
  */
-public class QaApplicationException extends RuntimeException {
-    /**
-     * Default Constructor
-     */
-    public QaApplicationException() {
-	super();
+public class QaStringComparator implements Comparator, Serializable {
+    static Logger logger = Logger.getLogger(QaStringComparator.class.getName());
+
+    public int compare(Object o1, Object o2) {
+	String s1 = (String) o1;
+	String s2 = (String) o2;
+
+	return s1.compareTo(s2);
     }
 
-    /**
-     * Constructor for customized error message
-     * 
-     * @param message
-     */
-    public QaApplicationException(String message) {
-	super(message);
+    public boolean equals(Object o) {
+	String s = (String) o;
+	return compare(this, o) == 0;
     }
-
-    /**
-     * Constructor for wrapping the throwable object
-     * 
-     * @param cause
-     */
-    public QaApplicationException(Throwable cause) {
-	super(cause);
-    }
-
-    /**
-     * Constructor for wrapping both the customized error message and throwable
-     * exception object.
-     * 
-     * @param message
-     * @param cause
-     */
-    public QaApplicationException(String message, Throwable cause) {
-	super(message, cause);
-    }
-
 }

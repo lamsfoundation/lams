@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.util;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -35,8 +35,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.qa.QaAppConstants;
+import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaSession;
+import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
+import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
-import org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm;
+import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -45,19 +50,12 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * @author Ozgur Demirtas
  * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
- */
-
-/**
  * Common utility functions live here.
  */
 public abstract class QaUtils implements QaAppConstants {
     static Logger logger = Logger.getLogger(QaUtils.class.getName());
 
     /**
-     * setDefaultSessionAttributes(HttpServletRequest request, QaContent
-     * defaultQaContent, QaAuthoringForm qaAuthoringForm)
      * 
      * @param request
      * @param defaultQaContent
@@ -162,7 +160,7 @@ public abstract class QaUtils implements QaAppConstants {
      *         db
      */
     public static boolean existsContent(long toolContentID, IQaService qaService) {
-	QaContent qaContent = qaService.loadQa(toolContentID);
+	QaContent qaContent = qaService.getQa(toolContentID);
 	if (qaContent == null)
 	    return false;
 
@@ -178,7 +176,7 @@ public abstract class QaUtils implements QaAppConstants {
      */
     public static boolean existsSession(long toolContentID, IQaService qaService) {
 	logger.debug("existsSession");
-	QaSession qaSession = qaService.retrieveQaSessionOrNullById(toolContentID);
+	QaSession qaSession = qaService.getSessionById(toolContentID);
 	
 
 	if (qaSession == null)
@@ -189,14 +187,6 @@ public abstract class QaUtils implements QaAppConstants {
 
     public static String getFormattedDateString(Date date) {
 	return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
-    }
-
-    public static void configureContentRepository(HttpServletRequest request, IQaService qaService) {
-	logger.debug("attempt configureContentRepository");
-	
-	logger.debug("calling configureContentRepository()");
-	qaService.configureContentRepository();
-	logger.debug("configureContentRepository ran successfully");
     }
 
     /**
@@ -258,19 +248,6 @@ public abstract class QaUtils implements QaAppConstants {
     }
 
     /**
-     * find out if the content is set to run offline or online. If it is set to
-     * run offline , the learners are informed about that..
-     * isRubnOffline(QaContent qaContent)
-     * 
-     * @param qaContent
-     * @return boolean
-     */
-    public static boolean isRunOffline(QaContent qaContent) {
-	logger.debug("is run offline: " + qaContent.isRunOffline());
-	return qaContent.isRunOffline();
-    }
-
-    /**
      * builds a String based map from a list convertToMap(List sessionsList)
      * 
      * @param sessionsList
@@ -278,29 +255,21 @@ public abstract class QaUtils implements QaAppConstants {
      */
     public static Map convertToStringMap(List sessionsList, String listType) {
 	Map map = new TreeMap(new QaComparator());
-	logger.debug("listType: " + listType);
 
 	Iterator listIterator = sessionsList.iterator();
 	Long mapIndex = new Long(1);
 
 	while (listIterator.hasNext()) {
 	    if (listType.equals("String")) {
-		logger.debug("listType String");
 		String text = (String) listIterator.next();
 		map.put(mapIndex.toString(), text);
 	    } else if (listType.equals("Long")) {
-		logger.debug("listType Long");
 		Long LongValue = (Long) listIterator.next();
 		map.put(mapIndex.toString(), LongValue.toString());
 	    }
 	    mapIndex = new Long(mapIndex.longValue() + 1);
 	}
 	return map;
-    }
-
-    public static boolean isContentInUse(QaContent qaContent) {
-	logger.debug("is content inuse: " + qaContent.isContentLocked());
-	return qaContent.isContentLocked();
     }
 
     /**
@@ -465,7 +434,7 @@ public abstract class QaUtils implements QaAppConstants {
 	logger.debug("value:" + value);
 	logger.debug("strToolContentID:" + strToolContentID);
 
-	QaContent qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
+	QaContent qaContent = qaService.getQa(new Long(strToolContentID).longValue());
 	
 	if (qaContent != null) {
 	    qaContent.setDefineLater(value);
@@ -501,7 +470,7 @@ public abstract class QaUtils implements QaAppConstants {
 	
 	logger.debug("toolContentID:" + toolContentID);
 
-	QaContent qaContent = qaService.loadQa(new Long(toolContentID).longValue());
+	QaContent qaContent = qaService.getQa(new Long(toolContentID).longValue());
 	
 	if (qaContent != null) {
 	    qaContent.setDefineLater(value);
@@ -523,37 +492,6 @@ public abstract class QaUtils implements QaAppConstants {
 	    }
 	}
 	return userID;
-    }
-
-    public static UserDTO getToolUser() {
-	/*obtain user object from the session*/
-	HttpSession ss = SessionManager.getSession();
-	/* get back login user DTO */
-	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	
-	return toolUser;
-    }
-
-    public static Long getUserId() {
-	UserDTO toolUser = getToolUser();
-	long userId = toolUser.getUserID().longValue();
-	logger.debug("userId: " + userId);
-	return new Long(userId);
-    }
-
-    public static String getUserName() {
-	/* double check if username and login is the same */
-	UserDTO toolUser = getToolUser();
-	String userName = toolUser.getLogin();
-	logger.debug("userName: " + userName);
-	return userName;
-    }
-
-    public static String getUserFullName() {
-	UserDTO toolUser = getToolUser();
-	String fullName = toolUser.getFirstName() + " " + toolUser.getLastName();
-	logger.debug("fullName: " + fullName);
-	return fullName;
     }
 
 }

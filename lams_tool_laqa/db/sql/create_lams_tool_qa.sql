@@ -66,7 +66,6 @@ CREATE TABLE tl_laqa11_que_content (
 
 CREATE TABLE tl_laqa11_usr_resp (
        response_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , hidden TINYINT(1) DEFAULT 0
      , answer TEXT
      , time_zone VARCHAR(255)
      , attempt_time DATETIME

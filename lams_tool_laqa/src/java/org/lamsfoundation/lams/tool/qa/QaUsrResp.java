@@ -25,8 +25,6 @@ package org.lamsfoundation.lams.tool.qa;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -52,21 +50,12 @@ public class QaUsrResp implements Serializable, Comparable {
     private String answer;
 
     /** nullable persistent field */
-    private boolean hidden;
-
-    /** nullable persistent field */
     private Date attemptTime;
 
     /** nullable persistent field */
-    private QaQueContent qaQueContent;
+    private QaQuestion qaQuestion;
 
     private boolean visible;
-
-    /** nullable persistent field */
-    private Long qaQueContentId; //added to enable deletion by the resp dao
-
-    /** nullable persistent field */
-    private Long queUsrId; //added to enable deletion by the resp dao
 
     /** nullable persistent field */
     private QaQueUsr qaQueUser;
@@ -75,52 +64,33 @@ public class QaUsrResp implements Serializable, Comparable {
     private String timezone;
 
     /** full constructor */
-    public QaUsrResp(Long responseId, String answer, boolean hidden, Date attemptTime, String timezone,
-	    QaQueContent qaQueContent, QaQueUsr qaQueUser) {
+    public QaUsrResp(Long responseId, String answer, Date attemptTime, String timezone,
+	    QaQuestion qaQuestion, QaQueUsr qaQueUser) {
 	this.responseId = responseId;
 	this.answer = answer;
-	this.hidden = hidden;
 	this.attemptTime = attemptTime;
 	this.timezone = timezone;
-	this.qaQueContent = qaQueContent;
+	this.qaQuestion = qaQuestion;
 	this.qaQueUser = qaQueUser;
     }
 
-    public QaUsrResp(String answer, boolean hidden, Date attemptTime, String timezone, QaQueContent qaQueContent,
+    public QaUsrResp(String answer, Date attemptTime, String timezone, QaQuestion qaQuestion,
 	    QaQueUsr qaQueUser) {
 	this.answer = answer;
-	this.hidden = hidden;
 	this.attemptTime = attemptTime;
 	this.timezone = timezone;
-	this.qaQueContent = qaQueContent;
+	this.qaQuestion = qaQuestion;
 	this.qaQueUser = qaQueUser;
     }
 
-    public QaUsrResp(String answer, boolean hidden, Date attemptTime, String timezone, QaQueContent qaQueContent,
+    public QaUsrResp(String answer, Date attemptTime, String timezone, QaQuestion qaQuestion,
 	    QaQueUsr qaQueUser, boolean visible) {
 	this.answer = answer;
-	this.hidden = hidden;
 	this.attemptTime = attemptTime;
 	this.timezone = timezone;
-	this.qaQueContent = qaQueContent;
+	this.qaQuestion = qaQuestion;
 	this.qaQueUser = qaQueUser;
 	this.visible = visible;
-    }
-
-    public QaUsrResp(String answer, boolean hidden, Date attemptTime, String timezone, QaQueContent qaQueContent,
-	    Long qaQueUsrUid) {
-	this.answer = answer;
-	this.hidden = hidden;
-	this.attemptTime = attemptTime;
-	this.timezone = timezone;
-	this.qaQueContent = qaQueContent;
-	this.queUsrId = qaQueUsrUid;
-    }
-
-    public QaUsrResp(String answer, Date attemptTime, QaQueContent question) {
-	this.answer = answer;
-	this.attemptTime = attemptTime;
-	this.qaQueContent = question;
     }
 
     /** default constructor */
@@ -136,8 +106,8 @@ public class QaUsrResp implements Serializable, Comparable {
      * @return the new qa user response cloned from original object
      */
     public static QaUsrResp newInstance(QaUsrResp response) {
-	return new QaUsrResp(response.getResponseId(), response.getAnswer(), response.isHidden(), response
-		.getAttemptTime(), response.getTimezone(), response.getQaQueContent(), response.qaQueUser);
+	return new QaUsrResp(response.getResponseId(), response.getAnswer(), response
+		.getAttemptTime(), response.getTimezone(), response.getQaQuestion(), response.qaQueUser);
     }
 
     public String toString() {
@@ -187,18 +157,18 @@ public class QaUsrResp implements Serializable, Comparable {
     }
 
     /**
-     * @return Returns the qaQueContent.
+     * @return Returns the qaQuestion.
      */
-    public QaQueContent getQaQueContent() {
-	return qaQueContent;
+    public QaQuestion getQaQuestion() {
+	return qaQuestion;
     }
 
     /**
-     * @param qaQueContent
-     *                The qaQueContent to set.
+     * @param qaQuestion
+     *                The qaQuestion to set.
      */
-    public void setQaQueContent(QaQueContent qaQueContent) {
-	this.qaQueContent = qaQueContent;
+    public void setQaQuestion(QaQuestion qaQuestion) {
+	this.qaQuestion = qaQuestion;
     }
 
     /**
@@ -231,74 +201,6 @@ public class QaUsrResp implements Serializable, Comparable {
 	this.responseId = responseId;
     }
 
-    /**
-     * @param responses
-     * @return
-     */
-    public boolean doesRespExistIn(List responses) {
-	for (Iterator i = responses.iterator(); i.hasNext();) {
-	    QaUsrResp resp = (QaUsrResp) i.next();
-	    if ((resp.getAnswer().trim()).equals(this.getAnswer().trim())
-		    && resp.getQaQueUser().getQueUsrId() == this.getQaQueUser().getQueUsrId())
-		return true;
-	}
-	return false;
-    }
-
-    /**
-     * @param responses
-     */
-    public void updateResponseBy(List responses) {
-	for (Iterator i = responses.iterator(); i.hasNext();) {
-	    QaUsrResp resp = (QaUsrResp) i.next();
-	    if (resp.getQaQueUser().getQueUsrId() == this.getQaQueUser().getQueUsrId())
-		//                   && resp.getQaAnsContent().getDisplayOrder()==this.getQaAnsContent().getDisplayOrder())
-		this.updateResponse(resp);
-
-	}
-    }
-
-    /**
-     * The response is not valid if it doesn't have a reference to question
-     * object and question user object.
-     * 
-     * @param resp
-     *                the response to be validated
-     * @return the validation result.
-     */
-    public boolean isResponseValid() {
-	return this.getQaQueUser() != null && this.getQaQueContent() != null;
-	//  &&this.getQaAnsContent()!=null;
-    }
-
-    /**
-     * Update current object according to the new response object.
-     * 
-     * @param resp
-     */
-    public void updateResponse(QaUsrResp resp) {
-	if (!resp.isResponseValid())
-	    throw new IllegalArgumentException("Invalid response for update ");
-
-	this.setAnswer(resp.getAnswer());
-	this.setAttemptTime(resp.getAttemptTime());
-	this.setQaQueContent(resp.getQaQueContent());
-
-	this.setQaQueUser(resp.getQaQueUser());
-
-    }
-
-    /**
-     * Validate whether the current response is correspondent to an author
-     * defined answer.
-     * 
-     * @return boolean value
-     */
-    public boolean isPredefinedResponse() {
-	//may need to add more logic here
-	return false;
-    }
-
     public int compareTo(Object o) {
 	QaUsrResp response = (QaUsrResp) o;
 
@@ -308,51 +210,6 @@ public class QaUsrResp implements Serializable, Comparable {
 	    return 1;
 
 	return (int) (responseId.longValue() - response.responseId.longValue());
-    }
-
-    /**
-     * @return Returns the qaQueContentId.
-     */
-    public Long getQaQueContentId() {
-	return qaQueContentId;
-    }
-
-    /**
-     * @param qaQueContentId
-     *                The qaQueContentId to set.
-     */
-    public void setQaQueContentId(Long qaQueContentId) {
-	this.qaQueContentId = qaQueContentId;
-    }
-
-    /**
-     * @return Returns the queUsrId.
-     */
-    public Long getQueUsrId() {
-	return queUsrId;
-    }
-
-    /**
-     * @param queUsrId
-     *                The queUsrId to set.
-     */
-    public void setQueUsrId(Long queUsrId) {
-	this.queUsrId = queUsrId;
-    }
-
-    /**
-     * @return Returns the hidden.
-     */
-    public boolean isHidden() {
-	return hidden;
-    }
-
-    /**
-     * @param hidden
-     *                The hidden to set.
-     */
-    public void setHidden(boolean hidden) {
-	this.hidden = hidden;
     }
 
     /**

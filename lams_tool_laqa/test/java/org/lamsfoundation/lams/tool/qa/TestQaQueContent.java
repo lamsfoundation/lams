@@ -30,7 +30,7 @@ package org.lamsfoundation.lams.tool.qa;
  */
 
 /**
- * Test case for QaQueContent
+ * Test case for QaQuestion
  */
 
 public class TestQaQueContent extends QaDataAccessTestCase
@@ -56,15 +56,15 @@ public class TestQaQueContent extends QaDataAccessTestCase
     	QaContent qaContent = qaContentDAO.getQaById(DEFAULT_CONTENT_ID);	
     	System.out.println(this.getClass().getName() + "qa content: " + qaContent);
     	
-    	QaQueContent qaQueContent=  new QaQueContent("ozgur's new question test", 
+    	QaQuestion qaQuestion=  new QaQuestion("ozgur's new question test", 
     													1, 
 														qaContent,
 														null,
 														null);
     	   	
-    	System.out.println(this.getClass().getName() + " qaQueContent: " + qaQueContent);
-    	qaQueContentDAO.createQueContent(qaQueContent);
-    	System.out.println(this.getClass().getName() + " qaQueContent created: ");
+    	System.out.println(this.getClass().getName() + " qaQuestion: " + qaQuestion);
+    	qaQuestionDAO.createQueContent(qaQuestion);
+    	System.out.println(this.getClass().getName() + " qaQuestion created: ");
     }
  */
  
@@ -84,7 +84,7 @@ public class TestQaQueContent extends QaDataAccessTestCase
 	    {
 	        Map.Entry pairs = (Map.Entry)itMap.next();
 	        
-	        QaQueContent queContent=  new QaQueContent(pairs.getValue().toString(), 
+	        QaQuestion queContent=  new QaQuestion(pairs.getValue().toString(), 
 	        											new Long(pairs.getKey().toString()).intValue(),
 	        											qaContent,
 														null,
@@ -99,8 +99,8 @@ public class TestQaQueContent extends QaDataAccessTestCase
   */  
     public void testCreateDefaultQaQueContent()
     {
-    	QaQueContent defaultQaQueContent = qaQueContentDAO.getQaQueById(TEST_EXISTING_QUE_CONTENT_ID);	
-    	System.out.println(this.getClass().getName() + " Default qa que content: " + defaultQaQueContent);
+//    	QaQuestion defaultQaQueContent = qaQuestionDAO.getQaQueById(TEST_EXISTING_QUE_CONTENT_ID);	
+//    	System.out.println(this.getClass().getName() + " Default qa que content: " + defaultQaQueContent);
     }
     
     

@@ -22,6 +22,8 @@ CREATE TABLE tl_laqa11_response_rating (
                   REFERENCES tl_laqa11_usr_resp (uid)
 )TYPE=InnoDB;
 
+-- 	LDEV-2653 autosave feature
+ALTER TABLE tl_laqa11_usr_resp DROP COLUMN hidden;
 
 UPDATE lams_tool SET tool_version = "20110217" WHERE tool_signature = "laqa11";
 

@@ -34,12 +34,38 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html>
 <lams:head>
 	<html:base />
-	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
+	
+	<lams:css />
+	<style media="screen,projection" type="text/css">
+		div.growlUI { background: url(check48.png) no-repeat 10px 10px }
+		div.growlUI h1, div.growlUI h2 {
+			color: white; padding: 5px 5px 5px 0px; text-align: center;
+		}
+	</style>
 	
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-latest.pack.js"></script>
+ 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.form.js'/>"></script>
+ 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.blockUI.js'/>"></script>	
 	<script language="JavaScript" type="text/JavaScript">
+	
+		var interval = "30000"; // = 30 seconds
+		
+		window.setInterval(
+			function(){
+				//fire onchange event for lams:textarea
+				$("[id$=__lamstextarea]").change();
+				//ajax form submit
+				$('#learningForm').ajaxSubmit({
+					url: "<c:url value='/learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
+	                success: function() {
+	                	$.growlUI('<fmt:message key="label.learning.draft.autosaved" />');
+	                }
+				});
+        	}, interval
+        );
+	
 		function submitMethod(actionMethod) {
 			var submit = true;
 			if (actionMethod != 'getPreviousQuestion') {
@@ -77,7 +103,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</h1>
 
 		<html:form action="/learning?validate=false"
-			enctype="multipart/form-data" method="POST" target="_self">
+			enctype="multipart/form-data" method="POST" target="_self" styleId="learningForm">
 			<c:choose>
 				<c:when test="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}">
 					<html:hidden property="method" value="getNextQuestion"/>

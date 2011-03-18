@@ -20,41 +20,48 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
+
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.qa.dao;
+package org.lamsfoundation.lams.tool.qa.dto;
 
-import java.util.List;
-
-import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
+ * <p>
+ * DTO that holds question and user attempts data for jsp purposes
+ * </p>
  * 
  * @author Ozgur Demirtas
- * 
  */
-public interface IQaQueContentDAO {
-    public QaQueContent getQaQueById(long qaQueContentId);
+public class EditActivityDTO implements Comparable {
+    private String monitoredContentInUse;
 
-    public QaQueContent getToolDefaultQuestionContent(final long qaContentId);
+    /**
+     * @return Returns the monitoredContentInUse.
+     */
+    public String getMonitoredContentInUse() {
+	return monitoredContentInUse;
+    }
 
-    public List getQuestionIndsForContent(QaContent qa);
+    /**
+     * @param monitoredContentInUse
+     *                The monitoredContentInUse to set.
+     */
+    public void setMonitoredContentInUse(String monitoredContentInUse) {
+	this.monitoredContentInUse = monitoredContentInUse;
+    }
 
-    public void createQueContent(QaQueContent queContent);
+    public String toString() {
+	return new ToStringBuilder(this).append("monitoredContentInUse", monitoredContentInUse).toString();
+    }
 
-    public void saveOrUpdateQaQueContent(QaQueContent qaQueContent);
+    public int compareTo(Object o) {
+	EditActivityDTO editActivityDTO = (EditActivityDTO) o;
 
-    public void removeQueContent(long qaQueContentId);
+	if (editActivityDTO == null)
+	    return 1;
+	else
+	    return 0;
+    }
 
-    public void removeQaQueContent(QaQueContent qaQueContent);
-
-    public List getQaQueContentsByContentId(long qaContentId);
-
-    public List getAllQuestionEntries(final long qaContentId);
-
-    public QaQueContent getQuestionContentByQuestionText(final String question, Long qaContentId);
-
-    public QaQueContent getQuestionContentByDisplayOrder(Long displayOrder, Long qaContentId);
-
-    public List getAllQuestionEntriesSorted(final long qaContentId);
 }

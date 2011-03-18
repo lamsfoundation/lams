@@ -41,8 +41,8 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
+import org.lamsfoundation.lams.tool.qa.QaQuestion;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 
@@ -75,7 +75,7 @@ public class QaOutputFactory extends OutputFactory {
 		// adding all existing conditions
 		userAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(qaContent.getConditions()));
 		// if no conditions were created in the tool instance, a default condition is added;
-		if (userAnswersDefinition.getDefaultConditions().isEmpty() && !qaContent.getQaQueContents().isEmpty()) {
+		if (userAnswersDefinition.getDefaultConditions().isEmpty() && !qaContent.getQaQuestions().isEmpty()) {
 
 		    QaCondition defaultCondition = createDefaultComplexUserAnswersCondition(qaContent);
 		    qaContent.getConditions().add(defaultCondition);
@@ -156,18 +156,13 @@ public class QaOutputFactory extends OutputFactory {
 
 	    QaSession session = qaService.retrieveQaSession(toolSessionId);
 	    QaContent qaContent = session.getQaContent();
-	    Set<QaQueContent> questions = qaContent.getQaQueContents();
+	    Set<QaQuestion> questions = qaContent.getQaQuestions();
 	    String[] answers = new String[questions.size()];
-	    QaQueUsr user = qaService.getQaUserBySession(learnerId, session.getUid());
-	    for (QaQueContent question : questions) {
-		List<QaUsrResp> attempts = null;
-		if (user != null) {
-		    attempts = qaService.getAttemptsForUserAndQuestionContent(user.getUid(), question.getUid());
-		}
-		if (attempts != null && !attempts.isEmpty()) {
-		    // only the last attempt is taken into consideration
-		    String answer = attempts.get(attempts.size() - 1).getAnswer();
-		    answers[question.getDisplayOrder() - 1] = answer;
+	    QaQueUsr user = qaService.getUserByIdAndSession(learnerId, session.getQaSessionId());
+	    for (QaQuestion question : questions) {
+		QaUsrResp response = qaService.getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
+		if (response != null) {
+		    answers[question.getDisplayOrder() - 1] = response.getAnswer();
 		}
 	    }
 	    return new ToolOutput(name, getI18NText(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, true), answers, false);
@@ -176,7 +171,7 @@ public class QaOutputFactory extends OutputFactory {
 
 	    QaSession session = qaService.retrieveQaSession(toolSessionId);
 	    QaContent qaContent = session.getQaContent();
-	    Set<QaQueContent> questions = qaContent.getQaQueContents();
+	    Set<QaQuestion> questions = qaContent.getQaQuestions();
 	    Set<QaQueUsr> users = session.getQaQueUsers();
 	    String[] dummyStringArray = new String[] {};
 
@@ -186,22 +181,19 @@ public class QaOutputFactory extends OutputFactory {
 		if (user != null) {
 		    List<String> answers = new LinkedList<String>();
 		    long lastAttemptTime = Long.MAX_VALUE;
-		    for (QaQueContent question : questions) {
+		    for (QaQuestion question : questions) {
 
-			List<QaUsrResp> attempts = qaService.getAttemptsForUserAndQuestionContent(user.getUid(),
-				question.getUid());
+			QaUsrResp response = qaService.getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
 
-			if (attempts != null && !attempts.isEmpty()) {
-			    // only the last attempt is taken into consideration
-			    QaUsrResp attempt = attempts.get(attempts.size() - 1);
+			if (response != null) {
 			    // we get the time of the attempt - the "lastAttemptTime" will the time of the whole answer
 			    // set given
-			    long timeOfAttempt = attempt.getAttemptTime().getTime();
+			    long timeOfAttempt = response.getAttemptTime().getTime();
 			    if (timeOfAttempt < lastAttemptTime) {
 				lastAttemptTime = timeOfAttempt;
 			    }
 
-			    String answer = attempt.getAnswer();
+			    String answer = response.getAnswer();
 			    if (!StringUtils.isBlank(answer)) {
 				// check for duplicate answers
 				boolean duplicate = false;
@@ -242,10 +234,10 @@ public class QaOutputFactory extends OutputFactory {
 	    // Questions asked in this Q&A activity
 	    QaSession session = qaService.retrieveQaSession(toolSessionId);
 	    QaContent qaContent = session.getQaContent();
-	    Set<QaQueContent> questions = qaContent.getQaQueContents();
+	    Set<QaQuestion> questions = qaContent.getQaQuestions();
 	    String[] questionArray = new String[questions.size()];
 	    int questionIndex = 0;
-	    for (QaQueContent question : questions) {
+	    for (QaQuestion question : questions) {
 		questionArray[questionIndex++] = question.getQuestion();
 	    }
 	    return new ToolOutput(name, getI18NText(QaAppConstants.QUESTIONS_DEFINITION_NAME, true), questionArray,
@@ -271,11 +263,11 @@ public class QaOutputFactory extends OutputFactory {
      * @return default Q&A condition
      */
     protected QaCondition createDefaultComplexUserAnswersCondition(QaContent qaContent) {
-	if (qaContent.getQaQueContents().isEmpty()) {
+	if (qaContent.getQaQuestions().isEmpty()) {
 	    return null;
 	}
-	Set<QaQueContent> questions = new HashSet<QaQueContent>();
-	questions.add((QaQueContent) qaContent.getQaQueContents().iterator().next());
+	Set<QaQuestion> questions = new HashSet<QaQuestion>();
+	questions.add((QaQuestion) qaContent.getQaQuestions().iterator().next());
 	String name = buildConditionName(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, qaContent.getQaContentId()
 		.toString());
 	// Default condition checks if the first answer contains word "LAMS"

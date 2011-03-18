@@ -37,23 +37,9 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * 
  */
 public class QaSessionDAO extends HibernateDaoSupport implements IQaSessionDAO {
-    private static final String COUNT_SESSION_INCOMPLITE = "select qaSession.session_status from QaSession qaSession where qaSession.session_status='INCOMPLETE' and qaSession.qaContentId = :qa";
-    private static final String COUNT_SESSION_ACTIVITY = "select qaSession.session_status from QaSession qaSession where qaSession.qaContentId = :qa";
-    private static final String GET_SESSION_IDS_FOR_CONTENT = "select qaSession.qaSessionId    from QaSession qaSession where qaSession.qaContentId = :qa";
     private static final String COUNT_SESSION_COMPLETE = "from   qaSession in class QaSession where qaSession.session_status='COMPLETE'";
-    private static final String COUNT_SESSION_INCOMPLETE = "from   qaSession in class QaSession where qaSession.session_status='INCOMPLETE'";
     private static final String GET_SESSIONS_FROM_CONTENT = "select qas.qaSessionId from QaSession qas where qas.qaContent=:qaContent order by qas.qaSessionId";
     private static final String GET_SESSIONNAMES_FROM_CONTENT = "select qas.session_name from QaSession qas where qas.qaContent=:qaContent order by qas.qaSessionId";
-
-    public int countSessionComplete() {
-	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(COUNT_SESSION_COMPLETE).list();
-
-	if (list != null && list.size() > 0) {
-	    return list.size();
-	} else
-	    return 0;
-    }
 
     public int countSessionComplete(QaContent qa) {
 	HibernateTemplate templ = this.getHibernateTemplate();
@@ -66,28 +52,7 @@ public class QaSessionDAO extends HibernateDaoSupport implements IQaSessionDAO {
 		++sessionCount;
 	    }
 	}
-	logger.debug("sessionCount: " + sessionCount);
 	return sessionCount;
-    }
-
-    public int countSessionIncomplete() {
-	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(COUNT_SESSION_INCOMPLETE).list();
-
-	if (list != null && list.size() > 0) {
-	    return list.size();
-	} else
-	    return 0;
-    }
-
-    public int studentActivityOccurred(QaContent qa) {
-	return (getHibernateTemplate().findByNamedParam(COUNT_SESSION_ACTIVITY, "qa", qa)).size();
-    }
-
-    public List getToolSessionsForContent(QaContent qa) {
-
-	List lisToolSessionIds = (getHibernateTemplate().findByNamedParam(GET_SESSION_IDS_FOR_CONTENT, "qa", qa));
-	return lisToolSessionIds;
     }
 
     /**
@@ -103,22 +68,6 @@ public class QaSessionDAO extends HibernateDaoSupport implements IQaSessionDAO {
 	    return qus;
 	}
 	return null;
-    }
-
-    public String getSessionNameById(long qaSessionId) {
-	String query = "from QaSession as qus where qus.qaSessionId = ?";
-	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(query).setLong(0, qaSessionId).list();
-
-	if (list != null && list.size() > 0) {
-	    QaSession qus = (QaSession) list.get(0);
-	    return qus.getSession_name();
-	}
-	return null;
-    }
-
-    public QaSession getQaSessionOrNullById(long qaSessionId) {
-	return getQaSessionById(qaSessionId);
     }
 
     /**

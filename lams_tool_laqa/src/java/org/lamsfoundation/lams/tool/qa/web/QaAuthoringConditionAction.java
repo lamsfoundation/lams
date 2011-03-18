@@ -46,9 +46,10 @@ import org.apache.struts.util.LabelValueBean;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
-import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
+import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.tool.qa.web.form.QaConditionForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
@@ -311,11 +312,11 @@ public class QaAuthoringConditionAction extends Action {
      * @param request
      * @return
      */
-    private List<QaQuestionContentDTO> getQuestionList(SessionMap sessionMap) {
-	List<QaQuestionContentDTO> list = (List<QaQuestionContentDTO>) sessionMap
+    private List<QaQuestionDTO> getQuestionList(SessionMap sessionMap) {
+	List<QaQuestionDTO> list = (List<QaQuestionDTO>) sessionMap
 		.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
 	if (list == null) {
-	    list = new LinkedList<QaQuestionContentDTO>();
+	    list = new LinkedList<QaQuestionDTO>();
 	    sessionMap.put(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, list);
 	}
 	return list;
@@ -378,13 +379,13 @@ public class QaAuthoringConditionAction extends Action {
 	String sessionMapID = conditionForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
-	List<QaQuestionContentDTO> questions = getQuestionList(sessionMap);
+	List<QaQuestionDTO> questions = getQuestionList(sessionMap);
 
 	// Initialise the LabelValueBeans in the possibleOptions array.
 	LabelValueBean[] lvBeans = new LabelValueBean[questions.size()];
 
 	int i = 0;
-	for (QaQuestionContentDTO question : questions) {
+	for (QaQuestionDTO question : questions) {
 	    String nonHTMLQuestion = question.getQuestion();
 	    if (nonHTMLQuestion != null) {
 		nonHTMLQuestion = WebUtil.removeHTMLtags(nonHTMLQuestion);
@@ -432,11 +433,11 @@ public class QaAuthoringConditionAction extends Action {
 	}
 
 	Integer[] selectedItems = form.getSelectedItems();
-	List<QaQuestionContentDTO> questions = getQuestionList(sessionMap);
+	List<QaQuestionDTO> questions = getQuestionList(sessionMap);
 
 	condition.temporaryQuestionDTOSet.clear();
 	for (Integer selectedItem : selectedItems) {
-	    for (QaQuestionContentDTO question : questions) {
+	    for (QaQuestionDTO question : questions) {
 		if (selectedItem.equals(new Integer(question.getDisplayOrder()))) {
 		    condition.temporaryQuestionDTOSet.add(question);
 		}

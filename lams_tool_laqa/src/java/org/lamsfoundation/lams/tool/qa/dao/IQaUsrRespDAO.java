@@ -23,8 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.dao;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 
 /**
@@ -33,9 +31,6 @@ import org.lamsfoundation.lams.tool.qa.QaUsrResp;
  * 
  */
 public interface IQaUsrRespDAO {
-    public void saveUserResponse(QaUsrResp resp);
-
-    public QaUsrResp getAttemptByUID(Long uid);
 
     public void updateUserResponse(QaUsrResp resp);
 
@@ -43,11 +38,9 @@ public interface IQaUsrRespDAO {
 
     public void removeUserResponse(QaUsrResp resp);
 
-    public void removeUserResponseByQaQueId(Long qaQueId);
+    public QaUsrResp getResponseById(Long responseId);
 
-    public QaUsrResp retrieveQaUsrResp(long responseId);
-
-    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId);
-
-    public void removeAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId);
+    public QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long questionId);
+    
+    int getCountResponsesByQaContent(final Long qaContentId);
 }

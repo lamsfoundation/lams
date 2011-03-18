@@ -20,8 +20,9 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
+
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.util;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -31,23 +32,20 @@ import org.apache.log4j.Logger;
 /**
  * @author Ozgur Demirtas
  * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
- */
-
-/**
  * A comparator implementation that can be used as a constructor to collections.
  * The TreeMap in the web layer makes use of it.
  * 
  */
-public class QaStringComparator implements Comparator, Serializable {
-    static Logger logger = Logger.getLogger(QaStringComparator.class.getName());
+public class QaComparator implements Comparator, Serializable {
+    static Logger logger = Logger.getLogger(QaComparator.class.getName());
 
     public int compare(Object o1, Object o2) {
 	String s1 = (String) o1;
 	String s2 = (String) o2;
 
-	return s1.compareTo(s2);
+	int key1 = new Long(s1).intValue();
+	int key2 = new Long(s2).intValue();
+	return key1 - key2;
     }
 
     public boolean equals(Object o) {

@@ -38,28 +38,19 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 /**
  * @author Ozgur Demirtas
  * 
- * TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code
- * Templates
  */
 
 public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
     static Logger logger = Logger.getLogger(QaQueUsrDAO.class.getName());
 
-    private static final String COUNT_SESSION_USER = "select qaQueUsr.queUsrId from QaQueUsr qaQueUsr where qaQueUsr.qaSessionId= :qaSession";
-    private static final String LOAD_USER_FOR_SESSION = "from qaQueUsr in class QaQueUsr where  qaQueUsr.qaSessionId= :qaSessionId";
+    private static final String COUNT_SESSION_USER = "select qaQueUsr.queUsrId from QaQueUsr qaQueUsr where qaQueUsr.qaSession.qaSessionId= :qaSession";
+    private static final String LOAD_USER_FOR_SESSION = "from qaQueUsr in class QaQueUsr where  qaQueUsr.qaSession.qaSessionId= :qaSessionId";
 
-    private static final String GET_USER_COUNT_FOR_CONTENT = "select count(*) from QaQueUsr quser, QaSession qses, QaQueContent qcon where "
+    private static final String GET_USER_COUNT_FOR_CONTENT = "select count(*) from QaQueUsr quser, QaSession qses, QaQuestion qcon where "
 	    + "quser.qaSession=qses and " + "qses.qaContent=qcon and " + "qcon.uid=:uid";
 
-    // select count(*) from tl_laqa11_que_usr quser, tl_laqa11_session qses where quser.qa_session_id=qses.uid and
-    // qses.qa_content_id=5378;
-
-    public QaQueUsr getQaUserByUID(Long uid) {
-	return (QaQueUsr) this.getHibernateTemplate().get(QaQueUsr.class, uid);
-    }
-
     public int countSessionUser(QaSession qaSession) {
-	return getHibernateTemplate().findByNamedParam(QaQueUsrDAO.COUNT_SESSION_USER, "qaSession", qaSession).size();
+	return (getHibernateTemplate().findByNamedParam(COUNT_SESSION_USER, "qaSession", qaSession)).size();
     }
 
     public QaQueUsr getQaQueUsrById(long qaQueUsrId) {
@@ -77,7 +68,7 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 
     public QaQueUsr getQaUserBySession(final Long queUsrId, final Long qaSessionId) {
 
-	String strGetUser = "from qaQueUsr in class QaQueUsr where qaQueUsr.queUsrId=:queUsrId and qaQueUsr.qaSessionId=:qaSessionId";
+	String strGetUser = "from qaQueUsr in class QaQueUsr where qaQueUsr.queUsrId=:queUsrId and qaQueUsr.qaSession.qaSessionId=:qaSessionId";
 	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSession().createQuery(strGetUser).setLong("queUsrId", queUsrId.longValue()).setLong(
 		"qaSessionId", qaSessionId.longValue()).list();
@@ -91,8 +82,8 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 
     public List getUserBySessionOnly(final QaSession qaSession) {
 	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(QaQueUsrDAO.LOAD_USER_FOR_SESSION).setLong("qaSessionId",
-		qaSession.getUid().longValue()).list();
+	List list = getSession().createQuery(LOAD_USER_FOR_SESSION).setLong("qaSessionId",
+		qaSession.getQaSessionId().longValue()).list();
 	return list;
     }
 
@@ -119,14 +110,13 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
 
 	int returnInt = 0;
 	if (qa != null && qa.getUid() != null) {
-	    List result = getSession().createQuery(QaQueUsrDAO.GET_USER_COUNT_FOR_CONTENT).setLong("uid", qa.getUid())
-		    .list();
-	    Long resultLong = result.get(0) != null ? (Long) result.get(0) : new Long(0);
+	    List result = getSession().createQuery(GET_USER_COUNT_FOR_CONTENT).setLong("uid", qa.getUid()).list();
+	    Long resultLong = (result.get(0) != null) ? (Long) result.get(0) : new Long(0);
 	    returnInt = resultLong.intValue();
 	} else {
-	    QaQueUsrDAO.logger.error("Attempt to count users from null content");
+	    logger.error("Attempt to count users from null content");
 	}
-	return returnInt;
+	return returnInt; 
     }
 
 }

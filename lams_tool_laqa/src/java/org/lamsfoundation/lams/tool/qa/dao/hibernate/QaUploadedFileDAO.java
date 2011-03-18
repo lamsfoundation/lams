@@ -23,7 +23,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -31,19 +30,14 @@ import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUploadedFileDAO;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author Ozgur Demirtas
  * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
  */
 
 public class QaUploadedFileDAO extends HibernateDaoSupport implements IQaUploadedFileDAO {
-    static Logger logger = Logger.getLogger(QaUploadedFileDAO.class.getName());
-
     private static final String GET_UPLOADED_FILES = "from QaUploadedFile qaUploadedFile where qaUploadedFile.qaContent.qaContentId = :contentId";
 
     public QaUploadedFile getUploadedFileById(long submissionId) {

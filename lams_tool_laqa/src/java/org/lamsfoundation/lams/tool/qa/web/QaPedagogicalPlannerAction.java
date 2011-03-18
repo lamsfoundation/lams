@@ -37,9 +37,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaQuestion;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.tool.qa.web.form.QaPedagogicalPlannerForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -60,7 +61,7 @@ public class QaPedagogicalPlannerAction extends LamsDispatchAction {
 	    HttpServletResponse response) {
 	QaPedagogicalPlannerForm plannerForm = (QaPedagogicalPlannerForm) form;
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaContent qaContent = getQaService().retrieveQa(toolContentID);
+	QaContent qaContent = getQaService().getQa(toolContentID);
 	plannerForm.fillForm(qaContent);
 	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	plannerForm.setContentFolderID(contentFolderId);
@@ -73,7 +74,7 @@ public class QaPedagogicalPlannerAction extends LamsDispatchAction {
 	ActionMessages errors = plannerForm.validate();
 	if (errors.isEmpty()) {
 
-	    QaContent qaContent = getQaService().retrieveQa(plannerForm.getToolContentID());
+	    QaContent qaContent = getQaService().getQa(plannerForm.getToolContentID());
 
 	    int questionIndex = 0;
 	    String question = null;
@@ -83,30 +84,29 @@ public class QaPedagogicalPlannerAction extends LamsDispatchAction {
 		if (StringUtils.isEmpty(question)) {
 		    plannerForm.removeQuestion(questionIndex);
 		} else {
-		    if (questionIndex < qaContent.getQaQueContents().size()) {
-			QaQueContent qaQueContent = getQaService().getQuestionContentByDisplayOrder(
+		    if (questionIndex < qaContent.getQaQuestions().size()) {
+			QaQuestion qaQuestion = getQaService().getQuestionByContentAndDisplayOrder(
 				(long) questionIndex + 1, qaContent.getUid());
-			qaQueContent.setQuestion(question);
-			getQaService().saveOrUpdateQaQueContent(qaQueContent);
+			qaQuestion.setQuestion(question);
+			getQaService().saveOrUpdateQaQueContent(qaQuestion);
 
 		    } else {
-			QaQueContent qaQueContent = new QaQueContent();
-			qaQueContent.setDisplayOrder(questionIndex + 1);
-			qaQueContent.setRequired(false);
-			qaQueContent.setQaContent(qaContent);
-			qaQueContent.setQaContentId(qaContent.getQaContentId());
-			qaQueContent.setQuestion(question);
-			getQaService().saveOrUpdateQaQueContent(qaQueContent);
+			QaQuestion qaQuestion = new QaQuestion();
+			qaQuestion.setDisplayOrder(questionIndex + 1);
+			qaQuestion.setRequired(false);
+			qaQuestion.setQaContent(qaContent);
+			qaQuestion.setQuestion(question);
+			getQaService().saveOrUpdateQaQueContent(qaQuestion);
 		    }
 		    questionIndex++;
 		}
 	    } while (question != null);
-	    if (questionIndex < qaContent.getQaQueContents().size()) {
+	    if (questionIndex < qaContent.getQaQuestions().size()) {
 		getQaService().removeQuestionsFromCache(qaContent);
-		for (; questionIndex < qaContent.getQaQueContents().size(); questionIndex++) {
-		    QaQueContent qaQueContent = getQaService().getQuestionContentByDisplayOrder(
+		for (; questionIndex < qaContent.getQaQuestions().size(); questionIndex++) {
+		    QaQuestion qaQuestion = getQaService().getQuestionByContentAndDisplayOrder(
 			    (long) questionIndex + 1, qaContent.getUid());
-		    getQaService().removeQaQueContent(qaQueContent);
+		    getQaService().removeQaQueContent(qaQuestion);
 		}
 	    }
 	} else {

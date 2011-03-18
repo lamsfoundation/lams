@@ -13,13 +13,13 @@
   <!-- ========== Form Bean Definitions =================================== -->
 
 	<form-beans>
-		<form-bean name="QaAuthoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaAuthoringForm"/>
-	   	<form-bean name="QaLearningForm" type="org.lamsfoundation.lams.tool.qa.web.QaLearningForm"/>
-	   	<form-bean name="QaMonitoringForm" type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringForm"/>
-	    <form-bean name="QaConditionForm" type="org.lamsfoundation.lams.tool.qa.web.QaConditionForm"/>
-	    <form-bean name="QaPedagogicalPlannerForm" type="org.lamsfoundation.lams.tool.qa.web.QaPedagogicalPlannerForm"/>
+		<form-bean name="QaAuthoringForm" type="org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm"/>
+	   	<form-bean name="QaLearningForm" type="org.lamsfoundation.lams.tool.qa.web.form.QaLearningForm"/>
+	   	<form-bean name="QaMonitoringForm" type="org.lamsfoundation.lams.tool.qa.web.form.QaMonitoringForm"/>
+	    <form-bean name="QaConditionForm" type="org.lamsfoundation.lams.tool.qa.web.form.QaConditionForm"/>
+	    <form-bean name="QaPedagogicalPlannerForm" type="org.lamsfoundation.lams.tool.qa.web.form.QaPedagogicalPlannerForm"/>
 	    
-	    <form-bean name="laqa11AdminForm" type="org.lamsfoundation.lams.tool.qa.web.QaAdminForm"/>
+	    <form-bean name="laqa11AdminForm" type="org.lamsfoundation.lams.tool.qa.web.form.QaAdminForm"/>
 	</form-beans>
 	
 	  <!-- ========== Global Exceptions Definitions =================================== -->

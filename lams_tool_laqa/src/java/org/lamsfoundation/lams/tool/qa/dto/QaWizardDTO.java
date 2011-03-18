@@ -21,10 +21,12 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.dto;
 
 import java.io.Serializable;
 import java.util.SortedSet;
+
+import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
 
 public class QaWizardDTO implements Serializable {
 

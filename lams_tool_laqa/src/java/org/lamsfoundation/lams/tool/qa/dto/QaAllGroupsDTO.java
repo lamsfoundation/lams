@@ -22,7 +22,7 @@
  */
 
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.dto;
 
 import java.util.List;
 

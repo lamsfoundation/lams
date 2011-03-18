@@ -22,7 +22,7 @@
  */
 
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.qa.web;
+package org.lamsfoundation.lams.tool.qa.web.form;
 
 /** ActionForm for the Learning environment */
 import org.apache.struts.action.ActionForm;
@@ -134,7 +134,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
      *                return void
      */
 
-    protected void resetUserActions() {
+    public void resetUserActions() {
 	this.getNextQuestion = null;
 	this.getPreviousQuestion = null;
 	this.endLearning = null;
@@ -142,7 +142,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 	this.forwardtoReflection = null;
     }
 
-    protected void resetAll() {
+    public void resetAll() {
 	this.submitAnswersContent = null;
 	this.getNextQuestion = null;
 	this.getPreviousQuestion = null;

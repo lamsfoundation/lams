@@ -26,7 +26,7 @@ import java.util.TreeSet;
 
 import org.lamsfoundation.lams.test.AbstractLamsTestCase;
 import org.lamsfoundation.lams.tool.qa.dao.hibernate.QaContentDAO;
-import org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQueContentDAO;
+import org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQuestionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQueUsrDAO;
 import org.lamsfoundation.lams.tool.qa.dao.hibernate.QaSessionDAO;
 import org.lamsfoundation.lams.tool.qa.dao.hibernate.QaUsrRespDAO;
@@ -62,12 +62,12 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
 	protected QaContentDAO qaContentDAO;
 	protected QaSessionDAO qaSessionDAO;
 	protected QaQueUsrDAO  qaQueUsrDAO;
-	protected QaQueContentDAO qaQueContentDAO;
+	protected QaQuestionDAO qaQuestionDAO;
 	protected QaUsrRespDAO  qaUsrRespDAO;
 	
 	
 	protected QaSession qaSession;
-	protected QaQueContent qaQueContent;
+	protected QaQuestion qaQuestion;
 	
 	
 	public QaDataAccessTestCase(String name)
@@ -81,7 +81,7 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
         qaContentDAO = (QaContentDAO) this.context.getBean("qaContentDAO");
         qaSessionDAO = (QaSessionDAO) this.context.getBean("qaSessionDAO");
         qaQueUsrDAO = (QaQueUsrDAO) this.context.getBean("qaQueUsrDAO");
-        qaQueContentDAO = (QaQueContentDAO) this.context.getBean("qaQueContentDAO");
+        qaQuestionDAO = (QaQuestionDAO) this.context.getBean("qaQuestionDAO");
         qaUsrRespDAO = (QaUsrRespDAO) this.context.getBean("qaUsrRespDAO");
         
     }
@@ -104,13 +104,13 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
     /*
     protected QaQueUsr getExistingUser(String username, String fullname)
     {
-    	QaQueContent qaQueContent = qaQueContentDAO.getQaQueById(TEST_EXISTING_QUE_CONTENT_ID);
+    	QaQuestion qaQuestion = qaQuestionDAO.getQaQueById(TEST_EXISTING_QUE_CONTENT_ID);
 		QaSession qaSession = qaSessionDAO.getQaSessionById(TEST_EXISTING_SESSION_ID);
     	
         QaQueUsr qaQueUsr= new QaQueUsr(new Long(TEST_NEW_USER_ID),
     									username,
 										fullname,
-										qaQueContent, 
+										qaQuestion, 
 										qaSession, 
 										new TreeSet());
     	qaQueUsrDAO.createUsr(qaQueUsr);
@@ -118,12 +118,12 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
     }
     
     
-    protected QaUsrResp getNewResponse(String response, QaQueContent qaQueContent)
+    protected QaUsrResp getNewResponse(String response, QaQuestion qaQuestion)
     {
     	QaUsrResp qaUsrResp= new QaUsrResp(response, false,
 											new Date(System.currentTimeMillis()),
 											"",
-											qaQueContent,
+											qaQuestion,
 											getExistingUser("randomstriker","Michael Random"));
 		qaUsrRespDAO.createUserResponse(qaUsrResp);
 		return qaUsrResp;
@@ -146,17 +146,13 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
         qa.setOnlineInstructions("");
         qa.setOfflineInstructions("");
         qa.setReportTitle("");
-        qa.setQaQueContents(new TreeSet());
+        qa.setQaQuestions(new TreeSet());
         qa.setQaSessions(new TreeSet());
         
         //create new qa que content
-        QaQueContent qaQueContent = new QaQueContent("What planet are you from",
-        											4, 
-    												qa, 
-    												new TreeSet(), 
-    												new TreeSet());
-        
-        qa.getQaQueContents().add(qaQueContent);
+	QaQuestion qaQuestion = new QaQuestion("What planet are you from", 4, "", false, qa, new TreeSet());
+       
+        qa.getQaQuestions().add(qaQuestion);
         
         //create the new content
         qaContentDAO.createQa(qa);

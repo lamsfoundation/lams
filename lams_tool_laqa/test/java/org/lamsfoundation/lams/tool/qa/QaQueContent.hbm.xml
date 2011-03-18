@@ -5,7 +5,7 @@
 
 <hibernate-mapping>
     <class
-        name="org.lamsfoundation.lams.tool.qa.QaQueContent"
+        name="org.lamsfoundation.lams.tool.qa.QaQuestion"
         table="tl_laqa11_que_content"
     >
 

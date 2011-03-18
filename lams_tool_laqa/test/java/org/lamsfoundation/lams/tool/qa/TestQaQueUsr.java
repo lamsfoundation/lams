@@ -56,18 +56,14 @@ public class TestQaQueUsr extends QaDataAccessTestCase
     }
     
     
-    public void testCreateNewUser()
-    {
-    	QaQueContent qaQueContent = qaQueContentDAO.getQaQueById(new Long(1).longValue() );
-		QaSession qaSession = qaSessionDAO.getQaSessionById(new Long(102).longValue());
-    	
-        QaQueUsr qaQueUsr= new QaQueUsr(new Long(TEST_NEW_USER_ID),
-    									"john",
-										"John Baker",
-										qaQueContent, 
-										qaSession, 
-										new TreeSet());
-    	qaQueUsrDAO.createUsr(qaQueUsr);
+    public void testCreateNewUser() {
+
+	QaSession qaSession = qaSessionDAO.getQaSessionById(new Long(102).longValue());
+
+	QaQueUsr qaQueUsr = new QaQueUsr(new Long(TEST_NEW_USER_ID), "john", "John Baker",
+
+	qaSession, new TreeSet());
+	qaQueUsrDAO.createUsr(qaQueUsr);
     }
 	
     

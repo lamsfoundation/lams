@@ -35,6 +35,8 @@ import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputFormatException;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
+import org.lamsfoundation.lams.tool.qa.dto.QaConditionDTO;
+import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaQuestionContentDTOComparator;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -51,10 +53,10 @@ public class QaCondition extends TextSearchCondition {
      * Questions linked to this condition. Answers to them will be scanned for
      * the words that make the condition's parameters.
      */
-    private Set<QaQueContent> questions = new TreeSet<QaQueContent>(new QaQueContentComparator());
+    private Set<QaQuestion> questions = new TreeSet<QaQuestion>(new QaQueContentComparator());
     private static Logger log = Logger.getLogger(QaCondition.class);
 
-    public SortedSet<QaQuestionContentDTO> temporaryQuestionDTOSet = new TreeSet<QaQuestionContentDTO>(
+    public SortedSet<QaQuestionDTO> temporaryQuestionDTOSet = new TreeSet<QaQuestionDTO>(
 	    new QaQuestionContentDTOComparator());
 
     public QaCondition() {
@@ -63,15 +65,15 @@ public class QaCondition extends TextSearchCondition {
 
     public QaCondition(QaConditionDTO conditionDTO) {
 	super(conditionDTO);
-	for (QaQueContent question : conditionDTO.getQuestions()) {
-	    QaQueContent questionCopy = new QaQueContent(question.getQuestion(), question.getDisplayOrder(), null,
-		    question.isRequired(), null, null, null);
+	for (QaQuestion question : conditionDTO.getQuestions()) {
+	    QaQuestion questionCopy = new QaQuestion(question.getQuestion(), question.getDisplayOrder(), null,
+		    question.isRequired(), null, null);
 	    getQuestions().add(questionCopy);
 	}
     }
 
     public QaCondition(Long conditionId, Integer conditionUIID, Integer orderId, String name, String displayName,
-	    String allWords, String phrase, String anyWords, String excludedWords, Set<QaQueContent> questions) {
+	    String allWords, String phrase, String anyWords, String excludedWords, Set<QaQuestion> questions) {
 	super(conditionId, conditionUIID, orderId, name, displayName, BranchCondition.OUTPUT_TYPE_COMPLEX, null, null,
 		null, allWords, phrase, anyWords, excludedWords);
 	setQuestions(questions);
@@ -87,7 +89,7 @@ public class QaCondition extends TextSearchCondition {
 		    // the condition "knows" it's an array of strings, i.e. user's answers
 		    String[] answers = (String[]) value.getValue();
 		    result = true;
-		    for (QaQueContent question : questions) {
+		    for (QaQuestion question : questions) {
 			String textToMatch = answers[question.getDisplayOrder() - 1];
 			textToMatch = WebUtil.removeHTMLtags(textToMatch);
 			result &= matches(textToMatch);
@@ -104,11 +106,11 @@ public class QaCondition extends TextSearchCondition {
 	return result;
     }
 
-    public Set<QaQueContent> getQuestions() {
+    public Set<QaQuestion> getQuestions() {
 	return questions;
     }
 
-    public void setQuestions(Set<QaQueContent> questions) {
+    public void setQuestions(Set<QaQuestion> questions) {
 	this.questions = questions;
     }
 
@@ -117,7 +119,7 @@ public class QaCondition extends TextSearchCondition {
      */
     @Override
     public Object clone() {
-	Set<QaQueContent> questionsCopy = new TreeSet<QaQueContent>(new QaQueContentComparator());
+	Set<QaQuestion> questionsCopy = new TreeSet<QaQuestion>(new QaQueContentComparator());
 	questionsCopy.addAll(questions);
 	return new QaCondition(null, null, orderId, name, displayName, allWords, phrase, anyWords, excludedWords,
 		questionsCopy);
@@ -132,11 +134,11 @@ public class QaCondition extends TextSearchCondition {
     @Override
     public QaCondition clone(int uiidOffset) {
 	Integer newConditionUIID = LearningDesign.addOffset(conditionUIID, uiidOffset);
-	Set<QaQueContent> questionsCopy = new TreeSet<QaQueContent>(new QaQueContentComparator());
+	Set<QaQuestion> questionsCopy = new TreeSet<QaQuestion>(new QaQueContentComparator());
 
-	for (QaQueContent question : getQuestions()) {
-	    QaQueContent questionCopy = new QaQueContent(question.getQuestion(), question.getDisplayOrder(), null,
-		    question.isRequired(), null, null, null);
+	for (QaQuestion question : getQuestions()) {
+	    QaQuestion questionCopy = new QaQuestion(question.getQuestion(), question.getDisplayOrder(), null,
+		    question.isRequired(), null, null);
 	    questionsCopy.add(questionCopy);
 	}
 	return new QaCondition(null, newConditionUIID, orderId, name, displayName, allWords, phrase, anyWords,
@@ -150,9 +152,9 @@ public class QaCondition extends TextSearchCondition {
      */
     public QaCondition clone(QaContent qaContent) {
 
-	Set<QaQueContent> questionsCopy = new TreeSet<QaQueContent>(new QaQueContentComparator());
-	for (QaQueContent conditionQuestion : getQuestions()) {
-	    for (QaQueContent contentQuestion : (Set<QaQueContent>) qaContent.getQaQueContents()) {
+	Set<QaQuestion> questionsCopy = new TreeSet<QaQuestion>(new QaQueContentComparator());
+	for (QaQuestion conditionQuestion : getQuestions()) {
+	    for (QaQuestion contentQuestion : (Set<QaQuestion>) qaContent.getQaQuestions()) {
 		if (conditionQuestion.getDisplayOrder() == contentQuestion.getDisplayOrder()) {
 		    questionsCopy.add(contentQuestion);
 		}

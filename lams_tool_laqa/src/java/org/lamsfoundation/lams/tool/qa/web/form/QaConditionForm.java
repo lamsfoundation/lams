@@ -21,11 +21,11 @@
  */
 
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.qa.web;
+package org.lamsfoundation.lams.tool.qa.web.form;
 
 import org.apache.struts.util.LabelValueBean;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
-import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
+import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.web.TextSearchActionForm;
 
 /**
@@ -63,7 +63,7 @@ public class QaConditionForm extends TextSearchActionForm {
 	setDisplayName(condition.getDisplayName());
 	Integer[] selectedItems = new Integer[condition.temporaryQuestionDTOSet.size()];
 	int questionIndex = 0;
-	for (QaQuestionContentDTO question : condition.temporaryQuestionDTOSet) {
+	for (QaQuestionDTO question : condition.temporaryQuestionDTOSet) {
 	    selectedItems[questionIndex] = new Integer(question.getDisplayOrder());
 	    questionIndex++;
 	}

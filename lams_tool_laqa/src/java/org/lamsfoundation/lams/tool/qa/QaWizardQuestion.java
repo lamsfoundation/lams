@@ -24,8 +24,6 @@
 package org.lamsfoundation.lams.tool.qa;
 
 import java.io.Serializable;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 

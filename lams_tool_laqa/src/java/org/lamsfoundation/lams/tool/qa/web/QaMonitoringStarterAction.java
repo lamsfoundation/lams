@@ -45,18 +45,19 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
-import org.lamsfoundation.lams.tool.qa.EditActivityDTO;
-import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.qa.GeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
-import org.lamsfoundation.lams.tool.qa.QaUtils;
+import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.dto.EditActivityDTO;
+import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.qa.dto.GeneralMonitoringDTO;
+import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
+import org.lamsfoundation.lams.tool.qa.util.QaUtils;
+import org.lamsfoundation.lams.tool.qa.web.form.QaMonitoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -128,11 +129,10 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	String toolContentID = qaMonitoringForm.getToolContentID();
 	logger.debug("toolContentID: " + toolContentID);
 
-	QaContent qaContent = qaService.loadQa(new Long(toolContentID).longValue());
-	logger.debug("existing qaContent:" + qaContent.getUid());
+	QaContent qaContent = qaService.getQa(new Long(toolContentID).longValue());
 
 	/*true means there is at least 1 response*/
-	if (qaService.studentActivityOccurredGlobal(qaContent)) {
+	if (qaService.isStudentActivityOccurredGlobal(qaContent)) {
 	    logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
 	    generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
 	} else {
@@ -155,8 +155,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	/** ...till here * */
 
 	EditActivityDTO editActivityDTO = new EditActivityDTO();
-	boolean isContentInUse = QaUtils.isContentInUse(qaContent);
-	logger.debug("isContentInUse:" + isContentInUse);
+	boolean isContentInUse = qaContent.isContentLocked();
 	if (isContentInUse == true) {
 	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
 	}
@@ -180,13 +179,13 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
 	List listQuestionContentDTO = new LinkedList();
 
-	Iterator queIterator = qaContent.getQaQueContents().iterator();
+	Iterator queIterator = qaContent.getQaQuestions().iterator();
 	while (queIterator.hasNext()) {
 
-	    QaQueContent qaQueContent = (QaQueContent) queIterator.next();
-	    if (qaQueContent != null) {
-		QaQuestionContentDTO qaQuestionContentDTO = new QaQuestionContentDTO(qaQueContent);
-		listQuestionContentDTO.add(qaQuestionContentDTO);
+	    QaQuestion qaQuestion = (QaQuestion) queIterator.next();
+	    if (qaQuestion != null) {
+		QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(qaQuestion);
+		listQuestionContentDTO.add(qaQuestionDTO);
 	    }
 	}
 
@@ -251,8 +250,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	String toolContentID = qaMonitoringForm.getToolContentID();
 	logger.debug("toolContentID:" + toolContentID);
 
-	QaContent qaContent = qaService.loadQa(new Long(toolContentID).longValue());
-	logger.debug("existing qaContent:" + qaContent.getUid());
+	QaContent qaContent = qaService.getQa(new Long(toolContentID).longValue());
 
 	if (qaContent == null) {
 	    QaUtils.cleanUpSessionAbsolute(request);

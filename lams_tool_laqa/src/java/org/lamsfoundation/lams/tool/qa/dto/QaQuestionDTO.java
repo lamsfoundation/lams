@@ -21,9 +21,10 @@
  * ****************************************************************
  */
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.tool.qa.QaQuestion;
 
 /**
  * <p>
@@ -32,7 +33,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Ozgur Demirtas
  */
-public class QaQuestionContentDTO implements Comparable {
+public class QaQuestionDTO implements Comparable {
     private String question;
     private String displayOrder;
     private String feedback;
@@ -44,14 +45,14 @@ public class QaQuestionContentDTO implements Comparable {
 		"displayOrder:", displayOrder).append("required:", Boolean.toString(required)).toString();
     }
 
-    public QaQuestionContentDTO(QaQueContent que) {
+    public QaQuestionDTO(QaQuestion que) {
 	this.question = que.getQuestion();
 	this.displayOrder = new Integer(que.getDisplayOrder()).toString();
 	this.feedback = que.getFeedback() != null ? que.getFeedback() : " ";
 	this.required = que.isRequired();
     }
 
-    public QaQuestionContentDTO(String question, String displayOrder, String feedback, boolean required) {
+    public QaQuestionDTO(String question, String displayOrder, String feedback, boolean required) {
 	this.question = question;
 	this.displayOrder = displayOrder;
 	this.feedback = feedback;
@@ -131,8 +132,8 @@ public class QaQuestionContentDTO implements Comparable {
 
     @Override
     public boolean equals(Object o) {
-	if (o instanceof QaQuestionContentDTO) {
-	    QaQuestionContentDTO compare = (QaQuestionContentDTO) o;
+	if (o instanceof QaQuestionDTO) {
+	    QaQuestionDTO compare = (QaQuestionDTO) o;
 	    return compare.getDisplayOrder().equals(getDisplayOrder());
 	}
 	return false;

@@ -5,7 +5,7 @@
 
 <hibernate-mapping>
     <class
-        name="org.lamsfoundation.lams.tool.qa.QaQueContent"
+        name="org.lamsfoundation.lams.tool.qa.QaQuestion"
         table="tl_laqa11_que_content"
     >
 
@@ -41,18 +41,6 @@
 	        column="feedback"
 	        length="65535"
 	    />
-    
-
-
-        <property
-            name="qaContentId"
-            type="java.lang.Long"
-            update="false"
-            insert="false"
-            access="property"
-            column="qa_content_id"
-            length="65535"
-        />
 
 	    <property
 	        name="required"
@@ -78,23 +66,5 @@
                 name="qa_content_id" 
             />
         </many-to-one>
-
- 		<set
-            name="qaUsrResps"
-            lazy="true"
-            inverse="true"
-            cascade="all-delete-orphan"
-            sort="natural"
-        >
-              <key
-                  column="qa_que_content_id"
-              >
-              </key>
-
-              <one-to-many
-                  class="org.lamsfoundation.lams.tool.qa.QaUsrResp"
-              />
-
-        </set>
     </class>
 </hibernate-mapping>

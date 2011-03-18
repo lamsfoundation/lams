@@ -125,13 +125,10 @@ package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
@@ -148,16 +145,16 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.QaApplicationException;
-import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaGeneralAuthoringDTO;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
-import org.lamsfoundation.lams.tool.qa.QaUtils;
+import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
+import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
+import org.lamsfoundation.lams.tool.qa.util.QaUtils;
+import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -325,13 +322,13 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	} else {
 	    QaStarterAction.logger.debug("getting existing content");
 	    /* it is possible that the content is in use by learners. */
-	    qaContent = qaService.loadQa(new Long(strToolContentID).longValue());
+	    qaContent = qaService.getQa(new Long(strToolContentID).longValue());
 	    
-	    if (qaService.studentActivityOccurredGlobal(qaContent)) {
+	    if (qaService.isStudentActivityOccurredGlobal(qaContent)) {
 		QaUtils.cleanUpSessionAbsolute(request);
 		
+		//add error.content.inUse to ActionMessages.
 		persistError(request, "error.content.inUse");
-		QaStarterAction.logger.debug("add error.content.inUse to ActionMessages.");
 		return mapping.findForward(QaAppConstants.ERROR_LIST);
 	    }
 	    qaContent = retrieveContent(request, mapping, qaAuthoringForm, new Long(
@@ -397,7 +394,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	QaStarterAction.logger.debug("isDefaultContent: " + isDefaultContent);
 
 	QaStarterAction.logger.debug("getting content with id:" + toolContentID);
-	QaContent qaContent = qaService.retrieveQa(toolContentID);
+	QaContent qaContent = qaService.getQa(toolContentID);
 	if (isDefaultContent && qaContent.getConditions().isEmpty()) {
 	    qaContent.getConditions().add(qaService.createDefaultComplexCondition(qaContent));
 	}
@@ -438,24 +435,24 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, qaGeneralAuthoringDTO.getActivityTitle());
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, qaGeneralAuthoringDTO.getActivityInstructions());
 
-	List<QaQuestionContentDTO> listQuestionContentDTO = new LinkedList();
+	List<QaQuestionDTO> listQuestionContentDTO = new LinkedList();
 
 	/*
 	 * get the existing question content
 	 */
 	boolean isFirst = false;
-	Iterator queIterator = qaContent.getQaQueContents().iterator();
+	Iterator queIterator = qaContent.getQaQuestions().iterator();
 	while (queIterator.hasNext()) {
 
-	    QaQueContent qaQueContent = (QaQueContent) queIterator.next();
-	    if (qaQueContent != null) {
-		QaQuestionContentDTO qaQuestionContentDTO = new QaQuestionContentDTO(qaQueContent);
-		listQuestionContentDTO.add(qaQuestionContentDTO);
+	    QaQuestion qaQuestion = (QaQuestion) queIterator.next();
+	    if (qaQuestion != null) {
+		QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(qaQuestion);
+		listQuestionContentDTO.add(qaQuestionDTO);
 		/**
 		 * make the first entry the default(first) one for jsp
 		 */
 		if (isFirst) {
-		    qaGeneralAuthoringDTO.setDefaultQuestionContent(qaQueContent.getQuestion());
+		    qaGeneralAuthoringDTO.setDefaultQuestionContent(qaQuestion.getQuestion());
 		    isFirst = false;
 		}
 	    }
@@ -469,8 +466,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	SortedSet<QaCondition> conditionSet = new TreeSet<QaCondition>(new TextSearchConditionComparator());
 	for (QaCondition condition : qaContent.getConditions()) {
 	    conditionSet.add(condition);
-	    for (QaQuestionContentDTO dto : listQuestionContentDTO) {
-		for (QaQueContent question : condition.getQuestions()) {
+	    for (QaQuestionDTO dto : listQuestionContentDTO) {
+		for (QaQuestion question : condition.getQuestions()) {
 		    if (dto.getDisplayOrder().equals(String.valueOf(question.getDisplayOrder()))) {
 			condition.temporaryQuestionDTOSet.add(dto);
 		    }
@@ -536,19 +533,14 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	/*
 	 * retrieve uid of the content based on default content id determined above
 	 */
-	long contentUID = 0;
 	try {
-	    QaStarterAction.logger.debug("retrieve uid of the content based on default content id determined above: "
-		    + defaultContentID);
-	    QaContent qaContent = qaService.loadQa(defaultContentID);
+	    //retrieve uid of the content based on default content id determined above
+	    QaContent qaContent = qaService.getQa(defaultContentID);
 	    if (qaContent == null) {
 		QaStarterAction.logger.debug("Exception occured: No default content");
 		persistError(request, "error.defaultContent.notSetup");
 		return false;
 	    }
-	    
-	    QaStarterAction.logger.debug("using qaContent uid: " + qaContent.getUid());
-	    contentUID = qaContent.getUid().longValue();
 	    
 	} catch (Exception e) {
 	    QaStarterAction.logger.debug("Exception occured: No default question content");
@@ -572,7 +564,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
      *         db
      */
     protected boolean existsContent(long toolContentID, IQaService qaService) {
-	QaContent qaContent = qaService.loadQa(toolContentID);
+	QaContent qaContent = qaService.getQa(toolContentID);
 	if (qaContent == null) {
 	    return false;
 	}

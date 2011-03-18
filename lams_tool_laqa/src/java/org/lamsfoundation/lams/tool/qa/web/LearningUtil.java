@@ -24,27 +24,27 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.qa.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.QaComparator;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
-import org.lamsfoundation.lams.tool.qa.QaQuestionContentDTO;
+import org.lamsfoundation.lams.tool.qa.QaQuestion;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
-import org.lamsfoundation.lams.tool.qa.QaUtils;
+import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.tool.qa.util.QaComparator;
+import org.lamsfoundation.lams.tool.qa.web.form.QaLearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -60,8 +60,7 @@ public class LearningUtil implements QaAppConstants {
     static Logger logger = Logger.getLogger(LearningUtil.class.getName());
 
     public static void saveFormRequestData(HttpServletRequest request, QaLearningForm qaLearningForm) {
-	logger.debug("saving form request data...");
-	String toolSessionID = request.getParameter("toolSessionID");
+	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	qaLearningForm.setToolSessionID(toolSessionID);
 
 	String userID = request.getParameter("userID");
@@ -72,12 +71,9 @@ public class LearningUtil implements QaAppConstants {
 
 	String totalQuestionCount = request.getParameter("totalQuestionCount");
 	qaLearningForm.setTotalQuestionCount(totalQuestionCount);
-
-	logger.debug("done saving form request data.");
     }
 
     public static GeneralLearnerFlowDTO buildGeneralLearnerFlowDTO(QaContent qaContent) {
-	logger.debug("starting buildMcGeneralLearnerFlowDTO: " + qaContent.getUid());
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = new GeneralLearnerFlowDTO();
 	generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
 	generalLearnerFlowDTO.setActivityInstructions(qaContent.getInstructions());
@@ -94,157 +90,80 @@ public class LearningUtil implements QaAppConstants {
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(qaContent.isAllowRichEditor()).toString());
 	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 	
-	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(qaContent.getQaQueContents().size()));
+	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(qaContent.getQaQuestions().size()));
 
-	Map<String, QaQuestionContentDTO> mapQuestions = new TreeMap();
-
-	Iterator contentIterator = qaContent.getQaQueContents().iterator();
-	while (contentIterator.hasNext()) {
-	    QaQueContent qaQueContent = (QaQueContent) contentIterator.next();
-	    if (qaQueContent != null) {
-		int displayOrder = qaQueContent.getDisplayOrder();
-		if (displayOrder != 0) {
-		    /*
-		     *  add the question to the questions Map in the displayOrder
-		     */
-		    QaQuestionContentDTO questionDTO = new QaQuestionContentDTO(qaQueContent);
-		    mapQuestions.put(questionDTO.getDisplayOrder(), questionDTO );
-		}
+	//create mapQuestions
+	Map<String, QaQuestionDTO> mapQuestions = new TreeMap<String, QaQuestionDTO>();
+	for (QaQuestion question : qaContent.getQaQuestions()) {
+	    int displayOrder = question.getDisplayOrder();
+	    if (displayOrder != 0) {
+		//add the question to the questions Map in the displayOrder
+		QaQuestionDTO questionDTO = new QaQuestionDTO(question);
+		mapQuestions.put(questionDTO.getDisplayOrder(), questionDTO);
 	    }
 	}
-
 	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
+	
 	return generalLearnerFlowDTO;
     }
 
-    /**
-     * createUsersAndResponses(Map mapAnswers, HttpServletRequest request)
-     * create users of the responses
-     * 
-     * @param mapAnswers,
-     *                request return void
-     * 
-     */
-    protected void createUsersAndResponses(Map mapAnswers, HttpServletRequest request, IQaService qaService,
-	    Long toolContentID, Long toolSessionID) {
-	logger.debug("toolContentID: " + toolContentID);
-	logger.debug("toolSessionID: " + toolSessionID);
+//    /**
+//     * Create users of the responses
+//     * 
+//     * @param mapAnswers
+//     * 
+//     */
+//    public static void storeResponses(Map<String, String> mapAnswers, IQaService qaService, Long toolContentID, Long toolSessionID) {
+//
+//	// get back login user DTO
+//	HttpSession ss = SessionManager.getSession();
+//	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+//	Long userId = new Long(toolUser.getUserID().longValue());
+//
+//	// obtain QaContent to be used in creating QaQueUsr
+//	QaContent qaContent = qaService.getQa(toolContentID.longValue());
+//
+//	QaQueUsr user = qaService.getUserByIdAndSession(userId, toolSessionID);
+//
+//	// check if Attempt to Entry is allowed, if so create the responses
+//	if (!user.isResponseFinalized() || !qaContent.isLockWhenFinished()) {
+//	    
+//	    Set<QaQuestion> questionsToStore;
+//	    if (qaContent.isQuestionsSequenced()) {
+//		String currentQuestionIndex = qaLearningForm.getCurrentQuestionIndex();
+//		QaQuestion currentQuestion = qaService.getQuestionContentByDisplayOrder(new Long(currentQuestionIndex), qaContent.getQaContentId());
+//		questionsToStore = new LinkedHashSet<QaQuestion>();
+//		questionsToStore.add(currentQuestion);
+//		
+//	    } else {
+//		questionsToStore = qaContent.getQaQuestions();
+//	    }
+//
+//	    for (QaQuestion question : questionsToStore) {
+//
+//		String displayOrder = new Long(question.getDisplayOrder()).toString();
+//		String answer = (String) mapAnswers.get(displayOrder);
+//
+//		QaUsrResp response = qaService.getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
+//		// if response doesn't exist
+//		if (response == null) {
+//		    response = new QaUsrResp(answer, new Date(System.currentTimeMillis()), "", question, user, true);
+//		    qaService.createQaUsrResp(response);
+//
+//		//if answer has changed
+//		} else if (! answer.equals(response.getAnswer())) {
+//		    response.setAnswer(answer);
+//		    response.setAttemptTime(new Date(System.currentTimeMillis()));
+//		    response.setTimezone("");
+//		    qaService.updateUserResponse(response);
+//		}
+//	    }
+//
+//	}
+//    }
 
-	HttpSession ss = SessionManager.getSession();
-	/* get back login user DTO */
-	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	logger.debug("retrieving toolUser userId: " + toolUser.getUserID());
-
-	String userName = toolUser.getLogin();
-	String fullName = toolUser.getFirstName() + " " + toolUser.getLastName();
-
-	Long userId = new Long(toolUser.getUserID().longValue());
-
-	/*
-	 * obtain QaContent to be used in creating QaQueUsr
-	 */
-	QaContent qaContent = qaService.retrieveQa(toolContentID.longValue());
-
-	QaSession qaSession = qaService.retrieveQaSessionOrNullById(toolSessionID.longValue());
-
-	Iterator contentIterator = qaContent.getQaQueContents().iterator();
-
-	QaQueUsr qaQueUsr = new QaQueUsr(userId, userName, fullName, null, qaSession, new TreeSet());
-
-
-	logger.debug("session uid: " + qaSession.getUid());
-	/*note that it is possible for a user to already exist from another tool session. In this case don't add any more user record*/
-	QaQueUsr qaQueUsrLocal = qaService.getQaUserBySession(userId, qaSession.getUid());
-
-	if ((qaQueUsr != null) && (qaQueUsrLocal == null)) {
-	    qaQueUsr = createUser(request, toolSessionID, qaService);
-	} else {
-	    qaQueUsr = qaQueUsrLocal;
-	}
-
-	boolean isResponseFinalized = qaQueUsr.isResponseFinalized();
-
-	boolean lockWhenFinished = qaContent.isLockWhenFinished();
-
-	boolean enableAttemptEntry = false;
-	boolean userAttemptExist = false;
-
-	if (!isResponseFinalized) {
-	    enableAttemptEntry = true;
-	}
-
-	if (isResponseFinalized && (!lockWhenFinished)) {
-	    userAttemptExist = true;
-	    enableAttemptEntry = true;
-	}
-
-	if (enableAttemptEntry) {
-	    logger.debug("enableAttemptEntry is true, so creating the responses: ");
-	    while (contentIterator.hasNext()) {
-		QaQueContent qaQueContent = (QaQueContent) contentIterator.next();
-		if (qaQueContent != null) {
-
-		    String displayOrder = new Long(qaQueContent.getDisplayOrder()).toString();
-		    String answer = (String) mapAnswers.get(displayOrder);
-
-
-
-		    String timezoneId = "";
-
-		    List attempts = qaService.getAttemptsForUserAndQuestionContent(qaQueUsr.getUid(), qaQueContent
-			    .getUid());
-
-		    if (userAttemptExist) {
-			qaService.removeAttemptsForUserAndQuestionContent(qaQueUsr.getUid(), qaQueContent.getUid());
-
-			QaUsrResp qaUsrResp = new QaUsrResp(answer, false, new Date(System.currentTimeMillis()),
-				timezoneId, qaQueContent, qaQueUsr, true);
-
-			if (qaUsrResp != null) {
-			    qaService.createQaUsrResp(qaUsrResp);
-			}
-		    } else {
-			if ((attempts != null) && (attempts.size() > 0)) {
-			} else {
-			    QaUsrResp qaUsrResp = new QaUsrResp(answer, false, new Date(System.currentTimeMillis()),
-				    timezoneId, qaQueContent, qaQueUsr, true);
-
-			    if (qaUsrResp != null) {
-				qaService.createQaUsrResp(qaUsrResp);
-			    }
-			}
-		    }
-		}
-	    }
-
-	}
-	if (qaQueUsr != null) {
-	    qaQueUsr.setResponseFinalized(true);
-	    logger.debug("finalized user input");
-	    qaService.updateQaQueUsr(qaQueUsr);
-	}
-    }
-
-    public static QaQueUsr createUser(HttpServletRequest request, Long toolSessionID, IQaService qaService) {
-	logger.debug("creating a new user in the tool db, toolSessionID: " + toolSessionID);
-
-	Long queUsrId = QaUtils.getUserId();
-	String username = QaUtils.getUserName();
-	String fullname = QaUtils.getUserFullName();
-
-	QaSession qaSession = qaService.retrieveQaSessionOrNullById(toolSessionID.longValue());
-
-	QaQueUsr qaQueUsr = new QaQueUsr(queUsrId, username, fullname, null, qaSession, new TreeSet());
-
-	qaService.createQaQueUsr(qaQueUsr);
-	return qaQueUsr;
-    }
-
-    protected String getRemainingQuestionCount(int currentQuestionIndex, String totalQuestionCount) {
-	logger.debug("totalQuestionCount: " + totalQuestionCount);
+    public static String getRemainingQuestionCount(int currentQuestionIndex, String totalQuestionCount) {
 	int remainingQuestionCount = new Long(totalQuestionCount).intValue() - currentQuestionIndex + 1;
-	logger.debug("remainingQuestionCount: " + remainingQuestionCount);
-
 	return new Integer(remainingQuestionCount).toString();
     }
 
@@ -255,26 +174,54 @@ public class LearningUtil implements QaAppConstants {
      * @param qaLearningForm
      *                return void
      */
-    protected String feedBackAnswersProgress(HttpServletRequest request, int currentQuestionIndex,
+    public static String feedBackAnswersProgress(HttpServletRequest request, int currentQuestionIndex,
 	    String totalQuestionCount) {
-	logger.debug("totalQuestionCount: " + totalQuestionCount);
 	int remainingQuestionCount = new Long(totalQuestionCount).intValue() - currentQuestionIndex + 1;
-	logger.debug("remainingQuestionCount: " + remainingQuestionCount);
 	String userFeedback = "";
-	if (remainingQuestionCount != 0)
+	if (remainingQuestionCount != 0) {
 	    userFeedback = "Remaining question count: " + remainingQuestionCount;
-	else
+	} else {
 	    userFeedback = "End of the questions.";
+	}
 
 	return userFeedback;
     }
-
-    public void setContentInUse(long toolContentID, IQaService qaService) {
-	QaContent qaContent = qaService.loadQa(toolContentID);
-
-	qaContent.setContentLocked(true);
-	logger.debug("content with id : " + toolContentID + "has been marked LOCKED");
-	qaService.updateQa(qaContent);
-	logger.debug("content with id : " + toolContentID + "has been marked LOCKED and updated in the db");
+    
+    /**
+     */
+    public static void populateAnswers(Map sessionMap, QaContent qaContent, QaQueUsr qaQueUsr,
+	    Map<String, QaQuestionDTO> mapQuestions, GeneralLearnerFlowDTO generalLearnerFlowDTO,
+	    IQaService qaService) {
+	
+	//create mapAnswers
+	Map<String, String> mapAnswers = (Map) sessionMap.get(MAP_ALL_RESULTS_KEY);
+	if (mapAnswers == null) {
+	    mapAnswers = new TreeMap<String, String>(new QaComparator());
+	    
+	    // get responses from DB
+	    Map<String, String> mapAnswersFromDb = new TreeMap<String, String>();
+	    for (QaQuestion question : qaContent.getQaQuestions()) {
+		Long questionUid = question.getUid();
+		QaUsrResp dbResponse = qaService.getResponseByUserAndQuestion(qaQueUsr.getQueUsrId(), questionUid);
+		if (dbResponse != null) {
+		    mapAnswersFromDb.put(String.valueOf(question.getDisplayOrder()), dbResponse.getAnswer());
+		}
+	    }	    
+	    
+	    // maybe we have come in from the review screen, if so get the answers from db.
+	    if (mapAnswersFromDb.size() > 0) {
+		mapAnswers.putAll(mapAnswersFromDb);
+	    } else {
+		for (Map.Entry pairs : mapQuestions.entrySet()) {
+		    mapAnswers.put(pairs.getKey().toString(), "");
+		}
+	    }
+	}
+	String currentAnswer = (String) mapAnswers.get("1");
+	generalLearnerFlowDTO.setCurrentQuestionIndex(new Integer(1));
+	generalLearnerFlowDTO.setCurrentAnswer(currentAnswer);
+	sessionMap.put(MAP_SEQUENTIAL_ANSWERS_KEY, mapAnswers);
+	generalLearnerFlowDTO.setMapAnswers(mapAnswers);
+	sessionMap.put(MAP_ALL_RESULTS_KEY, mapAnswers);
     }
 }

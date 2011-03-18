@@ -23,17 +23,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.qa.web;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -43,8 +35,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.fileupload.DiskFileUpload;
-import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -56,7 +46,7 @@ import org.lamsfoundation.lams.tool.qa.QaWizardCognitiveSkill;
 import org.lamsfoundation.lams.tool.qa.QaWizardQuestion;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
-import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.tool.qa.web.form.QaAdminForm;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

@@ -41,7 +41,7 @@
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 
-	<bean id="qaQueContentDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQueContentDAO">
+	<bean id="qaQuestionDAO" class="org.lamsfoundation.lams.tool.qa.dao.hibernate.QaQuestionDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 
@@ -80,7 +80,7 @@
 					<property name="qaDAO"><ref bean="qaContentDAO"/></property>
 					<property name="qaSessionDAO"><ref bean="qaSessionDAO"/></property>
 					<property name="qaQueUsrDAO"><ref bean="qaQueUsrDAO"/></property>
-					<property name="qaQueContentDAO"><ref bean="qaQueContentDAO"/></property>
+					<property name="qaQuestionDAO"><ref bean="qaQuestionDAO"/></property>
 					<property name="qaUsrRespDAO"><ref bean="qaUsrRespDAO"/></property>	
 					<property name="qaResponseRatingDAO"><ref bean="qaResponseRatingDAO"/></property>									
 					<property name="qaUploadedFileDAO"><ref bean="qaUploadedFileDAO"/></property>	

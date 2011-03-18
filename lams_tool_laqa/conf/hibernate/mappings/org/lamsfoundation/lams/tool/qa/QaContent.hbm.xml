@@ -190,7 +190,7 @@
     
 
    	 <set
-            name="qaQueContents"
+            name="qaQuestions"
             lazy="true"
             inverse="true"
             cascade="all"
@@ -202,7 +202,7 @@
               </key>
 
               <one-to-many
-                  class="org.lamsfoundation.lams.tool.qa.QaQueContent"
+                  class="org.lamsfoundation.lams.tool.qa.QaQuestion"
               />
     </set>
 

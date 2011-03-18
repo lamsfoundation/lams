@@ -22,10 +22,9 @@
  */
 
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.dto;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 

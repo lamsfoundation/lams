@@ -32,28 +32,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:WebAppURL />
 </c:set>
 
-<c:forEach var="questionEntry"
-	items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
-
-	<c:forEach var="answerEntry"
-		items="${generalLearnerFlowDTO.mapAnswers}">
+<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
+	<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswers}">
+	
 		<c:if test="${questionEntry.key == answerEntry.key}">
-
-		<div class="shading-bg">
-			<p>
-			 <strong><fmt:message key="label.question" /> <c:out
+		
+			<div class="shading-bg">
+				<p>
+			 		<strong><fmt:message key="label.question" /> <c:out
 					value="${questionEntry.key}" />:</strong>
 					<c:if test="${questionEntry.value.required}">
 						<fmt:message key="label.required" />
 					</c:if>
 					<c:out value="${questionEntry.value.question}" escapeXml="false" />
-					</p>
+				</p>
+								 
+				<p>
+					<strong><fmt:message key="label.answer" /></strong>
+				</p>
 				
-				 
-					  <p><strong><fmt:message key="label.answer" /></strong>
-					</p>
-					
-					<c:choose>
+				<c:choose>
 						<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
 							<lams:CKEditor id="answer${questionEntry.key}" value="${answerEntry.value}"
 								toolbarSet="DefaultLearner">
@@ -63,23 +61,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<c:otherwise>
 							<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
 						</c:otherwise>
-					</c:choose>
-		</div>
+				</c:choose>
+			</div>
 		
 		</c:if>
 	
-	
 	</c:forEach>
-
 </c:forEach>
  
- 	<div class="space-bottom-top align-right">
-	
-		<html:button property="btnCombined"
-			onclick="javascript:submitMethod('submitAnswersContent');"
-			styleClass="button">
+	<div class="space-bottom-top align-right">
+		<html:button property="btnCombined" onclick="javascript:submitMethod('submitAnswersContent');"	styleClass="button">
 			<fmt:message key="button.submitAllContent" />
 		</html:button>
-		
-		</div>
+	</div>
 

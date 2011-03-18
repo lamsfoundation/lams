@@ -78,13 +78,13 @@ public class TestQaContent extends QaDataAccessTestCase
 	    qa.setQaSessions(new TreeSet());
 	    
 	    //create new qa que content
-	    QaQueContent qaQueContent = new QaQueContent("What planet are you from",
+	    QaQuestion qaQuestion = new QaQuestion("What planet are you from",
 	    											4, 
 													qa, 
 													new TreeSet(), 
 													new TreeSet());
 	    
-	    qa.getQaQueContents().add(qaQueContent);
+	    qa.getQaQueContents().add(qaQuestion);
 	    
 	    //create the new content
 	    qaContentDAO.createQa(qa);
@@ -100,7 +100,7 @@ public class TestQaContent extends QaDataAccessTestCase
         qaSession.setQaContent(qa);
         
         //create new qa que response
-        qaQueContent.getQaUsrResps().add(getNewResponse("I am from Venus", qaQueContent));
+        qaQuestion.getQaUsrResps().add(getNewResponse("I am from Venus", qaQuestion));
         
 	    //create a new session with the  new content
         qaSessionDAO.CreateQaSession(qaSession);
@@ -120,8 +120,8 @@ public class TestQaContent extends QaDataAccessTestCase
     	while (queIterator.hasNext())
     	{
     		System.out.println(this.getClass().getName() + " \nin loop");
-    		QaQueContent qaQueContent=(QaQueContent) queIterator.next();
-    		System.out.println(this.getClass().getName() + " \nquestion: " + qaQueContent.getQuestion());
+    		QaQuestion qaQuestion=(QaQuestion) queIterator.next();
+    		System.out.println(this.getClass().getName() + " \nquestion: " + qaQuestion.getQuestion());
     	}
     }
 

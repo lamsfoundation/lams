@@ -23,14 +23,11 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
@@ -39,41 +36,18 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * 
  */
 public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
-    private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT = "from qaUsrResp in class QaUsrResp where qaUsrResp.queUsrId=:queUsrId and qaUsrResp.qaQueContentId=:qaQueContentId";
-
-    public QaQueUsr getUserById(long userId) {
-	return (QaQueUsr) this.getHibernateTemplate().load(QaQueUsr.class, new Long(userId));
-
-    }
+    private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION = "from qaUsrResp in class QaUsrResp where qaUsrResp.qaQueUser.queUsrId=:queUsrId and qaUsrResp.qaQuestion.uid=:questionId";
+    
+    private static final String GET_COUNT_RESPONSES_BY_QACONTENT = "SELECT COUNT(*) from "
+	    + QaUsrResp.class.getName() + " as r where r.qaQuestion.qaContent.qaContentId=?";
 
     public void createUserResponse(QaUsrResp qaUsrResp) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().save(qaUsrResp);
     }
 
-    public QaUsrResp retrieveQaUsrResp(long responseId) {
-	return (QaUsrResp) this.getHibernateTemplate().get(QaUsrResp.class, new Long(responseId));
-    }
-
-    public QaUsrResp getAttemptByUID(Long uid) {
-	String query = "from QaUsrResp attempt where attempt.responseId=?";
-
-	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(query).setLong(0, uid.longValue()).list();
-
-	if (list != null && list.size() > 0) {
-	    QaUsrResp attempt = (QaUsrResp) list.get(0);
-	    return attempt;
-	}
-	return null;
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.tool.qa.dao.interfaces.IQaUsrRespDAO#saveUserResponse(com.lamsinternational.tool.qa.domain.QaUsrResp)
-     */
-    public void saveUserResponse(QaUsrResp resp) {
-	this.getSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().save(resp);
+    public QaUsrResp getResponseById(Long responseId) {
+	return (QaUsrResp) this.getHibernateTemplate().get(QaUsrResp.class, responseId);
     }
 
     /**
@@ -89,40 +63,23 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 	this.getHibernateTemplate().delete(resp);
     }
 
-    public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId) {
-	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT).setLong("queUsrId",
-		queUsrId.longValue()).setLong("qaQueContentId", qaQueContentId.longValue()).list();
-
-	return list;
-    }
-
-    public void removeAttemptsForUserAndQuestionContent(final Long queUsrId, final Long qaQueContentId) {
-	HibernateTemplate templ = this.getHibernateTemplate();
-	List list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT).setLong("queUsrId",
-		queUsrId.longValue()).setLong("qaQueContentId", qaQueContentId.longValue()).list();
-
-	if (list != null && list.size() > 0) {
-	    Iterator listIterator = list.iterator();
-	    while (listIterator.hasNext()) {
-		QaUsrResp qaUsrResp = (QaUsrResp) listIterator.next();
-		this.getSession().setFlushMode(FlushMode.AUTO);
-		templ.delete(qaUsrResp);
-		templ.flush();
-	    }
+    public QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long questionId) {
+	List<QaUsrResp> list = getSession().createQuery(LOAD_ATTEMPT_FOR_USER_AND_QUESTION)
+		.setLong("queUsrId", queUsrId.longValue()).setLong("questionId", questionId.longValue()).list();
+	if (list == null || list.size() == 0) {
+	    return null;
+	} else {
+	    return (QaUsrResp) list.get(list.size() - 1);
 	}
     }
-
-    public void removeUserResponseByQaQueId(Long qaQueId) {
-	if (qaQueId != null) {
-	    String query = "from resp in class org.lamsfoundation.lams.tool.qa.QaUsrResp"
-		    + " where resp.qaQueContentId = ?";
-	    Object obj = getSession().createQuery(query).setLong(0, qaQueId.longValue()).uniqueResult();
-	    if (obj != null) {
-		this.getSession().setFlushMode(FlushMode.AUTO);
-		getHibernateTemplate().delete(obj);
-	    }
+    
+    public int getCountResponsesByQaContent(final Long qaContentId) {
+	    
+	List list = getHibernateTemplate().find(GET_COUNT_RESPONSES_BY_QACONTENT, new Object[] { qaContentId });
+	if (list == null || list.size() == 0) {
+	    return 0;
 	}
+	return ((Number) list.get(0)).intValue();
     }
 
 }

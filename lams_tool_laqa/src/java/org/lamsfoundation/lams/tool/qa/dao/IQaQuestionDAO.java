@@ -20,41 +20,34 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.dao;
 
-import java.io.Serializable;
-import java.util.Comparator;
+import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.qa.QaContent;
+import org.lamsfoundation.lams.tool.qa.QaQuestion;
 
 /**
+ * 
  * @author Ozgur Demirtas
  * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
  */
+public interface IQaQuestionDAO {
 
-/**
- * A comparator implementation that can be used as a constructor to collections.
- * The TreeMap in the web layer makes use of it.
- * 
- */
-public class QaComparator implements Comparator, Serializable {
-    static Logger logger = Logger.getLogger(QaComparator.class.getName());
+    public void createQueContent(QaQuestion queContent);
 
-    public int compare(Object o1, Object o2) {
-	String s1 = (String) o1;
-	String s2 = (String) o2;
+    public void saveOrUpdateQaQueContent(QaQuestion qaQuestion);
 
-	int key1 = new Long(s1).intValue();
-	int key2 = new Long(s2).intValue();
-	return key1 - key2;
-    }
+    public void removeQueContent(long qaQueContentId);
 
-    public boolean equals(Object o) {
-	String s = (String) o;
-	return compare(this, o) == 0;
-    }
+    public void removeQaQueContent(QaQuestion qaQuestion);
+
+    public List getAllQuestionEntries(final long qaContentId);
+
+    public QaQuestion getQuestionContentByQuestionText(final String question, Long qaContentId);
+
+    public QaQuestion getQuestionByDisplayOrder(Long displayOrder, Long qaContentId);
+
+    public List getAllQuestionEntriesSorted(final long qaContentId);
 }

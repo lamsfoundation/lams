@@ -32,7 +32,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaQuestion;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -41,8 +41,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 /**
  * @author Ozgur Demirtas
  * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
  */
 
 public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
@@ -51,17 +49,7 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
     private static final String LOAD_QA_BY_SESSION = "select qa from QaContent qa left join fetch "
 	    + "qa.qaSessions session where session.qaSessionId=:sessionId";
 
-    private static final String COUNT_USER_RESPONSED = "select distinct u.userId from QaQueUsr u left join fetch"
-	    + " u.qaQueContent as ques where ques.qaContent = :qa group by u.userId";
-
-    public QaContentDAO() {
-    }
-
-    public QaContent getQaById(long qaId) {
-	return loadQaById(qaId);
-    }
-
-    public QaContent loadQaById(long qaId) {
+    public QaContent getQaByContentId(long qaId) {
 	String query = "from QaContent as qa where qa.qaContentId = ?";
 	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSession().createQuery(query).setLong(0, qaId).list();
@@ -71,10 +59,6 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	    return qa;
 	}
 	return null;
-    }
-
-    public QaContent getQaContentByUID(Long uid) {
-	return (QaContent) this.getHibernateTemplate().get(QaContent.class, uid);
     }
 
     public void updateQa(QaContent qa) {
@@ -110,10 +94,6 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
     public void UpdateQa(QaContent qa) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(qa);
-    }
-
-    public int countUserResponsed(QaContent qa) {
-	return getHibernateTemplate().findByNamedParam(QaContentDAO.COUNT_USER_RESPONSED, "qa", qa).size();
     }
 
     public void removeAllQaSession(QaContent qaContent) {
@@ -153,7 +133,7 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
     public void removeQuestionsFromCache(QaContent qaContent) {
 	if (qaContent != null) {
 
-	    for (QaQueContent question : (Set<QaQueContent>) qaContent.getQaQueContents()) {
+	    for (QaQuestion question : (Set<QaQuestion>) qaContent.getQaQuestions()) {
 		getHibernateTemplate().evict(question);
 	    }
 	    getHibernateTemplate().evict(qaContent);

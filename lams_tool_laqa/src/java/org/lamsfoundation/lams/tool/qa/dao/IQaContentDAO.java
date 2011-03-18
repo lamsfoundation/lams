@@ -32,11 +32,7 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
  * 
  */
 public interface IQaContentDAO {
-    public QaContent getQaById(long qaId);
-
-    public QaContent loadQaById(long qaId);
-
-    public QaContent getQaContentByUID(Long uid);
+    public QaContent getQaByContentId(long qaId);
 
     public QaContent getQaBySession(Long sessionId);
 
@@ -53,8 +49,6 @@ public interface IQaContentDAO {
     public void removeQaById(Long qaId);
 
     public void removeAllQaSession(QaContent content);
-
-    public int countUserResponsed(QaContent content);
 
     public void deleteCondition(QaCondition condition);
 

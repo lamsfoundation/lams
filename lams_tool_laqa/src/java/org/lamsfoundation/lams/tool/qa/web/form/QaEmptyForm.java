@@ -22,46 +22,15 @@
  */
 
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.qa;
+package org.lamsfoundation.lams.tool.qa.web.form;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.struts.action.ActionForm;
 
 /**
- * <p>
- * DTO that holds question and user attempts data for jsp purposes
- * </p>
- * 
  * @author Ozgur Demirtas
+ * 
+ * TODO To change the template for this generated type comment go to Window -
+ * Preferences - Java - Code Style - Code Templates
  */
-public class EditActivityDTO implements Comparable {
-    private String monitoredContentInUse;
-
-    /**
-     * @return Returns the monitoredContentInUse.
-     */
-    public String getMonitoredContentInUse() {
-	return monitoredContentInUse;
-    }
-
-    /**
-     * @param monitoredContentInUse
-     *                The monitoredContentInUse to set.
-     */
-    public void setMonitoredContentInUse(String monitoredContentInUse) {
-	this.monitoredContentInUse = monitoredContentInUse;
-    }
-
-    public String toString() {
-	return new ToStringBuilder(this).append("monitoredContentInUse", monitoredContentInUse).toString();
-    }
-
-    public int compareTo(Object o) {
-	EditActivityDTO editActivityDTO = (EditActivityDTO) o;
-
-	if (editActivityDTO == null)
-	    return 1;
-	else
-	    return 0;
-    }
-
+public class QaEmptyForm extends ActionForm {
 }

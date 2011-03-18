@@ -26,8 +26,8 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
-import org.lamsfoundation.lams.tool.qa.dao.IQaConfigItemDAO;
 import org.lamsfoundation.lams.tool.qa.QaConfigItem;
+import org.lamsfoundation.lams.tool.qa.dao.IQaConfigItemDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
 
 public class QaConfigItemDAO extends BaseDAO implements IQaConfigItemDAO {

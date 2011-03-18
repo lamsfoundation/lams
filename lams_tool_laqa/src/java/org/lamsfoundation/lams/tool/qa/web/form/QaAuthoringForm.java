@@ -21,11 +21,9 @@
  * ****************************************************************
  */
 /* $$Id$$ */
-package org.lamsfoundation.lams.tool.qa.web;
+package org.lamsfoundation.lams.tool.qa.web.form;
 
 /* ActionForm for the Authoring environment*/
-import java.util.Map;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;

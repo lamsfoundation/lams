@@ -60,17 +60,6 @@
         length="100"
     />
     
-    <property
-        name="qaContentId"
-        type="java.lang.Long"
-        update="false"
-        insert="false"
-        access="property"
-        column="qa_content_id"
-        length="20"
-    />
-
-    
    <many-to-one
         name="qaContent"
         class="org.lamsfoundation.lams.tool.qa.QaContent"

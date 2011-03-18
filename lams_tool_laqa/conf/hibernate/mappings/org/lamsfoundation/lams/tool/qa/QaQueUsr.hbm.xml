@@ -55,15 +55,6 @@
             access="property"
             column="learnerFinished"
    />
-
-    <property
-        name="qaSessionId"
-        type="java.lang.Long"
-        column="qa_session_id"
-        update="false"
-        insert="false"
-    >
-    </property>
     
     <many-to-one
         name="qaSession"
