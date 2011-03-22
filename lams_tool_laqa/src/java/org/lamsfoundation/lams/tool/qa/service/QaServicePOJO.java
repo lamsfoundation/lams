@@ -72,7 +72,7 @@ import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
@@ -174,7 +174,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     }
 
-    public QaQuestion getQuestionContentByQuestionText(final String question, Long contentUid)
+    public QaQueContent getQuestionContentByQuestionText(final String question, Long contentUid)
 	    throws QaApplicationException {
 	try {
 	    return qaQuestionDAO.getQuestionContentByQuestionText(question, contentUid);
@@ -185,7 +185,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public QaQuestion getQuestionByContentAndDisplayOrder(Long displayOrder, Long contentUid)
+    public QaQueContent getQuestionByContentAndDisplayOrder(Long displayOrder, Long contentUid)
 	    throws QaApplicationException {
 	try {
 	    return qaQuestionDAO.getQuestionByDisplayOrder(displayOrder, contentUid);
@@ -196,7 +196,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public void saveOrUpdateQaQueContent(QaQuestion qaQuestion) throws QaApplicationException {
+    public void saveOrUpdateQaQueContent(QaQueContent qaQuestion) throws QaApplicationException {
 	try {
 	    qaQuestionDAO.saveOrUpdateQaQueContent(qaQuestion);
 
@@ -207,7 +207,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
     }
 
-    public void createQaQue(QaQuestion qaQuestion) throws QaApplicationException {
+    public void createQaQue(QaQueContent qaQuestion) throws QaApplicationException {
 	try {
 	    qaQuestionDAO.createQueContent(qaQuestion);
 	} catch (DataAccessException e) {
@@ -318,7 +318,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    updateQa(qaContent);
 	}
 	
-	QaQuestion question = getQuestionByContentAndDisplayOrder(new Long(questionDisplayOrder),
+	QaQueContent question = getQuestionByContentAndDisplayOrder(new Long(questionDisplayOrder),
 		qaContent.getUid());
 
 	QaUsrResp response = getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
@@ -484,7 +484,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
 
-    public void removeQaQueContent(QaQuestion qaQuestion) throws QaApplicationException {
+    public void removeQaQueContent(QaQueContent qaQuestion) throws QaApplicationException {
 	try {
 	    qaQuestionDAO.removeQaQueContent(qaQuestion);
 	} catch (DataAccessException e) {
@@ -730,8 +730,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 
 	    // don't export following fields value
 	    toolContentObj.setQaSessions(null);
-	    Set<QaQuestion> questions = toolContentObj.getQaQuestions();
-	    for (QaQuestion question : questions) {
+	    Set<QaQueContent> questions = toolContentObj.getQaQueContents();
+	    for (QaQueContent question : questions) {
 		question.setQaQueUsers(null);
 		question.setQaContent(null);
 	    }
@@ -779,8 +779,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    toolContentObj.setCreatedBy(newUserUid);
 
 	    // set back the tool content
-	    Set<QaQuestion> questions = toolContentObj.getQaQuestions();
-	    for (QaQuestion question : questions) {
+	    Set<QaQueContent> questions = toolContentObj.getQaQueContents();
+	    for (QaQueContent question : questions) {
 		question.setQaContent(toolContentObj);
 	    }
 	    Set<QaUploadedFile> files = toolContentObj.getQaUploadedFiles();
@@ -1379,12 +1379,12 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	// setQaSessions(Set qaSessions);
 
 	// set up question from body
-	QaQuestion question = new QaQuestion();
+	QaQueContent question = new QaQueContent();
 	String content = WebUtil.convertNewlines((String) importValues.get(ToolContentImport102Manager.CONTENT_BODY));
 	question.setQuestion(content);
 	question.setDisplayOrder(1);
 	question.setQaContent(toolContentObj);
-	toolContentObj.getQaQuestions().add(question);
+	toolContentObj.getQaQueContents().add(question);
 
 	qaDAO.saveOrUpdateQa(toolContentObj);
 

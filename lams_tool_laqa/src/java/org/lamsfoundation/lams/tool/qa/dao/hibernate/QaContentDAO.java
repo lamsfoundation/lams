@@ -32,7 +32,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaContentDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -133,7 +133,7 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
     public void removeQuestionsFromCache(QaContent qaContent) {
 	if (qaContent != null) {
 
-	    for (QaQuestion question : (Set<QaQuestion>) qaContent.getQaQuestions()) {
+	    for (QaQueContent question : (Set<QaQueContent>) qaContent.getQaQueContents()) {
 		getHibernateTemplate().evict(question);
 	    }
 	    getHibernateTemplate().evict(qaContent);

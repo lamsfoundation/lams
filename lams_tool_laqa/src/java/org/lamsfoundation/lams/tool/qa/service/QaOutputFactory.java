@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 
@@ -75,7 +75,7 @@ public class QaOutputFactory extends OutputFactory {
 		// adding all existing conditions
 		userAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(qaContent.getConditions()));
 		// if no conditions were created in the tool instance, a default condition is added;
-		if (userAnswersDefinition.getDefaultConditions().isEmpty() && !qaContent.getQaQuestions().isEmpty()) {
+		if (userAnswersDefinition.getDefaultConditions().isEmpty() && !qaContent.getQaQueContents().isEmpty()) {
 
 		    QaCondition defaultCondition = createDefaultComplexUserAnswersCondition(qaContent);
 		    qaContent.getConditions().add(defaultCondition);
@@ -156,10 +156,10 @@ public class QaOutputFactory extends OutputFactory {
 
 	    QaSession session = qaService.retrieveQaSession(toolSessionId);
 	    QaContent qaContent = session.getQaContent();
-	    Set<QaQuestion> questions = qaContent.getQaQuestions();
+	    Set<QaQueContent> questions = qaContent.getQaQueContents();
 	    String[] answers = new String[questions.size()];
 	    QaQueUsr user = qaService.getUserByIdAndSession(learnerId, session.getQaSessionId());
-	    for (QaQuestion question : questions) {
+	    for (QaQueContent question : questions) {
 		QaUsrResp response = qaService.getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
 		if (response != null) {
 		    answers[question.getDisplayOrder() - 1] = response.getAnswer();
@@ -171,7 +171,7 @@ public class QaOutputFactory extends OutputFactory {
 
 	    QaSession session = qaService.retrieveQaSession(toolSessionId);
 	    QaContent qaContent = session.getQaContent();
-	    Set<QaQuestion> questions = qaContent.getQaQuestions();
+	    Set<QaQueContent> questions = qaContent.getQaQueContents();
 	    Set<QaQueUsr> users = session.getQaQueUsers();
 	    String[] dummyStringArray = new String[] {};
 
@@ -181,7 +181,7 @@ public class QaOutputFactory extends OutputFactory {
 		if (user != null) {
 		    List<String> answers = new LinkedList<String>();
 		    long lastAttemptTime = Long.MAX_VALUE;
-		    for (QaQuestion question : questions) {
+		    for (QaQueContent question : questions) {
 
 			QaUsrResp response = qaService.getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
 
@@ -234,10 +234,10 @@ public class QaOutputFactory extends OutputFactory {
 	    // Questions asked in this Q&A activity
 	    QaSession session = qaService.retrieveQaSession(toolSessionId);
 	    QaContent qaContent = session.getQaContent();
-	    Set<QaQuestion> questions = qaContent.getQaQuestions();
+	    Set<QaQueContent> questions = qaContent.getQaQueContents();
 	    String[] questionArray = new String[questions.size()];
 	    int questionIndex = 0;
-	    for (QaQuestion question : questions) {
+	    for (QaQueContent question : questions) {
 		questionArray[questionIndex++] = question.getQuestion();
 	    }
 	    return new ToolOutput(name, getI18NText(QaAppConstants.QUESTIONS_DEFINITION_NAME, true), questionArray,
@@ -263,11 +263,11 @@ public class QaOutputFactory extends OutputFactory {
      * @return default Q&A condition
      */
     protected QaCondition createDefaultComplexUserAnswersCondition(QaContent qaContent) {
-	if (qaContent.getQaQuestions().isEmpty()) {
+	if (qaContent.getQaQueContents().isEmpty()) {
 	    return null;
 	}
-	Set<QaQuestion> questions = new HashSet<QaQuestion>();
-	questions.add((QaQuestion) qaContent.getQaQuestions().iterator().next());
+	Set<QaQueContent> questions = new HashSet<QaQueContent>();
+	questions.add((QaQueContent) qaContent.getQaQueContents().iterator().next());
 	String name = buildConditionName(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, qaContent.getQaContentId()
 		.toString());
 	// Default condition checks if the first answer contains word "LAMS"

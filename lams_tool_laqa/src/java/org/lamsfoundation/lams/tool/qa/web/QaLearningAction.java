@@ -122,7 +122,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
@@ -272,7 +272,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
 	QaContent qaContent = qaSession.getQaContent();
-	int intTotalQuestionCount = qaContent.getQaQuestions().size();
+	int intTotalQuestionCount = qaContent.getQaQueContents().size();
 	
 	if (! qaContent.isQuestionsSequenced()) {
 	    
@@ -284,7 +284,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	} else {
 	    String currentQuestionIndex = qaLearningForm.getCurrentQuestionIndex();
 	    String newAnswer = qaLearningForm.getAnswer();
-	    QaQuestion currentQuestion = qaService.getQuestionByContentAndDisplayOrder(new Long(currentQuestionIndex), qaContent.getUid());
+	    QaQueContent currentQuestion = qaService.getQuestionByContentAndDisplayOrder(new Long(currentQuestionIndex), qaContent.getUid());
 	    
 	    boolean isRequiredQuestionMissed = currentQuestion.isRequired() && isEmpty(newAnswer);
 	    if (!isRequiredQuestionMissed) {

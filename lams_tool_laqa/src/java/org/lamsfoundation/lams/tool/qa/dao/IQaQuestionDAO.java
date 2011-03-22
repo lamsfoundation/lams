@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.qa.dao;
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 
 /**
  * 
@@ -35,19 +35,19 @@ import org.lamsfoundation.lams.tool.qa.QaQuestion;
  */
 public interface IQaQuestionDAO {
 
-    public void createQueContent(QaQuestion queContent);
+    public void createQueContent(QaQueContent queContent);
 
-    public void saveOrUpdateQaQueContent(QaQuestion qaQuestion);
+    public void saveOrUpdateQaQueContent(QaQueContent qaQuestion);
 
     public void removeQueContent(long qaQueContentId);
 
-    public void removeQaQueContent(QaQuestion qaQuestion);
+    public void removeQaQueContent(QaQueContent qaQuestion);
 
     public List getAllQuestionEntries(final long qaContentId);
 
-    public QaQuestion getQuestionContentByQuestionText(final String question, Long qaContentId);
+    public QaQueContent getQuestionContentByQuestionText(final String question, Long qaContentId);
 
-    public QaQuestion getQuestionByDisplayOrder(Long displayOrder, Long qaContentId);
+    public QaQueContent getQuestionByDisplayOrder(Long displayOrder, Long qaContentId);
 
     public List getAllQuestionEntriesSorted(final long qaContentId);
 }

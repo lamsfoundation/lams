@@ -43,7 +43,7 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.util.QaComparator;
@@ -438,9 +438,9 @@ public class AuthoringUtil implements QaAppConstants {
 	qaContent = qaService.getQa(new Long(strToolContentID).longValue());
 
 	for (QaCondition condition : conditions) {
-	    condition.setQuestions(new TreeSet<QaQuestion>(new QaQueContentComparator()));
+	    condition.setQuestions(new TreeSet<QaQueContent>(new QaQueContentComparator()));
 	    for (QaQuestionDTO dto : condition.temporaryQuestionDTOSet) {
-		for (QaQuestion queContent : (Set<QaQuestion>) qaContent.getQaQuestions()) {
+		for (QaQueContent queContent : (Set<QaQueContent>) qaContent.getQaQueContents()) {
 		    if (dto.getDisplayOrder().equals(String.valueOf(queContent.getDisplayOrder()))) {
 			condition.getQuestions().add(queContent);
 		    }
@@ -472,7 +472,7 @@ public class AuthoringUtil implements QaAppConstants {
 	    while (listIterator.hasNext()) {
 		++mapIndex;
 
-		QaQuestion queContent = (QaQuestion) listIterator.next();
+		QaQueContent queContent = (QaQueContent) listIterator.next();
 
 		//Checking whether to remove question with id  queContent.getUid()
 		entryUsed = false;
@@ -487,7 +487,7 @@ public class AuthoringUtil implements QaAppConstants {
 
 		if (entryUsed == false) {
 
-		    QaQuestion removeableQaQueContent = qaService.getQuestionContentByQuestionText(queContent
+		    QaQueContent removeableQaQueContent = qaService.getQuestionContentByQuestionText(queContent
 			    .getQuestion(), qaContent.getUid());
 		    if (removeableQaQueContent != null) {
 			//Removing question with id removeableQaQueContent.getUid() 
@@ -522,11 +522,11 @@ public class AuthoringUtil implements QaAppConstants {
 	    
 		++displayOrder;
 		
-		QaQuestion existingQaQueContent = qaService.getQuestionContentByQuestionText(questionText, qaContent.getUid());
+		QaQueContent existingQaQueContent = qaService.getQuestionContentByQuestionText(questionText, qaContent.getUid());
 		if (existingQaQueContent == null) {
-		    QaQuestion queContent = new QaQuestion(questionText, displayOrder, questionContentDTO.getFeedback(),
+		    QaQueContent queContent = new QaQueContent(questionText, displayOrder, questionContentDTO.getFeedback(),
 			    	questionContentDTO.isRequired(), qaContent, null);
-		    qaContent.getQaQuestions().add(queContent);
+		    qaContent.getQaQueContents().add(queContent);
 		    queContent.setQaContent(qaContent);
 
 		    AuthoringUtil.logger.info("Creating new question with question=" + queContent.getQuestion() + ", displayOrder=" + queContent.getDisplayOrder());
@@ -572,9 +572,9 @@ public class AuthoringUtil implements QaAppConstants {
 	    Iterator listIterator = sortedQuestions.iterator();
 	    int displayOrder = 1;
 	    while (listIterator.hasNext()) {
-		QaQuestion queContent = (QaQuestion) listIterator.next();
+		QaQueContent queContent = (QaQueContent) listIterator.next();
 
-		QaQuestion existingQaQueContent = qaService.getQuestionContentByQuestionText(
+		QaQueContent existingQaQueContent = qaService.getQuestionContentByQuestionText(
 			queContent.getQuestion(), qaContent.getUid());
 		existingQaQueContent.setDisplayOrder(displayOrder);
 		qaService.saveOrUpdateQaQueContent(existingQaQueContent);

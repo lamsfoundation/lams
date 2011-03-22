@@ -67,7 +67,7 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
 	
 	
 	protected QaSession qaSession;
-	protected QaQuestion qaQuestion;
+	protected QaQueContent qaQuestion;
 	
 	
 	public QaDataAccessTestCase(String name)
@@ -104,7 +104,7 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
     /*
     protected QaQueUsr getExistingUser(String username, String fullname)
     {
-    	QaQuestion qaQuestion = qaQuestionDAO.getQaQueById(TEST_EXISTING_QUE_CONTENT_ID);
+    	QaQueContent qaQuestion = qaQuestionDAO.getQaQueById(TEST_EXISTING_QUE_CONTENT_ID);
 		QaSession qaSession = qaSessionDAO.getQaSessionById(TEST_EXISTING_SESSION_ID);
     	
         QaQueUsr qaQueUsr= new QaQueUsr(new Long(TEST_NEW_USER_ID),
@@ -118,7 +118,7 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
     }
     
     
-    protected QaUsrResp getNewResponse(String response, QaQuestion qaQuestion)
+    protected QaUsrResp getNewResponse(String response, QaQueContent qaQuestion)
     {
     	QaUsrResp qaUsrResp= new QaUsrResp(response, false,
 											new Date(System.currentTimeMillis()),
@@ -146,13 +146,13 @@ public class QaDataAccessTestCase extends AbstractLamsTestCase
         qa.setOnlineInstructions("");
         qa.setOfflineInstructions("");
         qa.setReportTitle("");
-        qa.setQaQuestions(new TreeSet());
+        qa.setQaQueContents(new TreeSet());
         qa.setQaSessions(new TreeSet());
         
         //create new qa que content
-	QaQuestion qaQuestion = new QaQuestion("What planet are you from", 4, "", false, qa, new TreeSet());
+	QaQueContent qaQuestion = new QaQueContent("What planet are you from", 4, "", false, qa, new TreeSet());
        
-        qa.getQaQuestions().add(qaQuestion);
+        qa.getQaQueContents().add(qaQuestion);
         
         //create the new content
         qaContentDAO.createQa(qa);

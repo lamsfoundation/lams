@@ -49,7 +49,7 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
@@ -225,9 +225,9 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	/*
 	 * fetch question content from content
 	 */
-	Iterator contentIterator = qaContent.getQaQuestions().iterator();
+	Iterator contentIterator = qaContent.getQaQueContents().iterator();
 	while (contentIterator.hasNext()) {
-	    QaQuestion qaQuestion = (QaQuestion) contentIterator.next();
+	    QaQueContent qaQuestion = (QaQueContent) contentIterator.next();
 	    if (qaQuestion != null) {
 		int displayOrder = qaQuestion.getDisplayOrder();
 

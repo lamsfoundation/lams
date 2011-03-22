@@ -120,7 +120,7 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.EditActivityDTO;
@@ -653,9 +653,9 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	List listQuestionContentDTO = new LinkedList();
 
-	Iterator queIterator = qaContent.getQaQuestions().iterator();
+	Iterator queIterator = qaContent.getQaQueContents().iterator();
 	while (queIterator.hasNext()) {
-	    QaQuestion qaQuestion = (QaQuestion) queIterator.next();
+	    QaQueContent qaQuestion = (QaQueContent) queIterator.next();
 	    if (qaQuestion != null) {
 		QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(qaQuestion);
 		listQuestionContentDTO.add(qaQuestionDTO);

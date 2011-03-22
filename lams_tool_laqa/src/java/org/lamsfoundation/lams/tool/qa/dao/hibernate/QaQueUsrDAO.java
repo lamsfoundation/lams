@@ -46,7 +46,7 @@ public class QaQueUsrDAO extends HibernateDaoSupport implements IQaQueUsrDAO {
     private static final String COUNT_SESSION_USER = "select qaQueUsr.queUsrId from QaQueUsr qaQueUsr where qaQueUsr.qaSession.qaSessionId= :qaSession";
     private static final String LOAD_USER_FOR_SESSION = "from qaQueUsr in class QaQueUsr where  qaQueUsr.qaSession.qaSessionId= :qaSessionId";
 
-    private static final String GET_USER_COUNT_FOR_CONTENT = "select count(*) from QaQueUsr quser, QaSession qses, QaQuestion qcon where "
+    private static final String GET_USER_COUNT_FOR_CONTENT = "select count(*) from QaQueUsr quser, QaSession qses, QaQueContent qcon where "
 	    + "quser.qaSession=qses and " + "qses.qaContent=qcon and " + "qcon.uid=:uid";
 
     public int countSessionUser(QaSession qaSession) {

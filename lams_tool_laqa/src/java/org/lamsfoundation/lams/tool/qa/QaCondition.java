@@ -53,7 +53,7 @@ public class QaCondition extends TextSearchCondition {
      * Questions linked to this condition. Answers to them will be scanned for
      * the words that make the condition's parameters.
      */
-    private Set<QaQuestion> questions = new TreeSet<QaQuestion>(new QaQueContentComparator());
+    private Set<QaQueContent> questions = new TreeSet<QaQueContent>(new QaQueContentComparator());
     private static Logger log = Logger.getLogger(QaCondition.class);
 
     public SortedSet<QaQuestionDTO> temporaryQuestionDTOSet = new TreeSet<QaQuestionDTO>(
@@ -65,15 +65,15 @@ public class QaCondition extends TextSearchCondition {
 
     public QaCondition(QaConditionDTO conditionDTO) {
 	super(conditionDTO);
-	for (QaQuestion question : conditionDTO.getQuestions()) {
-	    QaQuestion questionCopy = new QaQuestion(question.getQuestion(), question.getDisplayOrder(), null,
+	for (QaQueContent question : conditionDTO.getQuestions()) {
+	    QaQueContent questionCopy = new QaQueContent(question.getQuestion(), question.getDisplayOrder(), null,
 		    question.isRequired(), null, null);
 	    getQuestions().add(questionCopy);
 	}
     }
 
     public QaCondition(Long conditionId, Integer conditionUIID, Integer orderId, String name, String displayName,
-	    String allWords, String phrase, String anyWords, String excludedWords, Set<QaQuestion> questions) {
+	    String allWords, String phrase, String anyWords, String excludedWords, Set<QaQueContent> questions) {
 	super(conditionId, conditionUIID, orderId, name, displayName, BranchCondition.OUTPUT_TYPE_COMPLEX, null, null,
 		null, allWords, phrase, anyWords, excludedWords);
 	setQuestions(questions);
@@ -89,7 +89,7 @@ public class QaCondition extends TextSearchCondition {
 		    // the condition "knows" it's an array of strings, i.e. user's answers
 		    String[] answers = (String[]) value.getValue();
 		    result = true;
-		    for (QaQuestion question : questions) {
+		    for (QaQueContent question : questions) {
 			String textToMatch = answers[question.getDisplayOrder() - 1];
 			textToMatch = WebUtil.removeHTMLtags(textToMatch);
 			result &= matches(textToMatch);
@@ -106,11 +106,11 @@ public class QaCondition extends TextSearchCondition {
 	return result;
     }
 
-    public Set<QaQuestion> getQuestions() {
+    public Set<QaQueContent> getQuestions() {
 	return questions;
     }
 
-    public void setQuestions(Set<QaQuestion> questions) {
+    public void setQuestions(Set<QaQueContent> questions) {
 	this.questions = questions;
     }
 
@@ -119,7 +119,7 @@ public class QaCondition extends TextSearchCondition {
      */
     @Override
     public Object clone() {
-	Set<QaQuestion> questionsCopy = new TreeSet<QaQuestion>(new QaQueContentComparator());
+	Set<QaQueContent> questionsCopy = new TreeSet<QaQueContent>(new QaQueContentComparator());
 	questionsCopy.addAll(questions);
 	return new QaCondition(null, null, orderId, name, displayName, allWords, phrase, anyWords, excludedWords,
 		questionsCopy);
@@ -134,10 +134,10 @@ public class QaCondition extends TextSearchCondition {
     @Override
     public QaCondition clone(int uiidOffset) {
 	Integer newConditionUIID = LearningDesign.addOffset(conditionUIID, uiidOffset);
-	Set<QaQuestion> questionsCopy = new TreeSet<QaQuestion>(new QaQueContentComparator());
+	Set<QaQueContent> questionsCopy = new TreeSet<QaQueContent>(new QaQueContentComparator());
 
-	for (QaQuestion question : getQuestions()) {
-	    QaQuestion questionCopy = new QaQuestion(question.getQuestion(), question.getDisplayOrder(), null,
+	for (QaQueContent question : getQuestions()) {
+	    QaQueContent questionCopy = new QaQueContent(question.getQuestion(), question.getDisplayOrder(), null,
 		    question.isRequired(), null, null);
 	    questionsCopy.add(questionCopy);
 	}
@@ -152,9 +152,9 @@ public class QaCondition extends TextSearchCondition {
      */
     public QaCondition clone(QaContent qaContent) {
 
-	Set<QaQuestion> questionsCopy = new TreeSet<QaQuestion>(new QaQueContentComparator());
-	for (QaQuestion conditionQuestion : getQuestions()) {
-	    for (QaQuestion contentQuestion : (Set<QaQuestion>) qaContent.getQaQuestions()) {
+	Set<QaQueContent> questionsCopy = new TreeSet<QaQueContent>(new QaQueContentComparator());
+	for (QaQueContent conditionQuestion : getQuestions()) {
+	    for (QaQueContent contentQuestion : (Set<QaQueContent>) qaContent.getQaQueContents()) {
 		if (conditionQuestion.getDisplayOrder() == contentQuestion.getDisplayOrder()) {
 		    questionsCopy.add(contentQuestion);
 		}

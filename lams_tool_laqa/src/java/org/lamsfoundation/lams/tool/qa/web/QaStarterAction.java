@@ -147,7 +147,7 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
@@ -441,10 +441,10 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	 * get the existing question content
 	 */
 	boolean isFirst = false;
-	Iterator queIterator = qaContent.getQaQuestions().iterator();
+	Iterator queIterator = qaContent.getQaQueContents().iterator();
 	while (queIterator.hasNext()) {
 
-	    QaQuestion qaQuestion = (QaQuestion) queIterator.next();
+	    QaQueContent qaQuestion = (QaQueContent) queIterator.next();
 	    if (qaQuestion != null) {
 		QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(qaQuestion);
 		listQuestionContentDTO.add(qaQuestionDTO);
@@ -467,7 +467,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	for (QaCondition condition : qaContent.getConditions()) {
 	    conditionSet.add(condition);
 	    for (QaQuestionDTO dto : listQuestionContentDTO) {
-		for (QaQuestion question : condition.getQuestions()) {
+		for (QaQueContent question : condition.getQuestions()) {
 		    if (dto.getDisplayOrder().equals(String.valueOf(question.getDisplayOrder()))) {
 			condition.temporaryQuestionDTOSet.add(dto);
 		    }

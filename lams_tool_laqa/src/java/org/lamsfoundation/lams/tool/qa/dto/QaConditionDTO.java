@@ -28,26 +28,26 @@ import java.util.TreeSet;
 
 import org.lamsfoundation.lams.learningdesign.dto.TextSearchConditionDTO;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.util.QaQueContentComparator;
 
 public class QaConditionDTO extends TextSearchConditionDTO {
-    private Set<QaQuestion> questions = new TreeSet<QaQuestion>(new QaQueContentComparator());
+    private Set<QaQueContent> questions = new TreeSet<QaQueContent>(new QaQueContentComparator());
 
     public QaConditionDTO(QaCondition condition, Integer toolActivityUIID) {
 	super(condition, toolActivityUIID);
-	for (QaQuestion question : condition.getQuestions()) {
-	    QaQuestion questionCopy = new QaQuestion(question.getQuestion(), question.getDisplayOrder(), null,
+	for (QaQueContent question : condition.getQuestions()) {
+	    QaQueContent questionCopy = new QaQueContent(question.getQuestion(), question.getDisplayOrder(), null,
 		    question.isRequired(), null, null);
 	    getQuestions().add(questionCopy);
 	}
     }
 
-    public Set<QaQuestion> getQuestions() {
+    public Set<QaQueContent> getQuestions() {
 	return questions;
     }
 
-    public void setQuestions(Set<QaQuestion> questions) {
+    public void setQuestions(Set<QaQueContent> questions) {
 	this.questions = questions;
     }
 

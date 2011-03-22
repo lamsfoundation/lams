@@ -37,7 +37,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.web.form.QaPedagogicalPlannerForm;
@@ -84,14 +84,14 @@ public class QaPedagogicalPlannerAction extends LamsDispatchAction {
 		if (StringUtils.isEmpty(question)) {
 		    plannerForm.removeQuestion(questionIndex);
 		} else {
-		    if (questionIndex < qaContent.getQaQuestions().size()) {
-			QaQuestion qaQuestion = getQaService().getQuestionByContentAndDisplayOrder(
+		    if (questionIndex < qaContent.getQaQueContents().size()) {
+			QaQueContent qaQuestion = getQaService().getQuestionByContentAndDisplayOrder(
 				(long) questionIndex + 1, qaContent.getUid());
 			qaQuestion.setQuestion(question);
 			getQaService().saveOrUpdateQaQueContent(qaQuestion);
 
 		    } else {
-			QaQuestion qaQuestion = new QaQuestion();
+			QaQueContent qaQuestion = new QaQueContent();
 			qaQuestion.setDisplayOrder(questionIndex + 1);
 			qaQuestion.setRequired(false);
 			qaQuestion.setQaContent(qaContent);
@@ -101,10 +101,10 @@ public class QaPedagogicalPlannerAction extends LamsDispatchAction {
 		    questionIndex++;
 		}
 	    } while (question != null);
-	    if (questionIndex < qaContent.getQaQuestions().size()) {
+	    if (questionIndex < qaContent.getQaQueContents().size()) {
 		getQaService().removeQuestionsFromCache(qaContent);
-		for (; questionIndex < qaContent.getQaQuestions().size(); questionIndex++) {
-		    QaQuestion qaQuestion = getQaService().getQuestionByContentAndDisplayOrder(
+		for (; questionIndex < qaContent.getQaQueContents().size(); questionIndex++) {
+		    QaQueContent qaQuestion = getQaService().getQuestionByContentAndDisplayOrder(
 			    (long) questionIndex + 1, qaContent.getUid());
 		    getQaService().removeQaQueContent(qaQuestion);
 		}

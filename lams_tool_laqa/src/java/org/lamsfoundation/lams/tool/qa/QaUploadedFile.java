@@ -43,9 +43,9 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
  */
 
 /**
- * QaQuestion Value Object The value object that maps to our model database
+ * QaQueContent Value Object The value object that maps to our model database
  * table: tl_laqa11_que_content The relevant hibernate mapping resides in:
- * QaQuestion.hbm.xml
+ * QaQueContent.hbm.xml
  * 
  * Holds question content within a particular content
  */

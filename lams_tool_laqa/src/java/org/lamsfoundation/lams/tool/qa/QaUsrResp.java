@@ -53,7 +53,7 @@ public class QaUsrResp implements Serializable, Comparable {
     private Date attemptTime;
 
     /** nullable persistent field */
-    private QaQuestion qaQuestion;
+    private QaQueContent qaQuestion;
 
     private boolean visible;
 
@@ -65,7 +65,7 @@ public class QaUsrResp implements Serializable, Comparable {
 
     /** full constructor */
     public QaUsrResp(Long responseId, String answer, Date attemptTime, String timezone,
-	    QaQuestion qaQuestion, QaQueUsr qaQueUser) {
+	    QaQueContent qaQuestion, QaQueUsr qaQueUser) {
 	this.responseId = responseId;
 	this.answer = answer;
 	this.attemptTime = attemptTime;
@@ -74,7 +74,7 @@ public class QaUsrResp implements Serializable, Comparable {
 	this.qaQueUser = qaQueUser;
     }
 
-    public QaUsrResp(String answer, Date attemptTime, String timezone, QaQuestion qaQuestion,
+    public QaUsrResp(String answer, Date attemptTime, String timezone, QaQueContent qaQuestion,
 	    QaQueUsr qaQueUser) {
 	this.answer = answer;
 	this.attemptTime = attemptTime;
@@ -83,7 +83,7 @@ public class QaUsrResp implements Serializable, Comparable {
 	this.qaQueUser = qaQueUser;
     }
 
-    public QaUsrResp(String answer, Date attemptTime, String timezone, QaQuestion qaQuestion,
+    public QaUsrResp(String answer, Date attemptTime, String timezone, QaQueContent qaQuestion,
 	    QaQueUsr qaQueUser, boolean visible) {
 	this.answer = answer;
 	this.attemptTime = attemptTime;
@@ -159,7 +159,7 @@ public class QaUsrResp implements Serializable, Comparable {
     /**
      * @return Returns the qaQuestion.
      */
-    public QaQuestion getQaQuestion() {
+    public QaQueContent getQaQuestion() {
 	return qaQuestion;
     }
 
@@ -167,7 +167,7 @@ public class QaUsrResp implements Serializable, Comparable {
      * @param qaQuestion
      *                The qaQuestion to set.
      */
-    public void setQaQuestion(QaQuestion qaQuestion) {
+    public void setQaQuestion(QaQueContent qaQuestion) {
 	this.qaQuestion = qaQuestion;
     }
 

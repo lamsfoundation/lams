@@ -104,7 +104,7 @@ public class TestQaSession extends QaDataAccessTestCase
     	Iterator contentIterator=qaContent.getQaQueContents().iterator();
     	while (contentIterator.hasNext())
     	{
-    		QaQuestion qaQuestion=(QaQuestion)contentIterator.next();
+    		QaQueContent qaQuestion=(QaQueContent)contentIterator.next();
     		System.out.println(this.getClass().getName() + "\n question : " + qaQuestion.getDisplayOrder() + " " + qaQuestion.getQuestion());
     		String displayOrder= new Integer(qaQuestion.getDisplayOrder()).toString();
     		mapQuestions.put(displayOrder,qaQuestion.getQuestion());

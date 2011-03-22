@@ -78,7 +78,7 @@ public class TestQaContent extends QaDataAccessTestCase
 	    qa.setQaSessions(new TreeSet());
 	    
 	    //create new qa que content
-	    QaQuestion qaQuestion = new QaQuestion("What planet are you from",
+	    QaQueContent qaQuestion = new QaQueContent("What planet are you from",
 	    											4, 
 													qa, 
 													new TreeSet(), 
@@ -120,7 +120,7 @@ public class TestQaContent extends QaDataAccessTestCase
     	while (queIterator.hasNext())
     	{
     		System.out.println(this.getClass().getName() + " \nin loop");
-    		QaQuestion qaQuestion=(QaQuestion) queIterator.next();
+    		QaQueContent qaQuestion=(QaQueContent) queIterator.next();
     		System.out.println(this.getClass().getName() + " \nquestion: " + qaQuestion.getQuestion());
     	}
     }

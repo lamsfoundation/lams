@@ -31,7 +31,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 public class QaPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
@@ -75,10 +75,10 @@ public class QaPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	    setToolContentID(qaContent.getQaContentId());
 
 	    question = new ArrayList<String>();
-	    Set questions = qaContent.getQaQuestions();
+	    Set questions = qaContent.getQaQueContents();
 	    if (questions != null) {
 		int topicIndex = 0;
-		for (QaQuestion message : (Set<QaQuestion>) questions) {
+		for (QaQueContent message : (Set<QaQueContent>) questions) {
 		    setQuestion(topicIndex++, message.getQuestion());
 		}
 	    }

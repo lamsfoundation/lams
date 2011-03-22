@@ -51,7 +51,7 @@
 
    <many-to-one
             name="qaQuestion"
-            class="org.lamsfoundation.lams.tool.qa.QaQuestion"
+            class="org.lamsfoundation.lams.tool.qa.QaQueContent"
             not-null="true"            
             cascade="none"
             outer-join="auto"

@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
@@ -84,9 +84,9 @@ public interface IQaService {
      */
     void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder);
 
-    public void createQaQue(QaQuestion qaQuestion) throws QaApplicationException;
+    public void createQaQue(QaQueContent qaQuestion) throws QaApplicationException;
 
-    public void removeQaQueContent(QaQuestion qaQuestion) throws QaApplicationException;
+    public void removeQaQueContent(QaQueContent qaQuestion) throws QaApplicationException;
 
     public void createQaUsrResp(QaUsrResp qaUsrResp) throws QaApplicationException;
 
@@ -94,15 +94,15 @@ public interface IQaService {
 
     public QaUsrResp getResponseById(Long responseId) throws QaApplicationException;
 
-    public QaQuestion getQuestionContentByQuestionText(final String question, Long contentUid)
+    public QaQueContent getQuestionContentByQuestionText(final String question, Long contentUid)
 	    throws QaApplicationException;
 
-    public QaQuestion getQuestionByContentAndDisplayOrder(Long displayOrder, Long contentUid)
+    public QaQueContent getQuestionByContentAndDisplayOrder(Long displayOrder, Long contentUid)
 	    throws QaApplicationException;
 
     public List getAllQuestionEntriesSorted(final long qaContentId) throws QaApplicationException;
 
-    public void saveOrUpdateQaQueContent(QaQuestion qaQuestion) throws QaApplicationException;
+    public void saveOrUpdateQaQueContent(QaQueContent qaQuestion) throws QaApplicationException;
 
     /**
      * Return the qa session object according to the requested session id.

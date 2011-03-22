@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
@@ -90,11 +90,11 @@ public class LearningUtil implements QaAppConstants {
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(qaContent.isAllowRichEditor()).toString());
 	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 	
-	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(qaContent.getQaQuestions().size()));
+	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(qaContent.getQaQueContents().size()));
 
 	//create mapQuestions
 	Map<String, QaQuestionDTO> mapQuestions = new TreeMap<String, QaQuestionDTO>();
-	for (QaQuestion question : qaContent.getQaQuestions()) {
+	for (QaQueContent question : qaContent.getQaQueContents()) {
 	    int displayOrder = question.getDisplayOrder();
 	    if (displayOrder != 0) {
 		//add the question to the questions Map in the displayOrder
@@ -128,18 +128,18 @@ public class LearningUtil implements QaAppConstants {
 //	// check if Attempt to Entry is allowed, if so create the responses
 //	if (!user.isResponseFinalized() || !qaContent.isLockWhenFinished()) {
 //	    
-//	    Set<QaQuestion> questionsToStore;
+//	    Set<QaQueContent> questionsToStore;
 //	    if (qaContent.isQuestionsSequenced()) {
 //		String currentQuestionIndex = qaLearningForm.getCurrentQuestionIndex();
-//		QaQuestion currentQuestion = qaService.getQuestionContentByDisplayOrder(new Long(currentQuestionIndex), qaContent.getQaContentId());
-//		questionsToStore = new LinkedHashSet<QaQuestion>();
+//		QaQueContent currentQuestion = qaService.getQuestionContentByDisplayOrder(new Long(currentQuestionIndex), qaContent.getQaContentId());
+//		questionsToStore = new LinkedHashSet<QaQueContent>();
 //		questionsToStore.add(currentQuestion);
 //		
 //	    } else {
 //		questionsToStore = qaContent.getQaQuestions();
 //	    }
 //
-//	    for (QaQuestion question : questionsToStore) {
+//	    for (QaQueContent question : questionsToStore) {
 //
 //		String displayOrder = new Long(question.getDisplayOrder()).toString();
 //		String answer = (String) mapAnswers.get(displayOrder);
@@ -200,7 +200,7 @@ public class LearningUtil implements QaAppConstants {
 	    
 	    // get responses from DB
 	    Map<String, String> mapAnswersFromDb = new TreeMap<String, String>();
-	    for (QaQuestion question : qaContent.getQaQuestions()) {
+	    for (QaQueContent question : qaContent.getQaQueContents()) {
 		Long questionUid = question.getUid();
 		QaUsrResp dbResponse = qaService.getResponseByUserAndQuestion(qaQueUsr.getQueUsrId(), questionUid);
 		if (dbResponse != null) {

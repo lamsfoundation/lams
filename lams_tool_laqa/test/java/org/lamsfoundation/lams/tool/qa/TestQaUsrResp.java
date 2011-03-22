@@ -58,7 +58,7 @@ public class TestQaUsrResp extends QaDataAccessTestCase
     
     public void testCreateNewResponse()
     {
-//    	QaQuestion qaQueContent = qaQuestionDAO.getQaQueById(new Long(1).longValue());
+//    	QaQueContent qaQueContent = qaQuestionDAO.getQaQueById(new Long(1).longValue());
 //    	
 //    	QaQueUsr qaQueUsr=qaQueUsrDAO.getQaQueUsrById(new Long(700).longValue()); 
 //    	

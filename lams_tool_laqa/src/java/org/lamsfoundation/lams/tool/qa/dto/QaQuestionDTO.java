@@ -24,7 +24,7 @@
 package org.lamsfoundation.lams.tool.qa.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 
 /**
  * <p>
@@ -45,7 +45,7 @@ public class QaQuestionDTO implements Comparable {
 		"displayOrder:", displayOrder).append("required:", Boolean.toString(required)).toString();
     }
 
-    public QaQuestionDTO(QaQuestion que) {
+    public QaQuestionDTO(QaQueContent que) {
 	this.question = que.getQuestion();
 	this.displayOrder = new Integer(que.getDisplayOrder()).toString();
 	this.feedback = que.getFeedback() != null ? que.getFeedback() : " ";

@@ -30,7 +30,7 @@ package org.lamsfoundation.lams.tool.qa;
  */
 
 /**
- * Test case for QaQuestion
+ * Test case for QaQueContent
  */
 
 public class TestQaQueContent extends QaDataAccessTestCase
@@ -56,7 +56,7 @@ public class TestQaQueContent extends QaDataAccessTestCase
     	QaContent qaContent = qaContentDAO.getQaById(DEFAULT_CONTENT_ID);	
     	System.out.println(this.getClass().getName() + "qa content: " + qaContent);
     	
-    	QaQuestion qaQuestion=  new QaQuestion("ozgur's new question test", 
+    	QaQueContent qaQuestion=  new QaQueContent("ozgur's new question test", 
     													1, 
 														qaContent,
 														null,
@@ -84,7 +84,7 @@ public class TestQaQueContent extends QaDataAccessTestCase
 	    {
 	        Map.Entry pairs = (Map.Entry)itMap.next();
 	        
-	        QaQuestion queContent=  new QaQuestion(pairs.getValue().toString(), 
+	        QaQueContent queContent=  new QaQueContent(pairs.getValue().toString(), 
 	        											new Long(pairs.getKey().toString()).intValue(),
 	        											qaContent,
 														null,
@@ -99,7 +99,7 @@ public class TestQaQueContent extends QaDataAccessTestCase
   */  
     public void testCreateDefaultQaQueContent()
     {
-//    	QaQuestion defaultQaQueContent = qaQuestionDAO.getQaQueById(TEST_EXISTING_QUE_CONTENT_ID);	
+//    	QaQueContent defaultQaQueContent = qaQuestionDAO.getQaQueById(TEST_EXISTING_QUE_CONTENT_ID);	
 //    	System.out.println(this.getClass().getName() + " Default qa que content: " + defaultQaQueContent);
     }
     

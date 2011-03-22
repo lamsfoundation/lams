@@ -36,11 +36,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @author Ozgur Demirtas
  * 
  * The value object that maps to our model database table: tl_laqa11_que_content The relevant hibernate mapping
- * resides in: QaQuestion.hbm.xml
+ * resides in: QaQueContent.hbm.xml
  * 
  * Holds question content within a particular content
  */
-public class QaQuestion implements Serializable, Comparable, Nullable {
+public class QaQueContent implements Serializable, Comparable, Nullable {
 
     private static final long serialVersionUID = -4028785701106936621L;
 
@@ -64,10 +64,10 @@ public class QaQuestion implements Serializable, Comparable, Nullable {
     private Set qaQueUsers;
 
     /** default constructor */
-    public QaQuestion() {
+    public QaQueContent() {
     }
 
-    public QaQuestion(String question, int displayOrder, String feedback, boolean required,
+    public QaQueContent(String question, int displayOrder, String feedback, boolean required,
 	    QaContent qaContent, Set qaQueUsers) {
 	this.question = question;
 	this.displayOrder = displayOrder;
@@ -77,8 +77,8 @@ public class QaQuestion implements Serializable, Comparable, Nullable {
 	this.qaQueUsers = qaQueUsers;
     }
 
-    public static QaQuestion newInstance(QaQuestion queContent, QaContent newQaContent) {
-	QaQuestion newQueContent = new QaQuestion(queContent.getQuestion(), queContent.getDisplayOrder(),
+    public static QaQueContent newInstance(QaQueContent queContent, QaContent newQaContent) {
+	QaQueContent newQueContent = new QaQueContent(queContent.getQuestion(), queContent.getDisplayOrder(),
 		queContent.getFeedback(), queContent.isRequired(), newQaContent, new TreeSet());
 	return newQueContent;
     }
@@ -91,10 +91,10 @@ public class QaQuestion implements Serializable, Comparable, Nullable {
 
     @Override
     public boolean equals(Object other) {
-	if (!(other instanceof QaQuestion)) {
+	if (!(other instanceof QaQueContent)) {
 	    return false;
 	}
-	QaQuestion castOther = (QaQuestion) other;
+	QaQueContent castOther = (QaQueContent) other;
 	return new EqualsBuilder().append(this.getUid(), castOther.getUid()).isEquals();
     }
 
@@ -187,7 +187,7 @@ public class QaQuestion implements Serializable, Comparable, Nullable {
     }
 
     public int compareTo(Object o) {
-	//QaQuestion queContent = (QaQuestion) o;
+	//QaQueContent queContent = (QaQueContent) o;
 
 	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
 	/*

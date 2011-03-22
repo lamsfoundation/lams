@@ -30,7 +30,7 @@
 	            </key>
 	
 	            <many-to-many
-	                class="org.lamsfoundation.lams.tool.qa.QaQuestion"
+	                class="org.lamsfoundation.lams.tool.qa.QaQueContent"
 	                column="question_uid"
 	             />
 	

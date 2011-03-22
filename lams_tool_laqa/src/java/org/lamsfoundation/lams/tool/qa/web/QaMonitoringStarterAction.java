@@ -48,7 +48,7 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dto.EditActivityDTO;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralMonitoringDTO;
@@ -173,10 +173,10 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
 	List listQuestionContentDTO = new LinkedList();
 
-	Iterator queIterator = qaContent.getQaQuestions().iterator();
+	Iterator queIterator = qaContent.getQaQueContents().iterator();
 	while (queIterator.hasNext()) {
 
-	    QaQuestion qaQuestion = (QaQuestion) queIterator.next();
+	    QaQueContent qaQuestion = (QaQueContent) queIterator.next();
 	    if (qaQuestion != null) {
 		QaQuestionDTO qaQuestionDTO = new QaQuestionDTO(qaQuestion);
 		listQuestionContentDTO.add(qaQuestionDTO);

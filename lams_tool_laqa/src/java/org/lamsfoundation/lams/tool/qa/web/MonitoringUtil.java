@@ -38,7 +38,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
-import org.lamsfoundation.lams.tool.qa.QaQuestion;
+import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
@@ -125,7 +125,7 @@ public class MonitoringUtil implements QaAppConstants {
 
 	Iterator itListQuestions = listQuestions.iterator();
 	while (itListQuestions.hasNext()) {
-	    QaQuestion qaQuestion = (QaQuestion) itListQuestions.next();
+	    QaQueContent qaQuestion = (QaQueContent) itListQuestions.next();
 
 	    if (qaQuestion != null) {
 		QaMonitoredAnswersDTO qaMonitoredAnswersDTO = new QaMonitoredAnswersDTO();
@@ -393,7 +393,7 @@ public class MonitoringUtil implements QaAppConstants {
 	    if (qaSession != null) {
 		Iterator itListQuestions = listQuestions.iterator();
 		while (itListQuestions.hasNext()) {
-		    QaQuestion qaQuestion = (QaQuestion) itListQuestions.next();
+		    QaQueContent qaQuestion = (QaQueContent) itListQuestions.next();
 
 		    if (qaQuestion != null) {
 			QaMonitoredAnswersDTO qaMonitoredAnswersDTO = new QaMonitoredAnswersDTO();
