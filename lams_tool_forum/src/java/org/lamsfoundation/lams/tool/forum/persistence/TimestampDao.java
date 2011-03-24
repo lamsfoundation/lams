@@ -24,6 +24,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.forum.persistence;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -34,17 +35,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class TimestampDao extends HibernateDaoSupport {
     
-    /* 0 if user opens forum first time; otherwise >0 */
-    private static final String SQL_QUERY_FIRST_TIME_BY_MESSAGE_USER = 
-	" SELECT count(*) FROM " + Timestamp.class.getName() + " ts WHERE ts.message.uid = ? AND ts.forumUser.uid = ? ";
-    
-    private static final String SQL_QUERY_TIMESTAMP_BY_MESSAGE_USER = 
-	" FROM " + Timestamp.class.getName() + " ts WHERE ts.message.uid = ? AND ts.forumUser.uid = ? ";
-    
-    private static final String SQL_QUERY_MESSAGE_NUMBER_BY_MESSAGE_USER = 
-	"SELECT count(*) FROM " + Message.class.getName() + " mes WHERE mes.uid IN (SELECT seq.message.uid FROM " + 
-	MessageSeq.class.getName() + " seq WHERE seq.rootMessage.uid = ?) " + " AND mes.updated > (SELECT ts.timestamp FROM " + 
-	Timestamp.class.getName() + " ts WHERE ts.message.uid = ? AND ts.forumUser.uid = ?)";
+    private static final String GET_TIMESTAMP_BY_MESSAGE_AND_USER = " FROM " + Timestamp.class.getName()
+	    + " ts WHERE ts.message.uid = ? AND ts.forumUser.uid = ? ";
     
     public void delete(Timestamp timestamp) {
 	this.getHibernateTemplate().delete(timestamp);
@@ -68,39 +60,11 @@ public class TimestampDao extends HibernateDaoSupport {
      * @return 
      */
     public Timestamp getTimestamp(Long messageId, Long forumUserId) {
-	List timestampList = this.getHibernateTemplate().find(SQL_QUERY_TIMESTAMP_BY_MESSAGE_USER, new Object[]{messageId, forumUserId});
+	List timestampList = this.getHibernateTemplate().find(GET_TIMESTAMP_BY_MESSAGE_AND_USER, new Object[]{messageId, forumUserId});
 	if (timestampList != null && timestampList.size() > 0)
 	    return (Timestamp) (timestampList.get(0));
 	else
 	    return null;
-    }
-    
-    /**
-     * Get number of new postings.
-     * 
-     * @param messageId
-     * @param userId
-     * @return 
-     */
-    public int getNewMessagesNum(Long messageId, Long userId) {
-	List firstTimeList = this.getHibernateTemplate().find(SQL_QUERY_FIRST_TIME_BY_MESSAGE_USER, new Object[]{messageId, userId});
-	if (firstTimeList != null && firstTimeList.size() > 0)
-	{
-		if (((Number)firstTimeList.get(0)).intValue() > 0) // if not first time
-		{
-		    List postingsList = this.getHibernateTemplate().find(SQL_QUERY_MESSAGE_NUMBER_BY_MESSAGE_USER, 
-			    new Object[]{messageId, messageId, userId});
-				
-		    if(postingsList != null && postingsList.size() > 0)
-			return ((Number)postingsList.get(0)).intValue();
-		    else
-			    return 0;
-		}
-		else
-		    return -1; // user views forum for the first time
-	}
-	else
-	    	return 0;
     }
     
 }

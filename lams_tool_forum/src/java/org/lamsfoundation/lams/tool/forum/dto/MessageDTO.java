@@ -59,7 +59,6 @@ public class MessageDTO {
 	private String attachmentLocalUrl;
 	
 	private int newPostingsNum;
-	private Date lastTopicDate;
 	
 	/**
 	 * Get a <code>MessageDTO</code> instance from a given <code>Message</code>.
@@ -232,13 +231,5 @@ public class MessageDTO {
 
 	public int getNewPostingsNum() {
 	    return newPostingsNum;
-	}
-
-	public void setLastTopicDate(Date lastTopicDate) {
-	    this.lastTopicDate = lastTopicDate;
-	}
-
-	public Date getLastTopicDate() {
-	    return lastTopicDate;
 	}
 }

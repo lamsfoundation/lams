@@ -258,12 +258,21 @@ public class LearningAction extends Action {
 	}
 
 	// get all root topic to display on init page
-	List rootTopics = forumService.getRootTopics(sessionId);
+	List<MessageDTO> rootTopics = forumService.getRootTopics(sessionId);
 	if (!forum.isAllowNewTopic()) {
 	    // add the number post the learner has made for each topic.
-	    updateNumOfPosts(rootTopics, forumUser);
+	    for (MessageDTO messageDTO : rootTopics) {
+		int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), messageDTO.getMessage().getUid());
+		messageDTO.setNumOfPosts(numOfPosts);
+	    }
 	}
 	request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
+	
+	// update new messages number
+	for (MessageDTO messageDTO : rootTopics) {
+	    int numOfNewPosts = forumService.getNewMessagesNum(messageDTO.getMessage(), forumUser.getUid());
+	    messageDTO.setNewPostingsNum(numOfNewPosts);
+	}
 
 	if (forum.isNotifyLearnersOnMarkRelease()) {
 	    forumService.getEventNotificationService().createEvent(ForumConstants.TOOL_SIGNATURE,
@@ -277,28 +286,7 @@ public class LearningAction extends Action {
 		    IEventNotificationService.PERIODICITY_SINGLE);
 	}
 
-	// displaying new postings
-	for (Iterator iterator = rootTopics.iterator(); iterator.hasNext();) {
-	    MessageDTO messageDTO = (MessageDTO) iterator.next();
-	    int numOfNewPosts = forumService.getNewMessagesNum(messageDTO.getMessage().getUid(), forumUser.getUid());
-	    if (numOfNewPosts == -1) {
-		messageDTO.setNewPostingsNum(messageDTO.getMessage().getReplyNumber() + 1);
-	    } else {
-		messageDTO.setNewPostingsNum(numOfNewPosts);
-	    }
-
-	    messageDTO.setLastTopicDate(forumService.getLastTopicDate(messageDTO.getMessage().getUid()));
-	}
-
 	return mapping.findForward("success");
-    }
-
-    private void updateNumOfPosts(List rootTopics, ForumUser forumUser) {
-	for (Iterator iterator = rootTopics.iterator(); iterator.hasNext();) {
-	    MessageDTO messageDTO = (MessageDTO) iterator.next();
-	    int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), messageDTO.getMessage().getUid());
-	    messageDTO.setNumOfPosts(numOfPosts);
-	}
     }
 
     /**
@@ -484,38 +472,9 @@ public class LearningAction extends Action {
 	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
 
 	// Saving or updating user timestamp
-	saveUserTimestamp(rootTopicId, forumUser);
+	forumService.saveTimestamp(rootTopicId, forumUser);
 
 	return mapping.findForward("success");
-    }
-
-    /**
-     * Saving user timestamp
-     * 
-     * @param toorTopicId
-     * @param forumUser
-     * @return
-     */
-    private void saveUserTimestamp(Long rootTopicId, ForumUser forumUser) {
-	Date curDate = new Date();
-	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	try {
-	    curDate = dateFormat.parse(dateFormat.format(new Date()));
-	} catch (ParseException pe) {
-	    pe.printStackTrace();
-	}
-
-	Timestamp timestamp = forumService.getTimestamp(rootTopicId, forumUser.getUid());
-	if (timestamp != null) {
-	    timestamp.setTimestamp(curDate);
-	    forumService.saveTimestamp(timestamp);
-	} else {
-	    timestamp = new Timestamp();
-	    timestamp.setMessage(forumService.getMessage(rootTopicId));
-	    timestamp.setTimestamp(curDate);
-	    timestamp.setForumUser(forumUser);
-	    forumService.saveTimestamp(timestamp);
-	}
     }
 
     /**
@@ -581,17 +540,12 @@ public class LearningAction extends Action {
 	request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 
-	saveUserTimestamp(message.getUid(), forumUser);
+	forumService.saveTimestamp(message.getUid(), forumUser);
 
+	//update new messages number
 	for (MessageDTO messageDTO : rootTopics) {
-	    int numOfNewPosts = forumService.getNewMessagesNum(messageDTO.getMessage().getUid(), forumUser.getUid());
-	    if (numOfNewPosts == -1) {
-		messageDTO.setNewPostingsNum(messageDTO.getMessage().getReplyNumber() + 1);
-	    } else {
-		messageDTO.setNewPostingsNum(numOfNewPosts);
-	    }
-
-	    messageDTO.setLastTopicDate(forumService.getLastTopicDate(messageDTO.getMessage().getUid()));
+	    int numOfNewPosts = forumService.getNewMessagesNum(messageDTO.getMessage(), forumUser.getUid());
+	    messageDTO.setNewPostingsNum(numOfNewPosts);
 	}
 	
 	// notify learners and teachers
@@ -701,7 +655,7 @@ public class LearningAction extends Action {
 	sessionMap.remove(ForumConstants.ATTR_ORIGINAL_MESSAGE);
 
 	// Saving or updating user timestamp
-	saveUserTimestamp(rootTopicId, forumUser);
+	forumService.saveTimestamp(rootTopicId, forumUser);
 	
 	// notify learners and teachers
 	Long forumId = (Long) sessionMap.get(ForumConstants.FORUM_ID);
@@ -841,7 +795,7 @@ public class LearningAction extends Action {
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 
 	// Saving or updating user timestamp
-	saveUserTimestamp(rootTopicId, forumUser);
+	forumService.saveTimestamp(rootTopicId, forumUser);
 
 	return mapping.findForward("success");
     }

@@ -25,6 +25,7 @@
 
 package org.lamsfoundation.lams.tool.forum.persistence;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -38,15 +39,17 @@ public class MessageSeqDao extends HibernateDaoSupport {
     private static final String SQL_QUERY_NUM_POSTS_BY_TOPIC = "select count(*) from " + MessageSeq.class.getName()
 	    + " ms where ms.message.createdBy.userId=? and ms.message.isAuthored = false and ms.rootMessage.uid=?";
 
+    private static final String SQL_QUERY_NUM_POSTS_BY_ROOT_MESSAGE_AND_DATE = "SELECT count(*) FROM "
+	    + MessageSeq.class.getName() + " seq WHERE seq.rootMessage.uid = ? AND seq.message.updated > ?";
+
     public List getTopicThread(Long rootTopicId) {
 	return this.getHibernateTemplate().find(SQL_QUERY_FIND_TOPIC_THREAD, rootTopicId);
     }
 
     public MessageSeq getByTopicId(Long messageId) {
 	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_TOPIC_ID, messageId);
-	if (list == null || list.isEmpty()) {
+	if (list == null || list.isEmpty())
 	    return null;
-	}
 	return (MessageSeq) list.get(0);
     }
 
@@ -56,15 +59,33 @@ public class MessageSeqDao extends HibernateDaoSupport {
 
     public void deleteByTopicId(Long topicUid) {
 	MessageSeq seq = getByTopicId(topicUid);
-	if (seq != null) {
+	if (seq != null)
 	    this.getHibernateTemplate().delete(seq);
-	}
     }
 
     public int getNumOfPostsByTopic(Long userID, Long topicID) {
 	List list = this.getHibernateTemplate().find(SQL_QUERY_NUM_POSTS_BY_TOPIC, new Object[] { userID, topicID });
-	if (list != null && list.size() > 0) {
+	if (list != null && list.size() > 0)
 	    return ((Number) list.get(0)).intValue();
+	else
+	    return 0;
+    }
+
+    /**
+     * Get number of messages newer than specified date.
+     * 
+     * @param rootMessageId
+     * @param userId
+     * @return
+     */
+    public int getNumOfPostsNewerThan(Long rootMessageId, Date date) {
+
+	// user views forum not the first time
+	List messages = this.getHibernateTemplate().find(SQL_QUERY_NUM_POSTS_BY_ROOT_MESSAGE_AND_DATE,
+		new Object[] { rootMessageId, date });
+
+	if (messages != null && messages.size() > 0) {
+	    return ((Number) messages.get(0)).intValue();
 	} else {
 	    return 0;
 	}

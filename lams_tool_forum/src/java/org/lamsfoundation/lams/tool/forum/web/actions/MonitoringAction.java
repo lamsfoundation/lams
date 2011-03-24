@@ -774,7 +774,7 @@ public class MonitoringAction extends Action {
 
 	report.setMark(mark);
 	report.setComment(markForm.getComment());
-	forumService.updateTopic(msg);
+	forumService.updateContainedReport(msg);
 
 	//echo back to topic list page: it depends which screen is come from: view special user mark, or view all user marks. 
 	if (StringUtils.equals(updateMode, ForumConstants.MARK_UPDATE_FROM_SESSION)) {

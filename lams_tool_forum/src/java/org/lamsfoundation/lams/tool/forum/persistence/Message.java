@@ -94,21 +94,21 @@ public class Message implements Cloneable {
 	try {
 	    msg = (Message) super.clone();
 	    msg.setUid(null);
-  			//it is not necessary to deep clone following comment fields.
-  			//don't  deep clone forum to avoid dead loop in clone
-//  			if(parent != null){
-//  				msg.parent = (Message) parent.clone();
-//  				//try to keep parent uid, so avoid persistant a new instance in database for parent message 
-//  				msg.parent.uid = parent.uid;
-//  			}
-//  			if(toolSession != null){
-//  				msg.toolSession = (ForumToolSession) toolSession.clone();
-//  			}
-//  			if(createdBy != null){
-//  				msg.createdBy = (ForumUser) createdBy.clone();
-//  			}
-//  			if(modifiedBy != null)
-//  				msg.modifiedBy = (ForumUser) modifiedBy.clone();
+	    // it is not necessary to deep clone following comment fields.
+	    // don't deep clone forum to avoid dead loop in clone
+	    // if(parent != null){
+	    // msg.parent = (Message) parent.clone();
+	    // //try to keep parent uid, so avoid persistant a new instance in database for parent message
+	    // msg.parent.uid = parent.uid;
+	    // }
+	    // if(toolSession != null){
+	    // msg.toolSession = (ForumToolSession) toolSession.clone();
+	    // }
+	    // if(createdBy != null){
+	    // msg.createdBy = (ForumUser) createdBy.clone();
+	    // }
+	    // if(modifiedBy != null)
+	    // msg.modifiedBy = (ForumUser) modifiedBy.clone();
 	    // clone attachment
 	    if (attachments != null) {
 		Iterator iter = attachments.iterator();
@@ -129,7 +129,7 @@ public class Message implements Cloneable {
 
 	return msg;
     }
-  	
+
     public Object updateClone(Message clone) {
 
 	clone.setBody(this.getBody());
@@ -145,8 +145,8 @@ public class Message implements Cloneable {
 	clone.setSubject(this.getSubject());
 	clone.setToolContentHandler(this.getToolContentHandler());
 	clone.setUpdated(clone.getUpdated());
- 
-  	// Update the attachments. Easiest way is to recopy them - which does NOT copy them in the content repository.
+
+	// Update the attachments. Easiest way is to recopy them - which does NOT copy them in the content repository.
 	clone.getAttachments().clear();
 	if (attachments != null) {
 	    Iterator iter = attachments.iterator();
@@ -170,7 +170,7 @@ public class Message implements Cloneable {
 	}
 	this.setUpdated(new Date(now));
     }
-	
+
     public boolean equals(Object o) {
 	if (this == o)
 	    return true;
@@ -184,19 +184,18 @@ public class Message implements Cloneable {
 	return new EqualsBuilder()
 		// .append(this.uid,genericEntity.getUid())
 		.append(this.subject, genericEntity.getSubject())
-		.append(this.body,genericEntity.getBody())
-		.append(this.replyNumber,genericEntity.getReplyNumber())
-		//.append(this.lastReplyDate,genericEntity.lastReplyDate)
-		//.append(this.created,genericEntity.created)
-		//.append(this.updated,genericEntity.updated)
-		.append(this.createdBy,genericEntity.getCreatedBy())
-		.append(this.modifiedBy,genericEntity.getModifiedBy())
-		.isEquals();
+		.append(this.body, genericEntity.getBody())
+		.append(this.replyNumber, genericEntity.getReplyNumber())
+		// .append(this.lastReplyDate,genericEntity.lastReplyDate)
+		// .append(this.created,genericEntity.created)
+		// .append(this.updated,genericEntity.updated)
+		.append(this.createdBy, genericEntity.getCreatedBy())
+		.append(this.modifiedBy, genericEntity.getModifiedBy()).isEquals();
     }
 
     public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(subject).append(body).append(created).append(updated).append(
-		createdBy).append(modifiedBy).toHashCode();
+	return new HashCodeBuilder().append(uid).append(subject).append(body).append(created).append(updated)
+		.append(createdBy).append(modifiedBy).toHashCode();
     }
 
     // **********************************************************
@@ -419,14 +418,15 @@ public class Message implements Cloneable {
     public void setParent(Message parent) {
 	this.parent = parent;
     }
+
     /**
      * @hibernate.many-to-one column="parent_uid"
      * @return
      */
     public Message getParent() {
-        return parent;
+	return parent;
     }
-    
+
     /**
      * @return a set of Attachments to this Message.
      * 

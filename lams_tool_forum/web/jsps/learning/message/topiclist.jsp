@@ -62,7 +62,7 @@
 					<c:out value="${topic.newPostingsNum}" />
 				</td>
 				<td>
-					<lams:Date value="${topic.lastTopicDate}"/>
+					<lams:Date value="${topic.message.lastReplyDate}"/>
 				</td>
 				<c:if test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
 					<td>

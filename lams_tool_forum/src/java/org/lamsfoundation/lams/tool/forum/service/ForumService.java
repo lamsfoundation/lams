@@ -87,7 +87,6 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumCondition;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumDao;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumException;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumReport;
-import org.lamsfoundation.lams.tool.forum.persistence.ForumReportDAO;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumToolSessionDao;
 import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
@@ -142,8 +141,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     private ForumToolSessionDao forumToolSessionDao;
 
-    private ForumReportDAO forumReportDAO;
-
     // system level handler and service
     private ILamsToolService toolService;
 
@@ -168,11 +165,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private IGradebookService gradebookService;
 
     private IEventNotificationService eventNotificationService;
-    
+
     private ILessonService lessonService;
-    
+
     private IActivityDAO activityDAO;
-    
+
     private Random generator = new Random();
 
     // ---------------------------------------------------------------------
@@ -248,11 +245,13 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    while (iter.hasNext()) {
 		Message clone = (Message) iter.next();
 		message.updateClone(clone);
+		clone.updateModificationData();
 		messageDao.saveOrUpdate(clone);
 	    }
 	}
 
 	// create message in database
+	message.updateModificationData();
 	messageDao.saveOrUpdate(message);
 
 	return message;
@@ -261,20 +260,20 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public Message updateTopic(Message message) throws PersistenceException {
 
 	// update message
+	message.updateModificationData();
 	messageDao.saveOrUpdate(message);
 
-	// udate root message's lastReply date if this message
-	// if this message is root message, then actually, it will update itself lastReplayDate
+	// udate root message's lastReplyDate
 	MessageSeq msgSeq = messageSeqDao.getByTopicId(message.getUid());
 	Message root = msgSeq.getRootMessage();
-	// update reply date
-	// messageDao.saveOrUpdate(root); // do not update date of root posting
+	root.setLastReplyDate(new Date());
+	messageDao.saveOrUpdate(root);
 
 	return message;
     }
 
-    public void updateReport(ForumReport report) {
-	forumReportDAO.saveObject(report);
+    public void updateContainedReport(Message message) {
+	messageDao.saveOrUpdate(message);
     }
 
     public Message updateMessageHideFlag(Long messageId, boolean hideFlag) {
@@ -307,7 +306,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     public void deleteTopic(Long topicUid) throws PersistenceException {
 	Message topic = messageDao.getById(topicUid);
-	
+
 	// cascade delete children topic by recursive
 	List children = messageDao.getChildrenTopics(topicUid);
 	if (children != null) {
@@ -317,12 +316,12 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		this.deleteTopic(msg.getUid());
 	    }
 	}
-	
+
 	// recursively delete clones
 	for (Message clone : (Set<Message>) topic.getSessionClones()) {
 	    this.deleteTopic(clone.getUid());
 	}
-	
+
 	messageSeqDao.deleteByTopicId(topicUid);
 	messageDao.delete(topicUid);
     }
@@ -339,6 +338,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	// parent sessionID maybe empty if created by author role. So given sessionId is exactly value.
 	ForumToolSession session = getSessionBySessionId(sessionId);
 	replyMessage.setToolSession(session);
+	replyMessage.updateModificationData();
 	messageDao.saveOrUpdate(replyMessage);
 
 	// get root topic and create record in MessageSeq table
@@ -354,11 +354,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	msgSeq.setRootMessage(root);
 	messageSeqDao.save(msgSeq);
 
-	// update last reply date for root messagegetlas
+	// update last reply date for root message
 	root.setLastReplyDate(new Date());
 	// update reply message number for root
 	root.setReplyNumber(root.getReplyNumber() + 1);
-	// messageDao.saveOrUpdate(root); // do not update the date of root posting
+	messageDao.saveOrUpdate(root);
 
 	return replyMessage;
     }
@@ -388,9 +388,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
      * repository
      * 
      * @param uuid
-     *                The <code>uuid</code> of the node to be deleted
+     *            The <code>uuid</code> of the node to be deleted
      * @param versionID
-     *                The <code>version_id</code> of the node to be deleted.
+     *            The <code>version_id</code> of the node to be deleted.
      * @throws SubmitFilesException
      */
     public void deleteFromRepository(Long uuid, Long versionID) throws ForumException {
@@ -444,7 +444,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	// sort by sequence id
 	Set topicSet = new TreeSet<MessageDTO>(new MessageDtoComparator());
 	topicSet.addAll(messageDTOs);
-	
+
 	topicsBySession.clear();
 	topicsBySession.addAll(topicSet);
 	return topicsBySession;
@@ -819,9 +819,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws DataMissingException
-     *                 if no tool content matches the toolSessionId
+     *             if no tool content matches the toolSessionId
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
 
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
@@ -866,7 +866,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
@@ -1333,14 +1333,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	this.userManagementService = userManagementService;
     }
 
-    public ForumReportDAO getForumReportDAO() {
-	return forumReportDAO;
-    }
-
-    public void setForumReportDAO(ForumReportDAO forumReportDAO) {
-	this.forumReportDAO = forumReportDAO;
-    }
-
     public ICoreNotebookService getCoreNotebookService() {
 	return coreNotebookService;
     }
@@ -1397,41 +1389,30 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
      * @param userId
      * @return
      */
-    public int getNewMessagesNum(Long messageId, Long userId) {
-	return timestampDao.getNewMessagesNum(messageId, userId);
+    public int getNewMessagesNum(Message message, Long userId) {
+	
+	Timestamp timestamp = timestampDao.getTimestamp(message.getUid(), userId);
+	if (timestamp == null) {
+	    // if first time - show all postings as new, including root message
+	    return message.getReplyNumber() + 1;
+	} else {
+	    return messageSeqDao.getNumOfPostsNewerThan(message.getUid(), timestamp.getTimestamp());
+	}
     }
 
-    /**
-     * Get last topic date.
-     * 
-     * @param messageId
-     * @return
-     */
-    public Date getLastTopicDate(Long messageId) {
-	return messageDao.getLastTopicDate(messageId);
-    }
-
-    /**
-     * Get timestamp.
-     * 
-     * @param messageId
-     * @param forumUserId
-     * @return
-     */
-    public Timestamp getTimestamp(Long MessageId, Long forumUserId) throws PersistenceException {
-	return timestampDao.getTimestamp(MessageId, forumUserId);
-    }
-
-    /**
-     * Save timestamp.
-     * 
-     * @param timestamp
-     * @return
-     */
-    public void saveTimestamp(Timestamp timestamp) {
+    public void saveTimestamp(Long rootTopicId, ForumUser forumUser) {
+	Timestamp timestamp = timestampDao.getTimestamp(rootTopicId, forumUser.getUid());
+	if (timestamp != null) {
+	    timestamp.setTimestamp(new Date());
+	} else {
+	    timestamp = new Timestamp();
+	    timestamp.setMessage(getMessage(rootTopicId));
+	    timestamp.setTimestamp(new Date());
+	    timestamp.setForumUser(forumUser);
+	}
 	timestampDao.saveOrUpdate(timestamp);
     }
-    
+
     public void sendNotificationsOnNewPosting(Long forumId, Long sessionId, Message message) {
 	Forum forum = getForum(forumId);
 	ForumUser postAuthor = message.getCreatedBy();
@@ -1439,7 +1420,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	ToolSession toolSession = toolService.getToolSession(sessionId);
 	Long activityId = toolSession.getToolActivity().getActivityId();
 	ToolActivity activity = (ToolActivity) activityDAO.getActivityByActivityId(activityId, ToolActivity.class);
-	
+
 	if (forum.isNotifyLearnersOnForumPosting()) {
 	    List<User> learners = lessonService.getLearnersHaveAttemptedActivity(activity);
 	    if (learners != null && !learners.isEmpty()) {
@@ -1447,13 +1428,14 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		for (User learner : learners) {
 		    learnerIds.add(learner.getUserId().longValue());
 		}
-		
-		getEventNotificationService().sendMessage(learnerIds.toArray(new Long[0]), DeliveryMethodMail.getInstance(),
+
+		getEventNotificationService().sendMessage(learnerIds.toArray(new Long[0]),
+			DeliveryMethodMail.getInstance(),
 			getLocalisedMessage("event.newposting.subject", new Object[] { forum.getTitle() }),
 			getLocalisedMessage("event.newposting.body", new Object[] { fullName, message.getBody() }));
 	    }
 	}
-	
+
 	if (forum.isNotifyTeachersOnForumPosting()) {
 	    List<User> monitoringUsers = lessonService.getMonitorsByToolSessionId(sessionId);
 	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
@@ -1462,7 +1444,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		    monitoringUsersIds.add(monitoringUser.getUserId().longValue());
 		}
 
-		getEventNotificationService().sendMessage(monitoringUsersIds.toArray(new Long[0]), DeliveryMethodMail.getInstance(),
+		getEventNotificationService().sendMessage(monitoringUsersIds.toArray(new Long[0]),
+			DeliveryMethodMail.getInstance(),
 			getLocalisedMessage("event.newposting.subject", new Object[] { forum.getTitle() }),
 			getLocalisedMessage("event.newposting.body", new Object[] { fullName, message.getBody() }));
 	    }

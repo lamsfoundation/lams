@@ -116,32 +116,15 @@ public interface IForumService {
      * @param userId
      * @return 
      */
-    public int getNewMessagesNum(Long messageId, Long userId);
+    int getNewMessagesNum(Message message, Long userId);
     
     /**
-     * Get last topic date.
+     * Saves timestamp
      * 
-     * @param messageId
-     * @return 
+     * @param rootTopicId
+     * @param forumUser
      */
-    public Date getLastTopicDate(Long messageId);
-    
-    /**
-     * Get timestamp.
-     * 
-     * @param messageId
-     * @param forumUserId
-     * @return 
-     */
-    public Timestamp getTimestamp(Long MessageId, Long forumUserId);
-    
-    /**
-     * Save timestamp.
-     * 
-     * @param timestamp
-     * @return 
-     */
-    public void saveTimestamp(Timestamp timestamp);
+    void saveTimestamp(Long rootTopicId, ForumUser forumUser);
     
     /**
      * Create a root topic.
@@ -355,11 +338,11 @@ public interface IForumService {
     public ForumUser getUserByID(Long userId);
 
     /**
-     * Update forum message report.
+     * Update report contained inside specified message.
      * 
-     * @param report
+     * @param message specified message
      */
-    public void updateReport(ForumReport report);
+    void updateContainedReport(Message message);
 
     // ************************************************************************************
     // Report Method
