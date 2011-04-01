@@ -149,5 +149,10 @@ CREATE TABLE lams_planner_activity_metadata (
 
 ALTER TABLE lams_planner_nodes DROP COLUMN file_uuid, DROP COLUMN file_name, ADD COLUMN ld_id BIGINT(20), ADD COLUMN teachers_permissions TINYINT UNSIGNED;
 
+-- LDEV-2664 Switch learner interface for learners if they use a mobile device
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('ForceMobileDevToUseFlashless','false', 'config.force.mobile.use.flashlesh', 'config.header.features', 'BOOLEAN', 1);
+
+
 COMMIT;
 SET AUTOCOMMIT = 1;
