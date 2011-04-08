@@ -29,11 +29,7 @@ function jqGridInclude()
         	if (minver !== true) filename = pathtojsfiles+modules[i].incfile;
         	else filename = pathtojsfiles+modules[i].minfile;
         	if (combineIntoOne !== true) {
-        		if(jQuery.browser.safari || jQuery.browser.msie ) {
-        			jQuery.ajax({url:filename,dataType:'script', async:false, cache: true});
-        		} else {
-        			IncludeJavaScript(filename);
-        		}
+		    document.writeln("<script type='text/javascript' src='"+filename+"'></script>");
         	} else {
         		combinedInclude[combinedInclude.length] = filename;
             }
