@@ -58,7 +58,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
     private Boolean permitEditCopy;
     private Boolean permitEditOriginal;
     private Boolean permitReplaceTemplate;
-    private Boolean permitRemoveTemplate;
+    private Boolean permitRemoveNode;
  
     // Not node-bound variables, but simply attributes used in JSP page
     private Boolean edit = false;
@@ -77,7 +77,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
     }
     
     public PedagogicalPlannerSequenceNodeDTO(PedagogicalPlannerSequenceNode node,
-	    Set<PedagogicalPlannerSequenceNode> subnodes, boolean isUserOwner, PedagogicalPlannerDAO dao) {
+	    Set<PedagogicalPlannerSequenceNode> subnodes, boolean isSysAdmin, PedagogicalPlannerDAO dao) {
 	if (pedagogicalPlannerDAO == null) {
 	    pedagogicalPlannerDAO = dao;
 	}
@@ -93,7 +93,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
 
 	HttpSession s = SessionManager.getSession();
 	UserDTO user = (UserDTO) s.getAttribute(AttributeNames.USER);
-	setPermissions(this, isUserOwner, user, node);
+	setPermissions(this, isSysAdmin, user, node);
 
 	this.subnodes = new LinkedList<PedagogicalPlannerSequenceNodeDTO>();
 	if (subnodes != null) {
@@ -108,7 +108,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
 		subnodeDTO.setLearningDesignTitle(subnode.getLearningDesignTitle());
 		subnodeDTO.setUid(subnode.getUid());
 		// viewing for everyone is the default setting
-		setPermissions(subnodeDTO, isUserOwner, user, subnode);
+		setPermissions(subnodeDTO, isSysAdmin, user, subnode);
 		if (user != null) {
 		    subnodeDTO.setDisplayAddRemoveEditorsLink(subnodeDTO.isEditor);
 		}
@@ -117,10 +117,11 @@ public class PedagogicalPlannerSequenceNodeDTO {
 	}
     }
 
-    private static void setPermissions(PedagogicalPlannerSequenceNodeDTO dto, boolean isUserOwner, UserDTO user,
+    private static void setPermissions(PedagogicalPlannerSequenceNodeDTO dto, boolean isSysAdmin, UserDTO user,
 	    PedagogicalPlannerSequenceNode node) {
 	// set permissions the view is based on
-	dto.isOwner = isUserOwner;
+	dto.isOwner = isSysAdmin
+		|| (user != null && node.getUser() != null && user.getUserID().equals(node.getUser().getUserId()));
 	dto.isEditor = dto.isOwner
 		|| (user != null && pedagogicalPlannerDAO.isEditor(user.getUserID(), node.getUid(),
 			Role.ROLE_AUTHOR_ADMIN));
@@ -137,7 +138,7 @@ public class PedagogicalPlannerSequenceNodeDTO {
 		|| (dto.isEditor && (nodePermissions == null || (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_MODIFY) != 0));
 	dto.permitReplaceTemplate = dto.isOwner
 		|| (dto.isEditor && (nodePermissions == null || (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REPLACE) != 0));
-	dto.permitRemoveTemplate = dto.isOwner
+	dto.permitRemoveNode = dto.isOwner
 		|| (dto.isEditor && (nodePermissions == null || (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REMOVE) != 0));
     }
 
@@ -317,11 +318,11 @@ public class PedagogicalPlannerSequenceNodeDTO {
         this.permitReplaceTemplate = permitChangeTemplate;
     }
 
-    public Boolean getPermitRemoveTemplate() {
-        return permitRemoveTemplate;
+    public Boolean getPermitRemoveNode() {
+        return permitRemoveNode;
     }
 
-    public void setPermitRemoveTemplate(Boolean permitRemoveTemplate) {
-        this.permitRemoveTemplate = permitRemoveTemplate;
+    public void setPermitRemoveNode(Boolean permitRemoveTemplate) {
+        this.permitRemoveNode = permitRemoveTemplate;
     }
 }

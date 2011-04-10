@@ -75,8 +75,6 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.FileException;
-import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -192,6 +190,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String ERROR_KEY_IMPORT = "error.planner.import";
     private static final String ERROR_KEY_FILTER_PARSE = "error.planner.filter.parse";
     private static final String ERROR_KEY_EXPORT_TEMPLATE = "error.planner.export.template";
+    private static final String ERROR_KEY_REMOVE_NODE_TREE = "error.planner.remove.node.tree";
 
     // Error messages used in this class. They are ment to be thrown.
     private static final String ERROR_USER_NOT_FOUND = "User not found.";
@@ -320,7 +319,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	PedagogicalPlannerSequenceNode node = null;
 	if (learningDesignId == null && nodeUid != null) {
 	    // we are opening a LD from a certain node, so check is we are allowed to do it
-	    isEditor = isEditor(request, nodeUid);
+	    isEditor = canEditNode(request, nodeUid);
 	    node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	    learningDesignId = node.getLearningDesignId();
 	}
@@ -431,7 +430,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	if (nodeUid != null) {
 	    PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	    if (node != null) {
-		boolean isEditor = isEditor(request, nodeUid);
+		boolean isEditor = canEditNode(request, nodeUid);
 		Integer nodePermissions = node.getPermissions();
 		planner.setPermissions(nodePermissions, isEditor);
 		
@@ -778,11 +777,10 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 	// Only certain roles can open the editor
 	boolean isSysAdmin = request.isUserInRole(Role.SYSADMIN);
-	boolean hasRole = isSysAdmin || isEditor(request, nodeUid);
+	boolean canEdit = canEditNode(request, nodeUid);
 	Boolean edit = WebUtil.readBooleanParam(request, CentralConstants.PARAM_EDIT, false);
-	edit &= hasRole;
+	edit &= canEdit;
 
-	
 	// Fill the DTO
 	PedagogicalPlannerSequenceNodeDTO dto = null;
 	if (filterText != null) {
@@ -831,7 +829,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Boolean importNode = WebUtil.readBooleanParam(request, CentralConstants.PARAM_IMPORT_NODE, false);
 	dto.setCreateSubnode(createSubnode);
 	dto.setEdit(edit);
-	dto.setIsEditor(hasRole);
+	dto.setIsEditor(canEdit);
 	dto.setImportNode(importNode);
 	dto.setTitlePath(titlePath);
 
@@ -885,10 +883,11 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	PedagogicalPlannerSequenceNodeForm nodeForm = (PedagogicalPlannerSequenceNodeForm) form;
 
 	boolean newRootNode = false;
+	Long parentUid = null;
 	if (nodeUid == null) {
 	    // It's a new subnode
 	    node = new PedagogicalPlannerSequenceNode();
-	    Long parentUid = nodeForm.getParentUid() == 0 ? null : nodeForm.getParentUid();
+	    parentUid = nodeForm.getParentUid() == 0 ? null : nodeForm.getParentUid();
 	    if (parentUid != null) {
 		PedagogicalPlannerSequenceNode parent = getPedagogicalPlannerDAO().getByUid(parentUid);
 		node.setParent(parent);
@@ -902,8 +901,11 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	    nodeUid = node.getUid();
 	}
-
-	if (!isEditor(request, nodeUid)) {
+	
+	// either user can edit current node or he is creating a subnode,
+	// so he needs permissions for the parent node
+	if (nodeUid == null ? (parentUid == null ? !canEditNode(request, nodeUid) : !canEditNode(request, parentUid))
+		: !canEditNode(request, nodeUid)) {
 	    log.debug("Unauthorised attempt to saveSequenceNode");
 	    throw new UserAccessDeniedException();
 	}
@@ -934,6 +936,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		 */
 		node.setLearningDesignId(null);
 		node.setLearningDesignTitle(null);
+		node.setPermissions(PedagogicalPlannerSequenceNode.PERMISSION_DEFAULT_SETTING);
 	    } else if (nodeForm.getFile() != null && nodeForm.getFile().getFileSize() > 0) {
 		// file has been uploaded, so copy it to file system and import LD
 		FormFile file = nodeForm.getFile();
@@ -1082,13 +1085,16 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID);
 	PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
 	Long parentUid = node.getParent() == null ? null : node.getParent().getUid();
-	
-	if (isEditor(request, nodeUid)) {
+	if (canRemoveSubtree(request, nodeUid)) {
 	    PedagogicalPlannerAction.log.debug("Removing sequence node with UID" + nodeUid);
 	    getPedagogicalPlannerDAO().removeNode(node);
+
 	} else {
+	    ActionMessages errors = new ActionMessages();
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+		    PedagogicalPlannerAction.ERROR_KEY_REMOVE_NODE_TREE));
+	    saveErrors(request, errors);
 	    log.debug("Unauthorised attempt to removeSequenceNode");
-	    throw new UserAccessDeniedException();
 	}
 	return openSequenceNode(mapping, form, request, parentUid);
     }
@@ -1246,7 +1252,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     public ActionForward importNode(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 
-	if (!isEditor(request, null)) {
+	if (!canEditNode(request, null)) {
 	    log.debug("Unauthorised access to importNode");
 	    throw new UserAccessDeniedException();
 	}
@@ -1886,7 +1892,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws Exception {
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
 
-	if (isEditor(request, nodeUid)) {
+	if (canEditNode(request, nodeUid)) {
 	    List existingUsers = getPedagogicalPlannerDAO().getNodeUsers(nodeUid, Role.ROLE_AUTHOR_ADMIN);
 
 	    Integer orgId = getUserManagementService().getRootOrganisation().getOrganisationId();
@@ -1935,7 +1941,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Integer userId = WebUtil.readIntParam(request, CentralConstants.PARAM_USER_ID, false);
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, true);
 	
-	if (isEditor(request, nodeUid)) {
+	if (canEditNode(request, nodeUid)) {
 	    getPedagogicalPlannerDAO().saveNodeRole(userId, nodeUid, Role.ROLE_AUTHOR_ADMIN);
 	} else {
 	    log.debug("Unauthorised attempt to add editor to node.");
@@ -1949,7 +1955,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	Integer userId = WebUtil.readIntParam(request, CentralConstants.PARAM_USER_ID, false);
 	Long nodeUid = WebUtil.readLongParam(request, CentralConstants.PARAM_UID, false);
 	
-	if (isEditor(request, nodeUid)) {
+	if (canEditNode(request, nodeUid)) {
 	    getPedagogicalPlannerDAO().removeNodeRole(userId, nodeUid, Role.ROLE_AUTHOR_ADMIN);
 	} else {
 	    log.debug("Unauthorised attempt to remove editor from node.");
@@ -1961,7 +1967,11 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     /*------------------------ COMMON METHODS --------------------*/
 
     // only these roles can edit nodes and give this role on this node to others
-    private Boolean isEditor(HttpServletRequest request, Long nodeUid) {
+    private boolean canEditNode(HttpServletRequest request, Long nodeUid) {
+	return isNodeOwnerOrSuperuser(request, nodeUid) || isEditor(request, nodeUid);
+    }
+
+    private boolean isNodeOwnerOrSuperuser(HttpServletRequest request, Long nodeUid) {
 	if (request.isUserInRole(Role.SYSADMIN)) {
 	    // sysadmins have all permission
 	    return true;
@@ -1970,17 +1980,46 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		// all global author admins (GAA) can create and edit at the root level
 		return getUserManagementService().isUserGlobalAuthorAdmin();
 	    } else {
-		// at any other node, a GAA needs to be linked to that node or one of its parents
-		return isNodeEditor(request, nodeUid);
+		// at any other node, the user needs to be the node's owner
+		// or linked to that node or one of its parents
+		User user = (User) getUserManagementService().getUserByLogin(request.getRemoteUser());
+		PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
+		User nodeOwner = node.getUser();
+		return nodeOwner != null && user.equals(nodeOwner);
 	    }
 	}
     }
     
-    private Boolean isNodeEditor(HttpServletRequest request, Long nodeUid) {
+    private boolean isEditor(HttpServletRequest request, Long nodeUid) {
 	User user = (User) getUserManagementService().getUserByLogin(request.getRemoteUser());
 	return getPedagogicalPlannerDAO().isEditor(user.getUserId(), nodeUid, Role.ROLE_AUTHOR_ADMIN);
     }
-    
+
+    private boolean canRemoveSubtree(HttpServletRequest request, Long nodeUid) {
+	if (nodeUid == null || request.isUserInRole(Role.SYSADMIN)) {
+	    return true;
+	}
+	boolean isOwner = isNodeOwnerOrSuperuser(request, nodeUid);
+	boolean isPlainEditor = isEditor(request, nodeUid);
+	if (isOwner || isPlainEditor) {
+	    PedagogicalPlannerSequenceNode node = getPedagogicalPlannerDAO().getByUid(nodeUid);
+	    Integer nodePermissions = node.getPermissions();
+	    if (isOwner || nodePermissions == null
+		    || (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REMOVE) != 0) {
+		Set<PedagogicalPlannerSequenceNode> subnodes = node.getSubnodes();
+		if (subnodes != null && !subnodes.isEmpty()) {
+		    for (PedagogicalPlannerSequenceNode subnode : subnodes) {
+			if (!canRemoveSubtree(request, subnode.getUid())) {
+			    return false;
+			}
+		    }
+		}
+		return true;
+	    }
+	}
+	return false;
+    }
+
     private IExportToolContentService getExportService() {
 	if (PedagogicalPlannerAction.exportService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
@@ -2088,5 +2127,4 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    }
 	}
     }
-
 }

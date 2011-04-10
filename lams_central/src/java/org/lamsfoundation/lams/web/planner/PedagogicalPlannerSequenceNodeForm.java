@@ -44,7 +44,7 @@ public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
     private Boolean permitEditorViewTemplate;
     private Boolean permitEditorModifyTemplate;
     private Boolean permitEditorReplaceTemplate;
-    private Boolean permitEditorRemoveTemplate;
+    private Boolean permitEditorRemoveNode;
 
     private Boolean permitTeacherViewTemplate;
     private Boolean permitTeacherEditCopy;
@@ -64,7 +64,7 @@ public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
 		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_MODIFY) != 0;
 	permitEditorReplaceTemplate = nodePermissions != null
 		&& (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REPLACE) != 0;
-	permitEditorRemoveTemplate = nodePermissions != null
+	permitEditorRemoveNode = nodePermissions != null
 		&& (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REMOVE) != 0;
 
 	permitTeacherViewTemplate = nodePermissions == null
@@ -92,7 +92,7 @@ public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
 		: 0;
 	permissions += Boolean.TRUE.equals(permitEditorReplaceTemplate) ? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REPLACE
 		: 0;
-	permissions += Boolean.TRUE.equals(permitEditorRemoveTemplate) ? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REMOVE
+	permissions += Boolean.TRUE.equals(permitEditorRemoveNode) ? PedagogicalPlannerSequenceNode.PERMISSION_EDITOR_REMOVE
 		: 0;
 	permissions += Boolean.TRUE.equals(permitTeacherViewTemplate) ? PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_VIEW
 		: 0;
@@ -205,12 +205,12 @@ public class PedagogicalPlannerSequenceNodeForm extends ActionForm {
 	this.permitEditorReplaceTemplate = permitEditorReplaceTemplate;
     }
 
-    public Boolean getPermitEditorRemoveTemplate() {
-	return permitEditorRemoveTemplate;
+    public Boolean getPermitEditorRemoveNode() {
+	return permitEditorRemoveNode;
     }
 
-    public void setPermitEditorRemoveTemplate(Boolean permitEditorRemoveTemplate) {
-	this.permitEditorRemoveTemplate = permitEditorRemoveTemplate;
+    public void setPermitEditorRemoveNode(Boolean permitEditorRemoveTemplate) {
+	this.permitEditorRemoveNode = permitEditorRemoveTemplate;
     }
 
     public Boolean getPermitTeacherViewTemplate() {

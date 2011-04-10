@@ -240,15 +240,15 @@
 		if ($('#permitEditorViewTemplate').attr('checked') == false) {
 			$('#permitEditorModifyTemplate').attr('checked', false);
 			$('#permitEditorReplaceTemplate').attr('checked', false);
-			$('#permitEditorRemoveTemplate').attr('checked', false);
+			$('#permitEditorRemoveNode').attr('checked', false);
 
 			$('#permitEditorModifyTemplate').attr('disabled', true);
 			$('#permitEditorReplaceTemplate').attr('disabled', true);
-			$('#permitEditorRemoveTemplate').attr('disabled', true);
+			$('#permitEditorRemoveNode').attr('disabled', true);
 		} else {
 			$('#permitEditorModifyTemplate').attr('disabled', false);
 			$('#permitEditorReplaceTemplate').attr('disabled', false);
-			$('#permitEditorRemoveTemplate').attr('disabled', false);
+			$('#permitEditorRemoveNode').attr('disabled', false);
 		}
 
 		if ($('#permitTeacherViewTemplate').attr('checked') == false) {
