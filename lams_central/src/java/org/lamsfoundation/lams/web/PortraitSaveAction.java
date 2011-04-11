@@ -28,6 +28,7 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -41,9 +42,16 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralToolContentHandler;
+import org.lamsfoundation.lams.util.FileUtilException;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.PortraitUtils;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -51,20 +59,22 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author jliew
  * @author Andrey Balan
  * 
- * @struts:action path="/saveportrait" name="PortraitActionForm" input=".portrait" scope="request" validate="false"
+ * @struts:action path="/saveportrait" parameter="method" name="PortraitActionForm" input=".portrait" scope="request" validate="false"
  * 
  * @struts:action-forward name="profile" path="/index.do?state=active&amp;tab=profile"
  * @struts:action-forward name="errors" path="/index.do?state=active&amp;tab=portrait"
  */
-public class PortraitSaveAction extends Action {
+public class PortraitSaveAction extends LamsDispatchAction {
 
     private static Logger log = Logger.getLogger(PortraitSaveAction.class);
     private static IUserManagementService service;
     private static CentralToolContentHandler centralToolContentHandler;
     private static int LARGEST_DIMENSION = 120;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    /**
+     * Upload portrait image.
+     */
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	if (isCancelled(request)) {
@@ -72,11 +82,6 @@ public class PortraitSaveAction extends Action {
 	}
 
 	ActionMessages errors = new ActionMessages();
-
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
-	PortraitSaveAction.centralToolContentHandler = (CentralToolContentHandler) wac
-		.getBean("centralToolContentHandler");
 
 	PortraitActionForm portraitForm = (PortraitActionForm) form;
 	FormFile file = portraitForm.getFile();
@@ -107,7 +112,7 @@ public class PortraitSaveAction extends Action {
 	if ((file != null) && !StringUtils.isEmpty(fileName)) {
 	    try {
 		fileName = fileName.substring(0, fileName.indexOf('.')) + ".jpg";		
-		node = PortraitSaveAction.centralToolContentHandler.uploadFile(is, fileName, file.getContentType(),
+		node = getCentralToolContentHandler().uploadFile(is, fileName, file.getContentType(),
 			IToolContentHandler.TYPE_ONLINE);
 		is.close();
 	    } catch (Exception e) {
@@ -120,12 +125,65 @@ public class PortraitSaveAction extends Action {
 
 	// delete old portrait file (we only want to keep the user's current portrait)
 	if (user.getPortraitUuid() != null) {
-	    PortraitSaveAction.centralToolContentHandler.deleteFile(user.getPortraitUuid());
+	    getCentralToolContentHandler().deleteFile(user.getPortraitUuid());
 	}
 	user.setPortraitUuid(node.getUuid());
 	getService().save(user);
 
 	return mapping.findForward("profile");
+    }
+    
+    
+    /**
+     * Save portrait taken from web camera.
+     */
+    public ActionForward saveWebcamPortrait(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	// check if there is a session with logged in user
+	HttpSession ss = SessionManager.getSession();
+	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	User user = getService().getUserByLogin(request.getRemoteUser());
+	if ((userDTO == null) || (user == null)) {
+	    throw new UserAccessDeniedException("User hasn't been logged in");
+	}
+
+	// check if the file is an image using the MIME content type
+	String mediaType = request.getContentType().split("/", 2)[0];
+	if (!mediaType.equals("image")) {
+	    throw new FileUtilException("The file is not an image.");
+	}
+
+	// check if there is an input stream
+	InputStream is = request.getInputStream();
+	if (is == null) {
+	    throw new FileUtilException("Sorry, there has been an error.");
+	}
+
+	// write to content repository
+	String fileName = user.getFullName() + " portrait.jpg";
+	NodeKey node = getCentralToolContentHandler().uploadFile(is, fileName, "image/jpeg", IToolContentHandler.TYPE_ONLINE);
+	is.close();
+
+	log.debug("saved file with uuid: " + node.getUuid() + " and version: " + node.getVersion());
+
+	// delete old portrait file (we only want to keep the user's current portrait)
+	if (user.getPortraitUuid() != null) {
+	    getCentralToolContentHandler().deleteFile(user.getPortraitUuid());
+	}
+	user.setPortraitUuid(node.getUuid());
+	getService().save(user);
+
+	return null;
+    }
+    
+    private CentralToolContentHandler getCentralToolContentHandler() {
+	if (centralToolContentHandler == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    centralToolContentHandler = (CentralToolContentHandler) wac.getBean("centralToolContentHandler");
+	}
+	return centralToolContentHandler;
     }
 
     private IUserManagementService getService() {
@@ -134,7 +192,7 @@ public class PortraitSaveAction extends Action {
 		    .getServletContext());
 	    PortraitSaveAction.service = (IUserManagementService) ctx.getBean("userManagementService");
 	}
-	return PortraitSaveAction.service;
+	return service;
     }
 }
 
