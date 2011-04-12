@@ -87,6 +87,8 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	private Date created;
 
 	private Date updated;
+	
+	private Date submissionDeadline;
 
 	private SubmitUser createdBy;
 
@@ -396,6 +398,18 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 
 	public void setUpdated(Date updated) {
 		this.updated = updated;
+	}
+	
+	/**
+	 * @hibernate.property column="submission_deadline"
+	 * @return
+	 */
+	public Date getSubmissionDeadline() {
+		return submissionDeadline;
+	}
+
+	public void setSubmissionDeadline(Date submissionDeadline) {
+		this.submissionDeadline = submissionDeadline;
 	}
 
 	/**

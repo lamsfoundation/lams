@@ -37,41 +37,20 @@
         }
         
         
-	var statisticTargetDiv = "statisticArea";
+	var statisticTargetDiv = "#statisticArea";
 	function doStatistic(){
 		var url = "<c:url value="/monitoring.do"/>";
 	    var reqIDVar = new Date();
-		var param = "method=doStatistic&toolContentID=" + ${param.toolContentID} +"&reqID="+reqIDVar.getTime();
-		messageLoading();
-	    var myAjax = new Ajax.Updater(
-		    	statisticTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:messageComplete,
-		    		evalScripts:true
-		    	}
-	    );
+		$(statisticTargetDiv).load(
+				url,
+				{
+					method: "doStatistic",
+					toolContentID: "${param.toolContentID}", 
+					reqID: reqIDVar.getTime()
+				}
+			);
 		
-	}
-	
-	function showBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			Element.show(targetDiv+"_Busy");
-		}
-	}
-	function hideBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			Element.hide(targetDiv+"_Busy");
-		}				
-	}
-	function messageLoading(){
-		showBusy(statisticTargetDiv);
-	}
-	function messageComplete(){
-		hideBusy(statisticTargetDiv);
-	}        
+	}       
 	</script>
 </lams:head>
 

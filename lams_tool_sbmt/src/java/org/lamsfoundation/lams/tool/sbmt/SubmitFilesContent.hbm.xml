@@ -175,6 +175,14 @@
         />
 
         <property
+            name="submissionDeadline"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="submission_deadline"
+        />
+
+        <property
             name="notifyLearnersOnMarkRelease"
             type="boolean"
             update="true"

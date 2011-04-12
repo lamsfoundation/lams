@@ -26,9 +26,11 @@
 package org.lamsfoundation.lams.tool.sbmt.web;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -63,6 +65,7 @@ import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -170,6 +173,23 @@ public class LearnerAction extends DispatchAction {
 	// add run offline support
 	if (content.isRunOffline()) {
 	    return mapping.findForward("runOffline");
+	}
+	
+	//check if there is submission deadline
+	Date submissionDeadline = content.getSubmissionDeadline();
+	if (submissionDeadline != null) {
+	    //store submission deadline to sessionMap
+	    sessionMap.put(SbmtConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
+	   
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+	    
+	    //calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
+		return mapping.findForward("runOffline");
+	    }
 	}
 
 	if (content.isNotifyLearnersOnMarkRelease()) {

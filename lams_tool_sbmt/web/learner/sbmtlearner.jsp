@@ -59,20 +59,28 @@
 		<p>
 			<c:out value="${sessionMap.instruction}" escapeXml="false" />
 		</p>
-    <c:if test="${sessionMap.mode == 'author' || sessionMap.mode == 'learner'}">
-		<c:if test="${sessionMap.lockOnFinish}">
-			<div class="info">
-				<c:choose>
-					<c:when test="${sessionMap.userFinished}">
-						<fmt:message key="message.activityLocked" />
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="message.warnLockOnFinish" />
-					</c:otherwise>
-				</c:choose>
-			</div>
+	    <c:if test="${sessionMap.mode == 'author' || sessionMap.mode == 'learner'}">
+			<c:if test="${sessionMap.lockOnFinish}">
+				<div class="info">
+					<c:choose>
+						<c:when test="${sessionMap.userFinished}">
+							<fmt:message key="message.activityLocked" />
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="message.warnLockOnFinish" />
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</c:if>
+			
+			<c:if test="${not empty sessionMap.submissionDeadline}">
+				<div class="info">
+					<fmt:message key="authoring.info.teacher.set.restriction" >
+						<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+					</fmt:message>
+				</div>
+			</c:if>			
 		</c:if>
-	</c:if>
 
 		<%@include file="/common/messages.jsp"%>
 		<c:if test="${sessionMap.limitUpload}">

@@ -29,9 +29,21 @@
 			<fmt:message key="activity.title"></fmt:message>
 		</h1>
 
-		<p>
-			<fmt:message key="run.offline.message" />
-		</p>
+		<c:choose>
+			<c:when test="${empty sessionMap.submissionDeadline}">
+				<p>
+					<fmt:message key="run.offline.message" />
+				</p>			
+			</c:when>
+			<c:otherwise>
+				<div class="warning">
+					<fmt:message key="authoring.info.teacher.set.restriction" >
+						<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+					</fmt:message>
+				</div>
+			</c:otherwise>
+		</c:choose>
+
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="small-space-top">

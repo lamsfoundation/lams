@@ -7,81 +7,140 @@
 	<lams:LAMSURL />
 </c:set>
 
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
+<style media="screen,projection" type="text/css">
+	#restrictUsageDiv {font-size: 13px; padding-bottom: 10px; padding-left: 18px; padding-top: -5px;}
+	#restrictUsageDiv :first-child {padding-bottom: 10px; padding-top: -5px;}
+	#datetime {padding-left: 7px; margin-right: 20px;}
+	#dateInfo {padding-left: 7px;}
+	#dateInfoDiv a {margin-left:10px;}
+</style>
+
+<link type="text/css" href="${lams}/css/jquery-ui-1.8.11.flick-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/jquery-ui-timepicker-addon.css" rel="stylesheet">
+
+<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
+
 <script type="text/javascript">
-	function launchPopup(url,title) {
+	$(function(){
+		$("#datetime").datetimepicker();
+		
+		var submissionDeadline = "${submissionDeadline}";
+		if (submissionDeadline != "") {
+			var date = new Date(eval(submissionDeadline));
+			$("#dateInfo").html( formatDate(date) );
+			
+			//open up date restriction area
+			toggleAdvancedOptionsVisibility(document.getElementById('restrictUsageDiv'), document.getElementById('restrictUsageTreeIcon'),'${lams}');
+		}
+	});
+	
+	function formatDate(date) {
+		var currHour = "" + date.getHours();
+		if (currHour.length == 1) {
+			currHour = "0" + currHour;
+		}			
+		var currMin = "" + date.getMinutes();
+		if (currMin.length == 1) {
+			currMin = "0" + currMin;
+		}
+		return $.datepicker.formatDate( 'mm/dd/yy', date ) + " " + currHour + ":" + currMin;
+	}
+	
+	function setSubmissionDeadline() {
+		//get the timestamp in milliseconds since midnight Jan 1, 1970
+		var date = $("#datetime").datetimepicker('getDate');
+		if (date == null) {
+			return;
+		}
+
+		var reqIDVar = new Date();
+		var url = "<c:url value="/monitoring.do"/>?method=setSubmissionDeadline&toolContentID=${param.toolContentID}&submissionDeadline="
+					+ date.getTime() + "&reqID=" + reqIDVar.getTime();
+
+		$.ajax({
+			url : url,
+			success : function() {
+				$.growlUI('<fmt:message key="monitor.summary.notification" />', '<fmt:message key="monitor.summary.date.restriction.set" />');
+				$("#datetimeDiv").hide();
+				$("#dateInfo").html(formatDate(date) );
+				$("#dateInfoDiv").show();
+			}
+		});
+	}
+	function removeSubmissionDeadline() {
+		var reqIDVar = new Date();
+		var url = "<c:url value="/monitoring.do"/>?method=setSubmissionDeadline&toolContentID=${param.toolContentID}&submissionDeadline="
+					+ "&reqID=" + reqIDVar.getTime();
+
+		$.ajax({
+			url : url,
+			success : function() {
+				$.growlUI('<fmt:message key="monitor.summary.notification" />', '<fmt:message key="monitor.summary.date.restriction.removed" />');
+				$("#dateInfoDiv").hide();
+				
+				$("#datetimeDiv").show();
+				$("#datetime").val("");
+			}
+		});
+	}
+	
+	function launchPopup(url, title) {
 		var wd = null;
-		if(wd && wd.open && !wd.closed){
+		if (wd && wd.open && !wd.closed) {
 			wd.close();
 		}
-		wd = window.open(url,title,'resizable,width=796,height=570,scrollbars');
+		wd = window.open(url, title,
+				'resizable,width=796,height=570,scrollbars');
 		wd.window.focus();
 	}
-	function showBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			Element.show(targetDiv+"_Busy");
-		}
-	}
-	function hideBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			Element.hide(targetDiv+"_Busy");
-		}				
-	}
-	
-	function viewMark(userId,sessionId){
+
+	function viewMark(userId, sessionId) {
 		var act = "<c:url value="/monitoring.do"/>";
-		launchPopup(act + "?method=listMark&userID="+userId+"&toolSessionID="+sessionId,"mark");
+		launchPopup(act + "?method=listMark&userID=" + userId
+				+ "&toolSessionID=" + sessionId, "mark");
 	}
-	function viewAllMarks(sessionId){
+	function viewAllMarks(sessionId) {
 		var act = "<c:url value="/monitoring.do"/>";
-		launchPopup(act + "?method=listAllMarks&toolSessionID="+sessionId,"mark");
+		launchPopup(act + "?method=listAllMarks&toolSessionID=" + sessionId,
+				"mark");
 	}
-	
-	var messageTargetDiv = "messageArea";
-	function releaseMarks(sessionId){
+
+	var messageTargetDiv = "#messageArea";
+	function releaseMarks(sessionId) {
 		var url = "<c:url value="/monitoring.do"/>";
-	    var reqIDVar = new Date();
-		var param = "method=releaseMarks&toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
-		messageLoading();
-	    var myAjax = new Ajax.Updater(
-		    	messageTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:messageComplete,
-		    		evalScripts:true
-		    	}
-	    );
-		
+		var reqIDVar = new Date();
+		$(messageTargetDiv).load(
+			url,
+			{
+				method: "releaseMarks",
+				toolSessionID: sessionId, 
+				reqID: reqIDVar.getTime()
+			}
+		);
 	}
-	
-	function downloadMarks(sessionId){
+
+	function downloadMarks(sessionId) {
 		var url = "<c:url value="/monitoring.do"/>";
-	    var reqIDVar = new Date();
-		var param = "?method=downloadMarks&toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
+		var reqIDVar = new Date();
+		var param = "?method=downloadMarks&toolSessionID=" + sessionId
+				+ "&reqID=" + reqIDVar.getTime();
 		url = url + param;
-		location.href=url;
-	}
-	
-	function messageLoading(){
-		showBusy(messageTargetDiv);
-	}
-	function messageComplete(){
-		hideBusy(messageTargetDiv);
+		location.href = url;
 	}
 </script>
 
 
-<h1>
+<h1 style="padding-bottom: 10px;">
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
 
 	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
 		<fmt:message key="monitor.summary.th.advancedSettings" />
 	</a>
 </h1>
-<br />
 
 <div class="monitoring-advanced" id="advancedDiv" style="display:none">
 <table class="alternative-color">
@@ -184,8 +243,7 @@
 </table>
 </div>
 
-
-
+<%@include file="daterestriction.jsp"%>
 
 <table cellpadding="0">
 <tr><td>

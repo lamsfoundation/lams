@@ -24,6 +24,7 @@ create table tl_lasbmt11_content (
    created datetime, 
    created_by bigint, 
    updated datetime,
+   submission_deadline datetime,
    mark_release_notify tinyint DEFAULT 0,
    file_submit_notify tinyint DEFAULT 0,
    primary key (content_id)
