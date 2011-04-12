@@ -7,14 +7,6 @@
 	<lams:LAMSURL />
 </c:set>
 
-<style media="screen,projection" type="text/css">
-	#restrictUsageDiv {font-size: 13px; padding-bottom: 10px; padding-left: 18px; padding-top: -5px;}
-	#restrictUsageDiv :first-child {padding-bottom: 10px; padding-top: -5px;}
-	#datetime {padding-left: 7px; margin-right: 20px;}
-	#dateInfo {padding-left: 7px;}
-	#dateInfoDiv a {margin-left:10px;}
-</style>
-
 <link type="text/css" href="${lams}/css/jquery-ui-1.8.11.flick-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui-timepicker-addon.css" rel="stylesheet">
 
