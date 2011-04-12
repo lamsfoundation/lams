@@ -1,6 +1,12 @@
-	/* css for timepicker (version: 0.9.3) */
-	.ui-timepicker-div .ui-widget-header{ margin-bottom: 8px; }
-	.ui-timepicker-div dl{ text-align: left; }
-	.ui-timepicker-div dl dt{ height: 25px; }
-	.ui-timepicker-div dl dd{ margin: -25px 0 10px 65px; }
-	.ui-timepicker-div td { font-size: 90%; }
+/* css for timepicker (version: 0.9.3) */
+.ui-timepicker-div .ui-widget-header{ margin-bottom: 8px; }
+.ui-timepicker-div dl{ text-align: left; }
+.ui-timepicker-div dl dt{ height: 25px; }
+.ui-timepicker-div dl dd{ margin: -25px 0 10px 65px; }
+.ui-timepicker-div td { font-size: 90%; }
+
+
+/* css for jquery.blockUI (version: 2.38), growl functionality */
+div.growlUI { background: url(../images/css/check48.png) no-repeat 10px 10px }
+div.growlUI h1, div.growlUI h2 { color: white; padding: 5px 5px 5px 75px; text-align: left }
+div.growlUI h1 { font-size: medium }
