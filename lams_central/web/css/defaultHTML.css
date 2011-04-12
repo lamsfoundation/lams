@@ -1357,6 +1357,18 @@ border:0px;
 .mycourses-completed-img {background: url('../images/css/lesson_completed.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
 }
 
+/* Date and time restriction area in monitor */
+#restrictUsageDiv {font-size: 13px; padding-bottom: 10px; padding-left: 18px; padding-top: -5px;}
+#restrictUsageDiv :first-child {padding-bottom: 10px; padding-top: -5px;}
+#datetime {padding-left: 7px; margin-right: 20px;}
+#dateInfo {padding-left: 7px;}
+#dateInfoDiv a {margin-left:10px;}
+
+/* Growl functionality, jquery.blockUI (version: 2.38) */
+div.growlUI { background: url(../images/css/check48.png) no-repeat 10px 10px }
+div.growlUI h1, div.growlUI h2 { color: white; padding: 5px 5px 5px 75px; text-align: left }
+div.growlUI h1 { font-size: medium }
+
 /*IE style workarounds */
 
 * html  #content {
