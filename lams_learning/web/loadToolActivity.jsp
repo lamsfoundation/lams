@@ -29,8 +29,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
 <%
-String protocol = request.getProtocol();
-if(protocol.startsWith("HTTPS")){
+String protocol;
+if(request.isSecure()){
 	protocol = "https://";
 }else{
 	protocol = "http://";
