@@ -61,8 +61,8 @@ public class WebAppURLTag extends TagSupport {
 		if ( HttpServletRequest.class.isInstance(sr) ) {
 			HttpServletRequest request = (HttpServletRequest) sr;
 			
-			String protocol = request.getProtocol();
-			if(protocol.startsWith("HTTPS")){
+			String protocol;
+			if(request.isSecure()){
 				protocol = "https://";
 			}else{
 				protocol = "http://";

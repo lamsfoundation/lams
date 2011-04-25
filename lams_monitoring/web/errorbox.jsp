@@ -2,8 +2,8 @@
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ page import="org.apache.struts.Globals" %>
 <%
-String cprotocol = request.getProtocol();
-if(cprotocol.startsWith("HTTPS")){
+String cprotocol;
+if(request.isSecure()){
 	cprotocol = "https://";
 }else{
 	cprotocol = "http://";
