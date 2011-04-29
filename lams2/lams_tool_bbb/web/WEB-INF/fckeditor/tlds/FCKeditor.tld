@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
+	http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+	version="2.0">
+	<description>
+		The FCKeditor Tag Library offers a very convenient way to create
+		several FCKeditor instances with different configurations.
+		Additionally, you can check for user-based capabilities.
+	</description>
+	<display-name>FCKeditor Tag Library</display-name>
+	<tlib-version>2.4</tlib-version>
+	<short-name>FCK</short-name>
+	<uri>http://java.fckeditor.net</uri>
+	<tag>
+		<description>
+			Creates a FCKeditor instance with the given parameters. Any
+			parameter except instanceName which is empty or contains
+			whitespaces only will be ignored.
+		</description>
+		<display-name>editor</display-name>
+		<name>editor</name>
+		<tag-class>net.fckeditor.tags.EditorTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<description>
+				The unique instance name under which the editor can be
+				retrieved through the API.
+			</description>
+			<name>instanceName</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Width of the FCKeditor instance in the browser window.
+			</description>
+			<name>width</name>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Height of the FCKeditor instance in the browser window.
+			</description>
+			<name>height</name>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				The toolbar set which shall be displayed to the user.
+			</description>
+			<name>toolbarSet</name>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				The path/folder in which the editor is deployed under
+				the given context. The context path will be attached
+				automatically. (e.g. '/fckeditor')
+			</description>
+			<name>basePath</name>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Passes any content to the FCKeditor document. Use the
+				jsp:attribute tag for large inline content. \r, \n, and
+				\t will be truncated.
+			</description>
+			<name>value</name>
+			<rtexprvalue>true</rtexprvalue>
+			<type>java.lang.String</type>
+		</attribute>
+		<example><![CDATA[
+<FCK:editor instanceName="editorDefault" height="500px" />]]>
+		</example>
+	</tag>
+	<tag>
+		<description>
+			Sets a config property of the editor to the supplied value.
+			You may provide any attribute you want for the editor. Set
+			at least one attribute per tag or several attributes with
+			one tag. This tag can only be nested within an editor tag.
+			For all configuration options click
+			<![CDATA[<a href="http://docs.fckeditor.net/FCKeditor_2.x/Developers_Guide/Configuration/Configuration_Options">here</a>]]>.
+		</description>
+		<display-name>config</display-name>
+		<name>config</name>
+		<tag-class>net.fckeditor.tags.ConfigTag</tag-class>
+		<body-content>empty</body-content>
+		<dynamic-attributes>true</dynamic-attributes>
+		<example>
+			<![CDATA[
+<FCK:config SkinPath="/skins/silver/" AutoDetectLanguage="true" />]]>
+		</example>
+	</tag>
+	<tag>
+		<description>
+			Displays session-dependent and compatibility-related
+			information. This tag is intended for developers only.
+			Response messages cannot be localized, they are English
+			only.
+		</description>
+		<display-name>check</display-name>
+		<name>check</name>
+		<tag-class>net.fckeditor.tags.CheckTag</tag-class>
+		<body-content>empty</body-content>
+		<attribute>
+			<description>
+				Provide the feature name you want to check. Valid
+				features are [FileUpload, FileBrowsing,
+				CompatibleBrowser]
+			</description>
+			<name>command</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<example><![CDATA[
+<FCK:check command="FileUpload" />
+<FCK:check command="CompatibleBrowser" />]]>
+		</example>
+	</tag>
+</taglib>
