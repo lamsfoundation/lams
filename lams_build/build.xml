@@ -319,11 +319,6 @@
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 			<property name="generate.for.installers" value="${generate.for.installers}"/>
 		</ant>
-		<ant antfile="../${tool_dimdim_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
 		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="deploy-tool"
 						inheritAll="false" >
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
@@ -539,7 +534,6 @@
 		<ant antfile="../${tool_assessment_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_chat_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_daco_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_dimdim_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_forum_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_gmap_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_images_dir}/build.xml" target="copy-tags" inheritAll="false"/>
