@@ -54,7 +54,7 @@ VALUES(
 
 -- default configuration values
 INSERT INTO tl_labbb10_config (config_key, config_value) VALUES ("server_url", "http://172.20.100.253/");
--- INSERT INTO tl_labbb10_config (config_key, config_value) VALUES ("version", "enterprise");
+INSERT INTO tl_labbb10_config (config_key, config_value) VALUES ("security_salt", "12309usadoiaksdjblquge12312");
 
 
 SET FOREIGN_KEY_CHECKS=1;

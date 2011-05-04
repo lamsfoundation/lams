@@ -9,7 +9,7 @@ create_date_time
 )
 VALUES
 (
-'Bbb Tool',
+'Web Conferencing Tool',
 'Bbb',
 0,
 NOW()

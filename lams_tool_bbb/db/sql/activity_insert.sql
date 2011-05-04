@@ -43,8 +43,8 @@ VALUES
 (
 NULL
 , 'Bbb Tool'
-, 'Bbb Tool'
-, 'Put some help text here.'
+, 'Web Conferencing Tool'
+, 'A web conferencig tool using Big Blue Button.'
 , NULL
 , NULL
 , NULL
