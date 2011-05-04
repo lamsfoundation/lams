@@ -1,0 +1,3 @@
+<action path="/endMeeting"
+	type="org.apache.struts.actions.ForwardAction"
+	parameter="tiles:/bbb/end_meeting" />

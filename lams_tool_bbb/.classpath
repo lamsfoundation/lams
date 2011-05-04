@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/java"/>
+	<classpathentry kind="src" path="test/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/javax.servlet.jsp.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/lib/jboss-j2ee.jar"/>
+	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE13_CONTAINER"/>
+	<classpathentry kind="var" path="JBOSS_HOME/server/default/deploy/jboss-hibernate.deployer/jboss-hibernate.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_contentrepository"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_gradebook"/>
+	<classpathentry kind="output" path="classes/java"/>
+</classpath>
