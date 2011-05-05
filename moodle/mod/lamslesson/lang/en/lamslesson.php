@@ -40,6 +40,7 @@ $string['lamslesson'] = 'LAMS Lesson';
 $string['pluginadministration'] = 'LAMS Lesson administration';
 $string['pluginname'] = 'LAMS Lesson';
 $string['selectsequence'] = 'Select sequence';
+$string['displaydesign'] = 'Display image design?';
 $string['availablesequences'] = 'Sequences';
 $string['openauthor'] = 'Author new LAMS lessons';
 

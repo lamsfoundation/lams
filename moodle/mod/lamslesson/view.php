@@ -66,14 +66,11 @@ $canmanage = has_capability('mod/lamslesson:manage', $context);
 // Log the lamslesson view.
 add_to_log($course->id, "lamslesson", "view lamslesson", "view.php?id=$cm->id", "$lamslesson->id", $cm->id);
         
-// Get raw data
-
-//$lessons = $DB->get_records('lamslesson', 'id', $cm->instance);
-
-
 // Check capabilities
 
 $canparticipate = has_capability('mod/lamslesson:participate', $context);
+
+
 
 // Output starts here
 echo $OUTPUT->header();
@@ -85,6 +82,14 @@ echo '<p>';
 echo format_module_intro('lamslesson', $lamslesson, $cm->id);
 echo '</p>';
 echo '<br>';
+
+if ($lamslesson->displaydesign) {
+   // Get design image
+   // For now we always will get this as PNG rather than SVG
+   $design_image = lamslesson_get_design_image($USER->username,$course->id,$course->shortname,$COURSE->timecreated,"au","en",$lamslesson->sequence_id,"2");
+   echo '<div><img class="centerimage" src="' . $design_image . '"></div>';
+}
+
 echo '<div class="smalltext">' . get_string('lastmodified', 'lamslesson') . ": " .  userdate($lamslesson->timemodified) .'</div>';
 echo $OUTPUT->box_end();
 
@@ -104,8 +109,6 @@ if ($canmanage) {
   echo $OUTPUT->action_link($monitorurl, get_string('openmonitor', 'lamslesson'), new popup_action('click', $monitorurl, '', array('height' => 600, 'width' => 996)));
   echo '</span></span>';
   echo '</div>';
-
-
 }
 
 echo $OUTPUT->box_end();

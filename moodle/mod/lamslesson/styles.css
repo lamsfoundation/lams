@@ -1,6 +1,7 @@
 /** General Styles **/
 .path-mod-lamslesson .smalltext {text-align:right;font-size: 0.75em;}
 .path-mod-lamslesson .centerlink {text-align:center;padding-top: 15px; padding-bottom:5px;}
+.path-mod-lamslesson .centerimage {   display: block;   margin-left: auto;   margin-right: auto; }
 .path-mod-lamslesson .progress-header {text-align:center;font-weight: bold;padding-top: 5px; padding-bottom:5px;}
 .path-mod-lamslesson .super {position:relative;bottom:0.5em;color:red;font-size:0.8em;}
 .path-mod-lamslesson .note {border:solid 1px #DEDEDE;background:#FFFFCC url([[pix:t/stop]]) 8px 16px no-repeat;color:#222222;padding:10px;text-align:center;}

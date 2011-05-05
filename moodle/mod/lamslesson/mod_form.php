@@ -141,7 +141,8 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 
 XXX;
 	}
-    
+
+//     $mform->addElement('','');    
     $mform->addElement('hidden', 'sequence_id');
     $mform->setType('sequence_id', PARAM_INT);
 
@@ -210,7 +211,8 @@ $html = $authorpreviewbutton . $html;
         $mform->addElement('header', 'selectsequence', get_string('selectsequence', 'lamslesson'));
 
         $mform->addElement('static', 'sequencemessage', '', $html);
-
+    	$mform->addElement('checkbox', 'displaydesign', get_string('displaydesign', 'lamslesson'));
+//	$mform->setAdvanced('displaydesign');
 //-------------------------------------------------------------------------------
 	$this->standard_grading_coursemodule_elements();
 
