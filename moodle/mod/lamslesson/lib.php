@@ -58,6 +58,7 @@ define('LAMSLESSON_PARAM_SINGLE_PROGRESS_METHOD', 'singleStudentProgress');
 define('LAMSLESSON_PARAM_PROGRESS_METHOD', 'studentProgress');
 define('LAMSLESSON_PARAM_CUSTOM_CSV', 'customCSV');
 define('LAMSLESSON_LD_SERVICE', '/services/xml/LearningDesignRepository');
+define('LAMSLESSON_LD_SERVICE_SVG', '/services/LearningDesignSVG');
 define('LAMSLESSON_LESSON_MANAGER', '/services/xml/LessonManager');
 define('LAMSLESSON_POPUP_OPTIONS', 'location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=700,resizable');
 define('LAMSLESSON_OUTPUT_METHOD', 'toolOutputsUser');
@@ -67,8 +68,6 @@ define('LAMSLESSON_OUTPUT_METHOD', 'toolOutputsUser');
  * global as this file can be included inside a function scope. However, using the global variables
  * at the module level is not a recommended.
  */
-//global $NEWMODULE_GLOBAL_VARIABLE;
-//$NEWMODULE_QUESTION_OF = array('Life', 'Universe', 'Everything');
 
 /**
  * Given an object containing all the necessary data,
@@ -113,6 +112,11 @@ function lamslesson_update_instance($lamslesson) {
     if ($originallamslesson->sequence_id != $lamslesson->sequence_id) {
       lamslesson_add_lesson($lamslesson);
     }
+
+    // if the displaydesign setting is unchecked with make sure we do that
+    if (isset($originallamslesson->displaydesign) && !isset($lamslesson->displaydesign)) {
+       	$lamslesson->displaydesign = 0;
+    }   
 
     return $DB->update_record('lamslesson', $lamslesson);
 }
@@ -258,6 +262,34 @@ function lamslesson_uninstall() {
 }
 
 
+
+/**
+ * Get design images
+ *
+ * 
+ */
+function lamslesson_get_design_image($username,$courseid,$coursename,$coursecreatedate,$country,$lang,$ldid,$format) {
+    global $CFG,$USER;
+    // append month/year to course name
+    $coursename = $coursename.' '.date('n/Y', $coursecreatedate);
+
+    // generate hash
+    $datetime = date('F d,Y g:i a');
+    $datetime_encoded = urlencode($datetime);
+    $rawstring = trim($datetime).trim($username).trim($CFG->lamslesson_serverid).trim($CFG->lamslesson_serverkey);
+    $hashvalue = sha1(strtolower($rawstring));
+
+
+    // Put together REST URL
+    $request = "$CFG->lamslesson_serverurl".LAMSLESSON_LD_SERVICE_SVG."?serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . $hashvalue . "&username=" . $username  . "&courseId=" . $courseid . "&courseName=" . urlencode($coursename) . "&mode=2&country=" . $country . "&lang=" . $lang . "&ldId=" . $ldid . "&svgFormat=" . $format;
+
+    return $request;
+#    $image_url = @file_get_contents($request);
+#    return $image_url;
+
+}
+
+
 /**
  * Get sequences(learning designs) for the user in lamslesson using the REST interface
  *
@@ -385,7 +417,7 @@ function lamslesson_add_lesson($form) {
     $form->lesson_id = lamslesson_get_lesson(
         $USER->username, $form->sequence_id, $form->course, 
         $form->name, $form->intro, 'start',
-        $locale['country'], $locale['lang'], $form->customCSV
+        $locale['country'], $locale['lang'], $form->customCSV, $form->displaydesign
     );
 
     if (!isset($form->lesson_id) || $form->lesson_id <= 0) {
@@ -489,7 +521,7 @@ function lamslesson_get_members($form) {
  * @param string $lang The Language's ISO code
  * @return int lesson id
  */
-function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$method,$country,$lang,$customcsv='') {
+function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$method,$country,$lang,$customcsv='',$displaydesign) {
 
   global $CFG, $USER;
   if (!isset($CFG->lamslesson_serverid, $CFG->lamslesson_serverkey) || $CFG->lamslesson_serverid == "") {
