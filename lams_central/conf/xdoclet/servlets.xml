@@ -70,6 +70,14 @@
 </servlet>
 
 <servlet>
+	<servlet-name>LearningDesignSVG</servlet-name>
+	
+	<servlet-class>
+		org.lamsfoundation.lams.webservice.LearningDesignSVGServlet
+	</servlet-class>
+</servlet>
+
+<servlet>
 	<servlet-name>LessonManager</servlet-name>
 	
 	<servlet-class>

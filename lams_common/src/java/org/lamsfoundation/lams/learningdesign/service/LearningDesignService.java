@@ -23,24 +23,28 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learningdesign.service;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.Vector;
 
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.jdom.JDOMException;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.Grouping;
-import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
-import org.lamsfoundation.lams.learningdesign.OptionsActivity;
-import org.lamsfoundation.lams.learningdesign.RandomGrouping;
-import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.LearningDesignDAO;
@@ -50,8 +54,12 @@ import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.ILoadedMessageSourceService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.svg.SVGGenerator;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -188,6 +196,67 @@ public class LearningDesignService implements ILearningDesignService{
 			libraries.add(libraryDTO);
 		}
 		return libraries;
+	}
+	
+	public boolean getLearningDesignSVG(Long learningDesignId, int imageFormat, OutputStream out) throws JDOMException, IOException, TranscoderException, ExportToolContentException {
+	    //construct absolute filePath to SVG
+	    String earFolder = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
+	    if (StringUtils.isBlank(earFolder)) {
+        	log.error("Unable to get path to the LAMS Server URL from the configuration table. SVG image creation failed");
+        	return false;
+	    }
+	    String directoryToStoreFile = FileUtil.getFullPath(earFolder, "lams-www.war\\secure\\learning-design-images");
+	    String fileExtension;
+	    if (imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG) {
+		fileExtension = ".svg";
+	    } else {
+		fileExtension = ".png";
+	    }
+	    String absoluteFilePath = FileUtil.getFullPath(directoryToStoreFile, learningDesignId.toString() + fileExtension);
+	    File file = new File(absoluteFilePath);
+	    
+	    //check if SVG exists and up-to-date
+	    LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignId);
+	    boolean isSvgOutdated = new Date(file.lastModified()).before(learningDesign.getLastModifiedDateTime());
+	    if (!file.exists() || isSvgOutdated) {
+		//generate new SVG image and save it to the file system
+		SVGGenerator svgGenerator = new SVGGenerator();
+		LearningDesignDTO ldDto = this.getLearningDesignDTO(learningDesignId, "");
+		svgGenerator.generateSvgDom(ldDto);
+		FileOutputStream fileOutputStream = new FileOutputStream(file);
+		svgGenerator.streamOutDocument(fileOutputStream, imageFormat);		
+	    }
+	    
+	    //stream out SVG to the specified by user OutputStream
+	    InputStream in = null;
+	    try {
+		in = new BufferedInputStream(new FileInputStream(file));
+		int count = 0;
+
+		int ch;
+		while ((ch = in.read()) != -1) {
+		    out.write((char) ch);
+		    count++;
+		}
+		out.flush();
+	    } catch (Exception e) {
+		log.error("Exception occured writing out file:" + e.getMessage());
+		throw new ExportToolContentException(e);
+	    } finally {
+		try {
+		    if (in != null) {
+			in.close(); // very important
+		    }
+		    if (out != null) {
+			out.close();
+		    }
+		} catch (Exception e) {
+		    log.error("Error Closing file. File already written out - no exception being thrown.", e);
+		    return false;
+		}
+	    }
+	    
+	    return true;
 	}
 
 	private void internationaliseActivities(Collection activities) {		

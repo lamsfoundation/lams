@@ -56,6 +56,8 @@ public class CentralConstants {
     public static final String PARAM_LANG = "lang";
 
     public static final String PARAM_METHOD = "method";
+    
+    public static final String PARAM_SVG_FORMAT = "svgFormat";
 
     public static final String PARAM_PROGRESS_USER = "progressUser";
 

@@ -34,6 +34,11 @@
 </servlet-mapping>
 
 <servlet-mapping>
+	<servlet-name>LearningDesignSVG</servlet-name>
+	<url-pattern>/services/LearningDesignSVG/*</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
 	<servlet-name>LessonManager</servlet-name>
 	<url-pattern>/services/xml/LessonManager/*</url-pattern>
 </servlet-mapping>

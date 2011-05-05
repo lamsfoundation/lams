@@ -666,16 +666,14 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    
 	    //generate SVG image
 	    if (format != ExportToolContentService.PACKAGE_FORMAT_IMS) {
-		SVGGenerator svgGenerator = new SVGGenerator();
-		svgGenerator.generateSvgDom(ldDto);
 		
 		String svgFileName = FileUtil.getFullPath(contentDir, ExportToolContentService.SVG_IMAGE_FILE_NAME);
 		FileOutputStream svgOutputStream = new FileOutputStream(svgFileName);
-		svgGenerator.streamOutDocument(svgOutputStream, SVGGenerator.OUTPUT_FORMAT_SVG);
+		service.getLearningDesignSVG(learningDesignId, SVGGenerator.OUTPUT_FORMAT_SVG, svgOutputStream);
 		
 		String pngFileName = FileUtil.getFullPath(contentDir, ExportToolContentService.PNG_IMAGE_FILE_NAME);
 		FileOutputStream pngOutputStream = new FileOutputStream(pngFileName);		
-		svgGenerator.streamOutDocument(pngOutputStream, SVGGenerator.OUTPUT_FORMAT_PNG);
+		service.getLearningDesignSVG(learningDesignId, SVGGenerator.OUTPUT_FORMAT_PNG, pngOutputStream);
 	    }
 
 	    log.debug("Learning design xml export success");
