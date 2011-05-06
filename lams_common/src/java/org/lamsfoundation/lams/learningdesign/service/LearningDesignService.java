@@ -206,6 +206,13 @@ public class LearningDesignService implements ILearningDesignService{
         	return false;
 	    }
 	    String directoryToStoreFile = FileUtil.getFullPath(earFolder, "lams-www.war\\secure\\learning-design-images");
+	    
+	    // Check whether this dir exists
+	    File svgPngDirectory = new File(directoryToStoreFile);
+	    if (!svgPngDirectory.exists()) {
+		svgPngDirectory.mkdirs();
+	    }
+	    
 	    String fileExtension;
 	    if (imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG) {
 		fileExtension = ".svg";
