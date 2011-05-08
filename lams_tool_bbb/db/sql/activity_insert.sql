@@ -42,9 +42,9 @@ activity_ui_id
 VALUES
 (
 NULL
-, 'Bbb Tool'
-, 'Web Conferencing Tool'
 , 'A web conferencig tool using Big Blue Button.'
+, 'Web Conferencing'
+, 'Web Conferencing help'
 , NULL
 , NULL
 , NULL
