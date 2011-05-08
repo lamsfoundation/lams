@@ -19,7 +19,7 @@ CREATE TABLE tl_laqa11_response_rating (
                   REFERENCES tl_laqa11_que_usr (uid)
      , INDEX (response_id)
      , CONSTRAINT FK_tl_laqa11_response_rating_2 FOREIGN KEY (response_id)
-                  REFERENCES tl_laqa11_usr_resp (uid)
+                  REFERENCES tl_laqa11_usr_resp (response_id)
 )TYPE=InnoDB;
 
 -- 	LDEV-2653 autosave feature
