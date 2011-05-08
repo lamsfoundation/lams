@@ -5,7 +5,7 @@ SET AUTOCOMMIT = 0;
 
 ----------------------Put all sql statements below here-------------------------
 
-ALTER TABLE tl_laqa11_que_content ADD COLUMN allow_rate_answers TINYINT(1) NOT NULL DEFAULT 0;
+ALTER TABLE tl_laqa11_content ADD COLUMN allow_rate_answers TINYINT(1) NOT NULL DEFAULT 0;
 
 -- LDEV-2649 Q&A option to rate other student's responses
 CREATE TABLE tl_laqa11_response_rating (
