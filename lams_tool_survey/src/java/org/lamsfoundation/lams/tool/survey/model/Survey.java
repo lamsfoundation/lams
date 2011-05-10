@@ -77,6 +77,7 @@ public class Survey implements Cloneable {
     // general infomation
     private Date created;
     private Date updated;
+    private Date submissionDeadline;
     private SurveyUser createdBy;
 
     // survey Items
@@ -539,4 +540,18 @@ public class Survey implements Cloneable {
     public void setConditions(Set<SurveyCondition> conditions) {
 	this.conditions = conditions;
     }
+
+
+    
+	/**
+     * @hibernate.property column="submission_deadline"
+	 * @return date submissionDeadline
+	 */
+	public Date getSubmissionDeadline() {
+		return submissionDeadline;
+	}
+	
+	public void setSubmissionDeadline(Date submissionDeadline) {
+		this.submissionDeadline = submissionDeadline;
+	}
 }

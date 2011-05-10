@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -65,6 +66,7 @@ import org.lamsfoundation.lams.tool.survey.web.form.AnswerForm;
 import org.lamsfoundation.lams.tool.survey.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -172,6 +174,9 @@ public class LearningAction extends Action {
 	    entryText = notebookEntry.getEntry();
 	}
 
+	// get session from shared session.
+	HttpSession ss = SessionManager.getSession();
+	
 	// basic information
 	sessionMap.put(SurveyConstants.ATTR_TITLE, survey.getTitle());
 	sessionMap.put(SurveyConstants.ATTR_SURVEY_INSTRUCTION, survey.getInstructions());
@@ -205,6 +210,23 @@ public class LearningAction extends Action {
 	    sessionMap.put(SurveyConstants.PARAM_RUN_OFFLINE, false);
 	}
 
+	// check if there is submission deadline
+	Date submissionDeadline = survey.getSubmissionDeadline();
+	if (submissionDeadline != null) {
+	    //store submission deadline to sessionMap
+	    sessionMap.put(SurveyConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
+	   
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+	    
+	    //calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
+	    	return mapping.findForward(SurveyConstants.RUN_OFFLINE);
+	    }
+	}		
+	
 	// init survey item list
 	SortedMap<Integer, AnswerDTO> surveyItemList = getQuestionList(sessionMap);
 	surveyItemList.clear();

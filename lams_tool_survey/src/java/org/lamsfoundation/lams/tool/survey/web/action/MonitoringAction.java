@@ -33,10 +33,13 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.Date;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -62,14 +65,19 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
 import org.lamsfoundation.lams.tool.survey.util.SurveyUserComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class MonitoringAction extends Action {
+	
+	public ISurveyService surveyService;
     private static final String MSG_LABEL_QUESTION = "label.question";
     private static final String MSG_LABEL_OPEN_RESPONSE = "label.open.response";
     private static final String MSG_LABEL_SESSION_NAME = "label.session.name";
@@ -102,6 +110,10 @@ public class MonitoringAction extends Action {
 	if (param.equals("exportSurvey")) {
 	    return exportSurvey(mapping, form, request, response);
 	}
+	
+	if (param.equals("setSubmissionDeadline")) {
+	    return setSubmissionDeadline(mapping, form, request, response);
+	}
 
 	return mapping.findForward(SurveyConstants.ERROR);
     }
@@ -118,6 +130,10 @@ public class MonitoringAction extends Action {
 
     private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+    	
+    // get session from shared session.
+    HttpSession ss = SessionManager.getSession();
+    	
 	// initial Session Map
 	SessionMap sessionMap = new SessionMap();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -153,6 +169,20 @@ public class MonitoringAction extends Action {
 	sessionMap.put(SurveyConstants.ATTR_REFLECT_LIST, relectList);
 	sessionMap.put(SurveyConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
 	
+	// check if there is submission deadline
+	Date submissionDeadline = survey.getSubmissionDeadline();
+	
+	if (submissionDeadline != null) {
+		
+		UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    MonitoringAction.log.info("Time:" + tzSubmissionDeadline.getTime());
+	    //store submission deadline to sessionMap
+	    sessionMap.put(SurveyConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+
+	}	
+
 	return mapping.findForward(SurveyConstants.SUCCESS);
     }
 
@@ -430,6 +460,37 @@ public class MonitoringAction extends Action {
 	    } catch (IOException e) {
 	    }
 	}
+	return null;
+    }
+    
+    /**
+     * Set Submission Deadline
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	surveyService = getSurveyService();
+		
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Survey survey = surveyService.getSurveyByContentId(contentID);
+	
+	Long dateParameter = WebUtil.readLongParam(request, SurveyConstants.ATTR_SUBMISSION_DEADLINE, true);
+	Date tzSubmissionDeadline = null;
+	if (dateParameter != null) {
+	    Date submissionDeadline = new Date(dateParameter);
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone teacherTimeZone = teacher.getTimeZone();
+	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+	}
+	survey.setSubmissionDeadline(tzSubmissionDeadline);
+	surveyService.saveOrUpdateSurvey(survey);
+
 	return null;
     }
     

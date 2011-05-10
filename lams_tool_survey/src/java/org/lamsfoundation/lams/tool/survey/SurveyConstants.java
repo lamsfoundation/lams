@@ -47,6 +47,12 @@ public class SurveyConstants {
     public static final String RUN_OFFLINE = "runOffline";
 
     public static final String FORWARD_RESULT = "result";
+    
+    // for submission deadline
+    
+    public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+    
+    public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 
     // for parameters' name
     public static final String PARAM_FILE_VERSION_ID = "fileVersionId";
