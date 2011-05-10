@@ -51,6 +51,7 @@ create table tl_latask10_taskList (
    is_monitor_verification_required tinyint,
    reflect_instructions varchar(255), 
    reflect_on_activity smallint, 
+   submission_deadline datetime DEFAULT NULL,
    primary key (uid)
 )TYPE=InnoDB;
 create table tl_latask10_taskList_item (

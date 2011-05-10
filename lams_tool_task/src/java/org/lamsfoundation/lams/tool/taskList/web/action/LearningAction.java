@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -72,6 +73,7 @@ import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
 import org.lamsfoundation.lams.tool.taskList.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -327,6 +329,23 @@ public class LearningAction extends Action {
 			return mapping.findForward("runOffline");
 		}else
 			sessionMap.put(TaskListConstants.PARAM_RUN_OFFLINE, false);
+		
+		//  check if there is submission deadline LDEV-2657
+		Date submissionDeadline = taskList.getSubmissionDeadline();
+		if (submissionDeadline != null) {
+			HttpSession ss = SessionManager.getSession();
+			UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			TimeZone learnerTimeZone = learnerDto.getTimeZone();
+			Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+			Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+			sessionMap.put(TaskListConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline);
+			
+			//calculate whether deadline has passed, and if so forward to "runOffline"
+			if (currentLearnerDate.after(tzSubmissionDeadline)) {
+				return mapping.findForward("runOffline");
+			}
+			
+		}
 				
 		sessionMap.put(TaskListConstants.ATTR_RESOURCE,taskList);
 		

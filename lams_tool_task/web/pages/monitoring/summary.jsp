@@ -2,9 +2,20 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="taskList" value="${sessionMap.taskList}"/>
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" > </script>
-<script type="text/javascript">
 
+<c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
+<c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
+<link type="text/css" href="${lams}/css/jquery-ui-1.8.11.flick-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/jquery-ui-timepicker-addon.css" rel="stylesheet">
+<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>  
+
+
+<script type="text/javascript">
+<!--
 	function summaryTask(taskUid){
 		var myUrl = "<c:url value="/monitoring/itemSummary.do"/>?toolContentID=${toolContentID}&taskListItemUid=" + taskUid;
 		launchPopup(myUrl,"LearnerView");
@@ -14,11 +25,80 @@
 		document.location.href = "<c:url value="/monitoring/setVerifiedByMonitor.do"/>?toolContentID=${toolContentID}&contentFolderID=${sessionMap.contentFolderID}&userUid=" + userUid;
 		return false;
 	}
+
+
+	$(function(){
+		$("#datetime").datetimepicker();
+
+		var submissionDeadline = '${sessionMap.submissionDeadline}';
+		if (submissionDeadline != "") {
+			var date = new Date(eval(submissionDeadline));
+
+			$("#dateInfo").html( formatDate(date) );
+			
+			//open up date restriction area
+			toggleAdvancedOptionsVisibility(document.getElementById('restrictUsageDiv'), document.getElementById('restrictUsageTreeIcon'),'${lams}');
+		
+		}
+		
+	});
+
+	function formatDate(date) {
+		var currHour = "" + date.getHours();
+		if (currHour.length == 1) {
+			currHour = "0" + currHour;
+		}  
+		var currMin = "" + date.getMinutes();
+		if (currMin.length == 1) {
+			currMin = "0" + currMin;
+		}
+		return $.datepicker.formatDate( 'mm/dd/yy', date ) + " " + currHour + ":" + currMin;
+	}
+
+	function setSubmissionDeadline() {
+		//get the timestamp in milliseconds since midnight Jan 1, 1970
+		var date = $("#datetime").datetimepicker('getDate');
+		if (date == null) {
+			return;
+		}
+
+		var reqIDVar = new Date();
+		var url = "<c:url value="/monitoring/setSubmissionDeadline.do"/>?toolContentID=${param.toolContentID}&submissionDeadline="
+					+ date.getTime() + "&reqID=" + reqIDVar.getTime();
+
+		$.ajax({
+			url : url,
+			success : function() {
+				$.growlUI('<fmt:message key="monitor.summary.notification" />', '<fmt:message key="monitor.summary.date.restriction.set" />');
+				$("#datetimeDiv").hide();
+				$("#dateInfo").html(formatDate(date) );
+				$("#dateInfoDiv").show();
+			}
+		});
+	}
+	function removeSubmissionDeadline() {
+		var reqIDVar = new Date();
+		var url = "<c:url value="/monitoring/setSubmissionDeadline.do"/>?toolContentID=${param.toolContentID}&submissionDeadline="
+					+ "&reqID=" + reqIDVar.getTime();
+
+		$.ajax({
+			url : url,
+			success : function() {
+				$.growlUI('<fmt:message key="monitor.summary.notification" />', '<fmt:message key="monitor.summary.date.restriction.removed" />');
+				$("#dateInfoDiv").hide();
+				
+				$("#datetimeDiv").show();
+				$("#datetime").val("");
+			}
+		});
+	}
+			
 	
+-->	
 </script>
 
 <%-- Overall TaskList information  --%>
-<h1>
+<h1 style="padding-bottom: 10px;">
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
 
 	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
@@ -128,6 +208,8 @@
 </table>
 </div>
 
+<%@include file="daterestriction.jsp"%>
+
 <%-- Summary list  --%>
 
 <c:if test="${empty summaryList}">
@@ -138,17 +220,10 @@
 
 <c:forEach var="summary" items="${summaryList}">
 
-	<c:if test="${sessionMap.isGroupedActivity}">
-		<h1>
-			<fmt:message key="monitoring.label.group" /> ${summary.sessionName}	
-		</h1>
-	</c:if>
-	
-	<h2 style="color:black; margin-left: 20px;">
-		<fmt:message key="label.monitoring.summary.overall.summary" />
-	</h2>
-	
+	<h1><fmt:message key="monitoring.label.group" /> ${summary.sessionName}	</h1>
+	<h2 style="color:black; margin-left: 20px;"><fmt:message key="label.monitoring.summary.overall.summary" />	</h2>
 	<table cellpadding="0" class="alternative-color" >
+		
 		<tr>
 			<th width="30%" style="background-repeat: repeat">
 				<fmt:message key="label.monitoring.summary.user" />

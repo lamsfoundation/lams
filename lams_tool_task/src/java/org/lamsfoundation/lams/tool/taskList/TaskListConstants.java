@@ -87,6 +87,10 @@ public class TaskListConstants {
 	public static final String ATTR_TASK_LIST_ITEM_DTOS = "itemDTOs";
 	public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 	
+	//  for submission deadline LDEV-2657
+	public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+	public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
+	
 	//error message keys
 	public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";
 	public static final String ERROR_MSG_NAME_BLANK = "error.condition.name.blank";

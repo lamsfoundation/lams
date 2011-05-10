@@ -68,6 +68,10 @@ public class TaskList implements Cloneable{
 	private boolean runOffline;
 	private boolean defineLater;
 	private boolean contentInUse;
+	
+	// LDEV-2657
+	private Date submissionDeadline;
+	
 	//instructions
 	private String onlineInstructions;
 	private String offlineInstructions;
@@ -692,7 +696,19 @@ public class TaskList implements Cloneable{
 	public void setReflectOnActivity(boolean reflectOnActivity) {
 		this.reflectOnActivity = reflectOnActivity;
 	}
+
+	/**
+	 * @hibernate.property column="submission_deadline"
+	 * @return date submissionDeadline
+	 */
+	public Date getSubmissionDeadline() {
+		return submissionDeadline;
+	}
 	
+	public void setSubmissionDeadline(Date submissionDeadline) {
+		this.submissionDeadline = submissionDeadline;
+	}
+
 	/**
 	 * For display use
 	 * @return

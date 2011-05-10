@@ -26,10 +26,13 @@ package org.lamsfoundation.lams.tool.taskList.web.action;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Date;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -49,9 +52,12 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskList;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -76,7 +82,11 @@ public class MonitoringAction extends Action {
 		if (param.equals("viewReflection")) {
 			return viewReflection(mapping, form, request, response);
 		}
-		
+
+		if (param.equals("setSubmissionDeadline")) {
+			return setSubmissionDeadline(mapping, form, request, response);
+		}
+
 		return mapping.findForward(TaskListConstants.ERROR);
 	}
 
@@ -103,7 +113,16 @@ public class MonitoringAction extends Action {
 		sessionMap.put(TaskListConstants.ATTR_RESOURCE, taskList);
 		sessionMap.put(TaskListConstants.ATTR_TOOL_CONTENT_ID, contentId);
 		sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,WebUtil.readStrParam(request,AttributeNames.PARAM_CONTENT_FOLDER_ID));
-		sessionMap.put(TaskListConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
+
+		 if (taskList.getSubmissionDeadline() != null) {
+			 Date submissionDeadline = taskList.getSubmissionDeadline();
+			 HttpSession ss = SessionManager.getSession();
+			 UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			 TimeZone teacherTimeZone = teacher.getTimeZone();
+			 Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
+			 sessionMap.put(TaskListConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+			 
+		 }
 		
 		return mapping.findForward(TaskListConstants.SUCCESS);
 	}

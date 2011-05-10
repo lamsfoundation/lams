@@ -38,7 +38,7 @@
 			<forward name="monitor" path="/pages/authoring/definelater.jsp" />
 		</action>
 		
-		<!-- ==========  Authroing Definitions: Instrcutions Files ========== -->
+		<!-- ==========  Authoring Definitions: Instructions Files ========== -->
 		
 		<action path="/authoring/uploadOnlineFile"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringAction"
@@ -73,7 +73,7 @@
 			<forward name="success" path="/pages/authoring/parts/instructionfilelist.jsp" />
 		</action>
 		
-		<!-- ==========  Authroing Definitions: Add taskListItem methods ========== -->
+		<!-- ==========  Authoring Definitions: Add taskListItem methods ========== -->
 		
 		<action path="/authoring/newItemInit"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringAction"
@@ -142,7 +142,7 @@
 			<forward name="success" path="/pages/authoring/pedagogicalPlannerForm.jsp" />
 		</action>
 		
-		<!-- ==========  Authroing Definitions: Add taskListCondition methods ========== -->
+		<!-- ==========  Authoring Definitions: Add taskListCondition methods ========== -->
 		
 		<action path="/authoring/showConditions"
 			type="org.lamsfoundation.lams.tool.taskList.web.action.AuthoringTaskListConditionAction"
@@ -300,6 +300,11 @@
 			parameter="viewReflection">
 			<forward name="success" path="/pages/monitoring/parts/notebook.jsp" />
 		</action>
+		
+		<action path="/monitoring/setSubmissionDeadline"
+			type="org.lamsfoundation.lams.tool.taskList.web.action.MonitoringAction"
+			parameter="setSubmissionDeadline" >
+		</action> 
 		
 		<!-- ========== Common Definitions============================== -->
 		
