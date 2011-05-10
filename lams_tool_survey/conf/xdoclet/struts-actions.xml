@@ -282,6 +282,11 @@
 			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
 			parameter="exportSurvey" >
 		</action>
+		
+		<action path="/monitoring/setSubmissionDeadline"
+			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
+			parameter="setSubmissionDeadline" >
+		</action>		
 		<!-- ========== BEGIN: Common ============================== -->
 		<action path="/clearsession"
 			type="org.lamsfoundation.lams.tool.survey.web.action.ClearSessionAction">

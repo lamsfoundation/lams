@@ -51,7 +51,13 @@
 			<p>
 				<c:out value="${sessionMap.instructions}" escapeXml="false" />
 			</p>
-
+			<c:if test="${not empty sessionMap.submissionDeadline}">
+				<div class="info">
+					<fmt:message key="authoring.info.teacher.set.restriction" >
+						<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+					</fmt:message>
+				</div>
+			</c:if>	
 			<c:choose>
 				<%-- Show on one page or when learner does not choose edit one question --%>
 				<c:when

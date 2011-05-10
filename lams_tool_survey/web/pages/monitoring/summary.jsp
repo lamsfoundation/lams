@@ -3,7 +3,18 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<c:set var="lams">
+ 		<lams:LAMSURL />
+</c:set>
+
+<link type="text/css" href="${lams}/css/jquery-ui-1.8.11.flick-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/jquery-ui-timepicker-addon.css" rel="stylesheet">
+<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>  
+
 <script type="text/javascript">
 	function exportSurvey(sessionId){
 		var url = "<c:url value="/monitoring/exportSurvey.do"/>";
@@ -12,9 +23,77 @@
 		url = url + param;
 		location.href=url;
 	}
+
+	$(function(){
+		$("#datetime").datetimepicker();
+
+		var submissionDeadline = '${sessionMap.submissionDeadline}';
+		if (submissionDeadline != "") {
+			var date = new Date(eval(submissionDeadline));
+			
+			$("#dateInfo").html( formatDate(date) );
+			
+			//open up date restriction area
+			toggleAdvancedOptionsVisibility(document.getElementById('restrictUsageDiv'), document.getElementById('restrictUsageTreeIcon'),'${lams}');
+		
+		}
+		
+	});
+
+	function formatDate(date) {
+		var currHour = "" + date.getHours();
+		if (currHour.length == 1) {
+			currHour = "0" + currHour;
+		}  
+		var currMin = "" + date.getMinutes();
+		if (currMin.length == 1) {
+			currMin = "0" + currMin;
+		}
+		return $.datepicker.formatDate( 'mm/dd/yy', date ) + " " + currHour + ":" + currMin;
+	}
+
+	function setSubmissionDeadline() {
+		//get the timestamp in milliseconds since midnight Jan 1, 1970
+		var date = $("#datetime").datetimepicker('getDate');
+		if (date == null) {
+			return;
+		}
+
+		var reqIDVar = new Date();
+		var url = "<c:url value="/monitoring/setSubmissionDeadline.do"/>?toolContentID=${param.toolContentID}&submissionDeadline="
+					+ date.getTime() + "&reqID=" + reqIDVar.getTime();
+
+		$.ajax({
+			url : url,
+			success : function() {
+				$.growlUI('<fmt:message key="monitor.summary.notification" />', '<fmt:message key="monitor.summary.date.restriction.set" />');
+				$("#datetimeDiv").hide();
+				$("#dateInfo").html(formatDate(date) );
+				$("#dateInfoDiv").show();
+			}
+		});
+	}
+	function removeSubmissionDeadline() {
+		var reqIDVar = new Date();
+		var url = "<c:url value="/monitoring/setSubmissionDeadline.do"/>?toolContentID=${param.toolContentID}&submissionDeadline="
+					+ "&reqID=" + reqIDVar.getTime();
+
+		$.ajax({
+			url : url,
+			success : function() {
+				$.growlUI('<fmt:message key="monitor.summary.notification" />', '<fmt:message key="monitor.summary.date.restriction.removed" />');
+				$("#dateInfoDiv").hide();
+				
+				$("#datetimeDiv").show();
+				$("#datetime").val("");
+			}
+		});
+	}
+		
+			
 </script>	
 
-<h1>
+<h1 style="padding-bottom: 10px;">
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
 
 	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
@@ -106,6 +185,8 @@
 	</c:choose>
 </table>
 </div>
+
+<%@include file="daterestriction.jsp"%>
 
 <br />
 
