@@ -101,6 +101,12 @@ public interface ForumConstants {
 
     public static final String ATTR_USER_FINISHED = "userFinished";
 
+    // for submission deadline LDEV-2657
+
+    public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+
+	public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
+
     // used in monitoring
     public static final String TITLE = "title";
 

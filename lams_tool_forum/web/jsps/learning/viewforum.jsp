@@ -13,6 +13,13 @@
 		<c:out value="${sessionMap.instruction}" escapeXml="false" />
 	</div>
 
+	<c:if test="${not empty sessionMap.submissionDeadline}">
+		<div class="info">
+			<fmt:message key="authoring.info.teacher.set.restriction" >
+				<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+			</fmt:message>
+		</div>
+	</c:if>
 	<c:if
 		test="${sessionMap.mode == 'author' || sessionMap.mode == 'learner'}">
 		<c:if test="${sessionMap.lockedWhenFinished}">

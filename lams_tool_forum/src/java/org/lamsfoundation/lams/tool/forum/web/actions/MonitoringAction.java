@@ -32,6 +32,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +41,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -71,11 +73,13 @@ import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MarkForm;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -168,6 +172,11 @@ public class MonitoringAction extends Action {
 	if (param.equals("viewReflection")) {
 	    return viewReflection(mapping, form, request, response);
 	}
+	
+	// **************** Date restriction *****************
+	if (param.equals("setSubmissionDeadline")) {
+	    return setSubmissionDeadline(mapping, form, request, response);
+	}
 
 	return mapping.findForward("error");
     }
@@ -210,13 +219,28 @@ public class MonitoringAction extends Action {
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	forumService = getForumService();
+	
+	// get session from shared session.
+	HttpSession ss = SessionManager.getSession();
+	
 	List sessionsList = forumService.getSessionsByContentId(toolContentID);
 
 	// A forum clone required for listing the advanced options LDEV-1662
 	Forum forumClone = null;
 
+	// check if there is submission deadline
+	Date submissionDeadline = forumService.getForumByContentId(toolContentID).getSubmissionDeadline();
+	
+	if (submissionDeadline != null) {
+		org.lamsfoundation.lams.usermanagement.dto.UserDTO learnerDto = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss.getAttribute(AttributeNames.USER);
+		TimeZone learnerTimeZone = learnerDto.getTimeZone();
+		Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+		request.setAttribute(ForumConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	}
+	
+	
 	Map sessionUsersMap = new TreeMap(this.new SessionDTOComparator());
-	// build a map with all users in the submitFilesSessionList
+	// build a map with all users in the forumSessionList
 	Iterator it = sessionsList.iterator();
 	while (it.hasNext()) {
 	    SessionDTO sessionDto = new SessionDTO();
@@ -795,6 +819,39 @@ public class MonitoringAction extends Action {
 	}
 
     }
+    
+    /**
+     * Set Submission Deadline
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	forumService = getForumService();
+		
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Forum forum = forumService.getForumByContentId(contentID);
+	
+	Long dateParameter = WebUtil.readLongParam(request, ForumConstants.ATTR_SUBMISSION_DEADLINE, true);
+	Date tzSubmissionDeadline = null;
+	if (dateParameter != null) {
+	    Date submissionDeadline = new Date(dateParameter);
+	    HttpSession ss = SessionManager.getSession();
+	    org.lamsfoundation.lams.usermanagement.dto.UserDTO teacher = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone teacherTimeZone = teacher.getTimeZone();
+	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+	}
+	forum.setSubmissionDeadline(tzSubmissionDeadline);
+	forumService.updateForum(forum);
+
+	return null;
+    }
+    
+
 
     // ==========================================================================================
     // Utility methods

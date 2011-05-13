@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -73,6 +74,7 @@ import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -192,6 +194,9 @@ public class LearningAction extends Action {
 	    throw new Exception("Failed on getting session by given sessionID:" + sessionId);
 	}
 
+	// get session from shared session.
+	HttpSession ss = SessionManager.getSession();
+	
 	Forum forum = session.getForum();
 	// lock on finish
 	ForumUser forumUser = getCurrentUser(request, sessionId);
@@ -284,6 +289,21 @@ public class LearningAction extends Action {
 		    ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(),
 		    forumUser.getUserId().longValue(), IEventNotificationService.DELIVERY_METHOD_MAIL,
 		    IEventNotificationService.PERIODICITY_SINGLE);
+	}
+	
+	// check if there is submission deadline
+	Date submissionDeadline = forum.getSubmissionDeadline();
+	if (submissionDeadline != null) {
+		sessionMap.put(ForumConstants.ATTR_SUBMISSION_DEADLINE, forum.getSubmissionDeadline());
+		UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		TimeZone learnerTimeZone = learnerDto.getTimeZone();
+		Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+		Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+		
+		//calculate whether submission deadline has passed, and if so forward to "runOffline"
+		if (currentLearnerDate.after(tzSubmissionDeadline)) {
+			return mapping.findForward("runOffline");
+		}
 	}
 
 	return mapping.findForward("success");

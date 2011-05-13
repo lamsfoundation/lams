@@ -50,6 +50,7 @@ create table tl_lafrum11_forum (
    notify_learners_on_forum_posting tinyint DEFAULT 0,
    notify_teachers_on_forum_posting tinyint DEFAULT 0,
    mark_release_notify tinyint DEFAULT 0,
+   submission_deadline datetime,
    primary key (uid)
 )TYPE=InnoDB;
 create table tl_lafrum11_forum_user (

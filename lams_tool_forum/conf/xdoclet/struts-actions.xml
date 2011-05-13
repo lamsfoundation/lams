@@ -395,6 +395,11 @@
 			parameter="viewReflection">
 			<forward name="success" path="tiles:/monitoring/forum/viewReflection" />
 		</action>
+		
+		<action path="/monitoring/setSubmissionDeadline"
+			type="org.lamsfoundation.lams.tool.forum.web.actions.MonitoringAction"
+			parameter="setSubmissionDeadline" >
+		</action> 	
 
 		<!-- ========== END: Monitoring  Definitions ============================== -->
 		<!-- System level actions -->

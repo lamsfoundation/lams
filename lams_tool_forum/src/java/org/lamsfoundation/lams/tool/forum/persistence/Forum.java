@@ -109,6 +109,8 @@ public class Forum implements Cloneable {
     private boolean notifyLearnersOnForumPosting;
 
     private boolean notifyTeachersOnForumPosting;
+    
+    private Date submissionDeadline;
 
     // conditions
     private Set<ForumCondition> conditions = new TreeSet<ForumCondition>(new TextSearchConditionComparator());
@@ -663,4 +665,16 @@ public class Forum implements Cloneable {
     public void setConditions(Set<ForumCondition> conditions) {
 	this.conditions = conditions;
     }
+    
+	/**
+     * @hibernate.property column="submission_deadline"
+	 * @return date submissionDeadline
+	 */
+	public Date getSubmissionDeadline() {
+		return submissionDeadline;
+	}
+	
+	public void setSubmissionDeadline(Date submissionDeadline) {
+		this.submissionDeadline = submissionDeadline;
+	}
 }
