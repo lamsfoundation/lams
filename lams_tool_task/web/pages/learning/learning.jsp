@@ -89,7 +89,7 @@
 		<c:if test="${not empty taskList.submissionDeadline}">
 			 <div class="info">
 			 	<fmt:message key="authoring.info.teacher.set.restriction" >
-			 		<fmt:param><lams:Date value="${sessionMap.submissionDeadline}}" /></fmt:param>
+			 		<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
 			 	</fmt:message>
 			 </div>
 		</c:if>
