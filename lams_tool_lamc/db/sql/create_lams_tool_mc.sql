@@ -20,6 +20,7 @@ CREATE TABLE tl_lamc11_content (
      , showMarks TINYINT(1) NOT NULL DEFAULT 0
      , randomize TINYINT(1) NOT NULL DEFAULT 0
      , displayAnswers TINYINT(1) NOT NULL DEFAULT 1
+     , submission_deadline datetime DEFAULT NULL
      , UNIQUE UQ_tl_lamc11_content_1 (content_id)
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;

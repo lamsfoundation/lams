@@ -86,6 +86,13 @@
         length="20"
     />
 
+   <property
+        name="submissionDeadline"
+        type="java.util.Date"
+        access="property"        
+        column="submission_deadline"
+        length="20"
+    />
 
    <property
         name="questionsSequenced"

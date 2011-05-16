@@ -23,13 +23,17 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Date;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -52,9 +56,12 @@ import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.lamsfoundation.lams.web.session.SessionManager;
 
 
 /**
@@ -186,6 +193,20 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    McContent mcContent=mcService.retrieveMc(new Long(toolContentID));
 		mcGeneralMonitoringDTO.setActivityTitle(mcContent.getTitle());
 		mcGeneralMonitoringDTO.setActivityInstructions(mcContent.getInstructions());
+		
+		// get session from shared session.
+		HttpSession ss = SessionManager.getSession();
+		
+		Date submissionDeadline = mcContent.getSubmissionDeadline();
+		
+		if (submissionDeadline != null) {
+		
+			UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			TimeZone learnerTimeZone = learnerDto.getTimeZone();
+			Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+			mcGeneralMonitoringDTO.setSubmissionDeadline(tzSubmissionDeadline.getTime());
+			
+		}
 
 		mcGeneralMonitoringDTO.setCurrentMonitoringTab("summary");
 		mcGeneralMonitoringDTO.setSbmtSuccess(new Boolean(false).toString());

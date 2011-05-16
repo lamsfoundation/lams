@@ -103,6 +103,9 @@ public class McContent implements Serializable {
 
     private boolean showMarks;
     
+    /* LDEV-2657 */
+    private Date submissionDeadline;
+    
     /** nullable persistent field */
     private Integer passMark;
 
@@ -521,6 +524,19 @@ public class McContent implements Serializable {
     public void setDisplayAnswers(boolean displayAnswers) {
     	this.displayAnswers = displayAnswers;
     }
+    
+    
+	/**
+	 * @return date submissionDeadline
+	 */
+	public Date getSubmissionDeadline() {
+		return submissionDeadline;
+	}
+	
+	public void setSubmissionDeadline(Date submissionDeadline) {
+		this.submissionDeadline = submissionDeadline;
+	}
+
     
     /**
      * Get total possible marks for this content. Iterates over the McQueContents set 

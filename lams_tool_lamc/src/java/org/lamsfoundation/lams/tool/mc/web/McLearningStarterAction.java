@@ -23,9 +23,11 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.servlet.ServletException;
@@ -56,6 +58,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -258,7 +261,28 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    	mcLearningForm.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
 	    }
 	    
+	    /*  
+	     * Is there a deadline set?
+	     */
 	    
+	    Date submissionDeadline = mcContent.getSubmissionDeadline();
+		
+		if (submissionDeadline != null) {
+			
+			HttpSession ss = SessionManager.getSession();			
+			UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			TimeZone learnerTimeZone = learnerDto.getTimeZone();
+			Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+			Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+			mcLearnerStarterDTO.setSubmissionDeadline(submissionDeadline);
+		
+			//calculate whether submission deadline has passed, and if so forward to "runOffline"
+			if (currentLearnerDate.after(tzSubmissionDeadline)) {
+				request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
+				return mapping.findForward(RUN_OFFLINE);
+			}
+		}
+		
 	    /*
 	     * Is the tool activity been checked as Run Offline in the property inspector?
 	     */

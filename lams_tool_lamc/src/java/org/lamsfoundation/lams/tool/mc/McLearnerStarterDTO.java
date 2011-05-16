@@ -22,6 +22,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc;
 
+import java.util.Date;
 
 
 /**
@@ -38,6 +39,8 @@ public class McLearnerStarterDTO implements Comparable
     protected String activityTitle;
     
     protected String toolActivityOffline;
+    
+    protected Date submissionDeadline;
     
     /**
      * @return Returns the toolActivityOffline.
@@ -75,6 +78,19 @@ public class McLearnerStarterDTO implements Comparable
     public void setQuestionListingMode(String questionListingMode) {
         this.questionListingMode = questionListingMode;
     }
+	/**
+	 * @return the submissionDeadline
+	 */
+	public Date getSubmissionDeadline() {
+		return submissionDeadline;
+	}
+	
+	/**
+	 * @param submissionDeadline the submissionDeadline to set
+	 */
+	public void setSubmissionDeadline(Date submissionDeadline) {
+		this.submissionDeadline = submissionDeadline;
+	}
 	public int compareTo(Object o)
     {
 	    McLearnerStarterDTO mcLearnerStarterDTO = (McLearnerStarterDTO) o;

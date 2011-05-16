@@ -33,6 +33,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
 </p>
 
+	<c:if test="${not empty mcLearnerStarterDTO.submissionDeadline}">
+		<div class="info">
+			<fmt:message key="authoring.info.teacher.set.restriction" >
+				<fmt:param><lams:Date value="${mcLearnerStarterDTO.submissionDeadline}" /></fmt:param>
+			</fmt:message>	
+		</div>
+	</c:if>	
+
 
 <c:if
 	test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
