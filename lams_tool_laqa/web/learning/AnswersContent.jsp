@@ -30,6 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
+<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
 
 <lams:html>
 <lams:head>
@@ -101,6 +102,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:out value="${generalLearnerFlowDTO.activityTitle}"
 				escapeXml="false" />
 		</h1>
+
+		<c:if test="${not empty sessionMap.submissionDeadline}">
+			<div class="info">
+				<fmt:message key="authoring.info.teacher.set.restriction" >
+					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+				</fmt:message>
+			</div>
+		</c:if>	
 
 		<html:form action="/learning?validate=false"
 			enctype="multipart/form-data" method="POST" target="_self" styleId="learningForm">

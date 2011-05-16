@@ -25,9 +25,11 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.servlet.ServletException;
@@ -60,6 +62,7 @@ import org.lamsfoundation.lams.tool.qa.util.QaComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaLearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -303,6 +306,24 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    return (mapping.findForward(RUN_OFFLINE));
 	}
 
+	//check if there is submission deadline
+	Date submissionDeadline = qaContent.getSubmissionDeadline();
+	if (submissionDeadline != null) {
+		//store submission deadline to sessionMap
+		sessionMap.put(QaAppConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
+		
+		HttpSession ss = SessionManager.getSession();
+		UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		TimeZone learnerTimeZone = learnerDto.getTimeZone();
+		Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+		Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+		
+		//calculate whether submission deadline has passed, and if so forward to "runOffline"
+		if (currentLearnerDate.after(tzSubmissionDeadline)) {
+			return mapping.findForward("runOffline");
+		}
+	}
+	
 	/*
 	 * Verify that userId does not already exist in the db.
 	 * If it does exist and the passed tool session id exists in the db, that means the user already responded to the content and 

@@ -46,7 +46,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<lams:WebAppURL />
 	</c:set>
 	<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
-	
+		
 	<!-- ********************  CSS ********************** -->
 	<c:choose>
 		<c:when test="${not empty localLinkPath}">
@@ -56,13 +56,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<lams:css  style="tabbed"/>
 		</c:otherwise>
 	</c:choose>
+
+	<link type="text/css" href="${lams}/css/jquery-ui-1.8.11.flick-theme.css" rel="stylesheet">
+	<link type="text/css" href="${lams}/css/jquery-ui-timepicker-addon.css" rel="stylesheet">
+	<link rel="stylesheet" href="<html:rewrite page='/includes/css/jRating.jquery.css'/>"  type="text/css" />
+	<link rel="stylesheet" href="<html:rewrite page='/includes/css/ratingStars.css'/>"  type="text/css" />
 	
 	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
-	
-	<link rel="stylesheet" href="<html:rewrite page='/includes/css/jRating.jquery.css'/>"  type="text/css" />
-	<link rel="stylesheet" href="<html:rewrite page='/includes/css/ratingStars.css'/>"  type="text/css" />
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-timepicker-addon.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<style media="screen,projection" type="text/css">
 		.ratingStarsDiv {padding-right: 15px;}
 	</style>
@@ -70,7 +76,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script type="text/javascript"> 
 		var pathToImageFolder = "<html:rewrite page='/images/'/>"; 
 	</script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.js'/>"></script>
+
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jRating.jquery.js'/>"></script>
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
@@ -81,7 +87,70 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		    	rateMax : 5,
 		    	isDisabled : true
 			});
+
+
+			$("#datetime").datetimepicker();
+			
+			var submissionDeadline = "${submissionDeadline}";
+			if (submissionDeadline != "") {
+				var date = new Date(eval(submissionDeadline));
+				$("#dateInfo").html( formatDate(date) );
+				
+				//open up date restriction area
+				toggleAdvancedOptionsVisibility(document.getElementById('restrictUsageDiv'), document.getElementById('restrictUsageTreeIcon'),'${lams}');
+			}
 		 });
+	  	
+		function formatDate(date) {
+			var currHour = "" + date.getHours();
+			if (currHour.length == 1) {
+				currHour = "0" + currHour;
+			}			
+			var currMin = "" + date.getMinutes();
+			if (currMin.length == 1) {
+				currMin = "0" + currMin;
+			}
+			return $.datepicker.formatDate( 'mm/dd/yy', date ) + " " + currHour + ":" + currMin;
+		}
+		
+		function setSubmissionDeadline() {
+			//get the timestamp in milliseconds since midnight Jan 1, 1970
+			var date = $("#datetime").datetimepicker('getDate');
+			if (date == null) {
+				return;
+			}
+	
+			var reqIDVar = new Date();
+			var url = "<c:url value="/monitoring.do"/>?dispatch=setSubmissionDeadline&toolContentID=${param.toolContentID}&submissionDeadline="
+						+ date.getTime() + "&reqID=" + reqIDVar.getTime();
+	
+			$.ajax({
+				url : url,
+				success : function() {
+					$.growlUI('<fmt:message key="monitor.summary.notification" />', '<fmt:message key="monitor.summary.date.restriction.set" />');
+					$("#datetimeDiv").hide();
+					$("#dateInfo").html(formatDate(date) );
+					$("#dateInfoDiv").show();
+				}
+			});
+		}
+		function removeSubmissionDeadline() {
+			var reqIDVar = new Date();
+			var url = "<c:url value="/monitoring.do"/>?dispatch=setSubmissionDeadline&toolContentID=${param.toolContentID}&submissionDeadline="
+						+ "&reqID=" + reqIDVar.getTime();
+	
+			$.ajax({
+				url : url,
+				success : function() {
+					$.growlUI('<fmt:message key="monitor.summary.notification" />', '<fmt:message key="monitor.summary.date.restriction.removed" />');
+					$("#dateInfoDiv").hide();
+					
+					$("#datetimeDiv").show();
+					$("#datetime").val("");
+				}
+			});
+		}
+		 
 
 		function submitMonitoringMethod(actionMethod) 
 		{

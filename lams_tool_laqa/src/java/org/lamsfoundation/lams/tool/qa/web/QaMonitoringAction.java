@@ -96,15 +96,18 @@ package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
@@ -134,8 +137,11 @@ import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 import org.lamsfoundation.lams.tool.qa.web.form.QaMonitoringForm;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
@@ -3338,6 +3344,38 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	return mapping.findForward(QaAppConstants.LOAD_MONITORING);
     }
+    
+    /**
+     * Set Submission Deadline
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	IQaService qaService = getQAService();
+	
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	QaContent content = qaService.getQa(contentID);
+	
+	Long dateParameter = WebUtil.readLongParam(request, QaAppConstants.ATTR_SUBMISSION_DEADLINE, true);
+	Date tzSubmissionDeadline = null;
+	if (dateParameter != null) {
+	    Date submissionDeadline = new Date(dateParameter);
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone teacherTimeZone = teacher.getTimeZone();
+	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+	}
+	content.setSubmissionDeadline(tzSubmissionDeadline);
+	qaService.saveOrUpdateQa(content);
+
+	return null;
+    }    
+    
 
     public void prepareReflectionData(HttpServletRequest request, QaContent qaContent, IQaService qaService,
 	    String userID, boolean exportMode, String currentSessionId) {
@@ -3529,4 +3567,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	return reflectionsContainerDTO;
     }
 
+    private IQaService getQAService() {
+    	return QaServiceProxy.getQaService(getServlet().getServletContext());
+    }
+    
 }

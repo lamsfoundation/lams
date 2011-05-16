@@ -25,6 +25,9 @@ CREATE TABLE tl_laqa11_response_rating (
 -- 	LDEV-2653 autosave feature
 ALTER TABLE tl_laqa11_usr_resp DROP COLUMN hidden;
 
+-- LDEV-2657 Date and time restriction 
+ALTER TABLE tl_laqa11_content ADD COLUMN submission_deadline DATETIME DEFAULT null;
+
 UPDATE lams_tool SET tool_version = "20110217" WHERE tool_signature = "laqa11";
 
 ----------------------Put all sql statements above here-------------------------

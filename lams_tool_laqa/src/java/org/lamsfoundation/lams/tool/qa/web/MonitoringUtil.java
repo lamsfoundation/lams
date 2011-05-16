@@ -24,13 +24,17 @@
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;	
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -49,6 +53,10 @@ import org.lamsfoundation.lams.tool.qa.dto.QaStatsDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.util.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * 
@@ -373,8 +381,18 @@ public class MonitoringUtil implements QaAppConstants {
 	//generateGroupsSessionData
 	List listAllGroupsDTO = buildGroupBasedSessionData(request, qaContent, qaService);
 	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
+	   
+    //set SubmissionDeadline, if any
+    if (qaContent.getSubmissionDeadline() != null) {
+    	Date submissionDeadline = qaContent.getSubmissionDeadline();
+    	HttpSession ss = SessionManager.getSession();
+    	UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+    	TimeZone teacherTimeZone = teacher.getTimeZone();
+    	Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
+    	request.setAttribute(QaAppConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
     }
-
+    }
+    
     public static List buildGroupBasedSessionData(HttpServletRequest request, QaContent qaContent, IQaService qaService) {
 	List listQuestions = qaService.getAllQuestionEntries(qaContent.getUid());
 

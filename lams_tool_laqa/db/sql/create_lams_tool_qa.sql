@@ -5,6 +5,7 @@ CREATE TABLE tl_laqa11_content (
      , instructions TEXT
      , creation_date DATETIME
      , update_date DATETIME
+     , submission_deadline DATETIME
      , reflect TINYINT(1) NOT NULL DEFAULT 0
      , questions_sequenced TINYINT(1) NOT NULL DEFAULT 0
      , username_visible TINYINT(1) NOT NULL DEFAULT 0

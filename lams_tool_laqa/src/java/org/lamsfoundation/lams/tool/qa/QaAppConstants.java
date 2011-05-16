@@ -254,7 +254,10 @@ public interface QaAppConstants {
     public static final String NO_AVAILABLE_SESSIONS = "noAvailableSessions";
     public static final String NO_TOOL_SESSIONS_AVAILABLE = "noToolSessionAvailable";
     public static final String ATTR_CONTENT = "content";
-
+    public static final String ATTR_RUN_OFFLINE = "runOffline";
+    public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+    public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
+   
     public static final String TIMEZONE = "timeZone";
     public static final String TIMEZONE_ID = "timeZoneId";
     /*

@@ -122,6 +122,8 @@ public class QaContent implements Serializable {
 
     /** nullable persistent field */
     private Date updateDate;
+    
+    private Date submissionDeadline;
 
     /** persistent field */
     private Set<QaQueContent> qaQueContents;
@@ -439,6 +441,21 @@ public class QaContent implements Serializable {
 	this.updateDate = updateDate;
     }
 
+    /**
+     * @return Returns the submissionDeadline.
+     */
+    public Date getSubmissionDeadline() {
+    	return submissionDeadline;
+    }
+    
+    /**
+     * @param submissionDeadline
+     * The submissionDeadline to set.
+     */
+    public void setSubmissionDeadline(Date submissionDeadline) {
+    	this.submissionDeadline = submissionDeadline;
+    }
+    
     /**
      * @return Returns the usernameVisible.
      */

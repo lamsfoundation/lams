@@ -22,6 +22,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
 
 <c:set var="lams">
 	<lams:LAMSURL />
@@ -72,6 +73,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<p>
 				<fmt:message key="label.learning.forceOfflineMessage" />
 			</p>
+			<c:choose>
+				<c:when test="${empty sessionMap.submissionDeadline}">
+					<p>
+						<fmt:message key="label.learning.forceOfflineMessage" />
+					</p>
+				</c:when>
+				<c:otherwise>
+					<div class="warning">
+						<fmt:message key="authoring.info.teacher.set.restriction" >
+							<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+						</fmt:message>
+					</div>
+				</c:otherwise>
+			</c:choose>
 
 			<div class="space-bottom-top align-right">
 
