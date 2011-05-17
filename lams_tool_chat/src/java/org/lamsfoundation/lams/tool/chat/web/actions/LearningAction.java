@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.chat.web.actions;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,6 +55,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.XMPPUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -147,6 +149,30 @@ public class LearningAction extends LamsDispatchAction {
 	    return mapping.findForward("runOffline");
 	}
 
+	/* Check if submission deadline is null */
+	
+	Date submissionDeadline = chatDTO.getSubmissionDeadline();
+	request.setAttribute("chatDTO", chatDTO);
+	
+	if (submissionDeadline != null) {
+
+		HttpSession ss = SessionManager.getSession();
+		UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		TimeZone learnerTimeZone = learnerDto.getTimeZone();
+		Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+		Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+		request.setAttribute("submissionDeadline", submissionDeadline);
+		
+		//calculate whether submission deadline has passed, and if so forward to "runOffline"
+		if (currentLearnerDate.after(tzSubmissionDeadline)) {
+			return mapping.findForward("runOffline");
+			
+		}
+	
+	}
+
+
+	
 	return mapping.findForward("learning");
 
     }

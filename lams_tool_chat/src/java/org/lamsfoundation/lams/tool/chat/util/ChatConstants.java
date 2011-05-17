@@ -57,10 +57,18 @@ public interface ChatConstants {
     public static final String USER_MESSAGES_DEFINITION_NAME = "user.messages.output.definition.chat";
     public static final String USER_MESSAGES_DEFAULT_CONDITION_DISPLAY_NAME_KEY = "user.messages.output.definition.chat.default.condition";
     public static final String ALL_USERS_MESSAGES_DEFINITION_NAME = "all.users.messages.output.definition.chat";
+    public static final String TEXT_SEARCH_DEFINITION_NAME = "text.search.output.definition.chat";
+    public static final String TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY = "text.search.output.definition.chat.default.condition";
+    
     public static final String SUCCESS = "success";
     public static final String ERROR_MSG_CONDITION = "error.condition";
     public static final String ERROR_MSG_NAME_BLANK = "error.condition.name.blank";
     public static final String ERROR_MSG_NAME_DUPLICATED = "error.condition.duplicated.name";
-
-    public static final String MESSAGE_SEPARATOR = "<br \\><br \\>";
+    public static final String MESSAGE_SEPARATOR = " ";
+    
+    /* Date time restriction LDEV-2657 */
+    public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+    public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
+    
+    
 }

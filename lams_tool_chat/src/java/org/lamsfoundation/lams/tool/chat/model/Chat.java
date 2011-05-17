@@ -85,6 +85,8 @@ public class Chat implements java.io.Serializable, Cloneable {
     private boolean defineLater;
 
     private Long toolContentId;
+    
+    private Date submissionDeadline;
 
     private Set chatAttachments;
 
@@ -367,6 +369,19 @@ public class Chat implements java.io.Serializable, Cloneable {
 	this.filterKeywords = filterKeywords;
     }
 
+	/**
+	 * @hibernate.property column="submission_deadline"
+	 * @return
+	 */
+	public Date getSubmissionDeadline() {
+		return submissionDeadline;
+	}
+
+	public void setSubmissionDeadline(Date submissionDeadline) {
+		this.submissionDeadline = submissionDeadline;
+	}
+
+    
     /**
      * toString
      * 

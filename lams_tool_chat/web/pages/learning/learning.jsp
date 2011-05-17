@@ -51,6 +51,13 @@
 			</c:choose>
 		</div>
 	</c:if>
+	<c:if test="${not empty submissionDeadline}">
+		<div class="info">
+			<fmt:message key="authoring.info.teacher.set.restriction" >
+				<fmt:param><lams:Date value="${submissionDeadline}" /></fmt:param>
+			</fmt:message>	
+		</div>
+	</c:if>	
    </c:if>
 	&nbsp;	
 	

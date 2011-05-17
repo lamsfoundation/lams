@@ -24,10 +24,13 @@
 
 package org.lamsfoundation.lams.tool.chat.web.actions;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -49,6 +52,7 @@ import org.lamsfoundation.lams.tool.chat.service.IChatService;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -96,6 +100,22 @@ public class MonitoringAction extends LamsDispatchAction {
 
  		Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB,true);
 		chatDTO.setCurrentTab(currentTab);
+
+		/* Check if submission deadline is null */
+		
+		Date submissionDeadline = chatDTO.getSubmissionDeadline();
+		
+		if (submissionDeadline != null) {
+			
+			HttpSession ss = SessionManager.getSession();
+			UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			TimeZone learnerTimeZone = learnerDto.getTimeZone();
+			Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+			request.setAttribute("submissionDeadline", tzSubmissionDeadline.getTime());
+			
+		}
+		
+		
 		
 		Map<Long, Integer> sessCountMap = chatService
 				.getMessageCountBySession(chat.getUid());
@@ -214,6 +234,43 @@ public class MonitoringAction extends LamsDispatchAction {
 		return openChatHistory(mapping, form, request, response);
 	}
 
+    /**
+     * Set Submission Deadline
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+    	
+		// set up chatService
+		if (chatService == null) {
+			chatService = ChatServiceProxy.getChatService(this.getServlet()
+					.getServletContext());
+		}
+    			
+    	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+    	Chat chat = chatService.getChatByContentId(contentID);
+	
+    	Long dateParameter = WebUtil.readLongParam(request, ChatConstants.ATTR_SUBMISSION_DEADLINE, true);
+    	Date tzSubmissionDeadline = null;
+    	if (dateParameter != null) {
+    		Date submissionDeadline = new Date(dateParameter);
+    		HttpSession ss = SessionManager.getSession();
+    		UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+    		TimeZone teacherTimeZone = teacher.getTimeZone();
+    		tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+    	}
+    	chat.setSubmissionDeadline(tzSubmissionDeadline);
+    	chatService.saveOrUpdateChat(chat);
+
+    	return null;
+    }
+
+	
 	/* Private Methods */
 
 	private ChatUser getCurrentUser(Long toolSessionId) {

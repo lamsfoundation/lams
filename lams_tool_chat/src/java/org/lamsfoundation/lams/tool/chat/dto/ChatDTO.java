@@ -28,6 +28,7 @@ package org.lamsfoundation.lams.tool.chat.dto;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -62,6 +63,8 @@ public class ChatDTO {
 	
 	public String reflectInstructions;
 	
+	public Date	submissionDeadline;
+	
 	public Set<ChatAttachmentDTO> onlineInstructionsFiles = new TreeSet<ChatAttachmentDTO>();
 
 	public Set<ChatAttachmentDTO> offlineInstructionsFiles = new TreeSet<ChatAttachmentDTO>();
@@ -82,6 +85,7 @@ public class ChatDTO {
 		lockOnFinish = chat.isLockOnFinished();
 		filteringEnabled = chat.isFilteringEnabled();
 		filteredKeyWords = chat.getFilterKeywords();
+		submissionDeadline = chat.getSubmissionDeadline();
 		
 		for (Iterator i = chat.getChatAttachments().iterator(); i.hasNext();) {
 			ChatAttachment att = (ChatAttachment) i.next();
@@ -228,5 +232,13 @@ public class ChatDTO {
 
 	public void setFilteredKeyWords(String filteredKeyWords) {
 		this.filteredKeyWords = filteredKeyWords;
+	}
+
+	public Date getSubmissionDeadline() {
+		return submissionDeadline;
+	}
+
+	public void setSubmissionDeadline(Date submissionDeadline) {
+		this.submissionDeadline = submissionDeadline;
 	}
 }
