@@ -159,6 +159,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TimeZone;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -189,6 +191,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -405,6 +408,28 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    VoteUtils.cleanUpSessionAbsolute(request);
 	    return mapping.findForward(VoteAppConstants.DEFINE_LATER);
 	}
+
+    //	check if there is submission deadline
+    Date submissionDeadline = voteContent.getSubmissionDeadline();
+    
+    if (submissionDeadline != null) {
+    	
+    	request.setAttribute(VoteAppConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
+    	HttpSession ss = SessionManager.getSession();
+    	UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+    	TimeZone learnerTimeZone = learnerDto.getTimeZone();
+    	Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+    	Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+    	voteGeneralLearnerFlowDTO.setSubmissionDeadline(tzSubmissionDeadline);	 
+    	
+    	//calculate whether deadline has passed, and if so forward to "runOffline"
+    	if (currentLearnerDate.after(tzSubmissionDeadline)) {
+    		return mapping.findForward(RUN_OFFLINE);
+    		
+    	}
+    	
+    }
+  
 
 	/*
 	 * fetch question content from content

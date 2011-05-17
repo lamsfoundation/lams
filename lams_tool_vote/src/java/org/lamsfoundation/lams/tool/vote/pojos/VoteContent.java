@@ -107,6 +107,8 @@ public class VoteContent implements Serializable {
 
     /** persistent field */
     private Set voteAttachments;
+    
+    private Date submissionDeadline;
 
     /**
      * persistent field This field can be calculated, but introducing it reduces number of DB calls.
@@ -538,4 +540,16 @@ public class VoteContent implements Serializable {
     public void setExternalInputsAdded(Short externalInputsAdded) {
 	this.externalInputsAdded = externalInputsAdded;
     }
+    
+   	public void setSubmissionDeadline(Date submissionDeadline) {
+		this.submissionDeadline = submissionDeadline;
+	}
+	
+	/**
+	 * @hibernate.property column="submission_deadline"
+	 * @return date submissionDeadline
+	 */
+	public Date getSubmissionDeadline() {
+		return submissionDeadline;
+	}
 }

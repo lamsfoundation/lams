@@ -125,6 +125,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="lockOnFinish" />
 			<html:hidden property="reportViewOnly" />
 			<html:hidden property="showResults" />
+			
+			
+			<c:if test="${not empty voteGeneralLearnerFlowDTO.submissionDeadline}">
+				<div class="info">
+					<fmt:message key="authoring.info.teacher.set.restriction" >
+						<fmt:param><lams:Date value="${voteGeneralLearnerFlowDTO.submissionDeadline}" /></fmt:param>
+					</fmt:message>	
+				</div>
+			</c:if>
 
 			<c:if test="${voteGeneralLearnerFlowDTO.activityRunOffline == 'true'}">
 				<div class="warning">

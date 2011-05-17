@@ -30,10 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Date;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -64,9 +67,12 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
@@ -724,6 +730,16 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 	VoteContent voteContent = voteService.retrieveVote(new Long(toolContentID));
 	VoteMonitoringAction.logger.debug("existing voteContent:" + voteContent);
+	
+	if (voteContent.getSubmissionDeadline() != null) {
+		Date submissionDeadline = voteContent.getSubmissionDeadline();
+		HttpSession ss = SessionManager.getSession();
+		UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+		TimeZone teacherTimeZone = teacher.getTimeZone();
+		Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
+		request.setAttribute(VoteAppConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	}	
+	
 
 	/* this section is related to summary tab. Starts here. */
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, voteContent, voteService);
@@ -3435,6 +3451,38 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 
 	return reflectionsContainerDTO;
     }
+
+    /**
+     * Set Submission Deadline
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+    	
+    	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+		
+    	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+    	VoteContent voteContent = voteService.retrieveVote(contentID);
+	
+    	Long dateParameter = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SUBMISSION_DEADLINE, true);
+    	Date tzSubmissionDeadline = null;
+    	if (dateParameter != null) {
+    		Date submissionDeadline = new Date(dateParameter);
+		    HttpSession ss = SessionManager.getSession();
+		    org.lamsfoundation.lams.usermanagement.dto.UserDTO teacher = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss.getAttribute(AttributeNames.USER);
+		    TimeZone teacherTimeZone = teacher.getTimeZone();
+		    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+    	}
+    	voteContent.setSubmissionDeadline(tzSubmissionDeadline);
+    	voteService.updateVote(voteContent);
+    	return null;
+    }
+
 
     /**
      * Return ResourceService bean.

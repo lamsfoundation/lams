@@ -143,6 +143,10 @@ public interface VoteAppConstants {
     public static final String OPT_INDEX = "optIndex";
 
     public static final String RUN_OFFLINE = "runOffline";
+    
+    // 	for submission deadline LDEV-2657
+    public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+    public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 
     /*
      * refers to number of questions presented initially, we have a single record for default content

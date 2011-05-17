@@ -22,6 +22,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.vote;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -93,7 +94,9 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
     
     protected String nominationsSubmited;
     
-    protected Map mapGeneralCheckedOptionsContent;
+    protected Date submissionDeadline;
+    
+	protected Map mapGeneralCheckedOptionsContent;
     
     protected Map mapStandardNominationsContent;
     
@@ -306,6 +309,19 @@ public class VoteGeneralLearnerFlowDTO implements Comparable
     public void setToolContentUID(String toolContentUID) {
         this.toolContentUID = toolContentUID;
     }    
+    
+    /**
+	 * @return the submissionDeadline
+	 */
+	public Date getSubmissionDeadline() {
+		return submissionDeadline;
+	}
+	/**
+	 * @param submissionDeadline the submissionDeadline to set
+	 */
+	public void setSubmissionDeadline(Date submissionDeadline) {
+		this.submissionDeadline = submissionDeadline;
+	}
     
     /**
      * @return Returns the previewOnly.

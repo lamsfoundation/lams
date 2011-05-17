@@ -22,6 +22,7 @@ CREATE TABLE tl_lavote11_content (
 	 , assigned_data_flow_object TINYINT(1)
      , external_inputs_added SMALLINT DEFAULT 0
 	 , max_external_inputs SMALLINT
+	 , submission_deadline datetime DEFAULT NULL
      , PRIMARY KEY (uid)
 )TYPE=InnoDB;
 

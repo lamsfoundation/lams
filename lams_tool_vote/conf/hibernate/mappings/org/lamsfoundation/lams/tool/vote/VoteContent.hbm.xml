@@ -190,6 +190,14 @@
         column="external_inputs_added"
    />
 
+   <property
+        name="submissionDeadline"
+        type="java.util.Date"
+        access="property"
+        column="submission_deadline"
+        length="20"        
+   />   
+
     	 <set
             name="voteQueContents"
             order-by="display_order"
