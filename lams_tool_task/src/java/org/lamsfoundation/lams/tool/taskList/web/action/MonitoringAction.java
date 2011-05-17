@@ -204,6 +204,39 @@ public class MonitoringAction extends Action {
 		request.setAttribute("userDTO", refDTO);
 		return mapping.findForward("success");
 	}
+	
+    /**
+     * Set Submission Deadline
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+    	
+		ITaskListService service = getTaskListService();
+    	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+    	TaskList taskList = service.getTaskListByContentId(contentID);
+    	
+    	Long dateParameter = WebUtil.readLongParam(request, TaskListConstants.ATTR_SUBMISSION_DEADLINE, true);
+    	Date tzSubmissionDeadline = null;
+    	if (dateParameter != null) {
+    		Date submissionDeadline = new Date(dateParameter);
+		    HttpSession ss = SessionManager.getSession();
+		    org.lamsfoundation.lams.usermanagement.dto.UserDTO teacher = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss.getAttribute(AttributeNames.USER);
+		    TimeZone teacherTimeZone = teacher.getTimeZone();
+		    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+    	}
+    	taskList.setSubmissionDeadline(tzSubmissionDeadline);
+    	service.saveOrUpdateTaskList(taskList);
+    	return null;
+    }
+    
+    
+	
 
 	// *************************************************************************************
 	// Private method
