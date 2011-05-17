@@ -24,8 +24,12 @@
 
 package org.lamsfoundation.lams.tool.notebook.web.actions;
 
+import java.util.Date;
+import java.util.TimeZone;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -38,9 +42,13 @@ import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 import org.lamsfoundation.lams.tool.notebook.service.INotebookService;
 import org.lamsfoundation.lams.tool.notebook.service.NotebookServiceProxy;
+import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.service.LamsToolService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
@@ -89,6 +97,16 @@ public class MonitoringAction extends LamsDispatchAction {
 		request.setAttribute("contentFolderID", contentFolderID);
 		request.setAttribute("isGroupedActivity", isGroupedActivity);
 		
+		Date submissionDeadline = notebook.getSubmissionDeadline();
+		
+		if (submissionDeadline != null) {
+			HttpSession ss = SessionManager.getSession();
+			UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			TimeZone teacherTimeZone = teacher.getTimeZone();
+			Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
+			request.setAttribute(NotebookConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+		}
+		
 		return mapping.findForward("success");
 	}
 
@@ -108,6 +126,41 @@ public class MonitoringAction extends LamsDispatchAction {
 
 		return mapping.findForward("notebookDisplay");
 	}
+	
+    /**
+     * Set Submission Deadline
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+    	
+    	setupService();
+       	
+    	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+
+    	Notebook notebook = notebookService
+		.getNotebookByContentId(contentID);
+    	
+    	Long dateParameter = WebUtil.readLongParam(request, NotebookConstants.ATTR_SUBMISSION_DEADLINE, true);
+    	Date tzSubmissionDeadline = null;
+    	if (dateParameter != null) {
+    		Date submissionDeadline = new Date(dateParameter);
+		    HttpSession ss = SessionManager.getSession();
+		    org.lamsfoundation.lams.usermanagement.dto.UserDTO teacher = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss.getAttribute(AttributeNames.USER);
+		    TimeZone teacherTimeZone = teacher.getTimeZone();
+		    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+    	}
+    	notebook.setSubmissionDeadline(tzSubmissionDeadline);
+    	notebookService.saveOrUpdateNotebook(notebook);
+    	return null;
+    }
+    
+   	
 	
 	/**
 	 * set up notebookService

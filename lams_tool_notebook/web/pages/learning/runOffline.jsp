@@ -15,10 +15,21 @@
 		${notebookDTO.title}
 	</h1>
 
-	<p>
-		<fmt:message key="message.runOfflineSet" />
-	</p>
-
+	<c:choose>
+		<c:when test="${empty notebookDTO.submissionDeadline}">
+		<p>
+			<fmt:message key="message.runOfflineSet" />
+		</p>
+		</c:when>
+		<c:otherwise>
+			<div class="warning">
+				<fmt:message key="authoring.info.teacher.set.restriction" >
+					<fmt:param><lams:Date value="${notebookDTO.submissionDeadline}" /></fmt:param>
+				</fmt:message>	
+			</div>
+		</c:otherwise>		
+	</c:choose>
+	
 	<c:if test="${mode == 'learner' || mode == 'author'}">
 		<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
 			<html:hidden property="dispatch" value="finishActivity" />

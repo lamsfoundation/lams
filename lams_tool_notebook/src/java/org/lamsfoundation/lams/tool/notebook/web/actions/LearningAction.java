@@ -25,9 +25,12 @@
 package org.lamsfoundation.lams.tool.notebook.web.actions;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -50,6 +53,7 @@ import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 import org.lamsfoundation.lams.tool.notebook.util.NotebookException;
 import org.lamsfoundation.lams.tool.notebook.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -156,6 +160,23 @@ public class LearningAction extends LamsDispatchAction {
 			request.setAttribute("contentEditable", true);
 		}
 		request.setAttribute("finishedActivity", notebookUser.isFinishedActivity());
+		
+		// date and time restriction LDEV-2657
+		Date submissionDeadline = notebook.getSubmissionDeadline();
+		if (submissionDeadline != null) {
+			HttpSession ss = SessionManager.getSession();
+			UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+			TimeZone learnerTimeZone = learnerDto.getTimeZone();
+			Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+			Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+			notebookDTO.submissionDeadline = tzSubmissionDeadline;
+
+			//calculate whether deadline has passed, and if so forward to "runOffline"
+			if (currentLearnerDate.after(tzSubmissionDeadline)) {
+				return mapping.findForward("runOffline");	
+			}
+		}
+
 
 		return mapping.findForward("notebook");
 	}

@@ -52,6 +52,14 @@
 		${notebookDTO.instructions}
 	</p>
 
+	<c:if test="${not empty notebookDTO.submissionDeadline}">
+		 <div class="info">
+		 	<fmt:message key="authoring.info.teacher.set.restriction" >
+		 		<fmt:param><lams:Date value="${notebookDTO.submissionDeadline}" /></fmt:param>
+		 	</fmt:message>
+		 </div>
+	</c:if>
+
 	<c:if test="${notebookDTO.lockOnFinish and mode == 'learner'}">
 		<div class="info">
 			<c:choose>

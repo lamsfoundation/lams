@@ -25,6 +25,7 @@
 
 package org.lamsfoundation.lams.tool.notebook.dto;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -56,6 +57,8 @@ public class NotebookDTO {
 	public boolean allowRichEditor;
 	
 	public boolean lockOnFinish;
+	
+	public Date submissionDeadline;
 	
 	public Set<NotebookAttachmentDTO> onlineInstructionsFiles;
 
@@ -194,6 +197,20 @@ public class NotebookDTO {
 
 	public void setLockOnFinish(boolean lockOnFinish) {
 		this.lockOnFinish = lockOnFinish;
+	}
+
+	/**
+	 * @return the submissionDeadline
+	 */
+	public Date getSubmissionDeadline() {
+		return submissionDeadline;
+	}
+
+	/**
+	 * @param submissionDeadline the submissionDeadline to set
+	 */
+	public void setSubmissionDeadline(Date submissionDeadline) {
+		this.submissionDeadline = submissionDeadline;
 	}
 
 	public Long getCurrentTab() {

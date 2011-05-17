@@ -77,6 +77,9 @@ public class Notebook implements java.io.Serializable, Cloneable {
     private boolean contentInUse;
 
     private boolean defineLater;
+    
+    // LDEV-2657
+    private Date submissionDeadline;
 
     private Long toolContentId;
 
@@ -285,7 +288,22 @@ public class Notebook implements java.io.Serializable, Cloneable {
 	this.defineLater = defineLater;
     }
 
+    public void setSubmissionDeadline(Date submissionDeadline) {
+		this.submissionDeadline = submissionDeadline;
+	}
+
     /**
+     * 
+     * @hibernate.property column="submission_deadline"
+     * @return date submissionDeadline
+     * 
+     */
+    
+	public Date getSubmissionDeadline() {
+		return submissionDeadline;
+	}
+
+	/**
      * @hibernate.property column="tool_content_id" length="20"
      * 
      */

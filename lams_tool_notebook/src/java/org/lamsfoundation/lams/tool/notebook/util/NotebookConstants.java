@@ -61,4 +61,8 @@ public interface NotebookConstants {
     public static final String ERROR_MSG_CONDITION = "error.condition";
     public static final String ERROR_MSG_NAME_BLANK = "error.condition.name.blank";
     public static final String ERROR_MSG_NAME_DUPLICATED = "error.condition.duplicated.name";
+    
+    //  for submission deadline LDEV-2657
+    public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+    public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 }
