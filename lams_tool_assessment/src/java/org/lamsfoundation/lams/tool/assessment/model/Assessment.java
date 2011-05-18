@@ -100,6 +100,8 @@ public class Assessment implements Cloneable {
     private Date created;
 
     private Date updated;
+    
+    private Date submissionDeadline;
 
     private AssessmentUser createdBy;
 
@@ -289,6 +291,25 @@ public class Assessment implements Cloneable {
      */
     public void setUpdated(Date updated) {
 	this.updated = updated;
+    }
+    
+    /**
+     * Returns deadline for learner's submission
+     * 
+     * @return submissionDeadline
+     * @hibernate.property column="submission_deadline"
+     */
+    public Date getSubmissionDeadline() {
+	return submissionDeadline;
+    }
+
+    /**
+     * Sets deadline for learner's submission
+     * 
+     * @param submissionDeadline
+     */
+    public void setSubmissionDeadline(Date submissionDeadline) {
+	this.submissionDeadline = submissionDeadline;
     }
 
     /**

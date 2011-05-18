@@ -24,6 +24,7 @@ create table tl_laasse10_assessment (
    uid bigint not null auto_increment,
    create_date datetime,
    update_date datetime,
+   submission_deadline datetime,
    create_by bigint,
    title varchar(255),
    run_offline tinyint,

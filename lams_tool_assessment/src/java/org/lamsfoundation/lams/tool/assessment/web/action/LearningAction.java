@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
@@ -62,6 +63,7 @@ import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -159,6 +161,7 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, assessment.getInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, false);
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, finishedLock);
+	sessionMap.put(AssessmentConstants.PARAM_RUN_OFFLINE, assessment.getRunOffline());
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AssessmentConstants.ATTR_USER, assessmentUser);
@@ -174,14 +177,28 @@ public class LearningAction extends Action {
 	assessment.setDefineLater(false);
 	service.saveOrUpdateAssessment(assessment);
 
-	// add run offline support
+	// run offline support
 	if (assessment.getRunOffline()) {
-	    sessionMap.put(AssessmentConstants.PARAM_RUN_OFFLINE, true);
 	    return mapping.findForward("runOffline");
-	} else {
-	    sessionMap.put(AssessmentConstants.PARAM_RUN_OFFLINE, false);
 	}
 
+	//check if there is submission deadline
+	Date submissionDeadline = assessment.getSubmissionDeadline();
+	if (submissionDeadline != null) {
+	    //store submission deadline to sessionMap
+	    sessionMap.put(AssessmentConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
+	   
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+	    
+	    //calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
+		return mapping.findForward("runOffline");
+	    }
+	}
 	
 	Set<AssessmentQuestion> questionList = new TreeSet<AssessmentQuestion>(new SequencableComparator());
 	if (questionsFromDB != null) {
@@ -320,7 +337,7 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, true);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
-    }   
+    } 
     
     /**
      * Display same entire authoring page content from HttpSession variable.

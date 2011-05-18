@@ -31,11 +31,13 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import jxl.JXLException;
 
@@ -61,7 +63,10 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentExportXLSUtil;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
@@ -95,6 +100,9 @@ public class MonitoringAction extends Action {
 	if (param.equals("saveUserGrade")) {
 	    return saveUserGrade(mapping, form, request, response);
 	}
+	if (param.equals("setSubmissionDeadline")) {
+	    return setSubmissionDeadline(mapping, form, request, response);
+	}	
 	if (param.equals("exportSummary")) {
 	    return exportSummary(mapping, form, request, response);
 	}
@@ -115,6 +123,16 @@ public class MonitoringAction extends Action {
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 	assessment.toDTO();
+	
+	//set SubmissionDeadline, if any
+	if (assessment.getSubmissionDeadline() != null) {
+	    Date submissionDeadline = assessment.getSubmissionDeadline();
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone teacherTimeZone = teacher.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
+	    request.setAttribute(AssessmentConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	}
 
 	// cache into sessionMap
 	boolean isGroupedActivity = service.isGroupedActivity(contentId);
@@ -183,6 +201,37 @@ public class MonitoringAction extends Action {
 	    service = getAssessmentService();
 	    service.changeQuestionResultMark(questionResultUid, newGrade);
 	}
+
+	return null;
+    }
+    
+    /**
+     * Set Submission Deadline
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	service = getAssessmentService();
+	
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Assessment assessment = service.getAssessmentByContentId(contentID);
+	
+	Long dateParameter = WebUtil.readLongParam(request, AssessmentConstants.ATTR_SUBMISSION_DEADLINE, true);
+	Date tzSubmissionDeadline = null;
+	if (dateParameter != null) {
+	    Date submissionDeadline = new Date(dateParameter);
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone teacherTimeZone = teacher.getTimeZone();
+	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+	}
+	assessment.setSubmissionDeadline(tzSubmissionDeadline);
+	service.saveOrUpdateAssessment(assessment);
 
 	return null;
     }

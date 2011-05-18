@@ -240,6 +240,10 @@
 			<forward name="question" path="/pages/monitoring/parts/questionsummary.jsp" />			
 			<forward name="user" path="/pages/monitoring/parts/usersummary.jsp" />
 		</action>	
+		<action path="/monitoring/setSubmissionDeadline"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
+			parameter="setSubmissionDeadline" >
+		</action>		
 		<action path="/monitoring/exportSummary"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
 			parameter="exportSummary" >

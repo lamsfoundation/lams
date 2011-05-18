@@ -41,6 +41,14 @@
             column="update_date"
         />
 
+        <property
+            name="submissionDeadline"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="submission_deadline"
+        />
+
         <many-to-one
             name="createdBy"
             class="org.lamsfoundation.lams.tool.assessment.model.AssessmentUser"

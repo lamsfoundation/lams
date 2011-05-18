@@ -24,9 +24,20 @@
 			${sessionMap.title}
 		</h1>
 
-		<p>
-			<fmt:message key="run.offline.message" />
-		</p>
+		<c:choose>
+			<c:when test="${empty sessionMap.submissionDeadline}">
+				<p>
+					<fmt:message key="run.offline.message" />
+				</p>			
+			</c:when>
+			<c:otherwise>
+				<div class="warning">
+					<fmt:message key="authoring.info.teacher.set.restriction" >
+						<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+					</fmt:message>
+				</div>
+			</c:otherwise>
+		</c:choose>
 
 		<div class="space-bottom-top align-right">
 			<html:link href="#" property="FinishButton" styleId="finishButton"
