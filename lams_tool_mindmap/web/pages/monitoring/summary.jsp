@@ -1,5 +1,13 @@
 <%@ include file="/common/taglibs.jsp"%>
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<c:set var="lams"><lams:LAMSURL/></c:set>
+
+<link type="text/css" href="${lams}/css/jquery-ui-1.8.11.flick-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/jquery-ui-timepicker-addon.css" rel="stylesheet">
+
+<script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
 <script type="text/javascript">
 <!--
 	var evalcomixWindow = null;
@@ -9,19 +17,30 @@
     	evalcomixWindow=window.open(url, 'evalcomixWindow', 'width=800,height=600,scrollbars=yes,resizable=yes');
 		if (window.focus) {evalcomixWindow.focus()}
 	}
+	
+	var settings = {
+		lams: '${lams}',
+		submissionDeadline: '${submissionDeadline}',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring.do?dispatch=setSubmissionDeadline"/>',
+		toolContentID: '${param.toolContentID}',
+		messageNotification: '<fmt:message key="monitor.summary.notification" />',
+		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
+		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+	};
+	
 //-->
 </script>
+<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
 <c:set var="dto" value="${mindmapDTO}" />
 
-<h1>
+<h1 style="padding-bottom: 10px;">
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
 
 	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
 		<fmt:message key="monitor.summary.th.advancedSettings" />
 	</a>
 </h1>
-<br />
 
 <div class="monitoring-advanced" id="advancedDiv" style="display:none">
 <table class="alternative-color">
@@ -89,6 +108,8 @@
 	
 </table>
 </div>
+
+<%@include file="dateRestriction.jsp"%>
 
 <c:if test="${empty dto.sessionDTOs}">
 	<p class="warning">

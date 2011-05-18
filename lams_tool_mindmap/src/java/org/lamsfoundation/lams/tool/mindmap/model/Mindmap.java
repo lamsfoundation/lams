@@ -45,6 +45,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     private Long uid;
     private Date createDate;
     private Date updateDate;
+    private Date submissionDeadline;
     private Long createBy;
     private String title;
     private String instructions;
@@ -128,6 +129,25 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     public void setUpdateDate(Date updateDate) {
 	this.updateDate = updateDate;
+    }
+    
+    /**
+     * Returns deadline for learner's submission
+     * 
+     * @return submissionDeadline
+     * @hibernate.property column="submission_deadline"
+     */
+    public Date getSubmissionDeadline() {
+	return submissionDeadline;
+    }
+
+    /**
+     * Sets deadline for learner's submission
+     * 
+     * @param submissionDeadline
+     */
+    public void setSubmissionDeadline(Date submissionDeadline) {
+	this.submissionDeadline = submissionDeadline;
     }
 
     /**

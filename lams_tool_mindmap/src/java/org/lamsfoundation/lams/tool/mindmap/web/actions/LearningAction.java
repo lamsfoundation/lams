@@ -27,9 +27,11 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -60,6 +62,7 @@ import org.lamsfoundation.lams.tool.mindmap.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -146,6 +149,24 @@ public class LearningAction extends LamsDispatchAction {
 	// check runOffline
 	if (mindmap.isRunOffline()) {
 	    return mapping.findForward("runOffline");
+	}
+		
+	// check if there is submission deadline
+	Date submissionDeadline = mindmap.getSubmissionDeadline();
+	if (submissionDeadline != null) {
+	    // store submission deadline to sessionMap
+	    request.setAttribute(MindmapConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
+
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+
+	    // calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
+		return mapping.findForward("runOffline");
+	    }
 	}
 
 	MindmapUser mindmapUser;

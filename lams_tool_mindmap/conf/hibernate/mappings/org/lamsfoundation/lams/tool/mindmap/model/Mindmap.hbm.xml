@@ -42,6 +42,14 @@
         />
 
         <property
+            name="submissionDeadline"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="submission_deadline"
+        />
+
+        <property
             name="createBy"
             type="java.lang.Long"
             update="true"
@@ -141,12 +149,11 @@
         />
 
         <property
-            name="lastActionId"
-            type="java.lang.Long"
+            name="mindmapExportContent"
+            type="java.lang.String"
             update="true"
             insert="true"
-            column="last_action_id"
-            length="20"
+            column="export_content"
         />
 
         <property
