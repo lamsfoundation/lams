@@ -35,7 +35,7 @@
 
 <p align="right">
 	<fmt:message key="admin.search" />:&nbsp;<html:text property="term" size="20" /> 
-	or <a onclick="document.UserSearchForm.term.value='';document.UserSearchForm.submit();"><fmt:message key="label.show.all.users"/></a>
+	 <fmt:message key="label.or" /> <a onclick="document.UserSearchForm.term.value='';document.UserSearchForm.submit();"><fmt:message key="label.show.all.users"/></a>
 </p>
 
 <logic:notEmpty name="userList">
