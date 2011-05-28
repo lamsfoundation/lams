@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<bean id="commonCartridgeMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.commonCartridge.ApplicationResources</value></property>
+			</bean>
+		</property>										
+	</bean>
+    <!-- core beans -->
+    <bean id="commonCartridgeDao" class="org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate.CommonCartridgeDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="commonCartridgeItemDao" class="org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate.CommonCartridgeItemDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="commonCartridgeItemVisitDao" class="org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate.CommonCartridgeItemVisitDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="commonCartridgeConfigItemDao" class="org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate.CommonCartridgeConfigItemDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>      
+
+   <bean id="commonCartridgeAttachmentDao" class="org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate.CommonCartridgeAttachmentDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="commonCartridgeUserDao" class="org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate.CommonCartridgeUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="commonCartridgeSessionDao" class="org.lamsfoundation.lams.tool.commonCartridge.dao.hibernate.CommonCartridgeSessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+
+    <!-- Managers -->
+	<bean id="commonCartridgeToolContentHandler" class="org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeToolContentHandler">
+	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
+	
+    <bean id="commonCartridgeManagerTarget" class="org.lamsfoundation.lams.tool.commonCartridge.service.CommonCartridgeServiceImpl">
+        <property name="commonCartridgeDao">
+            <ref local="commonCartridgeDao"/>
+        </property>
+        <property name="commonCartridgeItemDao">
+            <ref local="commonCartridgeItemDao"/>
+        </property>
+        <property name="commonCartridgeItemVisitDao">
+            <ref local="commonCartridgeItemVisitDao"/>
+        </property>
+        <property name="commonCartridgeConfigItemDao">
+            <ref local="commonCartridgeConfigItemDao"/>
+        </property>        
+        <property name="commonCartridgeAttachmentDao">
+            <ref local="commonCartridgeAttachmentDao"/>
+        </property>
+        <property name="commonCartridgeUserDao">
+            <ref local="commonCartridgeUserDao"/>
+        </property>
+        <property name="commonCartridgeSessionDao">
+            <ref local="commonCartridgeSessionDao"/>
+        </property>
+        <property name="commonCartridgeToolContentHandler">
+            <ref local="commonCartridgeToolContentHandler"/>
+        </property>
+        <property name="repositoryService">
+            <ref bean="repositoryService"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="learnerService">
+   			<ref bean="learnerService"/>
+   		</property>
+   		<property name="auditService">
+   			<ref bean="auditService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService"><ref bean="commonCartridgeMessageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   
+		<property name="eventNotificationService">
+			<ref bean="eventNotificationService"/>
+		</property>   
+		<property name="lessonService">
+   			<ref bean="lessonService"/>
+   		</property>
+				
+    </bean>
+
+    <bean id="commonCartridgeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref local="commonCartridgeManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setItemComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setItemVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setItemAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+			    <prop key="importToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                
+                <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
+				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
+

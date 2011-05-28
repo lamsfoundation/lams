@@ -1,0 +1,1272 @@
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA
+ * 
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+/* $$Id$$ */
+package org.lamsfoundation.lams.tool.commonCartridge.service;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Vector;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.struts.upload.FormFile;
+import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.ICredentials;
+import org.lamsfoundation.lams.contentrepository.ITicket;
+import org.lamsfoundation.lams.contentrepository.IVersionedNode;
+import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+import org.lamsfoundation.lams.contentrepository.LoginException;
+import org.lamsfoundation.lams.contentrepository.NodeKey;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
+import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
+import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
+import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
+import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
+import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
+import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutput;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;
+import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeAttachmentDAO;
+import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeConfigItemDAO;
+import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeDAO;
+import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeItemDAO;
+import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeItemVisitDAO;
+import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeSessionDAO;
+import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeUserDAO;
+import org.lamsfoundation.lams.tool.commonCartridge.dto.ReflectDTO;
+import org.lamsfoundation.lams.tool.commonCartridge.dto.Summary;
+import org.lamsfoundation.lams.tool.commonCartridge.ims.IMSManifestException;
+import org.lamsfoundation.lams.tool.commonCartridge.ims.ImscpApplicationException;
+import org.lamsfoundation.lams.tool.commonCartridge.ims.SimpleCommonCartridgeConverter;
+import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
+import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeAttachment;
+import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeConfigItem;
+import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
+import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItemInstruction;
+import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItemVisitLog;
+import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeSession;
+import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeUser;
+import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeToolContentHandler;
+import org.lamsfoundation.lams.tool.commonCartridge.util.ReflectDTOComparator;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
+import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
+import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
+
+/**
+ * 
+ * @author Andrey Balan
+ * 
+ */
+public class CommonCartridgeServiceImpl implements ICommonCartridgeService, ToolContentManager, ToolSessionManager,
+	ToolContentImport102Manager
+
+{
+    static Logger log = Logger.getLogger(CommonCartridgeServiceImpl.class.getName());
+
+    private CommonCartridgeDAO commonCartridgeDao;
+
+    private CommonCartridgeItemDAO commonCartridgeItemDao;
+
+    private CommonCartridgeAttachmentDAO commonCartridgeAttachmentDao;
+
+    private CommonCartridgeUserDAO commonCartridgeUserDao;
+
+    private CommonCartridgeSessionDAO commonCartridgeSessionDao;
+
+    private CommonCartridgeItemVisitDAO commonCartridgeItemVisitDao;
+
+    private CommonCartridgeConfigItemDAO commonCartridgeConfigItemDao;
+
+    // tool service
+    private CommonCartridgeToolContentHandler commonCartridgeToolContentHandler;
+
+    private MessageService messageService;
+
+    // system services
+    private IRepositoryService repositoryService;
+
+    private ILamsToolService toolService;
+
+    private ILearnerService learnerService;
+
+    private IAuditService auditService;
+
+    private IUserManagementService userManagementService;
+
+    private IExportToolContentService exportContentService;
+
+    private ICoreNotebookService coreNotebookService;
+
+    private IEventNotificationService eventNotificationService;
+
+    private ILessonService lessonService;
+
+    public IVersionedNode getFileNode(Long itemUid, String relPathString) throws CommonCartridgeApplicationException {
+	CommonCartridgeItem item = (CommonCartridgeItem) commonCartridgeItemDao.getObject(CommonCartridgeItem.class,
+		itemUid);
+	if (item == null) {
+	    throw new CommonCartridgeApplicationException("Reource item " + itemUid + " not found.");
+	}
+
+	return getFile(item.getFileUuid(), item.getFileVersionId(), relPathString);
+    }
+
+    // *******************************************************************************
+    // Service method
+    // *******************************************************************************
+    /**
+     * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
+     * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
+     * 
+     * @param uuid
+     * @param versionId
+     * @param relativePath
+     * @param attemptCount
+     * @return file node
+     * @throws ImscpApplicationException
+     */
+    private IVersionedNode getFile(Long uuid, Long versionId, String relativePath)
+	    throws CommonCartridgeApplicationException {
+
+	ITicket tic = getRepositoryLoginTicket();
+
+	try {
+
+	    return repositoryService.getFileItem(tic, uuid, versionId, relativePath);
+
+	} catch (AccessDeniedException e) {
+
+	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
+		    + " path " + relativePath + ".";
+
+	    error = error + "AccessDeniedException: " + e.getMessage() + " Unable to retry further.";
+	    CommonCartridgeServiceImpl.log.error(error);
+	    throw new CommonCartridgeApplicationException(error, e);
+
+	} catch (Exception e) {
+
+	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
+		    + " path " + relativePath + "." + " Exception: " + e.getMessage();
+	    CommonCartridgeServiceImpl.log.error(error);
+	    throw new CommonCartridgeApplicationException(error, e);
+
+	}
+    }
+
+    /**
+     * This method verifies the credentials of the CommonCartridge Tool and gives it the <code>Ticket</code> to login
+     * and access the Content Repository.
+     * 
+     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
+     * the tool needs to upload/download files from the content repository.
+     * 
+     * @return ITicket The ticket for repostory access
+     * @throws CommonCartridgeApplicationException
+     */
+    private ITicket getRepositoryLoginTicket() throws CommonCartridgeApplicationException {
+	ICredentials credentials = new SimpleCredentials(commonCartridgeToolContentHandler.getRepositoryUser(),
+		commonCartridgeToolContentHandler.getRepositoryId());
+	try {
+	    ITicket ticket = repositoryService.login(credentials,
+		    commonCartridgeToolContentHandler.getRepositoryWorkspaceName());
+	    return ticket;
+	} catch (AccessDeniedException ae) {
+	    throw new CommonCartridgeApplicationException("Access Denied to repository." + ae.getMessage());
+	} catch (WorkspaceNotFoundException we) {
+	    throw new CommonCartridgeApplicationException("Workspace not found." + we.getMessage());
+	} catch (LoginException e) {
+	    throw new CommonCartridgeApplicationException("Login failed." + e.getMessage());
+	}
+    }
+
+    public CommonCartridge getCommonCartridgeByContentId(Long contentId) {
+	CommonCartridge rs = commonCartridgeDao.getByContentId(contentId);
+	if (rs == null) {
+	    CommonCartridgeServiceImpl.log.error("Could not find the content by given ID:" + contentId);
+	}
+	return rs;
+    }
+
+    public CommonCartridge getDefaultContent(Long contentId) throws CommonCartridgeApplicationException {
+	if (contentId == null) {
+	    String error = messageService.getMessage("error.msg.default.content.not.find");
+	    CommonCartridgeServiceImpl.log.error(error);
+	    throw new CommonCartridgeApplicationException(error);
+	}
+
+	CommonCartridge defaultContent = getDefaultCommonCartridge();
+	// save default content by given ID.
+	CommonCartridge content = new CommonCartridge();
+	content = CommonCartridge.newInstance(defaultContent, contentId, commonCartridgeToolContentHandler);
+	return content;
+    }
+
+    public List getAuthoredItems(Long commonCartridgeUid) {
+	return commonCartridgeItemDao.getAuthoringItems(commonCartridgeUid);
+    }
+
+    public CommonCartridgeAttachment uploadInstructionFile(FormFile uploadFile, String fileType)
+	    throws UploadCommonCartridgeFileException {
+	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
+	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.upload.file.not.found",
+		    new Object[] { uploadFile }));
+	}
+
+	// upload file to repository
+	NodeKey nodeKey = processFile(uploadFile, fileType);
+
+	// create new attachement
+	CommonCartridgeAttachment file = new CommonCartridgeAttachment();
+	file.setFileType(fileType);
+	file.setFileUuid(nodeKey.getUuid());
+	file.setFileVersionId(nodeKey.getVersion());
+	file.setFileName(uploadFile.getFileName());
+	file.setCreated(new Date());
+
+	return file;
+    }
+
+    public void createUser(CommonCartridgeUser commonCartridgeUser) {
+	commonCartridgeUserDao.saveObject(commonCartridgeUser);
+    }
+
+    public CommonCartridgeUser getUserByIDAndContent(Long userId, Long contentId) {
+
+	return commonCartridgeUserDao.getUserByUserIDAndContentID(userId, contentId);
+
+    }
+
+    public CommonCartridgeUser getUserByIDAndSession(Long userId, Long sessionId) {
+
+	return commonCartridgeUserDao.getUserByUserIDAndSessionID(userId, sessionId);
+
+    }
+
+    public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws CommonCartridgeApplicationException {
+	ITicket ticket = getRepositoryLoginTicket();
+	try {
+	    repositoryService.deleteVersion(ticket, fileUuid, fileVersionId);
+	} catch (Exception e) {
+	    throw new CommonCartridgeApplicationException("Exception occured while deleting files from"
+		    + " the repository " + e.getMessage());
+	}
+    }
+
+    public void saveOrUpdateCommonCartridge(CommonCartridge commonCartridge) {
+	commonCartridgeDao.saveObject(commonCartridge);
+    }
+
+    public void deleteCommonCartridgeAttachment(Long attachmentUid) {
+	commonCartridgeAttachmentDao.removeObject(CommonCartridgeAttachment.class, attachmentUid);
+
+    }
+
+    public void saveOrUpdateCommonCartridgeItem(CommonCartridgeItem item) {
+	commonCartridgeItemDao.saveObject(item);
+    }
+
+    public void deleteCommonCartridgeItem(Long uid) {
+	commonCartridgeItemDao.removeObject(CommonCartridgeItem.class, uid);
+    }
+
+    public List<CommonCartridgeItem> getCommonCartridgeItemsBySessionId(Long sessionId) {
+	CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(sessionId);
+	if (session == null) {
+	    CommonCartridgeServiceImpl.log.error("Failed get CommonCartridgeSession by ID [" + sessionId + "]");
+	    return null;
+	}
+	// add commonCartridge items from Authoring
+	CommonCartridge commonCartridge = session.getCommonCartridge();
+	List<CommonCartridgeItem> items = new ArrayList<CommonCartridgeItem>();
+	items.addAll(commonCartridge.getCommonCartridgeItems());
+
+	// add commonCartridge items from CommonCartridgeSession
+	items.addAll(session.getCommonCartridgeItems());
+
+	return items;
+    }
+
+    public List<Summary> exportBySessionId(Long sessionId, boolean skipHide) {
+	CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(sessionId);
+	if (session == null) {
+	    CommonCartridgeServiceImpl.log.error("Failed get CommonCartridgeSession by ID [" + sessionId + "]");
+	    return null;
+	}
+	// initial commonCartridge items list
+	List<Summary> itemList = new ArrayList();
+	Set<CommonCartridgeItem> resList = session.getCommonCartridge().getCommonCartridgeItems();
+	for (CommonCartridgeItem item : resList) {
+	    if (skipHide && item.isHide()) {
+		continue;
+	    }
+	    // if item is create by author
+	    if (item.isCreateByAuthor()) {
+		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
+		itemList.add(sum);
+	    }
+	}
+
+	// get this session's all commonCartridge items
+	Set<CommonCartridgeItem> sessList = session.getCommonCartridgeItems();
+	for (CommonCartridgeItem item : sessList) {
+	    if (skipHide && item.isHide()) {
+		continue;
+	    }
+
+	    // to skip all item create by author
+	    if (!item.isCreateByAuthor()) {
+		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
+		itemList.add(sum);
+	    }
+	}
+
+	return itemList;
+    }
+
+    public List<List<Summary>> exportByContentId(Long contentId) {
+	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(contentId);
+	List<List<Summary>> groupList = new ArrayList();
+
+	// create init commonCartridge items list
+	List<Summary> initList = new ArrayList();
+	groupList.add(initList);
+	Set<CommonCartridgeItem> resList = commonCartridge.getCommonCartridgeItems();
+	for (CommonCartridgeItem item : resList) {
+	    if (item.isCreateByAuthor()) {
+		Summary sum = new Summary(null, null, item, true);
+		initList.add(sum);
+	    }
+	}
+
+	// session by session
+	List<CommonCartridgeSession> sessionList = commonCartridgeSessionDao.getByContentId(contentId);
+	for (CommonCartridgeSession session : sessionList) {
+	    List<Summary> group = new ArrayList<Summary>();
+	    // get this session's all commonCartridge items
+	    Set<CommonCartridgeItem> sessList = session.getCommonCartridgeItems();
+	    for (CommonCartridgeItem item : sessList) {
+		// to skip all item create by author
+		if (!item.isCreateByAuthor()) {
+		    Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
+		    group.add(sum);
+		}
+	    }
+	    if (group.size() == 0) {
+		group.add(new Summary(session.getSessionId(), session.getSessionName(), null, false));
+	    }
+	    groupList.add(group);
+	}
+
+	return groupList;
+    }
+
+    public CommonCartridge getCommonCartridgeBySessionId(Long sessionId) {
+	CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(sessionId);
+	// to skip CGLib problem
+	Long contentId = session.getCommonCartridge().getContentId();
+	CommonCartridge res = commonCartridgeDao.getByContentId(contentId);
+	int miniView = res.getMiniViewCommonCartridgeNumber();
+	// construct dto fields;
+	res.setMiniViewNumberStr(messageService.getMessage("label.learning.minimum.review", new Object[] { new Integer(
+		miniView) }));
+	return res;
+    }
+
+    public CommonCartridgeSession getCommonCartridgeSessionBySessionId(Long sessionId) {
+	return commonCartridgeSessionDao.getSessionBySessionId(sessionId);
+    }
+
+    public void saveOrUpdateCommonCartridgeSession(CommonCartridgeSession resSession) {
+	commonCartridgeSessionDao.saveObject(resSession);
+    }
+
+    public void retrieveComplete(SortedSet<CommonCartridgeItem> commonCartridgeItemList, CommonCartridgeUser user) {
+	for (CommonCartridgeItem item : commonCartridgeItemList) {
+	    CommonCartridgeItemVisitLog log = commonCartridgeItemVisitDao.getCommonCartridgeItemLog(item.getUid(),
+		    user.getUserId());
+	    if (log == null) {
+		item.setComplete(false);
+	    } else {
+		item.setComplete(log.isComplete());
+	    }
+	}
+    }
+
+    public void setItemComplete(Long commonCartridgeItemUid, Long userId, Long sessionId) {
+	CommonCartridgeItemVisitLog log = commonCartridgeItemVisitDao.getCommonCartridgeItemLog(commonCartridgeItemUid,
+		userId);
+	if (log == null) {
+	    log = new CommonCartridgeItemVisitLog();
+	    CommonCartridgeItem item = commonCartridgeItemDao.getByUid(commonCartridgeItemUid);
+	    log.setCommonCartridgeItem(item);
+	    CommonCartridgeUser user = commonCartridgeUserDao.getUserByUserIDAndSessionID(userId, sessionId);
+	    log.setUser(user);
+	    log.setSessionId(sessionId);
+	    log.setAccessDate(new Timestamp(new Date().getTime()));
+	}
+	log.setComplete(true);
+	commonCartridgeItemVisitDao.saveObject(log);
+    }
+
+    public void setItemAccess(Long commonCartridgeItemUid, Long userId, Long sessionId) {
+	CommonCartridgeItemVisitLog log = commonCartridgeItemVisitDao.getCommonCartridgeItemLog(commonCartridgeItemUid,
+		userId);
+	if (log == null) {
+	    log = new CommonCartridgeItemVisitLog();
+	    CommonCartridgeItem item = commonCartridgeItemDao.getByUid(commonCartridgeItemUid);
+	    log.setCommonCartridgeItem(item);
+	    CommonCartridgeUser user = commonCartridgeUserDao.getUserByUserIDAndSessionID(userId, sessionId);
+	    log.setUser(user);
+	    log.setComplete(false);
+	    log.setSessionId(sessionId);
+	    log.setAccessDate(new Timestamp(new Date().getTime()));
+	    commonCartridgeItemVisitDao.saveObject(log);
+	}
+    }
+
+    public String finishToolSession(Long toolSessionId, Long userId) throws CommonCartridgeApplicationException {
+	CommonCartridgeUser user = commonCartridgeUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
+	user.setSessionFinished(true);
+	commonCartridgeUserDao.saveObject(user);
+
+	// CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(toolSessionId);
+	// session.setStatus(CommonCartridgeConstants.COMPLETED);
+	// commonCartridgeSessionDao.saveObject(session);
+
+	String nextUrl = null;
+	try {
+	    nextUrl = this.leaveToolSession(toolSessionId, userId);
+	} catch (DataMissingException e) {
+	    throw new CommonCartridgeApplicationException(e);
+	} catch (ToolException e) {
+	    throw new CommonCartridgeApplicationException(e);
+	}
+	return nextUrl;
+    }
+
+    public int checkMiniView(Long toolSessionId, Long userUid) {
+	int miniView = commonCartridgeItemVisitDao.getUserViewLogCount(toolSessionId, userUid);
+	CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(toolSessionId);
+	if (session == null) {
+	    CommonCartridgeServiceImpl.log.error("Failed get session by ID [" + toolSessionId + "]");
+	    return 0;
+	}
+	int reqView = session.getCommonCartridge().getMiniViewCommonCartridgeNumber();
+
+	return reqView - miniView;
+    }
+
+    public CommonCartridgeItem getCommonCartridgeItemByUid(Long itemUid) {
+	return commonCartridgeItemDao.getByUid(itemUid);
+    }
+
+    public List<List<Summary>> getSummary(Long contentId) {
+	List<List<Summary>> groupList = new ArrayList<List<Summary>>();
+	List<Summary> group = new ArrayList<Summary>();
+
+	// get all item which is accessed by user
+	Map<Long, Integer> visitCountMap = commonCartridgeItemVisitDao.getSummary(contentId);
+
+	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(contentId);
+	Set<CommonCartridgeItem> resItemList = commonCartridge.getCommonCartridgeItems();
+
+	// get all sessions in a commonCartridge and retrieve all commonCartridge items under this session
+	// plus initial commonCartridge items by author creating (resItemList)
+	List<CommonCartridgeSession> sessionList = commonCartridgeSessionDao.getByContentId(contentId);
+	for (CommonCartridgeSession session : sessionList) {
+	    // one new group for one session.
+	    group = new ArrayList<Summary>();
+	    // firstly, put all initial commonCartridge item into this group.
+	    for (CommonCartridgeItem item : resItemList) {
+		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item);
+		// set viewNumber according visit log
+		if (visitCountMap.containsKey(item.getUid())) {
+		    sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());
+		}
+		group.add(sum);
+	    }
+	    // get this session's all commonCartridge items
+	    Set<CommonCartridgeItem> sessItemList = session.getCommonCartridgeItems();
+	    for (CommonCartridgeItem item : sessItemList) {
+		// to skip all item create by author
+		if (!item.isCreateByAuthor()) {
+		    Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item);
+		    // set viewNumber according visit log
+		    if (visitCountMap.containsKey(item.getUid())) {
+			sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());
+		    }
+		    group.add(sum);
+		}
+	    }
+	    // so far no any item available, so just put session name info to Summary
+	    if (group.size() == 0) {
+		group.add(new Summary(session.getSessionId(), session.getSessionName(), null));
+	    }
+	    groupList.add(group);
+	}
+
+	return groupList;
+
+    }
+
+    public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
+	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
+
+	List<CommonCartridgeSession> sessionList = commonCartridgeSessionDao.getByContentId(contentId);
+	for (CommonCartridgeSession session : sessionList) {
+	    Long sessionId = session.getSessionId();
+	    boolean hasRefection = session.getCommonCartridge().isReflectOnActivity();
+	    Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
+	    // get all users in this session
+	    List<CommonCartridgeUser> users = commonCartridgeUserDao.getBySessionID(sessionId);
+	    for (CommonCartridgeUser user : users) {
+		ReflectDTO ref = new ReflectDTO(user);
+
+		if (setEntry) {
+		    NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+			    CommonCartridgeConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+		    if (entry != null) {
+			ref.setReflect(entry.getEntry());
+		    }
+		}
+
+		ref.setHasRefection(hasRefection);
+		list.add(ref);
+	    }
+	    map.put(sessionId, list);
+	}
+
+	return map;
+    }
+
+    public List<CommonCartridgeUser> getUserListBySessionItem(Long sessionId, Long itemUid) {
+	List<CommonCartridgeItemVisitLog> logList = commonCartridgeItemVisitDao.getCommonCartridgeItemLogBySession(
+		sessionId, itemUid);
+	List<CommonCartridgeUser> userList = new ArrayList(logList.size());
+	for (CommonCartridgeItemVisitLog visit : logList) {
+	    CommonCartridgeUser user = visit.getUser();
+	    user.setAccessDate(visit.getAccessDate());
+	    userList.add(user);
+	}
+	return userList;
+    }
+
+    public void setItemVisible(Long itemUid, boolean visible) {
+	CommonCartridgeItem item = commonCartridgeItemDao.getByUid(itemUid);
+	if (item != null) {
+	    // createBy should be null for system default value.
+	    Long userId = 0L;
+	    String loginName = "No user";
+	    if (item.getCreateBy() != null) {
+		userId = item.getCreateBy().getUserId();
+		loginName = item.getCreateBy().getLoginName();
+	    }
+	    if (visible) {
+		auditService.logShowEntry(CommonCartridgeConstants.TOOL_SIGNATURE, userId, loginName, item.toString());
+	    } else {
+		auditService.logHideEntry(CommonCartridgeConstants.TOOL_SIGNATURE, userId, loginName, item.toString());
+	    }
+	    item.setHide(!visible);
+	    commonCartridgeItemDao.saveObject(item);
+	}
+    }
+
+    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
+	    String entryText) {
+	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
+		entryText);
+    }
+
+    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
+	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
+	if (list == null || list.isEmpty()) {
+	    return null;
+	} else {
+	    return list.get(0);
+	}
+    }
+
+    /**
+     * @param notebookEntry
+     */
+    public void updateEntry(NotebookEntry notebookEntry) {
+	coreNotebookService.updateEntry(notebookEntry);
+    }
+
+    public CommonCartridgeUser getUser(Long uid) {
+	return (CommonCartridgeUser) commonCartridgeUserDao.getObject(CommonCartridgeUser.class, uid);
+    }
+
+    // *****************************************************************************
+    // private methods
+    // *****************************************************************************
+    private CommonCartridge getDefaultCommonCartridge() throws CommonCartridgeApplicationException {
+	Long defaultCommonCartridgeId = getToolDefaultContentIdBySignature(CommonCartridgeConstants.TOOL_SIGNATURE);
+	CommonCartridge defaultCommonCartridge = getCommonCartridgeByContentId(defaultCommonCartridgeId);
+	if (defaultCommonCartridge == null) {
+	    String error = messageService.getMessage("error.msg.default.content.not.find");
+	    CommonCartridgeServiceImpl.log.error(error);
+	    throw new CommonCartridgeApplicationException(error);
+	}
+
+	return defaultCommonCartridge;
+    }
+
+    private Long getToolDefaultContentIdBySignature(String toolSignature) throws CommonCartridgeApplicationException {
+	Long contentId = null;
+	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+	if (contentId == null) {
+	    String error = messageService.getMessage("error.msg.default.content.not.find");
+	    CommonCartridgeServiceImpl.log.error(error);
+	    throw new CommonCartridgeApplicationException(error);
+	}
+	return contentId;
+    }
+
+    /**
+     * Process an uploaded file.
+     * 
+     * @throws CommonCartridgeApplicationException
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws RepositoryCheckedException
+     * @throws InvalidParameterException
+     */
+    private NodeKey processFile(FormFile file, String fileType) throws UploadCommonCartridgeFileException {
+	NodeKey node = null;
+	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
+	    String fileName = file.getFileName();
+	    try {
+		node = commonCartridgeToolContentHandler.uploadFile(file.getInputStream(), fileName,
+			file.getContentType(), fileType);
+	    } catch (InvalidParameterException e) {
+		throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.invaid.param.upload"));
+	    } catch (FileNotFoundException e) {
+		throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.file.not.found"));
+	    } catch (RepositoryCheckedException e) {
+		throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.repository"));
+	    } catch (IOException e) {
+		throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.io.exception"));
+	    }
+	}
+	return node;
+    }
+
+    private NodeKey processPackage(String packageDirectory, String initFile) throws UploadCommonCartridgeFileException {
+	NodeKey node = null;
+	try {
+	    node = commonCartridgeToolContentHandler.uploadPackage(packageDirectory, initFile);
+	} catch (InvalidParameterException e) {
+	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.invaid.param.upload"));
+	} catch (RepositoryCheckedException e) {
+	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.repository"));
+	}
+	return node;
+    }
+
+    public List<CommonCartridgeItem> uploadCommonCartridgeFile(CommonCartridgeItem item, FormFile file)
+	    throws UploadCommonCartridgeFileException {
+	try {
+	    InputStream is = file.getInputStream();
+	    String fileName = file.getFileName();
+	    String fileType = file.getContentType();
+	    // need unzip upload, and parse learning object information from XML file.
+	    String packageDirectory = ZipFileUtil.expandZip(is, fileName);
+	    SimpleCommonCartridgeConverter cpConverter = new SimpleCommonCartridgeConverter(packageDirectory);
+	    String initFile = cpConverter.getDefaultItem();
+	    item.setInitialItem(initFile);
+	    item.setImsSchema(cpConverter.getSchema());
+	    item.setOrganizationXml(cpConverter.getOrganzationXML());
+//	    // upload package
+//	    NodeKey nodeKey = processPackage(packageDirectory, initFile);
+//	    item.setFileUuid(nodeKey.getUuid());
+//	    item.setFileVersionId(nodeKey.getVersion());
+//	    item.setFileType(fileType);
+//	    item.setFileName(fileName);
+
+	    List<CommonCartridgeItem> items = cpConverter.getBasicLTIItems();
+	    return items;
+
+	} catch (ZipFileUtilException e) {
+	    CommonCartridgeServiceImpl.log.error(messageService.getMessage("error.msg.zip.file.exception") + " : "
+		    + e.toString());
+	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.zip.file.exception"));
+	} catch (FileNotFoundException e) {
+	    CommonCartridgeServiceImpl.log.error(messageService.getMessage("error.msg.file.not.found") + ":"
+		    + e.toString());
+	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.file.not.found"));
+	} catch (IOException e) {
+	    CommonCartridgeServiceImpl.log.error(messageService.getMessage("error.msg.io.exception") + ":"
+		    + e.toString());
+	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.io.exception"));
+	} catch (IMSManifestException e) {
+	    CommonCartridgeServiceImpl.log.error(messageService.getMessage("error.msg.ims.package") + ":"
+		    + e.toString());
+	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.ims.package"));
+	} catch (ImscpApplicationException e) {
+	    CommonCartridgeServiceImpl.log.error(messageService.getMessage("error.msg.ims.application") + ":"
+		    + e.toString());
+	    throw new UploadCommonCartridgeFileException(messageService.getMessage("error.msg.ims.application"));
+	}
+    }
+
+    public CommonCartridgeConfigItem getConfigItem(String key) {
+	return commonCartridgeConfigItemDao.getConfigItemByKey(key);
+    }
+
+    public void saveOrUpdateConfigItem(CommonCartridgeConfigItem item) {
+	commonCartridgeConfigItemDao.saveOrUpdate(item);
+    }
+
+    // *****************************************************************************
+    // set methods for Spring Bean
+    // *****************************************************************************
+    public void setAuditService(IAuditService auditService) {
+	this.auditService = auditService;
+    }
+
+    public void setLearnerService(ILearnerService learnerService) {
+	this.learnerService = learnerService;
+    }
+
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
+
+    public void setRepositoryService(IRepositoryService repositoryService) {
+	this.repositoryService = repositoryService;
+    }
+
+    public void setCommonCartridgeAttachmentDao(CommonCartridgeAttachmentDAO commonCartridgeAttachmentDao) {
+	this.commonCartridgeAttachmentDao = commonCartridgeAttachmentDao;
+    }
+
+    public void setCommonCartridgeDao(CommonCartridgeDAO commonCartridgeDao) {
+	this.commonCartridgeDao = commonCartridgeDao;
+    }
+
+    public void setCommonCartridgeItemDao(CommonCartridgeItemDAO commonCartridgeItemDao) {
+	this.commonCartridgeItemDao = commonCartridgeItemDao;
+    }
+
+    public void setCommonCartridgeSessionDao(CommonCartridgeSessionDAO commonCartridgeSessionDao) {
+	this.commonCartridgeSessionDao = commonCartridgeSessionDao;
+    }
+
+    public void setCommonCartridgeToolContentHandler(CommonCartridgeToolContentHandler commonCartridgeToolContentHandler) {
+	this.commonCartridgeToolContentHandler = commonCartridgeToolContentHandler;
+    }
+
+    public void setCommonCartridgeUserDao(CommonCartridgeUserDAO commonCartridgeUserDao) {
+	this.commonCartridgeUserDao = commonCartridgeUserDao;
+    }
+
+    public void setToolService(ILamsToolService toolService) {
+	this.toolService = toolService;
+    }
+
+    public CommonCartridgeItemVisitDAO getCommonCartridgeItemVisitDao() {
+	return commonCartridgeItemVisitDao;
+    }
+
+    public void setCommonCartridgeItemVisitDao(CommonCartridgeItemVisitDAO commonCartridgeItemVisitDao) {
+	this.commonCartridgeItemVisitDao = commonCartridgeItemVisitDao;
+    }
+
+    public CommonCartridgeConfigItemDAO getCommonCartridgeConfigItemDao() {
+	return commonCartridgeConfigItemDao;
+    }
+
+    public void setCommonCartridgeConfigItemDao(CommonCartridgeConfigItemDAO commonCartridgeConfigItemDao) {
+	this.commonCartridgeConfigItemDao = commonCartridgeConfigItemDao;
+    }
+
+    // *******************************************************************************
+    // ToolContentManager, ToolSessionManager methods
+    // *******************************************************************************
+
+    public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
+	CommonCartridge toolContentObj = commonCartridgeDao.getByContentId(toolContentId);
+	if (toolContentObj == null) {
+	    try {
+		toolContentObj = getDefaultCommonCartridge();
+	    } catch (CommonCartridgeApplicationException e) {
+		throw new DataMissingException(e.getMessage());
+	    }
+	}
+	if (toolContentObj == null) {
+	    throw new DataMissingException("Unable to find default content for the commonCartridge tool");
+	}
+
+	// set CommonCartridgeToolContentHandler as null to avoid copy file node in repository again.
+	toolContentObj = CommonCartridge.newInstance(toolContentObj, toolContentId, null);
+	toolContentObj.setToolContentHandler(null);
+	toolContentObj.setOfflineFileList(null);
+	toolContentObj.setOnlineFileList(null);
+	toolContentObj.setMiniViewNumberStr(null);
+	try {
+	    exportContentService.registerFileClassForExport(CommonCartridgeAttachment.class.getName(), "fileUuid",
+		    "fileVersionId");
+	    exportContentService.registerFileClassForExport(CommonCartridgeItem.class.getName(), "fileUuid",
+		    "fileVersionId");
+	    exportContentService.exportToolContent(toolContentId, toolContentObj, commonCartridgeToolContentHandler,
+		    rootPath);
+	} catch (ExportToolContentException e) {
+	    throw new ToolException(e);
+	}
+    }
+
+    public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
+	    String toVersion) throws ToolException {
+
+	try {
+	    exportContentService.registerFileClassForImport(CommonCartridgeAttachment.class.getName(), "fileUuid",
+		    "fileVersionId", "fileName", "fileType", null, null);
+	    exportContentService.registerFileClassForImport(CommonCartridgeItem.class.getName(), "fileUuid",
+		    "fileVersionId", "fileName", "fileType", null, "initialItem");
+
+	    Object toolPOJO = exportContentService.importToolContent(toolContentPath,
+		    commonCartridgeToolContentHandler, fromVersion, toVersion);
+	    if (!(toolPOJO instanceof CommonCartridge)) {
+		throw new ImportToolContentException(
+			"Import Share commonCartridge tool content failed. Deserialized object is " + toolPOJO);
+	    }
+	    CommonCartridge toolContentObj = (CommonCartridge) toolPOJO;
+
+	    // reset it to new toolContentId
+	    toolContentObj.setContentId(toolContentId);
+	    CommonCartridgeUser user = commonCartridgeUserDao.getUserByUserIDAndContentID(
+		    new Long(newUserUid.longValue()), toolContentId);
+	    if (user == null) {
+		user = new CommonCartridgeUser();
+		UserDTO sysUser = ((User) userManagementService.findById(User.class, newUserUid)).getUserDTO();
+		user.setFirstName(sysUser.getFirstName());
+		user.setLastName(sysUser.getLastName());
+		user.setLoginName(sysUser.getLogin());
+		user.setUserId(new Long(newUserUid.longValue()));
+		user.setCommonCartridge(toolContentObj);
+	    }
+	    toolContentObj.setCreatedBy(user);
+
+	    // reset all commonCartridgeItem createBy user
+	    Set<CommonCartridgeItem> items = toolContentObj.getCommonCartridgeItems();
+	    for (CommonCartridgeItem item : items) {
+		item.setCreateBy(user);
+	    }
+	    commonCartridgeDao.saveObject(toolContentObj);
+	} catch (ImportToolContentException e) {
+	    throw new ToolException(e);
+	}
+    }
+
+    /**
+     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
+     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
+     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
+     * the toolContentId
+     * 
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
+     */
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+	return new TreeMap<String, ToolOutputDefinition>();
+    }
+
+    public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
+	if (toContentId == null) {
+	    throw new ToolException("Failed to create the SharedCommonCartridgeFiles tool seession");
+	}
+
+	CommonCartridge commonCartridge = null;
+	if (fromContentId != null) {
+	    commonCartridge = commonCartridgeDao.getByContentId(fromContentId);
+	}
+	if (commonCartridge == null) {
+	    try {
+		commonCartridge = getDefaultCommonCartridge();
+	    } catch (CommonCartridgeApplicationException e) {
+		throw new ToolException(e);
+	    }
+	}
+
+	CommonCartridge toContent = CommonCartridge.newInstance(commonCartridge, toContentId,
+		commonCartridgeToolContentHandler);
+	commonCartridgeDao.saveObject(toContent);
+
+	// save commonCartridge items as well
+	Set items = toContent.getCommonCartridgeItems();
+	if (items != null) {
+	    Iterator iter = items.iterator();
+	    while (iter.hasNext()) {
+		CommonCartridgeItem item = (CommonCartridgeItem) iter.next();
+		// createRootTopic(toContent.getUid(),null,msg);
+	    }
+	}
+    }
+
+    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
+	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(toolContentId);
+	if (commonCartridge == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
+	}
+	commonCartridge.setDefineLater(value);
+    }
+
+    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
+	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(toolContentId);
+	if (commonCartridge == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
+	}
+	commonCartridge.setRunOffline(value);
+    }
+
+    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
+	    ToolException {
+	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(toolContentId);
+	if (removeSessionData) {
+	    List list = commonCartridgeSessionDao.getByContentId(toolContentId);
+	    Iterator iter = list.iterator();
+	    while (iter.hasNext()) {
+		CommonCartridgeSession session = (CommonCartridgeSession) iter.next();
+		commonCartridgeSessionDao.delete(session);
+	    }
+	}
+	commonCartridgeDao.delete(commonCartridge);
+    }
+
+    public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
+	CommonCartridgeSession session = new CommonCartridgeSession();
+	session.setSessionId(toolSessionId);
+	session.setSessionName(toolSessionName);
+	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(toolContentId);
+	session.setCommonCartridge(commonCartridge);
+	commonCartridgeSessionDao.saveObject(session);
+    }
+
+    public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
+	if (toolSessionId == null) {
+	    CommonCartridgeServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
+	    throw new ToolException("Fail to remove tool Session based on null tool session id.");
+	}
+	if (learnerId == null) {
+	    CommonCartridgeServiceImpl.log.error("Fail to leave tool Session based on null learner.");
+	    throw new ToolException("Fail to remove tool Session based on null learner.");
+	}
+
+	CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(toolSessionId);
+	if (session != null) {
+	    session.setStatus(CommonCartridgeConstants.COMPLETED);
+	    commonCartridgeSessionDao.saveObject(session);
+	} else {
+	    CommonCartridgeServiceImpl.log.error("Fail to leave tool Session.Could not find shared commonCartridge "
+		    + "session by given session id: " + toolSessionId);
+	    throw new DataMissingException("Fail to leave tool Session."
+		    + "Could not find shared commonCartridge session by given session id: " + toolSessionId);
+	}
+	return learnerService.completeToolSession(toolSessionId, learnerId);
+    }
+
+    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+	return null;
+    }
+
+    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
+	    ToolException {
+	return null;
+    }
+
+    public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
+	commonCartridgeSessionDao.deleteBySessionId(toolSessionId);
+    }
+
+    /**
+     * Get the tool output for the given tool output names.
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
+     *      java.lang.Long)
+     */
+    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
+	return new TreeMap<String, ToolOutput>();
+    }
+
+    /**
+     * Get the tool output for the given tool output name.
+     * 
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
+     *      java.lang.Long)
+     */
+    public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
+	return null;
+    }
+
+    /* ===============Methods implemented from ToolContentImport102Manager =============== */
+
+    /**
+     * Import the data for a 1.0.2 Noticeboard or HTMLNoticeboard
+     */
+    public void import102ToolContent(Long toolContentId, UserDTO user, Hashtable importValues) {
+	Date now = new Date();
+	CommonCartridge toolContentObj = new CommonCartridge();
+
+	try {
+	    toolContentObj.setTitle((String) importValues.get(ToolContentImport102Manager.CONTENT_TITLE));
+	    toolContentObj.setContentId(toolContentId);
+	    toolContentObj.setContentInUse(Boolean.FALSE);
+	    toolContentObj.setCreated(now);
+	    toolContentObj.setDefineLater(Boolean.FALSE);
+	    toolContentObj.setInstructions(WebUtil.convertNewlines((String) importValues
+		    .get(ToolContentImport102Manager.CONTENT_BODY)));
+	    toolContentObj.setOfflineInstructions(null);
+	    toolContentObj.setOnlineInstructions(null);
+	    toolContentObj.setRunOffline(Boolean.FALSE);
+	    toolContentObj.setUpdated(now);
+	    toolContentObj.setReflectOnActivity(Boolean.FALSE);
+	    toolContentObj.setReflectInstructions(null);
+
+	    toolContentObj.setRunAuto(Boolean.FALSE);
+	    Integer minToComplete = WDDXProcessor.convertToInteger(importValues,
+		    ToolContentImport102Manager.CONTENT_URL_MIN_NUMBER_COMPLETE);
+	    toolContentObj.setMiniViewCommonCartridgeNumber(minToComplete != null ? minToComplete.intValue() : 0);
+	    toolContentObj.setLockWhenFinished(Boolean.FALSE);
+	    toolContentObj.setRunAuto(Boolean.FALSE);
+
+	    // leave as empty, no need to set them to anything.
+	    // toolContentObj.setAttachments(attachments);
+
+	    /*
+	     * unused entries from 1.0.2 [directoryName=] no equivalent in 2.0 [runtimeSubmissionStaffFile=true] no
+	     * equivalent in 2.0 [contentShowUser=false] no equivalent in 2.0 [isHTML=false] no equivalent in 2.0
+	     * [showbuttons=false] no equivalent in 2.0 [isReusable=false] not used in 1.0.2 (would be lock when
+	     * finished)
+	     */
+	    CommonCartridgeUser ruser = new CommonCartridgeUser();
+	    ruser.setUserId(new Long(user.getUserID().longValue()));
+	    ruser.setFirstName(user.getFirstName());
+	    ruser.setLastName(user.getLastName());
+	    ruser.setLoginName(user.getLogin());
+	    createUser(ruser);
+	    toolContentObj.setCreatedBy(ruser);
+
+	    // CommonCartridge Items. They are ordered on the screen by create date so they need to be saved in the
+	    // right
+	    // order.
+	    // So read them all in first, then go through and assign the dates in the correct order and then save.
+	    Vector urls = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_URL_URLS);
+	    SortedMap<Integer, CommonCartridgeItem> items = new TreeMap<Integer, CommonCartridgeItem>();
+	    if (urls != null) {
+		Iterator iter = urls.iterator();
+		while (iter.hasNext()) {
+		    Hashtable urlMap = (Hashtable) iter.next();
+		    Integer itemOrder = WDDXProcessor.convertToInteger(urlMap,
+			    ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
+		    CommonCartridgeItem item = new CommonCartridgeItem();
+		    item.setTitle((String) urlMap.get(ToolContentImport102Manager.CONTENT_TITLE));
+		    item.setCreateBy(ruser);
+		    item.setCreateByAuthor(true);
+		    item.setHide(false);
+
+		    Vector instructions = (Vector) urlMap
+			    .get(ToolContentImport102Manager.CONTENT_URL_URL_INSTRUCTION_ARRAY);
+		    if (instructions != null && instructions.size() > 0) {
+			item.setItemInstructions(new HashSet());
+			Iterator insIter = instructions.iterator();
+			while (insIter.hasNext()) {
+			    item.getItemInstructions().add(createInstruction((Hashtable) insIter.next()));
+			}
+		    }
+
+		    String commonCartridgeType = (String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_TYPE);
+		    if (ToolContentImport102Manager.URL_RESOURCE_TYPE_URL.equals(commonCartridgeType)) {
+			item.setType(CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI);
+			item.setUrl((String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_URL));
+			item.setOpenUrlNewWindow(false);
+		    } else if (ToolContentImport102Manager.URL_RESOURCE_TYPE_FILE.equals(commonCartridgeType)) {
+			item.setType(CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE);
+		    } else {
+			throw new ToolException("Invalid shared commonCartridge type. Type was " + commonCartridgeType);
+		    }
+
+		    items.put(itemOrder, item);
+		}
+	    }
+
+	    Iterator iter = items.values().iterator();
+	    Date itemDate = null;
+	    while (iter.hasNext()) {
+		if (itemDate != null) {
+		    try {
+			Thread.sleep(1000);
+		    } catch (Exception e) {
+		    }
+		}
+		itemDate = new Date();
+
+		CommonCartridgeItem item = (CommonCartridgeItem) iter.next();
+		item.setCreateDate(itemDate);
+		toolContentObj.getCommonCartridgeItems().add(item);
+	    }
+
+	} catch (WDDXProcessorConversionException e) {
+	    CommonCartridgeServiceImpl.log.error("Unable to content for activity " + toolContentObj.getTitle()
+		    + "properly due to a WDDXProcessorConversionException.", e);
+	    throw new ToolException(
+		    "Invalid import data format for activity "
+			    + toolContentObj.getTitle()
+			    + "- WDDX caused an exception. Some data from the design will have been lost. See log for more details.");
+	}
+
+	commonCartridgeDao.saveObject(toolContentObj);
+
+    }
+
+    private CommonCartridgeItemInstruction createInstruction(Hashtable instructionEntry)
+	    throws WDDXProcessorConversionException {
+
+	Integer instructionOrder = WDDXProcessor.convertToInteger(instructionEntry,
+		ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
+
+	// the description column in 1.0.2 was longer than 255 chars, so truncate.
+	String instructionText = (String) instructionEntry.get(ToolContentImport102Manager.CONTENT_URL_INSTRUCTION);
+	if (instructionText != null && instructionText.length() > 255) {
+	    if (CommonCartridgeServiceImpl.log.isDebugEnabled()) {
+		CommonCartridgeServiceImpl.log
+			.debug("1.0.2 Import truncating Item Instruction to 255 characters. Original text was\'"
+				+ instructionText + "\'");
+	    }
+	    instructionText = instructionText.substring(0, 255);
+	}
+
+	CommonCartridgeItemInstruction instruction = new CommonCartridgeItemInstruction();
+	instruction.setDescription(instructionText);
+	instruction.setSequenceId(instructionOrder);
+
+	return instruction;
+    }
+
+    /** Set the description, throws away the title value as this is not supported in 2.0 */
+    public void setReflectiveData(Long toolContentId, String title, String description) throws ToolException,
+	    DataMissingException {
+
+	CommonCartridge toolContentObj = getCommonCartridgeByContentId(toolContentId);
+	if (toolContentObj == null) {
+	    throw new DataMissingException("Unable to set reflective data titled " + title
+		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
+	}
+
+	toolContentObj.setReflectOnActivity(Boolean.TRUE);
+	toolContentObj.setReflectInstructions(description);
+    }
+
+    /* =================================================================================== */
+
+    public IExportToolContentService getExportContentService() {
+	return exportContentService;
+    }
+
+    public void setExportContentService(IExportToolContentService exportContentService) {
+	this.exportContentService = exportContentService;
+    }
+
+    public IUserManagementService getUserManagementService() {
+	return userManagementService;
+    }
+
+    public void setUserManagementService(IUserManagementService userManagementService) {
+	this.userManagementService = userManagementService;
+    }
+
+    public ICoreNotebookService getCoreNotebookService() {
+	return coreNotebookService;
+    }
+
+    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
+	this.coreNotebookService = coreNotebookService;
+    }
+
+    public IEventNotificationService getEventNotificationService() {
+	return eventNotificationService;
+    }
+
+    public void setEventNotificationService(IEventNotificationService eventNotificationService) {
+	this.eventNotificationService = eventNotificationService;
+    }
+
+    public String getLocalisedMessage(String key, Object[] args) {
+	return messageService.getMessage(key, args);
+    }
+
+    public ILessonService getLessonService() {
+	return lessonService;
+    }
+
+    public void setLessonService(ILessonService lessonService) {
+	this.lessonService = lessonService;
+    }
+
+    /**
+     * Finds out which lesson the given tool content belongs to and returns its monitoring users.
+     * 
+     * @param sessionId
+     *            tool session ID
+     * @return list of teachers that monitor the lesson which contains the tool with given session ID
+     */
+    public List<User> getMonitorsByToolSessionId(Long sessionId) {
+	return getLessonService().getMonitorsByToolSessionId(sessionId);
+    }
+}
