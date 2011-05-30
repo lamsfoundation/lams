@@ -10,8 +10,8 @@
 
 	<%@ include file="/common/tabbedheader.jsp"%>
 
+	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 	<script>
-        
         function init(){
             var tag = document.getElementById("currentTab");
 	    	if(tag.value != "")
@@ -39,12 +39,9 @@
         	myForm.action = "<c:url value='/authoring/uploadOfflineFile.do'/>";
         	myForm.submit();
         }
-        
-        
     </script>
 	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
 
- 
 </lams:head>
 <body class="stripes" onLoad="init()">
 <div id="page">

@@ -11,6 +11,7 @@
 
 	<%@ include file="/common/tabbedheader.jsp"%>
 
+	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 	<script>
         function init(){
             var tag = document.getElementById("currentTab");
