@@ -17,21 +17,20 @@ function toggleAdvancedOptionsVisibility(div, img, imageUrl)
 }
 
 //check if jquery is loaded
-if ((typeof jQuery != 'undefined') && (typeof settings != 'undefined')) {
+if ((typeof jQuery != 'undefined') && (typeof submissionDeadlineSettings != 'undefined')) {
 	//support for setting up submission deadline
 	$(function(){
 		$("#datetime").datetimepicker();
-		
-		if (settings.submissionDeadline != "") {
-			var date = new Date(eval(settings.submissionDeadline));
-			$("#dateInfo").html( formatDate2(date) );
+		if (submissionDeadlineSettings.submissionDeadline != "") {
+			var date = new Date(eval(submissionDeadlineSettings.submissionDeadline));
+			$("#dateInfo").html( formatDate(date) );
 			
 			//open up date restriction area
-			toggleAdvancedOptionsVisibility(document.getElementById('restrictUsageDiv'), document.getElementById('restrictUsageTreeIcon'),settings.lams);
+			toggleAdvancedOptionsVisibility(document.getElementById('restrictUsageDiv'), document.getElementById('restrictUsageTreeIcon'),submissionDeadlineSettings.lams);
 		}
 	});	
 	
-	function formatDate2(date) {
+	function formatDate(date) {
 		var currHour = "" + date.getHours();
 		if (currHour.length == 1) {
 			currHour = "0" + currHour;
@@ -51,32 +50,32 @@ if ((typeof jQuery != 'undefined') && (typeof settings != 'undefined')) {
 		}
 
 		var reqIDVar = new Date();
-		var parameterDelimiter = (settings.setSubmissionDeadlineUrl.indexOf("?") == -1) ? "?" : "&"; 
+		var parameterDelimiter = (submissionDeadlineSettings.setSubmissionDeadlineUrl.indexOf("?") == -1) ? "?" : "&"; 
 		
-		var url = settings.setSubmissionDeadlineUrl + parameterDelimiter + "toolContentID=" + settings.toolContentID + "&submissionDeadline=" +
+		var url = submissionDeadlineSettings.setSubmissionDeadlineUrl + parameterDelimiter + "toolContentID=" + submissionDeadlineSettings.toolContentID + "&submissionDeadline=" +
 					+ date.getTime() + "&reqID=" + reqIDVar.getTime();
 
 		$.ajax({
 			url : url,
 			success : function() {
-				$.growlUI(settings.messageNotification, settings.messageRestrictionSet);
+				$.growlUI(submissionDeadlineSettings.messageNotification, submissionDeadlineSettings.messageRestrictionSet);
 				$("#datetimeDiv").hide();
-				$("#dateInfo").html(formatDate2(date) );
+				$("#dateInfo").html(formatDate(date) );
 				$("#dateInfoDiv").show();
 			}
 		});
 	}
 	function removeSubmissionDeadline() {
 		var reqIDVar = new Date();
-		var parameterDelimiter = (settings.setSubmissionDeadlineUrl.indexOf("?") == -1) ? "?" : "&"; 
+		var parameterDelimiter = (submissionDeadlineSettings.setSubmissionDeadlineUrl.indexOf("?") == -1) ? "?" : "&"; 
 		
-		var url = settings.setSubmissionDeadlineUrl + parameterDelimiter + "toolContentID=" + settings.toolContentID + "&submissionDeadline=" +
+		var url = submissionDeadlineSettings.setSubmissionDeadlineUrl + parameterDelimiter + "toolContentID=" + submissionDeadlineSettings.toolContentID + "&submissionDeadline=" +
 				"&reqID=" + reqIDVar.getTime();
 
 		$.ajax({
 			url : url,
 			success : function() {
-				$.growlUI(settings.messageNotification, settings.messageRestrictionRemoved);
+				$.growlUI(submissionDeadlineSettings.messageNotification, submissionDeadlineSettings.messageRestrictionRemoved);
 				$("#dateInfoDiv").hide();
 				
 				$("#datetimeDiv").show();
