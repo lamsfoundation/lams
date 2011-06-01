@@ -4,10 +4,23 @@
 <link type="text/css" href="${lams}/css/jquery-ui-1.8.11.flick-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui-timepicker-addon.css" rel="stylesheet">
 
+<script type="text/javascript">
+	//pass settings to monitorToolSummaryAdvanced.js
+	var submissionDeadlineSettings = {
+		lams: '${lams}',
+		submissionDeadline: '${submissionDeadline}',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring.do?dispatch=setSubmissionDeadline"/>',
+		toolContentID: '${param.toolContentID}',
+		messageNotification: '<fmt:message key="monitor.summary.notification" />',
+		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
+		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+	};
+</script>	
 <script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui-timepicker-addon.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
+<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
 <!--
 	var evalcomixWindow = null;
@@ -17,20 +30,9 @@
     	evalcomixWindow=window.open(url, 'evalcomixWindow', 'width=800,height=600,scrollbars=yes,resizable=yes');
 		if (window.focus) {evalcomixWindow.focus()}
 	}
-	
-	var settings = {
-		lams: '${lams}',
-		submissionDeadline: '${submissionDeadline}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring.do?dispatch=setSubmissionDeadline"/>',
-		toolContentID: '${param.toolContentID}',
-		messageNotification: '<fmt:message key="monitor.summary.notification" />',
-		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
-	};
-	
 //-->
 </script>
-<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+
 
 <c:set var="dto" value="${mindmapDTO}" />
 

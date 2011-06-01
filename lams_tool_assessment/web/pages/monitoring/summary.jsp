@@ -176,7 +176,8 @@
 	};
 	window.onresize = resizeIframe;
 	
-	var settings = {
+	// pass settings to monitorToolSummaryAdvanced.js
+	var submissionDeadlineSettings = {
 		lams: '<lams:LAMSURL />',
 		submissionDeadline: '${submissionDeadline}',
 		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',

@@ -9,6 +9,17 @@
 <script type="text/javascript">
 <!--
 	var tb_pathToImage = "${lams}/images/loadingAnimation.gif";
+	
+	//pass settings to monitorToolSummaryAdvanced.js
+	var submissionDeadlineSettings = {
+		lams: '${lams}',
+		submissionDeadline: '${submissionDeadline}',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring.do?dispatch=setSubmissionDeadline"/>',
+		toolContentID: '${param.toolContentID}',
+		messageNotification: '<fmt:message key="monitor.summary.notification" />',
+		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
+		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+	};
 //-->	
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
@@ -21,79 +32,10 @@
 <!--
 	var evalcomixWindow = null;
 	
-	function openEvalcomixWindow(url)
-	{
+	function openEvalcomixWindow(url) {
     	evalcomixWindow=window.open(url,'evalcomixWindow','width=800,height=600,scrollbars=yes,resizable=yes');
 		if (window.focus) {evalcomixWindow.focus()}
 	}
-
-
-	$(function(){
-		$("#datetime").datetimepicker();
-
-		var submissionDeadline = '${submissionDeadline}';
-		if (submissionDeadline != "") {
-			var date = new Date(eval(submissionDeadline));
-
-			$("#dateInfo").html( formatDate(date) );
-			
-			//open up date restriction area
-			toggleAdvancedOptionsVisibility(document.getElementById('restrictUsageDiv'), document.getElementById('restrictUsageTreeIcon'),'${lams}');
-		
-		}
-		
-	});
-
-	function formatDate(date) {
-		var currHour = "" + date.getHours();
-		if (currHour.length == 1) {
-			currHour = "0" + currHour;
-		}  
-		var currMin = "" + date.getMinutes();
-		if (currMin.length == 1) {
-			currMin = "0" + currMin;
-		}
-		return $.datepicker.formatDate( 'mm/dd/yy', date ) + " " + currHour + ":" + currMin;
-	}
-
-	function setSubmissionDeadline() {
-		//get the timestamp in milliseconds since midnight Jan 1, 1970
-		var date = $("#datetime").datetimepicker('getDate');
-		if (date == null) {
-			return;
-		}
-
-		var reqIDVar = new Date();
-		 var url = "<c:url value="/monitoring.do"/>?dispatch=setSubmissionDeadline&toolContentID=${param.toolContentID}&submissionDeadline="
-					+ date.getTime() + "&reqID=" + reqIDVar.getTime();
-
-		$.ajax({
-			url : url,
-			success : function() {
-				$.growlUI('<fmt:message key="monitor.summary.notification" />', '<fmt:message key="monitor.summary.date.restriction.set" />');
-				$("#datetimeDiv").hide();
-				$("#dateInfo").html(formatDate(date) );
-				$("#dateInfoDiv").show();
-			}
-		});
-	}
-	function removeSubmissionDeadline() {
-		var reqIDVar = new Date();
-        var url = "<c:url value="/monitoring.do"/>?dispatch=setSubmissionDeadline&toolContentID=${param.toolContentID}&submissionDeadline="
-        			+ "&reqID=" + reqIDVar.getTime();
-
-		$.ajax({
-			url : url,
-			success : function() {
-				$.growlUI('<fmt:message key="monitor.summary.notification" />', '<fmt:message key="monitor.summary.date.restriction.removed" />');
-				$("#dateInfoDiv").hide();
-				
-				$("#datetimeDiv").show();
-				$("#datetime").val("");
-			}
-		});
-	}	
-	
 //-->
 </script>
 
