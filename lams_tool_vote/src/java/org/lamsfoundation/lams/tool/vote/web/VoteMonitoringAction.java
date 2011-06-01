@@ -393,14 +393,14 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
     }
 
     public ActionForward submitSession(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, MessageService messageService) throws IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException {
 	VoteMonitoringAction.logger.debug("dispathcing submitSession..");
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	VoteMonitoringAction.logger.debug("voteService: " + voteService);
 
 	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
 
-	commonSubmitSessionCode(form, request, voteService, messageService, voteGeneralMonitoringDTO);
+	commonSubmitSessionCode(form, request, voteService, getMessageService(), voteGeneralMonitoringDTO);
 	VoteMonitoringAction.logger.debug("post commonSubmitSessionCode: " + voteGeneralMonitoringDTO);
 
 	return mapping.findForward(VoteAppConstants.LOAD_MONITORING);
