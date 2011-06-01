@@ -184,30 +184,13 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	public void initialiseMonitoringData(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response,
 	        IMcService mcService, McGeneralMonitoringDTO mcGeneralMonitoringDTO)
 	{
-	    logger.debug("start initializing  monitoring data...mcService: " + mcService);
-		McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
-
-	    String toolContentID=mcMonitoringForm.getToolContentID();
-	    logger.debug("toolContentID: " + toolContentID);
+    	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
+    	String toolContentID = mcMonitoringForm.getToolContentID();
 	    
 	    McContent mcContent=mcService.retrieveMc(new Long(toolContentID));
+	    	mcGeneralMonitoringDTO.setToolContentID(toolContentID.toString());
 		mcGeneralMonitoringDTO.setActivityTitle(mcContent.getTitle());
 		mcGeneralMonitoringDTO.setActivityInstructions(mcContent.getInstructions());
-		
-		// get session from shared session.
-		HttpSession ss = SessionManager.getSession();
-		
-		Date submissionDeadline = mcContent.getSubmissionDeadline();
-		
-		if (submissionDeadline != null) {
-		
-			UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			TimeZone learnerTimeZone = learnerDto.getTimeZone();
-			Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
-			mcGeneralMonitoringDTO.setSubmissionDeadline(tzSubmissionDeadline.getTime());
-			
-		}
-
 		mcGeneralMonitoringDTO.setCurrentMonitoringTab("summary");
 		mcGeneralMonitoringDTO.setSbmtSuccess(new Boolean(false).toString());
 		mcGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
@@ -267,19 +250,6 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    mcGeneralMonitoringDTO.setCurrentMonitoredToolSession("All");
 	    mcGeneralMonitoringDTO.setListMonitoredAnswersContainerDto(new LinkedList());
 	    mcGeneralMonitoringDTO.setExistsOpenMcs(new Boolean(false).toString());
-	    
-	    // setting up the advanced summary for LDEV-1662
-	    request.setAttribute("questionsSequenced",	mcContent.isQuestionsSequenced());
-	    request.setAttribute("showMarks", mcContent.isShowMarks());
-	    request.setAttribute("randomize", mcContent.isRandomize());
-	    request.setAttribute("displayAnswers", mcContent.isDisplayAnswers());
-	    request.setAttribute("retries", mcContent.isRetries());
-	    request.setAttribute("reflect", mcContent.isReflect());
-	    request.setAttribute("reflectionSubject", mcContent.getReflectionSubject());
-	    request.setAttribute("passMark", mcContent.getPassMark());
-	    
-	    boolean isGroupedActivity = mcService.isGroupedActivity(new Long(toolContentID));
-	    request.setAttribute("isGroupedActivity", isGroupedActivity);
 
 	    // The edit activity code needs a session map
 	    SessionMap sessionMap = new SessionMap();

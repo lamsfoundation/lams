@@ -99,11 +99,7 @@ public class McGeneralMonitoringDTO implements Comparable
     protected String offlineInstructions;
     protected List attachmentList;
     protected List deletedAttachmentList;
-    
     protected String contentFolderID;
-    protected Long submissionDeadline;
-
-
     
     /**
      * @return Returns the listOfflineFilesMetadata.
@@ -657,16 +653,7 @@ public class McGeneralMonitoringDTO implements Comparable
         this.sessionUserCount = sessionUserCount;
     }
     
-    
-    public Long getSubmissionDeadline() {
-		return submissionDeadline;
-	}
-	public void setSubmissionDeadline(Long submissionDeadline) {
-		this.submissionDeadline = submissionDeadline;
-	}
-
-    
-	public String toString() {
+ 	public String toString() {
         return new ToStringBuilder(this)
         	.append("toolContentID: ", toolContentID)
         	.append("activeModule: ", activeModule)
@@ -711,7 +698,6 @@ public class McGeneralMonitoringDTO implements Comparable
 			.append("sessionUserCount: ", sessionUserCount)
 			.append("completedSessionUserCount: ", completedSessionUserCount)
 			.append("completedSessionUserPercent: ", completedSessionUserPercent)
-			.append("submissionDeadline", submissionDeadline)
             .toString();
     }
 

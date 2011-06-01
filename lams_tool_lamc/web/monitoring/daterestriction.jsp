@@ -15,7 +15,7 @@
 		<fmt:message key="monitor.summary.when.date.restriction.is.set" />
 	</p	>
 		
-	<div id="datetimeDiv" <c:if test='${not empty mcGeneralMonitoringDTO.submissionDeadline}'> style="display: none;" </c:if>>
+	<div id="datetimeDiv" <c:if test='${not empty submissionDeadline}'> style="display: none;" </c:if>>
 		<span>
 			<fmt:message key="monitor.summary.after.date" />
 		</span>
@@ -27,7 +27,7 @@
 		</html:link>
 	</div>
 
-	<div id="dateInfoDiv" <c:if test='${empty mcGeneralMonitoringDTO.submissionDeadline}'> style="display: none;" </c:if>>
+	<div id="dateInfoDiv" <c:if test='${empty submissionDeadline}'> style="display: none;" </c:if>>
 		<span>
 			<fmt:message key="monitor.summary.after.date" />
 		</span>

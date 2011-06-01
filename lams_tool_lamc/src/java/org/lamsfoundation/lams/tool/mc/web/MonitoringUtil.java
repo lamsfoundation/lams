@@ -28,9 +28,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -49,6 +51,10 @@ import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * 
@@ -573,46 +579,56 @@ public class MonitoringUtil implements McAppConstants{
 	}	
 
 	
-	/**
-	 * void setupAllSessionsData(HttpServletRequest request, McContent mcContent, IMcService mcService)
-	 * 
-	 * @param request
-	 * @param mcContent
-	 * @param mcService
-	 */
-	protected static void setupAllSessionsData(HttpServletRequest request, McContent mcContent, IMcService mcService)
-	{
-	    logger.debug("starting setupAllSessionsData, mcContent: " + mcContent);
-	    logger.debug("CURRENT_MONITORED_TOOL_SESSION: " + request.getAttribute(CURRENT_MONITORED_TOOL_SESSION));
+    /**
+     * Sets up auxiliary parameters. Used by all monitoring action methods. 
+     * 
+     * @param request
+     * @param mcContent
+     * @param mcService
+     */
+    protected static void setupAllSessionsData(HttpServletRequest request, McContent mcContent, IMcService mcService) {
+	List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(request, mcContent, mcService);
+	request.setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 
-	    List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, mcContent, mcService);
-	    request.setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
-	    logger.debug("LIST_MONITORED_ANSWERS_CONTAINER_DTO: " + request.getAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO));
-	    
-	    List listMonitoredMarksContainerDTO=MonitoringUtil.buildGroupsMarkData(request, mcContent, mcService);
-	    request.setAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO, listMonitoredMarksContainerDTO);
-	    logger.debug("LIST_MONITORED_MARKS_CONTAINER_DTO: " + request.getAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO));
-	    logger.debug("ending setupAllSessionsData, mcContent: ");
-	    
-	    request.setAttribute(HR_COLUMN_COUNT, new Integer(mcContent.getMcQueContents().size()+2).toString());
-	    
-	    String strPassMark="";
-	    Integer passMark=mcContent.getPassMark();
-	    logger.debug("passMark: " + passMark);
-	    
-    	if (passMark == null)
-    	    strPassMark=" ";
-    	else if ((passMark != null) && (passMark.equals("0")))
-    	    strPassMark=" ";
-    	else
-    	    strPassMark=passMark.toString();
-    	
-    	logger.debug("strPassMark: " + strPassMark);
-    	 
-    	if (strPassMark.trim().equals("0"))
-    		strPassMark=" ";
-    	
-    	logger.debug("strPassMark: " + strPassMark);
-    	request.setAttribute(PASSMARK, strPassMark);
+	List listMonitoredMarksContainerDTO = MonitoringUtil.buildGroupsMarkData(request, mcContent, mcService);
+	request.setAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO, listMonitoredMarksContainerDTO);
+
+	request.setAttribute(HR_COLUMN_COUNT, new Integer(mcContent.getMcQueContents().size() + 2).toString());
+
+	String strPassMark = "";
+	Integer passMark = mcContent.getPassMark();
+	if (passMark == null)
+	    strPassMark = " ";
+	else if ((passMark != null) && (passMark.equals("0")))
+	    strPassMark = " ";
+	else
+	    strPassMark = passMark.toString();
+	if (strPassMark.trim().equals("0"))
+	    strPassMark = " ";
+	request.setAttribute(PASSMARK, strPassMark);
+
+	// setting up the advanced summary for LDEV-1662
+	request.setAttribute("questionsSequenced", mcContent.isQuestionsSequenced());
+	request.setAttribute("showMarks", mcContent.isShowMarks());
+	request.setAttribute("randomize", mcContent.isRandomize());
+	request.setAttribute("displayAnswers", mcContent.isDisplayAnswers());
+	request.setAttribute("retries", mcContent.isRetries());
+	request.setAttribute("reflect", mcContent.isReflect());
+	request.setAttribute("reflectionSubject", mcContent.getReflectionSubject());
+	request.setAttribute("passMark", mcContent.getPassMark());
+	request.setAttribute("toolContentID", mcContent.getMcContentId());
+	
+	// setting up Date and time restriction in activities
+	HttpSession ss = SessionManager.getSession();
+	Date submissionDeadline = mcContent.getSubmissionDeadline();
+	if (submissionDeadline != null) {
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    request.setAttribute("submissionDeadline", tzSubmissionDeadline.getTime());
 	}
+
+	boolean isGroupedActivity = mcService.isGroupedActivity(new Long(mcContent.getMcContentId()));
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
+    }
 }
