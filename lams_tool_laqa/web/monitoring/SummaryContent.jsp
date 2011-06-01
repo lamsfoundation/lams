@@ -19,8 +19,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <%@ include file="/common/taglibs.jsp"%>
-<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-
 <h1 style="padding-bottom: 10px;">
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
 
