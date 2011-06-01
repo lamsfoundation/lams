@@ -23,14 +23,17 @@
 package org.lamsfoundation.lams.tool.vote.web;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -53,7 +56,11 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * 
@@ -1224,20 +1231,14 @@ public class MonitoringUtil implements VoteAppConstants {
     }
 
     public static void buildVoteStatsDTO(HttpServletRequest request, IVoteService voteService, VoteContent voteContent) {
-	logger.debug("building voteStatsDTO: " + voteContent);
-	VoteStatsDTO voteStatsDTO = new VoteStatsDTO();
 
 	int countSessionComplete = 0;
 	int countAllUsers = 0;
-	logger.debug("finding out about content level notebook entries: " + voteContent);
 	Iterator iteratorSession = voteContent.getVoteSessions().iterator();
 	while (iteratorSession.hasNext()) {
 	    VoteSession voteSession = (VoteSession) iteratorSession.next();
-	    logger.debug("voteSession: " + voteSession);
 
 	    if (voteSession != null) {
-		logger.debug("voteSession id: " + voteSession.getVoteSessionId());
-
 		if (voteSession.getSessionStatus().equals(COMPLETED)) {
 		    ++countSessionComplete;
 		}
@@ -1245,24 +1246,37 @@ public class MonitoringUtil implements VoteAppConstants {
 		Iterator iteratorUser = voteSession.getVoteQueUsers().iterator();
 		while (iteratorUser.hasNext()) {
 		    VoteQueUsr voteQueUsr = (VoteQueUsr) iteratorUser.next();
-		    logger.debug("voteQueUsr: " + voteQueUsr);
-
 		    if (voteQueUsr != null) {
-			logger.debug("voteQueUsr foundid");
 			++countAllUsers;
 		    }
 		}
 	    }
 	}
-	logger.debug("countAllUsers: " + countAllUsers);
-	logger.debug("countSessionComplete: " + countSessionComplete);
 
+	VoteStatsDTO voteStatsDTO = new VoteStatsDTO();
 	voteStatsDTO.setCountAllUsers(new Integer(countAllUsers).toString());
 	voteStatsDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
-
-	logger.debug("voteStatsDTO: " + voteStatsDTO);
-
 	request.setAttribute(VOTE_STATS_DTO, voteStatsDTO);
+	
+	// setting up the advanced summary for LDEV-1662
+	request.setAttribute("lockOnFinish", voteContent.isLockOnFinish());
+	request.setAttribute("allowText", voteContent.isAllowText());
+	request.setAttribute("maxNominationCount", voteContent.getMaxNominationCount());
+	request.setAttribute("minNominationCount", voteContent.getMinNominationCount());
+	request.setAttribute("showResults", voteContent.isShowResults());
+	request.setAttribute("reflect", voteContent.isReflect());
+	request.setAttribute("reflectionSubject", voteContent.getReflectionSubject());
+	request.setAttribute("toolContentID", voteContent.getVoteContentId());
+	
+	// setting up the SubmissionDeadline
+	if (voteContent.getSubmissionDeadline() != null) {
+	    Date submissionDeadline = voteContent.getSubmissionDeadline();
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone teacherTimeZone = teacher.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
+	    request.setAttribute(VoteAppConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	}
     }
 
     public static void generateGroupsSessionData(HttpServletRequest request, IVoteService voteService,

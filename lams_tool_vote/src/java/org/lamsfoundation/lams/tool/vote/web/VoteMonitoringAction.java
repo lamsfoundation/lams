@@ -731,16 +731,6 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	VoteContent voteContent = voteService.retrieveVote(new Long(toolContentID));
 	VoteMonitoringAction.logger.debug("existing voteContent:" + voteContent);
 	
-	if (voteContent.getSubmissionDeadline() != null) {
-		Date submissionDeadline = voteContent.getSubmissionDeadline();
-		HttpSession ss = SessionManager.getSession();
-		UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		TimeZone teacherTimeZone = teacher.getTimeZone();
-		Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
-		request.setAttribute(VoteAppConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
-	}	
-	
-
 	/* this section is related to summary tab. Starts here. */
 	Map summaryToolSessions = MonitoringUtil.populateToolSessions(request, voteContent, voteService);
 	VoteMonitoringAction.logger.debug("summaryToolSessions: " + summaryToolSessions);
