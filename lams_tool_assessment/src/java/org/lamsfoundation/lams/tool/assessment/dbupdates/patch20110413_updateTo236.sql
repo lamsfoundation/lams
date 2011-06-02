@@ -8,6 +8,10 @@ SET AUTOCOMMIT = 0;
 -- LDEV-2657 Date and time restriction 
 ALTER TABLE tl_laasse10_assessment ADD COLUMN submission_deadline DATETIME DEFAULT null;
 
+-- LDEV-2684 Option for not displaying answers summary
+
+ALTER TABLE tl_laasse10_assessment ADD COLUMN display_summary tinyint DEFAULT false;
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on

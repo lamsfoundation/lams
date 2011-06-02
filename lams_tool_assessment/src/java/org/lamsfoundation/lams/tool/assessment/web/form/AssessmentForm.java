@@ -81,6 +81,7 @@ public class AssessmentForm extends ActionForm {
 	    assessment.setDefineLater(false);
 	    assessment.setShuffled(false);
 	    assessment.setRunOffline(false);
+	    assessment.setDisplaySummary(false);
 	}
     }
 

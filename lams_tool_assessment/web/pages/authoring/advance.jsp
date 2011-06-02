@@ -96,6 +96,14 @@
 </p>
 
 <p>
+	<html:checkbox property="assessment.displaySummary" styleClass="noBorder" styleId="displaySummary">
+	</html:checkbox>
+	<label for="displaySummary">
+		<fmt:message key="label.authoring.advance.display.summary" />
+	</label>
+</p>
+
+<p>
 	<html:checkbox property="assessment.notifyTeachersOnAttemptCompletion"
 		styleClass="noBorder" styleId="notifyTeachersOnAttemptCompletion">
 	</html:checkbox>

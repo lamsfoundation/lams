@@ -83,6 +83,8 @@ public class Assessment implements Cloneable {
     
     private boolean allowHistoryResponses;
     
+    private boolean displaySummary;
+    
     private boolean defineLater;
 
     private boolean contentInUse;
@@ -598,6 +600,20 @@ public class Assessment implements Cloneable {
     }
     
     /**
+     * @hibernate.property column="display_summary"
+     * @return
+     */
+	public boolean isDisplaySummary() {
+		return displaySummary;
+	}
+
+	public void setDisplaySummary(boolean displaySummary) {
+		this.displaySummary = displaySummary;
+	}
+
+	
+
+	/**
      * @hibernate.property column="questions_per_page"
      * @return
      */
