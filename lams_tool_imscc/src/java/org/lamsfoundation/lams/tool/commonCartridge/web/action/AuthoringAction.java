@@ -25,14 +25,18 @@ package org.lamsfoundation.lams.tool.commonCartridge.web.action;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -143,13 +147,13 @@ public class AuthoringAction extends Action {
 	if (param.equals("saveOrUpdateItem")) {
 	    return saveOrUpdateItem(mapping, form, request, response);
 	}
+	if (param.equals("selectResources")) {
+	    return selectResources(mapping, form, request, response);
+	}
 	if (param.equals("removeItem")) {
 	    return removeItem(mapping, form, request, response);
 	}
 	// -----------------------CommonCartridge Item Instruction function ---------------------------
-	if (param.equals("removeItemAttachment")) {
-	    return removeItemAttachment(mapping, form, request, response);
-	}
 	if (param.equals("initPedagogicalPlannerForm")) {
 	    return initPedagogicalPlannerForm(mapping, form, request, response);
 	}
@@ -161,23 +165,6 @@ public class AuthoringAction extends Action {
 	}
 
 	return mapping.findForward(CommonCartridgeConstants.ERROR);
-    }
-
-    /**
-     * Remove commonCartridge item attachment, such as single file, learning object ect. It is a ajax call and just
-     * temporarily remove from page, all permenant change will happen only when user sumbit this commonCartridge item
-     * again.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward removeItemAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	request.setAttribute("itemAttachment", null);
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
     }
 
     /**
@@ -283,8 +270,8 @@ public class AuthoringAction extends Action {
 	    return findForward(itemForm.getItemType(), mapping);
 	}
 
+	short type = itemForm.getItemType();
 	try {
-	    short type = itemForm.getItemType();
 	    if (type == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE) {
 		uploadCommonCartridge(request, itemForm);
 	    } else {
@@ -302,7 +289,67 @@ public class AuthoringAction extends Action {
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
 	// return null to close this window
+	
+	if (type == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE) {
+	    return mapping.findForward("selectResources");
+	} else {
+	    return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	}	
+    }
+    
+    /**
+     * 
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws ServletException
+     */
+    private ActionForward selectResources(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	//count uploaded resources
+	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	List<CommonCartridgeItem> uploadedCartridgeResources = getUploadedCartridgeResources(sessionMap);
+	int countUploadedResources = uploadedCartridgeResources.size();
+	
+	SortedSet<CommonCartridgeItem> items = getCommonCartridgeItemList(sessionMap);
+	
+	for (int i = 0; i < countUploadedResources; i++) {
+	    String itemStr = request.getParameter(CommonCartridgeConstants.ATTR_ITEM + i);
+	    if (StringUtils.isBlank(itemStr)) {
+		continue;
+	    }
+	    
+	    CommonCartridgeItem resource = uploadedCartridgeResources.get(i);
+	    
+	    String launchUrl = request.getParameter(CommonCartridgeConstants.ATTR_REMOTE_TOOL_URL + i);
+	    resource.setLaunchUrl(launchUrl);
+	    String toolKey = request.getParameter(CommonCartridgeConstants.ATTR_REMOTE_TOOL_KEY + i);
+	    resource.setKey(toolKey);
+	    String toolSecret = request.getParameter(CommonCartridgeConstants.ATTR_REMOTE_TOOL_SECRET + i);
+	    resource.setSecret(toolSecret);
+	    String buttonText = request.getParameter(CommonCartridgeConstants.ATTR_BUTTON_TEXT + i);
+	    resource.setButtonText(buttonText);
+	    String isOpenUrlNewWindow = request.getParameter(CommonCartridgeConstants.ATTR_OPEN_URL_NEW_WINDOW + i);
+	    resource.setOpenUrlNewWindow(isOpenUrlNewWindow != null);
+	    int frameHeight = WebUtil.readIntParam(request, CommonCartridgeConstants.ATTR_FRAME_HEIGHT + i, true);
+	    resource.setFrameHeight(frameHeight);
+	    
+	    //add selected resource to item list
+	    items.add(resource);
+	}
+	
+	
+	// set session map ID so that itemlist.jsp can get sessionMAP
+	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	// return null to close this window
+	
+
 	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	
     }
 
     /**
@@ -771,6 +818,16 @@ public class AuthoringAction extends Action {
     }
 
     /**
+     * List items from fresh uploaded cartridge.
+     * 
+     * @param request
+     * @return
+     */
+    private List<CommonCartridgeItem> getUploadedCartridgeResources(SessionMap sessionMap) {
+	return getListFromSession(sessionMap, "uploadedCartridgeResources");
+    }
+    
+    /**
      * List save current commonCartridge items.
      * 
      * @param request
@@ -921,8 +978,9 @@ public class AuthoringAction extends Action {
 	}
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(itemForm.getSessionMapID());
-	SortedSet<CommonCartridgeItem> commonCartridgeList = getCommonCartridgeItemList(sessionMap);
-	commonCartridgeList.addAll(items);
+	List<CommonCartridgeItem> uploadedCartridgeResources = getUploadedCartridgeResources(sessionMap);
+	uploadedCartridgeResources.clear();
+	uploadedCartridgeResources.addAll(items);
     }
 
     /**
@@ -992,7 +1050,7 @@ public class AuthoringAction extends Action {
     private ActionErrors validateCommonCartridgeItem(CommonCartridgeItemForm itemForm) {
 	ActionErrors errors = new ActionErrors();
 	if (StringUtils.isBlank(itemForm.getTitle())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(CommonCartridgeConstants.ERROR_MSG_TITLE_BLANK));
+//	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(CommonCartridgeConstants.ERROR_MSG_TITLE_BLANK));
 	}
 
 	if (itemForm.getItemType() == CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI) {

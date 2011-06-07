@@ -7,61 +7,33 @@
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed"/>
 
-		<script type="text/javascript">
-		   <%-- user for  commonCartridgecommonCartridgeitem.js --%>
-	       var removeItemAttachmentUrl = "<c:url value='/authoring/removeItemAttachment.do'/>";
-		</script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/commonCartridgeItem.js'/>"></script>
 	</lams:head>
-	<body>
-
-		<!-- Basic Info Form-->
-
+	
+	<body class="stripes" onload="parent.resizeIframe();">
+	<div id="content" style="width: 90%; text-align: center;">
 		<%@ include file="/common/messages.jsp"%>
 		<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="commonCartridgeItemForm" enctype="multipart/form-data">
 			<html:hidden property="sessionMapID" />
 			<input type="hidden" name="itemType" id="itemType" value="2" />
 			<html:hidden property="itemIndex" />
 
-
 			<h2 class="no-space-left">
-				<fmt:message key="label.authoring.basic.add.common.cartridge" />
+				<fmt:message key="label.authoring.basic.upload.common.cartridge" />
 			</h2>
-
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.resource.title.input" />
-			</div>
-
-			<html:text property="title" size="55" tabindex="1" />
-
-			<%--  Remove description in as LDEV-617
-							<tr>
-								<td width="130px">
-									<fmt:message key="label.authoring.basic.resource.description.input" />
-								</td>
-								<td>
-									<lams:STRUTS-textarea rows="5" cols="55" tabindex="2" property="description" />
-								</td>
-							</tr>
-							--%>
-
-			<div class="field-name space-top">
-				<fmt:message key="label.authoring.basic.resource.common.cartridge" />
-			</div>
-			<c:set var="itemAttachment"
-				value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<br />
+			
+			<c:set var="itemAttachment" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<div id="itemAttachmentArea">
 				<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
+			<a href="#" onclick="submitCommonCartridgeItem()" class="button"><fmt:message
+					key="button.upload" /> </a>				
 			</div>
+			<br /><br />
+
 
 		</html:form>
 		
-		<lams:ImgButtonWrapper>
-			<a href="#" onclick="submitCommonCartridgeItem()" class="button-add-item"><fmt:message
-					key="label.authoring.basic.add.file" /> </a>
-			<a href="javascript:;" onclick="cancelCommonCartridgeItem()" class="button space-left"><fmt:message
-					key="label.cancel" /> </a>
-		</lams:ImgButtonWrapper>
-		<br />
+	</div>	
 	</body>
 </lams:html>

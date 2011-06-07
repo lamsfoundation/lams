@@ -16,6 +16,7 @@
 
 	<%@ include file="/common/tabbedheader.jsp"%>
 	<%@ include file="/common/fckeditorheader.jsp"%>
+	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 
 	<script>
         

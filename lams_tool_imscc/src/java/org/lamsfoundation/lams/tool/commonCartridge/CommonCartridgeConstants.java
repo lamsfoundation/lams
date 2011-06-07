@@ -113,6 +113,14 @@ public class CommonCartridgeConstants {
     public static final String ATTR_INSTRUCTIONS = "instructions";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
+    
+    public static final String ATTR_ITEM = "item";
+    public static final String ATTR_REMOTE_TOOL_URL = "toolUrl";
+    public static final String ATTR_REMOTE_TOOL_KEY = "toolKey";
+    public static final String ATTR_REMOTE_TOOL_SECRET = "toolSecret";
+    public static final String ATTR_BUTTON_TEXT = "buttonText";
+    public static final String ATTR_FRAME_HEIGHT = "frameHeight";
+    public static final String ATTR_OPEN_URL_NEW_WINDOW = "openUrlNewWindow";
 
     // error message keys
     public static final String ERROR_MSG_TITLE_BLANK = "error.resource.item.title.blank";

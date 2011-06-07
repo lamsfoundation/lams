@@ -8,52 +8,31 @@
 
 <script type="text/javascript">
 <!-- Common Javascript functions for LAMS -->
-	var offlineArea = "offlinefileArea";
-	var onlineArea = "onlinefileArea";
+	var offlineArea = "#offlinefileArea";
+	var onlineArea = "#onlinefileArea";
 	function deleteOfflineFile(fileUuid,fileVersionId){
 		var url = "<c:url value="/authoring/deleteOfflineFile.do"/>";
-	    var reqIDVar = new Date();
-		var param = "sessionMapID=${formBean.sessionMapID}&fileUuid=" + fileUuid + "&fileVersionId="+ fileVersionId+"&reqID="+reqIDVar.getTime();
-		offlineLoading();
-	    var myAjax = new Ajax.Updater(
-		    	offlineArea,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:offlineComplete,
-		    		evalScripts:false
-		    	}
-	    );
+		$(offlineArea).load(
+			url,
+			{
+				fileVersionId: fileVersionId,
+				fileUuid: fileUuid, 
+				sessionMapID: "${formBean.sessionMapID}",
+				reqID: (new Date()).getTime()
+			}
+		);
 	}
 	function deleteOnlineFile(fileUuid,fileVersionId){
 		var url = "<c:url value="/authoring/deleteOnlineFile.do"/>";
-	    var reqIDVar = new Date();
-		var param = "sessionMapID=${formBean.sessionMapID}&fileUuid=" + fileUuid + "&fileVersionId="+ fileVersionId+"&reqID="+reqIDVar.getTime();
-		onlineLoading();
-	    var myAjax = new Ajax.Updater(
-		    	onlineArea,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:onlineComplete,
-		    		evalScripts:false
-		    	}
-	    );
-	}
-
-	function offlineLoading(){
-		showBusy(offlineArea);
-	}
-	function offlineComplete(){
-		hideBusy(offlineArea);
-	}
-	function onlineLoading(){
-		showBusy(onlineArea);
-	}
-	function onlineComplete(){
-		hideBusy(onlineArea);
+		$(onlineArea).load(
+			url,
+			{
+				fileVersionId: fileVersionId,
+				fileUuid: fileUuid, 
+				sessionMapID: "${formBean.sessionMapID}",
+				reqID: (new Date()).getTime()
+			}
+		);
 	}
 </script>
 <!-- Instruction Tab Content -->

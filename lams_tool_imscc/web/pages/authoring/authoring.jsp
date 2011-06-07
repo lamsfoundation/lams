@@ -8,9 +8,17 @@
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.author.title" /></title>
-
+	
 	<%@ include file="/common/tabbedheader.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
+	<%@ include file="/common/fckeditorheader.jsp"%>	
+	
+	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/thickbox.css'/>" />
+	
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
+	<script type="text/javascript"> 
+		var pathToImageFolder = "<html:rewrite page='/includes/images/'/>"; 
+	</script>
+ 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>
 
 	<script>
         function init(){
