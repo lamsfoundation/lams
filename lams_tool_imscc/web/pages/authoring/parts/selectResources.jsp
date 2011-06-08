@@ -15,12 +15,12 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.form.js'/>"></script>
-		
 		<script type="text/javascript">
     		function formSubmit(){
     			$('#itemForm').ajaxSubmit({
     				target: $("#commonCartridgeListArea", self.parent.document),
     				success: function() {
+    					self.parent.refreshThickbox();
     					self.parent.tb_remove();
     				}
     			});
@@ -29,13 +29,13 @@
 	</lams:head>
 
 	<body class="stripes" onload="parent.resizeIframe();">
-	<div id="content" style="width: 95%;">
+	<div id="content" style="width: 93%;">
 		<%@ include file="/common/messages.jsp"%>
 
 <form id="itemForm" name="itemForm" action="<c:url value='/authoring/selectResources.do'/>">
 <input type="hidden" value="${sessionMapID}" name="sessionMapID"> 
 <div>
-	<h1 class="space-bottom">
+	<h1 class="small-space-bottom">
 		<fmt:message key="label.authoring.select.available.resources" />
 	</h1>
 
@@ -61,11 +61,18 @@
 						</a>
 						
 						<div class="monitoring-advanced" id="advancedDiv${status.index}" style="display:none">
-
+							
 							<div class="field-name space-top">
 								<fmt:message key="label.authoring.basic.bascilti.url" />
-							</div>
-							<input type="text" name="toolUrl${status.index}" value="${resource.launchUrl}" size="55" />
+							</div>							
+							<c:choose>
+								<c:when test="${(empty resource.launchUrl) && !(empty resource.secureLaunchUrl)}">
+									<input type="text" name="secureLaunchUrl${status.index}" value="${resource.secureLaunchUrl}" size="55" />
+								</c:when>
+								<c:otherwise>
+									<input type="text" name="launchUrl${status.index}" value="${resource.launchUrl}" size="55" />
+								</c:otherwise>
+							</c:choose>
 							
 							<div class="field-name space-top">
 								<fmt:message key="label.authoring.basic.bascilti.key" />
@@ -104,7 +111,7 @@
 </div>
 </form>
 
-	<br />
+
 	<lams:ImgButtonWrapper >
 		<a href="#" onclick="self.parent.tb_remove();" onmousedown="self.focus();" class="button space-left right-buttons">
 			<fmt:message key="label.cancel" /> 

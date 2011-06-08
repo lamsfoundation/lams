@@ -6,9 +6,25 @@
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed" />
+		
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/commonCartridgeItem.js'/>"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
+		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.form.js'/>"></script>
+		<script type="text/javascript">
+    		function formSubmit(){
+    			$('#commonCartridgeItemForm').ajaxSubmit({
+    				target: $("#commonCartridgeListArea", self.parent.document),
+    				success: function() {
+    					self.parent.refreshThickbox()
+    					self.parent.tb_remove();
+    				}
+    			});
+    		}
+		</script>
 	</lams:head>
-	<body class="tabpart">
+	
+	<body class="stripes" onload="parent.resizeIframe();">
+	<div id="content" style="width: 93%; ">	
 
 		<!-- Basic Info Form-->
 		<%@ include file="/common/messages.jsp"%>
@@ -80,14 +96,17 @@
 
 		</html:form>
 
+		<br />
 		<lams:ImgButtonWrapper>
-			<a href="#" onclick="submitCommonCartridgeItem()" class="button-add-item">
+			<a href="javascript:;" onclick="self.parent.tb_remove();" class="button space-left right-buttons space-right ">
+				<fmt:message key="label.cancel" /> 
+			</a>		
+			<a href="#" onclick="formSubmit()" class="button-add-item right-buttons space-left">
 				<fmt:message key="label.authoring.basic.add.url" />
 			</a>
-			<a href="javascript:;" onclick="cancelCommonCartridgeItem()" class="button space-left">
-				<fmt:message key="label.cancel" /> 
-			</a>
 		</lams:ImgButtonWrapper>
-		<br />
+		
+		
+	</div>
 	</body>
 </lams:html>

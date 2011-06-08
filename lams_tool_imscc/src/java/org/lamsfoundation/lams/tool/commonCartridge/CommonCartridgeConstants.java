@@ -115,7 +115,8 @@ public class CommonCartridgeConstants {
     public static final String ATTR_USER_FINISHED = "userFinished";
     
     public static final String ATTR_ITEM = "item";
-    public static final String ATTR_REMOTE_TOOL_URL = "toolUrl";
+    public static final String ATTR_LAUNCH_URL = "launchUrl";
+    public static final String ATTR_SECURE_LAUNCH_URL = "secureLaunchUrl";
     public static final String ATTR_REMOTE_TOOL_KEY = "toolKey";
     public static final String ATTR_REMOTE_TOOL_SECRET = "toolSecret";
     public static final String ATTR_BUTTON_TEXT = "buttonText";

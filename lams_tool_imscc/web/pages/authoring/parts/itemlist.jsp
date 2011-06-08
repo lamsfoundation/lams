@@ -25,15 +25,20 @@
 						</span>
 						${commonCartridge.title}
 					</td>
-					<td width="10%">
+					<td width="9%">
 						<a href="#"
 							onclick="previewItem(1,${status.index},'${sessionMapID}')"> <fmt:message
 								key="label.authoring.basic.resource.verify.url" /> </a>
 					</td>
 					<td width="5%">
-						<img src="${tool}includes/images/edit.gif"
-							title="<fmt:message key="label.authoring.basic.resource.edit" />"
-							onclick="editItem(${status.index},'${sessionMapID}')" />
+					
+						<c:set var="editItemUrl" >
+							<c:url value='/authoring/editItemInit.do'/>?sessionMapID=${sessionMapID}&itemIndex=${status.index}&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true
+						</c:set>		
+						<a href="${editItemUrl}" class="thickbox" style="border-style: none;"> 
+							<img src="${tool}includes/images/edit.gif"
+								title="<fmt:message key="label.authoring.basic.resource.edit" />" style="border-style: none;"/>
+						</a>
 
 					</td>
 					<td width="5%">

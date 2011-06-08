@@ -1,46 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean"
-	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script lang="javascript">
-
-	function showMessage(url) {
-		var area=document.getElementById("reourceInputArea");
-		if(area != null){
-			area.style.width="650px";
-			area.style.height="100%";
-			area.src=url;
-			area.style.display="block";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="none";
-		}
-		location.hash = "reourceInputArea";
-	}
-	function hideMessage(){
-		var area=document.getElementById("reourceInputArea");
-		if(area != null){
-			area.style.width="0px";
-			area.style.height="0px";
-			area.style.display="none";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="block";
-		}
-	}
 
 	function previewItem(type,idx,sessionMapID){
 		//1:url, 2:file, 3:website,4:learning object
 		//This mode is special for unsaved author page. It is different with the author mode in preview 
 		var myUrl = "<c:url value='/reviewItem.do?mode=author_session&itemIndex='/>"+idx+"&sessionMapID="+sessionMapID;
 		launchPopup(myUrl,"Review");
-	}
-	
-	function editItem(idx,sessionMapID){
-		 var reqIDVar = new Date();
-		var url = "<c:url value="/authoring/editItemInit.do?itemIndex="/>" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
-		showMessage(url);
 	}
 	
 	var commonCartridgeListTargetDiv = "#commonCartridgeListArea";
@@ -65,7 +31,6 @@
 			);
 		};
 	}
-	
 	
 	function deleteItemLoading(){
 		showBusy(commonCartridgeListTargetDiv);
@@ -137,13 +102,4 @@
 	<a href="<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=2"/>&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true" class="space-left thickbox">
 		<fmt:message key="label.authoring.basic.upload.common.cartridge" />
 	</a>
-</p>
-
-<p>
-	<iframe
-		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
-		id="reourceInputArea" name="reourceInputArea"
-		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
-		scrolling="no">
-	</iframe>
 </p>

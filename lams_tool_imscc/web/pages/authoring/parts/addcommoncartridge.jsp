@@ -11,26 +11,31 @@
 	</lams:head>
 	
 	<body class="stripes" onload="parent.resizeIframe();">
-	<div id="content" style="width: 90%; text-align: center;">
+	<div id="content" style="width: 93%; text-align: center;">
 		<%@ include file="/common/messages.jsp"%>
 		<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="commonCartridgeItemForm" enctype="multipart/form-data">
 			<html:hidden property="sessionMapID" />
 			<input type="hidden" name="itemType" id="itemType" value="2" />
 			<html:hidden property="itemIndex" />
 
-			<h2 class="no-space-left">
+			<h1 class="space-bottom">
 				<fmt:message key="label.authoring.basic.upload.common.cartridge" />
-			</h2>
-			<br />
+			</h1>
 			
 			<c:set var="itemAttachment" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<div id="itemAttachmentArea">
 				<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
-			<a href="#" onclick="submitCommonCartridgeItem()" class="button"><fmt:message
-					key="button.upload" /> </a>				
 			</div>
-			<br /><br />
-
+			
+			<lams:ImgButtonWrapper >
+				<a href="#" onclick="self.parent.tb_remove();" onmousedown="self.focus();" class="button space-left right-buttons">
+					<fmt:message key="label.cancel" /> 
+				</a>
+				<a href="#" onclick="submitCommonCartridgeItem();" onmousedown="self.focus();" class="button right-buttons">
+					<fmt:message key="button.upload" />
+				</a>
+			</lams:ImgButtonWrapper>
+			<br />
 
 		</html:form>
 		

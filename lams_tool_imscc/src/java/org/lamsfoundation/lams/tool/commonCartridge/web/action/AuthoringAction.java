@@ -325,8 +325,10 @@ public class AuthoringAction extends Action {
 	    
 	    CommonCartridgeItem resource = uploadedCartridgeResources.get(i);
 	    
-	    String launchUrl = request.getParameter(CommonCartridgeConstants.ATTR_REMOTE_TOOL_URL + i);
+	    String launchUrl = request.getParameter(CommonCartridgeConstants.ATTR_LAUNCH_URL + i);
 	    resource.setLaunchUrl(launchUrl);
+	    String secureLaunchUrl = request.getParameter(CommonCartridgeConstants.ATTR_SECURE_LAUNCH_URL + i);
+	    resource.setSecureLaunchUrl(secureLaunchUrl);
 	    String toolKey = request.getParameter(CommonCartridgeConstants.ATTR_REMOTE_TOOL_KEY + i);
 	    resource.setKey(toolKey);
 	    String toolSecret = request.getParameter(CommonCartridgeConstants.ATTR_REMOTE_TOOL_SECRET + i);
@@ -1049,11 +1051,13 @@ public class AuthoringAction extends Action {
      */
     private ActionErrors validateCommonCartridgeItem(CommonCartridgeItemForm itemForm) {
 	ActionErrors errors = new ActionErrors();
-	if (StringUtils.isBlank(itemForm.getTitle())) {
-//	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(CommonCartridgeConstants.ERROR_MSG_TITLE_BLANK));
-	}
 
 	if (itemForm.getItemType() == CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI) {
+	    if (StringUtils.isBlank(itemForm.getTitle())) {
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+			CommonCartridgeConstants.ERROR_MSG_TITLE_BLANK));
+	    }	    
+	    
 	    if (StringUtils.isBlank(itemForm.getUrl())) {
 		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
 			CommonCartridgeConstants.ERROR_MSG_URL_BLANK));
