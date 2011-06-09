@@ -390,6 +390,7 @@ public class AuthoringAction extends Action {
 	    if (question != null) {
 		// This flushs user UID info to message if this user is a new user.
 		question.setCreateBy(assessmentUser);
+		removeNewLineCharacters(question);
 		questionList.add(question);
 	    }
 	}
@@ -1472,5 +1473,29 @@ public class AuthoringAction extends Action {
 	    }
 	}
 	return paramMap;
+    }
+
+    /**
+     * Removes redundant new line characters from options left by CKEditor (otherwise it will break Javascript in
+     * monitor)
+     * 
+     * @param question
+     */
+    private void removeNewLineCharacters(AssessmentQuestion question) {
+	Set<AssessmentQuestionOption> options = question.getQuestionOptions();
+	if (options != null) {
+	    for (AssessmentQuestionOption option : options) {
+		String optionString = option.getOptionString();
+		if (optionString != null) {
+		    option.setOptionString(optionString.replaceAll("[\n\r\f]", ""));
+		}
+
+		String questionStr = option.getQuestion();
+		if (questionStr != null) {
+		    option.setQuestion(questionStr.replaceAll("[\n\r\f]", ""));
+		}
+	    }
+	    
+	}
     }
 }
