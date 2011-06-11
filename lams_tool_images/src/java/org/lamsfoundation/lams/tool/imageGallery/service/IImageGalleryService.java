@@ -168,6 +168,14 @@ public interface IImageGalleryService {
     void saveOrUpdateImageGalleryItem(ImageGalleryItem item);
     
     /**
+     * Delete image with the given uid from imageGallery.
+     * 
+     * @param toolSessionId
+     * @param imageUid
+     */
+    void deleteImage(Long toolSessionId, Long imageUid);
+    
+    /**
      * Save/update ImageRating.
      * 
      * @param rating

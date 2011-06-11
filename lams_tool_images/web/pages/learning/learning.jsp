@@ -7,7 +7,7 @@
 	<title>
 		<fmt:message key="label.learning.title" />
 	</title>
-	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/headerWithoutPrototype.jsp"%>
 
 	<%-- param has higher level for request attribute --%>
 	<c:if test="${not empty param.sessionMapID}">
@@ -43,6 +43,8 @@
 		.caption{position:absolute;top:0px;left:0px;width:150px;font-size:12px;color:#0087e5;}
 		#description{position:absolute; top:1000px; left:1000px; width:150px; font-style:italic;}
 		#openOriginalSizeLink{position:absolute; top:1000px; left:1000px;}
+		#delete_button{position:absolute; top:10px; left:1000px; z-index: 1000;opacity:0.4;filter:alpha(opacity=40); display:none;}
+		#delete_button:hover {opacity:1;filter:alpha(opacity=100)}
 		#rating_stars{position: absolute; top: 1000px; left: 1000px; width:150px; margin-top: 10}		
 		
 		#main_image{margin: 0 auto 20 0; height: ${(mediumImageDimensions*3)/4 + 40}px; width: ${mediumImageDimensions}px;}
@@ -112,6 +114,9 @@
 				$("#openOriginalSizeLink").css('left', linkLeftPosition);
 				$("#openOriginalSizeLink").css('top', image.height() + 10);
 				$("#openOriginalSizeLink").width(image.width());
+				
+				$("#delete_button").hide();
+				$("#delete_button").css('left', image.width() - 30);
 						
 				setStarRatingChecked(0);
 				$("#rating_stars").css('left', image.width() + 20);					
@@ -170,6 +175,16 @@
 		}
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
+		}
+		
+		function deleteImage(){
+			var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
+			
+			if (deletionConfirmed) {
+				var imageUid = $('#commentsArea_imageUid').val();
+				document.location.href = "<c:url value="/learning/deleteImage.do"/>?sessionMapID=${sessionMapID}&imageUid=" + imageUid;
+			}
+			return false;
 		}
 
 		function addNewComment(currentImageUid, comment){
@@ -257,6 +272,12 @@
 				}
 			}
 			
+			//set visibility of "Delete image" button 
+			var isAuthor = $('#commentsArea_isAuthor').val();
+			if (isAuthor == "true") {
+				$("#delete_button").show();
+			}
+			
 		}
 		function setStarRatingChecked(currentRating){
 			$('#rating_stars_inputs').empty();
@@ -322,6 +343,14 @@
 				<a href="" title="Enlarge" class="thickbox" >
 					<fmt:message key="label.learning.open.original.size" />
 				</a>
+			</div>
+			
+			<%--Delete button---------------------------------------%>
+
+			<div id="delete_button">
+				<img src="<lams:WebAppURL />includes/images/delete.png"
+					title="<fmt:message key="label.learning.delete.image" />"
+					onclick="return deleteImage();" />
 			</div>
 			
 			<%--Ranking/Voting area---------------------------------------%>

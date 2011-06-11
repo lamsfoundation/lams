@@ -25,6 +25,7 @@
 <input type="hidden" name="numberRatings" id="commentsArea_numberRatings" value="${commentsSessionMap.numberRatings}"/>
 <input type="hidden" name="currentRating" id="commentsArea_currentRating" value="${commentsSessionMap.currentRating}"/>
 <input type="hidden" name="isVoted" id="commentsArea_isVoted" value="${commentsSessionMap.isVoted}"/>
+<input type="hidden" name="isAuthor" id="commentsArea_isAuthor" value="${commentsSessionMap.isAuthor}"/>
 <input type="hidden" name="addedBy" id="commentsArea_addedBy" value="${commentsAddedBy}"/>
 
 

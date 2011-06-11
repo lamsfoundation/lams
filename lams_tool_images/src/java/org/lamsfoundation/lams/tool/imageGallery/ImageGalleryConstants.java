@@ -47,6 +47,7 @@ public class ImageGalleryConstants {
     public static final String PARAM_CURRENT_IMAGE = "currentImage";
     public static final String PARAM_CURRENT_RATING = "currentRating";
     public static final String PARAM_IS_VOTED = "isVoted";
+    public static final String PARAM_IS_AUTHOR = "isAuthor";
     public static final String PARAM_NUMBER_RATINGS = "numberRatings";
     public static final String PARAM_AVERAGE_RATING = "averageRating";
 

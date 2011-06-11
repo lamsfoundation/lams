@@ -319,6 +319,16 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     public void saveOrUpdateImageGalleryItem(ImageGalleryItem image) {
 	imageGalleryItemDao.saveObject(image);
     }
+    
+    public void deleteImage(Long toolSessionId, Long imageUid) {
+	ImageGallery imageGallery = getImageGalleryBySessionId(toolSessionId);
+	ImageGalleryItem image = getImageGalleryItemByUid(imageUid);
+	
+	Set<ImageGalleryItem> imageList = imageGallery.getImageGalleryItems();
+	imageList.remove(image);
+	imageGallery.setImageGalleryItems(imageList);
+	saveOrUpdateImageGallery(imageGallery);
+    }
 
     public ImageRating getImageRatingByImageAndUser(Long imageUid, Long userId) {
 	return imageRatingDao.getImageRatingByImageAndUser(imageUid, userId);

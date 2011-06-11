@@ -187,6 +187,13 @@
 			<forward name="images" path="/pages/learning/parts/addmultipleimages.jsp" />
 			<forward name="success" path="/pages/learning/start.jsp" />
 		</action>		
+		<action path="/learning/deleteImage"
+			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
+			parameter="deleteImage"
+			scope="request" 
+			validate="false">
+			<forward name="success" path="/learning/start.do" redirect="true"/>
+		</action>		
 		
 		<action path="/learning/loadImageData"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"

@@ -46,6 +46,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.struts.action.ActionRedirect;
+import org.apache.struts.config.ForwardConfig;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.DeliveryMethodMail;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -110,6 +112,9 @@ public class LearningAction extends Action {
 	}
 	if (param.equals("saveMultipleImages")) {
 	    return saveMultipleImages(mapping, form, request, response);
+	}
+	if (param.equals("deleteImage")) {
+	    return deleteImage(mapping, form, request, response);
 	}
 
 	// ================ Comments =======================
@@ -406,6 +411,35 @@ public class LearningAction extends Action {
 
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
+    
+    /**
+     * Save file or url imageGallery item into database.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward deleteImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	IImageGalleryService service = getImageGalleryService();
+	
+	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
+	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
+
+	service.deleteImage(sessionId, imageUid);
+	
+	// redirect	
+	ForwardConfig redirectConfig = mapping.findForwardConfig(ImageGalleryConstants.SUCCESS);
+	ActionRedirect redirect = new ActionRedirect(redirectConfig);
+	redirect.addParameter(AttributeNames.ATTR_MODE, mode);
+	redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
+	return redirect;
+    }
 
     /**
      * Sets Image data to session variable, to be shown on main learning page.
@@ -436,7 +470,8 @@ public class LearningAction extends Action {
 
 	// becuase in webpage will use this login name. Here is just
 	// initial it to avoid session close error in proxy object.
-	if (image.getCreateBy() != null) {
+	ImageGalleryUser createdBy = image.getCreateBy();
+	if (createdBy != null) {
 	    image.getCreateBy().getLoginName();
 	}
 
@@ -472,6 +507,11 @@ public class LearningAction extends Action {
 	    }
 	    sessionMap.put(ImageGalleryConstants.PARAM_IS_VOTED, isVotedForThisImage);
 	}
+	
+	//set visibility of "Delete image" button 
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	boolean isAuthor = !mode.isTeacher() && !image.isCreateByAuthor() && (createdBy != null) && (createdBy.getUserId().equals(imageGalleryUser.getUserId()));
+	sessionMap.put(ImageGalleryConstants.PARAM_IS_AUTHOR, isAuthor);
 
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
