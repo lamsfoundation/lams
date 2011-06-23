@@ -2,7 +2,7 @@
 
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
-
+SET FOREIGN_KEY_CHECKS=0;
 ----------------------Put all sql statements below here-------------------------
 
 ALTER TABLE tl_laqa11_content ADD COLUMN allow_rate_answers TINYINT(1) NOT NULL DEFAULT 0;
@@ -35,3 +35,4 @@ UPDATE lams_tool SET tool_version = "20110217" WHERE tool_signature = "laqa11";
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;
 SET AUTOCOMMIT = 1;
+SET FOREIGN_KEY_CHECKS=1;
