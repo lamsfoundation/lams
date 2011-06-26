@@ -1,4 +1,5 @@
 SET AUTOCOMMIT = 0;
+set FOREIGN_KEY_CHECKS = 0;
 
 -- SIF-10 Addding a release date to the lesson table so we can 
 -- track release events
@@ -161,3 +162,4 @@ values ('ForceMobileDevToUseFlashless','false', 'config.force.mobile.use.flashle
 
 COMMIT;
 SET AUTOCOMMIT = 1;
+set FOREIGN_KEY_CHECKS = 1;
