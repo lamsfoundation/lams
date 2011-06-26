@@ -151,8 +151,7 @@ CREATE TABLE lams_planner_activity_metadata (
 ALTER TABLE lams_planner_nodes DROP COLUMN file_uuid, DROP COLUMN file_name, ADD COLUMN ld_id BIGINT(20), ADD COLUMN teachers_permissions TINYINT UNSIGNED;
 
 -- all statements below should be moved to a next patch file?
-ALTER TABLE lams_planner_nodes CHANGE COLUMN teachers_permissions permissions INTEGER, ADD COLUMN user_id BIGINT(20),
-							   ADD CONSTRAINT FK_lams_planner_node_user FOREIGN KEY (user_id) REFERENCES lams_user(user_id) ON DELETE SET NULL ON UPDATE SET NULL;
+ALTER TABLE lams_planner_nodes CHANGE COLUMN teachers_permissions permissions INTEGER, ADD COLUMN user_id BIGINT(20), ADD CONSTRAINT FK_lams_planner_node_user FOREIGN KEY (user_id) REFERENCES lams_user(user_id) ON DELETE SET NULL ON UPDATE SET NULL;
 
 
 -- LDEV-2664 Switch learner interface for learners if they use a mobile device
