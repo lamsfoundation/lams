@@ -44,7 +44,7 @@
 	<param-value>context.central</param-value>
 </context-param>
 
-  <filter>
+<filter>
 	<filter-name>SystemSessionFilter</filter-name>
 	<filter-class>
 		org.lamsfoundation.lams.web.session.SystemSessionFilter
@@ -85,11 +85,11 @@
 	-->
 	<init-param>
 		<param-name>ignorePaths</param-name>
-		<param-value>/login,/server,/echo</param-value>
+		<param-value>/servlet/authoring/storeLearningDesignDetails</param-value>
 	</init-param>
 </filter>
 
-  <filter-mapping>
+<filter-mapping>
 	<filter-name>SystemSessionFilter</filter-name>
 	<url-pattern>*.do</url-pattern>
 </filter-mapping>
@@ -116,7 +116,7 @@
 
 <filter-mapping>
 	<filter-name>SystemSessionFilter</filter-name>
-	<url-pattern>/fckeditor/*</url-pattern>
+	<url-pattern>/ckeditor/*</url-pattern>
 </filter-mapping>
 
 <filter-mapping>
@@ -156,7 +156,7 @@
 
 <filter-mapping>
 	<filter-name>hibernateFilter</filter-name>
-	<url-pattern>/fckeditor/*</url-pattern>
+	<url-pattern>/ckeditor/*</url-pattern>
 </filter-mapping>
 
 <filter-mapping>
@@ -196,12 +196,12 @@
 
 <filter-mapping>
 	<filter-name>LocaleFilter</filter-name>
-	<url-pattern>/fckeditor/*</url-pattern>
+	<url-pattern>/ckeditor/*</url-pattern>
 </filter-mapping>
 
 <filter-mapping>
 	<filter-name>OpenIdFilter</filter-name>
-<url-pattern>/*</url-pattern>
+<url-pattern>/OpenIDServlet</url-pattern>
 </filter-mapping>
 
 <filter-mapping>
@@ -234,18 +234,28 @@
 </listener>
 
    <servlet>
+      <servlet-name>insertLearningDesign</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.authoring.web.InsertLDServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>GetRecordingServlet</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.webservice.GetRecordingServlet</servlet-class>
+
+   </servlet>
+   <servlet>
       <servlet-name>forgotPasswordServlet</servlet-name>
       <servlet-class>org.lamsfoundation.lams.web.ForgotPasswordServlet</servlet-class>
 
    </servlet>
    <servlet>
-      <servlet-name>WhiteboardToSwfServlet</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.webservice.WhiteboardToSwfServlet</servlet-class>
+      <servlet-name>flashCrashDump</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.web.FlashCrashDumpServlet</servlet-class>
 
    </servlet>
    <servlet>
-      <servlet-name>dumpWDDX</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.web.ReportWddxStructureServlet</servlet-class>
+      <servlet-name>storeLD</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.authoring.web.StoreLDServlet</servlet-class>
 
    </servlet>
    <servlet>
@@ -293,8 +303,45 @@
 
    </servlet>
    <servlet>
+      <servlet-name>copyMultipleToolContent</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.authoring.web.CopyMultipleToolContentServlet</servlet-class>
+
+   </servlet>
+   <servlet>
       <servlet-name>updateCollapsedGroup</servlet-name>
       <servlet-class>org.lamsfoundation.lams.web.UpdateCollapsedGroupServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>storeNotebookEntry</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.notebook.web.StoreNBEntryServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>lamsStartupServlet</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.web.LamsStartupServlet</servlet-class>
+
+      <load-on-startup>1</load-on-startup>
+
+   </servlet>
+   <servlet>
+      <servlet-name>WhiteboardToSwfServlet</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.webservice.WhiteboardToSwfServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>storeTheme</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.themes.web.StoreThemeServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>competenceServlet</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.authoring.web.CompetenceServlet</servlet-class>
+
+   </servlet>
+   <servlet>
+      <servlet-name>LessonJoinServlet</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.webservice.xml.LessonJoinServlet</servlet-class>
 
    </servlet>
    <servlet>
@@ -314,13 +361,8 @@
 
    </servlet>
    <servlet>
-      <servlet-name>BogoPogoServlet</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.webservice.WhiteboardToJpgServlet</servlet-class>
-
-   </servlet>
-   <servlet>
-      <servlet-name>flashCrashDump</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.web.FlashCrashDumpServlet</servlet-class>
+      <servlet-name>saveLessonOrder</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.web.LessonOrderServlet</servlet-class>
 
    </servlet>
    <servlet>
@@ -329,55 +371,13 @@
 
    </servlet>
    <servlet>
-      <servlet-name>competenceServlet</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.authoring.web.CompetenceServlet</servlet-class>
+      <servlet-name>dumpWDDX</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.web.ReportWddxStructureServlet</servlet-class>
 
    </servlet>
    <servlet>
-      <servlet-name>LessonJoinServlet</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.webservice.xml.LessonJoinServlet</servlet-class>
-
-   </servlet>
-   <servlet>
-      <servlet-name>storeLD</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.authoring.web.StoreLDServlet</servlet-class>
-
-   </servlet>
-   <servlet>
-      <servlet-name>saveLessonOrder</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.web.LessonOrderServlet</servlet-class>
-
-   </servlet>
-   <servlet>
-      <servlet-name>storeTheme</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.themes.web.StoreThemeServlet</servlet-class>
-
-   </servlet>
-   <servlet>
-      <servlet-name>insertLearningDesign</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.authoring.web.InsertLDServlet</servlet-class>
-
-   </servlet>
-   <servlet>
-      <servlet-name>storeNotebookEntry</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.notebook.web.StoreNBEntryServlet</servlet-class>
-
-   </servlet>
-   <servlet>
-      <servlet-name>lamsStartupServlet</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.web.LamsStartupServlet</servlet-class>
-
-      <load-on-startup>1</load-on-startup>
-
-   </servlet>
-   <servlet>
-      <servlet-name>GetRecordingServlet</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.webservice.GetRecordingServlet</servlet-class>
-
-   </servlet>
-   <servlet>
-      <servlet-name>copyMultipleToolContent</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.authoring.web.CopyMultipleToolContentServlet</servlet-class>
+      <servlet-name>BogoPogoServlet</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.webservice.WhiteboardToJpgServlet</servlet-class>
 
    </servlet>
 
@@ -448,6 +448,13 @@
 </servlet>
 
 <servlet>
+	<servlet-name>LearningDesignSVG</servlet-name>
+	<servlet-class>
+		org.lamsfoundation.lams.webservice.LearningDesignSVGServlet
+	</servlet-class>
+</servlet>
+
+<servlet>
 	<servlet-name>LessonManager</servlet-name>
 	<servlet-class>
 		org.lamsfoundation.lams.webservice.xml.LessonManagerServlet
@@ -502,6 +509,11 @@
 </servlet-mapping>
 
 <servlet-mapping>
+	<servlet-name>LearningDesignSVG</servlet-name>
+	<url-pattern>/services/LearningDesignSVG/*</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
 	<servlet-name>LessonManager</servlet-name>
 	<url-pattern>/services/xml/LessonManager/*</url-pattern>
 </servlet-mapping>
@@ -517,64 +529,36 @@
 </servlet-mapping>
 
    <servlet-mapping>
+      <servlet-name>insertLearningDesign</servlet-name>
+      <url-pattern>/servlet/authoring/insertLearningDesign</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>GetRecordingServlet</servlet-name>
+      <url-pattern>/GetRecording</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
       <servlet-name>forgotPasswordServlet</servlet-name>
       <url-pattern>/ForgotPasswordRequest</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>WhiteboardToSwfServlet</servlet-name>
-      <url-pattern>/WhiteboardToSwf</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>dumpWDDX</servlet-name>
-      <url-pattern>/servlet/dumpWDDX</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>SimpleUploader</servlet-name>
-      <url-pattern>/fckeditor/editor/filemanager/upload/simpleuploader</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>updateCollapsedGroup</servlet-name>
-      <url-pattern>/servlet/updateCollapsedGroup</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>Connector</servlet-name>
-      <url-pattern>/fckeditor/editor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>BogoPogoServlet</servlet-name>
-      <url-pattern>/BogoPogo</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>flashCrashDump</servlet-name>
       <url-pattern>/servlet/flashCrashDump</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>editLD</servlet-name>
-      <url-pattern>/eof/authoring/editLearningDesign</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>competenceServlet</servlet-name>
-      <url-pattern>/competenceServlet</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
-      <servlet-name>LessonJoinServlet</servlet-name>
-      <url-pattern>/services/xml/LessonJoin/*</url-pattern>
-   </servlet-mapping>
-   <servlet-mapping>
       <servlet-name>storeLD</servlet-name>
       <url-pattern>/servlet/authoring/storeLearningDesignDetails</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>saveLessonOrder</servlet-name>
-      <url-pattern>/servlet/saveLessonOrder</url-pattern>
+      <servlet-name>SimpleUploader</servlet-name>
+      <url-pattern>/ckeditor/filemanager/upload/simpleuploader</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>storeTheme</servlet-name>
-      <url-pattern>/themes/servlet/storeTheme</url-pattern>
+      <servlet-name>copyMultipleToolContent</servlet-name>
+      <url-pattern>/servlet/authoring/copyMultipleToolContent</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>insertLearningDesign</servlet-name>
-      <url-pattern>/servlet/authoring/insertLearningDesign</url-pattern>
+      <servlet-name>updateCollapsedGroup</servlet-name>
+      <url-pattern>/servlet/updateCollapsedGroup</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>storeNotebookEntry</servlet-name>
@@ -585,12 +569,40 @@
       <url-pattern>/lamsstartupservlet</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>GetRecordingServlet</servlet-name>
-      <url-pattern>/GetRecording</url-pattern>
+      <servlet-name>WhiteboardToSwfServlet</servlet-name>
+      <url-pattern>/WhiteboardToSwf</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>copyMultipleToolContent</servlet-name>
-      <url-pattern>/servlet/authoring/copyMultipleToolContent</url-pattern>
+      <servlet-name>storeTheme</servlet-name>
+      <url-pattern>/themes/servlet/storeTheme</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>competenceServlet</servlet-name>
+      <url-pattern>/competenceServlet</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>LessonJoinServlet</servlet-name>
+      <url-pattern>/services/xml/LessonJoin/*</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>Connector</servlet-name>
+      <url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>saveLessonOrder</servlet-name>
+      <url-pattern>/servlet/saveLessonOrder</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>editLD</servlet-name>
+      <url-pattern>/eof/authoring/editLearningDesign</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>dumpWDDX</servlet-name>
+      <url-pattern>/servlet/dumpWDDX</url-pattern>
+   </servlet-mapping>
+   <servlet-mapping>
+      <servlet-name>BogoPogoServlet</servlet-name>
+      <url-pattern>/BogoPogo</url-pattern>
    </servlet-mapping>
 
    <session-config>
@@ -679,10 +691,6 @@
 		<!--  ======================================================== -->	
 		<!--   Customized Tag Library -->
 		<!--  ======================================================== -->	
-		<taglib>
-		    <taglib-uri>fck-editor</taglib-uri>
-		    <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
-		</taglib>
 		 <taglib>
 		   <taglib-uri>tags-lams</taglib-uri>
 		   <taglib-location>/WEB-INF/lams.tld</taglib-location>
@@ -759,6 +767,15 @@
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>MONITOR</role-name>
+    	</auth-constraint>
+    </security-constraint>
+    <security-constraint>
+	   	<web-resource-collection>
+	    	<web-resource-name>Prohibited Content</web-resource-name>
+		    <url-pattern>/index.do</url-pattern>
+    	</web-resource-collection>
+    	<auth-constraint>
+    		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
 
