@@ -1,10 +1,4 @@
 <filter-mapping>
-    	<filter-name>UrlRewriteFilter</filter-name>
-        <url-pattern>/learner.jsp</url-pattern>
-        <dispatcher>FORWARD</dispatcher>
-</filter-mapping>
-
-<filter-mapping>
 	<filter-name>SystemSessionFilter</filter-name>
 	<url-pattern>*.do</url-pattern>
 </filter-mapping>
