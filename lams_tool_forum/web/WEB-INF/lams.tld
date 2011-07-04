@@ -496,6 +496,15 @@
         <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
+  	<tag>
+		<description>Checks whether Flash enabled for learner</description>
+		<display-name>Checks whether Flash enabled for learner</display-name>
+		<icon>    
+		</icon>
+		<name>LearnerFlashEnabled</name>
+		<tag-class>org.lamsfoundation.lams.web.tag.LearnerFlashEnabledTag</tag-class>
+		<body-content>empty</body-content>
+ 	</tag>
 	<tag-file>
 		<name>head</name>
 	    <path>/WEB-INF/tags/Head.tag</path>
@@ -503,10 +512,6 @@
   	<tag-file>
 	    <name>ProgressOutput</name>
 		<path>/WEB-INF/tags/ProgressOutput.tag</path>
-   	</tag-file>  
-	<tag-file>
-	    <name>LearnerFlashEnabled</name>
-		<path>/WEB-INF/tags/LearnerFlashEnabled.tag</path>
    	</tag-file>  
 
 </taglib>

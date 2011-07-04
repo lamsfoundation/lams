@@ -142,6 +142,8 @@ public class ConfigurationKeys {
     public static String ALLOW_EDIT_ON_FLY = "AllowLiveEdit";
     
     public static String SHOW_ALL_MY_LESSON_LINK = "ShowAllMyLessonLink";
+    
+    public static String FORCE_MOBILE_DEV_TO_USE_FLASHLESS = "ForceMobileDevToUseFlashless";
 
     public static String LDAP_PROVISIONING_ENABLED = "LDAPProvisioningEnabled";
 
