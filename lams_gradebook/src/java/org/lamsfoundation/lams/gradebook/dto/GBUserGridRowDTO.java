@@ -36,6 +36,9 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     String output;
     String activityUrl;
     
+    // For excel export
+    String firstName;
+    String lastName;
 
     public GBUserGridRowDTO() {
     }
@@ -113,6 +116,22 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 
     public void setActivityUrl(String activityUrl) {
 	this.activityUrl = activityUrl;
+    }
+    
+    public String getFirstName() {
+	return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+	this.firstName = firstName;
+    }
+    
+    public String getLastName() {
+	return lastName;
+    }
+
+    public void setLastName(String lastName) {
+	this.lastName = lastName;
     }
 
 }

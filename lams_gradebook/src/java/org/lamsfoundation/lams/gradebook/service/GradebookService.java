@@ -245,6 +245,8 @@ public class GradebookService implements IGradebookService {
 	    for (User learner : learners) {
 		GBUserGridRowDTO gUserDTO = new GBUserGridRowDTO();
 		gUserDTO.setRowName(learner.getLastName() + " " + learner.getFirstName());
+		gUserDTO.setFirstName(learner.getFirstName());
+		gUserDTO.setLastName(learner.getLastName());
 		gUserDTO.setId(learner.getUserId().toString());
 
 		gUserDTO.setMarksAvailable(getTotalMarksAvailable(activity));
@@ -303,6 +305,8 @@ public class GradebookService implements IGradebookService {
 		    GBUserGridRowDTO gradebookUserDTO = new GBUserGridRowDTO();
 		    gradebookUserDTO.setId(learner.getUserId().toString());
 		    gradebookUserDTO.setRowName(learner.getLastName() + " " + learner.getFirstName());
+		    gradebookUserDTO.setFirstName(learner.getFirstName());
+		    gradebookUserDTO.setLastName(learner.getLastName());
 
 		    // Setting the status and time taken for the user's lesson
 		    LearnerProgress learnerProgress = getLearnerProgress(lesson, learner);
@@ -567,22 +571,24 @@ public class GradebookService implements IGradebookService {
 		ExcelCell[] activityTitleRow = new ExcelCell[4];
 		activityTitleRow[0] = new ExcelCell(act.getTitle(), true);
 		rowList.add(activityTitleRow);
-		ExcelCell[] titleRow = new ExcelCell[4];
-		titleRow[0] = new ExcelCell(getMessage("gradebook.export.user"), true);
-		titleRow[1] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
-		titleRow[2] = new ExcelCell(getMessage("gradebook.export.outputs"), true);
-		titleRow[3] = new ExcelCell(getMessage("gradebook.columntitle.mark"), true);
+		ExcelCell[] titleRow = new ExcelCell[5];
+		titleRow[0] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
+		titleRow[1] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
+		titleRow[2] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
+		titleRow[3] = new ExcelCell(getMessage("gradebook.export.outputs"), true);
+		titleRow[4] = new ExcelCell(getMessage("gradebook.columntitle.mark"), true);
 		rowList.add(titleRow);
 
 		// Get the rest of the data
 		List<GBUserGridRowDTO> userRows = activityViewMap.get(act);
 		for (GBUserGridRowDTO userRow : userRows) {
-		    ExcelCell[] userDataRow = new ExcelCell[4];
+		    ExcelCell[] userDataRow = new ExcelCell[5];
 
-		    userDataRow[0] = new ExcelCell(userRow.getRowName(), false);
-		    userDataRow[1] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
-		    userDataRow[2] = new ExcelCell(userRow.getOutput(), false);
-		    userDataRow[3] = new ExcelCell(userRow.getMark(), false);
+		    userDataRow[0] = new ExcelCell(userRow.getLastName(), false);
+		    userDataRow[1] = new ExcelCell(userRow.getFirstName(), false);
+		    userDataRow[2] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
+		    userDataRow[3] = new ExcelCell(userRow.getOutput(), false);
+		    userDataRow[4] = new ExcelCell(userRow.getMark(), false);
 		    rowList.add(userDataRow);
 		}
 
@@ -702,18 +708,20 @@ public class GradebookService implements IGradebookService {
 	    ArrayList<GBUserGridRowDTO> userRows = getGBUserRowsForLesson(lesson);
 
 	    // Setting up the user marks table
-	    ExcelCell[] userTitleRow = new ExcelCell[3];
-	    userTitleRow[0] = new ExcelCell(getMessage("gradebook.export.user"), true);
-	    userTitleRow[1] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
-	    userTitleRow[2] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
+	    ExcelCell[] userTitleRow = new ExcelCell[4];
+	    userTitleRow[0] = new ExcelCell(getMessage("gradebook.export.last.name"), true);int s =2;
+	    userTitleRow[1] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
+	    userTitleRow[2] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
+	    userTitleRow[3] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
 	    rowList.add(userTitleRow);
 
 	    for (GBUserGridRowDTO userRow : userRows) {
 		// Adding the user data for the lesson
-		ExcelCell[] userDataRow = new ExcelCell[3];
-		userDataRow[0] = new ExcelCell(userRow.getRowName(), false);
-		userDataRow[1] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
-		userDataRow[2] = new ExcelCell(userRow.getMark(), false);
+		ExcelCell[] userDataRow = new ExcelCell[4];
+		userDataRow[0] = new ExcelCell(userRow.getLastName(), false);
+		userDataRow[1] = new ExcelCell(userRow.getFirstName(), false);
+		userDataRow[2] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
+		userDataRow[3] = new ExcelCell(userRow.getMark(), false);
 		rowList.add(userDataRow);
 	    }
 	    // ------------------------------------------------------------------
@@ -744,22 +752,24 @@ public class GradebookService implements IGradebookService {
 	    ArrayList<GBUserGridRowDTO> userRows = getGBUserRowsForLesson(lesson);
 
 	    // Setting up the user marks table
-	    ExcelCell[] userTitleRow = new ExcelCell[5];
-	    userTitleRow[0] = new ExcelCell(getMessage("gradebook.exportcourse.learner.name"), true);
-	    userTitleRow[1] = new ExcelCell(getMessage("gradebook.exportcourse.progress"), true);
-	    userTitleRow[2] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
-	    userTitleRow[3] = new ExcelCell(getMessage("gradebook.exportcourse.lessonFeedback"), true);
-	    userTitleRow[4] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
+	    ExcelCell[] userTitleRow = new ExcelCell[6];
+	    userTitleRow[0] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
+	    userTitleRow[1] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
+	    userTitleRow[2] = new ExcelCell(getMessage("gradebook.exportcourse.progress"), true);
+	    userTitleRow[3] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
+	    userTitleRow[4] = new ExcelCell(getMessage("gradebook.exportcourse.lessonFeedback"), true);
+	    userTitleRow[5] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
 	    rowList.add(userTitleRow);
 
 	    for (GBUserGridRowDTO userRow : userRows) {
 		// Adding the user data for the lesson
-		ExcelCell[] userDataRow = new ExcelCell[5];
-		userDataRow[0] = new ExcelCell(userRow.getRowName(), false);
-		userDataRow[1] = new ExcelCell(userRow.getStatus(), false);
-		userDataRow[2] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
-		userDataRow[3] = new ExcelCell(userRow.getFeedback(), false);
-		userDataRow[4] = new ExcelCell(userRow.getMark(), false);
+		ExcelCell[] userDataRow = new ExcelCell[6];
+		userDataRow[0] = new ExcelCell(userRow.getLastName(), false);
+		userDataRow[1] = new ExcelCell(userRow.getFirstName(), false);
+		userDataRow[2] = new ExcelCell(userRow.getStatus(), false);
+		userDataRow[3] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
+		userDataRow[4] = new ExcelCell(userRow.getFeedback(), false);
+		userDataRow[5] = new ExcelCell(userRow.getMark(), false);
 		rowList.add(userDataRow);
 	    }
 

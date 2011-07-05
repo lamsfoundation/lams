@@ -170,7 +170,6 @@
 				<exclude name="web.xml" />
 				<exclude name="classes/**" />
 			</webinf>
-			<classes dir="${build.classes.java}" />
 			<!-- front end programs like HTML, JSP, CSS etc. -->
 			<fileset dir="${conf.web.dir}">
 				<include name="**/*.jsp" />
