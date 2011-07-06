@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -359,6 +360,14 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	String fileName = organisation.getName().replaceAll(" ", "_") + ".xls";
 	response.setContentType("application/x-download");
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);	
+	
+	//downloadTokenValue will have been provided when requesting excel export
+	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
+	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
+	fileDownloadTokenCookie.setPath("/");
+	response.addCookie(fileDownloadTokenCookie); 
+	
+	//Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
 	GradebookUtil.exportGradebookLessonToExcel(out, gradebookService.getMessage("gradebook.export.dateheader"),
 		dataToExport);

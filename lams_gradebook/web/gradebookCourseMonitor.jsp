@@ -27,11 +27,52 @@
 	</style>
 	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
 
 	<script type="text/javascript">
+	
+		//Detecting-the-file-download-dialog-in-the-browser: http://geekswithblogs.net/GruffCode/archive/2010/10/28/detecting-the-file-download-dialog-in-the-browser.aspx
+		var fileDownloadCheckTimer;
+		function blockExportButton() {
+		    var token = new Date().getTime(); //use the current timestamp as the token value
+		    
+			$('#exportLinkArea').block({
+		    	message: '<h1 style="color:#fff";><fmt:message key="gradebook.coursemonitor.wait"/></h1>',
+		    	baseZ: 1000000,
+		    	fadeIn:  0, 
+			    css: { 
+		        	border: 'none', 
+		        	padding: '3px', 
+		        	backgroundColor: '#000', 
+		        	'-webkit-border-radius': '10px', 
+		        	'-moz-border-radius': '10px', 
+		        	opacity: .8 
+		    	},
+		    	overlayCSS: {
+			    	opacity: 0
+		    	}
+	        });
+		    
+		    fileDownloadCheckTimer = window.setInterval(function () {
+		    	var cookieValue = $.cookie('fileDownloadToken');
+		    	if (cookieValue == token) {
+		    		unBlockExportButton();
+		    	}
+		    }, 1000);
+			
+		    document.location.href = "<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelCourseGradebook&organisationID=${organisationID}&downloadTokenValue=" + token;
+			return false;
+		}
+		
+		function unBlockExportButton() {
+			window.clearInterval(fileDownloadCheckTimer);
+			$.cookie('fileDownloadToken', null); //clears this cookie value
+			$('#exportLinkArea').unblock();
+		} 
 		
 		jQuery(document).ready(function(){
-  
+
 			jQuery("#organisationGrid").jqGrid({
 				caption: "${organisationName}",
 			    datatype: "xml",
@@ -184,11 +225,11 @@
 			</h1>
 			<br />
 			
-			<a href="<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelCourseGradebook&organisationID=${organisationID}">
+			<div id="exportLinkArea" style="padding-bottom: 20px;">
+				<a href="#" onclick="JavaScript:blockExportButton();" >
 				<fmt:message key="gradebook.export.excel.1" />
 			</a> <fmt:message key="gradebook.export.excel.2" />
-			<br />
-			<br />
+			</div>
 			
 			<div style="width: 700px; margin-left: 10px; margin-right: 10px;">
 				<table id="organisationGrid" class="scroll"></table>
