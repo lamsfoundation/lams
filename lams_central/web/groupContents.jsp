@@ -54,6 +54,13 @@
 					</span>
 				</a>
 			</c:forEach>
+			<c:forEach var="childlink" items="${childOrg.moreLinks}">
+				<a href="${childlink.url}" class="sequence-action-link" title="${childlink.tooltip}"> 
+					<span class="${childlink.style}" >
+						<fmt:message key="${childlink.name}" />
+					</span>
+				</a>
+			</c:forEach>    
 		</p>
 		
 		<div class="sequence-name">

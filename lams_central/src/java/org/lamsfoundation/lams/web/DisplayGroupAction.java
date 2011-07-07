@@ -188,6 +188,16 @@ public class DisplayGroupAction extends Action {
 			    + "&classID=" + org.getOrganisationId()
 			    + "&KeepThis=true&TB_iframe=true&height=480&width=610", "add-lesson-button thickbox"
 			    + org.getOrganisationId(), null));
+		
+		// Adding gradebook course monitor links if enabled
+		if (org.getParentOrganisation().getEnableGradebookForMonitors() && (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))) {
+		    String link = "javascript:openGradebookCourseMonitorPopup(" + "'" + org.getName() + "','"
+			    + Configuration.get(ConfigurationKeys.SERVER_URL)
+			    + "/gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID="
+			    + org.getOrganisationId() + "'," + "850,400,0,0);";
+
+		    moreLinks.add(new IndexLinkBean("index.coursegradebook.subgroup", link, "mycourses-mark-img", ""));
+		}
 	    }
 	}
 	orgBean.setLinks(links);
