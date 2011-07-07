@@ -106,8 +106,8 @@ public class GradebookService implements IGradebookService {
     @SuppressWarnings("unchecked")
     public List<GradebookGridRowDTO> getGBActivityRowsForLearner(Lesson lesson, User learner) {
 
-	GradebookService.logger.debug("Getting gradebook user data for lesson: " + lesson.getLessonId()
-		+ ". For user: " + learner.getUserId());
+	logger.debug("Getting gradebook user data for lesson: " + lesson.getLessonId() + ". For user: "
+		+ learner.getUserId());
 
 	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
 
@@ -116,7 +116,7 @@ public class GradebookService implements IGradebookService {
 	properties.put("user", learner);
 	LearnerProgress learnerProgress = getLearnerProgress(lesson, learner);
 
-	Set<Activity> activities = lesson.getLearningDesign().getActivities();
+	Set<Activity> activities = (Set<Activity>) lesson.getLearningDesign().getActivities();
 
 	/*
 	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
@@ -156,7 +156,7 @@ public class GradebookService implements IGradebookService {
     @SuppressWarnings("unchecked")
     public List<GradebookGridRowDTO> getGBActivityRowsForLesson(Lesson lesson) {
 
-	GradebookService.logger.debug("Getting gradebook data for lesson: " + lesson.getLessonId());
+	logger.debug("Getting gradebook data for lesson: " + lesson.getLessonId());
 
 	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
 
@@ -311,6 +311,13 @@ public class GradebookService implements IGradebookService {
 		    // Setting the status and time taken for the user's lesson
 		    LearnerProgress learnerProgress = getLearnerProgress(lesson, learner);
 		    gradebookUserDTO.setStatus(getLessonStatusStr(learnerProgress));
+		    
+		    //set current activity if available
+		    if ((learnerProgress != null) && (learnerProgress.getCurrentActivity() != null)) {
+			gradebookUserDTO.setCurrentActivity(learnerProgress.getCurrentActivity().getTitle());
+		    }
+		    
+		    //calculate time taken
 		    if (learnerProgress != null) {
 			if (learnerProgress.getStartDate() != null && learnerProgress.getFinishDate() != null) {
 			    gradebookUserDTO.setTimeTaken(learnerProgress.getFinishDate().getTime()
@@ -526,7 +533,7 @@ public class GradebookService implements IGradebookService {
 	    }
 
 	} else {
-	    GradebookService.logger.error("Request for gradebook grid with a null organisation");
+	    logger.error("Request for gradebook grid with a null organisation");
 	}
 
 	return lessonRows;
@@ -568,7 +575,7 @@ public class GradebookService implements IGradebookService {
 
 	    for (Activity act : activityViewMap.keySet()) {
 
-		ExcelCell[] activityTitleRow = new ExcelCell[4];
+		ExcelCell[] activityTitleRow = new ExcelCell[5];
 		activityTitleRow[0] = new ExcelCell(act.getTitle(), true);
 		rowList.add(activityTitleRow);
 		ExcelCell[] titleRow = new ExcelCell[5];
@@ -592,7 +599,7 @@ public class GradebookService implements IGradebookService {
 		    rowList.add(userDataRow);
 		}
 
-		rowList.add(GradebookService.EMPTY_ROW);
+		rowList.add(EMPTY_ROW);
 	    }
 
 	    data = rowList.toArray(new ExcelCell[][] {});
@@ -637,7 +644,7 @@ public class GradebookService implements IGradebookService {
 		    rowList.add(activityDataRow);
 		}
 
-		rowList.add(GradebookService.EMPTY_ROW);
+		rowList.add(EMPTY_ROW);
 	    }
 
 	    data = rowList.toArray(new ExcelCell[][] {});
@@ -665,10 +672,9 @@ public class GradebookService implements IGradebookService {
 
 	    ExcelCell[] lessonAverageTimeTaken = new ExcelCell[2];
 	    lessonAverageTimeTaken[0] = new ExcelCell(getMessage("gradebook.export.average.lesson.time.taken"), true);
-	    lessonAverageTimeTaken[1] = new ExcelCell(gradebookDAO.getAverageDurationLesson(lesson.getLessonId()),
-		    false);
+	    lessonAverageTimeTaken[1] = new ExcelCell(gradebookDAO.getAverageDurationLesson(lesson.getLessonId()), false);
 	    rowList.add(lessonAverageTimeTaken);
-	    rowList.add(GradebookService.EMPTY_ROW);
+	    rowList.add(EMPTY_ROW);
 	    // ------------------------------------------------------------------
 
 	    // Adding the activity average data to the summary -----------------
@@ -696,7 +702,7 @@ public class GradebookService implements IGradebookService {
 		activityDataRow[3] = new ExcelCell(activityRow.getAverageMark(), false);
 		rowList.add(activityDataRow);
 	    }
-	    rowList.add(GradebookService.EMPTY_ROW);
+	    rowList.add(EMPTY_ROW);
 	    // ------------------------------------------------------------------
 
 	    // Adding the user lesson marks to the summary----------------------
@@ -709,7 +715,7 @@ public class GradebookService implements IGradebookService {
 
 	    // Setting up the user marks table
 	    ExcelCell[] userTitleRow = new ExcelCell[4];
-	    userTitleRow[0] = new ExcelCell(getMessage("gradebook.export.last.name"), true);int s =2;
+	    userTitleRow[0] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
 	    userTitleRow[1] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
 	    userTitleRow[2] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
 	    userTitleRow[3] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
@@ -739,9 +745,16 @@ public class GradebookService implements IGradebookService {
     public ExcelCell[][] getCourseDataForExcel(Integer userId, Integer organisationId) {
 	// The entire data list
 	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
-	
+
+	User user = (User) getUserService().findById(User.class, userId);
 	List<Lesson> lessons = lessonService.getLessonsByGroupAndUser(userId, organisationId);
 	for (Lesson lesson : lessons) {
+
+	    // Dont include lesson in list if the user doesnt have permission
+	    if (!(lesson.getLessonClass().isStaffMember(user) || userService.isUserInRole(userId, organisationId,
+		    Role.GROUP_MANAGER))) {
+		continue;
+	    }
 
 	    // Adding the user lesson marks to the summary----------------------
 	    ExcelCell[] lessonTitle = new ExcelCell[1];
@@ -766,7 +779,15 @@ public class GradebookService implements IGradebookService {
 		ExcelCell[] userDataRow = new ExcelCell[6];
 		userDataRow[0] = new ExcelCell(userRow.getLastName(), false);
 		userDataRow[1] = new ExcelCell(userRow.getFirstName(), false);
-		userDataRow[2] = new ExcelCell(userRow.getStatus(), false);
+		String status;
+		if (userRow.getStatus().contains("tick.png")) {
+		    status = getMessage("gradebook.exportcourse.ok");
+		} else if (userRow.getStatus().contains("cog.png")) {
+		    status = getMessage("gradebook.exportcourse.current.activity", new String[] { userRow.getCurrentActivity()});
+		} else {
+		    status = "-";
+		}		
+		userDataRow[2] = new ExcelCell(status, false);
 		userDataRow[3] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
 		userDataRow[4] = new ExcelCell(userRow.getFeedback(), false);
 		userDataRow[5] = new ExcelCell(userRow.getMark(), false);
@@ -908,8 +929,8 @@ public class GradebookService implements IGradebookService {
     private GBActivityGridRowDTO getGradebookActivityDTO(ToolActivity activity, User learner,
 	    LearnerProgress learnerProgress) {
 
-	GradebookService.logger.debug("Getting gradebook data for activity: " + activity.getActivityId()
-		+ ". For user: " + learner.getUserId());
+	logger.debug("Getting gradebook data for activity: " + activity.getActivityId() + ". For user: "
+		+ learner.getUserId());
 
 	GBActivityGridRowDTO gactivityDTO = new GBActivityGridRowDTO();
 	gactivityDTO.setId(activity.getActivityId().toString());
@@ -1013,7 +1034,7 @@ public class GradebookService implements IGradebookService {
 		status = "<img src='" + IMAGES_DIR + "/tick.png' />";
 	    } else if (learnerProgress.getAttemptedActivities() != null
 		    && learnerProgress.getAttemptedActivities().size() > 0) {
-		status = "<img src='" + IMAGES_DIR + "/cog.png' />";
+		status = "<img src='" + IMAGES_DIR + "/cog.png' title='" + learnerProgress.getCurrentActivity().getTitle() + "' />";
 	    }
 	}
 	return status;
@@ -1032,7 +1053,7 @@ public class GradebookService implements IGradebookService {
 	if (learnerProgress != null) {
 	    byte statusByte = learnerProgress.getProgressState(activity);
 	    if (statusByte == LearnerProgress.ACTIVITY_ATTEMPTED) {
-		return "<img src='" + IMAGES_DIR + "/cog.png' />";
+		return "<img src='" + IMAGES_DIR + "/cog.png' title='" + learnerProgress.getCurrentActivity().getTitle() + "' />";
 	    } else if (statusByte == LearnerProgress.ACTIVITY_COMPLETED) {
 		return "<img src='" + IMAGES_DIR + "/tick.png' />";
 	    }
@@ -1078,7 +1099,7 @@ public class GradebookService implements IGradebookService {
 			}
 
 		    } catch (RuntimeException e) {
-			GradebookService.logger.debug("Runtime exception when attempted to get outputs for activity: "
+			logger.debug("Runtime exception when attempted to get outputs for activity: "
 				+ toolAct.getActivityId() + ", continuing for other activities", e);
 		    }
 		}
@@ -1156,6 +1177,10 @@ public class GradebookService implements IGradebookService {
 
     public String getMessage(String key) {
 	return messageService.getMessage(key);
+    }
+
+    public String getMessage(String key, Object[] args) {
+	return messageService.getMessage(key, args);
     }
 
     // Getter and setter methods -----------------------------------------------

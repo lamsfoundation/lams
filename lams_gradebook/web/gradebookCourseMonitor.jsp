@@ -135,7 +135,7 @@
 					     colModel:[
 					     	{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 					     	{name:'rowName',index:'rowName', sortable:true, editable:false},
-					      	{name:'status', index:'status', sortable:false, editable:false, search:false, width:50, align:"center"},
+					      	{name:'status', index:'status', sortable:false, editable:false, search:false, title:false, width:50, align:"center"},
 					      	{name:'timeTaken', index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
 					     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false},
 					     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}

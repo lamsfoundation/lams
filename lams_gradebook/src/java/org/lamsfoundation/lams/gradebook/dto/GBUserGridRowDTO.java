@@ -39,6 +39,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     // For excel export
     String firstName;
     String lastName;
+    String currentActivity;
 
     public GBUserGridRowDTO() {
     }
@@ -132,6 +133,14 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 
     public void setLastName(String lastName) {
 	this.lastName = lastName;
+    }
+    
+    public String getCurrentActivity() {
+	return currentActivity;
+    }
+    
+    public void setCurrentActivity(String currentActivity) {
+	this.currentActivity = currentActivity;
     }
 
 }
