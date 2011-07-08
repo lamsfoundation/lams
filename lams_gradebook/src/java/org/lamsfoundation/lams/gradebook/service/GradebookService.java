@@ -714,21 +714,23 @@ public class GradebookService implements IGradebookService {
 	    ArrayList<GBUserGridRowDTO> userRows = getGBUserRowsForLesson(lesson);
 
 	    // Setting up the user marks table
-	    ExcelCell[] userTitleRow = new ExcelCell[4];
+	    ExcelCell[] userTitleRow = new ExcelCell[5];
 	    userTitleRow[0] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
 	    userTitleRow[1] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
-	    userTitleRow[2] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
-	    userTitleRow[3] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
+	    userTitleRow[2] = new ExcelCell(getMessage("gradebook.exportcourse.progress"), true);
+	    userTitleRow[3] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
+	    userTitleRow[4] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
 	    rowList.add(userTitleRow);
 
 	    for (GBUserGridRowDTO userRow : userRows) {
-		// Adding the user data for the lesson
-		ExcelCell[] userDataRow = new ExcelCell[4];
-		userDataRow[0] = new ExcelCell(userRow.getLastName(), false);
-		userDataRow[1] = new ExcelCell(userRow.getFirstName(), false);
-		userDataRow[2] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
-		userDataRow[3] = new ExcelCell(userRow.getMark(), false);
-		rowList.add(userDataRow);
+		 // Adding the user data for the lesson
+		    ExcelCell[] userDataRow = new ExcelCell[5];
+		    userDataRow[0] = new ExcelCell(userRow.getLastName(), false);
+		    userDataRow[1] = new ExcelCell(userRow.getFirstName(), false);
+		    userDataRow[2] = new ExcelCell(getProgressMessage(userRow), false);
+		    userDataRow[3] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
+		    userDataRow[4] = new ExcelCell(userRow.getMark(), false);
+		    rowList.add(userDataRow);
 	    }
 	    // ------------------------------------------------------------------
 
@@ -779,15 +781,7 @@ public class GradebookService implements IGradebookService {
 		ExcelCell[] userDataRow = new ExcelCell[6];
 		userDataRow[0] = new ExcelCell(userRow.getLastName(), false);
 		userDataRow[1] = new ExcelCell(userRow.getFirstName(), false);
-		String status;
-		if (userRow.getStatus().contains("tick.png")) {
-		    status = getMessage("gradebook.exportcourse.ok");
-		} else if (userRow.getStatus().contains("cog.png")) {
-		    status = getMessage("gradebook.exportcourse.current.activity", new String[] { userRow.getCurrentActivity()});
-		} else {
-		    status = "-";
-		}		
-		userDataRow[2] = new ExcelCell(status, false);
+		userDataRow[2] = new ExcelCell(getProgressMessage(userRow), false);
 		userDataRow[3] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
 		userDataRow[4] = new ExcelCell(userRow.getFeedback(), false);
 		userDataRow[5] = new ExcelCell(userRow.getMark(), false);
@@ -843,6 +837,23 @@ public class GradebookService implements IGradebookService {
 	Locale locale = new Locale(user.getLocale().getLanguageIsoCode(), user.getLocale().getCountryIsoCode());
 	String dateStr = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, locale).format(date);
 	return dateStr;
+    }
+
+    /**
+     * Returns progress status as text message.
+     * @param userRow
+     * @return
+     */
+    private String getProgressMessage(GBUserGridRowDTO userRow) {
+	String status;
+	if (userRow.getStatus().contains("tick.png")) {
+	    status = getMessage("gradebook.exportcourse.ok");
+	} else if (userRow.getStatus().contains("cog.png")) {
+	    status = getMessage("gradebook.exportcourse.current.activity", new String[] { userRow.getCurrentActivity()});
+	} else {
+	    status = "-";
+	}
+	return status;
     }
 
     /**
