@@ -902,7 +902,7 @@ CREATE TABLE lams_log_event (
      , CONSTRAINT FK_lams_event_log_2 FOREIGN KEY (user_id)
                   REFERENCES lams_user (user_id)           
      , CONSTRAINT FK_lams_event_log_3 FOREIGN KEY (learning_design_id)
-                  REFERENCES lams_learning_design (learning_design_id)
+                  REFERENCES lams_learning_design (learning_design_id) ON DELETE CASCADE
      , CONSTRAINT FK_lams_event_log_4 FOREIGN KEY (lesson_id)
                   REFERENCES lams_lesson (lesson_id)
      , CONSTRAINT FK_lams_event_log_5 FOREIGN KEY (activity_id)
