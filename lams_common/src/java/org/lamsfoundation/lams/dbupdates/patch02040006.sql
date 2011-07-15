@@ -153,10 +153,13 @@ ALTER TABLE lams_planner_nodes DROP COLUMN file_uuid, DROP COLUMN file_name, ADD
 -- all statements below should be moved to a next patch file?
 ALTER TABLE lams_planner_nodes CHANGE COLUMN teachers_permissions permissions INTEGER, ADD COLUMN user_id BIGINT(20), ADD CONSTRAINT FK_lams_planner_node_user FOREIGN KEY (user_id) REFERENCES lams_user(user_id) ON DELETE SET NULL ON UPDATE SET NULL;
 
-
 -- LDEV-2664 Switch learner interface for learners if they use a mobile device
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('ForceMobileDevToUseFlashless','false', 'config.force.mobile.use.flashlesh', 'config.header.features', 'BOOLEAN', 1);
+
+-- LDEV-2704 Weaken foreign key's constraints due to problems with learning designs removal
+ALTER TABLE lams_log_event DROP FOREIGN KEY FK_lams_event_log_3;
+ALTER TABLE lams_log_event ADD CONSTRAINT FK_lams_event_log_3 FOREIGN KEY (learning_design_id) REFERENCES lams_learning_design (learning_design_id ) ON DELETE CASCADE;
 
 
 COMMIT;
