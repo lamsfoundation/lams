@@ -50,11 +50,10 @@
 	</c:otherwise>
 </c:choose>
 
-<c:set var="styleVar" value="border:0;" />
 <c:if test="${highlight eq true}">
-	<c:set var="styleVar" value="border:0; color: #e7eef8;" />
+	<c:set var="classVar" value="tab-link-highlight" />
 </c:if>
 
-<a class="tab-middle-link" href="<c:out value='${url}' />" title="<c:out value='${titleValue}'/>" style="${styleVar}">
+<a class="tab-middle-link ${classVar}" href="<c:out value='${url}' />" title="<c:out value='${titleValue}'/>" style="border:0;">
 	<c:out value="${tabname}" escapeXml="false"/>	
 </a>

@@ -243,6 +243,10 @@ input:hover.button {
     background: url('../images/ramsthemecss/button_highlight_right.jpg') no-repeat top right;
 }
 
+#nav-right a.tab-link-highlight, #nav-right a.tab-link-highlight:hover {
+ 	color: #e7eef8;
+ }
+
 #nav a.tab-middle-link-selected {
 	color: #333333
 }

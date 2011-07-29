@@ -286,6 +286,10 @@ Tab navigation styles
          background: url('../images/css/button_highlight_right.jpg') no-repeat top right; 
          float: left 	 
  }
+ 
+ #nav-right a.tab-link-highlight, #nav-right a.tab-link-highlight:hover {
+ 	color: #e7eef8;
+ }
 
 /*
 *************************************************
