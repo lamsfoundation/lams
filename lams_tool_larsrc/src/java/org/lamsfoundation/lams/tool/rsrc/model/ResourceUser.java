@@ -53,6 +53,10 @@ public class ResourceUser implements Cloneable{
 	//=============== NON Persisit value: for display use ===========
 	//the user access some reousrce item date time. Use in monitoring summary page
 	private Date accessDate;
+	//resource item complete date. Use in monitoring summary page
+	private Date completeDate;
+	//difference between completeDate and accessDate
+	private Date timeTaken;
 	
 	public ResourceUser(){
 	}
@@ -215,6 +219,17 @@ public class ResourceUser implements Cloneable{
 	public void setAccessDate(Date accessDate) {
 		this.accessDate = accessDate;
 	}
-
+	public Date getCompleteDate() {
+		return completeDate;
+	}
+	public void setCompleteDate(Date completeDate) {
+		this.completeDate = completeDate;
+	}
+	public Date getTimeTaken() {
+		return timeTaken;
+	}
+	public void setTimeTaken(Date timeTaken) {
+		this.timeTaken = timeTaken;
+	}
 
 }

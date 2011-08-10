@@ -38,6 +38,7 @@ public class ResourceItemVisitLog {
 	private ResourceUser user;
 	private ResourceItem resourceItem;
 	private boolean complete;
+	private Date completeDate;
 	private Date accessDate;
 	private Long sessionId;
 	
@@ -50,6 +51,16 @@ public class ResourceItemVisitLog {
 	}
 	public void setAccessDate(Date accessDate) {
 		this.accessDate = accessDate;
+	}
+	/**
+	 * @hibernate.property column="complete_date"
+	 * @return
+	 */
+	public Date getCompleteDate() {
+		return completeDate;
+	}
+	public void setCompleteDate(Date completeDate) {
+		this.completeDate = completeDate;
 	}
 	/**
 	 * @hibernate.many-to-one  column="resource_item_uid"

@@ -72,6 +72,7 @@ create table tl_larsrc11_resource_item (
 create table tl_larsrc11_item_log (
    uid bigint not null auto_increment,
    access_date datetime,
+   complete_date datetime,
    resource_item_uid bigint,
    user_uid bigint,
    complete tinyint,

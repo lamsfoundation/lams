@@ -33,6 +33,14 @@
             column="access_date"
         />
 
+        <property
+            name="completeDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="complete_date"
+        />
+
         <many-to-one
             name="resourceItem"
             class="org.lamsfoundation.lams.tool.rsrc.model.ResourceItem"

@@ -460,6 +460,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    log.setAccessDate(new Timestamp(new Date().getTime()));
 	}
 	log.setComplete(true);
+	log.setCompleteDate(new Timestamp(new Date().getTime()));
 	resourceItemVisitDao.saveObject(log);
     }
 
@@ -599,6 +600,10 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	for (ResourceItemVisitLog visit : logList) {
 	    ResourceUser user = visit.getUser();
 	    user.setAccessDate(visit.getAccessDate());
+	    user.setCompleteDate(visit.getCompleteDate());
+	    Date timeTaken = (visit.getCompleteDate() != null && visit.getAccessDate() != null) ? 
+		    new Date(visit.getCompleteDate().getTime() - visit.getAccessDate().getTime()) : null;
+	    user.setTimeTaken(timeTaken);
 	    userList.add(user);
 	}
 	return userList;
