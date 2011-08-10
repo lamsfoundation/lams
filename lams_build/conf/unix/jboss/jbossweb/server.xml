@@ -80,7 +80,7 @@
 
             <Valve className="org.apache.catalina.valves.AccessLogValve"
                 prefix="localhost_access_log." suffix=".log"
-                pattern="common" directory="${jboss.server.log.dir}" 
+                pattern="combined" directory="${jboss.server.log.dir}" 
                 resolveHosts="false" />
 
             <!-- Uncomment to enable single sign-on across web apps
