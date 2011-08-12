@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.gradebook.dto.GBLessonGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
+import org.lamsfoundation.lams.gradebook.util.LessonComparator;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
@@ -645,7 +646,7 @@ public class GradebookService implements IGradebookService {
 
 	    ExcelCell[] lessonAverageTimeTaken = new ExcelCell[2];
 	    lessonAverageTimeTaken[0] = new ExcelCell(getMessage("gradebook.export.average.lesson.time.taken"), true);
-	    lessonAverageTimeTaken[1] = new ExcelCell(gradebookDAO.getAverageDurationLesson(lesson.getLessonId()), false);
+	    lessonAverageTimeTaken[1] = new ExcelCell(gradebookDAO.getAverageDurationLesson(lesson.getLessonId())/1000, false);
 	    rowList.add(lessonAverageTimeTaken);
 	    rowList.add(EMPTY_ROW);
 	    // ------------------------------------------------------------------
@@ -722,7 +723,8 @@ public class GradebookService implements IGradebookService {
 	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
 
 	User user = (User) getUserService().findById(User.class, userId);
-	List<Lesson> lessonsFromDB = lessonService.getLessonsByGroupAndUser(userId, organisationId);
+	Set<Lesson> lessonsFromDB = new TreeSet<Lesson>(new LessonComparator());
+	lessonsFromDB.addAll(lessonService.getLessonsByGroupAndUser(userId, organisationId));
 	
 	List<Lesson> lessons = new LinkedList<Lesson>();
 	// Dont include lesson in list if the user doesnt have permission
@@ -736,7 +738,7 @@ public class GradebookService implements IGradebookService {
 	}
 	
 	if (lessons == null || (lessons.size() == 0)) {
-	    return null;
+	    return rowList.toArray(new ExcelCell[][] {});
 	}
 	
 	//collect users from all lessons
