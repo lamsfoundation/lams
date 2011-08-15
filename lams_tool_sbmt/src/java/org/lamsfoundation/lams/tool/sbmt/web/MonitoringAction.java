@@ -222,30 +222,26 @@ public class MonitoringAction extends LamsDispatchAction {
 	    // create an empty excel file
 	    HSSFWorkbook wb = new HSSFWorkbook();
 	    HSSFSheet sheet = wb.createSheet("Marks");
-	    sheet.setColumnWidth((short) 0, (short) 5000);
+	    sheet.setColumnWidth(0, 5000);
 	    HSSFRow row;
 	    HSSFCell cell;
 
 	    Iterator iter = userFilesMap.values().iterator();
 	    Iterator dtoIter;
 
-	    short idx = (short) 0;
+	    int idx = 0;
 
 	    row = sheet.createRow(idx++);
-	    cell = row.createCell((short) 2);
-	    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+	    cell = row.createCell(2);
 	    cell.setCellValue(getMessageService().getMessage("label.learner.fileName"));
 
-	    cell = row.createCell((short) 3);
-	    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+	    cell = row.createCell(3);
 	    cell.setCellValue(getMessageService().getMessage("label.learner.fileDescription"));
 
-	    cell = row.createCell((short) 4);
-	    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+	    cell = row.createCell(4);
 	    cell.setCellValue(getMessageService().getMessage("label.learner.marks"));
 
-	    cell = row.createCell((short) 5);
-	    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+	    cell = row.createCell(5);
 	    cell.setCellValue(getMessageService().getMessage("label.learner.comments"));
 
 	    while (iter.hasNext()) {
@@ -256,22 +252,19 @@ public class MonitoringAction extends LamsDispatchAction {
 		    FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
 		    row = sheet.createRow(idx++);
 
-		    short count = 0;
+		    int count = 0;
 
 		    cell = row.createCell(count++);
-		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 		    cell.setCellValue(dto.getOwner().getFirstName() + " " + dto.getOwner().getLastName());
 
 		    ++count;
 
-		    sheet.setColumnWidth(count, (short) 8000);
+		    sheet.setColumnWidth(count, 8000);
 
 		    cell = row.createCell(count++);
-		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 		    cell.setCellValue(dto.getFilePath());
 
 		    cell = row.createCell(count++);
-		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 		    cell.setCellValue(dto.getFileDescription());
 
 		    cell = row.createCell(count++);
@@ -280,7 +273,6 @@ public class MonitoringAction extends LamsDispatchAction {
 		    cell.setCellValue(marks != null ? marks : "");
 
 		    cell = row.createCell(count++);
-		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 		    cell.setCellValue(dto.getComments());
 		}
 	    }

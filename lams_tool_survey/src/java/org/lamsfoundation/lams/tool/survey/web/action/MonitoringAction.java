@@ -289,7 +289,7 @@ public class MonitoringAction extends Action {
 	    // create an empty excel file
 	    HSSFWorkbook wb = new HSSFWorkbook();
 	    HSSFSheet sheet = wb.createSheet("Survey");
-	    sheet.setColumnWidth((short) 0, (short) 5000);
+	    sheet.setColumnWidth(0, 5000);
 	    HSSFRow row;
 	    HSSFCell cell;
 	    int idx = 0;
@@ -301,31 +301,27 @@ public class MonitoringAction extends Action {
 		Survey survey = session.getSurvey();
 		// survey title
 		row = sheet.createRow(idx++);
-		cell = row.createCell((short) 0);
-		cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		cell = row.createCell(0);
 		cell.setCellValue(removeHTMLTags(survey.getTitle()));
 
 		// survey instruction
 		row = sheet.createRow(idx++);
-		cell = row.createCell((short) 0);
-		cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		cell = row.createCell(0);
 		cell.setCellValue(removeHTMLTags(survey.getInstructions()));
 
 		// display 2 empty row
 		row = sheet.createRow(idx++);
-		cell = row.createCell((short) 0);
+		cell = row.createCell(0);
 		cell.setCellValue("");
 		row = sheet.createRow(idx++);
-		cell = row.createCell((short) 0);
+		cell = row.createCell(0);
 		cell.setCellValue("");
 
 		// display session name
 		row = sheet.createRow(idx++);
-		cell = row.createCell((short) 0);
-		cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		cell = row.createCell(0);
 		cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_SESSION_NAME));
-		cell = row.createCell((short) 1);
-		cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		cell = row.createCell(1);
 		cell.setCellValue(removeHTMLTags(session.getSessionName()));
 
 		// begin to display question and its answers
@@ -334,7 +330,7 @@ public class MonitoringAction extends Action {
 		for (Entry<SurveyQuestion, List<AnswerDTO>> questionEntry : questionEntries) {
 		    // display 1 empty row
 		    row = sheet.createRow(idx++);
-		    cell = row.createCell((short) 0);
+		    cell = row.createCell(0);
 		    cell.setCellValue("");
 
 		    questionIdx++;
@@ -343,44 +339,39 @@ public class MonitoringAction extends Action {
 
 		    // display question content
 		    row = sheet.createRow(idx++);
-		    cell = row.createCell((short) 0);
-		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		    cell = row.createCell(0);
 		    cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_QUESTION) + " " + questionIdx);
-		    cell = row.createCell((short) 1);
-		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		    cell = row.createCell(1);
 		    cell.setCellValue(removeHTMLTags(question.getDescription()));
 
 		    // display options content
 		    Set<SurveyOption> options = question.getOptions();
 
 		    row = sheet.createRow(idx++);
-		    cell = row.createCell((short) 0);
-		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		    cell = row.createCell(0);
 		    cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_POSSIBLE_ANSWERS));
 
 		    int optionIdx = 0;
 		    for (SurveyOption option : options) {
 			optionIdx++;
 			row = sheet.createRow(idx++);
-			cell = row.createCell((short) 0);
+			cell = row.createCell(0);
 			cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + optionIdx);
-			cell = row.createCell((short) 1);
-			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			cell = row.createCell(1);
 			cell.setCellValue(removeHTMLTags(option.getDescription()));
 		    }
 		    if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 			optionIdx++;
 			row = sheet.createRow(idx++);
-			cell = row.createCell((short) 0);
+			cell = row.createCell(0);
 			cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + optionIdx);
-			cell = row.createCell((short) 1);
-			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			cell = row.createCell(1);
 			cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_OPEN_RESPONSE));
 		    }
 
 		    // display 1 empty row
 		    row = sheet.createRow(idx++);
-		    cell = row.createCell((short) 0);
+		    cell = row.createCell(0);
 		    cell.setCellValue("");
 
 		    // //////////////////////////
@@ -390,8 +381,7 @@ public class MonitoringAction extends Action {
 
 		    int cellIdx = 0;
 		    row = sheet.createRow(idx++);
-		    cell = row.createCell((short) cellIdx);
-		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		    cell = row.createCell(cellIdx);
 		    cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_LEARNER));
 		    // increase one more option number if there are open entry option
 		    int optionsNum = options.size();
@@ -399,7 +389,7 @@ public class MonitoringAction extends Action {
 			optionsNum++;
 		    }
 		    for (cellIdx = 1; cellIdx <= optionsNum; cellIdx++) {
-			cell = row.createCell((short) cellIdx);
+			cell = row.createCell(cellIdx);
 			cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + cellIdx);
 		    }
 
@@ -407,12 +397,12 @@ public class MonitoringAction extends Action {
 		    for (AnswerDTO answer : answers) {
 			row = sheet.createRow(idx++);
 			cellIdx = 0;
-			cell = row.createCell((short) cellIdx);
+			cell = row.createCell(cellIdx);
 			cell.setCellValue(answer.getReplier().getLoginName());
 			// for answer's options
 			for (SurveyOption option : options) {
 			    cellIdx++;
-			    cell = row.createCell((short) cellIdx);
+			    cell = row.createCell(cellIdx);
 			    if (answer.getAnswer() == null) {
 				break;
 			    }
@@ -425,8 +415,7 @@ public class MonitoringAction extends Action {
 			}
 			// for textEntry option
 			if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
-			    cell = row.createCell((short) ++cellIdx);
-			    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			    cell = row.createCell(++cellIdx);
 			    if (answer.getAnswer() != null) {
 				cell.setCellValue(removeHTMLTags(answer.getAnswer().getAnswerText()));
 			    }

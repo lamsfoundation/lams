@@ -4744,7 +4744,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		Iterator queIterator= mcContent.getMcQueContents().iterator();
 		Long mapIndex=new Long(1);
 			
-		short idx = (short) 0;
+		int idx = 0;
 
 		Iterator marksIterator = listMonitoredMarksContainerDTO.iterator();
 			
@@ -4760,12 +4760,10 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 						
 					row = sheet.createRow(idx++);
 							
-					cell = row.createCell((short) 0);
-					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+					cell = row.createCell(0);
 					cell.setCellValue(messageService.getMessage("group.label"));
 							
-					cell = row.createCell((short) 1);
-					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+					cell = row.createCell(1);
 					cell.setCellValue(currentSessionName);
 							
 					idx++;
@@ -4773,12 +4771,10 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 							
 					row = sheet.createRow(idx++);
 							
-					cell = row.createCell((short) count++);
-					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+					cell = row.createCell(count++);
 					cell.setCellValue(messageService.getMessage("label.learner"));
 							
-					cell = row.createCell((short) count++);
-					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+					cell = row.createCell(count++);
 					cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.username"));
 							
 					Iterator answersIterator = listMonitoredAnswersContainerDTO.iterator();
@@ -4786,13 +4782,11 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 					while(answersIterator.hasNext()) {
 						McMonitoredAnswersDTO mcMonitoredAnswersDTO = (McMonitoredAnswersDTO) answersIterator.next();
 								
-						cell = row.createCell((short) count++);
-						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+						cell = row.createCell(count++);
 						cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.question.mark", new Object[] {count-1, mcMonitoredAnswersDTO.getMark()}));
 					}
 						
-					cell = row.createCell((short) count++);
-					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+					cell = row.createCell(count++);
 					cell.setCellValue(messageService.getMessage("label.total"));
 							
 					Iterator userMarkIterator = usersMarksMap.values().iterator();
@@ -4804,24 +4798,20 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 						McUserMarkDTO userMark = (McUserMarkDTO) userMarkIterator.next();
 						String currentUserSessionId = userMark.getSessionId();
 
-						cell = row.createCell((short) count++);
-						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+						cell = row.createCell(count++);
 						cell.setCellValue(userMark.getFullName());
 								
-						cell = row.createCell((short) count++);
-						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+						cell = row.createCell(count++);
 						cell.setCellValue(userMark.getUserName());
 								
 								
 						Integer[] marks = userMark.getMarks();
 						for(int i=0; i<marks.length; i++) {
-							cell = row.createCell((short) count++);
-							cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+							cell = row.createCell(count++);
 							cell.setCellValue(marks[i]);
 						}
 										
-						cell = row.createCell((short) count++);
-						cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+						cell = row.createCell(count++);
 						cell.setCellValue(userMark.getTotalMark());
 					}	
 					

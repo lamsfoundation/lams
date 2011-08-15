@@ -44,22 +44,15 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import jxl.CellView;
-import jxl.JXLException;
-import jxl.Workbook;
-import jxl.format.Font;
-import jxl.write.Label;
-import jxl.write.Number;
-import jxl.write.WritableCell;
-import jxl.write.WritableCellFormat;
-import jxl.write.WritableFont;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
-
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.lamsfoundation.lams.gradebook.dto.ExcelCell;
-import org.lamsfoundation.lams.gradebook.dto.GBActivityGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBAverageMarkComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBAverageTimeTakenComparator;
@@ -74,6 +67,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class GradebookUtil {
+    
+    private static CellStyle boldStyle;
 
     /**
      * Wrapper method for printing the xml for grid rows
@@ -327,8 +322,13 @@ public class GradebookUtil {
     }
 
     public static void exportGradebookLessonToExcel(OutputStream out, String dateHeader,
-	    LinkedHashMap<String, ExcelCell[][]> dataToExport) throws IOException, JXLException {
-	WritableWorkbook workbook = Workbook.createWorkbook(out);
+	    LinkedHashMap<String, ExcelCell[][]> dataToExport) throws IOException {
+	Workbook workbook = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
+	
+	boldStyle = workbook.createCellStyle();
+	Font font = workbook.createFont();
+	font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+	boldStyle.setFont(font);
 
 	int i = 0;
 	for (String sheetName : dataToExport.keySet()) {
@@ -338,72 +338,63 @@ public class GradebookUtil {
 	    }
 	}
 
-	workbook.write();
-	workbook.close();
+	workbook.write(out);
+	out.close();
     }
 
-    public static void createSheet(WritableWorkbook workbook, String sheetName, String sheetTitle, int sheetIndex,
-	    String dateHeader, ExcelCell[][] data) throws IOException, JXLException {
-	WritableSheet sheet = workbook.createSheet(sheetName, sheetIndex);
-
-	// Prepare cell formatter used in all columns
-	CellView stretchedCellView = new CellView();
-	stretchedCellView.setAutosize(true);
+    public static void createSheet(Workbook workbook, String sheetName, String sheetTitle, int sheetIndex,
+	    String dateHeader, ExcelCell[][] data) throws IOException {
+	Sheet sheet = workbook.createSheet(sheetName);
+	
 
 	// Print title in bold, if needed
 	if (!StringUtils.isBlank(sheetTitle)) {
-	    sheet.addCell(createWritableCell(new ExcelCell(sheetTitle, true), 0, 0));
+	    Row row = sheet.createRow(0);
+	    createCell(new ExcelCell(sheetTitle, true), 0, row);
 	}
 
 	// Print current date, if needed
 	if (!StringUtils.isBlank(dateHeader)) {
-	    sheet.addCell(new Label(0, 1, dateHeader));
+	    Row row = sheet.createRow(1);
+	    createCell(new ExcelCell(dateHeader, false), 0, row);
+	    
 	    SimpleDateFormat titleDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
-	    sheet.addCell(new Label(1, 1, titleDateFormat.format(new Date())));
+	    createCell(new ExcelCell(titleDateFormat.format(new Date()), false), 1, row);
 	}
 
 	if (data != null) {
 	    // Print data
 	    for (int rowIndex = 0; rowIndex < data.length; rowIndex++) {
-		int sheetRowIndex = rowIndex + 4;
+		Row row = sheet.createRow(rowIndex + 4);
+		
 		for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++) {
 		    ExcelCell excelCell = data[rowIndex][columnIndex];
-		    if (excelCell != null) {
-			sheet.addCell(createWritableCell(excelCell, columnIndex, sheetRowIndex));
-		    }
+		    createCell(excelCell, columnIndex, row);
 		}
 	    }
 	}
     }
 
-    public static WritableCell createWritableCell(ExcelCell cell, int col, int row) throws WriteException {
+    public static void createCell(ExcelCell excelCell, int cellnum, Row row) {
 
-	if (cell != null) {
-	    WritableCell writeableCell = null;
-	    if (cell.getCellValue() != null && cell.getCellValue() instanceof Date) {
+	if (excelCell != null) {
+	    Cell cell = row.createCell(cellnum);
+	    if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof Date) {
 		SimpleDateFormat cellDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT);
-		writeableCell = new Label(col, row, cellDateFormat.format(cell.getCellValue()));
-	    } else if (cell.getCellValue() != null && cell.getCellValue() instanceof java.lang.Double) {
-		writeableCell = new Number(col, row, (Double) cell.getCellValue());
-	    } else if (cell.getCellValue() != null && cell.getCellValue() instanceof java.lang.Long) {
-		writeableCell = new Number(col, row, ((Long) cell.getCellValue()).doubleValue());
-	    } else if (cell.getCellValue() != null) {
-		writeableCell = new Label(col, row, cell.getCellValue().toString());
-	    } else {
-		writeableCell = new Label(col, row, null);
+		cell.setCellValue(cellDateFormat.format(excelCell.getCellValue()));
+	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Double) {
+		cell.setCellValue((Double) excelCell.getCellValue());
+	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Long) {
+		cell.setCellValue(((Long) excelCell.getCellValue()).doubleValue());
+	    } else if (excelCell.getCellValue() != null) {
+		cell.setCellValue(excelCell.getCellValue().toString());
 	    }
 
-	    if (cell.getIsBold() == Boolean.TRUE) {
-		Font font = writeableCell.getCellFormat().getFont();
-		WritableFont labelFont = new WritableFont(font);
-		labelFont.setBoldStyle(WritableFont.BOLD);
-		WritableCellFormat labelCellFormat = new WritableCellFormat(labelFont);
-		writeableCell.setCellFormat(labelCellFormat);
+	    if (excelCell.getIsBold()) {
+		cell.setCellStyle(boldStyle);
 	    }
-	    return writeableCell;
-	} else {
-	    return null;
 	}
     }
+
 
 }

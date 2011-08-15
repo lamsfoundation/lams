@@ -2,6 +2,11 @@ Deployed Libraries
 
 Folder            Library                               Version                License                       Vendor                           Description
 
+apache-poi        poi-3.8-beta4-20110812.jar            3.8-beta4              Apache License 2.0            Apache                           the Java API for Microsoft Documents
+                  poi-ooxml-3.8-beta4-20110812.jar
+                  poi-ooxml-schemas-3.8-beta4-20110812.jar 
+                  xmlbeans-2.4.0.jar 
+
 aspirin           activation-1.1.1.jar 
                   aspirin.jar                           0.8.03                 Apache 1.1 license                                             embeddable send-only SMTP server
                   commons-pool-1.5.1.jar 

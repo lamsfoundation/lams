@@ -235,24 +235,21 @@ public class MonitoringAction extends Action {
 			//create an empty excel file
 			HSSFWorkbook wb = new HSSFWorkbook();
 			HSSFSheet sheet = wb.createSheet("Marks");
-			sheet.setColumnWidth((short) 0, (short) 5000);
-			sheet.setColumnWidth((short) 2, (short) 8000);
+			sheet.setColumnWidth(0, 5000);
+			sheet.setColumnWidth(2, 8000);
 			HSSFRow row;
 			HSSFCell cell;
 
-			short idx = (short) 0;
+			int idx = 0;
 
 			row = sheet.createRow(idx++);
-			cell = row.createCell((short) 0);
-			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			cell = row.createCell(0);
 			cell.setCellValue(service.getMessageService().getMessage("label.monitoring.downloadmarks.learner.name"));
 
-			cell = row.createCell((short) 1);
-			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			cell = row.createCell(1);
 			cell.setCellValue(service.getMessageService().getMessage("label.monitoring.downloadmarks.marks"));
 
-			cell = row.createCell((short) 2);
-			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			cell = row.createCell(2);
 			cell.setCellValue(service.getMessageService().getMessage("label.monitoring.downloadmarks.comments"));
 
 			for (SpreadsheetUser user : userList) {
@@ -260,13 +257,12 @@ public class MonitoringAction extends Action {
 					SpreadsheetMark mark = user.getUserModifiedSpreadsheet().getMark();
 					row = sheet.createRow(idx++);
 
-					short count = 0;
+					int count = 0;
 
 					cell = row.createCell(count++);
-					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 					cell.setCellValue(user.getLoginName());
 
-					//					sheet.setColumnWidth((short) count,(short)8000);
+					//sheet.setColumnWidth(count,8000);
 
 					cell = row.createCell(count++);
 					if (mark.getMarks() != null) {
@@ -285,7 +281,6 @@ public class MonitoringAction extends Action {
 					}
 
 					cell = row.createCell(count++);
-					cell.setEncoding(HSSFCell.ENCODING_UTF_16);
 					cell.setCellValue(mark.getComments());
 				}
 			}

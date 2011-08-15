@@ -313,7 +313,7 @@ public class MonitoringAction extends Action {
 	    HSSFWorkbook wb = new HSSFWorkbook();
 
 	    HSSFSheet sheet = wb.createSheet("Marks");
-	    sheet.setColumnWidth((short) 0, (short) 5000);
+	    sheet.setColumnWidth(0, 5000);
 	    HSSFRow row = null;
 	    HSSFCell cell;
 	    Iterator iter = getTopicsSortedByAuthor(topicList).values().iterator();
@@ -331,54 +331,45 @@ public class MonitoringAction extends Action {
 		    if (first) {
 			first = false;
 			row = sheet.createRow(0);
-			cell = row.createCell((short) idx);
-			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			cell = row.createCell(idx);
 			cell.setCellValue(getMessageService().getMessage("lable.topic.title.subject"));
-			sheet.setColumnWidth((short) idx, (short) 8000);
+			sheet.setColumnWidth(idx, 8000);
 			++idx;
 
-			cell = row.createCell((short) idx);
-			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			cell = row.createCell(idx);
 			cell.setCellValue(getMessageService().getMessage("lable.topic.title.author"));
-			sheet.setColumnWidth((short) idx, (short) 8000);
+			sheet.setColumnWidth(idx, 8000);
 			++idx;
 
-			cell = row.createCell((short) idx);
-			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			cell = row.createCell(idx);
 			cell.setCellValue(getMessageService().getMessage("label.download.marks.heading.date"));
-			sheet.setColumnWidth((short) idx, (short) 8000);
+			sheet.setColumnWidth(idx, 8000);
 			++idx;
 
-			cell = row.createCell((short) idx);
-			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			cell = row.createCell(idx);
 			cell.setCellValue(getMessageService().getMessage("label.download.marks.heading.marks"));
-			sheet.setColumnWidth((short) idx, (short) 8000);
+			sheet.setColumnWidth(idx, 8000);
 			++idx;
 
-			cell = row.createCell((short) idx);
-			cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+			cell = row.createCell(idx);
 			cell.setCellValue(getMessageService().getMessage("label.download.marks.heading.comments"));
-			sheet.setColumnWidth((short) idx, (short) 8000);
+			sheet.setColumnWidth(idx, 8000);
 			++idx;
 		    }
 		    ++fileCount;
 		    idx = 0;
 		    row = sheet.createRow(fileCount);
-		    cell = row.createCell((short) idx++);
-		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		    cell = row.createCell(idx++);
 		    cell.setCellValue(dto.getMessage().getSubject());
 
-		    cell = row.createCell((short) idx++);
-		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		    cell = row.createCell(idx++);
 		    cell.setCellValue(dto.getAuthor());
 
-		    cell = row.createCell((short) idx++);
-		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		    cell = row.createCell(idx++);
 		    cell.setCellValue(DateFormat.getInstance().format(dto.getMessage().getCreated()));
 
-		    cell = row.createCell((short) idx++);
-		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
-
+		    cell = row.createCell(idx++);
+		    
 		    if (dto.getMessage() != null && dto.getMessage().getReport() != null
 			    && dto.getMessage().getReport().getMark() != null) {
 			cell.setCellValue(NumberUtil.formatLocalisedNumber(dto.getMessage().getReport().getMark(),
@@ -387,8 +378,7 @@ public class MonitoringAction extends Action {
 			cell.setCellValue("");
 		    }
 
-		    cell = row.createCell((short) idx++);
-		    cell.setEncoding(HSSFCell.ENCODING_UTF_16);
+		    cell = row.createCell(idx++);
 		    if (dto.getMessage() != null && dto.getMessage().getReport() != null) {
 			cell.setCellValue(dto.getMessage().getReport().getComment());
 		    } else {
