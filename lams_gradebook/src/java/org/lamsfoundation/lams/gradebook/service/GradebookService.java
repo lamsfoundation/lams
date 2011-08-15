@@ -77,12 +77,9 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * @author lfoxton
  * 
  * This service handles all gradebook-related service calls
  * 
- */
-/**
  * @author lfoxton
  * 
  */
@@ -484,7 +481,7 @@ public class GradebookService implements IGradebookService {
 			}
 
 			LearnerProgress learnerProgress = getLearnerProgress(lesson, user);
-			lessonRow.setStatus(getLessonStatusStr(lesson, learnerProgress, user));
+			lessonRow.setStatus(getLessonStatusStr(learnerProgress));
 			if (learnerProgress != null) {
 			    if (learnerProgress.getStartDate() != null && learnerProgress.getFinishDate() != null) {
 				lessonRow.setTimeTaken(learnerProgress.getFinishDate().getTime()
@@ -743,8 +740,11 @@ public class GradebookService implements IGradebookService {
 	
 	//collect users from all lessons
 	Set<User> allLearners = new LinkedHashSet<User>();
+	Map<Long, Set<User>> lessonUsers = new HashMap<Long, Set<User>>();
 	for (Lesson lesson : lessons) {
-	    allLearners.addAll(lesson.getAllLearners());
+	    Set dbLessonUsers = lesson.getAllLearners();
+	    lessonUsers.put(lesson.getLessonId(), dbLessonUsers);
+	    allLearners.addAll(dbLessonUsers);
 	}
 	
 	int numberOfCellsInARow = 2 + lessons.size()*4;
@@ -778,7 +778,7 @@ public class GradebookService implements IGradebookService {
 	
 	for (User learner : allLearners) {
 	    // Fetching the user data
-	    List<GBUserGridRowDTO> userRows = getGBUserRowsForUser(learner, lessons);
+	    List<GBUserGridRowDTO> userRows = getGBUserRowsForUser(learner, lessons, lessonUsers);
 	    i = 0;
 	    ExcelCell[] userDataRow = new ExcelCell[numberOfCellsInARow];
 	    userDataRow[i++] = new ExcelCell(learner.getLastName(), false);
@@ -831,11 +831,24 @@ public class GradebookService implements IGradebookService {
      * @param lessons
      * @return
      */
-    private List<GBUserGridRowDTO> getGBUserRowsForUser(User learner, List<Lesson> lessons) {
+    private List<GBUserGridRowDTO> getGBUserRowsForUser(User learner, List<Lesson> lessons, Map<Long, Set<User>> lessonUsers) {
 
 	List<GBUserGridRowDTO> gradebookUserDTOs = new LinkedList<GBUserGridRowDTO>();
 	for (Lesson lesson : lessons) {
-	    GBUserGridRowDTO gradebookUserDTO = populateGradebookUserDTO(learner, lesson);
+	    GBUserGridRowDTO gradebookUserDTO;
+	    
+	    //check if learner is participating in this lesson
+	    if (lessonUsers.get(lesson.getLessonId()).contains(learner)) {
+		gradebookUserDTO = populateGradebookUserDTO(learner, lesson);
+	    } else {
+		gradebookUserDTO = new GBUserGridRowDTO();
+		gradebookUserDTO.setId(learner.getUserId().toString());
+		gradebookUserDTO.setRowName(learner.getLastName() + " " + learner.getFirstName());
+		gradebookUserDTO.setFirstName(learner.getFirstName());
+		gradebookUserDTO.setLastName(learner.getLastName());
+		gradebookUserDTO.setStatus("n/a");
+	    }
+	    
 	    gradebookUserDTOs.add(gradebookUserDTO);
 	}
 
@@ -860,7 +873,7 @@ public class GradebookService implements IGradebookService {
 
 	// Setting the status and time taken for the user's lesson
 	LearnerProgress learnerProgress = getLearnerProgress(lesson, learner);
-	gradebookUserDTO.setStatus(getLessonStatusStr(lesson, learnerProgress, learner));
+	gradebookUserDTO.setStatus(getLessonStatusStr(learnerProgress));
 
 	// set current activity if available
 	if ((learnerProgress != null) && (learnerProgress.getCurrentActivity() != null)) {
@@ -1101,22 +1114,18 @@ public class GradebookService implements IGradebookService {
      * @param learnerProgress
      * @return
      */
-    private String getLessonStatusStr(Lesson lesson, LearnerProgress learnerProgress, User user) {
+    private String getLessonStatusStr(LearnerProgress learnerProgress) {
+	String status = "-";
+
 	final String IMAGES_DIR = Configuration.get(ConfigurationKeys.SERVER_URL) + "images";
-
-	String status;
-	if ((learnerProgress != null) && learnerProgress.isComplete()) {
-	    status = "<img src='" + IMAGES_DIR + "/tick.png' />";
-	} else if ((learnerProgress != null) && (learnerProgress.getAttemptedActivities() != null)
-		&& (learnerProgress.getAttemptedActivities().size() > 0)) {
-	    status = "<img src='" + IMAGES_DIR + "/cog.png' title='" + learnerProgress.getCurrentActivity().getTitle()
-		    + "' />";
-	} else if (lesson.getAllLearners().contains(user)) {
-	    status = "-";
-	} else {
-	    status = "n/a";
+	if (learnerProgress != null) {
+	    if (learnerProgress.isComplete()) {
+		status = "<img src='" + IMAGES_DIR + "/tick.png' />";
+	    } else if (learnerProgress.getAttemptedActivities() != null
+		    && learnerProgress.getAttemptedActivities().size() > 0) {
+		status = "<img src='" + IMAGES_DIR + "/cog.png' title='" + learnerProgress.getCurrentActivity().getTitle() + "' />";
+	    }
 	}
-
 	return status;
     }
 
