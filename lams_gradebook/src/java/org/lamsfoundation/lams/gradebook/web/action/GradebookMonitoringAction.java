@@ -307,7 +307,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 		Lesson lesson = lessonService.getLesson(lessonID);
 
 		if (lesson != null) {
-			String fileName = lesson.getLessonName().replaceAll(" ", "_") + ".xls";
+			String fileName = lesson.getLessonName().replaceAll(" ", "_") + ".xlsx";
 
 			response.setContentType("application/x-download");
 			response.setHeader("Content-Disposition", "attachment;filename=" + fileName);

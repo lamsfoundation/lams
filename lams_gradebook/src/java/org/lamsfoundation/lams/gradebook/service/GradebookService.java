@@ -740,10 +740,8 @@ public class GradebookService implements IGradebookService {
 	
 	//collect users from all lessons
 	Set<User> allLearners = new LinkedHashSet<User>();
-	Map<Long, Set<User>> lessonUsers = new HashMap<Long, Set<User>>();
 	for (Lesson lesson : lessons) {
 	    Set dbLessonUsers = lesson.getAllLearners();
-	    lessonUsers.put(lesson.getLessonId(), dbLessonUsers);
 	    allLearners.addAll(dbLessonUsers);
 	}
 	
@@ -778,7 +776,7 @@ public class GradebookService implements IGradebookService {
 	
 	for (User learner : allLearners) {
 	    // Fetching the user data
-	    List<GBUserGridRowDTO> userRows = getGBUserRowsForUser(learner, lessons, lessonUsers);
+	    List<GBUserGridRowDTO> userRows = getGBUserRowsForUser(learner, lessons, organisationId);
 	    i = 0;
 	    ExcelCell[] userDataRow = new ExcelCell[numberOfCellsInARow];
 	    userDataRow[i++] = new ExcelCell(learner.getLastName(), false);
@@ -831,21 +829,44 @@ public class GradebookService implements IGradebookService {
      * @param lessons
      * @return
      */
-    private List<GBUserGridRowDTO> getGBUserRowsForUser(User learner, List<Lesson> lessons, Map<Long, Set<User>> lessonUsers) {
+    private List<GBUserGridRowDTO> getGBUserRowsForUser(User learner, List<Lesson> lessons, Integer organisationId) {
 
 	List<GBUserGridRowDTO> gradebookUserDTOs = new LinkedList<GBUserGridRowDTO>();
+	Map<Long, LearnerProgress> lessonLearnerProgressMap = getLessonLearnerProgressMap(learner, organisationId);
+	Map<Long, GradebookUserLesson> gradebookUserLessonMap = getGradebookUserLessonMap(learner, organisationId);
+	
 	for (Lesson lesson : lessons) {
-	    GBUserGridRowDTO gradebookUserDTO;
+	    GBUserGridRowDTO gradebookUserDTO = new GBUserGridRowDTO();
+	    gradebookUserDTO.setId(learner.getUserId().toString());
+	    gradebookUserDTO.setRowName(learner.getLastName() + " " + learner.getFirstName());
+	    gradebookUserDTO.setFirstName(learner.getFirstName());
+	    gradebookUserDTO.setLastName(learner.getLastName());
 	    
 	    //check if learner is participating in this lesson
-	    if (lessonUsers.get(lesson.getLessonId()).contains(learner)) {
-		gradebookUserDTO = populateGradebookUserDTO(learner, lesson);
+	    if (lesson.getAllLearners().contains(learner)) {
+		// Setting the status and time taken for the user's lesson
+		LearnerProgress learnerProgress = lessonLearnerProgressMap.get(lesson.getLessonId());
+		gradebookUserDTO.setStatus(getLessonStatusStr(learnerProgress));
+
+		// set current activity if available
+		if ((learnerProgress != null) && (learnerProgress.getCurrentActivity() != null)) {
+		    gradebookUserDTO.setCurrentActivity(learnerProgress.getCurrentActivity().getTitle());
+		}
+
+		// calculate time taken
+		if (learnerProgress != null) {
+		    if (learnerProgress.getStartDate() != null && learnerProgress.getFinishDate() != null) {
+			gradebookUserDTO.setTimeTaken(learnerProgress.getFinishDate().getTime()
+				- learnerProgress.getStartDate().getTime());
+		    }
+		}
+
+		GradebookUserLesson gradebookUserLesson = gradebookUserLessonMap.get(lesson.getLessonId());
+		if (gradebookUserLesson != null) {
+		    gradebookUserDTO.setMark(gradebookUserLesson.getMark());
+		    gradebookUserDTO.setFeedback(gradebookUserLesson.getFeedback());
+		}
 	    } else {
-		gradebookUserDTO = new GBUserGridRowDTO();
-		gradebookUserDTO.setId(learner.getUserId().toString());
-		gradebookUserDTO.setRowName(learner.getLastName() + " " + learner.getFirstName());
-		gradebookUserDTO.setFirstName(learner.getFirstName());
-		gradebookUserDTO.setLastName(learner.getLastName());
 		gradebookUserDTO.setStatus("n/a");
 	    }
 	    
@@ -1264,6 +1285,45 @@ public class GradebookService implements IGradebookService {
 	}
     }
 
+    @SuppressWarnings("unchecked")
+    private Map<Long, LearnerProgress> getLessonLearnerProgressMap(User user, Integer organisationId) {
+	
+	if (user != null) {
+	    String query = "select lp from LearnerProgress lp where lp.user.userId=? and (lp.lesson.organisation.organisationId=? or lp.lesson.organisation.parentOrganisation.organisationId=?)";
+	    List<LearnerProgress> learnerProgressList = baseDAO.find(query, new Object[] { user.getUserId(),
+		    organisationId, organisationId });
+	    
+	    if (learnerProgressList != null && learnerProgressList.size() > 0) {
+		Map<Long, LearnerProgress> map = new HashMap<Long, LearnerProgress>();
+		for (LearnerProgress learnerProgress : learnerProgressList) {
+		    map.put(learnerProgress.getLesson().getLessonId(), learnerProgress);
+		}
+		return map;
+	    }
+	}
+	
+	return  new HashMap<Long, LearnerProgress>();
+    }
+    
+    @SuppressWarnings("unchecked")
+    private Map<Long, GradebookUserLesson> getGradebookUserLessonMap(User user, Integer organisationId) {
+	
+	if (user != null) {
+	    String query = "select ul from GradebookUserLesson ul where ul.learner.userId=? and (ul.lesson.organisation.organisationId=? or ul.lesson.organisation.parentOrganisation.organisationId=?)";
+	    List<GradebookUserLesson> gradebookUserLessons = baseDAO.find(query, new Object[] { user.getUserId(), organisationId, organisationId });
+	    
+	    if (gradebookUserLessons != null && gradebookUserLessons.size() > 0) {
+		Map<Long, GradebookUserLesson> map = new HashMap<Long, GradebookUserLesson>();
+		for (GradebookUserLesson gradebookUserLesson : gradebookUserLessons) {
+		    map.put(gradebookUserLesson.getLesson().getLessonId(), gradebookUserLesson);
+		}
+		return map;
+	    }
+	}
+	
+	return  new HashMap<Long, GradebookUserLesson>();
+    }
+    
     public String getMessage(String key) {
 	return messageService.getMessage(key);
     }
