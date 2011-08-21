@@ -77,39 +77,39 @@ public class LearningDesignSVGServlet extends HttpServlet {
 	    String courseName = request.getParameter(CentralConstants.PARAM_COURSE_NAME);
 	    String country = request.getParameter(CentralConstants.PARAM_COUNTRY);
 	    String lang = request.getParameter(CentralConstants.PARAM_LANG);
-	    String modeStr = request.getParameter(CentralConstants.PARAM_MODE);
 	    Long learningDesignId = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
 	    int imageFormat = WebUtil.readIntParam(request, CentralConstants.PARAM_SVG_FORMAT);
 	    
-	    if (serverId == null || datetime == null || hashValue == null || username == null || courseId == null
-		    || country == null || lang == null || modeStr == null) {
-		String msg = "Parameters missing";
-		log.error(msg);
-		response.sendError(response.SC_BAD_REQUEST, "Parameters missing");
-	    }
-	    
-	    //check imageFormat parameter is correct
-	    if (!(imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG) && !(imageFormat == SVGGenerator.OUTPUT_FORMAT_PNG)) {
-		String msg = "Image format parameter is incorrect";
-		log.error(msg);
-		response.sendError(response.SC_BAD_REQUEST, msg);
-	    }
-	    
-	    // LDEV-2196 preserve character encoding if necessary
-	    if (request.getCharacterEncoding() == null) {
-	    	log.debug("request.getCharacterEncoding is empty, parsing username and courseName as 8859_1 to UTF-8...");
-	    	username = new String(username.getBytes("8859_1"), "UTF-8");
-	    	if (courseName != null) {
-	    		courseName = new String(courseName.getBytes("8859_1"), "UTF-8");
-	    	}
-	    }
+	 // temporarily override security for MindApp integration purposes
+	    String isMindapp = request.getParameter("mindapp");
+	    if (isMindapp == null) {
+		if (serverId == null || datetime == null || hashValue == null || username == null || courseId == null
+			    || country == null || lang == null) {
+		    String msg = "Parameters missing";
+		    log.error(msg);
+		    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameters missing");
+		}
 
-	    // get Server map
-	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
+		// check imageFormat parameter is correct
+		if (!(imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG)
+			&& !(imageFormat == SVGGenerator.OUTPUT_FORMAT_PNG)) {
+		    String msg = "Image format parameter is incorrect";
+		    log.error(msg);
+		    response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
+		}
 
-	    // authenticate
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    
+		// LDEV-2196 preserve character encoding if necessary
+		if (request.getCharacterEncoding() == null) {
+		    log.debug("request.getCharacterEncoding is empty, parsing username and courseName as 8859_1 to UTF-8...");
+		    username = new String(username.getBytes("8859_1"), "UTF-8");
+		}
+
+		// get Server map
+		ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
+
+		// authenticate
+		Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    }
 	    // generate response
 	    String contentType;
 	    if (imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG) {
@@ -123,7 +123,7 @@ public class LearningDesignSVGServlet extends HttpServlet {
 	    
 	} catch (Exception e) {
 	    log.error("Problem with LearningDesignRepositoryServlet request", e);
-	    response.sendError(response.SC_BAD_REQUEST, "Problem with LearningDesignRepositoryServlet request");
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Problem with LearningDesignRepositoryServlet request");
 	}
 
     }

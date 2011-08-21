@@ -143,7 +143,8 @@ public class LessonManagerServlet extends HttpServlet {
 
 	// Custom CSV string to be used for tool adapters
 	String customCSV = request.getParameter(CentralConstants.PARAM_CUSTOM_CSV);
-
+	
+	String isMindapp = request.getParameter("mindapp");
 	Long ldId = null;
 	Long lsId = null;
 	try {
@@ -155,11 +156,12 @@ public class LessonManagerServlet extends HttpServlet {
 	    Document document = builder.newDocument();
 
 	    Element element = null;
-
-	    if (hashValue == null || hashValue.equals("")) {
-		throw new NullPointerException("Hash value missing in parameters");
+	 // temporarily override security for MindApp integration purposes
+	    if (isMindapp == null) {
+		if (hashValue == null || hashValue.equals("")) {
+		    throw new NullPointerException("Hash value missing in parameters");
+		}
 	    }
-
 	    if (method.equals(CentralConstants.METHOD_START)) {
 		ldId = new Long(ldIdStr);
 		Long lessonId = startLesson(serverId, datetime, hashValue, username, ldId, courseId, title, desc,
@@ -171,7 +173,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    } else if (method.equals(CentralConstants.METHOD_PREVIEW)) {
 		ldId = new Long(ldIdStr);
 		Long lessonId = startPreview(serverId, datetime, hashValue, username, ldId, courseId, title, desc,
-			country, lang, customCSV);
+			country, lang, customCSV, isMindapp);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
@@ -490,24 +492,31 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     public Long startPreview(String serverId, String datetime, String hashValue, String username, Long ldId,
-	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV)
-	    throws RemoteException {
+	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV,
+	    String isMindapp) throws RemoteException {
 
 	try {
-	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
-	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
-		    courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
+	    Integer userId = null;
+	    if (isMindapp == null) {
+		ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
+		Authenticator.authenticate(serverMap, datetime, username, hashValue);
+		ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap,
+			username);
+		ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap,
+			userMap, courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
+		userId = userMap.getUser().getUserId();
+	    } else {
+		userId = 7;
+	    }
+
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLessonForPreview(title, desc, ldId,
-		    userMap.getUser().getUserId(), customCSV, false, false, false);
+		    userId, customCSV, false, false, false);
 	    // 2. create lessonClass for lesson
-	    LessonManagerServlet.monitoringService.createPreviewClassForLesson(userMap.getUser().getUserId(), lesson
-		    .getLessonId());
+	    LessonManagerServlet.monitoringService.createPreviewClassForLesson(userId, lesson.getLessonId());
 
 	    // 3. start lesson
-	    LessonManagerServlet.monitoringService.startLesson(lesson.getLessonId(), userMap.getUser().getUserId());
+	    LessonManagerServlet.monitoringService.startLesson(lesson.getLessonId(), userId);
 
 	    return lesson.getLessonId();
 	} catch (Exception e) {

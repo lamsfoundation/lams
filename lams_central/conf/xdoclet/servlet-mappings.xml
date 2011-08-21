@@ -4,6 +4,11 @@
 </servlet-mapping>
 
 <servlet-mapping>
+	<servlet-name>action</servlet-name>
+	<url-pattern>*.mindapp</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
 	<servlet-name>download</servlet-name>
 	<url-pattern>/download/*</url-pattern>
 </servlet-mapping>

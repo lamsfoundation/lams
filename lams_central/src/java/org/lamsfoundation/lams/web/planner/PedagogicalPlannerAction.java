@@ -242,6 +242,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     // Parameters
     public static final String PARAM_REQUEST_SRC = "requestSrc";
     public static final String PARAM_NOTIFY_CLOSE_URL = "notifyCloseURL";
+    public static final String PARAM_FORBID_BUTTONS = "forbidButtons";
     
     // Template copy mode values
     public static final String COPY_MODE_EDIT_CURRENT = "editCurrent";
@@ -442,6 +443,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		}
 	    }
 	}
+	
+	String forbidButtonsString = request.getParameter(PARAM_FORBID_BUTTONS);
+	planner.overridePermissions(forbidButtonsString);
 
 	// Some additional options for submitting activity forms; should be moved to configuration file in the future
 	planner.setSendInPortions(false);

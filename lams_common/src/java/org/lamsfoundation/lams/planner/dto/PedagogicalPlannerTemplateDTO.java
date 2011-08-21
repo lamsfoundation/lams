@@ -25,9 +25,25 @@ package org.lamsfoundation.lams.planner.dto;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode;
 
 public class PedagogicalPlannerTemplateDTO {
+
+    private static enum PermissionToLetterMapping {
+	PREVIEW("P"), VIEW_IN_FULL_AUTHOR("V"), EXPORT("E"), SAVE("S"), CLOSE_EDITOR("C");
+
+	private String letter;
+
+	private PermissionToLetterMapping(String letter) {
+	    this.letter = letter;
+	}
+
+	public String getLetter() {
+	    return letter;
+	}
+    }
+
     private String sequenceTitle;
     private Boolean sendInPortions;
     private Integer activitiesPerPortion;
@@ -36,24 +52,35 @@ public class PedagogicalPlannerTemplateDTO {
     private Long learningDesignID;
     private Integer activitySupportingPlannerCount = 0;
     private Long nodeUid;
-    
+
     private Boolean isEditor = false;
     private Boolean permitPreview = true;
-    private Boolean permitViewInFullAuthor =true ;
+    private Boolean permitViewInFullAuthor = true;
     private Boolean permitExport = true;
     private Boolean permitSave = true;
+    private Boolean permitExitEditor = true;
 
     public void setPermissions(Integer nodePermissions, boolean isEditor) {
 	// set permissions the view is based on
 	this.isEditor = isEditor;
-	permitPreview = isEditor || nodePermissions == null
-		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_PREVIEW) != 0;
-	permitViewInFullAuthor = isEditor || nodePermissions == null
-		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_VIEW_IN_FULL_AUTHOR) != 0;
-	permitExport = isEditor || nodePermissions == null
-		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_EXPORT) != 0;
-	permitSave = isEditor || nodePermissions == null
-		|| (nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_SAVE) != 0;
+	permitPreview = isEditor || (nodePermissions == null)
+		|| ((nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_PREVIEW) != 0);
+	permitViewInFullAuthor = isEditor || (nodePermissions == null)
+		|| ((nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_VIEW_IN_FULL_AUTHOR) != 0);
+	permitExport = isEditor || (nodePermissions == null)
+		|| ((nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_EXPORT) != 0);
+	permitSave = isEditor || (nodePermissions == null)
+		|| ((nodePermissions & PedagogicalPlannerSequenceNode.PERMISSION_TEACHER_SAVE) != 0);
+    }
+
+    public void overridePermissions(String forbid) {
+	if (!StringUtils.isBlank(forbid)) {
+	    permitPreview &= !forbid.contains(PermissionToLetterMapping.PREVIEW.getLetter());
+	    permitViewInFullAuthor &= !forbid.contains(PermissionToLetterMapping.VIEW_IN_FULL_AUTHOR.getLetter());
+	    permitExport &= !forbid.contains(PermissionToLetterMapping.EXPORT.getLetter());
+	    permitSave &= !forbid.contains(PermissionToLetterMapping.SAVE.getLetter());
+	    permitExitEditor &= !forbid.contains(PermissionToLetterMapping.CLOSE_EDITOR.getLetter());
+	}
     }
 
     public String getSequenceTitle() {
@@ -113,50 +140,58 @@ public class PedagogicalPlannerTemplateDTO {
     }
 
     public Long getNodeUid() {
-        return nodeUid;
+	return nodeUid;
     }
 
     public void setNodeUid(Long nodeUid) {
-        this.nodeUid = nodeUid;
+	this.nodeUid = nodeUid;
     }
 
     public Boolean getIsEditor() {
-        return isEditor;
+	return isEditor;
     }
 
     public void setIsEditor(Boolean isEditor) {
-        this.isEditor = isEditor;
+	this.isEditor = isEditor;
     }
 
     public Boolean getPermitPreview() {
-        return permitPreview;
+	return permitPreview;
     }
 
     public void setPermitPreview(Boolean permitTeacherPreview) {
-        this.permitPreview = permitTeacherPreview;
+	this.permitPreview = permitTeacherPreview;
     }
 
     public Boolean getPermitViewInFullAuthor() {
-        return permitViewInFullAuthor;
+	return permitViewInFullAuthor;
     }
 
     public void setPermitViewInFullAuthor(Boolean permitTeacherViewCopyInFullAuthor) {
-        this.permitViewInFullAuthor = permitTeacherViewCopyInFullAuthor;
+	this.permitViewInFullAuthor = permitTeacherViewCopyInFullAuthor;
     }
 
     public Boolean getPermitExport() {
-        return permitExport;
+	return permitExport;
     }
 
     public void setPermitExport(Boolean permitTeacherExportCopy) {
-        this.permitExport = permitTeacherExportCopy;
+	this.permitExport = permitTeacherExportCopy;
     }
 
     public Boolean getPermitSave() {
-        return permitSave;
+	return permitSave;
     }
 
     public void setPermitSave(Boolean permitTeacherSaveCopy) {
-        this.permitSave = permitTeacherSaveCopy;
+	this.permitSave = permitTeacherSaveCopy;
+    }
+
+    public Boolean getPermitExitEditor() {
+	return permitExitEditor;
+    }
+
+    public void setPermitExitEditor(Boolean permitExitEditor) {
+	this.permitExitEditor = permitExitEditor;
     }
 }

@@ -172,7 +172,7 @@
 			</webinf>
 			<fileset dir="${conf.web.dir}">
 				<include name="*"/>
-				<include name="css/*"/>
+				<include name="css/**"/>
 				<include name="includes/**"/>
 				<include name="images/**"/>
 				<include name="ckeditor/**"/>
@@ -190,6 +190,10 @@
 		<!-- Add Pedagogical Planner, if available -->
 		<available file="../${lams_planner}/build.xml" property="planner_available" />
 		<antcall target="copy-planner" />
+		
+		<!-- Add Mindapp integration, if available -->
+		<available file="../${lams_mindapp}/build.xml" property="mindapp_available" />
+		<antcall target="copy-mindapp-war" />
 	</target>
 
 
@@ -197,7 +201,12 @@
 	<!-- Make jar archive for deployment        		    	          -->
 	<!-- ================================================================ -->
 	<target name="build-jar" depends="compile" description="creates jar file">
-		<delete file="${build.lib}/${product}.jar"/>
+		
+		<!-- Add Mindapp integration, if available -->
+		<available file="../${lams_mindapp}/build.xml" property="mindapp_available" />
+		<antcall target="copy-mindapp-jar" />
+		
+		<delete file="${build.lib}/${product}.jar"/>	
 		<jar jarfile="${build.lib}/${product}.jar"  manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
 			<fileset dir="${build.classes.java}"/>
 			<fileset dir="${build.classes.test}"/>
@@ -208,7 +217,9 @@
 				<include name="**/*.txt"/>
 			</fileset>
 		</copy>
+
 	</target>
+	
 	<!-- =================================================================== -->
 	<!-- Run JUnit Tests                                                     -->
 	<!-- =================================================================== -->
@@ -294,8 +305,8 @@
 				<include name="**/*"/>
 			</fileset>
 		</copy>
-		<copy overwrite="yes" todir="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/central">
-			<fileset dir="${conf.language.dir}">
+		<copy overwrite="yes" todir="${jboss.deploy}/lams-dictionary.jar">
+			<fileset dir="${build.lib}/language">
 				<include name="**/*.properties"/>
 			</fileset>
 		</copy>
@@ -305,8 +316,8 @@
 	<target name="deploy-jar" depends="build-jar">
 		<copy file="${build.lib}/${product}.jar"
 				todir="${jboss.deploy}"/>
-		<copy overwrite="yes" todir="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/central">
-			<fileset dir="${conf.language.dir}">
+		<copy overwrite="yes" todir="${jboss.deploy}/lams-dictionary.jar">
+			<fileset dir="${build.lib}/language">
 				<include name="**/*.properties"/>
 			</fileset>
 		</copy>
@@ -314,6 +325,13 @@
 
 	<target name="copy-planner" if="planner_available">
 		<ant antfile="../${lams_planner}/build.xml" target="copy-to-central" />
+	</target>
+	
+	<target name="copy-mindapp-jar" if="mindapp_available">
+		<ant antfile="../${lams_mindapp}/build.xml" target="copy-jar-to-central" />
+	</target>
+	<target name="copy-mindapp-war" if="mindapp_available">
+		<ant antfile="../${lams_mindapp}/build.xml" target="copy-war-to-central" />
 	</target>
 	
 	<!-- ================================= -->

@@ -69,10 +69,11 @@ public class LoginRequestValve extends ValveBase {
 		// invoke next valve,
 		// so we can get internal session and manager
 		getNext().invoke(request, response);
-
+		
 		// when coming back from LoginRequest save the redirect to catalina
 		// internal session
-		if (hreq.getRequestURI().endsWith(LOGIN_REQUEST)) {
+		// temporarily override security for MindApp integration purposes
+		if (hreq.getRequestURI().endsWith(LOGIN_REQUEST) || response.getHeader("mindappLogin") != null) {
 			// Looking at response header to determine redirect location
 			boolean isLoginSuccessful = false;
 			String[] headerNames = response.getHeaderNames();
@@ -89,6 +90,7 @@ public class LoginRequestValve extends ValveBase {
 				}
 			}
 
+
 			// if login request is successful then it will redirected the page
 			// to j_security_check otherwise it's unsuccessful.
 			if (!isLoginSuccessful) {
@@ -98,12 +100,18 @@ public class LoginRequestValve extends ValveBase {
 				HttpSession hses = hreq.getSession(false);
 				log.debug("Session Id - " + hses.getId());
 				String userid = hreq.getParameter(PARAM_USERID);
+				if (userid == null){
+				    userid = response.getHeader("mindappLogin");
+				}
 
 				// get the redirect url from RequestDispatcher
 				// The RequestDispatcher also setup any session variable
 				// required to carryout the method
-				String redirect = LoginRequestDispatcher.getRequestURL(hreq);
-
+				
+				String redirect = response.getHeader("mindappRedirect");
+				if (redirect == null) {
+				   redirect = LoginRequestDispatcher.getRequestURL(hreq);
+				}
 				// check required parameters
 				if (userid != null && redirect != null && hses != null) {
 					log.info("LOGIN REQUEST DETECTED - LOGIN SUCCESSFUL");

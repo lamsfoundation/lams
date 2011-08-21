@@ -11,3 +11,32 @@
     </action>
     
      -->
+     
+    <action
+      path="/mindapp/*"
+      type="org.lamsfoundation.lams.mindapp.MindappAction"
+      parameter="method"
+      unknown="false"
+      validate="true"
+    >
+      <forward
+        name="help"
+        path="/mindapp/mindappHelp.jsp"
+        redirect="false"
+      />
+      <forward
+        name="config"
+        path="/mindapp/mindappForumConfig.jsp"
+        redirect="false"
+      />
+      <forward
+        name="add"
+        path="/mindapp/mindappAddLearningDesign.jsp"
+        redirect="false"
+      />
+      <forward
+        name="initialAuthentication"
+        path="/mindapp/mindappAuthenticationBounce.jsp"
+        redirect="false"
+      />
+    </action>

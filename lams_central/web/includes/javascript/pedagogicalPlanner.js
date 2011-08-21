@@ -180,7 +180,6 @@
   	   		startPreview(startPreviewUrl);
   	   	}
   	   	else if (actionAfterCompleted==ACTION_OPEN_AUTHOR){
-  	   		window.resizeTo(authoring_width,authoring_height);
   	   		var openAuthorURL = "home.do?method=author&learningDesignID=" + learningDesignId;
   	   		if (requestSrc != "") {
   	   			openAuthorURL += "&requestSrc=" + requestSrc;
@@ -190,7 +189,15 @@
   	   			notifyCloseURL = notifyCloseURL.replace (/&/g, '%26');
   	   			openAuthorURL += "&notifyCloseURL=" + notifyCloseURL;
   	   		}
-  	   		document.location.href = openAuthorURL;
+  	   		if (window.opener == null) {
+  	   			var wd = window.open(openAuthorURL,'aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
+	  	  		if (window.focus) {
+	  				wd.window.focus();
+	  			}
+  	   		} else {
+	  	   		window.resizeTo(authoring_width,authoring_height);
+	  	   		document.location.href = openAuthorURL;
+  	   		}
   	   	}
   	   	else if (actionAfterCompleted==ACTION_EXPORT){
   	   		 document.getElementById("downloadFileDummyIframe").src="pedagogicalPlanner.do?method=exportTemplate&ldId="+learningDesignId;
