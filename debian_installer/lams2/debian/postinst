@@ -17,6 +17,15 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+update234to235 () {
+    # Add eadventure tool, new in 2.3.5
+    cd /usr/share/lams2/lams_tool_eadventure
+    sed -i -e "s/\(<dbDriverUrl>\).*\(\?.*\)\(<\/dbDriverUrl>\)/\1jdbc:mysql:\/\/localhost:3306\/$db_name\2\3/" deploy.xml
+    sed -i -e "s/\(<dbUsername>\).*\(<\/dbUsername>\)/\1$db_user\2/" deploy.xml
+    sed -i -e "s/\(<dbPassword>\).*\(<\/dbPassword>\)/\1$db_pass\2/" deploy.xml
+    ./deploy.sh || true
+
+}
 update232to233 () {
     # Remove old llid language files
     cd /usr/share/jboss-4.0.2/server/default/deploy/lams.ear/lams-dictionary.jar/org/lamsfoundation/lams/library/
@@ -227,6 +236,11 @@ case "$1" in
         sed -i -e "s/port=\"8080\"/port=\"$server_port\"/" server.xml
 
         case "$2" in
+             2.3.4*)
+                update;
+		update234to235;
+            ;;
+
             2.3.3*)
                 update;
             ;;

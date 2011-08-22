@@ -109,7 +109,7 @@
 			</fileset>
 		</copy>
 		<replace file="${build_dir}/lams_tool_assessment/deploy.xml"
-			token="/home/jliew/lams_tool_assessment/build/deploy" 
+			token="/usr/local/lams2/lams_tool_assessment/build/deploy" 
 			value="/usr/share/lams2/lams_tool_assessment" />
 		<replace file="${build_dir}/lams_tool_assessment/deploy.xml"
 			token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
@@ -127,7 +127,7 @@
                         </fileset>
                 </copy>
                 <replace file="${build_dir}/lams_tool_images/deploy.xml"
-                        token="/home/jliew/lams_tool_images/build/deploy" 
+                        token="/usr/local/lams2/lams_tool_images/build/deploy" 
                         value="/usr/share/lams2/lams_tool_images" />
                 <replace file="${build_dir}/lams_tool_images/deploy.xml"
                         token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
@@ -145,7 +145,7 @@
                         </fileset>
                 </copy>
                 <replace file="${build_dir}/lams_tool_mindmap/deploy.xml"
-                        token="/home/jliew/lams_tool_mindmap/build/deploy" 
+                        token="/usr/local/lams2/lams_tool_mindmap/build/deploy" 
                         value="/usr/share/lams2/lams_tool_mindmap" />
                 <replace file="${build_dir}/lams_tool_mindmap/deploy.xml"
                         token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
@@ -163,7 +163,7 @@
                         </fileset>
                 </copy>
                 <replace file="${build_dir}/lams_tool_pixlr/deploy.xml"
-                        token="/home/jliew/lams_tool_pixlr/build/deploy" 
+                        token="/usr/local/lams2/lams_tool_pixlr/build/deploy" 
                         value="/usr/share/lams2/lams_tool_pixlr" />
                 <replace file="${build_dir}/lams_tool_pixlr/deploy.xml"
                         token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
@@ -181,14 +181,14 @@
                         </fileset>
                 </copy>
                 <replace file="${build_dir}/lams_tool_videorecorder/deploy.xml"
-                        token="/home/jliew/lams_tool_videorecorder/build/deploy" 
+                        token="/usr/local/lams2/lams_tool_videorecorder/build/deploy" 
                         value="/usr/share/lams2/lams_tool_videorecorder" />
                 <replace file="${build_dir}/lams_tool_videorecorder/deploy.xml"
                         token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
         </target>
 
 	<target name="copy-2.3-tool-packages" depends="copy-assessment-tool-package,copy-images-tool-package,
-		copy-mindmap-tool-package,copy-pixlr-tool-package,copy-videorecorder-tool-package">
+		copy-mindmap-tool-package,copy-pixlr-tool-package,copy-videorecorder-tool-package,copy-eadventure-tool-package">
 	</target>
 
 	<!-- 2.2 update packages; token string hard coded in replace task -->
@@ -204,7 +204,7 @@
                         </fileset>
                 </copy>
                 <replace file="${build_dir}/lams_tool_daco/deploy.xml"
-                        token="/home/jliew/lams_tool_daco/build/deploy" 
+                        token="/usr/local/lams2/lams_tool_daco/build/deploy" 
                         value="/usr/share/lams2/lams_tool_daco" />
                 <replace file="${build_dir}/lams_tool_daco/deploy.xml"
                         token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
@@ -222,7 +222,7 @@
                         </fileset>
                 </copy>
                 <replace file="${build_dir}/lams_tool_dimdim/deploy.xml"
-                        token="/home/jliew/lams_tool_dimdim/build/deploy" 
+                        token="/usr/local/lams2/lams_tool_dimdim/build/deploy" 
                         value="/usr/share/lams2/lams_tool_dimdim" />
                 <replace file="${build_dir}/lams_tool_dimdim/deploy.xml"
                         token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
@@ -240,7 +240,7 @@
                         </fileset>
                 </copy>
                 <replace file="${build_dir}/lams_tool_gmap/deploy.xml"
-                        token="/home/jliew/lams_tool_gmap/build/deploy" 
+                        token="/usr/local/lams2/lams_tool_gmap/build/deploy" 
                         value="/usr/share/lams2/lams_tool_gmap" />
                 <replace file="${build_dir}/lams_tool_gmap/deploy.xml"
                         token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
@@ -258,7 +258,7 @@
                         </fileset>
                 </copy>
                 <replace file="${build_dir}/lams_tool_spreadsheet/deploy.xml"
-                        token="/home/jliew/lams_tool_spreadsheet/build/deploy" 
+                        token="/usr/local/lams2/lams_tool_spreadsheet/build/deploy" 
                         value="/usr/share/lams2/lams_tool_spreadsheet" />
                 <replace file="${build_dir}/lams_tool_spreadsheet/deploy.xml"
                         token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
@@ -276,7 +276,7 @@
                         </fileset>
                 </copy>
                 <replace file="${build_dir}/lams_tool_task/deploy.xml"
-                        token="/home/jliew/lams_tool_task/build/deploy" 
+                        token="/usr/local/lams2/lams_tool_task/build/deploy" 
                         value="/usr/share/lams2/lams_tool_task" />
                 <replace file="${build_dir}/lams_tool_task/deploy.xml"
                         token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
@@ -294,11 +294,30 @@
                         </fileset>
                 </copy>
                 <replace file="${build_dir}/lams_tool_wiki/deploy.xml"
-                        token="/home/jliew/lams_tool_wiki/build/deploy" 
+                        token="/usr/local/lams2/lams_tool_wiki/build/deploy" 
                         value="/usr/share/lams2/lams_tool_wiki" />
                 <replace file="${build_dir}/lams_tool_wiki/deploy.xml"
                         token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
         </target>
+
+        <target name="copy-eadventure-tool-package">
+                <delete failonerror="false">
+                        <fileset dir="${build_dir}/lams_tool_eadventure">
+                                <include name="**" />
+                        </fileset>
+                </delete>
+                <copy overwrite="yes" preservelastmodified="true" todir="${build_dir}/lams_tool_eadventure">
+                        <fileset dir="${projects_dir}/lams_tool_eadventure/build/deploy">
+                                <include name="**" />
+                        </fileset>
+                </copy>
+                <replace file="${build_dir}/lams_tool_eadventure/deploy.xml"
+                        token="/usr/local/lams2/lams_tool_eadventure/build/deploy" 
+                        value="/usr/share/lams2/lams_tool_eadventure" />
+                <replace file="${build_dir}/lams_tool_eadventure/deploy.xml"
+                        token="/usr/local/jboss-4.0.2" value="/usr/share/jboss-4.0.2" />
+        </target>
+
 
 	<target name="copy-2.2-tool-packages" depends="copy-daco-tool-package,copy-dimdim-tool-package,
                 copy-gmap-tool-package,copy-spreadsheet-tool-package,copy-wiki-tool-package">
