@@ -17,6 +17,10 @@ package org.lamsfoundation.lams.vos
 		public var enableLiveEdit:Boolean;
 		public var enableIm:Boolean;
 		
+		public var enableTimeLimits:Boolean;
+		public var scheduledNumberDaysToLessonFinish:int;
+		public var enableIndividualTimeLimit:Boolean;
+		
 		public var enableScheduling:Boolean;
 		
 		public var numberLessonsSplit:int;
@@ -46,6 +50,10 @@ package org.lamsfoundation.lams.vos
 			data.enablePresence = this.enablePresence;
 			data.enableLiveEdit = this.enableLiveEdit;
 			data.enableIm = this.enableIm;
+			
+			if (this.enableTimeLimits && this.enableIndividualTimeLimit) {
+				data.scheduledNumberDaysToLessonFinish = WDDXUtil.toWDDXNull(this.scheduledNumberDaysToLessonFinish);
+			}
 			
 			data.numberLessonsSplit = WDDXUtil.toWDDXNull(this.numberLessonsSplit);
 			data.numberLearnersSplit = WDDXUtil.toWDDXNull(this.numberLearnersSplit);

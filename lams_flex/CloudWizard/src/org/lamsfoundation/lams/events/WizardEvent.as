@@ -23,6 +23,8 @@ package org.lamsfoundation.lams.events
 		
 		public static const ADD_LESSON:String					= "addLessonEvent";
 		public static const SCHEDULE_LESSON:String				= "scheduleLessonEvent";
+		public static const SCHEDULE_LESSON_FINISH:String		= "scheduleLessonFinishEvent";
+		public static const CHECK_SCHEDULE_LESSON_FINISH:String	= "checkScheduleLessonFinishEvent";
 		public static const CREATE_LESSON_CLASS:String 			= "createLessonClassEvent";
 		public static const SPLIT_LESSON_CLASS:String			= "splitLessonClassEvent";
 		public static const START:String						= "startEvent";
@@ -49,6 +51,8 @@ package org.lamsfoundation.lams.events
 		public var startEvent_type:String;
 		public var schedule:String;
 		public var timeZone:uint;
+		
+		public var scheduledNumberDaysToLessonFinish:int;
 		
 		public var last:Boolean = true;
 		

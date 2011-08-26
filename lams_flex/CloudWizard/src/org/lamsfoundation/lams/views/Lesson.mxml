@@ -8,6 +8,8 @@
 
 	<mx:Script>
 		<![CDATA[
+			import com.visualempathy.display.controls.datetime.DateTimePicker;
+			
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
 			import mx.core.Application;
@@ -21,15 +23,11 @@
 			import org.lamsfoundation.lams.common.dictionary.XMLDictionaryRegistry;
 			import org.lamsfoundation.lams.common.util.WDDXParser;
 			import org.lamsfoundation.lams.common.util.WDDXUtil;
-			
-			import org.lamsfoundation.lams.events.WizardEvent;
 			import org.lamsfoundation.lams.events.NavigationEvent;
-			
+			import org.lamsfoundation.lams.events.WizardEvent;
 			import org.lamsfoundation.lams.vos.Lesson;
 			import org.lamsfoundation.lams.vos.WorkspaceCollection;
 			import org.lamsfoundation.lams.vos.WorkspaceItem;
-	
-			import com.visualempathy.display.controls.datetime.DateTimePicker;
 			
    			[Bindable]
    			public var _workspace:WorkspaceItem;
@@ -93,7 +91,7 @@
    					return;
    					
    				selectedNode = Tree(event.target).selectedItem as WorkspaceItem;
-   				
+				
    				Wizard.clearValidationFocus();
    				lessonNameVal.validate();	
    			
@@ -221,6 +219,18 @@
 				
 			}
 			
+			//check if this lesson should be scheduled for finish and if so schedule it
+			public function checkForLessonFinishOnSchedule(event:WizardEvent):void {
+				if(newLesson.enableTimeLimits && !newLesson.enableIndividualTimeLimit) {
+					var wizardEvent:WizardEvent = new WizardEvent(WizardEvent.SCHEDULE_LESSON_FINISH);
+					wizardEvent.lesson = newLesson;
+					wizardEvent.scheduledNumberDaysToLessonFinish = newLesson.scheduledNumberDaysToLessonFinish;
+					
+					this.dispatchEvent(wizardEvent);					
+				}
+				
+			}
+			
 			private function hasFocus(value:Boolean):void {
 				if(value) {
 					// tab is current selection
@@ -245,6 +255,7 @@
 	<mate:Listener type="{NavigationEvent.TAB_SELECT}" receive="hasFocus(event.selectedIndex==Wizard.LESSON_INDEX)" />
 	<mate:Listener type="{WizardEvent.OPEN_FOLDER}"  receive="openFolders(event)" />
 	<mate:Listener type="{WizardEvent.START}" receive="startLesson(event)" />
+	<mate:Listener type="{WizardEvent.CHECK_SCHEDULE_LESSON_FINISH}" receive="checkForLessonFinishOnSchedule(event)" />
 	
 	<!-- Model ______________________________________________________________________ -->
 	<vos:Lesson id="newLesson">
@@ -259,6 +270,11 @@
 		<vos:enableIm>{advanced.enableIm.selected}</vos:enableIm>
 		<vos:numberLessonsSplit>{advanced.noInstances}</vos:numberLessonsSplit>
 		<vos:numberLearnersSplit>{advanced.noLearnersPerInstance}</vos:numberLearnersSplit>
+		<vos:enableTimeLimits>
+			{advanced.enableTimeLimits.selected}
+		</vos:enableTimeLimits>
+		<vos:scheduledNumberDaysToLessonFinish>{advanced.noDaysToLessonFinish.value}</vos:scheduledNumberDaysToLessonFinish>
+		<vos:enableIndividualTimeLimit>{advanced.enableIndividualTimeLimit.selected}</vos:enableIndividualTimeLimit>
 		<vos:enableScheduling>
 			{advanced.enableScheduling.selected}
 		</vos:enableScheduling>

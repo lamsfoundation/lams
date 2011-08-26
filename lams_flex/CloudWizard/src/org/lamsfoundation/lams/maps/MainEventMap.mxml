@@ -191,6 +191,8 @@
 		<HTTPServiceInvoker instance="{startLessonService}">
 			<Request lessonID="{event.lesson.lessonID}" userID="{userID}" />
 			<resultHandlers>
+				<EventAnnouncer generator="{WizardEvent}" type="{WizardEvent.CHECK_SCHEDULE_LESSON_FINISH}" />
+				
 				<MethodInvoker generator="{WDDXParser}" 
 					method="parseObject" arguments="{resultObject}" />
 				<MethodInvoker generator="{WizardManager}" method="closeOnSuccess" arguments="{[lastReturn, event.last]}" />
@@ -209,10 +211,20 @@
 		<HTTPServiceInvoker instance="{scheduleLessonService}">
 			<Request lessonID="{event.lesson.lessonID}" lessonStartDate="{event.schedule}" scheduleTimeZoneIdx="{event.timeZone}" userID="{userID}" />
 			<resultHandlers>
+				<EventAnnouncer generator="{WizardEvent}" type="{WizardEvent.CHECK_SCHEDULE_LESSON_FINISH}" />
+				
 				<MethodInvoker generator="{WDDXParser}" 
 					method="parseObject" arguments="{resultObject}" />
 				<MethodInvoker generator="{WizardManager}" method="closeOnSuccess" arguments="{[lastReturn, event.last]}" />
 			</resultHandlers>
+		</HTTPServiceInvoker>
+	</EventHandlers>
+	
+	<!-- WizardEvent.SCHEDULE_LESSON_FINISH ________________________________________________  -->
+	<EventHandlers type="{WizardEvent.SCHEDULE_LESSON_FINISH}">
+		<!-- schedule to finish lesson -->
+		<HTTPServiceInvoker instance="{scheduleLessonFinishService}">
+			<Request lessonID="{event.lesson.lessonID}" scheduledNumberDaysToLessonFinish="{event.scheduledNumberDaysToLessonFinish}" userID="{userID}" />
 		</HTTPServiceInvoker>
 	</EventHandlers>
 	
@@ -242,6 +254,7 @@
 	<mx:HTTPService id="splitLessonsService" url="{serverURL}monitoring/initializeAndCreateLessons" resultFormat="xml" />
 	<mx:HTTPService id="startLessonService" url="{serverURL}monitoring/monitoring.do?method=startLesson" resultFormat="xml" />
 	<mx:HTTPService id="scheduleLessonService" url="{serverURL}monitoring/monitoring.do?method=startOnScheduleLesson" resultFormat="xml" />
+	<mx:HTTPService id="scheduleLessonFinishService" url="{serverURL}monitoring/monitoring.do?method=finishOnScheduleLesson" resultFormat="xml" />
 	<mx:HTTPService id="presenceService" url="{serverURL}Presence.do?method=createXmppRoom" resultFormat="xml" />
 	<mx:HTTPService id="dictionaryService" url="monitoring.do?method=getDictionaryXML" resultFormat="e4x" />         
 	
