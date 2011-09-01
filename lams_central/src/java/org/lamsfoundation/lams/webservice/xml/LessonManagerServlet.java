@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -165,7 +166,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    if (method.equals(CentralConstants.METHOD_START)) {
 		ldId = new Long(ldIdStr);
 		Long lessonId = startLesson(serverId, datetime, hashValue, username, ldId, courseId, title, desc,
-			country, lang, customCSV);
+			country, lang, customCSV, isMindapp);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
@@ -296,26 +297,37 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     public Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
-	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV)
-	    throws RemoteException {
+	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV,
+	    String isMindapp) throws RemoteException {
 	try {
-	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
-	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
-		    courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
+	    User user = null;
+	    Organisation organisation = null;
+	    ExtServerOrgMap serverMap = null;
+	    if (isMindapp == null) {
+		serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
+		Authenticator.authenticate(serverMap, datetime, username, hashValue);
+		ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap,
+			username);
+		ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap,
+			userMap, courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
+		user = userMap.getUser();
+		organisation = orgMap.getOrganisation();
+	    } else {
+		user = userManagementService.getUserByLogin("test3");
+		organisation = ((UserOrganisation) user.getUserOrganisations().iterator().next()).getOrganisation();
+	    }
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId,
-		    orgMap.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV,
-		    Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);
+		    organisation.getOrganisationId(), user.getUserId(), customCSV, Boolean.FALSE, Boolean.FALSE,
+		    Boolean.FALSE);
 	    // 2. create lessonClass for lesson
-	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
+	    createLessonClass(lesson, organisation, user);
 	    // 3. start lesson
-	    LessonManagerServlet.monitoringService.startLesson(lesson.getLessonId(), userMap.getUser().getUserId());
-	    
-	    //store information which extServer has started the lesson
-	    integrationService.createExtServerLessonMap(lesson.getLessonId(), serverMap);
-
+	    LessonManagerServlet.monitoringService.startLesson(lesson.getLessonId(), user.getUserId());
+	    if (isMindapp == null) {
+		// store information which extServer has started the lesson
+		integrationService.createExtServerLessonMap(lesson.getLessonId(), serverMap);
+	    }
 	    return lesson.getLessonId();
 	} catch (Exception e) {
 	    throw new RemoteException(e.getMessage(), e);

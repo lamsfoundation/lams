@@ -1464,7 +1464,13 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 	{
 		return (Vector<UserFlashDTO>) userMgmtService.getUsersFromOrganisationByRole(organisationID, roleName, true, false);
 	}
-	
-	
-	
+    
+        /**
+         * Get the workspace folders for a particular name. Does not check the user permissions - that will be checked if
+         * you try to get anything from the folder.
+         */
+        public List<WorkspaceFolder> getWorkspaceFolder(String workspaceFolderName) {
+    	return (List<WorkspaceFolder>) baseDAO.findByProperty(WorkspaceFolder.class, "name", workspaceFolderName);
+        }
+
 }

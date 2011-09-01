@@ -69,7 +69,13 @@ public interface IWorkspaceManagementService {
 	 * anything from the folder.
 	 */
 	public WorkspaceFolder getWorkspaceFolder(Integer workspaceFolderID);
-
+	
+        /**
+         * Get the workspace folders for a particular name. Does not check the user permissions - that will be checked if
+         * you try to get anything from the folder.
+         */
+	public List<WorkspaceFolder> getWorkspaceFolder(String workspaceFolderName);
+	
 	/**
 	 * This method returns the contents of the folder with given
 	 * <code>workspaceFolderID</code> depending upon the <code>mode</code>. 

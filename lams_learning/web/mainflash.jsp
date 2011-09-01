@@ -36,7 +36,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:set var="randomID">
 			<lams:generateID id="${param.lessonID}"/>
 		</c:set>
-
+		<c:if test="${not empty param.notifyCloseURL}">
+			<c:set var="notifyCloseURL" value="${param.notifyCloseURL}" scope="request" />
+		</c:if>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
 		<script language="JavaScript" type="text/JavaScript">		
@@ -87,6 +89,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			}
 			
 			function closeWindow() {
+				
+				// refresh the parent window
+				var parentURL = "${notifyCloseURL}";
+				
+				if (parentURL != "") {
+					if (window.parent.opener == null){
+						window.location.href = parentURL;
+					} else {
+						window.parent.opener.location.href = parentURL;
+					}
+				}
+				
+				if(isInternetExplorer) {
+					this.focus();
+					window.opener = this;
+					window.close();
+				} else {
+					window.location.href = "javascript: window.close()";
+				}
+				
 				top.window.close();
 			}
 

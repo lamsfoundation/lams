@@ -25,8 +25,8 @@
         redirect="false"
       />
       <forward
-        name="config"
-        path="/mindapp/mindappForumConfig.jsp"
+        name="initialAuthentication"
+        path="/mindapp/mindappAuthenticationBounce.jsp"
         redirect="false"
       />
       <forward
@@ -35,8 +35,13 @@
         redirect="false"
       />
       <forward
-        name="initialAuthentication"
-        path="/mindapp/mindappAuthenticationBounce.jsp"
+        name="configure"
+        path="/mindapp/mindappConfigureBounce.jsp"
+        redirect="false"
+      />
+      <forward
+        name="learn"
+        path="/mindapp/mindappLearnerBounce.jsp"
         redirect="false"
       />
     </action>
