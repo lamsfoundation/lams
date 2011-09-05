@@ -267,6 +267,7 @@
 		<vos:learnerExportPortfolio>{advanced.enabledExportPortfolio.selected}</vos:learnerExportPortfolio>
 		<vos:enablePresence>{advanced.enablePresence.selected}</vos:enablePresence>
 		<vos:enableLiveEdit>{advanced.enabledLiveEdit.selected}</vos:enableLiveEdit>
+		<vos:enableLessonNotifications>{advanced.enableLessonNotifications.selected}</vos:enableLessonNotifications>
 		<vos:enableIm>{advanced.enableIm.selected}</vos:enableIm>
 		<vos:numberLessonsSplit>{advanced.noInstances}</vos:numberLessonsSplit>
 		<vos:numberLearnersSplit>{advanced.noLearnersPerInstance}</vos:numberLearnersSplit>

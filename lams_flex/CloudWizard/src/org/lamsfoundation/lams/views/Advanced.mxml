@@ -300,6 +300,7 @@
 			<mx:CheckBox id="startInMonitor" selected="false" label="{dictionary.getLabel('finish.btn')}" labelPlacement="right" change="changeStartMonitorSelection()" />
 			
 			<mx:CheckBox id="enabledLiveEdit" selected="true" label="{dictionary.getLabel('wizard.learner.enLiveEdit.cb.lbl')}" labelPlacement="right" />
+			<mx:CheckBox id="enableLessonNotifications" selected="true" label="{dictionary.getLabel('advanced.tab.enable.lesson.notifications')}" labelPlacement="right" />
 			<mx:CheckBox id="enabledExportPortfolio" selected="true" label="{dictionary.getLabel('wizard.learner.expp.cb.lbl')}" labelPlacement="right" />
 			<mx:CheckBox id="enablePresence" selected="false" label="{dictionary.getLabel('wizard.learner.enpres.cb.lbl')}" labelPlacement="right" change="changePresenceSelection()" />
 			<mx:CheckBox id="enableIm" selected="false" enabled="{enablePresence.selected}" label="{dictionary.getLabel('advanced.tab.form.enable.im.label')}" labelPlacement="right" />

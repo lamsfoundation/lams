@@ -15,6 +15,7 @@ package org.lamsfoundation.lams.vos
 		public var learnerExportPortfolio:Boolean;
 		public var enablePresence:Boolean;
 		public var enableLiveEdit:Boolean;
+		public var enableLessonNotifications:Boolean;
 		public var enableIm:Boolean;
 		
 		public var enableTimeLimits:Boolean;
@@ -49,6 +50,7 @@ package org.lamsfoundation.lams.vos
 			
 			data.enablePresence = this.enablePresence;
 			data.enableLiveEdit = this.enableLiveEdit;
+			data.enableLessonNotifications = this.enableLessonNotifications;
 			data.enableIm = this.enableIm;
 			
 			if (this.enableTimeLimits && this.enableIndividualTimeLimit) {
