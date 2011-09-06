@@ -61,8 +61,9 @@
 <c:if test="${empty accessMode}">
 	<c:set var="accessMode" value="author" scope="request"/>
 </c:if>
-
-<c:set var="saveUnableMsgKey" value="authoring.msg.no.tasks.save" scope="request"/>
+<c:if test="${not empty param.notifyCloseURL}">
+	<c:set var="notifyCloseURL" value="${param.notifyCloseURL}" scope="session"/>
+</c:if>
 
 <!-- begin tab content -->
 <script type="text/javascript">
@@ -70,19 +71,21 @@
        	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&contentFolderID=${contentFolderID}'/>";
 	}
     function doSubmit_Form_Only() {
-        	var table = document.getElementById("itemTable");
-    	var length2 = table.rows;
-    	var length = length2.length;
-
-		if( length == 0 ) {
-        	alert("<fmt:message key='${saveUnableMsgKey}'/>")
-		} else {
-	        document.getElementById("${formID}").submit();    		
-		}
+    	document.getElementById("${formID}").submit();
     }
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
-        	location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
+			var notifyCloseURL = "${notifyCloseURL}";
+			if (notifyCloseURL == ""){
+				location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
+			} else {
+				if (window.parent.opener == null){
+					window.location.href = notifyCloseURL;
+				} else {
+					window.parent.opener.location.href = notifyCloseURL;
+				}
+			}
+        	
         	//just for depress alert window when call window.close()
         	//only available for IE browser
         	var userAgent=navigator.userAgent;

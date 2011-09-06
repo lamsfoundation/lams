@@ -50,16 +50,19 @@
 
 <%-- Default value for message key --%>
 <c:if test="${empty cancelButtonLabelKey}">
-	<c:set var="cancelButtonLabelKey" value="label.common.cancel" scope="request"/>
+	<c:set var="cancelButtonLabelKey" value="label.authoring.cancel.button" scope="request"/>
 </c:if>
 <c:if test="${empty saveButtonLabelKey}">
 	<c:set var="saveButtonLabelKey" value="label.authoring.save.button" scope="request"/>
 </c:if>
 <c:if test="${empty cancelConfirmMsgKey}">
-	<c:set var="cancelConfirmMsgKey" value="message.authoring.cancel.save" scope="request"/>
+	<c:set var="cancelConfirmMsgKey" value="authoring.msg.cancel.save" scope="request"/>
 </c:if>
 <c:if test="${empty accessMode}">
 	<c:set var="accessMode" value="author" scope="request"/>
+</c:if>
+<c:if test="${not empty param.notifyCloseURL}">
+	<c:set var="notifyCloseURL" value="${param.notifyCloseURL}" scope="session"/>
 </c:if>
 
 <!-- begin tab content -->
@@ -72,7 +75,17 @@
     }
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
-        	location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
+			var notifyCloseURL = "${notifyCloseURL}";
+			if (notifyCloseURL == ""){
+				location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
+			} else {
+				if (window.parent.opener == null){
+					window.location.href = notifyCloseURL;
+				} else {
+					window.parent.opener.location.href = notifyCloseURL;
+				}
+			}
+        	
         	//just for depress alert window when call window.close()
         	//only available for IE browser
         	var userAgent=navigator.userAgent;

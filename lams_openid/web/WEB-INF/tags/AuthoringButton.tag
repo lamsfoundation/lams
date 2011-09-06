@@ -61,6 +61,9 @@
 <c:if test="${empty accessMode}">
 	<c:set var="accessMode" value="author" scope="request"/>
 </c:if>
+<c:if test="${not empty param.notifyCloseURL}">
+	<c:set var="notifyCloseURL" value="${param.notifyCloseURL}" scope="session"/>
+</c:if>
 
 <!-- begin tab content -->
 <script type="text/javascript">
@@ -72,7 +75,17 @@
     }
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
-        	location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}&customiseSessionID=${customiseSessionID}'/>";
+			var notifyCloseURL = "${notifyCloseURL}";
+			if (notifyCloseURL == ""){
+				location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
+			} else {
+				if (window.parent.opener == null){
+					window.location.href = notifyCloseURL;
+				} else {
+					window.parent.opener.location.href = notifyCloseURL;
+				}
+			}
+        	
         	//just for depress alert window when call window.close()
         	//only available for IE browser
         	var userAgent=navigator.userAgent;
@@ -84,10 +97,10 @@
 </script>	
 <p id="saveCancelButtons" >
 		<html:link href="javascript:;" property="cancel" onclick="javascript:doCancel()" styleClass="button right-buttons space-left">
-			<fmt:message key="${cancelButtonLabelKey}" />
+			<span class="cancelIcon"><fmt:message key="${cancelButtonLabelKey}" /></span>
 		</html:link>
 		<html:link href="javascript:doSubmit_Form_Only();" property="submit" styleClass="button right-buttons space-left">
-			<fmt:message key="${saveButtonLabelKey}" /> 
+			<span class="okIcon"><fmt:message key="${saveButtonLabelKey}" /></span>
 		</html:link>
 </p>
 <!-- end tab content -->

@@ -74,6 +74,7 @@ public abstract class LamsAuthoringFinishAction extends Action {
     private static final String RE_EDIT_URL = "reEditUrl";
 
     private static final String PARAM_DEFINE_LATER = "defineLater";
+    private static final String PARAM_NOTIFY_CLOSE_URL = "notifyCloseURL";
 
     /**
      * Action method, will handle save/cancel action.
@@ -83,7 +84,8 @@ public abstract class LamsAuthoringFinishAction extends Action {
 	String action = request.getParameter(ACTION_NAME);
 	String modeStr = request.getParameter(ACTION_MODE);
 	String cSessionID = request.getParameter(CUSTOMISE_SESSION_ID);
-
+	String notifyCloseURL = (String) request.getSession().getAttribute(PARAM_NOTIFY_CLOSE_URL);
+	
 	// clear session according to the ToolAccessMode.
 	if (StringUtils.equals(ToolAccessMode.LEARNER.toString(), modeStr))
 	    clearSession(cSessionID, request.getSession(), ToolAccessMode.LEARNER);
@@ -122,6 +124,10 @@ public abstract class LamsAuthoringFinishAction extends Action {
 	    }
 	    tool.getServiceName();
 	    nextUrl = WebUtil.appendParameterToURL(nextUrl, RE_EDIT_URL, URLEncoder.encode(reeditUrl, "UTF-8"));
+
+	    if (!StringUtils.isBlank(notifyCloseURL)) {
+		nextUrl = WebUtil.appendParameterToURL(nextUrl, PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
+	    }
 	    response.sendRedirect(nextUrl);
 	}
 	if (StringUtils.equals(action, CANCEL_ACTION) && StringUtils.equals(ToolAccessMode.TEACHER.toString(), modeStr)) {
