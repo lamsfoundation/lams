@@ -44,7 +44,7 @@
 	<param-value>context.central</param-value>
 </context-param>
 
-<filter>
+  <filter>
 	<filter-name>SystemSessionFilter</filter-name>
 	<filter-class>
 		org.lamsfoundation.lams.web.session.SystemSessionFilter
@@ -89,9 +89,14 @@
 	</init-param>
 </filter>
 
-<filter-mapping>
+  <filter-mapping>
 	<filter-name>SystemSessionFilter</filter-name>
 	<url-pattern>*.do</url-pattern>
+</filter-mapping>
+
+<filter-mapping>
+	<filter-name>SystemSessionFilter</filter-name>
+	<url-pattern>*.mindapp</url-pattern>
 </filter-mapping>
 
 <filter-mapping>
@@ -127,6 +132,11 @@
 <filter-mapping>
 	<filter-name>hibernateFilter</filter-name>
 	<url-pattern>*.do</url-pattern>
+</filter-mapping>
+
+<filter-mapping>
+	<filter-name>hibernateFilter</filter-name>
+	<url-pattern>*.mindapp</url-pattern>
 </filter-mapping>
 
 <filter-mapping>
@@ -172,6 +182,11 @@
 <filter-mapping>
 	<filter-name>LocaleFilter</filter-name>
 	<url-pattern>*.do</url-pattern>
+</filter-mapping>
+
+<filter-mapping>
+	<filter-name>LocaleFilter</filter-name>
+	<url-pattern>*.mindapp</url-pattern>
 </filter-mapping>
 
 <filter-mapping>
@@ -479,6 +494,11 @@
 </servlet-mapping>
 
 <servlet-mapping>
+	<servlet-name>action</servlet-name>
+	<url-pattern>*.mindapp</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
 	<servlet-name>download</servlet-name>
 	<url-pattern>/download/*</url-pattern>
 </servlet-mapping>
@@ -732,7 +752,7 @@
     		<url-pattern>*.html</url-pattern>
     		<url-pattern>*.do</url-pattern>
     		<url-pattern>/servlet/*</url-pattern>
-    		<url-pattern>/fckeditor/*</url-pattern>
+    		<url-pattern>/ckeditor/*</url-pattern>
     		<url-pattern>/toolcontent/*</url-pattern>
     		<url-pattern>/development/*</url-pattern>
     		<url-pattern>/pedagogical_planner/*</url-pattern>
@@ -767,15 +787,7 @@
     	</web-resource-collection>
     	<auth-constraint>
     		<role-name>MONITOR</role-name>
-    	</auth-constraint>
-    </security-constraint>
-    <security-constraint>
-	   	<web-resource-collection>
-	    	<web-resource-name>Prohibited Content</web-resource-name>
-		    <url-pattern>/index.do</url-pattern>
-    	</web-resource-collection>
-    	<auth-constraint>
-    		<role-name>SYSADMIN</role-name>
+    		<role-name>GROUP MANAGER</role-name>
     	</auth-constraint>
     </security-constraint>
 

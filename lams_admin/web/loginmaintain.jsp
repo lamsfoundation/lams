@@ -16,7 +16,7 @@
 
 <div align="center"> 
 
-<lams:CKEditor id="news" value="<bean:write name="LoginMaintainForm" property="news" filter="false" />"
+<lams:CKEditor id="news" value="<bean:write name='LoginMaintainForm' property='news' filter='false' />"
 	contentFolderID="-1" width="95%">
 </lams:CKEditor>
 
