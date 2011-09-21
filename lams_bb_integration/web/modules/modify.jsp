@@ -1,120 +1,158 @@
-<%@ page import="java.util.*,
-                java.util.Date,
-                java.text.SimpleDateFormat,
-                blackboard.data.*,
-                blackboard.persist.*,
-                blackboard.data.course.*,
-                blackboard.data.user.*,
-                blackboard.persist.course.*,
-                blackboard.data.content.*,
-                blackboard.persist.content.*,
-                blackboard.db.*,
-                blackboard.base.*,
-                blackboard.platform.*,
-                blackboard.platform.plugin.*"
-	errorPage="/error.jsp"
-%>
-<%@ taglib uri="/bbUI" prefix="bbUI"%>
-<%@ taglib uri="/bbData" prefix="bbData"%>
-<bbData:context id="ctx">
+<%--
+    Original Version: 2007 LAMS Foundation
+    Updated for Blackboard 9.1 SP6 (including new bbNG tag library) 2011
+    Richard Stals (www.stals.com.au)
+    Edith Cowan University, Western Australia
+--%>
+<%--
+    Step 1 For Modifing an existing LAMS Lesson
+    Set the various attributes for the LAMS lesson in Blackboard
+
+    Step 1 - modify.jsp
+    Step 2 - modify_proc.jsp
+--%>
+<%@ page import="java.util.*"%>
+<%@ page import="java.util.Date"%>
+<%@ page import="java.util.Calendar"%>
+<%@ page import="java.text.SimpleDateFormat"%>
+<%@ page import="blackboard.data.*"%>
+<%@ page import="blackboard.persist.*"%>
+<%@ page import="blackboard.data.course.*"%>
+<%@ page import="blackboard.data.user.*"%>
+<%@ page import="blackboard.persist.course.*"%>
+<%@ page import="blackboard.data.content.*"%>
+<%@ page import="blackboard.persist.content.*"%>
+<%@ page import="blackboard.db.*"%>
+<%@ page import="blackboard.base.*"%>
+<%@ page import="blackboard.platform.*"%>
+<%@ page import="blackboard.platform.plugin.*"%>
+<%@ page errorPage="/error.jsp"%>  
+<%@ taglib uri="/bbNG" prefix="bbNG"%>
+<bbNG:genericPage title="Modify A LAMS Lesson" ctxId="ctx">
 
 <%
     String NOT_AVAILABLE = "<i>Item is not available.</i><br>";
 
-    //check permission
-    if (!PlugInUtil.authorizeForCourseControlPanel(request, response))
-        return;
+    // SECURITY!
+    // Authorise current user for Course Control Panel (automatic redirect)
+    try{
+        if (!PlugInUtil.authorizeForCourseControlPanel(request, response))
+            return;
+    } catch(PlugInException e) {
+        throw new RuntimeException(e);
+    }
 
-    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+    // Retrieve the Db persistence manager from the persistence service
+    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();    
+    
+    // Get the content ID for this item 
     Container bbContainer = bbPm.getContainer();
+    Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, request.getParameter("content_id") );    
     
-    Id contentId = new PkId( bbContainer, CourseDocument.COURSE_DOCUMENT_DATA_TYPE, request.getParameter("content_id") );
-    
+    // Load the Course Document (Lams Lesson)
     ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
     Content courseDoc = (Content)courseDocumentLoader.loadById( contentId );
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    Date startDate = null;
-    Date endDate = null;
-    
-    if(courseDoc.getStartDate() != null)
-        startDate = courseDoc.getStartDate().getTime(); 
-    if(courseDoc.getEndDate() != null)
-        endDate = courseDoc.getStartDate().getTime();
-        
+    // Get the Item Attributes
+    Calendar startDate = courseDoc.getStartDate();
+    Calendar endDate = courseDoc.getEndDate();	
     FormattedText desc = courseDoc.getBody();
     String description = desc.getText().replaceFirst(NOT_AVAILABLE, ""); //remove the NOT_AVAILABLE substring
 
 %>
 
-<bbUI:docTemplate title="Modify LAMS">
-<bbUI:coursePage courseId="<%=PlugInUtil.getCourseId(request)%>">	 
-
-<bbUI:breadcrumbBar  environment="CTRL_PANEL"  handle="control_panel" isContent="true">
-  <bbUI:breadcrumb>Modify HTML Block</bbUI:breadcrumb>
-</bbUI:breadcrumbBar>
-<bbUI:titleBar iconUrl="/images/ci/icons/tools_u.gif">Modify LAMS</bbUI:titleBar>
-<form name="lams_form" action="modify_proc.jsp" method="post">
-	<input type="hidden" name="content_id" value="<%=request.getParameter("content_id")%>">
-   	<input type="hidden" name="course_id" value="<%=request.getParameter("course_id")%>">
-  		
-	
-	<bbUI:step title="Name and describe the lesson">
-		<bbUI:dataElement label="Name">
-            <input id="title" type="text" name="title" value="<%=courseDoc.getTitle()%>">
-        </bbUI:dataElement>
+    <%-- Breadcrumbs --%>
+    <bbNG:breadcrumbBar environment="CTRL_PANEL" isContent="true">
+        <bbNG:breadcrumb title="Modify A LAMS Lesson" />
+    </bbNG:breadcrumbBar>
     
-        <bbUI:dataElement label="Description">
-			<textarea name="description" rows="12" cols="35"><%=description%></textarea>
-        </bbUI:dataElement>
-    </bbUI:step> 
+    <%-- Page Header --%>
+    <bbNG:pageHeader>    	
+        <bbNG:pageTitleBar title="Modify A LAMS Lesson"/>
+    </bbNG:pageHeader>
+    
+    <%-- Form for the LAMS Lesson Attributes --%>
+    <form name="lams_form" id="lams_form" action="modify_proc.jsp" method="post" onSubmit="return validateModify();">
+        <input type="hidden" name="content_id" value="<%=request.getParameter("content_id")%>">
+        <input type="hidden" name="course_id" value="<%=request.getParameter("course_id")%>">
+  		
+        <bbNG:dataCollection>
+	
+            <bbNG:step title="Name and describe the lesson">
+            
+                <bbNG:dataElement label="Name" isRequired="true" labelFor="title">
+                    <input id="title" type="text" name="title" value="<%=courseDoc.getTitle()%>">
+                </bbNG:dataElement>
         
-   	<bbUI:step title="Lesson options">
-        <bbUI:dataElement label="Do you want to make LAMS visible?">
-            <input type="Radio" name="isAvailable" value="true" <%=(courseDoc.getIsAvailable())?"checked":""%>>Yes
-            <input type="Radio" name="isAvailable" value="false" <%=(courseDoc.getIsAvailable())?"":"checked"%>>No
-        </bbUI:dataElement>
-        <bbUI:dataElement label="Track number of views">
-            <input type="radio" name="isTracked" value="true" <%=(courseDoc.getIsTracked())?"checked":""%>>Yes
-            <input type="radio" name="isTracked" value="false" <%=(courseDoc.getIsTracked())?"":"checked"%>>No
-        </bbUI:dataElement>
-        <bbUI:dataElement label="Choose date restrictions">
-        	<bbUI:dateAvailability formName="lams_form" 
-                                   startDateField="startDate" endDateField="endDate" 
-                                   startDate="<%=startDate%>" endDate="<%=endDate%>"/>
-    	</bbUI:dataElement>   
-    </bbUI:step> 
-    <bbUI:step title="Start lesson">
-    	<br>
-    	<bbUI:dataElement> 
-    		<input type="submit" name="start" onClick="validateModify();" value="Modify">
-    		<input type="button" name="cancel" onClick="back();" value="Cancel">
-    	</bbUI:dataElement> 
-    </bbUI:step>
-</form>
-</bbUI:coursePage>
+                <bbNG:dataElement label="Description" labelFor="description">
+                    <textarea name="description" rows="12" cols="35"><%=description%></textarea>
+                </bbNG:dataElement>
+                
+            </bbNG:step> 
+            
+            <bbNG:step title="Lesson options">
+            
+                <bbNG:dataElement label="Do you want to make LAMS visible?">
+                    <input type="Radio" name="isAvailable" value="true" <%=(courseDoc.getIsAvailable())?"checked":""%>>Yes
+                    <input type="Radio" name="isAvailable" value="false" <%=(courseDoc.getIsAvailable())?"":"checked"%>>No
+                </bbNG:dataElement>
+                
+                <bbNG:dataElement label="Track number of views">
+                    <input type="radio" name="isTracked" value="true" <%=(courseDoc.getIsTracked())?"checked":""%>>Yes
+                    <input type="radio" name="isTracked" value="false" <%=(courseDoc.getIsTracked())?"":"checked"%>>No
+                </bbNG:dataElement>
+                
+                <bbNG:dataElement label="Choose date restrictions">
+                    <%--
+                        Show start and end dates if they have been set
+                        If non ehave been set, leave the tags out so that Blackboard puts the default dates in
+                    --%>
+                    <% if(startDate==null && endDate==null) { %>
+                    	<bbNG:dateRangePicker baseFieldName="lessonAvailability" showTime="true" />
+                    <% } else if(endDate==null) { %>
+                    	<bbNG:dateRangePicker baseFieldName="lessonAvailability" showTime="true" startDateTime="<%=startDate%>" />
+                    <% } else if(startDate==null) { %>
+                    	<bbNG:dateRangePicker baseFieldName="lessonAvailability" showTime="true" endDateTime="<%=endDate%>" />
+                    <% } else { %>
+                    	<bbNG:dateRangePicker baseFieldName="lessonAvailability" showTime="true" startDateTime="<%=startDate%>" endDateTime="<%=endDate%>" />
+                    <% } %>
+                </bbNG:dataElement>   
+                
+            </bbNG:step> 
+            
+            <bbNG:stepSubmit title="Start Lesson" cancelOnClick="back();" />
 
-<script language="JavaScript" type="text/javascript">
-		<!--
-			function back()
-			{
-				history.go(-1);
-			}
-			
-			function validateModify()
-			{
-				var title = trim(document.getElementById("title").value);
-				
-				// valdation
-				if (title==null||title=="")
-				{
-					alert("Lesson must have a name.");
-					return false;
-				}
+        </bbNG:dataCollection>
+    </form>
 
-			}
-		//-->
-</script>
-</bbUI:docTemplate>						  
-</bbData:context>
+
+    <bbNG:jsBlock>
+        <script language="JavaScript" type="text/javascript">
+        <!--
+        
+            // Go back one page if the user clicks the Cancel Button
+            function back() {
+                history.go(-1);
+            }
+            
+            // Do form vaildation
+            // Check that a title has been supplied 
+            function validateModify() {
+                var title = rettrim(document.lams_form.title.value);
+                if ((title == "")||(title == null)) {
+                    alert("The title is empty. Please enter a title for the LAMS sequence.");
+                    return false;
+                }        
+            }
+            
+            // Utility function to trim
+            function rettrim(stringToTrim) {
+                return stringToTrim.replace(/^\s+|\s+$/g,"");
+            }
+
+        //-->
+        </script>
+    </bbNG:jsBlock>
+    
+</bbNG:genericPage>
 

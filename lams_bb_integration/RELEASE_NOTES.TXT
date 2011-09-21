@@ -18,6 +18,17 @@ https://bugs.lamsfoundation.org/browse/<bug reference>
 * LDEV-1353 All uppercase characters in secret key causes an illegal state 
 		  	exception
 
+1.1.0 Fixes / Changes for Blackboard 9.1 (SP6)
+* Removed references to the AccessManagerService class (deprecated)
+* Replaced references to deprecated COURSE_DOCUMENT_DATA_TYPE and COURSE_DATA_TYPE to DATA_TYPE
+* PlugInUtil.getEditableContentReturnURL() now requires two mandatory parameters (previously only required one), code now supplies both
+* Consistent security checking across all jsp pages
+* Prevent students who are still enrolled but have a status of inactive accessing the LAMS lesson URL directly
+* Changed code workflow to NOT set start date automatically on creation and modification of lessons.  You can now set and unset both start and end dates.
+* Updated all jsp pages to use the new Blackboard presentation tags (Using bbNG instead of bbData and bbUI)
+* Updated and increased level of code comments in jsp pages for future maintenance
+* Deleted all unused jsp pages.
+
 
 
 

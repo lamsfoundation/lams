@@ -1,138 +1,138 @@
+<%--
+    Original Version: 2007 LAMS Foundation
+    Updated for Blackboard 9.1 SP6 (including new bbNG tag library) 2011
+    Richard Stals (www.stals.com.au)
+    Edith Cowan University, Western Australia
+--%>
+<%--
+    Step 1 For Creating a New LAMS Lesson
+    Allows the user to (optionally) author a new LAMS lesson
+    Then the user must select a LAMS lesson before proceeding to Step 2.
+
+    Step 1 - create.jsp
+    Step 2 - start_lesson.jsp
+    Step 3 - start_lesson_proc.jsp
+--%>
 <%@ page import="blackboard.platform.plugin.PlugInUtil"%>
+<%@ page import="blackboard.platform.plugin.PlugInException"%>
 <%@ page import="org.lamsfoundation.ld.integration.Constants"%>
 <%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
 <%@ page errorPage="/error.jsp"%>
+<%@ taglib uri="/bbNG" prefix="bbNG"%>
 
-<%@ taglib uri="/bbData" prefix="bbData"%>
-<%@ taglib uri="/bbUI" prefix="bbUI"%>
-
-<bbData:context  id="ctx">
-<bbUI:docTemplate title = "Add new LAMS">
-<head>
-	<link type="text/css" rel="stylesheet" href="css/bb.css" />
-</head>
+<bbNG:genericPage title="Add New LAMS" ctxId="ctx">
+    <bbNG:jsFile href="lib/tigra/tree.js" />
+    <bbNG:jsFile href="lib/tigra/tree_tpl.js" />
 <%
-	// SECURITY!
-    //AccessManagerService accessManager = (AccessManagerService) BbServiceManager.lookupService(AccessManagerService.class);
-	if (!PlugInUtil.authorizeForCourseControlPanel(request,response)){
-		//accessManager.sendAccessDeniedRedirect(request,response);
-		//TODO: redirect user to login page, since sendAccessDeniedRedirect is deprecated another way is needed
-		response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-		return;
-	}
-	String authorUrl = LamsSecurityUtil.generateRequestURL(ctx, "author");
-	String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, 2);
-	
-	// Error checking
-	if (learningDesigns.equals("error"))
-	{
-		response.sendRedirect("lamsServerDown.jsp");
-	}
+    // SECURITY!
+    // Authorise current user for Course Control Panel (automatic redirect)
+    try{
+        if (!PlugInUtil.authorizeForCourseControlPanel(request, response))
+            return;
+    } catch(PlugInException e) {
+        throw new RuntimeException(e);
+    }
+
+    // Get the Login Request URL for authoring LAMS Lessons
+    String authorUrl = LamsSecurityUtil.generateRequestURL(ctx, "author");
+    
+    // Get the list of Learning Designs
+    String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, 2);
+        // Error checking
+        if (learningDesigns.equals("error")) {
+            response.sendRedirect("lamsServerDown.jsp");
+            return;
+        }
 
 %>
+    <%-- Breadcrumbs --%>
+    <bbNG:breadcrumbBar environment="COURSE" isContent="true">
+        <bbNG:breadcrumb title="Add New LAMS" />
+    </bbNG:breadcrumbBar>
 
-<bbUI:breadcrumbBar handle="control_panel" isContent="true" >
-    <bbUI:breadcrumb>Add new LAMS</bbUI:breadcrumb>
-</bbUI:breadcrumbBar>
-
-<bbUI:titleBar iconUrl ="/images/ci/icons/bookopen_u.gif">Add new LAMS</bbUI:titleBar>
-
-
-
-
-
-<form name="workspace_form" id="workspace_form" action="start_lesson.jsp" method="post">
+    <%-- Page Header --%>
+    <bbNG:pageHeader>    	
+        <bbNG:pageTitleBar title="Add New LAMS"/>
+    </bbNG:pageHeader>
     
+    <%-- Action Control Bar --%>
+    <bbNG:actionControlBar>
+    	<bbNG:actionButton id="open_author" url="javascript:openAuthor();" title="Open Author" primary="true"/>     <%-- Open the LAMS Author Window --%>
+        <bbNG:actionButton id="refresh" url="javascript:refreshSeqList();" title="Refresh" primary="true"/>         <%-- Refresh the list of LAMS sequences --%>
+        <bbNG:actionButton id="next" url="javascript:openNext();" title="Next" primary="true"/>                     <%-- Go to Next Step --%>
+    </bbNG:actionControlBar>
     
-    <input type="hidden" name="content_id" value="<%=request.getParameter("content_id")%>">
-    <input type="hidden" name="course_id" value="<%=request.getParameter("course_id")%>">
-    <input type="hidden" name="sequence_id" id="sequence_id" value="0">
-    
-    
-    <bbUI:step title="Select an existing sequence from the LAMS workspace.">
-        <bbUI:dataElement> 
-        <br>                    
-            <script language="JavaScript" type="text/javascript" src="../lib/tigra/tree.js"></script>
-			<script language="JavaScript" type="text/javascript" src="../lib/tigra/tree_tpl.js"></script>
-            <script language="JavaScript" type="text/javascript">
-            	<!-- 
-            	 	var TREE_ITEMS = <%=learningDesigns%>;            		
-					var tree = new tree(TREE_ITEMS, TREE_TPL);	
-					
-				//-->
-			</script>
-		<br>
-		</bbUI:dataElement>
-	 </bbUI:step>
-	 <bbUI:step title="Open author, refresh the workspace or start the chosen lesson.">		
-        <bbUI:dataElement> 
-           	<input type="button" class="button"name="author" onClick="openAuthor();" value="Open Author">
-            <input type="button" class="button"name="action" onClick="refreshSeqList();" value="Refresh">
-            <input id="disabledNextButton" style="visibility:visible" class="disabled" type="button" name="disabledNextButton" value="Next" disabled="true">
-            <input id="nextButton" style="visibility:hidden" class="button" type="submit" name="nextButton" onClick="openNext();" value="Next">
-     	</bbUI:dataElement> 
-     	<br>
-     </bbUI:step>
-    
-</form>
+    <%-- Form to Collect ID of Selected LAMS Sequence --%>
+    <form name="workspace_form" id="workspace_form" action="start_lesson.jsp" method="post">
+    	<input type="hidden" name="content_id" value="<%=request.getParameter("content_id")%>">
+        <input type="hidden" name="course_id" value="<%=request.getParameter("course_id")%>">
+    	<input type="hidden" name="sequence_id" id="sequence_id" value="0">
+        <%-- Display LAMS Sequence tree (Using tigra) --%>
+        <script language="JavaScript" type="text/javascript">
+            <!-- 
+                var TREE_ITEMS = <%=learningDesigns%>;            		
+                var tree = new tree(TREE_ITEMS, TREE_TPL);	
+            //-->
+        </script>
+    </form>
 
 
-<script language="JavaScript" type="text/javascript">
-<!--
-    var authorWin = null;
+    <bbNG:jsBlock>
+        <script language="JavaScript" type="text/javascript">
+        <!--
+            var authorWin = null;
+            var isSelected = false;
+        
+            // Open the LAMS Seuence Author Window
+            function openAuthor() {
+                authorUrl = '<%=authorUrl%>';
+                authorUrl += "&notifyCloseURL=";
+                
+                if(authorWin && authorWin.open && !authorWin.closed){
+                    try {
+                        authorWin.focus();
+                    }catch(e){
+                        // popups blocked by a 3rd party
+                        alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
+                    }
+                }
+                else{
+                    try {
+                        authorWin = window.open(authorUrl,'aWindow','width=800,height=600,resizable');
+                        authorWin.focus();
+                    }catch(e){
+                        // popups blocked by a 3rd party
+                        alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
+                    }
+                }
+            }
+            
+            // Refresh the LAMS sequence list (tigra tree)
+            function refreshSeqList() {
+                document.getElementById("sequence_id").value="0";
+                document.location.reload();
+            }
+            
+            // Go to Step 2
+            function openNext() {
+                if(isSelected) {
+                    //Submit Form
+                    document.getElementById("workspace_form").submit();
+                } else {
+                    //Error Message
+                    alert("You must select a LAMS Sequence before continuing.");
+                }
+            }
+            
+            //Executed when a seuqence is selected
+            //Set the flag and form element
+            function selectSequence(id) {
+                document.getElementById("sequence_id").value=id;
+                isSelected = true;
+            }
 
-    function openAuthor()
-    {
-    	authorUrl = '<%=authorUrl%>'; 
-    	//authorUrl += "&notifyCloseURL=" + window.location.href; 
-    	authorUrl += "&notifyCloseURL="
-    	if(authorWin && authorWin.open && !authorWin.closed){
-    		try {
-            	authorWin.focus();
-            }catch(e){
-		        // popups blocked by a 3rd party
-		   	}
-        }
-        else{
-            try {
-            	authorWin = window.open(authorUrl,'aWindow','width=800,height=600,resizable');
-            	authorWin.focus();
-            }catch(e){
-		        // popups blocked by a 3rd party
-		    }
-        }
-    }
+        //-->
+        </script>
+    </bbNG:jsBlock>
     
-    function refreshSeqList()
-    {
-    	document.getElementById("sequence_id").value="0";
-    	document.location.reload();
-    }
-    
-    function openNext()
-    {
-    }
-    
-    function selectSequence(id) 
-    {
-		//document.workspace_form.nextButton.class= "button"; 
-		//document.getElementById("nextButton").disabled = false;
-		//document.getElementById("nextButton").type = "submit";  
-		//document.getElementById("disabledNextButton").type = "hidden";
-		
-		var b = document.getElementById("disabledNextButton")
-		b.parentNode.removeChild(b);
-
-		document.getElementById("nextButton").style.visibility = "visible";  
-		
-		
-		//document.getElementById("nextButton").class = "button"; 	
-    	document.getElementById("sequence_id").value=id;
-	}
-//-->
-</script>
-
-
-
-</bbUI:docTemplate>
-</bbData:context>
+</bbNG:genericPage>

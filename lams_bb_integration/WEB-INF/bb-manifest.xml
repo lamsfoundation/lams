@@ -5,9 +5,9 @@
     <name value= "LAMS2 Module"/>
     <handle value= "lamscontent"/>
     <description value= "LAMS2 and Blackboard integration allows LAMS2 leaning designs to be managed and views in a Blackboard Environment."/>
-    <version value= "1.0.2"/>
+    <version value= "1.1.0"/>
     <requires>
-      <bbversion value="7.0.0"/>
+      <bbversion value="9.1.0"/>
     </requires>
      <vendor>
       <id value="lams"/>
@@ -17,10 +17,6 @@
     </vendor>
     <http-actions>
       <config value="admin/config.jsp"/>
-	  <!-- This page is not executed when installing/uninstalling
-	  	<create value="admin/install.jsp"/>
-	    <remove value="admin/uninstall.jsp"/>
-	  -->
     </http-actions>
     
     <!-- Custom content types defined by this extension -->
@@ -31,9 +27,6 @@
             <http-actions>
                 <create value="modules/create.jsp" />
                 <modify value="modules/modify.jsp"/>
-                <!-- This page is not executed when removing 
-	                <remove value="modules/remove.jsp" />
-                -->
             </http-actions>
             <icons>
                 <toolbar value="/images/logo.gif" />
@@ -41,28 +34,24 @@
             </icons>
         </content-handler>
     </content-handlers>
-    
-    <!-- Tools defined by this extension -->
-    
-    
         
     <!-- code permissions required for proper operation -->
     <permissions>
         <permission type="attribute" name="user.authinfo" actions="get"/>
         <permission type="persist" name="Content"  actions="create,modify,delete"/> 
         <permission type="persist" name="contenthandler" actions="modify"/>
-		<permission type="blackboard.data.AttributePermission" name="user.personalinfo" actions="get" />
+	<permission type="blackboard.data.AttributePermission" name="user.personalinfo" actions="get" />
 
         <!-- Permission for WebService -->
-		<permission type="java.lang.RuntimePermission" name="getClassLoader" />
-		<permission type="java.lang.RuntimePermission" name="createClassLoader" />
-		<permission type="java.lang.RuntimePermission" name="accessDeclaredMembers" actions=""/>
-		<permission type="java.net.SocketPermission" name="*" actions="connect"/>
-		<permission type="java.util.PropertyPermission" name="java.protocol.handler.pkgs" actions="write"/>
+	<permission type="java.lang.RuntimePermission" name="getClassLoader" />
+	<permission type="java.lang.RuntimePermission" name="createClassLoader" />
+	<permission type="java.lang.RuntimePermission" name="accessDeclaredMembers" actions=""/>
+	<permission type="java.net.SocketPermission" name="*" actions="connect"/>
+	<permission type="java.util.PropertyPermission" name="java.protocol.handler.pkgs" actions="write"/>
 		
-		<permission type="persist" name="Outcome" actions="create,modify,delete"/>
+	<permission type="persist" name="Outcome" actions="create,modify,delete"/>
     	<permission type="persist" name="OutcomeDefinition" actions="create,modify,delete"/>
     	<permission type="persist" name="OutcomeDefinitionCategory" actions="create,modify,delete"/>
-    	</permissions>
+    </permissions>
 </plugin>
 </manifest>

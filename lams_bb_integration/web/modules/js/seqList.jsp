@@ -4,9 +4,8 @@
 <%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsServiceUtil"%>
 <%@ page import="lamsws.SimpleLearningDesignVO"%>
 <%@ page errorPage="/error.jsp"%>  
-<%@ taglib uri="/bbData" prefix="bbData"%>
-<%@ taglib uri="/bbUI" prefix="bbUI"%>
-<bbData:context  id="ctx">
+<%@ taglib uri="/bbNG" prefix="bbNG"%>
+<bbNG:genericPage title="LAMS Learning Activity Management System" ctxId="ctx">
 <%
 	/***
 	 * this JSP page simply generate a list of all Learning Design from the LearningDesign web service
@@ -50,4 +49,5 @@
 	//close designs XML tag
 	%></designs><%
 %>
-</bbData:context>
+        
+</bbNG:genericPage>
