@@ -22,15 +22,6 @@
     <servlet-name>UserDataServlet</servlet-name>
     <url-pattern>/UserData</url-pattern>
   </servlet-mapping>
-  
-
-  <taglib>
-    <taglib-uri>/bbUI</taglib-uri>
-	<taglib-location>/WEB-INF/config/taglibs/bbUI.tld</taglib-location>
-  </taglib>
-  <taglib>
-    <taglib-uri>/bbData</taglib-uri>
-	<taglib-location>/WEB-INF/config/taglibs/bbData.tld</taglib-location>
-  </taglib>
+ 
  
 </web-app>

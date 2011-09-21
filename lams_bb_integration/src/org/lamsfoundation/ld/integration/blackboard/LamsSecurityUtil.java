@@ -331,7 +331,8 @@ public class LamsSecurityUtil {
 		} 
 		
 	}
-    
+	
+	    
     /**
      * @return gets server address from the lams.properties file
      */

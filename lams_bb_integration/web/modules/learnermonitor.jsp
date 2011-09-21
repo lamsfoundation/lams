@@ -1,196 +1,168 @@
-<%@ page import="java.util.*,
-                java.util.Date,
-                java.text.SimpleDateFormat,
-                blackboard.data.*,
-                blackboard.persist.*,
-                blackboard.data.course.*,
-                blackboard.data.user.*,
-                blackboard.persist.course.*,
-                blackboard.data.content.*,
-                blackboard.persist.content.*,
-                blackboard.persist.navigation.CourseTocDbLoader,
-                blackboard.db.*,
-                blackboard.base.*,
-                org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil,
-                blackboard.platform.*,
-                blackboard.platform.plugin.*"
-	errorPage="/error.jsp"
-%>
-<%@ taglib uri="/bbUI" prefix="bbUI"%>
-<%@ taglib uri="/bbData" prefix="bbData"%>
-<bbData:context id="ctx">
+<%--
+    Original Version: 2007 LAMS Foundation
+    Updated for Blackboard 9.1 SP6 (including new bbNG tag library) 2011
+    Richard Stals (www.stals.com.au)
+    Edith Cowan University, Western Australia
+--%>
+<%--
+    Handle LAMS Lesson Access
+    Students - access lesson only
+    Staff - additionally access the Lesson Monitor
+--%>
+<%@ page import="java.util.*"%>
+<%@ page import="java.util.Date"%>
+<%@ page import="java.text.SimpleDateFormat"%>
+<%@ page import="blackboard.data.*"%>
+<%@ page import="blackboard.persist.*"%>
+<%@ page import="blackboard.data.course.*"%>
+<%@ page import="blackboard.data.user.*"%>
+<%@ page import="blackboard.persist.course.*"%>
+<%@ page import="blackboard.data.content.*"%>
+<%@ page import="blackboard.persist.content.*"%>
+<%@ page import="blackboard.persist.navigation.CourseTocDbLoader"%>
+<%@ page import="blackboard.db.*"%>
+<%@ page import="blackboard.base.*"%>
+<%@ page import="blackboard.platform.*"%>
+<%@ page import="blackboard.platform.plugin.*"%>
+<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
+<%@ page errorPage="/error.jsp"%>
+<%@ taglib uri="/bbNG" prefix="bbNG"%>
 
+<bbNG:genericPage title="LAMS Options" ctxId="ctx">
 <%
-	String lsid = request.getParameter("lsid");
-	String learnerUrl = LamsSecurityUtil.generateRequestURL(ctx, "learner") + "&lsid=" + lsid;
-	String monitorUrl = LamsSecurityUtil.generateRequestURL(ctx, "monitor") + "&lsid=" + lsid;
-	String liveEditUrl = LamsSecurityUtil.generateRequestURL(ctx, "author");
+    // SECURITY!
+    // Authorise current user for Course Access (automatic redirect)
+    try{
+        if (!PlugInUtil.authorizeForCourse(request, response))
+            return;
+    } catch(PlugInException e) {
+        throw new RuntimeException(e);
+    }
+    
+    // Get the LAMS access URLs
+    String lsid = request.getParameter("lsid");
+    String learnerUrl = LamsSecurityUtil.generateRequestURL(ctx, "learner") + "&lsid=" + lsid;
+    String monitorUrl = LamsSecurityUtil.generateRequestURL(ctx, "monitor") + "&lsid=" + lsid;
+    String liveEditUrl = LamsSecurityUtil.generateRequestURL(ctx, "author");
 	
-//	 add port to the url if the port is in the blackboard url.
-	int bbport = request.getServerPort();
-	String bbportstr = bbport != 0 ? ":" + bbport : "";
-	
-	//String contentUrl = LamsSecurityUtil.generateRequestURL(ctx, "learner") + "&lsid=" + learningSessionId;
-	String updateGradesUrl = "\"" + request.getScheme()
-									+ "://" +
-									request.getServerName() + 
-								    bbportstr +
-									request.getContextPath() + 
-									"/modules/updateGrades.jsp?lsid=" + lsid + 
-									"&course_id=" + request.getParameter("course_id") +
-									"&lineitem_id=" + request.getParameter("lineitem_id")
-									+ "\"";
-	
+    // Get Course ID and Session User ID
+    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+    String course_idstr = request.getParameter("course_id");    
+    Id course_id = bbPm.generateId(Course.DATA_TYPE, course_idstr);
+    User sessionUser = ctx.getUser();
+    Id sessionUserId = sessionUser.getId();
 
-	String course_idstr = request.getParameter("course_id");	
+    // Get the membership data to determine the User's Role
+    CourseMembership courseMembership = null;
+    CourseMembership.Role courseRole = null;
+    boolean isActive = false;
+    
+    CourseMembershipDbLoader sessionCourseMembershipLoader = (CourseMembershipDbLoader) bbPm.getLoader(CourseMembershipDbLoader.TYPE);
+    try {  
+        courseMembership = sessionCourseMembershipLoader.loadByCourseAndUserId(course_id, sessionUserId);
+        courseRole = courseMembership.getRole();
+        isActive = courseMembership.getIsAvailable();
+    } catch (KeyNotFoundException e) {
+        // There is no membership record.
+        e.printStackTrace();
+    } catch (PersistenceException pe) {
+        // There is no membership record.
+        pe.printStackTrace();
+    }
 
-	BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
-	Id course_id = bbPm.generateId(Course.COURSE_DATA_TYPE, course_idstr);
-	User sessionUser = ctx.getUser();
-	Id sessionUserId = sessionUser.getId();
-	
-
-	//get the membership data to determine the User's Role
-	CourseMembership courseMembership = null;
-	CourseMembership.Role courseRole = null;
-	CourseMembershipDbLoader sessionCourseMembershipLoader =
-		(CourseMembershipDbLoader) bbPm.getLoader(CourseMembershipDbLoader.TYPE);
-	try 
-	{  
-		courseMembership = sessionCourseMembershipLoader.loadByCourseAndUserId(course_id, sessionUserId);
-		courseRole = courseMembership.getRole();
-	} 
-	catch (KeyNotFoundException e) 
-	{
-		// There is no membership record.
-		e.printStackTrace();
-		
-	}
-	catch (PersistenceException pe) 
-	{
-		// There is no membership record.
-		pe.printStackTrace();
-	}
-
-
-	String instructorstr="hidden";
-	if (courseRole.equals(CourseMembership.Role.INSTRUCTOR)||courseRole.equals(CourseMembership.Role.TEACHING_ASSISTANT)) 
-	{
-		// instructor or assistant
-		// can choose to redirect to monitor or learner
-		instructorstr="button";
-	}
-	else if (!courseRole.equals(CourseMembership.Role.STUDENT))
-	{
-
-		response.sendRedirect("notAllowed.jsp");
-	}
+    // Is the User an Instructor of Teaching Assistant
+    boolean instructorstr=false;
+    if (courseRole.equals(CourseMembership.Role.INSTRUCTOR)||courseRole.equals(CourseMembership.Role.TEACHING_ASSISTANT)) {
+        instructorstr=true;
+    } else if (!courseRole.equals(CourseMembership.Role.STUDENT)) {
+        // The user is not an Instructor, Teaching Assistant or Student - Access Denied 
+        response.sendRedirect("notAllowed.jsp");
+    }
+    
+    // Are they active in the course?  If not let Blackboard handle the redirect
+    if (!isActive) {
+        PlugInUtil.sendAccessDeniedRedirect(request, response);
+    }
 %>
 
-<bbUI:docTemplate>
-<head>
-	<link type="text/css" rel="stylesheet" href="css/bb.css" />
-	<script language="JavaScript" type="text/javascript">
-		<!--
-			var learnerWin = null;
-			var monitorWin = null;
-			var liveEditUrl= null;
-			var learnerUrl = null;
-			var monitorUrl = null;
-			
-			function back()
-			{
-				history.go(-1);
-			}
-			
-			function openLearner()
-			{
-				learnerUrl = '<%=learnerUrl%>'; 
-		    	if(learnerWin && learnerWin.open && !learnerWin.closed){
-		            try {
-		            	learnerWin.focus();
-		            }catch(e){
-		            	// popups blocked by a 3rd party
-		            }
-		        }
-		        else{
-		            try {
-			            learnerWin = window.open(learnerUrl,'lWin','width=800,height=600,resizable=1');
-			            learnerWin.focus();
-			        }catch(e){
-		            	// popups blocked by a 3rd party
-		            }
-		        }
-			}
-			
-			function openMonitor()
-			{
-				monitorUrl = '<%=monitorUrl%>'; 
-		    	if(monitorWin && monitorWin.open && !monitorWin.closed){
-		    	
-		            try {
-		            monitorWin.focus();
-		            }catch(e){
-		            	// popups blocked by a 3rd party
-		            }
-		        }
-		        else{
-		            try {
-		            monitorWin = window.open(monitorUrl,'aWin','width=800,height=600,resizable=1');
-		            monitorWin.opener = self;
-		            monitorWin.focus();
-		            }catch(e){
-		            	// popups blocked by a 3rd party
-		            }
-		            
-		        }
-			}
-			
-			function updateGrades()
-			{
-				window.location = <%=updateGradesUrl%>
-			}
-			
-			function openAuthorForEditOnFly( learningDesignID )
-			{				
-				liveEditUrl= '<%=liveEditUrl%>' + '&layout=editonfly&learningDesignID=' + learningDesignID;
-				if(monitorWin && !monitorWin.closed)
-				{
-					monitorWin.location = liveEditUrl;
-				}
-				else
-				{
-					monitorWin = window.open(liveEditUrl,'width=800,height=600,resizable');
-					monitorWin.focus();
-				}
-			}
-			
-			
-		//-->
-</script>
-</head>
+    <%-- Breadcrumbs --%>
+    <bbNG:breadcrumbBar environment="CTRL_PANEL" isContent="true">
+        <bbNG:breadcrumb title="LAMS Options" />
+    </bbNG:breadcrumbBar>
 
+    <%-- Page Header --%>
+    <bbNG:pageHeader>    	
+        <bbNG:pageTitleBar title="LAMS Options"/>
+    </bbNG:pageHeader>
 
+    <%-- Action Control Bar --%>
+    <bbNG:actionControlBar>
+        <bbNG:actionButton id="open_learner" url="javascript:openLearner();" title="Open Lesson" primary="true"/>       <%-- Access the Lesson as a Learner --%>
+        <% if(instructorstr) { %>
+            <bbNG:actionButton id="open_monitor" url="javascript:openMonitor();" title="Open Monitor" primary="true"/>  <%-- Access the Monitor --%>
+        <% } %>
+        <bbNG:actionButton id="cancel" url="javascript:back();" title="Cancel" primary="false"/>                        <%-- Cancel (Go Back) --%>
+    </bbNG:actionControlBar>
 
-
-<bbUI:breadcrumbBar handle="control_panel" isContent="true" >
-    <bbUI:breadcrumb>LAMS Options</bbUI:breadcrumb>
-</bbUI:breadcrumbBar>
-
-<bbUI:titleBar iconUrl ="/images/ci/icons/bookopen_u.gif">LAMS Options</bbUI:titleBar>
-
-
-<form name="workspace_form" id="workspace_form" method="post">
-	<br>
-	<b>Please Choose an Option</b>
-	<br><br>
-	&nbsp&nbsp&nbsp&nbsp
-	<input type="button" class="button" name="OpenLearner" onClick="openLearner();" value="Open Lesson">
-	<input type="<%=instructorstr%>" class="button" name="OpenMonitor" onClick="openMonitor();" value="Open Monitor">
-	<input type="<%=instructorstr%>" class="button" name="UpdateGrades" onClick="updateGrades();" value="Update Progress">
-	<input type="button" class="button" name="Cancel" onClick="back();" value="Cancel">
-
-</form>
-	
-</bbUI:docTemplate>						  
-</bbData:context>
+    <bbNG:jsBlock>
+        <script language="JavaScript" type="text/javascript">
+        <!--
+            var learnerWin = null;
+            var monitorWin = null;
+            var liveEditUrl= null;
+            var learnerUrl = null;
+            var monitorUrl = null;
+                
+            // Go back one page if the user clicks the Cancel Button
+            function back() {
+                history.go(-1);
+            }
+                
+            // Open the Lesson as a Learner
+            function openLearner() {
+                learnerUrl = '<%=learnerUrl%>'; 
+                if(learnerWin && learnerWin.open && !learnerWin.closed){
+                    try {
+                        learnerWin.focus();
+                    } catch(e) {
+                        // popups blocked by a 3rd party
+                        alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
+                    }
+                } else {
+                    try {
+                        learnerWin = window.open(learnerUrl,'lWin','width=800,height=600,resizable=1');
+                        learnerWin.focus();
+                    } catch(e) {
+                        // popups blocked by a 3rd party
+                        alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
+                    }
+                }
+            }
+            
+            // Open the Lesson Monitor                
+            function openMonitor() {
+                monitorUrl = '<%=monitorUrl%>'; 
+                if(monitorWin && monitorWin.open && !monitorWin.closed){
+                    try {
+                        monitorWin.focus();
+                    } catch(e) {
+                            // popups blocked by a 3rd party
+                            alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
+                    }
+                } else {
+                    try {
+                        monitorWin = window.open(monitorUrl,'aWin','width=800,height=600,resizable=1');
+                        monitorWin.opener = self;
+                        monitorWin.focus();
+                    } catch(e) {
+                        // popups blocked by a 3rd party
+                        alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");    
+                    }
+                }
+            }
+           
+        //-->
+        </script>
+    </bbNG:jsBlock>
+        
+</bbNG:genericPage>

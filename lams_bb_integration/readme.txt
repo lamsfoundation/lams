@@ -4,6 +4,11 @@ Blackboard - LAMS Integration Module
 By Luke Foxton <lfoxton@melcoe.mq.edu.au>
 LAMS Foundation Copyright (C) 2007 (http://lamsfoundation.org)
 
+Updated for the Blackboard 9.1 SP6 Building block by
+Richard Stals (www.stals.com.au)
+Edith Cowan University
+2011
+
 Contents
 ================================================================================
 1. Requirements
@@ -17,7 +22,7 @@ Contents
 1. Requirements
 ================================================================================
 	1.1 Minimum requirement to install the module
-		- Blackboard Learning System 7
+		- Blackboard Learning System 9.1
 
 	1.2 Minimum requirement to build the module from source
 		- Java 2 Platform, Standard Edition, v 1.5
@@ -56,7 +61,7 @@ Contents
 4. Configuring the LAMS Server for Blackboard Integration
 ================================================================================
 	1. Login to LAMS as sysadmin	
-	2. Open the Sys Admin window, thne navigate to the "Maintain Integrated 
+	2. Open the Sys Admin window, the navigate to the "Maintain Integrated 
 	   Servers page.
 	3. Click "Add New Server"
 	4. Put in the same ID and key as blackboard
@@ -67,7 +72,7 @@ Contents
 	7. Enter the "User Information URL", this points to the servlet that
 	   provides LAMS with Blackboard user information.
 	   (See step 7 of "Configuring the module in Blackboard")
-	8. You can optionally put a timout URL and choose an organisation to add
+	8. You can optionally put a timeout URL and choose an organisation to add
 	   the integrated server to.
 	
 	
