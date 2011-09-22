@@ -324,7 +324,7 @@
   function expandActivity(id){
 	 var activity = $('#activity'+id);
 	 var currentHeight = activity.height();
-	 var targetHeight =  activity[0].contentDocument.height + 150;
+	 var targetHeight =  activity.contents().find("html").height() + 10;
 	 var expanded = 'true';
 	 if (initialActivityHeight == null){
 		 initialActivityHeight = currentHeight;

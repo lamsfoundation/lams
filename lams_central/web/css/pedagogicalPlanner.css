@@ -24,9 +24,13 @@ CSS for PedagogicalPlanner
    
 .titleCell {
    	padding: 0px 0px 0px 5px;
-   	width: 85px;
+   	width: 45px;
    	text-align: center;
    }
+   
+.titleCell .toolIcon {
+	margin-bottom: 20px;
+	}
    
 .formCell {
    	width: 780px;
