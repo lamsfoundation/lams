@@ -86,6 +86,14 @@
 </servlet>
 
 <servlet>
+	<servlet-name>GradebookServlet</servlet-name>
+	
+	<servlet-class>
+		org.lamsfoundation.lams.web.GradebookServlet
+	</servlet-class>
+</servlet>
+
+<servlet>
     <servlet-name>JabberHTTPBindingServlet</servlet-name>
     <servlet-class>org.jabber.JabberHTTPBind.JHBServlet</servlet-class>
 </servlet>
