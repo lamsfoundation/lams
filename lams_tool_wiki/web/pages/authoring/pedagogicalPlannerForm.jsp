@@ -12,7 +12,7 @@
 		}
 		
 		body {
-			width: 550px;
+			width: ${param.plannerCKEditorLongWidth};
 		}
 	</style>
 	
@@ -47,7 +47,7 @@
 			value="${formBean.wikiBody}"
 			contentFolderID="${formBean.contentFolderID}"
 			toolbarSet="CustomPedplanner" height="150px"
-			width="750px" displayExpanded="false">
+			width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 		</lams:CKEditor>
 	</html:form>
 </body>

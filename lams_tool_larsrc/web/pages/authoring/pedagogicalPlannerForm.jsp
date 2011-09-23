@@ -19,7 +19,7 @@
 		}
 		
 		body {
-			width: 750px;
+			width: ${param.plannerCKEditorLongWidth};
 		}
 		
 		table#itemTable td {
@@ -87,7 +87,7 @@
 			value="${formBean.instructions}"
 			contentFolderID="${formBean.contentFolderID}"
                toolbarSet="CustomPedplanner" height="150px"
-               width="750px" displayExpanded="false">
+               width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 		</lams:CKEditor>
 		
 		<c:if test="${formBean.itemCount ne 0}">

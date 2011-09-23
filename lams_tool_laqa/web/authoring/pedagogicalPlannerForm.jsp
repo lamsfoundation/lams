@@ -12,7 +12,7 @@
 		}
 		
 		body {
-			 width: 750px;
+			 width: ${param.plannerCKEditorLongWidth};
 		}
 			
 		table#questionTable td {
@@ -84,7 +84,7 @@
 							value="${formBean.questionList[questionIndex-1]}"
 							contentFolderID="${formBean.contentFolderID}"
 		 	   	            toolbarSet="CustomPedplanner" height="150px"
-		  	              width="705px" displayExpanded="false">
+		  	              width="${param.plannerCKEditorShortWidth}" displayExpanded="false">
 						</lams:CKEditor>
 						</td>
 					<td>

@@ -13,8 +13,8 @@
 			float: right;
 		}
 		
-		body{
-			width: 750px;
+		body {
+			width: ${param.plannerCKEditorLongWidth};
 		}
 		
 		table#topicTable td {
@@ -85,7 +85,7 @@
 			value="${formBean.instructions}"
 			contentFolderID="${formBean.contentFolderID}"
                toolbarSet="CustomPedplanner" height="150px"
-               width="750px" displayExpanded="false">
+               width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 		</lams:CKEditor>
 		
 		<h4 class="space-left small-space-top"><fmt:message key="label.planner.topic"/></h4>
@@ -97,7 +97,7 @@
 							value="${formBean.topicList[topicIndex-1]}"
 							contentFolderID="${formBean.contentFolderID}"
 			                toolbarSet="CustomPedplanner" height="150px"
-			                width="705px" displayExpanded="false">
+			                width="${param.plannerCKEditorShortWidth}" displayExpanded="false">
 						</lams:CKEditor>
 					</td>
 					<td>

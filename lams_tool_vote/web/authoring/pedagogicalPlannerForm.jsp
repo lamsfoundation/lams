@@ -12,7 +12,7 @@
 		}
 		
 		body {
-			width: 750px;
+			width: ${param.plannerCKEditorLongWidth};
 		}
 		
 		table#nominationTable td {
@@ -82,7 +82,7 @@
 			value="${formBean.instructions}"
 			contentFolderID="${formBean.contentFolderID}"
                toolbarSet="CustomPedplanner" height="150px"
-               width="750px" displayExpanded="false">
+               width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 		</lams:CKEditor>
 		
 		<c:if test="${formBean.nominationCount ne 0}">
@@ -95,7 +95,7 @@
 								value="${formBean.nominationList[nominationIndex-1]}"
 								contentFolderID="${formBean.contentFolderID}"
 				                toolbarSet="CustomPedplanner" height="150px"
-				                width="705px" displayExpanded="false">
+				                width="${param.plannerCKEditorShortWidth}" displayExpanded="false">
 							</lams:CKEditor>
 						</td>
 						<td>

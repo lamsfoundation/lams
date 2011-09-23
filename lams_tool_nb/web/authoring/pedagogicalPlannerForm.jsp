@@ -27,7 +27,7 @@
 			value="${formBean.basicContent}"
 			contentFolderID="${formBean.contentFolderID}"
                toolbarSet="CustomPedplanner" height="190px"
-               width="750px" displayExpanded="false">
+               width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 		</lams:CKEditor>
 	</html:form>
 </body>

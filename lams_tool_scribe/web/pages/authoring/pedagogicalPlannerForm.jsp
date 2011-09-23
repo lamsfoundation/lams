@@ -71,7 +71,7 @@
 							value="${formBean.headingList[headingIndex-1]}"
 							contentFolderID="${formBean.contentFolderID}"
 			                toolbarSet="CustomPedplanner" height="150px"
-			                width="750px" displayExpanded="false">
+			                width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 						</lams:CKEditor>
 					</div>
 				</c:forEach>

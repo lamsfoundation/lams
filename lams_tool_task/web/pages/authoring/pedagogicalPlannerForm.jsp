@@ -14,7 +14,7 @@
 		}
 		
 		body {
-			width: 750px;
+			width: ${param.plannerCKEditorLongWidth};
 		}
 		
 		input.item {
