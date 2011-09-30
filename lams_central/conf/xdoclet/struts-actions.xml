@@ -44,4 +44,9 @@
         path="/mindapp/mindappLearnerBounce.jsp"
         redirect="false"
       />
+      <forward
+        name="dock"
+        path="/mindapp/mindappDockBounce.jsp"
+        redirect="false"
+      />
     </action>
