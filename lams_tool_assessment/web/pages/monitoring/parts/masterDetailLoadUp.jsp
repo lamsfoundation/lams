@@ -2,7 +2,7 @@
 <script type="text/javascript">
 	<!--
 	function masterDetailLoadUp(){
-			jQuery("#userSummary${assessmentResult.sessionId}").setGridParam({scrollOffset: 18});
+			jQuery("#userSummary${assessmentResult.sessionId}").clearGridData().setGridParam({scrollOffset: 18});
  	        <c:forEach var="questionResult" items="${assessmentResult.questionResults}" varStatus="i">
 	       		<c:set var="question" value="${questionResult.assessmentQuestion}"/>
  	        	var responseStr = "";
