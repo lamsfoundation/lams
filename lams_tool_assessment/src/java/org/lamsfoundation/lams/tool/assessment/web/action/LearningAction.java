@@ -26,10 +26,14 @@ package org.lamsfoundation.lams.tool.assessment.web.action;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -39,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -58,6 +63,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
+import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationException;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
@@ -145,8 +151,34 @@ public class LearningAction extends Action {
 	    assessmentUser = getCurrentUser(service, toolSessionId);
 	}
 
-	List<AssessmentQuestion> questionsFromDB = service.getAssessmentQuestionsBySessionId(toolSessionId);
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
+	Set<QuestionReference> questionReferences = new TreeSet<QuestionReference>(new SequencableComparator());
+	questionReferences.addAll(assessment.getQuestionReferences());
+	HashMap<Long, AssessmentQuestion> questionToReferenceMap = new HashMap<Long, AssessmentQuestion>();
+	ArrayList<AssessmentQuestion> takenQuestion = new ArrayList<AssessmentQuestion>();
+	
+	//add non-random questions
+	for (QuestionReference questionReference : questionReferences) {
+	    if (!questionReference.isRandomQuestion()) {
+		AssessmentQuestion question = questionReference.getQuestion();
+		takenQuestion.add(question);
+		questionToReferenceMap.put(questionReference.getUid(), question);
+	    }
+	}
+	
+	Set<AssessmentQuestion> allQuestions = assessment.getQuestions();
+	Collection<AssessmentQuestion> availableQuestions = CollectionUtils.subtract(allQuestions, takenQuestion);
+	//add random questions (actually replacing them with real ones)
+	for (QuestionReference questionReference : questionReferences) {
+	    if (questionReference.isRandomQuestion()) {
+		//pick a random element
+		Random rand = new Random(System.currentTimeMillis());
+		AssessmentQuestion question = (AssessmentQuestion) availableQuestions.toArray()[rand.nextInt(availableQuestions.size())];
+		takenQuestion.add(question);
+		questionToReferenceMap.put(questionReference.getUid(), question);
+		availableQuestions.remove(question);
+	    }
+	}
 
 	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), assessmentUser.getUserId());
 	int attemptsAllowed = assessment.getAttemptsAllowed();
@@ -200,24 +232,22 @@ public class LearningAction extends Action {
 	    }
 	}
 	
-	Set<AssessmentQuestion> questionList = new TreeSet<AssessmentQuestion>(new SequencableComparator());
-	if (questionsFromDB != null) {
-	    // remove hidden questions.
-	    for (AssessmentQuestion question : questionsFromDB) {
-		// becuase in webpage will use this login name. Here is just
-		// initialize it to avoid session close error in proxy object.
-		if (question.getCreateBy() != null) {
-		    question.getCreateBy().getLoginName();
-		}
-		questionList.add(question);
+	//sort questions
+	LinkedList<AssessmentQuestion> questionList = new LinkedList<AssessmentQuestion>();
+	for (QuestionReference questionReference : questionReferences) {
+	    AssessmentQuestion question = questionToReferenceMap.get(questionReference.getUid());
+	    // becuase in webpage will use this login name. Here is just initialize it to avoid session close error in proxy object.
+	    if (question.getCreateBy() != null) {
+		question.getCreateBy().getLoginName();
 	    }
+	    questionList.add(question);
 	}
 
 	// shuffling
 	if (assessment.isShuffled()) {
 	    ArrayList<AssessmentQuestion> shuffledList = new ArrayList<AssessmentQuestion>(questionList);
 	    Collections.shuffle(shuffledList);
-	    questionList = new LinkedHashSet<AssessmentQuestion>(shuffledList);
+	    questionList = new LinkedList<AssessmentQuestion>(shuffledList);
 	}
 	for (AssessmentQuestion question : questionList) {
 	    if (question.isShuffle() || (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING)) {

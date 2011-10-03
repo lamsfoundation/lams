@@ -23,6 +23,10 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.assessment.web.action;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
@@ -44,6 +48,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.fileupload.DiskFileUpload;
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -55,6 +62,7 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
@@ -64,6 +72,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
+import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationException;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.service.UploadAssessmentFileException;
@@ -71,6 +80,7 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentForm;
 import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentQuestionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -78,6 +88,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.thoughtworks.xstream.XStream;
 
 /**
  * @author Andrey Balan
@@ -143,11 +155,28 @@ public class AuthoringAction extends Action {
 	if (param.equals("removeQuestion")) {
 	    return removeQuestion(mapping, form, request, response);
 	}
-	if (param.equals("upQuestion")) {
-	    return upQuestion(mapping, form, request, response);
+	// ----------------------- Question Reference functions ---------------------------
+	if (param.equals("addQuestionReference")) {
+	    return addQuestionReference(mapping, form, request, response);
 	}
-	if (param.equals("downQuestion")) {
-	    return downQuestion(mapping, form, request, response);
+	if (param.equals("removeQuestionReference")) {
+	    return removeQuestionReference(mapping, form, request, response);
+	}
+	if (param.equals("upQuestionReference")) {
+	    return upQuestionReference(mapping, form, request, response);
+	}
+	if (param.equals("downQuestionReference")) {
+	    return downQuestionReference(mapping, form, request, response);
+	}	
+	// ----------------------- Import/Export Questions functions ---------------------------
+	if (param.equals("importInit")) {
+	    return importInit(mapping, form, request, response);
+	}
+	if (param.equals("importQuestions")) {
+	    return importQuestions(mapping, form, request, response);
+	}
+	if (param.equals("exportQuestions")) {
+	    return exportQuestions(mapping, form, request, response);
 	}	
 	// -----------------------Assessment Answer Option functions ---------------------------
 	if (param.equals("addOption")) {
@@ -176,7 +205,7 @@ public class AuthoringAction extends Action {
 	
 	return mapping.findForward(AssessmentConstants.ERROR);
     }
-
+    
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
@@ -255,10 +284,20 @@ public class AuthoringAction extends Action {
 	questionList.clear();
 	questionList.addAll(questions);
 	
+	// init question references
+	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
+	references.clear();
+	if (assessment.getQuestionReferences() != null) {
+	    references.addAll(assessment.getQuestionReferences());
+	}
+	
+	// init available questions
+	reinitializeAvailableQuestions(sessionMap);
+	
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT_FORM, assessmentForm);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-
+    
     /**
      * Display same entire authoring page content from HttpSession variable.
      * 
@@ -382,7 +421,7 @@ public class AuthoringAction extends Action {
 	assessmentPO.setAttachments(attPOSet);
 	// ************************* Handle assessment questions *******************
 	// Handle assessment questions
-	Set questionList = new LinkedHashSet();
+	Set questions = new LinkedHashSet();
 	SortedSet topics = getQuestionList(sessionMap);
 	iter = topics.iterator();
 	while (iter.hasNext()) {
@@ -391,11 +430,22 @@ public class AuthoringAction extends Action {
 		// This flushs user UID info to message if this user is a new user.
 		question.setCreateBy(assessmentUser);
 		removeNewLineCharacters(question);
-		questionList.add(question);
+		questions.add(question);
 	    }
 	}
-	assessmentPO.setQuestions(questionList);
-	// delete instructino file from database.
+	assessmentPO.setQuestions(questions);
+	
+	// delete References from database.
+	List<QuestionReference> deletedReferences = getDeletedQuestionReferences(sessionMap);
+	iter = deletedReferences.iterator();
+	while (iter.hasNext()) {
+	    QuestionReference reference = (QuestionReference) iter.next();
+	    iter.remove();
+	    if (reference.getUid() != null)
+		service.deleteQuestionReference(reference.getUid());
+	}
+	
+	// delete Questions from database.
 	List deletedQuestionList = getDeletedQuestionList(sessionMap);
 	iter = deletedQuestionList.iterator();
 	while (iter.hasNext()) {
@@ -404,6 +454,11 @@ public class AuthoringAction extends Action {
 	    if (question.getUid() != null)
 		service.deleteAssessmentQuestion(question.getUid());
 	}
+	
+	// Handle question references
+	Set<QuestionReference> questionReferences = updateQuestionReferencesGrades(request, sessionMap, true);
+	assessmentPO.setQuestionReferences(questionReferences);
+	
 	// handle assessment question attachment file:
 	List delQuestionAttList = getDeletedQuestionAttachmentList(sessionMap);
 	iter = delQuestionAttList.iterator();
@@ -482,6 +537,7 @@ public class AuthoringAction extends Action {
 	AssessmentForm assessmentForm = (AssessmentForm) form;
 	// get back sessionMAP
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(assessmentForm.getSessionMapID());
+	updateQuestionReferencesGrades(request, sessionMap, true);
 
 	FormFile file;
 	if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type))
@@ -606,6 +662,7 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	updateQuestionReferencesGrades(request, sessionMap, false);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form; 
 	questionForm.setSessionMapID(sessionMapID);
@@ -656,6 +713,7 @@ public class AuthoringAction extends Action {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	updateQuestionReferencesGrades(request, sessionMap, false);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	
 	int questionIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
@@ -693,6 +751,9 @@ public class AuthoringAction extends Action {
 	
 	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
 	extractFormToAssessmentQuestion(request, questionForm);
+	
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(questionForm.getSessionMapID());
+	reinitializeAvailableQuestions(sessionMap);
 
 	// set session map ID so that questionlist.jsp can get sessionMAP
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, questionForm.getSessionMapID());
@@ -715,6 +776,7 @@ public class AuthoringAction extends Action {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	updateQuestionReferencesGrades(request, sessionMap, false);
 
 	int questionIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
 	if (questionIdx != -1) {
@@ -726,6 +788,178 @@ public class AuthoringAction extends Action {
 	    // add to delList
 	    List delList = getDeletedQuestionList(sessionMap);
 	    delList.add(question);
+	    
+	    //remove according questionReference, if exists
+	    SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
+	    QuestionReference questionReferenceToDelete = null;
+	    for (QuestionReference questionReference: questionReferences) {
+		if ((questionReference.getQuestion() != null)
+			&& (questionReference.getQuestion().getSequenceId() == question.getSequenceId())) {
+		    questionReferenceToDelete = questionReference;
+		}
+	    }
+	    if (questionReferenceToDelete != null) {
+		List<QuestionReference> rRefList = new ArrayList<QuestionReference>(questionReferences);
+		rRefList.remove(questionReferenceToDelete.getSequenceId() - 1);
+		questionReferences.clear();
+		questionReferences.addAll(rRefList);
+		// add to delList
+		List<QuestionReference> delReferencesList = getDeletedQuestionReferences(sessionMap);
+		delReferencesList.add(questionReferenceToDelete);
+	    }
+
+	}
+	
+	reinitializeAvailableQuestions(sessionMap);
+
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return mapping.findForward(AssessmentConstants.SUCCESS);
+    }
+    
+    /**
+    * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only happen
+    * when user submit whole page. So this remove is just impact HttpSession values.
+    * 
+    * @param mapping
+    * @param form
+    * @param request
+    * @param response
+    * @return
+    */
+   private ActionForward addQuestionReference(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	// get back sessionMAP
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	updateQuestionReferencesGrades(request, sessionMap, false);
+	
+	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
+	int questionIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
+	
+	//set SequenceId
+	QuestionReference reference = new QuestionReference();
+	int maxSeq = 1;
+	if (references != null && references.size() > 0) {
+	    QuestionReference last = references.last();
+	    maxSeq = last.getSequenceId() + 1;
+	}
+	reference.setSequenceId(maxSeq);
+	
+	//set isRandomQuestion
+	boolean isRandomQuestion = (questionIdx == -1);
+	reference.setRandomQuestion(isRandomQuestion);
+	    
+	if (isRandomQuestion) { 
+	    reference.setDefaultGrade(1);
+	} else {
+	    SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
+	    AssessmentQuestion question = null;
+	    for (AssessmentQuestion questionFromList : questionList) {
+		if (questionFromList.getSequenceId() == questionIdx) {
+		    question = questionFromList;
+		    break;
+		}
+	    }
+	    reference.setQuestion(question);
+	    
+	    reference.setDefaultGrade(question.getDefaultGrade());
+	}
+	references.add(reference);
+	
+	reinitializeAvailableQuestions(sessionMap);
+
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return mapping.findForward(AssessmentConstants.SUCCESS);
+   }
+   
+   /**
+    * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only happen
+    * when user submit whole page. So this remove is just impact HttpSession values.
+    * 
+    * @param mapping
+    * @param form
+    * @param request
+    * @param response
+    * @return
+    */
+   private ActionForward removeQuestionReference(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	// get back sessionMAP
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	updateQuestionReferencesGrades(request, sessionMap, false);
+
+	int questionReferenceIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
+	if (questionReferenceIdx != -1) {
+	    SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
+	    List<QuestionReference> rList = new ArrayList<QuestionReference>(questionReferences);
+	    QuestionReference questionReference = rList.remove(questionReferenceIdx);
+	    questionReferences.clear();
+	    questionReferences.addAll(rList);
+	    // add to delList
+	    List delList = getDeletedQuestionReferences(sessionMap);
+	    delList.add(questionReference);
+	}
+	
+	reinitializeAvailableQuestions(sessionMap);
+
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return mapping.findForward(AssessmentConstants.SUCCESS);
+   }
+   
+   /**
+    * Move up current question reference.
+    * 
+    * @param mapping
+    * @param form
+    * @param request
+    * @param response
+    * @return
+    */
+   private ActionForward upQuestionReference(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	return switchQuestionReferences(mapping, request, true);
+   }
+
+    /**
+     * Move down current question reference.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward downQuestionReference(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	return switchQuestionReferences(mapping, request, false);
+    }
+
+    private ActionForward switchQuestionReferences(ActionMapping mapping, HttpServletRequest request, boolean up) {
+	// get back sessionMAP
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	updateQuestionReferencesGrades(request, sessionMap, false);
+
+	int questionReferenceIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
+	if (questionReferenceIdx != -1) {
+	    SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
+	    List<QuestionReference> rList = new ArrayList<QuestionReference>(references);
+	    // get current and the target item, and switch their sequnece
+	    QuestionReference reference = rList.get(questionReferenceIdx);
+	    QuestionReference repReference;
+	    if (up)
+		repReference = rList.get(--questionReferenceIdx);
+	    else
+		repReference = rList.get(++questionReferenceIdx);
+	    int upSeqId = repReference.getSequenceId();
+	    repReference.setSequenceId(reference.getSequenceId());
+	    reference.setSequenceId(upSeqId);
+
+	    // put back list, it will be sorted again
+	    references.clear();
+	    references.addAll(rList);
 	}
 
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -733,61 +967,161 @@ public class AuthoringAction extends Action {
     }
     
     /**
-     * Move up current question.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
+     * Initializes import questions page.
      */
-    private ActionForward upQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchQuestion(mapping, request, true);
-    }
-
-    /**
-     * Move down current question.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward downQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	return switchQuestion(mapping, request, false);
-    }
-
-    private ActionForward switchQuestion(ActionMapping mapping, HttpServletRequest request, boolean up) {
-	// get back sessionMAP
+    private ActionForward importInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
-	int questionIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
-	if (questionIdx != -1) {
-	    SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
-	    List<AssessmentQuestion> rList = new ArrayList<AssessmentQuestion>(questionList);
-	    // get current and the target item, and switch their sequnece
-	    AssessmentQuestion question = rList.get(questionIdx);
-	    AssessmentQuestion repQuestion;
-	    if (up)
-		repQuestion = rList.get(--questionIdx);
-	    else
-		repQuestion = rList.get(++questionIdx);
-	    int upSeqId = repQuestion.getSequenceId();
-	    repQuestion.setSequenceId(question.getSequenceId());
-	    question.setSequenceId(upSeqId);
-
-	    // put back list, it will be sorted again
-	    questionList.clear();
-	    questionList.addAll(rList);
-	}
-
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
+    
+    /**
+     * Imports questions into question bank from uploaded xml file.
+     */
+    private ActionForward importQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
+	SortedSet<AssessmentQuestion> oldQuestions = getQuestionList(sessionMap);	
+	
+	List<String> ldErrorMsgs = new ArrayList<String>();
+	List<String> toolsErrorMsgs = new ArrayList<String>();
+	try {
+	    File designFile = null;
+	    Map<String, String> params = new HashMap<String, String>();
+	    String filename = null;
+
+	    String uploadPath = FileUtil.createTempDirectory("_uploaded_2questions_xml");
+
+	    DiskFileUpload fu = new DiskFileUpload();
+	    // maximum size that will be stored in memory
+	    fu.setSizeThreshold(4096);
+	    // the location for saving data that is larger than getSizeThreshold()
+	    // fu.setRepositoryPath(uploadPath);
+
+	    List fileItems = fu.parseRequest(request);
+	    Iterator iter = fileItems.iterator();
+	    while (iter.hasNext()) {
+		FileItem fi = (FileItem) iter.next();
+		// UPLOAD_FILE is input field from HTML page
+		if (!fi.getFieldName().equalsIgnoreCase("UPLOAD_FILE"))
+		    params.put(fi.getFieldName(), fi.getString());
+		else {
+		    // filename on the client
+		    filename = FileUtil.getFileName(fi.getName());
+		    designFile = new File(uploadPath + filename);
+		    fi.write(designFile);
+		}
+	    }
+
+	    String filename2 = designFile.getName();
+	    String fileExtension = filename2 != null && filename2.length() >= 4 ? filename2
+		    .substring(filename2.length() - 4) : "";
+	    if (! fileExtension.equalsIgnoreCase(".xml")) {
+		throw new RuntimeException("Wrong file extension. Xml is expected");
+	    }
+	    //String learningDesignPath = ZipFileUtil.expandZip(new FileInputStream(designFile), filename2);
+
+	    // import learning design
+	    String fullFilePath = designFile.getAbsolutePath();//FileUtil.getFullPath(learningDesignPath,   ExportToolContentService.LEARNING_DESIGN_FILE_NAME);
+	    List<AssessmentQuestion> questions = (List<AssessmentQuestion>) FileUtil.getObjectFromXML(null, fullFilePath);
+	    if (questions != null) {
+		for (AssessmentQuestion question : questions) {
+		    question.setCreateDate(new Timestamp(new Date().getTime()));
+		    int maxSeq = 1;
+		    if (oldQuestions != null && oldQuestions.size() > 0) {
+			AssessmentQuestion last = oldQuestions.last();
+			maxSeq = last.getSequenceId() + 1;
+		    }
+		    question.setSequenceId(maxSeq);
+		    oldQuestions.add(question);
+		}
+	    }
+	    
+	} catch (Exception e) {
+	    log.error("Error occured during import", e);
+	    toolsErrorMsgs.add(e.getClass().getName() + " " + e.getMessage());
+	}
+
+	if (toolsErrorMsgs.size() > 0) {
+	    request.setAttribute("toolsErrorMessages", toolsErrorMsgs);
+	}
+	
+	reinitializeAvailableQuestions(sessionMap);
+	return mapping.findForward(AssessmentConstants.SUCCESS);
+    }
+    
+    /**
+     * Exports xml format questions from question bank.
+     */
+    private ActionForward exportQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	
+	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
+	Assessment assessment = assessmentForm.getAssessment();
+
+	String errors = null;
+	if (assessment != null) {
+	    try {
+		ArrayList<AssessmentQuestion> questionsToExport = new ArrayList<AssessmentQuestion>();
+		
+		for (AssessmentQuestion question : getQuestionList(sessionMap)) {
+		    AssessmentQuestion clonedQuestion = (AssessmentQuestion) question.clone();
+		    clonedQuestion.setCreateBy(null);
+		    questionsToExport.add(clonedQuestion);
+		}
+		// exporting XML
+		XStream designXml = new XStream();
+		String resultedXml = designXml.toXML(questionsToExport);
+		
+		response.setContentType("application/x-download");
+		response.setHeader("Content-Disposition", "attachment;filename=" + AssessmentConstants.EXPORT_QUESTIONS_FILENAME);
+		log.debug("Exporting assessment questions to an xml: " + assessment.getContentId());
+
+		OutputStream out = null;
+		try {
+		    out = response.getOutputStream();
+		    out.write(resultedXml.getBytes());
+		    int count = resultedXml.getBytes().length;
+		    log.debug("Wrote out " + count + " bytes");
+		    response.setContentLength(count);
+		    out.flush();
+		} catch (Exception e) {
+		    log.error("Exception occured writing out file:" + e.getMessage());
+		    throw new ExportToolContentException(e);
+		} finally {
+		    try {
+			if (out != null) {
+			    out.close();
+			}
+		    } catch (Exception e) {
+			log.error("Error Closing file. File already written out - no exception being thrown.", e);
+		    }
+		}
+
+	    } catch (Exception e) {
+		errors = "Unable to export tool content: " + e.toString();
+		log.error(errors);
+	    }
+
+	}
+	if (errors != null) {
+	    try {
+		PrintWriter out = response.getWriter();
+		out.write(errors);
+		out.flush();
+	    } catch (IOException e) {
+	    }
+	}
+	return null;
+    }
+
     
     /**
      * Ajax call, will add one more input line for new resource item instruction.
@@ -998,6 +1332,26 @@ public class AuthoringAction extends Action {
     // Private method
     // *************************************************************************************
     /**
+     * refreshes set of all available questions for adding to question list 
+     * 
+     * @param sessionMap
+     */
+    private void reinitializeAvailableQuestions(SessionMap sessionMap) {
+	SortedSet<AssessmentQuestion> bankQuestions = getQuestionList(sessionMap);
+	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
+	Set<AssessmentQuestion> questionsFromList = new LinkedHashSet<AssessmentQuestion>();
+	for (QuestionReference reference : references) {
+	    questionsFromList.add(reference.getQuestion());
+	}
+	
+	Set<AssessmentQuestion> availableQuestions = new TreeSet<AssessmentQuestion>(new SequencableComparator());
+	availableQuestions.addAll(CollectionUtils.subtract(bankQuestions, questionsFromList));
+	
+	sessionMap.put(AssessmentConstants.ATTR_AVAILABLE_QUESTIONS, availableQuestions);
+    }
+
+    
+    /**
      * Return AssessmentService bean.
      */
     private IAssessmentService getAssessmentService() {
@@ -1037,6 +1391,22 @@ public class AuthoringAction extends Action {
 	}
 	return list;
     }
+    
+    /**
+     * List save current question references.
+     * 
+     * @param request
+     * @return
+     */
+    private SortedSet<QuestionReference> getQuestionReferences(SessionMap sessionMap) {
+	SortedSet<QuestionReference> list = (SortedSet<QuestionReference>) sessionMap
+		.get(AssessmentConstants.ATTR_QUESTION_REFERENCES);
+	if (list == null) {
+	    list = new TreeSet<QuestionReference>(new SequencableComparator());
+	    sessionMap.put(AssessmentConstants.ATTR_QUESTION_REFERENCES, list);
+	}
+	return list;
+    }
 
     /**
      * List save deleted assessment questions, which could be persisted or non-persisted questions.
@@ -1046,6 +1416,16 @@ public class AuthoringAction extends Action {
      */
     private List getDeletedQuestionList(SessionMap sessionMap) {
 	return getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_QUESTION_LIST);
+    }
+    
+    /**
+     * List save deleted assessment questions, which could be persisted or non-persisted questions.
+     * 
+     * @param request
+     * @return
+     */
+    private List getDeletedQuestionReferences(SessionMap sessionMap) {
+	return getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_QUESTION_REFERENCES);
     }
 
     /**
@@ -1273,6 +1653,29 @@ public class AuthoringAction extends Action {
 	return mode;
     }
     
+    private Set<QuestionReference> updateQuestionReferencesGrades(HttpServletRequest request, SessionMap sessionMap, boolean isFormSubmit) {
+	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_QUESTION_REFERENCES_GRADES);
+	
+	SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
+	for (QuestionReference questionReference : questionReferences) {
+	    try {
+		int grade;
+		if (isFormSubmit) {
+		    grade = WebUtil.readIntParam(request, AssessmentConstants.PARAM_GRADE + questionReference.getSequenceId());
+		} else {
+		    String gradeStr = paramMap.get(AssessmentConstants.PARAM_GRADE + questionReference.getSequenceId());
+		    grade = new Integer(gradeStr);
+		}
+		
+		questionReference.setDefaultGrade(grade);
+	    } catch (Exception e) {
+		log.debug(e.getMessage());
+	    }
+	}
+	
+	return questionReferences;
+    }
+    
     /**
      * Get answer options from <code>HttpRequest</code>
      * 
@@ -1459,6 +1862,10 @@ public class AuthoringAction extends Action {
      */
     private Map<String, String> splitRequestParameter(HttpServletRequest request, String parameterName) {
 	String list = request.getParameter(parameterName);
+	if (list == null) {
+	    return null;
+	}
+	
 	String[] params = list.split("&");
 	Map<String, String> paramMap = new HashMap<String, String>();
 	String[] pair;

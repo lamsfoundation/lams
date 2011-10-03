@@ -148,6 +148,26 @@
         </set>
 
         <set
+            name="questionReferences"
+            lazy="true"
+            inverse="false"
+            cascade="all"
+            sort="unsorted"
+            order-by="sequence_id asc"
+        >
+
+            <key
+                column="assessment_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.tool.assessment.model.QuestionReference"
+            />
+
+        </set>
+
+        <set
             name="overallFeedbacks"
             lazy="false"
             cascade="all"
@@ -237,6 +257,14 @@
             update="true"
             insert="true"
             column="allow_history_responses"
+        />
+
+        <property
+            name="displaySummary"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="display_summary"
         />
 
         <property

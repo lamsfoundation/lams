@@ -55,7 +55,7 @@ public class AssessmentUnit implements Cloneable, Sequencable {
 	return uid;
     }
 
-    private void setUid(Long uuid) {
+    public void setUid(Long uuid) {
 	uid = uuid;
     }
 

@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 
@@ -40,7 +43,7 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
  * @hibernate.class table="tl_laasse10_assessment_question"
  * 
  */
-public class AssessmentQuestion implements Cloneable, Sequencable {
+public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     private static final Logger log = Logger.getLogger(AssessmentQuestion.class);
 
     private Long uid;
@@ -139,15 +142,43 @@ public class AssessmentQuestion implements Cloneable, Sequencable {
 		obj.units = set;
 	    }
 	    
-	    // clone AssessmentUser as well
-	    if (this.createBy != null) {
-		((AssessmentQuestion) obj).setCreateBy((AssessmentUser) this.createBy.clone());
-	    }
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + AssessmentQuestion.class + " failed");
 	}
 
 	return obj;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+	if (this == o)
+	    return true;
+	if (!(o instanceof AssessmentQuestion))
+	    return false;
+
+	final AssessmentQuestion genericEntity = (AssessmentQuestion) o;
+
+	return new EqualsBuilder().append(this.getUid(), genericEntity.getUid()).append(this.getSequenceId(), genericEntity.getSequenceId()).isEquals();
+    }
+    
+    @Override
+    public int compareTo(Object o) {
+	if ((o != null) && o instanceof AssessmentQuestion) {
+	    AssessmentQuestion anotherQuestion = (AssessmentQuestion) o;
+	    return (int) (sequenceId - anotherQuestion.getSequenceId());
+	} else {
+	    return 1;
+	}
+    }
+    
+    @Override
+    public String toString() {
+	return new ToStringBuilder(this).append("uid", getUid()).toString();
+    }
+
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(getUid()).append(getSequenceId()).toHashCode();
     }
 
     // **********************************************************

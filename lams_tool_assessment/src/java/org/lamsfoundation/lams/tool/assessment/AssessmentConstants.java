@@ -37,6 +37,8 @@ public class AssessmentConstants {
     public static final int INITIAL_UNITS_NUMBER = 2;
     
     public static final int INITIAL_OVERALL_FEEDBACK_NUMBER = 3;
+    
+    public static final String EXPORT_QUESTIONS_FILENAME = "questions.xml";
 
     // question type;
     public static final short QUESTION_TYPE_MULTIPLE_CHOICE = 1;
@@ -70,6 +72,8 @@ public class AssessmentConstants {
     public static final String PARAM_FILE_UUID = "fileUuid";
 
     public static final String PARAM_QUESTION_INDEX = "questionIndex";
+    
+    public static final String PARAM_QUESTION_REFERENCE_INDEX = "questionReferenceIndex";
 
     public static final String PARAM_QUESTION_UID = "questionUid";
     
@@ -117,16 +121,24 @@ public class AssessmentConstants {
     public static final String ATTR_QUESTION_TYPE = "questionType";
 
     public static final String ATTR_QUESTION_LIST = "questionList";
+    
+    public static final String ATTR_QUESTION_REFERENCES = "questionReferences";
+    
+    public static final String ATTR_AVAILABLE_QUESTIONS = "availableQuestions";
 
     public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
 
     public static final String ATTR_DELETED_QUESTION_LIST = "deleteAssessmentList";
+    
+    public static final String ATTR_DELETED_QUESTION_REFERENCES = "deleteQuestionReferences";
 
     public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
 
     public static final String ATTR_DELETED_QUESTION_ATTACHMENT_LIST = "deletedQuestionAttachmmentList";
     
     public static final String ATTR_UNIT_LIST = "unitList";
+    
+    public static final String ATTR_QUESTION_REFERENCES_GRADES = "referenceGrades";
     
     public static final String ATTR_UNIT_COUNT = "unitCount";
     

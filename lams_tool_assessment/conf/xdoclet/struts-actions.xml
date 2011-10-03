@@ -116,15 +116,45 @@
 			parameter="removeQuestion">
 			<forward name="success" path="/pages/authoring/parts/questionlist.jsp" />
 		</action>
-		<action path="/authoring/upQuestion"
+		
+		<!-- ==========  Authroing Definitions: Question References methods ========== -->
+		
+		<action path="/authoring/addQuestionReference"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
-			parameter="upQuestion">
+			parameter="addQuestionReference">
 			<forward name="success" path="/pages/authoring/parts/questionlist.jsp" />
 		</action>
-		<action path="/authoring/downQuestion"
+		<action path="/authoring/removeQuestionReference"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
-			parameter="downQuestion">
+			parameter="removeQuestionReference">
 			<forward name="success" path="/pages/authoring/parts/questionlist.jsp" />
+		</action>
+		<action path="/authoring/upQuestionReference"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
+			parameter="upQuestionReference">
+			<forward name="success" path="/pages/authoring/parts/questionlist.jsp" />
+		</action>
+		<action path="/authoring/downQuestionReference"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
+			parameter="downQuestionReference">
+			<forward name="success" path="/pages/authoring/parts/questionlist.jsp" />
+		</action>
+		
+		<!-- ==========  Authroing Definitions: Export/Import questions methods ========== -->
+		
+		<action path="/authoring/importInit"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
+			parameter="importInit">
+			<forward name="success" path="/pages/authoring/importQuestions.jsp" />
+		</action>
+		<action path="/authoring/importQuestions"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
+			parameter="importQuestions">
+			<forward name="success" path="/pages/authoring/parts/questionlist.jsp" />
+		</action>
+		<action path="/authoring/exportQuestions"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.AuthoringAction"
+			parameter="exportQuestions">
 		</action>
 	
 		<!-- ==========  Authroing Definitions: Assessment Answer Option methods ========== -->

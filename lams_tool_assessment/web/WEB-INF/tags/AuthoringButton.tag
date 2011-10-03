@@ -65,13 +65,25 @@
 	<c:set var="notifyCloseURL" value="${param.notifyCloseURL}" scope="session"/>
 </c:if>
 
+<c:set var="unableToSaveMsgKey" value="authoring.msg.one.question.to.be.saved" scope="request"/>
+
 <!-- begin tab content -->
 <script type="text/javascript">
 	if(<c:choose><c:when test="${LAMS_AUTHORING_SUCCESS_FLAG == true}">true</c:when><c:otherwise>false</c:otherwise></c:choose>){
        	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&contentFolderID=${contentFolderID}'/>";
 	}
     function doSubmit_Form_Only() {
-    	document.getElementById("${formID}").submit();
+    	var amountOfQuestions = $('#questionTable tr').size();
+    	var amountOfReferences = $('#referencesTable tr').size();
+
+		if( amountOfQuestions <= 1 ) {
+        	alert("<fmt:message key='${unableToSaveMsgKey}'/>");
+		} else if (amountOfReferences > amountOfQuestions) {
+			alert("<fmt:message key='label.authoring.basic.warning.too.many.questions'/>");
+		} else {
+	    	$("#overallFeedbackList").val($('#advancedInputArea').contents().find('#overallFeedbackForm').serialize(true));
+	    	document.getElementById("${formID}").submit();
+		}
     }
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){

@@ -107,8 +107,11 @@ public class Assessment implements Cloneable {
 
     private AssessmentUser createdBy;
 
-    // assessment questions
+    // Question bank questions
     private Set questions;
+    
+    // assessment questions references that form question list
+    private Set questionReferences;
     
     private Set overallFeedbacks;
 
@@ -126,6 +129,7 @@ public class Assessment implements Cloneable {
     public Assessment() {
 	attachments = new TreeSet();
 	questions = new TreeSet(new SequencableComparator());
+	questionReferences = new TreeSet(new SequencableComparator());
 	overallFeedbacks = new TreeSet(new SequencableComparator());
     }
 
@@ -146,6 +150,12 @@ public class Assessment implements Cloneable {
 	    for (AssessmentQuestion question : questions) {
 		question.setCreateBy(toContent.getCreatedBy());
 	    }
+	    Set<QuestionReference> questionReferences = toContent.getQuestionReferences();
+	    for (QuestionReference questionReference : questionReferences) {
+		if (questionReference.getQuestion() != null) {
+		    questionReference.getQuestion().setCreateBy(toContent.getCreatedBy());
+		}
+	    }
 	}
 	return toContent;
     }
@@ -157,9 +167,11 @@ public class Assessment implements Cloneable {
 	try {
 	    assessment = (Assessment) super.clone();
 	    assessment.setUid(null);
+	    
+	    // clone questions
 	    if (questions != null) {
 		Iterator iter = questions.iterator();
-		Set<AssessmentQuestion> set = new TreeSet<AssessmentQuestion>(new SequencableComparator());
+		TreeSet<AssessmentQuestion> set = new TreeSet<AssessmentQuestion>(new SequencableComparator());
 		while (iter.hasNext()) {
 		    AssessmentQuestion question = (AssessmentQuestion) iter.next();
 		    AssessmentQuestion newQuestion = (AssessmentQuestion) question.clone();
@@ -168,6 +180,30 @@ public class Assessment implements Cloneable {
 		}
 		assessment.questions = set;
 	    }
+	    
+	    // clone questionReferences
+	    if (questionReferences != null) {
+		Iterator iter = questionReferences.iterator();
+		Set<QuestionReference> set = new TreeSet<QuestionReference>(new SequencableComparator());
+		while (iter.hasNext()) {
+		    QuestionReference questionReference = (QuestionReference) iter.next();
+		    QuestionReference newQuestionReference = (QuestionReference) questionReference.clone();
+		    
+		    // update questionReferences with new cloned question
+		    if (newQuestionReference.getQuestion() != null) {
+			for (AssessmentQuestion newQuestion : (Set<AssessmentQuestion>) assessment.questions) {
+			    if (newQuestion.getSequenceId() == newQuestionReference.getQuestion().getSequenceId()) {
+				newQuestionReference.setQuestion(newQuestion);
+				break;
+			    }
+			}
+		    }
+		    
+		    set.add(newQuestionReference);
+		}
+		assessment.questionReferences = set;
+	    }
+	    
 	    // clone OverallFeedbacks
 	    if (overallFeedbacks != null) {
 		Iterator iter = overallFeedbacks.iterator();
@@ -469,8 +505,24 @@ public class Assessment implements Cloneable {
 	return questions;
     }
 
-    public void setQuestions(Set assessmentQuestions) {
-	this.questions = assessmentQuestions;
+    public void setQuestions(Set questions) {
+	this.questions = questions;
+    }
+    
+    /**
+     * 
+     * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="sequence_id asc"
+     * @hibernate.collection-key column="assessment_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.QuestionReference"
+     * 
+     * @return
+     */
+    public Set getQuestionReferences() {
+	return questionReferences;
+    }
+
+    public void setQuestionReferences(Set questionReferences) {
+	this.questionReferences = questionReferences;
     }
     
     /**

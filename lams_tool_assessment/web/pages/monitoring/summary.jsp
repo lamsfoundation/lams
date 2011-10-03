@@ -20,19 +20,13 @@
 						'userId',
 						'sessionId',
 						"<fmt:message key="label.monitoring.summary.user.name" />",
-			   	        <c:forEach var="question" items="${assessment.questions}">
-			   	     		"${question.title}", 
-			   	        </c:forEach>
 					    "<fmt:message key="label.monitoring.summary.total" />"],
 					    
 			   	colModel:[
 			   		{name:'id',index:'id', width:20, sorttype:"int"},
 			   		{name:'userId',index:'userId', width:0},
 			   		{name:'sessionId',index:'sessionId', width:0},
-			   		{name:'userName',index:'userName', width:100},
-		   	        <c:forEach var="question" items="${assessment.questions}">
-		   	     		{name:'${question.uid}', index:'${question.uid}', width:80, align:"right", sorttype:"float"},
-	   	        	</c:forEach>			   				
+			   		{name:'userName',index:'userName', width:200},
 			   		{name:'total',index:'total', width:50,align:"right",sorttype:"float", formatter:'number', formatoptions:{decimalPlaces: 2}}		
 			   	],
 			   	
@@ -71,23 +65,11 @@
    	   	     		userId:"${assessmentResult.user.userId}",
    	   	     		sessionId:"${assessmentResult.user.session.sessionId}",
    	   	     		userName:"${assessmentResult.user.lastName}, ${assessmentResult.user.firstName}",
-		   	   	  	<c:choose>
-		   	   			<c:when test="${not empty assessmentResult.questionResults}">
-				   	        <c:forEach var="questionResult" items="${assessmentResult.questionResults}">
-			   	    			${questionResult.assessmentQuestion.uid}:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>",
-	   	        			</c:forEach>		
-		   	   			</c:when>
-		   	   			<c:otherwise>
-				   	        <c:forEach var="question" items="${assessment.questions}">
-				   	     		${question.uid}:"-",
-		   	        		</c:forEach>		   	   			
-		   	   			</c:otherwise>
-		   	   		</c:choose>	
-   	   	     		
    	   	     		total:"<fmt:formatNumber value='${assessmentResult.grade}' maxFractionDigits='3'/>"
    	   	   	    });
 	        </c:forEach>
 	        
+	        var oldValue = 0;
 			jQuery("#userSummary${summary.sessionId}").jqGrid({
 				datatype: "local",
 				gridstate:"hidden",
@@ -114,16 +96,16 @@
 
 				cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
   				cellEdit: true,
+  				afterEditCell: function (rowid,name,val,iRow,iCol){
+  					oldValue = eval(val);
+				},	 
   				afterSaveCell : function (rowid,name,val,iRow,iCol){
-					//var questionResultUid = jQuery("#session${session.sessionId}").getCell(rowid, 'questionResultUid');   || (questionResultUid=="")
   					if (isNaN(val)) {
   						jQuery("#userSummary${summary.sessionId}").restoreCell(iRow,iCol); 
   					} else {
   						var parentSelectedRowId = jQuery("#list${summary.sessionId}").getGridParam("selrow");
-  						var previousValue =  eval(jQuery("#list${summary.sessionId}").getCell(parentSelectedRowId, eval(rowid)+3));
   						var previousTotal =  eval(jQuery("#list${summary.sessionId}").getCell(parentSelectedRowId, 'total'));
-  						jQuery("#list${summary.sessionId}").setCell(parentSelectedRowId, eval(rowid)+3, val, {}, {});
-  						jQuery("#list${summary.sessionId}").setCell(parentSelectedRowId, 'total', previousTotal - previousValue + eval(val), {}, {});
+  						jQuery("#list${summary.sessionId}").setCell(parentSelectedRowId, 'total', previousTotal - oldValue + eval(val), {}, {});
   					}
 				},	  		
   				beforeSubmitCell : function (rowid,name,val,iRow,iCol){

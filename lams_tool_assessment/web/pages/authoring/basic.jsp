@@ -1,13 +1,14 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 <c:url var="newQuestionInitUrl" value='/authoring/newQuestionInit.do'>
-	<c:param name="sessionMapID" value="${formBean.sessionMapID}" />
+	<c:param name="sessionMapID" value="${sessionMapID}" />
 </c:url>	
 
 <script lang="javascript">
 	//The panel of assessment list panel
 	var questionListTargetDiv = "#questionListArea";
-	function deleteQuestion(idx,sessionMapID){
+	function deleteQuestion(idx){
 		var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
 
 		if (deletionConfirmed) {
@@ -16,7 +17,8 @@
 				url,
 				{
 					questionIndex: idx, 
-					sessionMapID: sessionMapID
+					sessionMapID: "${sessionMapID}",
+					referenceGrades: serializeReferenceGrades()
 				},
 				function(){
 					refreshThickbox();
@@ -24,32 +26,78 @@
 			);
 		};
 	}
-	function upQuestion(idx, sessionMapID){
-		var url = "<c:url value="/authoring/upQuestion.do"/>";
+	function addQuestionReference(){
+		var questionTypeDropdown = document.getElementById("questionSelect");
+		var idx = questionTypeDropdown.value;
+		
+		var url = "<c:url value="/authoring/addQuestionReference.do"/>";
 		$(questionListTargetDiv).load(
 				url,
 				{
 					questionIndex: idx, 
-					sessionMapID: sessionMapID
+					sessionMapID: "${sessionMapID}",
+					referenceGrades: serializeReferenceGrades()
 				},
 				function(){
 					refreshThickbox();
 				}
 		);
 	}
-	function downQuestion(idx, sessionMapID){
-		var url = "<c:url value="/authoring/downQuestion.do"/>";
+	function deleteQuestionReference(idx){
+		var url = "<c:url value="/authoring/removeQuestionReference.do"/>";
+		$(questionListTargetDiv).load(
+			url,
+			{
+				questionReferenceIndex: idx, 
+				sessionMapID: "${sessionMapID}",
+				referenceGrades: serializeReferenceGrades()
+			},
+			function(){
+				refreshThickbox();
+			}
+		);
+	}
+	function upQuestionReference(idx){
+		var url = "<c:url value="/authoring/upQuestionReference.do"/>";
 		$(questionListTargetDiv).load(
 				url,
 				{
-					questionIndex: idx, 
-					sessionMapID: sessionMapID
+					questionReferenceIndex: idx, 
+					sessionMapID: "${sessionMapID}",
+					referenceGrades: serializeReferenceGrades()
 				},
 				function(){
 					refreshThickbox();
 				}
 		);
 	}
+	function downQuestionReference(idx){
+		var url = "<c:url value="/authoring/downQuestionReference.do"/>";
+		$(questionListTargetDiv).load(
+				url,
+				{
+					questionReferenceIndex: idx, 
+					sessionMapID: "${sessionMapID}",
+					referenceGrades: serializeReferenceGrades()
+				},
+				function(){
+					refreshThickbox();
+				}
+		);
+	}
+	function serializeReferenceGrades(){
+		var serializedGrades = "";
+		$("[name^=grade]").each(function() {
+			serializedGrades += "&" + this.name + "="  + this.value;
+		});
+		return serializedGrades;
+	}
+	
+	function exportQuestions(){   
+	    var reqIDVar = new Date();
+		var param = "?sessionMapID=${sessionMapID}&reqID="+reqIDVar.getTime();
+		location.href="<c:url value='/authoring/exportQuestions.do'/>" + param;
+	};
 
 	function resizeIframe() {
 		if (document.getElementById('TB_iframeContent') != null) {
@@ -72,7 +120,7 @@
 	function createNewQuestionInitHref() {
 		var questionTypeDropdown = document.getElementById("questionType");
 		var questionType = questionTypeDropdown.selectedIndex + 1;
-		var newQuestionInitHref = "${newQuestionInitUrl}&questionType=" + questionType + "&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true";
+		var newQuestionInitHref = "${newQuestionInitUrl}&questionType=" + questionType + "&referenceGrades=" + encodeURIComponent(serializeReferenceGrades()) + "&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true";
 		$("#newQuestionInitHref").attr("href", newQuestionInitHref)
 	};
 	function refreshThickbox(){
@@ -125,9 +173,21 @@
 	</select>
 	
 	<a onclick="createNewQuestionInitHref();return false;" href="" class="button-add-item space-left thickbox" id="newQuestionInitHref">  
-		<fmt:message key="label.authoring.basic.add.question" />
+		<fmt:message key="label.authoring.basic.add.question.to.pool" />
+	</a>
+	
+	<c:set var="importInitUrl" >
+		<c:url value='/authoring/importInit.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=240&width=650
+	</c:set>
+	<a href="${importInitUrl}" class="button space-right thickbox" id="importButton" style="float: right;">  
+		<fmt:message key="label.authoring.basic.import.questions" />
+	</a>
+	
+	<a onclick="javascript:exportQuestions();" class="button space-right" id="exportButton" style="float: right;">  
+		<fmt:message key="label.authoring.basic.export.questions" />
 	</a>
 </p>
+<br>
  
 <p>
 	<iframe

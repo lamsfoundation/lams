@@ -68,7 +68,7 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
 	return uid;
     }
 
-    private void setUid(Long uuid) {
+    public void setUid(Long uuid) {
 	uid = uuid;
     }
 

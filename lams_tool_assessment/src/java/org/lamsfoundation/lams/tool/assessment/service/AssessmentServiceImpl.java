@@ -87,6 +87,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUnit;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
+import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
@@ -212,7 +213,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public Assessment getAssessmentByContentId(Long contentId) {
 	Assessment rs = assessmentDao.getByContentId(contentId);
 	if (rs == null) {
-	    AssessmentServiceImpl.log.error("Could not find the content by given ID:" + contentId);
+	    AssessmentServiceImpl.log.debug("Could not find the content by given ID:" + contentId);
 	}
 	return rs;
     }
@@ -292,6 +293,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     public void deleteAssessmentQuestion(Long uid) {
 	assessmentQuestionDao.removeObject(AssessmentQuestion.class, uid);
+    }
+    
+    public void deleteQuestionReference(Long uid) {
+	assessmentQuestionDao.removeObject(QuestionReference.class, uid);
     }
 
     public List<AssessmentQuestion> getAssessmentQuestionsBySessionId(Long sessionId) {
@@ -408,7 +413,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    pattern = Pattern.compile(optionString, java.util.regex.Pattern.CASE_INSENSITIVE
 			    | java.util.regex.Pattern.UNICODE_CASE);
 		}
-		boolean isAnswerCorrect = question.getAnswerString() != null ? pattern.matcher(
+		boolean isAnswerCorrect = (question.getAnswerString() != null) ? pattern.matcher(
 			question.getAnswerString()).matches() : false;
 
 		if (isAnswerCorrect) {
@@ -424,8 +429,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    boolean isAnswerCorrect = false;
 		    try {
 			float answerFloat = Float.valueOf(question.getAnswerString());
-			isAnswerCorrect = answerFloat >= option.getOptionFloat() - option.getAcceptedError()
-				&& answerFloat <= option.getOptionFloat() + option.getAcceptedError();
+			isAnswerCorrect = ((answerFloat >= (option.getOptionFloat() - option.getAcceptedError())) && (answerFloat <= (option
+				.getOptionFloat() + option.getAcceptedError())));
 		    } catch (Exception e) {
 		    }
 
@@ -440,9 +445,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 				try {
 				    float answerFloat = Float.valueOf(answerFloatStr);
 				    answerFloat = answerFloat / unit.getMultiplier();
-				    isAnswerCorrect = answerFloat >= option.getOptionFloat()
-					    - option.getAcceptedError()
-					    && answerFloat <= option.getOptionFloat() + option.getAcceptedError();
+				    isAnswerCorrect = ((answerFloat >= (option.getOptionFloat() - option
+					    .getAcceptedError())) && (answerFloat <= (option.getOptionFloat() + option
+					    .getAcceptedError())));
 				    if (isAnswerCorrect) {
 					break;
 				    }
@@ -609,10 +614,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			break;
 		    }
 		}
-
 	    }
-	    userSummaryItem.setQuestionResults(questionResultsForSummary);
-	    userSummaryItems.add(userSummaryItem);
+	    
+	    //skip questions without answers
+	    if (questionResultsForSummary.isEmpty()) {
+		continue;
+	    } else {
+		userSummaryItem.setQuestionResults(questionResultsForSummary);
+		userSummaryItems.add(userSummaryItem);
+	    }
 	}
 	userSummary.setUserSummaryItems(userSummaryItems);
 
@@ -649,6 +659,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			    break;
 			}
 		    }
+		    if (questionResult == null) {
+			continue;
+		    }
 		}
 		questionResult.setUser(user);
 		sessionQuestionResults.add(questionResult);
@@ -667,7 +680,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		}
 	    }
 	}
-	float averageMark = count == 0 ? 0 : total / count;
+	float averageMark = (count == 0) ? 0 : total / count;
 	questionSummary.setAverageMark(averageMark);
 
 	escapeQuotes(questionSummary);

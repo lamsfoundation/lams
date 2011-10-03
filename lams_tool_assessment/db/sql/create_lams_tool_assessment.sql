@@ -72,6 +72,17 @@ create table tl_laasse10_assessment_question (
    session_uid bigint,
    primary key (uid)
 )type=innodb;
+create table tl_laasse10_question_reference (
+   uid bigint not null auto_increment,
+   question_uid bigint,
+   question_type smallint,
+   title varchar(255),
+   sequence_id integer,
+   default_grade integer DEFAULT 1,
+   random_question tinyint DEFAULT 0,
+   assessment_uid bigint,
+   primary key (uid)
+)type=innodb;
 create table tl_laasse10_question_option (
    uid bigint not null unique auto_increment,
    question_uid bigint,
@@ -158,6 +169,8 @@ alter table tl_laasse10_assessment add index FK_NEW_1720029621_89093BF758092FB (
 alter table tl_laasse10_assessment_question add index FK_NEW_1720029621_F52D1F93758092FB (create_by), add constraint FK_NEW_1720029621_F52D1F93758092FB foreign key (create_by) references tl_laasse10_user (uid);
 alter table tl_laasse10_assessment_question add index FK_NEW_1720029621_F52D1F9330E79035 (assessment_uid), add constraint FK_NEW_1720029621_F52D1F9330E79035 foreign key (assessment_uid) references tl_laasse10_assessment (uid);
 alter table tl_laasse10_assessment_question add index FK_NEW_1720029621_F52D1F93EC0D3147 (session_uid), add constraint FK_NEW_1720029621_F52D1F93EC0D3147 foreign key (session_uid) references tl_laasse10_session (uid);
+alter table tl_laasse10_question_reference add index FK_tl_laasse10_question_reference_1 (question_uid), add constraint FK_tl_laasse10_question_reference_1 foreign key (question_uid) references tl_laasse10_assessment_question (uid);
+alter table tl_laasse10_question_reference add index FK_tl_laasse10_question_reference_2 (assessment_uid), add constraint FK_tl_laasse10_question_reference_2 foreign key (assessment_uid) references tl_laasse10_assessment (uid);
 alter table tl_laasse10_question_option add index FK_tl_laasse10_question_option_1 (question_uid), add constraint FK_tl_laasse10_question_option_1 foreign key (question_uid) references tl_laasse10_assessment_question (uid);
 alter table tl_laasse10_assessment_overall_feedback add index FK_tl_laasse10_assessment_overall_feedback_1 (assessment_uid), add constraint FK_tl_laasse10_assessment_overall_feedback_1 foreign key (assessment_uid) references tl_laasse10_assessment (uid);
 alter table tl_laasse10_assessment_unit add index FK_tl_laasse10_assessment_unit_1 (question_uid), add constraint FK_tl_laasse10_assessment_unit_1 foreign key (question_uid) references tl_laasse10_assessment_question (uid);

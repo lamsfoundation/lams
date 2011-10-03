@@ -134,6 +134,8 @@ public interface IAssessmentService {
      * @param uid
      */
     void deleteAssessmentQuestion(Long uid);
+    
+    void deleteQuestionReference(Long uid);
 
     /**
      * Return all reource questions within the given toolSessionID.
