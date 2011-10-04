@@ -92,13 +92,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				// refresh the parent window
 				var parentURL = "${notifyCloseURL}";
-				
 				if (parentURL != "") {
 					if (window.parent.opener == null){
 						window.location.href = parentURL;
 					} else {
 						window.parent.opener.location.href = parentURL;
 					}
+					return true;
 				}
 				
 				if(isInternetExplorer) {
