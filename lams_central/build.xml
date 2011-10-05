@@ -201,16 +201,16 @@
 	<!-- Make jar archive for deployment        		    	          -->
 	<!-- ================================================================ -->
 	<target name="build-jar" depends="compile" description="creates jar file">
-		
-		<!-- Add Mindapp integration, if available -->
-		<available file="../${lams_mindapp}/build.xml" property="mindapp_available" />
-		<antcall target="copy-mindapp-jar" />
-		
 		<delete file="${build.lib}/${product}.jar"/>	
 		<jar jarfile="${build.lib}/${product}.jar"  manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
 			<fileset dir="${build.classes.java}"/>
 			<fileset dir="${build.classes.test}"/>
 		</jar>
+		
+		<!-- Add Mindapp integration, if available -->
+		<available file="../${lams_mindapp}/build.xml" property="mindapp_available" />
+		<antcall target="copy-mindapp-jar" />
+		
 		<copy overwrite="yes" todir="${build.lib}/language/org/lamsfoundation/lams/central">
 			<fileset dir="${conf.language.dir}">
 				<include name="**/*.properties"/>
