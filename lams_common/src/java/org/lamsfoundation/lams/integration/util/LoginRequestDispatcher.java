@@ -74,6 +74,8 @@ public class LoginRequestDispatcher {
     public static final String PARAM_EXT_LMS_ID = "extlmsid";
     
     public static final String PARAM_MODE = "mode";
+    
+    public static final String MODE_GRADEBOOK = "gradebook";
 
     public static final String METHOD_AUTHOR = "author";
 
@@ -81,7 +83,7 @@ public class LoginRequestDispatcher {
 
     public static final String METHOD_LEARNER = "learner";
 
-    private static final String PARAM_LESSON_ID = "lsid";
+    public static final String PARAM_LESSON_ID = "lsid";
 
     private static final String URL_DEFAULT = "/index.jsp";
 
@@ -90,6 +92,8 @@ public class LoginRequestDispatcher {
     private static final String URL_LEARNER = "/home.do?method=learner&lessonID=";
 
     private static final String URL_MONITOR = "/home.do?method=monitorLesson&lessonID=";
+    
+    private static final String URL_GRADEBOOK = "/services/Gradebook?";
 
     private static IIntegrationService integrationService = null;
 
@@ -115,9 +119,11 @@ public class LoginRequestDispatcher {
 	    throw new ServletException(e);
 	}
 
+	if (MODE_GRADEBOOK.equals(mode)) {
+	    return request.getContextPath() + URL_GRADEBOOK + request.getQueryString();
+	}
 	/** AUTHOR * */
-	if (METHOD_AUTHOR.equals(method)) {
-
+	else if (METHOD_AUTHOR.equals(method)) {
 	    String requestSrc = request.getParameter(PARAM_REQUEST_SRC);
 	    String notifyCloseURL = request.getParameter(PARAM_NOTIFY_CLOSE_URL);
 
@@ -148,8 +154,7 @@ public class LoginRequestDispatcher {
 	/** LEARNER * */
 	else if (METHOD_LEARNER.equals(method) && lessonId != null) {
 	    String url = request.getContextPath() + URL_LEARNER + lessonId;
-	    if (mode != null)
-	    {
+	    if (mode != null) {
 		url += "&" + PARAM_MODE + "=" + mode;
 	    }
 	    return url;

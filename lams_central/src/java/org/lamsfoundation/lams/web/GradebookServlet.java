@@ -75,23 +75,27 @@ public class GradebookServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	HttpSession hses = request.getSession(true);
 
-	String username = request.getParameter(CentralConstants.PARAM_USERNAME);
+	String username = request.getParameter(LoginRequestDispatcher.PARAM_USER_ID);
 	String serverId = request.getParameter(LoginRequestDispatcher.PARAM_SERVER_ID);
-	String datetime = request.getParameter(CentralConstants.PARAM_DATE_TIME);
+	String timestamp = request.getParameter(LoginRequestDispatcher.PARAM_TIMESTAMP);
 	String hash = request.getParameter(LoginRequestDispatcher.PARAM_HASH);
 	String countryIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_COUNTRY);
 	String langIsoCode = request.getParameter(LoginRequestDispatcher.PARAM_LANGUAGE);
 	String extCourseId = request.getParameter(LoginRequestDispatcher.PARAM_COURSE_ID);
-	String lessonId = request.getParameter(CentralConstants.PARAM_LESSON_ID);
-
+	String lessonId = request.getParameter(LoginRequestDispatcher.PARAM_LESSON_ID);
+	String courseName = request.getParameter(CentralConstants.PARAM_COURSE_NAME);
+	String method = request.getParameter(LoginRequestDispatcher.PARAM_METHOD);
+	
 	// either lesson ID or course ID is required; if both provided, only lesson ID is used
-	if ((username == null) || (serverId == null) || (datetime == null) || (hash == null)
+	if ((username == null) || (serverId == null) || (timestamp == null) || (hash == null)
 		|| ((lessonId == null) && (extCourseId == null))) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Gradebook request failed - invalid parameters");
 	} else {
 	    ExtServerOrgMap serverMap = getService().getExtServerOrgMap(serverId);
 	    try {
-		Authenticator.authenticate(serverMap, datetime, username, hash);
+		// if request comes from LoginRequest, method parameter was meaningful there
+		// if it's a direct call, it can be anything
+		Authenticator.authenticate(serverMap, timestamp, username, method, hash);
 		String redirect = null;
 
 		if (lessonId == null) {
@@ -99,7 +103,7 @@ public class GradebookServlet extends HttpServlet {
 		    ExtUserUseridMap userMap = GradebookServlet.integrationService.getExtUserUseridMap(serverMap,
 			    username);
 		    ExtCourseClassMap orgMap = GradebookServlet.integrationService.getExtCourseClassMap(serverMap,
-			    userMap, extCourseId, countryIsoCode, langIsoCode, null, null);
+			    userMap, extCourseId, countryIsoCode, langIsoCode, courseName, method);
 		    Organisation org = orgMap.getOrganisation();
 		    redirect = Configuration.get(ConfigurationKeys.SERVER_URL)
 			    + GradebookServlet.GRADEBOOK_ORGANISATION_URL + org.getOrganisationId();
