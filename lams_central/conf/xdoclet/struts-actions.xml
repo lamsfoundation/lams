@@ -18,6 +18,8 @@
       parameter="method"
       unknown="false"
       validate="true"
+      scope="request"
+ 	  name="MindappUserRegistrationForm"
     >
       <forward
         name="help"
@@ -25,8 +27,8 @@
         redirect="false"
       />
       <forward
-        name="openidAuthentication"
-        path=""
+        name="authenticate"
+        path="/mindapp/mindappUserRegister.jsp"
         redirect="false"
       />
       <forward
