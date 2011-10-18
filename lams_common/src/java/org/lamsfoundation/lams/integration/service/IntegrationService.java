@@ -135,8 +135,9 @@ public class IntegrationService implements IIntegrationService {
 	    Organisation org = map.getOrganisation();
 
 	    // update external course name if if has changed
-	    if (extCourseName != null && !org.getName().equals(buildName(serverMap.getPrefix(), extCourseName))) {
-		org.setName(buildName(serverMap.getPrefix(), extCourseName));
+	    String requestedCourseName = prefix ? buildName(serverMap.getPrefix(), extCourseName) : extCourseName;
+	    if (extCourseName != null && !org.getName().equals(requestedCourseName)) {
+		org.setName(requestedCourseName);
 		service.updateOrganisationandWorkspaceNames(org);
 	    }
 	    if (service.getUserOrganisation(user.getUserId(), org.getOrganisationId()) == null) {

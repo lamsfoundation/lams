@@ -113,12 +113,14 @@ public class LoginRequestDispatcher {
 	String lessonId = request.getParameter(PARAM_LESSON_ID);
 	String mode = request.getParameter(PARAM_MODE);
 
-	try {
-	    addUserToLessonClass(request, lessonId, method);
-	} catch (UserInfoFetchException e) {
-	    throw new ServletException(e);
+	if (lessonId != null) {
+	    try {
+		addUserToLessonClass(request, lessonId, method);
+	    } catch (UserInfoFetchException e) {
+		throw new ServletException(e);
+	    }
 	}
-
+	
 	if (MODE_GRADEBOOK.equals(mode)) {
 	    return request.getContextPath() + URL_GRADEBOOK + request.getQueryString();
 	}

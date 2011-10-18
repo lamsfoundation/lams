@@ -73,15 +73,11 @@ public class LearningDesignSVGServlet extends HttpServlet {
 	    String datetime = request.getParameter(CentralConstants.PARAM_DATE_TIME);
 	    String hashValue = request.getParameter(CentralConstants.PARAM_HASH_VALUE);
 	    String username = request.getParameter(CentralConstants.PARAM_USERNAME);
-	    String courseId = request.getParameter(CentralConstants.PARAM_COURSE_ID);
-	    String courseName = request.getParameter(CentralConstants.PARAM_COURSE_NAME);
-	    String country = request.getParameter(CentralConstants.PARAM_COUNTRY);
-	    String lang = request.getParameter(CentralConstants.PARAM_LANG);
+
 	    Long learningDesignId = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
 	    int imageFormat = WebUtil.readIntParam(request, CentralConstants.PARAM_SVG_FORMAT);
 
-	    if (serverId == null || datetime == null || hashValue == null || username == null || courseId == null
-		    || country == null || lang == null) {
+	    if (serverId == null || datetime == null || hashValue == null || username == null) {
 		String msg = "Parameters missing";
 		log.error(msg);
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameters missing");
