@@ -88,6 +88,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		}
 	}
 
+	function resizeOnMessageFrameLoad(){
+		var messageAreaFrame = document.getElementById("messageArea");
+		messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
+	}
+
 </script>
 
 <html:hidden property="questionIndex" />
@@ -156,7 +161,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <p>
 	<iframe
-		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
+		onload="javascript:resizeOnMessageFrameLoad()"
 		id="messageArea" name="messageArea"
 		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
 		scrolling="no">

@@ -47,8 +47,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</div>
 			<lams:CKEditor id="newNomination"
 				value="${voteGeneralAuthoringDTO.editableNominationText}"
-				contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
-
+				contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}">
+			</lams:CKEditor>
+		
+			<script type="text/javascript">
+				// an awful place to put javascript code,
+				// but only after processing CKEditor tag above there is CKEDITOR object defined
+				CKEDITOR.on('instanceReady', function(e){
+					if (e.editor.element.$.id == 'newNomination'){
+						window.parent.resizeOnMessageFrameLoad();
+					}
+				});
+			</script>
+			
 			<lams:ImgButtonWrapper>
 				<a href="#" onclick="document.getElementById('newNominationForm').submit();"
 					class="button-add-item"> <fmt:message
