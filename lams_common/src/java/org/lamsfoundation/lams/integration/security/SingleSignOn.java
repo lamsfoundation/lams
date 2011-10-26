@@ -34,6 +34,7 @@ import org.apache.catalina.authenticator.SingleSignOnEntry;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.web.session.SystemSessionFilter;
 
 /**
  * <p>
@@ -110,12 +111,15 @@ public class SingleSignOn extends org.apache.catalina.authenticator.SingleSignOn
 				request.setAuthType(entry.getAuthType());
 				request.setUserPrincipal(entry.getPrincipal());
 			}
-		} else {
-//			if (log.isDebugEnabled())
-//				log.debug(" No cached principal found, erasing SSO cookie");
-			cookie.setMaxAge(0);
-			response.addCookie(cookie);
-		}
+        	} else {
+        	    // if (log.isDebugEnabled())
+        	    // log.debug(" No cached principal found, erasing SSO cookie");
+        	    deregister(cookie.getValue());
+		    cookie = new Cookie(cookie.getName(), "");
+		    cookie.setPath("/");
+		    cookie.setMaxAge(0);
+		    response.addCookie(cookie);
+        	}
 
 		// Invoke the next Valve in our pipeline
 		getNext().invoke(request, response);
