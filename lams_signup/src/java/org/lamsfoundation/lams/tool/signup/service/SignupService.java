@@ -113,7 +113,8 @@ public class SignupService {
 	user.setDisabledFlag(false);
 	user.setAuthenticationMethod(getAuthenticationMethod(AuthenticationMethod.DB));
 	user.setLocale(getDefaultLocale());
-	user.setCreateDate(new Date());
+	user.setCreateDate(new Date());	
+	user.setEnableFlash(true);
 	signupDAO.insert(user);
 
 	// add to org
