@@ -83,7 +83,7 @@ public class UserDataServlet extends HttpServlet {
             String secretKey = LamsPluginUtil.getSecretKey();
             String serverId = LamsPluginUtil.getServerId();
             
-            if(!sha1(tsParam+ usernameParam + serverId + secretKey).equals(hashParam)){
+            if(!sha1(tsParam.toLowerCase() + usernameParam.toLowerCase() + serverId.toLowerCase() + secretKey.toLowerCase()).equals(hashParam)){
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "authentication failed");
             }
 
