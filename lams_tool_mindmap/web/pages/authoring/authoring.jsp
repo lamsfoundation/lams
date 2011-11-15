@@ -34,6 +34,12 @@
 	{
 		swfobject.embedSWF("${mindmapType}", "flashContent", x, y, "9.0.0", false, flashvars);
 	}
+
+	// set Mindmap content before submitting authoring form
+	$(document).ready(function(){
+		// selects "save" button in lams:AuthoringButton tag
+		$('a[href*="doSubmit_Form_Only()"]').click(setMindmapContent);
+	});	
 //]]>
 </script>
 
