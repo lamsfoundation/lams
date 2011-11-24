@@ -28,13 +28,13 @@ id and server key as was used in config.jsp
 Step 3
 ======
 
-Run the build-war ant task to get the lams-openid.war. It should end up in the 
+Run the build-war ant task to get the lams-openid.war and lams-openid.jar. They should end up in the 
 build/lib directory
 
 Step 4
 ======
 
-Stop the LAMS server and copy lams-openid.war to lams.ear.
+Stop the LAMS server and copy lams-openid.war and lams-openid.jar to lams.ear.
 
 Step 5
 ======
@@ -44,8 +44,8 @@ recognise the web application:
 
 	<module>
 		<web>
-			<web-uri>lams-openid.war</web-uri><
-			context-root>/lams/openid</context-root>
+			<web-uri>lams-openid.war</web-uri>
+			<context-root>/lams/openid</context-root>
 		</web>
 	</module>
 
