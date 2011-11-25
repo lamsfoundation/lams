@@ -62,3 +62,10 @@
     <servlet-name>OpenIDServlet</servlet-name>
     <url-pattern>/OpenIDServlet</url-pattern>
 </servlet-mapping>
+
+<!--SAML Integration - do not uncomment manually
+<servlet-mapping>
+	<servlet-name>SamlServlet</servlet-name>
+	<url-pattern>/SamlServlet</url-pattern>
+</servlet-mapping>
+SAML Integration - do not uncomment manually-->

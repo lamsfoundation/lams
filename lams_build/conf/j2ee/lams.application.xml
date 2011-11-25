@@ -50,6 +50,12 @@
 		</web>
     </module>
     
+    <!--SAML Integration - do not uncomment manually
+    <module>
+    	<java>lams-saml.jar</java>
+    </module>
+    SAML Integration - do not uncomment manually-->
+    
     <!-- 
     	======================================================== 
 	 	  Tool modules and Security Roles 

@@ -132,3 +132,10 @@
     <filter-name>hibernateFilter</filter-name>
     <url-pattern>/OpenIDServlet</url-pattern>
 </filter-mapping>
+
+<!--SAML Integration - do not uncomment manually
+<filter-mapping>
+    <filter-name>hibernateFilter</filter-name>
+    <url-pattern>/SamlServlet</url-pattern>
+</filter-mapping>
+SAML Integration - do not uncomment manually-->
