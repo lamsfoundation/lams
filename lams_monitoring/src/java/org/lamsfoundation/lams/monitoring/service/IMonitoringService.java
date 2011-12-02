@@ -57,31 +57,33 @@ public interface IMonitoringService {
     public MessageService getMessageService();
 
     /**
-     * Initialize a new lesson so as to start the learning process. It needs to
-     * notify lams which learning design it belongs to. The initialize process
-     * doesn't involve the setup of lesson class and organization.
+     * Initialize a new lesson so as to start the learning process. It needs to notify lams which learning design it
+     * belongs to. The initialize process doesn't involve the setup of lesson class and organization.
      * 
      * @param lessonName
      *            the name of the lesson
      * @param lessonDescription
      *            the description of the lesson.
      * @param learnerExportAvailable
-     *            should the export portfolio option be made available to the
-     *            learner?
+     *            should the export portfolio option be made available to the learner?
      * @param learningDesignId
      *            the selected learning design
      * @param organisationId
-     *            the copied sequence will be put in the default runtime
-     *            sequence folder for this org, if such a folder exists.
+     *            the copied sequence will be put in the default runtime sequence folder for this org, if such a folder
+     *            exists.
      * @param userId
      *            the user who want to create this lesson.
      * @param customCSV
      *            the custom comma separated values to be used by toolAdapters
+     * @param numberDaysToLessonFinish
+     *            number of days the lesson will be available to user since he starts it. (lesson finish scheduling
+     *            feature)
      * @return the lesson initialized.
      */
     public Lesson initializeLesson(String lessonName, String lessonDescription, Boolean learnerExportAvailable,
 	    long learningDesignId, Integer organisationId, Integer userID, String customCSV,
-	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled);
+	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
+	    Integer numberDaysToLessonFinish);
 
     /**
      * Initialize a new lesson so as to start the learning process for a normal
@@ -220,11 +222,12 @@ public interface IMonitoringService {
      * 
      * @param lessonId
      * @param endDate
-     *            the lesson end date and time.
+     *            number of days since lesson start when the lesson should be closed.
      * @param userId
      *            checks that the user is a staff member for this lesson
      */
-    public void finishLessonOnSchedule(long lessonId, Date endDate, Integer userId) throws UserAccessDeniedException;
+    public void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId)
+	    throws UserAccessDeniedException;
 
     /**
      * Finish a lesson.A Finished lesson can be viewed on the monitoring

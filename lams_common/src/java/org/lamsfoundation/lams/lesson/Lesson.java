@@ -98,7 +98,10 @@ public class Lesson implements Serializable {
     private Date scheduleStartDate;
     
     /** nullable persistent field */
-    private Date scheduleEndDate;
+    private Date scheduleEndDate;  
+    
+    /** nullable persistent field */
+    private Integer scheduledNumberDaysToLessonFinish; 
     
     /** persistent field */
     private User user;
@@ -152,68 +155,73 @@ public class Lesson implements Serializable {
     }
     
     /**
-     * Minimum constructor that initialize the lesson data. It doesn't include
-     * organization and class information.
-     * Cain constructor pattern implementation.
+     * Minimum constructor that initialize the lesson data. It doesn't include organization and class information. Cain
+     * constructor pattern implementation.
      */
-    public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, 
-    		Integer previousLessonStateId, Boolean learnerExportAvailable, 
-    		LearningDesign learningDesign, Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled) 
-    {
-        this(null,name,description,createDateTime,null,null,user,lessonStateId,previousLessonStateId,
-        		learnerExportAvailable,false, learningDesign,null,null,learnerProgresses, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
-    }     
+    public Lesson(String name, String description, Date createDateTime, User user, Integer lessonStateId,
+	    Integer previousLessonStateId, Boolean learnerExportAvailable, LearningDesign learningDesign,
+	    Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled, Integer scheduledNumberDaysTolessonFinish) {
+	this(null, name, description, createDateTime, null, null, user, lessonStateId, previousLessonStateId,
+		learnerExportAvailable, false, learningDesign, null, null, learnerProgresses, learnerPresenceAvailable,
+		learnerImAvailable, liveEditEnabled, scheduledNumberDaysTolessonFinish);
+    }   
     
-    /** 
-     * Constructor that creates a new lesson with organization and class 
-     * information.
-     * Chain construtor pattern implementation. 
+    /**
+     * Constructor that creates a new lesson with organization and class information. Chain construtor pattern
+     * implementation.
      */
-    public Lesson(String name,String description,Date createDateTime, User user, Integer lessonStateId, Integer previousLessonStateId, 
-    		Boolean learnerExportAvailable, LearningDesign learningDesign, LessonClass lessonClass, 
-    		Organisation organisation, Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled) 
-    {
-        this(null,name,description,createDateTime,null,null,user,lessonStateId,previousLessonStateId,
-        		learnerExportAvailable, false, learningDesign,lessonClass,organisation,learnerProgresses, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
-    }    
+    public Lesson(String name, String description, Date createDateTime, User user, Integer lessonStateId,
+	    Integer previousLessonStateId, Boolean learnerExportAvailable, LearningDesign learningDesign,
+	    LessonClass lessonClass, Organisation organisation, Set learnerProgresses,
+	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled) {
+	this(null, name, description, createDateTime, null, null, user, lessonStateId, previousLessonStateId,
+		learnerExportAvailable, false, learningDesign, lessonClass, organisation, learnerProgresses,
+		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, null);
+    }   
     
     /** full constructor */
-    public Lesson(Long lessonId,String name,String description, Date createDateTime, Date startDateTime, Date endDateTime, User user, 
-    		Integer lessonStateId, Integer previousLessonStateId, Boolean learnerExportAvailable,  Boolean lockedForEdit,
-    		LearningDesign learningDesign, LessonClass lessonClass, 
-    		Organisation organisation, Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled) 
-    {
-        this.lessonId = lessonId;
-        this.lessonName = name;
-        this.lessonDescription = description;
-        this.createDateTime = createDateTime;
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
-        this.user = user;
-        this.lessonStateId = lessonStateId;
-        this.previousLessonStateId = previousLessonStateId;
-        this.learnerExportAvailable = learnerExportAvailable != null ? learnerExportAvailable : Boolean.FALSE;
-        this.learnerPresenceAvailable = learnerPresenceAvailable != null ? learnerPresenceAvailable : Boolean.FALSE;
-        this.learnerImAvailable = learnerImAvailable != null ? learnerImAvailable : Boolean.FALSE;
-        this.lockedForEdit = false;
-        this.learningDesign = learningDesign;
-        this.lessonClass = lessonClass;
-        this.organisation = organisation;
-        this.learnerProgresses = learnerProgresses;
-        this.liveEditEnabled = liveEditEnabled;
-        this.gradebookUserLessons = new HashSet<GradebookUserLesson>();
-        this.marksReleased = false;
+    public Lesson(Long lessonId, String name, String description, Date createDateTime, Date startDateTime,
+	    Date endDateTime, User user, Integer lessonStateId, Integer previousLessonStateId,
+	    Boolean learnerExportAvailable, Boolean lockedForEdit, LearningDesign learningDesign,
+	    LessonClass lessonClass, Organisation organisation, Set learnerProgresses,
+	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
+	    Integer scheduledNumberDaysToLessonFinish) {
+	this.lessonId = lessonId;
+	this.lessonName = name;
+	this.lessonDescription = description;
+	this.createDateTime = createDateTime;
+	this.startDateTime = startDateTime;
+	this.endDateTime = endDateTime;
+	this.user = user;
+	this.lessonStateId = lessonStateId;
+	this.previousLessonStateId = previousLessonStateId;
+	this.learnerExportAvailable = learnerExportAvailable != null ? learnerExportAvailable : Boolean.FALSE;
+	this.learnerPresenceAvailable = learnerPresenceAvailable != null ? learnerPresenceAvailable : Boolean.FALSE;
+	this.learnerImAvailable = learnerImAvailable != null ? learnerImAvailable : Boolean.FALSE;
+	this.lockedForEdit = false;
+	this.learningDesign = learningDesign;
+	this.lessonClass = lessonClass;
+	this.organisation = organisation;
+	this.learnerProgresses = learnerProgresses;
+	this.liveEditEnabled = liveEditEnabled;
+	this.gradebookUserLessons = new HashSet<GradebookUserLesson>();
+	this.marksReleased = false;
+	this.scheduledNumberDaysToLessonFinish = scheduledNumberDaysToLessonFinish;
     }
+
     /**
-     * Factory method that create a new lesson. It initialized all necessary
-     * data for a new lesson with organization and lesson class information.
-     * It is designed for monitor side to create a lesson by teacher.
+     * Factory method that create a new lesson. It initialized all necessary data for a new lesson with organization and
+     * lesson class information. It is designed for monitor side to create a lesson by teacher.
      * 
-     * @param user the teacher who created this lesson
+     * @param user
+     *            the teacher who created this lesson
      * @pram learnerExportAvailable should the export portfolio option be made available to the learner?
-     * @param organisation the organisation associated with this lesson.
-     * @param ld the learning design associated with this lesson.
-     * @param newLessonClass the lesson class that will run this lesson.
+     * @param organisation
+     *            the organisation associated with this lesson.
+     * @param ld
+     *            the learning design associated with this lesson.
+     * @param newLessonClass
+     *            the lesson class that will run this lesson.
      * @return the new lesson object.
      */
     public static Lesson createNewLesson(String lessonName,
@@ -261,7 +269,8 @@ public class Lesson implements Serializable {
                                                      LearningDesign ld,
                                                      Boolean learnerPresenceAvailable,
                                                      Boolean learnerImAvailable,
-                                                     Boolean liveEditEnabled)
+                                                     Boolean liveEditEnabled,
+                                                     Integer scheduledNumberDaysToLessonFinish)
     {
         return new Lesson(lessonName,
                           lessonDescription,
@@ -274,7 +283,8 @@ public class Lesson implements Serializable {
                           new HashSet(),
                           learnerPresenceAvailable,
                           learnerImAvailable,
-                          liveEditEnabled);
+                          liveEditEnabled,
+                          scheduledNumberDaysToLessonFinish);
     }
     //---------------------------------------------------------------------
     // Getters and Setters
@@ -389,6 +399,33 @@ public class Lesson implements Serializable {
     {
         this.scheduleEndDate = scheduleEndDate;
     }
+    
+    /**
+     * @return Returns whether there is an end date for individual user.
+     */
+    public boolean isScheduledToCloseForIndividuals() {
+	return (scheduledNumberDaysToLessonFinish != null);
+    }
+
+    /**
+     * @hibernate.property type="java.lang.Integer" column="scheduled_number_days_to_lesson_finish" length="3"
+     * 
+     * @return Returns the number of days the lesson will be available to user since he starts it. (It's ON only if the
+     *         lesson was scheduled to be finished and individual option was selected)
+     */
+    public Integer getScheduledNumberDaysToLessonFinish() {
+	return scheduledNumberDaysToLessonFinish;
+    }
+
+    /**
+     * @param scheduledNumberDaysToLessonFinish
+     *            the number of days the lesson will be available to user since he starts it. (It's ON only if the lesson
+     *            was scheduled to be finished and individual option was selected)
+     */
+    public void setScheduledNumberDaysToLessonFinish(Integer scheduledNumberDaysToLessonFinish) {
+	this.scheduledNumberDaysToLessonFinish = scheduledNumberDaysToLessonFinish;
+    }
+    
     /**
      * @hibernate.property type="java.sql.Timestamp" column="schedule_start_date_time"
      *            		   length="19"

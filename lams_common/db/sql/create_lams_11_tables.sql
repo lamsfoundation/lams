@@ -641,6 +641,7 @@ CREATE TABLE lams_lesson (
      , class_grouping_id BIGINT(20)
      , lesson_state_id INT(3) NOT NULL
      , start_date_time DATETIME
+     , scheduled_number_days_to_lesson_finish INT(3) DEFAULT NULL
      , schedule_start_date_time DATETIME
      , end_date_time DATETIME
      , schedule_end_date_time DATETIME
@@ -819,6 +820,7 @@ CREATE TABLE lams_progress_attempted (
 CREATE TABLE lams_user_group (
        user_id BIGINT(20) NOT NULL
      , group_id BIGINT(20) NOT NULL
+     , scheduled_lesson_end_date DATETIME
      , PRIMARY KEY (user_id, group_id)
      , INDEX (user_id)
      , CONSTRAINT FK_lams_user_group_1 FOREIGN KEY (user_id)

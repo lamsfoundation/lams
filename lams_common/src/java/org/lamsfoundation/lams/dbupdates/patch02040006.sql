@@ -161,6 +161,9 @@ values ('ForceMobileDevToUseFlashless','false', 'config.force.mobile.use.flashle
 ALTER TABLE lams_log_event DROP FOREIGN KEY FK_lams_event_log_3;
 ALTER TABLE lams_log_event ADD CONSTRAINT FK_lams_event_log_3 FOREIGN KEY (learning_design_id) REFERENCES lams_learning_design (learning_design_id ) ON DELETE CASCADE;
 
+-- WVI-14 adding Lesson time limits ability
+ALTER TABLE lams_lesson ADD COLUMN scheduled_number_days_to_lesson_finish INT(3) DEFAULT NULL;
+ALTER TABLE lams_user_group ADD COLUMN scheduled_lesson_end_date DATETIME;
 
 COMMIT;
 SET AUTOCOMMIT = 1;

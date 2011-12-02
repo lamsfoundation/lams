@@ -46,12 +46,12 @@ public class FinishScheduleLessonJob extends MonitoringJob{
         long lessonId = ((Long)properties.get(MonitoringConstants.KEY_LESSON_ID)).longValue();
         Integer userId = (Integer)properties.get(MonitoringConstants.KEY_USER_ID);
         if(log.isDebugEnabled())
-            log.debug("Lesson ["+lessonId+"] is stopping...");
+            log.debug("Lesson ["+lessonId+"] is suspending...");
         
 		
-		monitoringService.finishLesson(lessonId,userId);
+		monitoringService.suspendLesson(lessonId,userId);
         
         if(log.isDebugEnabled())
-            log.debug("Lesson ["+lessonId+"] stopped");
+            log.debug("Lesson ["+lessonId+"] suspended");
 	}
 }

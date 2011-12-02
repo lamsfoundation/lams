@@ -33,6 +33,7 @@
 				<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
 				<property name="activityDAO"><ref bean="activityDAO"/></property>
 				<property name="groupingDAO"><ref bean="groupingDAO"/></property>
+				<property name="groupUserDAO"><ref bean="groupUserDAO"/></property>
 				<property name="activityMapping"><ref bean="activityMapping"/></property>
 				<property name="userManagementService"><ref bean="userManagementService"/></property>
 				<property name="lessonService"><ref bean="lessonService"/></property>

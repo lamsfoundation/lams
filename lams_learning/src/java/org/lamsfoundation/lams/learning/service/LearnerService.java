@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.learning.service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -51,6 +52,7 @@ import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupUser;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouper;
@@ -60,6 +62,7 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -98,6 +101,7 @@ public class LearnerService implements ICoreLearnerService {
     private ILessonDAO lessonDAO;
     private IActivityDAO activityDAO;
     private IGroupingDAO groupingDAO;
+    private IGroupUserDAO groupUserDAO;
     private ProgressEngine progressEngine;
     private IToolSessionDAO toolSessionDAO;
     private IDataFlowDAO dataFlowDAO;
@@ -190,6 +194,21 @@ public class LearnerService implements ICoreLearnerService {
      */
     public void setGroupingDAO(IGroupingDAO groupingDAO) {
 	this.groupingDAO = groupingDAO;
+    }
+    
+    /**
+     * @return the groupUserDAO
+     */
+    public IGroupUserDAO getGroupUserDAO() {
+	return groupUserDAO;
+    }
+
+    /**
+     * @param groupUserDAO
+     *                groupUserDAO
+     */
+    public void setGroupUserDAO(IGroupUserDAO groupUserDAO) {
+	this.groupUserDAO = groupUserDAO;
     }
 
     /**
@@ -291,6 +310,18 @@ public class LearnerService implements ICoreLearnerService {
 	    // Use TimeStamp rather than Date directly to keep consistent with Hibnerate persiste object.
 	    learnerProgress.setStartDate(new Timestamp(new Date().getTime()));
 	    learnerProgressDAO.saveLearnerProgress(learnerProgress);
+	    
+	    // check if lesson is set to be finished for individual users then store finish date
+	    if (lesson.isScheduledToCloseForIndividuals()) {
+		GroupUser groupUser = groupUserDAO.getGroupUser(lesson, learnerId);
+		if (groupUser != null) {
+		    Calendar calendar = Calendar.getInstance();
+		    calendar.setTime(learnerProgress.getStartDate());
+		    calendar.add(Calendar.DATE, lesson.getScheduledNumberDaysToLessonFinish());
+		    Date endDate = calendar.getTime();
+		    groupUser.setScheduledLessonEndDate(endDate);
+		}
+	    }
 
 	} else {
 

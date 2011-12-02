@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.learningdesign; 
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -35,9 +36,12 @@ import org.lamsfoundation.lams.usermanagement.User;
  * @hibernate.class table="lams_user_group"
  */
 public class GroupUser implements Serializable {
+    
+    private static final long serialVersionUID = 4680781848791310422L;
 
     private Group group;
     private User user;
+    private Date scheduledLessonEndDate;
 
     public GroupUser() {
     }
@@ -66,5 +70,21 @@ public class GroupUser implements Serializable {
 
     public void setUser(User user) {
 	this.user = user;
+    }
+    
+    /**
+     * @hibernate.property type="java.sql.Timestamp" column="scheduled_lesson_end_date" length="19"
+     * 
+     * @return Returns the scheduledLessonEndDate.
+     */
+    public Date getScheduledLessonEndDate() {
+	return scheduledLessonEndDate;
+    }
+    
+    /**
+     * @param scheduledLessonEndDate The scheduledLessonEndDate to set.
+     */
+    public void setScheduledLessonEndDate(Date scheduledLessonEndDate) {
+	this.scheduledLessonEndDate = scheduledLessonEndDate;
     }
 }

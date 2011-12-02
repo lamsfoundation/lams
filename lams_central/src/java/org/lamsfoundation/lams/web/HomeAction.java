@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +37,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.lamsfoundation.lams.learningdesign.GroupUser;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -73,6 +76,7 @@ public class HomeAction extends DispatchAction {
 
     private static IUserManagementService service;
     private static ILessonService lessonService;
+    private static IGroupUserDAO groupUserDAO;
 
     private IUserManagementService getService() {
 	if (service == null) {
@@ -90,6 +94,15 @@ public class HomeAction extends DispatchAction {
 	    lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
 	return lessonService;
+    }
+    
+    private IGroupUserDAO getGroupUserDAO() {
+	if (groupUserDAO == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    groupUserDAO = (IGroupUserDAO) ctx.getBean("groupUserDAO");
+	}
+	return groupUserDAO;
     }
 
     private UserDTO getUser() {
@@ -156,6 +169,17 @@ public class HomeAction extends DispatchAction {
 		    log.error("learner: User " + user.getLogin()
 			    + " is not a learner in the requested lesson. Cannot access the lesson.");
 		    return displayMessage(mapping, req, "error.authorisation");
+		}
+		
+		//check if the lesson is scheduled to be finished to individual users  
+		if (lesson.isScheduledToCloseForIndividuals()) {
+		    GroupUser groupUser = getGroupUserDAO().getGroupUser(lesson, user.getUserID());
+		    if ((groupUser != null) && (groupUser.getScheduledLessonEndDate() != null) && groupUser.getScheduledLessonEndDate().before(new Date())) {
+			log.error("learner: User " + user.getLogin()
+				+ " cannot access the lesson due to lesson end date has passed.");
+			return displayMessage(mapping, req, "error.finish.date.passed");
+
+		    }
 		}
 
 		if (mode != null)

@@ -556,6 +556,9 @@
 	<bean id="groupDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>
+	<bean id="groupUserDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.GroupUserDAO">
+		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
+	</bean>
 	<bean id="licenseDAO" class="org.lamsfoundation.lams.learningdesign.dao.hibernate.LicenseDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>	

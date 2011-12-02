@@ -67,18 +67,18 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
- * <p>The action servlet that provide all the monitoring functionalities. It
- * interact with the teacher via flash and JSP monitoring interface.</p>
+ * <p>
+ * The action servlet that provide all the monitoring functionalities. It interact with the teacher via flash and JSP
+ * monitoring interface.
+ * </p>
  * 
  * @author Jacky Fang
- * @since  2005-4-15
+ * @since 2005-4-15
  * @version 1.1
  * 
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action path="/monitoring" 
- *                parameter="method" 
- *                validate="false"
+ * @struts:action path="/monitoring" parameter="method" validate="false"
  * @struts.action-forward name = "previewdeleted" path = "/previewdeleted.jsp"
  * @struts.action-forward name = "notsupported" path = ".notsupported"
  * @struts.action-forward name = "timeChart" path = "/timeChart.jsp"
@@ -194,7 +194,7 @@ public class MonitoringAction extends LamsDispatchAction
     		Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresenceAvailable", false);
     		Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImAvailable", false);
     		Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
-    		Lesson newLesson = monitoringService.initializeLesson(title,desc,learnerExportAvailable,ldId,organisationId,getUserId(), null, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
+    		Lesson newLesson = monitoringService.initializeLesson(title,desc,learnerExportAvailable,ldId,organisationId,getUserId(), null, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, null);
     		
     		flashMessage = new FlashMessage("initializeLesson",newLesson.getLessonId());
 		} catch (Exception e) {
@@ -328,9 +328,8 @@ public class MonitoringAction extends LamsDispatchAction
     	
     	try {
         	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-        	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_FINISH_DATE);
-    		Date finishDate = DateFormat.getInstance().parse(dateStr);
-    		monitoringService.finishLessonOnSchedule(lessonId,finishDate,getUserId());
+        	int scheduledNumberDaysToLessonFinish = WebUtil.readIntParam(request, MonitoringConstants.PARAM_SCHEDULED_NUMBER_DAYS_TO_LESSON_FINISH);
+        	monitoringService.finishLessonOnSchedule(lessonId,scheduledNumberDaysToLessonFinish,getUserId());
     		flashMessage = new FlashMessage("finishOnScheduleLesson",Boolean.TRUE);
     	}catch (Exception e) {
 			flashMessage = handleException(e, "finishOnScheduleLesson", monitoringService);
@@ -732,6 +731,9 @@ public class MonitoringAction extends LamsDispatchAction
    			languageCollection.add(new String("add.now.button.label"));
    			languageCollection.add(new String("advanced.tab.form.advanced.options.label"));
    			languageCollection.add(new String("advanced.tab.form.enable.im.label"));
+   			languageCollection.add(new String("advanced.tab.form.time.limits.label"));
+   			languageCollection.add(new String("advanced.tab.form.enter.number.days.label"));
+   			languageCollection.add(new String("advanced.tab.form.individual.not.entire.group.label"));
    			languageCollection.add(new String("advanced.tab.form.scheduling.label"));
    			languageCollection.add(new String("advanced.tab.form.enable.label"));
    			languageCollection.add(new String("advanced.tab.form.validation.no.learners.error"));
