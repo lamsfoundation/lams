@@ -244,7 +244,7 @@ function lamslesson_scale_used($lamslessonid, $scaleid) {
 function lamslesson_scale_used_anywhere($scaleid) {
     global $DB;
 
-    if ($scaleid and $DB->record_exists('lamslesson', 'grade', -$scaleid)) {
+    if ($scaleid and $DB->record_exists('lamslesson', array('grade' => -$scaleid))) {
         return true;
     } else {
         return false;
