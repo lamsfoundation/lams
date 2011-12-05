@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy;
 import org.lamsfoundation.lams.learningdesign.strategy.IContributionTypeStrategy;
 import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
+import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.util.WebUtil;

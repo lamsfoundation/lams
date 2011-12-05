@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
@@ -443,6 +444,19 @@ public interface IMonitoringService {
      * @throws IOException
      */
     public String getLessonStaff(Long lessonID, Integer userID) throws IOException;
+    
+    /**
+     * Returns users by search type criteria. It's sorted by first and last user names.
+     * 
+     * @param searchType one of 11 constants from <code>MonitoringConstants</code> defining search type
+     * @param lessonId
+     * @param lessonIds
+     * @param activityId
+     * @param xDaystoFinish
+     * @param orgId
+     * @return
+     */
+    Collection<User> getUsersByEmailNotificationSearchType(int searchType, Long lessonId, String[] lessonIds, Long activityId, Integer xDaystoFinish, Integer orgId);
 
     /**
      * This method returns the LearningDesign details for a given Lesson

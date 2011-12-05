@@ -84,8 +84,8 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.monitoring.LearnerProgressBatchDTO;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
+import org.lamsfoundation.lams.monitoring.dto.LearnerProgressBatchDTO;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -1587,8 +1587,123 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
 	return flashMessage.serializeMessage();
     }
+    
+    public Collection<User> getUsersByEmailNotificationSearchType(int searchType, Long lessonId, String[] lessonIds, Long activityId, Integer xDaystoFinish, Integer orgId) {
+	
+	Lesson lesson = null;
+	if (lessonId != null) {
+	    lesson  = learnerService.getLesson(lessonId);
+	}
+	
+	Collection<User> users = new LinkedList<User>();
+	switch (searchType) {
+	case MonitoringConstants.LESSON_TYPE_ASSIGNED_TO_LESSON:
+	    users = lesson.getAllLearners();
+	    break;
+	    
+	case MonitoringConstants.LESSON_TYPE_HAVENT_FINISHED_LESSON:
+	    Set<User> allUsers = lesson.getAllLearners();
+	    List<User> usersCompletedLesson = getUsersCompletedLesson(lessonId);
+	    users = CollectionUtils.subtract(allUsers, usersCompletedLesson);
+	    break;
+	
+	case MonitoringConstants.LESSON_TYPE_HAVE_FINISHED_LESSON:
+	case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_PARTICULAR_LESSON:
+	    users = getUsersCompletedLesson(lessonId);
+	    break;
+	    
+	case MonitoringConstants.LESSON_TYPE_HAVENT_STARTED_LESSON:
+	case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_PARTICULAR_LESSON:
+	    allUsers = lesson.getAllLearners();
+	    List<User> usersStartedLesson = lessonService.getActiveLessonLearners(lessonId);
+	    users = CollectionUtils.subtract(allUsers, usersStartedLesson);
+	    break;
+	    
+	case MonitoringConstants.LESSON_TYPE_HAVE_STARTED_LESSON:
+	    users = lessonService.getActiveLessonLearners(lessonId);
+	    break;
 
+	case MonitoringConstants.LESSON_TYPE_HAVENT_REACHED_PARTICULAR_ACTIVITY:
+	    Activity activity = learnerService.getActivity(activityId);
+	    allUsers = lesson.getAllLearners();
+	    List<User> usersAttemptedActivity = lessonService.getLearnersHaveAttemptedActivity(activity);
+	    users = CollectionUtils.subtract(allUsers, usersAttemptedActivity);
+	    break;
+	   
+	case MonitoringConstants.LESSON_TYPE_LESS_THAN_X_DAYS_TO_DEADLINE:
+	    Date now = new Date();
+	    Calendar currentTimePlusXDays = Calendar.getInstance();
+	    currentTimePlusXDays.setTime(now);
+	    currentTimePlusXDays.add(Calendar.DATE, xDaystoFinish);
 
+	    Date scheduleEndDate = lesson.getScheduleEndDate();
+	    if (scheduleEndDate != null) {
+		if (now.before(scheduleEndDate) && currentTimePlusXDays.getTime().after(scheduleEndDate)) {
+		    users = lesson.getAllLearners();
+		}
+		
+	    } else if (lesson.isScheduledToCloseForIndividuals()) {
+		users = groupUserDAO.getUsersWithLessonEndingSoonerThan(lesson, currentTimePlusXDays.getTime());
+	    }
+	    break;
+
+	case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_ANY_LESSONS:
+	    List<User> allUSers = learnerService.getUserManagementService().getUsersFromOrganisation(orgId);
+	    Set<User> usersStartedAtLest1Lesson = new TreeSet<User>();
+	    
+	    Organisation org = (Organisation) learnerService.getUserManagementService().findById(Organisation.class, orgId);
+	    Set<Lesson> lessons = org.getLessons();
+	    for (Lesson les : lessons) {
+		Activity firstActivity = les.getLearningDesign().getFirstActivity();
+		List<User> usersStartedFirstActivity = learnerProgressDAO.getLearnersHaveAttemptedActivity(firstActivity);
+		usersStartedAtLest1Lesson.addAll(usersStartedFirstActivity);
+	    }
+	    
+	    users = CollectionUtils.subtract(allUSers, usersStartedAtLest1Lesson);
+	    
+	    break;
+	    
+	case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_THESE_LESSONS:
+	    int i = 0;
+	    for (String lessonIdStr : lessonIds) {
+		lessonId = Long.parseLong(lessonIdStr);
+		List<User> completedLesson = getUsersCompletedLesson(lessonId);
+		if (i++ == 0) {
+		    users = completedLesson;
+		} else {
+		    users = CollectionUtils.intersection(users, completedLesson);
+		}
+	    }
+	    break;
+	}	    
+	
+	Set<User> sortedUsers = new TreeSet<User>(new Comparator<User>() {
+	    public int compare(User usr0, User usr1) {
+		return ((usr0.getFirstName() + usr0.getLastName() + usr0.getLogin()).compareTo(usr1.getFirstName() + usr1.getLastName() + usr1.getLogin()));
+	    }
+	});
+	sortedUsers.addAll(users);
+	
+	return sortedUsers;
+    }
+    
+    
+    /**
+     * Returns list of users who has already finished specified lesson.
+     * 
+     * @param lessonId specified lesson
+     * @return
+     */
+    private List<User> getUsersCompletedLesson(Long lessonId) {
+	List<User> usersCompletedLesson = new LinkedList<User>();
+	
+	List<LearnerProgress> completedLearnerProgresses = learnerProgressDAO.getCompletedLearnerProgressForLesson(lessonId);
+	for (LearnerProgress learnerProgress : completedLearnerProgresses) {
+	    usersCompletedLesson.add(learnerProgress.getUser());
+	}
+	return usersCompletedLesson;
+    }
+    
     /**
      * (non-Javadoc)
      * 

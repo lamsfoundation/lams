@@ -82,13 +82,13 @@
 </listener>
 
    <servlet>
-      <servlet-name>initializeLesson</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.InitializeLessonServlet</servlet-class>
+      <servlet-name>gateExportPortfolio</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.GateExportPortfolioServlet</servlet-class>
 
    </servlet>
    <servlet>
-      <servlet-name>performChosenGrouping</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.PerformChosenGroupingServlet</servlet-class>
+      <servlet-name>createLessonClass</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.CreateLessonServlet</servlet-class>
 
    </servlet>
    <servlet>
@@ -97,13 +97,13 @@
 
    </servlet>
    <servlet>
-      <servlet-name>branchingExportPortfolio</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.BranchingExportPortfolioServlet</servlet-class>
+      <servlet-name>performChosenGrouping</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.PerformChosenGroupingServlet</servlet-class>
 
    </servlet>
    <servlet>
-      <servlet-name>gateExportPortfolio</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.GateExportPortfolioServlet</servlet-class>
+      <servlet-name>branchingExportPortfolio</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.BranchingExportPortfolioServlet</servlet-class>
 
    </servlet>
    <servlet>
@@ -112,8 +112,8 @@
 
    </servlet>
    <servlet>
-      <servlet-name>createLessonClass</servlet-name>
-      <servlet-class>org.lamsfoundation.lams.monitoring.web.CreateLessonServlet</servlet-class>
+      <servlet-name>initializeLesson</servlet-name>
+      <servlet-class>org.lamsfoundation.lams.monitoring.web.InitializeLessonServlet</servlet-class>
 
    </servlet>
 
@@ -145,32 +145,32 @@
 </servlet-mapping>
 
    <servlet-mapping>
-      <servlet-name>initializeLesson</servlet-name>
-      <url-pattern>/initializeLesson</url-pattern>
+      <servlet-name>gateExportPortfolio</servlet-name>
+      <url-pattern>/gateExportPortfolio</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>performChosenGrouping</servlet-name>
-      <url-pattern>/monitoring/performChosenGrouping</url-pattern>
+      <servlet-name>createLessonClass</servlet-name>
+      <url-pattern>/createLessonClass</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>initializeAndCreateLessons</servlet-name>
       <url-pattern>/initializeAndCreateLessons</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>branchingExportPortfolio</servlet-name>
-      <url-pattern>/branchingExportPortfolio</url-pattern>
+      <servlet-name>performChosenGrouping</servlet-name>
+      <url-pattern>/monitoring/performChosenGrouping</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>gateExportPortfolio</servlet-name>
-      <url-pattern>/gateExportPortfolio</url-pattern>
+      <servlet-name>branchingExportPortfolio</servlet-name>
+      <url-pattern>/branchingExportPortfolio</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
       <servlet-name>sequenceExportPortfolio</servlet-name>
       <url-pattern>/sequenceExportPortfolio</url-pattern>
    </servlet-mapping>
    <servlet-mapping>
-      <servlet-name>createLessonClass</servlet-name>
-      <url-pattern>/createLessonClass</url-pattern>
+      <servlet-name>initializeLesson</servlet-name>
+      <url-pattern>/initializeLesson</url-pattern>
    </servlet-mapping>
 
    <session-config>
@@ -236,13 +236,6 @@
 		    <taglib-uri>tags-xml</taglib-uri>
 		    <taglib-location>/WEB-INF/jstl/tlds/x.tld</taglib-location>
 		  </taglib>
-		<!--  ======================================================== -->	
-		<!--   Customized Tag Library -->
-		<!--  ======================================================== -->	
-		<taglib>
-		    <taglib-uri>fck-editor</taglib-uri>
-		    <taglib-location>/WEB-INF/fckeditor/tlds/FCKeditor.tld</taglib-location>
-		</taglib>
 		<!--  ======================================================== -->	
 		<!--   LAMS Tag Library -->
 		<!--  ======================================================== -->	
