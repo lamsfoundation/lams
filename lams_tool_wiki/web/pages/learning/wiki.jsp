@@ -106,6 +106,7 @@
 		<html:hidden property="dispatch" styleId="dispatch" value="finishActivity" />
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="mode" />
+		<input type="hidden" name="userID" value="${userDTO.userId}"/>
 		<html:hidden property="currentWikiPage" value="${currentWikiPage.uid}" styleId="currentWikiPage" />
 		<input type="hidden" id="wikiLinks" />
 		<html:hidden property="newPageName" styleId="newPageName" />
