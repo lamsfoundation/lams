@@ -61,6 +61,9 @@
     	<property name="liveEditEnabled" type="java.lang.Boolean"
         	column="live_edit_enabled" length="1">
     	</property>
+    	<property name="enableLessonNotifications" type="java.lang.Boolean"
+    		column="enable_lesson_notifications" length="1">
+    	</property>
 		<property name="lockedForEdit" type="java.lang.Boolean"
         	column="locked_for_edit" length="1">
     	</property>
@@ -251,7 +254,8 @@
 		<return-scalar column="description" type="string" />
 		<return-scalar column="lesson_state_id" type="integer" />
 		<return-scalar column="lesson_completed_flag" type="boolean" />
-		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag
+		<return-scalar column="enable_lesson_notifications" type="boolean" />
+		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag, l.enable_lesson_notifications
 		  FROM (lams_lesson l, lams_learning_design ld, lams_group g, lams_user_group ug, lams_grouping gi)
 		    LEFT JOIN lams_learner_progress lp ON lp.user_id = ug.user_id AND lp.lesson_id = l.lesson_id
 		  WHERE l.learning_design_id = ld.learning_design_id
@@ -271,7 +275,8 @@
 		<return-scalar column="description" type="string" />
 		<return-scalar column="lesson_state_id" type="integer" />
 		<return-scalar column="lesson_completed_flag" type="boolean" />
-		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag
+		<return-scalar column="enable_lesson_notifications" type="boolean" />
+		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag, l.enable_lesson_notifications
 		  FROM (lams_lesson l, lams_learning_design ld, lams_group g, lams_user_group ug, lams_grouping gi)
 		    LEFT JOIN lams_learner_progress lp ON lp.user_id = ug.user_id AND lp.lesson_id = l.lesson_id
 		  WHERE l.learning_design_id = ld.learning_design_id
@@ -291,7 +296,8 @@
 		<return-scalar column="description" type="string" />
 		<return-scalar column="lesson_state_id" type="integer" />
 		<return-scalar column="lesson_completed_flag" type="boolean" />
-		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag
+		<return-scalar column="enable_lesson_notifications" type="boolean" />
+		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag, l.enable_lesson_notifications
 		  FROM (lams_lesson l, lams_learning_design ld)
 		    LEFT JOIN lams_learner_progress lp ON lp.user_id = :userId AND lp.lesson_id = l.lesson_id
 		  WHERE l.learning_design_id = ld.learning_design_id

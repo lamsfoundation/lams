@@ -143,6 +143,9 @@ public class Lesson implements Serializable {
     private Boolean liveEditEnabled;
     
     /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
+    private Boolean enableLessonNotifications;
+    
+    /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
     private Boolean marksReleased;
     
     private Date releaseDate;
@@ -160,11 +163,12 @@ public class Lesson implements Serializable {
      */
     public Lesson(String name, String description, Date createDateTime, User user, Integer lessonStateId,
 	    Integer previousLessonStateId, Boolean learnerExportAvailable, LearningDesign learningDesign,
-	    Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled, Integer scheduledNumberDaysTolessonFinish) {
+	    Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
+	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Integer scheduledNumberDaysTolessonFinish) {
 	this(null, name, description, createDateTime, null, null, user, lessonStateId, previousLessonStateId,
 		learnerExportAvailable, false, learningDesign, null, null, learnerProgresses, learnerPresenceAvailable,
-		learnerImAvailable, liveEditEnabled, scheduledNumberDaysTolessonFinish);
-    }   
+		learnerImAvailable, liveEditEnabled, enableLessonNotifications, scheduledNumberDaysTolessonFinish);
+    }
     
     /**
      * Constructor that creates a new lesson with organization and class information. Chain construtor pattern
@@ -176,8 +180,8 @@ public class Lesson implements Serializable {
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled) {
 	this(null, name, description, createDateTime, null, null, user, lessonStateId, previousLessonStateId,
 		learnerExportAvailable, false, learningDesign, lessonClass, organisation, learnerProgresses,
-		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, null);
-    }   
+		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, false, null);
+    }  
     
     /** full constructor */
     public Lesson(Long lessonId, String name, String description, Date createDateTime, Date startDateTime,
@@ -185,30 +189,31 @@ public class Lesson implements Serializable {
 	    Boolean learnerExportAvailable, Boolean lockedForEdit, LearningDesign learningDesign,
 	    LessonClass lessonClass, Organisation organisation, Set learnerProgresses,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Integer scheduledNumberDaysToLessonFinish) {
-	this.lessonId = lessonId;
-	this.lessonName = name;
-	this.lessonDescription = description;
-	this.createDateTime = createDateTime;
-	this.startDateTime = startDateTime;
-	this.endDateTime = endDateTime;
-	this.user = user;
-	this.lessonStateId = lessonStateId;
-	this.previousLessonStateId = previousLessonStateId;
-	this.learnerExportAvailable = learnerExportAvailable != null ? learnerExportAvailable : Boolean.FALSE;
-	this.learnerPresenceAvailable = learnerPresenceAvailable != null ? learnerPresenceAvailable : Boolean.FALSE;
-	this.learnerImAvailable = learnerImAvailable != null ? learnerImAvailable : Boolean.FALSE;
-	this.lockedForEdit = false;
-	this.learningDesign = learningDesign;
-	this.lessonClass = lessonClass;
-	this.organisation = organisation;
-	this.learnerProgresses = learnerProgresses;
-	this.liveEditEnabled = liveEditEnabled;
-	this.gradebookUserLessons = new HashSet<GradebookUserLesson>();
-	this.marksReleased = false;
-	this.scheduledNumberDaysToLessonFinish = scheduledNumberDaysToLessonFinish;
+	    Boolean enableLessonNotifications, Integer scheduledNumberDaysToLessonFinish) {
+        this.lessonId = lessonId;
+        this.lessonName = name;
+        this.lessonDescription = description;
+        this.createDateTime = createDateTime;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.user = user;
+        this.lessonStateId = lessonStateId;
+        this.previousLessonStateId = previousLessonStateId;
+        this.learnerExportAvailable = learnerExportAvailable != null ? learnerExportAvailable : Boolean.FALSE;
+        this.learnerPresenceAvailable = learnerPresenceAvailable != null ? learnerPresenceAvailable : Boolean.FALSE;
+        this.learnerImAvailable = learnerImAvailable != null ? learnerImAvailable : Boolean.FALSE;
+        this.lockedForEdit = false;
+        this.learningDesign = learningDesign;
+        this.lessonClass = lessonClass;
+        this.organisation = organisation;
+        this.learnerProgresses = learnerProgresses;
+        this.liveEditEnabled = liveEditEnabled;
+        this.enableLessonNotifications = enableLessonNotifications;
+        this.gradebookUserLessons = new HashSet<GradebookUserLesson>();
+        this.marksReleased = false;
+        this.scheduledNumberDaysToLessonFinish = scheduledNumberDaysToLessonFinish;
     }
-
+    
     /**
      * Factory method that create a new lesson. It initialized all necessary data for a new lesson with organization and
      * lesson class information. It is designed for monitor side to create a lesson by teacher.
@@ -270,6 +275,7 @@ public class Lesson implements Serializable {
                                                      Boolean learnerPresenceAvailable,
                                                      Boolean learnerImAvailable,
                                                      Boolean liveEditEnabled,
+                                                     Boolean enableLessonNotifications,
                                                      Integer scheduledNumberDaysToLessonFinish)
     {
         return new Lesson(lessonName,
@@ -284,6 +290,7 @@ public class Lesson implements Serializable {
                           learnerPresenceAvailable,
                           learnerImAvailable,
                           liveEditEnabled,
+                          enableLessonNotifications,
                           scheduledNumberDaysToLessonFinish);
     }
     //---------------------------------------------------------------------
@@ -526,6 +533,17 @@ public class Lesson implements Serializable {
 		this.liveEditEnabled = liveEditEnabled;
 	}
 	
+    /**
+     * @hibernate.property type="java.lang.Boolean" column="enable_lesson_notifications" length="1"
+     */
+    public Boolean getEnableLessonNotifications() {
+	return enableLessonNotifications;
+    }
+
+    public void setEnableLessonNotifications(Boolean enableLessonNotifications) {
+	this.enableLessonNotifications = enableLessonNotifications;
+    }
+	
 	/** 
      * @hibernate.property type="java.lang.Boolean"  column="locked_for_edit"
      *            	       length="1"
@@ -676,15 +694,15 @@ public class Lesson implements Serializable {
         this.marksReleased = marksReleased;
     }
 
-    /** 
-     * @hibernate.property type="java.util.Date"  column="release_date"
+    /**
+     * @hibernate.property type="java.util.Date" column="release_date"
      * 
      */
     public Date getReleaseDate() {
-		return releaseDate;
-	}
+	return releaseDate;
+    }
 
-	public void setReleaseDate(Date releaseDate) {
-		this.releaseDate = releaseDate;
-	}
+    public void setReleaseDate(Date releaseDate) {
+	this.releaseDate = releaseDate;
+    }
 }

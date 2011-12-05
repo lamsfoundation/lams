@@ -34,63 +34,79 @@ package org.lamsfoundation.lams.index;
  * Created at 10:12:09 on 14/06/2006
  */
 public class IndexLinkBean {
-	
-	private String name;
-	private String url;
-	private String style;
-	private String tooltip;
-	
-	public IndexLinkBean(String name, String url, String style, String tooltip) {
-		super();
-		this.name = name;
-		this.url = url;
-		this.style = style;
-		this.tooltip = tooltip;
-	}
-	
-	public IndexLinkBean(String name, String url) {
-		this.name = name;
-		this.url = url;
-	}
-	/**
-	 * @return Returns the name.
-	 */
-	public String getName() {
-		return name;
-	}
-	/**
-	 * @param name The name to set.
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-	/**
-	 * @return Returns the url.
-	 */
-	public String getUrl() {
-		return url;
-	}
-	/**
-	 * @param url The url to set.
-	 */
-	public void setUrl(String url) {
-		this.url = url;
-	}
-	
-	public String getStyle() {
-		return style;
-	}
-	
-	public void setStyle(String style) {
-		this.style = style;
-	}
-	
-	public String getTooltip() {
-	    return tooltip;
-	}
 
-	public void setTooltip(String tooltip) {
-	    this.tooltip = tooltip;
-	}
+    private String name;
+    private String url;
+    private String style;
+    private String spanStyle;
+    private String tooltip;
+
+    public IndexLinkBean(String name, String url, String style, String spanStyle, String tooltip) {
+	super();
+	this.name = name;
+	this.url = url;
+	this.style = style;
+	this.spanStyle = spanStyle;
+	this.tooltip = tooltip;
+    }
+
+    public IndexLinkBean(String name, String url) {
+	this.name = name;
+	this.url = url;
+    }
+
+    /**
+     * @return Returns the name.
+     */
+    public String getName() {
+	return name;
+    }
+
+    /**
+     * @param name
+     *            The name to set.
+     */
+    public void setName(String name) {
+	this.name = name;
+    }
+
+    /**
+     * @return Returns the url.
+     */
+    public String getUrl() {
+	return url;
+    }
+
+    /**
+     * @param url
+     *            The url to set.
+     */
+    public void setUrl(String url) {
+	this.url = url;
+    }
+    
+    public String getStyle() {
+	return style;
+    }
+
+    public void setStyle(String style) {
+	this.style = style;
+    }
+
+    public String getSpanStyle() {
+	return spanStyle;
+    }
+
+    public void setSpanStyle(String spanStyle) {
+	this.spanStyle = spanStyle;
+    }
+
+    public String getTooltip() {
+	return tooltip;
+    }
+
+    public void setTooltip(String tooltip) {
+	this.tooltip = tooltip;
+    }
 
 }

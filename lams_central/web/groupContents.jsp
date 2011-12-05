@@ -29,8 +29,15 @@
 				<c:if test="${lesson.state eq 4}"> <span class="mycourses-stop-img" title="<fmt:message key="label.disabled"/>" >&nbsp;</span> </c:if>
 				<c:if test="${lesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" >&nbsp;</span> </c:if>
 				<c:forEach var="lessonlink" items="${lesson.links}">
-					<a href="<c:out value='${lessonlink.url}'/>" class="sequence-action-link"> 
-						<span class="${lessonlink.style}"> 
+					<c:set var="tooltip" value="" />
+					<c:if test="${lessonlink.tooltip ne null}">
+						<c:set var="tooltip">
+							<fmt:message key="${lessonlink.tooltip}" />
+						</c:set>
+					</c:if>
+				
+					<a href="<c:out value='${lessonlink.url}'/>" class="sequence-action-link ${lessonlink.style}" title="${tooltip}"> 
+						<span class="${lessonlink.spanStyle}"> 
 							<fmt:message key="${lessonlink.name}" /> 
 						</span>
 					</a>
@@ -77,11 +84,17 @@
 					<c:if test="${childLesson.state eq 4}"> <span class="mycourses-stop-img" title="<fmt:message key="label.disabled"/>" >&nbsp;</span> </c:if>
 					<c:if test="${childLesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" >&nbsp;</span> </c:if>
 					<c:forEach var="childlessonlink" items="${childLesson.links}">
-					<a href="<c:out value='${childlessonlink.url}'/>" class="sequence-action-link"> 
-						<span class="${childlessonlink.style}"> 
-							<fmt:message key="${childlessonlink.name}" /> 
-						</span>
-					</a>
+						<c:set var="tooltip" value="" />
+						<c:if test="${childlessonlink.tooltip ne null}">
+							<c:set var="tooltip">
+								<fmt:message key="${childlessonlink.tooltip}" />
+							</c:set>
+						</c:if>
+						<a href="<c:out value='${childlessonlink.url}'/>" class="sequence-action-link ${childlessonlink.style}" title="${tooltip}"> 
+							<span class="${childlessonlink.spanStyle}"> 
+								<fmt:message key="${childlessonlink.name}" /> 
+							</span>
+						</a>
 					</c:forEach>
 				</p>
 			</c:forEach></div>

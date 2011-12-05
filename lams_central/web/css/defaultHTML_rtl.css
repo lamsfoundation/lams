@@ -1354,6 +1354,9 @@ text-align:right;
 .mycourses-completed-img {background: url('../images/css/lesson_completed.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
 }
 
+.mycourses-notifications-img {background: url('../images/css/notifications_go.png')  no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px;
+}
+
 /* Date and time restriction area in monitor */
 #restrictUsageDiv {font-size: 13px; padding-bottom: 10px; padding-left: 18px; padding-top: -5px;}
 #restrictUsageDiv :first-child {padding-bottom: 10px; padding-top: -5px;}
@@ -1671,6 +1674,25 @@ ul.more-actions-list li {
 
 #content-main a:hover.search-lesson {
 	background: url('../images/css/search_lesson.png') no-repeat 0px 0px;
+        color: #47bc23;
+        padding: 5px 12px 6px 30px;
+        text-decoration: none;
+        border-right:1px solid #d2d2d2;
+        border-bottom: 0px;
+}
+
+#content-main a.course-notifications {
+	background: url('../images/css/course-notifications.png') no-repeat 0px 0px;
+	color: #666;
+	padding: 5px 12px 6px 30px;
+	text-decoration: none;
+	border-right:1px solid #d2d2d2;
+	border-bottom: 0px;
+	display: run-in;
+}
+
+#content-main a:hover.course-notifications {
+	background: url('../images/css/course-notifications.png') no-repeat 0px 0px;
         color: #47bc23;
         padding: 5px 12px 6px 30px;
         text-decoration: none;

@@ -75,6 +75,8 @@ public interface IMonitoringService {
      *            the user who want to create this lesson.
      * @param customCSV
      *            the custom comma separated values to be used by toolAdapters
+     * @param enableNotifications
+     *            enable "email notifications" link for the current lesson
      * @param numberDaysToLessonFinish
      *            number of days the lesson will be available to user since he starts it. (lesson finish scheduling
      *            feature)
@@ -83,7 +85,7 @@ public interface IMonitoringService {
     public Lesson initializeLesson(String lessonName, String lessonDescription, Boolean learnerExportAvailable,
 	    long learningDesignId, Integer organisationId, Integer userID, String customCSV,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Integer numberDaysToLessonFinish);
+	    Boolean enableNotifications, Integer numberDaysToLessonFinish);
 
     /**
      * Initialize a new lesson so as to start the learning process for a normal

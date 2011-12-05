@@ -165,6 +165,10 @@ ALTER TABLE lams_log_event ADD CONSTRAINT FK_lams_event_log_3 FOREIGN KEY (learn
 ALTER TABLE lams_lesson ADD COLUMN scheduled_number_days_to_lesson_finish INT(3) DEFAULT NULL;
 ALTER TABLE lams_user_group ADD COLUMN scheduled_lesson_end_date DATETIME;
 
+-- WVI-15 Email Notifications
+ALTER TABLE lams_lesson ADD COLUMN enable_lesson_notifications TINYINT(1) DEFAULT 0;
+ALTER TABLE lams_organisation ADD COLUMN enable_course_notifications TINYINT(1) NOT NULL DEFAULT 0;
+
 COMMIT;
 SET AUTOCOMMIT = 1;
 set FOREIGN_KEY_CHECKS = 1;

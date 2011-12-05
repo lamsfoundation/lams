@@ -227,6 +227,7 @@ CREATE TABLE lams_organisation (
      , admin_browse_all_users TINYINT(1) NOT NULL DEFAULT 0
      , admin_change_status TINYINT(1) NOT NULL DEFAULT 0
      , admin_create_guest TINYINT(1) NOT NULL DEFAULT 0
+     , enable_course_notifications TINYINT(1) NOT NULL DEFAULT 0
 	 , enable_monitor_gradebook TINYINT(1) NOT NULL DEFAULT 0
      , enable_learner_gradebook TINYINT(1) NOT NULL DEFAULT 0
      , locale_id INTEGER
@@ -650,6 +651,7 @@ CREATE TABLE lams_lesson (
      , learner_presence_avail TINYINT(1) DEFAULT 0
      , learner_im_avail TINYINT(1) DEFAULT 0
 	 , live_edit_enabled TINYINT(1) DEFAULT 0
+	 , enable_lesson_notifications TINYINT(1) DEFAULT 0
      , locked_for_edit TINYINT DEFAULT 0
 	 , marks_released TINYINT DEFAULT 0
      , version INTEGER DEFAULT 1

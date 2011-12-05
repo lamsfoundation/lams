@@ -96,6 +96,15 @@
 			</meta>
 		</property>
 		
+		<property name="enableCourseNotifications"
+			type="java.lang.Boolean" column="enable_course_notifications" not-null="false"
+			length="1">
+			<meta attribute="field-description">
+				@hibernate.property column="enable_course_notifications"
+				length="1" not-null="true"
+			</meta>
+		</property>
+		
 		<property name="enableGradebookForMonitors"
 			type="java.lang.Boolean" column="enable_monitor_gradebook"
 			not-null="false" length="1">

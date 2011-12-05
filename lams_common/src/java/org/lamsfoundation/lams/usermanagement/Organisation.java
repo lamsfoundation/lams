@@ -32,21 +32,20 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 
-/** 
- *        @hibernate.class
- *         table="lams_organisation"
- *     
-*/
+/**
+ * @hibernate.class table="lams_organisation"
+ * 
+ */
 public class Organisation implements Serializable, Comparable {
 
-	private static final long serialVersionUID = -6742443056151585129L;
+    private static final long serialVersionUID = -6742443056151585129L;
 
-	/** identifier field */
+    /** identifier field */
     private Integer organisationId;
 
     /** nullable persistent field */
     private String name;
-    
+
     /** nullable persistent field */
     private String code;
 
@@ -73,460 +72,415 @@ public class Organisation implements Serializable, Comparable {
 
     /** persistent field */
     private Set childOrganisations;
-    
+
     /** persistent field */
     private Set lessons;
-    
+
     private OrganisationState organisationState;
 
-	private SupportedLocale locale;
+    private SupportedLocale locale;
 
     /** persistent field */
     private Boolean courseAdminCanAddNewUsers;
 
     /** persistent field */
     private Boolean courseAdminCanBrowseAllUsers;
-    
+
     /** persistent field */
     private Boolean courseAdminCanChangeStatusOfCourse;
 
     /** persistent field */
     private Boolean courseAdminCanCreateGuestAccounts;
-    
+
+    /** persistent field */
+    private Boolean enableCourseNotifications;
+
     /** persistent field */
     private Boolean enableGradebookForMonitors;
-    
+
     /** persistent field */
     private Boolean enableGradebookForLearners;
-    
+
     /** persistent field */
     private Date archivedDate;
-    
+
     private String orderedLessonIds;
 
     /** full constructor */
-    public Organisation(String name, String description, Organisation parentOrganisation, 
-    			Date createDate, User createdBy, Workspace workspace, 
-    			OrganisationType organisationType, Set userOrganisations, Set childOrganisations, Set lessons,
-    			Boolean courseAdminCanAddNewUsers, Boolean courseAdminCanBrowseAllUsers, Boolean courseAdminCanChangeStatusOfCourse, 
-    			Boolean courseAdminCanCreateGuestAccounts, String orderedLessonIds, Boolean enableGradebookForLearners, Boolean enableGradebookForMonitors) {
-        this.name = name;
-        this.description = description;
-        this.parentOrganisation = parentOrganisation;
-        this.createDate = createDate;
-        this.createdBy = createdBy;
-        this.workspace = workspace;
-        this.organisationType = organisationType;
-        this.userOrganisations = userOrganisations;
-        this.childOrganisations = childOrganisations;
-        this.lessons = lessons;
-        this.courseAdminCanAddNewUsers = courseAdminCanAddNewUsers;
-        this.courseAdminCanBrowseAllUsers = courseAdminCanBrowseAllUsers;
-        this.courseAdminCanChangeStatusOfCourse = courseAdminCanChangeStatusOfCourse;
-        this.courseAdminCanCreateGuestAccounts = courseAdminCanCreateGuestAccounts;
-        this.orderedLessonIds = orderedLessonIds;
-        this.enableGradebookForLearners = enableGradebookForLearners;
-        this.enableGradebookForMonitors = enableGradebookForMonitors;
+    public Organisation(String name, String description, Organisation parentOrganisation, Date createDate,
+	    User createdBy, Workspace workspace, OrganisationType organisationType, Set userOrganisations,
+	    Set childOrganisations, Set lessons, Boolean courseAdminCanAddNewUsers,
+	    Boolean courseAdminCanBrowseAllUsers, Boolean courseAdminCanChangeStatusOfCourse,
+	    Boolean courseAdminCanCreateGuestAccounts, Boolean enableCourseNotifications, String orderedLessonIds,
+	    Boolean enableGradebookForLearners, Boolean enableGradebookForMonitors) {
+	this.name = name;
+	this.description = description;
+	this.parentOrganisation = parentOrganisation;
+	this.createDate = createDate;
+	this.createdBy = createdBy;
+	this.workspace = workspace;
+	this.organisationType = organisationType;
+	this.userOrganisations = userOrganisations;
+	this.childOrganisations = childOrganisations;
+	this.lessons = lessons;
+	this.courseAdminCanAddNewUsers = courseAdminCanAddNewUsers;
+	this.courseAdminCanBrowseAllUsers = courseAdminCanBrowseAllUsers;
+	this.courseAdminCanChangeStatusOfCourse = courseAdminCanChangeStatusOfCourse;
+	this.courseAdminCanCreateGuestAccounts = courseAdminCanCreateGuestAccounts;
+	this.enableCourseNotifications = enableCourseNotifications;
+	this.orderedLessonIds = orderedLessonIds;
+	this.enableGradebookForLearners = enableGradebookForLearners;
+	this.enableGradebookForMonitors = enableGradebookForMonitors;
     }
 
     /** default constructor */
     public Organisation() {
-        this.courseAdminCanAddNewUsers = Boolean.FALSE;
-        this.courseAdminCanBrowseAllUsers = Boolean.FALSE;
-        this.courseAdminCanChangeStatusOfCourse = Boolean.FALSE;
-        this.courseAdminCanCreateGuestAccounts = Boolean.FALSE;
-        this.enableGradebookForLearners = Boolean.FALSE;
-        this.enableGradebookForMonitors = Boolean.FALSE;
-
+	this.courseAdminCanAddNewUsers = Boolean.FALSE;
+	this.courseAdminCanBrowseAllUsers = Boolean.FALSE;
+	this.courseAdminCanChangeStatusOfCourse = Boolean.FALSE;
+	this.courseAdminCanCreateGuestAccounts = Boolean.FALSE;
+	this.enableCourseNotifications = Boolean.FALSE;
+	this.enableGradebookForLearners = Boolean.FALSE;
+	this.enableGradebookForMonitors = Boolean.FALSE;
     }
 
     /** minimal constructor */
-    public Organisation(Date createDate, User createdBy, Workspace workspace, OrganisationType organisationType, Set userOrganisations, Set lessons) {
-        this.createDate = createDate;
-        this.createdBy = createdBy;
-        this.workspace = workspace;
-        this.organisationType = organisationType;
-        this.userOrganisations = userOrganisations;
-        this.lessons = lessons;
-        
-        // mandatory fields in the db
-        this.courseAdminCanAddNewUsers = Boolean.FALSE;
-        this.courseAdminCanBrowseAllUsers = Boolean.FALSE;
-        this.courseAdminCanChangeStatusOfCourse = Boolean.FALSE;
-        this.courseAdminCanCreateGuestAccounts = Boolean.FALSE;
-        this.enableGradebookForLearners = Boolean.FALSE;
-        this.enableGradebookForMonitors = Boolean.FALSE;
-    }
-    public Organisation(String name, 
-    					String description,						
-						Date createDate,
-						User createdBy,
-						OrganisationType organisationType) {
-		super();
-		this.name = name;
-		this.description = description;		
-		this.createDate = createDate;		
-		this.createdBy = createdBy;
-		this.organisationType = organisationType;
-	}
+    public Organisation(Date createDate, User createdBy, Workspace workspace, OrganisationType organisationType,
+	    Set userOrganisations, Set lessons) {
+	this.createDate = createDate;
+	this.createdBy = createdBy;
+	this.workspace = workspace;
+	this.organisationType = organisationType;
+	this.userOrganisations = userOrganisations;
+	this.lessons = lessons;
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Integer"
-     *             column="organisation_id"
-     *         
+	// mandatory fields in the db
+	this.courseAdminCanAddNewUsers = Boolean.FALSE;
+	this.courseAdminCanBrowseAllUsers = Boolean.FALSE;
+	this.courseAdminCanChangeStatusOfCourse = Boolean.FALSE;
+	this.courseAdminCanCreateGuestAccounts = Boolean.FALSE;
+	this.enableCourseNotifications = Boolean.FALSE;
+	this.enableGradebookForLearners = Boolean.FALSE;
+	this.enableGradebookForMonitors = Boolean.FALSE;
+    }
+
+    public Organisation(String name, String description, Date createDate, User createdBy,
+	    OrganisationType organisationType) {
+	super();
+	this.name = name;
+	this.description = description;
+	this.createDate = createDate;
+	this.createdBy = createdBy;
+	this.organisationType = organisationType;
+    }
+
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Integer" column="organisation_id"
+     * 
      */
     public Integer getOrganisationId() {
-        return this.organisationId;
+	return this.organisationId;
     }
 
     public void setOrganisationId(Integer organisationId) {
-        this.organisationId = organisationId;
+	this.organisationId = organisationId;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="name"
-     *             length="250"
-     *         
+    /**
+     * @hibernate.property column="name" length="250"
+     * 
      */
     public String getName() {
-        return this.name;
+	return this.name;
     }
 
     public void setName(String name) {
-        this.name = name;
+	this.name = name;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="code"
-     *             length="20"
-     *         
+    /**
+     * @hibernate.property column="code" length="20"
+     * 
      */
     public String getCode() {
-        return this.code;
+	return this.code;
     }
 
     public void setCode(String code) {
-        this.code = code;
+	this.code = code;
     }
-    
-    /** 
-     *            @hibernate.property
-     *             column="description"
-     *             length="250"
-     *         
+
+    /**
+     * @hibernate.property column="description" length="250"
+     * 
      */
     public String getDescription() {
-        return this.description;
+	return this.description;
     }
 
     public void setDescription(String description) {
-        this.description = description;
+	this.description = description;
     }
 
-    /** 
-     *            @hibernate.many-to-one
-     *            @hibernate.column name="parent_organisation_id"         
-     *         
+    /**
+     * @hibernate.many-to-one
+     * @hibernate.column name="parent_organisation_id"
+     * 
      */
     public Organisation getParentOrganisation() {
-        return this.parentOrganisation;
+	return this.parentOrganisation;
     }
 
     public void setParentOrganisation(Organisation parentOrganisation) {
-        this.parentOrganisation = parentOrganisation;
+	this.parentOrganisation = parentOrganisation;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="create_date"
-     *             length="19"
-     *             not-null="true"
-     *         
+    /**
+     * @hibernate.property column="create_date" length="19" not-null="true"
+     * 
      */
     public Date getCreateDate() {
-        return this.createDate;
+	return this.createDate;
     }
 
     public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
+	this.createDate = createDate;
     }
 
     /**
-     * 		@hibernate.many-to-one not-null="true"
-     *      @hibernate.column name="created_by"    
-     *         
+     * @hibernate.many-to-one not-null="true"
+     * @hibernate.column name="created_by"
+     * 
      */
     public User getCreatedBy() {
-        return this.createdBy;
+	return this.createdBy;
     }
 
     public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
+	this.createdBy = createdBy;
     }
 
-
-    /** 
-     *            @hibernate.many-to-one
-     *             cascade="all"
-     *             not-null="false"
-     *            @hibernate.column name="workspace_id"         
-     *         
+    /**
+     * @hibernate.many-to-one cascade="all" not-null="false"
+     * @hibernate.column name="workspace_id"
+     * 
      */
     public Workspace getWorkspace() {
-        return this.workspace;
+	return this.workspace;
     }
 
     public void setWorkspace(Workspace workspace) {
-        this.workspace = workspace;
+	this.workspace = workspace;
     }
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *         
+    /**
+     * @hibernate.many-to-one not-null="true"
+     * 
      */
     public OrganisationType getOrganisationType() {
-        return this.organisationType;
+	return this.organisationType;
     }
 
     public void setOrganisationType(OrganisationType organisationType) {
-        this.organisationType = organisationType;
+	this.organisationType = organisationType;
     }
 
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="organisation_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.UserOrganisation"
-     *         
+    /**
+     * @hibernate.set lazy="true" inverse="true" cascade="none"
+     * @hibernate.collection-key column="organisation_id"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.UserOrganisation"
+     * 
      */
     public Set getUserOrganisations() {
-        return this.userOrganisations;
+	return this.userOrganisations;
     }
 
     public void setUserOrganisations(Set userOrganisations) {
-        this.userOrganisations = userOrganisations;
+	this.userOrganisations = userOrganisations;
     }
 
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="parent_organisation_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.Organisation"
-     *         
+    /**
+     * @hibernate.set lazy="true" inverse="true" cascade="none"
+     * @hibernate.collection-key column="parent_organisation_id"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.Organisation"
+     * 
      */
-	public Set getChildOrganisations() {
-		return childOrganisations;
-	}
+    public Set getChildOrganisations() {
+	return childOrganisations;
+    }
 
-	public void setChildOrganisations(Set childOrganisations) {
-		this.childOrganisations = childOrganisations;
-	}
-	
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="organisation_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.lesson.Lesson"
-     *         
+    public void setChildOrganisations(Set childOrganisations) {
+	this.childOrganisations = childOrganisations;
+    }
+
+    /**
+     * @hibernate.set lazy="true" inverse="true" cascade="none"
+     * @hibernate.collection-key column="organisation_id"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.lesson.Lesson"
+     * 
      */
     public Set getLessons() {
-        return this.lessons;
+	return this.lessons;
     }
 
     public void setLessons(Set lessons) {
-        this.lessons = lessons;
+	this.lessons = lessons;
     }
 
-     /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="organisation_state_id"         
-     *         
+    /**
+     * @hibernate.many-to-one not-null="true"
+     * @hibernate.column name="organisation_state_id"
+     * 
      */
     public OrganisationState getOrganisationState() {
-        return this.organisationState;
+	return this.organisationState;
     }
 
     public void setOrganisationState(OrganisationState organisationState) {
-        this.organisationState = organisationState;
+	this.organisationState = organisationState;
     }
 
-    /** 
-     *            @hibernate.property
-     *              column="admin_add_new_users"
-     *              length="1"
-     *              not-null="true"
-     *         
+    /**
+     * @hibernate.property column="admin_add_new_users" length="1" not-null="true"
+     * 
      */
     public Boolean getCourseAdminCanAddNewUsers() {
-        return this.courseAdminCanAddNewUsers;
+	return this.courseAdminCanAddNewUsers;
     }
 
     public void setCourseAdminCanAddNewUsers(Boolean courseAdminCanAddNewUsers) {
-        this.courseAdminCanAddNewUsers = courseAdminCanAddNewUsers;
+	this.courseAdminCanAddNewUsers = courseAdminCanAddNewUsers;
     }
 
-    /** 
-     *            @hibernate.property
-     *              column="admin_browse_all_users"
-     *              length="1"
-     *              not-null="true"
-     *         
+    /**
+     * @hibernate.property column="admin_browse_all_users" length="1" not-null="true"
+     * 
      */
     public Boolean getCourseAdminCanBrowseAllUsers() {
-        return this.courseAdminCanBrowseAllUsers;
+	return this.courseAdminCanBrowseAllUsers;
     }
 
     public void setCourseAdminCanBrowseAllUsers(Boolean courseAdminCanBrowseAllUsers) {
-        this.courseAdminCanBrowseAllUsers = courseAdminCanBrowseAllUsers;
+	this.courseAdminCanBrowseAllUsers = courseAdminCanBrowseAllUsers;
     }
 
-    /** 
-     *            @hibernate.property
-     *              column="admin_change_status"
-     *              length="1"
-     *              not-null="true"
-     *         
+    /**
+     * @hibernate.property column="admin_change_status" length="1" not-null="true"
+     * 
      */
     public Boolean getCourseAdminCanChangeStatusOfCourse() {
-        return this.courseAdminCanChangeStatusOfCourse;
+	return this.courseAdminCanChangeStatusOfCourse;
     }
 
     public void setCourseAdminCanChangeStatusOfCourse(Boolean courseAdminCanChangeStatusOfCourse) {
-        this.courseAdminCanChangeStatusOfCourse = courseAdminCanChangeStatusOfCourse;
+	this.courseAdminCanChangeStatusOfCourse = courseAdminCanChangeStatusOfCourse;
     }
 
-    /** 
-     *            @hibernate.property
-     *              column="admin_create_guest"
-     *              length="1"
-     *              not-null="true"
-     *         
+    /**
+     * @hibernate.property column="admin_create_guest" length="1" not-null="true"
+     * 
      */
     public Boolean getCourseAdminCanCreateGuestAccounts() {
-        return this.courseAdminCanCreateGuestAccounts;
+	return this.courseAdminCanCreateGuestAccounts;
     }
 
     public void setCourseAdminCanCreateGuestAccounts(Boolean courseAdminCanCreateGuestAccounts) {
-        this.courseAdminCanCreateGuestAccounts = courseAdminCanCreateGuestAccounts;
+	this.courseAdminCanCreateGuestAccounts = courseAdminCanCreateGuestAccounts;
     }
 
-    
-   
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("organisationId", getOrganisationId())
-            .toString();
+    /**
+     * @hibernate.property column="enable_course_notifications" length="1" not-null="true"
+     * 
+     */
+    public Boolean getEnableCourseNotifications() {
+	return this.enableCourseNotifications;
+    }
+
+    public void setEnableCourseNotifications(Boolean enableCourseNotifications) {
+	this.enableCourseNotifications = enableCourseNotifications;
+    }
+
+    public String toString() {
+	return new ToStringBuilder(this).append("organisationId", getOrganisationId()).toString();
     }
 
     public boolean equals(Object other) {
-        if ( !(other instanceof Organisation) ) return false;
-        Organisation castOther = (Organisation) other;
-        return new EqualsBuilder()
-            .append(this.getOrganisationId(), castOther.getOrganisationId())
-            .isEquals();
+	if (!(other instanceof Organisation))
+	    return false;
+	Organisation castOther = (Organisation) other;
+	return new EqualsBuilder().append(this.getOrganisationId(), castOther.getOrganisationId()).isEquals();
     }
 
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(getOrganisationId())
-            .toHashCode();
+	return new HashCodeBuilder().append(getOrganisationId()).toHashCode();
     }
-    public OrganisationDTO getOrganisationDTO(){
-    	return new OrganisationDTO(this);
+
+    public OrganisationDTO getOrganisationDTO() {
+	return new OrganisationDTO(this);
     }
-	/**
-	 * @hibernate.many-to-one
-     *       not-null="true"
-     *       lazy="false"
-     * @hibernate.column name="locale_id"         
-	 * @param localeCountry
-	 */
-	public SupportedLocale getLocale() {
-		return locale;
-	}
 
-	public void setLocale(SupportedLocale locale) {
-		this.locale = locale;
-	}
+    /**
+     * @hibernate.many-to-one not-null="true" lazy="false"
+     * @hibernate.column name="locale_id"
+     * @param localeCountry
+     */
+    public SupportedLocale getLocale() {
+	return locale;
+    }
 
-	public int compareTo(Object o) {
-		return name.compareToIgnoreCase(((Organisation)o).getName());
-	}
-	
-	/** 
-     *            @hibernate.property
-     *             column="archived_date"
-     *             length="19"
-     *             not-null="false"
-     *         
+    public void setLocale(SupportedLocale locale) {
+	this.locale = locale;
+    }
+
+    public int compareTo(Object o) {
+	return name.compareToIgnoreCase(((Organisation) o).getName());
+    }
+
+    /**
+     * @hibernate.property column="archived_date" length="19" not-null="false"
+     * 
      */
     public Date getArchivedDate() {
-        return this.archivedDate;
+	return this.archivedDate;
     }
 
     public void setArchivedDate(Date archivedDate) {
-        this.archivedDate = archivedDate;
+	this.archivedDate = archivedDate;
     }
-    
+
     /**
-	 * @hibernate.property column="ordered_lesson_ids" length="65535"
+     * @hibernate.property column="ordered_lesson_ids" length="65535"
      */
-    public String getOrderedLessonIds()
-    {
-        return orderedLessonIds;
+    public String getOrderedLessonIds() {
+	return orderedLessonIds;
     }
 
-    public void setOrderedLessonIds(String orderedLessonIds)
-    {
-        this.orderedLessonIds = orderedLessonIds;
+    public void setOrderedLessonIds(String orderedLessonIds) {
+	this.orderedLessonIds = orderedLessonIds;
     }
 
-    /** 
-     *            @hibernate.property
-     *              column="enable_teacher_gradebook"
-     *              length="1"
-     *              not-null="true"
-     *         
+    /**
+     * @hibernate.property column="enable_teacher_gradebook" length="1" not-null="true"
+     * 
      */
     public Boolean getEnableGradebookForMonitors() {
-        return enableGradebookForMonitors;
+	return enableGradebookForMonitors;
     }
 
     public void setEnableGradebookForMonitors(Boolean enableGradebookForMonitors) {
-        this.enableGradebookForMonitors = enableGradebookForMonitors;
+	this.enableGradebookForMonitors = enableGradebookForMonitors;
     }
 
-    /** 
-     *            @hibernate.property
-     *              column="enable_learner_gradebook"
-     *              length="1"
-     *              not-null="true"
-     *         
+    /**
+     * @hibernate.property column="enable_learner_gradebook" length="1" not-null="true"
+     * 
      */
     public Boolean getEnableGradebookForLearners() {
-        return enableGradebookForLearners;
+	return enableGradebookForLearners;
     }
 
     public void setEnableGradebookForLearners(Boolean enableGradebookForLearners) {
-        this.enableGradebookForLearners = enableGradebookForLearners;
+	this.enableGradebookForLearners = enableGradebookForLearners;
     }
 
 }

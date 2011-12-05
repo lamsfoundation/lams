@@ -194,7 +194,7 @@ public class MonitoringAction extends LamsDispatchAction
     		Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresenceAvailable", false);
     		Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImAvailable", false);
     		Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
-    		Lesson newLesson = monitoringService.initializeLesson(title,desc,learnerExportAvailable,ldId,organisationId,getUserId(), null, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, null);
+    		Lesson newLesson = monitoringService.initializeLesson(title,desc,learnerExportAvailable,ldId,organisationId,getUserId(), null, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, Boolean.FALSE, null);
     		
     		flashMessage = new FlashMessage("initializeLesson",newLesson.getLessonId());
 		} catch (Exception e) {
@@ -730,6 +730,7 @@ public class MonitoringAction extends LamsDispatchAction
    			languageCollection.add(new String("lesson.tab.heading.label"));
    			languageCollection.add(new String("add.now.button.label"));
    			languageCollection.add(new String("advanced.tab.form.advanced.options.label"));
+   			languageCollection.add(new String("advanced.tab.enable.lesson.notifications"));
    			languageCollection.add(new String("advanced.tab.form.enable.im.label"));
    			languageCollection.add(new String("advanced.tab.form.time.limits.label"));
    			languageCollection.add(new String("advanced.tab.form.enter.number.days.label"));

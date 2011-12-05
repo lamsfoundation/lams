@@ -774,8 +774,11 @@ public class LessonService implements ILessonService {
 		String lessonDescription = (String) tuple[2];
 		Integer lessonState = (Integer) tuple[3];
 		Boolean lessonCompleted = (Boolean) tuple[4];
+		lessonCompleted = lessonCompleted == null ? false : lessonCompleted.booleanValue();
+		Boolean enableLessonNotifications = (Boolean) tuple[5];
+		enableLessonNotifications = enableLessonNotifications == null ? false : enableLessonNotifications.booleanValue();
 		IndexLessonBean bean = new IndexLessonBean(lessonId, lessonName, lessonDescription, lessonState,
-			(lessonCompleted == null ? false : lessonCompleted.booleanValue()));
+			lessonCompleted, enableLessonNotifications);
 		map.put(new Long(lessonId), bean);
 	    }
 	}

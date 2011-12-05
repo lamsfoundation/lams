@@ -23,6 +23,7 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.learningdesign.dao.hibernate;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,11 +31,16 @@ import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Andrey Balan
  */
 public class GroupUserDAO extends BaseDAO implements IGroupUserDAO {
+
+    private static final String GET_USERS_BY_LESSON_AND_TIME = "SELECT DISTINCT gu.user FROM "
+	    + GroupUser.class.getName()
+	    + " AS gu WHERE gu.group.grouping.groupingId=? AND (gu.scheduledLessonEndDate IS NOT NULL) AND (NOW() < gu.scheduledLessonEndDate) AND (? > gu.scheduledLessonEndDate)";
 
     public GroupUser getGroupUser(Lesson lesson, Integer userId) {
 	HashMap<String, Object> properties = new HashMap<String, Object>();
@@ -46,7 +52,19 @@ public class GroupUserDAO extends BaseDAO implements IGroupUserDAO {
 	} else {
 	    return list.get(0);
 	}
-	
+
+    }
+
+    /**
+     * Returns users with deadline sooner than specified date
+     * 
+     * @param lesson
+     * @param timeToScheduledLessonEnd
+     * @return
+     */
+    public List<User> getUsersWithLessonEndingSoonerThan(Lesson lesson, Date timeToScheduledLessonEnd) {
+	return getHibernateTemplate().find(GET_USERS_BY_LESSON_AND_TIME,
+		new Object[] { lesson.getLessonClass().getGroupingId(), timeToScheduledLessonEnd });
     }
 
     public void saveGroupUser(GroupUser groupUser) {

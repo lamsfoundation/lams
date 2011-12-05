@@ -23,18 +23,23 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.learningdesign.dao;
 
+import java.util.Date;
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Andrey Balan
  */
 public interface IGroupUserDAO extends IBaseDAO {
 
-    public GroupUser getGroupUser(Lesson lesson, Integer userId);
+    GroupUser getGroupUser(Lesson lesson, Integer userId);
+    
+    List<User> getUsersWithLessonEndingSoonerThan(Lesson lesson, Date timeToScheduledLessonEnd);
 
-    public void saveGroupUser(GroupUser groupUser);
+    void saveGroupUser(GroupUser groupUser);
 
 }

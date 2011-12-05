@@ -136,6 +136,7 @@
 				<include name="grouping/*"/>
 				<include name="images/*"/>
 				<include name="template/*"/>
+				<include name="emailnotifications/*"/>
 			</fileset>
 		</war>
 	</target>

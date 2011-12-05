@@ -103,6 +103,12 @@
 	</tr>
 	<tr>
 		<td colspan=2>
+			<html-el:checkbox property="enableCourseNotifications" />
+			<fmt:message key="admin.enable.course.notifications"/>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=2>
 			<html-el:checkbox onclick="unSelectLearnerGradebook();" styleId="enableGradebookForMonitors" property="enableGradebookForMonitors" />
 			<fmt:message key="admin.gradebook.monitor.enable"/>
 		</td>
