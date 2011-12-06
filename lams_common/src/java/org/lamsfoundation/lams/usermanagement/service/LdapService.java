@@ -299,52 +299,60 @@ public class LdapService implements ILdapService {
     public boolean addLDAPUser(Attributes attrs, Integer userId) {
 	User user = (User) service.findById(User.class, userId);
 	// get ldap attributes for lams org and roles
-	String ldapOrgAttr = getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_ORG_ATTR)));
+	//String ldapOrgAttr = getSingleAttributeString(attrs.get(Configuration.get(ConfigurationKeys.LDAP_ORG_ATTR)));
+	List<String> ldapOrgs = getAttributeStrings(attrs.get(Configuration.get(ConfigurationKeys.LDAP_ORG_ATTR)));
 	List<String> ldapRoles = getAttributeStrings(attrs.get(Configuration.get(ConfigurationKeys.LDAP_ROLES_ATTR)));
 	// get column name of lams_organisation to match ldapOrgAttr to
 	String orgField = Configuration.get(ConfigurationKeys.LDAP_ORG_FIELD);
 
-	if (ldapOrgAttr != null && ldapRoles != null && orgField != null) {
+	boolean isAddingUserSuccessful = true;
+	if (ldapOrgs != null && ldapRoles != null && orgField != null) {
 	    // get list of possible matching organisations
-	    log.debug("Looking for organisation to add ldap user to...");
-	    List orgList = (List) service.findByProperty(Organisation.class, orgField, ldapOrgAttr);
-	    if (orgList != null && !orgList.isEmpty()) {
-		Organisation org = null;
-		if (orgList.size() == 1) {
-		    org = (Organisation) orgList.get(0);
-		} else if (orgList.size() > 1) {
-		    // if there are multiple orgs, select the one that is
-		    // active, if there is one
-		    HashMap<String, Object> properties = new HashMap<String, Object>();
-		    properties.put(orgField, ldapOrgAttr);
-		    properties.put("organisationState.organisationStateId", OrganisationState.ACTIVE);
-		    orgList = (List) service.findByProperties(Organisation.class, properties);
-		    if (orgList.size() == 1) {
-			org = (Organisation) orgList.get(0);
+		for (String ldapOrg : ldapOrgs) {
+		    log.debug("Looking for organisation to add ldap user to...");
+		    List orgList = (List) service.findByProperty(Organisation.class, orgField, ldapOrg);
+		    if (orgList != null && !orgList.isEmpty()) {
+			Organisation org = null;
+			if (orgList.size() == 1) {
+			    org = (Organisation) orgList.get(0);
+			} else if (orgList.size() > 1) {
+			    // if there are multiple orgs, select the one that is
+			    // active, if there is one
+			    HashMap<String, Object> properties = new HashMap<String, Object>();
+			    properties.put(orgField, ldapOrg);
+			    properties.put("organisationState.organisationStateId", OrganisationState.ACTIVE);
+			    orgList = (List) service.findByProperties(Organisation.class, properties);
+			    if (orgList.size() == 1) {
+				org = (Organisation) orgList.get(0);
+			    } else {
+				log.warn("More than one LAMS organisation found with the " + orgField + ": " + ldapOrg);
+				isAddingUserSuccessful = false;
+				break;
+			    }
+			}
+			
+			// now convert the roles to lams roles and add the user to the org
+			List<String> roleIds = getRoleIds(ldapRoles);
+			if (roleIds != null && !roleIds.isEmpty()) {
+			    service.setRolesForUserOrganisation(user, org.getOrganisationId(), roleIds);
+			} else {
+			    log.warn("Couldn't map any roles from attribute: "
+				    + Configuration.get(ConfigurationKeys.LDAP_ROLES_ATTR));
+			    isAddingUserSuccessful = false;
+			}
+			
+			// if the user is a member of any other groups, remove them
+			if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_ONLY_ONE_ORG)) {
+			    service.removeUserFromOtherGroups(userId, org.getOrganisationId());
+			    break;
+			}			
 		    } else {
-			log.warn("More than one LAMS organisation found with the " + orgField + ": " + ldapOrgAttr);
-			return false;
+			log.warn("No LAMS organisations found with the " + orgField + ": " + ldapOrg);
+			isAddingUserSuccessful = false;
 		    }
 		}
-		// if the user is a member of any other groups, remove them
-		if (Configuration.getAsBoolean(ConfigurationKeys.LDAP_ONLY_ONE_ORG)) {
-		    service.removeUserFromOtherGroups(userId, org.getOrganisationId());
-		}
-		// now convert the roles to lams roles and add the user to the
-		// org
-		List<String> roleIds = getRoleIds(ldapRoles);
-		if (roleIds != null && !roleIds.isEmpty()) {
-		    service.setRolesForUserOrganisation(user, org.getOrganisationId(), roleIds);
-		    return true;
-		} else {
-		    log.warn("Couldn't map any roles from attribute: "
-			    + Configuration.get(ConfigurationKeys.LDAP_ROLES_ATTR));
-		}
-	    } else {
-		log.warn("No LAMS organisations found with the " + orgField + ": " + ldapOrgAttr);
-	    }
 	}
-	return false;
+	return isAddingUserSuccessful;
     }
 
     // get list of LAMS role ids from list of ldap roles
