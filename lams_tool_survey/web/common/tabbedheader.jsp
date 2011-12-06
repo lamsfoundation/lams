@@ -4,7 +4,6 @@
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 
  	<!-- ********************  CSS ********************** -->
-	<link href="<html:rewrite page='/includes/css/survey.css'/>" rel="stylesheet" type="text/css">
 	<lams:css style="tabbed"/>
 
 

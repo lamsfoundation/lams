@@ -3,9 +3,7 @@
 <c:set var="tool"><lams:WebAppURL/></c:set>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 
-	
- 	<!-- ********************  CSS ********************** -->
-	<link href="<html:rewrite page='/includes/css/survey.css'/>" rel="stylesheet" type="text/css">
+	<!-- ********************  CSS ********************** -->
 	<lams:css />
 
 
