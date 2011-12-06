@@ -8,13 +8,13 @@
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed" />
 
+		<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 		<%-- user for  surveysurveyitem.js --%>
 		<script type="text/javascript">
-	   var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
-       var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
-	</script>
-		<script type="text/javascript"
-			src="<html:rewrite page='/includes/javascript/surveyitem.js'/>"></script>
+	   		var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
+       		var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
+		</script>
+		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/surveyitem.js'/>"></script>
 
 	</lams:head>
 	<body>
