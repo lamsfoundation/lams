@@ -198,6 +198,8 @@ public class AssessmentConstants {
     
     public static final String ATTR_IS_RESUBMIT_ALLOWED = "isResubmitAllowed";
     
+    public static final String ATTR_IS_USER_FAILED = "isUserFailed";
+    
     public static final String ATTR_FINISHED_LOCK = "finishedLock";
     
     public static final String ATTR_USER = "user";

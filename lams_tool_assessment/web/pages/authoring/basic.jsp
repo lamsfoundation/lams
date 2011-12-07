@@ -6,6 +6,10 @@
 </c:url>	
 
 <script lang="javascript">
+	$(document).ready(function(){
+		reinitializePassingMarkSelect(true);
+	});
+
 	//The panel of assessment list panel
 	var questionListTargetDiv = "#questionListArea";
 	function deleteQuestion(idx){
@@ -21,6 +25,7 @@
 					referenceGrades: serializeReferenceGrades()
 				},
 				function(){
+					reinitializePassingMarkSelect(false);
 					refreshThickbox();
 				}
 			);
@@ -39,6 +44,7 @@
 					referenceGrades: serializeReferenceGrades()
 				},
 				function(){
+					reinitializePassingMarkSelect(false);
 					refreshThickbox();
 				}
 		);
@@ -53,6 +59,7 @@
 				referenceGrades: serializeReferenceGrades()
 			},
 			function(){
+				reinitializePassingMarkSelect(false);
 				refreshThickbox();
 			}
 		);
@@ -128,6 +135,21 @@
 		imgLoader = new Image();// preload image
 		imgLoader.src = tb_pathToImage;
 	};
+	function reinitializePassingMarkSelect(isPageFresh){
+		var oldValue = (isPageFresh) ? "${formBean.assessment.passingMark}" : $("#passingMark").val();
+		$('#passingMark').empty();
+		$('#passingMark').append( new Option("<fmt:message key='label.authoring.advance.passing.mark.none' />",0) );
+		
+		var maxGrade = 0;
+		$("[name^=grade]").each(function() {
+			maxGrade += eval(this.value);
+		});
+		
+		for (var i = 1; i<=maxGrade; i++) {
+			var isSelected = (oldValue == i);
+		    $('#passingMark').append( new Option(i,i,isSelected) );
+		}
+	};	
 
 
 </script>

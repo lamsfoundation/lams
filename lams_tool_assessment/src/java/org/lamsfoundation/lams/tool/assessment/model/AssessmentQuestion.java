@@ -56,6 +56,9 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     
     private int sequenceId;
 
+    /**
+     * Default grade set in author.
+     */
     private int defaultGrade;
     
     private float penaltyFactor;
@@ -98,6 +101,11 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     private boolean answerBoolean;
     
     private String questionFeedback;
+    
+    /**
+     * Grade acquired from QUestionReference in learner.
+     */
+    private int grade;
     
     private float mark;
     
@@ -258,6 +266,8 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
+     * Default grade set in author. To be used only in author
+     * 
      * @hibernate.property column="default_grade"
      * 
      * @return
@@ -266,6 +276,9 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 	return defaultGrade;
     }
 
+    /**
+     * @param defaultGrade Default grade set in author. To be used only in author
+     */
     public void setDefaultGrade(int defaultGrade) {
 	this.defaultGrade = defaultGrade;
     }
@@ -491,6 +504,20 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
     public String getQuestionFeedback() {
 	return questionFeedback;
+    }
+    
+    /**
+     * @return Grade acquired from QUestionReference in learner.
+     */
+    public int getGrade() {
+	return grade;
+    }
+    
+    /**
+     * @param grade Grade acquired from QUestionReference in learner.
+     */
+    public void setGrade(int grade) {
+	this.grade = grade;
     }
     
     public Float getMark() {

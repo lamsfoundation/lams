@@ -240,6 +240,8 @@ public class LearningAction extends Action {
 	    if (question.getCreateBy() != null) {
 		question.getCreateBy().getLoginName();
 	    }
+	    question.setGrade(questionReference.getDefaultGrade());
+	    
 	    questionList.add(question);
 	}
 
@@ -352,17 +354,22 @@ public class LearningAction extends Action {
 	processUserAnswers(sessionMap);
 	loadupResultMarks(sessionMap);
 	
-	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
+	//calculate whether isResubmitAllowed
 	IAssessmentService service = getAssessmentService();
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userID = new Long(userDTO.getUserID().longValue());
-	//AssessmentUser user = service.getUserByIDAndSession(userID, toolSessionId);
 	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userID);
 	int attemptsAllowed = assessment.getAttemptsAllowed();
-	boolean isResubmitAllowed = ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0));// && !user.isSessionFinished();
+	boolean isResubmitAllowed = ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0));
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed);
+	
+	//calculate whether isUserFailed
+	AssessmentResult result = (AssessmentResult) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_RESULT);
+	int passingMark = assessment.getPassingMark();
+	boolean isUserFailed = ((passingMark != 0) && (passingMark > result.getGrade()));
+	request.setAttribute(AssessmentConstants.ATTR_IS_USER_FAILED, isUserFailed);
 	
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, true);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);

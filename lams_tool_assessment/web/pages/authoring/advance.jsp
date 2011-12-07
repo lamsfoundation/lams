@@ -1,6 +1,26 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
+<script lang="javascript">
+	$(document).ready(function(){
+		$("#attemptsAllowedRadio").click(function() {
+			$("#passingMark").val("0");
+			$("#passingMark").attr("disabled", "disabled");
+			$("#attemptsAllowed").attr("disabled", "");
+		});
+		
+		$("#passingMarkRadio").click(function() {
+			$("#attemptsAllowed").val("0");
+			$("#attemptsAllowed").attr("disabled", "disabled");
+			$("#passingMark").attr("disabled", "");
+		});
+		
+		<c:if test="${formBean.assessment.passingMark == 0}">$("#passingMark").attr("disabled", "disabled");</c:if>
+		<c:if test="${formBean.assessment.passingMark > 0}">$("#attemptsAllowed").attr("disabled", "disabled");</c:if>
+	});
+
+</script>
+
 <!-- Advance Tab Content -->
 <p class="small-space-top">
 	<html:text property="assessment.timeLimit" size="3" styleId="timeLimit"></html:text>
@@ -35,7 +55,17 @@
 </p>
 
 <p>
-	<html:select property="assessment.attemptsAllowed" >
+	<label>
+		<fmt:message key="label.authoring.advance.choose.restriction" />
+	</label>
+	<br><br>
+	
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type="radio" name="isAttemptsChosen" value="${true}" id="attemptsAllowedRadio"
+		<c:if test="${formBean.assessment.passingMark == 0}">checked="checked"</c:if> 
+	/>
+	<fmt:message key="label.authoring.advance.attempts.allowed" />
+	<html:select property="assessment.attemptsAllowed" styleId="attemptsAllowed" >
 		<html:option value="0"><fmt:message key="label.authoring.advance.unlimited" /></html:option>
 		<html:option value="6">6</html:option>
 		<html:option value="5">5</html:option>
@@ -44,7 +74,16 @@
 		<html:option value="2">2</html:option>
 		<html:option value="1">1</html:option>
 	</html:select>
-	<fmt:message key="label.authoring.advance.attempts.allowed" />
+	<br><br>
+	
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type="radio" name="isAttemptsChosen" value="${false}" id="passingMarkRadio"	
+		<c:if test="${formBean.assessment.passingMark > 0}">checked="checked"</c:if> 
+	/>
+	<fmt:message key="label.authoring.advance.passing.mark" />
+	<html:select property="assessment.passingMark" styleId="passingMark" >
+	</html:select>
+	
 </p>
 
 <p>

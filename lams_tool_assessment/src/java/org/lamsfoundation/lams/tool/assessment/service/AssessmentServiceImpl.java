@@ -354,7 +354,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		AssessmentQuestionResult processedAnswer = this.processUserAnswer(question, numberWrongAnswers);
 		questionResultList.add(processedAnswer);
 
-		maximumGrade += question.getDefaultGrade();
+		maximumGrade += question.getGrade();
 		grade += processedAnswer.getMark();
 	    }
 	}
@@ -389,7 +389,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	questionResult.setFinishDate(new Date());
 
 	float mark = 0;
-	float maxMark = question.getDefaultGrade();
+	float maxMark = question.getGrade();
 	if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 	    for (AssessmentQuestionOption option : question.getQuestionOptions()) {
 		if (option.getAnswerBoolean()) {

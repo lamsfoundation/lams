@@ -67,6 +67,8 @@ public class Assessment implements Cloneable {
     
     private int attemptsAllowed;
     
+    private int passingMark;
+    
     private boolean runOffline;
 
     private boolean shuffled;
@@ -689,6 +691,20 @@ public class Assessment implements Cloneable {
 
     public void setAttemptsAllowed(int attemptsAllowed) {
 	this.attemptsAllowed = attemptsAllowed;
+    }
+    
+    /**
+     * passing mark based on which we decide either user has failed or passed
+     * 
+     * @hibernate.property column="passing_mark"
+     * @return
+     */
+    public int getPassingMark() {
+	return passingMark;
+    }
+    
+    public void setPassingMark(int passingMark) {
+	this.passingMark = passingMark;
     }
 
     /**

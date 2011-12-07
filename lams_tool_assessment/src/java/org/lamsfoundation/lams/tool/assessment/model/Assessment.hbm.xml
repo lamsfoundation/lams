@@ -284,6 +284,14 @@
         />
 
         <property
+            name="passingMark"
+            type="int"
+            update="true"
+            insert="true"
+            column="passing_mark"
+        />
+
+        <property
             name="shuffled"
             type="boolean"
             update="true"

@@ -30,6 +30,7 @@ create table tl_laasse10_assessment (
    run_offline tinyint,
    time_limit integer DEFAULT 0,
    attempts_allowed integer DEFAULT 1,
+   passing_mark integer DEFAULT 0,
    instructions text,
    online_instructions text,
    offline_instructions text,

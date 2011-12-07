@@ -142,6 +142,8 @@ public class AssessmentResult {
     }
     
     /**
+     * Overall assessment grade (incl all penalties)
+     * 
      * @hibernate.property column="grade"
      * @return
      */
@@ -149,6 +151,11 @@ public class AssessmentResult {
 	return grade;
     }
 
+    /**
+     * Overall assessment grade (incl all penalties)
+     * 
+     * @param grade
+     */
     public void setGrade(float grade) {
 	this.grade = grade;
     }

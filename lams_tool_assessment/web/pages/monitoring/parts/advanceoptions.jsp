@@ -55,6 +55,23 @@
 	
 	<tr>
 		<td>
+			<fmt:message key="label.authoring.advance.passing.mark" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${assessment.passingMark == 0}">
+					-
+				</c:when>
+				<c:otherwise>
+					${assessment.passingMark}
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
 			<fmt:message key="label.authoring.advance.allow.students.overall.feedback" />
 		</td>
 		

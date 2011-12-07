@@ -24,6 +24,9 @@ create table tl_laasse10_question_reference (
    primary key (uid)
 )type=innodb;
 
+-- LDEV-2717 Add passing mark feature to assessment tool
+ALTER TABLE tl_laasse10_assessment ADD COLUMN passing_mark integer DEFAULT 0;
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on

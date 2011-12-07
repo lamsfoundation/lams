@@ -162,6 +162,14 @@
 			</div>
 		</c:if>
 		
+		<c:if test="${isUserFailed}">
+			<div class="warning">
+				<fmt:message key="label.learning.havent.reached.passing.mark">
+					<fmt:param>${assessment.passingMark}</fmt:param>
+				</fmt:message>
+			</div>
+		</c:if>
+		
 		<div id="question" style="display:none; cursor: default"> 
 	        <h1 style="padding: 30 10 50">
 	        	<fmt:message key='label.learning.blockui.are.you.ready' />
@@ -196,10 +204,12 @@
 							<html:link href="javascript:;" property="resubmit" onclick="return resubmit()" styleClass="button">
 								<fmt:message key="label.learning.resubmit" />
 							</html:link>						
-						</c:if>					
-						<html:link href="#" property="FinishButton" onclick="return finishSession()" styleClass="button">
-							<span class="nextActivity"><fmt:message key="label.learning.next.activity" /></span>
-						</html:link>
+						</c:if>	
+						<c:if test="${! isUserFailed}">				
+							<html:link href="#" property="FinishButton" onclick="return finishSession()" styleClass="button">
+								<span class="nextActivity"><fmt:message key="label.learning.next.activity" /></span>
+							</html:link>
+						</c:if>
 					</c:otherwise>
 				</c:choose>
 			</div>
