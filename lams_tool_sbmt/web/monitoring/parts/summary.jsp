@@ -10,6 +10,10 @@
 <link type="text/css" href="${lams}/css/jquery-ui-1.8.11.flick-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui-timepicker-addon.css" rel="stylesheet">
 
+<script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
 <script type="text/javascript">
 	// pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
@@ -23,10 +27,6 @@
 	};
 </script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-timepicker-addon.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
 
 <script type="text/javascript">
 	function launchPopup(url, title) {
