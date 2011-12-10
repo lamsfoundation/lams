@@ -916,6 +916,10 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	}
     }
 
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
+    }
+    
     /**
      * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
      * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
@@ -924,7 +928,8 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
      * 
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+	    throws ToolException {
 	return new TreeMap<String, ToolOutputDefinition>();
     }
 
