@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<bean id="eadventureMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.eucm.lams.tool.eadventure.ApplicationResources</value></property>
+			</bean>
+		</property>										
+	</bean>
+    <!-- core beans -->
+    <bean id="eadventureDao" class="org.eucm.lams.tool.eadventure.dao.hibernate.EadventureDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="eadventureAttachmentDao" class="org.eucm.lams.tool.eadventure.dao.hibernate.EadventureAttachmentDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="eadventureUserDao" class="org.eucm.lams.tool.eadventure.dao.hibernate.EadventureUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="eadventureSessionDao" class="org.eucm.lams.tool.eadventure.dao.hibernate.EadventureSessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
+    <bean id="eadventureItemVisitDao" class="org.eucm.lams.tool.eadventure.dao.hibernate.EadventureItemVisitDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
+    <bean id="eadventureVarsDao" class="org.eucm.lams.tool.eadventure.dao.hibernate.EadventureVarsDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
+    <bean id="eadventureParamDao" class="org.eucm.lams.tool.eadventure.dao.hibernate.EadventureParamDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
+     <bean id="eadventureConditionDao" class="org.eucm.lams.tool.eadventure.dao.hibernate.EadventureConditionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
+     <bean id="eadventureExpressionDao" class="org.eucm.lams.tool.eadventure.dao.hibernate.EadventureExpressionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
+    <bean id="eadventureOutputFactory" class="org.eucm.lams.tool.eadventure.service.EadventureOutputFactory">  
+    	<property name="toolMessageService"><ref bean="eadventureMessageService"/></property>  
+	</bean> 
+
+
+    <!-- Managers -->
+	<bean id="eadventureToolContentHandler" class="org.eucm.lams.tool.eadventure.util.EadventureToolContentHandler">
+	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
+	
+    <bean id="eadventureManagerTarget" class="org.eucm.lams.tool.eadventure.service.EadventureServiceImpl">
+        <property name="eadventureDao">
+            <ref local="eadventureDao"/>
+        </property>
+        <property name="eadventureAttachmentDao">
+            <ref local="eadventureAttachmentDao"/>
+        </property>
+        <property name="eadventureUserDao">
+            <ref local="eadventureUserDao"/>
+        </property>
+        <property name="eadventureSessionDao">
+            <ref local="eadventureSessionDao"/>
+        </property>
+         <property name="eadventureItemVisitDao">
+            <ref local="eadventureItemVisitDao"/>
+        </property>
+         <property name="eadventureVarsDao">
+            <ref local="eadventureVarsDao"/>
+        </property>
+        <property name="eadventureParamDao">
+            <ref local="eadventureParamDao"/>
+        </property>
+         <property name="eadventureConditionDao">
+            <ref local="eadventureConditionDao"/>
+        </property>
+         <property name="eadventureExpressionDao">
+            <ref local="eadventureExpressionDao"/>
+        </property>
+        <property name="eadventureToolContentHandler">
+            <ref local="eadventureToolContentHandler"/>
+        </property>
+        <property name="repositoryService">
+            <ref bean="repositoryService"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="learnerService">
+   			<ref bean="learnerService"/>
+   		</property>
+   		<property name="auditService">
+   			<ref bean="auditService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService"><ref bean="eadventureMessageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   
+		<property name="eventNotificationService">
+			<ref bean="eventNotificationService"/>
+		</property>   
+		<property name="gradebookService">
+			<ref bean="gradebookService" />
+		</property>
+		<property name="lessonService">
+   			<ref bean="lessonService"/>
+   		</property>
+				<property name="eadventureOutputFactory"><ref bean="eadventureOutputFactory"/></property>
+    </bean>
+
+    <bean id="eadventureService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref local="eadventureManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setItemAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="uploadEadventureFile">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setItemComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>                
+                <prop key="setAppletInput">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+			    <prop key="importToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                
+                <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
+				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
+

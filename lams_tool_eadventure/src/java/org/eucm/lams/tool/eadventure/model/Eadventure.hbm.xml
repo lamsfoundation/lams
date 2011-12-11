@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+    <class
+        name="org.eucm.lams.tool.eadventure.model.Eadventure"
+        table="tl_eueadv10_eadventure"
+    >
+
+        <id
+            name="uid"
+            column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-Eadventure.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="created"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="create_date"
+        />
+
+        <property
+            name="updated"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="update_date"
+        />
+
+        <many-to-one
+            name="createdBy"
+            class="org.eucm.lams.tool.eadventure.model.EadventureUser"
+            cascade="save-update"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="create_by"
+        />
+
+        <property
+            name="title"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="title"
+        />
+
+        <property
+            name="runOffline"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="run_offline"
+        />
+
+        <property
+            name="lockWhenFinished"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="lock_on_finished"
+        />
+
+        <property
+            name="instructions"
+            type="text"
+            update="true"
+            insert="true"
+            column="instructions"
+        />
+
+        <property
+            name="onlineInstructions"
+            type="text"
+            update="true"
+            insert="true"
+            column="online_instructions"
+        />
+
+        <property
+            name="offlineInstructions"
+            type="text"
+            update="true"
+            insert="true"
+            column="offline_instructions"
+        />
+
+        <set
+            name="attachments"
+            lazy="true"
+            inverse="false"
+            cascade="all"
+            sort="unsorted"
+            order-by="create_date desc"
+        >
+
+            <key
+                column="eadventure_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.eucm.lams.tool.eadventure.model.EadventureAttachment"
+            />
+
+        </set>
+
+        <property
+            name="contentInUse"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="content_in_use"
+        />
+
+        <property
+            name="defineLater"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="define_later"
+        />
+
+        <property
+            name="contentId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="content_id"
+            unique="true"
+        />
+
+        <property
+            name="reflectInstructions"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="reflect_instructions"
+        />
+
+        <property
+            name="reflectOnActivity"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="reflect_on_activity"
+        />
+
+        <property
+            name="imsSchema"
+            type="text"
+            update="true"
+            insert="true"
+            column="ims_schema"
+        />
+
+        <property
+            name="organizationXml"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="organization_xml"
+            length="65535"
+        />
+
+        <property
+            name="fileName"
+            type="text"
+            update="true"
+            insert="true"
+            column="file_name"
+        />
+
+        <property
+            name="fileUuid"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="file_uuid"
+        />
+
+        <property
+            name="fileVersionId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="file_version_id"
+        />
+
+        <property
+            name="fileType"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="file_type"
+        />
+
+        <property
+            name="defineComplete"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="define_complete"
+        />
+
+        <set
+            name="params"
+            lazy="true"
+            inverse="false"
+            cascade="all"
+            sort="unsorted"
+        >
+
+            <key
+                column="eadventure_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.eucm.lams.tool.eadventure.model.EadventureParam"
+            />
+
+        </set>
+
+        <property
+            name="initialItem"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="init_item"
+        />
+
+        <set
+            name="conditions"
+            lazy="true"
+            inverse="false"
+            cascade="all"
+            sort="unsorted"
+            order-by="sequence_id"
+        >
+
+            <key
+                column="eadventure_uid"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.eucm.lams.tool.eadventure.model.EadventureCondition"
+            />
+
+        </set>
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-Eadventure.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
+</hibernate-mapping>
