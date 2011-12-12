@@ -277,9 +277,6 @@
 				<include name="common/**"/> 
 				<include name="layout/**"/> 
 			</fileset>
-			<lib dir="${weblib}/jaxen">  
-				<include name="*.jar"/> 
-			</lib> 
 			<lib dir="${weblib}/reload_2_0_1">
 				<include name="*.jar"/>
 			</lib>

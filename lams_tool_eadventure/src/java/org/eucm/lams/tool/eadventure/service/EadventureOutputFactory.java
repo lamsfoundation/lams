@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.OutputType;
+import org.lamsfoundation.lams.tool.SimpleURL;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -59,70 +60,74 @@ public class EadventureOutputFactory extends OutputFactory {
     protected final static String OUTPUT_NAME_TOOL_CONDITION = "tool.condition";
     
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject)
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
 	    throws ToolException {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-	
-	ToolOutputDefinition definition =null;
-	// add default outputs
-	definition =  buildRangeDefinition(OUTPUT_NAME_LEARNER_TOTAL_SCORE, new Long(0), new Long(0), true );
-	definitionMap.put(OUTPUT_NAME_LEARNER_TOTAL_SCORE, definition);
-	definition =  buildBooleanOutputDefinition(OUTPUT_NAME_LEARNER_COMPLETED);
-	definitionMap.put(OUTPUT_NAME_LEARNER_COMPLETED, definition);
-	definition =  buildRangeDefinition(OUTPUT_NAME_LEARNER_TOTAL_TIME, new Long(0), new Long(0), false );
-	definitionMap.put(OUTPUT_NAME_LEARNER_TOTAL_TIME, definition);
-	definition =  buildRangeDefinition(OUTPUT_NAME_LEARNER_REAL_TIME, new Long(0), new Long(0), false );
-	definitionMap.put(OUTPUT_NAME_LEARNER_REAL_TIME, definition);
-	
-	Eadventure ead = (Eadventure)toolContentObject;
-	//TODO cambiar por ead.getParamsWithoutDeafault();
-	 Set<EadventureParam> eadParams = ead.getParams();
-	    for (EadventureParam param : eadParams){        
+
+	switch (definitionType) {
+	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+	    ToolOutputDefinition definition = null;
+	    // add default outputs
+	    definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_TOTAL_SCORE, new Long(0), new Long(0), true);
+	    definitionMap.put(OUTPUT_NAME_LEARNER_TOTAL_SCORE, definition);
+	    definition = buildBooleanOutputDefinition(OUTPUT_NAME_LEARNER_COMPLETED);
+	    definitionMap.put(OUTPUT_NAME_LEARNER_COMPLETED, definition);
+	    definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_TOTAL_TIME, new Long(0), new Long(0), false);
+	    definitionMap.put(OUTPUT_NAME_LEARNER_TOTAL_TIME, definition);
+	    definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_REAL_TIME, new Long(0), new Long(0), false);
+	    definitionMap.put(OUTPUT_NAME_LEARNER_REAL_TIME, definition);
+
+	    Eadventure ead = (Eadventure) toolContentObject;
+	    // TODO cambiar por ead.getParamsWithoutDeafault();
+	    Set<EadventureParam> eadParams = ead.getParams();
+	    for (EadventureParam param : eadParams) {
 		String text;
 		// skip default outputs
-		if (isDefaultOutput(param.getType())){
-		if (param.getType().equals(EadventureConstants.PARAMS_TYPE_BOOLEAN)){
-		  definition =  buildBooleanOutputDefinition(param.getName());
-		  definition.setDescription(getI18NText("output.desc.learner.user.defined", false) + param.getName());	
-		}else if (param.getType().equals(EadventureConstants.PARAMS_TYPE_INTEGER)){
-		    definition =  buildRangeDefinition(param.getName(), new Long(0), null);
-		    definition.setDescription(getI18NText("output.desc.learner.user.defined", false) + param.getName());
-		} if (param.getType().equals(EadventureConstants.PARAMS_TYPE_STRING)){
-		    definition =  buildRangeDefinition(param.getName(), new Long(0), null);
-		    definition.setDescription(getI18NText("output.desc.learner.user.defined", false) + param.getName());
+		if (isDefaultOutput(param.getType())) {
+		    if (param.getType().equals(EadventureConstants.PARAMS_TYPE_BOOLEAN)) {
+			definition = buildBooleanOutputDefinition(param.getName());
+			definition.setDescription(getI18NText("output.desc.learner.user.defined", false)
+				+ param.getName());
+		    } else if (param.getType().equals(EadventureConstants.PARAMS_TYPE_INTEGER)) {
+			definition = buildRangeDefinition(param.getName(), new Long(0), null);
+			definition.setDescription(getI18NText("output.desc.learner.user.defined", false)
+				+ param.getName());
+		    }
+		    if (param.getType().equals(EadventureConstants.PARAMS_TYPE_STRING)) {
+			definition = buildRangeDefinition(param.getName(), new Long(0), null);
+			definition.setDescription(getI18NText("output.desc.learner.user.defined", false)
+				+ param.getName());
+		    }
+		    definitionMap.put(param.getName(), definition);
 		}
-		definitionMap.put(param.getName(), definition);
-		}
-		}
-	    
-		
-		//add the conditions defined at authoring
-	    if (ead.getConditions()!=null&&ead.getConditions().size()>0){
-	    	ToolOutputDefinition definitionOthers = buildBooleanSetOutputDefinition(OUTPUT_NAME_TOOL_CONDITION);
-		if ( definitionOthers.getDefaultConditions() == null )
+	    }
+
+	    // add the conditions defined at authoring
+	    if (ead.getConditions() != null && ead.getConditions().size() > 0) {
+		ToolOutputDefinition definitionOthers = buildBooleanSetOutputDefinition(OUTPUT_NAME_TOOL_CONDITION);
+		if (definitionOthers.getDefaultConditions() == null)
 		    definitionOthers.setDefaultConditions(new ArrayList<BranchCondition>());
-		
+
 		List<BranchCondition> defaultConditions = definitionOthers.getDefaultConditions();
 		String trueString = Boolean.TRUE.toString();
-			
+
 		Iterator<EadventureCondition> iter2 = ead.getConditions().iterator();
-		while ( iter2.hasNext() ) {
+		while (iter2.hasNext()) {
 		    EadventureCondition condition = iter2.next();
-			String name = buildConditionName(OUTPUT_NAME_TOOL_CONDITION, condition.getName());
-			defaultConditions.add(new BranchCondition(null, null, condition.getSequenceId(),  name, 
-					condition.getName(), 
-					OutputType.OUTPUT_BOOLEAN.toString(),
-					null, 
-					null, 
-					trueString));
+		    String name = buildConditionName(OUTPUT_NAME_TOOL_CONDITION, condition.getName());
+		    defaultConditions.add(new BranchCondition(null, null, condition.getSequenceId(), name, condition
+			    .getName(), OutputType.OUTPUT_BOOLEAN.toString(), null, null, trueString));
 		}
-			
+
 		definitionOthers.setShowConditionNameOnly(Boolean.TRUE);
-		
+
 		definitionMap.put(OUTPUT_NAME_TOOL_CONDITION, definitionOthers);
 	    }
-	    
-	    
+	    break;
+	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
+	    break;
+	}
+
 	return definitionMap;
     }
     

@@ -1053,22 +1053,22 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
      * @throws EadventureApplicationException
      */
     
-  //  @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId) throws ToolException {
+    // @Override
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+	    throws ToolException {
 	Eadventure content = getEadventureByContentId(toolContentId);
 	if (content == null) {
 	    try {
 		content = getDefaultContent(toolContentId);
-		
+
 	    } catch (EadventureApplicationException e) {
 		throw new ToolException(e);
 	    }
 	}
-	
-	SortedMap<String, ToolOutputDefinition> prueba = getEadventureOutputFactory().getToolOutputDefinitions(content);
-	
-	
-	
+
+	SortedMap<String, ToolOutputDefinition> prueba = getEadventureOutputFactory().getToolOutputDefinitions(content,
+		definitionType);
+
 	return prueba;
     }
 
@@ -1621,6 +1621,10 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	
     }
 
+    public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	return null;
+    }
+    
     //@Override
     public EadventureItemVisitLog getEadventureItemLog(Long itemUid, Long userId) {
 	
@@ -1643,10 +1647,4 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
     public void setEadventureExpressionDao(EadventureExpressionDAO eadventureExpressionDao) {
         this.eadventureExpressionDao = eadventureExpressionDao;
     }
-
-   
-
-   
-
-    
 }
