@@ -47,6 +47,7 @@
 			<value>/org/lamsfoundation/lams/learning/learningApplicationContext.xml</value>
 			
 			 <value>classpath*:org/lamsfoundation/lams/tool/**/*pplicationContext.xml</value>
+			 <value>classpath*:org/eucm/lams/tool/**/*pplicationContext.xml</value>
 			 
 			 <!-- 
 			 <value>/org/lamsfoundation/lams/tool/pixlr/pixlrApplicationContext.xml</value>
