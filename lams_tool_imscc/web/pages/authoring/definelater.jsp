@@ -15,7 +15,6 @@
 	<title><fmt:message key="label.author.title" /></title>
 
 	<%@ include file="/common/tabbedheader.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>
 	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 
 	<script>
@@ -40,7 +39,7 @@
         
        
     </script>
-	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
+	<!-- ******************** END CK Editor related javascript & HTML ********************** -->
 
 
 </lams:head>

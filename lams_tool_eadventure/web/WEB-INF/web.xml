@@ -222,13 +222,6 @@
 		    <taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
 		  </taglib>
 		<!--  ======================================================== -->	
-		<!--   FCKEditor Tag Library -->
-		<!--  ======================================================== -->	
-		<taglib>
-		    <taglib-uri>fck-editor</taglib-uri>
-		    <taglib-location>/WEB-INF/tlds/fckeditor/FCKeditor.tld</taglib-location>
-		</taglib>
-		<!--  ======================================================== -->	
 		<!--   Customized Tag Library -->
 		<!--  ======================================================== -->	
 		<taglib>

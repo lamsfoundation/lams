@@ -61,26 +61,31 @@
 <c:if test="${empty accessMode}">
 	<c:set var="accessMode" value="author" scope="request"/>
 </c:if>
+<c:if test="${not empty param.notifyCloseURL}">
+	<c:set var="notifyCloseURL" value="${param.notifyCloseURL}" scope="session"/>
+</c:if>
 
 <!-- begin tab content -->
 <script type="text/javascript">
 	if(<c:choose><c:when test="${LAMS_AUTHORING_SUCCESS_FLAG == true}">true</c:when><c:otherwise>false</c:otherwise></c:choose>){
        	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&contentFolderID=${contentFolderID}'/>";
 	}
-	var noGameSelected = "<fmt:message key='error.eadventure.not.ead.added' />";
-	
     function doSubmit_Form_Only() {
-			var game=document.getElementById("gameName");
-		if (game==null){
-			alert(noGameSelected);
-		} else {
-		document.getElementById("${formID}").submit();
-			}
-    	
+    	document.getElementById("${formID}").submit();
     }
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
-        	location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}&customiseSessionID=${customiseSessionID}'/>";
+			var notifyCloseURL = "${notifyCloseURL}";
+			if (notifyCloseURL == ""){
+				location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
+			} else {
+				if (window.parent.opener == null){
+					window.location.href = notifyCloseURL;
+				} else {
+					window.parent.opener.location.href = notifyCloseURL;
+				}
+			}
+        	
         	//just for depress alert window when call window.close()
         	//only available for IE browser
         	var userAgent=navigator.userAgent;

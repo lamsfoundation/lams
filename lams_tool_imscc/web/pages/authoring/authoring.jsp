@@ -10,7 +10,6 @@
 	<title><fmt:message key="label.author.title" /></title>
 	
 	<%@ include file="/common/tabbedheader.jsp"%>
-	<%@ include file="/common/fckeditorheader.jsp"%>	
 	
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/thickbox.css'/>" />
 	
@@ -87,7 +86,7 @@
 	}
         
     </script>
-	<!-- ******************** END FCK Editor related javascript & HTML ********************** -->
+	<!-- ******************** END CK Editor related javascript & HTML ********************** -->
 
  
 </lams:head>
