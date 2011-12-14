@@ -123,6 +123,26 @@
    </tag>
    <tag>
 
+      <description>Converts role name into form usable as message resources key</description>
+      <display-name>Converts role name into form usable as message resources key</display-name>
+      <icon>    
+      </icon>
+      <name>role</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.RoleTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Converts role name into form usable as message resources key</description>
+         <name>role</name>
+         <required>true</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
       <description>Help tag</description>
       <display-name>Help tag</display-name>
       <icon>    
@@ -167,22 +187,13 @@
    </tag>
    <tag>
 
-      <description>Converts role name into form usable as message resources key</description>
-      <display-name>Converts role name into form usable as message resources key</display-name>
+      <description>Checks whether Flash enabled for learner</description>
+      <display-name>Checks whether Flash enabled for learner</display-name>
       <icon>    
       </icon>
-      <name>role</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.RoleTag</tag-class>
+      <name>LearnerFlashEnabled</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.LearnerFlashEnabledTag</tag-class>
       <body-content>empty</body-content>
-
-      <attribute>
-         <description>Converts role name into form usable as message resources key</description>
-         <name>role</name>
-         <required>true</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
 
    </tag>
    <tag>
@@ -285,11 +296,6 @@
 		</attribute>
 		<attribute>
 			<name>errorStyleId</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-		</attribute>
-		<attribute>
-			<name>index</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
@@ -436,8 +442,8 @@
        <path>/WEB-INF/tags/TabName.tag</path>
    	</tag-file>
    	<tag-file>
-       <name>FCKEditor</name>
-       <path>/WEB-INF/tags/FCKEditor.tag</path>
+       <name>CKEditor</name>
+       <path>/WEB-INF/tags/CKEditor.tag</path>
    	</tag-file>
    	<tag-file>
        <name>AuthoringButton</name>
@@ -466,7 +472,7 @@
    	<tag-file>
 	    <name>ImgButtonWrapper</name>
 		<path>/WEB-INF/tags/ImgButtonWrapper.tag</path>
-   	</tag-file>  
+   	</tag-file>
    	<tag-file>
 	    <name>TextSearch</name>
 		<path>/WEB-INF/tags/TextSearch.tag</path>
@@ -501,6 +507,15 @@
         <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
+  	<tag>
+	  	<description>Checks whether Flash enabled for learner</description>
+	  	<display-name>Checks whether Flash enabled for learner</display-name>
+	 	<icon>    
+	 	</icon>
+	 	<name>LearnerFlashEnabled</name>
+	 	<tag-class>org.lamsfoundation.lams.web.tag.LearnerFlashEnabledTag</tag-class>
+	 	<body-content>empty</body-content>
+ 	</tag> 
 	<tag-file>
 		<name>head</name>
 	    <path>/WEB-INF/tags/Head.tag</path>
@@ -508,10 +523,6 @@
   	<tag-file>
 	    <name>ProgressOutput</name>
 		<path>/WEB-INF/tags/ProgressOutput.tag</path>
-   	</tag-file>  
-	<tag-file>
-	    <name>LearnerFlashEnabled</name>
-		<path>/WEB-INF/tags/LearnerFlashEnabled.tag</path>
    	</tag-file>  
 
 </taglib>
