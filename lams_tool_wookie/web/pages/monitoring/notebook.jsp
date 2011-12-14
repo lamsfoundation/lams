@@ -17,7 +17,6 @@
 		
 		<link href="${tool}pages/learning/wookie_style.css" rel="stylesheet" type="text/css">
 		<lams:css/>
-		<link href="${lams}css/fckeditor_style.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 
 		

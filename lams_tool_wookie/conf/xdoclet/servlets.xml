@@ -20,7 +20,7 @@
 	<load-on-startup>1</load-on-startup>
 </servlet>
 
-<!--  FCKEditor Connector Configuration -->
+<!--  CKEditor Connector Configuration -->
 
 <servlet>
 	<servlet-name>Connector</servlet-name>
