@@ -203,6 +203,10 @@ public class LAMSUploadServlet extends HttpServlet {
 				    	fields.put(item.getFieldName(),item);
 				}
 				FileItem uplFile=(FileItem)fields.get("NewFile");
+                		if (uplFile == null) {
+                		    // form field name used by CKEditor 3.x
+                		    uplFile = (FileItem) fields.get("upload");
+                		}
 				String fileNameLong=uplFile.getName();
 				fileNameLong=fileNameLong.replace('\\','/');
 				String[] pathParts=fileNameLong.split("/");
