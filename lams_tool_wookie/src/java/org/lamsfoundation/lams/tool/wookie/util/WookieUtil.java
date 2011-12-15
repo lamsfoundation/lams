@@ -48,6 +48,8 @@ import org.lamsfoundation.lams.tool.wookie.dto.WidgetData;
 import org.lamsfoundation.lams.tool.wookie.dto.WidgetDefinition;
 import org.lamsfoundation.lams.tool.wookie.web.actions.AuthoringAction;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -217,6 +219,10 @@ public class WookieUtil {
 	if (participantThumbnailURL != null) {
 	    params.put(WookieConstants.PARAM_KEY_PARTICIPANT_THUMBNAIL_URL, URLEncoder.encode(participantThumbnailURL,
 		    "UTF8"));
+	} else {
+	    // LDEV-2742 add default avatar
+	    String defaultAvatar = Configuration.get(ConfigurationKeys.SERVER_URL) + "images/lamb_big.png";
+	    params.put(WookieConstants.PARAM_KEY_PARTICIPANT_THUMBNAIL_URL, URLEncoder.encode(defaultAvatar, "UTF8"));
 	}
 	params.put(WookieConstants.PARAM_KEY_API_KEY, URLEncoder.encode(apiKey, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_REQUEST_ID, URLEncoder.encode(WookieConstants.PARAM_VALUE_ADD_PARTICIPANT,
