@@ -196,7 +196,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	request.setAttribute("currentImageURL", currentImageURL);
-	request.setAttribute("pixlrURL", url);
+	request.setAttribute("pixlrURL", URLEncoder.encode(url, "UTF-8"));
 	request.setAttribute("returnURL", returnURL);
 
 	// set readOnly flag.
