@@ -143,13 +143,18 @@ public class DisplayGroupAction extends Action {
 	}
 
 	if (org.getEnableGradebookForLearners() && contains(roles, Role.ROLE_LEARNER)) {
-
-	    String link = "javascript:openGradebookLearnerPopup(" + "'" + org.getName() + "','"
-		    + Configuration.get(ConfigurationKeys.SERVER_URL)
-		    + "/gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID="
-		    + org.getOrganisationId() + "'," + "750,400,0,0);";
-
-	    links.add(new IndexLinkBean("index.coursegradebook.learner", link, "my-grades-button", null, null));
+		try {
+			// for some reason the name needs to be encoded twice so it's encoded on JSP page as well
+			String encodedOrgName = URLEncoder.encode(URLEncoder.encode(org.getName(), "UTF8"), "UTF8");
+			String link = "javascript:openGradebookLearnerPopup(" + "'" + encodedOrgName + "','"
+			    + Configuration.get(ConfigurationKeys.SERVER_URL)
+			    + "/gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID="
+			    + org.getOrganisationId() + "'," + "750,400,0,0);";
+	
+		    links.add(new IndexLinkBean("index.coursegradebook.learner", link, "my-grades-button", null, null));
+		} catch (UnsupportedEncodingException e) {
+			log.error("Error while encoding course name, skipping gradebook course monitor link", e);
+		}
 	}
 	
 	if ((contains(roles, Role.ROLE_GROUP_ADMIN) || contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,
