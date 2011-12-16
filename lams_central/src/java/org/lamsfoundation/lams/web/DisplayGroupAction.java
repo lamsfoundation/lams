@@ -23,6 +23,8 @@
 /* $Id$ */
 package org.lamsfoundation.lams.web;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -149,7 +151,7 @@ public class DisplayGroupAction extends Action {
 
 	    links.add(new IndexLinkBean("index.coursegradebook.learner", link, "my-grades-button", null, null));
 	}
-
+	
 	if ((contains(roles, Role.ROLE_GROUP_ADMIN) || contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,
 		Role.ROLE_MONITOR))
 		&& stateId.equals(OrganisationState.ACTIVE)) {
@@ -180,13 +182,18 @@ public class DisplayGroupAction extends Action {
 
 		// Adding gradebook course monitor links if enabled
 		if (org.getEnableGradebookForMonitors() && (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))) {
-		    String link = "javascript:openGradebookCourseMonitorPopup(" + "'" + org.getName() + "','"
-			    + Configuration.get(ConfigurationKeys.SERVER_URL)
-			    + "/gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID="
-			    + org.getOrganisationId() + "'," + "850,400,0,0);";
-
-		    moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "course-gradebook-button", null,
-			    "index.coursegradebook.tooltip"));
+		    try {
+			// for some reason the name needs to be encoded twice so it's encoded on JSP page as well
+			String encodedOrgName = URLEncoder.encode(URLEncoder.encode(org.getName(), "UTF8"), "UTF8");
+			String link = "javascript:openGradebookCourseMonitorPopup(" + "'" + encodedOrgName + "','"
+				+ Configuration.get(ConfigurationKeys.SERVER_URL)
+				+ "/gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID="
+				+ org.getOrganisationId() + "'," + "850,400,0,0);";
+			moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "course-gradebook-button", null,
+				"index.coursegradebook.tooltip"));
+		    } catch (UnsupportedEncodingException e) {
+			log.error("Error while encoding course name, skipping gradebook course monitor link", e);
+		    }
 		}
 
 	    } else {//CLASS_TYPE
@@ -200,13 +207,18 @@ public class DisplayGroupAction extends Action {
 		// Adding gradebook course monitor links if enabled
 		if (org.getParentOrganisation().getEnableGradebookForMonitors()
 			&& (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))) {
-		    String link = "javascript:openGradebookCourseMonitorPopup(" + "'" + org.getName() + "','"
-			    + Configuration.get(ConfigurationKeys.SERVER_URL)
-			    + "/gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID="
-			    + org.getOrganisationId() + "'," + "850,400,0,0);";
-
-		    moreLinks.add(new IndexLinkBean("index.coursegradebook.subgroup", link, "mycourses-mark-img", null,
-			    null));
+		    try {
+			// for some reason the name needs to be encoded twice so it's encoded on JSP page as well
+			String encodedOrgName = URLEncoder.encode(URLEncoder.encode(org.getName(), "UTF8"), "UTF8");
+			String link = "javascript:openGradebookCourseMonitorPopup(" + "'" + encodedOrgName + "','"
+				+ Configuration.get(ConfigurationKeys.SERVER_URL)
+				+ "/gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID="
+				+ org.getOrganisationId() + "'," + "850,400,0,0);";
+			moreLinks.add(new IndexLinkBean("index.coursegradebook.subgroup", link, "mycourses-mark-img",
+				null, null));
+		    } catch (UnsupportedEncodingException e) {
+			log.error("Error while encoding course name, skipping gradebook course monitor link", e);
+		    }
 		}
 	    }
 	}
@@ -346,11 +358,16 @@ public class DisplayGroupAction extends Action {
 	    if ((contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))
 		    && org.getEnableGradebookForMonitors()
 		    || (parent != null && parent.getEnableGradebookForMonitors())) {
-		String link = "javascript:openGradebookLessonMonitorPopup(" + "'" + org.getName() + "','"
-			+ Configuration.get(ConfigurationKeys.SERVER_URL)
-			+ "/gradebook/gradebookMonitoring.do?lessonID=" + bean.getId() + "'," + "850,700,0,0);";
-
-		lessonLinks.add(new IndexLinkBean("index.coursegradebookmonitor", link, null, "mycourses-mark-img", null));
+		try {
+		    String encodedOrgName = URLEncoder.encode(URLEncoder.encode(org.getName(), "UTF8"), "UTF8");
+		    String link = "javascript:openGradebookLessonMonitorPopup(" + "'" + encodedOrgName + "','"
+			    + Configuration.get(ConfigurationKeys.SERVER_URL)
+			    + "/gradebook/gradebookMonitoring.do?lessonID=" + bean.getId() + "'," + "850,700,0,0);";
+		    lessonLinks.add(new IndexLinkBean("index.coursegradebookmonitor", link, null, "mycourses-mark-img",
+			    null));
+		} catch (UnsupportedEncodingException e) {
+		    log.error("Error while encoding course name, skipping gradebook lesson monitor link", e);
+		}
 	    }
 
 	    if (lessonLinks.size() > 0) {
