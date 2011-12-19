@@ -8,6 +8,7 @@
 <%@ attribute name="width" required="false" rtexprvalue="true"%>
 <%@ attribute name="contentFolderID" required="false" rtexprvalue="true"%>
 <%@ attribute name="displayExpanded" required="false" rtexprvalue="true"%>
+<%@ attribute name="resizeParentFrameName" required="false" rtexprvalue="true"%>
 
 <c:set var="language">
 	<lams:user property="fckLanguageMapping" />
@@ -38,6 +39,18 @@
 
 <script type="text/javascript">
 	function initializeCKEditor(){
+		
+		if ("${resizeParentFrameName}" != ""){
+			CKEDITOR.on('instanceReady', function(e){
+				if (e.editor.element.$.id == "${id}"){
+					var messageAreaFrame = window.parent.document.getElementById("${resizeParentFrameName}");
+					if (messageAreaFrame != null){
+						messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
+					}
+				}
+			});
+		}
+		
 		CKEDITOR.basePath = "${ckEditorBasePath}";
 	    
 		var instance = CKEDITOR.replace( "${id}", {
