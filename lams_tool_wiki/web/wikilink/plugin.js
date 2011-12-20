@@ -8,13 +8,22 @@ CKEDITOR.plugins.add('WikiLink',
              editor.ui.addButton(
                 'WikiLink',
                 {
-                   label : "WikiLink",
+                   label   : "WikiLink",
                    command : 'WikiLink',
-                   icon : pluginPath + 'wikilink.gif',
-                   title : editor.lang.wikilink.WikiLinkToolTip
+                   icon    : pluginPath + 'wikilink.gif',
+                   title   : editor.lang.wikilink.WikiLinkToolTip
                 }
              );
-             editor.addCommand('WikiLink', {exec:showDialogPlugin});
+             
+             editor.addCommand(
+            	'WikiLink', 
+            	{
+            	   exec : function(editor){
+            	   			editor.openDialog('WikiLink');
+             			  }
+            	}
+             );
+             
              CKEDITOR.dialog.addIframe(
                 'WikiLink',
                 'WikiLink',
@@ -26,8 +35,4 @@ CKEDITOR.plugins.add('WikiLink',
              );
           }
        }
-    );
-
-function showDialogPlugin(e){
-	e.openDialog('WikiLink');
-}
+);

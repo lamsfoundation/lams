@@ -8,14 +8,21 @@ CKEDITOR.plugins.add('paint',
 	             editor.ui.addButton(
 	                'Paint_Button',
 	                {
-	                   label : 'Paint canvas',
+	                   label   : 'Paint canvas',
 	                   command : 'Paint canvas',
-	                   icon : pluginPath + 'icon.png',
-	                   title : editor.lang.Paint.Button
+	                   icon    : pluginPath + 'icon.png',
+	                   title   : editor.lang.Paint.Button
 	                }
 	             );
-	             
-	             editor.addCommand('Paint canvas', {exec:showDialogPlugin});
+  
+	             editor.addCommand(
+	                'Paint canvas', 
+	 	            {
+	 	               exec : function(editor){
+	 	                 	  	editor.openDialog(editor.lang.Paint.DialogName);
+	 	                  	  }
+	 	            }
+	 	         );
 	             
 	             editor.paintStartingImage = "";
 	             
@@ -42,7 +49,3 @@ CKEDITOR.plugins.add('paint',
 	          }
 	       }
 	    );
-
-function showDialogPlugin(e){
-	e.openDialog(e.lang.Paint.DialogName);
-}
