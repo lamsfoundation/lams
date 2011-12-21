@@ -5,15 +5,10 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
+		<link href="<html:rewrite page='/includes/css/addQuestion.css'/>" rel="stylesheet" type="text/css">
+		
 		<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 		<c:set var="questionType" value="3"	scope="request" />
-		
-		<style type="text/css">
-			label { width: 10em; float: left; }
-			label.error { float: none; color: red; padding-left: .5em; vertical-align: top; font-weight: bold; font-style: italic;}
-			em { font-weight: bold; padding-right: 1em; vertical-align: top; }
-			input.error { border: 2px solid red;}			
-		</style>
 
 		<script type="text/javascript">
 			var questionType = ${questionType};
