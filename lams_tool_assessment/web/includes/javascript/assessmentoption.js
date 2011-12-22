@@ -6,7 +6,11 @@
 	//    var removeOptionUrl = "<c:url value='/authoring/removeOption.do'/>";
 	//    var addOptionUrl = "<c:url value='/authoring/newOption.do'/>";
 	function addOption(){
-		var oldCkeditorInstances = storeOldCkeditorInstances();
+		//store old InstanceIds before doing Ajax call. We need to keep record of old ones to prevent reinitializing new CKEditor two times.
+		var oldOptionIds = new Array();
+ 		for (var instanceId in CKEDITOR.instances){
+			oldOptionIds[instanceId] = instanceId;
+		}
 		
 		var url= addOptionUrl;
 		var contentFolderID= $("#contentFolderID").val();
@@ -20,13 +24,11 @@
 				optionList: optionList 
 			},
 			function(){
-				reinitializeGeneralCKEditorInstances(oldCkeditorInstances);
+				reinitializeOptionEditors(oldOptionIds);
 			}
 		);
 	}
 	function removeOption(idx){
-		var oldCkeditorInstances = storeOldCkeditorInstances();
-		
  		var url= removeOptionUrl;
 		var contentFolderID= $("#contentFolderID").val();
 		prepareOptionEditorsForAjaxSubmit();
@@ -40,13 +42,11 @@
 					optionList: optionList 
 				},
 				function(){
-					reinitializeGeneralCKEditorInstances(oldCkeditorInstances);
+					reinitializeOptionEditors(null);
 				}
 		);
 	}
 	function upOption(idx){
-		var oldCkeditorInstances = storeOldCkeditorInstances();
-		
  		var url= upOptionUrl;
 		var contentFolderID= $("#contentFolderID").val();
 		prepareOptionEditorsForAjaxSubmit();
@@ -60,13 +60,11 @@
 					optionList: optionList 
 				},
 				function(){
-					reinitializeGeneralCKEditorInstances(oldCkeditorInstances);
+					reinitializeOptionEditors(null);
 				}
 		);
 	}
 	function downOption(idx){
-		var oldCkeditorInstances = storeOldCkeditorInstances();
-		
  		var url= downOptionUrl;
 		var contentFolderID= $("#contentFolderID").val(); 	
 		prepareOptionEditorsForAjaxSubmit();
@@ -80,34 +78,30 @@
 					optionList: optionList 
 				},
 				function(){
-					reinitializeGeneralCKEditorInstances(oldCkeditorInstances);
+					reinitializeOptionEditors(null);
 				}
 		);
 	}
 	
-	//store references to general CKEditors before doing Ajax call
-	function storeOldCkeditorInstances(oldCkeditorInstances){
- 		var oldCkeditorInstances = new Array();
- 		oldCkeditorInstances.question = CKEDITOR.instances["question"];
- 		oldCkeditorInstances.generalFeedback = CKEDITOR.instances["generalFeedback"];  
- 		oldCkeditorInstances.feedbackOnCorrect = CKEDITOR.instances["feedbackOnCorrect"];
- 		oldCkeditorInstances.feedbackOnIncorrect = CKEDITOR.instances["feedbackOnIncorrect"];  
- 		oldCkeditorInstances.feedbackOnCorrectOutsideForm = CKEDITOR.instances["feedbackOnCorrectOutsideForm"];
- 		oldCkeditorInstances.feedbackOnPartiallyCorrectOutsideForm = CKEDITOR.instances["feedbackOnPartiallyCorrectOutsideForm"];
- 		oldCkeditorInstances.feedbackOnIncorrectOutsideForm = CKEDITOR.instances["feedbackOnIncorrectOutsideForm"];
- 		return oldCkeditorInstances;
-	}
-	
-	//reinitialize all general CKEditor after Ajax call has done
-	function reinitializeGeneralCKEditorInstances(oldCkeditorInstances){
-		for (var instanceId in oldCkeditorInstances){
-			if (instanceId == null) continue;
-			var instance = oldCkeditorInstances[instanceId];
-			if (instance == null) continue;
-			var initializeFunction = instance.initializeFunction;
-			instance.destroy();
-			instance = initializeFunction();
-			instance.initializeFunction = initializeFunction;
+	//reinitialize all CKEditors responsible for options after Ajax call has done
+	function reinitializeOptionEditors(optionIds){
+		if (optionIds == null) {
+			optionIds = CKEDITOR.instances;
+		}
+		
+		for (var instanceId in optionIds){
+			//skip general fckeditors
+			if (instanceId.match("^(optionString|optionQuestion|optionFeedback)")) { 
+				if (instanceId == null) continue;
+				var instance = CKEDITOR.instances[instanceId];
+				if (instance == null) continue;
+				var initializeFunction = instance.initializeFunction;
+				CKEDITOR.remove(instance);
+				//don't initialize elements that were deleted
+				if ($("#" + instanceId).length == 0) continue;
+				instance = initializeFunction();
+				instance.initializeFunction = initializeFunction;
+			}
 		}
 	}
 	
