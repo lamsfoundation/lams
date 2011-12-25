@@ -127,7 +127,7 @@
 	function createNewQuestionInitHref() {
 		var questionTypeDropdown = document.getElementById("questionType");
 		var questionType = questionTypeDropdown.selectedIndex + 1;
-		var newQuestionInitHref = "${newQuestionInitUrl}&questionType=" + questionType + "&referenceGrades=" + encodeURIComponent(serializeReferenceGrades()) + "&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true";
+		var newQuestionInitHref = "${newQuestionInitUrl}&questionType=" + questionType + "&referenceGrades=" + encodeURIComponent(serializeReferenceGrades()) + "&KeepThis=true&TB_iframe=true&height=540&width=950&modal=true";
 		$("#newQuestionInitHref").attr("href", newQuestionInitHref)
 	};
 	function refreshThickbox(){
@@ -210,11 +210,3 @@
 	</a>
 </p>
 <br>
- 
-<p>
-	<iframe
-		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
-		id="reourceInputArea" name="reourceInputArea" 
-		style="width:0px;height:0px;border:0px;display:none" frameborder="no" scrolling="no">
-	</iframe>
-</p>
