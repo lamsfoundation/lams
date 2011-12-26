@@ -150,11 +150,12 @@ public class LAMSUploadServlet extends HttpServlet {
 		
 		String typeStr=request.getParameter("Type");
 		String currentFolderStr=request.getParameter("CurrentFolder");
-		
-		if(!isEnabled(currentFolderStr)) {
+		String ckeditorSetUrlFuncNum = request.getParameter("CKEditorFuncNum");
+
+		if(!isEnabled(currentFolderStr) && ckeditorSetUrlFuncNum != null) {
 			retVal="203";
 			out.println("<script type=\"text/javascript\">");
-			out.println("window.parent.OnUploadCompleted("+retVal+",'"+fileUrl+"','"+newName+"','"+errorMessage+"');");
+			out.println("this.parent.CKEDITOR.tools.callFunction(" + ckeditorSetUrlFuncNum + ",'','Uploading is disabled, user content folder is not defined');");
 			out.println("</script>");
 			out.flush();
 			out.close();
@@ -242,10 +243,16 @@ public class LAMSUploadServlet extends HttpServlet {
 			errorMessage="This file uploader is disabled. Please check the WEB-INF/web.xml file";
 		}
 		
-		
-		out.println("<script type=\"text/javascript\">");
-		out.println("window.parent.OnUploadCompleted("+retVal+",'"+fileUrl+"','"+newName+"','"+errorMessage+"');");
-		out.println("</script>");
+        	if (ckeditorSetUrlFuncNum != null) {
+        	    out.println("<script type=\"text/javascript\">");
+        	    out.println("this.parent.CKEDITOR.tools.callFunction(" + ckeditorSetUrlFuncNum + ",'" + fileUrl
+        		    + "','File successfully uploaded: " + newName + "');");
+        	    out.println("</script>");
+        	} else if (debug) {
+        	    System.out
+        		    .println("LAMSUploadServlet: Upload successful but no CKEditor method found to run after completion. ");
+        	}
+
 		out.flush();
 		out.close();
 	
