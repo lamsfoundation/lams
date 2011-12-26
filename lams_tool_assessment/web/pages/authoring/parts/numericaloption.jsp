@@ -9,7 +9,7 @@
 		</td>
 		<td style="padding-left:10px; border-bottom:0px; background:none;">	
 			<input type="text" name="optionFloat${status.index}"
-				id="optionFloat${status.index}" size="25" value="${option.optionFloat}" class="number" title="<fmt:message key='label.authoring.choice.enter.float'/>">
+				id="optionFloat${status.index}" value="${option.optionFloat}" class="number shortInputText" title="<fmt:message key='label.authoring.choice.enter.float'/>">
 		</td>									
 	</tr>
 	
@@ -21,7 +21,7 @@
 		</td>
 		<td style="padding-left:10px; border-bottom:0px; background:none;">	
 			<input type="text" name="optionAcceptedError${status.index}"
-				id="optionAcceptedError${status.index}" size="25" value="${option.acceptedError}" class="number" title="<fmt:message key='label.authoring.choice.enter.float'/>">
+				id="optionAcceptedError${status.index}" value="${option.acceptedError}" class="number shortInputText" title="<fmt:message key='label.authoring.choice.enter.float'/>">
 		</td>									
 	</tr>	
 	
@@ -45,7 +45,7 @@
 	<tr>		
 		<td style="padding-left:10px; border-bottom:0px; background:none;" colspan="2">
 			<lams:CKEditor id="optionFeedback${status.index}" value="${option.feedback}"
-				contentFolderID="${contentFolderID}" width="690">
+				contentFolderID="${contentFolderID}">
 			</lams:CKEditor>		
 		</td>
 	</tr>	

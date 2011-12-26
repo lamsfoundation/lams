@@ -11,7 +11,7 @@
 	<tr>			
 		<td style="padding-left:10px; border-bottom:0px; background:none;">
 			<lams:CKEditor id="optionQuestion${status.index}" value="${option.question}"
-				contentFolderID="${contentFolderID}" width="690">
+				contentFolderID="${contentFolderID}">
 			</lams:CKEditor>				
 		</td>									
 	</tr>						
@@ -25,7 +25,7 @@
 	<tr>			
 		<td style="padding-left:10px; border-bottom:0px; background:none;" width="612px">	
 			<input type="text" name="optionString${status.index}"
-				id="optionString${status.index}" size="111" value="${option.optionString}">
+				id="optionString${status.index}" value="${option.optionString}">
 		</td>									
 	</tr>
 </table>

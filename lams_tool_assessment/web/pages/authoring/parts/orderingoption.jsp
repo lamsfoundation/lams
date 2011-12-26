@@ -11,7 +11,7 @@
 	<tr>		
 		<td style="padding-left:10px; border-bottom:0px; background:none;">	
 			<lams:CKEditor id="optionString${status.index}" value="${option.optionString}"
-				contentFolderID="${contentFolderID}" width="690px">
+				contentFolderID="${contentFolderID}">
 			</lams:CKEditor>					
 		</td>									
 	</tr>

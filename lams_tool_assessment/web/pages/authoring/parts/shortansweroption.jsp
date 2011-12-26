@@ -10,7 +10,7 @@
 	</tr>
 	<tr>		
 		<td style="padding-left:10px; border-bottom:0px; background:none;">	
-			<input type="text" name="optionString${status.index}" value="${option.optionString}" styleClass="noBorder" size="111"/>
+			<input type="text" name="optionString${status.index}" value="${option.optionString}"/>
 		</td>									
 	</tr>
 	
@@ -34,7 +34,7 @@
 	<tr>		
 		<td style="padding-left:10px; padding-right:0px; border-bottom:0px; background:none;">
 			<lams:CKEditor id="optionFeedback${status.index}" value="${option.feedback}"
-				contentFolderID="${contentFolderID}" width="690px">
+				contentFolderID="${contentFolderID}">
 			</lams:CKEditor>		
 		</td>
 	</tr>	

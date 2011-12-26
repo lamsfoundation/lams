@@ -100,32 +100,32 @@
 					<fmt:message key="label.authoring.basic.question.name" />
 					<img title="Required field" alt="Required field" src="${ctxPath}/includes/images/req.gif" />
 				</div>
-				<html:text property="title" size="55" />
+				<html:text property="title"/>
 	
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.question.text" />
 				</div>
 				<lams:CKEditor id="question" value="${formBean.question}"
-					contentFolderID="${formBean.contentFolderID}" width="715px">
+					contentFolderID="${formBean.contentFolderID}">
 				</lams:CKEditor>
 				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.default.question.grade" />
 					<img title="Required field" alt="Required field" src="${ctxPath}/includes/images/req.gif" />
 				</div>
-				<html:text property="defaultGrade" size="3" />
+				<html:text property="defaultGrade" styleClass="shortInputText"/>
 					
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.penalty.factor" />
 					<img title="Required field" alt="Required field" src="${ctxPath}/includes/images/req.gif" />
 				</div>
-				<html:text property="penaltyFactor" size="3" />
+				<html:text property="penaltyFactor" styleClass="shortInputText"/>
 				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.basic.general.feedback" />
 				</div>
 				<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}"
-					contentFolderID="${formBean.contentFolderID}" width="715px">
+					contentFolderID="${formBean.contentFolderID}">
 				</lams:CKEditor>
 	
 				<div class="field-name space-top">
@@ -140,14 +140,14 @@
 					<fmt:message key="label.authoring.true.false.feedback.on.true" />
 				</div>
 				<lams:CKEditor id="feedbackOnCorrect" value="${formBean.feedbackOnCorrect}"
-					contentFolderID="${formBean.contentFolderID}" width="715px">
+					contentFolderID="${formBean.contentFolderID}">
 				</lams:CKEditor>
 				
 				<div class="field-name space-top">
 					<fmt:message key="label.authoring.true.false.feedback.on.false" />
 				</div>
 				<lams:CKEditor id="feedbackOnIncorrect" value="${formBean.feedbackOnIncorrect}"
-					contentFolderID="${formBean.contentFolderID}" width="715px">
+					contentFolderID="${formBean.contentFolderID}">
 				</lams:CKEditor>				
 			</html:form>
 			

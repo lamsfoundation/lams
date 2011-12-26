@@ -4,3 +4,6 @@ em { font-weight: bold; padding-right: 1em; vertical-align: top; }
 input.error { border: 2px solid red;}
 #content {width: 91%; margin-bottom: 10px;}
 table.alternative-color td {padding-left: 0;}
+input[type=text].shortInputText {width:10%;}
+input[type=text] {width:98%;}
+textarea {width:98%;}
