@@ -14,14 +14,15 @@
 				
 				function triggerOK(){
 					if(!dataSent){
-						document.getElementById('flashContent').sendData("<lams:LAMSURL/>ckeditor/filemanager/browser/default/connectors/jsp/connector?Command=PaintUpload&Type=/Image&DesignFolder=/" + CK.contentFolderID + "&CurrentFolder=");	// Target URL
+						document.getElementById('flashContent').sendData("<lams:LAMSURL/>ckeditor/filemanager/browser/default/connectors/jsp/connector?Command=PaintUpload&Type=/Image&DesignFolder=/" + CK.config.contentFolderID + "&CurrentFolder=");	// Target URL
 						dataSent = true;
 					}
 					return false;
 				}
 				
 				function imageReceived(source){
-					CK.insertHtml('<img class="ckeditor_paint" src="' + source + '" style="border: none;"/>');
+					var trimmedSource = source.replace(/^\s+|\s+$/g, '');
+					CK.insertHtml('<img class="ckeditor_paint" src="' + trimmedSource + '" style="border: none;"/>');
 					CK.focus();
 					dataSent = false;
 					thisDialog.getButton('cancel').click();
@@ -49,8 +50,8 @@
 				var flashvars = {
 					dictionary: xmlDic,
 					startingImageURL: CK.paintStartingImage,
-					userId: "4",						// User ID
-					contentFolder: CK.contentFolderID	// Content Folder Id
+					userId: "4",								// User ID
+					contentFolder: CK.config.contentFolderID	// Content Folder Id
 				}
 				CK.paintStartingImage = "";
 				swfobject.embedSWF("CK Paint.swf", "flashContent", "800", "500", "9.0.0", null, flashvars);
