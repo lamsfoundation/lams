@@ -76,7 +76,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 					countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 			// 1. init lesson
 			Lesson lesson = monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId, orgMap
-					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, null);
+					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, null);
 			// 2. create lessonClass for lesson
 			createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 			// 3. start lesson
@@ -98,7 +98,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 					countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 			// 1. init lesson
 			Lesson lesson = monitoringService.initializeLesson(title, desc,  Boolean.TRUE, ldId, orgMap
-					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, null);
+					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, null);
 			// 2. create lessonClass for lesson
 			createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 			// 3. schedule lesson
