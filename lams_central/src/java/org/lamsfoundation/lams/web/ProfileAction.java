@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.Globals;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -202,8 +203,13 @@ public class ProfileAction extends LamsDispatchAction {
 
     public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
+	
+	//some errors may have already been set in ProfileSaveAction
+	ActionMessages errors = (ActionMessages) request.getAttribute(Globals.ERROR_KEY);
+	if (errors == null) {
+	    errors = new ActionMessages();
+	}
 
-	ActionMessages errors = new ActionMessages();
 	if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_EDIT_ENABLE)) {
 	    if (!Configuration.getAsBoolean(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)) {
 		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.edit.disabled"));

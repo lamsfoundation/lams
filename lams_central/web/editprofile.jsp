@@ -52,6 +52,16 @@
 		<td class="align-right"><fmt:message key="label.last_name"/> *:</td>
 		<td><html:text property="lastName" size="50" maxlength="128" disabled="${!profileEditEnabled}" /></td>
 	</tr>
+	
+	<%-- 
+		Disabled properties are not submitted, but first and last name are required.
+		These hidden fields deliver required data to ProfileSaveAction even if only Partial Profile Editing is available.
+	--%>
+	<c:if test="${!profileEditEnabled}">
+		<html:hidden property="firstName" />
+		<html:hidden property="lastName" />
+	</c:if>
+	
 	<tr>
 		<td class="align-right"><fmt:message key="label.email"/> *:</td>
 		<td><html:text property="email" size="50" maxlength="128" disabled="${!profileEditEnabled and !partialProfileEditEnabled}" /></td>
