@@ -29,7 +29,13 @@
             <url-pattern>/profile.jsp</url-pattern>
             <url-pattern>/sysadmin.jsp</url-pattern>
             <url-pattern>/template.jsp</url-pattern>
-            
+
+                <!-- 2.4 jsps -->
+                <url-pattern>/tutorialVideo.jsp</url-pattern>
+                <url-pattern>/portrait.jsp</url-pattern>
+                <url-pattern>/loadVars.jsp</url-pattern>
+                <!-- end 2.4 jsps -->
+
     		<url-pattern>*.html</url-pattern>
     		<url-pattern>*.do</url-pattern>
     		<url-pattern>/servlet/*</url-pattern>
