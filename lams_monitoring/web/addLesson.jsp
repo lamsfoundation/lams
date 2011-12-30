@@ -88,7 +88,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					"src", "<lams:LAMSURL/>/monitoring/CloudWizard",
 					"FlashVars", "<c:out value="${wizard_flashvars}" />"+"",
 					"width", "100%",
-					"height", "100%",
+					"height", "95%",
 					"align", "middle",
 					"id", "CloudWizard",
 					"quality", "high",
