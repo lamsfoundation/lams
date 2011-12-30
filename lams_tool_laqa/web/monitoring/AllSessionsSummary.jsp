@@ -142,8 +142,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																		 <td colspan=4 valign=top>   
 																			<c:if test="${userData.visible != 'true' }"> 			
 																                         <i><fmt:message key="label.response.hidden"/> </i> 
-																			</c:if> 								
-											 						 		<lams:textarea name="updatedResponse" rows="6" cols="60"><c:out value="${userData.response}" escapeXml="false"/></lams:textarea>
+																			</c:if>
+																			<!--  LDEV-2629 -->																			
+																			<c:choose>
+																				<c:when test="${content.allowRichEditor}">
+																				<lams:CKEditor id="updatedResponse" value="${userData.response}"
+																					toolbarSet="DefaultLearner">
+																				</lams:CKEditor>
+																			</c:when>
+																				<c:otherwise>
+																					<lams:textarea name="updatedResponse" rows="6" cols="60"><c:out value="${userData.response}" escapeXml="false"/></lams:textarea>
+																				</c:otherwise>
+																			</c:choose>																			
+																			 	
 																		 </td>
 																	</tr>
 																	
