@@ -214,7 +214,7 @@
 						<fmt:message key="monitoring.user.fullname"/>
 					</th>
 					<th>
-						<fmt:message key="monitoring.user.loginname"/>
+						<fmt:message key="monitoring.user.submittedFiles"/>
 					</th>
 					<c:if test="${user.hasRefection}">
 						<th>
@@ -231,7 +231,9 @@
 				<td><c:out value="${user.firstName}" /> 
 					<c:out value="${user.lastName}" />
 				</td>
-				<td><c:out value="${user.login}" /></td>
+				<!-- LDEV-2194 -->
+				<td align="center"><c:out value="${fn:length(user.filesUploaded)}" /></td>
+				
 				<c:if test="${user.hasRefection}">
 				<td>
 						<c:set var="viewReflection">

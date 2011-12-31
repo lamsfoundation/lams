@@ -139,7 +139,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    request.setAttribute(SbmtConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
 	}
-
+	
 	DynaActionForm smbtMonitoringForm = (DynaActionForm) form;
 	// smbtMonitoringForm.set("currentTab", WebUtil.readStrParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
 
@@ -501,6 +501,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		learnerDto.setAnyFilesMarked(false);
 		List<FileDetailsDTO> files = (List<FileDetailsDTO>) userFilesMap.get(user);
 		if (files != null && files.size() > 0) {
+			// LDEV-2194 showing number of uploaded files
+			learnerDto.setFilesUploaded(files);
 		    for (FileDetailsDTO file : files) {
 			if (file.getMarks() != null && file.getMarks().trim().length() > 0) {
 			    learnerDto.setAnyFilesMarked(true);
