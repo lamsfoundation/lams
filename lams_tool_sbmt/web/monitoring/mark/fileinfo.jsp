@@ -3,8 +3,7 @@
 		<td colspan="2">
 			<c:out value="${fileInfo.owner.firstName}" />
 			<c:out value="${fileInfo.owner.lastName}" />
-			<fmt:message key="label.submit.file.suffix" />			
-			(<c:out value="${fn:length(report)}" />):
+			<fmt:message key="label.submit.file.suffix" />:
 		</td>
 	<tr>
 </c:if> 
