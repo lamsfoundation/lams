@@ -16,8 +16,8 @@
 	function showMessage(url) {
 		var area=document.getElementById("reourceInputArea");
 		if(area != null){
-			area.style.width="650px";
-			area.style.height="100%";
+			area.style.width="100%";
+			area.style.height="530px";
 			area.src=url;
 			area.style.display="block";
 		}
