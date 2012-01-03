@@ -41,8 +41,8 @@ INSERT INTO lams_log_event_type VALUES (5, 'TYPE_LEARNER_ACTIVITY_START');
 INSERT INTO lams_log_event_type VALUES (6, 'TYPE_LEARNER_ACTIVITY_FINISH');
 
 -- LDEV-2639 Make print button in LAMS learner optional 
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)  
-values ('DisplayPrintButton','false', 'config.display.print.button', 'config.header.features', 'BOOLEAN', 1);
+INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required)  
+VALUES ('DisplayPrintButton','false', 'config.display.print.button', 'config.header.features', 'BOOLEAN', 1);
 
 -- LDEV-2628 Report instant completion
 ALTER TABLE lams_ext_server_org_map ADD COLUMN lesson_finish_url text DEFAULT NULL;
@@ -88,6 +88,20 @@ ALTER TABLE lams_user_group ADD COLUMN scheduled_lesson_end_date DATETIME;
 -- WVI-15 Email Notifications
 ALTER TABLE lams_lesson ADD COLUMN enable_lesson_notifications TINYINT(1) DEFAULT 0;
 ALTER TABLE lams_organisation ADD COLUMN enable_course_notifications TINYINT(1) NOT NULL DEFAULT 0;
+
+-- LDEV-2756 Introducing Kaltura CKEditor plugin
+INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+VALUES ('KalturaServer','', 'config.kaltura.server', 'config.header.kaltura', 'STRING', 0);
+INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+VALUES ('KalturaPartnerId','', 'config.kaltura.partner.id', 'config.header.kaltura', 'STRING', 0);
+INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+VALUES ('KalturaSubPartnerId','', 'config.kaltura.sub.partner.id', 'config.header.kaltura', 'STRING', 0);
+INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+VALUES ('KalturaUserSecret','', 'config.kaltura.user.secret', 'config.header.kaltura', 'STRING', 0);
+INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+VALUES ('KalturaKCWUiConfId','', 'config.kaltura.kcw.uiconfid', 'config.header.kaltura', 'STRING', 0);
+INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+VALUES ('KalturaKDPUiConfId','', 'config.kaltura.kdp.uiconfid', 'config.header.kaltura', 'STRING', 0);
 
 COMMIT;
 SET AUTOCOMMIT = 1;

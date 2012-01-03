@@ -263,4 +263,17 @@ public class ConfigurationKeys {
     
     public static String PROFILE_PARTIAL_EDIT_ENABLE = "ProfilePartialEditEnable";
 
+    public static String KALTURA_SERVER = "KalturaServer";
+
+    public static String KALTURA_PARTNER_ID = "KalturaPartnerId";
+
+    public static String KALTURA_SUB_PARTNER_ID = "KalturaSubPartnerId";
+
+    public static String KALTURA_USER_SECRET = "KalturaUserSecret";
+
+    public static String KALTURA_KCW_UI_CONF_ID = "KalturaKCWUiConfId";
+    
+    public static String KALTURA_KDP_UI_CONF_ID = "KalturaKDPUiConfId";
+
+
 }

@@ -1,6 +1,6 @@
 CKEDITOR.config.toolbar_Default = [
 	['Source','-','Maximize', 'Preview','PasteFromWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','equation'], 
-	['Paint_Button','MoviePlayer','VideoRecorder','Image','Link','Table','HorizontalRule','Smiley','SpecialChar','Templates','Format','Font','FontSize','About']
+	['Paint_Button','MoviePlayer','VideoRecorder','Kaltura','Image','Link','Table','HorizontalRule','Smiley','SpecialChar','Templates','Format','Font','FontSize','About']
 ] ;
 
 CKEDITOR.config.toolbar_DefaultLearner = [
@@ -43,7 +43,7 @@ CKEDITOR.config.templates = CKEDITOR.basePath + '../www/htmltemplates.xml';
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.config.enterMode = 'div' ;
 CKEDITOR.plugins.addExternal('WikiLink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js') ;
-CKEDITOR.config.extraPlugins = 'videorecorder,WikiLink,equation,paint,movieplayer' ;
+CKEDITOR.config.extraPlugins = 'videorecorder,kaltura,WikiLink,equation,paint,movieplayer' ;
 
 // ---- Additional scripts -----
 // Hides editor instaces until they are fully initialized
