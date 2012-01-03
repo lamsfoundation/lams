@@ -246,3 +246,21 @@ values ('AdminScreenSize','1024x768', 'config.admin.screen.size', 'config.header
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('GmapKey','', 'config.gmap.gmapkey', 'config.gmap.section.title', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('KalturaServer','', 'config.kaltura.server', 'config.header.kaltura', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('KalturaPartnerId','', 'config.kaltura.partner.id', 'config.header.kaltura', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('KalturaSubPartnerId','', 'config.kaltura.sub.partner.id', 'config.header.kaltura', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('KalturaUserSecret','', 'config.kaltura.user.secret', 'config.header.kaltura', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('KalturaKCWUiConfId','', 'config.kaltura.kcw.uiconfid', 'config.header.kaltura', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('KalturaKDPUiConfId','', 'config.kaltura.kdp.uiconfid', 'config.header.kaltura', 'STRING', 0);
