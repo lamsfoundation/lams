@@ -111,8 +111,7 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 		ToolSession toolSession = getLamsToolService().getToolSession(toolSessionID);
 		Lesson lesson = toolSession.getLesson();
 		User user = getUser();
-
-		if ((toolSession.getLearners() != null) && toolSession.getLearners().contains(user)) {
+		if ((lesson != null) && (lesson.getAllLearners() != null) && lesson.getAllLearners().contains(user)) {
 		    if (AccessPermissionFilter.log.isTraceEnabled()) {
 			AccessPermissionFilter.log.trace("OK, user "
 				+ user.getLogin()
