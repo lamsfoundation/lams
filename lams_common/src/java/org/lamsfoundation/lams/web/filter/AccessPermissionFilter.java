@@ -37,9 +37,11 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
+import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -65,6 +67,7 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
     private static ILamsToolService lamsToolService;
     private static IUserManagementService userManagementService;
     private static IToolContentDAO toolContentDAO;
+    private static IToolSessionDAO toolSessionDAO;
 
     /*
      * Requests to specific Tool's Monitor and Learner are processed by Tool itself, so they do not go through filters defined in Central.
@@ -120,6 +123,13 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 					+ lesson.getLessonName()));
 		    }
 		} else {
+		    if ((toolSession instanceof NonGroupedToolSession) && toolSession.getLearners().contains(user)) {
+			if (AccessPermissionFilter.log.isDebugEnabled()) {
+			    AccessPermissionFilter.log.debug("Removing NonGroupedToolSession ID: "
+				    + toolSession.getToolSessionId() + " for user: " + user.getLogin());
+			}
+			getToolSessionDAO().removeToolSession(toolSession);
+		    }
 		    throw new SecurityException("User "
 			    + user.getLogin()
 			    + " is not a leaner in the requested lesson."
@@ -231,5 +241,14 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 	    AccessPermissionFilter.toolContentDAO = (IToolContentDAO) ctx.getBean("toolContentDAO");
 	}
 	return AccessPermissionFilter.toolContentDAO;
+    }
+
+    private IToolSessionDAO getToolSessionDAO() {
+	if (AccessPermissionFilter.toolSessionDAO == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getFilterConfig()
+		    .getServletContext());
+	    AccessPermissionFilter.toolSessionDAO = (IToolSessionDAO) ctx.getBean("toolSessionDAO");
+	}
+	return AccessPermissionFilter.toolSessionDAO;
     }
 }
