@@ -339,6 +339,26 @@
 			<property name="jboss.deploy" location="${jboss.deploy}"/>
 			<property name="generate.for.installers" value="${generate.for.installers}"/>
 		</ant>
+		<ant antfile="../${tool_eadventure_dir}/build.xml" target="deploy-tool"
+						inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+			<property name="generate.for.installers" value="${generate.for.installers}"/>
+		</ant>
+		<ant antfile="../${tool_wookie_dir}/build.xml" target="deploy-tool"
+						inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+			<property name="generate.for.installers" value="${generate.for.installers}"/>
+		</ant>
+		<ant antfile="../${tool_imscc_dir}/build.xml" target="deploy-tool"
+						inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+			<property name="generate.for.installers" value="${generate.for.installers}"/>
+		</ant>
+		<ant antfile="../${tool_bbb_dir}/build.xml" target="deploy-tool"
+						inheritAll="false" >
+			<property name="jboss.deploy" location="${jboss.deploy}"/>
+			<property name="generate.for.installers" value="${generate.for.installers}"/>
+		</ant>
 	</target>
 
 	<target name="deploy-minimal-tools" description="Deploy the tools shared between LAMS and RAMS. Called by deploy-lams-tools and deploy-rams-tools">
@@ -551,6 +571,10 @@
 		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_vote_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_wiki_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+                <ant antfile="../${tool_eadventure_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+                <ant antfile="../${tool_wookie_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+                <ant antfile="../${tool_imscc_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+                <ant antfile="../${tool_bbb_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		
 	</target>
 	
