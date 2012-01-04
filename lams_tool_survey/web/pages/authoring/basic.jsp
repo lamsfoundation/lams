@@ -11,7 +11,7 @@
 	function showMessage(url) {
 		var area=document.getElementById("questionInputArea");
 		if(area != null){
-			area.style.width="640px";
+			area.style.width="100%";
 			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
@@ -110,6 +110,11 @@
 		}				
 	}
 
+	function resizeOnMessageFrameLoad(){
+		var messageAreaFrame = document.getElementById("questionInputArea");
+		messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
+	}
+
 </script>
 <!-- Basic Tab Content -->
 <table>
@@ -151,7 +156,7 @@
 
 <p>
 	<iframe
-		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
+		onload="javascript:resizeOnMessageFrameLoad();"
 		id="questionInputArea" name="questionInputArea"
 		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
 		scrolling="no">

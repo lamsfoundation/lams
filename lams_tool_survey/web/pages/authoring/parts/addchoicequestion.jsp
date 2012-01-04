@@ -46,7 +46,10 @@
 
 			<lams:CKEditor id="question.description"
 				value="${formBean.question.description}"
-				contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+				contentFolderID="${formBean.contentFolderID}"
+				width="100%"
+				resizeParentFrameName="questionInputArea">	
+			</lams:CKEditor>
 
 			<div class="space-top">
 				<html:checkbox property="question.optional" styleClass="noBorder"
