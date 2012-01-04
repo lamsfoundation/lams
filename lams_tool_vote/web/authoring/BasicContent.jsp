@@ -37,7 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	function showMessage(url) {
 		var area=document.getElementById("messageArea");
 		if(area != null){
-			area.style.width="750px";
+			area.style.width="100%";
 			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
