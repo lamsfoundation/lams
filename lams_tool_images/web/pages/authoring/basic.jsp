@@ -17,7 +17,7 @@
 		var area=document.getElementById("reourceInputArea");
 		if(area != null){
 			area.style.width="100%";
-			area.style.height="530px";
+			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
 		}
@@ -105,8 +105,14 @@
 		    		onComplete:deleteItemComplete,
 		    		evalScripts:false
 		    	}
-	    );
+			);
 	}
+	
+	function resizeOnMessageFrameLoad(){
+		var messageAreaFrame = document.getElementById("reourceInputArea");
+		messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
+	}
+	    
 
 </script>
 <!-- Basic Tab Content -->
@@ -126,7 +132,9 @@
 			</div>
 			<lams:CKEditor id="imageGallery.instructions"
 				value="${formBean.imageGallery.instructions}"
-				contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+				contentFolderID="${formBean.contentFolderID}">
+				width="100%"
+			</lams:CKEditor>
 		</td>
 	</tr>
 
@@ -145,7 +153,7 @@
 
 <p>
 	<iframe
-		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'; LyteBox.prototype.updateLyteboxItems();"
+		onload="javascript:resizeOnMessageFrameLoad();"
 		id="reourceInputArea" name="reourceInputArea"
 		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
 		scrolling="no">
