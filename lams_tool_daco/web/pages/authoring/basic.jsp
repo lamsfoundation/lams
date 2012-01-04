@@ -10,7 +10,7 @@
 
 		var area=document.getElementById("questionInputArea");
 		if(area != null){
-			area.style.width="650px";
+			area.style.width="100%";
 			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
@@ -74,6 +74,10 @@
 	function deleteQuestionComplete(){
 		hideBusy("#questionListArea");
 	}
+	function resizeOnMessageFrameLoad(){
+		var messageAreaFrame = document.getElementById("questionInputArea");
+		messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
+	}
 </script>
 
 <!-- Basic Tab Content -->
@@ -108,5 +112,5 @@
 	<fmt:message key="label.authoring.basic.question.add" />
 </html:link></p>
 <a name="questionInputAreaAnchor"></a>
-<p><iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+10+'px';window.location.hash = '#questionInputArea';" id="questionInputArea"
+<p><iframe onload="javascript:this.style.height=resizeOnMessageFrameLoad();window.location.hash = '#questionInputArea';" id="questionInputArea"
 	name="questionInputArea" style="width: 0px; height: 0px; border: 0px; display: none" frameborder="no" scrolling="no"> </iframe></p>
