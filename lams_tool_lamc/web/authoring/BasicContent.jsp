@@ -28,7 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	function showMessage(url) {
 		var area=document.getElementById("messageArea");
 		if(area != null){
-			area.style.width="640px";
+			area.style.width="100%";
 			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
@@ -63,6 +63,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	{
 		document.McMonitoringForm.questionIndex.value=questionIndex;
         submitMonitoringMethod('removeQuestion');
+	}
+
+        function resizeOnMessageFrameLoad(){
+		var messageAreaFrame = document.getElementById("messageArea");
+		messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
 	}
 
 </script>
@@ -121,7 +126,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <p>
 	<iframe
-		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
+		onload="javascript:resizeOnMessageFrameLoad();"
 		id="messageArea" name="messageArea"
 		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
 		scrolling="no">

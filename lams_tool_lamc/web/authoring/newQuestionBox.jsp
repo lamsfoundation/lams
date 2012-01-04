@@ -180,7 +180,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</div>
 			<lams:CKEditor id="newQuestion"
 				value="${mcGeneralAuthoringDTO.editableQuestionText}"
-				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
+				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"
+				width="100%"
+				resizeParentFrameName="messageArea">
+			</lams:CKEditor>
 
 			<%@ include file="/authoring/candidateAnswersAddList.jsp"%>
 
