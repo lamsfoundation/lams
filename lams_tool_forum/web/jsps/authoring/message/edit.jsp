@@ -46,7 +46,10 @@
 
 			<div class="small-space-bottom">
 				<lams:CKEditor id="message.body" value="${formBean.message.body}"
-					contentFolderID="${sessionMap.contentFolderID}"></lams:CKEditor>
+					contentFolderID="${sessionMap.contentFolderID}"
+					width="100%"
+					resizeParentFrameName="messageArea">
+				</lams:CKEditor>
 				<html:errors property="message.body" />
 			</div>
 			
