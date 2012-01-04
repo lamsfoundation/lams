@@ -10,7 +10,7 @@
 	function showMessage(url) {
 		var area=document.getElementById("resourceInputArea");
 		if(area != null){
-			area.style.width="650px";
+			area.style.width="100%";
 			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
@@ -106,7 +106,10 @@
 		    	}
 	    );
 	}
-
+	function resizeOnMessageFrameLoad(){
+		var messageAreaFrame = document.getElementById("resourceInputArea");
+		messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
+	}
 </script>
 
 <!-- Basic Tab Content -->
@@ -145,7 +148,7 @@
 
 <p>
 	<iframe
-		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
+		onload="javascript:resizeOnMessageFrameLoad();"
 		id="resourceInputArea" name="resourceInputArea"
 		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
 		scrolling="no">
