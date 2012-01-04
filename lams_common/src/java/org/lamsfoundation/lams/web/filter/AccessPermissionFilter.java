@@ -36,12 +36,12 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.tool.IToolVO;
-import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
-import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -63,11 +63,13 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
     private static Logger log = Logger.getLogger(AccessPermissionFilter.class);
 
     private static final char REQUEST_QUERY_SEPARATOR = '?';
+    private static final String PAGE_LIST_DELIMITER = ";";
 
     private static ILamsToolService lamsToolService;
+    private static ILamsCoreToolService lamsCoreToolService;
     private static IUserManagementService userManagementService;
+    private static ILessonService lessonService;
     private static IToolContentDAO toolContentDAO;
-    private static IToolSessionDAO toolSessionDAO;
 
     /*
      * Requests to specific Tool's Monitor and Learner are processed by Tool itself, so they do not go through filters defined in Central.
@@ -79,6 +81,13 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
     private String toolSignature;
     private Pattern monitorPattern;
     private Pattern learnerPattern;
+
+    /*
+     * Pages delimited by PAGE_LIST_DELIMITER will be checked for user access persmissions
+     * to the lesson identified by "lessonID" parameter.
+     */
+    private String lessonSecuredPages;
+    private String[] lessonSecuredPagesArray;
 
     @Override
     protected void initFilterBean() {
@@ -95,6 +104,10 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 		learnerPattern = AccessPermissionFilter.makePattern(tool.getLearnerUrl());
 	    }
 	}
+
+	if (lessonSecuredPages != null) {
+	    lessonSecuredPagesArray = lessonSecuredPages.split(AccessPermissionFilter.PAGE_LIST_DELIMITER);
+	}
     }
 
     @SuppressWarnings("unchecked")
@@ -102,89 +115,112 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 	    throws IOException, ServletException {
 
-	// rebuild request URL from parts
-	String requestURL = request.getRequestURI() + AccessPermissionFilter.REQUEST_QUERY_SEPARATOR
-		+ request.getQueryString();
+	String requestURI = request.getRequestURI();
+	boolean checkPerformed = false;
 
-	// check if user is trying to access a lesson in which he is not a learner
-	if ((learnerPattern != null) && learnerPattern.matcher(requestURL).find()) {
-	    String toolSessionIDParam = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	    if (toolSessionIDParam != null) {
-		Long toolSessionID = Long.valueOf(toolSessionIDParam);
-		ToolSession toolSession = getLamsToolService().getToolSession(toolSessionID);
-		Lesson lesson = toolSession.getLesson();
-		User user = getUser();
-		if ((lesson != null) && (lesson.getAllLearners() != null) && lesson.getAllLearners().contains(user)) {
-		    if (AccessPermissionFilter.log.isTraceEnabled()) {
-			AccessPermissionFilter.log.trace("OK, user "
-				+ user.getLogin()
-				+ " is a leaner in the requested lesson."
-				+ (lesson == null ? "" : " Lesson ID: " + lesson.getLessonId() + ", name: "
-					+ lesson.getLessonName()));
-		    }
-		} else {
-		    if ((toolSession instanceof NonGroupedToolSession) && toolSession.getLearners().contains(user)) {
-			if (AccessPermissionFilter.log.isDebugEnabled()) {
-			    AccessPermissionFilter.log.debug("Removing NonGroupedToolSession ID: "
-				    + toolSession.getToolSessionId() + " for user: " + user.getLogin());
-			}
-			getToolSessionDAO().removeToolSession(toolSession);
-		    }
-		    throw new SecurityException("User "
-			    + user.getLogin()
-			    + " is not a leaner in the requested lesson."
-			    + (lesson == null ? "" : " Lesson ID: " + lesson.getLessonId() + ", name: "
-				    + lesson.getLessonName()));
-		}
-	    }
-
-	    // check if user is trying to access a lesson in which he is not a monitor
-	} else if ((monitorPattern != null) && monitorPattern.matcher(requestURL).find()) {
-	    String toolContentIDParam = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	    if (toolContentIDParam != null) {
-		Long toolContentID = Long.valueOf(toolContentIDParam);
-		// Any DAO extending IBaseDAO would do, it is nothing specific for ToolContentDAO
-		ToolContent toolContent = (ToolContent) getToolContentDAO().find(ToolContent.class, toolContentID);
-		// There can be multiple activities for single toolContentID? Proper permissions for any of them will do
-		Set<ToolActivity> activities = toolContent.getActivities();
-		if ((activities != null) && !activities.isEmpty()) {
-
-		    boolean isStaffMember = false;
-		    User user = getUser();
-		    Lesson lesson = null;
-
-		    activityLoop: for (ToolActivity activity : activities) {
-			Set<ToolSession> toolSessions = activity.getToolSessions();
-			if ((toolSessions != null) && !toolSessions.isEmpty()) {
-			    // There may be multiple Tool Sessions for gropued activity, but they all should be in the
-			    // same lesson anyway, so pick the first one
-			    lesson = toolSessions.iterator().next().getLesson();
-			    if ((lesson != null) && (lesson.getLessonClass() != null)
-				    && lesson.getLessonClass().isStaffMember(user)) {
-				isStaffMember = true;
-				break activityLoop;
+	if (lessonSecuredPagesArray != null) {
+	    for (String lessonSecuredPage : lessonSecuredPagesArray) {
+		if (requestURI.endsWith(lessonSecuredPage)) {
+		    // it is one of pages we need to check learner lesson access for
+		    checkPerformed = true;
+		    String lessonIDParam = request.getParameter(AttributeNames.PARAM_LESSON_ID);
+		    if (lessonIDParam != null) {
+			Long lessonID = Long.valueOf(lessonIDParam);
+			Lesson lesson = getLessonService().getLesson(lessonID);
+			if (lesson != null) {
+			    User user = getUser();
+			    if ((lesson.getLessonClass() != null)
+				    && lesson.getLessonClass().getLearners().contains(user)) {
+				if (AccessPermissionFilter.log.isTraceEnabled()) {
+				    AccessPermissionFilter.log.trace("OK, user " + user.getLogin()
+					    + " is a learner in the requested lesson. Lesson ID: "
+					    + lesson.getLessonId() + ", name: " + lesson.getLessonName());
+				}
+			    } else {
+				throw new SecurityException("User " + user.getLogin()
+					+ " is not a learner in the requested lesson. Lesson ID: "
+					+ lesson.getLessonId() + ", name: " + lesson.getLessonName());
 			    }
 			}
 		    }
+		}
+	    }
+	}
 
-		    if (isStaffMember) {
+	// some optimisation - Monitor/Learner (Tools) and lesson secured pages (Learner) check do not go in pairs
+	if (!checkPerformed) {
+	    // rebuild request URL from parts
+	    String requestURL = requestURI + AccessPermissionFilter.REQUEST_QUERY_SEPARATOR + request.getQueryString();
+
+	    // check if user is trying to access a lesson in which he is not a learner
+	    if ((learnerPattern != null) && learnerPattern.matcher(requestURL).find()) {
+		checkPerformed = true;
+		String toolSessionIDParam = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+		if (toolSessionIDParam != null) {
+		    Long toolSessionID = Long.valueOf(toolSessionIDParam);
+		    Set<User> learners = getLamsToolService().getAllPotentialLearners(toolSessionID);
+		    User user = getUser();
+		    if ((learners != null) && learners.contains(user)) {
 			if (AccessPermissionFilter.log.isTraceEnabled()) {
-			    AccessPermissionFilter.log.trace("OK, user "
+			    AccessPermissionFilter.log.trace("OK, user " + user.getLogin()
+				    + " is a learner in the requested lesson. ToolSessionID: " + toolSessionIDParam);
+			}
+		    } else {
+			throw new SecurityException("User " + user.getLogin()
+				+ " is not a learner in the requested lesson. ToolSessionID: " + toolSessionIDParam);
+		    }
+		}
+
+		// check if user is trying to access a lesson in which he is not a monitor
+	    } else if ((monitorPattern != null) && monitorPattern.matcher(requestURL).find()) {
+		checkPerformed = true;
+		String toolContentIDParam = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+		if (toolContentIDParam != null) {
+		    Long toolContentID = Long.valueOf(toolContentIDParam);
+		    // Any DAO extending IBaseDAO would do, it is nothing specific for ToolContentDAO
+		    ToolContent toolContent = (ToolContent) getToolContentDAO().find(ToolContent.class, toolContentID);
+		    // There can be multiple activities for single toolContentID? Proper permissions for any of them
+		    // will do
+		    Set<ToolActivity> activities = toolContent.getActivities();
+		    if ((activities != null) && !activities.isEmpty()) {
+
+			boolean isStaffMember = false;
+			User user = getUser();
+			Lesson lesson = null;
+
+			for (ToolActivity activity : activities) {
+			    ToolSession toolSession = getLamsCoreToolService().getToolSessionByLearner(user, activity);
+			    if (toolSession != null) {
+				lesson = toolSession.getLesson();
+				if ((lesson != null) && (lesson.getLessonClass() != null)
+					&& lesson.getLessonClass().isStaffMember(user)) {
+				    isStaffMember = true;
+				    break;
+				}
+			    }
+			}
+
+			if (isStaffMember) {
+			    if (AccessPermissionFilter.log.isTraceEnabled()) {
+				AccessPermissionFilter.log.trace("OK, user "
+					+ user.getLogin()
+					+ " is a monitor in the requested lesson."
+					+ (lesson == null ? "" : " Lesson ID: " + lesson.getLessonId() + ", name: "
+						+ lesson.getLessonName()));
+			    }
+			} else {
+			    throw new SecurityException("User "
 				    + user.getLogin()
-				    + " is a monitor in the requested lesson."
+				    + " is not a monitor in the requested lesson."
 				    + (lesson == null ? "" : " Lesson ID: " + lesson.getLessonId() + ", name: "
 					    + lesson.getLessonName()));
 			}
-		    } else {
-			throw new SecurityException("User "
-				+ user.getLogin()
-				+ " is not a monitor in the requested lesson."
-				+ (lesson == null ? "" : " Lesson ID: " + lesson.getLessonId() + ", name: "
-					+ lesson.getLessonName()));
 		    }
 		}
 	    }
-	} else if (AccessPermissionFilter.log.isTraceEnabled()) {
+	}
+
+	if (!checkPerformed && AccessPermissionFilter.log.isTraceEnabled()) {
 	    AccessPermissionFilter.log.trace("URL does not match any patterns to check, carry on.");
 	}
 
@@ -211,10 +247,6 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 	return Pattern.compile(escaped, Pattern.CASE_INSENSITIVE);
     }
 
-    public void setToolSignature(String toolName) {
-	this.toolSignature = toolName;
-    }
-
     private IUserManagementService getUserManagementService() {
 	if (AccessPermissionFilter.userManagementService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getFilterConfig()
@@ -234,6 +266,24 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 	return AccessPermissionFilter.lamsToolService;
     }
 
+    private ILamsCoreToolService getLamsCoreToolService() {
+	if (AccessPermissionFilter.lamsCoreToolService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getFilterConfig()
+		    .getServletContext());
+	    AccessPermissionFilter.lamsCoreToolService = (ILamsCoreToolService) ctx.getBean("lamsCoreToolService");
+	}
+	return AccessPermissionFilter.lamsCoreToolService;
+    }
+
+    private ILessonService getLessonService() {
+	if (AccessPermissionFilter.lessonService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getFilterConfig()
+		    .getServletContext());
+	    AccessPermissionFilter.lessonService = (ILessonService) ctx.getBean("lessonService");
+	}
+	return AccessPermissionFilter.lessonService;
+    }
+
     private IToolContentDAO getToolContentDAO() {
 	if (AccessPermissionFilter.toolContentDAO == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getFilterConfig()
@@ -243,12 +293,11 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 	return AccessPermissionFilter.toolContentDAO;
     }
 
-    private IToolSessionDAO getToolSessionDAO() {
-	if (AccessPermissionFilter.toolSessionDAO == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getFilterConfig()
-		    .getServletContext());
-	    AccessPermissionFilter.toolSessionDAO = (IToolSessionDAO) ctx.getBean("toolSessionDAO");
-	}
-	return AccessPermissionFilter.toolSessionDAO;
+    public void setToolSignature(String toolName) {
+	this.toolSignature = toolName;
+    }
+
+    public void setLessonSecuredPages(String lessonSecuredPages) {
+	this.lessonSecuredPages = lessonSecuredPages;
     }
 }
