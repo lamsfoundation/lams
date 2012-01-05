@@ -16,5 +16,5 @@
 
  <filter-mapping>
     <filter-name>AccessPermissionFilter</filter-name>
-     <url-pattern>/mainflash.jsp</url-pattern>
+     <url-pattern>*.jsp</url-pattern>
 </filter-mapping>
