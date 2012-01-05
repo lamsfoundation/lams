@@ -14,8 +14,9 @@
 	<target name="usage" description="print usage message">
 		<echo>------------ Utility Methods ------------------------</echo>
 		<echo>usage: this message</echo>
-		<echo>clean: clean the ear assembly directories</echo>
-		<echo>clean-subprojects: clean sub project build directories</echo>
+		<echo>clean-core: clean sub project from LAMS Core</echo>
+		<echo>clean-tools: clean LAMS tools</echo>
+		<echo>clean-all: clean tools and core</echo>
 		<echo>build-subprojects: build sub projects</echo>
 		<echo>build-tool-deploy-utility: build the tool_deploy utility and update copy in lams_build</echo>
 		<echo>------------ Build/Deploy LAMS  ------------------------</echo>
@@ -33,16 +34,59 @@
 		<echo>Eclipse may not deploy all of the newly created files.</echo>
 	</target>
 
-	<!-- clean dirs for this script only -->
-	<target name="clean" description="cleans assembly">
-	        <delete dir="${assembly}"></delete>
-	        <delete dir="${jboss.server.instance}/tmp"></delete>
-	        <delete dir="${jboss.server.instance}/work/jboss.web/localhost"></delete>
+	<!-- clean all LAMS -->
+
+	<target name="clean-all" description="cleans all projects including core" depends="clean-core, clean-tools" />
+
+
+	<!-- clean all core projects -->
+	
+	<target name="clean-core" description="Cleans Core projects">
+		<ant antfile="../${lams_common}/build.xml" target="clean" inheritAll="false" />
+		<ant antfile="../${lams_contentrepository}/build.xml" target="clean-build" inheritAll="false" />
+		<ant antfile="../${lams_central}/build.xml" target="clean" />
+		<ant antfile="../${lams_learning}/build.xml" target="clean" />
+		<ant antfile="../${lams_monitoring}/build.xml"  target="clean" />
+		<ant antfile="../${lams_admin}/build.xml" target="clean" />
+		<ant antfile="../${lams_www}/build.xml" target="clean" />
+		<ant antfile="../${lams_gradebook}/build.xml" target="clean" />
+		<ant antfile="../${lams_gradebook}/build.xml" target="clean" />
+		<!-- clean dirs for this script only -->
+		 <delete dir="./build"></delete>
+       		<delete dir="${assembly}"></delete>
+        	<delete dir="${jboss.server.instance}/tmp"></delete>
+        	<delete dir="${jboss.server.instance}/work"></delete>
 	</target>
+		
+	<!-- clean all tools -->
 
-	<!-- clean all projects -->
-	<target name="clean-subprojects" description="cleans sub projects" />
+	<target name="clean-tools" description="Cleans all tool projects">
+			<ant antfile="../${tool_forum_dir}/build.xml" target="clean" />
+			<ant antfile="../${tool_lanb_dir}/build.xml" target="clean-build" />
+			<ant antfile="../${tool_laqa_dir}/build.xml" target="clean" />
+			<ant antfile="../${tool_sbmt_dir}/build.xml" target="clean" />
+	  		<ant antfile="../${tool_chat_dir}/build.xml" target="clean-build" />
+			<ant antfile="../${tool_larsrc_dir}/build.xml" target="clean" />
+	 		<ant antfile="../${tool_vote_dir}/build.xml" target="clean" />
+	  		<ant antfile="../${tool_notebook_dir}/build.xml" target="clean-build" />
+	  		<ant antfile="../${tool_survey_dir}/build.xml" target="clean" />
+	  		<ant antfile="../${tool_scribe_dir}/build.xml" target="clean-build" />
+	  		<ant antfile="../${tool_task_dir}/build.xml" target="clean" />
+			<ant antfile="../${tool_gmap_dir}/build.xml" target="clean-build" />
+			<ant antfile="../${tool_spreadsheet_dir}/build.xml" target="clean" />
+			<ant antfile="../${tool_daco_dir}/build.xml" target="clean" />
+			<ant antfile="../${tool_wiki_dir}/build.xml" target="clean-build" />
+			<ant antfile="../${tool_images_dir}/build.xml" target="clean" />
+			<ant antfile="../${tool_videorecorder_dir}/build.xml" target="clean-build" />
+			<ant antfile="../${tool_mindmap_dir}/build.xml" target="clean-build" />
+			<ant antfile="../${tool_assessment_dir}/build.xml" target="clean" />
+			<ant antfile="../${tool_pixlr_dir}/build.xml" target="clean-build" />
+			<ant antfile="../${tool_eadventure_dir}/build.xml" target="clean" />
+			<ant antfile="../${tool_wookie_dir}/build.xml" target="clean-build" />
+			<ant antfile="../${tool_imscc_dir}/build.xml" target="clean" />
+			<ant antfile="../${tool_bbb_dir}/build.xml" target="clean-build" />
 
+	</target>
 
 	<!-- build sub-projects -->
 	<target name="build-subprojects" 
@@ -103,7 +147,7 @@
 	</target>
 	
 	<!-- assemble ear -->
-	<target name="assemble-ear" depends="init, clean, build-subprojects"
+	<target name="assemble-ear" depends="init, clean-core, build-subprojects"
 		description="Assemble lams ear in exploded form">
 		<!-- have to copy the libs etc. to a temp location otherwise we end up with all the directories under lib as well-->
 		<mkdir dir="${assembly}/temp" />
