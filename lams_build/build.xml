@@ -42,50 +42,48 @@
 	<!-- clean all core projects -->
 	
 	<target name="clean-core" description="Cleans Core projects">
-		<ant antfile="../${lams_common}/build.xml" target="clean" inheritAll="false" />
-		<ant antfile="../${lams_contentrepository}/build.xml" target="clean-build" inheritAll="false" />
-		<ant antfile="../${lams_central}/build.xml" target="clean" />
-		<ant antfile="../${lams_learning}/build.xml" target="clean" />
-		<ant antfile="../${lams_monitoring}/build.xml"  target="clean" />
-		<ant antfile="../${lams_admin}/build.xml" target="clean" />
-		<ant antfile="../${lams_www}/build.xml" target="clean" />
-		<ant antfile="../${lams_gradebook}/build.xml" target="clean" />
-		<ant antfile="../${lams_gradebook}/build.xml" target="clean" />
-		<!-- clean dirs for this script only -->
-		 <delete dir="./build"></delete>
-       		<delete dir="${assembly}"></delete>
-        	<delete dir="${jboss.server.instance}/tmp"></delete>
-        	<delete dir="${jboss.server.instance}/work"></delete>
+                <delete dir="../${lams_common}/build/" quiet="false"/>
+                <delete dir="../${lams_contentrepository}/build" quiet="false"/>
+                <delete dir="../${lams_central}/build" quiet="false"/>
+                <delete dir="../${lams_learning}/build" quiet="false"/>
+                <delete dir="../${lams_monitoring}/build" quiet="false"/>
+                <delete dir="../${lams_admin}/build" quiet="false"/>
+                <delete dir="../${lams_www}/build" quiet="false"/>
+                <delete dir="../${lams_gradebook}/build" quiet="false"/>
+                <delete dir="../${lams_gradebook}/build" quiet="false"/>
+                <delete dir="./build" quiet="false"/>
+                <delete dir="${assembly}" quiet="false"/>
+                <delete dir="${jboss.server.instance}/tmp" quiet="false"/>
+                <delete dir="${jboss.server.instance}/work" quiet="false"/>
 	</target>
 		
 	<!-- clean all tools -->
 
 	<target name="clean-tools" description="Cleans all tool projects">
-			<ant antfile="../${tool_forum_dir}/build.xml" target="clean" />
-			<ant antfile="../${tool_lanb_dir}/build.xml" target="clean-build" />
-			<ant antfile="../${tool_laqa_dir}/build.xml" target="clean" />
-			<ant antfile="../${tool_sbmt_dir}/build.xml" target="clean" />
-	  		<ant antfile="../${tool_chat_dir}/build.xml" target="clean-build" />
-			<ant antfile="../${tool_larsrc_dir}/build.xml" target="clean" />
-	 		<ant antfile="../${tool_vote_dir}/build.xml" target="clean" />
-	  		<ant antfile="../${tool_notebook_dir}/build.xml" target="clean-build" />
-	  		<ant antfile="../${tool_survey_dir}/build.xml" target="clean" />
-	  		<ant antfile="../${tool_scribe_dir}/build.xml" target="clean-build" />
-	  		<ant antfile="../${tool_task_dir}/build.xml" target="clean" />
-			<ant antfile="../${tool_gmap_dir}/build.xml" target="clean-build" />
-			<ant antfile="../${tool_spreadsheet_dir}/build.xml" target="clean" />
-			<ant antfile="../${tool_daco_dir}/build.xml" target="clean" />
-			<ant antfile="../${tool_wiki_dir}/build.xml" target="clean-build" />
-			<ant antfile="../${tool_images_dir}/build.xml" target="clean" />
-			<ant antfile="../${tool_videorecorder_dir}/build.xml" target="clean-build" />
-			<ant antfile="../${tool_mindmap_dir}/build.xml" target="clean-build" />
-			<ant antfile="../${tool_assessment_dir}/build.xml" target="clean" />
-			<ant antfile="../${tool_pixlr_dir}/build.xml" target="clean-build" />
-			<ant antfile="../${tool_eadventure_dir}/build.xml" target="clean" />
-			<ant antfile="../${tool_wookie_dir}/build.xml" target="clean-build" />
-			<ant antfile="../${tool_imscc_dir}/build.xml" target="clean" />
-			<ant antfile="../${tool_bbb_dir}/build.xml" target="clean-build" />
-
+                        <delete dir="../${tool_forum_dir}/build" quiet="false" />
+                        <delete dir="../${tool_lanb_dir}/build" quiet="false" />
+                        <delete dir="../${tool_laqa_dir}/build" quiet="false" />
+                        <delete dir="../${tool_sbmt_dir}/build" quiet="false" />
+                        <delete dir="../${tool_chat_dir}/build" quiet="false" />
+                        <delete dir="../${tool_larsrc_dir}/build" quiet="false" />
+                        <delete dir="../${tool_vote_dir}/build" quiet="false" />
+                        <delete dir="../${tool_notebook_dir}/build" quiet="false" />
+                        <delete dir="../${tool_survey_dir}/build" quiet="false" />
+                        <delete dir="../${tool_scribe_dir}/build" quiet="false" />
+                        <delete dir="../${tool_task_dir}/build" quiet="false" />
+                        <delete dir="../${tool_gmap_dir}/build" quiet="false" />
+                        <delete dir="../${tool_spreadsheet_dir}/build" quiet="false" />
+                        <delete dir="../${tool_daco_dir}/build" quiet="false" />
+                        <delete dir="../${tool_wiki_dir}/build" quiet="false" />
+                        <delete dir="../${tool_images_dir}/build" quiet="false" />
+                        <delete dir="../${tool_videorecorder_dir}/build" quiet="false" />
+                        <delete dir="../${tool_mindmap_dir}/build" quiet="false" />
+                        <delete dir="../${tool_assessment_dir}/build" quiet="false" />
+                        <delete dir="../${tool_pixlr_dir}/build" quiet="false" />
+                        <delete dir="../${tool_eadventure_dir}/build" quiet="false" />
+                        <delete dir="../${tool_wookie_dir}/build" quiet="false" />
+                        <delete dir="../${tool_imscc_dir}/build" quiet="false" />
+                        <delete dir="../${tool_bbb_dir}/build" quiet="false" />
 	</target>
 
 	<!-- build sub-projects -->
