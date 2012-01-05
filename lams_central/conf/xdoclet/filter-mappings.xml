@@ -5,11 +5,6 @@
 
 <filter-mapping>
 	<filter-name>SystemSessionFilter</filter-name>
-	<url-pattern>*.mindapp</url-pattern>
-</filter-mapping>
-
-<filter-mapping>
-	<filter-name>SystemSessionFilter</filter-name>
 	<url-pattern>*.jsp</url-pattern>
 </filter-mapping>
 
@@ -41,11 +36,6 @@
 <filter-mapping>
 	<filter-name>hibernateFilter</filter-name>
 	<url-pattern>*.do</url-pattern>
-</filter-mapping>
-
-<filter-mapping>
-	<filter-name>hibernateFilter</filter-name>
-	<url-pattern>*.mindapp</url-pattern>
 </filter-mapping>
 
 <filter-mapping>
@@ -91,11 +81,6 @@
 <filter-mapping>
 	<filter-name>LocaleFilter</filter-name>
 	<url-pattern>*.do</url-pattern>
-</filter-mapping>
-
-<filter-mapping>
-	<filter-name>LocaleFilter</filter-name>
-	<url-pattern>*.mindapp</url-pattern>
 </filter-mapping>
 
 <filter-mapping>
