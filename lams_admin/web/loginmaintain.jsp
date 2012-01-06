@@ -17,7 +17,7 @@
 
 <c:set var="existingContent"><bean:write name='LoginMaintainForm' property='news' filter='false' /></c:set>
 
-<lams:CKEditor id="news" value="${existingContent}"	contentFolderID="-1" width="95%"></lams:CKEditor>
+<lams:CKEditor id="news" value="${existingContent}"	contentFolderID="-1" width="95%" height="600px"></lams:CKEditor>
 
 </div>
 <br />
