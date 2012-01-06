@@ -32,18 +32,18 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.TimeZone;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -52,12 +52,13 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.struts.action.Action;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.struts.action.ActionRedirect;
+import org.apache.struts.config.ForwardConfig;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
@@ -77,9 +78,9 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -797,6 +798,7 @@ public class MonitoringAction extends Action {
 	    request.setAttribute(ForumConstants.ATTR_REPORT, topicsByUser);
 	    //listMark or listAllMark.
 	    return mapping.findForward("success");
+	    
 	} else if (StringUtils.equals(updateMode, ForumConstants.MARK_UPDATE_FROM_USER)) {
 	    List<MessageDTO> messageList = forumService.getMessagesByUserUid(user.getUid(), sessionId);
 	    Map<ForumUser, List<MessageDTO>> topicMap = new TreeMap(this.new ForumUserComparator());
@@ -804,8 +806,17 @@ public class MonitoringAction extends Action {
 	    request.setAttribute(ForumConstants.ATTR_REPORT, topicMap);
 	    //listMark or listAllMark.
 	    return mapping.findForward("success");
+	    
 	} else { //mark from view forum
-	    return mapping.findForward("viewTopic");
+	    //display root topic rather than leaf one
+	    Long rootTopicId = forumService.getRootTopicId(msg.getUid());
+	    
+	    ForwardConfig redirectConfig = mapping.findForwardConfig("viewTopic");
+	    ActionRedirect redirect = new ActionRedirect(redirectConfig);
+	    redirect.addParameter(ForumConstants.ATTR_SESSION_MAP_ID, markForm.getSessionMapID());
+	    redirect.addParameter(ForumConstants.ATTR_USER, user);
+	    redirect.addParameter(ForumConstants.ATTR_TOPIC_ID, rootTopicId);
+	    return redirect;
 	}
 
     }

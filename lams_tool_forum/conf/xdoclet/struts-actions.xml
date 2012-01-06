@@ -377,7 +377,7 @@
 			validate="false"
 			parameter="updateMark" >
 			<forward name="success" path="tiles:/monitoring/forum/viewMark" />
-			<forward name="viewTopic" path="/learning/viewTopic.do" />
+			<forward name="viewTopic" path="/learning/viewTopic.do" redirect="true"/>
 		</action>
 	
 		<action path="/monitoring/viewTopic"
