@@ -711,7 +711,7 @@ function lamslesson_get_course_userids($lamslessonid, $context=NULL) {
 		$listofcontexts = '('.$sitecontext->id.')'; // must be site
 	}
 	$sql = "SELECT u.id
-		FROM {$CFG->prefix}user u INNER JOIN {$CFG->prefix}role_assignments r ON u.id=r.userid
+		FROM {user} u INNER JOIN {role_assignments} r ON u.id=r.userid
 		WHERE r.contextid IN $listofcontexts OR r.contextid=$context->id
 		AND u.deleted=0 AND u.username!='guest'";
 	$users = $DB->get_records_sql($sql);

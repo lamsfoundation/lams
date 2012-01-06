@@ -18,14 +18,19 @@ include_once($CFG->libdir.'/datalib.php');
 include_once('lib.php');
 global $DB;
 
+$hs = required_param('hs', PARAM_ALPHANUM);
+$ts = required_param('ts', PARAM_RAW);
+$un = required_param('un', PARAM_ALPHANUM);
+$lsid = required_param('lsId', PARAM_INT);
+
 if(!isset($CFG->lamslesson_serverid)||!isset($CFG->lamslesson_serverkey)) {
     header('HTTP/1.1 401 Unauthenticated');
     exit(1);
 }
-$plaintext = trim($_GET['ts']).trim($_GET['un']).trim($CFG->lamslesson_serverid).trim($CFG->lamslesson_serverkey);
+$plaintext = trim($ts).trim($un).trim($CFG->lamslesson_serverid).trim($CFG->lamslesson_serverkey);
 $hash = sha1(strtolower($plaintext));
 
-if($hash!=$_GET['hs']){
+if($hash != $hs){
   header('HTTP/1.1 401 Unauthenticated');
   exit(1);
 }
@@ -33,8 +38,7 @@ if($hash!=$_GET['hs']){
 //OK, the caller is authenticated. Now let's fulfill its request.
 // and make Moodle get the latest marks for this user in this lesson
 
-$lsid = $_GET['lsId'];
-$user = $DB->get_record('user', array('username'=>$_GET['un']));
+$user = $DB->get_record('user', array('username'=>$un));
 if(!$user){
   header('HTTP/1.1 401 Unauthenticated');
   exit(1);

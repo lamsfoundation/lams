@@ -16,14 +16,19 @@
     include_once($CFG->libdir.'/datalib.php');
     global $DB;
 
+    $hs = required_param('hs', PARAM_ALPHANUM);
+    $ts = required_param('ts', PARAM_RAW);
+    $un = required_param('un', PARAM_ALPHANUM);
+    $lsid = optional_param('lsid', '', PARAM_INT);
+
     if(!isset($CFG->lamslesson_serverid)||!isset($CFG->lamslesson_serverkey))
     {
         header('HTTP/1.1 401 Unauthenticated');
         exit(1);
     }
-    $plaintext = trim($_GET['ts']).trim($_GET['un']).trim($CFG->lamslesson_serverid).trim($CFG->lamslesson_serverkey);
+    $plaintext = trim($ts).trim($un).trim($CFG->lamslesson_serverid).trim($CFG->lamslesson_serverkey);
     $hash = sha1(strtolower($plaintext));
-    if($hash!=$_GET['hs']){
+    if($hash != $hs){
         header('HTTP/1.1 401 Unauthenticated');
         exit(1);
     }
@@ -32,7 +37,7 @@
     //What it needs is user info in CSV format. It should be like this:
     //username,first name,last name,job title, department, organisation,
     //address,phone,fax,mobile,email
-    $user = $DB->get_record('user', array('username'=>$_GET['un']));
+    $user = $DB->get_record('user', array('username'=>$un));
 
     //return false if none found
     if(!$user){
