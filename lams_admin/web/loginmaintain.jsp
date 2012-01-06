@@ -1,5 +1,4 @@
 <%@ include file="/taglibs.jsp"%>
-<%@ taglib uri="tags-lams" prefix="lams" %>
 
 <h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
 </h4>
@@ -16,9 +15,9 @@
 
 <div align="center"> 
 
-<lams:CKEditor id="news" value="<bean:write name='LoginMaintainForm' property='news' filter='false' />"
-	contentFolderID="-1" width="95%">
-</lams:CKEditor>
+<c:set var="existingContent"><bean:write name='LoginMaintainForm' property='news' filter='false' /></c:set>
+
+<lams:CKEditor id="news" value="${existingContent}"	contentFolderID="-1" width="95%"></lams:CKEditor>
 
 </div>
 <br />
