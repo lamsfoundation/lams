@@ -208,7 +208,10 @@ public class CSSBundler extends Bundler {
 		
 					File[] files = dir.listFiles();
 					for ( File imageFile: files ) {
+					    //skip the directories out
+					    if (imageFile.isFile()) {
 						filesToCopy.put(outputImageDirectory+File.separatorChar+imageFile.getName(),imageFile);
+					    }
 					}
 				}
 			}
