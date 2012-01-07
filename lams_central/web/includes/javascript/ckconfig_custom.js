@@ -45,6 +45,7 @@ CKEDITOR.config.enterMode = 'div' ;
 CKEDITOR.plugins.addExternal('WikiLink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js') ;
 CKEDITOR.config.extraPlugins = 'videorecorder,kaltura,WikiLink,equation,paint,movieplayer' ;
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
+CKEDITOR.config.removePlugins = 'elementspath';
 
 // ---- Additional scripts -----
 // Hides editor instaces until they are fully initialized
