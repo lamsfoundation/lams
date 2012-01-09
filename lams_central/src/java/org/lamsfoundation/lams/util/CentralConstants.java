@@ -90,6 +90,8 @@ public class CentralConstants {
     public static final String METHOD_SINGLE_STUDENT_PROGRESS = "singleStudentProgress";
 
     public static final String METHOD_JOIN_LESSON = "join";
+    
+    public static final String METHOD_VERIFY_EXT_SERVER = "verify";
 
     public static final String ATTR_COURSE_ID = "courseId";
 

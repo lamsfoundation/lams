@@ -219,17 +219,29 @@ public class LessonManagerServlet extends HttpServlet {
 	    } else if (method.equals("toolOutputsAllUsers")) {
 		lsId = new Long(lsIdStr);
 		element = getToolOutputs(document, serverId, datetime, hashValue, username, lsId, courseId, false);
+		
 	    } else if (method.equals("authoredToolOutputsAllUsers")) {
 		lsId = new Long(lsIdStr);
 		element = getToolOutputs(document, serverId, datetime, hashValue, username, lsId, courseId, true);
+		
 	    } else if (method.equals("toolOutputsUser")) {
 		lsId = new Long(lsIdStr);
 		element = getToolOutputsForUser(document, serverId, datetime, hashValue, username, lsId, courseId,
 			false, outputsUser);
+		
 	    } else if (method.equals("authoredToolOutputsUser")) {
 		lsId = new Long(lsIdStr);
 		element = getToolOutputsForUser(document, serverId, datetime, hashValue, username, lsId, courseId,
 			true, outputsUser);
+		
+	    }  else if (method.equals(CentralConstants.METHOD_VERIFY_EXT_SERVER)) {
+		verify(serverId, datetime, hashValue);
+		response.setContentType("text/html");
+		out.write("1");
+		out.flush();
+		out.close();
+		return;
+		
 	    } else {
 		String msg = "Method :" + method + " is not recognised";
 		LessonManagerServlet.log.error(msg);
@@ -846,6 +858,27 @@ public class LessonManagerServlet extends HttpServlet {
 	    throw new Exception(e);
 	}
 
+    }
+    
+    /**
+     * Verifies external server. Also it has a WSDL analog
+     * <code>org.lamsfoundation.lams.webservice.VerificationServiceSoapBindingImpl</code>
+     * 
+     * @param serverId
+     * @param datetime
+     * @param hash
+     * @return
+     * @throws Exception
+     */
+    public boolean verify(String serverId, String datetime, String hash) throws Exception {
+	try {
+	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
+	    Authenticator.authenticate(serverMap, datetime, hash);
+	    return true;
+	} catch (Exception e) {
+	    LessonManagerServlet.log.error("Problem verifying external server: " + serverId, e);
+	    throw new Exception(e);
+	}
     }
 
     /**
