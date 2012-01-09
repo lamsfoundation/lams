@@ -66,12 +66,14 @@ $string['requestsource'] = 'Moodle instance name:';
 $string['requestsourceinfo'] = 'What is the name of your Moodle instance?. This value will appear after saving a sequence and will be used to prompt the user to "return to <this value>". So here you can put the name you give your Moodle server. ie: "Virtual Campus"';
 
 $string['validationbutton'] = "Validate settings";
-$string['validationinfo'] = 'Press the button to validate your settings.';
+$string['validationheader'] = 'Settings validation';
+$string['validationinfo'] = 'Before you save your settings, please press the button to validate them with the LAMS server. If the validation is correct, save these settings. If not, please check that the settings you have entered match with the values in the LAMS server';
+$string['validationhelp'] = 'Need help? check out the';
+$string['lamsmoodlehelp'] = 'LAMS-Moodle integration tutorial';
 
-
+$string['validationsuccessful'] = 'Validation successful! You can now save your settings and start using LAMS within Moodle.';
+$string['validationfailed'] = 'Validation failed: please check that the settings you have entered match with the settings in LAMS';
 //
-
-$string['notsetup'] = 'Configuration is not complete';
 
 
 // Labels for errors when calling LAMS Server
