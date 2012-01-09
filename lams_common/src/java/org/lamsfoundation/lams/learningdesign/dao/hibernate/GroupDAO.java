@@ -44,8 +44,8 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 public class GroupDAO extends BaseDAO implements IGroupDAO {
 
 	private final static String NUM_GROUPS = "select count(*) from "
-		+ Group.class.getName() + " group "
-		+ " where group.users.userId = :userID";
+		+ Group.class.getName() + " g join g.users u"
+		+ " where u.userId = :userID";
 
 	/* (non-Javadoc)
 	 * @see org.lamsfoundation.lams.learningdesign.dao.interfaces.IGroupDAO#getGroupById(java.lang.Long)
