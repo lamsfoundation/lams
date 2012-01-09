@@ -24,23 +24,24 @@
 package org.lamsfoundation.lams.webservice;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.events.DeliveryMethodMail;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
@@ -69,7 +70,6 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
@@ -77,10 +77,11 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * ----------------XDoclet Tags--------------------
  * 
- * @struts:action path="/Register" parameter="method" validate="false"
+ * @web:servlet name="RegisterServlet"
+ * @web:servlet-mapping url-pattern="/services/Register/*"
  * 
  */
-public class RegisterAction extends LamsDispatchAction {
+public class RegisterAction extends HttpServlet {
 
     private static Logger logger = Logger.getLogger(RegisterAction.class);
     
@@ -99,6 +100,54 @@ public class RegisterAction extends LamsDispatchAction {
     private static IEventNotificationService eventNotificationService  = null;
     
     private static MessageService messageService  = null;
+    
+    public synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+	    IOException {
+
+	String method = request.getParameter(CentralConstants.PARAM_METHOD);
+	if (method.equals("addUserToGroupLessons")) {
+	    addUserToGroupLessons(request, response);
+
+	} else if (method.equals("removeUserFromGroup")) {
+	    removeUserFromGroup(request, response);
+
+	} else if (method.equals("resetUserTimeLimit")) {
+	    resetUserTimeLimit(request, response);
+	}
+
+    }
+    
+    /**
+     * Initialization of the servlet. <br>
+     * 
+     * @throws ServletException
+     *                 if an error occured
+     */
+    public void init() throws ServletException {
+	learnerProgressDAO = (ILearnerProgressDAO) WebApplicationContextUtils.getRequiredWebApplicationContext(
+		getServletContext()).getBean("learnerProgressDAO");
+
+	integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
+		getServletContext()).getBean("integrationService");
+
+	lessonService = (ILessonService) WebApplicationContextUtils.getRequiredWebApplicationContext(
+		getServletContext()).getBean("lessonService");
+
+	learnerService = (ICoreLearnerService) WebApplicationContextUtils.getRequiredWebApplicationContext(
+		getServletContext()).getBean("learnerService");
+
+	groupUserDAO = (IGroupUserDAO) WebApplicationContextUtils.getRequiredWebApplicationContext(
+		getServletContext()).getBean("groupUserDAO");
+
+	userManagementService = (IUserManagementService) WebApplicationContextUtils.getRequiredWebApplicationContext(
+		getServletContext()).getBean("userManagementService");
+
+	eventNotificationService = (IEventNotificationService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("eventNotificationService");
+
+	messageService = (MessageService) WebApplicationContextUtils.getRequiredWebApplicationContext(
+		getServletContext()).getBean(CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
+    }
     
     /**
      * Add user to group lessons. 
@@ -122,15 +171,13 @@ public class RegisterAction extends LamsDispatchAction {
      *   @param isEmailParticipant - if set to 1 -then LAMS will email the user his/her login details
      *   @param isEmailCoordinator - if an email confirmation to and admin is required, just put the email address for the admin person here.
      */
-    public String addUserToGroupLessons(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    public void addUserToGroupLessons(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	try {
-	    init();
-	    
 	    String serverId = request.getParameter(CentralConstants.PARAM_SERVER_ID);
 	    String datetime = request.getParameter(CentralConstants.PARAM_DATE_TIME);
 	    String hashValue = request.getParameter(CentralConstants.PARAM_HASH_VALUE);
 	    String groupName = request.getParameter(CentralConstants.PARAM_COURSE_ID);
+	    String lessonId = request.getParameter(CentralConstants.ATTR_LESSON_ID);
 	    String username = request.getParameter(CentralConstants.PARAM_USERNAME);
 	    String firstName = request.getParameter("firstName");
 	    String lastName = request.getParameter("lastName");
@@ -157,27 +204,42 @@ public class RegisterAction extends LamsDispatchAction {
 	    ExtUserUseridMap userMap = integrationService.getImplicitExtUserUseridMap(extServer, username, hashedPassword,
 		    firstName, lastName, email);
 	    User user = userMap.getUser();
-
-	    //gets organisation from DB if exists, throws exception otherwise
-	    Organisation org = getOrganisationByName(groupName);
-
+	    
+	    HashSet<Lesson> lessonsToJoin = new HashSet<Lesson>();
+	    HashSet<Organisation> organisationsToJoin = new HashSet<Organisation>();
+	    
+	    if (StringUtils.isNotBlank(groupName)) {
+		// gets organisation from DB if exists, throws exception otherwise
+		Organisation org = getOrganisationByName(groupName);
+		organisationsToJoin.add(org);
+		lessonsToJoin.addAll(org.getLessons());
+	    }
+	    
+	    if (StringUtils.isNotBlank(lessonId)) {
+		Long lessonIdLong = Long.parseLong(lessonId);
+		Lesson lesson = lessonService.getLesson(lessonIdLong);
+		organisationsToJoin.add(lesson.getOrganisation());
+		lessonsToJoin.add(lesson);
+	    }
+	    
+	    //add to all required organisations
 	    List learnerRole = new ArrayList();
 	    learnerRole.add(Role.ROLE_LEARNER.toString());
-	    userManagementService.setRolesForUserOrganisation(user, org.getOrganisationId(), learnerRole);
-
-	    // add user to lessons (checks for duplicates)
-	    if (org.getLessons() != null) {
-		for (Lesson lesson : (Set<Lesson>) org.getLessons()) {
-		    boolean isAdded = lessonService.addLearner(lesson.getLessonId(), user.getUserId());
-		    if (isAdded) {
-			logger.debug("Added user:" + user.getLogin() + " to lesson:" + lesson.getLessonName() + " as a learner");
-		    }
+	    for (Organisation organisationToJoin : organisationsToJoin) {
+		userManagementService.setRolesForUserOrganisation(user, organisationToJoin.getOrganisationId(), learnerRole);
+	    }
+	    
+	    // add to all required lessons (checks for duplicates)
+	    for (Lesson lesson : lessonsToJoin) {
+		boolean isAdded = lessonService.addLearner(lesson.getLessonId(), user.getUserId());
+		if (isAdded) {
+		    logger.debug("Added user:" + user.getLogin() + " to lesson:" + lesson.getLessonName() + " as a learner");
 		}
 	    }
 	    
 	    //join user to all lessons in the group
 	    if ("1".equals(isJoinLesson)) {
-		for (Lesson lesson : (Set<Lesson>) org.getLessons()) {
+		for (Lesson lesson : lessonsToJoin) {
 		    
 		    LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(user.getUserId(), lesson.getLessonId());
 		    if (learnerProgress == null) {
@@ -200,7 +262,7 @@ public class RegisterAction extends LamsDispatchAction {
 	    if (StringUtils.isNotBlank(isEmailCoordinator)) {
 		List<User> coordinators = userManagementService.getAllUsersWithEmail(isEmailCoordinator);
 		if ((coordinators == null) || (coordinators.size() == 0)) {
-		    return "There are no coordinators with email: " + isEmailCoordinator;
+		    throw new RuntimeException("There are no coordinators with email: " + isEmailCoordinator);
 		}
 		User coordinator = coordinators.get(0);
 		
@@ -216,8 +278,6 @@ public class RegisterAction extends LamsDispatchAction {
 	    logger.error(e.getMessage());
 	    writeAJAXResponse(response, "ERROR: " + e.getMessage());
 	}
-	
-	return null;
     }
     
     /**
@@ -236,11 +296,8 @@ public class RegisterAction extends LamsDispatchAction {
      *   @param username - this is your WV Central ID
      *   @param isRemoveFromAllCourses - if set to 1 -then ignores courseId parameter and removes from all courses
      */
-    public String removeUserFromGroup(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    public void removeUserFromGroup(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	try {
-	    init();
-	    
 	    String serverId = request.getParameter(CentralConstants.PARAM_SERVER_ID);
 	    String datetime = request.getParameter(CentralConstants.PARAM_DATE_TIME);
 	    String hashValue = request.getParameter(CentralConstants.PARAM_HASH_VALUE);
@@ -293,8 +350,6 @@ public class RegisterAction extends LamsDispatchAction {
 	} catch (Exception e) {
 	    writeAJAXResponse(response, "ERROR: " + e.getMessage());
 	}
-	
-	return null;
     }
     
     /**
@@ -313,11 +368,8 @@ public class RegisterAction extends LamsDispatchAction {
      *   @param courseId - courseId is essentially a unique identifier for your Functional Speciality (note this is not the name of the Functional Speciality but its unique id)
      *   @param username - this is your WV Central ID
      */
-    public String resetUserTimeLimit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    public void resetUserTimeLimit(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	try {
-	    init();
-	    
 	    String serverId = request.getParameter(CentralConstants.PARAM_SERVER_ID);
 	    String datetime = request.getParameter(CentralConstants.PARAM_DATE_TIME);
 	    String hashValue = request.getParameter(CentralConstants.PARAM_HASH_VALUE);
@@ -354,8 +406,6 @@ public class RegisterAction extends LamsDispatchAction {
 	    logger.error(e.getMessage());
 	    writeAJAXResponse(response, "ERROR: " + e.getMessage());
 	}
-	
-	return null;
     }
     
     /**
@@ -446,35 +496,20 @@ public class RegisterAction extends LamsDispatchAction {
 	}
     }
     
-    /**
-     * Initialization of the servlet. <br>
-     * 
-     * @throws ServletException
-     *                 if an error occured
-     */
-    private void init() throws ServletException {
-	learnerProgressDAO = (ILearnerProgressDAO) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServlet().getServletContext()).getBean("learnerProgressDAO");
+    protected void writeAJAXResponse(HttpServletResponse response, String output) throws IOException {
+	response.setContentType("text/html;charset=utf-8");
+	PrintWriter out = response.getWriter();
 
-	integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServlet().getServletContext()).getBean("integrationService");
-
-	lessonService = (ILessonService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServlet().getServletContext()).getBean("lessonService");
-
-	learnerService = (ICoreLearnerService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServlet().getServletContext()).getBean("learnerService");
-
-	groupUserDAO = (IGroupUserDAO) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServlet().getServletContext()).getBean("groupUserDAO");
-
-	userManagementService = (IUserManagementService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServlet().getServletContext()).getBean("userManagementService");
-
-	eventNotificationService = (IEventNotificationService) WebApplicationContextUtils
-		.getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("eventNotificationService");
-
-	messageService = (MessageService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServlet().getServletContext()).getBean(CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
+	if (output.length() > 0) {
+	    out.println(output);
+	}
+	
+	out.flush();
+	out.close();
     }
+
+    protected void writeAJAXOKResponse(HttpServletResponse response) throws IOException {
+	writeAJAXResponse(response, "OK");
+    }
+    
 }
