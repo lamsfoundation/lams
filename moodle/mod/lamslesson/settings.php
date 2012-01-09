@@ -47,11 +47,23 @@ if ($ADMIN->fulltree) {
 
 
     // Validation button
-    $html = <<<XXX
-Here is where the button will go get_string('validationbutton', 'lamslesson') <strong>bold</strong>
-XXX;
 
-    $settings->add(new admin_setting_heading('lamslesson_validation', get_string('validationinfo', 'lamslesson'),
+    $html = html_writer::script('', $CFG->wwwroot.'/mod/lamslesson/validate.js');
+    $html .=  html_writer::tag('p', get_string('validationinfo', 'lamslesson')); 
+    $html .=  html_writer::start_tag('div', array('style' => 'text-align:center;padding-top: 15px; padding-bottom:5px;'));
+    $html .=  html_writer::start_tag('span', array('id' => 'validatebutton', 'class' => 'yui-button yui-link-button'));
+    $html .=  html_writer::tag('a', get_string('validationbutton', 'lamslesson'), 
+		array('id' => 'validatebtn', 
+			'name' => 'validatebtn', 
+			'href' => 'javascript:validate();'));
+    $html .= html_writer::end_tag('span');
+    $html .= html_writer::end_tag('div');
+    $html .= html_writer::tag('div', get_string('validationhelp', 'lamslesson') . ' ' 
+		.html_writer::link('http://wiki.lamsfoundation.org/display/lamsdocs/Moodle2',  get_string('lamsmoodlehelp', 'lamslesson'), 
+					array('target' => '_blank')), 
+		array('style' => 'text-align: right; font-size: 10px;', 'target' => '_blank'));
+
+    $settings->add(new admin_setting_heading('lamslesson_validation', get_string('validationheader', 'lamslesson'),
                        $html));
 }
 
