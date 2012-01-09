@@ -54,6 +54,7 @@ define('LAMSLESSON_PARAM_AUTHOR_METHOD', 'author');
 define('LAMSLESSON_PARAM_MONITOR_METHOD', 'monitor');
 define('LAMSLESSON_PARAM_LEARNER_METHOD', 'learner');
 define('LAMSLESSON_PARAM_PREVIEW_METHOD', 'preview');
+define('LAMSLESSON_PARAM_VERIFY_METHOD', 'verify');
 define('LAMSLESSON_PARAM_SINGLE_PROGRESS_METHOD', 'singleStudentProgress');
 define('LAMSLESSON_PARAM_PROGRESS_METHOD', 'studentProgress');
 define('LAMSLESSON_PARAM_CUSTOM_CSV', 'customCSV');
@@ -890,5 +891,36 @@ function lamslesson_update_grades($lamslesson, $userid, $usermark) {
     } else {
         lamslesson_grade_item_update($lamslesson);
     }
+
+}
+
+/**
+ * Verify Moodle settings with LAMS
+ *
+ * @param url $url
+ * @param string $id
+ * @param string $key
+ */
+function lamslesson_verify($url, $id, $key){
+
+    $datetime =    date("F d,Y g:i a");
+    $datetime_encoded = urlencode($datetime);
+
+    $plaintext = $datetime.$id.$key;
+    // create hash
+    $hashvalue = sha1(strtolower($plaintext));
+
+    $request = $url . LAMSLESSON_LESSON_MANAGER . "?method=" . LAMSLESSON_PARAM_VERIFY_METHOD . "&serverId=" . $id . "&datetime=" . $datetime_encoded . "&hashValue=" . $hashvalue;
+
+    $validate = file_get_contents($request);
+
+   if ( $validate == 1 )  {
+	// validation successful
+	return get_string('validationsuccessful', 'lamslesson');
+   } else {
+	// validation failed
+	return get_string('validationfailed', 'lamslesson');
+   }
+
 }
 

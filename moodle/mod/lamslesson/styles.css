@@ -11,6 +11,7 @@
 #learnerbutton a {text-decoration:none;padding-left: 2.25em;background: url([[pix:t/go]]) 8% 50% no-repeat;}
 #monitorbutton a {text-decoration:none;padding-left: 2.25em;background: url([[pix:a/search]]) 5% 50% no-repeat;}
 #previewbutton a {text-decoration:none;padding-left: 2.25em;background: url([[pix:a/search]]) 5% 50% no-repeat;}
+#validatebutton a {text-decoration:none;padding-left: 2.25em;background: url([[pix:i/admin]]) 5% 50% no-repeat;}
 
 /* Copyright (c) 2006 Yahoo! Inc. All rights reserved. 
 This file is from:
