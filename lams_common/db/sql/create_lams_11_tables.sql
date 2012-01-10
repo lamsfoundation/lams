@@ -334,6 +334,7 @@ CREATE TABLE lams_learning_design (
      , read_only_flag TINYINT(4) NOT NULL
      , date_read_only DATETIME
      , user_id BIGINT(20) NOT NULL
+     , original_user_id BIGINT(20) NOT NULL
      , help_text TEXT
      , online_instructions TEXT
      , offline_instructions TEXT

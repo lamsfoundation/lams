@@ -103,6 +103,9 @@ VALUES ('KalturaKCWUiConfId','', 'config.kaltura.kcw.uiconfid', 'config.header.k
 INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 VALUES ('KalturaKDPUiConfId','', 'config.kaltura.kdp.uiconfid', 'config.header.kaltura', 'STRING', 0);
 
+-- LDEV-2560 Add original author information
+ALTER TABLE lams_learning_design ADD COLUMN original_user_id BIGINT(20) AFTER user_id;
+
 COMMIT;
 SET AUTOCOMMIT = 1;
 set FOREIGN_KEY_CHECKS = 1;

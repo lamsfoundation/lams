@@ -59,6 +59,7 @@ public class LearningDesignDTO extends BaseDTO {
     private Boolean editOverrideLock;
     private Date dateReadOnly;
     private Integer userID;
+    private Integer originalUserID;
     private Integer editOverrideUserID;
     private String editOverrideUserFullName;
     private String helpText;
@@ -91,8 +92,8 @@ public class LearningDesignDTO extends BaseDTO {
     public LearningDesignDTO(Long learningDesignId, Integer learningDesignUIID, String description, String title,
 	    Long firstActivityID, Integer firstActivityUIID, Long floatingActivityID, Integer floatingActivityUIID,
 	    Integer maxId, Boolean validDesign, Boolean readOnly, Boolean editOverrideLock, Date dateReadOnly,
-	    Integer userID, Integer editOverrideUserID, String editOverrideUserFullName, String helpText,
-	    Integer copyTypeID, Date createDateTime, String version, Integer designVersion,
+	    Integer userID, Integer originalUserID, Integer editOverrideUserID, String editOverrideUserFullName,
+	    String helpText, Integer copyTypeID, Date createDateTime, String version, Integer designVersion,
 	    Long originalLearningDesignID, Integer workspaceFolderID, Long duration, String licenseText,
 	    Long licenseID, Date lastModifiedDateTime, String offlineInstructions, String onlineInstructions) {
 	super();
@@ -112,6 +113,7 @@ public class LearningDesignDTO extends BaseDTO {
 	this.offlineInstructions = offlineInstructions;
 	this.onlineInstructions = onlineInstructions;
 	this.userID = userID;
+	this.originalUserID = originalUserID;
 	this.editOverrideUserID = editOverrideUserID;
 	this.editOverrideUserFullName = editOverrideUserFullName;
 	this.helpText = helpText;
@@ -158,7 +160,8 @@ public class LearningDesignDTO extends BaseDTO {
 	this.onlineInstructions = learningDesign.getOnlineInstructions();
 
 	this.userID = learningDesign.getUser() != null ? learningDesign.getUser().getUserId() : null;
-
+	this.originalUserID = learningDesign.getOriginalUser() != null ? learningDesign.getOriginalUser().getUserId() : null;
+	
 	this.editOverrideUserID = learningDesign.getEditOverrideUser() != null ? learningDesign.getEditOverrideUser()
 		.getUserId() : null;
 	this.editOverrideUserFullName = learningDesign.getEditOverrideUser() != null ? learningDesign
@@ -348,6 +351,10 @@ public class LearningDesignDTO extends BaseDTO {
 	return userID;
     }
 
+    public Integer getOriginalUserID() {
+        return originalUserID;
+    }
+    
     /**
      * @return Returns the editOnFlyUserID.
      */
@@ -655,6 +662,12 @@ public class LearningDesignDTO extends BaseDTO {
     public void setUserID(Integer userID) {
 	if (!userID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER))
 	    this.userID = userID;
+    }
+
+    public void setOriginalUserID(Integer originalUserID) {
+	if (!originalUserID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_INTEGER)) {
+	    this.originalUserID = originalUserID;
+	}
     }
 
     /**

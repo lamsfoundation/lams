@@ -181,6 +181,7 @@ public interface WDDXTAGS {
     public static final String EDIT_OVERRIDE_LOCK = "editOverrideLock";
     public static final String DATE_READ_ONLY = "dateReadOnly";
     public static final String USER_ID = "userID";
+    public static final String ORIGINAL_USER_ID = "originalUserID";
     public static final String EDIT_OVERRIDE_USER_ID = "editOverrideUserID";
 
     public static final String COPY_TYPE = "copyTypeID";

@@ -116,6 +116,9 @@ public class LearningDesign implements Serializable {
 
 	/** persistent field */
 	private User user;
+	
+	/** persistent field */
+	private User originalUser;
 
 	/** persistent field */
 	private LearningDesign originalLearningDesign;
@@ -180,6 +183,7 @@ public class LearningDesign implements Serializable {
 			Date createDateTime,
 			String version,
 			User user,
+			User originalUser,
 			LearningDesign originalLearningDesign,
 			Set childLearningDesigns, Set lessons, Set transitions,
 			SortedSet activities,
@@ -208,6 +212,7 @@ public class LearningDesign implements Serializable {
 		this.createDateTime = createDateTime != null ? createDateTime : new Date();
 		this.version = version;
 		this.user = user;
+		this.originalUser = originalUser;
 		this.originalLearningDesign = originalLearningDesign;
 		this.childLearningDesigns = childLearningDesigns;
 		this.lessons = lessons;
@@ -243,6 +248,7 @@ public class LearningDesign implements Serializable {
 			Date createDateTime,
 			String version,
 			User user,
+			User originalUser,
 			org.lamsfoundation.lams.learningdesign.LearningDesign originalLearningDesign,
 			Set childLearningDesigns, Set lessons, Set transitions,
 			SortedSet activities) {
@@ -253,6 +259,7 @@ public class LearningDesign implements Serializable {
 		this.createDateTime = createDateTime != null ? createDateTime : new Date();
 		this.version = version;
 		this.user = user;
+		this.originalUser = originalUser;
 		this.originalLearningDesign = originalLearningDesign;
 		this.childLearningDesigns = childLearningDesigns;
 		this.lessons = lessons;
@@ -298,6 +305,7 @@ public class LearningDesign implements Serializable {
 		newDesign.setContentFolderID(design.getContentFolderID());
 		newDesign.setEditOverrideLock(design.getEditOverrideLock());
 		newDesign.setEditOverrideUser(design.getEditOverrideUser());
+		newDesign.setOriginalUser(design.getOriginalUser());
 		return newDesign;
 	}	
 
@@ -401,6 +409,15 @@ public class LearningDesign implements Serializable {
 	public void setUser(User user) {
 		this.user = user;
 	}
+	
+	public User getOriginalUser() {
+	    return originalUser;
+	}
+
+	public void setOriginalUser(User originalUser) {
+	    this.originalUser = originalUser;
+	}
+	
 	/** If this is a lesson type of learning design, then the original learning design was the authoring
 	 * learning design which was copied to make this learning design. The original design may or may not still exist 
 	 * in the database.  */
@@ -590,6 +607,4 @@ public class LearningDesign implements Serializable {
 	public FloatingActivity getFloatingActivity() {
 		return floatingActivity;
 	}
-
-
 }

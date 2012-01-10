@@ -2250,6 +2250,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	ld.setCreateDateTime(new Date());
 	ld.setLastModifiedDateTime(new Date());
 	ld.setUser(importer);
+	ld.setOriginalUser(importer);
 	return ld;
     }
 

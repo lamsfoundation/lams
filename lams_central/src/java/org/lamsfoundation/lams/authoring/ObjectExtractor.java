@@ -349,6 +349,18 @@ public class ObjectExtractor implements IObjectExtractor {
 	learningDesign.setWorkspaceFolder(workspaceFolder);
 	learningDesign.setUser(user);
 
+	if (existingLearningDesign == null) {
+	    if (keyExists(table, WDDXTAGS.ORIGINAL_USER_ID)) {
+		Integer originalUserID = WDDXProcessor.convertToInteger(table, WDDXTAGS.ORIGINAL_USER_ID);
+		User originalUser = (User) getBaseDAO().find(User.class, originalUserID);
+		learningDesign.setOriginalUser(originalUser);
+	    } else {
+		learningDesign.setOriginalUser(user);
+	    }
+	} else {
+	    learningDesign.setOriginalUser(existingLearningDesign.getOriginalUser());
+	}
+
 	// Pull out all the existing groups. there isn't an easy way to pull
 	// them out of the db requires an outer join across
 	// three objects (learning design -> grouping activity -> grouping) so

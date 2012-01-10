@@ -210,6 +210,11 @@
         <column name="user_id" />
     </many-to-one>
     
+    <!-- bi-directional many-to-one association to User -->
+    <many-to-one name="originalUser" class="org.lamsfoundation.lams.usermanagement.User" not-null="false">
+        <column name="original_user_id" />
+    </many-to-one>
+    
     <!-- bi-directional many-to-one association to WorkspaceFolder-->
     <many-to-one name="workspaceFolder" class="org.lamsfoundation.lams.usermanagement.WorkspaceFolder">
         <column name="workspace_folder_id" />

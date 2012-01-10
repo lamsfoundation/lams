@@ -538,6 +538,7 @@ public class LD102Importer implements ApplicationContextAware{
 		}
 	
 		ld.setUser(importer);
+		ld.setOriginalUser(importer);
 		if(folder != null)
 			ld.setWorkspaceFolder(folder);
 
