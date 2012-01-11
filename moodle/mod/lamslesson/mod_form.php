@@ -91,14 +91,19 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 	  $openauthorlabel = get_string('openauthor', 'lamslesson');
 	  $openpreviewlabel = get_string('previewthislesson', 'lamslesson');
 
+    	  // display user's lams workspace
+    	  $lds = lamslesson_get_sequences_rest($USER->username, $COURSE->id, $COURSE->fullname, $COURSE->timecreated, $USER->country, $USER->lang) ;
+
 	  // html "chunk" for open Author button 
 
         $authorpreviewbutton = html_writer::script(js_writer::set_variable('authorWin', 'null') . 
                                 js_writer::set_variable('previewWin', 'null') .
                                 js_writer::set_variable('options', $popupoptions) .
                                 js_writer::set_variable('requestsrc', $CFG->lamslesson_requestsource) .
-                                js_writer::set_variable('course', $COURSE->id)
-                );
+                                js_writer::set_variable('course', $COURSE->id) .
+				js_writer::set_variable('sequence_id', $sequence_id) .
+				js_writer::set_variable('updatewarning', $updatewarning) .
+				js_writer::set_variable('currentsequence', $currentsequence));
 
         $authorpreviewbutton .= html_writer::script('', $CFG->wwwroot.'/mod/lamslesson/preview.js');
 
@@ -119,76 +124,33 @@ class mod_lamslesson_mod_form extends moodleform_mod {
         $authorpreviewbutton .= html_writer::end_tag('div');
 	}
 
-    $mform->addElement('hidden', 'sequence_id');
-    $mform->setType('sequence_id', PARAM_INT);
+	$mform->addElement('hidden', 'sequence_id');
+    	$mform->setType('sequence_id', PARAM_INT);
 
-    $mform->addElement('hidden', 'customCSV', $customcsv);
-    $mform->setType('customCSV', PARAM_TEXT);
+    	$mform->addElement('hidden', 'customCSV', $customcsv);
+    	$mform->setType('customCSV', PARAM_TEXT);
 
-    // display user's lams workspace
-    $lds = lamslesson_get_sequences_rest($USER->username, $COURSE->id, $COURSE->fullname, $COURSE->timecreated, $USER->country, $USER->lang) ;
+    	// html "chuck" for YUI tree
+    	$treecomponent = html_writer::tag('div', '' , array('id' => 'treeDiv'));
+    	$treecomponent .= html_writer::tag('div', '' , array('id' => 'updatesequence'));
 
-    
+    	$treecomponent .= html_writer::tag('script', 'var tree = new YAHOO.widget.TreeView("treeDiv",['. $lds .']);tree.getNodeByIndex(1).expand(true);tree.getNodeByIndex(2).expand(true);', array('type' => 'text/javascript'));
+    	$treecomponent .= html_writer::script('', $CFG->wwwroot.'/mod/lamslesson/tree.js');
 
-    // html "chuck" for YUI tree
-    $html = <<<XXX
-     <script type="text/javascript">
-       <!--
-       function selectSequence(obj, name){
-	// if the selected object is a sequence (id!=0) then we assign the id to the hidden sequence_id
-	// also if the name is blank we just add the name of the sequence to the name too. 
+    	// Now we put the two html chunks together
+    	$html = $authorpreviewbutton . $treecomponent;
 
-	document.getElementsByName("sequence_id")[0].value = obj;
+        $mform->addElement('hidden', 'sequence_id');
+        $mform->setType('sequence_id', PARAM_INT);
 
-	  if (obj!=0) {
-	    if (document.getElementsByName("name")[0].value == '') {
-	      document.getElementsByName("name")[0].value = name;
-	    }
-	    document.getElementById('previewbutton').style.visibility='visible';
-	  } else {
-	    document.getElementById('previewbutton').style.visibility='hidden';
-	  }
-      }
-
-        //-->
-     </script>
-
-<div id="treeDiv"></div>
-<div id="updatesequence"></div>
-<script type="text/javascript">
-var tree;
-tree = new YAHOO.widget.TreeView("treeDiv",[
-$lds
-					    ]);
-// expand only the first two nodes
-tree.getNodeByIndex(1).expand(true);
-tree.getNodeByIndex(2).expand(true);
-
-if ($sequence_id > 0) {
-  var node = tree.getNodeByProperty('id', $sequence_id);
-  var sequenceName = node.label;
-  var updateDiv = document.createElement('div');
-  updateDiv.setAttribute('class','note');
-  updateDiv.setAttribute('id','currentsequence');
-  updateDiv.innerHTML = '<p>$updatewarning</p><strong>$currentsequence ' + sequenceName +'</strong>';
-  document.getElementById('updatesequence').appendChild(updateDiv);
-}
-tree.render();
-tree.subscribe('clickEvent',function(oArgs) {
-    selectSequence(oArgs.node.data.id, oArgs.node.label);
-  });
-</script>
-
-XXX;
-
-    // Now we put the two html chunks together
-$html = $authorpreviewbutton . $html; 
+        $mform->addElement('hidden', 'customCSV', $customcsv);
+        $mform->setType('customCSV', PARAM_TEXT);
 
         $mform->addElement('header', 'selectsequence', get_string('selectsequence', 'lamslesson'));
 
         $mform->addElement('static', 'sequencemessage', '', $html);
     	$mform->addElement('checkbox', 'displaydesign', get_string('displaydesign', 'lamslesson'));
-//	$mform->setAdvanced('displaydesign');
+
 //-------------------------------------------------------------------------------
 	$this->standard_grading_coursemodule_elements();
 
