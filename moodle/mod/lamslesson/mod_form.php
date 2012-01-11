@@ -124,12 +124,6 @@ class mod_lamslesson_mod_form extends moodleform_mod {
         $authorpreviewbutton .= html_writer::end_tag('div');
 	}
 
-	$mform->addElement('hidden', 'sequence_id');
-    	$mform->setType('sequence_id', PARAM_INT);
-
-    	$mform->addElement('hidden', 'customCSV', $customcsv);
-    	$mform->setType('customCSV', PARAM_TEXT);
-
     	// html "chuck" for YUI tree
     	$treecomponent = html_writer::tag('div', '' , array('id' => 'treeDiv'));
     	$treecomponent .= html_writer::tag('div', '' , array('id' => 'updatesequence'));
