@@ -92,57 +92,33 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 	  $openpreviewlabel = get_string('previewthislesson', 'lamslesson');
 
 	  // html "chunk" for open Author button 
-	  $authorpreviewbutton = <<<XXX
-<script language="javascript" type="text/javascript">
-<!--
-	  var authorWin = null;
-	  var previewWin = null;
-	  var options = '$popupoptions';
-	  
-	  function openAuthor(url,name,fullscreen) {
-	    url = url + "&requestSrc=" + escape("$CFG->lamslesson_requestsource");
-	    url = url + "&notifyCloseURL=" + escape(window.location.href);
-	    if(authorWin && !authorWin.closed){
-	      authorWin.focus();
-	    }else{
-	      authorWin = window.open(url,name,options);
-	      if (fullscreen) {
-		authorWin.moveTo(0,0);
-		authorWin.resizeTo(screen.availWidth,screen.availHeight);
-	      }
-	      authorWin.focus();
-	    }
-	    return false;
-	  }
 
-	  function openPreview(url,name,fullscreen) {
+        $authorpreviewbutton = html_writer::script(js_writer::set_variable('authorWin', 'null') . 
+                                js_writer::set_variable('previewWin', 'null') .
+                                js_writer::set_variable('options', $popupoptions) .
+                                js_writer::set_variable('requestsrc', $CFG->lamslesson_requestsource) .
+                                js_writer::set_variable('course', $COURSE->id)
+                );
 
-	    url = url + "&ldId=" + document.getElementsByName("sequence_id")[0].value;
-	    url = url + "&course=" + $COURSE->id;
-	    previewWin = window.open(url,name,options);
-	    if (fullscreen) {
-	      previewWin.moveTo(0,0);
-	      previewWin.resizeTo(screen.availWidth,screen.availHeight);
-	    }
-	    previewWin.focus();
-	    return false;
-	  }
-	  
-	  //-->
-</script>
-<div id="buttons" style="float:right;">
-    <span id="previewbutton" style="visibility:hidden;" class="yui-button yui-link-button"><span class="first-child">
-    <a onclick="openPreview('$previewurl','preview',0)" href="#nogo">$openpreviewlabel</a>
-    </span></span>
-    <span id="authorbutton" class="yui-button yui-link-button"><span class="first-child">
-    <a onclick="openAuthor('$authorurl','author',0)" href="#nogo">$openauthorlabel</a>
-    </span></span>
-</div>
+        $authorpreviewbutton .= html_writer::script('', $CFG->wwwroot.'/mod/lamslesson/preview.js');
 
-XXX;
+
+        $authorpreviewbutton .= html_writer::start_tag('div', array('id' => 'buttons', 'style' => 'float:right;'));
+        // Preview button
+        $authorpreviewbutton .= html_writer::start_tag('span', array('id' => 'previewbutton', 'style' => 'visibility:hidden;', 'class' => 'yui-button yui-link-button'));
+        $authorpreviewbutton .= html_writer::start_tag('span', array('class' => 'first-child'));
+        $authorpreviewbutton .= html_writer::link('#nogo', $openpreviewlabel, array('onclick' => js_writer::function_call('openPreview', array('1' => $previewurl, '2' => preview, '3' => 0))));
+        $authorpreviewbutton .= html_writer::end_tag('span');
+        $authorpreviewbutton .= html_writer::end_tag('span');
+	//Authoring button
+        $authorpreviewbutton .= html_writer::start_tag('span', array('id' => 'authorbutton', 'class' => 'yui-button yui-link-button'));
+        $authorpreviewbutton .= html_writer::start_tag('span', array('class' => 'first-child'));
+        $authorpreviewbutton .= html_writer::link('#nogo', $openauthorlabel, array('onclick' => js_writer::function_call('openAuthor', array('1' => $authorurl, '2' => author, '3' => 0))));
+        $authorpreviewbutton .= html_writer::end_tag('span');
+        $authorpreviewbutton .= html_writer::end_tag('span');
+        $authorpreviewbutton .= html_writer::end_tag('div');
 	}
 
-//     $mform->addElement('','');    
     $mform->addElement('hidden', 'sequence_id');
     $mform->setType('sequence_id', PARAM_INT);
 
