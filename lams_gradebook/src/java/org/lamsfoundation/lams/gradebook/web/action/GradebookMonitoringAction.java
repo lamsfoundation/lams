@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -308,7 +309,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
 		if (lesson != null) {
 			String fileName = lesson.getLessonName().replaceAll(" ", "_") + ".xlsx";
-
+			fileName  = FileUtil.encodeFilenameForDownload(request, fileName);
+			
 			response.setContentType("application/x-download");
 			response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
 			logger.debug("Exporting to a spreadsheet gradebook lesson: " + lessonID);
@@ -358,6 +360,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	dataToExport.put(gradebookService.getMessage("gradebook.exportcourse.course.summary"), summaryData);
 
 	String fileName = organisation.getName().replaceAll(" ", "_") + ".xls";
+	fileName  = FileUtil.encodeFilenameForDownload(request, fileName);
+	
 	response.setContentType("application/x-download");
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);	
 	
