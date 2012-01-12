@@ -164,6 +164,7 @@ public class RegisterAction extends HttpServlet {
      *   @param hashValue - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime + username + method + serverId  + serverKey ]
      *   @param courseId - courseId is essentially a unique identifier for your Functional Speciality (note this is not the name of the Functional Speciality but its unique id)
      *   @param username - this is your WV Central ID
+     *   @param usePrefix - if set to 1 - force the addition of the server integration prefix to usernames 
      *   @param firstName - well, first name 
      *   @param lastName - last name
      *   @param email - email
@@ -180,6 +181,7 @@ public class RegisterAction extends HttpServlet {
 	    String groupName = request.getParameter(CentralConstants.PARAM_COURSE_ID);
 	    String lessonId = request.getParameter(CentralConstants.ATTR_LESSON_ID);
 	    String username = request.getParameter(CentralConstants.PARAM_USERNAME);
+	    String usePrefix = request.getParameter("usePrefix");
 	    String firstName = request.getParameter("firstName");
 	    String lastName = request.getParameter("lastName");
 	    String email = request.getParameter("email");
@@ -200,6 +202,12 @@ public class RegisterAction extends HttpServlet {
 	    //create new password
 	    String password = RandomPasswordGenerator.nextPassword(8);
 	    String hashedPassword = HashUtil.sha1(password);
+
+	    // check whether we need to use a prefix for users
+	    if ("1".equals(usePrefix)) {
+		username = extServer.getPrefix() + "_" + username.trim();
+		logger.debug("Adding prefix to username:" + username);
+	    }
 
 	    //get user from the DB if exists, create it otherwise
 	    ExtUserUseridMap userMap = integrationService.getImplicitExtUserUseridMap(extServer, username, hashedPassword,
@@ -295,6 +303,7 @@ public class RegisterAction extends HttpServlet {
      *   @param hashValue - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime + username +  method + serverId  + serverKey ]
      *   @param courseId - courseId is essentially a unique identifier for your Functional Speciality (note this is not the name of the Functional Speciality but its unique id)
      *   @param username - this is your WV Central ID
+     *   @param usePrefix - if set to 1 - force the addition of the server integration prefix to usernames 
      *   @param isRemoveFromAllCourses - if set to 1 -then ignores courseId parameter and removes from all courses
      */
     public void removeUserFromGroup(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -306,6 +315,7 @@ public class RegisterAction extends HttpServlet {
 	    String groupName = request.getParameter(CentralConstants.PARAM_COURSE_ID);
 	    String username = request.getParameter(CentralConstants.PARAM_USERNAME);
 	    String isRemoveFromAllCourses = request.getParameter("isRemoveFromAllCourses");
+            String usePrefix = request.getParameter("usePrefix");
 
 	    if (serverId == null || datetime == null || hashValue == null || username == null) {
 		String msg = "Parameters missing";
@@ -316,6 +326,12 @@ public class RegisterAction extends HttpServlet {
 	    // authenticate external server
 	    ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, method, hashValue);
+
+            // check whether we need to use a prefix for users
+            if ("1".equals(usePrefix)) {
+                username = extServer.getPrefix() + "_" + username.trim();
+                logger.debug("Adding prefix to username:" + username);
+            }
 
 	    //get user from the DB if exists, throws exception otherwise
 	    ExtUserUseridMap userMap = getExtUserUseridMap(extServer, username);
@@ -369,6 +385,7 @@ public class RegisterAction extends HttpServlet {
      *   @param hashValue - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime + username + method + serverId  + serverKey ]
      *   @param courseId - courseId is essentially a unique identifier for your Functional Speciality (note this is not the name of the Functional Speciality but its unique id)
      *   @param username - this is your WV Central ID
+     *   @param usePrefix - if set to 1 - force the addition of the server integration prefix to usernames 
      */
     public void resetUserTimeLimit(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	try {
@@ -378,6 +395,7 @@ public class RegisterAction extends HttpServlet {
 	    String hashValue = request.getParameter(CentralConstants.PARAM_HASH_VALUE);
 	    String courseId = request.getParameter(CentralConstants.PARAM_COURSE_ID);
 	    String username = request.getParameter(CentralConstants.PARAM_USERNAME);
+            String usePrefix = request.getParameter("usePrefix");
 
 	    if (serverId == null || datetime == null || hashValue == null || username == null || courseId == null) {
 		String msg = "Parameters missing";
@@ -388,6 +406,12 @@ public class RegisterAction extends HttpServlet {
 	    // authenticate external server
 	    ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, method, hashValue);
+
+            // check whether we need to use a prefix for users
+            if ("1".equals(usePrefix)) {
+                username = extServer.getPrefix() + "_" + username.trim();
+                logger.debug("Adding prefix to username:" + username);
+            }
 
 	    //get user from the DB if exists, throws exception otherwise
 	    ExtUserUseridMap userMap = getExtUserUseridMap(extServer, username);
