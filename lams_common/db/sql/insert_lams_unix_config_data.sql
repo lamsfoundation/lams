@@ -1,5 +1,5 @@
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('ServerURL','http://shaun.melcoe.mq.edu.au/lams/', 'config.server.url', 'config.header.system', 'STRING', 1);
+values ('ServerURL','http://137.111.246.19:8080/lams/', 'config.server.url', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('ServerURLContextPath','lams/', 'config.server.url.context.path', 'config.header.system', 'STRING', 1);
@@ -15,6 +15,9 @@ values ('DumpDir','/var/opt/lams/dump', 'config.dump.dir', 'config.header.system
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('EARDir','/usr/local/jboss-5.1/server/default/deploy/lams.ear/', 'config.ear.dir', 'config.header.system', 'STRING', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+values ('EnableServerRegistration', 'false', 'config.server2server.registration.enable', 'config.header.system', 'BOOLEAN', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('InternalSMTPServer','true', 'config.use.internal.smtp.server', 'config.header.email', 'BOOLEAN', 0);

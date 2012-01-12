@@ -68,6 +68,8 @@ import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -174,6 +176,15 @@ public class RegisterAction extends HttpServlet {
      */
     public void addUserToGroupLessons(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	try {
+
+	    // Check if Server registration is available
+	    boolean serverToServerEnable = Configuration.getAsBoolean(ConfigurationKeys.ENABLE_SERVER_REGISTRATION);
+	    if (!serverToServerEnable) {
+		String msg = "Server to server registration is not enabled";
+                logger.error(msg);
+                response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
+		return;
+	    }
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	    String serverId = request.getParameter(CentralConstants.PARAM_SERVER_ID);
 	    String datetime = request.getParameter(CentralConstants.PARAM_DATE_TIME);
@@ -308,7 +319,15 @@ public class RegisterAction extends HttpServlet {
      */
     public void removeUserFromGroup(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	try {
-	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
+		    // Check if Server registration is available
+	    boolean serverToServerEnable = Configuration.getAsBoolean(ConfigurationKeys.ENABLE_SERVER_REGISTRATION);
+	    if (!serverToServerEnable) {
+		String msg = "Server to server registration is not enabled";
+                logger.error(msg);
+                response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
+		return;
+	    }
+    	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	    String serverId = request.getParameter(CentralConstants.PARAM_SERVER_ID);
 	    String datetime = request.getParameter(CentralConstants.PARAM_DATE_TIME);
 	    String hashValue = request.getParameter(CentralConstants.PARAM_HASH_VALUE);
@@ -389,6 +408,15 @@ public class RegisterAction extends HttpServlet {
      */
     public void resetUserTimeLimit(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	try {
+	    // Check if Server registration is available
+	    boolean serverToServerEnable = Configuration.getAsBoolean(ConfigurationKeys.ENABLE_SERVER_REGISTRATION);
+	    if (!serverToServerEnable) {
+		String msg = "Server to server registration is not enabled";
+                logger.error(msg);
+                response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
+		return;
+	    }
+
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	    String serverId = request.getParameter(CentralConstants.PARAM_SERVER_ID);
 	    String datetime = request.getParameter(CentralConstants.PARAM_DATE_TIME);

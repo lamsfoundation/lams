@@ -112,6 +112,9 @@ values ('DisplayPrintButton','false', 'config.display.print.button', 'config.hea
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('ForceMobileDevToUseFlashless','false', 'config.force.mobile.use.flashlesh', 'config.header.features', 'BOOLEAN', 1);
 
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+values ('EnableServerRegistration', 'false', 'config.server2server.registration.enable', 'config.header.features', 'BOOLEAN', 1);
+
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LDAPProvisioningEnabled','false', 'config.ldap.provisioning.enabled', 'config.header.ldap', 'BOOLEAN', 1);
 

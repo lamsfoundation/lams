@@ -275,5 +275,7 @@ public class ConfigurationKeys {
     
     public static String KALTURA_KDP_UI_CONF_ID = "KalturaKDPUiConfId";
 
+    // LDEV-2747
+    public static String ENABLE_SERVER_REGISTRATION = "EnableServerRegistration";
 
 }
