@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 
@@ -33,6 +34,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     String feedback;
 
     // For activity view
+    Date startDate;
     String output;
     String activityUrl;
     
@@ -69,6 +71,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 		ret.add(rowName);
 	    }
 	    ret.add(status);
+	    ret.add(startDate != null ? convertDateToString(startDate, DEFAULT_DATE_FORMAT) : CELL_EMPTY);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add((output != null) ? output.toString() : CELL_EMPTY);
 	    ret.add(feedback);
@@ -141,6 +144,14 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     
     public void setCurrentActivity(String currentActivity) {
 	this.currentActivity = currentActivity;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startTime) {
+        this.startDate = startTime;
     }
 
 }

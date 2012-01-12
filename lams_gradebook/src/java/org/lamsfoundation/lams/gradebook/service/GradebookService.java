@@ -256,6 +256,7 @@ public class GradebookService implements IGradebookService {
 		// Set the progress
 		LearnerProgress learnerProgress = getLearnerProgress(lesson, learner);
 		gUserDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
+		gUserDTO.setStartDate(getActivityStartDate(learnerProgress, activity));
 		gUserDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
 
 		// Get the tool outputs for this user if there are any
@@ -1111,6 +1112,24 @@ public class GradebookService implements IGradebookService {
 	}
 
 	return gactivityDTO;
+    }
+
+    /**
+     * Gets activity start time, either attempted or completed
+     * @param learnerProgress
+     * @param activity
+     * @return
+     */
+    private Date getActivityStartDate(LearnerProgress learnerProgress, Activity activity) {
+	Date startDate = null;
+	if (learnerProgress != null) {
+	    startDate = learnerProgress.getAttemptedActivities().get(activity);
+	    if (startDate == null) {
+		CompletedActivityProgress compProg = learnerProgress.getCompletedActivities().get(activity);
+		startDate = compProg.getStartDate();
+	    }
+	}
+	return startDate;
     }
 
     private Long getActivityDuration(LearnerProgress learnerProgress, Activity activity) {

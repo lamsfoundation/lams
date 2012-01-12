@@ -23,8 +23,11 @@
 /* $Id$ */
 package org.lamsfoundation.lams.gradebook.dto;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 
@@ -33,6 +36,9 @@ public abstract class GradebookGridRowDTO {
     public abstract ArrayList<String> toStringArray(GBGridView view);
 
     public static final String CELL_EMPTY = "-";
+
+    public static final DateFormat DEFAULT_DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT,
+	    DateFormat.SHORT);
 
     // The id for a row, might be activityId, userId, lessonID etc
     public String id;
@@ -93,6 +99,20 @@ public abstract class GradebookGridRowDTO {
 	} else {
 	    return null;
 	}
+    }
+
+    /**
+     * A shared function to convert date into a readable string
+     * 
+     * @param date to format
+     * @return formatted date
+     */
+    protected String convertDateToString(Date date, DateFormat format) {
+	if (date != null) {
+	    DateFormat usedFormat = format == null ? DEFAULT_DATE_FORMAT : format;
+	    return usedFormat.format(date);
+	}
+	return null;
     }
 
     protected String markToString() {
