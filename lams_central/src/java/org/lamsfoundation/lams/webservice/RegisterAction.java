@@ -161,7 +161,7 @@ public class RegisterAction extends HttpServlet {
      *   @param method=addUserToGroupLessons - selfexplanatory.
      *   @param serverId - this is a string of characters we'll provide to you
      *   @param datetime - a character string with the date and time you make this request (format example 2011100608:15:10)
-     *   @param hashValue - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime + username +  serverId  + serverKey ]
+     *   @param hashValue - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime + username + method + serverId  + serverKey ]
      *   @param courseId - courseId is essentially a unique identifier for your Functional Speciality (note this is not the name of the Functional Speciality but its unique id)
      *   @param username - this is your WV Central ID
      *   @param firstName - well, first name 
@@ -292,7 +292,7 @@ public class RegisterAction extends HttpServlet {
      *   @param method=removeUserFromGroup - selfexplanatory.
      *   @param serverId - this is a string of characters we'll provide to you
      *   @param datetime - a character string with the date and time you make this request (format example 2011100608:15:10)
-     *   @param hashValue - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime + username +  serverId  + serverKey ]
+     *   @param hashValue - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime + username +  method + serverId  + serverKey ]
      *   @param courseId - courseId is essentially a unique identifier for your Functional Speciality (note this is not the name of the Functional Speciality but its unique id)
      *   @param username - this is your WV Central ID
      *   @param isRemoveFromAllCourses - if set to 1 -then ignores courseId parameter and removes from all courses
@@ -366,7 +366,7 @@ public class RegisterAction extends HttpServlet {
      *   @param method=resetUserTimeLimit - selfexplanatory.
      *   @param serverId - this is a string of characters we'll provide to you
      *   @param datetime - a character string with the date and time you make this request (format example 2011100608:15:10)
-     *   @param hashValue - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime + username +  serverId  + serverKey ]
+     *   @param hashValue - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime + username + method + serverId  + serverKey ]
      *   @param courseId - courseId is essentially a unique identifier for your Functional Speciality (note this is not the name of the Functional Speciality but its unique id)
      *   @param username - this is your WV Central ID
      */
