@@ -1067,6 +1067,7 @@ public class GradebookService implements IGradebookService {
 	}
 
 	// Setting status
+	gactivityDTO.setStartDate(getActivityStartDate(learnerProgress, activity));
 	gactivityDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
 	gactivityDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
 
@@ -1100,14 +1101,6 @@ public class GradebookService implements IGradebookService {
 			+ activity.getTool().getLearnerProgressUrl() + "&userID=" + learner.getUserId()
 			+ "&toolSessionID=" + toolSession.getToolSessionId().toString());
 		gactivityDTO.setOutput(this.getToolOutputsStr(activity, toolSession, learner));
-
-		if (activityState == LearnerProgress.ACTIVITY_ATTEMPTED) {
-		    gactivityDTO.setStartDate(learnerProgress.getAttemptedActivities().get(activity));
-		} else {
-		    if (learnerProgress.getCompletedActivities() != null && learnerProgress.getCompletedActivities().get(activity) != null) {
-			gactivityDTO.setStartDate(learnerProgress.getCompletedActivities().get(activity).getStartDate());
-		    }
-		}
 	    }
 	}
 
@@ -1126,7 +1119,9 @@ public class GradebookService implements IGradebookService {
 	    startDate = learnerProgress.getAttemptedActivities().get(activity);
 	    if (startDate == null) {
 		CompletedActivityProgress compProg = learnerProgress.getCompletedActivities().get(activity);
-		startDate = compProg.getStartDate();
+		if (compProg != null) {
+		    startDate = compProg.getStartDate();
+		}
 	    }
 	}
 	return startDate;
