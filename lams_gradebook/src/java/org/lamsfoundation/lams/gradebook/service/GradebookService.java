@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.gradebook.service;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,9 +38,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
@@ -73,6 +77,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -256,7 +261,7 @@ public class GradebookService implements IGradebookService {
 		// Set the progress
 		LearnerProgress learnerProgress = getLearnerProgress(lesson, learner);
 		gUserDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
-		gUserDTO.setStartDate(getActivityStartDate(learnerProgress, activity));
+		gUserDTO.setStartDate(getActivityStartDate(learnerProgress, activity, learner.getTimeZone()));
 		gUserDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
 
 		// Get the tool outputs for this user if there are any
@@ -1067,7 +1072,7 @@ public class GradebookService implements IGradebookService {
 	}
 
 	// Setting status
-	gactivityDTO.setStartDate(getActivityStartDate(learnerProgress, activity));
+	gactivityDTO.setStartDate(getActivityStartDate(learnerProgress, activity, learner.getTimeZone()));
 	gactivityDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
 	gactivityDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
 
@@ -1108,12 +1113,14 @@ public class GradebookService implements IGradebookService {
     }
 
     /**
-     * Gets activity start time, either attempted or completed
+     * Gets either attempted or completed activity start time ajusted to monitor time zone.
+     * 
      * @param learnerProgress
      * @param activity
+     * @param timeZone
      * @return
      */
-    private Date getActivityStartDate(LearnerProgress learnerProgress, Activity activity) {
+    private Date getActivityStartDate(LearnerProgress learnerProgress, Activity activity, String timeZone) {
 	Date startDate = null;
 	if (learnerProgress != null) {
 	    startDate = learnerProgress.getAttemptedActivities().get(activity);
@@ -1122,6 +1129,18 @@ public class GradebookService implements IGradebookService {
 		if (compProg != null) {
 		    startDate = compProg.getStartDate();
 		}
+	    }
+	}
+	
+	if (startDate != null) {
+	    if (StringUtils.isBlank(timeZone)) {
+		logger.warn("No user time zone provided, leaving server default");
+	    } else {
+		if (logger.isTraceEnabled()) {
+		    logger.trace("Adjusting time according to zone \"" + timeZone + "\"");
+		}
+		TimeZone userTimeZone = TimeZone.getTimeZone(timeZone);
+		startDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, startDate);
 	    }
 	}
 	return startDate;
