@@ -94,9 +94,7 @@
 		var notifyCloseURL = "${notifyCloseURL}";
 		if (notifyCloseURL == ""){
 			if (nextAction == "defineLater") {
-				alert(notifyCloseURL);
 				refreshParentMonitoringWindow();
-				alert(nextAction);
 			}
 			location.href="<c:url value='${clearSessionActionUrl}?action=" + nextAction + "&mode=${accessMode}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
 		} else {
