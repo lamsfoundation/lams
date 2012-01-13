@@ -82,19 +82,14 @@ public abstract class LamsAuthoringFinishAction extends Action {
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	String action = request.getParameter(ACTION_NAME);
-	String modeStr = request.getParameter(ACTION_MODE);
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, ACTION_MODE, false);
 	String cSessionID = request.getParameter(CUSTOMISE_SESSION_ID);
 	String notifyCloseURL = (String) request.getSession().getAttribute(PARAM_NOTIFY_CLOSE_URL);
 	
 	// clear session according to the ToolAccessMode.
-	if (StringUtils.equals(ToolAccessMode.LEARNER.toString(), modeStr))
-	    clearSession(cSessionID, request.getSession(), ToolAccessMode.LEARNER);
-	else if (StringUtils.equals(ToolAccessMode.TEACHER.toString(), modeStr))
-	    clearSession(cSessionID, request.getSession(), ToolAccessMode.TEACHER);
-	else
-	    // if(StringUtils.equals(ToolAccessMode.AUTHOR.toString(),modeStr)) : default value
-	    clearSession(cSessionID, request.getSession(), ToolAccessMode.AUTHOR);
+	clearSession(cSessionID, request.getSession(), mode);
 
+	//CONFIRM_ACTION got fired only for general authoring and not for define later one
 	if (StringUtils.equals(action, CONFIRM_ACTION)) {
 	    String nextUrl = getLamsUrl() + "authoringConfirm.jsp";
 	    String signature = request.getParameter(TOOL_SIGNATURE);
@@ -105,24 +100,11 @@ public abstract class LamsAuthoringFinishAction extends Action {
 
 	    // check whether it use on define it later page
 	    IToolVO tool = getToolService().getToolBySignature(signature);
-	    String defineLater = request.getParameter(PARAM_DEFINE_LATER);
 
-	    String reeditUrl;
-	    if (StringUtils.equalsIgnoreCase(defineLater, "yes") || StringUtils.equalsIgnoreCase(defineLater, "true")) {
-		// define it later page
-		reeditUrl = WebUtil.appendParameterToURL(getLamsUrl() + tool.getDefineLaterUrl(),
-			AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId.toString());
-		reeditUrl = WebUtil.appendParameterToURL(reeditUrl, AttributeNames.PARAM_CONTENT_FOLDER_ID,
-			contentFolderID);
-
-	    } else {
-		// authoring page
-		reeditUrl = WebUtil.appendParameterToURL(getLamsUrl() + tool.getAuthorUrl(),
-			AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId.toString());
-		reeditUrl = WebUtil.appendParameterToURL(reeditUrl, AttributeNames.PARAM_CONTENT_FOLDER_ID,
-			contentFolderID);
-	    }
-	    tool.getServiceName();
+	    //add reeditUrl parameter
+	    String reeditUrl = WebUtil.appendParameterToURL(getLamsUrl() + tool.getAuthorUrl(),
+		    AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId.toString());
+	    reeditUrl = WebUtil.appendParameterToURL(reeditUrl, AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	    nextUrl = WebUtil.appendParameterToURL(nextUrl, RE_EDIT_URL, URLEncoder.encode(reeditUrl, "UTF-8"));
 
 	    if (!StringUtils.isBlank(notifyCloseURL)) {
@@ -130,7 +112,7 @@ public abstract class LamsAuthoringFinishAction extends Action {
 	    }
 	    response.sendRedirect(nextUrl);
 	}
-	if (StringUtils.equals(action, CANCEL_ACTION) && StringUtils.equals(ToolAccessMode.TEACHER.toString(), modeStr)) {
+	if (StringUtils.equals(action, CANCEL_ACTION) && mode.isTeacher()) {
 	    String signature = request.getParameter(TOOL_SIGNATURE);
 	    Long toolContentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
