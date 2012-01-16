@@ -23,6 +23,7 @@ class restore_lamslesson_activity_structure_step extends restore_activity_struct
 
         $paths[] = new restore_path_element('lamslesson', '/activity/lamslesson');
         if ($userinfo) {
+		// No need to restore userdata as that's already in LAMS
         }
 
         // Return the paths wrapped into standard activity structure
