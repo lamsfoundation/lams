@@ -112,13 +112,13 @@ class mod_lamslesson_mod_form extends moodleform_mod {
         // Preview button
         $authorpreviewbutton .= html_writer::start_tag('span', array('id' => 'previewbutton', 'style' => 'visibility:hidden;', 'class' => 'yui-button yui-link-button'));
         $authorpreviewbutton .= html_writer::start_tag('span', array('class' => 'first-child'));
-        $authorpreviewbutton .= html_writer::link('#nogo', $openpreviewlabel, array('onclick' => js_writer::function_call('openPreview', array('1' => $previewurl, '2' => preview, '3' => 0))));
+        $authorpreviewbutton .= html_writer::link('#nogo', $openpreviewlabel, array('onclick' => js_writer::function_call('openPreview', array('1' => $previewurl, '2' => 'preview', '3' => 0))));
         $authorpreviewbutton .= html_writer::end_tag('span');
         $authorpreviewbutton .= html_writer::end_tag('span');
 	//Authoring button
         $authorpreviewbutton .= html_writer::start_tag('span', array('id' => 'authorbutton', 'class' => 'yui-button yui-link-button'));
         $authorpreviewbutton .= html_writer::start_tag('span', array('class' => 'first-child'));
-        $authorpreviewbutton .= html_writer::link('#nogo', $openauthorlabel, array('onclick' => js_writer::function_call('openAuthor', array('1' => $authorurl, '2' => author, '3' => 0))));
+        $authorpreviewbutton .= html_writer::link('#nogo', $openauthorlabel, array('onclick' => js_writer::function_call('openAuthor', array('1' => $authorurl, '2' => 'author', '3' => 0))));
         $authorpreviewbutton .= html_writer::end_tag('span');
         $authorpreviewbutton .= html_writer::end_tag('span');
         $authorpreviewbutton .= html_writer::end_tag('div');
