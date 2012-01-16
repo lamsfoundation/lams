@@ -32,6 +32,7 @@ class backup_lamslesson_activity_structure_step extends backup_activity_structur
 
         // All the rest of elements only happen if we are including user info
         if ($userinfo) {
+		// there's no need to do anything here as all the userdata is in LAMS
         }
 
         // Return the root element (lamslesson), wrapped into standard activity structure

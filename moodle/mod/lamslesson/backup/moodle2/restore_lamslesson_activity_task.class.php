@@ -51,9 +51,6 @@ class restore_lamslesson_activity_task extends restore_activity_task {
     static public function define_decode_rules() {
         $rules = array();
 
-        //$rules[] = new restore_decode_rule('CHOICEVIEWBYID', '/mod/lamslesson/view.php?id=$1', 'course_module');
-        //$rules[] = new restore_decode_rule('CHOICEINDEX', '/mod/lamslesson/index.php?id=$1', 'course');
-
         return $rules;
 
     }
