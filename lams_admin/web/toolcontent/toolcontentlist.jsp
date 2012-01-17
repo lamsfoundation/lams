@@ -13,7 +13,7 @@
 </p>
 
 <c:set var="displayToolManagement" value="false" />
-<logic:iterate id="dto" name="activeTools">
+<logic:iterate id="dto" name="toolLibrary">
 	<c:if test="${dto.adminURL != null}">
 		<c:set var="displayToolManagement" value="true" />
 	</c:if>
@@ -26,8 +26,9 @@
 		<th><fmt:message key="sysadmin.library.activity.description" /></th>
 		<th><fmt:message key="label.tool.version" /></th>
 		<th><fmt:message key="label.database.version" /></th>
+		<th style="padding-right: 15px"><fmt:message key="sysadmin.function" /></th>
 	</tr>
-	<logic:iterate name="activeTools" id="dto">
+	<logic:iterate name="toolLibrary" id="dto">
 		<tr>
 			<td>
 				<c:out value="${dto.activityTitle}" />
@@ -41,28 +42,36 @@
 			<td>
 				<c:out value="${dbVersions[dto.toolSignature]}" />
 			</td>
+			<td>
+				<c:choose>
+					<c:when test="${learningLibraryValidity[dto.learningLibraryID]}">
+						<a href="<c:url value='toolcontentlist.do?action=disable&libraryID=${dto.learningLibraryID}' />"><fmt:message key="admin.disable" /></a>
+					</c:when>
+					<c:otherwise>
+						<a href="<c:url value='toolcontentlist.do?action=enable&libraryID=${dto.learningLibraryID}'/>"><fmt:message key="admin.enable" /></a>
+					</c:otherwise>
+				</c:choose>
+			</td>
 		</tr>
 		<tr>
-			<td colspan="4">
-				<c:set var="editDefaultContentUrl">
-					<lams:LAMSURL /><c:out value="${dto.authoringURL}" />?toolContentID=<c:out value="${dto.toolContentID}" />&contentFolderID=-1"
-				</c:set>
-				<a href="${editDefaultContentUrl}" target="_blank">
-					<fmt:message key="sysadmin.edit.default.tool.content" />
-				</a>
-				<c:if test="${displayToolManagement == 'true'}">
-					<c:choose>
-						<c:when test="${dto.adminURL != null}">
-							&nbsp;&nbsp;
-							<a href="<lams:LAMSURL /><c:out value="${dto.adminURL}" />">
-								<fmt:message key="msg.tool.management"></fmt:message>
-							</a>
-						</c:when>
-						<c:otherwise></c:otherwise>
-					</c:choose>
+			<td colspan="5">
+				<c:if test="${not empty dto.toolContentID}">
+					<c:set var="editDefaultContentUrl">
+						<lams:LAMSURL /><c:out value="${dto.authoringURL}" />?toolContentID=<c:out value="${dto.toolContentID}" />&contentFolderID=-1"
+					</c:set>
+					<a href="${editDefaultContentUrl}" target="_blank">
+						<fmt:message key="sysadmin.edit.default.tool.content" />
+					</a>
+					<c:if test="${(displayToolManagement == 'true') and (dto.adminURL != null)}">
+						&nbsp;&nbsp;
+						<a href="<lams:LAMSURL /><c:out value="${dto.adminURL}" />">
+							<fmt:message key="msg.tool.management" />
+						</a>
+					</c:if>
 				</c:if>
 			</td>
 		</tr>
 	</logic:iterate>
 </table>
 </p>
+<p>${fn:length(toolLibrary)} <fmt:message key="sysadmin.library.totals" /></p>
