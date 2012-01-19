@@ -83,7 +83,6 @@ public class MockMonitor extends MockUser implements Runnable {
 
 	public String initLesson(String initLessonURL, String ldId, String userId, String name) {
 		try {
-			delay();
 			if ( userId == null ) {
 				throw new TestHarnessException("User id is missing. If you have set UserCreated (admin properties) to true, then you must set UserId in the monitor properties.");
 			}
@@ -103,7 +102,6 @@ public class MockMonitor extends MockUser implements Runnable {
 
 	public void createLessonClass(String createLessonClassURL, String userId) {
 		try {
-			delay();
 			String url = createLessonClassURL.replace(USER_ID_PATTERN, userId);
 			InputStream postBodyIS = buildPostBody();
 			new Call(wc, test, "Create Lesson Class", url, postBodyIS, WDDX_CONTENT_TYPE).execute();
@@ -115,7 +113,6 @@ public class MockMonitor extends MockUser implements Runnable {
 
 	public void startLesson(String startLessonURL, String lsId, String userId) {
 		try {
-			delay();
 			String url = startLessonURL.replace(LESSON_ID_PATTERN, lsId).replace(USER_ID_PATTERN, userId);
 			WebResponse resp = (WebResponse) new Call(wc, test, "Start Lesson", url).execute();
 			if (!checkPageContains(resp, LESSON_CREATED_FLAG)) {
