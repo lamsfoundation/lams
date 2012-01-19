@@ -84,6 +84,7 @@ public class SingleSignOn extends org.apache.catalina.authenticator.SingleSignOn
 				break;
 			}
 		}
+
 		if (cookie == null) {
 //			if (log.isDebugEnabled())
 //				log.debug(" SSO cookie is not present");
@@ -100,25 +101,25 @@ public class SingleSignOn extends org.apache.catalina.authenticator.SingleSignOn
 //			log.debug("principal - " + p.getName());
 			register(cookie.getValue(), p, Constants.FORM_METHOD, username, password);
 		}
-		SingleSignOnEntry entry = lookup(cookie.getValue());
-		if (entry != null) {
-//			if (log.isDebugEnabled())
-//				log.debug(" Found cached principal '" + entry.getPrincipal().getName()
-//						+ "' with auth type '" + entry.getAuthType() + "'");
-			request.setNote(Constants.REQ_SSOID_NOTE, cookie.getValue());
-			// Only set security elements if reauthentication is not required
-			if (!getRequireReauthentication()) {
-				request.setAuthType(entry.getAuthType());
-				request.setUserPrincipal(entry.getPrincipal());
-			}
-        	} else {
+        	SingleSignOnEntry entry = lookup(cookie.getValue());
+        	if (entry != null) {
+        	    // if (log.isDebugEnabled())
+        	    // log.debug(" Found cached principal '" + entry.getPrincipal().getName()
+        	    // + "' with auth type '" + entry.getAuthType() + "'");
+        	    request.setNote(Constants.REQ_SSOID_NOTE, cookie.getValue());
+        	    // Only set security elements if reauthentication is not required
+        	    if (!getRequireReauthentication()) {
+        		request.setAuthType(entry.getAuthType());
+        		request.setUserPrincipal(entry.getPrincipal());
+        	    }
+        	} else if (!request.getRequestURI().endsWith(Constants.FORM_ACTION)) {
         	    // if (log.isDebugEnabled())
         	    // log.debug(" No cached principal found, erasing SSO cookie");
         	    deregister(cookie.getValue());
-		    cookie = new Cookie(cookie.getName(), "");
-		    cookie.setPath("/");
-		    cookie.setMaxAge(0);
-		    response.addCookie(cookie);
+        	    cookie = new Cookie(cookie.getName(), "");
+        	    cookie.setPath("/");
+        	    cookie.setMaxAge(0);
+        	    response.addCookie(cookie);
         	}
 
 		// Invoke the next Valve in our pipeline

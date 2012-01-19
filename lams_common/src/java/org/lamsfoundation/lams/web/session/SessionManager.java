@@ -176,26 +176,29 @@ public class SessionManager {
     public static void startSession(ServletRequest req, ServletResponse res) {
 	Cookie ssoCookie = findCookie((HttpServletRequest) req, SystemSessionFilter.SSO_SESSION_COOKIE);
 	String currentSessionId = null;
-	if (ssoCookie != null) {
-	    currentSessionId = ssoCookie.getValue();
-	    Object obj = getSession(currentSessionId);
-	    //log.debug(ssoCookie.getName() + " cookie exists, value " + currentSessionId);
-	    // if cookie exists, but session does not - usually means session expired.
-	    // delete the cookie first and set it to null in order to create a new one
-	    if (obj == null) {
-		log.debug(SystemSessionFilter.SSO_SESSION_COOKIE + " " + currentSessionId 
-			+ " cookie exists, but corresponding session doesn't exist, removing cookie");
-		removeCookie((HttpServletResponse) res,SystemSessionFilter.SSO_SESSION_COOKIE);
-		ssoCookie = null;
-	    }
-	}
+
 	if (ssoCookie == null) {
 	    currentSessionId = (String) new UUIDHexGenerator().generate(null, null);
 	    // create new session and set it into cookie
 	    createSession(currentSessionId);
-	    ssoCookie = createCookie((HttpServletResponse) res, SystemSessionFilter.SSO_SESSION_COOKIE, currentSessionId);
-	    SessionManager.log.debug("==>Creating new " + SystemSessionFilter.SSO_SESSION_COOKIE + " - " + ssoCookie.getValue());
+	    ssoCookie = createCookie((HttpServletResponse) res, SystemSessionFilter.SSO_SESSION_COOKIE,
+		    currentSessionId);
+	    SessionManager.log.debug("==>Creating new " + SystemSessionFilter.SSO_SESSION_COOKIE + " - "
+		    + ssoCookie.getValue());
+	} else {
+	    currentSessionId = ssoCookie.getValue();
+	    Object obj = getSession(currentSessionId);
+	    // log.debug(ssoCookie.getName() + " cookie exists, value " + currentSessionId);
+	    // if cookie exists, but session does not - usually means session expired.
+	    // delete the cookie first and set it to null in order to create a new one
+	    if (obj == null) {
+		log.debug(SystemSessionFilter.SSO_SESSION_COOKIE + " " + currentSessionId
+			+ " cookie exists, but corresponding session doesn't exist, removing cookie");
+		removeCookie((HttpServletResponse) res, SystemSessionFilter.SSO_SESSION_COOKIE);
+		currentSessionId = null;
+	    }
 	}
+
 	
 	Cookie cookie = findCookie((HttpServletRequest) req, SystemSessionFilter.SYS_SESSION_COOKIE);
 	if (cookie == null) {
@@ -206,7 +209,7 @@ public class SessionManager {
 		session.invalidate();
 	    }
 	}
-	 
+	
 	setCurrentSessionId(currentSessionId);
 	// reset session last access time
 	SessionVisitor sessionVisitor = getSessionVisitor();
