@@ -48,7 +48,20 @@
             <web-uri>lams-gradebook.war</web-uri>
             <context-root>/lams/gradebook</context-root>
 		</web>
+		
     </module>
+    
+    <!--lams-signup - do not uncomment manually
+    <module>
+        <web>
+            <web-uri>lams-signup.war</web-uri>
+            <context-root>/lams/signup</context-root>
+                </web>
+    </module>
+    <module>
+        <java>lams-signup.jar</java>
+    </module>
+    lams-signup - do not uncomment manually-->
     
     <!-- 
     	======================================================== 

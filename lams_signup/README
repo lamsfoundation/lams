@@ -5,6 +5,11 @@ modification to work with 2.4.
 
 Installation
 ------------
+Run deploy-war task from build.xml Ant file.
+This will deploy both jar and war to lams.ear
+and make necessary modifications to JBoss configuration file.
+
+Otherwise follow manual installation:
 
 Drop jar and war into lams.ear.  Modify lams.ear/META-INF/application.xml and
 add the following;

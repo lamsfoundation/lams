@@ -142,8 +142,18 @@
 
 	<!-- deploy-war : for convenience during development. Should be deployed via the master build -->
 	<target name="deploy-war" depends="build-war">
-		<!--copy file="${build.lib}/${product}.jar" todir="${jboss.deploy}" /-->
+		<copy file="${build.lib}/${product}.jar" todir="${jboss.deploy}" />
 		<copy file="${build.lib}/${product}.war" todir="${jboss.deploy}" />
+		
+		<echo message="Enable lams-signup in JBoss config files" />
+		<replaceregexp flags="gi"
+				 match="(?:&lt;!--)?lams-signup - do not uncomment manually(?:--&gt;)?"
+				 replace="&lt;!-- lams-signup --&gt;">
+		 	<fileset dir="${jboss.deploy}">
+				<include name="META-INF/application.xml" />
+		 		<include name="lams-central.war/WEB-INF/web.xml" />
+		 	</fileset>
+		</replaceregexp>
 	</target>
 
 	<target name="deploy-jar" depends="build-jar">

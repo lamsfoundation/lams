@@ -56,6 +56,18 @@
     </module>
     SAML Integration - do not uncomment manually-->
     
+    <!--lams-signup - do not uncomment manually
+    <module>
+        <web>
+            <web-uri>lams-signup.war</web-uri>
+            <context-root>/lams/signup</context-root>
+                </web>
+    </module>
+    <module>
+        <java>lams-signup.jar</java>
+    </module>
+    lams-signup - do not uncomment manually-->
+    
     <!-- 
     	======================================================== 
 	 	  Tool modules and Security Roles 
