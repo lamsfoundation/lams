@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.learning.service;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -244,7 +245,14 @@ public class LearnerService implements ICoreLearnerService {
      */
     public LessonDTO[] getActiveLessonsFor(Integer learnerId) {
 	User learner = (User) userManagementService.findById(User.class, learnerId);
-	List activeLessons = lessonDAO.getActiveLessonsForLearner(learner);
+	List<Lesson> activeLessons = lessonDAO.getActiveLessonsForLearner(learner);
+	// remove lessons which do not have preceding lessons finished
+	Iterator<Lesson> lessonIter = activeLessons.iterator();
+	while (lessonIter.hasNext()) {
+	    if (!lessonService.checkLessonReleaseConditions(lessonIter.next().getLessonId(), learnerId)) {
+		lessonIter.remove();
+	    }
+	}
 	return getLessonDataFor(activeLessons);
     }
 
@@ -293,6 +301,9 @@ public class LearnerService implements ICoreLearnerService {
 	    LearnerService.log.error("joinLesson: Learner " + learner.getLogin() + " joining lesson " + lesson
 		    + " but lesson has not started");
 	    throw new LearnerServiceException("Cannot join lesson as lesson has not started");
+	}
+	if (!lessonService.checkLessonReleaseConditions(lessonID, learnerId)) {
+	    throw new LearnerServiceException("Cannot join lesson as preceding lessons have not been finished");
 	}
 
 	LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(learner.getUserId(), lessonID);

@@ -55,6 +55,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</fmt:message>
 	</p>
 	
+	<c:if test="${not empty releasedLessons}">
+		<p>
+			<fmt:message key="message.released.lessons">
+				<fmt:param>
+					${releasedLessons}
+				</fmt:param>		
+			</fmt:message>
+		</p>
+	</c:if>
+	
 	<c:if test="${displayPrintButton}">
 		<p class="align-right space-top">
 			<a href="#" class="button" onclick="JavaScript:window.print();">

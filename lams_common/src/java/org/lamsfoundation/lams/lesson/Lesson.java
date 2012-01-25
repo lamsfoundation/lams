@@ -150,6 +150,12 @@ public class Lesson implements Serializable {
     
     private Date releaseDate;
     
+    /**
+     * For lesson conditional release
+     */
+    private Set<Lesson> precedingLessons;
+    private Set<Lesson> succeedingLessons;
+    
     //---------------------------------------------------------------------
     // constructors
     //---------------------------------------------------------------------
@@ -704,5 +710,21 @@ public class Lesson implements Serializable {
 
     public void setReleaseDate(Date releaseDate) {
 	this.releaseDate = releaseDate;
+    }
+
+    public Set<Lesson> getPrecedingLessons() {
+        return precedingLessons;
+    }
+
+    public void setPrecedingLessons(Set<Lesson> precedingLessons) {
+        this.precedingLessons = precedingLessons;
+    }
+
+    public Set<Lesson> getSucceedingLessons() {
+        return succeedingLessons;
+    }
+
+    public void setSucceedingLessons(Set<Lesson> succeedingLessons) {
+        this.succeedingLessons = succeedingLessons;
     }
 }

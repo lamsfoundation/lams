@@ -37,6 +37,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -163,6 +164,10 @@ public class HomeAction extends DispatchAction {
 		if (lesson == null || !lesson.isLessonStarted()) {
 		    return displayMessage(mapping, req, "message.lesson.not.started.cannot.participate");
 		}
+		if (!getLessonService().checkLessonReleaseConditions(lessonId, user.getUserID())) {
+		    return displayMessage(mapping, req, "message.preceding.lessons.not.finished.cannot.participate");
+		}
+		
 
 		if (lesson.getLessonClass() == null
 			|| !lesson.getLessonClass().getLearners().contains(getRealUser(user))) {

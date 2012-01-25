@@ -834,4 +834,36 @@ public class LessonService implements ILessonService {
 	}
 	return null;
     }
+    
+    /**
+     * Check if preceding lessons have been completed and the given lesson is available to the user.
+     */
+    public boolean checkLessonReleaseConditions(Long lessonId, Integer learnerId) {
+	Lesson lesson = getLesson(lessonId);
+	if (lesson != null) {
+	    for (Lesson precedingLesson : lesson.getPrecedingLessons()) {
+		LearnerProgress progress = getUserProgressForLesson(learnerId, precedingLesson.getLessonId());
+		if (progress == null || !progress.isComplete()) {
+		    return false;
+		}
+	    }
+	}
+	return true;
+    }
+    
+    /**
+     * Find lessons which just got available after the given lesson has been completed.
+     */
+    public Set<Lesson> getReleasedSucceedingLessons(Long completedLessonId, Integer learnerId) {
+	Set<Lesson> releasedSucceedingLessons = new HashSet<Lesson>();
+	Lesson lesson = getLesson(completedLessonId);
+	if (lesson != null) {
+	    for (Lesson succeedingLesson : lesson.getSucceedingLessons()) {
+		if (checkLessonReleaseConditions(succeedingLesson.getLessonId(), learnerId)) {
+		    releasedSucceedingLessons.add(succeedingLesson);
+		}
+	    }
+	}
+	return releasedSucceedingLessons;
+    }
 }

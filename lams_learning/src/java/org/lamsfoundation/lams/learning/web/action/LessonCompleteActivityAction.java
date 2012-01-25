@@ -25,6 +25,8 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +38,8 @@ import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
@@ -56,6 +60,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class LessonCompleteActivityAction extends ActivityAction {
     
     private static IntegrationService integrationService = null;
+    private static ILessonService lessonService = null;
 
     /**
      * Gets an activity from the request (attribute) and forwards onto a display action using the ActionMappings class.
@@ -66,6 +71,17 @@ public class LessonCompleteActivityAction extends ActivityAction {
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, getLearnerService());
 	LearningWebUtil.setupProgressInRequest((ActivityForm) actionForm, request, learnerProgress);
 	
+	Set<Lesson> releasedLessons = getLessonService().getReleasedSucceedingLessons(
+		learnerProgress.getLesson().getLessonId(), learnerProgress.getUser().getUserId());
+	if (!releasedLessons.isEmpty()) {
+	    StringBuilder releasedLessonNames = new StringBuilder();
+	    for (Lesson releasedLesson : releasedLessons) {
+		releasedLessonNames.append(releasedLesson.getLessonName()).append(", ");
+	    }
+	    releasedLessonNames.delete(releasedLessonNames.length() - 2, releasedLessonNames.length());
+	    request.setAttribute(ActivityAction.RELEASED_LESSONS_REQUEST_ATTRIBUTE, releasedLessonNames.toString());
+	}
+
 	//checks for lessonFinishUrl parameter
 	String lessonFinishCallbackUrl = getIntegrationService().getLessonFinishCallbackUrl(learnerProgress.getUser(),
 		learnerProgress.getLesson());
@@ -82,5 +98,13 @@ public class LessonCompleteActivityAction extends ActivityAction {
 		    getServlet().getServletContext()).getBean("integrationService");
 	}
 	return integrationService;
+    }
+    
+    private ILessonService getLessonService() {
+	if (lessonService == null) {
+	    lessonService = (ILessonService) WebApplicationContextUtils.getRequiredWebApplicationContext(
+		    getServlet().getServletContext()).getBean("lessonService");
+	}
+	return lessonService;
     }
 }

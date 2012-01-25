@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.lesson.service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -416,4 +417,14 @@ public interface ILessonService {
      * @return
      */
     public LessonDetailsDTO getLessonDetailsFromSessionID(Long toolSessionID);
+    
+    /**
+     * Check if preceding lessons have been completed and the given lesson is available to the user.
+     */
+    public boolean checkLessonReleaseConditions(Long lessonId, Integer learnerId);
+    
+    /**
+     * Find lessons which just got available after the given lesson has been completed.
+     */
+    public Set<Lesson> getReleasedSucceedingLessons(Long completedLessonId, Integer learnerId);
 }

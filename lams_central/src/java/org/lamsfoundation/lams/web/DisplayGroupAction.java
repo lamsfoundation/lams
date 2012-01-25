@@ -28,8 +28,10 @@ import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.naming.NamingException;
@@ -295,6 +297,14 @@ public class DisplayGroupAction extends Action {
 	// iterate through user's lessons where they are learner
 	Map<Long, IndexLessonBean> map = getLessonService().getLessonsByOrgAndUserWithCompletedFlag(userId, orgId,
 		Role.ROLE_LEARNER);
+	// remove lessons which do not have preceding lessons completed
+	Iterator<Entry<Long, IndexLessonBean>> lessonIter = map.entrySet().iterator();
+	while (lessonIter.hasNext()) {
+	    if (!lessonService.checkLessonReleaseConditions(lessonIter.next().getKey(), userId)) {
+		lessonIter.remove();
+	    }
+	}
+	
 	for (IndexLessonBean bean : map.values()) {
 	    List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
 	    String url = null;

@@ -110,6 +110,17 @@ ALTER TABLE lams_learning_design ADD COLUMN original_user_id BIGINT(20) AFTER us
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
 values ('EnableServerRegistration', 'false', 'config.server2server.registration.enable', 'config.header.system', 'BOOLEAN', 1);
 
+-- LDEV-2782 Conditional release for lessons
+CREATE TABLE lams_lesson_release (
+      lesson_id BIGINT(20)
+   ,  preceding_lesson_id BIGINT(20)
+   , CONSTRAINT FK_lams_lesson_release_1 FOREIGN KEY (lesson_id)
+                  REFERENCES lams_lesson (lesson_id) ON DELETE CASCADE ON UPDATE CASCADE
+   , CONSTRAINT FK_lams_lesson_release_2 FOREIGN KEY (preceding_lesson_id)
+                  REFERENCES lams_lesson (lesson_id) ON DELETE CASCADE ON UPDATE CASCADE
+   , PRIMARY KEY (lesson_id,preceding_lesson_id)
+)TYPE=InnoDB;
+
 COMMIT;
 SET AUTOCOMMIT = 1;
 set FOREIGN_KEY_CHECKS = 1;

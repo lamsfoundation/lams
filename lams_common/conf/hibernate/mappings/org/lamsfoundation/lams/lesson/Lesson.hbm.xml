@@ -124,6 +124,24 @@
 			lazy="false">
 			<column name="organisation_id" />
 		</many-to-one>
+		
+		<set name="precedingLessons" table="lams_lesson_release" cascade="all" >
+            <key>
+                <column name="lesson_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="org.lamsfoundation.lams.lesson.Lesson">
+                <column name="preceding_lesson_id" not-null="true" />
+            </many-to-many>
+        </set>
+        
+       <set name="succeedingLessons" table="lams_lesson_release" cascade="all" >
+            <key>
+                <column name="preceding_lesson_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="org.lamsfoundation.lams.lesson.Lesson">
+                <column name="lesson_id" not-null="true" />
+            </many-to-many>
+        </set>
 
 	</class>
 	
