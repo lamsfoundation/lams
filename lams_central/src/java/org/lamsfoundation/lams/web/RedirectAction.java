@@ -124,6 +124,12 @@ public class RedirectAction extends LamsAction {
 	    // Get the tool session
 	    ToolSession toolSession = getToolSession(toolSessionID);
 
+	    if (toolSession == null) {
+		log.error("No ToolSession with ID " + toolSessionID + " found.");
+		return mapping.findForward("error");
+	    }
+	    
+
 	    // Get the lesson
 	    Lesson lesson = toolSession.getLesson();
 
