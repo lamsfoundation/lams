@@ -641,6 +641,8 @@
 				<include name="admin-console.war/"/>
 				<include name="xnio-provider.jar/"/>
 				<include name="http-invoker.sar/"/>
+                <include name="management/"/>
+                <include name="jmx-console.war/"/>
 			</fileset>
 		</copy>
 		
@@ -680,6 +682,8 @@
 		<delete dir="${jboss.ear.deploy}/admin-console.war/"/>
 		<delete dir="${jboss.ear.deploy}/xnio-provider.jar/"/>
 		<delete dir="${jboss.ear.deploy}/http-invoker.sar/"/>
+        <delete dir="${jboss.ear.deploy}/jmx-console.war/"/>
+        <delete dir="${jboss.ear.deploy}/management/"/>
 		
 		<delete file="${jboss.server.instance}/deployers/jsr77-deployers-jboss-beans.xml"/>
 		<delete file="${jboss.server.instance}/deployers/logbridge-jboss-beans.xml"/>
