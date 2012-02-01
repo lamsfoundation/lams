@@ -1364,6 +1364,9 @@ border:0px;
 .mycourses-notifications-img {background: url('../images/css/notifications_go.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px;
 }
 
+.mycourses-conditions-img {background: url('../images/css/conditions.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
+}
+
 /* Date and time restriction area in monitor */
 #restrictUsageDiv {font-size: 13px; padding-bottom: 10px; padding-left: 18px; padding-top: -5px;}
 #restrictUsageDiv :first-child {padding-bottom: 10px; padding-top: -5px;}

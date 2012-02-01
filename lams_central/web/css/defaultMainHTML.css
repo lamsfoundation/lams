@@ -959,7 +959,8 @@ border:0px;
 .mycourses-completed-img {background: url('../images/css/lesson_completed.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
 }
 
-
+.mycourses-conditions-img {background: url('../images/css/conditions.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
+}
 
 
 /*IE style workarounds */

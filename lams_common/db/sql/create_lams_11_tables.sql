@@ -1204,12 +1204,12 @@ CREATE TABLE lams_openid_config (
    , PRIMARY KEY (config_key)
 )TYPE=InnoDB;
 
-CREATE TABLE lams_lesson_release (
+CREATE TABLE lams_lesson_dependency (
       lesson_id BIGINT(20)
    ,  preceding_lesson_id BIGINT(20)
-   , CONSTRAINT FK_lams_lesson_release_1 FOREIGN KEY (lesson_id)
+   , CONSTRAINT FK_lams_lesson_dependency_1 FOREIGN KEY (lesson_id)
                   REFERENCES lams_lesson (lesson_id) ON DELETE CASCADE ON UPDATE CASCADE
-   , CONSTRAINT FK_lams_lesson_release_2 FOREIGN KEY (preceding_lesson_id)
+   , CONSTRAINT FK_lams_lesson_dependency_2 FOREIGN KEY (preceding_lesson_id)
                   REFERENCES lams_lesson (lesson_id) ON DELETE CASCADE ON UPDATE CASCADE
    , PRIMARY KEY (lesson_id,preceding_lesson_id)
 )TYPE=InnoDB;

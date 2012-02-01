@@ -125,7 +125,7 @@
 			<column name="organisation_id" />
 		</many-to-one>
 		
-		<set name="precedingLessons" table="lams_lesson_release" cascade="all" >
+		<set name="precedingLessons" table="lams_lesson_dependency" cascade="all" >
             <key>
                 <column name="lesson_id" not-null="true" />
             </key>
@@ -134,7 +134,7 @@
             </many-to-many>
         </set>
         
-       <set name="succeedingLessons" table="lams_lesson_release" cascade="all" >
+       <set name="succeedingLessons" table="lams_lesson_dependency" cascade="all" >
             <key>
                 <column name="preceding_lesson_id" not-null="true" />
             </key>
@@ -273,7 +273,9 @@
 		<return-scalar column="lesson_state_id" type="integer" />
 		<return-scalar column="lesson_completed_flag" type="boolean" />
 		<return-scalar column="enable_lesson_notifications" type="boolean" />
-		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag, l.enable_lesson_notifications
+		<return-scalar column="dependent" type="boolean" />
+		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag, l.enable_lesson_notifications,
+		       (SELECT TRUE FROM lams_lesson_dependency ld WHERE ld.lesson_id = l.lesson_id LIMIT 1) AS dependent
 		  FROM (lams_lesson l, lams_learning_design ld, lams_group g, lams_user_group ug, lams_grouping gi)
 		    LEFT JOIN lams_learner_progress lp ON lp.user_id = ug.user_id AND lp.lesson_id = l.lesson_id
 		  WHERE l.learning_design_id = ld.learning_design_id
@@ -294,7 +296,9 @@
 		<return-scalar column="lesson_state_id" type="integer" />
 		<return-scalar column="lesson_completed_flag" type="boolean" />
 		<return-scalar column="enable_lesson_notifications" type="boolean" />
-		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag, l.enable_lesson_notifications
+		<return-scalar column="dependent" type="boolean" />
+		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag, l.enable_lesson_notifications,
+		       (SELECT TRUE FROM lams_lesson_dependency ld WHERE ld.lesson_id = l.lesson_id LIMIT 1) AS dependent
 		  FROM (lams_lesson l, lams_learning_design ld, lams_group g, lams_user_group ug, lams_grouping gi)
 		    LEFT JOIN lams_learner_progress lp ON lp.user_id = ug.user_id AND lp.lesson_id = l.lesson_id
 		  WHERE l.learning_design_id = ld.learning_design_id
@@ -315,7 +319,9 @@
 		<return-scalar column="lesson_state_id" type="integer" />
 		<return-scalar column="lesson_completed_flag" type="boolean" />
 		<return-scalar column="enable_lesson_notifications" type="boolean" />
-		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag, l.enable_lesson_notifications
+		<return-scalar column="dependent" type="boolean" />
+		SELECT l.lesson_id, l.name, l.description, l.lesson_state_id, lp.lesson_completed_flag, l.enable_lesson_notifications,
+		       (SELECT TRUE FROM lams_lesson_dependency ld WHERE ld.lesson_id = l.lesson_id LIMIT 1) AS dependent
 		  FROM (lams_lesson l, lams_learning_design ld)
 		    LEFT JOIN lams_learner_progress lp ON lp.user_id = :userId AND lp.lesson_id = l.lesson_id
 		  WHERE l.learning_design_id = ld.learning_design_id

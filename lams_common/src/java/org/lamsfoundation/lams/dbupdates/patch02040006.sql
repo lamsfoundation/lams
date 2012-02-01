@@ -111,12 +111,12 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('EnableServerRegistration', 'false', 'config.server2server.registration.enable', 'config.header.system', 'BOOLEAN', 1);
 
 -- LDEV-2782 Conditional release for lessons
-CREATE TABLE lams_lesson_release (
+CREATE TABLE lams_lesson_dependency (
       lesson_id BIGINT(20)
    ,  preceding_lesson_id BIGINT(20)
-   , CONSTRAINT FK_lams_lesson_release_1 FOREIGN KEY (lesson_id)
+   , CONSTRAINT FK_lams_lesson_dependency_1 FOREIGN KEY (lesson_id)
                   REFERENCES lams_lesson (lesson_id) ON DELETE CASCADE ON UPDATE CASCADE
-   , CONSTRAINT FK_lams_lesson_release_2 FOREIGN KEY (preceding_lesson_id)
+   , CONSTRAINT FK_lams_lesson_dependency_2 FOREIGN KEY (preceding_lesson_id)
                   REFERENCES lams_lesson (lesson_id) ON DELETE CASCADE ON UPDATE CASCADE
    , PRIMARY KEY (lesson_id,preceding_lesson_id)
 )TYPE=InnoDB;

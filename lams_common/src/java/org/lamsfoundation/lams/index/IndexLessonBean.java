@@ -43,20 +43,27 @@ public class IndexLessonBean implements Comparable {
     private Integer state;
     private boolean completed;
     private boolean enableLessonNotifications;
+    private boolean dependent;
     private List<IndexLinkBean> links;
+
+    public IndexLessonBean(Long id, String name) {
+	this.id = id;
+	this.name = name;
+    }
 
     public IndexLessonBean(String name, String url) {
 	this.name = name;
 	this.url = url;
     }
 
-    public IndexLessonBean(Long id, String name, String description, Integer state, boolean completed, boolean enableLessonNotifications) {
+    public IndexLessonBean(Long id, String name, String description, Integer state, boolean completed, boolean enableLessonNotifications, boolean dependent) {
 	this.id = id;
 	this.name = name;
 	this.description = description;
 	this.state = state;
 	this.completed = completed;
 	this.enableLessonNotifications = enableLessonNotifications;
+	this.dependent = dependent;
     }
 
     public IndexLessonBean(Long id, String name, String description, String url, Integer state, boolean completed,
@@ -150,5 +157,13 @@ public class IndexLessonBean implements Comparable {
 
     public void setEnableLessonNotifications(boolean enableLessonNotifications) {
 	this.enableLessonNotifications = enableLessonNotifications;
+    }
+
+    public boolean isDependent() {
+        return dependent;
+    }
+
+    public void setDependent(boolean hasDependencies) {
+        this.dependent = hasDependencies;
     }
 }

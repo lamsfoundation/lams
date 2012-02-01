@@ -293,6 +293,9 @@ body.stripes {
 .mycourses-addlesson-img {background: url('../images/ramsthemecss/mycourses_addlesson.jpg') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px;
 }
 
+.mycourses-conditions-img {background: url('../images/css/conditions.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
+}
+
 /*layout of the forum tables with the colored table heading cell */
 table.forum { 
 	width:93%;

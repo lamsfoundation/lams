@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.IndexUtils;
@@ -300,7 +301,8 @@ public class DisplayGroupAction extends Action {
 	// remove lessons which do not have preceding lessons completed
 	Iterator<Entry<Long, IndexLessonBean>> lessonIter = map.entrySet().iterator();
 	while (lessonIter.hasNext()) {
-	    if (!lessonService.checkLessonReleaseConditions(lessonIter.next().getKey(), userId)) {
+	    Entry<Long,IndexLessonBean> entry = lessonIter.next();
+	    if (entry.getValue().isDependent() && !lessonService.checkLessonReleaseConditions(entry.getKey(), userId)) {
 		lessonIter.remove();
 	    }
 	}
@@ -340,28 +342,24 @@ public class DisplayGroupAction extends Action {
 	Integer userRole = (contains(roles, Role.ROLE_GROUP_MANAGER)) ? Role.ROLE_GROUP_MANAGER : Role.ROLE_MONITOR;
 	Map<Long, IndexLessonBean> staffMap = getLessonService().getLessonsByOrgAndUserWithCompletedFlag(userId, orgId,
 		userRole);
+	boolean isGroupManagerOrMonitor = contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR);
 	for (IndexLessonBean bean : staffMap.values()) {
 	    if (map.containsKey(bean.getId())) {
 		bean = map.get(bean.getId());
 	    }
 	    List<IndexLinkBean> lessonLinks = bean.getLinks();
-	    if (lessonLinks == null)
+	    if (lessonLinks == null) {
 		lessonLinks = new ArrayList<IndexLinkBean>();
-	    if (stateId.equals(OrganisationState.ACTIVE)) {
-		if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR)) {
-		    lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + bean.getId()
-			    + ")", null, "mycourses-monitor-img", null));
-
-		}
-	    } else if (stateId.equals(OrganisationState.ARCHIVED)) {
-		if (contains(roles, Role.ROLE_GROUP_MANAGER)) {
-		    lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:openMonitorLesson(" + bean.getId()
-			    + ")", null, "mycourses-monitor-img", null));
-		}
 	    }
 	    
+	    if ((isGroupManagerOrMonitor && stateId.equals(OrganisationState.ACTIVE))
+		    || (stateId.equals(OrganisationState.ARCHIVED) && contains(roles, Role.ROLE_GROUP_MANAGER))) {
+		lessonLinks.add(new IndexLinkBean("index.monitor",
+			"javascript:openMonitorLesson(" + bean.getId() + ")", null, "mycourses-monitor-img", null));
+	    }
+
 	    // Adding lesson notifications links if enabled
-	    if (bean.isEnableLessonNotifications() && (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))) {
+	    if (isGroupManagerOrMonitor && bean.isEnableLessonNotifications()) {
 		String emailnotificationsUrl = Configuration.get(ConfigurationKeys.SERVER_URL)
 			+ "/monitoring/emailNotifications.do?method=getLessonView&lessonID=" + bean.getId()
 			+ "&KeepThis=true&TB_iframe=true&height=560&width=800";
@@ -370,9 +368,9 @@ public class DisplayGroupAction extends Action {
 	    }
 
 	    // Adding gradebook course monitor links if enabled
-	    if ((contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))
-		    && org.getEnableGradebookForMonitors()
-		    || (parent != null && parent.getEnableGradebookForMonitors())) {
+	    if (isGroupManagerOrMonitor
+		    && (org.getEnableGradebookForMonitors() || (parent != null && parent
+			    .getEnableGradebookForMonitors()))) {
 		try {
 		    String encodedOrgName = URLEncoder.encode(URLEncoder.encode(org.getName(), "UTF8"), "UTF8");
 		    String link = "javascript:openGradebookLessonMonitorPopup(" + "'" + encodedOrgName + "','"
@@ -383,6 +381,15 @@ public class DisplayGroupAction extends Action {
 		} catch (UnsupportedEncodingException e) {
 		    log.error("Error while encoding course name, skipping gradebook lesson monitor link", e);
 		}
+	    }
+	    
+	    // Add lesson conditions thickbox if it has dependencies
+	    if (isGroupManagerOrMonitor && bean.isDependent()) {
+		String conditionsLink = Configuration.get(ConfigurationKeys.SERVER_URL)
+			+ "/lessonConditions.do?method=getIndexLessonConditions&" + CentralConstants.PARAM_LESSON_ID
+			+ "=" + bean.getId() + "&KeepThis=true&TB_iframe=true&height=480&width=610";
+		lessonLinks.add(new IndexLinkBean("index.conditions", conditionsLink, "thickbox" + orgId,
+			"mycourses-conditions-img", "index.conditions.tooltip"));
 	    }
 
 	    if (lessonLinks.size() > 0) {
