@@ -382,9 +382,9 @@ public class DisplayGroupAction extends Action {
 		    log.error("Error while encoding course name, skipping gradebook lesson monitor link", e);
 		}
 	    }
-	    
-	    // Add lesson conditions thickbox if it has dependencies
-	    if (isGroupManagerOrMonitor && bean.isDependent()) {
+
+	    // Add lesson conditions thickbox
+	    if (isGroupManagerOrMonitor) {
 		String conditionsLink = Configuration.get(ConfigurationKeys.SERVER_URL)
 			+ "/lessonConditions.do?method=getIndexLessonConditions&" + CentralConstants.PARAM_LESSON_ID
 			+ "=" + bean.getId() + "&KeepThis=true&TB_iframe=true&height=480&width=610";

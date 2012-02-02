@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.web;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,6 +46,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * This Action takes care of operations on lesson conditional release based on preceding lesson completion.
+ * 
  * @author Marcin Cieslak
  * 
  * @struts.action path="/lessonConditions" parameter="method" validate="false"
@@ -57,12 +59,14 @@ public class LessonConditionsAction extends DispatchAction {
 
     private static final String PARAM_PRECEDING_LESSONS = "precedingLessons";
     private static final String PARAM_PRECEDING_LESSON_ID = "precedingLessonId";
+    private static final String PARAM_AVAILABLE_LESSONS = "availableLessons";
 
     private static LessonService lessonService;
 
     /**
      * Prepares data for thickbox displayed on Index page.
      */
+    @SuppressWarnings("unchecked")
     public ActionForward getIndexLessonConditions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -78,6 +82,18 @@ public class LessonConditionsAction extends DispatchAction {
 	request.setAttribute(CentralConstants.PARAM_TITLE, lesson.getLessonName());
 	request.setAttribute(LessonConditionsAction.PARAM_PRECEDING_LESSONS, precedingLessons);
 
+	Set<Lesson> organisationLessons = lesson.getOrganisation().getLessons();
+	List<IndexLessonBean> availableLessons = new ArrayList<IndexLessonBean>(organisationLessons.size());
+	for (Lesson organisationLesson : organisationLessons) {
+	    if (!lessonId.equals(organisationLesson.getLessonId())
+		    && !lesson.getPrecedingLessons().contains(organisationLesson)) {
+		IndexLessonBean availableLessonBean = new IndexLessonBean(organisationLesson.getLessonId(),
+			organisationLesson.getLessonName());
+		availableLessons.add(availableLessonBean);
+	    }
+	}
+	request.setAttribute(LessonConditionsAction.PARAM_AVAILABLE_LESSONS, availableLessons);
+
 	return mapping.findForward(LessonConditionsAction.FORWARD_INDEX_LESSON_CONDITION);
     }
 
@@ -87,7 +103,8 @@ public class LessonConditionsAction extends DispatchAction {
     public ActionForward removeLessonDependency(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
-	Long removedPrecedingLessonId = WebUtil.readLongParam(request, PARAM_PRECEDING_LESSON_ID, false);
+	Long removedPrecedingLessonId = WebUtil.readLongParam(request,
+		LessonConditionsAction.PARAM_PRECEDING_LESSON_ID, false);
 
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	Iterator<Lesson> precedingLessonIter = lesson.getPrecedingLessons().iterator();
@@ -97,7 +114,24 @@ public class LessonConditionsAction extends DispatchAction {
 		break;
 	    }
 	}
-	
+
+	// after operation, display contents again
+	return getIndexLessonConditions(mapping, form, request, response);
+    }
+
+    /**
+     *  Adds given lesson to dependecies and displays updated list in thickbox.
+     */
+    public ActionForward addLessonDependency(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
+	Long addedPrecedingLessonId = WebUtil.readLongParam(request, LessonConditionsAction.PARAM_PRECEDING_LESSON_ID,
+		false);
+
+	Lesson lesson = getLessonService().getLesson(lessonId);
+	Lesson addedPrecedingLesson = getLessonService().getLesson(addedPrecedingLessonId);
+	lesson.getPrecedingLessons().add(addedPrecedingLesson);
+
 	// after operation, display contents again
 	return getIndexLessonConditions(mapping, form, request, response);
     }
