@@ -7,7 +7,7 @@
 
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.author.title" /></title>
+	<title><fmt:message key="label.common.heading" /></title>
 
 	<%@ include file="/common/tabbedheader.jsp"%>
 
@@ -49,7 +49,7 @@
 <body class="stripes" onLoad="init()">
 <div id="page">
 		<h1>
-			<fmt:message key="label.common.heading" />
+			<fmt:message key="label.author.title" />
 		</h1>
 <div id="header">
 		<lams:Tabs useKey="true" control="true">
