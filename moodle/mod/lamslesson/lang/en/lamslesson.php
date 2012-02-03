@@ -77,11 +77,6 @@ $string['validationfailed'] = 'Validation failed: please check that the settings
 
 
 // Labels for errors when calling LAMS Server
-$string['restcall503'] = 'Call to LAMS failed: received an HTTP status of 503. This might mean that LAMS is unavailable. Please wait a minute and try again, or contact your system administrator.';
-$string['restcall403'] = 'Call to LAMS failed: received an HTTP status of 403 Forbidden. Please check the configurations settings and/or contact your system administrator.';
-$string['restcall400'] = 'Call to LAMS failed: received an HTTP status of 400 Bad Request. Please check the configurations settings and/or contact your system administrator.';
-$string['restcall500'] = 'Call to LAMS failed: received an HTTP status of 500 Internal Error. Please check the configurations settings and/or contact your system administrator.';
-$string['restcalldefault'] = 'Call to LAMS failed: received an HTTP status of: $a';
 $string['restcallfail'] = 'Call to LAMS failed: received no response or connection was refused. Please check that you have the correct LAMS server URL and that it is online.';
 $string['sequencenotselected'] = 'You must select a sequence to proceed.';
 $string['previewthislesson'] = 'Preview this lesson';
