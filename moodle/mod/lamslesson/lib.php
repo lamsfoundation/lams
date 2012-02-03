@@ -36,6 +36,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir.'/datalib.php');
 require_once($CFG->libdir.'/moodlelib.php');
 require_once($CFG->libdir.'/xmlize.php');
+require_once($CFG->libdir.'/filelib.php');
 
 /// CONSTANTS ///////////////////////////////////////////////////////////
 
@@ -285,8 +286,6 @@ function lamslesson_get_design_image($username,$courseid,$coursename,$coursecrea
     $request = "$CFG->lamslesson_serverurl".LAMSLESSON_LD_SERVICE_SVG."?serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . $hashvalue . "&username=" . $username  . "&courseId=" . $courseid . "&courseName=" . urlencode($coursename) . "&mode=2&country=" . $country . "&lang=" . $lang . "&ldId=" . $ldid . "&svgFormat=" . $format;
 
     return $request;
-#    $image_url = @file_get_contents($request);
-#    return $image_url;
 
 }
 
@@ -318,32 +317,11 @@ function lamslesson_get_sequences_rest($username,$courseid,$coursename,$coursecr
     // Put together REST URL
     $request = "$CFG->lamslesson_serverurl".LAMSLESSON_LD_SERVICE."?serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . $hashvalue . "&username=" . $username  . "&courseId=" . $courseid . "&courseName=" . urlencode($coursename) . "&mode=2&country=" . $country . "&lang=$lang";
 
-    //print($request);
     // GET call to LAMS
-    $xml = @file_get_contents($request);
+    $xml = lamslesson_http_call($request);
 
-    if(!empty($http_response_header[0])) {
-    	// Retrieve HTTP status code
-    	list($version, $status_code, $msg) = explode(' ', $http_response_header[0], 3);
-
-    	// Check the HTTP Status code
-    	switch($status_code) {
-    		case 200:
-    			break;
-    		case 503:
-    			print_error('restcall503', 'lamslesson', $CFG->wwwroot.'/course/view.php?id='.$courseid);
-    			break;
-    		case 403:
-    			print_error('restcall403', 'lamslesson', $CFG->wwwroot.'/course/view.php?id='.$courseid);
-    			break;
-    		case 400:
-    			print_error('restcall400', 'lamslesson', $CFG->wwwroot.'/course/view.php?id='.$courseid);
-    			break;
-    		default:
-    			print_error('restcalldefault', 'lamslesson', $CFG->wwwroot.'/course/view.php?id='.$courseid, $status_code);
-    	}
-    } else {
-    	print_error('restcallfail', 'lamslesson', $CFG->wwwroot.'/course/view.php?id='.$courseid);
+    if($xml == false) {
+         print_error('restcallfail', 'lamslesson', $CFG->wwwroot.'/course/view.php?id='.$courseid); 
     }
 
     $xml_array = xmlize($xml);
@@ -544,7 +522,7 @@ function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$method,$c
   $request = "$CFG->lamslesson_serverurl" . LAMSLESSON_LESSON_MANAGER . "?method=" . $method . "&serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . $hashvalue . "&username=" . $username . "&ldId=" . $ldid . "&courseId=" . $courseid . "&title=" . $title . "&desc=" . $desc . "&country=" . $country . "&lang=" . $lang;
 
   // GET call to LAMS
-  $xml = file_get_contents($request);
+  $xml = lamslesson_http_call($request);
 
   $xml_array = xmlize($xml);
   $lessonId = $xml_array['Lesson']['@']['lessonId'];
@@ -578,7 +556,7 @@ function lamslesson_fill_lesson($username,$lsid,$courseid,$country,$lang,$learne
   $request = "$CFG->lamslesson_serverurl" . LAMSLESSON_LESSON_MANAGER . "?method=join&serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . $hashvalue . "&username=" . $username . "&lsId=" . $lsid . "&courseId=" . $courseid . "&country=" . $country . "&lang=" . $lang . "&learnerIds=" . $learneridstr . "&monitorIds=" . $monitoridstr;
     
   // GET call to LAMS
-  return file_get_contents($request);
+  return lamslesson_http_call($request);
 }
 
 function lamslesson_get_lams_outputs($username,$lamslesson,$foruser) {
@@ -604,7 +582,7 @@ function lamslesson_get_lams_outputs($username,$lamslesson,$foruser) {
 
   // GET call to LAMS
 
-  $xml = file_get_contents($request);
+  $xml = lamslesson_http_call($request);
 
   $results = xmlize($xml);
 
@@ -743,7 +721,7 @@ function lamslesson_get_student_progress($username,$ldid,$courseid) {
   
   // GET call to LAMS
   
-  $xml = file_get_contents($request);
+  $xml = lamslesson_http_call($request);
 
   $xml_array = xmlize($xml);
 
@@ -912,7 +890,7 @@ function lamslesson_verify($url, $id, $key){
 
     $request = $url . LAMSLESSON_LESSON_MANAGER . "?method=" . LAMSLESSON_PARAM_VERIFY_METHOD . "&serverId=" . $id . "&datetime=" . $datetime_encoded . "&hashValue=" . $hashvalue;
 
-    $validate = file_get_contents($request);
+    $validate = lamslesson_http_call($request);
 
    if ( $validate == 1 )  {
 	// validation successful
@@ -924,3 +902,18 @@ function lamslesson_verify($url, $id, $key){
 
 }
 
+/**
+ * Submits an HTTP POST to a LAMS server
+ * @param string $request
+ * @return false or string with response if correct
+ */
+function lamslesson_http_call($request) {
+        global $CFG;
+        $results = download_file_content($request);
+
+        if ($results) {
+            return $results;
+        } else {
+            return false;
+        }
+}
