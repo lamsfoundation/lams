@@ -22,13 +22,22 @@
 		}
 	</style>
 	
+	<script type="text/javascript" src="includes/javascript/jquery-latest.pack.js"></script>
 	<script type="text/javascript">
 		var lessonId="${lsId}";
+		var edit="${edit}";
 		
 		function removePrecedingLesson(precedingLessonId){
 			document.location.href="<lams:LAMSURL/>lessonConditions.do?method=removeLessonDependency&lsId=" + lessonId
 						  + "&precedingLessonId=" + precedingLessonId;
 		}
+
+		$(document).ready(function(){
+			if (edit == 'true'){
+				// refresh Index page after editable conditions thickbox is closed
+				$('#TB_window',window.parent.document).attr('TB_refreshParentOnClose','true');
+			}
+		});
 	</script>
 </lams:head>
     
@@ -61,50 +70,53 @@
 						<c:out value="${precedingLesson.name}" />
 					</td>
 					<td>
-						<img src="<lams:LAMSURL/>images/icons/cross.png"
-							 style="cursor: pointer;"
-							 title="<fmt:message key="label.conditions.box.remove.dependency" />"
-							 onclick="javascript:removePrecedingLesson(${precedingLesson.id})" />
+						<c:if test="${edit}">
+							<img src="<lams:LAMSURL/>images/icons/cross.png"
+								 style="cursor: pointer;"
+								 title="<fmt:message key="label.conditions.box.remove.dependency" />"
+								 onclick="javascript:removePrecedingLesson(${precedingLesson.id})" />
+						</c:if>
 					</td>
 				</tr>
 			</c:forEach>
 		</c:otherwise>
 	</c:choose>
 	
-	
-	<tr>
-		<td colspan="2">
-			<h4>
-				<fmt:message key="label.conditions.box.add.dependency" />
-			</h4>
-		</td>
-	</tr>
-	
-	<c:choose>
-		<c:when test="${empty availableLessons}">
-			<tr>
-				<td colspan="2" class="lessonList emptyList">
-					<fmt:message key="label.conditions.box.no.dependency" />
-				</td>
-			</tr>
-		</c:when>
-		<c:otherwise>
-			<form action="${addLessonDependencyUrl}" method="post">
-			<tr>
-				<td class="lessonList" style="width: 70%">
-					<select name="precedingLessonId">
-						<c:forEach var="availableLesson" items="${availableLessons}">
-							<option value="${availableLesson.id}">${availableLesson.name}</option>
-						</c:forEach>
-					</select>
-				</td>
-				<td>
-					<input class="button" type="submit" value="<fmt:message key="index.addlesson"/>" />
-				</td>
-			</tr>	
-			</form>
-		</c:otherwise>
-	</c:choose>
+	<c:if test="${edit}">
+		<tr>
+			<td colspan="2">
+				<h4>
+					<fmt:message key="label.conditions.box.add.dependency" />
+				</h4>
+			</td>
+		</tr>
+		
+		<c:choose>
+			<c:when test="${empty availableLessons}">
+				<tr>
+					<td colspan="2" class="lessonList emptyList">
+						<fmt:message key="label.conditions.box.no.dependency" />
+					</td>
+				</tr>
+			</c:when>
+			<c:otherwise>
+				<form action="${addLessonDependencyUrl}" method="post">
+				<tr>
+					<td class="lessonList" style="width: 70%">
+						<select name="precedingLessonId">
+							<c:forEach var="availableLesson" items="${availableLessons}">
+								<option value="${availableLesson.id}">${availableLesson.name}</option>
+							</c:forEach>
+						</select>
+					</td>
+					<td>
+						<input class="button" type="submit" value="<fmt:message key="index.addlesson"/>" />
+					</td>
+				</tr>	
+				</form>
+			</c:otherwise>
+		</c:choose>
+	</c:if>
 </table>
 </div>
 </div>

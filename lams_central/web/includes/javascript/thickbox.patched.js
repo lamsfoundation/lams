@@ -283,6 +283,12 @@ function tb_remove() {
 	}
 	document.onkeydown = "";
 	document.onkeyup = "";
+	
+	// refresh parent window if certain attribute is set
+	if ($("#TB_window").attr("TB_refreshParentOnClose") == 'true'){
+		parent.location.reload(1);
+	}
+	
 	return false;
 }
 

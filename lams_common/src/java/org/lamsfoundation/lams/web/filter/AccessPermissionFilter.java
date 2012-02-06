@@ -125,15 +125,22 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 		    checkPerformed = true;
 		    String lessonIDParam = request.getParameter(AttributeNames.PARAM_LESSON_ID);
 		    if (lessonIDParam != null) {
-			Long lessonID = Long.valueOf(lessonIDParam);
-			Lesson lesson = getLessonService().getLesson(lessonID);
+			Long lessonId = Long.valueOf(lessonIDParam);
+			Lesson lesson = getLessonService().getLesson(lessonId);
 			if (lesson != null) {
 			    User user = getUser();
 			    if ((lesson.getLessonClass() != null)
 				    && lesson.getLessonClass().getLearners().contains(user)) {
-				if (AccessPermissionFilter.log.isTraceEnabled()) {
-				    AccessPermissionFilter.log.trace("OK, user " + user.getLogin()
-					    + " is a learner in the requested lesson. Lesson ID: "
+				// check if preceding lessons are complete
+				if (getLessonService().checkLessonReleaseConditions(lessonId, user.getUserId())) {
+				    if (AccessPermissionFilter.log.isTraceEnabled()) {
+					AccessPermissionFilter.log.trace("OK, user " + user.getLogin()
+						+ " is a learner in the requested lesson. Lesson ID: "
+						+ lesson.getLessonId() + ", name: " + lesson.getLessonName());
+				    }
+				} else {
+				    throw new SecurityException("User " + user.getLogin()
+					    + " has not finished required preceding lessons. Lesson ID: "
 					    + lesson.getLessonId() + ", name: " + lesson.getLessonName());
 				}
 			    } else {
