@@ -184,6 +184,7 @@
 					<include name="excel/*.jar" />
 					<include name="csv/*.jar" />
 					<include name="joid/*.jar" />
+					<include name="urlrewritefilter/*.jar" />
 				</patternset>
 			</fileset> 
 			<fileset dir="..">

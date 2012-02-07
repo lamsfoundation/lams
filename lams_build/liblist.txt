@@ -171,3 +171,4 @@ xdoclet          maven-xdoclet-plugin-1.2.3.jar         1.2.3
                  xdoclet-xdoclet-module-1.2.3.jar       1.2.3                                                           
                  xjavadoc-1.5-snapshot050611.jar        1.5-snapshot050611                                              
 
+urlrewritefilter urlrewrite-3.2.0.jar                   3.2.0                 BSD License              tuckey.org         Java Web Filter which allows rewriting URLs
