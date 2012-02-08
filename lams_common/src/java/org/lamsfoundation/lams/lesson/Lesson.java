@@ -148,8 +148,6 @@ public class Lesson implements Serializable {
     /** Persistent field. Defaults to FALSE if not set to anything by a constructor parameter. */
     private Boolean marksReleased;
     
-    private Date releaseDate;
-    
     /**
      * For lesson conditional release
      */
@@ -698,18 +696,6 @@ public class Lesson implements Serializable {
 
     public void setMarksReleased(Boolean marksReleased) {
         this.marksReleased = marksReleased;
-    }
-
-    /**
-     * @hibernate.property type="java.util.Date" column="release_date"
-     * 
-     */
-    public Date getReleaseDate() {
-	return releaseDate;
-    }
-
-    public void setReleaseDate(Date releaseDate) {
-	this.releaseDate = releaseDate;
     }
 
     public Set<Lesson> getPrecedingLessons() {

@@ -121,6 +121,8 @@ CREATE TABLE lams_lesson_dependency (
    , PRIMARY KEY (lesson_id,preceding_lesson_id)
 )TYPE=InnoDB;
 
+ALTER TABLE lams_lesson DROP COLUMN release_date;
+
 COMMIT;
 SET AUTOCOMMIT = 1;
 set FOREIGN_KEY_CHECKS = 1;
