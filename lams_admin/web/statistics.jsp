@@ -3,19 +3,21 @@
 <script src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-<!--
 	function loadGroupStats(orgId) {
-		jQuery.ajax({		
-			type: "GET",
-			url: "<lams:WebAppURL/>/statistics.do",
-			data: {method : "groupStats", orgId : orgId},
-			cache: false,
-			success: function (html) {
-				jQuery("#groupDiv").html(html);
-			}
-		});
+		if (orgId) {
+			jQuery.ajax({		
+				type: "GET",
+				url: "<lams:WebAppURL/>/statistics.do",
+				data: {method : "groupStats", orgId : orgId},
+				cache: false,
+				success: function (html) {
+					jQuery("#groupDiv").html(html);
+				}
+			});
+		} else {
+			jQuery("#groupDiv").html(null);
+		}
 	}
-//-->
 </script>
 
 <h4 class="align-left">
@@ -88,10 +90,10 @@
 <br />
 <h1><fmt:message key="admin.statistics.title.byGroup" /></h1>
 <br />
-<select>
+<select onchange="javascript:loadGroupStats(this.options[this.selectedIndex].value)">
 	<option></option>
 	<c:forEach var="groupEntry" items="${groupMap}" >	
-		<option onclick="loadGroupStats('${groupEntry.value}')">${groupEntry.key}</option>
+		<option value="${groupEntry.value}">${groupEntry.key}</option>
 	</c:forEach>
 </select>
 <br />
