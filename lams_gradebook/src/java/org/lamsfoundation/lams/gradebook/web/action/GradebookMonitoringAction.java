@@ -282,11 +282,6 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 		Lesson lesson = lessonService.getLesson(lessonID);
 
 		boolean marksReleased = lesson.getMarksReleased() != null && lesson.getMarksReleased();
-		if (!marksReleased) {
-
-			// If marks not released, set a new release date
-			lesson.setReleaseDate(new Date());
-		}
 
 		lesson.setMarksReleased(!marksReleased);
 
