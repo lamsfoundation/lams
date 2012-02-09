@@ -2,12 +2,18 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="tags-logic" prefix="logic" %>
+<%@ taglib uri="tags-html" prefix="html" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <lams:html>
 <lams:head>
 	<c:url value="/lessonConditions.do" var="addLessonDependencyUrl">
 		<c:param name="method" value="addLessonDependency" />
+		<c:param name="lsId" value="${lsId}" />
+	</c:url>
+	<c:url value="/lessonConditions.do" var="setDaysToLessonFinishUrl">
+		<c:param name="method" value="setDaysToLessonFinish" />
 		<c:param name="lsId" value="${lsId}" />
 	</c:url>
 	
@@ -44,6 +50,15 @@
 <body class="stripes">
 <div id="page">
 <div id="content">
+
+<logic:messagesPresent> 
+	<div class="warning">
+		<html:messages id="error">
+			<c:out value="${error}" escapeXml="false"/><br/>
+		</html:messages>
+    </div>
+</logic:messagesPresent>
+
 <table>
 
 	<tr>
@@ -116,6 +131,46 @@
 				</form>
 			</c:otherwise>
 		</c:choose>
+	</c:if>
+	
+	<tr>
+		<td colspan="2">
+			<h4>
+				<c:choose>
+					<c:when test="${empty lessonDaysToFinish}">
+						<fmt:message key="label.conditions.box.no.finish.date" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.conditions.box.finish.date">
+							<fmt:param>${lessonDaysToFinish}</fmt:param>
+							<fmt:param><lams:Date style="short" value="${lessonStartDate}"/></fmt:param>
+						</fmt:message>
+					</c:otherwise>
+				</c:choose>
+			</h4>
+		</td>
+	</tr>
+	
+	<c:if test="${edit}">
+		<form action="${setDaysToLessonFinishUrl}" method="post">
+			<tr>
+				<td class="lessonList" style="width: 70%">
+					<input name="lessonDaysToFinish" type="text" size="3"
+						<c:choose>
+							<c:when test="${empty lessonDaysToFinish}">
+								value="30"
+							</c:when>
+							<c:otherwise>
+								value="${lessonDaysToFinish}"
+							</c:otherwise>
+						</c:choose>
+					/>
+					<fmt:message key="label.days"/>
+				</td>
+				<td>
+					<input class="button" type="submit" value="<fmt:message key="label.set"/>" />
+				</td>
+		</form>
 	</c:if>
 </table>
 </div>

@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -811,22 +812,45 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	calendar.setTime(startDate);
 	calendar.add(Calendar.DATE, scheduledNumberDaysToLessonFinish);
 	Date endDate = calendar.getTime();
+	
+	if (endDate.before(new Date())) {
+	    throw new IllegalArgumentException("Lesson scheduled finish date is already in the past");
+	}
 
-	JobDetail finishLessonJob = getFinishScheduleLessonJob();
-	// setup the message for scheduling job
-	finishLessonJob.setName("finishLessonOnSchedule:" + lessonId);
-	finishLessonJob.setDescription(requestedLesson.getLessonName() + ":"
-		+ (requestedLesson.getUser() == null ? "" : requestedLesson.getUser().getFullName()));
-	finishLessonJob.getJobDataMap().put(MonitoringConstants.KEY_LESSON_ID, new Long(lessonId));
-	finishLessonJob.getJobDataMap().put(MonitoringConstants.KEY_USER_ID, new Integer(userId));
+	JobDetail finishLessonJob = null;
+	String finishLessonJobName = "finishLessonOnSchedule:" + lessonId;
+	String triggerName = "finishLessonOnScheduleTrigger:" + lessonId;
+	boolean alreadyScheduled = false;
+
+	try {
+	    // if trigger exists, the job was already scheduled and we need to move the trigger
+	    alreadyScheduled = scheduler.getTrigger(triggerName, Scheduler.DEFAULT_GROUP) != null;
+	} catch (SchedulerException e) {
+	    log.error(e);
+	}
+	
+	if (!alreadyScheduled) {
+	    finishLessonJob = getFinishScheduleLessonJob();
+	    // setup the message for scheduling job
+	    finishLessonJob.setName(finishLessonJobName);
+	    finishLessonJob.setDescription(requestedLesson.getLessonName() + ":"
+		    + (requestedLesson.getUser() == null ? "" : requestedLesson.getUser().getFullName()));
+	    finishLessonJob.getJobDataMap().put(MonitoringConstants.KEY_LESSON_ID, new Long(lessonId));
+	    finishLessonJob.getJobDataMap().put(MonitoringConstants.KEY_USER_ID, new Integer(userId));
+	}
+
 	// create customized triggers
-	Trigger finishLessonTrigger = new SimpleTrigger("finishLessonOnScheduleTrigger:" + lessonId,
-		Scheduler.DEFAULT_GROUP, endDate);
+	Trigger finishLessonTrigger = new SimpleTrigger(triggerName, Scheduler.DEFAULT_GROUP, endDate);
+	finishLessonTrigger.setJobName(finishLessonJobName);
 	// start the scheduling job
 	try {
 	    requestedLesson.setScheduleEndDate(endDate);
 	    lessonDAO.updateLesson(requestedLesson);
-	    scheduler.scheduleJob(finishLessonJob, finishLessonTrigger);
+	    if (alreadyScheduled) {
+		scheduler.rescheduleJob(triggerName, Scheduler.DEFAULT_GROUP, finishLessonTrigger);
+	    } else {
+		scheduler.scheduleJob(finishLessonJob, finishLessonTrigger);
+	    }
 	} catch (SchedulerException e) {
 	    throw new MonitoringServiceException("Error occurred at "
 		    + "[finishLessonOnSchedule]- fail to start scheduling", e);

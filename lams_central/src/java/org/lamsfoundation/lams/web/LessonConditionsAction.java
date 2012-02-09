@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.web;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -36,11 +37,16 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
-import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
+import org.joda.time.Interval;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.service.LessonService;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CentralConstants;
@@ -66,8 +72,11 @@ public class LessonConditionsAction extends DispatchAction {
     private static final String PARAM_PRECEDING_LESSONS = "precedingLessons";
     private static final String PARAM_PRECEDING_LESSON_ID = "precedingLessonId";
     private static final String PARAM_AVAILABLE_LESSONS = "availableLessons";
+    private static final String PARAM_LESSON_START_DATE = "lessonStartDate";
+    private static final String PARAM_LESSON_DAYS_TO_FINISH = "lessonDaysToFinish";
 
-    private static LessonService lessonService;
+    private static ILessonService lessonService;
+    private static IMonitoringService monitoringService;
 
     /**
      * Prepares data for thickbox displayed on Index page.
@@ -76,12 +85,12 @@ public class LessonConditionsAction extends DispatchAction {
      */
     @SuppressWarnings("unchecked")
     public ActionForward getIndexLessonConditions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws InvalidParameterException {
+	    HttpServletResponse response) {
 
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	if (lesson == null) {
-	    throw new InvalidParameterException("Lesson with ID: " + lessonId + " does not exist.");
+	    throw new IllegalArgumentException("Lesson with ID: " + lessonId + " does not exist.");
 	}
 
 	List<IndexLessonBean> precedingLessons = new ArrayList<IndexLessonBean>(lesson.getPrecedingLessons().size());
@@ -106,6 +115,17 @@ public class LessonConditionsAction extends DispatchAction {
 	}
 	request.setAttribute(LessonConditionsAction.PARAM_AVAILABLE_LESSONS, availableLessons);
 
+	Date endDate = lesson.getScheduleEndDate();
+	if (endDate != null) {
+	    Date startDate = (lesson.getStartDateTime() == null) ? lesson.getScheduleStartDate() : lesson
+		    .getStartDateTime();
+	    Interval interval = new Interval(startDate.getTime(), endDate.getTime());
+	    Period daysToLessonFinish = interval.toPeriod(PeriodType.days());
+
+	    request.setAttribute(LessonConditionsAction.PARAM_LESSON_START_DATE, startDate);
+	    request.setAttribute(LessonConditionsAction.PARAM_LESSON_DAYS_TO_FINISH, daysToLessonFinish.getDays());
+	}
+
 	request.setAttribute(CentralConstants.PARAM_EDIT, canEdit(request, lesson));
 
 	return mapping.findForward(LessonConditionsAction.FORWARD_INDEX_LESSON_CONDITION);
@@ -117,19 +137,12 @@ public class LessonConditionsAction extends DispatchAction {
      * @throws InvalidParameterException
      */
     public ActionForward removeLessonDependency(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws InvalidParameterException {
+	    HttpServletResponse response) {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
 	Long removedPrecedingLessonId = WebUtil.readLongParam(request,
 		LessonConditionsAction.PARAM_PRECEDING_LESSON_ID, false);
 
-	Lesson lesson = getLessonService().getLesson(lessonId);
-	if (lesson == null) {
-	    throw new InvalidParameterException("Lesson with ID: " + lessonId + " does not exist.");
-	}
-	if (!canEdit(request, lesson)) {
-	    throw new SecurityException("Current user can not edit lesson conditions");
-	}
-
+	Lesson lesson = getLessonAndCheckPermissions(request, lessonId);
 	Iterator<Lesson> precedingLessonIter = lesson.getPrecedingLessons().iterator();
 	while (precedingLessonIter.hasNext()) {
 	    if (precedingLessonIter.next().getLessonId().equals(removedPrecedingLessonId)) {
@@ -148,27 +161,73 @@ public class LessonConditionsAction extends DispatchAction {
      * @throws InvalidParameterException
      */
     public ActionForward addLessonDependency(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws InvalidParameterException {
+	    HttpServletResponse response) {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
 	Long addedPrecedingLessonId = WebUtil.readLongParam(request, LessonConditionsAction.PARAM_PRECEDING_LESSON_ID,
 		false);
 
-	Lesson lesson = getLessonService().getLesson(lessonId);
-	if (lesson == null) {
-	    throw new InvalidParameterException("Lesson with ID: " + lessonId + " does not exist.");
-	}
-	if (!canEdit(request, lesson)) {
-	    throw new SecurityException("Current user can not edit lesson conditions");
-	}
+	Lesson lesson = getLessonAndCheckPermissions(request, lessonId);
 	Lesson addedPrecedingLesson = getLessonService().getLesson(addedPrecedingLessonId);
 	if (addedPrecedingLesson == null) {
-	    throw new InvalidParameterException("Preceding lesson with ID: " + lessonId + " does not exist.");
+	    throw new IllegalArgumentException("Preceding lesson with ID: " + lessonId + " does not exist.");
 	}
 
 	lesson.getPrecedingLessons().add(addedPrecedingLesson);
 
 	// after operation, display contents again
 	return getIndexLessonConditions(mapping, form, request, response);
+    }
+
+    /**
+     * Sets a new lesson scheduled finish date, based on give number of days.
+     */
+    public ActionForward setDaysToLessonFinish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
+	Integer daysToLessonFinish = null;
+	ActionMessages errors = new ActionMessages();
+	try {
+	    daysToLessonFinish = WebUtil.readIntParam(request, LessonConditionsAction.PARAM_LESSON_DAYS_TO_FINISH,
+		    false);
+	    if (daysToLessonFinish <= 0) {
+		throw new IllegalArgumentException("Number of days to lesson finish is a nonpositive number");
+	    }
+	} catch (IllegalArgumentException e) {
+	    LessonConditionsAction.logger.error(e);
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.conditions.box.finish.date.number"));
+	}
+
+	if (daysToLessonFinish != null) {
+	    Lesson lesson = getLessonAndCheckPermissions(request, lessonId);
+	    HttpSession session = SessionManager.getSession();
+	    UserDTO currentUser = (UserDTO) session.getAttribute(AttributeNames.USER);
+	    try {
+		// reschedule the lesson
+		getMonitoringService().finishLessonOnSchedule(lessonId, daysToLessonFinish, currentUser.getUserID());
+	    } catch (IllegalArgumentException e) {
+		LessonConditionsAction.logger.error(e);
+		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.conditions.box.finish.date",
+			new Object[] { e.getMessage() }));
+	    }
+	}
+
+	if (!errors.isEmpty()) {
+	    saveErrors(request, errors);
+	}
+
+	// after operation, display contents again
+	return getIndexLessonConditions(mapping, form, request, response);
+    }
+
+    private Lesson getLessonAndCheckPermissions(HttpServletRequest request, Long lessonId) {
+	Lesson lesson = getLessonService().getLesson(lessonId);
+	if (lesson == null) {
+	    throw new IllegalArgumentException("Lesson with ID: " + lessonId + " does not exist.");
+	}
+	if (!canEdit(request, lesson)) {
+	    throw new SecurityException("Current user can not edit lesson conditions");
+	}
+	return lesson;
     }
 
     /**
@@ -183,12 +242,21 @@ public class LessonConditionsAction extends DispatchAction {
 	return currentUser.getUserID().equals(lesson.getUser().getUserId());
     }
 
-    private LessonService getLessonService() {
+    private ILessonService getLessonService() {
 	if (LessonConditionsAction.lessonService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
-	    LessonConditionsAction.lessonService = (LessonService) ctx.getBean("lessonService");
+	    LessonConditionsAction.lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
 	return LessonConditionsAction.lessonService;
+    }
+
+    private IMonitoringService getMonitoringService() {
+	if (LessonConditionsAction.monitoringService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    LessonConditionsAction.monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
+	}
+	return LessonConditionsAction.monitoringService;
     }
 }

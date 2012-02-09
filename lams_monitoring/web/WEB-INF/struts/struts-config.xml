@@ -188,6 +188,34 @@
       />
     </action>
     <action
+      path="/emailNotifications"
+      type="org.lamsfoundation.lams.monitoring.web.EmailNotificationsAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="lessonView"
+        path="/emailnotifications/lessonNotifications.jsp"
+        redirect="false"
+      />
+      <forward
+        name="courseView"
+        path="/emailnotifications/courseNotifications.jsp"
+        redirect="false"
+      />
+      <forward
+        name="userList"
+        path="/emailnotifications/userList.jsp"
+        redirect="false"
+      />
+      <forward
+        name="scheduledEmailList"
+        path="/emailnotifications/scheduledEmailList.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/sequence"
       type="org.lamsfoundation.lams.monitoring.web.SequenceAction"
       parameter="method"
