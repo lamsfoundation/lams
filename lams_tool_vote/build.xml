@@ -257,7 +257,7 @@
 		   				<include name="export/*"/>
 						<include name="includes/*"/>	   					   				
 		   				<include name="monitoring/*"/>
-						<include name="learning/*"/>	   				
+						<include name="learning/**"/>	   				
 	   					<include name="images/**"/>
 		   				<include name="css/**"/>
 				</fileset>
