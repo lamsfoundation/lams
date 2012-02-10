@@ -20,73 +20,9 @@
 		
 		<link rel="stylesheet" href="<html:rewrite page='/includes/css/jRating.jquery.css'/>"  type="text/css" />
 		<link rel="stylesheet" href="<html:rewrite page='/includes/css/ratingStars.css'/>"  type="text/css" />
+		<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 		<style type="text/css">
-/*layout of the table with the alternate color for the table heading cell */
-table.alternative-color {
- 	 width:100%; 
-	 margin-left:0px; 
-	 padding-top:0px; 
-	 margin-bottom:15px; 
-	 text-align:left;
-}
-
-table.alternative-color th {
-
-	font-size: 12px;
-	height: 30px;
-}
-
-table.alternative-color td {
-	padding:5px;
-	padding-left: 2px;
-	font-size: 11px;
-	border-bottom: 1px solid #efefef;
-	vertical-align: middle; 
-	background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 0px
-}
-
-table.alternative-color td.first, table.alternative-color th.first {
-	border-left: none;
-	padding-left: 2px;
-}
-table.alternative-color .ui-btn-up-c {
-font-weight: normal; cursor: default;
-}
-b.error {color:#cc0000;} 
-
-/*layout of the forum tables with the colored table heading cell */
-table.forum { 
-	width:93%;
-	margin-bottom:10px;
-	background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 49px; 
-	text-align:left; 
-	border-bottom:1px solid #efefef;}
-
-table.forum th { 
-	height:20px; 
-	padding-top:5px; 
-	padding-left:15px; 
-	border-left:1px solid #cacdd1;  
-	font-size:12px; 
-	vertical-align:middle;
-}
-
-table.forum td.posted-by {
-	background: url('../images/css/forum_postedby_bg.jpg') repeat-x; 
-	height:20px; 
-	padding-left:15px; 
-	padding-top:0px; 
-	font-size:10px;
-	vertical-align:top; 
-	border-left:1px solid #cacdd1; 
-	color:#666;
-}
-
-table.forum td {
-	padding-left:20px; 
-	font-size:11px; 
-	vertical-align:top; 
-}
+			body {font-size: 16px;}
 		</style>
 
 		<!-- ********************  javascript from header.jsp ********************** -->
