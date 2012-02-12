@@ -45,7 +45,7 @@
 		
 				<div class="space-bottom-top align-right">
 					<html:hidden property="dispatch" value="submitReflection" />
-					<html:link href="#" styleClass="button" styleId="finishButton" 
+					<html:link href="#nogo" styleClass="button" styleId="finishButton" 
 				          onclick="javascript:document.learningForm.submit();return false">
 						<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
 					</html:link>

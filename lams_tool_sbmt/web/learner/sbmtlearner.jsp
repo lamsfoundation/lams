@@ -285,7 +285,7 @@
 							</html:button>
 						</c:when>
 						<c:otherwise>
-							<html:link href="#" property="finishButton"
+							<html:link href="#nogo" property="finishButton"
 								onclick="finish();return false" styleClass="button"
 								styleId="finishButton">
 								<span class="nextActivity"><fmt:message key="button.finish" /></span>

@@ -116,7 +116,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<div data-role="footer" data-theme="b" class="ui-bar">
 			<span class="ui-finishbtn-right">
-				<a href="#" name="learnerFinished" id="finishButton"
+				<a href="#nogo" name="learnerFinished" id="finishButton"
 					onclick="javascript:submitMethod('learnerFinished');return false" data-role="button" data-icon="arrow-r" data-theme="b">
 					<span class="nextActivity"><fmt:message key="label.finished" /></span>
 				</a>

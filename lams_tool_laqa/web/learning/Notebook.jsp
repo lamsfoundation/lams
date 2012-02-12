@@ -78,7 +78,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				styleClass="text-area"></html:textarea>
 
 			<div class="space-bottom-top align-right">
-				<html:link href="#" property="submitReflection" styleId="finishButton"
+				<html:link href="#nogo" property="submitReflection" styleId="finishButton"
 					onclick="javascript:submitMethod('submitReflection');return false" styleClass="button">
 					<span class="nextActivity"><fmt:message key="button.endLearning" /></span>
 				</html:link>

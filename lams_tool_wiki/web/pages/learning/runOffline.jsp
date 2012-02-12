@@ -24,7 +24,7 @@
 			<html:hidden property="toolSessionID" />
 
 			<div align="right" class="space-bottom-top">
-				<html:link href="#" styleClass="button" styleId="finishButton" onclick="javascript:submitForm('finish'); return false">
+				<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="javascript:submitForm('finish'); return false">
 					<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
 				</html:link>
 			</div>

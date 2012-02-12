@@ -40,7 +40,7 @@
 				styleClass="text-area" />
 
 			<div class="space-bottom-top align-right">
-				<html:link href="#" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+				<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
 					<span class="nextActivity"><fmt:message key="button.finish" /></span
 				</html:link>
 			</div>

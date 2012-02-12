@@ -417,7 +417,7 @@
 			<%--"Check for new" and "Add new image" buttons---------------%>
 			
 			<c:if test="${imageGallery.allowShareImages && (mode != 'teacher')}">
-				<a href="#" onclick="return checkNew()" class="button check_for_new"> 
+				<a href="#nogo" onclick="return checkNew()" class="button check_for_new"> 
 					<fmt:message key="label.check.for.new" /> 
 				</a>
 			</c:if>
@@ -479,7 +479,7 @@
 						</html:button>
 					</c:when>
 					<c:otherwise>
-						<html:link href="#" property="FinishButton" styleId="finishButton"	onclick="return finishSession()" styleClass="button" >
+						<html:link href="#nogo" property="FinishButton" styleId="finishButton"	onclick="return finishSession()" styleClass="button" >
 							<span class="nextActivity"><fmt:message key="label.finished" /></span>
 						</html:link>
 					</c:otherwise>

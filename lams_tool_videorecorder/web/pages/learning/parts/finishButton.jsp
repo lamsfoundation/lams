@@ -59,7 +59,7 @@
 			</c:when>
 			<c:otherwise>
 				<html:hidden property="dispatch" value="finishActivity" />
-				<html:link href="#" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+				<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
 					<span class="nextActivity"><fmt:message key="button.finish" /></span>
 				</html:link>
 			</c:otherwise>
