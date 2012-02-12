@@ -206,7 +206,7 @@
 							</html:link>						
 						</c:if>	
 						<c:if test="${! isUserFailed}">				
-							<html:link href="#" property="FinishButton" onclick="return finishSession()" styleClass="button">
+							<html:link href="#nogo" property="FinishButton" onclick="return finishSession()" styleClass="button">
 								<span class="nextActivity"><fmt:message key="label.learning.next.activity" /></span>
 							</html:link>
 						</c:if>
