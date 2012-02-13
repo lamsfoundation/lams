@@ -693,9 +693,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 			transitionDAO.update(toTransition);
 
 		} else if (toTransition != null && fromTransition == null) {
+		    	toTransition.getFromActivity().setTransitionFrom(null);
 			design.getTransitions().remove(toTransition);
 		} else if (toTransition == null && fromTransition != null) {
 			design.setFirstActivity(fromTransition.getToActivity());
+			fromTransition.getToActivity().setTransitionTo(null);
 			design.getTransitions().remove(fromTransition);
 		}
 
