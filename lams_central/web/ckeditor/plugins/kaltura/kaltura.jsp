@@ -106,28 +106,56 @@
 			self.close ();
 		}
 		
+		//in order to use CKEditor preview feature with IE9 applying http://www.aaronpeters.nl/blog/prevent-double-callback-execution-in-IE9 
 		function saveToCKEditor(entries) {
 			var innerHTML = '';
-			innerHTML +=	'<script type="text/javascript" src="' + CKGlobal.plugins.getPath('kaltura') + '/swfobject/swfobject.js"><\/script>';
+			
+			//add divs containing videos
+			for(var i = 0; i < entries.length; i++) {
+				var entryId = entries[i].entryId;
+				innerHTML +=	'<div id="kplayer' + entryId + '"><object height="400" width="360"><embed height="400" type="application/x-shockwave-flash" width="360" src="#"></embed></object></div>';
+			}
+			//enable HTML5 support
 			innerHTML +=	'<script type="text/javascript" src="' + KALTURA_SERVER + '/p/' + PARTNER_ID + '/sp/' + SUB_PARTNER_ID + '/embedIframeJs/uiconf_id/' + KDP_UI_CONF_ID + '/partner_id/' + PARTNER_ID + '"><\/script>';
 
+			innerHTML +=	'<script type="text/javascript">';
+			
+			// this is the callback function; execute after external script finishes loading
+			innerHTML +=	'    function callback() {';			
 			for(var i = 0; i < entries.length; i++) {
-				var entryId = entries[i].entryId; //mediatype is available as well (entries[i].mediaType)
+				var entryId = entries[i].entryId;
 				
-				innerHTML +=	'<div id="kplayer' + entryId + '"><object height="400" width="360"><embed height="400" type="application/x-shockwave-flash" width="360"></embed></object></div>';
-				innerHTML +=	'<script type="text/javascript">';
-				innerHTML +=	'	var params = {';
+				innerHTML +=	'	var params'+entryId+' = {';
 				innerHTML +=	'		allowscriptaccess: "always",';
 				innerHTML +=	'		allownetworking: "all",';
 				innerHTML +=	'		allowfullscreen: "true",';
 				innerHTML +=	'		wmode: "opaque"';
 				innerHTML +=	'	};	';
-				innerHTML +=	'	var flashVars = {';
-				innerHTML +=	'		entryId: "' + entryId + '"';
+				innerHTML +=	'	var flashVars'+entryId+' = {';
+				innerHTML +=	'		entryId: "'+entryId+'"';
 				innerHTML +=	'	};	';
-				innerHTML +=	'	swfobject.embedSWF("' + KALTURA_SERVER + '/kwidget/wid/_' + PARTNER_ID + '/uiconf_id/' + KDP_UI_CONF_ID + '", "kplayer' + entryId + '", "400", "360", "9.0.0", "' + CKGlobal.plugins.getPath('kaltura') + '/swfobject/expressInstall.swf", flashVars, params);';
-				innerHTML +=	"<\/script>";
-			}
+				innerHTML +=	'	swfobject.embedSWF("' + KALTURA_SERVER + '/kwidget/wid/_' + PARTNER_ID + '/uiconf_id/' + KDP_UI_CONF_ID + '", "kplayer' + entryId + '", "400", "360", "9.0.0", "' + CKGlobal.plugins.getPath('kaltura') + '/swfobject/expressInstall.swf", flashVars'+entryId+', params'+entryId+');';
+			}		
+			innerHTML +=	'    }';
+			
+			innerHTML +=	'var script = document.createElement("script");';
+			innerHTML +=	'script.src = "' + CKGlobal.plugins.getPath('kaltura') + '/swfobject/swfobject.js"; ';
+			innerHTML +=	'if (script.readyState) {'; // IE, incl. IE9
+			innerHTML +=	'	script.onreadystatechange = function() {';
+			innerHTML +=	'		if (script.readyState == "loaded" || script.readyState == "complete") {';
+			innerHTML +=	'			script.onreadystatechange = null;';
+			innerHTML +=	'			callback();';
+			innerHTML +=	'		}';
+			innerHTML +=	'	};';
+			innerHTML +=	'} else {';
+			innerHTML +=	'	script.onload = function() {'; // Other browsers
+			innerHTML +=	'		callback();';
+			innerHTML +=	'	};';
+			innerHTML +=	'}';
+			innerHTML +=	'document.getElementsByTagName("head")[0].appendChild(script);';
+
+			innerHTML +='<\/script>';
+			
 			CK.insertHtml(innerHTML);
 		}
 	// -->
