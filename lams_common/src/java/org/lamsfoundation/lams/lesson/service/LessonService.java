@@ -779,8 +779,9 @@ public class LessonService implements ILessonService {
 		enableLessonNotifications = enableLessonNotifications == null ? false : enableLessonNotifications.booleanValue();
 		Boolean dependent = (Boolean) tuple[6];
 		dependent = dependent == null ? false : dependent.booleanValue();
+		Boolean scheduledFinish = (Boolean) tuple[7];
 		IndexLessonBean bean = new IndexLessonBean(lessonId, lessonName, lessonDescription, lessonState,
-			lessonCompleted, enableLessonNotifications, dependent);
+			lessonCompleted, enableLessonNotifications, dependent, scheduledFinish);
 		map.put(new Long(lessonId), bean);
 	    }
 	}

@@ -60,7 +60,7 @@
 </logic:messagesPresent>
 
 <table>
-
+<!-- Preceding lessons setup -->
 	<tr>
 		<td colspan="2">
 			<h4>
@@ -97,6 +97,7 @@
 		</c:otherwise>
 	</c:choose>
 	
+	<!-- Adding new preceding lesson -->
 	<c:if test="${edit}">
 		<tr>
 			<td colspan="2">
@@ -127,21 +128,27 @@
 					<td>
 						<input class="button" type="submit" value="<fmt:message key="index.addlesson"/>" />
 					</td>
-				</tr>	
+				</tr>
 				</form>
 			</c:otherwise>
 		</c:choose>
 	</c:if>
 	
+	<!-- Finish date setup -->
 	<tr>
 		<td colspan="2">
 			<h4>
 				<c:choose>
 					<c:when test="${empty lessonDaysToFinish}">
-						<fmt:message key="label.conditions.box.no.finish.date" />
+						<fmt:message key="label.conditions.box.finish.no.date" />
+					</c:when>
+					<c:when test="${lessonIndividualFinish}">
+						<fmt:message key="label.conditions.box.finish.individual.date">
+							<fmt:param>${lessonDaysToFinish}</fmt:param>
+						</fmt:message>
 					</c:when>
 					<c:otherwise>
-						<fmt:message key="label.conditions.box.finish.date">
+						<fmt:message key="label.conditions.box.finish.global.date">
 							<fmt:param>${lessonDaysToFinish}</fmt:param>
 							<fmt:param><lams:Date style="short" value="${lessonStartDate}"/></fmt:param>
 						</fmt:message>
@@ -151,25 +158,35 @@
 		</td>
 	</tr>
 	
+	<!-- Changing finish date -->
 	<c:if test="${edit}">
 		<form action="${setDaysToLessonFinishUrl}" method="post">
 			<tr>
 				<td class="lessonList" style="width: 70%">
-					<input name="lessonDaysToFinish" type="text" size="3"
-						<c:choose>
-							<c:when test="${empty lessonDaysToFinish}">
-								value="30"
-							</c:when>
-							<c:otherwise>
-								value="${lessonDaysToFinish}"
-							</c:otherwise>
-						</c:choose>
-					/>
-					<fmt:message key="label.days"/>
+					<select name="lessonDaysToFinish">
+						<c:forEach begin="0" end="120" var="index">
+							<option
+							<c:if test="${(empty lessonDaysToFinish and index eq 0) or index eq lessonDaysToFinish}">
+								selected="selected"
+							</c:if>
+							>${index}</option>
+						</c:forEach>
+					</select>
+					<fmt:message key="advanced.tab.form.enter.number.days.label"/>
 				</td>
-				<td>
+				<td rowspan="2" style="vertical-align: middle">
 					<input class="button" type="submit" value="<fmt:message key="label.set"/>" />
 				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="checkbox" name="lessonIndividualFinish" value="true" 
+					<c:if test="${lessonIndividualFinish}">
+						checked="checked"
+					</c:if>
+					/><fmt:message key="advanced.tab.form.individual.not.entire.group.label"/>
+				</td>
+			</tr>	
 		</form>
 	</c:if>
 </table>

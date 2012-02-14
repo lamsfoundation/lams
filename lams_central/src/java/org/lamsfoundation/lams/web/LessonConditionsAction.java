@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.web;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -44,10 +45,15 @@ import org.joda.time.Interval;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
 import org.lamsfoundation.lams.index.IndexLessonBean;
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupUser;
+import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -74,9 +80,11 @@ public class LessonConditionsAction extends DispatchAction {
     private static final String PARAM_AVAILABLE_LESSONS = "availableLessons";
     private static final String PARAM_LESSON_START_DATE = "lessonStartDate";
     private static final String PARAM_LESSON_DAYS_TO_FINISH = "lessonDaysToFinish";
+    private static final String PARAM_INDIVIDUAL_FINISH = "lessonIndividualFinish";
 
     private static ILessonService lessonService;
     private static IMonitoringService monitoringService;
+    private static IGroupUserDAO groupUserDAO;
 
     /**
      * Prepares data for thickbox displayed on Index page.
@@ -116,7 +124,13 @@ public class LessonConditionsAction extends DispatchAction {
 	request.setAttribute(LessonConditionsAction.PARAM_AVAILABLE_LESSONS, availableLessons);
 
 	Date endDate = lesson.getScheduleEndDate();
-	if (endDate != null) {
+	if (endDate == null) {
+	    Integer daysToLessonFinish = lesson.getScheduledNumberDaysToLessonFinish();
+	    if (daysToLessonFinish != null) {
+		request.setAttribute(LessonConditionsAction.PARAM_LESSON_DAYS_TO_FINISH, daysToLessonFinish);
+		request.setAttribute(LessonConditionsAction.PARAM_INDIVIDUAL_FINISH, true);
+	    }
+	} else {
 	    Date startDate = (lesson.getStartDateTime() == null) ? lesson.getScheduleStartDate() : lesson
 		    .getStartDateTime();
 	    Interval interval = new Interval(startDate.getTime(), endDate.getTime());
@@ -124,6 +138,7 @@ public class LessonConditionsAction extends DispatchAction {
 
 	    request.setAttribute(LessonConditionsAction.PARAM_LESSON_START_DATE, startDate);
 	    request.setAttribute(LessonConditionsAction.PARAM_LESSON_DAYS_TO_FINISH, daysToLessonFinish.getDays());
+	    request.setAttribute(LessonConditionsAction.PARAM_INDIVIDUAL_FINISH, false);
 	}
 
 	request.setAttribute(CentralConstants.PARAM_EDIT, canEdit(request, lesson));
@@ -179,36 +194,75 @@ public class LessonConditionsAction extends DispatchAction {
     }
 
     /**
-     * Sets a new lesson scheduled finish date, based on give number of days.
+     * Sets lesson finish date, either for individuals or lesson as a whole. If days<=0, schedule is removed.
      */
     public ActionForward setDaysToLessonFinish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
-	Integer daysToLessonFinish = null;
+	int daysToLessonFinish = WebUtil.readIntParam(request, LessonConditionsAction.PARAM_LESSON_DAYS_TO_FINISH,
+		false);
+	boolean individualFinish = WebUtil.readBooleanParam(request, LessonConditionsAction.PARAM_INDIVIDUAL_FINISH,
+		false);
 	ActionMessages errors = new ActionMessages();
-	try {
-	    daysToLessonFinish = WebUtil.readIntParam(request, LessonConditionsAction.PARAM_LESSON_DAYS_TO_FINISH,
-		    false);
-	    if (daysToLessonFinish <= 0) {
-		throw new IllegalArgumentException("Number of days to lesson finish is a nonpositive number");
-	    }
-	} catch (IllegalArgumentException e) {
-	    LessonConditionsAction.logger.error(e);
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.conditions.box.finish.date.number"));
-	}
 
-	if (daysToLessonFinish != null) {
-	    Lesson lesson = getLessonAndCheckPermissions(request, lessonId);
-	    HttpSession session = SessionManager.getSession();
-	    UserDTO currentUser = (UserDTO) session.getAttribute(AttributeNames.USER);
-	    try {
-		// reschedule the lesson
-		getMonitoringService().finishLessonOnSchedule(lessonId, daysToLessonFinish, currentUser.getUserID());
-	    } catch (IllegalArgumentException e) {
-		LessonConditionsAction.logger.error(e);
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.conditions.box.finish.date",
-			new Object[] { e.getMessage() }));
+	Lesson lesson = getLessonAndCheckPermissions(request, lessonId);
+	HttpSession session = SessionManager.getSession();
+	UserDTO currentUser = (UserDTO) session.getAttribute(AttributeNames.USER);
+	try {
+	    // (re)schedule the lesson or remove it when set for individual finish of daysToLessonFinish=0
+	    getMonitoringService().finishLessonOnSchedule(lessonId, individualFinish ? 0 : daysToLessonFinish,
+		    currentUser.getUserID());
+	    // if finish date is individual, the field below is filled
+	    lesson.setScheduledNumberDaysToLessonFinish(individualFinish && (daysToLessonFinish > 0) ? daysToLessonFinish
+		    : null);
+
+	    // iterate through each GroupLearner and set/remove individual lesson finish date, if needed
+	    Group learnerGroup = lesson.getLessonClass().getLearnersGroup();
+	    if (learnerGroup != null) {
+		for (User learner : (Set<User>) learnerGroup.getUsers()) {
+		    GroupUser groupUser = getGroupUserDAO().getGroupUser(lesson, learner.getUserId());
+		    if (groupUser != null) {
+
+			if (individualFinish && (daysToLessonFinish > 0)) {
+			    // set individual finish date based on start date
+			    LearnerProgress learnerProgress = getLessonService().getUserProgressForLesson(
+				    learner.getUserId(), lessonId);
+			    if ((learnerProgress == null) || (learnerProgress.getStartDate() == null)) {
+				if (groupUser.getScheduledLessonEndDate() != null) {
+				    LessonConditionsAction.logger.warn("Improper DB value: User with ID "
+					    + learner.getUserId()
+					    + " has scheduledLessonEndDate set but has not started the lesson yet.");
+				}
+			    } else {
+				// set new finish date according to moment when user joined the lesson
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(learnerProgress.getStartDate());
+				calendar.add(Calendar.DATE, daysToLessonFinish);
+				Date endDate = calendar.getTime();
+				groupUser.setScheduledLessonEndDate(endDate);
+
+				if (LessonConditionsAction.logger.isDebugEnabled()) {
+				    LessonConditionsAction.logger.debug("Reset time limit for user: "
+					    + learner.getLogin() + " in lesson: " + lesson.getLessonId() + " to "
+					    + endDate);
+				}
+			    }
+			} else if (groupUser.getScheduledLessonEndDate() != null) {
+			    // remove individual finish date
+			    groupUser.setScheduledLessonEndDate(null);
+
+			    if (LessonConditionsAction.logger.isDebugEnabled()) {
+				LessonConditionsAction.logger.debug("Remove time limit for user: " + learner.getLogin()
+					+ " in lesson: " + lesson.getLessonId());
+			    }
+			}
+		    }
+		}
 	    }
+	} catch (Exception e) {
+	    LessonConditionsAction.logger.error(e);
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.conditions.box.finish.date",
+		    new Object[] { e.getMessage() }));
 	}
 
 	if (!errors.isEmpty()) {
@@ -258,5 +312,14 @@ public class LessonConditionsAction extends DispatchAction {
 	    LessonConditionsAction.monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
 	}
 	return LessonConditionsAction.monitoringService;
+    }
+
+    private IGroupUserDAO getGroupUserDAO() {
+	if (LessonConditionsAction.groupUserDAO == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    LessonConditionsAction.groupUserDAO = (IGroupUserDAO) ctx.getBean("groupUserDAO");
+	}
+	return LessonConditionsAction.groupUserDAO;
     }
 }
