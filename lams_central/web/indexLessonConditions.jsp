@@ -164,7 +164,7 @@
 			<tr>
 				<td class="lessonList" style="width: 70%">
 					<select name="lessonDaysToFinish">
-						<c:forEach begin="0" end="120" var="index">
+						<c:forEach begin="0" end="180" var="index">
 							<option
 							<c:if test="${(empty lessonDaysToFinish and index eq 0) or index eq lessonDaysToFinish}">
 								selected="selected"
