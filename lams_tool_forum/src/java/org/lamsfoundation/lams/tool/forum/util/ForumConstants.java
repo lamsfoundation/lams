@@ -43,9 +43,7 @@ public interface ForumConstants {
     public static final int STATUS_CONTENT_COPYED = 1;
 
     public static final int SESSION_STATUS_FINISHED = 1;
-
-    public final static int MAX_FILE_SIZE = 250 * 1000;
-
+    
     public final static String FORUM_SERVICE = "forumService";
 
     public final static String CONTENT_HANDLER = "toolContentHandler";
@@ -100,6 +98,8 @@ public interface ForumConstants {
     public static final String ATTR_FINISHED_LOCK = "finishedLock";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
+    
+    public static final String ATTR_UPLOAD_MAX_FILE_SIZE = "uploadMaxFileSize";
 
     // for submission deadline LDEV-2657
 

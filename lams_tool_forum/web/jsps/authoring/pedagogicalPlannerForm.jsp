@@ -49,7 +49,7 @@
   			});
   		}
   		function prepareFormData(){
-			//SCKeditor content is not submitted when sending by jQuery; we need to do this
+			//CKeditor content is not submitted when sending by jQuery; we need to do this
 			
 			var instructions = CKEDITOR.instances.instructions.getData();
 			document.getElementById("instructions").value=instructions;

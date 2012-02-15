@@ -73,6 +73,8 @@ import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -88,6 +90,8 @@ public class LearningAction extends Action {
     private static Logger log = Logger.getLogger(LearningAction.class);
 
     private static final boolean MODE_OPTIONAL = false;
+
+    private static final int UPLOAD_MAX_FILE_SIZE = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
 
     private IForumService forumService;
 
@@ -617,7 +621,9 @@ public class LearningAction extends Action {
 	// as it has a link from the view topic screen back to View Forum screen.
 	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
 	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
-
+	
+	sessionMap.put(ForumConstants.ATTR_UPLOAD_MAX_FILE_SIZE, LearningAction.UPLOAD_MAX_FILE_SIZE);
+	
 	return mapping.findForward("success");
     }
 

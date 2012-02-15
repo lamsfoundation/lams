@@ -20,6 +20,11 @@
 			<div class="field-name title-space-top">
 				<fmt:message key="message.label.attachment" />
 			</div>
+			<div style="font-style: italic; margin-bottom: 10px">
+				<fmt:message key="label.upload.info">
+					<fmt:param>${sessionMap.uploadMaxFileSize}</fmt:param>
+				</fmt:message>
+			</div>
 			<html:file tabindex="3" property="attachmentFile" />
 			<html:errors property="message.attachment" />
 		
