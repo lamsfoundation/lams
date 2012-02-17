@@ -25,11 +25,6 @@ CREATE TABLE tl_lafrum11_message_rating (
 
 UPDATE lams_tool SET tool_version = "20110228" WHERE tool_signature = "lafrum11";
 
--- LDEV-2657
-alter table tl_lafrum11_forum add column submission_deadline datetime default null;
-
-UPDATE lams_tool SET tool_version = "20110408" WHERE tool_signature = "lafrum11";
-
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on
