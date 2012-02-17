@@ -70,9 +70,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<h1>
 				<fmt:message key="activity.title" />
 			</h1>
-			<p>
-				<fmt:message key="label.learning.forceOfflineMessage" />
-			</p>
 			<c:choose>
 				<c:when test="${empty sessionMap.submissionDeadline}">
 					<p>
