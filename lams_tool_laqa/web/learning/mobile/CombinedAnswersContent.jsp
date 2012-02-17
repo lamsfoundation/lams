@@ -1,0 +1,55 @@
+<%@ taglib uri="tags-bean" prefix="bean"%>
+<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="tags-logic" prefix="logic"%>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
+
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
+
+<ul data-role="listview" data-theme="c" id="qaQuestions">
+	<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
+		<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswers}">
+			<c:if test="${questionEntry.key == answerEntry.key}">
+	
+			<li>
+				<p class="space-top">
+				 	<strong><fmt:message key="label.question" /> 
+				 	<c:out	value="${questionEntry.key}" />:</strong>
+					<c:if test="${questionEntry.value.required}">
+						<fmt:message key="label.required" />
+					</c:if>
+					<c:out value="${questionEntry.value.question}" escapeXml="false" />
+				</p>
+					
+				<p class="small-space-top">
+					<strong><fmt:message key="label.answer" /></strong>
+				</p>
+					
+				<div class="small-space-bottom">
+					<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
+				</div>
+			</li>
+			
+			</c:if>
+		</c:forEach>
+	</c:forEach>
+</ul>
+
+<div class="space-top button-inside">
+	<button name="btnCombined" onclick="javascript:submitMethod('submitAnswersContent');" data-theme="b">
+		<fmt:message key="button.submitAllContent" />
+	</button>
+</div>
+
+</div><!-- /page div -->
+
+<div data-role="footer" data-theme="b">
+	<h2>&nbsp;</h2>
+</div><!-- /footer -->
+
