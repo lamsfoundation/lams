@@ -22,7 +22,7 @@ create table tl_laasse10_question_reference (
    random_question tinyint DEFAULT 0,
    assessment_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 
 -- LDEV-2717 Add passing mark feature to assessment tool
 ALTER TABLE tl_laasse10_assessment ADD COLUMN passing_mark integer DEFAULT 0;

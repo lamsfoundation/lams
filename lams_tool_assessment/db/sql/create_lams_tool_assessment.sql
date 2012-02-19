@@ -19,7 +19,7 @@ create table tl_laasse10_attachment (
    create_date datetime,
    assessment_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laasse10_assessment (
    uid bigint not null auto_increment,
    create_date datetime,
@@ -48,7 +48,7 @@ create table tl_laasse10_assessment (
    shuffled tinyint,
    attempt_completion_notify tinyint DEFAULT 0,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laasse10_assessment_question (
    uid bigint not null auto_increment,
    question_type smallint,
@@ -72,7 +72,7 @@ create table tl_laasse10_assessment_question (
    assessment_uid bigint,
    session_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laasse10_question_reference (
    uid bigint not null auto_increment,
    question_uid bigint,
@@ -83,7 +83,7 @@ create table tl_laasse10_question_reference (
    random_question tinyint DEFAULT 0,
    assessment_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laasse10_question_option (
    uid bigint not null unique auto_increment,
    question_uid bigint,
@@ -95,7 +95,7 @@ create table tl_laasse10_question_option (
    grade float,
    feedback text,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laasse10_assessment_overall_feedback (
    uid bigint not null unique auto_increment,
    assessment_uid bigint,
@@ -103,7 +103,7 @@ create table tl_laasse10_assessment_overall_feedback (
    grade_boundary integer,
    feedback text,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laasse10_assessment_unit (
    uid bigint not null unique auto_increment,
    question_uid bigint,
@@ -111,7 +111,7 @@ create table tl_laasse10_assessment_unit (
    multiplier float,
    unit varchar(255),
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laasse10_assessment_result (
    uid bigint not null auto_increment,
    assessment_uid bigint,
@@ -122,7 +122,7 @@ create table tl_laasse10_assessment_result (
    maximum_grade integer,
    grade float,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laasse10_question_result (
    uid bigint not null auto_increment,
    assessment_question_uid bigint,
@@ -135,7 +135,7 @@ create table tl_laasse10_question_result (
    penalty float,
    finish_date datetime DEFAULT NULL,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laasse10_option_answer (
    uid bigint not null unique auto_increment,
    question_result_uid bigint,
@@ -143,7 +143,7 @@ create table tl_laasse10_option_answer (
    answer_boolean boolean,
    answer_int integer,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laasse10_session (
    uid bigint not null auto_increment,
    session_end_date datetime,
@@ -153,7 +153,7 @@ create table tl_laasse10_session (
    session_id bigint,
    session_name varchar(250),
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laasse10_user (
    uid bigint not null auto_increment,
    user_id bigint,
@@ -164,7 +164,7 @@ create table tl_laasse10_user (
    session_uid bigint,
    assessment_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 alter table tl_laasse10_attachment add index FK_NEW_1720029621_1E7009430E79035 (assessment_uid), add constraint FK_NEW_1720029621_1E7009430E79035 foreign key (assessment_uid) references tl_laasse10_assessment (uid);
 alter table tl_laasse10_assessment add index FK_NEW_1720029621_89093BF758092FB (create_by), add constraint FK_NEW_1720029621_89093BF758092FB foreign key (create_by) references tl_laasse10_user (uid);
 alter table tl_laasse10_assessment_question add index FK_NEW_1720029621_F52D1F93758092FB (create_by), add constraint FK_NEW_1720029621_F52D1F93758092FB foreign key (create_by) references tl_laasse10_user (uid);

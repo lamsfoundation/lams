@@ -26,7 +26,7 @@ CREATE TABLE tool_imscp_package (
   initial_item varchar(255),
   organizationXML text,
   PRIMARY KEY  (sid)
-) TYPE=InnoDB COMMENT='Details of an IMS Content Package';
+) ENGINE=InnoDB COMMENT='Details of an IMS Content Package';
 
 --
 -- Table structure for table 'tool_imscp_userprogress'
@@ -48,5 +48,5 @@ CREATE TABLE tool_imscp_userprogress (
   		FOREIGN KEY (package_id) 
   		REFERENCES tool_imscp_package(sid) 
   		ON DELETE NO ACTION ON UPDATE NO ACTION
-) TYPE=InnoDB COMMENT='Current state for a learner in a session';
+) ENGINE=InnoDB COMMENT='Current state for a learner in a session';
 

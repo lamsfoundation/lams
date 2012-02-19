@@ -16,7 +16,7 @@ CREATE TABLE tl_lanb11_content (
      , date_created DATETIME
      , date_updated DATETIME
      , PRIMARY KEY (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lanb11_session (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -30,7 +30,7 @@ CREATE TABLE tl_lanb11_session (
      , INDEX (nb_content_uid)
      , CONSTRAINT FK_tl_lanb11_session_1 FOREIGN KEY (nb_content_uid)
                   REFERENCES tl_lanb11_content (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lanb11_user (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -43,7 +43,7 @@ CREATE TABLE tl_lanb11_user (
      , INDEX (nb_session_uid)
      , CONSTRAINT FK_tl_lanb11_user_1 FOREIGN KEY (nb_session_uid)
                   REFERENCES tl_lanb11_session (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 
 CREATE TABLE tl_lanb11_attachment (
@@ -57,7 +57,7 @@ CREATE TABLE tl_lanb11_attachment (
      , INDEX (nb_content_uid)
      , CONSTRAINT FK_tl_lanb11_attachment_1 FOREIGN KEY (nb_content_uid)
                   REFERENCES tl_lanb11_content (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 -- Default Content For Noticeboard Tool
 

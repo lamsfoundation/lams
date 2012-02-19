@@ -8,7 +8,7 @@ CREATE TABLE lams_openid_config (
      config_key VARCHAR(20) NOT NULL
    , config_value VARCHAR(255) NOT NULL
    , PRIMARY KEY (config_key)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 INSERT INTO lams_openid_config(config_key, config_value) values ("enabled", "false");
 INSERT INTO lams_openid_config(config_key, config_value) values ("portalURL", "");

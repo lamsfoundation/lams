@@ -19,7 +19,7 @@ create table tl_lavidr10_attachment (
 	create_date datetime,
 	videoRecorder_uid bigint,
 	primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 
 create table tl_lavidr10_videoRecorder (
 	uid bigint not null auto_increment,
@@ -47,7 +47,7 @@ create table tl_lavidr10_videoRecorder (
 	export_offline bit,
 	export_all bit,
 	primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 
 create table tl_lavidr10_session (
 	uid bigint not null auto_increment, 
@@ -58,7 +58,7 @@ create table tl_lavidr10_session (
 	videoRecorder_uid bigint,
 	content_folder_id varchar(32),
 	primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 
 create table tl_lavidr10_recording (
 	uid bigint not null auto_increment,
@@ -74,7 +74,7 @@ create table tl_lavidr10_recording (
 	is_just_sound bit,
 	videoRecorder_session_uid bigint,
 	primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 
 create table tl_lavidr10_user (
 	uid bigint not null auto_increment,
@@ -85,7 +85,7 @@ create table tl_lavidr10_user (
 	videoRecorder_session_uid bigint,
 	entry_uid bigint,
 	primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 
 create table tl_lavidr10_comment (
    uid bigint not null auto_increment,
@@ -95,7 +95,7 @@ create table tl_lavidr10_comment (
    create_by bigint,
    create_date datetime,
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 create table tl_lavidr10_rating (
    uid bigint not null auto_increment,
@@ -105,7 +105,7 @@ create table tl_lavidr10_rating (
    create_by bigint,
    create_date datetime,
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 alter table tl_lavidr10_attachment add index FK_NEW_75587508_12090F57FC940906 (videoRecorder_uid), add constraint FK_NEW_75587508_12090F57FC940906 foreign key (videoRecorder_uid) references tl_lavidr10_videoRecorder (uid);
 alter table tl_lavidr10_session add index FK_NEW_75587508_B7C198E2FC940906 (videoRecorder_uid), add constraint FK_NEW_75587508_B7C198E2FC940906 foreign key (videoRecorder_uid) references tl_lavidr10_videoRecorder (uid);
@@ -161,6 +161,6 @@ CREATE TABLE tl_lavidr10_conditions (
                   REFERENCES lams_branch_condition(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
 	 , CONSTRAINT VideoRecorderConditionToVideoRecorder FOREIGN KEY (content_uid)
                   REFERENCES tl_lavidr10_videoRecorder(uid) ON DELETE CASCADE ON UPDATE CASCADE
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 SET FOREIGN_KEY_CHECKS=1;

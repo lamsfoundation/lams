@@ -28,7 +28,7 @@ update_date datetime,
 create_by bigint,
 answer_submit_notify tinyint DEFAULT 0,
 primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 
 
 create table tl_lasurv11_answer (
@@ -39,7 +39,7 @@ answer_choices varchar(255),
 udpate_date datetime, 
 answer_text text, 
 primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 
 create table tl_lasurv11_attachment (
 uid bigint not null auto_increment, 
@@ -50,7 +50,7 @@ file_uuid bigint,
 create_date datetime, 
 survey_uid bigint, 
 primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 
 create table tl_lasurv11_option (
 uid bigint not null auto_increment, 
@@ -58,7 +58,7 @@ description text,
 sequence_id integer, 
 question_uid bigint, 
 primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 
 create table tl_lasurv11_question (
 uid bigint not null auto_increment, 
@@ -72,7 +72,7 @@ optional smallint,
 allow_multiple_answer smallint,
 survey_uid bigint, 
 primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 
 create table tl_lasurv11_session (
 uid bigint not null auto_increment, 
@@ -82,7 +82,7 @@ survey_uid bigint,
 session_id bigint, 
 session_name varchar(250), 
 primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 
 create table tl_lasurv11_user (
 uid bigint not null auto_increment, 
@@ -94,7 +94,7 @@ session_uid bigint,
 survey_uid bigint, 
 session_finished smallint, 
 primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lasurv11_conditions (
        condition_id BIGINT(20) NOT NULL
@@ -104,7 +104,7 @@ CREATE TABLE tl_lasurv11_conditions (
                   REFERENCES lams_branch_condition(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
 	 , CONSTRAINT SurveyConditionToSurvey FOREIGN KEY (content_uid)
                   REFERENCES tl_lasurv11_survey(uid) ON DELETE CASCADE ON UPDATE CASCADE
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lasurv11_condition_questions (
  	   condition_id BIGINT(20)
@@ -114,7 +114,7 @@ CREATE TABLE tl_lasurv11_condition_questions (
                   REFERENCES tl_lasurv11_conditions(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
 	 , CONSTRAINT SurveyConditionQuestionToSurveyQuestion FOREIGN KEY (question_uid)
                   REFERENCES tl_lasurv11_question(uid) ON DELETE CASCADE ON UPDATE CASCADE	
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 alter table tl_lasurv11_answer add index FK6DAAFE3BB1423DC1 (user_uid), add constraint FK6DAAFE3BB1423DC1 foreign key (user_uid) references tl_lasurv11_user (uid);
 alter table tl_lasurv11_answer add index FK6DAAFE3B25F3BB77 (question_uid), add constraint FK6DAAFE3B25F3BB77 foreign key (question_uid) references tl_lasurv11_question (uid);

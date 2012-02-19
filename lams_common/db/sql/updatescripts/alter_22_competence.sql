@@ -7,7 +7,7 @@ CREATE TABLE lams_competence (
      , PRIMARY KEY (competence_id)
      , CONSTRAINT LearningDesignCompetenceMap FOREIGN KEY (learning_design_id)
                   REFERENCES lams_learning_design(learning_design_id) ON DELETE CASCADE ON UPDATE CASCADE
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE lams_competence_mapping (
        competence_mapping_id BIGINT NOT NULL UNIQUE auto_increment
@@ -20,4 +20,4 @@ CREATE TABLE lams_competence_mapping (
                   REFERENCES lams_learning_activity (activity_id) ON DELETE CASCADE ON UPDATE CASCADE
 	 , CONSTRAINT FK_lams_competence_mapping_2 FOREIGN KEY (competence_id)
 	                  REFERENCES lams_competence (competence_id) ON DELETE CASCADE ON UPDATE CASCADE
-)TYPE=InnoDB;
+)ENGINE=InnoDB;

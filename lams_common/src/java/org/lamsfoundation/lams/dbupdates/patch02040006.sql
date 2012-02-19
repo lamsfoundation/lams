@@ -30,7 +30,7 @@ CREATE TABLE lams_log_event (
                   REFERENCES lams_lesson (lesson_id)
      , CONSTRAINT FK_lams_event_log_5 FOREIGN KEY (activity_id)
                   REFERENCES lams_learning_activity (activity_id)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 DELETE FROM lams_log_event_type;
 INSERT INTO lams_log_event_type VALUES (1, 'TYPE_TEACHER_LEARNING_DESIGN_CREATE');
@@ -55,7 +55,7 @@ CREATE TABLE lams_ext_server_lesson_map (
   UNIQUE KEY `lesson_id` (`lesson_id`),
   CONSTRAINT lams_ext_server_lesson_map_fk1 FOREIGN KEY (ext_server_org_map_id) REFERENCES lams_ext_server_org_map (sid) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT lams_ext_server_lesson_map_fk2 FOREIGN KEY (lesson_id) REFERENCES lams_lesson (lesson_id) ON DELETE CASCADE ON UPDATE CASCADE
-) TYPE=InnoDB;
+) ENGINE=InnoDB;
 
 -- LDEV-2642 and LDEV-2646 Move metadata to separate table. Use LD ID rather than ZIPed file for template.
 CREATE TABLE lams_planner_activity_metadata (
@@ -66,7 +66,7 @@ CREATE TABLE lams_planner_activity_metadata (
 	 , editing_advice VARCHAR(255)
      , CONSTRAINT FK_lams_planner_metadata_primary FOREIGN KEY (activity_id)
                   REFERENCES lams_learning_activity (activity_id) ON DELETE CASCADE ON UPDATE CASCADE
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 ALTER TABLE lams_planner_nodes DROP COLUMN file_uuid, DROP COLUMN file_name, ADD COLUMN ld_id BIGINT(20), ADD COLUMN teachers_permissions TINYINT UNSIGNED;
 
@@ -119,7 +119,7 @@ CREATE TABLE lams_lesson_dependency (
    , CONSTRAINT FK_lams_lesson_dependency_2 FOREIGN KEY (preceding_lesson_id)
                   REFERENCES lams_lesson (lesson_id) ON DELETE CASCADE ON UPDATE CASCADE
    , PRIMARY KEY (lesson_id,preceding_lesson_id)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 ALTER TABLE lams_lesson DROP COLUMN release_date;
 

@@ -12,7 +12,7 @@ CREATE TABLE lams_user_disabled_tutorials (
    , CONSTRAINT FK_lams_user_disabled_tutorials_1 FOREIGN KEY (user_id)
                   REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
    , PRIMARY KEY (user_id,page_str)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 -- LDEV-2374
 ALTER TABLE lams_learning_activity ADD COLUMN transition_to_id BIGINT(20);
@@ -37,7 +37,7 @@ CREATE TABLE lams_data_flow (
 	, CONSTRAINT FK_lams_learning_transition_1 FOREIGN KEY (transition_id)
                   REFERENCES lams_learning_transition (transition_id) ON DELETE CASCADE ON UPDATE CASCADE
 	, PRIMARY KEY (data_flow_object_id)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 COMMIT;
 SET AUTOCOMMIT = 1;

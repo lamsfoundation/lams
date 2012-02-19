@@ -29,7 +29,7 @@ CREATE TABLE tl_ladaco10_contents (
    learner_entry_notify tinyint DEFAULT 0,
    record_submit_notify tinyint DEFAULT 0,
    PRIMARY KEY (uid)
-)TYPE=innodb;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_ladaco10_sessions (
    uid bigint NOT NULL UNIQUE auto_increment,
@@ -40,7 +40,7 @@ CREATE TABLE tl_ladaco10_sessions (
    session_id bigint UNIQUE,
    session_name varchar(250),
    PRIMARY KEY (uid)
-)TYPE=innodb;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_ladaco10_attachments (
    uid bigint NOT NULL UNIQUE auto_increment,
@@ -51,7 +51,7 @@ CREATE TABLE tl_ladaco10_attachments (
    create_date datetime ,
    content_uid bigint,
    PRIMARY KEY (uid)
-)TYPE=innodb;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_ladaco10_questions (
    uid bigint NOT NULL UNIQUE auto_increment,
@@ -67,7 +67,7 @@ CREATE TABLE tl_ladaco10_questions (
    content_uid bigint,
    session_uid bigint,
    PRIMARY KEY (uid)
-)TYPE=innodb;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_ladaco10_answer_options 
 (uid bigint NOT NULL UNIQUE auto_increment,
@@ -75,7 +75,7 @@ question_uid bigint,
 sequence_num tinyint unsigned DEFAULT 1,
 answer_option varchar(255),
 PRIMARY KEY (uid))
-TYPE=innodb;
+ENGINE=InnoDB;
 
 CREATE TABLE tl_ladaco10_users (
    uid bigint NOT NULL auto_increment,
@@ -87,7 +87,7 @@ CREATE TABLE tl_ladaco10_users (
    session_uid bigint,
    content_uid bigint,
    PRIMARY KEY (uid)
-)TYPE=innodb;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_ladaco10_answers (
    uid bigint NOT NULL UNIQUE auto_increment,
@@ -101,7 +101,7 @@ CREATE TABLE tl_ladaco10_answers (
    file_version_id bigint,
    create_date datetime,
    PRIMARY KEY (uid)
-)TYPE=innodb;
+)ENGINE=InnoDB;
 
 ALTER TABLE tl_ladaco10_attachments ADD INDEX (content_uid), ADD CONSTRAINT  FOREIGN KEY (content_uid) REFERENCES tl_ladaco10_contents (uid);
 ALTER TABLE tl_ladaco10_contents ADD INDEX  (create_by), ADD CONSTRAINT DacoToUser FOREIGN KEY (create_by) REFERENCES tl_ladaco10_users (uid);

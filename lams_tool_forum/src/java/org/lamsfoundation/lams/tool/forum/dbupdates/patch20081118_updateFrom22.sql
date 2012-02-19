@@ -17,7 +17,7 @@ create table tl_lafrum11_timestamp (
   unique key `uid` (`uid`),
   key `message_uid` (`message_uid`),
   key `forum_user_uid` (`forum_user_uid`)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 alter table tl_lafrum11_timestamp add index ForumUserFK (forum_user_uid), add constraint ForumUserFK foreign key (forum_user_uid) references tl_lafrum11_forum_user (uid);
 alter table tl_lafrum11_timestamp add index MessageFK (message_uid), add constraint MessageFK foreign key (message_uid) references tl_lafrum11_message (uid);

@@ -17,7 +17,7 @@ create table tl_eueadv10_attachment (
    create_date datetime,
    eadventure_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_eueadv10_eadventure (
    uid bigint not null auto_increment,
    create_date datetime,
@@ -44,7 +44,7 @@ create table tl_eueadv10_eadventure (
    complete tinyint,
    define_complete tinyint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_eueadv10_session (
    uid bigint not null auto_increment,
    session_end_date datetime,
@@ -54,7 +54,7 @@ create table tl_eueadv10_session (
    session_id bigint,
    session_name varchar(250),
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_eueadv10_user (
    uid bigint not null auto_increment,
    user_id bigint,
@@ -65,7 +65,7 @@ create table tl_eueadv10_user (
    session_uid bigint,
    eadventure_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_eueadv10_item_log (
    uid bigint not null auto_increment,
    access_date datetime,
@@ -74,7 +74,7 @@ create table tl_eueadv10_item_log (
    complete tinyint,
    session_id bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_eueadv10_var (
    uid bigint not null auto_increment,
    name varchar(255),
@@ -82,7 +82,7 @@ create table tl_eueadv10_var (
    value text,
    visit_log_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_eueadv10_param (
    uid bigint not null auto_increment,
    name varchar(255),
@@ -90,14 +90,14 @@ create table tl_eueadv10_param (
    input tinyint,
    eadventure_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_eueadv10_condition (
    uid bigint not null auto_increment,
    sequence_id integer,
    eadventure_uid bigint,
    name varchar(255),
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_eueadv10_condition_expression (
 	uid bigint not null auto_increment,
 	condition_uid bigint,
@@ -108,7 +108,7 @@ create table tl_eueadv10_condition_expression (
 	sequence_id integer,
 	next_op varchar(255),
 	primary key (uid)	
-)type=innodb;
+)ENGINE=InnoDB;
 alter table tl_eueadv10_attachment add index FK_NEW_1226715514_1E7009430E79035 (eadventure_uid), add constraint FK_NEW_1226715514_1E7009430E79035 foreign key (eadventure_uid) references tl_eueadv10_eadventure (uid);
 alter table tl_eueadv10_eadventure add index FK_NEW_1226715514_89093BF758092FB (create_by), add constraint FK_NEW_1226715514_89093BF758092FB foreign key (create_by) references tl_eueadv10_user (uid);
 alter table tl_eueadv10_item_log add index FK_NEW_1226715514_693580A438BF8DFE (eadventure_item_uid), add constraint FK_NEW_1226715514_693580A438BF8DFE foreign key (eadventure_item_uid) references tl_eueadv10_eadventure (uid);

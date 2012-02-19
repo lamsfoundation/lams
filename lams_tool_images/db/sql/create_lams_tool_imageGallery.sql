@@ -19,7 +19,7 @@ create table tl_laimag10_attachment (
    create_date datetime,
    imageGallery_uid bigint,
    primary key (attachment_uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laimag10_imageGallery (
    uid bigint not null auto_increment,
    create_date datetime,
@@ -43,7 +43,7 @@ create table tl_laimag10_imageGallery (
    allow_rank tinyint,
    image_submit_notify tinyint DEFAULT 0,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laimag10_imageGallery_item (
    uid bigint not null auto_increment,
    description text,
@@ -65,7 +65,7 @@ create table tl_laimag10_imageGallery_item (
    file_type varchar(255),
    file_name varchar(255),
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laimag10_image_comment (
    uid bigint not null auto_increment,
    comment text,
@@ -73,21 +73,21 @@ create table tl_laimag10_image_comment (
    create_by bigint,
    create_date datetime,
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 create table tl_laimag10_image_rating (
    uid bigint not null auto_increment,
    rating integer,
    imageGallery_item_uid bigint,
    create_by bigint,
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 create table tl_laimag10_image_vote (
    uid bigint not null auto_increment,
    is_voted tinyint,
    imageGallery_item_uid bigint,
    create_by bigint,
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 create table tl_laimag10_item_log (
    uid bigint not null auto_increment,
    access_date datetime,
@@ -96,7 +96,7 @@ create table tl_laimag10_item_log (
    complete tinyint,
    session_id bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laimag10_session (
    uid bigint not null auto_increment,
    session_end_date datetime,
@@ -106,7 +106,7 @@ create table tl_laimag10_session (
    session_id bigint,
    session_name varchar(250),
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laimag10_user (
    uid bigint not null auto_increment,
    user_id bigint,
@@ -117,13 +117,13 @@ create table tl_laimag10_user (
    session_uid bigint,
    imageGallery_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laimag10_configuration (
    uid bigint not null auto_increment,
    config_key varchar(30) unique,
    config_value varchar(255),
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 alter table tl_laimag10_attachment add index FK_NEW_1821149711_1E7009430E79035 (imageGallery_uid), add constraint FK_NEW_1821149711_1E7009430E79035 foreign key (imageGallery_uid) references tl_laimag10_imageGallery (uid);
 alter table tl_laimag10_imageGallery add index FK_NEW_1821149711_89093BF758092FB (create_by), add constraint FK_NEW_1821149711_89093BF758092FB foreign key (create_by) references tl_laimag10_user (uid);

@@ -14,7 +14,7 @@ CREATE TABLE lams_input_activity (
      , INDEX (activity_id)
      , CONSTRAINT FK_lams_input_activity_2 FOREIGN KEY (activity_id)
                   REFERENCES lams_learning_activity (activity_id)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 
 CREATE TABLE lams_branch_condition (
@@ -28,7 +28,7 @@ CREATE TABLE lams_branch_condition (
      , end_value VARCHAR(255)
      , exact_match_value VARCHAR(255)
      , PRIMARY KEY (condition_id)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE lams_branch_activity_entry (
        entry_id BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -50,7 +50,7 @@ CREATE TABLE lams_branch_activity_entry (
      , INDEX (condition_id)
      , CONSTRAINT FK_lams_branch_activity_entry_4 FOREIGN KEY (condition_id)
                   REFERENCES lams_branch_condition (condition_id)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 ALTER TABLE lams_learning_activity 
 ADD COLUMN default_activity_id BIGINT(20)
@@ -119,7 +119,7 @@ CREATE TABLE lams_user_organisation_collapsed (
      , PRIMARY KEY (user_organisation_id)
      , CONSTRAINT FK_lams_user_organisation_collapsed_1 FOREIGN KEY (user_organisation_id)
                   REFERENCES lams_user_organisation (user_organisation_id)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 -- LDEV-1301
 ALTER TABLE lams_configuration 

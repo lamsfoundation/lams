@@ -24,7 +24,7 @@ CREATE TABLE tl_lavote11_content (
 	 , max_external_inputs SMALLINT
 	 , submission_deadline datetime DEFAULT NULL
      , PRIMARY KEY (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lavote11_session (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -39,7 +39,7 @@ CREATE TABLE tl_lavote11_session (
      , INDEX (vote_content_id)
      , CONSTRAINT FK_tl_lavote11_session_1 FOREIGN KEY (vote_content_id)
                   REFERENCES tl_lavote11_content (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lavote11_usr (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -53,7 +53,7 @@ CREATE TABLE tl_lavote11_usr (
      , INDEX (vote_session_id)
      , CONSTRAINT FK_tl_lavote11_usr_1 FOREIGN KEY (vote_session_id)
                   REFERENCES tl_lavote11_session (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lavote11_nomination_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -64,7 +64,7 @@ CREATE TABLE tl_lavote11_nomination_content (
      , INDEX (vote_content_id)
      , CONSTRAINT FK_tl_lavote11_nomination_content_1 FOREIGN KEY (vote_content_id)
                   REFERENCES tl_lavote11_content (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lavote11_usr_attempt (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -82,7 +82,7 @@ CREATE TABLE tl_lavote11_usr_attempt (
      , INDEX (vote_nomination_content_id)
      , CONSTRAINT FK_tl_lavote11_usr_attempt_3 FOREIGN KEY (vote_nomination_content_id)
                   REFERENCES tl_lavote11_nomination_content (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lavote11_uploadedfile (
        submissionId BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -94,7 +94,7 @@ CREATE TABLE tl_lavote11_uploadedfile (
      , INDEX (vote_content_id)
      , CONSTRAINT FK_tablex_111 FOREIGN KEY (vote_content_id)
                   REFERENCES tl_lavote11_content (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 
 INSERT INTO tl_lavote11_content(uid, content_id , title , instructions , creation_date , created_by , run_offline , define_later, offline_instructions, online_instructions, content_in_use, retries, lock_on_finish) VALUES (1, ${default_content_id} ,'Voting','Instructions', NOW(), 1,0, 0, '','', 0, 0, 0);

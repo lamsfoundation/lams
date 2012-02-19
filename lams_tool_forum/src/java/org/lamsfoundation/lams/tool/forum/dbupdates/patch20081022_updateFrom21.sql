@@ -13,7 +13,7 @@ CREATE TABLE tl_lafrum11_conditions (
                   REFERENCES lams_branch_condition(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
 	 , CONSTRAINT ForumConditionToForum FOREIGN KEY (content_uid)
                   REFERENCES tl_lafrum11_forum(uid) ON DELETE CASCADE ON UPDATE CASCADE
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lafrum11_condition_topics (
  	   condition_id BIGINT(20)
@@ -23,7 +23,7 @@ CREATE TABLE tl_lafrum11_condition_topics (
                   REFERENCES tl_lafrum11_conditions(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
 	 , CONSTRAINT ForumConditionQuestionToForumQuestion FOREIGN KEY (topic_uid)
                   REFERENCES tl_lafrum11_message(uid) ON DELETE CASCADE ON UPDATE CASCADE	
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 ALTER TABLE tl_lafrum11_forum ADD COLUMN mark_release_notify tinyint DEFAULT 0;
 ----------------------Put all sql statements above here-------------------------

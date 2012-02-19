@@ -28,7 +28,7 @@ create table tl_lasbmt11_content (
    mark_release_notify tinyint DEFAULT 0,
    file_submit_notify tinyint DEFAULT 0,
    primary key (content_id)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 create table tl_lasbmt11_user (
 	uid bigint not null auto_increment, 
 	user_id integer, 
@@ -39,7 +39,7 @@ create table tl_lasbmt11_user (
 	last_name varchar(255), 
 	content_id bigint, 
 	primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 create table tl_lasbmt11_instruction_files (
    uid bigint not null auto_increment,
@@ -49,7 +49,7 @@ create table tl_lasbmt11_instruction_files (
    name varchar(255),
    content_id bigint,
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 create table tl_lasbmt11_report (
    report_id bigint not null auto_increment,
    comments text,
@@ -59,14 +59,14 @@ create table tl_lasbmt11_report (
    mark_file_version_id bigint,
    mark_file_name varchar(255),
    primary key (report_id)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 create table tl_lasbmt11_session (
    session_id bigint not null,
    status integer not null,
    content_id bigint,
    session_name varchar(250),
    primary key (session_id)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 create table tl_lasbmt11_submission_details (
    submission_id bigint not null auto_increment,
    filePath varchar(250),
@@ -77,7 +77,7 @@ create table tl_lasbmt11_submission_details (
    session_id bigint,
    learner_id bigint,
    primary key (submission_id)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 alter table tl_lasbmt11_content add index FKAEF329AC172BC670 (created_by), add constraint FKAEF329AC172BC670 foreign key (created_by) references tl_lasbmt11_user (uid);
 alter table tl_lasbmt11_instruction_files add index FKA75538F9785A173A (content_id), add constraint FKA75538F9785A173A foreign key (content_id) references tl_lasbmt11_content (content_id);

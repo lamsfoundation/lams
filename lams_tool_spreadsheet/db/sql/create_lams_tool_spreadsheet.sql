@@ -13,7 +13,7 @@ create table tl_lasprd10_attachment (
    create_date datetime,
    spreadsheet_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_lasprd10_spreadsheet (
    uid bigint not null auto_increment,
    create_date datetime,
@@ -34,20 +34,20 @@ create table tl_lasprd10_spreadsheet (
    reflect_instructions varchar(255), 
    reflect_on_activity smallint, 
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_lasprd10_user_modified_spreadsheet (
    uid bigint not null auto_increment,
    user_modified_spreadsheet text,
    mark_id bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_lasprd10_spreadsheet_mark (
    uid bigint not null auto_increment,
    marks varchar(255),
    comments text,
    date_marks_released datetime,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_lasprd10_session (
    uid bigint not null auto_increment,
    session_end_date datetime,
@@ -57,7 +57,7 @@ create table tl_lasprd10_session (
    session_id bigint,
    session_name varchar(250),
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_lasprd10_user (
    uid bigint not null auto_increment,
    user_id bigint,
@@ -69,7 +69,7 @@ create table tl_lasprd10_user (
    spreadsheet_uid bigint,
    user_modified_spreadsheet_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 alter table tl_lasprd10_attachment add index FK_NEW_2065267438_1E7009430E79035 (spreadsheet_uid), add constraint FK_NEW_2065267438_1E7009430E79035 foreign key (spreadsheet_uid) references tl_lasprd10_spreadsheet (uid);
 alter table tl_lasprd10_spreadsheet add index FK_NEW_2065267438_89093BF758092FB (create_by), add constraint FK_NEW_2065267438_89093BF758092FB foreign key (create_by) references tl_lasprd10_user (uid);
 alter table tl_lasprd10_session add index FK_NEW_2065267438_24AA78C530E79035 (spreadsheet_uid), add constraint FK_NEW_2065267438_24AA78C530E79035 foreign key (spreadsheet_uid) references tl_lasprd10_spreadsheet (uid);

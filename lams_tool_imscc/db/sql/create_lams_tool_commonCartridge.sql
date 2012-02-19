@@ -17,14 +17,14 @@ create table tl_laimsc11_attachment (
    create_date datetime,
    commonCartridge_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laimsc11_item_instruction (
    uid bigint not null auto_increment,
    description varchar(255),
    sequence_id integer,
    item_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laimsc11_commonCartridge (
    uid bigint not null auto_increment,
    create_date datetime,
@@ -44,7 +44,7 @@ create table tl_laimsc11_commonCartridge (
    reflect_instructions varchar(255), 
    reflect_on_activity smallint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laimsc11_commonCartridge_item (
    uid bigint not null auto_increment,
    file_uuid bigint,
@@ -73,7 +73,7 @@ create table tl_laimsc11_commonCartridge_item (
    commonCartridge_uid bigint,
    session_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laimsc11_item_log (
    uid bigint not null auto_increment,
    access_date datetime,
@@ -82,7 +82,7 @@ create table tl_laimsc11_item_log (
    complete tinyint,
    session_id bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laimsc11_session (
    uid bigint not null auto_increment,
    session_end_date datetime,
@@ -92,7 +92,7 @@ create table tl_laimsc11_session (
    session_id bigint,
    session_name varchar(250),
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laimsc11_user (
    uid bigint not null auto_increment,
    user_id bigint,
@@ -103,13 +103,13 @@ create table tl_laimsc11_user (
    session_uid bigint,
    commonCartridge_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_laimsc11_configuration (
    uid bigint not null auto_increment,
    config_key varchar(30) unique,
    config_value varchar(255),
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 alter table tl_laimsc11_attachment add index FK_NEW_1279208528_1E7009430E79035 (commonCartridge_uid), add constraint FK_NEW_1279208528_1E7009430E79035 foreign key (commonCartridge_uid) references tl_laimsc11_commonCartridge (uid);
 alter table tl_laimsc11_item_instruction add index FK_NEW_1279208528_A5665013980570ED (item_uid), add constraint FK_NEW_1279208528_A5665013980570ED foreign key (item_uid) references tl_laimsc11_commonCartridge_item (uid);

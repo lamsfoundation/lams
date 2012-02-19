@@ -15,7 +15,7 @@ create table tl_lawook10_attachment (
 	create_date datetime, 
 	wookie_uid bigint, 
 	primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 create table tl_lawook10_wookie (
 	uid bigint not null auto_increment, 
@@ -39,7 +39,7 @@ create table tl_lawook10_wookie (
 	widget_width integer,
 	widget_height integer,
 	primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 create table tl_lawook10_session (
 	uid bigint not null auto_increment, 
@@ -55,7 +55,7 @@ create table tl_lawook10_session (
 	widget_maximise bit,
 	widget_identifier varchar(511),
 	primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 create table tl_lawook10_user (
 	uid bigint not null auto_increment, 
@@ -68,13 +68,13 @@ create table tl_lawook10_user (
 	entry_uid bigint, 
 	user_widget_url varchar(511),
 	primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 create table tl_lawook10_configuration (
 	uid bigint not null auto_increment, 
 	config_key varchar(30) unique, 
 	config_value text, primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 alter table tl_lawook10_attachment add index IN_WOOKIE_ATTACH (wookie_uid), add constraint FK_WOOKIE_ATTACH foreign key (wookie_uid) references tl_lawook10_wookie (uid);
 alter table tl_lawook10_session add index IN_WOOKIE_SESSION (wookie_uid), add constraint FK_WOOKIE_SESSION foreign key (wookie_uid) references tl_lawook10_wookie (uid);

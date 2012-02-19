@@ -26,7 +26,7 @@ CREATE TABLE lams_planner_nodes (
 	UNIQUE KEY (parent_uid, order_id),
 	CONSTRAINT FK_lams_planner_node_parent FOREIGN KEY (parent_uid)
 	               REFERENCES lams_planner_nodes(uid) ON DELETE CASCADE ON UPDATE CASCADE
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 -- LDEV-2074 --------------
 ALTER TABLE lams_learning_design ADD COLUMN floating_activity_id BIGINT(20);
 CREATE INDEX idx_design_floating_act ON lams_learning_design (floating_activity_id ASC);
@@ -55,7 +55,7 @@ CREATE TABLE lams_registration (
 	 , server_key VARCHAR(255) NOT NULL
 	 , server_id VARCHAR(255) NOT NULL
      , PRIMARY KEY (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 -- LDEV-2107 --------------
 INSERT into lams_workspace_folder_type VALUES (3, 'PUBLIC SEQUENCES');
@@ -76,7 +76,7 @@ CREATE TABLE lams_activity_evaluation (
 	, CONSTRAINT FK_lams_activity_evaluation_1 FOREIGN KEY (activity_id)
                   REFERENCES lams_learning_activity (activity_id) ON DELETE CASCADE ON UPDATE CASCADE
 	, PRIMARY KEY (activity_evaluation_id)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 -- LDEV-2174 -------------
 ALTER TABLE lams_tool DROP COLUMN classpath_addition;
@@ -100,7 +100,7 @@ CREATE TABLE lams_gradebook_user_activity (
 	, CONSTRAINT FK_lams_gradebook_user_activity_2 FOREIGN KEY (user_id)
                   REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 	, PRIMARY KEY (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE lams_gradebook_user_lesson (
 	  uid BIGINT(20) NOT NULL auto_increment
@@ -114,7 +114,7 @@ CREATE TABLE lams_gradebook_user_lesson (
 	, CONSTRAINT FK_lams_gradebook_user_lesson_2 FOREIGN KEY (user_id)
                   REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
 	, PRIMARY KEY (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 -- LDEV-2207 ------------ Adding flag in lesson to release marks for gradebook
 ALTER TABLE lams_lesson ADD COLUMN marks_released TINYINT DEFAULT 0;
@@ -138,7 +138,7 @@ CREATE TABLE lams_presence_chat_msgs (
 	date_sent DATETIME,
 	message VARCHAR(1023),
 	PRIMARY KEY (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 -- LDEV-2005 Video Recorder configuration stuff --------------
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 

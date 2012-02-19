@@ -19,7 +19,7 @@ create table tl_lawiki10_wiki_page_temp (
 	wiki_session_uid bigint, 
 	primary key (uid), 
 	unique key wiki_unique_key (wiki_uid, title, wiki_session_uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 INSERT INTO tl_lawiki10_wiki_page_temp SELECT * from tl_lawiki10_wiki_page;
 drop table if exists tl_lawiki10_wiki_page;

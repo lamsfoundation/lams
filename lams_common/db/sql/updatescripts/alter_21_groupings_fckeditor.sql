@@ -41,7 +41,7 @@ CREATE TABLE lams_password_request (
      , request_key VARCHAR(32) NOT NULL
      , request_date DATETIME NOT NULL
      , PRIMARY KEY (request_id)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 CREATE UNIQUE INDEX IX_lams_psswd_rqst_key ON lams_password_request (request_key ASC);
 
 CREATE INDEX email ON lams_user (email ASC);

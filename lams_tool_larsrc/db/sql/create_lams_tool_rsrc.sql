@@ -15,14 +15,14 @@ create table tl_larsrc11_attachment (
    create_date datetime,
    resource_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_larsrc11_item_instruction (
    uid bigint not null auto_increment,
    description varchar(255),
    sequence_id integer,
    item_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_larsrc11_resource (
    uid bigint not null auto_increment,
    create_date datetime,
@@ -45,7 +45,7 @@ create table tl_larsrc11_resource (
    reflect_on_activity smallint,
    assigment_submit_notify tinyint DEFAULT 0,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_larsrc11_resource_item (
    uid bigint not null auto_increment,
    file_uuid bigint,
@@ -68,7 +68,7 @@ create table tl_larsrc11_resource_item (
    session_uid bigint,
    order_id integer,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_larsrc11_item_log (
    uid bigint not null auto_increment,
    access_date datetime,
@@ -78,7 +78,7 @@ create table tl_larsrc11_item_log (
    complete tinyint,
    session_id bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_larsrc11_session (
    uid bigint not null auto_increment,
    session_end_date datetime,
@@ -88,7 +88,7 @@ create table tl_larsrc11_session (
    session_id bigint,
    session_name varchar(250),
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 create table tl_larsrc11_user (
    uid bigint not null auto_increment,
    user_id bigint,
@@ -99,7 +99,7 @@ create table tl_larsrc11_user (
    session_uid bigint,
    resource_uid bigint,
    primary key (uid)
-)type=innodb;
+)ENGINE=InnoDB;
 alter table tl_larsrc11_attachment add index FK1E7009430E79035 (resource_uid), add constraint FK1E7009430E79035 foreign key (resource_uid) references tl_larsrc11_resource (uid);
 alter table tl_larsrc11_item_instruction add index FKA5665013980570ED (item_uid), add constraint FKA5665013980570ED foreign key (item_uid) references tl_larsrc11_resource_item (uid);
 alter table tl_larsrc11_resource add index FK89093BF758092FB (create_by), add constraint FK89093BF758092FB foreign key (create_by) references tl_larsrc11_user (uid);

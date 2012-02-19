@@ -12,7 +12,7 @@ CREATE TABLE TEST_1 (
 TEST_1_INT INT, 
 TEST_1_STR VARCHAR(255), #asdadasdsd
 TEST_1_DATE DATETIME
-) TYPE=InnoDB;
+) ENGINE=InnoDB;
 
 -- more comments
 INSERT INTO TEST_1 VALUES (1, 'foo', NOW());

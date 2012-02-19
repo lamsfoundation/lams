@@ -20,7 +20,7 @@ CREATE TABLE tl_lafrum11_message_rating (
      , INDEX (message_id)
      , CONSTRAINT FK_tl_lafrum11_message_rating_2 FOREIGN KEY (message_id)
                   REFERENCES tl_lafrum11_message (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 
 UPDATE lams_tool SET tool_version = "20110228" WHERE tool_signature = "lafrum11";

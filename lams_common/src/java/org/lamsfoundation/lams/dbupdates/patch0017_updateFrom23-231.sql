@@ -20,7 +20,7 @@ CREATE TABLE lams_ext_server_tool_map (
   UNIQUE KEY unique_adapter_map (ext_server_org_map_id, tool_id),
   CONSTRAINT lams_ext_server_tool_map_fk1 FOREIGN KEY (ext_server_org_map_id) REFERENCES lams_ext_server_org_map (sid) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT lams_ext_server_tool_map_fk2 FOREIGN KEY (tool_id) REFERENCES lams_tool (tool_id) ON DELETE CASCADE ON UPDATE CASCADE
-) TYPE=InnoDB;
+) ENGINE=InnoDB;
 
 -- LDEV-2369 Add tutorial video support
 ALTER TABLE lams_user ADD COLUMN tutorials_disabled TINYINT(1) DEFAULT 0,
@@ -31,7 +31,7 @@ CREATE TABLE lams_user_disabled_tutorials (
   page_str CHAR(5) NOT NULL,
   CONSTRAINT FK_lams_user_disabled_tutorials_1 FOREIGN KEY (user_id) REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
   PRIMARY KEY (user_id,page_str)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 ----------------------Put all sql statements above here-------------------------
 

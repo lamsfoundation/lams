@@ -22,7 +22,7 @@ CREATE TABLE tl_laqa11_content (
      , showOtherAnswers TINYINT(1) NOT NULL DEFAULT 1
      , allow_rich_editor TINYINT(1) NOT NULL DEFAULT 0
      , PRIMARY KEY (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_laqa11_session (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -36,7 +36,7 @@ CREATE TABLE tl_laqa11_session (
      , INDEX (qa_content_id)
      , CONSTRAINT FK_tl_laqa11_session_1 FOREIGN KEY (qa_content_id)
                   REFERENCES tl_laqa11_content (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_laqa11_que_usr (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -50,7 +50,7 @@ CREATE TABLE tl_laqa11_que_usr (
      , INDEX (qa_session_id)
      , CONSTRAINT FK_tl_laqa11_que_usr_1 FOREIGN KEY (qa_session_id)
                   REFERENCES tl_laqa11_session (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_laqa11_que_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -63,7 +63,7 @@ CREATE TABLE tl_laqa11_que_content (
      , INDEX (qa_content_id)
      , CONSTRAINT FK_tl_laqa11_que_content_1 FOREIGN KEY (qa_content_id)
                   REFERENCES tl_laqa11_content (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_laqa11_usr_resp (
        response_id BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -80,7 +80,7 @@ CREATE TABLE tl_laqa11_usr_resp (
      , INDEX (qa_que_content_id)
      , CONSTRAINT FK_tl_laqa11_usr_resp_2 FOREIGN KEY (qa_que_content_id)
                   REFERENCES tl_laqa11_que_content (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_laqa11_response_rating (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -94,7 +94,7 @@ CREATE TABLE tl_laqa11_response_rating (
      , INDEX (response_id)
      , CONSTRAINT FK_tl_laqa11_response_rating_2 FOREIGN KEY (response_id)
                   REFERENCES tl_laqa11_usr_resp (response_id)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_laqa11_uploadedfile (
        submissionId BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -106,7 +106,7 @@ CREATE TABLE tl_laqa11_uploadedfile (
      , INDEX (qa_content_id)
      , CONSTRAINT FK_tl_laqa11_uploadedfile_1 FOREIGN KEY (qa_content_id)
                   REFERENCES tl_laqa11_content (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_laqa11_conditions (
        condition_id BIGINT(20) NOT NULL
@@ -116,7 +116,7 @@ CREATE TABLE tl_laqa11_conditions (
                   REFERENCES lams_branch_condition(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
 	 , CONSTRAINT QaConditionToQaContent FOREIGN KEY (content_uid)
                   REFERENCES tl_laqa11_content(uid) ON DELETE CASCADE ON UPDATE CASCADE
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_laqa11_condition_questions (
  	   condition_id BIGINT(20)
@@ -126,7 +126,7 @@ CREATE TABLE tl_laqa11_condition_questions (
                   REFERENCES tl_laqa11_conditions(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
 	 , CONSTRAINT QaConditionQuestionToQaQuestion FOREIGN KEY (question_uid)
                   REFERENCES tl_laqa11_que_content(uid) ON DELETE CASCADE ON UPDATE CASCADE	
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 -- data for content table
 INSERT INTO tl_laqa11_content (qa_content_id, title, instructions, creation_date, lockWhenFinished)  VALUES (${default_content_id}, 'Q&A', 'Instructions', NOW() , 0);
@@ -140,10 +140,10 @@ drop table if exists tl_laqa11_configuration;
 drop table if exists tl_laqa11_wizard_category;
 drop table if exists tl_laqa11_wizard_cognitive_skill;
 drop table if exists tl_laqa11_wizard_question;
-create table tl_laqa11_configuration (uid bigint not null auto_increment, config_key varchar(30) unique, config_value varchar(255), primary key (uid))TYPE=InnoDB;
-create table tl_laqa11_wizard_category (uid bigint not null auto_increment, title varchar(255) not null, primary key (uid))TYPE=InnoDB;
-create table tl_laqa11_wizard_cognitive_skill (uid bigint not null auto_increment, title varchar(255) not null, category_uid bigint, primary key (uid))TYPE=InnoDB;
-create table tl_laqa11_wizard_question (uid bigint not null auto_increment, cognitive_skill_uid bigint, title text not null, primary key (uid))TYPE=InnoDB;
+create table tl_laqa11_configuration (uid bigint not null auto_increment, config_key varchar(30) unique, config_value varchar(255), primary key (uid))ENGINE=InnoDB;
+create table tl_laqa11_wizard_category (uid bigint not null auto_increment, title varchar(255) not null, primary key (uid))ENGINE=InnoDB;
+create table tl_laqa11_wizard_cognitive_skill (uid bigint not null auto_increment, title varchar(255) not null, category_uid bigint, primary key (uid))ENGINE=InnoDB;
+create table tl_laqa11_wizard_question (uid bigint not null auto_increment, cognitive_skill_uid bigint, title text not null, primary key (uid))ENGINE=InnoDB;
 alter table tl_laqa11_wizard_cognitive_skill add index FK3BA4132BCBB0DC8D (category_uid), add constraint FK3BA4132BCBB0DC8D foreign key (category_uid) references tl_laqa11_wizard_category (uid);
 alter table tl_laqa11_wizard_question add index FKAF08A0C7EFF77FD4 (cognitive_skill_uid), add constraint FKAF08A0C7EFF77FD4 foreign key (cognitive_skill_uid) references tl_laqa11_wizard_cognitive_skill (uid);
 

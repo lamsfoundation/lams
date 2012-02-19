@@ -19,7 +19,7 @@ CREATE TABLE lams_events (
 	 , fail_time DATETIME
 	 , INDEX (scope,name,event_session_id)
      , PRIMARY KEY (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE lams_event_subscriptions (
        uid BIGINT NOT NULL UNIQUE auto_increment
@@ -35,7 +35,7 @@ CREATE TABLE lams_event_subscriptions (
      , INDEX (event_uid)
      , CONSTRAINT EventSubscriptionsToEvent FOREIGN KEY (event_uid)
                   REFERENCES lams_events (uid) ON DELETE CASCADE ON UPDATE CASCADE
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 -- LDEV1909 - Competence Editor Update Scripts ---------------------------------
 CREATE TABLE lams_competence (
@@ -47,7 +47,7 @@ CREATE TABLE lams_competence (
      , PRIMARY KEY (competence_id)
      , CONSTRAINT LearningDesignCompetenceMap FOREIGN KEY (learning_design_id)
                   REFERENCES lams_learning_design(learning_design_id) ON DELETE CASCADE ON UPDATE CASCADE
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE lams_competence_mapping (
        competence_mapping_id BIGINT NOT NULL UNIQUE auto_increment
@@ -60,7 +60,7 @@ CREATE TABLE lams_competence_mapping (
                   REFERENCES lams_learning_activity (activity_id) ON DELETE CASCADE ON UPDATE CASCADE
 	 , CONSTRAINT FK_lams_competence_mapping_2 FOREIGN KEY (competence_id)
 	                  REFERENCES lams_competence (competence_id) ON DELETE CASCADE ON UPDATE CASCADE
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 -- LDEV-1604 - Text based complex conditions -----------------------------------
 CREATE TABLE lams_text_search_condition (
@@ -72,7 +72,7 @@ CREATE TABLE lams_text_search_condition (
      , PRIMARY KEY (condition_id)
 	 , CONSTRAINT TextSearchConditionInheritance FOREIGN KEY (condition_id)
                   REFERENCES lams_branch_condition(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 --  LDEV1929 - Updated script for lesson creation with presence --------------
 ALTER TABLE lams_lesson ADD COLUMN learner_presence_avail TINYINT(1) DEFAULT 0;

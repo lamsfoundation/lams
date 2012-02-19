@@ -20,7 +20,7 @@ create table tl_lafrum11_attachment (
    forum_uid bigint,
    message_uid bigint,
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 create table tl_lafrum11_forum (
    uid bigint not null auto_increment,
    create_date datetime,
@@ -52,7 +52,7 @@ create table tl_lafrum11_forum (
    mark_release_notify tinyint DEFAULT 0,
    submission_deadline datetime,
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 create table tl_lafrum11_forum_user (
    uid bigint not null auto_increment,
    user_id bigint,
@@ -62,7 +62,7 @@ create table tl_lafrum11_forum_user (
    login_name varchar(255),
    session_finished smallint,
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 create table tl_lafrum11_message (
    uid bigint not null auto_increment,
    create_date datetime,
@@ -83,21 +83,21 @@ create table tl_lafrum11_message (
    report_id bigint,
    authored_parent_uid bigint,
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 create table tl_lafrum11_message_seq (
    uid bigint not null auto_increment,
    root_message_uid bigint,
    message_uid bigint,
    message_level smallint,
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 create table tl_lafrum11_report (
    uid bigint not null auto_increment,
    comment text,
    release_date datetime,
    mark float,
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 CREATE TABLE tl_lafrum11_message_rating (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , rating float
@@ -110,7 +110,7 @@ CREATE TABLE tl_lafrum11_message_rating (
      , INDEX (message_id)
      , CONSTRAINT FK_tl_lafrum11_message_rating_2 FOREIGN KEY (message_id)
                   REFERENCES tl_lafrum11_message (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 create table tl_lafrum11_tool_session (
    uid bigint not null auto_increment,
    version integer not null,
@@ -122,7 +122,7 @@ create table tl_lafrum11_tool_session (
    session_id bigint,
    session_name varchar(250),
    primary key (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 CREATE TABLE tl_lafrum11_conditions (
        condition_id BIGINT(20) NOT NULL
 	 , content_uid BIGINT(20)
@@ -131,7 +131,7 @@ CREATE TABLE tl_lafrum11_conditions (
                   REFERENCES lams_branch_condition(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
 	 , CONSTRAINT ForumConditionToForum FOREIGN KEY (content_uid)
                   REFERENCES tl_lafrum11_forum(uid) ON DELETE CASCADE ON UPDATE CASCADE
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lafrum11_condition_topics (
  	   condition_id BIGINT(20)
@@ -141,7 +141,7 @@ CREATE TABLE tl_lafrum11_condition_topics (
                   REFERENCES tl_lafrum11_conditions(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
 	 , CONSTRAINT ForumConditionQuestionToForumQuestion FOREIGN KEY (topic_uid)
                   REFERENCES tl_lafrum11_message(uid) ON DELETE CASCADE ON UPDATE CASCADE	
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 create table tl_lafrum11_timestamp (
   uid BIGINT(20) not null auto_increment,
   message_uid BIGINT(20) not null,
@@ -151,7 +151,7 @@ create table tl_lafrum11_timestamp (
   unique key `uid` (`uid`),
   key `message_uid` (`message_uid`),
   key `forum_user_uid` (`forum_user_uid`)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 alter table tl_lafrum11_attachment add index FK389AD9A2FE939F2A (message_uid), add constraint FK389AD9A2FE939F2A foreign key (message_uid) references tl_lafrum11_message (uid);
 alter table tl_lafrum11_attachment add index FK389AD9A2131CE31E (forum_uid), add constraint FK389AD9A2131CE31E foreign key (forum_uid) references tl_lafrum11_forum (uid);

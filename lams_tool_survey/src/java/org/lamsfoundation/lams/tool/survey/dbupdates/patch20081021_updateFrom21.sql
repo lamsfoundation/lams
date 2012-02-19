@@ -13,7 +13,7 @@ CREATE TABLE tl_lasurv11_conditions (
                   REFERENCES lams_branch_condition(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
 	 , CONSTRAINT SurveyConditionToSurvey FOREIGN KEY (content_uid)
                   REFERENCES tl_lasurv11_survey(uid) ON DELETE CASCADE ON UPDATE CASCADE
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lasurv11_condition_questions (
  	   condition_id BIGINT(20)
@@ -23,7 +23,7 @@ CREATE TABLE tl_lasurv11_condition_questions (
                   REFERENCES tl_lasurv11_conditions(condition_id) ON DELETE CASCADE ON UPDATE CASCADE
 	 , CONSTRAINT SurveyConditionQuestionToSurveyQuestion FOREIGN KEY (question_uid)
                   REFERENCES tl_lasurv11_question(uid) ON DELETE CASCADE ON UPDATE CASCADE	
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 UPDATE lams_tool SET supports_outputs=1 WHERE tool_signature='lasurv11';
 

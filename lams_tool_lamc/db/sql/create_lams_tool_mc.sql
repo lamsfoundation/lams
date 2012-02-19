@@ -23,7 +23,7 @@ CREATE TABLE tl_lamc11_content (
      , submission_deadline datetime DEFAULT NULL
      , UNIQUE UQ_tl_lamc11_content_1 (content_id)
      , PRIMARY KEY (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lamc11_que_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -36,7 +36,7 @@ CREATE TABLE tl_lamc11_que_content (
      , INDEX (mc_content_id)
      , CONSTRAINT FK_tl_lamc11_que_content_1 FOREIGN KEY (mc_content_id)
                   REFERENCES tl_lamc11_content (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lamc11_options_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -48,7 +48,7 @@ CREATE TABLE tl_lamc11_options_content (
      , INDEX (mc_que_content_id)
      , CONSTRAINT FK_tl_lamc11_options_content_1 FOREIGN KEY (mc_que_content_id)
                   REFERENCES tl_lamc11_que_content (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lamc11_session (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -63,7 +63,7 @@ CREATE TABLE tl_lamc11_session (
      , INDEX (mc_content_id)
      , CONSTRAINT FK_tl_lamc_session_1 FOREIGN KEY (mc_content_id)
                   REFERENCES tl_lamc11_content (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lamc11_que_usr (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -79,7 +79,7 @@ CREATE TABLE tl_lamc11_que_usr (
      , INDEX (mc_session_id)
      , CONSTRAINT FK_tl_lamc11_que_usr_1 FOREIGN KEY (mc_session_id)
                   REFERENCES tl_lamc11_session (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lamc11_usr_attempt (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -102,7 +102,7 @@ CREATE TABLE tl_lamc11_usr_attempt (
      , INDEX (que_usr_id)
      , CONSTRAINT FK_tl_lamc11_usr_attempt_4 FOREIGN KEY (que_usr_id)
                   REFERENCES tl_lamc11_que_usr (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 CREATE TABLE tl_lamc11_uploadedfile (
        submissionId BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -114,7 +114,7 @@ CREATE TABLE tl_lamc11_uploadedfile (
      , INDEX (mc_content_id)
      , CONSTRAINT FK_tl_lamc11_uploadedFile FOREIGN KEY (mc_content_id)
                   REFERENCES tl_lamc11_content (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
 
 INSERT INTO tl_lamc11_content(uid, content_id , title, instructions, creation_date , reflect, questions_sequenced , created_by , run_offline , define_later,  offline_instructions, online_instructions, content_in_use, retries, show_report, pass_mark) VALUES (1, ${default_content_id} , 'MCQ', 'Instructions', NOW(), 0, 0, 1, 0, 0, '','', 0, 0, 0, 0);

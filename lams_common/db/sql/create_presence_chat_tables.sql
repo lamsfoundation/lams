@@ -7,5 +7,5 @@ CREATE TABLE lams_presence_chat_msgs (
 	date_sent DATETIME,
 	message VARCHAR(1023),
 	PRIMARY KEY (uid)
-)TYPE=InnoDB;
+)ENGINE=InnoDB;
 
