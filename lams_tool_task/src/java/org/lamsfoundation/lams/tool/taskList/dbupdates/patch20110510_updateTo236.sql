@@ -5,7 +5,7 @@ SET AUTOCOMMIT = 0;
 
 ----------------------Put all sql statements below here-------------------------
 -- LDEV-2657
-alter table tl_latask10_taskList add column submission_deadline datetime default null;
+alter table tl_latask10_tasklist add column submission_deadline datetime default null;
 
 UPDATE lams_tool SET tool_version = "20110510" WHERE tool_signature = "latask10";
 
