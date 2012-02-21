@@ -112,14 +112,6 @@ public class SingleSignOn extends org.apache.catalina.authenticator.SingleSignOn
         		request.setAuthType(entry.getAuthType());
         		request.setUserPrincipal(entry.getPrincipal());
         	    }
-        	} else if (!request.getRequestURI().endsWith(Constants.FORM_ACTION)) {
-        	    // if (log.isDebugEnabled())
-        	    // log.debug(" No cached principal found, erasing SSO cookie");
-        	    deregister(cookie.getValue());
-        	    cookie = new Cookie(cookie.getName(), "");
-        	    cookie.setPath("/");
-        	    cookie.setMaxAge(0);
-        	    response.addCookie(cookie);
         	}
 
 		// Invoke the next Valve in our pipeline
