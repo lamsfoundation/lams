@@ -126,35 +126,37 @@ public class FileValidatorUtil {
     	return validateFileSize(fileSize, largeFile,errorKey, errors);
     	
     }
-    
-    private static boolean validateFileSize(int fileSize, boolean largeFile, String errorKey, ActionMessages errors){
-    	float maxFileSize;
-        
-        //whether we are using large file or not?
-        if(largeFile)
-            maxFileSize = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE);
-        else
-            maxFileSize = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
-        
-        if(fileSize >  maxFileSize){
-            //Set arg0 in message bundle
-            String unit= "";
-            if(maxFileSize >= 1024){
-            	maxFileSize = maxFileSize/1024;
-            	unit = "K";
-            }
-            if(maxFileSize >= 1024){
-            	maxFileSize = maxFileSize/1024;
-            	unit = "M";
-            }
-            NumberFormat format = NumberFormat.getInstance();
-			format.setMaximumFractionDigits(1);
-			String maxSize = format.format(maxFileSize) + unit;
-            
-            //set error message
-            errors.add(errorKey, new ActionMessage(MSG_KEY,maxSize));
-            return false;
-        }
-        return true;
+
+    private static boolean validateFileSize(int fileSize, boolean largeFile, String errorKey, ActionMessages errors) {
+	float maxFileSize = largeFile ? Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)
+		: Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
+
+	if (fileSize > maxFileSize) {
+	    String maxSize = formatSize(maxFileSize);
+
+	    // set error message
+	    errors.add(errorKey, new ActionMessage(MSG_KEY, maxSize));
+	    return false;
+	}
+	return true;
+    }
+
+    public static String formatSize(double size) {
+	String unit = null;
+	if (size >= 1024) {
+	    size = size / 1024;
+	    if (size >= 1024) {
+		size = size / 1024;
+		unit = " MB";
+	    } else {
+		unit = " KB";
+	    }
+	} else {
+	    unit = " B";
+	}
+
+	NumberFormat format = NumberFormat.getInstance();
+	format.setMaximumFractionDigits(1);
+	return format.format(size) + unit;
     }
 }
