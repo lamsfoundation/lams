@@ -234,7 +234,7 @@
 						<include name="common/*"/>
 						<include name="includes/*"/>
 						<include name="layout/*"/>							
-						<include name="learning/*"/>
+						<include name="learning/**"/>
 						<include name="export/*"/>
 						<include name="css/*"/>	   					   				
 						<include name="includes/*"/>	   					   				

@@ -3,6 +3,35 @@ body {
 	font-family: verdana, arial, helvetica, sans-serif;
 }
 
+h2 {/*color:#47bc23;  */
+	font-size:14px; 
+	padding-top:10px;
+	margin-bottom:5px; } 
+
+span.h2font {color:#47bc23;  
+	font-size:14px; } 
+
+h3 {/*color:#47bc23; */
+	font-size:13px; 
+	margin-top:10px;
+	margin-bottom:5px; } 
+
+
+h4 {color:#0087e5; 
+	font-size:11px;
+	margin-top:10px;
+	margin-bottom:10px;
+	padding:0;
+	}
+	
+h5 {/*color:#47bc23; */
+	font-size:14px;
+	margin-right:40px;
+	margin-bottom:8px;
+	}
+	
+.regular-li { font-size: 14px; font-weight: normal; }
+
 /**********************layout of the table with the alternate color for the table heading cell *********************/
 table.alternative-color {
  	 width:100%; 
@@ -59,7 +88,6 @@ table.forum th {
 }
 
 table.forum td.posted-by {
-	background: url('../images/css/forum_postedby_bg.jpg') repeat-x; 
 	height:20px; 
 	padding-left:15px; 
 	padding-top:0px; 
@@ -132,7 +160,7 @@ hr {border:0px;
 	border: 1px solid #E82A28;
 }
 
-.ui-finishbtn-right { float: right;padding-right: 40px; }
+.ui-finishbtn-right { float: right;padding-right: 40px; min-height: 30px;}
 
 .button-inside {font-size: 16px;}
 
