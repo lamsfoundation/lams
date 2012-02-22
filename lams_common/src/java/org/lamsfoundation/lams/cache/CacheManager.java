@@ -25,14 +25,21 @@ package org.lamsfoundation.lams.cache;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.ObjectName;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
+import org.hibernate.SessionFactory;
+import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.persister.collection.AbstractCollectionPersister;
+import org.hibernate.persister.entity.EntityPersister;
 import org.jboss.cache.Cache;
 import org.jboss.cache.CacheException;
 import org.jboss.cache.Fqn;
@@ -51,6 +58,7 @@ public class CacheManager implements ICacheManager {
 
     /* Spring configured variables */
     private String cacheObjectName = null;
+    private SessionFactory sessionFactory;
 
     /*
      * There is one cache across the whole system, so it should be safe to use a static cache bean. Do not use this
@@ -66,6 +74,11 @@ public class CacheManager implements ICacheManager {
      * required.
      */
     private Cache getCache() {
+	throw new NotImplementedException("You can not retrieve Cache using JMX on current JBoss version");
+	
+	/* OLD implementation, to be revised on next JBoss upgrade
+	 
+	 
 	if (cache == null) {
 
 	    try {
@@ -76,7 +89,8 @@ public class CacheManager implements ICacheManager {
 		 * When migrating to JBoss 5, the way the Cache is accessed had to be changed. Also, currently Cache is
 		 * not exposed by JMX, so it is also unavailable for Cache Manager. Trying to retrieve it causes an
 		 * error. This will be fixed in the future.
-		 */
+		 * /
+	
 		MBeanServer server = JMXUtil.getMBeanServer();
 		CacheJmxWrapperMBean wrapper = (CacheJmxWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(
 			server, ObjectName.getInstance(cacheObjectName), CacheJmxWrapperMBean.class, false);
@@ -98,6 +112,7 @@ public class CacheManager implements ICacheManager {
 	    }
 	}
 	return cache;
+	*/
     }
 
     /** Get the String[] version of the objects class name. */
@@ -206,7 +221,7 @@ public class CacheManager implements ICacheManager {
 	}
     }
 
-    public Map getCachedItems() {
+    public Map<String,Set<String>> getCachedItems() {
 	Cache cache = getCache();
 	Map allChildNames = new TreeMap();
 	if (cache == null) {
@@ -215,6 +230,48 @@ public class CacheManager implements ICacheManager {
 	    addChildren("/", cache, allChildNames);
 	}
 	return allChildNames;
+    }
+
+    public Set<String> getCachedClasses() {
+	Set<String> cachedClasses = new TreeSet<String>();
+
+	for (Entry<String, EntityPersister> cacheEntry : ((Map<String, EntityPersister>) getSessionFactory()
+		.getAllClassMetadata()).entrySet()) {
+	    if (cacheEntry.getValue().hasCache()) {
+		cachedClasses.add(cacheEntry.getKey());
+	    }
+	}
+
+	for (Entry<String, AbstractCollectionPersister> cacheEntry : ((Map<String, AbstractCollectionPersister>) getSessionFactory()
+		.getAllCollectionMetadata()).entrySet()) {
+	    if (cacheEntry.getValue().hasCache()) {
+		cachedClasses.add(cacheEntry.getKey());
+	    }
+	}
+
+	return cachedClasses;
+    }
+    
+    public void clearCachedClass(String className) {
+	for (Entry<String, EntityPersister> cacheEntry : ((Map<String, EntityPersister>) getSessionFactory()
+		.getAllClassMetadata()).entrySet()) {
+	    if ((className == null || className.equals(cacheEntry.getKey())) && cacheEntry.getValue().hasCache()) {
+		getSessionFactory().evictEntity(cacheEntry.getKey());
+		if (log.isDebugEnabled()) {
+		    log.debug("Evicted entity: " + cacheEntry.getKey());
+		}
+	    }
+	}
+
+	for (Entry<String, AbstractCollectionPersister> cacheEntry : ((Map<String, AbstractCollectionPersister>) getSessionFactory()
+		.getAllCollectionMetadata()).entrySet()) {
+	    if ((className == null || className.equals(cacheEntry.getKey())) && cacheEntry.getValue().hasCache()) {
+		getSessionFactory().evictCollection(cacheEntry.getKey());
+		if (log.isDebugEnabled()) {
+		    log.debug("Evicted collection: " + cacheEntry.getKey());
+		}
+	    }
+	}
     }
 
     /*
@@ -283,4 +340,11 @@ public class CacheManager implements ICacheManager {
 	this.cacheObjectName = cacheObjectName;
     }
 
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 }

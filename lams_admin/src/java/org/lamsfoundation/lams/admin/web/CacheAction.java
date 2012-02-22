@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.admin.web;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +36,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.cache.CacheManager;
+import org.lamsfoundation.lams.cache.ICacheManager;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.springframework.web.context.WebApplicationContext;
@@ -42,8 +44,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 /**
- * this is an action where all lams client environments launch.
- * initial configuration of the individual environment setting is done here.
+ * This is an action where all lams client environments launch.
+ * Initial configuration of the individual environment setting is done here.
  * 
  * @struts:action name="CacheActionForm"
  * 				  path="/cache"
@@ -58,7 +60,7 @@ public class CacheAction extends LamsDispatchAction {
 	public static final String NODE_KEY = "node";
 	
 	private static Logger log = Logger.getLogger(CacheAction.class);
-	private static CacheManager manager;
+	private static ICacheManager cacheManager;
     /**
 	 * request for sysadmin environment
 	 */
@@ -67,11 +69,12 @@ public class CacheAction extends LamsDispatchAction {
 			throws IOException, ServletException {
 
 		try {
+			if (log.isDebugEnabled()) {
+			    log.debug("Cache lookup");
+			}
 			
-			log.debug("cache lookup");
-
 			// todo restrict access to admin only. Can't do at present as don't know orgID
-			log.error("CacheAction should be restricted to admin only. No check being done. Please implement.");
+			log.warn("CacheAction should be restricted to admin only. No check being done. Please implement.");
 			/*String login = req.getRemoteUser();
 			int orgId = new Integer(req.getParameter("orgId")).intValue();
 			
@@ -88,7 +91,7 @@ public class CacheAction extends LamsDispatchAction {
 				return mapping.findForward("error");
 			} */
 			
-			Map items = getManager().getCachedItems();
+			Set<String> items = getCacheManager().getCachedClasses();
 			req.setAttribute(CACHE_ENTRIES, items);
 			return mapping.findForward("cache");
 			
@@ -106,33 +109,21 @@ public class CacheAction extends LamsDispatchAction {
 			throws IOException, ServletException {
 
 		try {
-			
-			log.debug("remove");
-
-			// todo restrict access to admin only. Can't do at present as don't know orgID
-			log.error("CacheAction should be restricted to admin only. No check being done. Please implement.");
-			/*String login = req.getRemoteUser();
-			int orgId = new Integer(req.getParameter("orgId")).intValue();
-			
-			if ( isUserInRole(login,orgId,Role.ADMIN))
-			{
-				log.debug("user is admin");
-				Organisation org = service.getOrganisationById(new Integer(orgId));
-				AdminPreparer.prepare(org,req,service);
-				return mapping.findForward("admin");
+		    	// todo restrict access to admin only. Can't do at present as don't know orgID
+		    
+			if (log.isDebugEnabled()) {
+			    log.debug("Remove entity from cache");
 			}
-			else
-			{
-				log.error("User "+login+" tried to get cache admin screen but isn't admin in organisation: "+orgId);
-				return mapping.findForward("error");
-			} */
+		    	String node = WebUtil.readStrParam(req, NODE_KEY);
 
-			String node = WebUtil.readStrParam(req, NODE_KEY, false);
-			getManager().clearCache(node);
+		    	// if node = ALL, remove all cache
+			getCacheManager().clearCachedClass(node.equalsIgnoreCase("ALL") ? null : node);
 			
-			Map items = getManager().getCachedItems();
-			req.setAttribute(CACHE_ENTRIES, items);
-			return mapping.findForward("cache");
+			// so we know what entity has been removed
+			req.setAttribute(NODE_KEY, node);
+			
+			// display the list again
+			return unspecified(mapping,form,req,res);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -140,12 +131,12 @@ public class CacheAction extends LamsDispatchAction {
 		}
 	}
 	
-	private CacheManager getManager(){
-		if(manager==null){
+	private ICacheManager getCacheManager(){
+		if(cacheManager==null){
 			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			manager = (CacheManager) ctx.getBean("cacheManager");
+			cacheManager = (CacheManager) ctx.getBean("cacheManager");
 		}
-		return manager;
+		return cacheManager;
 	}
 
 }

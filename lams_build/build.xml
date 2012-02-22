@@ -489,9 +489,6 @@
 		<copy overwrite="yes" todir="${jboss.ear.deploy}">
 			<fileset dir="${conf.jboss}/service">
 				<include name="mysql*.xml" />
-				<!--
-					<include name="lams-cache-jboss-beans.xml" />
-				-->
 			</fileset>
 	        <filterset>
 	            <filter token="db.name" value="${db.name}"/>

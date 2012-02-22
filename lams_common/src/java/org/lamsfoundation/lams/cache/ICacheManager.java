@@ -24,6 +24,9 @@
 
 package org.lamsfoundation.lams.cache;
 
+import java.util.Map;
+import java.util.Set;
+
 /** Wraps up the JBOSS Cache in some simple methods to add, get and 
  * remove an object to/from the cache. Used for manually caching objects,
  * rather than Hibernate managed objects.
@@ -43,6 +46,14 @@ package org.lamsfoundation.lams.cache;
  * If errors occur putting values in the cache, or getting values from the cache,
  * then they will be logged in the server log. Exceptions are not thrown - better
  * to have the system degrade if the cache isn't available, rather than failing.
+ * 
+ * JBOSS 5 UPDATE:
+ * Due to difficulties in accessing Cache through JMX after upgrade to JBoss 5,
+ * described in LDEV-2071 and LDEV-2811, methods manipulating Cache directly
+ * are now foribidden and throw an exception.
+ * These methods are not used anywhere in LAMS now, but might become handy in future development
+ * and should be reimplemented once necessary tools become available on newer JBoss distribution.
+ * Only new methods based on cached Entity manipulation, not Nodes, are currently available.
  */
 public interface ICacheManager {
 
@@ -82,6 +93,20 @@ public interface ICacheManager {
 	/**
 	 * Remove a particular item from the cache. 
 	 */
-	public abstract void removeItem(String[] classNameParts, Object key);
-
-}
+        public abstract void removeItem(String[] classNameParts, Object key);
+    
+        /**
+         * Gets hierarchical structure of Node -> Children.
+         */
+        public abstract Map<String, Set<String>> getCachedItems();
+    
+        /**
+         * Gets flat set of cached Classes and Collection roles.
+         */
+        public abstract Set<String> getCachedClasses();
+        
+        /**
+         * Evicts all entities given by Class name or Collection role.
+         */
+        public abstract void clearCachedClass(String className);
+    }

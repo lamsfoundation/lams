@@ -5,23 +5,36 @@
 </h4>
 <h1><fmt:message key="cache.title"/></h1>
 <br/>
-<p><fmt:message key="cache.explanation1"/></p>
+<p><fmt:message key="cache.explanation4"/></p>
 <p><fmt:message key="cache.explanation2"/></p>
-<p><fmt:message key="cache.explanation3"/></p>
 
-<!-- cache is a Map, where each key is a node and the value is a set containing the child nodes of this key. Each child node -->
-<!-- may or may not have its own value in the map. -->
+<c:if test="${not empty node}">
+	<div class="info" >
+		<c:choose>
+			<c:when test="${node eq 'ALL'}">
+				<fmt:message key="cache.removed.all" />
+			</c:when>
+			<c:otherwise>
+				<fmt:message key="cache.removed">
+					<fmt:param>${node}</fmt:param>
+				</fmt:message>
+			</c:otherwise>
+		</c:choose>
+	</div>
+</c:if>
 
-<p><fmt:message key="cache.entries.title"/></p>
+<!-- cache is a list, where each item is a cached class -->
 
-<p><ul>
-<c:forEach var="itemEntry" items="${cache}">
-
-<LI><c:out value="${itemEntry.key}"/> <A HREF="cache.do?method=remove&node=<c:out value="${itemEntry.key}"/>"><fmt:message key="cache.button.remove"/></a><BR>
-Children:
-	<c:forEach var="child" items="${itemEntry.value}">
-		<c:out value="${child}"/><BR>
+<p><fmt:message key="cache.entries.title2"/></p>
+<p>
+	<a href="cache.do?method=remove&node=ALL"><fmt:message key="cache.button.remove.all"/></a>
+</p>
+<ul>
+	<c:forEach var="node" items="${cache}">
+		<li><c:out value="${node}"/>
+			<a href="cache.do?method=remove&node=<c:out value="${node}"/>"><fmt:message key="cache.button.remove"/></a>
+			<br/>
+		</li>
 	</c:forEach>
+</ul>
 
-</c:forEach>
-</ul></p>
