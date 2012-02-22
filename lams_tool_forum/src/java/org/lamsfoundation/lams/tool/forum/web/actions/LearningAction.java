@@ -92,8 +92,6 @@ public class LearningAction extends Action {
 
     private static final boolean MODE_OPTIONAL = false;
 
-    private static final int UPLOAD_MAX_FILE_SIZE = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
-
     private IForumService forumService;
 
     @Override
@@ -623,11 +621,12 @@ public class LearningAction extends Action {
 	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
 	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
 
-	if (sessionMap.get(ForumConstants.ATTR_UPLOAD_MAX_FILE_SIZE) == null && LearningAction.UPLOAD_MAX_FILE_SIZE > 0) {
-	    sessionMap.put(ForumConstants.ATTR_UPLOAD_MAX_FILE_SIZE,
-		    FileValidatorUtil.formatSize(LearningAction.UPLOAD_MAX_FILE_SIZE));
+	int uploadMaxFileSize = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
+	// it defaults to -1 if property was not found
+	if (uploadMaxFileSize > 0) {
+	    sessionMap.put(ForumConstants.ATTR_UPLOAD_MAX_FILE_SIZE, FileValidatorUtil.formatSize(uploadMaxFileSize));
 	}
-	
+
 	return mapping.findForward("success");
     }
 
