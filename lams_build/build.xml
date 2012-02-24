@@ -618,94 +618,269 @@
 		
 	</target>
 	
-	<target name="slim-jboss" description="makes a backup and removes unnecessary services from JBoss 5; do not run twice!">
+	<target name="slim-jboss" description="Makes a backup and removes unnecessary files from JBoss 5.1; do not run twice!">
 		<!-- Backup -->
-		<copy todir="${jboss.server.instance}/slim-backup/deploy">
+		<copy todir="${jboss.server.instance}/slim-backup/server/default/deploy">
 			<fileset dir="${jboss.ear.deploy}/">
-				<include name="ejb2-container-jboss-beans.xml"/>
-				<include name="ejb2-timer-service.xml"/>
-				<include name="ejb3-connectors-jboss-beans.xml"/>
-				<include name="ejb3-container-jboss-beans.xml"/>
-				<include name="ejb3-interceptors-aop.xml"/>
-				<include name="ejb3-timerservice-jboss-beans.xml"/>
+				<include name="ejb*.xml"/>
+				<include name="jms-ra.rar"/>
+				<include name="quartz-ra.rar"/>
+				<include name="mail*.xml"/>
+				<include name="schedule*.xml"/>
+				<include name="hsqldb-ds.xml"/>
+				<include name="hdscanner-jboss-beans.xml"/>
+				<include name="jboss-xa-jdbc.rar"/>
+				<include name="sqlexception-service.xml"/>
+				<include name="legacy-invokers-service.xml"/>
 				<include name="jsr88-service.xml"/>
 				<include name="monitoring-service.xml"/>
 				<include name="profileservice-jboss-beans.xml"/>
-				<include name="schedule-manager-service.xml"/>
-				<include name="scheduler-service.xml"/>
 				<include name="transaction-service.xml"/>
-				<include name="jbossws.sar/"/>
+				
 				<include name="profileservice-secured.jar/"/>
+				<include name="uuid-key-generator.sar/"/>
+				<include name="messaging/"/>
+				<include name="jbossws.sar/"/>	
 				<include name="admin-console.war/"/>
+				<include name="jmx-remoting.sar/"/>
+                <include name="jmx-console.war/"/>	
 				<include name="xnio-provider.jar/"/>
 				<include name="http-invoker.sar/"/>
                 <include name="management/"/>
-                <include name="jmx-console.war/"/>
+				<include name="ROOT.war/"/>
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.server.instance}/slim-backup/deployers">
+		<copy todir="${jboss.server.instance}/slim-backup/server/default/deployers">
 			<fileset dir="${jboss.server.instance}/deployers">
+				<include name="ejb3-timerservice-jboss-beans.xml"/>
+				<include name="jboss-ejb3-endpoint-deployer.jar"/>
+				<include name="ejb-deployer-jboss-beans.xml"/>
+				<include name="messaging-definitions-jboss-beans.xml"/>
+				<include name="hibernate-deployer-jboss-beans.xml"/>
 				<include name="jsr77-deployers-jboss-beans.xml"/>
 				<include name="logbridge-jboss-beans.xml"/>
+				<include name="clustering-deployer-jboss-beans.xml"/>
+				
+				<include name="bsh.deployer/"/>
 				<include name="jbossws.deployer/"/>
 				<include name="seam.deployer/"/>
+				<include name="xnio.deployer/"/>
+				<include name="webbeans.deployer/"/>
 			</fileset>
 		</copy>
 		
-		<copy todir="${jboss.server.instance}/slim-backup/conf">
+		<copy todir="${jboss.server.instance}/slim-backup/server/default/deployers/jbossweb.deployer"
+			  file="${jboss.server.instance}/deployers/jbossweb.deployer/web.xml"/>
+		<copy todir="${jboss.server.instance}/slim-backup/server/default/deployers/jbossweb.deployer/META-INF"
+			  file="${jboss.server.instance}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml"/>
+		
+		<copy todir="${jboss.server.instance}/slim-backup/server/default/conf">
 			<fileset dir="${jboss.server.instance}/conf">
 				<include name="bootstrap.xml"/>
+				<include name="standardjboss.xml"/>
+				<include name="jax-ws-catalog.xml"/>
+				<include name="chap8.keystore"/>	
 			</fileset>
 		</copy>
 		
-		<!-- Configuring -->
-		<copy overwrite="yes" file="${conf.jboss}/bootstrap.slim.xml" tofile="${jboss.server.instance}/conf/bootstrap.xml" />
+		<copy todir="${jboss.server.instance}/slim-backup/server/default/conf/props">
+			<fileset dir="${jboss.server.instance}/conf/props">
+				<include name="messaging-*.properties"/>
+				<include name="jbossws-*.properties"/>
+			</fileset>
+		</copy>
 		
-		<delete file="${jboss.ear.deploy}/ejb2-container-jboss-beans.xml"/>
-		<delete file="${jboss.ear.deploy}/ejb2-timer-service.xml"/>
-		<delete file="${jboss.ear.deploy}/ejb3-connectors-jboss-beans.xml"/>
-		<delete file="${jboss.ear.deploy}/ejb3-container-jboss-beans.xml"/>
-		<delete file="${jboss.ear.deploy}/ejb3-interceptors-aop.xml"/>
-		<delete file="${jboss.ear.deploy}/ejb3-timerservice-jboss-beans.xml"/>
-		<delete file="${jboss.ear.deploy}/jsr88-service.xml"/>
-		<delete file="${jboss.ear.deploy}/monitoring-service.xml"/>
-		<delete file="${jboss.ear.deploy}/profileservice-jboss-beans.xml"/>
-		<delete file="${jboss.ear.deploy}/schedule-manager-service.xml"/>
-		<delete file="${jboss.ear.deploy}/scheduler-service.xml"/>
-		<delete file="${jboss.ear.deploy}/transaction-service.xml"/>
+		<copy todir="${jboss.server.instance}/slim-backup/server/default/conf/bootstrap">
+			<fileset dir="${jboss.server.instance}/conf/bootstrap">
+				<include name="deployers.xml"/>
+			</fileset>
+		</copy>
 		
-		<delete dir="${jboss.ear.deploy}/jbossws.sar/"/>
-		<delete dir="${jboss.ear.deploy}/profileservice-secured.jar/"/>
-		<delete dir="${jboss.ear.deploy}/admin-console.war/"/>
-		<delete dir="${jboss.ear.deploy}/xnio-provider.jar/"/>
-		<delete dir="${jboss.ear.deploy}/http-invoker.sar/"/>
-        <delete dir="${jboss.ear.deploy}/jmx-console.war/"/>
-        <delete dir="${jboss.ear.deploy}/management/"/>
+		<copy todir="${jboss.server.instance}/slim-backup/server/">
+			<fileset dir="${jboss.server}">
+				<include name="all/"/>
+				<include name="minimal"/>
+				<include name="standard"/>
+				<include name="web"/>
+			</fileset>
+		</copy>
 		
-		<delete file="${jboss.server.instance}/deployers/jsr77-deployers-jboss-beans.xml"/>
-		<delete file="${jboss.server.instance}/deployers/logbridge-jboss-beans.xml"/>
+		<copy todir="${jboss.server.instance}/slim-backup/bin/">
+			<fileset dir="${jboss.home}/bin">
+				<include name="password_tool.sh"/>
+				<include name="probe*"/>
+				<include name="twiddle*"/>
+				<include name="ws*"/>
+			</fileset>
+		</copy>
 		
-		<delete dir="${jboss.server.instance}/deployers/jbossws.deployer"/>
-		<delete dir="${jboss.server.instance}/deployers/seam.deployer"/>
+		<copy todir="${jboss.server.instance}/slim-backup/common/lib/">
+			<fileset dir="${jboss.home}/common/lib">
+				<include name="antlr.jar"/>
+				<include name="autonumber-plugin.jar"/>
+				<include name="bcel.jar"/>
+				<include name="bsf.jar"/>
+				<include name="bsh.jar"/>
+				<include name="commons-collections.jar"/>
+				<include name="commons-logging.jar"/>
+				<include name="dtdparser121.jar"/>
+				<include name="hibernate-jmx.jar"/>
+				<include name="hibernate-validator.jar"/>
+				<include name="hsqldb.jar"/>
+				<include name="hsqldb-plugin.jar"/>
+				<include name="jbossas-remoting.jar"/>
+				<include name="jbossha.jar"/>
+				<include name="jboss-iiop.jar"/>
+				<include name="jboss-jaspi-api.jar"/>
+				<include name="jboss-jsr77.jar"/>
+				<include name="jbossjts-jacorb.jar"/>
+				<include name="jboss-management.jar"/>
+				<include name="jboss-messaging.jar"/>
+				<include name="jboss-messaging-int.jar"/>
+				<include name="jboss-monitoring.jar"/>
+				<include name="jboss-negotiation.jar"/>
+				<include name="jboss-profileservice.jar"/>
+				<include name="jboss-remoting-aspects.jar"/>
+				<include name="jboss-security-aspects.jar"/>
+				<include name="jboss-srp.jar"/>
+				<include name="jbossws-native-*.jar"/>
+				<include name="log4j-snmp-appender.jar"/>
+				<include name="mail-plugin.jar"/>
+				<include name="scheduler-*.jar"/>
+				<include name="xnio-api.jar"/>
+			</fileset>
+		</copy>
+		
+		<copy todir="${jboss.server.instance}/slim-backup/">
+			<fileset dir="${jboss.home}/">
+				<include name="jar-versions.xml"/>
+				<include name="readme.html"/>
+				<include name="docs/"/>
+			</fileset>
+		</copy>
+		
+		<!-- Reconfiguration -->
+		<copy overwrite="yes" file="conf/slim/bootstrap.xml" tofile="${jboss.server.instance}/conf/bootstrap.xml"/>
+		<copy overwrite="yes" file="conf/slim/standardjboss.xml" tofile="${jboss.server.instance}/conf/standardjboss.xml"/>
+		<copy overwrite="yes" file="conf/slim/deployers.xml" tofile="${jboss.server.instance}/conf/bootstrap/deployers.xml"/>
+		<copy overwrite="yes" file="conf/slim/legacy-invokers-service.xml" tofile="${jboss.ear.deploy}/legacy-invokers-service.xml"/>
+		<copy overwrite="yes" file="conf/slim/war-deployers-jboss-beans.xml"
+			                  tofile="${jboss.server.instance}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml"/>
+		<copy overwrite="yes" file="conf/slim/web.xml"
+				              tofile="${jboss.server.instance}/deployers/jbossweb.deployer/web.xml"/>
+		
+		<!-- Delete files -->
+		<delete includeemptydirs="true" verbose="true">
+		    <fileset dir="${jboss.ear.deploy}">
+				<include name="ejb*.xml"/>
+				<include name="jms-ra.rar"/>
+				<include name="quartz-ra.rar"/>
+				<include name="mail*.xml"/>
+				<include name="schedule*.xml"/>
+				<include name="hsqldb-ds.xml"/>
+				<include name="hdscanner-jboss-beans.xml"/>
+				<include name="jboss-xa-jdbc.rar"/>
+				<include name="sqlexception-service.xml"/>
+				<include name="jsr88-service.xml"/>
+				<include name="monitoring-service.xml"/>
+				<include name="profileservice-jboss-beans.xml"/>
+				<include name="transaction-service.xml"/>
+				
+				<include name="profileservice-secured.jar/"/>
+				<include name="uuid-key-generator.sar/"/>
+				<include name="messaging/"/>
+				<include name="jbossws.sar/"/>	
+				<include name="admin-console.war/"/>
+				<include name="jmx-remoting.sar/"/>
+                <include name="jmx-console.war/"/>	
+				<include name="xnio-provider.jar/"/>
+				<include name="http-invoker.sar/"/>
+                <include name="management/"/>
+				<include name="ROOT.war/"/>
+		    </fileset>
+			<fileset dir="${jboss.server.instance}/deployers">
+				<include name="ejb3-timerservice-jboss-beans.xml"/>
+				<include name="jboss-ejb3-endpoint-deployer.jar"/>
+				<include name="ejb-deployer-jboss-beans.xml"/>
+				<include name="messaging-definitions-jboss-beans.xml"/>
+				<include name="hibernate-deployer-jboss-beans.xml"/>
+				<include name="jsr77-deployers-jboss-beans.xml"/>
+				<include name="logbridge-jboss-beans.xml"/>
+				<include name="clustering-deployer-jboss-beans.xml"/>
+				
+				<include name="bsh.deployer/"/>
+				<include name="jbossws.deployer/"/>
+				<include name="seam.deployer/"/>
+				<include name="xnio.deployer/"/>
+				<include name="webbeans.deployer/"/>
+			</fileset>
+			<fileset dir="${jboss.server.instance}/conf">
+				<include name="jax-ws-catalog.xml"/>
+				<include name="chap8.keystore"/>	
+			</fileset>
+			<fileset dir="${jboss.server.instance}/conf/props">
+				<include name="messaging-*.properties"/>
+				<include name="jbossws-*.properties"/>
+			</fileset>
+			<fileset dir="${jboss.server}">
+				<include name="all/"/>
+				<include name="minimal/"/>
+				<include name="standard/"/>
+				<include name="web/"/>
+			</fileset>
+		    <fileset dir="${jboss.home}/bin">
+				<include name="password_tool.sh"/>
+				<include name="probe*"/>
+				<include name="twiddle*"/>
+				<include name="ws*"/>
+		    </fileset>
+			<fileset dir="${jboss.home}/common/lib">
+				<include name="antlr.jar"/>
+				<include name="autonumber-plugin.jar"/>
+				<include name="bcel.jar"/>
+				<include name="bsf.jar"/>
+				<include name="bsh.jar"/>
+				<include name="commons-collections.jar"/>
+				<include name="commons-logging.jar"/>
+				<include name="dtdparser121.jar"/>
+				<include name="hibernate-jmx.jar"/>
+				<include name="hibernate-validator.jar"/>
+				<include name="hsqldb.jar"/>
+				<include name="hsqldb-plugin.jar"/>
+				<include name="jbossas-remoting.jar"/>
+				<include name="jbossha.jar"/>
+				<include name="jboss-iiop.jar"/>
+				<include name="jboss-jaspi-api.jar"/>
+				<include name="jboss-jsr77.jar"/>
+				<include name="jbossjts-jacorb.jar"/>
+				<include name="jboss-management.jar"/>
+				<include name="jboss-messaging.jar"/>
+				<include name="jboss-messaging-int.jar"/>
+				<include name="jboss-monitoring.jar"/>
+				<include name="jboss-negotiation.jar"/>
+				<include name="jboss-profileservice.jar"/>
+				<include name="jboss-remoting-aspects.jar"/>
+				<include name="jboss-security-aspects.jar"/>
+				<include name="jboss-srp.jar"/>
+				<include name="jbossws-native-*.jar"/>
+				<include name="log4j-snmp-appender.jar"/>
+				<include name="mail-plugin.jar"/>
+				<include name="scheduler-*.jar"/>
+				<include name="xnio-api.jar"/>
+			</fileset>
+		    <fileset dir="${jboss.home}">
+				<include name="docs/"/>
+				<include name="jar-versions.xml"/>
+				<include name="readme.html"/>
+		    </fileset>
+		</delete>
 	</target>
 	
-	<target name="slim-jboss-revert" description="reverts changes made by slim-jboss task">
-		<copy overwrite="yes" todir="${jboss.ear.deploy}">
-			<fileset dir="${jboss.server.instance}/slim-backup/deploy/">
-				<include name="*/"/>
-			</fileset>
-		</copy>
-		
-		<copy overwrite="yes" todir="${jboss.server.instance}/conf">
-			<fileset dir="${jboss.server.instance}/slim-backup/conf">
-				<include name="*.xml"/>
-			</fileset>
-		</copy>
-		
-		<copy overwrite="yes" todir="${jboss.server.instance}/deployers">
-			<fileset dir="${jboss.server.instance}/slim-backup/deployers">
-				<include name="*/"/>
+	<target name="slim-jboss-revert" description="Reverts changes made by slim-jboss task">
+		<copy overwrite="yes" todir="${jboss.home}" verbose="true">
+			<fileset dir="${jboss.server.instance}/slim-backup/">
+				<include name="*/**"/>
 			</fileset>
 		</copy>
 	</target>
