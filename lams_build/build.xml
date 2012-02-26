@@ -776,7 +776,7 @@
 				<include name="ejb*.xml"/>
 				<include name="jms-ra.rar"/>
 				<include name="quartz-ra.rar"/>
-				<include name="mail*.xml"/>
+				<include name="mail*"/>
 				<include name="schedule*.xml"/>
 				<include name="hsqldb-ds.xml"/>
 				<include name="hdscanner-jboss-beans.xml"/>
