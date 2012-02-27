@@ -46,7 +46,7 @@
 		//constant used for tracking user info
 		var USER_ID  = 'ANONYMOUS';
 		var CKGlobal;
-		var CK
+		var CK;
 		function initialize() {
 			//initialize ckeditor related variables
 			CKGlobal = window.opener.CKEDITOR;
@@ -57,7 +57,7 @@
 				alert(CK.lang.kaltura.KalturaErrorNoconfig);
 				return false;
 			}
-			 
+			
 			//start Kaltura session
 			var kConfig = new KalturaConfiguration(parseInt(PARTNER_ID));
 			kConfig.serviceUrl = KALTURA_SERVER;
@@ -108,17 +108,20 @@
 		
 		//in order to use CKEditor preview feature with IE9 applying http://www.aaronpeters.nl/blog/prevent-double-callback-execution-in-IE9 
 		function saveToCKEditor(entries) {
-			var innerHTML = '';
-			
-			//add divs containing videos
+			//check all videos uploaded successfully
 			for(var i = 0; i < entries.length; i++) {
 				var entryId = entries[i].entryId;
-				innerHTML +=	'<div id="kplayer' + entryId + '"><object height="400" width="360"><embed height="400" type="application/x-shockwave-flash" width="360" src="#"></embed></object></div>';
+				if ((entryId == null) || (entryId == "")) {
+					alert("An error occurred processing this video. Please, reupload it.");
+					return;
+				}
 			}
+			
 			//enable HTML5 support
-			innerHTML +=	'<script type="text/javascript" src="' + KALTURA_SERVER + '/p/' + PARTNER_ID + '/sp/' + SUB_PARTNER_ID + '/embedIframeJs/uiconf_id/' + KDP_UI_CONF_ID + '/partner_id/' + PARTNER_ID + '"><\/script>';
-
-			innerHTML +=	'<script type="text/javascript">';
+			var html5 = CKGlobal.dom.element.createFromHtml( '<script type="text/javascript" src="' + KALTURA_SERVER + '/p/' + PARTNER_ID + '/sp/' + SUB_PARTNER_ID + '/embedIframeJs/uiconf_id/' + KDP_UI_CONF_ID + '/partner_id/' + PARTNER_ID + '"><\/script>' );
+			CK.document.getBody().append(html5);
+			
+			var innerHTML =	'<script type="text/javascript">';
 			
 			// this is the callback function; execute after external script finishes loading
 			innerHTML +=	'    function callback() {';			
@@ -153,10 +156,17 @@
 			innerHTML +=	'	};';
 			innerHTML +=	'}';
 			innerHTML +=	'document.getElementsByTagName("head")[0].appendChild(script);';
-
 			innerHTML +='<\/script>';
+			var embedSwf = CKGlobal.dom.element.createFromHtml( innerHTML );
+			embedSwf.insertAfter(html5);
 			
-			CK.insertHtml(innerHTML);
+			//add divs which will contain videos
+			for(var i = 0; i < entries.length; i++) {
+				var entryId = entries[i].entryId;
+				var div = CKGlobal.dom.element.createFromHtml('<div id="kplayer' + entryId + '"><object height="400" width="360"><embed height="400" type="application/x-shockwave-flash" width="360" src="#"></embed></object></div>' );
+				div.insertAfter(embedSwf);
+			}
+			
 		}
 	// -->
 	</script>
