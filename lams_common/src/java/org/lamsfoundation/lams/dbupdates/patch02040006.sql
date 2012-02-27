@@ -75,7 +75,7 @@ ALTER TABLE lams_planner_nodes CHANGE COLUMN teachers_permissions permissions IN
 
 -- LDEV-2664 Switch learner interface for learners if they use a mobile device
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('ForceMobileDevToUseFlashless','false', 'config.force.mobile.use.flashlesh', 'config.header.features', 'BOOLEAN', 1);
+values ('ForceMobileDevToUseFlashless','true', 'config.force.mobile.use.flashlesh', 'config.header.features', 'BOOLEAN', 1);
 
 -- LDEV-2704 Weaken foreign key's constraints due to problems with learning designs removal
 ALTER TABLE lams_log_event DROP FOREIGN KEY FK_lams_event_log_3;

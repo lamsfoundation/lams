@@ -113,7 +113,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('DisplayPrintButton','false', 'config.display.print.button', 'config.header.features', 'BOOLEAN', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('ForceMobileDevToUseFlashless','false', 'config.force.mobile.use.flashlesh', 'config.header.features', 'BOOLEAN', 1);
+values ('ForceMobileDevToUseFlashless','true', 'config.force.mobile.use.flashlesh', 'config.header.features', 'BOOLEAN', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LDAPProvisioningEnabled','false', 'config.ldap.provisioning.enabled', 'config.header.ldap', 'BOOLEAN', 1);
