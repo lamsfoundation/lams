@@ -354,7 +354,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	ExcelCell[][] summaryData = gradebookService.getCourseDataForExcel(user.getUserId(), organisationId);
 	dataToExport.put(gradebookService.getMessage("gradebook.exportcourse.course.summary"), summaryData);
 
-	String fileName = organisation.getName().replaceAll(" ", "_") + ".xls";
+	String fileName = organisation.getName().replaceAll(" ", "_") + ".xlsx";
 	fileName  = FileUtil.encodeFilenameForDownload(request, fileName);
 	
 	response.setContentType("application/x-download");
