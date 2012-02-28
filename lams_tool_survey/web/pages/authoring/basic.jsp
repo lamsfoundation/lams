@@ -38,10 +38,17 @@
 
 	
 	function editItem(idx,itemType,sessionMapID,contentFolderID){
-		 var reqIDVar = new Date();
+		var reqIDVar = new Date();
 		var url = "<c:url value="/authoring/editItemInit.do?itemIndex="/>" + idx +"&itemType="+itemType+"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID+"&contentFolderID="+contentFolderID;
 		showMessage(url);
 	}
+
+	function copyItem(idx,itemType,sessionMapID,contentFolderID){
+		var reqIDVar = new Date();
+		var url = "<c:url value="/authoring/copyItemInit.do?itemIndex="/>" + idx +"&itemType="+itemType+"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID+"&contentFolderID="+contentFolderID;
+		showMessage(url);
+	}
+	
 	//The panel of survey list panel
 	var surveyListTargetDiv = "surveyListArea";
 	function deleteItem(idx,sessionMapID){

@@ -152,6 +152,9 @@ public class AuthoringAction extends Action {
 	if (param.equals("newItemInit")) {
 	    return newItemlInit(mapping, form, request, response);
 	}
+	if (param.equals("copyItemInit")) {
+	    return copyItemlInit(mapping, form, request, response);
+	}
 	if (param.equals("editItemInit")) {
 	    return editItemInit(mapping, form, request, response);
 	}
@@ -334,6 +337,31 @@ public class AuthoringAction extends Action {
 	}
 	request.setAttribute("instructionList", instructionList);
 	if (questionForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
+	    return mapping.findForward(SurveyConstants.FORWARD_OPEN_QUESTION);
+	} else {
+	    return mapping.findForward(SurveyConstants.FORWARD_CHOICE_QUESTION);
+	}
+    }
+    
+    /**
+     * Create a new question based on existing one.
+     */
+    private ActionForward copyItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	QuestionForm itemForm = (QuestionForm) form;
+	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+
+	int itemIdx = NumberUtils.stringToInt(request.getParameter(SurveyConstants.PARAM_ITEM_INDEX), -1);
+	SortedSet<SurveyQuestion> surveyList = getSurveyItemList(sessionMap);
+	List<SurveyQuestion> rList = new ArrayList<SurveyQuestion>(surveyList);
+	SurveyQuestion item = rList.get(itemIdx);
+	if (item != null) {
+	    populateItemToForm(-1, item, itemForm, request);
+	    itemForm.setItemIndex(null);
+	}
+
+	if (itemForm.getItemType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 	    return mapping.findForward(SurveyConstants.FORWARD_OPEN_QUESTION);
 	} else {
 	    return mapping.findForward(SurveyConstants.FORWARD_CHOICE_QUESTION);

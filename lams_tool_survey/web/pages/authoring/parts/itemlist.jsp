@@ -73,6 +73,14 @@
 				</td>
 				<td width="20px" align="center">
 
+					<img src="<html:rewrite page='/includes/images/page_copy.png'/>"
+						border="0"
+						title="<fmt:message key="label.copy"/>"
+						onclick="copyItem(${status.index},${question.type},'${sessionMapID}','${contentFolderID}')">
+
+				</td>
+				<td width="20px" align="center">
+
 					<img src="<html:rewrite page='/includes/images/cross.gif'/>" border="0"
 						title="<fmt:message
 							key="label.authoring.basic.survey.delete" />"

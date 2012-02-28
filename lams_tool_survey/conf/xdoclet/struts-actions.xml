@@ -80,6 +80,16 @@
 			<forward name="opentext" path="/pages/authoring/parts/addopenquestion.jsp" />
 		</action>
 		
+		<action path="/authoring/copyItemInit"
+			type="org.lamsfoundation.lams.tool.survey.web.action.AuthoringAction"
+			name="questionForm" 
+			scope="request" 
+			validate="false"			
+			parameter="copyItemInit">
+			<forward name="question" path="/pages/authoring/parts/addchoicequestion.jsp" />
+			<forward name="opentext" path="/pages/authoring/parts/addopenquestion.jsp" />
+		</action>
+		
 		<action path="/authoring/editItemInit"
 			type="org.lamsfoundation.lams.tool.survey.web.action.AuthoringAction"
 			name="questionForm" 
