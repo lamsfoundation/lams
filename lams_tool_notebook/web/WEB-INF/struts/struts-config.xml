@@ -64,8 +64,8 @@
         redirect="false"
       />
       <forward
-        name="notebook_display"
-        path="tiles:/monitoring/notebook_display"
+        name="notebookDisplay"
+        path="tiles:/monitoring/notebookDisplay"
         redirect="false"
       />
     </action>
@@ -81,11 +81,6 @@
       <forward
         name="success"
         path="tiles:/authoring/main"
-        redirect="false"
-      />
-      <forward
-        name="message_page"
-        path="tiles:/generic/message"
         redirect="false"
       />
     </action>
