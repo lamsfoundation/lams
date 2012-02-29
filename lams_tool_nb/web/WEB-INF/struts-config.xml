@@ -90,7 +90,7 @@
       />
       <forward
         name="monitorReflectionPage"
-        path=".monitorReflectionPage"
+        path="/monitoring/reflection.jsp"
         redirect="false"
       />
     </action>
@@ -175,11 +175,6 @@
       <forward
         name="authoringContent"
         path="/authoring/authoring.jsp"
-        redirect="false"
-      />
-      <forward
-        name="displayMessage"
-        path=".message"
         redirect="false"
       />
     </action>

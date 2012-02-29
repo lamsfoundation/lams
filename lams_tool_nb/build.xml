@@ -221,6 +221,7 @@ Ant build file.
 				<include name="template/*"/> <!-- used by tiles -->
 				<include name="css/**"/>
 				<include name="authoring/*.*"/>
+				<include name="learning/**"/>
 				<include name="monitoring/*.*"/>
 			</fileset>
 		</war>

@@ -82,7 +82,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  *                parameter="method" validate="true" input="/author_page.jsp"
  *
  * @struts:action-forward name="authoringContent" path="/authoring/authoring.jsp"
- * @struts:action-forward name="displayMessage" path=".message"
  * 
  * ----------------XDoclet Tags--------------------
  */

@@ -70,7 +70,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @struts:action path="/monitoring" name="NbMonitoringForm" scope="request" type="org.lamsfoundation.lams.tool.noticeboard.web.NbMonitoringAction"
  *                input=".monitoringContent" validate="false" parameter="method"
  * @struts:action-forward name="monitorPage" path="/monitoring/monitoring.jsp"
- * @struts:action-forward name="monitorReflectionPage" path=".monitorReflectionPage"
+ * @struts:action-forward name="monitorReflectionPage" path="/monitoring/reflection.jsp"
  * ----------------XDoclet Tags--------------------
  */
 public class NbMonitoringAction extends LamsDispatchAction {
