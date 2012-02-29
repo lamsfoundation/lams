@@ -3,6 +3,8 @@ body {
 	font-family: verdana, arial, helvetica, sans-serif;
 }
 
+body.large-font {font-size: 16px;}
+
 h2 {/*color:#47bc23;  */
 	font-size:14px; 
 	padding-top:10px;
