@@ -115,7 +115,9 @@ public class LessonConditionsAction extends DispatchAction {
 	List<IndexLessonBean> availableLessons = new ArrayList<IndexLessonBean>(organisationLessons.size());
 	for (Lesson organisationLesson : organisationLessons) {
 	    if (!lessonId.equals(organisationLesson.getLessonId())
-		    && !lesson.getPrecedingLessons().contains(organisationLesson)) {
+		    && !lesson.getPrecedingLessons().contains(organisationLesson)
+		    && !Lesson.REMOVED_STATE.equals(organisationLesson.getLessonStateId())
+		    && !Lesson.FINISHED_STATE.equals(organisationLesson.getLessonStateId())) {
 		IndexLessonBean availableLessonBean = new IndexLessonBean(organisationLesson.getLessonId(),
 			organisationLesson.getLessonName());
 		availableLessons.add(availableLessonBean);
