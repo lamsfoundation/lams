@@ -16,11 +16,14 @@
 				</a>
 			</div>
 		</c:if>
-		<table style="table-layout: fixed">
+		<table class="lesson-table" style="table-layout: fixed">
 			<c:forEach var="lesson" items="${orgBean.lessons}">
 				<c:set var="hasLessonToSort">true</c:set>
-				<tr id="<c:out value="${lesson.id}"/>" class="j-single-lesson">
-					<td style="word-wrap: break-word;">
+			<tr id="<c:out value="${lesson.id}"/>" class="j-single-lesson">
+					<td class="td-lesson" style="width: 25px;">
+					<c:if test="${lesson.completed}"> <span class="mycourses-completed-img" title="<fmt:message key="label.completed"/>" >&nbsp;</span> </c:if>
+                    </td>
+					<td class="td-lesson" style="word-wrap: break-word;">
 						<c:choose>
 							<c:when test="${empty lesson.url}">
 								<a title="<c:out value="${lesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${lesson.name}" /></a> 
@@ -29,18 +32,18 @@
 								<a title="<c:out value="${lesson.description}"/>" href="<c:out value="${lesson.url}"/>" class="sequence-name-link"> <c:out value="${lesson.name}" /></a> 
 							</c:otherwise>
 						</c:choose>
-					<td style="width: 150px;">
-						<c:if test="${lesson.completed}"> <span class="mycourses-completed-img" title="<fmt:message key="label.completed"/>" >&nbsp;</span> </c:if>
+                        </td>
+					<td class="td-lesson" style="width: 150px;">
 						<c:if test="${lesson.state eq 4}"> <span class="mycourses-stop-img" title="<fmt:message key="label.disabled"/>" >&nbsp;</span> </c:if>
 						<c:if test="${lesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" >&nbsp;</span> </c:if>
 						<c:if test="${lesson.dependent or lesson.scheduledFinish}"> <span class="mycourses-conditions-img" title="<fmt:message key="index.conditions.flag.tooltip"/>" >&nbsp;</span> </c:if>
 					</td>
 					<c:choose>
 						<c:when test="${empty lesson.links}">
-							<td style="width: 170px;"></td>
+							<td class="td-lesson" style="width: 220px;"></td>
 						</c:when>
 						<c:otherwise>
-							<td class="split-menu-button" style="width: 170px;">
+							<td class="split-menu-button" style="width: 220px;">
 								<ul>
 									<li>
 										<c:forEach var="lessonlink" items="${lesson.links}" varStatus="status">
@@ -53,13 +56,13 @@
 											
 											<c:choose>
 												<c:when test="${status.first}">
-													<a href="#" class="${lessonlink.style}">
+													<a href="#nogo" class="${lessonlink.style}">
 						                        		<span onclick="<c:out value='${lessonlink.url}'/>" title="${tooltip}" 
 						                        		class="${lessonlink.spanStyle}" style="margin-right:0px">
 						                        			<fmt:message key="${lessonlink.name}" /> &nbsp;
 						                        		</span>
-														<em class="">
-															<img src="<lams:LAMSURL/>/images/icons/bullet_arrow_down.png" alt="dropdown">
+														<em class="em-menu-button">
+															<img src="<lams:LAMSURL/>/images/icons/bullet_arrow_down.png" alt="dropdown" style="border-style: none;">
 														</em>
 													</a>
 													<ul class="button-menu">
@@ -149,7 +152,7 @@
 												
 												<c:choose>
 													<c:when test="${status.first}">
-														<a href="#" class="${childlessonlink.style}">
+														<a href="#nogo" class="${childlessonlink.style}">
 							                        		<span onclick="<c:out value='${childlessonlink.url}'/>" title="${tooltip}" 
 							                        		class="${childlessonlink.spanStyle}" style="margin-right:0px">
 							                        			<fmt:message key="${childlessonlink.name}" /> &nbsp;

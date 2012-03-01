@@ -1233,7 +1233,8 @@ My Courses Pages
 /************ The sequence name box **********/
 .sequence-name {
 	margin-top:5px;
-	margin-left:30px;
+	margin-left:10px;
+    margin-right:10px;
 	
 }
 
@@ -1355,16 +1356,16 @@ border:0px;
 .mycourses-addlesson-img {background: url('../images/css/mycourses_addlesson.png') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px;
 }
 
-.mycourses-stop-img {background: url('../images/css/lesson_disabled.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
+.mycourses-stop-img {background: url('../images/css/lesson_disabled.png') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px; 
 }
 
-.mycourses-completed-img {background: url('../images/css/lesson_completed.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
+.mycourses-completed-img {background: url('../images/css/lesson_completed.png') no-repeat 0 3px;  margin-right:5px; padding:5px 0px 5px 25px; 
 }
 
-.mycourses-notifications-img {background: url('../images/css/notifications_go.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px;
+.mycourses-notifications-img {background: url('../images/css/notifications_go.png') no-repeat 0 3px;  margin-right:5px; padding:5px 0px 5px 25px;
 }
 
-.mycourses-conditions-img {background: url('../images/css/conditions.png') no-repeat 0 3px; margin-left:20px; margin-right:5px; padding:5px 0px 5px 25px; 
+.mycourses-conditions-img {background: url('../images/css/conditions.png') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px; 
 }
 
 /* Date and time restriction area in monitor */
@@ -1706,3 +1707,78 @@ ul.more-actions-list li {
         border-right:1px solid #d2d2d2;
         border-bottom: 0px;
 }
+
+/* LDEV-2820 button-dropdown */
+.j-single-lesson {
+    padding-left:3px;
+    padding-right:3px;
+    height:30px; 
+}
+
+.j-single-lesson:hover { background: #F0F8FF; }
+
+.lesson-table {
+    border: 0px;
+    border-spacing:  0px;
+}
+.td-lesson {
+    padding: 2px;
+}
+.em-menu-button {
+    border: none;
+}
+
+.split-menu-button {
+	}
+	.split-menu-button ul {
+		}
+		.split-menu-button ul li {
+			position: relative;
+            list-style-type: none;
+			}
+			.split-menu-button ul li:hover {
+            /*    background-color: #e6e6e6; */
+			}
+			.split-menu-button ul li a {
+                border-bottom: none;
+				display: block;
+				float: left;
+				position: relative;
+				color: #808080;
+				text-decoration: none;
+                border: 1px solid #ccc;
+                background-color: #F5F5F5;
+			}
+				.split-menu-button ul li a:hover, #zone-bar ul li a.zoneCur {
+                     background-color: #e6e6e6;
+				}
+			.split-menu-button ul li ul {
+				display: none;
+				position: absolute;
+				margin-top: 22px;
+				left: -25px;
+				border: 1px solid #ccc;
+				background-color: #FFFFFF;
+				z-index: 1;
+				}
+				.split-menu-button ul li ul li {
+					float: none;
+					padding-top: 3px; 
+                    margin: 0;
+				}
+				.split-menu-button ul li ul li:hover {
+					background: #e6e6e6;
+					}
+					.split-menu-button ul li ul li a {
+						display: block;
+						float: none;
+						margin-left: 5px;
+						width: 170px;
+                        border: 0px;
+                        background-color: #FFFFFF;
+					}
+					.split-menu-button ul li ul li a:hover {
+						/* background: #d9f0b7; */
+					}
+}
+/* end LDEV-2820 */
