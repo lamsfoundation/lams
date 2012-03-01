@@ -21,9 +21,6 @@
 		<link rel="stylesheet" href="<html:rewrite page='/includes/css/jRating.jquery.css'/>"  type="text/css" />
 		<link rel="stylesheet" href="<html:rewrite page='/includes/css/ratingStars.css'/>"  type="text/css" />
 		<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
-		<style type="text/css">
-			body {font-size: 16px;}
-		</style>
 
 		<!-- ********************  javascript from header.jsp ********************** -->
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
@@ -82,7 +79,7 @@
 		</script>			
 		
 	</lams:head>
-	<body>
+	<body class="large-font">
 <div data-role="page" data-cache="false">
 
 	<div data-role="header" data-theme="b">

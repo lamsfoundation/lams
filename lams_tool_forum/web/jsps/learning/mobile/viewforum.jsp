@@ -142,13 +142,13 @@
 					<c:choose>
 						<c:when
 							test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-							<html:button property="continue" onclick="javascript:location.href='${continue}';" styleClass="button">
+							<button name="continue" onclick="javascript:location.href='${continue}';" data-icon="arrow-r">
 								<fmt:message key="label.continue" />
-							</html:button>
+							</button>
 						</c:when>
 		
 						<c:otherwise>
-							<button name="finish" id="finishForum" data-theme="b" data-icon="arrow-r" onclick="finishForum();">
+							<button name="finish" id="finishForum" data-icon="arrow-r" onclick="finishForum();">
 								<fmt:message key="label.finish" />
 							</button>
 						</c:otherwise>

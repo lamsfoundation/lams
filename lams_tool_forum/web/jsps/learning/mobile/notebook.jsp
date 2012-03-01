@@ -17,10 +17,13 @@
 	<html:hidden property="userID" />
 	<html:hidden property="sessionMapID" />
 
-	<div id="content">
+	<div data-role="header" data-theme="b" data-nobackbtn="true">
 		<h1>
 			${sessionMap.title}
 		</h1>
+	</div>
+	
+	<div data-role="content">
 
 		<%@ include file="/common/messages.jsp"%>
 
@@ -31,11 +34,13 @@
 		<html:textarea cols="52" rows="6" property="entryText"
 			styleClass="text-area" />
 
-		<div class="space-bottom-top align-right">
-			<html:link  href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+	</div>
+	
+	<div data-role="footer" data-theme="b" class="ui-bar">
+		<span class="ui-finishbtn-right">
+			<a  href="#nogo" id="finishButton" onclick="submitForm('finish')" data-role="button" data-icon="arrow-r" data-theme="b">
 				<span class="nextActivity"><fmt:message key="label.finish" /></span>
-			</html:link>
-		</div>
-
+			</a>
+		</span>
 	</div>
 </html:form>

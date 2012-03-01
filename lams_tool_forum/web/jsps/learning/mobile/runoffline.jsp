@@ -1,11 +1,13 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-<div id="content">
-
+<div data-role="header" data-theme="b" data-nobackbtn="true">
 	<h1>
 		<fmt:message key="activity.title" />
 	</h1>
+</div>
+
+<div data-role="content">
 
 	<c:choose>
 		<c:when test="${empty sessionMap.submissionDeadline}">
@@ -22,7 +24,12 @@
 		</c:otherwise>
 	</c:choose>
 
-	<div class="space-bottom-top align-right">
+
+</div>
+
+<div data-role="footer" data-theme="b" class="ui-bar">
+	<span class="ui-finishbtn-right">
+	
 		<c:set var="continue">
 			<html:rewrite
 				page="/learning/newReflection.do?sessionMapID=${sessionMapID}" />
@@ -41,21 +48,19 @@
 		<c:choose>
 			<c:when
 				test="${sessionMap.reflectOn && (not sessionMap.finishedLock)}">
-				<html:button property="continue"
-					onclick="javascript:location.href='${continue}';"
-					styleClass="button">
+				<button name="continue" onclick="javascript:location.href='${continue}';" data-icon="arrow-r" data-theme="b">
 					<fmt:message key="label.continue" />
-				</html:button>
+				</button>
 			</c:when>
 			<c:otherwise>
-				<html:link href="#nogo"  property="finish" styleId="finish"
-					onclick="submitFinish();" styleClass="button">
+				<a href="#nogo"  name="finish" id="finish"
+					onclick="submitFinish();" data-role="button" data-icon="arrow-r" data-theme="b">
 					<span class="nextActivity"><fmt:message key="label.finish" /></span>
-				</html:link>
+				</a>
 			</c:otherwise>
 		</c:choose>
-
-	</div>
+		
+	</span>
 </div>
 
 

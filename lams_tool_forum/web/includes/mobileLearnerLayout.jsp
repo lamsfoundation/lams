@@ -15,9 +15,6 @@
 		<title><fmt:message key="activity.title" /></title>
 		
 		<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
-		<style type="text/css">
-			body {font-size: 16px;}
-		</style>
 
 		<!-- ********************  javascript from header.jsp ********************** -->
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
@@ -46,7 +43,7 @@
 		<script src="${lams}includes/javascript/jquery.mobile.js"></script>		
 		
 	</lams:head>
-	<body>
+	<body class="large-font">
 		<tiles:insert attribute="bodyMobile" />
 	</body>
 </lams:html>
