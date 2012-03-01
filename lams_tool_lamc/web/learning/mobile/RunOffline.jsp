@@ -34,11 +34,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html>
 <lams:head>
 	<html:base />
-	<title><fmt:message key="activity.title" />
-	</title>
-	
+	<title><fmt:message key="activity.title" /></title>
+
 	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
+	
 	<script src="${lams}includes/javascript/jquery-1.7.1.min.js"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
 	<script type="text/javascript">
@@ -48,77 +48,69 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				elem.disabled = true;
 			}
 		}
-        function submitForm(methodName){
-            //var f = document.getElementById('messageForm');
-            //f.submit();
-            document.McLearningForm.submit();
-    }
+	         function submitForm(methodName){
+	                var f = document.getElementById('messageForm');
+	                f.submit();
+	        }
 	</script>
 </lams:head>
 
 <body>
-<div data-role="page" data-cache="false">
-
-	<div data-role="header" data-theme="b" data-nobackbtn="true">
-		<h1>
-			<fmt:message key="activity.title" />
-		</h1>
-	</div><!-- /header -->
 
 	<html:form action="/learning?method=displayMc&validate=false"
-		method="POST"  styleId="messageForm" onsubmit="disableFinishButton();">
+		method="POST" onsubmit="disableFinishButton();" styleId="messageForm">
 		<html:hidden property="toolContentID" />
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="httpSessionID" />
 		<html:hidden property="userID" />
 
-
-		<div data-role="content">
-
-			<h1>
-				<fmt:message key="activity.title" />
-			</h1>
-			<c:choose>
-				<c:when test="${empty mcLearnerStarterDTO.submissionDeadline}">
-					<p>
-						<fmt:message key="label.learning.forceOfflineMessage" />
-					</p>
-				</c:when>
-				<c:otherwise>
-					<div class="warning">
-						<fmt:message key="authoring.info.teacher.set.restriction" >
-							<fmt:param><lams:Date value="${mcLearnerStarterDTO.submissionDeadline}" /></fmt:param>
-						</fmt:message>							
-					</div>
-				</c:otherwise>
-			</c:choose>	
-
-		</div>
+		<div data-role="page" data-cache="false">
 		
-		<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
-			<html:hidden property="learnerFinished" value="Finished" />
-		</c:if>
+			<div data-role="header" data-theme="b" data-nobackbtn="true">
+				<h1>
+					<fmt:message key="activity.title" />
+				</h1>
+			</div>
 	
-	
-	<div data-role="footer" data-theme="b" class="ui-bar">
-		<span class="ui-finishbtn-right">
-				<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
-				    <a href="#" id="finishButton" 
-				    	onclick="javascript:submitForm('finish');return false" data-role="button" data-icon="arrow-r" data-theme="b">
-						<span class="nextActivity"><fmt:message key="label.finished" /></span>
-				    </a>
-				</c:if>
+			<div data-role="content">
+				<c:choose>
+					<c:when test="${empty mcLearnerStarterDTO.submissionDeadline}">
+						<p>
+							<fmt:message key="label.learning.forceOfflineMessage" />
+						</p>
+					</c:when>
+					<c:otherwise>
+						<div class="warning">
+							<fmt:message key="authoring.info.teacher.set.restriction" >
+								<fmt:param><lams:Date value="${mcLearnerStarterDTO.submissionDeadline}" /></fmt:param>
+							</fmt:message>							
+						</div>
+					</c:otherwise>
+				</c:choose>			
+			</div>	
+								
+			<div data-role="footer" data-theme="b" class="ui-bar">
+				<span class="ui-finishbtn-right">
 
-				<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}">
-					<html:submit property="forwardtoReflection" styleClass="button">
-						<fmt:message key="label.continue" />
-					</html:submit>
-				</c:if>
-		</span>
-	</div><!-- /footer -->
-	</html:form>
+					<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
+						<html:hidden property="learnerFinished" value="Finished" />
+						
+						<a href="#nogo" id="finishButton" onclick="javascript:submitForm('finish');return false"  data-role="button" data-icon="arrow-r">
+							<span class="nextActivity"><fmt:message key="label.finished" /></span>
+						</a>
+					</c:if>
 	
-</div>
+					<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}">
+						<button type="submit" name="forwardtoReflection" data-icon="arrow-r">
+							<fmt:message key="label.continue" />
+						</button>
+					</c:if>
+				</span>
+			</div>
+			
+			
+		</div>
+	</html:form>
 </body>
 </lams:html>
 
