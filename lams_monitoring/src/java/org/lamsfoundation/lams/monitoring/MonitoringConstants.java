@@ -63,4 +63,5 @@ public class MonitoringConstants {
     public static final int COURSE_TYPE_HAVENT_STARTED_PARTICULAR_LESSON = 8;
     public static final int COURSE_TYPE_HAVENT_STARTED_ANY_LESSONS = 9;
     public static final int COURSE_TYPE_HAVE_FINISHED_THESE_LESSONS = 10;
+    public static final int COURSE_TYPE_HAVENT_FINISHED_THESE_LESSONS = 11;
 }

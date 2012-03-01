@@ -1717,7 +1717,25 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		}
 	    }
 	    break;
-	}	    
+	
+	case MonitoringConstants.COURSE_TYPE_HAVENT_FINISHED_THESE_LESSONS:
+	    users = new TreeSet<User>();
+	    
+	    //add all available users from selected lessons
+	    for (String lessonIdStr : lessonIds) {
+		lessonId = Long.parseLong(lessonIdStr);
+		lesson  = learnerService.getLesson(lessonId);
+		users.addAll(lesson.getAllLearners());
+	    }
+	    
+	    //subtract the ones which have completed any of the selected lessons
+	    for (String lessonIdStr : lessonIds) {
+		lessonId = Long.parseLong(lessonIdStr);
+		List<User> completedLesson = getUsersCompletedLesson(lessonId);
+		users = CollectionUtils.subtract(users, completedLesson);
+	    }
+	    break;
+	}
 	
 	Set<User> sortedUsers = new TreeSet<User>(new Comparator<User>() {
 	    public int compare(User usr0, User usr1) {

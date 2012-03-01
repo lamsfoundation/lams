@@ -193,7 +193,7 @@
 			
 			//process in case of "Have finished these lessons"
 			var lessonIds = "";
-			if (searchType == 10) {
+			if ((searchType == 10) || (searchType == 11)) {
 				$("#lessonsDiv").show();
 
     			var ids = jQuery("#lessonsTable").getGridParam('selarrrow');
@@ -244,6 +244,7 @@
 				<option value="8"><fmt:message key="email.notifications.user.search.property.8" /></option>
 				<option value="9"><fmt:message key="email.notifications.user.search.property.9" /></option>
 				<option value="10"><fmt:message key="email.notifications.user.search.property.10" /></option>
+				<option value="11"><fmt:message key="email.notifications.user.search.property.11" /></option>
 			</select>
 		</div>
 		

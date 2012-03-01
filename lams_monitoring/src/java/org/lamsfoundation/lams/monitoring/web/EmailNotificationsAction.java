@@ -337,9 +337,10 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    break;
 
 	case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_ANY_LESSONS:
-	case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_THESE_LESSONS:
 	case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_PARTICULAR_LESSON:
 	case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_PARTICULAR_LESSON:
+	case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_THESE_LESSONS:
+	case MonitoringConstants.COURSE_TYPE_HAVENT_FINISHED_THESE_LESSONS:
 	    Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	    Assert.notNull(organisationId);
 	    map.put(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
@@ -366,6 +367,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    map.put(AttributeNames.PARAM_LESSON_ID, lessonId);
 	    break;
 	case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_THESE_LESSONS:
+	case MonitoringConstants.COURSE_TYPE_HAVENT_FINISHED_THESE_LESSONS:
 	    String[]  lessonIds = request.getParameterValues(AttributeNames.PARAM_LESSON_ID);
 	    Assert.notNull(lessonIds);
 	    map.put("lessonIDs", lessonIds);
