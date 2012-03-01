@@ -16,35 +16,74 @@
 				</a>
 			</div>
 		</c:if>
-		<c:forEach var="lesson" items="${orgBean.lessons}">
-			<c:set var="hasLessonToSort">true</c:set>
-			<p id="<c:out value="${lesson.id}"/>" class="j-single-lesson">
-				<c:if test="${empty lesson.url}">
-					<a title="<c:out value="${lesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${lesson.name}" /></a> 
-				</c:if>
-				<c:if test="${not empty lesson.url}">
-					<a title="<c:out value="${lesson.description}"/>" href="<c:out value="${lesson.url}"/>" class="sequence-name-link"> <c:out value="${lesson.name}" /></a> 
-				</c:if>
-				<c:if test="${lesson.completed}"> <span class="mycourses-completed-img" title="<fmt:message key="label.completed"/>" >&nbsp;</span> </c:if>
-				<c:if test="${lesson.state eq 4}"> <span class="mycourses-stop-img" title="<fmt:message key="label.disabled"/>" >&nbsp;</span> </c:if>
-				<c:if test="${lesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" >&nbsp;</span> </c:if>
-				<c:if test="${lesson.dependent or lesson.scheduledFinish}"> <span class="mycourses-conditions-img" title="<fmt:message key="index.conditions.flag.tooltip"/>" >&nbsp;</span> </c:if>
-				<c:forEach var="lessonlink" items="${lesson.links}">
-					<c:set var="tooltip" value="" />
-					<c:if test="${lessonlink.tooltip ne null}">
-						<c:set var="tooltip">
-							<fmt:message key="${lessonlink.tooltip}" />
-						</c:set>
-					</c:if>
-				
-					<a href="<c:out value='${lessonlink.url}'/>" class="sequence-action-link ${lessonlink.style}" title="${tooltip}"> 
-						<span class="${lessonlink.spanStyle}"> 
-							<fmt:message key="${lessonlink.name}" /> 
-						</span>
-					</a>
-				</c:forEach>
-			</p>
-		</c:forEach>
+		<table style="table-layout: fixed">
+			<c:forEach var="lesson" items="${orgBean.lessons}">
+				<c:set var="hasLessonToSort">true</c:set>
+				<tr id="<c:out value="${lesson.id}"/>" class="j-single-lesson">
+					<td style="word-wrap: break-word;">
+						<c:choose>
+							<c:when test="${empty lesson.url}">
+								<a title="<c:out value="${lesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${lesson.name}" /></a> 
+							</c:when>
+							<c:otherwise>
+								<a title="<c:out value="${lesson.description}"/>" href="<c:out value="${lesson.url}"/>" class="sequence-name-link"> <c:out value="${lesson.name}" /></a> 
+							</c:otherwise>
+						</c:choose>
+					<td style="width: 150px;">
+						<c:if test="${lesson.completed}"> <span class="mycourses-completed-img" title="<fmt:message key="label.completed"/>" >&nbsp;</span> </c:if>
+						<c:if test="${lesson.state eq 4}"> <span class="mycourses-stop-img" title="<fmt:message key="label.disabled"/>" >&nbsp;</span> </c:if>
+						<c:if test="${lesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" >&nbsp;</span> </c:if>
+						<c:if test="${lesson.dependent or lesson.scheduledFinish}"> <span class="mycourses-conditions-img" title="<fmt:message key="index.conditions.flag.tooltip"/>" >&nbsp;</span> </c:if>
+					</td>
+					<c:choose>
+						<c:when test="${empty lesson.links}">
+							<td style="width: 170px;"></td>
+						</c:when>
+						<c:otherwise>
+							<td class="split-menu-button" style="width: 170px;">
+								<ul>
+									<li>
+										<c:forEach var="lessonlink" items="${lesson.links}" varStatus="status">
+											<c:set var="tooltip" value="" />
+											<c:if test="${lessonlink.tooltip ne null}">
+												<c:set var="tooltip">
+													<fmt:message key="${lessonlink.tooltip}" />
+												</c:set>
+											</c:if>
+											
+											<c:choose>
+												<c:when test="${status.first}">
+													<a href="#" class="${lessonlink.style}">
+						                        		<span onclick="<c:out value='${lessonlink.url}'/>" title="${tooltip}" 
+						                        		class="${lessonlink.spanStyle}" style="margin-right:0px">
+						                        			<fmt:message key="${lessonlink.name}" /> &nbsp;
+						                        		</span>
+														<em class="">
+															<img src="<lams:LAMSURL/>/images/icons/bullet_arrow_down.png" alt="dropdown">
+														</em>
+													</a>
+													<ul class="button-menu">
+												</c:when>
+												<c:otherwise>
+													<li>
+														<a href="<c:out value='${lessonlink.url}'/>" class="${lessonlink.style}">
+															<span class="${lessonlink.spanStyle}" title="${tooltip}"><fmt:message key="${lessonlink.name}" /> &nbsp;</span>
+														</a>
+													</li>
+													<c:if test="${status.last}">
+														</ul>
+													</c:if>
+												</c:otherwise>
+											</c:choose>
+										</c:forEach>
+									</li>
+								</ul>
+			        		</td>
+						</c:otherwise>
+					</c:choose>
+				</tr>
+			</c:forEach>
+		</table>
 		</div>
 	</div>
 		
@@ -74,31 +113,72 @@
 		<div class="sequence-name">
 			<div id="<c:out value="${childOrg.id}"/>" class="j-subgroup-lessons"><c:forEach var="childLesson" items="${childOrg.lessons}">
 				<c:set var="hasLessonToSort">true</c:set>
-				<p id="<c:out value="${childLesson.id}"/>" class="j-single-subgroup-lesson">
-					<c:if test="${empty childLesson.url}">
-						<a title="<c:out value="${childLesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${childLesson.name}" /></a>
-					</c:if>
-					<c:if test="${not empty childLesson.url}">
-						<a title="<c:out value="${childLesson.description}"/>" href="<c:out value='${childLesson.url}'/>" class="sequence-name-link"> <c:out value="${childLesson.name}" /></a> 
-					</c:if>
-					<c:if test="${childLesson.completed}"> <span class="mycourses-completed-img" title="<fmt:message key="label.completed"/>" >&nbsp;</span> </c:if>
-					<c:if test="${childLesson.state eq 4}"> <span class="mycourses-stop-img" title="<fmt:message key="label.disabled"/>" >&nbsp;</span> </c:if>
-					<c:if test="${childLesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" >&nbsp;</span> </c:if>
-					<c:if test="${lesson.dependent or lesson.scheduledFinish}"> <span class="mycourses-conditions-img" title="<fmt:message key="index.conditions.flag.tooltip"/>" >&nbsp;</span> </c:if>
-					<c:forEach var="childlessonlink" items="${childLesson.links}">
-						<c:set var="tooltip" value="" />
-						<c:if test="${childlessonlink.tooltip ne null}">
-							<c:set var="tooltip">
-								<fmt:message key="${childlessonlink.tooltip}" />
-							</c:set>
-						</c:if>
-						<a href="<c:out value='${childlessonlink.url}'/>" class="sequence-action-link ${childlessonlink.style}" title="${tooltip}"> 
-							<span class="${childlessonlink.spanStyle}"> 
-								<fmt:message key="${childlessonlink.name}" /> 
-							</span>
-						</a>
-					</c:forEach>
-				</p>
+				<table style="table-layout: fixed">
+					<tr id="<c:out value="${childLesson.id}"/>" class="j-single-subgroup-lesson">
+						<td style="word-wrap: break-word;">
+							<c:choose>
+								<c:when test="${empty childlesson.url}">
+									<a title="<c:out value="${childlesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${childlesson.name}" /></a> 
+								</c:when>
+								<c:otherwise>
+									<a title="<c:out value="${childlesson.description}"/>" href="<c:out value="${childlesson.url}"/>" class="sequence-name-link"> <c:out value="${childlesson.name}" /></a> 
+								</c:otherwise>
+							</c:choose>
+						</td>
+						<td style="width: 150px;">
+							<c:if test="${childLesson.completed}"> <span class="mycourses-completed-img" title="<fmt:message key="label.completed"/>" >&nbsp;</span> </c:if>
+							<c:if test="${childLesson.state eq 4}"> <span class="mycourses-stop-img" title="<fmt:message key="label.disabled"/>" >&nbsp;</span> </c:if>
+							<c:if test="${childLesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" >&nbsp;</span> </c:if>
+							<c:if test="${lesson.dependent or lesson.scheduledFinish}"> <span class="mycourses-conditions-img" title="<fmt:message key="index.conditions.flag.tooltip"/>" >&nbsp;</span> </c:if>
+						</td>
+						<c:choose>
+							<c:when test="${empty childlesson.links}">
+								<td style="width: 170px;"></td>
+							</c:when>
+							<c:otherwise>
+								<td class="split-menu-button" style="width: 170px;">
+									<ul>
+										<li>
+											<c:forEach var="childlessonlink" items="${childLesson.links}">
+												<c:set var="tooltip" value="" />
+												<c:if test="${childlessonlink.tooltip ne null}">
+													<c:set var="tooltip">
+														<fmt:message key="${childlessonlink.tooltip}" />
+													</c:set>
+												</c:if>
+												
+												<c:choose>
+													<c:when test="${status.first}">
+														<a href="#" class="${childlessonlink.style}">
+							                        		<span onclick="<c:out value='${childlessonlink.url}'/>" title="${tooltip}" 
+							                        		class="${childlessonlink.spanStyle}" style="margin-right:0px">
+							                        			<fmt:message key="${childlessonlink.name}" /> &nbsp;
+							                        		</span>
+															<em class="">
+																<img src="<lams:LAMSURL/>/images/icons/bullet_arrow_down.png" alt="dropdown">
+															</em>
+														</a>
+														<ul class="button-menu">
+													</c:when>
+													<c:otherwise>
+														<li>
+															<a href="<c:out value='${childlessonlink.url}'/>" class="${childlessonlink.style}">
+																<span class="${childlessonlink.spanStyle}" title="${tooltip}"><fmt:message key="${childlessonlink.name}" /> &nbsp;</span>
+															</a>
+														</li>
+														<c:if test="${status.last}">
+															</ul>
+														</c:if>
+													</c:otherwise>
+												</c:choose>
+											</c:forEach>
+										</li>
+									</ul>
+			        			</td>
+		   					</c:otherwise>
+						</c:choose>
+					</tr>
+				</table>
 			</c:forEach></div>
 		</div>
 	</div>

@@ -27,6 +27,7 @@
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>/css/thickbox.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>/css/buttonMenuSplit.css" type="text/css">
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="javascript" type="text/javascript" src="loadVars.jsp"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
@@ -58,6 +59,23 @@
 				 		$.get("${disableAllTutorialVideosUrl}");
 					}
 				</c:if>
+				
+				$(".split-menu-button li em").live("click", function(event) {
+					var hidden = $(this).parents("li").children("ul").is(":hidden");
+					$(this).parents("li").children("ul").hide();
+					$(this).parents("li").children("a").removeClass("zoneCur");
+						
+					if (hidden) {
+						$(this)
+							.parents("li").children("ul").toggle()
+							.parents("li").children("a").addClass("zoneCur");
+						} 
+
+	                event.stopPropagation();
+				   });
+		       $("html").click(function() {
+	                $(".split-menu-button>ul>li>ul").hide();
+	           });
 			});
 		
 			function getEnableSortingText() {

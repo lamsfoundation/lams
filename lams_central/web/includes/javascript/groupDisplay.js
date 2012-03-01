@@ -160,10 +160,10 @@
 						jQuery(element).height()],
 						onStop: function() {
 							var ids = [];
-							jQuery(this).parent().children("p").each(function(i, element) {
+							jQuery(this).siblings("tr").each(function(i, element) {
 								ids.push(element.id);
 							});
-							var jLessonsId = jQuery(this).parent().attr("id");
+							var jLessonsId = jQuery(this).parents("div[class$='lessons']").attr("id");
 							var dashIndex = jLessonsId.indexOf("-");
 							var orgId = (dashIndex>0 ? jLessonsId.substring(0, dashIndex) : jLessonsId);
 							jQuery.ajax({
