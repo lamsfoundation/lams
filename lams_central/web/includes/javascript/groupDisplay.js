@@ -16,7 +16,7 @@
 							toggleGroupContents(element, stateId);
 							registerToolTip(element);
 							jQuery(element).css("display", "block");
-							jQuery("a[class^='thickbox']",element).each(function(){
+							jQuery("a[class*='thickbox']",element).each(function(){
 								tb_init(this);
 							});
 							initMoreActions(element);
