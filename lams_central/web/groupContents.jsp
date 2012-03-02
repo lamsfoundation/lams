@@ -135,7 +135,7 @@
 						<td class="td-lesson" style="width: 150px;">
 							<c:if test="${childLesson.state eq 4}"> <span class="mycourses-stop-img" title="<fmt:message key="label.disabled"/>" >&nbsp;</span> </c:if>
 							<c:if test="${childLesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" >&nbsp;</span> </c:if>
-							<c:if test="${lesson.dependent or lesson.scheduledFinish}"> <span class="mycourses-conditions-img" title="<fmt:message key="index.conditions.flag.tooltip"/>" >&nbsp;</span> </c:if>
+							<c:if test="${childLesson.dependent or childLesson.scheduledFinish}"> <span class="mycourses-conditions-img" title="<fmt:message key="index.conditions.flag.tooltip"/>" >&nbsp;</span> </c:if>
 						</td>
 						<c:choose>
 							<c:when test="${empty childLesson.links}">
