@@ -114,50 +114,53 @@
 		</p>
 		
 		<div class="sequence-name">
-			<div id="<c:out value="${childOrg.id}"/>" class="j-subgroup-lessons"><c:forEach var="childLesson" items="${childOrg.lessons}">
+			<div id="<c:out value="${childOrg.id}"/>" class="j-subgroup-lessons">
+			<c:forEach var="childLesson" items="${childOrg.lessons}">
 				<c:set var="hasLessonToSort">true</c:set>
-				<table style="table-layout: fixed">
+				<table class="lesson-table" style="table-layout: fixed">
 					<tr id="<c:out value="${childLesson.id}"/>" class="j-single-subgroup-lesson">
-						<td style="word-wrap: break-word;">
+						<td class="td-lesson" style="width: 25px;">
+							<c:if test="${childLesson.completed}"> <span class="mycourses-completed-img" title="<fmt:message key="label.completed"/>" >&nbsp;</span> </c:if>
+	                    </td>
+						<td class="td-lesson" style="word-wrap: break-word;">
 							<c:choose>
-								<c:when test="${empty childlesson.url}">
-									<a title="<c:out value="${childlesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${childlesson.name}" /></a> 
+								<c:when test="${empty childLesson.url}">
+									<a title="<c:out value="${childLesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${childLesson.name}" /></a> 
 								</c:when>
 								<c:otherwise>
-									<a title="<c:out value="${childlesson.description}"/>" href="<c:out value="${childlesson.url}"/>" class="sequence-name-link"> <c:out value="${childlesson.name}" /></a> 
+									<a title="<c:out value="${childLesson.description}"/>" href="<c:out value="${childLesson.url}"/>" class="sequence-name-link"> <c:out value="${childLesson.name}" /></a> 
 								</c:otherwise>
 							</c:choose>
 						</td>
-						<td style="width: 150px;">
-							<c:if test="${childLesson.completed}"> <span class="mycourses-completed-img" title="<fmt:message key="label.completed"/>" >&nbsp;</span> </c:if>
+						<td class="td-lesson" style="width: 150px;">
 							<c:if test="${childLesson.state eq 4}"> <span class="mycourses-stop-img" title="<fmt:message key="label.disabled"/>" >&nbsp;</span> </c:if>
 							<c:if test="${childLesson.state eq 6}"> <span class="mycourses-stop-img" title="<fmt:message key="label.archived"/>" >&nbsp;</span> </c:if>
 							<c:if test="${lesson.dependent or lesson.scheduledFinish}"> <span class="mycourses-conditions-img" title="<fmt:message key="index.conditions.flag.tooltip"/>" >&nbsp;</span> </c:if>
 						</td>
 						<c:choose>
-							<c:when test="${empty childlesson.links}">
-								<td style="width: 170px;"></td>
+							<c:when test="${empty childLesson.links}">
+							<td class="td-lesson" style="width: 220px;"></td>
 							</c:when>
 							<c:otherwise>
-								<td class="split-menu-button" style="width: 170px;">
+								<td class="split-menu-button" style="width: 220px;">
 									<ul>
 										<li>
-											<c:forEach var="childlessonlink" items="${childLesson.links}">
+											<c:forEach var="childLessonlink" items="${childLesson.links}" varStatus="status">
 												<c:set var="tooltip" value="" />
-												<c:if test="${childlessonlink.tooltip ne null}">
+												<c:if test="${childLessonlink.tooltip ne null}">
 													<c:set var="tooltip">
-														<fmt:message key="${childlessonlink.tooltip}" />
+														<fmt:message key="${childLessonlink.tooltip}" />
 													</c:set>
 												</c:if>
 												
 												<c:choose>
 													<c:when test="${status.first}">
-														<a href="#nogo" class="${childlessonlink.style}">
-							                        		<span onclick="<c:out value='${childlessonlink.url}'/>" title="${tooltip}" 
-							                        		class="${childlessonlink.spanStyle}" style="margin-right:0px">
-							                        			<fmt:message key="${childlessonlink.name}" /> &nbsp;
+														<a href="#nogo" class="${childLessonlink.style}">
+							                        		<span onclick="<c:out value='${childLessonlink.url}'/>" title="${tooltip}" 
+							                        		class="${childLessonlink.spanStyle}" style="margin-right:0px">
+							                        			<fmt:message key="${childLessonlink.name}" /> &nbsp;
 							                        		</span>
-															<em class="">
+															<em class="em-menu-button">
 																<img src="<lams:LAMSURL/>/images/icons/bullet_arrow_down.png" alt="dropdown">
 															</em>
 														</a>
@@ -165,8 +168,8 @@
 													</c:when>
 													<c:otherwise>
 														<li>
-															<a href="<c:out value='${childlessonlink.url}'/>" class="${childlessonlink.style}">
-																<span class="${childlessonlink.spanStyle}" title="${tooltip}"><fmt:message key="${childlessonlink.name}" /> &nbsp;</span>
+															<a href="<c:out value='${childLessonlink.url}'/>" class="${childLessonlink.style}">
+																<span class="${childLessonlink.spanStyle}" title="${tooltip}"><fmt:message key="${childLessonlink.name}" /> &nbsp;</span>
 															</a>
 														</li>
 														<c:if test="${status.last}">

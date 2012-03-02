@@ -16,7 +16,9 @@
 							toggleGroupContents(element, stateId);
 							registerToolTip(element);
 							jQuery(element).css("display", "block");
-							tb_init('a.thickbox'+jQuery(element).attr("id"));
+							jQuery("a[class^='thickbox']",element).each(function(){
+								tb_init(this);
+							});
 							initMoreActions(element);
 						}
 					);
@@ -125,8 +127,9 @@
 					var org = jQuery("div.course-bg#"+orgId);
 					if (jQuery("div.j-lessons", org).size() > 0) {
 						var jLessons = jQuery("div.j-lessons#"+orgId+"-lessons");
-						makeSortable(jLessons, "j-single-lesson");
-						jQuery("div.j-subgroup-lessons", org).each(function() {
+						var jLessonsTable = jQuery("table.lesson-table",jLessons);
+						makeSortable(jLessonsTable, "j-single-lesson");
+						jQuery("div.j-subgroup-lessons>table.lesson-table", org).each(function() {
 							makeSortable(jQuery(this), "j-single-subgroup-lesson");
 						});
 						jQuery("div.mycourses-right-buttons", jLessons).html("<a class=\"sorting\" title=\""+getSortingEnabledText()+"\"><img src=\"images/sorting_enabled.gif\"></a>");
@@ -138,11 +141,12 @@
 						var orgId = this.id;
 						if (jQuery("div.j-lessons", this).size() > 0) {
 							var jLessons = jQuery("div.j-lessons#"+orgId+"-lessons")
+							var jLessonsTable = jQuery("table.lesson-table",jLessons);
 							var link = jQuery("div.mycourses-right-buttons", jLessons);
 							if (link.html().indexOf(getSortingEnabledText()) >= 0) {
-								jLessons.SortableDestroy();
+								jLessonsTable.SortableDestroy();
 								link.html("<a class=\"sorting\" onclick=\"makeOrgSortable("+orgId+")\" title=\""+getEnableSortingText()+"\"><img src=\"images/sorting_disabled.gif\"></a>");
-								jQuery("div.j-subgroup-lessons", this).each(function() {
+								jQuery("div.j-subgroup-lessons>table.lesson-table", this).each(function() {
 									jQuery(this).SortableDestroy();
 								});
 							}
