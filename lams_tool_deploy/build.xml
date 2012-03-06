@@ -7,6 +7,7 @@
         <property name="build.dir" value="build/lib"/>
     	<property name="build.report.dir" value="build/report"/>
         <property name="lib.dir" value="lib"/>
+		<property name="sharedlib" value="../lams_build/lib"/>
         <property name="src.dir" value="src/java"/>
         <property name="test.src.dir" value="test/java"/>
         <property name="jar.file" value="${build.dir}/lams-tool-deploy.jar"/>
@@ -19,6 +20,12 @@
             <fileset dir="${lib.dir}">
                 <include name="**/*.jar"/>
             </fileset>
+    		<fileset dir="${sharedlib}">
+    			<include name="**/*.jar" />
+    		</fileset>
+    		<fileset dir="${deploy.tool.dir}">
+    			<include name="commons-*.jar" />
+    		</fileset>
         </path>
         
         <path id="test.class.path">

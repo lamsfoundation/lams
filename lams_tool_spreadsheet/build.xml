@@ -150,20 +150,20 @@
 	<!-- Spreadsheet Database tasks                                       -->
 	<!-- =================================================================== -->
 	<target name="clean-db"	description="clean spreadsheet database.">
-		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+		<sql driver="${db.driver}" url="${db.url.build}" userid="${db.username}"
 				password="${db.password}"  encoding="${db.encoding}">
 			<classpath>
-				<pathelement location="${db.driver.jar}"/>
+				<fileset dir="${db.driver.dir}" includes="*.jar"/> 
 			</classpath>
 			<transaction src="${db.scripts}/cleanup_lams_tool_spreadsheet.sql"/>
 		</sql>
 	</target>
 	
 	<target name="init-db"	description="drop and create forum database.">
-		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+		<sql driver="${db.driver}" url="${db.url.build}" userid="${db.username}"
 				password="${db.password}"  encoding="${db.encoding}">
 			<classpath>
-				<pathelement location="${db.driver.jar}"/>
+				<fileset dir="${db.driver.dir}" includes="*.jar"/> 
 			</classpath>
 			<transaction src="${db.scripts}/drop_lams_tool_spreadsheet.sql"/>
 			<transaction src="${db.scripts}/create_lams_tool_spreadsheet.sql"/>
@@ -172,10 +172,10 @@
 	
 	<target name="build-db"	depends="init-db" 
 							description="build qa tool database.">
-		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+		<sql driver="${db.driver}" url="${db.url.build}" userid="${db.username}"
 				password="${db.password}"  encoding="${db.encoding}">
 			<classpath>
-				<pathelement location="${db.driver.name}"/>
+				<fileset dir="${db.driver.dir}" includes="*.jar"/> 
 			</classpath>
 			<transaction src="${db.scripts}/insert_lams_tool_spreadsheet_data.sql"/>
 		</sql>
@@ -308,14 +308,17 @@
 		<echo>+------------------------------------------+</echo>
 		<echo>| Generate the deployment package.         |</echo>
 		<echo>+------------------------------------------+</echo>
-		<path id="deploy.lib.classpath">
-			<fileset dir="${deploy.tool.dir}">
-				<include name="lib/*.jar"/>
-			</fileset>
-		</path> 
+			<path id="deploy.lib.classpath">
+				<fileset dir="${deploy.tool.dir}">
+					<include name="lib/*.jar" />
+				</fileset>
+				<fileset dir="${sharedlib}">
+					<include name="**/*.jar" />
+				</fileset>
+			</path>
 			  
 		<mkdir dir="${build.deploy}"/>
-		<mkdir dir="${build.deploy}/lib"/> 
+		
 		<mkdir dir="${build.deploy}/sql"/> 
 		<mkdir dir="${build.deploy}/language"/> 
 		 
@@ -359,12 +362,6 @@
 			</fileset>
 		</copy>
 
-		<copy overwrite="yes" todir="${build.deploy}/lib">
-			<fileset dir="${deploy.tool.dir}/lib">
-				<include name="*.jar"/>
-			</fileset>
-		</copy>
-		
 		<copy overwrite="true" todir="${build.deploy}">
 				<fileset dir="${build.lib}">
 					<include name="*.jar"/>
@@ -389,7 +386,7 @@
 			generateForInstallers="${generate.for.installers}"
 			dbPassword="${db.password}"
 			dbUsername="${db.username}"
-			dbDriverUrl="${db.url}"
+			dbDriverUrl="${db.url.build}"
 			dbDriverClass="com.mysql.jdbc.Driver"
 			deployFiles="${build.deploy}/${product}.war,${build.deploy}/${product}.jar"
 			toolJarFileName="${product}.jar"
@@ -423,11 +420,14 @@
 	</target>
 
 	<target name="run-deploy-package" description="Run the deploy tool.">
-		<path id="deploy.classpath">
-			<fileset dir="${build.deploy}">
-				<include name="lib/*.jar"/>
-			</fileset>
-		</path> 
+				<path id="deploy.classpath">
+					<fileset dir="${deploy.tool.dir}/lib">
+						<include name="*.jar" />
+					</fileset>
+					<fileset dir="${sharedlib}">
+						<include name="**/*.jar" />
+					</fileset>
+				</path>
 
 		<echo>Deploying the Spreadsheet tool</echo>
 	

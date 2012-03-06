@@ -133,30 +133,30 @@ Ant build file.
 	<!-- Database Tasks                                             -->
 	<!-- =================================================================== -->
 		<target name="clean-db"	description="Deletes the Noticeboard Tool Tables">
-			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+			<sql driver="${db.driver}" url="${db.url.build}" userid="${db.username}"
 					password="${db.password}"  encoding="${db.encoding}">
 				<classpath>
-					<pathelement location="${db.driver.jar}"/>
+					<fileset dir="${db.driver.dir}" includes="*.jar"/> 
 				</classpath>
 				<transaction src="${db.scripts}/drop_lams_tool_nb.sql"/>
 			</sql>
 		</target>
 		
 		<target name="build-db" depends="" description="Deletes and Creates the Noticeboard Tool tables and inserts default content">
-			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+			<sql driver="${db.driver}" url="${db.url.build}" userid="${db.username}"
 								password="${db.password}"  encoding="${db.encoding}">
 							<classpath>
-								<pathelement location="${db.driver.jar}"/>
+								<fileset dir="${db.driver.dir}" includes="*.jar"/> 
 							</classpath>
 					<transaction src="${db.scripts}/init_lams_tool_nb.sql"/>
 			</sql>
 		</target>	
 	
 	<!--	<target name="insert-test-data" depends="build-db" description="Inserts test data for noticeboard tool in order for test cases to run">
-				<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+				<sql driver="${db.driver}" url="${db.url.build}" userid="${db.username}"
 									password="${db.password}"  encoding="${db.encoding}">
 								<classpath>
-									<pathelement location="${db.driver.jar}"/>
+									<fileset dir="${db.driver.dir}" includes="*.jar"/> 
 								</classpath>
 						<transaction src="${db.scripts}/insert_lams_tool_nb_data.sql"/>
 				</sql>
@@ -171,10 +171,10 @@ Ant build file.
 		                <filter token="default_content_id" value="${test.contentid}"/>
 			        </filterset>
 			    </copy>
-				<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+				<sql driver="${db.driver}" url="${db.url.build}" userid="${db.username}"
 					password="${db.password}"  encoding="${db.encoding}">
 				<classpath>
-					<pathelement location="${db.driver.jar}"/>
+					<fileset dir="${db.driver.dir}" includes="*.jar"/> 
 				</classpath>
 				<transaction src="${db.scripts}/drop_lams_tool_nb.sql"/>
 				<transaction src="${build.sql}/create_lams_tool_nb_test.sql"/>
@@ -271,7 +271,7 @@ Ant build file.
 	         appname="${name}"
 	         prefsdir="${middlegen}"
 	         gui="${middlegen.gui}"
-	         databaseurl="${db.url}"
+	         databaseurl="${db.url.build}"
 	         initialContextFactory="${java.naming.factory.initial}"
 	         providerURL="${java.naming.provider.url}"
 	         datasourceJNDIName="${datasource.jndi.name}"
@@ -389,14 +389,17 @@ Ant build file.
 		<target name="create-deploy-package" depends="build-war" 
 				description="Generate the deployment package.">
 
-				<path id="deploy.lib.classpath">
-					<fileset dir="${deploy.tool.dir}">
-						<include name="lib/*.jar"/>
-					</fileset>
-				</path> 
+			<path id="deploy.lib.classpath">
+				<fileset dir="${deploy.tool.dir}">
+					<include name="lib/*.jar" />
+				</fileset>
+				<fileset dir="${sharedlib}">
+					<include name="**/*.jar" />
+				</fileset>
+			</path> 
 					  
 				<mkdir dir="${build.deploy}"/>
-				<mkdir dir="${build.deploy}/lib"/> 
+				
 				<mkdir dir="${build.deploy}/sql"/> 
 				<mkdir dir="${build.deploy}/lang"/> 
 				<mkdir dir="${build.deploy}/language"/>
@@ -441,12 +444,6 @@ Ant build file.
 					</fileset>
 				</copy>
 
-				<copy overwrite="yes" todir="${build.deploy}/lib">
-					<fileset dir="${deploy.tool.dir}/lib">
-						<include name="*.jar"/>
-					</fileset>
-				</copy>
-
 				<copy overwrite="yes" todir="${build.deploy}/language">
 					<fileset dir="${conf.language.dir}">
 						<include name="*.properties"/>
@@ -471,7 +468,7 @@ Ant build file.
 					generateForInstallers="${generate.for.installers}"
 					dbPassword="${db.password}"
 					dbUsername="${db.username}"
-					dbDriverUrl="${db.url}"
+					dbDriverUrl="${db.url.build}"
 					dbDriverClass="com.mysql.jdbc.Driver"
 					deployFiles="${build.deploy}/${product}.war,${build.deploy}/${product}.jar"
 					toolJarFileName="${product}.jar"
@@ -502,11 +499,14 @@ Ant build file.
 			</target>
 		
 	<target name="run-deploy-package" description="Run the deploy tool.">
-				<path id="deploy.classpath">
-					<fileset dir="${build.deploy}">
-						<include name="lib/*.jar"/>
-					</fileset>
-				</path> 
+		<path id="deploy.classpath">
+			<fileset dir="${deploy.tool.dir}/lib">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="${sharedlib}">
+				<include name="**/*.jar" />
+			</fileset>
+		</path>
 
 				<echo>Deploying the Noticeboard Tool</echo>
 		

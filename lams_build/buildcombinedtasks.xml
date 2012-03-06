@@ -16,13 +16,14 @@
 		
 			<path id="deploy.lib.classpath">
 				<fileset dir="${deploy.tool.dir}">
-					<include name="lib/*.jar"/>
+					<include name="lib/*.jar" />
 				</fileset>
-			</path> 
+				<fileset dir="${sharedlib}">
+					<include name="**/*.jar" />
+				</fileset>
+			</path>
 				  
 			<mkdir dir="${assembly.activity}/"/>
-			<mkdir dir="${assembly.activity}/lib"/> 
-			<mkdir dir="${assembly.activity}/sql"/> 
 			<mkdir dir="${assembly.activity}/language"/> 
 			<mkdir dir="${dest.language.file.folder}" />
 		
@@ -60,11 +61,6 @@
 		        </filterchain>
 		    </copy>
 
-			<copy overwrite="yes" todir="${assembly.activity}/lib">
-				<fileset dir="${deploy.tool.dir}/lib">
-					<include name="*.jar"/>
-				</fileset>
-			</copy>
 
 			<taskdef name="generateDeployLibraryProperties" 
 				classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.CreateLibraryPackageTask">
@@ -77,16 +73,9 @@
 				configFile="${assembly.activity}/deploy.xml"
 				dbPassword="${db.password}"
 				dbUsername="${db.username}"
-				dbDriverUrl="${db.url}"
+				dbDriverUrl="${db.url.build}"
 				dbDriverClass="com.mysql.jdbc.Driver"	
 				/>
-		
-			<!-- Do the actual deployment -->
-			<path id="deploy.classpath">
-				<fileset dir="${assembly.activity}">
-					<include name="lib/*.jar"/>
-				</fileset>
-			</path> 
 		
 			<!-- copy the language files to the assembly folder -->
 			<echo>Copying language files</echo>
@@ -98,7 +87,7 @@
 	
 			<java
 				classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.DeployLibrary"
-				classpathref="deploy.classpath"
+				classpathref="deploy.lib.classpath"
 				fork="true">
 					<arg file="${assembly.activity}/deploy.xml"/>
 					<arg file="${assembly.activity}/language"/>

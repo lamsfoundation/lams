@@ -59,14 +59,14 @@
 	</target>
 
 	<target name="check-driver-present">
-		<available file="${db.driver.jar}" type="file" property="driver.present" />
+		<available file="${db.driver.dir}" type="dir" property="driver.present" />
 	</target>
 	<target name="panic-if-driver-not-present" unless="driver.present">
 		<fail>
 		      The JDBC driver you have specified by including one of the files in ${basedir}/config/database
-		      doesn't exist. You have to download this driver separately and put it in ${db.driver.jar}
+		      doesn't exist. You have to download this driver separately and put it in ${db.driver.dir}
 		      Please make sure you're using a version that is equal or superior to the one we looked for.
-		      If you name the driver jar file differently, please update the db.driver.jar property
+		      If you name the driver jar file differently, please update the db.driver.dir property
 		      in the ${basedir}/config/database/xxx.xml file accordingly.
 		     </fail>
 	</target>
@@ -76,7 +76,7 @@
 	<target name="middlegen" description="Run Middlegen For QA Tool" unless="middlegen.skip" depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present">
 		<taskdef name="middlegen" classname="middlegen.MiddlegenTask" classpathref="all-libs" />
 
-		<middlegen appname="lams_tool_laqa11" prefsdir="${conf.middlegen.dir}" gui="${middlegen.gui}" databaseurl="${db.url}" driver="${db.driver}" username="${db.username}" password="${db.password}" includeViews="false">
+		<middlegen appname="lams_tool_laqa11" prefsdir="${conf.middlegen.dir}" gui="${middlegen.gui}" databaseurl="${db.url.build}" driver="${db.driver}" username="${db.username}" password="${db.password}" includeViews="false">
 
 			<hibernate destination="${conf.hibernate.mapping.dir}" package="${laqa11.package}" genXDocletTags="true" javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper" />
 
@@ -255,9 +255,9 @@
 	<!-- Clean and rebuild the database. 									 -->
 	<!-- =================================================================== -->
 	<target name="rebuild-db" description="rebuild QA tables">
-		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}" password="${db.password}" encoding="${db.encoding}">
+		<sql driver="${db.driver}" url="${db.url.build}" userid="${db.username}" password="${db.password}" encoding="${db.encoding}">
 			<classpath>
-				<pathelement location="${db.driver.jar}" />
+				<fileset dir="${db.driver.dir}" includes="*.jar"/> 
 			</classpath>
 			<transaction src="${db.scripts}/drop_lams_tool_qa.sql" />
 			<transaction src="${db.scripts}/create_lams_tool_qa.sql" />
@@ -269,9 +269,9 @@
 	<!-- Clean tool database. 									 -->
 	<!-- =================================================================== -->
 	<target name="clean-tool-db" description="rebuild qa tables">
-		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}" password="${db.password}" encoding="${db.encoding}">
+		<sql driver="${db.driver}" url="${db.url.build}" userid="${db.username}" password="${db.password}" encoding="${db.encoding}">
 			<classpath>
-				<pathelement location="${db.driver.jar}" />
+				<fileset dir="${db.driver.dir}" includes="*.jar"/> 
 			</classpath>
 			<transaction src="${db.scripts}/drop_lams_tool_qa.sql" />
 		</sql>
@@ -287,10 +287,13 @@
 			<fileset dir="${deploy.tool.dir}">
 				<include name="lib/*.jar" />
 			</fileset>
+			<fileset dir="${sharedlib}">
+				<include name="**/*.jar" />
+			</fileset>
 		</path>
 
 		<mkdir dir="${build.deploy}" />
-		<mkdir dir="${build.deploy}/lib" />
+		
 		<mkdir dir="${build.deploy}/sql" />
 		<mkdir dir="${build.deploy}/language" />
 
@@ -334,12 +337,6 @@
 			</fileset>
 		</copy>
 
-		<copy overwrite="yes" todir="${build.deploy}/lib">
-			<fileset dir="${deploy.tool.dir}/lib">
-				<include name="*.jar" />
-			</fileset>
-		</copy>
-
 		<copy overwrite="yes" todir="${build.deploy}/language">
 			<fileset dir="${conf.language.dir}">
 				<include name="*.properties" />
@@ -357,7 +354,7 @@
 			<classpath refid="deploy.lib.classpath" />
 		</taskdef>
 
-		<generateDeployProperties depends="compile" mode="development" outputPath="${build.deploy}" generateForInstallers="${generate.for.installers}" dbPassword="${db.password}" dbUsername="${db.username}" dbDriverUrl="${db.url}" dbDriverClass="com.mysql.jdbc.Driver" deployFiles="${build.deploy}/${product}.war,${build.deploy}/${product}.jar" toolJarFileName="${product}.jar" toolSignature="${signature}" toolVersion="${tool.version}" hideTool="${hideTool}" minServerVersionNumber="${min.server.version.number}" toolUpdateScriptPath="${build.deploy}/sql/updatescripts/updateTo${tool.version}.sql" toolTablesScriptPath="${build.deploy}/sql/create_lams_tool_qa.sql" toolTablesDeleteScriptPath="${build.deploy}/sql/drop_lams_tool_qa.sql" toolActivityInsertScriptPath="${build.deploy}/sql/activity_insert.sql" toolLibraryInsertScriptPath="${build.deploy}/sql/library_insert.sql" toolInsertScriptPath="${build.deploy}/sql/tool_insert.sql" toolDBVersionScriptPath="${build.deploy}/sql/db_version_insert.sql" toolApplicationContextPath="/org/lamsfoundation/lams/tool/qa/qaApplicationContext.xml" lamsEarPath="${jboss.deploy}" toolContext="${toolContext}" toolWebUri="${product}.war" languageFilesPackage="org.lamsfoundation.lams.tool.qa">
+		<generateDeployProperties depends="compile" mode="development" outputPath="${build.deploy}" generateForInstallers="${generate.for.installers}" dbPassword="${db.password}" dbUsername="${db.username}" dbDriverUrl="${db.url.build}" dbDriverClass="com.mysql.jdbc.Driver" deployFiles="${build.deploy}/${product}.war,${build.deploy}/${product}.jar" toolJarFileName="${product}.jar" toolSignature="${signature}" toolVersion="${tool.version}" hideTool="${hideTool}" minServerVersionNumber="${min.server.version.number}" toolUpdateScriptPath="${build.deploy}/sql/updatescripts/updateTo${tool.version}.sql" toolTablesScriptPath="${build.deploy}/sql/create_lams_tool_qa.sql" toolTablesDeleteScriptPath="${build.deploy}/sql/drop_lams_tool_qa.sql" toolActivityInsertScriptPath="${build.deploy}/sql/activity_insert.sql" toolLibraryInsertScriptPath="${build.deploy}/sql/library_insert.sql" toolInsertScriptPath="${build.deploy}/sql/tool_insert.sql" toolDBVersionScriptPath="${build.deploy}/sql/db_version_insert.sql" toolApplicationContextPath="/org/lamsfoundation/lams/tool/qa/qaApplicationContext.xml" lamsEarPath="${jboss.deploy}" toolContext="${toolContext}" toolWebUri="${product}.war" languageFilesPackage="org.lamsfoundation.lams.tool.qa">
 
 			<!-- language files go as a fileset. Not nice but can't work out how to embed them in a tag. -->
 			<fileset dir="${build.deploy}/language">
@@ -386,11 +383,14 @@
 
 	<target name="run-deploy-package" description="Run the deploy tool.">
 
-		<path id="deploy.classpath">
-			<fileset dir="${build.deploy}">
-				<include name="lib/*.jar" />
-			</fileset>
-		</path>
+				<path id="deploy.classpath">
+					<fileset dir="${deploy.tool.dir}/lib">
+						<include name="*.jar" />
+					</fileset>
+					<fileset dir="${sharedlib}">
+						<include name="**/*.jar" />
+					</fileset>
+				</path>
 
 		<echo>Deploying the QA tool</echo>
 

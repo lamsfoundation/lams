@@ -168,7 +168,7 @@
    </target>
 
    <target name="check-driver-present">
-      <available file="${database.driver.file}" type="file" property="driver.present"/>
+      <available file="${database.driver.file}" type="dir" property="driver.present"/>
    </target>
    <target name="panic-if-driver-not-present" unless="driver.present">
       <fail>

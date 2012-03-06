@@ -9,12 +9,26 @@ http://www.mysql.com/downloads/api-jdbc-stable.html
   <!-- lams-ds datasource for use by LAMS Core and Services -->
   <local-tx-datasource>
     <jndi-name>jdbc/lams-ds</jndi-name>
-    <connection-url>jdbc:mysql://localhost:3306/@db.name@</connection-url>
-    <driver-class>com.mysql.jdbc.Driver</driver-class>
+    <connection-url>@db.url.run@</connection-url>
+    <driver-class>@db.driver@</driver-class>
     <!-- Tell MySQL Connector to use UTF-8 character encoding, -->
     <!-- and convert MySQL zero times to null -->
     <connection-property name="characterEncoding">utf8</connection-property>
     <connection-property name="zeroDateTimeBehavior">convertToNull</connection-property>
+
+    <!-- Properties below are used only for embedded MySQL server -->
+    <connection-property name="server.basedir">@db.location@</connection-property>
+    <connection-property name="createDatabaseIfNotExist">false</connection-property>
+    <connection-property name="server.initialize-user">false</connection-property>
+	<connection-property name="server.key_buffer">16K</connection-property>
+    <connection-property name="server.max_allowed_packet">1M</connection-property>
+    <connection-property name="server.table_cache">4</connection-property>
+    <connection-property name="server.sort_buffer_size">64K</connection-property>
+    <connection-property name="server.read_buffer_size">256K</connection-property>
+    <connection-property name="server.read_rnd_buffer_size">256K</connection-property>
+    <connection-property name="server.net_buffer_length">2K</connection-property>
+    <connection-property name="server.thread_stack">128K</connection-property>
+
     <!-- Set transaction isolation level to match db -->
     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>	
     <user-name>@db.username@</user-name>

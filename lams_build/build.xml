@@ -121,8 +121,6 @@
 		<copy todir="${deploy.tool}/lib" overwrite="yes" flatten="true">
 			<fileset dir="../${lams_tool_deploy}/lib">
 				<include name="jakarta-commmons/*.jar" />
-				<include name="mysql/*.jar" />
-				<include name="xstream/*.jar" />
 			</fileset>
 		</copy>
 		
@@ -169,7 +167,7 @@
 					<include name="jakarta-taglibs/*.jar" />
 					<include name="jdom/*.jar" />
 					<include name="jfreechart/*.jar" />
-					<include name="mysql/*.jar" />
+					<include name="mysql/mysql-connector-java-*.jar" />
 					<include name="odmg/*.jar" />
 					<include name="smack/smack.jar"/>
 					<include name="smack/smackx.jar"/>
@@ -201,7 +199,16 @@
 				<include name="${lams_gradebook}/${sub.build.lib}/*.jar"/>
 				<include name="${lams_gradebook}/${sub.build.lib}/*.war"/>
 			</fileset>
-		</copy> 
+		</copy>
+		
+		<!-- Copy connectors for embedded MySQL, if they are available -->
+		<copy todir="${assembly}/temp" verbose="true" overwrite="true" failonerror="false">
+			<fileset dir="../mysql_embedded/connectors">
+				<include name="*-driver.jar" />
+				<include name="*-db-files-${osPropertiesName}.jar" />
+			</fileset>
+		</copy>
+
 		<!-- lams-central.war is already expanded -->
 		<copy todir="${assembly}/temp/" failonerror="true">
 			<fileset dir="../${lams_central}/${sub.build.lib}/">
@@ -491,7 +498,9 @@
 				<include name="mysql*.xml" />
 			</fileset>
 	        <filterset>
-	            <filter token="db.name" value="${db.name}"/>
+	        	<filter token="db.driver" value="${db.driver}"/>
+	        	<filter token="db.url.run" value="${db.url.run}"/>
+	        	<filter token="db.location" value="${db.location}"/>
                 <filter token="db.username" value="${db.username}"/>
                 <filter token="db.password" value="${db.password}"/>
 	        </filterset>

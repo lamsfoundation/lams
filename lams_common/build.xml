@@ -10,6 +10,7 @@ Ant build file.
 	<property file="build.properties"/>
 	<property file="../lams_build/common.properties"/>
 	<property file="../lams_build/${osPropertiesName}.properties" />
+
 	
 	<path id="all-libs">
 		<fileset dir="${sharedlib}">
@@ -65,12 +66,12 @@ Ant build file.
 	</target>
 
 	<target name="check-driver-present">
-		<available file="${db.driver.jar}" type="file" property="driver.present"/>
+		<available file="${db.driver.dir}" type="dir" property="driver.present"/>
 	</target>
 	<target name="panic-if-driver-not-present" unless="driver.present">
 		<fail>
 	      The JDBC driver you have specified by including one of the files in ${basedir}/config/database
-	      doesn't exist. You have to download this driver separately and put it in ${db.driver.jar}
+	      doesn't exist. You have to download this driver separately and put it in ${db.driver.dir}
 	      Please make sure you're using a version that is equal or superior to the one we looked for.
 	      If you name the driver jar file differently, please update the database.driver.jar property
 	      in the ${basedir}/config/database/xxx.xml file accordingly.
@@ -97,7 +98,7 @@ Ant build file.
          appname="learningdesign"
          prefsdir="${middlegen}"
          gui="${middlegen.gui}"
-         databaseurl="${db.url}"
+         databaseurl="${db.url.build}"
          driver="${db.driver}"
          username="${db.username}"
          password="${db.password}"
@@ -297,11 +298,19 @@ Ant build file.
                     <filter token="dbname" value="${db.name}"/>
 	        </filterset>
 		</copy>
-
-		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
-				password="${db.password}" encoding="${db.encoding}">
+		
+		<!-- Copy connectors for embedded MySQL, if they are available -->
+		<copy todir="${db.driver.dir}" verbose="true" overwrite="true" failonerror="false">
+			<fileset dir="../mysql_embedded/connectors">
+				<include name="*-driver.jar" />
+				<include name="*-db-files-${osPropertiesName}.jar" />
+			</fileset>
+		</copy>
+		
+		<sql driver="${db.driver}" url="${db.url.init.build}" userid="${db.username}"
+				password="${db.password}" encoding="${db.encoding}" >
 			<classpath>
-				<pathelement location="${db.driver.jar}"/>
+				<fileset dir="${db.driver.dir}" includes="*.jar"/> 
 			</classpath>
 			<transaction src="${build}/create_lams_11_db.sql"/>
 			<transaction src="${db.scripts}/drop_lams_11_tables.sql"/>
@@ -333,10 +342,10 @@ Ant build file.
 	<!-- =================================================================== -->
 	<target name="insert-test-data" depends="rebuild-db"
 		description="insert test data to lams database">
-		<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+		<sql driver="${db.driver}" url="${db.url.build}" userid="${db.username}"
 				password="${db.password}"  encoding="${db.encoding}">
 			<classpath>
-				<pathelement location="${db.driver.jar}"/>
+				<fileset dir="${db.driver.dir}" includes="*.jar"/> 
 			</classpath>
 			<transaction src="${db.scripts}/insert_test_data.sql"/>
 		</sql>

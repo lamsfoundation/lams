@@ -53,14 +53,14 @@
 		</target>
 
 		<target name="check-driver-present">
-			<available file="${db.driver.jar}" type="file" property="driver.present"/>
+			<available file="${db.driver.dir}" type="dir" property="driver.present"/>
 		</target>
 		<target name="panic-if-driver-not-present" unless="driver.present">
 			<fail>
 		      The JDBC driver you have specified by including one of the files in ${basedir}/config/database
-		      doesn't exist. You have to download this driver separately and put it in ${db.driver.jar}
+		      doesn't exist. You have to download this driver separately and put it in ${db.driver.dir}
 		      Please make sure you're using a version that is equal or superior to the one we looked for.
-		      If you name the driver jar file differently, please update the db.driver.jar property
+		      If you name the driver jar file differently, please update the db.driver.dir property
 		      in the ${basedir}/config/database/xxx.xml file accordingly.
 		     </fail>
 	   </target>
@@ -73,7 +73,7 @@
 			<middlegen appname="lams_tool_lamc11" 
 					   prefsdir="${conf.middlegen.dir}"
 					   gui="${middlegen.gui}"
-					   databaseurl="${db.url}"
+					   databaseurl="${db.url.build}"
 					   driver="${db.driver}"
 					   username="${db.username}"
 					   password="${db.password}"
@@ -286,10 +286,10 @@
 		<!-- =================================================================== -->
 		<target name="rebuild-db"
 			description="rebuild MCQ tables">
-			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+			<sql driver="${db.driver}" url="${db.url.build}" userid="${db.username}"
 					password="${db.password}"  encoding="${db.encoding}">
 				<classpath>
-					<pathelement location="${db.driver.jar}"/>
+					<fileset dir="${db.driver.dir}" includes="*.jar"/> 
 				</classpath>
 				<transaction src="${db.scripts}/drop_lams_tool_mc.sql"/>
 				<transaction src="${db.scripts}/create_lams_tool_mc.sql"/>
@@ -302,10 +302,10 @@
 		<!-- =================================================================== -->
 		<target name="clean-tool-db"
 			description="rebuild Mc tables">
-			<sql driver="${db.driver}" url="${db.url}" userid="${db.username}"
+			<sql driver="${db.driver}" url="${db.url.build}" userid="${db.username}"
 					password="${db.password}"  encoding="${db.encoding}">
 				<classpath>
-					<pathelement location="${db.driver.jar}"/>
+					<fileset dir="${db.driver.dir}" includes="*.jar"/> 
 				</classpath>
 				<transaction src="${db.scripts}/drop_lams_tool_mc.sql"/>
 			</sql>
@@ -320,12 +320,15 @@
 
 			<path id="deploy.lib.classpath">
 				<fileset dir="${deploy.tool.dir}">
-					<include name="lib/*.jar"/>
+					<include name="lib/*.jar" />
 				</fileset>
-			</path> 
+				<fileset dir="${sharedlib}">
+					<include name="**/*.jar" />
+				</fileset>
+			</path>
 				  
 			<mkdir dir="${build.deploy}"/>
-			<mkdir dir="${build.deploy}/lib"/> 
+			
 			<mkdir dir="${build.deploy}/sql"/> 
 			<mkdir dir="${build.deploy}/language"/>
 			 
@@ -369,12 +372,6 @@
 				</fileset>
 			</copy>
 
-			<copy overwrite="yes" todir="${build.deploy}/lib">
-				<fileset dir="${deploy.tool.dir}/lib">
-					<include name="*.jar"/>
-				</fileset>
-			</copy>
-
 			<copy overwrite="yes" todir="${build.deploy}/language">
 				<fileset dir="${conf.language.dir}">
 					<include name="*.properties"/>
@@ -399,7 +396,7 @@
 				generateForInstallers="${generate.for.installers}"
 				dbPassword="${db.password}"
 				dbUsername="${db.username}"
-				dbDriverUrl="${db.url}"
+				dbDriverUrl="${db.url.build}"
 				dbDriverClass="com.mysql.jdbc.Driver"
 				deployFiles="${build.deploy}/${product}.war,${build.deploy}/${product}.jar"
 				toolJarFileName="${product}.jar"
@@ -430,11 +427,14 @@
 		</target>
 	
 		<target name="run-deploy-package" description="Run the deploy tool.">
-			<path id="deploy.classpath">
-				<fileset dir="${build.deploy}">
-					<include name="lib/*.jar"/>
-				</fileset>
-			</path> 
+					<path id="deploy.classpath">
+						<fileset dir="${deploy.tool.dir}/lib">
+							<include name="*.jar" />
+						</fileset>
+						<fileset dir="${sharedlib}">
+							<include name="**/*.jar" />
+						</fileset>
+					</path>
 
 			<echo>Deploying the MCQ tool</echo>
 	
