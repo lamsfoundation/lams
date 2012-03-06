@@ -16,7 +16,7 @@ CKEDITOR.config.toolbar_DefaultLearner = [
 ] ;
 
 CKEDITOR.config.toolbar_CustomWiki = [
-	['Preview','PasteFromWord'],
+	['Source','-','Preview','PasteFromWord'],
 	['Undo','Redo'],
 	['Bold','Italic','Underline', '-','Subscript','Superscript'],
 	['NumberedList','BulletedList','-','Outdent','Indent'],
