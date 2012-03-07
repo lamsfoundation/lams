@@ -65,7 +65,7 @@ package org.lamsfoundation.lams.validators
         private function validateScheduleDate(timePicker:DateTimePicker, timeZonePicker:ComboBox):void {
         	var now:Date = new Date();
         	var tzList:ArrayCollection = (timeZonePicker.dataProvider != null) ? timeZonePicker.dataProvider as ArrayCollection : new ArrayCollection();
-        	var usersTzIdx:uint = Advanced.getUserTimeZone(Application.application.param("tz") as String, tzList.toArray());
+        	var usersTzIdx:uint = Advanced.getUserTimeZoneIndex(Application.application.param("tz") as String, tzList.toArray());
         	var usersTzOffset:Number = timeZonePicker.dataProvider[usersTzIdx].data;
  			
  			var selectedTzOffset:Number = timeZonePicker.selectedItem.data;

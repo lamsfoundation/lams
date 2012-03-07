@@ -7,19 +7,20 @@
 
 	<mx:Script>
 		<![CDATA[
-			import mx.states.State;
-			import mx.core.Application;
-			import mx.collections.ArrayCollection;
 			import com.asfusion.mate.actions.builders.EventAnnouncer;
-			import mx.controls.ToolTip;
-			import org.lamsfoundation.lams.events.WizardEvent;
+			
 			import mx.binding.utils.BindingUtils;
-			import mx.events.ValidationResultEvent;
+			import mx.collections.ArrayCollection;
 			import mx.controls.Text;
-		    import mx.managers.ToolTipManager;
-
-			import org.lamsfoundation.lams.events.NavigationEvent;
+			import mx.controls.ToolTip;
+			import mx.core.Application;
+			import mx.events.ValidationResultEvent;
+			import mx.managers.ToolTipManager;
+			import mx.states.State;
+			
 			import org.lamsfoundation.lams.common.dictionary.XMLDictionaryRegistry;
+			import org.lamsfoundation.lams.events.NavigationEvent;
+			import org.lamsfoundation.lams.events.WizardEvent;
    			
    			public static var LAMS_FLASH_FORMAT:String = "DD/M/YYYY L:NN A";
    			
@@ -51,36 +52,16 @@
    			private var tzList:Array;
    			
    			[Bindable]
-   			private var userTimeZone:uint;
+   			private var userTimeZoneIndex:uint;
    			
-   			public static function getUserTimeZone(tz:String, tzList:Array):uint {
-   				var count:uint = 0;
+			//returns user's timezone index from the list of timezones
+   			public static function getUserTimeZoneIndex(tz:String, tzList:Array):uint {
    				
-   				var timeZoneLbl:String = tz;
-   				var pIdx:int = timeZoneLbl.indexOf("GMT");
-   				
-   				var timeZoneType:String;
-   				var timeZoneOffset:String;
-   				var tzOffsetVal:Number;
-   				
-   				if(pIdx != -1) {
-   					timeZoneType = timeZoneLbl.substring(0, 4);
-   					timeZoneOffset = timeZoneLbl.substring(4, timeZoneLbl.length);
-   					
-   					tzOffsetVal = Number(timeZoneOffset.substring(0, timeZoneOffset.lastIndexOf(":")));
-   					
-   					timeZoneLbl = timeZoneType + tzOffsetVal;	 
-   					
-   				}
-   				
-   				for(var i:uint=0; i<tzList.length; ++i) {
-   					var label:String = tzList[i].label;
-   					
-   					if(label == timeZoneLbl) {
-   						return count;
-   					}
-   					
-   					count++;
+   				for(var i:uint=0; i<tzList.length; i++) {
+   					var timeZoneId:String = tzList[i].timeZoneId;
+					if (tz == timeZoneId) {
+						return i;
+					}
    				}
    				
    				return null;
@@ -252,6 +233,7 @@
 			private function createTimeZoneList():void {
 				var label:String = "";
 				var value:String = "";
+				var timeZoneId:String = "";
 				
 				if(tzList != null && tzList.length > 0)
 					return;
@@ -259,19 +241,16 @@
 				tzList = new Array();
 				
 				// populate TimeZone list from User (java) class passed through in the Dictionary data.
-				for (var i:uint = 0; i <= 30; i++) {
-					label = dictionary.getLabel(String('timezoneID' + i));
+				var timezoneNumber:uint = uint(dictionary.getValue("timezoneNumber"));
+				for (var i:uint = 0; i < timezoneNumber; i++) {
+					label = dictionary.getLabel(String('timezoneID' + i)) as String;
 					value = dictionary.getValue(String('timezoneID' + i)) as String;
+					timeZoneId = label.substring(0, label.indexOf(" - "));
 					
-					tzList.push({label: label, data: value });
+					tzList.push({label: label, data: value, timeZoneId: timeZoneId });
 				}
 				
-				//tzList = [ "GMT-12", "GMT-11", "GMT-10", "GMT-9", "GMT-8", "GMT-7",
-				//    "GMT-6", "GMT-5", "GMT-4", "Canada/Newfoundland", "GMT-3", "GMT-2", "GMT-1", "GMT", "GMT+1", "GMT+2",
-				//    "GMT+3", "Asia/Tehran", "GMT+4", "Asia/Kabul", "GMT+5", "Asia/Calcutta", "Asia/Katmandu", "GMT+6", "GMT+7",
-				//    "GMT+8", "GMT+9", "Australia/Adelaide", "GMT+10", "GMT+11", "GMT+12" ]
-				
-				userTimeZone = Advanced.getUserTimeZone(Application.application.param("tz") as String, tzList);
+				userTimeZoneIndex = Advanced.getUserTimeZoneIndex(Application.application.param("tz") as String, tzList);
 			}
 		]]>
 	</mx:Script>
@@ -328,7 +307,7 @@
 			<mx:VBox width="100%">
 				<mx:FormItem id="dateTimePicker_fItm" focusEnabled="true">
 					<timePicker:DateTimePicker id="scheduleDateTimePicker" enabled="{enableScheduling.selected}" selectedDate="{new Date()}" change="checkScheduleDateTime(event)" minuteIncrement="1" backgroundColor="#FFFFFF"/>        
-					<mx:ComboBox id="scheduleDateTZ" editable="false" dataProvider="{tzList}" enabled="{enableScheduling.selected}" change="checkScheduleDateTime(event)" selectedIndex="{userTimeZone}" />
+					<mx:ComboBox id="scheduleDateTZ" editable="false" dataProvider="{tzList}" enabled="{enableScheduling.selected}" change="checkScheduleDateTime(event)" selectedIndex="{userTimeZoneIndex}" />
 				</mx:FormItem>
 			</mx:VBox>
 			

@@ -778,9 +778,13 @@ public class MonitoringAction extends LamsDispatchAction
 		}
 		
 		if(module.equals("wizard")) {
+		    
 		    //sort timezones
 		    TreeSet<Timezone> timezones = new TreeSet<Timezone>(new TimezoneComparator());
 		    timezones.addAll(getTimezoneService().getDefaultTimezones());
+		    
+		    //let Flex know the number of timezones
+    		    languageOutput += "<entry key='timezoneNumber'><data>" + timezones.size() + "</data></entry>";
 
         	    int i = 0;
         	    for (Timezone timezone : timezones) {
