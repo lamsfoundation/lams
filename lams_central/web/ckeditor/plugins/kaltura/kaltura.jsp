@@ -117,14 +117,15 @@
 				}
 			}
 			
+			var swfobject = CKGlobal.dom.element.createFromHtml( '<script type="text/javascript" src="' + CKGlobal.plugins.getPath('kaltura') + '/swfobject/swfobject.js"><\/script>' );
+			CK.document.getBody().append(swfobject);
+			
 			//enable HTML5 support
 			var html5 = CKGlobal.dom.element.createFromHtml( '<script type="text/javascript" src="' + KALTURA_SERVER + '/p/' + PARTNER_ID + '/sp/' + SUB_PARTNER_ID + '/embedIframeJs/uiconf_id/' + KDP_UI_CONF_ID + '/partner_id/' + PARTNER_ID + '"><\/script>' );
-			CK.document.getBody().append(html5);
-			
-			var innerHTML =	'<script type="text/javascript">';
+			html5.insertAfter(swfobject);
 			
 			// this is the callback function; execute after external script finishes loading
-			innerHTML +=	'    function callback() {';			
+			var innerHTML =	'<script type="text/javascript">';			
 			for(var i = 0; i < entries.length; i++) {
 				var entryId = entries[i].entryId;
 				
@@ -139,23 +140,6 @@
 				innerHTML +=	'	};	';
 				innerHTML +=	'	swfobject.embedSWF("' + KALTURA_SERVER + '/kwidget/wid/_' + PARTNER_ID + '/uiconf_id/' + KDP_UI_CONF_ID + '", "kplayer' + entryId + '", "400", "360", "9.0.0", "' + CKGlobal.plugins.getPath('kaltura') + '/swfobject/expressInstall.swf", flashVars'+entryId+', params'+entryId+');';
 			}		
-			innerHTML +=	'    }';
-			
-			innerHTML +=	'var script = document.createElement("script");';
-			innerHTML +=	'script.src = "' + CKGlobal.plugins.getPath('kaltura') + '/swfobject/swfobject.js"; ';
-			innerHTML +=	'if (script.readyState) {'; // IE, incl. IE9
-			innerHTML +=	'	script.onreadystatechange = function() {';
-			innerHTML +=	'		if (script.readyState == "loaded" || script.readyState == "complete") {';
-			innerHTML +=	'			script.onreadystatechange = null;';
-			innerHTML +=	'			callback();';
-			innerHTML +=	'		}';
-			innerHTML +=	'	};';
-			innerHTML +=	'} else {';
-			innerHTML +=	'	script.onload = function() {'; // Other browsers
-			innerHTML +=	'		callback();';
-			innerHTML +=	'	};';
-			innerHTML +=	'}';
-			innerHTML +=	'document.getElementsByTagName("head")[0].appendChild(script);';
 			innerHTML +='<\/script>';
 			var embedSwf = CKGlobal.dom.element.createFromHtml( innerHTML );
 			embedSwf.insertAfter(html5);
