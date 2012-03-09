@@ -296,6 +296,8 @@ INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_cod
 VALUES (29, 'es', 'MX', 'Español (México)', 'LTR', 'es');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
 VALUES (30, 'cs', 'CZ', 'Čeština', 'LTR', 'cs');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
+VALUES (31, 'id', 'ID', 'Indonesian', 'LTR', 'en-au');
 
 
 -- Default TimeZones
