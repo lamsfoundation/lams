@@ -290,6 +290,13 @@ INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_cod
 VALUES (26, 'tr', 'TR', 'Türkçe', 'LTR', 'tr');
 INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
 VALUES (27, 'ca', 'ES', 'Català', 'LTR', 'ca');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
+VALUES (28, 'sl', 'SI', 'Slovenščina', 'LTR', 'sl');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
+VALUES (29, 'es', 'MX', 'Español (México)', 'LTR', 'es');
+INSERT INTO lams_supported_locale (locale_id, language_iso_code, country_iso_code, description, direction, fckeditor_code) 
+VALUES (30, 'cs', 'CZ', 'Čeština', 'LTR', 'cs');
+
 
 -- Default TimeZones
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+12');
