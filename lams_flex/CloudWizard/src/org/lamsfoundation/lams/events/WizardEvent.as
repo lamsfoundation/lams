@@ -50,7 +50,6 @@ package org.lamsfoundation.lams.events
 		
 		public var startEvent_type:String;
 		public var schedule:String;
-		public var timeZone:String;
 		
 		public var scheduledNumberDaysToLessonFinish:int;
 		

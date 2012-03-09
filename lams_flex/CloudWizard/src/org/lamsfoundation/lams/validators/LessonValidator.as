@@ -34,7 +34,7 @@ package org.lamsfoundation.lams.validators
             } else if(value is FormItem) {
             	var children:Array = (value as FormItem).getChildren();
             	if(children.length > 0) {
-            		validateScheduleDate(children[0] as DateTimePicker, children[1] as ComboBox);
+            		validateScheduleDate(children[0] as DateTimePicker);
             	}
             } 
             
@@ -62,18 +62,9 @@ package org.lamsfoundation.lams.validators
         		results.push(new ValidationResult(true, "", "noLearners", this.errorMessage));
         }
         
-        private function validateScheduleDate(timePicker:DateTimePicker, timeZonePicker:ComboBox):void {
+        private function validateScheduleDate(timePicker:DateTimePicker):void {
         	var now:Date = new Date();
-        	var tzList:ArrayCollection = (timeZonePicker.dataProvider != null) ? timeZonePicker.dataProvider as ArrayCollection : new ArrayCollection();
-        	var usersTzIdx:uint = Advanced.getUserTimeZoneIndex(Application.application.param("tz") as String, tzList.toArray());
-        	var usersTzOffset:Number = timeZonePicker.dataProvider[usersTzIdx].data;
- 			
- 			var selectedTzOffset:Number = timeZonePicker.selectedItem.data;
-        	var rawOffset:Number = (usersTzOffset - selectedTzOffset);
-        	
-        	var valTime:Number = now.setTime(now.getTime() - rawOffset);
-        	
-        	if(timePicker.enabled) {
+	       	if(timePicker.enabled) {
 	        	if(timePicker.selectedDate.date > now.date)
 	        		return;	
 	        	else if(timePicker.selectedDate.date == now.date)

@@ -284,9 +284,7 @@ public class MonitoringAction extends LamsDispatchAction
         	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
     		Date startDate = DateUtil.convertFromLAMSFlashFormat(dateStr);
     		
-    		String timeZoneId = WebUtil.readStrParam(request, MonitoringConstants.PARAM_SCHEDULE_TIME_ZONE_IDX, true);
-    		
-    		monitoringService.startLessonOnSchedule(lessonId,startDate,getUserId(),timeZoneId);
+    		monitoringService.startLessonOnSchedule(lessonId, startDate, getUserId());
     		flashMessage = new FlashMessage("startOnScheduleLesson",Boolean.TRUE);
     	}catch (Exception e) {
 			flashMessage = handleException(e, "startOnScheduleLesson", monitoringService);
@@ -777,27 +775,8 @@ public class MonitoringAction extends LamsDispatchAction
 			languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>" + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
 		}
 		
-		if(module.equals("wizard")) {
-		    
-		    //sort timezones
-		    TreeSet<Timezone> timezones = new TreeSet<Timezone>(new TimezoneComparator());
-		    timezones.addAll(getTimezoneService().getDefaultTimezones());
-		    
-		    //let Flex know the number of timezones
-    		    languageOutput += "<entry key='timezoneNumber'><data>" + timezones.size() + "</data></entry>";
-
-        	    int i = 0;
-        	    for (Timezone timezone : timezones) {
-        		TimeZone timeZone = TimeZone.getTimeZone(timezone.getTimezoneId());
-        		languageOutput += "<entry key='timezoneID" + i++ + "'>" + 
-        			"<name>" + timezone.getTimezoneId() + " - " + timeZone.getDisplayName() + "</name>" + 
-        			"<data>" + TimeZone.getTimeZone(timezone.getTimezoneId()).getRawOffset() + "</data>" + 
-        			"</entry>";
-        	    }
-        
-        	    if (orgName != null) {
-        		languageOutput += "<entry key='orgName'><name>" + orgName + "</name></entry>";
-        	    }
+		if(module.equals("wizard") && (orgName != null)) {
+		    languageOutput += "<entry key='orgName'><name>" + orgName + "</name></entry>";
 		}
 		
 		languageOutput += "</language></xml>";

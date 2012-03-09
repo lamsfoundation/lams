@@ -209,7 +209,7 @@
 		
 		<!-- schedule lesson -->
 		<HTTPServiceInvoker instance="{scheduleLessonService}">
-			<Request lessonID="{event.lesson.lessonID}" lessonStartDate="{event.schedule}" scheduleTimeZoneIdx="{event.timeZone}" userID="{userID}" />
+			<Request lessonID="{event.lesson.lessonID}" lessonStartDate="{event.schedule}" userID="{userID}" />
 			<resultHandlers>
 				<EventAnnouncer generator="{WizardEvent}" type="{WizardEvent.CHECK_SCHEDULE_LESSON_FINISH}" />
 				

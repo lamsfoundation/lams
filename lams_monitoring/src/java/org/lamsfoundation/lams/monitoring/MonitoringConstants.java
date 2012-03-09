@@ -47,7 +47,6 @@ public class MonitoringConstants {
     public static final String KEY_GROUP_ORDER_ID = "orderID";
     public static final String KEY_GROUP_LEARNERS = "learners";
     public static final Object KEY_USERS = "users";
-    public static final String PARAM_SCHEDULE_TIME_ZONE_IDX = "scheduleTimeZoneIdx";
 	
     // ---------------------------------------------------------------------
     // Search type constants used in EmailNotificationsAction

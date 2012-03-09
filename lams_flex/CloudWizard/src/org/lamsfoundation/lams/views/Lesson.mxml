@@ -189,8 +189,6 @@
 				
 				wizardEvent.lesson = newLesson;
 				wizardEvent.schedule = (newLesson.enableScheduling) ? advanced.scheduleDateTimeStr : null;
-				var selectedTimeZoneIndex:uint = advanced.scheduleDateTZ.selectedIndex;
-				wizardEvent.timeZone = advanced.scheduleDateTZ.dataProvider[selectedTimeZoneIndex].timeZoneId;
 				
 				if(lessonInstances.length > 1) {
 					startLessonInstances(wizardEvent);
@@ -211,8 +209,6 @@
 					
 					wizardEvent.lesson = newLesson;
 					wizardEvent.schedule = event.schedule;
-					var selectedTimeZoneIndex:uint = advanced.scheduleDateTZ.selectedIndex;
-					wizardEvent.timeZone = advanced.scheduleDateTZ.dataProvider[selectedTimeZoneIndex].timeZoneId;
 				
 					wizardEvent.last = (lessonInstances.length == count);
 				

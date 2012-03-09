@@ -722,7 +722,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startLessonOnSchedule(long
      *      , Date, User)
      */
-    public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId, String timeZoneId) {
+    public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId) {
 
 	// we get the lesson just created
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -747,18 +747,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
 	
 	// Change client/users schedule date to server's timezone.
-	User user = (User) baseDAO.find(User.class, userId);
-	
-	TimeZone tz = TimeZone.getDefault();
-	TimeZone selectedTz;
-	
-	if (timeZoneId != null) {
-	    selectedTz = TimeZone.getTimeZone(timeZoneId);
-	} else {
-	    selectedTz = TimeZone.getTimeZone(user.getTimeZone());
-	}
-	
-	Date tzStartLessonDate = DateUtil.convertFromTimeZoneToDefault(selectedTz, startDate);
+	User user = (User) baseDAO.find(User.class, userId);	
+	TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
+	Date tzStartLessonDate = DateUtil.convertFromTimeZoneToDefault(userTimeZone, startDate);
 
 	JobDetail startLessonJob = getStartScheduleLessonJob();
 	// setup the message for scheduling job

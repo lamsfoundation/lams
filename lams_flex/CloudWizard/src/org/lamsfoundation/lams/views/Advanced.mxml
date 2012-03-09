@@ -48,25 +48,6 @@
    			private var instTxt_idx:uint;
    			private static var focusTimeout:uint;
    			
-   			[Bindable]
-   			private var tzList:Array;
-   			
-   			[Bindable]
-   			private var userTimeZoneIndex:uint;
-   			
-			//returns user's timezone index from the list of timezones
-   			public static function getUserTimeZoneIndex(tz:String, tzList:Array):uint {
-   				
-   				for(var i:uint=0; i<tzList.length; i++) {
-   					var timeZoneId:String = tzList[i].timeZoneId;
-					if (tz == timeZoneId) {
-						return i;
-					}
-   				}
-   				
-   				return null;
-   			}
-   			
    			public function enableSplitLessonsOption():void {
    				if(!enableSplitLessons.selected) {
    					Wizard.clearValidationFocus();
@@ -146,7 +127,6 @@
 				if(value) {
 					
 					// tab is current selection
-					createTimeZoneList();
 					enableSplitLessonsOption();
 
 					var valEvent:ValidationResultEvent = scheduleValidator.validate();
@@ -160,18 +140,16 @@
 			}
 			
 			private function checkScheduleDateTime(event:Event):void {
-				if(scheduleDateTZ != null) {
-					this.scheduleDateTimeStr = ScheduleDateDisplay.format(scheduleDateTimePicker.selectedDate);
-					var valEvent:ValidationResultEvent = scheduleValidator.validate();
+				this.scheduleDateTimeStr = ScheduleDateDisplay.format(scheduleDateTimePicker.selectedDate);
+				var valEvent:ValidationResultEvent = scheduleValidator.validate();
 					
-					this.clearValidationFocus(valEvent.currentTarget.listener);
+				this.clearValidationFocus(valEvent.currentTarget.listener);
 	   				
-					if(valEvent.results != null) {
-						this.dispatchEvent(valEvent);
-						this.setValidationFocus(valEvent.currentTarget.listener);
-					} else {
-						this.clearValidationHighlight(valEvent.currentTarget.listener);
-					}
+				if(valEvent.results != null) {
+					this.dispatchEvent(valEvent);
+					this.setValidationFocus(valEvent.currentTarget.listener);
+				} else {
+					this.clearValidationHighlight(valEvent.currentTarget.listener);
 				}
 			}
 			
@@ -229,29 +207,6 @@
 				if(scheduleDateTimePicker.selectedDate < now)
 					scheduleDateTimePicker.selectedDate = now;
 			}
-			
-			private function createTimeZoneList():void {
-				var label:String = "";
-				var value:String = "";
-				var timeZoneId:String = "";
-				
-				if(tzList != null && tzList.length > 0)
-					return;
-				
-				tzList = new Array();
-				
-				// populate TimeZone list from User (java) class passed through in the Dictionary data.
-				var timezoneNumber:uint = uint(dictionary.getValue("timezoneNumber"));
-				for (var i:uint = 0; i < timezoneNumber; i++) {
-					label = dictionary.getLabel(String('timezoneID' + i)) as String;
-					value = dictionary.getValue(String('timezoneID' + i)) as String;
-					timeZoneId = label.substring(0, label.indexOf(" - "));
-					
-					tzList.push({label: label, data: value, timeZoneId: timeZoneId });
-				}
-				
-				userTimeZoneIndex = Advanced.getUserTimeZoneIndex(Application.application.param("tz") as String, tzList);
-			}
 		]]>
 	</mx:Script>
 	
@@ -307,7 +262,6 @@
 			<mx:VBox width="100%">
 				<mx:FormItem id="dateTimePicker_fItm" focusEnabled="true">
 					<timePicker:DateTimePicker id="scheduleDateTimePicker" enabled="{enableScheduling.selected}" selectedDate="{new Date()}" change="checkScheduleDateTime(event)" minuteIncrement="1" backgroundColor="#FFFFFF"/>        
-					<mx:ComboBox id="scheduleDateTZ" editable="false" dataProvider="{tzList}" enabled="{enableScheduling.selected}" change="checkScheduleDateTime(event)" selectedIndex="{userTimeZoneIndex}" />
 				</mx:FormItem>
 			</mx:VBox>
 			
