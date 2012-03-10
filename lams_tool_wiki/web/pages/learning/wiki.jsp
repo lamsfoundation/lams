@@ -494,5 +494,10 @@
 		window.location=url;
 	}
 
+	var doRefreshPage = "${doRefreshPage}";
+	if (doRefreshPage == "true"){
+		refreshPage();
+	}
+
 -->
 </script>

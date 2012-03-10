@@ -152,6 +152,10 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	    }
 
 	}
+	
+	// LDEV-2824 Refresh page after loading, so Chrome does not disable new javascript code
+	request.setAttribute(WikiConstants.ATTR_REFRESH_PAGE, true);
+	
 	// Make sure the current page is set correctly then return to the wiki
 	return returnToWiki(mapping, wikiForm, request, response, currentPageUid);
     }
@@ -394,6 +398,9 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	    notifyWikiChange(toolSessionID, "notify.pageAdded.subject", "notify.pageAdded.body", user, request);
 	}
 
+	// LDEV-2824 Refresh page after loading, so Chrome does not disable new javascript code
+	request.setAttribute(WikiConstants.ATTR_REFRESH_PAGE, true);
+	
 	// go to the new wiki page
 	return returnToWiki(mapping, wikiForm, request, response, currentPageUid);
     }

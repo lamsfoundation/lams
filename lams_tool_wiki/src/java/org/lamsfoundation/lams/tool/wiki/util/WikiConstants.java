@@ -64,6 +64,7 @@ public interface WikiConstants {
     public static final String ATTR_CONTENT_EDITAVLE = "contentEditable";
     public static final String ATTR_MAIN_PAGE_TITLE = "mainPageTitle";
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
+    public static final String ATTR_REFRESH_PAGE = "doRefreshPage";
     
     // Events 
     public static final String EVENT_NOTIFY_TEACHERS = "wikiNotifyTeachers";
