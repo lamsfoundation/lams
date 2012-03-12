@@ -463,6 +463,7 @@
 	function submitWiki(dispatch)
 	{
 		document.getElementById("dispatch").value=dispatch;
+		replaceJavascriptToken();
 		document.getElementById("learningForm").submit();
 	}
 
@@ -492,11 +493,6 @@
 	{
 		var url = "<lams:WebAppURL/>/learning.do?mode=${mode}&toolSessionID=${lrnForm.toolSessionID}&currentWikiPageId=${currentWikiPage.uid}"
 		window.location=url;
-	}
-
-	var doRefreshPage = "${doRefreshPage}";
-	if (doRefreshPage == "true"){
-		refreshPage();
 	}
 
 -->

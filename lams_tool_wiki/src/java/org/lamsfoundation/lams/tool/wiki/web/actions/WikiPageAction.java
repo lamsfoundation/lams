@@ -110,6 +110,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	// Set up the wiki form
 	WikiPageForm wikiForm = (WikiPageForm) form;
+	revertJavascriptTokenReplacement(wikiForm);
 
 	// Get the current wiki page
 	WikiPage currentPage = wikiService.getWikiPageByUid(currentPageUid);
@@ -152,9 +153,6 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	    }
 
 	}
-	
-	// LDEV-2824 Refresh page after loading, so Chrome does not disable new javascript code
-	request.setAttribute(WikiConstants.ATTR_REFRESH_PAGE, true);
 	
 	// Make sure the current page is set correctly then return to the wiki
 	return returnToWiki(mapping, wikiForm, request, response, currentPageUid);
@@ -357,6 +355,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	// Set up the authoring form
 	WikiPageForm wikiForm = (WikiPageForm) form;
+	revertJavascriptTokenReplacement(wikiForm);
 
 	// get the wiki by either toolContentId or tool session
 	if (toolSessionID == null) {
@@ -397,9 +396,6 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	if (toolSessionID != null && user != null) {
 	    notifyWikiChange(toolSessionID, "notify.pageAdded.subject", "notify.pageAdded.body", user, request);
 	}
-
-	// LDEV-2824 Refresh page after loading, so Chrome does not disable new javascript code
-	request.setAttribute(WikiConstants.ATTR_REFRESH_PAGE, true);
 	
 	// go to the new wiki page
 	return returnToWiki(mapping, wikiForm, request, response, currentPageUid);
@@ -557,6 +553,23 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	
 	    notificationService.trigger(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS, toolSessionID,
 		    subject, body);
+	}
+    }
+
+    /**
+     * Replaces codeword back to "javascript", so the content works correctly after displaying.
+     */
+    private void revertJavascriptTokenReplacement(WikiPageForm form) {
+	String encodedWikiBody = form.getNewPageWikiBody();
+	if (encodedWikiBody != null) {
+	    form.setNewPageWikiBody(encodedWikiBody.replace(WikiConstants.JAVASCRIPT_REPLACE_TOKEN,
+		    WikiConstants.JAVASCRIPT_TOKEN));
+	}
+
+	encodedWikiBody = form.getWikiBody();
+	if (encodedWikiBody != null) {
+	    form.setWikiBody(encodedWikiBody.replace(WikiConstants.JAVASCRIPT_REPLACE_TOKEN,
+		    WikiConstants.JAVASCRIPT_TOKEN));
 	}
     }
 }

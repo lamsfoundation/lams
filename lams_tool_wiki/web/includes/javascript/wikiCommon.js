@@ -88,3 +88,14 @@ function toggleWikiList(webUrl)
 		wikiListImage.src = webUrl + "/images/tree_open.gif";
 	}
 }
+
+// LDEV-2824 Replace "javascript" with another word before posting so browser does not detect it as XSS attack
+function replaceJavascriptToken()
+{
+	for (var instanceId in CKEDITOR.instances){
+		var instance = CKEDITOR.instances[instanceId];
+		var data = instance.getData();
+		var encodedData = data.replace(/javascript/g,"JAVASCRIPTREPLACE");
+		instance.setData(encodedData);
+	}
+}

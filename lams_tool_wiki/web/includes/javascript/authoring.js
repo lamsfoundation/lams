@@ -25,12 +25,7 @@ function doSelectTab(tabId) {
 		finishButtonDiv.style.display = "block";
 	}
 }
-function doSubmit(method) {
-	document.authoringForm.dispatch.value = method;
-	document.authoringForm.submit();
-}
 function deleteAttachment(dispatch, uuid) {
-	document.authoringForm.dispatch.value = dispatch;
 	document.authoringForm.deleteFileUuid.value = uuid;
-	document.authoringForm.submit();
+	submitWiki(dispatch);
 }

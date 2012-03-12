@@ -92,7 +92,7 @@
 
 			<html:file property="onlineFile">
 			</html:file>
-			<html:link href="javascript:doSubmit('uploadOnline');"
+			<html:link href="javascript:submitWiki('uploadOnline');"
 				property="submit" styleClass="button">
 				<fmt:message key="button.upload" />
 			</html:link>
@@ -196,7 +196,7 @@
 
 			<html:file property="offlineFile">
 			</html:file>
-			<html:link href="javascript:doSubmit('uploadOffline');"
+			<html:link href="javascript:submitWiki('uploadOffline');"
 				property="submit" styleClass="button">
 				<fmt:message key="button.upload" />
 			</html:link>
