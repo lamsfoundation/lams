@@ -51,7 +51,7 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
     private static final String GET_AVERAGE_COMPLETION_TIME = "select prog.finishDate, prog.startDate from LearnerProgress prog where "
 	    + "prog.lesson.lessonId=:lessonID";
 
-    private static final String GET_AVERAGE_COMPLETION_TIME_ACTIVITY = "select compProg.finishDate, compProg.startDate from CompletedActivityProgress compProg, Activity act where "
+    private static final String GET_AVERAGE_COMPLETION_TIME_ACTIVITY = "select compProg.finishDate, compProg.startDate from CompletedActivityProgress compProg where "
 	    + "compProg.activity.activityId=:activityID";
 
     private static final String GET_AVERAGE_MARK_FOR_ACTIVTY = "select avg(gact.mark) from GradebookUserActivity gact where "
@@ -60,7 +60,7 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
     private static final String GET_AVERAGE_MARK_FOR_GROUPED_ACTIVTY = "select avg(gact.mark) from GradebookUserActivity gact, GroupUser gu, Group grp where "
 	    + "gact.activity.activityId=:activityID and grp.groupId=:groupID and gu.user=gact.learner and gu.group=grp";
 
-    private static final String GET_AVERAGE_COMPLETION_TIME_GROUPED_ACTIVITY = "select compProg.finishDate, compProg.startDate from CompletedActivityProgress compProg, Activity act, Group grp, GroupUser gu where "
+    private static final String GET_AVERAGE_COMPLETION_TIME_GROUPED_ACTIVITY = "select compProg.finishDate, compProg.startDate from CompletedActivityProgress compProg, Group grp, GroupUser gu where "
 	    + "compProg.activity.activityId=:activityID and grp.groupId=:groupID and gu.user=compProg.learnerProgress.user and gu.group=grp";
 
     @SuppressWarnings("unchecked")
