@@ -183,7 +183,7 @@ public class Configuration implements InitializingBean {
 	    publicFolder = (WorkspaceFolder) list.get(0);
 	    String[] langCountry = LanguageUtil.getDefaultLangCountry();
 	    Locale locale = new Locale(langCountry[0], langCountry[1]);
-	    publicFolder.setName(messageService.getMessageSource().getMessage("public.folder", null, locale));
+	    publicFolder.setName(messageService.getMessageSource().getMessage("public.folder.name", null, locale));
 	    configurationDAO.update(publicFolder);
 	}
     }
