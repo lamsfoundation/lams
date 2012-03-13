@@ -300,7 +300,7 @@ Ant build file.
 		</copy>
 		
 		<!-- Copy connectors for embedded MySQL, if they are available -->
-		<copy todir="${db.driver.dir}" verbose="true" overwrite="true" failonerror="false">
+		<copy todir="${db.driver.dir}" verbose="true" overwrite="false" failonerror="false">
 			<fileset dir="../mysql_embedded/connectors">
 				<include name="*-driver.jar" />
 				<include name="*-db-files-${osPropertiesName}.jar" />

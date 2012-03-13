@@ -202,7 +202,7 @@
 		</copy>
 		
 		<!-- Copy connectors for embedded MySQL, if they are available -->
-		<copy todir="${assembly}/temp" verbose="true" overwrite="true" failonerror="false">
+		<copy todir="${assembly}/temp" verbose="true" overwrite="false" failonerror="false">
 			<fileset dir="../mysql_embedded/connectors">
 				<include name="*-driver.jar" />
 				<include name="*-db-files-${osPropertiesName}.jar" />
