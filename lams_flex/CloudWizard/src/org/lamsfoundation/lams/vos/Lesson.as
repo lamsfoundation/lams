@@ -26,7 +26,11 @@ package org.lamsfoundation.lams.vos
 		
 		public var numberLessonsSplit:int;
 		public var numberLearnersSplit:int;
-	
+		
+		// Conditions
+		public var enablePrecedingLesson:Boolean;
+		public var precedingLessonID:uint;
+		
 		// new Lesson copy
 		public var copyType:uint = 2;
 	
@@ -59,6 +63,10 @@ package org.lamsfoundation.lams.vos
 			
 			data.numberLessonsSplit = WDDXUtil.toWDDXNull(this.numberLessonsSplit);
 			data.numberLearnersSplit = WDDXUtil.toWDDXNull(this.numberLearnersSplit);
+			
+			if (this.enablePrecedingLesson) {
+				data.precedingLessonID = this.precedingLessonID;
+			}			
 			
 			data.copyType = this.copyType;
 			

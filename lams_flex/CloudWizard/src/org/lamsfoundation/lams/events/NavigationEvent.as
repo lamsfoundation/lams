@@ -12,6 +12,7 @@ package org.lamsfoundation.lams.events
 		public static const LESSON: String = "lessonNavigationEvent"
 		public static const LEARNERS: String = "learnersNavigationEvent"
 		public static const ADVANCED: String = "advancedNavigationEvent"
+		public static const CONDITIONS: String = "conditionsNavigationEvent"
 		
 		public var selectedIndex:uint;
 		

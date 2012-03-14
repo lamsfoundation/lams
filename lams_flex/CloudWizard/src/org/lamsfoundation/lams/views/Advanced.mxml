@@ -134,8 +134,6 @@
 						this.dispatchEvent(valEvent);
 						this.setValidationFocus(valEvent.currentTarget.listener);
 					}
-				} else {
-					this.clearValidationFocus(dateTimePicker_fItm);
 				}
 			}
 			
@@ -163,6 +161,7 @@
 				}
 				
 				//enable/disable TimeLimit subgroup
+				/* 
 				enableTimeLimits.enabled = !startInMonitor.selected;
 				if(startInMonitor.selected) {
 					enableTimeLimits.selected = false;
@@ -170,6 +169,7 @@
 				if(enableIndividualTimeLimit.selected) {
 					enableIndividualTimeLimit.selected = false;
 				}
+				*/
 				
 				var event:WizardEvent = new WizardEvent(WizardEvent.CHANGE_START_BUTTON_LABEL);
 				
@@ -245,16 +245,6 @@
 			</mx:FormItem>
 			
 			<mx:VBox id="learnersNoteBox" width="100%" />
-			
-			<!-- Time limits -->
-			<mx:FormHeading id="timeLimits_fH" label="{dictionary.getLabel('advanced.tab.form.time.limits.label')}"  paddingTop="5"/>
-			<mx:CheckBox id="enableTimeLimits" name="enableTimeLimits" selected="false" label="{dictionary.getLabel('advanced.tab.form.enable.label')}" labelPlacement="right" />
-			<mx:VBox width="100%">
-				<mx:FormItem id="enableTimeLimits_fItm" label="{dictionary.getLabel('advanced.tab.form.enter.number.days.label')}" enabled="{enableTimeLimits.selected}" focusEnabled="true">
-					<mx:NumericStepper id="noDaysToLessonFinish" value="30" minimum="1" maximum="999"/>
-				</mx:FormItem>
-				<mx:CheckBox id="enableIndividualTimeLimit" selected="false" enabled="{enableTimeLimits.selected}" label="{dictionary.getLabel('advanced.tab.form.individual.not.entire.group.label')}" labelPlacement="right" />
-			</mx:VBox>
 			
 			<!-- Scheduling options -->
 			<mx:FormHeading id="scheduling_fH" label="{dictionary.getLabel('advanced.tab.form.scheduling.label')}"  paddingTop="5"/>

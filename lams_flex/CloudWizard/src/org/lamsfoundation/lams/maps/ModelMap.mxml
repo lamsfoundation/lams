@@ -31,5 +31,9 @@
 	<Injectors target="{Advanced}" >
 		<PropertyInjector targetKey="dictionary" source="{WizardManager}" sourceKey="dictionaryRegistry" />
 	</Injectors>
-	
+
+	<Injectors target="{Conditions}" >
+		<PropertyInjector targetKey="dictionary" source="{WizardManager}" sourceKey="dictionaryRegistry" />
+	</Injectors>
+
 </EventMap>

@@ -46,6 +46,9 @@
    			
    			[Bindable]
    			public var advanced:Advanced;
+			
+			[Bindable]
+			public var conditions:Conditions;
    			
    			[Bindable]
    			public var dictionary:XMLDictionaryRegistry;
@@ -110,6 +113,7 @@
    			}
    			
 			public function addLesson(event:Event):Boolean {
+				
 				if(selectedNode != null && selectedNode.isValidDesign()) {
 					// validate lesson name (tab - lesson)
 					var valEvent:ValidationResultEvent = lessonNameVal.validate();
@@ -152,6 +156,12 @@
 						
 					// validate learning design
 					} else if(newLesson.learningDesignID != 0) {
+						// populate newLesson.precedingLessonID with value
+						if (conditions.enablePrecedingLesson.selected) {
+							var selectedPrecedingLesson:uint = conditions.precedingLesson.selectedIndex;
+							newLesson.precedingLessonID = conditions.precedingLesson.dataProvider[selectedPrecedingLesson].data;
+						}
+						
 						var addType:String = (newLesson.numberLessonsSplit > 0) ? WizardEvent.SPLIT_LESSON_CLASS : WizardEvent.ADD_LESSON;
 						var wizardEvent:WizardEvent = new WizardEvent(addType);
 						wizardEvent.lesson = newLesson;
@@ -270,13 +280,16 @@
 		<vos:numberLessonsSplit>{advanced.noInstances}</vos:numberLessonsSplit>
 		<vos:numberLearnersSplit>{advanced.noLearnersPerInstance}</vos:numberLearnersSplit>
 		<vos:enableTimeLimits>
-			{advanced.enableTimeLimits.selected}
+			{conditions.enableTimeLimits.selected}
 		</vos:enableTimeLimits>
-		<vos:scheduledNumberDaysToLessonFinish>{advanced.noDaysToLessonFinish.value}</vos:scheduledNumberDaysToLessonFinish>
-		<vos:enableIndividualTimeLimit>{advanced.enableIndividualTimeLimit.selected}</vos:enableIndividualTimeLimit>
+		<vos:scheduledNumberDaysToLessonFinish>{conditions.noDaysToLessonFinish.value}</vos:scheduledNumberDaysToLessonFinish>
+		<vos:enableIndividualTimeLimit>{conditions.enableIndividualTimeLimit.selected}</vos:enableIndividualTimeLimit>
 		<vos:enableScheduling>
 			{advanced.enableScheduling.selected}
 		</vos:enableScheduling>
+		<vos:enablePrecedingLesson>
+			{conditions.enablePrecedingLesson.selected}
+		</vos:enablePrecedingLesson>
 		<vos:learners>
 			<vos:UserCollection users="{learners.learnersSelected}" groupName="{learners.learnersGroupName}" />
 		</vos:learners>
