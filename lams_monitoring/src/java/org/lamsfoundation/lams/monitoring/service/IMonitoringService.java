@@ -86,7 +86,7 @@ public interface IMonitoringService {
     public Lesson initializeLesson(String lessonName, String lessonDescription, Boolean learnerExportAvailable,
 	    long learningDesignId, Integer organisationId, Integer userID, String customCSV,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Boolean enableNotifications, Integer numberDaysToLessonFinish);
+	    Boolean enableNotifications, Integer numberDaysToLessonFinish, Long precedingLessonId);
 
     /**
      * Initialize a new lesson so as to start the learning process for a normal
@@ -895,8 +895,8 @@ public interface IMonitoringService {
 	/** Open Time Chart */
 	public Boolean openTimeChart(long lessonId, Integer userId) throws UserAccessDeniedException;
 
-	/** Get Organisation Name */
-	public String getOrganisationName(Integer organisationId);
+	/** Get Organisation by organisationId */
+	public Organisation getOrganisation(Integer organisationId);
 	
 	public void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson);
 	

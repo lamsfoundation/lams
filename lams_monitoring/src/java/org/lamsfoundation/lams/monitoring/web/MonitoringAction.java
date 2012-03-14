@@ -26,11 +26,9 @@ package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.TimeZone;
-import java.util.TreeSet;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,20 +36,15 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
-import org.lamsfoundation.lams.timezone.Timezone;
-import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
-import org.lamsfoundation.lams.timezone.util.TimezoneComparator;
-import org.lamsfoundation.lams.timezone.util.TimezoneDTOComparator;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
-import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -194,7 +187,7 @@ public class MonitoringAction extends LamsDispatchAction
     		Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresenceAvailable", false);
     		Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImAvailable", false);
     		Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
-    		Lesson newLesson = monitoringService.initializeLesson(title,desc,learnerExportAvailable,ldId,organisationId,getUserId(), null, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, Boolean.FALSE, null);
+    		Lesson newLesson = monitoringService.initializeLesson(title,desc,learnerExportAvailable,ldId,organisationId,getUserId(), null, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, Boolean.FALSE, null, null);
     		
     		flashMessage = new FlashMessage("initializeLesson",newLesson.getLessonId());
 		} catch (Exception e) {
@@ -682,14 +675,9 @@ public class MonitoringAction extends LamsDispatchAction
     	MessageService messageService = monitoringService.getMessageService();
     	
     	String module = WebUtil.readStrParam(request,"module",false);
-    	Integer orgId = WebUtil.readIntParam(request,"orgId",true);
-    	
-    	String orgName = null;
-    	if(orgId != null) orgName = monitoringService.getOrganisationName(orgId);
 		
     	ArrayList<String> languageCollection = new ArrayList<String>();
-		
-    	if(module.equals("wizard")) {
+   	if(module.equals("wizard")) {
     		// pre-existing flash app (AS 2.0) labels
     		languageCollection.add(new String("sys.error.msg.start"));
     		languageCollection.add(new String("sys.error"));
@@ -743,6 +731,8 @@ public class MonitoringAction extends LamsDispatchAction
    			languageCollection.add(new String("class.tab.print.name.label"));
    			languageCollection.add(new String("class.tab.heading.label"));
    			languageCollection.add(new String("advanced.tab.form.validation.schedule.date.error"));
+   			languageCollection.add(new String("conditions.tab.label"));
+   			languageCollection.add(new String("conditions.tab.form.preceding.label"));
    			
     	} else if(module.equals("timechart")) {
 
@@ -769,21 +759,44 @@ public class MonitoringAction extends LamsDispatchAction
     		languageCollection.add(new String("alert.no.learner.data"));
     	}
 		
-		String languageOutput = "<xml><language>";
-		
-		for(int i = 0; i < languageCollection.size(); i++){
-			languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>" + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
+	String languageOutput = "<xml><language>";
+
+	for (int i = 0; i < languageCollection.size(); i++) {
+	    languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>"
+		    + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
+	}
+
+	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
+	if (module.equals("wizard") && (orgId != null)) {
+	    
+	    Organisation organisation = monitoringService.getOrganisation(orgId);
+	    
+	    int count = 0;
+	    for (Lesson lesson : (Set<Lesson>) organisation.getLessons()) {
+		if (!Lesson.REMOVED_STATE.equals(lesson.getLessonStateId())
+			&& !Lesson.FINISHED_STATE.equals(lesson.getLessonStateId())) {
+		    languageOutput += "<entry key='lessonID" + count++ + "'>" + 
+				"<name>" + lesson.getLessonName() + "</name>" + 
+				"<data>" + lesson.getLessonId() + "</data>" + 
+				"</entry>";
 		}
-		
-		if(module.equals("wizard") && (orgName != null)) {
-		    languageOutput += "<entry key='orgName'><name>" + orgName + "</name></entry>";
-		}
-		
-		languageOutput += "</language></xml>";
-		
-		response.setContentType("text/xml");
-		response.setCharacterEncoding("UTF-8");
-		response.getWriter().print(languageOutput);
+	    }
+
+//	    // sort lessons
+//	    TreeSet<Timezone> lessons = new TreeSet<Timezone>(new TimezoneComparator());
+//	    lessons.addAll(getTimezoneService().getDefaultTimezones());
+
+	    // let Flex know the number of lessons
+	    languageOutput += "<entry key='lessonsNumber'><data>" + count + "</data></entry>";
+
+	    languageOutput += "<entry key='orgName'><name>" + organisation.getName() + "</name></entry>";
+	}
+
+	languageOutput += "</language></xml>";
+
+	response.setContentType("text/xml");
+	response.setCharacterEncoding("UTF-8");
+	response.getWriter().print(languageOutput);
         
         return null;
     }

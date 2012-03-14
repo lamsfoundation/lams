@@ -416,13 +416,15 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     public Lesson initializeLesson(String lessonName, String lessonDescription, Boolean learnerExportAvailable,
 	    long learningDesignId, Integer organisationId, Integer userID, String customCSV,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Boolean enableLessonNotifications, Integer scheduledNumberDaysToLessonFinish) {
+	    Boolean enableLessonNotifications, Integer scheduledNumberDaysToLessonFinish, Long precedingLessonId) {
 
 	LearningDesign originalLearningDesign = authoringService.getLearningDesign(new Long(learningDesignId));
 	if (originalLearningDesign == null) {
 	    throw new MonitoringServiceException("Learning design for id=" + learningDesignId
 		    + " is missing. Unable to initialize lesson.");
 	}
+
+	Lesson precedingLesson = (precedingLessonId == null) ? null : lessonDAO.getLesson(precedingLessonId);
 
 	// The duplicated sequence should go in the run sequences folder under
 	// the given organisation
@@ -452,7 +454,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	User user = userID != null ? (User) baseDAO.find(User.class, userID) : null;
 	Lesson initializedLesson = initializeLesson(lessonName, lessonDescription, learnerExportAvailable,
 		originalLearningDesign, user, runSeqFolder, LearningDesign.COPY_TYPE_LESSON, customCSV,
-		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications, scheduledNumberDaysToLessonFinish);
+		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications, scheduledNumberDaysToLessonFinish, precedingLesson);
 	
 	Long initializedLearningDesignId = initializedLesson.getLearningDesign().getLearningDesignId();
 	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CREATE, userID, initializedLearningDesignId, initializedLesson.getLessonId(), null);
@@ -477,13 +479,13 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
 	return initializeLesson(lessonName, lessonDescription, Boolean.TRUE, originalLearningDesign, user, null,
 		LearningDesign.COPY_TYPE_PREVIEW, customCSV, learnerPresenceAvailable, learnerImAvailable,
-		liveEditEnabled, null, null);
+		liveEditEnabled, null, null, null);
     }
 
     public Lesson initializeLesson(String lessonName, String lessonDescription, Boolean learnerExportAvailable,
 	    LearningDesign originalLearningDesign, User user, WorkspaceFolder workspaceFolder, int copyType,
 	String customCSV, Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	Boolean enableLessonNotifications, Integer scheduledNumberDaysToLessonFinish) {
+	Boolean enableLessonNotifications, Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
 
 	// copy the current learning design
 	LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign, new Integer(
@@ -500,7 +502,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
 	Lesson lesson = createNewLesson(title, lessonDescription, user, learnerExportAvailable, copiedLearningDesign,
 		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
-		scheduledNumberDaysToLessonFinish);
+		scheduledNumberDaysToLessonFinish, precedingLesson);
 	auditAction(MonitoringService.AUDIT_LESSON_CREATED_KEY, new Object[] { lessonName,
 		copiedLearningDesign.getTitle(), learnerExportAvailable });
 	return lesson;
@@ -533,7 +535,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    Boolean enableLessonNotifications = WDDXProcessor.convertToBoolean("enableLessonNotifications", table.get("enableLessonNotifications"));
 	    String customCSV = WDDXProcessor.convertToString(WDDXTAGS.CUSTOM_CSV, table.get(WDDXTAGS.CUSTOM_CSV));
 	    Integer scheduledNumberDaysToLessonFinish = WDDXProcessor.convertToInteger("scheduledNumberDaysToLessonFinish", table.get("scheduledNumberDaysToLessonFinish"));
-
+	    Long precedingLessonId = WDDXProcessor.convertToLong("organisationID", table.get("precedingLessonID"));
+	    
 	    // initialize lesson
 
 	    Lesson newLesson = null;
@@ -544,7 +547,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    } else {
 		newLesson = initializeLesson(title, desc, learnerExportAvailable, ldId, organisationId, creatorUserId,
 			customCSV, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
-			scheduledNumberDaysToLessonFinish);
+			scheduledNumberDaysToLessonFinish, precedingLessonId);
 	    }
 
 	    if (newLesson != null) {
@@ -2230,10 +2233,17 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     private Lesson createNewLesson(String lessonName, String lessonDescription, User user,
 	    Boolean learnerExportAvailable, LearningDesign copiedLearningDesign, Boolean learnerPresenceAvailable,
 	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
-	    Integer scheduledNumberDaysToLessonFinish) {
+	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
 	Lesson newLesson = Lesson.createNewLessonWithoutClass(lessonName, lessonDescription, user,
 		learnerExportAvailable, copiedLearningDesign, learnerPresenceAvailable, learnerImAvailable,
 		liveEditEnabled, enableLessonNotifications, scheduledNumberDaysToLessonFinish);
+	if (precedingLesson != null) {
+	    HashSet precedingLessons = new HashSet();
+	    precedingLessons.add(precedingLesson);
+	    newLesson.setPrecedingLessons(precedingLessons);
+//	    newLesson.getPrecedingLessons().add(precedingLesson);
+	}
+	
 	lessonDAO.saveLesson(newLesson);
 	return newLesson;
     }
@@ -2990,13 +3000,14 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    Boolean enableLessonNotifications = WDDXProcessor.convertToBoolean("enableLessonNotifications", table.get("enableLessonNotifications"));
 	    int numLessons = WDDXProcessor.convertToInt("numberLessonsSplit", table.get("numberLessonsSplit"));
 	    Integer scheduledNumberDaysToLessonFinish = WDDXProcessor.convertToInteger("scheduledNumberDaysToLessonFinish", table.get("scheduledNumberDaysToLessonFinish"));
-
+	    Long precedingLessonId = WDDXProcessor.convertToLong("organisationID", table.get("precedingLessonID"));
+	    
 	    // initialize multiple lessons
 	    if (numLessons > 0) {
 		for (int i = 1; i <= numLessons; i++) {
 		    Lesson newLesson = initializeLesson(title + " " + i, desc, learnerExportAvailable, ldId,
 			    organisationId, creatorUserId, customCSV, learnerPresenceAvailable, learnerImAvailable,
-			    liveEditEnabled, enableLessonNotifications, scheduledNumberDaysToLessonFinish);
+			    liveEditEnabled, enableLessonNotifications, scheduledNumberDaysToLessonFinish, precedingLessonId);
 		    lessonIds.add(newLesson.getLessonId());
 		}
 	    }
@@ -3118,9 +3129,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		groupDAO.saveGroup(group);
 	}
 	
-	public String getOrganisationName(Integer organisationId) {
-		Organisation org = (Organisation) baseDAO.find(Organisation.class, organisationId);
-		return org.getName();
+	public Organisation getOrganisation(Integer organisationId) {
+		return (Organisation) baseDAO.find(Organisation.class, organisationId);
 	}
 	
 	/**
@@ -3163,7 +3173,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 					.getLearningDesign().getLearningDesignId(), group.getOrganisationId(), userDto
 					.getUserID(), null, lesson.getLearnerPresenceAvailable(), lesson
 					.getLearnerImAvailable(), lesson.getLiveEditEnabled(), lesson
-					.getEnableLessonNotifications(), null);
+					.getEnableLessonNotifications(), null, null);
 
 				// save LessonClasses
 				newLesson = this
