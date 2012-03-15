@@ -96,6 +96,8 @@ function replaceJavascriptToken()
 		var instance = CKEDITOR.instances[instanceId];
 		var data = instance.getData();
 		var encodedData = data.replace(/javascript/g,"JAVASCRIPTREPLACE");
-		instance.setData(encodedData);
+		instance.setData(encodedData, function() {
+			instance.updateElement();
+		});
 	}
 }
