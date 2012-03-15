@@ -733,6 +733,8 @@ public class MonitoringAction extends LamsDispatchAction
    			languageCollection.add(new String("advanced.tab.form.validation.schedule.date.error"));
    			languageCollection.add(new String("conditions.tab.label"));
    			languageCollection.add(new String("conditions.tab.form.preceding.label"));
+   			languageCollection.add(new String("conditions.tab.form.preceding.info.label"));
+   			languageCollection.add(new String("advanced.tab.form.time.limits.info.label")); 
    			
     	} else if(module.equals("timechart")) {
 

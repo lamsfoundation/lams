@@ -86,7 +86,7 @@
 		<mx:TabNavigator id="tabViews" width="100%" height="100%" change="tabChange(event)" creationPolicy="all">
 			<views:Lesson id="lessonView" label="{dictionary.getLabel('lesson.tab.label')}" learners="{learnersView}" advanced="{advancedView}" conditions="{conditionsView}"/>
 			<views:Learners id="learnersView" label="{dictionary.getLabel('class.tab.label')}" lesson="{lessonView}" learnersGroupName="{dictionary.getLabelAndInsert('learners.group.name', [dictionary.getLabel('orgName')])}" staffGroupName="{dictionary.getLabelAndInsert('staff.group.name', [dictionary.getLabel('orgName')])}"/>
-			<views:Advanced id="advancedView" label="{dictionary.getLabel('advanced.tab.label')}" learners="{learnersView}" lesson="{lessonView}" />
+			<views:Advanced id="advancedView" label="{dictionary.getLabel('advanced.tab.label')}" learners="{learnersView}" lesson="{lessonView}" conditions="{conditionsView}"/>
 			<views:Conditions id="conditionsView" label="{dictionary.getLabel('conditions.tab.label')}" />
 		</mx:TabNavigator>
 		<mx:HBox horizontalAlign="right" width="100%" paddingRight="10">

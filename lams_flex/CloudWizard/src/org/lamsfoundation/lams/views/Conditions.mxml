@@ -71,7 +71,8 @@
 	<mx:Form id="conditionsForm"  width="100%" height="100%">
 		<mx:VBox width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10">
 			<!-- Preceding lesson -->
-			<mx:FormHeading id="scheduling_fH" label="{dictionary.getLabel('conditions.tab.form.preceding.label')}" />
+			<mx:FormHeading id="precedingLesson_fH" label="{dictionary.getLabel('conditions.tab.form.preceding.label')}" />
+			<mx:Text width="100%" textAlign="left" selectable="false" text="{dictionary.getLabel('conditions.tab.form.preceding.info.label')}" truncateToFit="true" paddingLeft="6"/>
 			<mx:CheckBox id="enablePrecedingLesson" name="enableConditionalLesson" selected="false" label="{dictionary.getLabel('advanced.tab.form.enable.label')}" labelPlacement="right" />
 			<mx:VBox width="100%">
 				<mx:FormItem id="precedingLessonPicker_fItm" focusEnabled="true">
@@ -80,7 +81,8 @@
 			</mx:VBox>
 			
 			<!-- Time limits -->
-			<mx:FormHeading id="timeLimits_fH" label="{dictionary.getLabel('advanced.tab.form.time.limits.label')}"  paddingTop="7"/>
+			<mx:FormHeading id="timeLimits_fH" label="{dictionary.getLabel('advanced.tab.form.time.limits.label')}"  paddingTop="8"/>
+			<mx:Text width="100%" textAlign="left" selectable="false" text="{dictionary.getLabel('advanced.tab.form.time.limits.info.label')}" truncateToFit="true" paddingLeft="6"/>
 			<mx:CheckBox id="enableTimeLimits" name="enableTimeLimits" selected="false" label="{dictionary.getLabel('advanced.tab.form.enable.label')}" labelPlacement="right" />
 			<mx:VBox width="100%">
 				<mx:FormItem id="enableTimeLimits_fItm" label="{dictionary.getLabel('advanced.tab.form.enter.number.days.label')}" enabled="{enableTimeLimits.selected}" focusEnabled="true">

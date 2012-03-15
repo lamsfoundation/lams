@@ -35,7 +35,10 @@
    			
    			[Bindable]
    			public var lesson:Lesson;
-   			
+
+			[Bindable]
+			public var conditions:Conditions;
+  			
    			[Bindable]
    			public var dictionary:XMLDictionaryRegistry;
    			
@@ -160,16 +163,16 @@
 					updateSelectedDate();
 				}
 				
-				//enable/disable TimeLimit subgroup
-				/* 
-				enableTimeLimits.enabled = !startInMonitor.selected;
+				//enable/disable PrecedingLesson and TimeLimit subgroup
+				conditions.enableTimeLimits.enabled = !startInMonitor.selected;
 				if(startInMonitor.selected) {
-					enableTimeLimits.selected = false;
+					conditions.enableTimeLimits.selected = false;
+					conditions.enableIndividualTimeLimit.selected = false;
 				}
-				if(enableIndividualTimeLimit.selected) {
-					enableIndividualTimeLimit.selected = false;
+				conditions.enablePrecedingLesson.enabled = !startInMonitor.selected;
+				if(startInMonitor.selected) {
+					conditions.enablePrecedingLesson.selected = false;
 				}
-				*/
 				
 				var event:WizardEvent = new WizardEvent(WizardEvent.CHANGE_START_BUTTON_LABEL);
 				
