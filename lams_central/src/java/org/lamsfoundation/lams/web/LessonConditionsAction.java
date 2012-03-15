@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,6 +52,7 @@ import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.lesson.util.LessonComparator;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -111,7 +113,8 @@ public class LessonConditionsAction extends DispatchAction {
 	request.setAttribute(CentralConstants.PARAM_TITLE, lesson.getLessonName());
 	request.setAttribute(LessonConditionsAction.PARAM_PRECEDING_LESSONS, precedingLessons);
 
-	Set<Lesson> organisationLessons = lesson.getOrganisation().getLessons();
+	Set<Lesson> organisationLessons = new TreeSet<Lesson>(new LessonComparator());
+	organisationLessons.addAll(lesson.getOrganisation().getLessons());
 	List<IndexLessonBean> availableLessons = new ArrayList<IndexLessonBean>(organisationLessons.size());
 	for (Lesson organisationLesson : organisationLessons) {
 	    if (!lessonId.equals(organisationLesson.getLessonId())

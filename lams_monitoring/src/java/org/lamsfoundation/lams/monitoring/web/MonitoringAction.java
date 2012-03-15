@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +40,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.util.LessonComparator;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
@@ -774,7 +776,9 @@ public class MonitoringAction extends LamsDispatchAction
 	    Organisation organisation = monitoringService.getOrganisation(orgId);
 	    
 	    int count = 0;
-	    for (Lesson lesson : (Set<Lesson>) organisation.getLessons()) {
+	    Set<Lesson> organisationLessons = new TreeSet<Lesson>(new LessonComparator());
+	    organisationLessons.addAll(organisation.getLessons());
+	    for (Lesson lesson : organisationLessons) {
 		if (!Lesson.REMOVED_STATE.equals(lesson.getLessonStateId())
 			&& !Lesson.FINISHED_STATE.equals(lesson.getLessonStateId())) {
 		    languageOutput += "<entry key='lessonID" + count++ + "'>" + 
