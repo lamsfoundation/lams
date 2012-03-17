@@ -463,8 +463,7 @@
 	function submitWiki(dispatch)
 	{
 		document.getElementById("dispatch").value=dispatch;
-		replaceJavascriptToken();
-		document.getElementById("learningForm").submit();
+		replaceJavascriptTokenAndSubmit("learningForm");
 	}
 
 

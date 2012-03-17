@@ -89,15 +89,28 @@ function toggleWikiList(webUrl)
 	}
 }
 
-// LDEV-2824 Replace "javascript" with another word before posting so browser does not detect it as XSS attack
-function replaceJavascriptToken()
-{
+//LDEV-2824 Replace "javascript" with another word before posting so browser does not detect it as XSS attack
+function replaceJavascriptTokenAndSubmit(formName) {
+	// updating CKEditor instance is asynchronous, but we need to make sure it's completed
+	// before submitting the form, thus sophisticated synchronization :/
+	var instanceUpdateStarted = 0;
+	var instanceUpdateCompleted = 0;
+	
 	for (var instanceId in CKEDITOR.instances){
 		var instance = CKEDITOR.instances[instanceId];
 		var data = instance.getData();
 		var encodedData = data.replace(/javascript/g,"JAVASCRIPTREPLACE");
+		instanceUpdateStarted++;
 		instance.setData(encodedData, function() {
 			instance.updateElement();
+			instanceUpdateCompleted++;
 		});
 	}
+	
+	var synchro = setInterval(function() {
+		if (instanceUpdateCompleted >= instanceUpdateStarted){
+			 clearInterval(synchro);
+			 document.getElementById(formName).submit();
+			}
+	}, 500);
 }

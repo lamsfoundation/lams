@@ -363,8 +363,7 @@
 	function submitWiki(dispatch)
 	{
 		document.getElementById("dispatch").value=dispatch;
-		replaceJavascriptToken();
-		document.getElementById("monitoringForm").submit();
+		replaceJavascriptTokenAndSubmit("monitoringForm");
 	}
 	
 	CKEDITOR.on('instanceCreated',function (editorInstance) 
