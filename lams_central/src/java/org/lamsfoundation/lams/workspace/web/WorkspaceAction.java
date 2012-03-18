@@ -199,6 +199,13 @@ public class WorkspaceAction extends LamsDispatchAction {
 		Integer mode = new Integer(WebUtil.readIntParam(request,"mode"));		
 		//Integer userID = new Integer(WebUtil.readIntParam(request,AttributeNames.PARAM_USER_ID));
 		Integer userID = getUserId(request);
+        
+        // LDEV-2833 IE9 won't refresh designs in lesson wizard
+        // so we purposely need to tell the browser not to cache this
+        response.addHeader("Pragma", "no-cache");
+        response.addHeader("Cache-Control", "no-cache");
+        response.addDateHeader("Expires", System.currentTimeMillis() - (1000L * 60L * 60L * 24L * 365L));
+
 		String methodKey = "getFolderContents";
 		try {
 			return returnWDDXPacket(new FlashMessage(methodKey,getFolderContents(folderID, mode, userID)), response);
