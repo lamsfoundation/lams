@@ -381,6 +381,8 @@ public class LearnerAction extends LamsDispatchAction {
 	    LearnerAction.log.debug("Getting Flash progress data...");
 	}
 
+    
+
 	FlashMessage message = null;
 	try {
 
@@ -404,7 +406,12 @@ public class LearnerAction extends LamsDispatchAction {
 	if (LearnerAction.log.isDebugEnabled()) {
 	    LearnerAction.log.debug("Sending learner progress data to flash:" + wddxPacket);
 	}
-	response.getWriter().print(wddxPacket);
+    // LDEV-2835
+	response.addHeader("Pragma", "no-cache");
+    response.addHeader("Cache-Control", "no-cache");
+    response.addDateHeader("Expires", System.currentTimeMillis() - (1000L * 60L * 60L * 24L * 365L));
+
+    response.getWriter().print(wddxPacket);
 
 	// don't need to return a action forward because it sent the wddx packet
 	// back already.
