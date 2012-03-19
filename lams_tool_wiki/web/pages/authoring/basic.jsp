@@ -18,24 +18,34 @@
 			<fmt:message key="label.wiki.view"></fmt:message>
 		</a> 
 		&nbsp;
-		<a href="javascript:changeDiv('edit');" title="<fmt:message key="label.wiki.edit.toolTip"></fmt:message>">
-			<fmt:message key="label.wiki.edit"></fmt:message>
-		</a> 
-		&nbsp;
+		<c:if test="${not currentWikiPage.deleted}">
+			<a href="javascript:changeDiv('edit');" title="<fmt:message key="label.wiki.edit.toolTip"></fmt:message>">
+				<fmt:message key="label.wiki.edit"></fmt:message>
+			</a> 
+			&nbsp;
+		</c:if>
 		<a href="javascript:cancelAdd();changeDiv('add');" title="<fmt:message key="label.wiki.add.toolTip"></fmt:message>">
 			<fmt:message key="label.wiki.add"></fmt:message>
 		</a> 
 		&nbsp;
 		<a href="javascript:changeDiv('history');" title="<fmt:message key="label.wiki.history.toolTip"></fmt:message>">
 			<fmt:message key="label.wiki.history"></fmt:message>
-		</a> 
-		<c:if test="${currentWikiPage.title != mainWikiPage.title}">
+		</a>
+		<c:if test="${currentWikiPage.title != mainWikiPage.title and not currentWikiPage.deleted}">
 			&nbsp;
-			<a href="javascript:doRemove(&#39;<fmt:message key="label.wiki.remove.confirm"></fmt:message>&#39;)"
-				title="<fmt:message key="label.wiki.remove.toolTip"></fmt:message>"
-			>
-				<fmt:message key="label.wiki.remove"></fmt:message>
-			</a>
+			<c:choose>
+				<c:when test="${defineLater eq 'yes'}">
+					<a href="javascript:doRemove('<fmt:message key="label.wiki.remove.mark.confirm"></fmt:message>')"
+					   title="<fmt:message key="label.wiki.remove.mark.toolTip"></fmt:message>">
+
+				</c:when>
+				<c:otherwise>
+					<a href="javascript:doRemove('<fmt:message key="label.wiki.remove.confirm"></fmt:message>')"
+					   title="<fmt:message key="label.wiki.remove.toolTip"></fmt:message>">
+				</c:otherwise>
+			</c:choose>
+						<fmt:message key="label.wiki.remove"></fmt:message>
+					</a>
 		</c:if>
 	</div>
 </div>
@@ -319,4 +329,3 @@
 	
 -->
 </script>
-

@@ -7,9 +7,9 @@
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
 	
-	<c:set var="defineLater" value="no" />
+	<c:set var="defineLater" value="no" scope="request" />
 	<c:if test="${sessionMap.mode == 'teacher'}">
-		<c:set var="defineLater" value="yes" />
+		<c:set var="defineLater" value="yes" scope="request" />
 	</c:if>
 
 	<div id="header">
@@ -32,7 +32,7 @@
 		<html:hidden property="sessionMapID" />
 		<html:hidden property="contentFolderID"/>
 		<html:hidden property="toolContentID"/>
-		<!--<html:hidden property="mode"/>-->
+		<html:hidden property="mode" value="${sessionMap.mode}"/>
 		<html:hidden property="currentWikiPage" value="${currentWikiPage.uid}" styleId="currentWikiPage" />
 		<html:hidden property="newPageName" styleId="newPageName"/>
 		<html:hidden property="historyPageContentId" styleId="historyPageContentId"/>
@@ -40,6 +40,9 @@
 		<div id="message" style="text-align: center;">
 			<c:if test="${unsavedChanges}">
 				<fmt:message key="message.unsavedChanges" />
+			</c:if>
+			<c:if test="${currentWikiPage.deleted}">
+				<p class="warning"><fmt:message key="label.wiki.removed" /></p>
 			</c:if>
 			<logic:messagesPresent>
 				<p class="warning">

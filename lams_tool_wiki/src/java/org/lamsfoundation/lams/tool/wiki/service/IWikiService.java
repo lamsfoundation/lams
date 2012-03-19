@@ -148,6 +148,13 @@ public interface IWikiService {
      * @param wikiPage
      */
     public void deleteWikiPage(WikiPage wikiPage);
+    
+    /**
+     * Mark an existing wiki page as deleted, but do not remove it for real.
+     * 
+     * @param wikiPage
+     */
+    public void markWikiPageAsDeleted(WikiPage wikiPage);
 
     /**
      * Gets a wiki page by wiki and title

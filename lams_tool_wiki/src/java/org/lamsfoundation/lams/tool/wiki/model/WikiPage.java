@@ -22,6 +22,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     private Wiki parentWiki;
     private String title;
     private Boolean editable;
+    private Boolean deleted;
     private Set<WikiPageContent> wikiContentVersions;
     private WikiPageContent currentWikiContent;
     private WikiSession wikiSession;
@@ -78,7 +79,19 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     public void setEditable(Boolean editable) {
 	this.editable = editable;
     }
+    
+    /**
+     * @hibernate.property column="deleted" length="1"
+     * 
+     */
+    public Boolean getDeleted() {
+        return deleted;
+    }
 
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
+    
     /**
      * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
      *                order-by="uid asc"

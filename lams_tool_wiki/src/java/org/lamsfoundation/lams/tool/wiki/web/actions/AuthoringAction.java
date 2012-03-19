@@ -115,7 +115,7 @@ public class AuthoringAction extends WikiPageAction {
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, "mode", true);
+	ToolAccessMode mode = getAccessMode(request);
 
 	// Set up the authForm.
 	AuthoringForm authForm = (AuthoringForm) form;
@@ -156,7 +156,8 @@ public class AuthoringAction extends WikiPageAction {
 	if (currentPageUid != null) {
 	    currentWikiPage = wikiService.getWikiPageByUid(currentPageUid);
 	} else {
-	    currentWikiPage = wiki.getMainPage();
+	    // get real instance instead of lazily initialized handler
+	    currentWikiPage = wiki.getMainPage(); 
 	}
 	WikiPageDTO currentPageDTO = new WikiPageDTO(currentWikiPage);
 	request.setAttribute(WikiConstants.ATTR_CURRENT_WIKI, currentPageDTO);
@@ -174,12 +175,17 @@ public class AuthoringAction extends WikiPageAction {
 	// Get the child wiki pages
 	SortedSet<WikiPageDTO> wikiPageDTOs = new TreeSet<WikiPageDTO>();
 	for (WikiPage wikiPage : wiki.getWikiPages()) {
-	    wikiPageDTOs.add(new WikiPageDTO(wikiPage));
+	    // check if page exists in real, not only phantom proxied object
+	    // (happens after removing a wiki page)
+	    wikiPage = wikiService.getWikiPageByUid(wikiPage.getUid());
+	    if (wikiPage != null) {
+		wikiPageDTOs.add(new WikiPageDTO(wikiPage));
+	    }
 	}
 	request.setAttribute(WikiConstants.ATTR_WIKI_PAGES, wikiPageDTOs);
 
 	// Set up sessionMap
-	SessionMap<String, Object> map = createSessionMap(wiki, getAccessMode(request), contentFolderID, toolContentID);
+	SessionMap<String, Object> map = createSessionMap(wiki, mode, contentFolderID, toolContentID);
 	authForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
@@ -187,6 +193,29 @@ public class AuthoringAction extends WikiPageAction {
 	request.setAttribute(WikiConstants.ATTR_SESSION_MAP, map);
 
 	return mapping.findForward("success");
+    }
+
+    public ActionForward removePage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
+	Wiki wiki = wikiService.getWikiByContentId(toolContentID);
+	if (wiki.isDefineLater()) {
+	    // Only mark as removed if editing a live version (monitor/live edit)
+	    return super.removePage(mapping, form, request, response);
+	}
+	// Completely delete the page
+	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+
+	// set up wikiService
+	if (wikiService == null) {
+	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
+	}
+
+	WikiPage wikiPage = wikiService.getWikiPageByUid(currentPageUid);
+	wikiService.deleteWikiPage(wikiPage);
+
+	// return to the main page, by setting the current page to null
+	return this.returnToWiki(mapping, form, request, response, null);
     }
 
     /**
@@ -530,14 +559,11 @@ public class AuthoringAction extends WikiPageAction {
      * @return
      */
     private ToolAccessMode getAccessMode(HttpServletRequest request) {
-	ToolAccessMode mode;
 	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    mode = ToolAccessMode.TEACHER;
-	} else {
-	    mode = ToolAccessMode.AUTHOR;
+	    return ToolAccessMode.TEACHER;
 	}
-	return mode;
+	return ToolAccessMode.AUTHOR;
     }
 
     /**

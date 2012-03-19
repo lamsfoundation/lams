@@ -428,15 +428,15 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
 	// Updating the wikiPage, setting a null user which indicated this
 	// change was made in author
-	wikiService.deleteWikiPage(wikiPage);
+	wikiService.markWikiPageAsDeleted(wikiPage);
 	
 	// Send removed page notifications
 	if (toolSessionID != null && user != null) {
 	    notifyWikiChange(toolSessionID, "notify.pageRemoved.subject", "notify.pageRemoved.body", user, request);
 	}
 
-	// return to the main page, by setting the current page to null
-	return this.returnToWiki(mapping, form, request, response, null);
+	// return to the same page with information about being removed displayed
+	return this.returnToWiki(mapping, form, request, response, currentPageUid);
 
     }
 

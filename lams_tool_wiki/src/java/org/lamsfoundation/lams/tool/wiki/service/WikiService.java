@@ -739,6 +739,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     public void deleteWikiPage(WikiPage wikiPage) {
 	wikiPageDAO.delete(wikiPage);
     }
+    
+    public void markWikiPageAsDeleted(WikiPage wikiPage) {
+	wikiPage.setDeleted(true);
+	wikiPageDAO.saveOrUpdate(wikiPage);
+    }
 
     public void deleteInstructionFile(Long contentID, Long uuid, Long versionID, String type) {
 	wikiDAO.deleteInstructionFile(contentID, uuid, versionID, type);
