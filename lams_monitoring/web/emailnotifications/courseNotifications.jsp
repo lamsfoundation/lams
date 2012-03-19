@@ -226,10 +226,7 @@
 		
 		<div id="emailTextareaDiv">
 		
-			<c:set var="emailBody"><fmt:message key="email.notifications.lesson.email.body" >
-					<fmt:param>${lesson.lessonName}</fmt:param>
-					<fmt:param><lams:LAMSURL/>home.do?method=learner&lessonID=${lesson.lessonId}</fmt:param>
-				</fmt:message>
+			<c:set var="emailBody"><fmt:message key="email.notifications.course.email.body.header"/><br/><br/><fmt:message key="email.notifications.course.email.body.msg"/><br/><br/><br/>
 			</c:set>
 			<textarea rows="8" name="emailBody" id="emailBody" cols="43" >${fn:replace(emailBody, '<br/>', newLineChar)}</textarea>
 			<br/><br/>
