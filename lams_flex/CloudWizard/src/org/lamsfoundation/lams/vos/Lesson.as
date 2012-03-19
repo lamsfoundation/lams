@@ -7,11 +7,14 @@ package org.lamsfoundation.lams.vos
 	{
 		public var lessonID:uint;
 		public var lessonName:String;
-		public var lessonDescription:String;
 		public var organisationID:uint;
 		public var learningDesignID:uint;
 		
 		// Advanced options
+		public var enableLessonIntro:Boolean;
+		public var lessonDescription:String;
+		public var displayDesignImage:Boolean;
+		
 		public var learnerExportPortfolio:Boolean;
 		public var enablePresence:Boolean;
 		public var enableLiveEdit:Boolean;
@@ -47,10 +50,15 @@ package org.lamsfoundation.lams.vos
 			var data:Object = new Object();
 			data.lessonID = this.lessonID;
 			data.lessonName = this.lessonName;
-			data.lessonDescription = WDDXUtil.toWDDXNull(this.lessonDescription);
 			data.organisationID = this.organisationID;
 			data.learningDesignID = this.learningDesignID;
 			data.learnerExportPortfolio = this.learnerExportPortfolio;
+			
+			data.enableLessonIntro = this.enableLessonIntro;
+			if (this.enableLessonIntro) {
+				data.lessonDescription = WDDXUtil.toWDDXNull(this.lessonDescription);
+			}
+			data.displayDesignImage = this.displayDesignImage;
 			
 			data.enablePresence = this.enablePresence;
 			data.enableLiveEdit = this.enableLiveEdit;

@@ -210,6 +210,12 @@
 				if(scheduleDateTimePicker.selectedDate < now)
 					scheduleDateTimePicker.selectedDate = now;
 			}
+			
+			public function enableLessonIntroOption():void {
+				if(!enableLessonIntro.selected) {
+					displayDesignImage.selected = false;
+				}
+			}
 		]]>
 	</mx:Script>
 	
@@ -226,11 +232,14 @@
 		
 	<mx:Form id="advancedOptionsForm"  width="100%" height="100%">
 		<mx:VBox width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10">
+			
 			<!-- Advanced details -->
 			<mx:FormHeading label="{dictionary.getLabel('advanced.tab.form.details.label')}" />
-			<mx:FormItem id="description_fItm" label="{dictionary.getLabel('summery.desc.lbl')}" width="80%" paddingRight="20">
+			<mx:CheckBox id="enableLessonIntro" name="enableLessonIntro" selected="false" label="{dictionary.getLabel('advanced.tab.enable.lesson.intro')}" labelPlacement="right" change="enableLessonIntroOption()" />
+			<mx:FormItem id="description_fItm" label="{dictionary.getLabel('summery.desc.lbl')}" enabled="{enableLessonIntro.selected}" width="80%" paddingRight="20" paddingLeft="15">
 				<mx:TextArea id="description_txi" text="{(lesson.selectedNode.isValidDesign()) ? lesson.selectedNode.description : ''}" width="100%" height="50" fontWeight="normal"/>
 			</mx:FormItem>
+			<mx:CheckBox id="displayDesignImage" name="displayDesignImage" selected="false" enabled="{enableLessonIntro.selected}" label="{dictionary.getLabel('advanced.tab.display.design.image')}" labelPlacement="right" paddingLeft="17"/>
 			
 			<!-- Advanced general options -->
 			<mx:FormHeading label="{dictionary.getLabel('advanced.tab.form.advanced.options.label')}" paddingTop="5" />

@@ -269,9 +269,11 @@
 	<vos:Lesson id="newLesson">
 		<vos:lessonID>{lessonID}</vos:lessonID>
 		<vos:lessonName>{resourceName_txi.text}</vos:lessonName>
-		<vos:lessonDescription>{advanced.description_txi.text}</vos:lessonDescription>
 		<vos:organisationID>{organisationID}</vos:organisationID>
 		<vos:learningDesignID>{selectedNode.resourceID}</vos:learningDesignID>
+		<vos:enableLessonIntro>{advanced.enableLessonIntro.selected}</vos:enableLessonIntro>
+		<vos:lessonDescription>{advanced.description_txi.text}</vos:lessonDescription>
+		<vos:displayDesignImage>{advanced.displayDesignImage.selected}</vos:displayDesignImage>
 		<vos:learnerExportPortfolio>{advanced.enabledExportPortfolio.selected}</vos:learnerExportPortfolio>
 		<vos:enablePresence>{advanced.enablePresence.selected}</vos:enablePresence>
 		<vos:enableLiveEdit>{advanced.enabledLiveEdit.selected}</vos:enableLiveEdit>

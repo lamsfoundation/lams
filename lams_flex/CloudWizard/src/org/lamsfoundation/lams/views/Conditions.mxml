@@ -81,10 +81,10 @@
 			</mx:VBox>
 			
 			<!-- Time limits -->
-			<mx:FormHeading id="timeLimits_fH" label="{dictionary.getLabel('advanced.tab.form.time.limits.label')}"  paddingTop="8"/>
+			<mx:FormHeading id="timeLimits_fH" label="{dictionary.getLabel('advanced.tab.form.time.limits.label')}"  paddingTop="10"/>
 			<mx:Text width="100%" textAlign="left" selectable="false" text="{dictionary.getLabel('advanced.tab.form.time.limits.info.label')}" truncateToFit="true" paddingLeft="6"/>
 			<mx:CheckBox id="enableTimeLimits" name="enableTimeLimits" selected="false" label="{dictionary.getLabel('advanced.tab.form.enable.label')}" labelPlacement="right" />
-			<mx:VBox width="100%">
+			<mx:VBox width="100%" paddingLeft="14">
 				<mx:FormItem id="enableTimeLimits_fItm" label="{dictionary.getLabel('advanced.tab.form.enter.number.days.label')}" enabled="{enableTimeLimits.selected}" focusEnabled="true">
 					<mx:NumericStepper id="noDaysToLessonFinish" value="30" minimum="1" maximum="999"/>
 				</mx:FormItem>
