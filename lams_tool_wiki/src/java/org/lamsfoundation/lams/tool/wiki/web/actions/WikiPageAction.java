@@ -439,6 +439,38 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	return this.returnToWiki(mapping, form, request, response, currentPageUid);
 
     }
+    
+    /**
+     * Restore a page previously marked as removed.
+     */
+    public ActionForward restorePage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	// The page to be restored
+	Long currentPageUid = WebUtil.readLongParam(request, WikiConstants.ATTR_CURRENT_WIKI);
+
+	// Get the session information for notifications
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
+	WikiUser user = getCurrentUser(toolSessionID);
+	
+	// set up wikiService
+	if (wikiService == null) {
+	    wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
+	}
+
+	WikiPage wikiPage = wikiService.getWikiPageByUid(currentPageUid);
+
+	// Updating the wikiPage
+	wikiService.restoreWikiPage(wikiPage);
+	
+	// Send removed page notifications
+	if (toolSessionID != null && user != null) {
+	    notifyWikiChange(toolSessionID, "notify.pageRestored.subject", "notify.pageRestored.body", user, request);
+	}
+
+	// return to the same page
+	return this.returnToWiki(mapping, form, request, response, currentPageUid);
+
+    }
 
     /**
      * Toggles whether a learner wants to receive notifications for wiki changes

@@ -118,7 +118,7 @@
 		<c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	
 		<!-- Set up edit and add flags -->
-		<c:set var="editableFlag" value="${currentWikiPage.editable and not maxEditsReached and not currentWikiPage.deleted}" />
+		<c:set var="editableFlag" value="${currentWikiPage.editable and not maxEditsReached}" />
 		<c:set var="addFlag" value="${wikiDTO.allowLearnerCreatePages and not maxEditsReached}" />
 	
 	
@@ -145,7 +145,7 @@
 						</a>
 					</c:if>
 					
-					<c:if test="${editableFlag}">
+					<c:if test="${editableFlag and not currentWikiPage.deleted}">
 						&nbsp;
 						<a href="javascript:changeDiv('edit');" title="<fmt:message key="label.wiki.edit.toolTip"></fmt:message>">
 							<fmt:message key="label.wiki.edit"></fmt:message>
@@ -166,13 +166,21 @@
 						</a>
 					</c:if>
 					
-					<c:if test="${currentWikiPage.title != mainWikiPage.title && editableFlag}">
+					<c:if test="${currentWikiPage.title != mainWikiPage.title and not currentWikiPage.deleted}">
 						&nbsp;
 						<a href="javascript:doRemove('<fmt:message key="label.wiki.remove.mark.confirm"></fmt:message>')"
 							title="<fmt:message key="label.wiki.remove.mark.toolTip"></fmt:message>"
 						>
 							<fmt:message key="label.wiki.remove"></fmt:message>
 						</a>
+					</c:if>
+					<c:if test="${currentWikiPage.deleted and editableFlag}">
+						&nbsp;
+						<a href="javascript:submitWiki('restorePage')"
+							title="<fmt:message key="label.wiki.restore.toolTip"></fmt:message>"
+						>
+							<fmt:message key="label.wiki.restore"></fmt:message>
+						</a>	
 					</c:if>
 				</c:if>
 			</div>

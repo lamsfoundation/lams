@@ -47,6 +47,14 @@
 						<fmt:message key="label.wiki.remove"></fmt:message>
 					</a>
 		</c:if>
+		<c:if test="${currentWikiPage.deleted}">
+			&nbsp;
+			<a href="javascript:submitWiki('restorePage')"
+				title="<fmt:message key="label.wiki.restore.toolTip"></fmt:message>"
+			>
+				<fmt:message key="label.wiki.restore"></fmt:message>
+			</a>	
+		</c:if>
 	</div>
 </div>
 

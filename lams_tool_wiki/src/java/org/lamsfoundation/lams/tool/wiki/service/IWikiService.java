@@ -155,7 +155,14 @@ public interface IWikiService {
      * @param wikiPage
      */
     public void markWikiPageAsDeleted(WikiPage wikiPage);
-
+    
+    /**
+     * Mark an existing wiki page as not deleted.
+     * 
+     * @param wikiPage
+     */
+    public void restoreWikiPage(WikiPage wikiPage);
+    
     /**
      * Gets a wiki page by wiki and title
      * 
