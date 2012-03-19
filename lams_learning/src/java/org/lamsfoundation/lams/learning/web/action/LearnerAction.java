@@ -409,7 +409,7 @@ public class LearnerAction extends LamsDispatchAction {
     // LDEV-2835
 	response.addHeader("Pragma", "no-cache");
     response.addHeader("Cache-Control", "no-cache");
-    response.addDateHeader("Expires", System.currentTimeMillis() - (1000L * 60L * 60L * 24L * 365L));
+    response.addDateHeader("Expires", System.currentTimeMillis() - LamsDispatchAction.HEADER_EXPIRES_VALUE);
 
     response.getWriter().print(wddxPacket);
 

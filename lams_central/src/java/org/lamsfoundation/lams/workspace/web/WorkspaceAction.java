@@ -202,9 +202,9 @@ public class WorkspaceAction extends LamsDispatchAction {
         
         // LDEV-2833 IE9 won't refresh designs in lesson wizard
         // so we purposely need to tell the browser not to cache this
-        response.addHeader("Pragma", "no-cache");
-        response.addHeader("Cache-Control", "no-cache");
-        response.addDateHeader("Expires", System.currentTimeMillis() - (1000L * 60L * 60L * 24L * 365L));
+	response.addHeader("Pragma", "no-cache");
+	response.addHeader("Cache-Control", "no-cache");
+	response.addDateHeader("Expires", System.currentTimeMillis() - LamsDispatchAction.HEADER_EXPIRES_VALUE);
 
 		String methodKey = "getFolderContents";
 		try {

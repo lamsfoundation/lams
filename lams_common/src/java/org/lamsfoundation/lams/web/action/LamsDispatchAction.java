@@ -45,6 +45,7 @@ public abstract class LamsDispatchAction extends DispatchAction {
     public static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain";
     public static final String CONTENT_TYPE_TEXT_HTML = "text/html";
     public static final String CONTENT_TYPE_TEXT_XML = "text/xml";
+    public static final long HEADER_EXPIRES_VALUE = 1000L * 60L * 60L * 24L * 365L;
 
     protected static TokenProcessor token = TokenProcessor.getInstance();
     protected static Logger log = Logger.getLogger(LamsDispatchAction.class);
