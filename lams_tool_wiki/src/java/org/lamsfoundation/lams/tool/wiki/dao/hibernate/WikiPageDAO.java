@@ -17,9 +17,10 @@ public class WikiPageDAO extends BaseDAO implements IWikiPageDAO {
     public static final String GET_BY_SESSION_AND_TITLE = "from tl_lawiki10_wiki_page in class "
 	    + WikiPage.class.getName() + " where wiki_session_uid=? AND title=?";
 
-    public static final String REMOVE_WIKI_REFERENCES = "UPDATE tl_lawiki10_wiki_page_content "
-	    + "SET body=REPLACE(body,?,?) WHERE editor IS NULL";
-    
+    public static final String REMOVE_WIKI_REFERENCES = "UPDATE tl_lawiki10_wiki_page_content AS content "
+	    + "JOIN tl_lawiki10_wiki_page AS page ON content.wiki_page_uid=page.uid "
+	    + "SET content.body=REPLACE(content.body,?,?) WHERE content.editor IS NULL AND page.wiki_uid=?";
+
     public static final String CHANGE_WIKI_JAVASCRIPT_METHOD = "javascript:changeWikiPage('?')";
 
     public void saveOrUpdate(WikiPage wikiPage) {
@@ -59,6 +60,7 @@ public class WikiPageDAO extends BaseDAO implements IWikiPageDAO {
 	SQLQuery query = this.getSession().createSQLQuery(REMOVE_WIKI_REFERENCES);
 	query.setString(0, codeToReplace);
 	query.setString(1, replacementCode);
+	query.setLong(2, removedWikiPage.getParentWiki().getUid());
 	
 	super.delete(object);
 	query.executeUpdate();
