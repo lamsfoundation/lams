@@ -189,7 +189,9 @@ public class MonitoringAction extends LamsDispatchAction
     		Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresenceAvailable", false);
     		Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImAvailable", false);
     		Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
-    		Lesson newLesson = monitoringService.initializeLesson(title,desc,learnerExportAvailable,ldId,organisationId,getUserId(), null, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, Boolean.FALSE, null, null);
+    		Lesson newLesson = monitoringService.initializeLesson(title, desc, ldId, organisationId, getUserId(), null,
+    			Boolean.FALSE, Boolean.FALSE, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
+    			liveEditEnabled, Boolean.FALSE, null, null);
     		
     		flashMessage = new FlashMessage("initializeLesson",newLesson.getLessonId());
 		} catch (Exception e) {
@@ -761,6 +763,8 @@ public class MonitoringAction extends LamsDispatchAction
     		languageCollection.add(new String("label.completed"));	
     		languageCollection.add(new String("advanced.tab.form.validation.schedule.date.error"));
     		languageCollection.add(new String("alert.no.learner.data"));
+    		languageCollection.add(new String("advanced.tab.enable.lesson.intro"));
+    		languageCollection.add(new String("advanced.tab.display.design.image"));
     	}
 		
 	String languageOutput = "<xml><language>";

@@ -236,22 +236,12 @@ public class LessonDataAccessTestCase extends AbstractCommonTestCase
     /**
      * Create lesson based on the information we initialized.
      */
-    protected void initLessonData()
-    {
-        testLesson = new Lesson("Test Lesson",
-                                "Test lesson description",
-                                new Date(System.currentTimeMillis()),
-                                testUser,
-                                Lesson.CREATED,
-                                null,
-                                true,
-                                testLearningDesign,
-                                testLessonClass,//lesson class
-                                testOrg,
-                                new HashSet(),
-                                false,
-                                false,
-                                false);
+    protected void initLessonData() {
+	testLesson = new Lesson("Test Lesson", "Test lesson description", new Date(System.currentTimeMillis()),
+		testUser, Lesson.CREATED, null, testLearningDesign, new HashSet(), false, false, true, false, false,
+		false, false, null);
+	testLesson.setLessonClass(testLessonClass);
+	testLesson.setOrganisation(testOrg);
     }
   
 

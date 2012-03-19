@@ -37,19 +37,20 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
+import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.svg.SVGGenerator;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -62,6 +63,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action path="/home" validate="false" parameter="method"
  * @struts:action-forward name="sysadmin" path="/sysadmin.jsp"
  * @struts:action-forward name="learner" path="/learner.jsp"
+ * @struts:action-forward name="lessonIntro" path="/lessonIntro.jsp"
  * @struts:action-forward name="author" path="/author.jsp"
  * @struts:action-forward name="monitorLesson" path="/monitorLesson.jsp"
  * @struts:action-forward name="addLesson" path="/addLesson.jsp"
@@ -77,43 +79,8 @@ public class HomeAction extends DispatchAction {
 
     private static IUserManagementService service;
     private static ILessonService lessonService;
+    private static ILearningDesignService learningDesignService;
     private static IGroupUserDAO groupUserDAO;
-
-    private IUserManagementService getService() {
-	if (service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
-	    service = (IUserManagementService) ctx.getBean("userManagementService");
-	}
-	return service;
-    }
-
-    private ILessonService getLessonService() {
-	if (lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
-	    lessonService = (ILessonService) ctx.getBean("lessonService");
-	}
-	return lessonService;
-    }
-    
-    private IGroupUserDAO getGroupUserDAO() {
-	if (groupUserDAO == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
-	    groupUserDAO = (IGroupUserDAO) ctx.getBean("groupUserDAO");
-	}
-	return groupUserDAO;
-    }
-
-    private UserDTO getUser() {
-	HttpSession ss = SessionManager.getSession();
-	return (UserDTO) ss.getAttribute(AttributeNames.USER);
-    }
-
-    private User getRealUser(UserDTO dto) {
-	return getService().getUserByLogin(dto.getLogin());
-    }
 
     /**
      * request for sysadmin environment
@@ -201,7 +168,31 @@ public class HomeAction extends DispatchAction {
 		String presenceUrl = Configuration.get(ConfigurationKeys.XMPP_DOMAIN);
 		req.setAttribute("presenceUrl", presenceUrl);
 		req.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
-		return mapping.findForward("learner");
+		
+		//show lesson intro page if required
+		if (lesson.isEnableLessonIntro()) {
+		    req.setAttribute("lessonName", lesson.getLessonName());
+		    req.setAttribute("lessonDescription", lesson.getLessonDescription());
+		    req.setAttribute("displayDesignImage", lesson.isDisplayDesignImage());
+		    
+		    //check if we need to create learning design SVG
+		    if (lesson.isDisplayDesignImage()) {
+			Long learningDesignId = lesson.getLearningDesign().getLearningDesignId();
+			req.setAttribute(AttributeNames.PARAM_LEARNINGDESIGN_ID, learningDesignId);
+
+			if (lesson.getLearnerProgresses().isEmpty()) {
+			    // create svg, png files on the server
+			    getLearningDesignService().createLearningDesignSVG(learningDesignId,
+				    SVGGenerator.OUTPUT_FORMAT_SVG);
+			    getLearningDesignService().createLearningDesignSVG(learningDesignId,
+				    SVGGenerator.OUTPUT_FORMAT_PNG);
+			}		
+		    }
+		    return mapping.findForward("lessonIntro");
+		} else {
+		    return mapping.findForward("learner");
+		}
+		
 	    }
 
 	} catch (Exception e) {
@@ -371,5 +362,50 @@ public class HomeAction extends DispatchAction {
     private ActionForward displayMessage(ActionMapping mapping, HttpServletRequest req, String messageKey) {
 	req.setAttribute("messageKey", messageKey);
 	return mapping.findForward("message");
+    }
+    
+    private IUserManagementService getService() {
+	if (service == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    service = (IUserManagementService) ctx.getBean("userManagementService");
+	}
+	return service;
+    }
+
+    private ILessonService getLessonService() {
+	if (lessonService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    lessonService = (ILessonService) ctx.getBean("lessonService");
+	}
+	return lessonService;
+    }
+    
+    private ILearningDesignService getLearningDesignService() {
+	if (learningDesignService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
+	}
+	return learningDesignService;
+    }
+    
+    private IGroupUserDAO getGroupUserDAO() {
+	if (groupUserDAO == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    groupUserDAO = (IGroupUserDAO) ctx.getBean("groupUserDAO");
+	}
+	return groupUserDAO;
+    }
+
+    private UserDTO getUser() {
+	HttpSession ss = SessionManager.getSession();
+	return (UserDTO) ss.getAttribute(AttributeNames.USER);
+    }
+
+    private User getRealUser(UserDTO dto) {
+	return getService().getUserByLogin(dto.getLogin());
     }
 }

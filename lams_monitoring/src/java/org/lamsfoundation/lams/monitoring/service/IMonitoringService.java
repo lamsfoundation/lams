@@ -65,8 +65,6 @@ public interface IMonitoringService {
      *            the name of the lesson
      * @param lessonDescription
      *            the description of the lesson.
-     * @param learnerExportAvailable
-     *            should the export portfolio option be made available to the learner?
      * @param learningDesignId
      *            the selected learning design
      * @param organisationId
@@ -76,6 +74,12 @@ public interface IMonitoringService {
      *            the user who want to create this lesson.
      * @param customCSV
      *            the custom comma separated values to be used by toolAdapters
+     * @param enableLessonIntro
+     *            display an intro page to the lesson
+     * @param displayDesignImage
+     *            display the design image or not
+     * @param learnerExportAvailable
+     *            should the export portfolio option be made available to the learner?
      * @param enableNotifications
      *            enable "email notifications" link for the current lesson
      * @param numberDaysToLessonFinish
@@ -83,10 +87,11 @@ public interface IMonitoringService {
      *            feature)
      * @return the lesson initialized.
      */
-    public Lesson initializeLesson(String lessonName, String lessonDescription, Boolean learnerExportAvailable,
-	    long learningDesignId, Integer organisationId, Integer userID, String customCSV,
-	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Boolean enableNotifications, Integer numberDaysToLessonFinish, Long precedingLessonId);
+    public Lesson initializeLesson(String lessonName, String lessonDescription, long learningDesignId,
+	    Integer organisationId, Integer userID, String customCSV, Boolean enableLessonIntro,
+	    Boolean displayDesignImage, Boolean learnerExportAvailable, Boolean learnerPresenceAvailable,
+	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableNotifications,
+	    Integer numberDaysToLessonFinish, Long precedingLessonId);
 
     /**
      * Initialize a new lesson so as to start the learning process for a normal

@@ -648,6 +648,8 @@ CREATE TABLE lams_lesson (
      , end_date_time DATETIME
      , schedule_end_date_time DATETIME
      , previous_state_id INT(3)
+     , enable_lesson_intro TINYINT(1) DEFAULT 0
+     , display_design_image TINYINT(1) DEFAULT 0
      , learner_exportport_avail TINYINT(1) DEFAULT 1
      , learner_presence_avail TINYINT(1) DEFAULT 0
      , learner_im_avail TINYINT(1) DEFAULT 0

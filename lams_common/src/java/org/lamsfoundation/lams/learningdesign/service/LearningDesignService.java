@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.ILoadedMessageSourceService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.svg.SVGGenerator;
@@ -198,12 +199,12 @@ public class LearningDesignService implements ILearningDesignService{
 		return libraries;
 	}
 	
-	public boolean getLearningDesignSVG(Long learningDesignId, int imageFormat, OutputStream out) throws JDOMException, IOException, TranscoderException, ExportToolContentException {
+	public String createLearningDesignSVG(Long learningDesignId, int imageFormat) throws JDOMException, IOException, TranscoderException {
 	    //construct absolute filePath to SVG
 	    String earFolder = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
 	    if (StringUtils.isBlank(earFolder)) {
         	log.error("Unable to get path to the LAMS Server URL from the configuration table. SVG image creation failed");
-        	return false;
+        	return null;
 	    }
 	    String directoryToStoreFile = FileUtil.getFullPath(earFolder, "lams-www.war\\secure\\learning-design-images");
 	    
@@ -234,36 +235,7 @@ public class LearningDesignService implements ILearningDesignService{
 		svgGenerator.streamOutDocument(fileOutputStream, imageFormat);		
 	    }
 	    
-	    //stream out SVG to the specified by user OutputStream
-	    InputStream in = null;
-	    try {
-		in = new BufferedInputStream(new FileInputStream(file));
-		int count = 0;
-
-		int ch;
-		while ((ch = in.read()) != -1) {
-		    out.write((char) ch);
-		    count++;
-		}
-		out.flush();
-	    } catch (Exception e) {
-		log.error("Exception occured writing out file:" + e.getMessage());
-		throw new ExportToolContentException(e);
-	    } finally {
-		try {
-		    if (in != null) {
-			in.close(); // very important
-		    }
-		    if (out != null) {
-			out.close();
-		    }
-		} catch (Exception e) {
-		    log.error("Error Closing file. File already written out - no exception being thrown.", e);
-		    return false;
-		}
-	    }
-	    
-	    return true;
+	    return absoluteFilePath;
 	}
 
 	private void internationaliseActivities(Collection activities) {		

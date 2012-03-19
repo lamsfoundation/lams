@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.learningdesign.service;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -80,16 +79,14 @@ public interface ILearningDesignService{
 	public void setValid(Long learningLibraryId, boolean valid);
 	
 	/**
-	 * Streams out learning design SVG into specified OutputStream. Additionally, stores resulted SVG into file system for caching.
+	 * Creates learning design SVG/PNG file. Also stores it into the file system for caching.
 	 * 
-	 * @param learningDesignId
-	 * @param imageFormat either SVGGenerator.OUTPUT_FORMAT_SVG or SVGGenerator.OUTPUT_FORMAT_PNG
-	 * @param out
-	 * @return whether operation was successful or not
+	 * @param learningDesignId source learning design for the outcome image
+	 * @param imageFormat it can be either SVGGenerator.OUTPUT_FORMAT_SVG or SVGGenerator.OUTPUT_FORMAT_PNG
+	 * @return
 	 * @throws JDOMException
 	 * @throws IOException
 	 * @throws TranscoderException
-	 * @throws ExportToolContentException
 	 */
-	boolean getLearningDesignSVG(Long learningDesignId, int imageFormat, OutputStream out) throws JDOMException, IOException, TranscoderException, ExportToolContentException;	
+	String createLearningDesignSVG(Long learningDesignId, int imageFormat) throws JDOMException, IOException, TranscoderException;
 }

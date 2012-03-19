@@ -45,10 +45,16 @@
 		</property>
 		<property name="previousLessonStateId" type="java.lang.Integer"
 			column="previous_state_id" length="3">
+		</property>                
+		<property name="enableLessonIntro" type="java.lang.Boolean"
+        		column="enable_lesson_intro" length="1">
+		</property>
+		<property name="displayDesignImage" type="java.lang.Boolean"
+        		column="display_design_image" length="1">
 		</property>
 		<property name="learnerExportAvailable" type="java.lang.Boolean"
-        	column="learner_exportport_avail" length="1">
-        </property>
+	        	column="learner_exportport_avail" length="1">
+        	</property>
         <property name="scheduledNumberDaysToLessonFinish" type="java.lang.Integer"
         	column="scheduled_number_days_to_lesson_finish" length="3">
         </property>

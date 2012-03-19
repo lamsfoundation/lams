@@ -23,6 +23,8 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.webservice;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -31,6 +33,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.security.Authenticator;
@@ -110,8 +113,14 @@ public class LearningDesignSVGServlet extends HttpServlet {
 		contentType = "image/png";
 	    }	    
 	    response.setContentType(contentType);
-	    OutputStream out = response.getOutputStream();
-	    learningDesignService.getLearningDesignSVG(learningDesignId, imageFormat, out);
+	   
+	    String imagePath = learningDesignService.createLearningDesignSVG(learningDesignId, imageFormat);
+	    
+	    OutputStream output = response.getOutputStream();
+	    FileInputStream input = new FileInputStream(imagePath);
+	    IOUtils.copy(input, output);
+	    IOUtils.closeQuietly(input);
+	    IOUtils.closeQuietly(output);
 	    
 	} catch (Exception e) {
 	    log.error("Problem with LearningDesignRepositoryServlet request", e);

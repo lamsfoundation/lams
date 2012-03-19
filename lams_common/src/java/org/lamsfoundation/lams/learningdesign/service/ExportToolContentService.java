@@ -62,6 +62,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -667,13 +668,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    //generate SVG image
 	    if (format != ExportToolContentService.PACKAGE_FORMAT_IMS) {
 		
-		String svgFileName = FileUtil.getFullPath(contentDir, ExportToolContentService.SVG_IMAGE_FILE_NAME);
-		FileOutputStream svgOutputStream = new FileOutputStream(svgFileName);
-		service.getLearningDesignSVG(learningDesignId, SVGGenerator.OUTPUT_FORMAT_SVG, svgOutputStream);
+		String destinationPath = FileUtil.getFullPath(contentDir, ExportToolContentService.SVG_IMAGE_FILE_NAME);
+		String svgPath = service.createLearningDesignSVG(learningDesignId, SVGGenerator.OUTPUT_FORMAT_SVG);
+		FileUtils.copyFile(new File(svgPath),  new File(destinationPath));
 		
-		String pngFileName = FileUtil.getFullPath(contentDir, ExportToolContentService.PNG_IMAGE_FILE_NAME);
-		FileOutputStream pngOutputStream = new FileOutputStream(pngFileName);		
-		service.getLearningDesignSVG(learningDesignId, SVGGenerator.OUTPUT_FORMAT_PNG, pngOutputStream);
+		destinationPath = FileUtil.getFullPath(contentDir, ExportToolContentService.PNG_IMAGE_FILE_NAME);
+		String pngPath = service.createLearningDesignSVG(learningDesignId, SVGGenerator.OUTPUT_FORMAT_PNG);
+		FileUtils.copyFile(new File(pngPath),  new File(destinationPath));
 	    }
 
 	    log.debug("Learning design xml export success");

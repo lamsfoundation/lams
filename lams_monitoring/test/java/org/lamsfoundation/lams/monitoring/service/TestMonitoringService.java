@@ -156,8 +156,9 @@ public class TestMonitoringService extends AbstractLamsTestCase {
 	String idName = "learning_design_id";
 	long previousLDId = getMaxId(lamsLearningDesignTableName, idName);
 
-	Lesson testLesson = monitoringService.initializeLesson("Test_Lesson", "Test_Description", Boolean.TRUE,
-		TEST_LEARNING_DESIGN_ID, null, testUser.getUserId(), null, false, false, false, false, null, null);
+	Lesson testLesson = monitoringService.initializeLesson("Test_Lesson", "Test_Description",
+		TEST_LEARNING_DESIGN_ID, null, testUser.getUserId(), null, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE,
+		false, false, false, false, null, null);
 	TestMonitoringService.TEST_LESSON_ID = testLesson.getLessonId();
 	Lesson createdLesson = lessonDao.getLesson(TestMonitoringService.TEST_LESSON_ID);
 	assertNotNull(createdLesson);

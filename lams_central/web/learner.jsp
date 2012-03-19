@@ -13,10 +13,10 @@
 	
 <c:choose>
 	<c:when test="${enableFlash}">
-		<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/mainflash.jsp?lessonID=<c:out value="${lessonID}"/>&portfolioEnabled=<c:out value="${portfolioEnabled}"/>&presenceEnabledPatch=<c:out value="${presenceEnabledPatch}"/>&presenceImEnabled=<c:out value="${presenceImEnabled}"/>&presenceUrl=<c:out value="${presenceUrl}"/>&createDateTime=<c:out value="${createDateTime}"/>&title=<c:out value="${title}"/><c:if test="${mode != null}">&mode=<c:out value="${mode}"/></c:if><c:if test="${param.notifyCloseURL != null}">&notifyCloseURL=<c:out value="${param.notifyCloseURL}"/></c:if>">
+		<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/mainflash.jsp?lessonID=<c:out value="${param.lessonID}"/>&portfolioEnabled=<c:out value="${param.portfolioEnabled}"/>&presenceEnabledPatch=<c:out value="${param.presenceEnabledPatch}"/>&presenceImEnabled=<c:out value="${param.presenceImEnabled}"/>&presenceUrl=<c:out value="${param.presenceUrl}"/>&createDateTime=<c:out value="${param.createDateTime}"/>&title=<c:out value="${param.title}"/><c:if test="${param.mode != null}">&mode=<c:out value="${param.mode}"/></c:if><c:if test="${param.param.notifyCloseURL != null}">&notifyCloseURL=<c:out value="${param.param.notifyCloseURL}"/></c:if>">
 	</c:when>
 	<c:otherwise>
-		<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/mainnoflash.jsp?lessonID=<c:out value="${lessonID}"/>&portfolioEnabled=<c:out value="${portfolioEnabled}"/>&presenceEnabledPatch=<c:out value="${presenceEnabledPatch}"/>&presenceImEnabled=<c:out value="${presenceImEnabled}"/>&presenceUrl=<c:out value="${presenceUrl}"/>&createDateTime=<c:out value="${createDateTime}"/>&title=<c:out value="${title}"/><c:if test="${mode != null}">&mode=<c:out value="${mode}"/></c:if><c:if test="${param.notifyCloseURL != null}">&notifyCloseURL=<c:out value="${param.notifyCloseURL}"/></c:if>">
+		<META HTTP-EQUIV="Refresh" CONTENT="0;URL=learning/mainnoflash.jsp?lessonID=<c:out value="${param.lessonID}"/>&portfolioEnabled=<c:out value="${param.portfolioEnabled}"/>&presenceEnabledPatch=<c:out value="${param.presenceEnabledPatch}"/>&presenceImEnabled=<c:out value="${param.presenceImEnabled}"/>&presenceUrl=<c:out value="${param.presenceUrl}"/>&createDateTime=<c:out value="${param.createDateTime}"/>&title=<c:out value="${param.title}"/><c:if test="${param.mode != null}">&mode=<c:out value="${param.mode}"/></c:if><c:if test="${param.param.notifyCloseURL != null}">&notifyCloseURL=<c:out value="${param.param.notifyCloseURL}"/></c:if>">
 	</c:otherwise>
 </c:choose>
 
