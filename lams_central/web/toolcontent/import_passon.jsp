@@ -1,8 +1,8 @@
 <%@ page language="java"  pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
-<c:set var="randomID"><lams:generateID/></c:set>
-<c:set var="passonurl" value="../toolcontent/import_passon.swf?learningDesignID=${learningDesignID}&uniqueID=${randomID}"/>
+<c:set var="userID"><lams:user property="userID"/></c:set>
+<c:set var="passonurl" value="../toolcontent/import_passon.swf?learningDesignID=${learningDesignID}&uniqueID=${userID}"/>
 
 <!-- URL's used in the movie-->
 <!-- text used in the movie-->
