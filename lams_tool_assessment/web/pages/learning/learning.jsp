@@ -2,6 +2,10 @@
         "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" />
@@ -31,7 +35,7 @@
 	
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.countdown.css'/>" />
 
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.4.2.min.js'/>"></script> 
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-1.7.1.min.js"></script> 
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.countdown.js'/>"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.blockUI.js'/>"></script>
 	<script type="text/javascript">
