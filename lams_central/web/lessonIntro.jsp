@@ -26,6 +26,8 @@
 		.ie img.svg { display: none }
 		.gecko div.svgobject { display: inline }
 		.gecko img.svg { display: none }
+		
+		#sequencePreview {padding: 10px; text-align: center;}
 	</style>	
 	
 </lams:head>

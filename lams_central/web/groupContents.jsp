@@ -26,10 +26,10 @@
 					<td class="td-lesson" style="word-wrap: break-word;">
 						<c:choose>
 							<c:when test="${empty lesson.url}">
-								<a title="<c:out value="${lesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${lesson.name}" /></a> 
+								<a class="disabled-sequence-name-link"> <c:out value="${lesson.name}" /></a> 
 							</c:when>
 							<c:otherwise>
-								<a title="<c:out value="${lesson.description}"/>" href="<c:out value="${lesson.url}"/>" class="sequence-name-link"> <c:out value="${lesson.name}" /></a> 
+								<a href="<c:out value="${lesson.url}"/>" class="sequence-name-link"> <c:out value="${lesson.name}" /></a> 
 							</c:otherwise>
 						</c:choose>
                         </td>
@@ -125,10 +125,10 @@
 						<td class="td-lesson" style="word-wrap: break-word;">
 							<c:choose>
 								<c:when test="${empty childLesson.url}">
-									<a title="<c:out value="${childLesson.description}"/>" class="disabled-sequence-name-link"> <c:out value="${childLesson.name}" /></a> 
+									<a class="disabled-sequence-name-link"> <c:out value="${childLesson.name}" /></a> 
 								</c:when>
 								<c:otherwise>
-									<a title="<c:out value="${childLesson.description}"/>" href="<c:out value="${childLesson.url}"/>" class="sequence-name-link"> <c:out value="${childLesson.name}" /></a> 
+									<a href="<c:out value="${childLesson.url}"/>" class="sequence-name-link"> <c:out value="${childLesson.name}" /></a> 
 								</c:otherwise>
 							</c:choose>
 						</td>
