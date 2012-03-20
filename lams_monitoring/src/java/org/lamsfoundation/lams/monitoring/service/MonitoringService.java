@@ -530,9 +530,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    long ldId = WDDXProcessor.convertToLong(AttributeNames.PARAM_LEARNINGDESIGN_ID, table
 		    .get(AttributeNames.PARAM_LEARNINGDESIGN_ID));
 	    String customCSV = WDDXProcessor.convertToString(WDDXTAGS.CUSTOM_CSV, table.get(WDDXTAGS.CUSTOM_CSV));
-	    boolean enableLessonIntro = WDDXProcessor.convertToBoolean("enableLessonIntro",
+	    Boolean enableLessonIntro = WDDXProcessor.convertToBoolean("enableLessonIntro",
 		    table.get("enableLessonIntro"));
-	    boolean displayDesignImage = WDDXProcessor.convertToBoolean("displayDesignImage",
+	    Boolean displayDesignImage = WDDXProcessor.convertToBoolean("displayDesignImage",
 		    table.get("displayDesignImage"));
 	    boolean learnerExportAvailable = WDDXProcessor.convertToBoolean("learnerExportPortfolio", table
 		    .get("learnerExportPortfolio"));
