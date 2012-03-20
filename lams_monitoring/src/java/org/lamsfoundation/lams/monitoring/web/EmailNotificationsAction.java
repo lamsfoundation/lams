@@ -52,6 +52,7 @@ import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.lesson.util.LessonComparator;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.EmailScheduleMessageJobDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
@@ -138,7 +139,15 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	
 	// getting the organisation
 	Organisation org = (Organisation) learnerService.getUserManagementService().findById(Organisation.class, orgId);
-	Set lessons = org.getLessons();
+	
+	//sort and filter lesson list
+	Set<Lesson> lessons = new TreeSet<Lesson>(new LessonComparator());
+	for (Lesson lesson : (Set<Lesson>)org.getLessons()) {
+	    if (!Lesson.REMOVED_STATE.equals(lesson.getLessonStateId())
+		    && !Lesson.FINISHED_STATE.equals(lesson.getLessonStateId())) {
+		lessons.add(lesson);
+	    }
+	}
 	
 	Lesson firstLesson = null;
 	Iterator<Lesson> lessonIter = lessons.iterator();
