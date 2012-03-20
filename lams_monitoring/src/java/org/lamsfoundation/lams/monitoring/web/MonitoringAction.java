@@ -739,6 +739,8 @@ public class MonitoringAction extends LamsDispatchAction
    			languageCollection.add(new String("conditions.tab.form.preceding.label"));
    			languageCollection.add(new String("conditions.tab.form.preceding.info.label"));
    			languageCollection.add(new String("advanced.tab.form.time.limits.info.label")); 
+    		languageCollection.add(new String("advanced.tab.enable.lesson.intro"));
+    		languageCollection.add(new String("advanced.tab.display.design.image"));
    			
     	} else if(module.equals("timechart")) {
 
@@ -763,8 +765,6 @@ public class MonitoringAction extends LamsDispatchAction
     		languageCollection.add(new String("label.completed"));	
     		languageCollection.add(new String("advanced.tab.form.validation.schedule.date.error"));
     		languageCollection.add(new String("alert.no.learner.data"));
-    		languageCollection.add(new String("advanced.tab.enable.lesson.intro"));
-    		languageCollection.add(new String("advanced.tab.display.design.image"));
     	}
 		
 	String languageOutput = "<xml><language>";
