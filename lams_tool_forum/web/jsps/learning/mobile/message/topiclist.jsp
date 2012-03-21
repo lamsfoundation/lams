@@ -1,4 +1,4 @@
-<%@ include file="/includes/taglibs.jsp"%>
+<%@ include file="/common/taglibs.jsp"%>
 
 
 <ul data-role="listview" data-inset="true">

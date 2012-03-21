@@ -1,4 +1,4 @@
-<%@ include file="/includes/taglibs.jsp"%>
+<%@ include file="/common/taglibs.jsp"%>
 
 <div>
 	<%-- Does not user general tag because this field need keep compatible with FCKEditor's content --%>

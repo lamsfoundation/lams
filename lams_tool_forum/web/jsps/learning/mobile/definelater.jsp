@@ -1,4 +1,4 @@
-<%@ include file="/includes/taglibs.jsp"%>
+<%@ include file="/common/taglibs.jsp"%>
 
 <div data-role="header" data-theme="b" data-nobackbtn="true">
 	<h1>

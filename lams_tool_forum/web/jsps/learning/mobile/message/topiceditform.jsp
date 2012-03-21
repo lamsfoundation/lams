@@ -1,4 +1,4 @@
-<%@ include file="/includes/taglibs.jsp"%>
+<%@ include file="/common/taglibs.jsp"%>
 
 <div class="field-name title-space-top">
 	<fmt:message key="message.label.subject" />

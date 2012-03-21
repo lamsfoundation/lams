@@ -1,5 +1,5 @@
 <%@ page language="java" %>
-<%@ include file="/includes/taglibs.jsp" %>
+<%@ include file="/common/taglibs.jsp" %>
 <br />
 <table align="center"><tr>
 <td valign="top"><html:img page="/images/icon_error.gif" /></td>

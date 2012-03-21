@@ -1,4 +1,4 @@
-<%@ include file="/includes/taglibs.jsp"%>
+<%@ include file="/common/taglibs.jsp"%>
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
