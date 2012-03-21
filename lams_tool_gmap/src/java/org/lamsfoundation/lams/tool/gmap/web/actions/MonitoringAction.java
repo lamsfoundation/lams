@@ -159,7 +159,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    // Retrieve the session and content.
 	    GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionID);
 	    if (gmapSession == null) {
-		throw new GmapException("Cannot retreive session with toolSessionID" + toolSessionID);
+		throw new GmapException("Cannot retrieve session with toolSessionID" + toolSessionID);
 	    }
 
 	    // update the marker list

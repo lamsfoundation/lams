@@ -106,7 +106,7 @@ public class LearningAction extends LamsDispatchAction {
 				.getSessionBySessionId(toolSessionID);
 		if (videoRecorderSession == null) {
 			throw new VideoRecorderException(
-					"Cannot retreive session with toolSessionID"
+					"Cannot retrieve session with toolSessionID"
 							+ toolSessionID);
 		}
 

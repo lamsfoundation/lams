@@ -115,7 +115,7 @@ public class LearningAction extends WikiPageAction {
 	// Retrieve the session and content.
 	WikiSession wikiSession = wikiService.getSessionBySessionId(toolSessionID);
 	if (wikiSession == null) {
-	    throw new WikiException("Cannot retreive session with toolSessionID" + toolSessionID);
+	    throw new WikiException("Cannot retrieve session with toolSessionID" + toolSessionID);
 	}
 
 	Wiki wiki = wikiSession.getWiki();

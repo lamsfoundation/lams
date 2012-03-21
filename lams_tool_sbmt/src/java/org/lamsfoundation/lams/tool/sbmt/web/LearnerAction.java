@@ -421,7 +421,7 @@ public class LearnerAction extends DispatchAction {
 	    dto.setLimitUploadLeft(limitUploadLeft);
 	}
 
-	// retreive notebook reflection entry.
+	// retrieve notebook reflection entry.
 	ISubmitFilesService submitFilesService = getService();
 
 	NotebookEntry notebookEntry = submitFilesService.getEntry((Long) sessionMap

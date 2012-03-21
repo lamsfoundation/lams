@@ -93,7 +93,7 @@ public class LearningAction extends LamsDispatchAction {
 	// Retrieve the session and content.
 	ChatSession chatSession = chatService.getSessionBySessionId(toolSessionID);
 	if (chatSession == null) {
-	    throw new ChatException("Cannot retreive session with toolSessionID" + toolSessionID);
+	    throw new ChatException("Cannot retrieve session with toolSessionID" + toolSessionID);
 	}
 
 	Chat chat = chatSession.getChat();

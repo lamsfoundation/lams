@@ -102,7 +102,7 @@ public class LearningAction extends LamsDispatchAction {
 				.getSessionBySessionId(toolSessionID);
 		if (notebookSession == null) {
 			throw new NotebookException(
-					"Cannot retreive session with toolSessionID"
+					"Cannot retrieve session with toolSessionID"
 							+ toolSessionID);
 		}
 

@@ -118,7 +118,7 @@ public class LearningAction extends LamsDispatchAction {
 				.getSessionBySessionId(toolSessionID);
 		if (scribeSession == null) {
 			throw new ScribeException(
-					"Cannot retreive session with toolSessionID"
+					"Cannot retrieve session with toolSessionID"
 							+ toolSessionID);
 		}
 		Scribe scribe = scribeSession.getScribe();

@@ -96,12 +96,12 @@ public class LearningAction extends LamsDispatchAction {
 		// Retrieve the session and content.
 		GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionID);
 		if (gmapSession == null) {
-			throw new GmapException("Cannot retreive session with toolSessionID"+ toolSessionID);
+			throw new GmapException("Cannot retrieve session with toolSessionID"+ toolSessionID);
 		}
 
 		Gmap gmap = gmapSession.getGmap();
 		if (gmap.getTitle() == null) {
-			throw new GmapException("Cannot retreive gmap with toolSessionID"+ toolSessionID);
+			throw new GmapException("Cannot retrieve gmap with toolSessionID"+ toolSessionID);
 		}
 		
 		
@@ -215,7 +215,7 @@ public class LearningAction extends LamsDispatchAction {
 			// Retrieve the session and content.
 			GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionID);
 			if (gmapSession == null) {
-				throw new GmapException("Cannot retreive session with toolSessionID"+ toolSessionID);
+				throw new GmapException("Cannot retrieve session with toolSessionID"+ toolSessionID);
 			}
 			
 			// update the marker list
@@ -273,7 +273,7 @@ public class LearningAction extends LamsDispatchAction {
 			// Retrieve the session and content.
 			GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionID);
 			if (gmapSession == null) {
-				throw new GmapException("Cannot retreive session with toolSessionID"+ toolSessionID);
+				throw new GmapException("Cannot retrieve session with toolSessionID"+ toolSessionID);
 			}
 			
 			// update the marker list

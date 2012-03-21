@@ -120,7 +120,7 @@ public class LearningAction extends LamsDispatchAction {
 	// Retrieve the session and content.
 	PixlrSession pixlrSession = pixlrService.getSessionBySessionId(toolSessionID);
 	if (pixlrSession == null) {
-	    throw new PixlrException("Cannot retreive session with toolSessionID" + toolSessionID);
+	    throw new PixlrException("Cannot retrieve session with toolSessionID" + toolSessionID);
 	}
 
 	Pixlr pixlr = pixlrSession.getPixlr();
@@ -414,7 +414,7 @@ public class LearningAction extends LamsDispatchAction {
 	// Retrieve the session and content.
 	PixlrSession pixlrSession = pixlrService.getSessionBySessionId(toolSessionID);
 	if (pixlrSession == null) {
-	    throw new PixlrException("Cannot retreive session with toolSessionID" + toolSessionID);
+	    throw new PixlrException("Cannot retrieve session with toolSessionID" + toolSessionID);
 	}
 
 	Pixlr pixlr = pixlrSession.getPixlr();

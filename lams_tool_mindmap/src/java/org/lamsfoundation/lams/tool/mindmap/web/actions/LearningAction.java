@@ -117,7 +117,7 @@ public class LearningAction extends LamsDispatchAction {
 	// Retrieve the session and content.
 	MindmapSession mindmapSession = mindmapService.getSessionBySessionId(toolSessionID);
 	if (mindmapSession == null) {
-	    throw new MindmapException("Cannot retreive session with toolSessionID: " + toolSessionID);
+	    throw new MindmapException("Cannot retrieve session with toolSessionID: " + toolSessionID);
 	}
 
 	Mindmap mindmap = mindmapSession.getMindmap();
@@ -810,7 +810,7 @@ public class LearningAction extends LamsDispatchAction {
 	    // Retrieve the session and content
 	    MindmapSession mindmapSession = mindmapService.getSessionBySessionId(toolSessionID);
 	    if (mindmapSession == null)
-		throw new MindmapException("Cannot retreive session with toolSessionID" + toolSessionID);
+		throw new MindmapException("Cannot retrieve session with toolSessionID" + toolSessionID);
 
 	    Mindmap mindmap = mindmapSession.getMindmap();
 

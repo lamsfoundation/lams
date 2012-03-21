@@ -353,8 +353,8 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    log.error("can not authenticate", e);
 	    response.sendError(response.SC_BAD_REQUEST, "can not authenticate");
 	} catch (UserInfoFetchException e) {
-	    log.error("can not retreive user information", e);
-	    response.sendError(response.SC_BAD_REQUEST, "can not retreive user information");
+	    log.error("can not retrieve user information", e);
+	    response.sendError(response.SC_BAD_REQUEST, "can not retrieve user information");
 	} catch (UserAccessDeniedException e) {
 	    log.error("user access denied", e);
 	    response.sendError(response.SC_BAD_REQUEST, "user access denied");

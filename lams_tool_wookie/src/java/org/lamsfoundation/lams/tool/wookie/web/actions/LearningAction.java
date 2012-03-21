@@ -106,7 +106,7 @@ public class LearningAction extends LamsDispatchAction {
 	// Retrieve the session and content.
 	WookieSession wookieSession = wookieService.getSessionBySessionId(toolSessionID);
 	if (wookieSession == null) {
-	    throw new WookieException("Cannot retreive session with toolSessionID" + toolSessionID);
+	    throw new WookieException("Cannot retrieve session with toolSessionID" + toolSessionID);
 	}
 
 	Wookie wookie = wookieSession.getWookie();
