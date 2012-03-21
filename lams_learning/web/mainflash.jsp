@@ -56,20 +56,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				}
 			}
 			
-			// Hook for Internet Explorer.
-			if (navigator.appName && navigator.appName.indexOf("Microsoft") != -1 && navigator.userAgent.indexOf("Windows") != -1 && navigator.userAgent.indexOf("Windows 3.1") == -1) {
-				document.write('<script language=\"VBScript\"\>\n');
-				document.write('On Error Resume Next\n');
-				document.write('Sub learning_FSCommand(ByVal command, ByVal args)\n');
-				document.write('	Call learning_DoFSCommand(command, args)\n');
-				document.write('End Sub\n');
-				document.write('</script\>\n');
-			}
-			
 			function openPopUp(args, title, h, w, resize, status, scrollbar, menubar, toolbar){
 				thePopUp = window.open(args,title,"HEIGHT="+h+",WIDTH="+w+",resizable="+resize+",scrollbars=yes,status="+status+",menubar="+menubar+", toolbar="+toolbar);
 			}
-			
 			
 			function openPopUpFS(args){
 				var params = args.split(",");
