@@ -17,8 +17,8 @@
     global $DB;
 
     $hs = required_param('hs', PARAM_ALPHANUM);
-    $ts = required_param('ts', PARAM_RAW);
-    $un = required_param('un', PARAM_ALPHANUM);
+    $ts = required_param('ts', PARAM_RAW_TRIMMED);
+    $un = required_param('un', PARAM_RAW_TRIMMED);    
     $lsid = optional_param('lsid', '', PARAM_INT);
 
     if(!isset($CFG->lamslesson_serverid)||!isset($CFG->lamslesson_serverkey))
