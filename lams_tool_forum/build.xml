@@ -539,6 +539,7 @@
 	 	<copy overwrite="yes" todir="${build.war}">
 			<fileset dir="${conf.web.dir}">
 				<include name="**"/>
+				<exclude name="WEB-INF/classes"/>
 			</fileset>
 	 	</copy>
 		
@@ -617,6 +618,7 @@
 			<fileset dir="${conf.web.dir}">
 				<include name="**"/>
 				<exclude name="WEB-INF/web.xml"/>
+				<exclude name="WEB-INF/classes"/>
 				<exclude name="**/.cvsignore"/>
 			</fileset>
 	 	</copy>
