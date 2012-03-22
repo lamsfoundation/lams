@@ -536,7 +536,7 @@ Ant build file.
 		<mkdir dir="${build.war}/WEB-INF/classes"/>
 	    <javac destdir="${build.war}/WEB-INF/classes"
 	           optimize="on"
-	           debug="on" failonerror="true"
+	           debug="off" failonerror="true"
 	           srcdir="${build.war}/WEB-INF/src" 
 		  	   excludes="**/*.smap"
 	    	   classpathref="jsp.precompile.classpath">
