@@ -1,3 +1,5 @@
+<%@ include file="/common/taglibs.jsp"%>
+
 <lams:html>
 	<lams:head>
 		<title><fmt:message key="export.title" /></title>

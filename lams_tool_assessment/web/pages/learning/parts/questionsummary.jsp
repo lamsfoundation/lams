@@ -1,3 +1,5 @@
+<%@ include file="/common/taglibs.jsp"%>
+
 <c:if test="${finishedLock && (fn:length(question.questionResults) > 1) && assessment.allowHistoryResponses}">
 	<div style="padding: 2px 15px 10px; font-style: italic; color:#47bc23;">
 		<fmt:message key="label.learning.question.summary.history.responces" />

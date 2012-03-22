@@ -10,6 +10,8 @@ drop table if exists tl_laasse10_question_result;
 drop table if exists tl_laasse10_option_answer;
 drop table if exists tl_laasse10_session;
 drop table if exists tl_laasse10_user;
+drop table if exists tl_laasse10_question_reference;
+
 create table tl_laasse10_attachment (
    uid bigint not null auto_increment,
    file_version_id bigint,

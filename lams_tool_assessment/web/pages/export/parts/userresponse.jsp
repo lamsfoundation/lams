@@ -1,3 +1,5 @@
+<%@ include file="/common/taglibs.jsp"%>
+
 					<c:choose>
 						<c:when test="${question.type == 1}">
 							<c:forEach var="questionOption" items="${question.questionOptions}">

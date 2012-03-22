@@ -1,3 +1,5 @@
+<%@ include file="/common/taglibs.jsp"%>
+
 <c:if test="${finishedLock}">
 
 	<c:if test="${assessment.allowQuestionFeedback && (question.generalFeedback != null)}">

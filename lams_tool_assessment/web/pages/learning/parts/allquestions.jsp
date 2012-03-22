@@ -1,3 +1,4 @@
+<%@ include file="/common/taglibs.jsp"%>		
 		<form id="answers" name="answers" method="post" >
 			<table cellspacing="0" class="alternative-color">
 				<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
