@@ -56,11 +56,8 @@
 		<echo>| clean                                    |</echo>
 		<echo>+------------------------------------------+</echo>
 
-		<delete dir="${build.classes.java}" quiet="false"/>
-        <delete dir="${build.classes.test}" quiet="false"/>
-		<delete dir="${build.lib}" quiet="false"/>
-		<delete dir="${build.deploy}" quiet="false"/>
-		<delete dir="${build.war}" quiet="false"/>
+		<delete dir="${build}" quiet="false"/>
+		<mkdir dir="${build}"/>
 		
 	</target>
 			
@@ -580,11 +577,8 @@
 	           optimize="off"
 	           debug="on" failonerror="false"
 	           srcdir="${build.war}/WEB-INF/src" 
-		   excludes="**/*.smap">
-	      <classpath>
-	      	<path refid="jsp.precompile.classpath"/>
-	        <pathelement location="${webapp.path}/WEB-INF/classes"/>
-	      </classpath>
+		  	   excludes="**/*.smap"
+	    	   classpathref="jsp.precompile.classpath">
 	      <include name="**" />
 	      <exclude name="tags/**" />
 	    </javac>
@@ -595,11 +589,14 @@
 			<fileset dir="${build.war}">
 				<include name="images/**"/>
 				<include name="includes/**"/>
-				<exclude name="includes/*.jsp"/>
 				<include name="WEB-INF/classes/**"/>
 				<include name="WEB-INF/struts/**"/>
 				<include name="WEB-INF/*.xml"/>
 				<exclude name="WEB-INF/web.xml"/>
+				<exclude name="**/*.jsp"/>
+				<exclude name="**/*.tag"/>
+				<exclude name="**/*.tld"/>
+				<exclude name="**/.cvsignore"/>
 			</fileset>
 		</copy>	
 	</target>
@@ -620,6 +617,7 @@
 			<fileset dir="${conf.web.dir}">
 				<include name="**"/>
 				<exclude name="WEB-INF/web.xml"/>
+				<exclude name="**/.cvsignore"/>
 			</fileset>
 	 	</copy>
 	</target>
