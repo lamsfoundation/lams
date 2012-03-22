@@ -33,6 +33,7 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-lams" prefix="lams"%>
 
 <%@ attribute name="formID" required="true" rtexprvalue="true" %>
 <%@ attribute name="toolSignature" required="true" rtexprvalue="true" %>
@@ -65,35 +66,52 @@
 	<c:set var="notifyCloseURL" value="${param.notifyCloseURL}" scope="session"/>
 </c:if>
 
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
+
 <!-- begin tab content -->
 <script type="text/javascript">
+	//we set LAMS_AUTHORING_SUCCESS_FLAG to true in AuthoringAction.update() method 
 	if(<c:choose><c:when test="${LAMS_AUTHORING_SUCCESS_FLAG == true}">true</c:when><c:otherwise>false</c:otherwise></c:choose>){
-       	location.href="<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&contentFolderID=${contentFolderID}'/>";
+
+		//if defineLater is true close current window
+		if (("${defineLater}" == "true") || ("${defineLater}" == "yes")) {
+			closeWindow("defineLater");
+			
+		//show confirmation page otherwise
+		} else {
+			location.href= "<c:url value='${clearSessionActionUrl}?action=confirm&mode=${accessMode}&signature=${toolSignature}&toolContentID=${toolContentID}&customiseSessionID=${customiseSessionID}&contentFolderID=${contentFolderID}'/>";
+		}
 	}
     function doSubmit_Form_Only() {
     	document.getElementById("${formID}").submit();
     }
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
-			var notifyCloseURL = "${notifyCloseURL}";
-			if (notifyCloseURL == ""){
-				location.href="<c:url value='${clearSessionActionUrl}?action=cancel&mode=${accessMode}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
-			} else {
-				if (window.parent.opener == null){
-					window.location.href = notifyCloseURL;
-				} else {
-					window.parent.opener.location.href = notifyCloseURL;
-				}
+    		closeWindow("cancel");
+    	}
+    }
+    function closeWindow(nextAction) {
+		var notifyCloseURL = "${notifyCloseURL}";
+		if (notifyCloseURL == ""){
+			if (nextAction == "defineLater") {
+				refreshParentMonitoringWindow();
 			}
-        	
-        	//just for depress alert window when call window.close()
-        	//only available for IE browser
-        	var userAgent=navigator.userAgent;
-        	if(userAgent.indexOf('MSIE') != -1)
-	        	window.opener = "authoring"
-        	window.close();
+			location.href="<c:url value='${clearSessionActionUrl}?action=" + nextAction + "&mode=${accessMode}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
+		} else {
+			if (window.parent.opener == null){
+				window.location.href = notifyCloseURL;
+			} else {
+				window.parent.opener.location.href = notifyCloseURL;
+			}
 		}
-    }  				
+    	
+    	//just for depress alert window when call window.close()
+    	//only available for IE browser
+    	var userAgent=navigator.userAgent;
+    	if(userAgent.indexOf('MSIE') != -1)
+        	window.opener = "authoring"
+    	window.close();
+    }			
 </script>	
 <p id="saveCancelButtons" >
 		<html:link href="javascript:;" property="cancel" onclick="javascript:doCancel()" styleClass="button right-buttons space-left">
