@@ -40,7 +40,7 @@
 		#listEmailsHref {border-bottom: 1px dotted #47BC23;color: #47BC23;text-decoration: none;}
 	</style>	
 	
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-1.5.1.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/monitorToolSummaryAdvanced.js "></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jqGrid.locale-en.js"></script>
