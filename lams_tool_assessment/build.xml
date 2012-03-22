@@ -581,8 +581,8 @@
 		<echo>Compiling JSP classes</echo>
 		<mkdir dir="${build.war}/WEB-INF/classes"/>
 	    <javac destdir="${build.war}/WEB-INF/classes"
-	           optimize="off"
-	           debug="on" failonerror="false"
+	           optimize="on"
+	           debug="on" failonerror="true"
 	           srcdir="${build.war}/WEB-INF/src" 
 		  	   excludes="**/*.smap"
 	    	   classpathref="jsp.precompile.classpath">
