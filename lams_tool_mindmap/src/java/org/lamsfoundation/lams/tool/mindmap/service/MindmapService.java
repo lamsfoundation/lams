@@ -493,21 +493,23 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    Mindmap mindmap = (Mindmap) toolPOJO;
 
 	    String mindmapContent = mindmap.getMindmapExportContent();
-	    MindmapUser mindmapUser = null;
+	    if (mindmapContent != null) {
+		MindmapUser mindmapUser = null;
 
-	    XStream xstream = new XStream();
-	    xstream.alias("branch", NodeModel.class);
-	    NodeModel rootNodeModel = (NodeModel) xstream.fromXML(mindmapContent);
-	    NodeConceptModel nodeConceptModel = rootNodeModel.getConcept();
-	    List<NodeModel> branches = rootNodeModel.getBranch();
+		XStream xstream = new XStream();
+		xstream.alias("branch", NodeModel.class);
+		NodeModel rootNodeModel = (NodeModel) xstream.fromXML(mindmapContent);
+		NodeConceptModel nodeConceptModel = rootNodeModel.getConcept();
+		List<NodeModel> branches = rootNodeModel.getBranch();
 
-	    MindmapNode rootMindmapNode = null;
-	    rootMindmapNode = saveMindmapNode(rootMindmapNode, null, nodeConceptModel.getId(), nodeConceptModel
-		    .getText(), nodeConceptModel.getColor(), mindmapUser, mindmap, null);
+		MindmapNode rootMindmapNode = null;
+		rootMindmapNode = saveMindmapNode(rootMindmapNode, null, nodeConceptModel.getId(),
+			nodeConceptModel.getText(), nodeConceptModel.getColor(), mindmapUser, mindmap, null);
 
-	    // saving child Nodes into database
-	    if (branches != null) {
-		getChildMindmapNodes(branches, rootMindmapNode, mindmapUser, mindmap, null);
+		// saving child Nodes into database
+		if (branches != null) {
+		    getChildMindmapNodes(branches, rootMindmapNode, mindmapUser, mindmap, null);
+		}
 	    }
 
 	    // reset it to new toolContentId
