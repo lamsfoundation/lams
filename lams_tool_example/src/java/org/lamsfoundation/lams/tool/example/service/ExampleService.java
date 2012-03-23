@@ -31,6 +31,7 @@ import java.util.TreeMap;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -217,6 +218,43 @@ public class ExampleService implements ToolSessionManager, ToolContentManager,
 
 	public void setAuditService(IAuditService auditService) {
 		this.auditService = auditService;
+	}
+
+	public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
+	    // FIXME Auto-generated method stub
+	    
+	}
+
+	public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
+	    // FIXME Auto-generated method stub
+	    
+	}
+
+	public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath,
+		String fromVersion, String toVersion) throws ToolException {
+	    // FIXME Auto-generated method stub
+	    
+	}
+
+	public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
+		throws ToolException {
+	    // FIXME Auto-generated method stub
+	    return null;
+	}
+
+	public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+	    // FIXME Auto-generated method stub
+	    return null;
+	}
+
+	public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
+	    // FIXME Auto-generated method stub
+	    return null;
+	}
+
+	public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
+	    // FIXME Auto-generated method stub
+	    return null;
 	}
 
 }
