@@ -557,7 +557,13 @@ Ant build file.
 				<exclude name="**/*.tld"/>
 				<exclude name="**/.cvsignore"/>
 			</fileset>
-		</copy>	
+		</copy>
+		
+	 	<copy todir="${build.war.assembly}/WEB-INF/lib" flatten="true" failonerror="false">
+			<fileset dir="${basedir}/lib">
+				<include name="**/*"/>
+			</fileset>
+	 	</copy>
 	</target>
 					
 	<!-- Runs if jsp.precompile setting is NOT set in lams_build/common.properties 
@@ -578,6 +584,12 @@ Ant build file.
 				<exclude name="WEB-INF/web.xml"/>
 				<exclude name="WEB-INF/classes"/>
 				<exclude name="**/.cvsignore"/>
+			</fileset>
+	 	</copy>
+		
+	 	<copy todir="${build.war.assembly}/WEB-INF/lib" flatten="true" failonerror="false">
+			<fileset dir="${basedir}/lib">
+				<include name="**/*"/>
 			</fileset>
 	 	</copy>
 	</target>
