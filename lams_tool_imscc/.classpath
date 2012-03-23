@@ -21,5 +21,5 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/reload_2_0_1/reload-jdom.jar"/>
 	<classpathentry kind="lib" path="lib/reload_2_0_1/reload-moonunit.jar"/>
-	<classpathentry kind="output" path="web/WEB-INF/classes"/>
+	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>
