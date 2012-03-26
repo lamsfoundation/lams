@@ -1,3 +1,5 @@
+<%@ include file="/common/taglibs.jsp"%>
+
 <script language="JavaScript" type="text/javascript" src="/lams//includes/javascript/jquery-1.1.4.pack.js"></script>
 <script language="JavaScript" type="text/javascript" src="/lams//includes/javascript/jquery.dimensions.pack.js"></script>
  
