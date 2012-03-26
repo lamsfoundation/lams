@@ -6,7 +6,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
-		<classpathentry kind="var" path="JBOSS_HOME/common/lib/hibernate-core.jar" sourcepath="/lams_build/lib/hibernate/src/hibernate-src.zip">
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/hibernate-core.jar" sourcepath="/lams_build/lib/hibernate/src/hibernate-src.zip">
 		<attributes>
 			<attribute name="javadoc_location" value="http://www.hibernate.org/hib_docs/v3/api/"/>
 		</attributes>
@@ -16,5 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_contentrepository"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_central"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_learning"/>
-	<classpathentry kind="output" path="build/classes"/>
-<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/></classpath>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
+	<classpathentry kind="output" path="build/classes/java"/>
+</classpath>
