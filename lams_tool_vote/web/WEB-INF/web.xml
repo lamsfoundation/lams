@@ -234,10 +234,6 @@ http://www.gnu.org/licenses/gpl.txt
 		    <taglib-location>/WEB-INF/struts/tlds/struts-logic.tld</taglib-location>
 		</taglib>
 		<taglib>
-		    <taglib-uri>tags-logic-el</taglib-uri>
-		    <taglib-location>/WEB-INF/struts/tlds/struts-logic-el.tld</taglib-location>
-		</taglib>
-		<taglib>
 		    <taglib-uri>tags-tiles</taglib-uri>
 		    <taglib-location>/WEB-INF/struts/tlds/struts-tiles.tld</taglib-location>
 		</taglib>
