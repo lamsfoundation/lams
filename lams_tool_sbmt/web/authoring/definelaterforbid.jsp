@@ -5,7 +5,7 @@
 <lams:html>
 <lams:head>
 	<lams:headItems />
-<lams:head>
+</lams:head>
 <body class="stripes">
 	<div align="center">
 		<h1>
