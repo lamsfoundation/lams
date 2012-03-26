@@ -600,6 +600,7 @@ Ant build file.
 			<fileset dir="${build.war}">
 				<include name="images/**"/>
 				<include name="includes/**"/>
+				<include name="wikilink/**"/>
 				<include name="WEB-INF/classes/**"/>
 				<include name="WEB-INF/struts/**"/>
 				<include name="WEB-INF/*.xml"/>
