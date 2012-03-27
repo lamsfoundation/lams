@@ -58,7 +58,6 @@
 			<fileset dir="${build.classes.java}" />
 			<fileset dir="${build.classes.test}" />
 			<fileset dir="${build.lib}" />
-			<fileset dir="${build.war}" />
 		</delete>
 	</target>
 
