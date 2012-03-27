@@ -106,7 +106,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:if test="${actport.floating}">
 					<div style="margin-top: 2px">&nbsp;</div>
 				</c:if>
-				<lams:ExportPortOutput actport="${actport}"/>
+				<c:set var="includeActport" value="${actport}" scope="request" />
+				<jsp:include page="/common/exportPortOutput.jsp" />
 				<c:if test="${status.last}">
 					</UL>
 				</c:if>

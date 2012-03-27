@@ -50,7 +50,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:if test="${activity.floating}">
 		<div style="margin-top: 2px">&nbsp;</div>
 	</c:if>
-	<lams:ProgressOutput activity="${activity}"/>
+	<c:set var="includeActivity" value="${activity}" scope="request"/>
+	<jsp:include page="/common/progressOutput.jsp" />
 	<c:if test="${status.last}">
 		</UL>
 	</c:if>

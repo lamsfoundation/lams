@@ -187,6 +187,17 @@
    </tag>
    <tag>
 
+      <description>Checks whether Flash enabled for learner</description>
+      <display-name>Checks whether Flash enabled for learner</display-name>
+      <icon>    
+      </icon>
+      <name>LearnerFlashEnabled</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.LearnerFlashEnabledTag</tag-class>
+      <body-content>empty</body-content>
+
+   </tag>
+   <tag>
+
       <description>Output stylesheet based on the user preferences.</description>
       <display-name>User's chosen stylesheet</display-name>
       <icon>    
@@ -445,11 +456,7 @@
    	<tag-file>
        <name>Passon</name>
        <path>/WEB-INF/tags/Passon.tag</path>
-   	</tag-file>  
-	<tag-file>
-	    <name>ExportPortOutput</name>
-		<path>/WEB-INF/tags/ExportPortOutput.tag</path>
-   	</tag-file>  
+   	</tag-file>   
    	<tag-file>
 	    <name>Date</name>
 		<path>/WEB-INF/tags/Date.tag</path>
@@ -497,21 +504,16 @@
     </attribute>
   </tag>
   	<tag>
-		<description>Checks whether Flash enabled for learner</description>
-		<display-name>Checks whether Flash enabled for learner</display-name>
-		<icon>    
-		</icon>
-		<name>LearnerFlashEnabled</name>
-		<tag-class>org.lamsfoundation.lams.web.tag.LearnerFlashEnabledTag</tag-class>
-		<body-content>empty</body-content>
- 	</tag>
+	  	<description>Checks whether Flash enabled for learner</description>
+	  	<display-name>Checks whether Flash enabled for learner</display-name>
+	 	<icon>    
+	 	</icon>
+	 	<name>LearnerFlashEnabled</name>
+	 	<tag-class>org.lamsfoundation.lams.web.tag.LearnerFlashEnabledTag</tag-class>
+	 	<body-content>empty</body-content>
+ 	</tag> 
 	<tag-file>
 		<name>head</name>
 	    <path>/WEB-INF/tags/Head.tag</path>
 	</tag-file>  
-  	<tag-file>
-	    <name>ProgressOutput</name>
-		<path>/WEB-INF/tags/ProgressOutput.tag</path>
-   	</tag-file>  
-
 </taglib>
