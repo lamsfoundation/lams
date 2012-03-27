@@ -552,12 +552,10 @@ Ant build file.
 		<echo>Copying web resources</echo>
 		<copy todir="${build.war.assembly}">	
 			<fileset dir="${build.war}">
-				<include name="images/**"/>
-				<include name="includes/**"/>
-				<include name="WEB-INF/classes/**"/>
-				<include name="WEB-INF/struts/**"/>
-				<include name="WEB-INF/*.xml"/>
+				<include name="**"/>
+				<exclude name="WEB-INF/src/"/>
 				<exclude name="WEB-INF/web.xml"/>
+				<exclude name="**/*.java"/>
 				<exclude name="**/*.jsp"/>
 				<exclude name="**/*.tag"/>
 				<exclude name="**/*.tld"/>
