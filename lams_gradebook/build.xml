@@ -53,9 +53,13 @@
 		<mkdir dir="${build.lib}" />
 	</target>
 
-	<target name="clean" description="removes all class files">
-		<delete dir="${build}" quiet="false"/>
-		<mkdir dir="${build}"/>
+	<target name="clean" depends="preparedirs" description="removes all class files">
+		<delete>
+			<fileset dir="${build.classes.java}" />
+			<fileset dir="${build.classes.test}" />
+			<fileset dir="${build.lib}" />
+			<fileset dir="${build.war}" />
+		</delete>
 	</target>
 
 	<target name="compile.java" depends="clean" description="compile java sources">
