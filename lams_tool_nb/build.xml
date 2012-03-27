@@ -33,10 +33,6 @@ Ant build file.
 		<!-- This property is supposed to be set in eclipse  -->
 		<pathelement location="${java.class.path}" />
 	</path>
-	<path id="schemaexport.classpath">
-		<path refid="project.classpath"/>
-		<pathelement location="${build.classes.java}"/>
-	</path>
 	
 	<target name="usage">
 		<echo message=""/>
@@ -574,7 +570,8 @@ Ant build file.
 			
 			<!-- Define JSP compiler -->
 			<path id="jsp.precompile.classpath">
-				<path refid="schemaexport.classpath"/>
+				<path refid="project.classpath"/>
+				<pathelement location="${build.classes.java}"/>
 				<fileset dir="${jboss.home}/lib">
 					<include name="jboss-common-core.jar" />
 					<include name="jboss-logging-spi.jar" />

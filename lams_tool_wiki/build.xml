@@ -550,7 +550,8 @@ Ant build file.
 		
 		<!-- Define JSP compiler -->
 		<path id="jsp.precompile.classpath">
-			<path refid="schemaexport.classpath"/>
+			<path refid="project.classpath"/>
+			<pathelement location="${build.classes.java}"/>
 			<fileset dir="${jboss.home}/lib">
 				<include name="jboss-common-core.jar" />
 				<include name="jboss-logging-spi.jar" />
