@@ -179,6 +179,7 @@
 		<property name="messageService"><ref bean="commonMessageService"/></property>
 		<property name="userManagementService"><ref local="userManagementService"/></property>
 		<property name="notebookEntryDAO"><ref bean="notebookEntryDAO" /></property>
+		<property name="baseDAO"><ref bean="baseDAO" /></property>
 	</bean>
 	
 	<!--  Presence Chat Service -->
