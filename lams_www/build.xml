@@ -22,6 +22,10 @@
 		<!-- This property is supposed to be set in eclipse  -->
 		<pathelement location="${java.class.path}" />
 	</path>
+	<path id="schemaexport.classpath">
+		<path refid="project.classpath"/>
+		<pathelement location="${build.classes.java}"/>
+	</path>
 
 	<target name="usage">
 		<echo message=""/>
@@ -54,10 +58,8 @@
 	</target>
 
 	<target name="clean" depends="preparedirs" description="removes all class files">
-		<delete>
-			<fileset dir="${build.web}"/>
-			<fileset dir="${build.lib}"/>
-		</delete>
+		<delete dir="${build}" quiet="false"/>
+		<mkdir dir="${build}"/>
 		<mkdir dir="${build.web}"/>	
 		<mkdir dir="${build.lib}"/>	
 	</target>
@@ -79,59 +81,144 @@
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
 	<!-- Make the war archive  for deployment             -->
 	<!-- = = = = = = = = = = = = = = = = = = = = = = = =  -->
-	<target name="build-war" depends="clean, copyContext" description="creates war file">
-   		<delete file="${conf.web.dir}/images/learner.logo.swf"/>
-		<delete file="${conf.web.dir}/images/monitor.logo.swf"/>
-		<copy todir="${conf.web.dir}/help" overwrite="yes">
-			<fileset dir="${basedir}/web/help">
-				<include name="*.pdf" />
-			</fileset>
-		</copy>
-		<copy todir="${conf.web.dir}/images" overwrite="yes">
+	<target name="build-war" depends="clean,copyContext,jsp-plaincopy,jsp-precompile" description="creates war file">
+		<copy todir="${build.war.assembly}/images" overwrite="yes">
 			<fileset dir="${conf.dir}/${conf.application}">
 				<include name="*.swf" />
 			</fileset>
 		</copy>
-		<delete file="${conf.web.dir}"/>
-		<copy todir="${conf.web.dir}" overwrite="yes">
+		<copy todir="${build.war.assembly}" overwrite="yes">
 			<fileset dir="${conf.dir}/${conf.application}">
 				<include name="news.html" />
 			</fileset>
 		</copy>
 
 		<delete file="${build.lib}/${product}.war"/>
-		<war warfile="${build.lib}/${product}.war" manifest="${conf.web.dir}/META-INF/MANIFEST.MF"
-  				webxml="${conf.webinf.dir}/web.xml">
-			<webinf dir="${conf.webinf.dir}">
-				<include name="*.xml"/>
-				<include name="*.tld"/>
-				<include name="tags/**"/>
-				<include name="*.properties"/>
-				<include name="struts/**"/>
-				<include name="jstl/**"/>
-				<include name="tiles/**"/>
-				<exclude name="web.xml"/>
-			</webinf>
-			<fileset dir="${conf.web.dir}">
-				<include name="*.*"/>
-				<include name="secure/*.*"/>
-				<include name="images/*.*"/>
-				<include name="help/*.*"/>
-				<include name="public/*.*"/>
-				<exclude name="web.xml"/>
+		<war warfile="${build.lib}/${product}.war" 
+  				webxml="${build.war}/WEB-INF/web.xml" manifest="${conf.dir}/war/META-INF/MANIFEST.MF">
+			<fileset dir="${build.war.assembly}">
+				<include name="**" />
 			</fileset>
 		</war>
 	</target>
 	
 
 	<target name="copy-tags" depends="" description="copy the lams.tld and the lams tags">
-	   		<copy todir="${conf.webinf.dir}" overwrite="yes" file="${tag.web.dir}/lams.tld" />	
-			<copy todir="${conf.webinf.dir}/tags" overwrite="yes">
-				<fileset dir="${tag.web.dir}/tags">
-					<include name="*.tag" />
-				</fileset>
-			</copy>
-	   </target>
-
+   		<copy todir="${conf.webinf.dir}" overwrite="yes" file="${tag.web.dir}/lams.tld" />	
+		<copy todir="${conf.webinf.dir}/tags" overwrite="yes">
+			<fileset dir="${tag.web.dir}/tags">
+				<include name="*.tag" />
+			</fileset>
+		</copy>
+	</target>
+	
+	<!-- Runs if jsp.precompile setting is set in lams_build/common.properties -->
+	<target name="jsp-precompile" if="jsp.precompile">
+		<!-- Work on a copy of web files, not originals-->
+		<echo>Copying web files</echo>
+		<delete dir="${build.war}" quiet="false"/>
+	 	<copy overwrite="yes" todir="${build.war}">
+			<fileset dir="${conf.web.dir}">
+				<include name="**"/>
+				<exclude name="WEB-INF/classes"/>
+			</fileset>
+	 	</copy>
+		
+		<!-- Define JSP compiler -->
+		<path id="jsp.precompile.classpath">
+			<path refid="project.classpath"/>
+			<pathelement location="${build.classes.java}"/>
+			<fileset dir="${jboss.home}/lib">
+				<include name="jboss-common-core.jar" />
+				<include name="jboss-logging-spi.jar" />
+			</fileset>
+			<fileset dir="${jboss.ear.deployers}/jbossweb.deployer">
+				<include name="*.jar" />
+			</fileset>
+	        <fileset dir="${jboss.ear.deploy}/jbossweb.sar">
+	            <include name="jbossweb.jar" />
+	        </fileset>
+		</path>
+		<taskdef classname="org.apache.jasper.JspC" name="jasper2" classpathref="jsp.precompile.classpath" />
+		
+		<!-- Generate Java files and put servlet mappings in web.xml file -->
+		<echo>Generating Java source from JSP pages</echo>
+		<jasper2 uriroot="${build.war}"
+			webXmlFragment="${build.war}/WEB-INF/generated_web.xml"
+			outputDir="${build.war}/WEB-INF/src"
+			package="${jsp.java.src.package}"
+			addWebXmlMappings="true" validateXml="false" failOnError="true"
+		/>
+		
+		<!-- Compile main Java source as some JSPs refer to it
+		Uncomment if you get "class not found" errors when precompiling JSPs
+		<antcall target="compile-java"/>
+		-->
+		
+		<!-- Compile Java files generated from JSPs -->
+		<echo>Compiling JSP classes</echo>
+		
+		<!-- Make src folder if it does not exist i.e. no JSPs were compiled in previous step -->
+		<mkdir dir="${build.war}/WEB-INF/src"/>
+		<mkdir dir="${build.war}/WEB-INF/classes"/>
+	    <javac destdir="${build.war}/WEB-INF/classes"
+	           optimize="on"
+	           debug="off" failonerror="true"
+	           srcdir="${build.war}/WEB-INF/src" 
+		  	   excludes="**/*.smap"
+	    	   classpathref="jsp.precompile.classpath">
+	      <include name="**" />
+	      <exclude name="tags/**" />
+	    </javac>
+		
+		<!-- Prepare files for WAR, exclude plain JSP and tags -->
+		<echo>Copying web resources</echo>
+		<copy todir="${build.war.assembly}">	
+			<fileset dir="${build.war}">
+				<include name="**"/>
+				<exclude name="WEB-INF/src/"/>
+				<exclude name="WEB-INF/web.xml"/>
+				<exclude name="**/*.java"/>
+				<exclude name="**/*.jsp"/>
+				<exclude name="**/*.tag"/>
+				<exclude name="**/*.tld"/>
+				<exclude name="**/.cvsignore"/>
+			</fileset>
+		</copy>
+		
+	 	<copy todir="${build.war.assembly}/WEB-INF/lib" flatten="true" failonerror="false">
+			<fileset dir="${basedir}/lib">
+				<include name="**/*"/>
+			</fileset>
+	 	</copy>
+	</target>
+					
+	<!-- Runs if jsp.precompile setting is NOT set in lams_build/common.properties 
+		 JSPs will be compiled at runtime, which is default behaviour allowing hotdeploy -->
+	<target name="jsp-plaincopy" unless="jsp.precompile">
+		<delete dir="${build.war}" quiet="false"/>
+		
+		<echo>Copying web resources</echo>
+	 	<copy todir="${build.war}">
+			<fileset dir="${conf.web.dir}">
+				<include name="WEB-INF/web.xml"/>
+			</fileset>
+	 	</copy>
+		
+	 	<copy todir="${build.war.assembly}">
+			<fileset dir="${conf.web.dir}">
+				<include name="**"/>
+				<exclude name="WEB-INF/web.xml"/>
+				<exclude name="WEB-INF/classes"/>
+				<exclude name="**/.cvsignore"/>
+			</fileset>
+	 	</copy>
+		
+	 	<copy todir="${build.war.assembly}/WEB-INF/lib" flatten="true" failonerror="false">
+			<fileset dir="${basedir}/lib">
+				<include name="**/*"/>
+			</fileset>
+	 	</copy>
+	</target>
 </project>
 
