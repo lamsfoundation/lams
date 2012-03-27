@@ -54,7 +54,7 @@
 	
 
 	<target name="check-driver-present">
-		<available file="${db.driver}" type="file" property="driver.present"/>
+		<available file="${db.driver}" type="dir" property="driver.present"/>
 	</target>
 	<target name="panic-if-driver-not-present" unless="driver.present">
 		<fail>
@@ -88,7 +88,7 @@
          appname="learningdesign"
          prefsdir="${middlegen}"
          gui="${middlegen.gui}"
-         databaseurl="${db.url}"
+         databaseurl="${db.url.build}"
          driver="${db.driver}"
          username="${db.username}"
          password="${db.password}"
