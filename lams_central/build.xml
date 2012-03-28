@@ -407,6 +407,7 @@
 		 JSPs will be compiled at runtime, which is default behaviour allowing hotdeploy -->
 	<target name="jsp-plaincopy" unless="jsp.precompile">
 		<delete dir="${build.war}" quiet="false"/>
+		<mkdir dir="${build.war}"/>
 		
 		<!-- Add Pedagogical Planner, if available -->
 		<available file="../${lams_planner}/build.xml" property="planner_available" />
