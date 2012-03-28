@@ -219,6 +219,6 @@ public class IndexAction extends Action {
 	String plannerPath = lamsEarPath + File.separator + IndexAction.PATH_LAMS_CENTRAL + File.separator
 		+ IndexAction.PATH_PEDAGOGICAL_PLANNER;
 	File plannerDir = new File(plannerPath);
-	return plannerDir.isDirectory() && plannerDir.list().length > 0;
+	return plannerDir.isDirectory();
     }
 }

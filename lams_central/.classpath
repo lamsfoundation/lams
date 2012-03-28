@@ -18,5 +18,5 @@
 	</classpathentry>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
 	<classpathentry kind="lib" path="/lams_build/lib/xstream/joda-time-0.98.jar"/>
-	<classpathentry kind="output" path="build/classes"/>
+	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>
