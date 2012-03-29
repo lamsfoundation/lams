@@ -67,6 +67,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<lams:help style="small" page="learner"/>
 		</div>
 		
+		<c:set var="presenceUrl" scope="request"><c:out value="${param.presenceUrl}"/></c:set>
 		<c:if test="${param.presenceEnabledPatch}">
 		    <%@ include file="/includes/presenceChat.jsp" %>
 		</c:if>

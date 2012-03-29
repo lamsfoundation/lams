@@ -39,6 +39,7 @@ public class LessonDetailsDTO {
     private String lessonDescription;
     private Integer lessonStateID;
     private Date createDateTime;
+    private String createDateTimeStr;
     private Date startDateTime;
     private String startDateTimeStr;
     private Date scheduleStartDate;
@@ -73,6 +74,7 @@ public class LessonDetailsDTO {
 
 	this.lessonStateID = lesson.getLessonStateId();
 	this.createDateTime = lesson.getCreateDateTime();
+	this.createDateTimeStr = null;
 	this.startDateTime = lesson.getStartDateTime();
 	this.startDateTimeStr = null;
 	this.scheduleStartDate = lesson.getScheduleStartDate();
@@ -144,6 +146,14 @@ public class LessonDetailsDTO {
      */
     public Date getCreateDateTime() {
 	return createDateTime != null ? createDateTime : WDDXTAGS.DATE_NULL_VALUE;
+    }
+    
+    public String getCreateDateTimeStr() {
+	return createDateTimeStr != null ? createDateTimeStr : WDDXTAGS.STRING_NULL_VALUE;
+    }
+
+    public void setCreateDateTimeStr(String createDateTimeStr) {
+	this.createDateTimeStr = createDateTimeStr;
     }
 
     /**

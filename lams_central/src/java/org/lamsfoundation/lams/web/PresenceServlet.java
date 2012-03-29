@@ -26,6 +26,8 @@ package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Vector;
 
 import javax.servlet.ServletException;
@@ -40,6 +42,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
@@ -108,9 +111,13 @@ public class PresenceServlet extends LamsDispatchAction{
 		
 		ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 		
+		/* Date Format for Chat room append */
+		DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
 		Long lessonId = (Long)WebUtil.readLongParam(request,"lessonId");
-		LessonDTO dto = learnerService.getLessonData(lessonId);
-		String xmppRoomName = lessonId + dto.getCreateDateTimeString() + "@" + Configuration.get(ConfigurationKeys.XMPP_CONFERENCE);
+		Lesson lesson = learnerService.getLesson(lessonId);
+		String createDateTimeStr = sfm.format(lesson.getCreateDateTime());
+		
+		String xmppRoomName = lessonId + "_" + createDateTimeStr + "@" + Configuration.get(ConfigurationKeys.XMPP_CONFERENCE);
 		xmppRoomName = xmppRoomName.replace(" ", "_");
 		xmppRoomName = xmppRoomName.replace(":", "_");
 		Boolean xmppRoomCreated = XMPPUtil.createMultiUserChat(xmppRoomName);

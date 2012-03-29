@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -162,7 +164,11 @@ public class HomeAction extends DispatchAction {
 		req.setAttribute(AttributeNames.PARAM_PRESENCE_ENABLED, lesson.getLearnerPresenceAvailable());
 		req.setAttribute(AttributeNames.PARAM_PRESENCE_IM_ENABLED, lesson.getLearnerImAvailable());
 		req.setAttribute(AttributeNames.PARAM_TITLE, lesson.getLessonName());
-		req.setAttribute(AttributeNames.PARAM_CREATE_DATE_TIME, lesson.getCreateDateTime());
+		
+		/* Date Format for Chat room append */
+		DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
+		req.setAttribute(AttributeNames.PARAM_CREATE_DATE_TIME, sfm.format(lesson.getCreateDateTime()));
+		
 		String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 		req.setAttribute("serverUrl", serverUrl);
 		String presenceUrl = Configuration.get(ConfigurationKeys.XMPP_DOMAIN);

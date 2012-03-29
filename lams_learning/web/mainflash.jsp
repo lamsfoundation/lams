@@ -162,7 +162,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</object>
 			</noscript>
 		</div>
-		
+
+		<c:set var="presenceUrl" scope="request"><c:out value="${param.presenceUrl}"/></c:set>
 		<c:if test="${param.presenceEnabledPatch}">
     		<%@ include file="/includes/presenceChat.jsp" %>
 		</c:if>

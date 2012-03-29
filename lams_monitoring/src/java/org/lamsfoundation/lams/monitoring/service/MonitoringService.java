@@ -1556,8 +1556,13 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	Locale userLocale = new Locale(user.getLocale().getLanguageIsoCode(), user.getLocale().getCountryIsoCode());
 	TimeZone tz = TimeZone.getTimeZone(user.getTimeZone());
 	
-	DateFormat indfm = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", userLocale);
+	/* Date Format for Chat room append */
+	DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
+	if (dto.getCreateDateTime() != WDDXTAGS.DATE_NULL_VALUE && dto.getCreateDateTime() != null) {
+	    dto.setCreateDateTimeStr(sfm.format(dto.getCreateDateTime()));
+	}
 	
+	DateFormat indfm = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", userLocale);
 	if (dto.getStartDateTime() != WDDXTAGS.DATE_NULL_VALUE && dto.getStartDateTime() != null) {
 		Date tzStartDate = DateUtil.convertToTimeZoneFromDefault(tz, dto.getStartDateTime());
 		dto.setStartDateTimeStr(indfm.format(tzStartDate) + " " + tz.getDisplayName(userLocale));
