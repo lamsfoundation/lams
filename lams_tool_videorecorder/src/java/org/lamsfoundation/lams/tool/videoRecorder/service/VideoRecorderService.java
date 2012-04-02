@@ -287,8 +287,7 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	videoRecorder.setToolContentHandler(null);
 	videoRecorder.setVideoRecorderSessions(null);
 
-	VideoRecorderRecording authorRecording = (VideoRecorderRecording) getFirstRecordingByToolContentId(
-		toolContentId).clone();
+	VideoRecorderRecording authorRecording = (VideoRecorderRecording) getFirstRecordingByToolContentId(toolContentId);
 	if (authorRecording != null) {
 	    authorRecording = (VideoRecorderRecording) authorRecording.clone();
 
