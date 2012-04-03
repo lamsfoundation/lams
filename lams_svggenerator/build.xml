@@ -63,6 +63,7 @@
 			<zipfileset src="${j2eelibs}/hibernate-core.jar" />
 			<zipfileset src="${j2eelibs}/log4j.jar"/>
 			<zipfileset src="./lib/commons-cli-1.2.jar"/>
+			<fileset file="${conf.dir}/jar/log4j.properties" />
 			
 			<manifest>
 				<attribute name="Main-Class" value="org.lamsfoundation.lams.svg.CommanLineSVGGenerator" />

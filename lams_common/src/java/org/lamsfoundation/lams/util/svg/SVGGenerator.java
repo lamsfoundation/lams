@@ -120,14 +120,23 @@ public class SVGGenerator extends SVGConstants{
 	    break;
 	    
 	case OUTPUT_FORMAT_PNG:
-	    //modify image references to be pointed to local images (LDEV-2603)
-	    NodeList imageNodes = doc.getElementsByTagNameNS(SVG_NAMESPACE, "image");
-	    final String FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES = "file://" + Configuration.get(ConfigurationKeys.LAMS_EAR_DIR).replaceAll("\\\\", "/") + "/lams-central.war/images/svg/";
-	    for (int i = 0; i < imageNodes.getLength(); i++) {
-		Element imageNode = (Element) imageNodes.item(i);
-		String imageFileName = imageNode.getAttributeNS(SVG_NAMESPACE_XLINK, "href");
-		imageFileName = imageFileName.replaceFirst(PATH_TO_LAMSCOMMUNITY_SVG_IMAGES, FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES);
-		imageNode.setAttributeNS(SVG_NAMESPACE_XLINK, "xlink:href", imageFileName);
+	    NodeList imageNodes = null;
+	    String FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES = null;
+	    
+	    boolean isLocalImagesUsed = (Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) != null);
+	    // change image references to local ones
+	    if (isLocalImagesUsed) {
+		imageNodes = doc.getElementsByTagNameNS(SVG_NAMESPACE, "image");
+		FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES = "file://"
+			+ Configuration.get(ConfigurationKeys.LAMS_EAR_DIR).replaceAll("\\\\", "/")
+			+ "/lams-central.war/images/svg/";
+		for (int i = 0; i < imageNodes.getLength(); i++) {
+		    Element imageNode = (Element) imageNodes.item(i);
+		    String imageFileName = imageNode.getAttributeNS(SVG_NAMESPACE_XLINK, "href");
+		    imageFileName = imageFileName.replaceFirst(PATH_TO_LAMSCOMMUNITY_SVG_IMAGES,
+			    FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES);
+		    imageNode.setAttributeNS(SVG_NAMESPACE_XLINK, "xlink:href", imageFileName);
+		}
 	    }
 	    
 	    PNGTranscoder transcoder = new PNGTranscoder();
@@ -141,11 +150,14 @@ public class SVGGenerator extends SVGConstants{
 	    outputStream.close();
 	    
 	    //roll back all image references for later use
-	    for (int i = 0; i < imageNodes.getLength(); i++) {
-		Element imageNode = (Element) imageNodes.item(i);
-		String imageFileName = imageNode.getAttributeNS(SVG_NAMESPACE_XLINK, "href");
-		imageFileName = imageFileName.replaceFirst(FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES, PATH_TO_LAMSCOMMUNITY_SVG_IMAGES);
-		imageNode.setAttributeNS(SVG_NAMESPACE_XLINK, "xlink:href", imageFileName);
+	    if (isLocalImagesUsed) {
+		for (int i = 0; i < imageNodes.getLength(); i++) {
+		    Element imageNode = (Element) imageNodes.item(i);
+		    String imageFileName = imageNode.getAttributeNS(SVG_NAMESPACE_XLINK, "href");
+		    imageFileName = imageFileName.replaceFirst(FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES,
+			    PATH_TO_LAMSCOMMUNITY_SVG_IMAGES);
+		    imageNode.setAttributeNS(SVG_NAMESPACE_XLINK, "xlink:href", imageFileName);
+		}
 	    }
 	    break;
 	    
