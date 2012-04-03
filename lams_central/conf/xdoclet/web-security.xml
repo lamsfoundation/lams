@@ -59,13 +59,6 @@
 
     <security-constraint>
 	   	<web-resource-collection>
-	    	<web-resource-name>Public access</web-resource-name>
-		    <url-pattern>/mindapp/*</url-pattern>
-    	</web-resource-collection>
-    </security-constraint>
-
-    <security-constraint>
-	   	<web-resource-collection>
 	    	<web-resource-name>Authoring Update</web-resource-name>
 		    <url-pattern>/authoring.do</url-pattern>
     	</web-resource-collection>

@@ -8,11 +8,6 @@
 />
 
 <form-bean
-  name="MindappUserRegistrationForm"
-  type="org.lamsfoundation.lams.mindapp.MindappUserRegistrationForm"
-/>
-
-<form-bean
   name="lamsCommunityLoginForm"
   type="org.lamsfoundation.lams.web.lamscommunity.LamsCommunityLoginForm"
 />
