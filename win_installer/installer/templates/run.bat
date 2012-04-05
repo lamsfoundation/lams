@@ -1,109 +1,161 @@
 @echo off
 rem -------------------------------------------------------------------------
-rem JBoss Bootstrap Script for Win32
+rem JBoss Bootstrap Script for Windows
 rem -------------------------------------------------------------------------
 
 rem $Id$
 
+SET JAVA_HOME=@JREDIR@
+
 @if not "%ECHO%" == ""  echo %ECHO%
-@if "%OS%" == "Windows_NT"  setlocal
+@if "%OS%" == "Windows_NT" setlocal
 
-set JAVA_HOME=@JAVA_HOME@
+if "%OS%" == "Windows_NT" (
+  set "DIRNAME=%~dp0%"
+) else (
+  set DIRNAME=.\
+)
 
-set DIRNAME=.\
-if "%OS%" == "Windows_NT" set DIRNAME=%~dp0%
-set PROGNAME=run.bat
-if "%OS%" == "Windows_NT" set PROGNAME=%~nx0%
+rem Read an optional configuration file.
+if "x%RUN_CONF%" == "x" (   
+   set "RUN_CONF=%DIRNAME%run.conf.bat"
+)
+if exist "%RUN_CONF%" (
+   echo Calling %RUN_CONF%
+   call "%RUN_CONF%" %*
+) else (
+   echo Config file not found %RUN_CONF%
+)
 
-rem Read all command line arguments
+pushd %DIRNAME%..
+if "x%JBOSS_HOME%" == "x" (
+  set "JBOSS_HOME=%CD%"
+)
+popd
 
-REM
-REM The %ARGS% env variable commented out in favor of using %* to include
-REM all args in java command line. See bug #840239. [jpl]
-REM
-REM set ARGS=
-REM :loop
-REM if [%1] == [] goto endloop
-REM         set ARGS=%ARGS% %1
-REM         shift
-REM         goto loop
-REM :endloop
+set DIRNAME=
+
+if "%OS%" == "Windows_NT" (
+  set "PROGNAME=%~nx0%"
+) else (
+  set "PROGNAME=run.bat"
+)
+
+if "x%JAVA_OPTS%" == "x" (
+  set "JAVA_OPTS=-Dprogram.name=%PROGNAME%"
+) else (
+  set "JAVA_OPTS=-Dprogram.name=%PROGNAME% %JAVA_OPTS%"
+)
+
+if "x%JAVA_HOME%" == "x" (
+  set  JAVA=java
+  echo JAVA_HOME is not set. Unexpected results may occur.
+  echo Set JAVA_HOME to the directory of your local JDK to avoid this message.
+) else (
+  set "JAVA=%JAVA_HOME%\bin\java"
+  if exist "%JAVA_HOME%\lib\tools.jar" (
+    set "JAVAC_JAR=%JAVA_HOME%\lib\tools.jar"
+  )
+)
+
+rem Add -server to the JVM options, if supported
+"%JAVA%" -server -version 2>&1 | findstr /I hotspot > nul
+if not errorlevel == 1 (
+  set "JAVA_OPTS=%JAVA_OPTS% -server"
+)
+
+rem Set Java platform if 64-Bit JVM used
+set JAVA_PLATFORM=
+"%JAVA%" -version 2>&1 | findstr /I "64-Bit ^| x86_64" > nul
+if not errorlevel == 1 (
+  if /I "%PROCESSOR_ARCHITECTURE%"=="IA64"  (set JAVA_PLATFORM=i64
+  ) else if /I "%PROCESSOR_ARCHITECTURE%"=="AMD64" (set JAVA_PLATFORM=x64
+  ) else if /I "%PROCESSOR_ARCHITECTURE%"=="x64"   (set JAVA_PLATFORM=x64
+  ) else if /I "%PROCESSOR_ARCHITEW6432%"=="IA64"  (set JAVA_PLATFORM=i64
+  ) else if /I "%PROCESSOR_ARCHITEW6432%"=="AMD64" (set JAVA_PLATFORM=x64
+  ) else (
+    echo PROCESSOR_ARCHITECTURE is not set. Unexpected results may occur.
+    echo Set PROCESSOR_ARCHITECTURE according to the 64-Bit JVM used.
+  )
+)
+
+if "x%JAVA_PLATFORM%" == "x" set JAVA_PLATFORM=x86
+
+rem Add native to the PATH if present
+set JBOSS_NATIVE_LOC=
+if exist "%JBOSS_HOME%\bin\META-INF\lib\windows-%JAVA_PLATFORM%" (
+  set "JBOSS_NATIVE_HOME=%JBOSS_HOME%\bin\META-INF\lib\windows-%JAVA_PLATFORM%"
+) else if exist "%JBOSS_HOME%\bin\native" (
+  set "JBOSS_NATIVE_HOME=%JBOSS_HOME%\bin\native"
+)
+
+if not "x%JBOSS_NATIVE_HOME%" == "x" (
+  set "PATH=%JBOSS_NATIVE_HOME%;%PATH%;%JBOSS_HOME%\bin"
+  set JAVA_OPTS=%JAVA_OPTS% "-Djava.library.path=%JBOSS_NATIVE_HOME%;%PATH%;%JBOSS_HOME%\bin"
+)
 
 rem Find run.jar, or we can't continue
 
-set RUNJAR=%DIRNAME%\run.jar
-if exist "%RUNJAR%" goto FOUND_RUN_JAR
-echo Could not locate %RUNJAR%. Please check that you are in the
-echo bin directory when running this script.
-goto END
-
-:FOUND_RUN_JAR
-
-if not "%JAVA_HOME%" == "" goto ADD_TOOLS
-
-set JAVA=java
-
-echo JAVA_HOME is not set.  Unexpected results may occur.
-echo Set JAVA_HOME to the directory of your local JDK to avoid this message.
-goto SKIP_TOOLS
-
-:ADD_TOOLS
-
-set JAVA=%JAVA_HOME%\bin\java
-
-if exist "%JAVA_HOME%\lib\tools.jar" goto SKIP_TOOLS
-echo Could not locate %JAVA_HOME%\lib\tools.jar. Unexpected results may occur.
-echo Make sure that JAVA_HOME points to a JDK and not a JRE.
-
-:SKIP_TOOLS
-
-rem Include the JDK javac compiler for JSP pages. The default is for a Sun JDK
-rem compatible distribution to which JAVA_HOME points
-
-set JAVAC_JAR=%JAVA_HOME%\lib\tools.jar
-
-rem If JBOSS_CLASSPATH is empty, don't include it, as this will 
-rem result in including the local directory, which makes error tracking
-rem harder.
-if "%JBOSS_CLASSPATH%" == "" (
-	set JBOSS_CLASSPATH=%JAVAC_JAR%;%RUNJAR%
-) ELSE (
-	set JBOSS_CLASSPATH=%JBOSS_CLASSPATH%;%JAVAC_JAR%;%RUNJAR%
+if exist "%JBOSS_HOME%\bin\run.jar" (
+  if "x%JAVAC_JAR%" == "x" (
+    set "RUNJAR=%JAVAC_JAR%;%JBOSS_HOME%\bin\run.jar"
+  ) else (
+    set "RUNJAR=%JBOSS_HOME%\bin\run.jar"
+  )
+) else (
+  echo Could not locate "%JBOSS_HOME%\bin\run.jar".
+  echo Please check that you are in the bin directory when running this script.
+  goto END
 )
 
+rem If JBOSS_CLASSPATH empty, don't include it, as this will
+rem result in including the local directory in the classpath, which makes
+rem error tracking harder.
+if "x%JBOSS_CLASSPATH%" == "x" (
+  set "RUN_CLASSPATH=%RUNJAR%"
+) else (
+  set "RUN_CLASSPATH=%JBOSS_CLASSPATH%;%RUNJAR%"
+)
+
+set JBOSS_CLASSPATH=%RUN_CLASSPATH%
+
 rem Setup JBoss specific properties
-set JAVA_OPTS=%JAVA_OPTS% -Dprogram.name=%PROGNAME%
-set JBOSS_HOME=%DIRNAME%\..
-
-rem Sun JVM memory allocation pool parameters. Modify as appropriate.
-set JAVA_OPTS=%JAVA_OPTS% -Xms128m -Xmx512m
-
-rem JPDA options. Uncomment and modify as appropriate to enable remote debugging.
-rem set JAVA_OPTS=-classic -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y %JAVA_OPTS%
 
 rem Setup the java endorsed dirs
 set JBOSS_ENDORSED_DIRS=%JBOSS_HOME%\lib\endorsed
 
 echo ===============================================================================
-echo .
+echo.
 echo   JBoss Bootstrap Environment
-echo .
+echo.
 echo   JBOSS_HOME: %JBOSS_HOME%
-echo .
+echo.
 echo   JAVA: %JAVA%
-echo .
+echo.
 echo   JAVA_OPTS: %JAVA_OPTS%
-echo .
+echo.
 echo   CLASSPATH: %JBOSS_CLASSPATH%
-echo .
+echo.
 echo ===============================================================================
-echo .
+echo.
+
+rem Remove tmp and work dirs before start
+if exist "%JBOSS_HOME%\server\default\tmp" (
+   rd /S /Q "%JBOSS_HOME%\server\default\tmp"
+)
+if exist "%JBOSS_HOME%\server\default\work" (
+   rd /S /Q "%JBOSS_HOME%\server\default\work"
+)
 
 :RESTART
-ECHO "%JAVA%" %JAVA_OPTS% "-Djava.endorsed.dirs=%JBOSS_ENDORSED_DIRS%" -classpath "%JBOSS_CLASSPATH%" org.jboss.Main %*
-IF ERRORLEVEL 10 GOTO RESTART
+"%JAVA%" %JAVA_OPTS% ^
+   -Djava.endorsed.dirs="%JBOSS_ENDORSED_DIRS%" ^
+   -classpath "%JBOSS_CLASSPATH%" ^
+   org.jboss.Main %*
+
+if ERRORLEVEL 10 goto RESTART
 
 :END
-if "%NOPAUSE%" == "" pause
+if "x%NOPAUSE%" == "x" pause
 
 :END_NO_PAUSE
