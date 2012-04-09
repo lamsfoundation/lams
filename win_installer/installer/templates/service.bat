@@ -80,7 +80,7 @@ echo Y > .r.lock
 REM Start wildfire server
 start /b ""  "%WILDFIRE_HOME%\wildfire.exe" 
 jbosssvc.exe -p 1 "Starting %SVCDISP%" > run.log
-call run.bat < .r.lock >> run.log 2>&1
+call "%JBOSS_HOME%\bin\run.bat" -b 0.0.0.0 < .r.lock >> run.log 2>&1
 jbosssvc.exe -p 1 "Shutdown %SVCDISP% service" >> run.log
 del .r.lock
 REM Stop MySQL 
@@ -94,7 +94,7 @@ goto cmdEnd
 REM Executed on service stop
 echo Y > .s.lock
 jbosssvc.exe -p 1 "Shutting down %SVCDISP%" > shutdown.log
-call shutdown -S < .s.lock >> shutdown.log 2>&1
+call "%JBOSS_HOME%\bin\shutdown" -S < .s.lock >> shutdown.log 2>&1
 jbosssvc.exe -p 1 "Shutdown %SVCDISP% service" >> shutdown.log
 REM Stop MySQL 
 set /p MYSQL_PID=<"%MYSQL_HOME%\data\MysqldResource.pid"

@@ -1,34 +1,39 @@
-LAMS 2.3.5 is released under the GPL license detailed below.  This package
+LAMS 2.4 is released under the GPL license version 2.0 detailed below.  This package
 also includes other libraries/packages, whose respective licenses are
 detailed below.
 
 Library/Package				License
 --------------------------------------------------------------------------------
+activation-1.1.1.jar	CDDL (Common Development and 
+					Distribution License 1.0)
 aspirin.jar				Apache License 2.0
 batik-1.7.ja				Apache License 2.0
 dnsjava-2.0.6.jar				BSD License
-wrapper.jar				Silver Egg Techology License (see license-wrapper.txt)
 antlr.jar					Antlr 3 License
 axis-ant.jar 				Apache License 2.0
 axis.jar					Apache License 2.0
+tk-discovery-1.0.0.jar			Apache License 2.0
 cglib-nodep-2.1_2.jar			Apache License 2.0
 cglib_jboss404GA.jar			Apache License 2.0
 commons-beanutils.jar			Apache License 2.0
 commons-codec-1.3.jar			Apache License 2.0
 commons-collections.jar			Apache License 2.0
 commons-digester.jar			Apache License 2.0
-commons-discovery-0.2.jar			Apache Software License 1.1
-commons-fileupload.jar			Apache Software License 1.1
-commons-lang-2.0.jar			Apache Software License 1.1
+commons-discovery-0.2.jar			Apache License 2.0
+commons-fileupload.jar			Apache License 2.0
+commons-io-2.1.jar				Apache License 2.0
+commons-lang-2.0.jar			Apache License 2.0
 commons-logging.jar			Apache License 2.0
+commons-pool-1.5.1.jar 		Apache License 2.0
 commons-validator.jar			Apache License 2.0
-FCKeditor-2.3.jar				CDL Closed Distribution License
+CKeditor 				CDL Closed Distribution License
+gomba-0.8.0.jar			Apache License 2.0
 gnujaxp.jar				GNU General Public License
 hibernate3.jar				GNU General Public License
 jakarta-oro.jar				Apache Software License 1.1
 jaxrpc.jar					CDDL (Common Development and 
 					Distribution License 1.0)
-JBoss 4.0.2				GNU Lesser General Public Licence
+JBoss 5.1				GNU Lesser General Public Licence
 jboss-cache.jar				GNU Lesser General Public Licence
 jboss-common.jar				GNU Lesser General Public Licence
 jboss-jmx.jar				GNU Lesser General Public Licence
@@ -40,13 +45,16 @@ jgroups.jar				GNU Lesser General Public Licence
 jmock-2003-03-19.jar			jMock Project License
 joda-time-0.98.jar				Joda Software License 1.0
 jsMath					Apache License 2.0
+json.jar				Apache License 2.0
 jstl.jar					JSTL License 1.1
 log4j-1.2.13.jar				Apache Software License 1.1
 mysql-connector-				(CDDL Common Development and 
-  java-3.1.12-bin-jar	    		Distribution License 1.0)
+  java-5.0.8-bin.jar	    		Distribution License 1.0)
 odmg-3.0.jar				ODMG 2.0 
-poi-2.5.1-final				Apache Software License 1.1
-  -20040804.jar		
+poi-3.8-beta4				Apache Software License 1.1
+  -20110812.jar	
+poi-ooxml-3.8				Apache Software License 1.1
+  -beta4-20110812.jar  
 quartz.jar				Apache License 2.0
 saaj.jar					(CDDL Common Development and 
 					Distribution License 1.0)
@@ -56,12 +64,13 @@ spring.jar					Apache License 2.0
 standard.jar				Apache License 2.0
 struts-el.jar				Apache License 2.0
 struts.jar					Apache License 2.0	
+urlrewrite-3.2.0.jar		BSD License
 wddx.jar					GNU General Public License
 wsdl4j-1.5.1.jar				CPL Common Public License 0.5 
 xml-writer-0.2.jar				XML-Write License
 xom-1.0.b3.jar				GNU Lesser General Public License
 xpp3-1.1.3.4d_b4.jar			XPP3 License
-xstream-1.1.jar				xstream Licanse
+xstream-1.1.3.jar				xstream License
 
 SHARE RESOURCES LIBRARY LICENSES
 castor-0.9.5.3-xml.jar			Castor License

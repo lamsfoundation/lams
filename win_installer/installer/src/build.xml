@@ -5,7 +5,7 @@
 	<property file="installer.properties" />
 
 	<target name="configure-deploy">
-		<copy overwrite="yes" todir="${INSTDIR}">
+		<copy overwrite="yes" todir="${MYSQLDIR}">
 			<fileset dir="${TEMP}">
 				<include name="update_lams_configuration.sql" />
 			</fileset>
@@ -18,10 +18,6 @@
 				<filter token="REPOSITORYDIR" value="${REPOSITORYDIR}" />
 				<filter token="LOCALE" value="${LOCALE}" />
 				<filter token="LOCALE_DIRECTION" value="${LOCALE_DIRECTION}" />
-				<filter token="WILDFIRE_DOMAIN" value="${WILDFIRE_DOMAIN}" />
-				<filter token="WILDFIRE_CONFERENCE" value="${WILDFIRE_CONFERENCE}" />
-				<filter token="WILDFIRE_USER" value="${WILDFIRE_USER}" />
-				<filter token="WILDFIRE_PASS" value="${WILDFIRE_PASS}" />
 				<filter token="LAMS_USER" value="${LAMS_USER}" />
 				<filter token="LAMS_PASS" value="${LAMS_PASS}" />
 			</filterset>
@@ -31,10 +27,15 @@
 				<include name="mysql-ds.xml" />
 			</fileset>
 			<filterset>
-				<filter token="DB_NAME" value="${DB_NAME}" />
-				<filter token="DB_USER" value="${DB_USER}" />
-				<filter token="DB_PASS" value="${DB_PASS}" />
-				<filter token="MYSQL_HOST" value="${MYSQL_HOST}" />
+				<filter token="MYSQLDIR" value="${MYSQLDIR}" />
+			</filterset>
+		</copy>		
+		<copy overwrite="yes" todir="${BINDIR}">
+			<fileset dir="${TEMP}">
+				<include name="update-script.bat" />
+			</fileset>
+			<filterset>
+				<filter token="INSTDIR" value="${INSTDIR}" />
 			</filterset>
 		</copy>
 		<copy overwrite="yes" todir="${TOMCATDIR}">
@@ -50,15 +51,31 @@
 				<include name="run.bat" />
 			</fileset>
 			<filterset>
-				<filter token="JAVA_HOME" value="${JDK_DIR_UNIX_SLASH}" />
+				<filter token="JREDIR" value="${JREDIR}" />
 			</filterset>
 		</copy>
-		<copy overwrite="yes" todir="${INSTDIR}">
+		<copy overwrite="yes" todir="${BINDIR}">
 			<fileset dir="${TEMP}">
-				<include name="wrapper.conf" />
+				<include name="shutdown.bat" />
 			</fileset>
 			<filterset>
-				<filter token="JAVA_HOME" value="${JDK_DIR_UNIX_SLASH}" />
+				<filter token="JREDIR" value="${JREDIR}" />
+			</filterset>
+		</copy>
+		<copy overwrite="yes" todir="${BINDIR}">
+			<fileset dir="${TEMP}">
+				<include name="service.bat" />
+			</fileset>
+			<filterset>
+				<filter token="INSTDIR" value="${INSTDIR}" />
+			</filterset>
+		</copy>
+		<copy overwrite="yes" todir="${BINDIR}">
+			<fileset dir="${TEMP}">
+				<include name="service64.bat" />
+			</fileset>
+			<filterset>
+				<filter token="INSTDIR" value="${INSTDIR}" />
 			</filterset>
 		</copy>
 		<copy overwrite="yes" todir="${INSTDIR}">
@@ -69,26 +86,6 @@
 				<filter token="URL" value="${URL}" />
 			</filterset>
 		</copy>
-		<copy overwrite="yes" todir="${INSTDIR}/jboss-4.0.2/server/default/conf">
-			<fileset dir="${TEMP}">
-				<include name="login-config.xml" />
-			</fileset>
-			<filterset>
-				<filter token="confdir" value="${INSTDIR}/jboss-4.0.2/server/default/conf" />
-			</filterset>
-		</copy>
 	</target>
-	
-	<target name="import-db">
-		<sql driver="com.mysql.jdbc.Driver" 
-			classpath="${EARDIR}/mysql-connector-java-5.0.8-bin.jar" 
-			url="jdbc:mysql://${MYSQL_HOST}/${DB_NAME}?characterEncoding=UTF-8" 
-			userid="${DB_USER}" 
-			password="${DB_PASS}"
-			encoding="utf8"
-			keepformat="yes">
-			<transaction src="${TEMP}/dump.sql" />
-			<transaction src="${INSTDIR}/update_lams_configuration.sql" />
-		</sql>
-	</target>	
+		
 </project>

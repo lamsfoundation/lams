@@ -24,20 +24,46 @@
 
 !include "MUI.nsh"
 !include "LogicLib.nsh"
+!include "x64.nsh"
+
+!define REG_HEAD "Software\LAMS Foundation\LAMSv2"
   
 Name "Start LAMS"
+RequestExecutionLevel user
 OutFile "..\..\build\lams-stop.exe"
 !define MUI_ICON "..\graphics\favicon.ico"
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_LANGUAGE "English"
+
+# variables
+Var JBOSSDIR		; JBOSS_HOME
+Var LAMSDIR			; LAMS_HOME
 
 Function .onInit
     SetSilent silent
 FunctionEnd
 
 Section
-    nsExec::ExecToStack 'sc stop LAMSv2'
-    Pop $0
-    Pop $1
-    MessageBox MB_OK "Stopped LAMSv2 service."
+
+	ReadRegStr $2 HKCU "${REG_HEAD}" "jboss_dir"
+	ReadRegStr $1 HKCU "${REG_HEAD}" "dir_inst"
+	StrCpy $JBOSSDIR $2
+	StrCpy $LAMSDIR $1
+
+	# Is LAMS installed as service?
+    ReadRegStr $0 HKCU "${REG_HEAD}" "is_service"
+	# if so, stop the service
+	${If} $0 == "1"	
+
+
+	${Else} 
+		# Stop LAMS Manually
+		${If} ${RunningX64}
+			nsExec::ExecToStack '"$JBOSSDIR\bin\service64.bat" stop'
+		${Else} 
+			nsExec::ExecToStack '"$JBOSSDIR\bin\service.bat" stop'
+		${EndIf}
+		MessageBox MB_OK "LAMS Server has been stopped now. Thank you for using LAMS!"
+	${EndIf}
+	Abort
 SectionEnd

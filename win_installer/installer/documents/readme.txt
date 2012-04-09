@@ -1,60 +1,57 @@
-LAMS 2.3.5 Learning Activity Management System
+LAMS 2.4 Learning Activity Management System
 ----------------------------------------------
 
-This is a pre-packaged copy of LAMS 2.3.5 for Windows.
+This is a pre-packaged copy of LAMS 2.4 for Windows. This package includes a Wildfire Jabber server 
+and an embedded MySQL database. 
+
+Feature list:
+
+http://wiki.lamsfoundation.org/display/lams/LAMS+2.4+Feature+list
 
 1. Startup and Shutdown
 =======================
 To use LAMS 2, first make sure it is started - use the 'Start LAMS' shortcut
-in the LAMSv2 Start Menu folder if you're not sure.  MySQL must be running.
-For chat rooms to function, Wildfire must also be running.
+in the LAMS Start Menu folder if you're not sure.  
 
 While LAMS 2 is running, you may access the login page using the 'Access 
-LAMS' short cut in the LAMSv2 Start Menu folder.
+LAMS' short cut in the LAMS Start Menu folder.
 
-To stop LAMS 2, use the 'Stop LAMS' shortcut in the LAMSv2 Start Menu 
+To stop LAMS 2, use the 'Stop LAMS' shortcut in the LAMS Start Menu 
 folder.
 
 
-2. Server Configuration
+2. Testing users 
+================
+
+By default LAMS comes with 4 testing users with the following usernames: test1, test2, test3, test4. 
+
+The passwords for this users is the same as for the admin users set up during installation. 
+
+
+3. Server Configuration
 =======================
-For single user installations (i.e., personal use on your own desktop), please
-ignore this section.
+This version of LAMS is not intended for server usage. 
 
-For server deployments, you will probably want to configure the default JVM 
-memory settings for your server.  In C:\lams\jboss-4.0.2\bin\run.bat (or 
-wherever you installed LAMS 2), find the line near the bottom that says
-
-	set JAVA_OPTS=%JAVA_OPTS% -Xms128m -Xmx512m
-	
-and adjust the minimum and maximum amount of memory allocated there.
-
-We also recommend increasing the -XX:MaxPermSize option if you have more than
-a couple of users.  e.g.
-
-	set JAVA_OPTS=%JAVA_OPTS% -Xms128m -Xmx512m -XX:MaxPermSize=128m
-
-For Sun JDK versions before 1.5.0_07, the default is 64m.  If your Sun JDK 
-version is 1.5.0_07 or later, the default is 256m.  
+Please check the LAMS Documentation to set up a scalable server.
 
 
-3. Web Resources
+4. Web Resources
 ================
 Windows Installer Help wiki (includes download links)
 
 	http://wiki.lamsfoundation.org/display/lamsdocs/Windows+Installer+Help
 	
+LAMS 2 help documents
+
+	http://wiki.lamsfoundation.org
+	
 LAMS 2 developer-oriented information
 
 	http://wiki.lamsfoundation.org/display/lams
 
-LAMS 2 help documents
-
-	http://wiki.lamsfoundation.org/display/lamsdocs
-
 Educational and technical forums for help and discussion
 				
-	http://www.lamscommunity.org
+	http://lamscommunity.org
 
 LAMS 2 bug tracker			
 

@@ -25,9 +25,11 @@ set NOPAUSE=Y
 REM Suppress killing service on logoff event
 set LAMS_HOME=@INSTDIR@
 set JBOSS_HOME=%LAMS_HOME%\jboss-5.1
-set JAVA_HOME=%LAMS_HOME%\jre
+set JRE_HOME=%LAMS_HOME%\jre
 set WILDFIRE_HOME=%LAMS_HOME%\wildfire
+set MYSQL_HOME=%LAMS_HOME%\data\db
 set "JAVA_OPTS=-Xms128M -Xmx512M -XX:MaxPermSize=256M"
+chdir /D %JBOSS_HOME%\bin
 
 REM Figure out the running mode
 
@@ -75,13 +77,16 @@ if not errorlevel 1 (
   goto cmdEnd
 )
 echo Y > .r.lock
-jbosssvc.x64.exe -p 1 "Starting %SVCDISP%" > run.log
 REM Start wildfire server
-start  %WILDFIRE_HOME%\wildfire.exe 
-call run.bat < .r.lock >> run.log 2>&1
+start /b ""  "%WILDFIRE_HOME%\wildfire.exe" 
+jbosssvc.x64.exe -p 1 "Starting %SVCDISP%" > run.log
+call  "%JBOSS_HOME%\bin\run.bat" -b 0.0.0.0 < .r.lock >> run.log 2>&1
 jbosssvc.x64.exe -p 1 "Shutdown %SVCDISP% service" >> run.log
 del .r.lock
-%JBOSS_HOME%\bin\mysqladmin.exe -P13306 -u lams -plamsdemo shutdown
+REM Stop MySQL 
+set /p MYSQL_PID=<"%MYSQL_HOME%\data\MysqldResource.pid"
+"%MYSQL_HOME%\c-mxj-utils\kill.exe" %MYSQL_PID%
+REM Stop Wildfire
 taskkill /f /t /FI "IMAGENAME eq wildfire.exe"
 goto cmdEnd
 
@@ -89,9 +94,12 @@ goto cmdEnd
 REM Executed on service stop
 echo Y > .s.lock
 jbosssvc.x64.exe -p 1 "Shutting down %SVCDISP%" > shutdown.log
-rem call shutdown -S < .s.lock >> shutdown.log 2>&1
+call "%JBOSS_HOME%\bin\shutdown" -S < .s.lock >> shutdown.log 2>&1
 jbosssvc.x64.exe -p 1 "Shutdown %SVCDISP% service" >> shutdown.log
-%JBOSS_HOME%\bin\mysqladmin.exe -P13306 -u lams -plamsdemo shutdown
+REM Stop MySQL 
+set /p MYSQL_PID=<"%MYSQL_HOME%\data\MysqldResource.pid"
+"%MYSQL_HOME%\c-mxj-utils\kill.exe" %MYSQL_PID%
+REM Stop Wildfire
 taskkill /f /t /FI "IMAGENAME eq wildfire.exe"
 del .s.lock
 goto cmdEnd

@@ -25,58 +25,80 @@
 !include "MUI.nsh"
 !include "LogicLib.nsh"
 !include "includes\Functions.nsh"
+!include "x64.nsh"
 
 !define REG_HEAD "Software\LAMS Foundation\LAMSv2"
   
 Name "Start LAMS"
+RequestExecutionLevel user
 OutFile "..\..\build\lams-start.exe"
 !define MUI_ICON "..\graphics\favicon.ico"
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_LANGUAGE "English"
+
+# variables
+Var JBOSSDIR		; JBOSS_HOME
+Var LAMSDIR			; LAMS_HOME
+Var LAMSPORT		; LAMS_PORT
+Var JREDIR			; JREDIR
 
 Function .onInit
     SetSilent silent
 FunctionEnd
 
 Section
-    ReadRegStr $9 HKLM "${REG_HEAD}" "db_user"
-    ReadRegStr $8 HKLM "${REG_HEAD}" "db_pass"
-    ReadRegStr $7 HKLM "${REG_HEAD}" "dir_inst"
-    ReadRegStr $6 HKLM "${REG_HEAD}" "dir_mysql"
-    ReadRegStr $5 HKLM "${REG_HEAD}" "mysql_host"
-    ReadRegStr $4 HKLM "${REG_HEAD}" "mysql_port"
+
+	ReadRegStr $4 HKCU "${REG_HEAD}" "jre_dir"
+	ReadRegStr $3 HKCU "${REG_HEAD}" "lams_port"
+	ReadRegStr $2 HKCU "${REG_HEAD}" "jboss_dir"
+	ReadRegStr $1 HKCU "${REG_HEAD}" "dir_inst"
+	StrCpy $JREDIR $4
+	StrCpy $LAMSPORT $3
+	StrCpy $JBOSSDIR $2
+	StrCpy $LAMSDIR $1
 	
-    # check mysql password, mysql server status
-    StrLen $0 $8
-    ${If} $0 == 0
-        nsExec::ExecToStack '$6\bin\mysqladmin.exe ping -h $5 -P $4 -u $9'
-    ${Else}
-        nsExec::ExecToStack '$6\bin\mysqladmin.exe ping -h $5 -P $4 -u $9 -p$8'
-    ${EndIf}
+    # check if LAMS is running
+    SetOutPath $TEMP
+    File "..\..\build\LocalPortScanner.class"
+    nsExec::ExecToStack '"$JREDIR\bin\java" LocalPortScanner $LAMSPORT'
     Pop $0
     Pop $1
+    ${If} $0 == 2
+        MessageBox MB_YESNO|MB_ICONQUESTION "LAMS appears to be running. Do you want to open the browser and access it now?" \
+            IDYES openbrowser  \
+            IDNO quit
+    ${EndIf}	
 
-    # check mysql password is correct
-    ${StrStr} $2 $1 "Access denied"
-    ${If} $2 != ""
-        ; mysql password somehow changed - prompt user to update registry entry
-    ${EndIf}
-    # check mysql is running
-    ${StrStr} $2 $1 "mysqld is alive"
-    ${If} $2 == ""
-        MessageBox MB_OK|MB_ICONEXCLAMATION "MySQL does not appear to be running - please make sure it is running before starting LAMS."
-        Abort
-    ${EndIf}
-
-    nsExec::ExecToStack 'sc start LAMSv2'
-    Pop $0
-    Pop $1
-    ${StrStr} $2 $1 "START_PENDING"
-    ${If} $2 == ""
-        MessageBox MB_OK|MB_ICONSTOP "Could not start LAMSv2 service: $\r$\n$1"
-    ${Else}
-        MessageBox MB_OK "Started LAMSv2 service.  Please wait a minute or two while LAMS starts up."
-        ExecShell "open" '"$7\index.html"'
-    ${EndIf}
-SectionEnd
+	# Is LAMS installed as service?
+    ReadRegStr $0 HKCU "${REG_HEAD}" "is_service"
+	# if so, start as service
+	${If} $0 == "1"
+	    nsExec::ExecToStack 'sc start LAMS Server'
+		Pop $0
+		Pop $1
+		${StrStr} $2 $1 "START_PENDING"
+		${If} $2 == ""
+			MessageBox MB_OK|MB_ICONSTOP "Could not start LAMSv2 service: $\r$\n$1"
+		${Else}
+			MessageBox MB_OK "Started LAMSv2 service.  Please wait a minute or two while it starts up."
+			ExecShell "open" '$LAMSDIR\index.html'
+		${EndIf}
+		goto quit
+	${Else} 
+		# We start LAMS Manually
+		MessageBox MB_OK "The LAMS Server is being started.  Please wait a minute or two while it starts up."
+		ExecShell "open" '$LAMSDIR\index.html'	
+		${If} ${RunningX64}
+			nsExec::ExecToStack '"$JBOSSDIR\bin\service64.bat" start'
+		${Else} 
+			nsExec::ExecToStack '"$JBOSSDIR\bin\service.bat" start'	
+			${EndIf}
+	${EndIf}
+	
+	Abort
+	openbrowser:
+		ExecShell "open" '$LAMSDIR\index.html'
+		Quit
+	quit:
+ SectionEnd
 
