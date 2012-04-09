@@ -113,6 +113,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			
 			window.onresize = resizeIframe;	
 		</script>
+		
+		<!--[if IE]>
+		<script type="text/javascript" event="FSCommand(command,args)" for="learning">
+			learning_DoFSCommand(command, args);
+		</script>
+		<![endif]-->
+		
 	</lams:head>
 
 	<body class="stripes" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
