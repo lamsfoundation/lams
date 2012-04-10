@@ -25,6 +25,8 @@
 !include "MUI.nsh"
 !include "LogicLib.nsh"
 !include "x64.nsh"
+!include "Ports.nsh"
+
 # functions from TextFunc.nsh
 !insertmacro FileJoin
 !insertmacro LineFind
@@ -216,11 +218,19 @@ Function PreLAMS2Config
         !insertmacro MUI_INSTALLOPTIONS_DISPLAY "lams2.ini"
 FunctionEnd
 Function PostLAMS2Config
-        !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_DOMAIN "lams2.ini" "Field 8" "State"
-        !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_PORT "lams2.ini" "Field 9" "State"
-        !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_LOCALE "lams2.ini" "Field 12" "State"
-        !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_USER "lams2.ini" "Field 2" "State"
-        !insertmacro MUI_INSTALLOPTIONS_READ $LAMS_PASS "lams2.ini" "Field 5" "State"
+	!insertmacro MUI_INSTALLOPTIONS_READ $LAMS_DOMAIN "lams2.ini" "Field 8" "State"
+	!insertmacro MUI_INSTALLOPTIONS_READ $LAMS_PORT "lams2.ini" "Field 9" "State"
+	!insertmacro MUI_INSTALLOPTIONS_READ $LAMS_LOCALE "lams2.ini" "Field 12" "State"
+	!insertmacro MUI_INSTALLOPTIONS_READ $LAMS_USER "lams2.ini" "Field 2" "State"
+	!insertmacro MUI_INSTALLOPTIONS_READ $LAMS_PASS "lams2.ini" "Field 5" "State"
+	
+	# check that there's no other app running on that port
+
+	${If} ${TCPPortOpen} $LAMS_PORT
+		MessageBox MB_OK "The port $LAMS_PORT is in used by another application. Please choose another one (ie: 8181)"
+		Abort
+	${EndIf}	
+ 		
 FunctionEnd
 Function PreFinal
     !insertmacro MUI_INSTALLOPTIONS_WRITE "final.ini" "Field 2" "Text" "Click 'Install' to commence installation of LAMS ${VERSION}"  
