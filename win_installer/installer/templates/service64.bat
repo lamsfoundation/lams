@@ -28,7 +28,7 @@ set JBOSS_HOME=%LAMS_HOME%\jboss-5.1
 set JRE_HOME=%LAMS_HOME%\jre
 set WILDFIRE_HOME=%LAMS_HOME%\wildfire
 set MYSQL_HOME=%LAMS_HOME%\data\db
-set "JAVA_OPTS=-Xms128M -Xmx512M -XX:MaxPermSize=256M"
+set "JAVA_OPTS=-Xms128M -Xmx512M -XX:MaxPermSize=256M -Dfile.encoding=UTF-8"
 chdir /D %JBOSS_HOME%\bin
 
 REM Figure out the running mode
