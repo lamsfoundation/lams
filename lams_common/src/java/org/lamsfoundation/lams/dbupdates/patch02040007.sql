@@ -14,8 +14,8 @@ update lams_learning_activity set
 			
 -- upgrade versions to 2.4		
 update lams_configuration set config_value='2.4' where config_key='Version';
-update lams_configuration set config_value='2.4.0.201201131351' where config_key='LearnerClientVersion' OR config_key='ServerVersionNumber' OR config_key='MonitorClientVersion' OR config_key='AuthoringClientVersion';
-update lams_configuration set config_value='2010-02-10' where config_key='DictionaryDateCreated';
+update lams_configuration set config_value='2.4.0.201204131000' where config_key='LearnerClientVersion' OR config_key='ServerVersionNumber' OR config_key='MonitorClientVersion' OR config_key='AuthoringClientVersion';
+update lams_configuration set config_value='2012-04-13' where config_key='DictionaryDateCreated';
 
 -- If there were no errors, commit and restore autocommit to on
 COMMIT;
