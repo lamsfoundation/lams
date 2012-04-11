@@ -93,10 +93,11 @@
 			if (nextAction == "defineLater") {
 				refreshParentMonitoringWindow();
 			}
-			location.href="<c:url value='${clearSessionActionUrl}?action=" + nextAction + "&mode=${accessMode}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
+			var clearSessionUrl = "<c:url value='${clearSessionActionUrl}?action=" + nextAction + "&mode=${accessMode}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
+			doAjaxCall(clearSessionUrl);
 		} else {
 			if (window.parent.opener == null){
-				window.location.href = notifyCloseURL;
+				doAjaxCall(notifyCloseURL);
 			} else {
 				window.parent.opener.location.href = notifyCloseURL;
 			}
