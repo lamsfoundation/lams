@@ -15,7 +15,8 @@ http://www.mysql.com/downloads/api-jdbc-stable.html
     <!-- and convert MySQL zero times to null -->
     <connection-property name="characterEncoding">utf8</connection-property>
     <connection-property name="zeroDateTimeBehavior">convertToNull</connection-property>
-
+    <connection-property name="useUnicode">true</connection-property>
+    
     <!-- Properties below are used only for embedded MySQL server -->
     <connection-property name="server.basedir">@db.location@</connection-property>
     <connection-property name="createDatabaseIfNotExist">false</connection-property>
