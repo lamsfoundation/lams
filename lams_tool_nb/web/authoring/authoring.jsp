@@ -113,11 +113,24 @@
 
 				<!-- Button Row -->
 				<html:hidden property="method" value="save" />
+				<c:set var="accessMode">
+					<c:choose>
+						<c:when test="${formBean.defineLater == 'true'}">
+							teacher
+						</c:when>
+						<c:otherwise>
+							author
+						</c:otherwise>
+					</c:choose>
+				</c:set>
+
 				<lams:AuthoringButton formID="authoringForm"
 					clearSessionActionUrl="/clearsession.do" toolSignature="lanb11"
 					toolContentID="${formBean.toolContentID}"
 					cancelButtonLabelKey="button.cancel"
 					saveButtonLabelKey="button.save"
+					accessMode="${accessMode}"
+					defineLater="${formBean.defineLater}"
 					customiseSessionID="${sessionMap.sessionID}"
 					contentFolderID="${NbAuthoringForm.contentFolderID}" />
 			</div>
