@@ -78,7 +78,7 @@
 				<filter token="INSTDIR" value="${INSTDIR}" />
 			</filterset>
 		</copy>
-		<copy overwrite="yes" todir="${INSTDIR}">
+		<copy overwrite="yes" todir="${INSTDIR}\slides">
 			<fileset dir="${TEMP}">
 				<include name="index.html" />
 			</fileset>

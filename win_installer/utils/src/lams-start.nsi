@@ -81,13 +81,13 @@ Section
 			MessageBox MB_OK|MB_ICONSTOP "Could not start LAMSv2 service: $\r$\n$1"
 		${Else}
 			MessageBox MB_OK "Started LAMSv2 service.  Please wait a minute or two while it starts up."
-			ExecShell "open" '$LAMSDIR\index.html'
+			ExecShell "open" '$LAMSDIR\slides\index.html'
 		${EndIf}
 		goto quit
 	${Else} 
 		# We start LAMS Manually
 		MessageBox MB_OK "The LAMS Server is being started.  Please wait a minute or two while it starts up."
-		ExecShell "open" '$LAMSDIR\index.html'	
+		ExecShell "open" '$LAMSDIR\slides\index.html'	
 		${If} ${RunningX64}
 			nsExec::ExecToStack '"$JBOSSDIR\bin\service64.bat" start'
 		${Else} 
@@ -97,7 +97,7 @@ Section
 	
 	Abort
 	openbrowser:
-		ExecShell "open" '$LAMSDIR\index.html'
+		ExecShell "open" '$LAMSDIR\slides\index.html'
 		Quit
 	quit:
  SectionEnd

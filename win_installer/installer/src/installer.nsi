@@ -25,11 +25,12 @@
 !include "MUI.nsh"
 !include "LogicLib.nsh"
 !include "x64.nsh"
-!include "Ports.nsh"
+!include "includes\Ports.nsh"
 
 # functions from TextFunc.nsh
 !insertmacro FileJoin
 !insertmacro LineFind
+
 # constants
 !define VERSION "2.4.0"
 !define LANGUAGE_PACK_VERSION "2012-04-09"
@@ -46,6 +47,7 @@
 !define BUILD "..\..\build\"
 !define DATABASE "..\..\database\"
 !define DEFAULT_REPOSITORY "..\..\repository\"
+
 # installer settings
 !define MUI_ICON "..\graphics\lams2.ico"
 !define MUI_UNICON "..\graphics\lams2.ico"
@@ -81,6 +83,7 @@ RequestExecutionLevel admin ;Require admin rights on NT6+ (When UAC is turned on
 # set instfiles page to wait when done
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
+
 # display finish page stuff
 !define MUI_FINISHPAGE_RUN $INSTDIR\lams-start.exe
 !define MUI_FINISHPAGE_RUN_TEXT "Start LAMS now"
@@ -88,6 +91,7 @@ RequestExecutionLevel admin ;Require admin rights on NT6+ (When UAC is turned on
 !define MUI_FINISHPAGE_SHOWREADME_TEXT "Open the readme file"
 !define MUI_FINISHPAGE_LINK "Visit LAMS Community"
 !define MUI_FINISHPAGE_LINK_LOCATION "http://lamscommunity.org"
+
 # installer screen progression
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "..\documents\license.txt"
@@ -98,13 +102,16 @@ Page custom PreLAMS2Config PostLAMS2Config
 Page custom PreFinal PostFinal
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
+
 # uninstaller screens
 !insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_UNPAGE_FINISH
+
 # supported translations
 !insertmacro MUI_LANGUAGE "English" # first language is the default language
+
 # reserve files
 #
 ReserveFile "lams.ini"
@@ -122,6 +129,7 @@ Var LAMS_USER           ; user name for lams system administrator
 Var LAMS_PASS           ; password for lams system administrator
 Var WINTEMP             ; temp dir
 Var TIMESTAMP           ; timestamp
+
 ##############################
 SectionGroup /e "LAMS ${VERSION} Full Install" fullInstall
     Section "LAMS ${VERSION}" lams
@@ -161,6 +169,7 @@ SectionGroup /e "LAMS ${VERSION} Full Install" fullInstall
 	SectionEnd
 */	
 SectionGroupEnd
+
 # functions
 #
 Function .onInit
@@ -181,6 +190,8 @@ Function .onInit
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "final.ini"
     
 FunctionEnd
+
+
 ################################################################################
 # USER INTERFACE CODE                                                          #
 ################################################################################
@@ -274,6 +285,8 @@ FunctionEnd
 ################################################################################
 # END USER INTERFACE CODE                                                      #
 ################################################################################
+
+
 ################################################################################
 # CODE USED FOR INSTALLER                                                      #
 ################################################################################    
@@ -307,6 +320,7 @@ Function DeployConfig
     SetOutPath $INSTDIR
     File /r "${BASE_DEV_DIR}\apache-ant-1.6.5"
     File /r "${BASE_DEV_DIR}\zip"
+	File /r "${BASE_DEV_DIR}\slides"
 		
     SetOutPath $TEMP
     File "build.xml"
@@ -467,11 +481,9 @@ Function RemoveTempFiles
     Delete "$TEMP\mysql-ds.xml"
     Delete "$TEMP\server.xml"
     Delete "$TEMP\run.bat"
-    Delete "$TEMP\wrapper.conf"
     Delete "$TEMP\dump.sql"
     Delete "$TEMP\build.xml"
     Delete "$TEMP\installer.properties"
-    Delete "$INSTDIR\wrapper.conf"
     Delete "$TEMP\index.html"
     RMDIR /r "$WINTEMP\lams"
 FunctionEnd
@@ -495,6 +507,8 @@ FunctionEnd
 ################################################################################
 # END CODE USED FOR INSTALLER                                                  #
 ################################################################################
+
+
 ################################################################################
 # CODE USED FOR UNINSTALLER                                                    #
 ################################################################################
@@ -635,8 +649,10 @@ SectionEnd
 ################################################################################
 # END CODE USED FOR UNINSTALLER                                                #
 ################################################################################
+
+
 ################################################################################
-# UTIL Functions                                              #
+# UTIL Functions                                                               #
 ################################################################################
 ; Push $filenamestring (e.g. 'c:\this\and\that\filename.htm')
 ; Push "\"
