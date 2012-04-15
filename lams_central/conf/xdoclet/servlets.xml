@@ -104,12 +104,3 @@
 		org.lamsfoundation.lams.web.SIFOpenIDServlet
 </servlet-class>
 </servlet>
-
-<!--SAML Integration - do not uncomment manually
-<servlet>
-	<servlet-name>SamlServlet</servlet-name>
-	<servlet-class>
-		org.lamsfoundation.lams.saml.SamlServlet
-	</servlet-class>
-</servlet>
-SAML Integration - do not uncomment manually-->

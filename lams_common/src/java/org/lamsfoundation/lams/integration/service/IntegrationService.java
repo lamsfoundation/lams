@@ -65,8 +65,6 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.LanguageUtil;
 
-
-
 /**
  * <p>
  * <a href="IntegrationService.java.html"><i>View Source</i><a>
@@ -99,7 +97,8 @@ public class IntegrationService implements IIntegrationService {
 
     // wrapper method for compatibility with original integration modules
     public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
-	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method) {
+	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method,
+	    Boolean prefix) {
 
 	// Set the pretty course name if available, otherwise maintain the extCourseId
 	String courseName = "";
@@ -108,16 +107,24 @@ public class IntegrationService implements IIntegrationService {
 	} else {
 	    courseName = extCourseId;
 	}
-	if (StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR) || StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR)) {
-		return getExtCourseClassMap(serverMap, userMap, extCourseId, courseName, countryIsoCode, langIsoCode, service
-				.getRootOrganisation().getOrganisationId().toString(), true, true);
+	if (StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR)
+		|| StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR)) {
+	    return getExtCourseClassMap(serverMap, userMap, extCourseId, courseName, countryIsoCode, langIsoCode,
+		    service.getRootOrganisation().getOrganisationId().toString(), true, prefix);
 	} else {
-		return getExtCourseClassMap(serverMap, userMap, extCourseId, courseName, countryIsoCode, langIsoCode, service
-				.getRootOrganisation().getOrganisationId().toString(), false, true);
+	    return getExtCourseClassMap(serverMap, userMap, extCourseId, courseName, countryIsoCode, langIsoCode,
+		    service.getRootOrganisation().getOrganisationId().toString(), false, prefix);
 	}
     }
 
-    // newer method which accepts course name, a parent org id, a flag for whether user should get 
+    // wrapper method for compatibility with original integration modules
+    public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
+	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method) {
+	return getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode, prettyCourseName,
+		method, true);
+    }
+
+    // newer method which accepts course name, a parent org id, a flag for whether user should get
     // 'teacher' roles, and a flag for whether to use a prefix in the org's name
     public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
 	    String extCourseId, String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId,
@@ -318,9 +325,10 @@ public class IntegrationService implements IIntegrationService {
 
     private String[] getUserDataFromExtServer(ExtServerOrgMap serverMap, String extUsername)
 	    throws UserInfoFetchException {
-	//the callback url must contain %username%, %timestamp% and %hash%
-	//eg: "http://test100.ics.mq.edu.au/webapps/lams-plglamscontent-bb_bb60/UserData?uid=%username%&ts=%timestamp%&hash=%hash%";
-	//where %username%, %timestamp% and %hash% will be replaced with their real values
+	// the callback url must contain %username%, %timestamp% and %hash%
+	// eg:
+	// "http://test100.ics.mq.edu.au/webapps/lams-plglamscontent-bb_bb60/UserData?uid=%username%&ts=%timestamp%&hash=%hash%";
+	// where %username%, %timestamp% and %hash% will be replaced with their real values
 	try {
 	    String userDataCallbackUrl = serverMap.getUserinfoUrl();
 	    String timestamp = Long.toString(new Date().getTime());
@@ -328,9 +336,9 @@ public class IntegrationService implements IIntegrationService {
 
 	    String encodedExtUsername = URLEncoder.encode(extUsername, "UTF8");
 
-	    //set the values for the parameters
-	    userDataCallbackUrl = userDataCallbackUrl.replaceAll("%username%", encodedExtUsername).replaceAll(
-		    "%timestamp%", timestamp).replaceAll("%hash%", hash);
+	    // set the values for the parameters
+	    userDataCallbackUrl = userDataCallbackUrl.replaceAll("%username%", encodedExtUsername)
+		    .replaceAll("%timestamp%", timestamp).replaceAll("%hash%", hash);
 	    log.debug(userDataCallbackUrl);
 	    URL url = new URL(userDataCallbackUrl);
 	    URLConnection conn = url.openConnection();
@@ -386,27 +394,27 @@ public class IntegrationService implements IIntegrationService {
 
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("tool.toolSignature", toolSig);
-	return (List<ExtServerToolAdapterMap>)service.findByProperties(ExtServerToolAdapterMap.class, properties);
+	return (List<ExtServerToolAdapterMap>) service.findByProperties(ExtServerToolAdapterMap.class, properties);
     }
-    
+
     @SuppressWarnings("unchecked")
-    public ExtServerToolAdapterMap getMappedServer(String serverId, String toolSig){
+    public ExtServerToolAdapterMap getMappedServer(String serverId, String toolSig) {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("tool.toolSignature", toolSig);
 	properties.put("extServer.serverid", serverId);
 	List ret = service.findByProperties(ExtServerToolAdapterMap.class, properties);
-	if  (ret != null && ret.size() > 0) {
-	    return (ExtServerToolAdapterMap)ret.get(0);
+	if (ret != null && ret.size() > 0) {
+	    return (ExtServerToolAdapterMap) ret.get(0);
 	} else {
 	    return null;
 	}
     }
-    
-    public void saveExtServerToolAdapterMap(ExtServerToolAdapterMap map){
+
+    public void saveExtServerToolAdapterMap(ExtServerToolAdapterMap map) {
 	service.save(map);
     }
-    
-    public void deleteExtServerToolAdapterMap(ExtServerToolAdapterMap map){
+
+    public void deleteExtServerToolAdapterMap(ExtServerToolAdapterMap map) {
 	service.delete(map);
     }
 
@@ -417,20 +425,20 @@ public class IntegrationService implements IIntegrationService {
     public ExtServerOrgMap getExtServerOrgMap(Integer sid) {
 	return (ExtServerOrgMap) service.findById(ExtServerOrgMap.class, sid);
     }
-    
+
     public void createExtServerLessonMap(Long lessonId, ExtServerOrgMap extServer) {
 	ExtServerLessonMap map = new ExtServerLessonMap();
 	map.setLessonId(lessonId);
 	map.setExtServer(extServer);
 	service.save(map);
     }
-    
+
     public String getLessonFinishCallbackUrl(User user, Lesson lesson) throws UnsupportedEncodingException {
 	// the callback url must contain %username%, %lessonid%, %timestamp% and %hash% eg:
 	// "http://test100.ics.mq.edu.au/webapps/lams-plglamscontent-bb_bb60/UserData?uid=%username%&lessonid=%lessonid%&ts=%timestamp%&hash=%hash%";
 	// where %username%, %lessonid%, %timestamp% and %hash% will be replaced with their real values
 	String lessonFinishCallbackUrl = null;
-	
+
 	if (lesson != null) {
 	    Long lessonId = lesson.getLessonId();
 	    ExtServerLessonMap extServerLesson = getExtServerLessonMap(lessonId);
@@ -457,9 +465,9 @@ public class IntegrationService implements IIntegrationService {
 	    }
 	}
 
-	 return lessonFinishCallbackUrl;
+	return lessonFinishCallbackUrl;
     }
-    
+
     private ExtServerLessonMap getExtServerLessonMap(Long lessonId) {
 	List list = service.findByProperty(ExtServerLessonMap.class, "lessonId", lessonId);
 	if (list == null || list.size() == 0) {
@@ -468,7 +476,7 @@ public class IntegrationService implements IIntegrationService {
 	    return (ExtServerLessonMap) list.get(0);
 	}
     }
-    
+
     private ExtUserUseridMap getExistingExtUserUseridMap(ExtServerOrgMap serverMap, User user) {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("extServerOrgMap.sid", serverMap.getSid());

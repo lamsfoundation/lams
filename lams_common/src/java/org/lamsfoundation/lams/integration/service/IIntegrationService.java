@@ -42,7 +42,10 @@ import org.lamsfoundation.lams.usermanagement.User;
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public interface IIntegrationService {
-	
+    
+    	ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, String extCourseId,
+	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method, Boolean prefix);
+
 	ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, 
 			String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method);
 	
