@@ -47,7 +47,7 @@ http://www.nic.fi/~tapio1/Teaching/FAQ.php3
 
 ***************************************************************/
 //initialization, browser, os detection
-var d, dom, nu='', brow='', ie, ie4, ie5, ie5x, ie6, ie7, ie8;
+var d, dom, nu='', brow='', ie, ie4, ie5, ie5x, ie6, ie7, ie8, ie9;
 var ns4, moz, moz_rv_sub, release_date='', moz_brow, moz_brow_nu='', moz_brow_nu_sub='', rv_full=''; 
 var mac, win, old, lin, ie5mac, ie5xwin, konq, saf, saf4, op, op4, op5, op6, op7, chrome;
 
@@ -177,6 +177,7 @@ ie5=(ie&&(nu.substring(0,1)==5));
 ie6=(ie&&(nu.substring(0,1)==6));
 ie7=(ie&&(nu.substring(0,1)==7));
 ie8=(ie&&(nu.substring(0,1)==8));
+ie9=(ie&&(nu.substring(0,1)==9));
 // default to get number from navigator app version.
 if(!nu) 
 {
