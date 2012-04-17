@@ -80,10 +80,10 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('HelpURL','http://wiki.lamsfoundation.org/display/lamsdocs/', 'config.help.url', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('XmppDomain','shaun.melcoe.mq.edu.au', 'config.xmpp.domain', 'config.header.chat', 'STRING', 0);
+values ('XmppDomain','localhost', 'config.xmpp.domain', 'config.header.chat', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('XmppConference','conference.shaun.melcoe.mq.edu.au', 'config.xmpp.conference', 'config.header.chat', 'STRING', 0);
+values ('XmppConference','localhost', 'config.xmpp.conference', 'config.header.chat', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('XmppAdmin','admin', 'config.xmpp.admin', 'config.header.chat', 'STRING', 0);
