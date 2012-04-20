@@ -909,7 +909,13 @@ function lamslesson_verify($url, $id, $key){
  */
 function lamslesson_http_call($request) {
         global $CFG;
-        $results = download_file_content($request);
+	
+	# pass charset as part of headers so it is interpreted correctly
+	# on the LAMS side. See LDEV-2875
+	$headers = array(
+		"Content-Type" =>  "application/x-www-form-urlencoded;charset=UTF-8"
+	);
+        $results = download_file_content($request, $headers);
 
         if ($results) {
             return $results;
