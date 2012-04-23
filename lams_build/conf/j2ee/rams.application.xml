@@ -51,17 +51,35 @@
 		
     </module>
     
+    <!--SAML Integration - do not uncomment manually
+    <module>
+        <web>
+            <web-uri>lams-saml.war</web-uri>
+            <context-root>/lams/saml</context-root>
+        </web>
+    </module>
+    SAML Integration - do not uncomment manually-->
+    
     <!--lams-signup - do not uncomment manually
     <module>
         <web>
             <web-uri>lams-signup.war</web-uri>
             <context-root>/lams/signup</context-root>
-                </web>
+        </web>
     </module>
     <module>
         <java>lams-signup.jar</java>
     </module>
     lams-signup - do not uncomment manually-->
+    
+    <!--Mindapp Integration - do not uncomment manually
+    <module>
+        <web>
+            <web-uri>lams-mindapp.war</web-uri>
+            <context-root>/lams/mindapp</context-root>
+        </web>
+    </module>
+    Mindapp Integration - do not uncomment manually-->
     
     <!-- 
     	======================================================== 
