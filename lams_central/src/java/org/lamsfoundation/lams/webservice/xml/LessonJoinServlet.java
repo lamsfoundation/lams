@@ -249,6 +249,8 @@ public class LessonJoinServlet extends HttpServlet {
 		// create new lesson
 		String lessonName;
 		String lessonDescription;
+		Boolean enableLessonIntro;
+		Boolean displayDesignImage;
 		Boolean learnerExportAvailable;
 		Boolean learnerPresenceAvailable;
 		Boolean learnerImAvailable;
@@ -267,6 +269,8 @@ public class LessonJoinServlet extends HttpServlet {
 			Lesson l = (Lesson)lessons.get(lessons.size()-1);
 			lessonName = incrementLessonName(l.getLessonName());
 			lessonDescription = l.getLessonDescription();
+			enableLessonIntro = l.isEnableLessonIntro();
+			displayDesignImage = l.isDisplayDesignImage();
 			learnerExportAvailable = l.getLearnerExportAvailable();
 			learnerPresenceAvailable = l.getLearnerPresenceAvailable();
 			learnerImAvailable = l.getLearnerImAvailable();
@@ -281,6 +285,8 @@ public class LessonJoinServlet extends HttpServlet {
 			LearningDesign ld = (LearningDesign)userService.findById(LearningDesign.class, ldId);
 			lessonName = ld.getTitle();
 			lessonDescription = ld.getDescription();
+			enableLessonIntro = false;
+			displayDesignImage = false;
 			learnerExportAvailable = true;
 			learnerPresenceAvailable = false;
 			learnerImAvailable = false;
@@ -292,8 +298,8 @@ public class LessonJoinServlet extends HttpServlet {
 			Vector userDTOs = userService.getUsersFromOrganisationByRole(orgId, Role.MONITOR, false, false);
 			staffList = getUsersFromDTOs(userDTOs);
 		}
-		Lesson lesson = monitoringService.initializeLesson(lessonName, lessonDescription, learnerExportAvailable, 
-				ldId, orgId, ownerUserId, null, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableNotifications, null);
+		Lesson lesson = monitoringService.initializeLesson(lessonName, lessonDescription,  
+				ldId, orgId, ownerUserId, null, enableLessonIntro, displayDesignImage, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableNotifications, null, null);
 		monitoringService.createLessonClassForLesson(lesson.getLessonId().longValue(), org, 
 				learnerGroupName, learnerList, staffGroupName, staffList, ownerUserId);
 		monitoringService.startLesson(lesson.getLessonId().longValue(), ownerUserId);

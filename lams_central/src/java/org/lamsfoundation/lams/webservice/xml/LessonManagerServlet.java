@@ -316,9 +316,8 @@ public class LessonManagerServlet extends HttpServlet {
 	    Organisation organisation = orgMap.getOrganisation();
 
 	    // 1. init lesson
-	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId,
-		    organisation.getOrganisationId(), user.getUserId(), customCSV, Boolean.FALSE, Boolean.FALSE,
-		    Boolean.TRUE, Boolean.FALSE, null);
+	    Lesson lesson = monitoringService.initializeLesson(title, desc, ldId, organisation.getOrganisationId(),
+		    user.getUserId(), customCSV, false, false, true, false, false, true, false, null, null);
 	    // 2. create lessonClass for lesson
 	    createLessonClass(lesson, organisation, user);
 	    // 3. start lesson
@@ -342,15 +341,14 @@ public class LessonManagerServlet extends HttpServlet {
 	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
 		    courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    // 1. init lesson
-	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId,
-		    orgMap.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false,
-		    false, true, false, null);
+	    Lesson lesson = monitoringService.initializeLesson(title, desc, ldId, orgMap.getOrganisation()
+		    .getOrganisationId(), userMap.getUser().getUserId(), customCSV, false, false, true, false, false,
+		    true, false, null, null);
 	    // 2. create lessonClass for lesson
 	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. schedule lesson
 	    Date date = DateUtil.convertFromLAMSFlashFormat(startDate);
-	    LessonManagerServlet.monitoringService.startLessonOnSchedule(lesson.getLessonId(), date, userMap.getUser()
-		    .getUserId(), null);
+	    monitoringService.startLessonOnSchedule(lesson.getLessonId(), date, userMap.getUser().getUserId());
 	    return lesson.getLessonId();
 	} catch (Exception e) {
 	    throw new RemoteException(e.getMessage(), e);

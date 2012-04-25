@@ -75,8 +75,9 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
 					countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 			// 1. init lesson
-			Lesson lesson = monitoringService.initializeLesson(title, desc, Boolean.TRUE, ldId, orgMap
-					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, null);
+                	Lesson lesson = monitoringService.initializeLesson(title, desc, ldId, orgMap.getOrganisation()
+                		.getOrganisationId(), userMap.getUser().getUserId(), customCSV, false, false, true, false, false,
+                		false, false, null, null);
 			// 2. create lessonClass for lesson
 			createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 			// 3. start lesson
@@ -97,14 +98,14 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 			ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
 					countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 			// 1. init lesson
-			Lesson lesson = monitoringService.initializeLesson(title, desc,  Boolean.TRUE, ldId, orgMap
-					.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, null);
+                	Lesson lesson = monitoringService.initializeLesson(title, desc, ldId, orgMap.getOrganisation()
+                		.getOrganisationId(), userMap.getUser().getUserId(), customCSV, false, false, true, false, false,
+                		false, false, null, null);
 			// 2. create lessonClass for lesson
 			createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 			// 3. schedule lesson
 			Date date = DateUtil.convertFromLAMSFlashFormat(startDate);
-			monitoringService.startLessonOnSchedule(lesson.getLessonId(), date, userMap.getUser()
-					.getUserId(), null);
+			monitoringService.startLessonOnSchedule(lesson.getLessonId(), date, userMap.getUser().getUserId());
 			return lesson.getLessonId();
 		} catch (Exception e) {
 			throw new RemoteException(e.getMessage(), e);
