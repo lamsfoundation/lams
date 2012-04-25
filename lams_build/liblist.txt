@@ -44,7 +44,7 @@ fckeditor         fckeditor-java-core-2.6.jar           2.6
 
 hibernate         hibernate3.jar                        3.2.0.cr2                                            hibernate.org                    JBoss
 
-j2ee              jstl.jar                              1.1.2                                                Sun Microsystems, Inc.           JavaServer Pages Standard Tag Library (JSTL)
+j2ee              jstl.jar                              1.2                                                  Sun Microsystems, Inc.           JavaServer Pages Standard Tag Library (JSTL)
 
 jakarta-commons   commons-beanutils.jar                 1.6                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Beanutils
                   commons-codec-1.3.jar                 1.3                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Codec
@@ -58,8 +58,6 @@ jakarta-commons   commons-beanutils.jar                 1.6                    A
                   commons-validator.jar                 1.1.4                  Apache License 2.0            The Apache Software Foundation   Commons Validator
 
 jakarta-poi       poi-2.5.1-final-20040804.jar          2.5.1-final-20040804                                                                  
-
-jakarta-taglibs   standard.jar                          1.1.2                                                Apache Software Foundation       JavaServer Pages Standard Tag Library (JSTL)
 
 jboss             jboss-cache.jar                       1.4.1.SP9                                            JBoss Inc.                       JBoss
                   jboss-common.jar                      4.0.2                                                JBoss Inc.                       JBoss

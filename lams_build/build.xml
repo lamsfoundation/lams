@@ -161,10 +161,8 @@
 					<include name="cglib/*.jar" />
 					<include name="dom4j/*.jar" />
 					<include name="fckeditor/*.jar" />
-					<include name="j2ee/*.jar" />
 					<include name="jabber/*.jar" />
 					<include name="jakarta-commons/*.jar" />
-					<include name="jakarta-taglibs/*.jar" />
 					<include name="jdom/*.jar" />
 					<include name="jfreechart/*.jar" />
 					<include name="mysql/mysql-connector-java-*.jar" />

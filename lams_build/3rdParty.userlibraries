@@ -29,7 +29,6 @@
         <archive path="/lams_build/lib/jakarta-commons/commons-lang-2.0.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-logging.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-validator.jar"/>
-        <archive path="/lams_build/lib/jakarta-taglibs/standard.jar"/>
         <archive path="/lams_build/lib/jdom/jdom.jar"/>
         <archive path="/lams_build/lib/junit/junit.jar"/>
         <archive javadoc="http://velocity.apache.org/engine/releases/velocity-1.4/api/" path="/lams_build/lib/middlegen/velocity-1.4-dev.jar"/>
