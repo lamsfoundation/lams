@@ -82,7 +82,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				// refresh the parent window
 				var parentURL = "${notifyCloseURL}";
 				if (parentURL != "") {
-					if (window.parent.opener == null){
+					if (window.parent.opener == null || '${param.noopener}' == 'true' || parentURL.indexOf('noopener=true') >= 0){
 						window.location.href = parentURL;
 					} else {
 						window.parent.opener.location.href = parentURL;
