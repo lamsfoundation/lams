@@ -121,8 +121,20 @@
 			CK.document.getBody().append(swfobject);
 			
 			//enable HTML5 support
-			var html5 = CKGlobal.dom.element.createFromHtml( '<script type="text/javascript" src="' + KALTURA_SERVER + '/p/' + PARTNER_ID + '/sp/' + SUB_PARTNER_ID + '/embedIframeJs/uiconf_id/' + KDP_UI_CONF_ID + '/partner_id/' + PARTNER_ID + '"><\/script>' );
+			var html5 = CKGlobal.dom.element.createFromHtml( '<script type="text/javascript" src="http://cdnbakmi.kaltura.com/html5/html5lib/v1.6.10.4/mwEmbedLoader.php"><\/script>' );
 			html5.insertAfter(swfobject);
+			var options = '<script type="text/javascript">';
+			options += 'mw.setConfig("Kaltura.ServiceUrl" , "' + KALTURA_SERVER + '" );';
+			options += 'mw.setConfig("Kaltura.CdnUrl" , "' + KALTURA_SERVER + '" );';
+			options += 'mw.setConfig("Kaltura.ServiceBase", "/api_v3/index.php?service=");';
+			options += 'mw.setConfig("EmbedPlayer.EnableIframeApi", true );';
+			options += 'mw.setConfig("EmbedPlayer.UseFlashOnAndroid", false );';
+			options += 'mw.setConfig("Kaltura.UseAppleAdaptive", false );';
+			options += 'mw.setConfig("EmbedPlayer.AttributionButton", false );';
+			options += 'mw.setConfig("EmbedPlayer.OverlayControls", false ); ';
+			options += '<\/script>';
+			var html5Options = CKGlobal.dom.element.createFromHtml(options);
+			html5Options.insertAfter(html5);
 			
 			// this is the callback function; execute after external script finishes loading
 			var innerHTML =	'<script type="text/javascript">';			
@@ -142,7 +154,7 @@
 			}		
 			innerHTML +='<\/script>';
 			var embedSwf = CKGlobal.dom.element.createFromHtml( innerHTML );
-			embedSwf.insertAfter(html5);
+			embedSwf.insertAfter(html5Options);
 			
 			//add divs which will contain videos
 			for(var i = 0; i < entries.length; i++) {
