@@ -30,14 +30,14 @@
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="javascript" type="text/javascript" src="loadVars.jsp"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-latest.pack.js"></script>
+	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript">
 		var pathToImageFolder = "<lams:LAMSURL/>/images/";
 	</script>
     <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox.patched.js"></script>
 	<c:if test="${empty tab}">
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery.dimensions.pack.js"></script>
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/interface.js"></script>
+	
+	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
 	</c:if>
 	<script language="javascript" type="text/javascript">
