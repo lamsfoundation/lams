@@ -115,10 +115,11 @@
 		
 		<div class="sequence-name">
 			<div id="<c:out value="${childOrg.id}"/>" class="j-subgroup-lessons">
-			<c:forEach var="childLesson" items="${childOrg.lessons}">
-				<c:set var="hasLessonToSort">true</c:set>
-				<table class="lesson-table">
-					<tr id="<c:out value="${childLesson.id}"/>" class="j-single-subgroup-lesson">
+			<table class="lesson-table">
+			
+				<c:forEach var="childLesson" items="${childOrg.lessons}">
+					<c:set var="hasLessonToSort">true</c:set>
+					<tr id="<c:out value="${childLesson.id}"/>" class="j-single-lesson">
 						<td class="td-lesson" style="width: 25px;">
 							<c:if test="${childLesson.completed}"> <span class="mycourses-completed-img" title="<fmt:message key="label.completed"/>" >&nbsp;</span> </c:if>
 	                    </td>
@@ -184,8 +185,10 @@
 		   					</c:otherwise>
 						</c:choose>
 					</tr>
-				</table>
-			</c:forEach></div>
+				</c:forEach>
+				
+			</table>
+			</div>
 		</div>
 	</div>
 	</c:forEach>

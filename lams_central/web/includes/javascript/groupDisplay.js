@@ -112,9 +112,9 @@
 					if (jQuery("div.j-lessons", org).size() > 0) {
 						var jLessons = jQuery("div.j-lessons#"+orgId+"-lessons");
 						var jLessonsTable = jQuery("table.lesson-table tbody",jLessons);
-						makeSortable(jLessonsTable, "j-single-lesson");
+						makeSortable(jLessonsTable);
 						jQuery("div.j-subgroup-lessons>table.lesson-table tbody", org).each(function() {
-							makeSortable(jQuery(this), "j-single-subgroup-lesson");
+							makeSortable(jQuery(this));
 						});
 						jQuery("div.mycourses-right-buttons", jLessons).html("<a class=\"sorting\" title=\""+getSortingEnabledText()+"\"><img src=\"images/sorting_enabled.gif\"></a>");
 					}
@@ -138,7 +138,7 @@
 					});
 				}
 				
-				function makeSortable(element, acceptClass) {
+				function makeSortable(element) {
 					jQuery(element).sortable({
 						axis: "y",
 						delay: 100,
