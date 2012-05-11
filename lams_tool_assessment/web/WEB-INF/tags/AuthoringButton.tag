@@ -114,6 +114,8 @@
 		} else {
 			if (window.parent.opener == null){
 				doAjaxCall(notifyCloseURL);
+			} else if ('${param.noopener}' == 'true' || notifyCloseURL.indexOf('noopener=true') >= 0){
+				window.location.href = notifyCloseURL;
 			} else {
 				window.parent.opener.location.href = notifyCloseURL;
 			}
