@@ -167,8 +167,8 @@ function saveToFCKEditor(eventObj) {
 										'&red5ServerUrl=<%= Configuration.get(ConfigurationKeys.RED5_SERVER_URL) %>' +
 										'&red5RecordingsUrl=<%= Configuration.get(ConfigurationKeys.RED5_RECORDINGS_URL) %>' +
 										'&lamsEarDir=<%= Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) %>' +
-										'&saveToLamsDestUrl=/lams-www.war/secure/'+CKGlobal.config.contentFolderID+'/Recordings/' +
-										'&contentFolderUrl=/lams//www/secure/'+CKGlobal.config.contentFolderID+'/Recordings/' +
+										'&saveToLamsDestUrl=/lams-www.war/secure/'+CK.config.contentFolderID+'/Recordings/' +
+										'&contentFolderUrl=/lams//www/secure/'+CK.config.contentFolderID+'/Recordings/' +
 										'&languageXML=' + escape(getLanguageXML()) +
 										"",
 						"width", "361",
