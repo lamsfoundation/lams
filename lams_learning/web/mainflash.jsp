@@ -26,13 +26,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
+<c:set var="progressPanelEnabled"><%=Configuration.get(ConfigurationKeys.LEARNER_COLLAPSIBLE_PROGRESS_PANEL)%></c:set>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <lams:html>
 
 	<lams:head>
 		<lams:css/>
+		<link href="css/mainflash.css" rel="stylesheet" type="text/css" />
+		
 		<title><fmt:message key="learner.title"/></title>
+		
 		<c:set var="randomID">
 			<lams:generateID id="${param.lessonID}"/>
 		</c:set>
@@ -40,7 +45,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:set var="notifyCloseURL" value="${param.notifyCloseURL}" scope="request" />
 		</c:if>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.layout.js"></script>
 		<script language="JavaScript" type="text/JavaScript">		
 			var thePopUp = null;
 		
@@ -49,9 +55,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				//alert("command:"+command+","+args);
 				if (command == "alert") {
 					doAlert(args);
-				}else if (command == "openPopUp"){
+				} else if (command == "openPopUp") {
 					openPopUpFS(args);
-				}else if (command == "closeWindow"){
+				} else if (command == "closeWindow") {
 					closeWindow(args);
 				}
 			}
@@ -111,7 +117,38 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			    </c:if>
 			}
 			
-			window.onresize = resizeIframe;	
+			window.onresize = resizeIframe;
+
+			// show if panel is not disabled in LAMS Configuration
+			if ('${progressPanelEnabled}'!='false'){
+				$(document).ready(function () {
+			        $('body').layout({
+				        	west: {
+						        	applyDefaultStyles:   	true,
+						        	initClosed:			  	true,
+						        	resizable:	          	false,
+						        	slidable:			 	false,
+						        	spacing_open:         	10,
+						        	spacing_closed:         10,
+						        	togglerContent_open:    '<fmt:message key="label.learner.progress.open"/>',
+						        	togglerContent_closed:  '<fmt:message key="label.learner.progress.closed"/>',
+						        	togglerLength_open:   	80,
+						        	togglerLength_closed: 	130,
+						        	togglerTip_open:      	'<fmt:message key="label.learner.progress.open.tooltip"/>',
+						        	togglerTip_closed:    	'<fmt:message key="label.learner.progress.closed.tooltip"/>',
+						        	onopen_start:			function(){
+			        	 										$('#controlFrame').css('visibility','visible');
+			        										}
+						        }
+					        });
+			        
+			       /* Because of initClosed parameter, controlFrame is not displayed in the beginning
+			          and embedded Flash loads (sometimes slowly) only when the pane is openened.
+			          Below is a trick to load the content but not show it.
+			       */
+			       $('#controlFrame').css('display','block').css('visibility','hidden');
+			    });
+			}
 		</script>
 		
 		<!--[if IE]>
@@ -122,20 +159,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 	</lams:head>
 
-	<body class="stripes" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-	
+	<body class="stripes">
+
 		<% 
 		String clientVersion = Configuration.get(ConfigurationKeys.LEARNER_CLIENT_VERSION);
 		String serverLanguage = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 		String languageDate = Configuration.get(ConfigurationKeys.DICTIONARY_DATE_CREATED);
 		String jabberServer = Configuration.get(ConfigurationKeys.XMPP_DOMAIN);
 		%>
-	
+
+
 		<c:set var="learnerurl_params">?userID=<lams:user property="userID"/>&firstName=<lams:user property="firstName"/>&lastName=<lams:user property="lastName"/>&serverURL=<lams:LAMSURL/>&presenceServerUrl=<%=jabberServer%>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&uniqueID=<c:out value="${randomID}"/><c:if test="${param.mode != null}">&mode=<c:out value="${param.mode}"/></c:if></c:set>
 		<c:set var="learnerurl_js">lams_learner<c:out value="${learnerurl_params}"/></c:set>
 		<c:set var="learnerurl_nojs">lams_learner.swf<c:out value="${learnerurl_params}"/></c:set>
 		
-		<div id="controlFrame" style="position: absolute; width: 160px; height:100%; top: 0px; left: 0px">
+		<div id="controlFrame" class="ui-layout-west" >
 			<script type="text/javascript">
 				AC_FL_RunContent('classid', 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000', 'codebase','http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,47,0','width','100%','height','100%','align','left','src','<c:out value="${learnerurl_js}" escapeXml="false"/>','quality','high','scale','noscale','bgcolor','#B3B7C8','name','learning', 'id', 'learning', 'allowscriptaccess','sameDomain', 'swliveconnect', true, 'type', 'application/x-shockwave-flash', 'pluginspage','http://www.macromedia.com/go/getflashplayer','movie', '<c:out value="${learnerurl_js}" escapeXml="false"/>' + '&isIe=' + isInternetExplorer);
 			</script> 
@@ -174,8 +212,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<c:if test="${param.presenceEnabledPatch}">
     		<%@ include file="/includes/presenceChat.jsp" %>
 		</c:if>
-		
-		<iframe onload="javascript:resizeIframe()" id="contentFrame" name="contentFrame" src="content.do?lessonID=<c:out value="${param.lessonID}"/>" scrolling="auto" style="border: none ; margin-left: 160px;">
+		<iframe onload="javascript:resizeIframe()" id="contentFrame" name="contentFrame" class="ui-layout-center" src="content.do?lessonID=<c:out value="${param.lessonID}"/>" scrolling="auto">
 		</iframe>		
 	</body>
 

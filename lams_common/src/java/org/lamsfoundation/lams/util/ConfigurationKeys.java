@@ -277,5 +277,8 @@ public class ConfigurationKeys {
 
     // LDEV-2747
     public static String ENABLE_SERVER_REGISTRATION = "EnableServerRegistration";
+    
+    // LDEV-2889
+    public static String LEARNER_COLLAPSIBLE_PROGRESS_PANEL = "LearnerCollapsProgressPanel";
 
 }
