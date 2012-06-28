@@ -245,6 +245,9 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('EnableFlash','true', 'config.flash.enable', 'config.header.features', 'BOOLEAN', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LearnerCollapsProgressPanel','true', 'config.learner.collapsible.progress.panel', 'config.header.features', 'BOOLEAN', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('AuthoringScreenSize','1024x768', 'config.authoring.screen.size', 'config.header.look.feel', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
@@ -291,3 +294,6 @@ values ('KalturaKCWUiConfId','', 'config.kaltura.kcw.uiconfid', 'config.header.k
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('KalturaKDPUiConfId','', 'config.kaltura.kdp.uiconfid', 'config.header.kaltura', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('SuffixImportedLD','false', 'config.authoring.suffix', 'config.header.features', 'BOOLEAN', 0);
