@@ -2084,11 +2084,15 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// then read and update the title, then save again.
 	learningDesignDAO.insert(ld);
 
-	ld.setTitle(ImportExportUtil.generateUniqueLDTitle(folder, ld.getTitle(), learningDesignDAO));
-
-	learningDesignDAO.update(ld);
-	// persist
-
+	
+	// add suffix if configuration is not set or is set to true
+	String addSuffix = Configuration.get(ConfigurationKeys.SUFFIX_IMPORTED_LD);
+	if (addSuffix == null || Boolean.valueOf(addSuffix)) {
+	    ld.setTitle(ImportExportUtil.generateUniqueLDTitle(folder, ld.getTitle(), learningDesignDAO));
+	    learningDesignDAO.update(ld);
+	    // persist
+	}
+	
 	// Once we have the competences saved, we can save the competence mappings
 	Set<CompetenceMapping> allCompetenceMappings = new HashSet<CompetenceMapping>();
 	for (AuthoringActivityDTO actDto : actDtoList) {

@@ -280,5 +280,8 @@ public class ConfigurationKeys {
     
     // LDEV-2889
     public static String LEARNER_COLLAPSIBLE_PROGRESS_PANEL = "LearnerCollapsProgressPanel";
-
+    
+    // CNG-26 Add to lams_configuration and set to false
+    // if you don't want imported LD to have _<timestamp>_<seq_number> appended
+    public static String SUFFIX_IMPORTED_LD = "SuffixImportedLD";
 }
