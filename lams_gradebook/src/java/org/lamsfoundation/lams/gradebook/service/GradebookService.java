@@ -724,17 +724,21 @@ public class GradebookService implements IGradebookService {
      */
     @SuppressWarnings("unchecked")
     public ExcelCell[][] getCourseDataForExcel(Integer userId, Integer organisationId) {
+	Organisation organisation = (Organisation) baseDAO.find(Organisation.class, organisationId);
+	
 	// The entire data list
 	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
 
 	User user = (User) getUserService().findById(User.class, userId);
 	Set<Lesson> lessonsFromDB = new TreeSet<Lesson>(new LessonComparator());
 	lessonsFromDB.addAll(lessonService.getLessonsByGroupAndUser(userId, organisationId));
-	
-	List<Lesson> lessons = new LinkedList<Lesson>();
+		
 	// Dont include lesson in list if the user doesnt have permission
+	Integer organisationToCheckPermission = (organisation.getParentOrganisation() == null) 
+		? organisation.getOrganisationId() : organisation.getParentOrganisation().getOrganisationId();
+	List<Lesson> lessons = new LinkedList<Lesson>();
 	for (Lesson lesson : lessonsFromDB) {
-	    if (!(lesson.getLessonClass().isStaffMember(user) || userService.isUserInRole(userId, organisationId,
+	    if (!(lesson.getLessonClass().isStaffMember(user) || userService.isUserInRole(userId, organisationToCheckPermission,
 		    Role.GROUP_MANAGER))) {
 		continue;
 	    }
