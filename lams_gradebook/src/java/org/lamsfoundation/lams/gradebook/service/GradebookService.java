@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -451,7 +452,7 @@ public class GradebookService implements IGradebookService {
 		    boolean marksReleased = lesson.getMarksReleased() != null && lesson.getMarksReleased();
 
 		    // Dont include lesson in list if the user doesnt have permission
-		    Integer organisationToCheckPermission = (organisation.getParentOrganisation() == null) 
+		    Integer organisationToCheckPermission = (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) 
 			    ? organisation.getOrganisationId() : organisation.getParentOrganisation().getOrganisationId();
 		    if (!(view == GBGridView.MON_COURSE
 			    && (lesson.getLessonClass().isStaffMember(user) || userService.isUserInRole(user
@@ -734,7 +735,7 @@ public class GradebookService implements IGradebookService {
 	lessonsFromDB.addAll(lessonService.getLessonsByGroupAndUser(userId, organisationId));
 		
 	// Dont include lesson in list if the user doesnt have permission
-	Integer organisationToCheckPermission = (organisation.getParentOrganisation() == null) 
+	Integer organisationToCheckPermission = (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) 
 		? organisation.getOrganisationId() : organisation.getParentOrganisation().getOrganisationId();
 	List<Lesson> lessons = new LinkedList<Lesson>();
 	for (Lesson lesson : lessonsFromDB) {
