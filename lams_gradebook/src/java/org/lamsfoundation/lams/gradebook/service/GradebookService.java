@@ -451,9 +451,11 @@ public class GradebookService implements IGradebookService {
 		    boolean marksReleased = lesson.getMarksReleased() != null && lesson.getMarksReleased();
 
 		    // Dont include lesson in list if the user doesnt have permission
+		    Integer organisationToCheckPermission = (organisation.getParentOrganisation() == null) 
+			    ? organisation.getOrganisationId() : organisation.getParentOrganisation().getOrganisationId();
 		    if (!(view == GBGridView.MON_COURSE
 			    && (lesson.getLessonClass().isStaffMember(user) || userService.isUserInRole(user
-				    .getUserId(), organisation.getOrganisationId(), Role.GROUP_MANAGER)) || view == GBGridView.LRN_COURSE
+				    .getUserId(), organisationToCheckPermission, Role.GROUP_MANAGER)) || view == GBGridView.LRN_COURSE
 			    && lesson.getAllLearners().contains(user) && marksReleased)) {
 			continue;
 		    }
