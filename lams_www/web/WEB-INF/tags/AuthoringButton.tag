@@ -62,9 +62,12 @@
 <c:if test="${empty accessMode}">
 	<c:set var="accessMode" value="author" scope="request"/>
 </c:if>
+<c:if test="${not empty param.notifyCloseURL}">
+	<c:set var="notifyCloseURL" value="${param.notifyCloseURL}" scope="session"/>
+</c:if>
 
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
-	
+
 <!-- begin tab content -->
 <script type="text/javascript">
 	//we set LAMS_AUTHORING_SUCCESS_FLAG to true in AuthoringAction.update() method 
@@ -85,7 +88,7 @@
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
     		closeWindow("cancel");
-		}
+    	}
     }
     function closeWindow(nextAction) {
 		var notifyCloseURL = "${notifyCloseURL}";
@@ -96,10 +99,10 @@
 			var clearSessionUrl = "<c:url value='${clearSessionActionUrl}?action=" + nextAction + "&mode=${accessMode}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
 			doAjaxCall(clearSessionUrl);
 		} else {
-			if (window.parent.opener == null){
-				doAjaxCall(notifyCloseURL);
-			} else if ('${param.noopener}' == 'true' || notifyCloseURL.indexOf('noopener=true') >= 0){
+			if ('${param.noopener}' == 'true' || notifyCloseURL.indexOf('noopener=true') >= 0) {
 				window.location.href = notifyCloseURL;
+			} else if (window.parent.opener == null){
+				doAjaxCall(notifyCloseURL);
 			} else {
 				window.parent.opener.location.href = notifyCloseURL;
 			}
@@ -111,7 +114,7 @@
     	if(userAgent.indexOf('MSIE') != -1)
         	window.opener = "authoring"
     	window.close();
-    }
+    }  				
 </script>	
 <p id="saveCancelButtons" >
 		<html:link href="javascript:;" property="cancel" onclick="javascript:doCancel()" styleClass="button right-buttons space-left">

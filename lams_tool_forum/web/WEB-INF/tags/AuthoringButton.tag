@@ -99,10 +99,10 @@
 			var clearSessionUrl = "<c:url value='${clearSessionActionUrl}?action=" + nextAction + "&mode=${accessMode}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
 			doAjaxCall(clearSessionUrl);
 		} else {
-			if (window.parent.opener == null){
-				doAjaxCall(notifyCloseURL);
-			} else if ('${param.noopener}' == 'true' || notifyCloseURL.indexOf('noopener=true') >= 0){
+			if ('${param.noopener}' == 'true' || notifyCloseURL.indexOf('noopener=true') >= 0) {
 				window.location.href = notifyCloseURL;
+			} else if (window.parent.opener == null){
+				doAjaxCall(notifyCloseURL);
 			} else {
 				window.parent.opener.location.href = notifyCloseURL;
 			}

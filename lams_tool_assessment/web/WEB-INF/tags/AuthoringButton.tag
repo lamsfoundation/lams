@@ -66,15 +66,13 @@
 	<c:set var="notifyCloseURL" value="${param.notifyCloseURL}" scope="session"/>
 </c:if>
 
-<c:set var="unableToSaveMsgKey" value="authoring.msg.one.question.to.be.saved" scope="request"/>
-
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
 
 <!-- begin tab content -->
 <script type="text/javascript">
 	//we set LAMS_AUTHORING_SUCCESS_FLAG to true in AuthoringAction.update() method 
 	if(<c:choose><c:when test="${LAMS_AUTHORING_SUCCESS_FLAG == true}">true</c:when><c:otherwise>false</c:otherwise></c:choose>){
-
+		
 		//if defineLater is true close current window
 		if (("${defineLater}" == "true") || ("${defineLater}" == "yes")) {
 			closeWindow("defineLater");
@@ -85,18 +83,7 @@
 		}
 	}
     function doSubmit_Form_Only() {
-    	var amountOfQuestions = $('#questionTable tr').size();
-    	var amountOfReferences = $('#referencesTable tr').size();
-
-		if( amountOfQuestions <= 1 ) {
-			$("#overallFeedbackList").val($('#advancedInputArea').contents().find('#overallFeedbackForm').serialize(true));
-	    	document.getElementById("${formID}").submit();
-		} else if (amountOfReferences > amountOfQuestions) {
-			alert("<fmt:message key='label.authoring.basic.warning.too.many.questions'/>");
-		} else {
-	    	$("#overallFeedbackList").val($('#advancedInputArea').contents().find('#overallFeedbackForm').serialize(true));
-	    	document.getElementById("${formID}").submit();
-		}
+    	document.getElementById("${formID}").submit();
     }
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
@@ -112,10 +99,10 @@
 			var clearSessionUrl = "<c:url value='${clearSessionActionUrl}?action=" + nextAction + "&mode=${accessMode}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
 			doAjaxCall(clearSessionUrl);
 		} else {
-			if (window.parent.opener == null){
-				doAjaxCall(notifyCloseURL);
-			} else if ('${param.noopener}' == 'true' || notifyCloseURL.indexOf('noopener=true') >= 0){
+			if ('${param.noopener}' == 'true' || notifyCloseURL.indexOf('noopener=true') >= 0) {
 				window.location.href = notifyCloseURL;
+			} else if (window.parent.opener == null){
+				doAjaxCall(notifyCloseURL);
 			} else {
 				window.parent.opener.location.href = notifyCloseURL;
 			}
@@ -127,7 +114,7 @@
     	if(userAgent.indexOf('MSIE') != -1)
         	window.opener = "authoring"
     	window.close();
-    } 				
+    }  				
 </script>	
 <p id="saveCancelButtons" >
 		<html:link href="javascript:;" property="cancel" onclick="javascript:doCancel()" styleClass="button right-buttons space-left">
