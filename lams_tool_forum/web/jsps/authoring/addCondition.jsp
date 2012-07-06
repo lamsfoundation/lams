@@ -40,7 +40,7 @@
 		<lams:ImgButtonWrapper>
 			<a href="javascript:;" onclick="javascript:forumConditionForm.submit();" class="button-add-item"><fmt:message
 					key="label.save" /> </a>
-			<a href="javascript:;" onclick="javascript:window.top.hideConditionMessage();"
+			<a href="javascript:;" onclick="javascript:window.parent.hideConditionMessage();"
 				class="button space-left"><fmt:message key="button.cancel" /> </a>
 		</lams:ImgButtonWrapper>
 	</body>

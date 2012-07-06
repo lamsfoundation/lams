@@ -79,10 +79,15 @@
 
 <%-- This script will works when a new resoruce Condition submit in order to refresh "TaskList List" panel. --%>
 <script type="text/javascript">
-
-	if(window.top != null){
-		window.top.hideConditionMessage();
-		var obj = window.top.document.getElementById('conditionsArea');
-		obj.innerHTML= document.getElementById("conditionList").innerHTML;
+	var win = null;
+	if (window.hideConditionMessage) {
+		win = window;
+	} else if (window.parent && window.parent.hideConditionMessage) {
+		win = window.parent;
+	} else {
+		win = window.top;
 	}
+	win.hideConditionMessage();
+	var obj = win.document.getElementById('conditionsArea');
+	obj.innerHTML= document.getElementById("conditionList").innerHTML;
 </script>

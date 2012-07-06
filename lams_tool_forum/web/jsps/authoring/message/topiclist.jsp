@@ -64,10 +64,15 @@
 </div>
 <%-- This script will works when a new resoruce item submit in order to refresh "Resource List" panel. --%>
 <script lang="javascript">
- 
-	if(window.top != null){
-		window.top.hideMessage();
-		var obj = window.top.document.getElementById('messageListArea');
-		obj.innerHTML= document.getElementById("topiclist").innerHTML;
+	var win = null;
+	if (window.hideMessage) {
+		win = window;
+	} else if (window.parent && window.parent.hideMessage) {
+		win = window.parent;
+	} else {
+		win = window.top;
 	}
+	win.hideMessage();
+	var obj = win.document.getElementById('messageListArea');
+	obj.innerHTML= document.getElementById("topiclist").innerHTML;
 </script>
