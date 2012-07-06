@@ -128,6 +128,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						        	initClosed:			  	true,
 						        	resizable:	          	false,
 						        	slidable:			 	false,
+						        	size:					160,
 						        	spacing_open:         	10,
 						        	spacing_closed:         10,
 						        	togglerContent_open:    '<fmt:message key="label.learner.progress.open"/>',
