@@ -91,7 +91,9 @@
     	}
     }
     function closeWindow(nextAction) {
-		var notifyCloseURL = "${notifyCloseURL}";
+        // notifyCloseURL needs to be encoded in Java *twice*, otherwise it won't work
+        // for both AuthoringButton.tag and authoringConfirm.jsp
+		var notifyCloseURL = decodeURIComponent("${notifyCloseURL}");
 		if (notifyCloseURL == ""){
 			if (nextAction == "defineLater") {
 				refreshParentMonitoringWindow();
