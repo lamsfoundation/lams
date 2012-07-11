@@ -224,9 +224,6 @@
 			</table>
 		</div>
 		
-		<a class="add-lesson-button thickbox" href="http://127.0.0.1:8080/lams//home.do?method=author&requestSrc=aaa&noopener=true&amp;KeepThis=true&amp;TB_iframe=true&amp;height=600&amp;width=810" title=""> 
-				Add AAAAAAAAAAAAAAAA
-			</a>
 	</div>
 	<div id="footer">
 		<p>
