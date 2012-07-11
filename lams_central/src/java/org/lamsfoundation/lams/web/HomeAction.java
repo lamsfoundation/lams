@@ -227,6 +227,7 @@ public class HomeAction extends DispatchAction {
 
 		String requestSrc = req.getParameter("requestSrc");
 		String notifyCloseURL = req.getParameter("notifyCloseURL");
+		String isPostMessageToParent = req.getParameter("isPostMessageToParent");
 		String customCSV = req.getParameter(AttributeNames.PARAM_CUSTOM_CSV);
 		String extLmsId = req.getParameter(AttributeNames.PARAM_EXT_LMS_ID);
 
@@ -247,6 +248,7 @@ public class HomeAction extends DispatchAction {
 
 		req.setAttribute("requestSrc", requestSrc);
 		req.setAttribute("notifyCloseURL", notifyCloseURL);
+		req.setAttribute("isPostMessageToParent", isPostMessageToParent);
 		req.setAttribute(AttributeNames.PARAM_CUSTOM_CSV, customCSV);
 		req.setAttribute(AttributeNames.PARAM_EXT_LMS_ID, extLmsId);
 

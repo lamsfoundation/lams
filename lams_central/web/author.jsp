@@ -185,9 +185,14 @@ function closeWindow(){
 	
 	// refresh the parent window
 	var parentURL = "${notifyCloseURL}";
+	var isPostMessageToParent = "${isPostMessageToParent}";
 	
 	if (parentURL != "") {
 		window.parent.opener.location.href = parentURL;
+		
+	//post message to parent window
+	} else if (isPostMessageToParent == "true") {
+		window.parent.opener.postMessage("refresh", "*");
 	}
 	
 	if(isInternetExplorer) {
