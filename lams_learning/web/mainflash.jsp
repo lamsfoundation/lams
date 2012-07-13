@@ -26,7 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<c:set var="progressPanelEnabled"><%=Configuration.get(ConfigurationKeys.LEARNER_COLLAPSIBLE_PROGRESS_PANEL)%></c:set>
+<c:set var="progressPanelEnabled"><lams:Configuration key="LearnerCollapsProgressPanel"/></c:set>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
