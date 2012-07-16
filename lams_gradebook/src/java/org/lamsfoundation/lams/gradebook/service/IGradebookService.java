@@ -23,6 +23,7 @@
 /* $Id$ */ 
 package org.lamsfoundation.lams.gradebook.service; 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
@@ -79,6 +80,14 @@ public interface IGradebookService {
      * @return
      */
     public List<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson);
+    
+    /**
+     * Gets the user rows for specified organisation
+     * 
+     * @param organisation
+     * @return
+     */
+    ArrayList<GBUserGridRowDTO> getGBUserRowsForOrganisation(Organisation organisation);
 
     /**
      * Updates a user's lesson mark, this will make it desynchronised with the
@@ -123,9 +132,12 @@ public interface IGradebookService {
      * Gets the lesson row dtos for a given organisation
      * 
      * @param organisation
+     * @param user user which results is requested
+     * @param viewer user who view gradebook. We display list of lessons based on his rights.
+     * @param view
      * @return
      */
-    public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, GBGridView view);
+    public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, User viewer, GBGridView view);
     
     /**
      * Gets a gradebook lesson mark/feedback for a given user and lesson

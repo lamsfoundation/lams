@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.gradebook.service;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,7 +42,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
@@ -317,6 +315,25 @@ public class GradebookService implements IGradebookService {
 	return gradebookUserDTOs;
 
     }
+    
+    public ArrayList<GBUserGridRowDTO> getGBUserRowsForOrganisation(Organisation organisation) {
+
+	ArrayList<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<GBUserGridRowDTO>();
+
+	if (organisation != null) {
+	    List<User> learners =  userService.getUsersFromOrganisation(organisation.getOrganisationId());
+
+	    if (learners != null) {
+		for (User learner : learners) {
+		    GBUserGridRowDTO gradebookUserDTO = populateGradebookUserDTO(learner, null);
+		    gradebookUserDTOs.add(gradebookUserDTO);
+		}
+	    }
+	}
+
+	return gradebookUserDTOs;
+
+    }
 
     /**
      * @see org.lamsfoundation.lams.gradebook.service.IGradebookService#getGradebookUserLesson(java.lang.Long,
@@ -438,7 +455,7 @@ public class GradebookService implements IGradebookService {
      * @see org.lamsfoundation.lams.gradebook.service.IGradebookService#getGBLessonRows(org.lamsfoundation.lams.usermanagement.Organisation)
      */
     @SuppressWarnings("unchecked")
-    public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, GBGridView view) {
+    public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, User viewer, GBGridView view) {
 	List<GBLessonGridRowDTO> lessonRows = new ArrayList<GBLessonGridRowDTO>();
 
 	if (organisation != null) {
@@ -449,22 +466,22 @@ public class GradebookService implements IGradebookService {
 
 		for (Lesson lesson : lessons) {
 
-		    boolean marksReleased = lesson.getMarksReleased() != null && lesson.getMarksReleased();
-
-		    // Dont include lesson in list if the user doesnt have permission
+		    // Don't include lesson in list if the user doesn't have permission
 		    Integer organisationToCheckPermission = (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) 
 			    ? organisation.getOrganisationId() : organisation.getParentOrganisation().getOrganisationId();
-		    if (!(view == GBGridView.MON_COURSE
-			    && (lesson.getLessonClass().isStaffMember(user) || userService.isUserInRole(user
-				    .getUserId(), organisationToCheckPermission, Role.GROUP_MANAGER)) || view == GBGridView.LRN_COURSE
-			    && lesson.getAllLearners().contains(user) && marksReleased)) {
+		    boolean hasTeacherPermission = lesson.getLessonClass().isStaffMember(viewer) || userService.isUserInRole(viewer.getUserId(), organisationToCheckPermission, Role.GROUP_MANAGER);
+		    boolean marksReleased = lesson.getMarksReleased() != null && lesson.getMarksReleased();
+		    boolean hasLearnerPermission = lesson.getAllLearners().contains(user);
+		    if (!( (view == GBGridView.MON_COURSE) && hasTeacherPermission
+			    || (view == GBGridView.LRN_COURSE) && hasLearnerPermission && marksReleased
+			    || (view == GBGridView.MON_USER) && hasTeacherPermission && hasLearnerPermission)) {
 			continue;
 		    }
 
 		    GBLessonGridRowDTO lessonRow = new GBLessonGridRowDTO();
 		    lessonRow.setLessonName(lesson.getLessonName());
 		    lessonRow.setId(lesson.getLessonId().toString());
-		    lessonRow.setStartDate(getLocaleDateString(user, lesson.getStartDateTime()));
+		    lessonRow.setStartDate(getLocaleDateString(viewer, lesson.getStartDateTime()));
 
 		    if (view == GBGridView.MON_COURSE) {
 
@@ -476,7 +493,7 @@ public class GradebookService implements IGradebookService {
 			String gbMonURL = Configuration.get(ConfigurationKeys.SERVER_URL)
 				+ "gradebook/gradebookMonitoring.do?lessonID=" + lesson.getLessonId().toString();
 			lessonRow.setGradebookMonitorURL(gbMonURL);
-		    } else if (view == GBGridView.LRN_COURSE) {
+		    } else if ((view == GBGridView.LRN_COURSE) || (view == GBGridView.MON_USER)) {
 
 			GradebookUserLesson gbLesson = gradebookDAO.getGradebookUserDataForLesson(lesson.getLessonId(),
 				user.getUserId());
@@ -922,12 +939,15 @@ public class GradebookService implements IGradebookService {
 	    }
 	}
 
-	GradebookUserLesson gradebookUserLesson = gradebookDAO.getGradebookUserDataForLesson(lesson.getLessonId(),
-		learner.getUserId());
-	if (gradebookUserLesson != null) {
-	    gradebookUserDTO.setMark(gradebookUserLesson.getMark());
-	    gradebookUserDTO.setFeedback(gradebookUserLesson.getFeedback());
+	if (lesson != null) {
+	    GradebookUserLesson gradebookUserLesson = gradebookDAO.getGradebookUserDataForLesson(lesson.getLessonId(),
+		    learner.getUserId());
+	    if (gradebookUserLesson != null) {
+		gradebookUserDTO.setMark(gradebookUserLesson.getMark());
+		gradebookUserDTO.setFeedback(gradebookUserLesson.getFeedback());
+	    }
 	}
+
 	return gradebookUserDTO;
 
     }

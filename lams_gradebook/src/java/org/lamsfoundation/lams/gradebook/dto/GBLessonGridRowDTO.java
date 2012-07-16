@@ -65,7 +65,7 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 	    ret.add((averageTimeTaken != null && averageTimeTaken != 0) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
 	    ret.add((averageMark != null) ? averageMark.toString() : CELL_EMPTY);
 	    
-	} else if (view == GBGridView.LRN_COURSE) {
+	} else if ((view == GBGridView.LRN_COURSE) || (view == GBGridView.MON_USER)) {
 	    if (gradebookLearnerURL != null && gradebookLearnerURL.length() != 0) {
 		ret.add("<a href='javascript:launchPopup(\"" + gradebookLearnerURL + "\",\"" + rowName + "\",796,570)'>" + rowName
 			+ "</a>");

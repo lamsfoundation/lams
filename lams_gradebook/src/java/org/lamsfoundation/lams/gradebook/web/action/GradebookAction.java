@@ -204,16 +204,21 @@ public class GradebookAction extends LamsDispatchAction {
 	String searchOper = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_OPERATION, true);
 	String searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_STRING, true);
 	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
-
-	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-
-	Lesson lesson = lessonService.getLesson(lessonID);
-
-	if (lesson != null) {
-
-	    // Get the user gradebook list from the db
-	    List<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<GBUserGridRowDTO>();
-
+	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
+	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
+	
+	// Get the user gradebook list from the db
+	List<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<GBUserGridRowDTO>();
+	
+	//if leesonID is specified show results based on lesson
+	if (lessonID != null) {
+	    
+	    Lesson lesson = lessonService.getLesson(lessonID);
+	    if (lesson == null) {
+		logger.error("No lesson could be found for: " + lessonID);
+		return null;
+	    }
+	    
 	    if (view == GBGridView.MON_USER || view == GBGridView.MON_COURSE) {
 		gradebookUserDTOs = gradebookService.getGBUserRowsForLesson(lesson);
 	    } else if (view == GBGridView.MON_ACTIVITY) {
@@ -241,15 +246,26 @@ public class GradebookAction extends LamsDispatchAction {
 		    return null;
 		}
 	    }
+	
+	//if organisationID is specified (but not lessonID) then show results for organisation
+	} else if (organisationID != null) {
 	    
-	    String ret = GradebookUtil.toGridXML(gradebookUserDTOs, view, sortBy, isSearch, searchField, searchOper,
-		    searchString, sortOrder, rowLimit, page);
-
-	    writeResponse(response, CONTENT_TYPE_TEXT_XML, ENCODING_UTF8, ret);
+	    Organisation org = (Organisation) userService.findById(Organisation.class, organisationID);
+	    if (org == null) {
+		logger.error("No organisation could be found for: " + organisationID);
+		return null;
+	    }
+	    
+	    gradebookUserDTOs = gradebookService.getGBUserRowsForOrganisation(org);
+	    
 	} else {
-	    logger.error("No lesson could be found for: " + lessonID);
+	    logger.error("Missing parameters: either lessonID or organisationID should be specified.");
+	    return null;	    
 	}
 
+	String ret = GradebookUtil.toGridXML(gradebookUserDTOs, view, sortBy, isSearch, searchField, searchOper,
+		searchString, sortOrder, rowLimit, page);
+	writeResponse(response, CONTENT_TYPE_TEXT_XML, ENCODING_UTF8, ret);
 	return null;
     }
 
@@ -285,39 +301,39 @@ public class GradebookAction extends LamsDispatchAction {
 	String searchOper = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_OPERATION, true);
 	String searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_STRING, true);
 	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
-
-	User user = getRealUser();
-
 	Integer courseID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	Organisation organisation = (Organisation) userService.findById(Organisation.class, courseID);
-
-	if (organisation != null && user != null) {
-
-	    Set<Lesson> lessons = (Set<Lesson>) organisation.getLessons();
-	    if (lessons != null) {
-
-		List<GBLessonGridRowDTO> gradebookLessonDTOs = new ArrayList<GBLessonGridRowDTO>();
-
-		gradebookLessonDTOs = gradebookService.getGBLessonRows(organisation, user, view);
-
-		if (sortBy == null) {
-		    sortBy = GradebookConstants.PARAM_ID;
-		}
-
-		// String ret = GradebookUtil.toGridXML(gradebookLessonDTOs, page, totalPages, method);
-		String ret = GradebookUtil.toGridXML(gradebookLessonDTOs, view, sortBy, isSearch, searchField,
-			searchOper, searchString, sortOrder, rowLimit, page);
-
-		
-		writeResponse(response, CONTENT_TYPE_TEXT_XML, ENCODING_UTF8, ret);
-
-	    }
-
+	
+	Set<Lesson> lessons = (Set<Lesson>) organisation.getLessons();
+	if (lessons == null) {
+	    return null;
+	}
+	
+	User user;
+	if (view == GBGridView.MON_USER) {
+	    Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
+	    user = (User) userService.findById(User.class, userID);
 	} else {
+	    user = getRealUser();
+	}
+	User viewer = getRealUser();
+	
+	if (organisation == null || user == null || viewer == null) {
 	    // Grid will handle error, just log and return null
-	    logger.error("Error: request for course gradebook data with null user or course. CourseID: " + courseID);
+	    logger.error("Error: request for course gradebook data with null course or user. CourseID: " + courseID);
+	    return null;
+	}
+	List<GBLessonGridRowDTO> gradebookLessonDTOs = gradebookService.getGBLessonRows(organisation, user, viewer, view);
+
+	if (sortBy == null) {
+	    sortBy = GradebookConstants.PARAM_ID;
 	}
 
+	// String ret = GradebookUtil.toGridXML(gradebookLessonDTOs, page, totalPages, method);
+	String ret = GradebookUtil.toGridXML(gradebookLessonDTOs, view, sortBy, isSearch, searchField, searchOper,
+		searchString, sortOrder, rowLimit, page);
+
+	writeResponse(response, CONTENT_TYPE_TEXT_XML, ENCODING_UTF8, ret);
 	return null;
     }
     

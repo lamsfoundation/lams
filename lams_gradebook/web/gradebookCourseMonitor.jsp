@@ -73,8 +73,9 @@
 		
 		jQuery(document).ready(function(){
 
+			// Create the lesson view grid with sub grid for users	
 			jQuery("#organisationGrid").jqGrid({
-				caption: "${organisationName}",
+				caption: "<fmt:message key="gradebook.gridtitle.lesson.view"/>",
 			    datatype: "xml",
 			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getCourseGridData&view=monCourse&organisationID=${organisationID}",
 			    height: "100%",
@@ -155,6 +156,7 @@
 							    	} 
 							    });
 					     	}
+					     	$("#userView").trigger("reloadGrid");
 					     },
 						 gridComplete: function(){
 						 	toolTip($(".jqgrow"));	// enable tooltips for grid
@@ -203,7 +205,202 @@
 				onClickButton: function(){
 					jQuery("#organisationGrid").setColumns();
 				}
-			});	
+			});
+			
+			// Create the user view grid with sub grid for lessons
+			jQuery("#userView").jqGrid({
+				caption: "<fmt:message key="gradebook.gridtitle.learner.view"/>",
+			    datatype: "xml",
+			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monCourse&organisationID=${organisationID}",
+			    height: "100%",
+			    width: 660,
+			    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
+			    sortorder: "asc", 
+			    sortname: "rowName", 
+			    pager: 'userViewPager',
+			    rowList:[5,10,20,30],
+			    rowNum:10,
+			    colNames:[
+					'',
+					"<fmt:message key="gradebook.columntitle.learnerName"/>",
+					"<fmt:message key="gradebook.columntitle.progress"/>", 
+					"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
+					"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
+			    	"<fmt:message key="gradebook.columntitle.mark"/>"
+			    ],
+			    colModel:[
+					{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
+					{name:'rowName',index:'rowName', sortable:true, editable:false},
+					{name:'status', index:'status', sortable:false, editable:false, search:false, title:false, width:50, align:"center", hidden:true},
+					{name:'timeTaken', index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center", hidden:true},
+					{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false, hidden:true},
+					{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center", hidden:true}
+			    ],
+			    loadError: function(xhr,st,err) {
+			    	jQuery("#userView").clearGridData();
+			    	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+			    },
+			    subGrid: true,
+				subGridRowExpanded: function(subgrid_id, row_id) {
+				   var subgrid_table_id;
+				   var userID = jQuery("#userView").getRowData(row_id)["id"];
+				   subgrid_table_id = subgrid_id+"_t";
+					 jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+subgrid_table_id+"_pager' class='scroll' ></div>");
+					   	jQuery("#"+subgrid_table_id).jqGrid({
+						     datatype: "xml",
+						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getCourseGridData&view=monUserView&organisationID=${organisationID}&userID=" + userID,
+						     height: "100%",
+						     cellEdit:true,
+						     imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
+						     pager: subgrid_table_id + "_pager",
+							 rowList:[5,10,20,30],
+							 rowNum:10,
+						     cellurl: "", //will be updated dynamically
+						     colNames: [
+								'', 
+								"<fmt:message key="gradebook.columntitle.lessonName"/>", 
+								"<fmt:message key="gradebook.columntitle.subGroup"/>", 
+								"<fmt:message key="gradebook.columntitle.progress"/>", 
+								"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
+								"<fmt:message key="gradebook.columntitle.startDate"/>", 
+								"<fmt:message key="gradebook.columntitle.completeDate"/>", 
+								"<fmt:message key="gradebook.columntitle.averageTimeTaken"/>", 
+								"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
+								"<fmt:message key="gradebook.columntitle.averageMark"/>", 
+								"<fmt:message key="gradebook.columntitle.mark"/>"
+						     ],
+						     colModel: [
+								{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
+								{name:'rowName',index:'rowName', sortable:true, editable:false, width:150},
+								{name:'subGroup',index:'subGroup', sortable:false, editable:false, search:false, width:130},
+								{name:'status',index:'status', sortable:false, editable:false, search:false, width:60, align:"center"},
+								{name:'feedback',  index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, width:150},
+								{name:'startDate',index:'startDate', sortable:false, editable:false, hidden:true, search:false},
+								{name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:true, search:false},
+								{name:'averageTimeTaken',index:'averageTimeTaken', sortable:true, hidden:true, editable:false, search:false, width:80, align:"center"},
+								{name:'timeTaken',index:'timeTaken', sortable:true, editable:false, hidden:true, search:false, width:80, align:"center"},
+								{name:'averageMark',index:'averageMark', sortable:true, editable:false, hidden:true, search:false, width:50, align:"center"},
+								{name:'mark',index:'mark', sortable:true, editable:true, search:false, width:60, align:"center"}
+						     ],
+						     loadError: function(xhr,st,err) {
+						    	jQuery("#"+subgrid_table_id).clearGridData();
+						    	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+						     },
+						     formatCell: function(rowid, cellname,value, iRow, iCol) {
+					    	 	if (cellname == "mark") {
+					    	 		
+					    	 		var rowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
+					    	 		var string = removeHTMLTags(rowData["mark"]);
+					    	 		
+					    	 		
+					    	 		if (string.indexOf("-") != -1)
+					    	 		{
+					    	 			string = " ";
+					    	 			
+					    	 		} else if (string.indexOf("/") != -1) {
+					    	 			splits = string.split("/");
+					    	 			
+					    	 			if(splits.length == 2) {
+					    	 				tempMark = splits[0];
+					    	 				string = " ";
+					    	 			} else {
+					    	 				string = " ";
+					    	 			}
+					    	 		}
+					    	 		
+					    	 		return string;
+					    	 		
+					    	 	}
+					    	 },
+					    	 beforeSaveCell: function(rowid, cellname,value, iRow, iCol){
+					    	 	value = trim(value);
+					    	 	
+					    	 	if (cellname == "mark") {
+					    	 		if (value == "") {
+					    	 			jQuery("#"+subgrid_table_id).restoreCell( iRow, iCol);
+					    	 			throw("Value required for mark.");
+					    	 		}
+					    	 		
+					    	 		var currRowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
+						     		if (currRowData['marksAvailable'] != null && currRowData['marksAvailable'] != "") {
+						     			if (parseFloat(value) > parseFloat(currRowData['marksAvailable'])){
+						     				info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.markhigher"/>", "<fmt:message key="label.ok"/>");
+						     				jQuery("#"+subgrid_table_id).restoreCell( iRow, iCol);
+						     				throw("Mark must be lower than maximum mark");
+						     			}
+						     		}
+					    	 	}
+					    	 	
+					    	 	//modify cellurl setting to include lessonid
+					    	 	var lessonID = jQuery("#"+subgrid_table_id).getRowData(rowid)["id"];
+					    	 	$("#"+subgrid_table_id).setGridParam({cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserLessonGradebookData&lessonID=" + lessonID + "&id=" + userID});
+					    	 },
+						     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
+						     	
+						     	var currRowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
+						     	if (cellname == "mark") {
+							     	
+							     	if (cellname == "mark") {
+							     		if (currRowData['marksAvailable'] != null && currRowData['marksAvailable'] != "") {
+							     			var markStr = "<font color='green'>" + value + "/" + currRowData['marksAvailable'] + "</font>";
+							     			jQuery("#"+subgrid_table_id).setCell(rowid, "mark", markStr, "", "");
+							     		}
+							     	}
+							     	
+							     	// Update the aggregated lesson mark
+							     	var lessonID = jQuery("#"+subgrid_table_id).getRowData(rowid)["id"];
+							     	$.get("<lams:LAMSURL/>/gradebook/gradebook.do", {dispatch:"getLessonMarkAggregate", lessonID:lessonID, userID:userID}, function(xml) {
+								    	if (xml!=null) {
+								    		jQuery("#userView").setCell(row_id, "mark", xml, "", "");
+								    	} 
+								    });							     	
+						     	}
+						     	$("#organisationGrid").trigger("reloadGrid");
+						     },
+						     errorCell: function(serverresponse, status) {
+						     	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.cellsave"/>", "<fmt:message key="label.ok"/>");
+						     },
+							 gridComplete: function(){
+							 	toolTip($(".jqgrow"));
+							 }
+					  	}).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}); // applying refresh button
+					  
+					  	// Adding button for show/hiding collumn
+					  	jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
+							caption: "",
+							buttonimg:"<lams:LAMSURL />images/table_edit.png", 
+							onClickButton: function(){
+								jQuery("#"+subgrid_table_id).setColumns();
+							}
+						});
+					},
+					gridComplete: function(){
+						toolTip($(".jqgrow"));  // allowing tooltips for this grid	
+					}
+				}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false}); // applying refresh button
+				
+				// Allowing search for this grid
+				jQuery("#userView").navButtonAdd('#userViewPager',{
+					caption: "",
+					title: "Search Names",
+					buttonimg:"<lams:LAMSURL />images/find.png", 
+					onClickButton: function(){
+						jQuery("#userView").searchGrid({
+								top:10, 
+								left:10,
+								sopt:['cn','bw','eq','ne','ew']
+							});
+						}
+				});
+				
+				// Allowing column editing for this grid
+				jQuery("#userView").navButtonAdd('#userViewPager',{
+					caption: "",
+					buttonimg:"<lams:LAMSURL />images/table_edit.png", 
+					onClickButton: function(){
+						jQuery("#userView").setColumns();
+					}
+				});
 		});
 	</script>
 
@@ -234,6 +431,12 @@
 			<div style="width: 700px; margin-left: 10px; margin-right: 10px;">
 				<table id="organisationGrid" class="scroll"></table>
 				<div id="organisationGridPager" class="scroll"></div>
+				
+				<br />
+				<br />
+				
+				<table id="userView" class="scroll" ></table>
+				<div id="userViewPager" class="scroll" ></div>
 				
 				<div class="tooltip" id="tooltip"></div>
 			</div>
