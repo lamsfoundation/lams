@@ -1,0 +1,195 @@
+		<!-- ========== Action Mapping Definitions ============================== -->
+		<!-- ========== BEGIN: Authroing Definitions ============================== -->
+		<action path="/authoring/start"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			name="scratchieForm" 
+			scope="request" 
+			parameter="start" 
+			validate="false">
+			<forward name="success" path="/pages/authoring/start.jsp" />
+		</action>
+		<action path="/definelater"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			name="scratchieForm" 
+			scope="request" 
+			parameter="definelater" 
+			validate="false">
+			<forward name="forbidden" path="/pages/authoring/definelaterforbid.jsp" />
+			<forward name="success" path="/pages/authoring/start.jsp" />
+		</action>
+		<action path="/authoring/init"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			name="scratchieForm" 
+			scope="request" 
+			parameter="initPage" 
+			validate="false">
+			<forward name="success" path="/pages/authoring/authoring.jsp" />
+			<forward name="definelater" path="/pages/authoring/definelater.jsp" />
+		</action>
+		
+		<action path="/authoring/update"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			name="scratchieForm" 
+			scope="request" 
+			parameter="updateContent" 
+			validate="false">
+			<forward name="author" path="/pages/authoring/authoring.jsp" />
+			<forward name="monitor" path="/pages/authoring/definelater.jsp" />
+		</action>
+		<!-- ==========  Instrcutions File: online/offline ========== -->
+		<action path="/authoring/uploadOnlineFile"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			name="scratchieForm" 
+			scope="request" 
+			validate="false"
+			parameter="uploadOnlineFile">
+			<forward name="success" path="/pages/authoring/authoring.jsp" />
+		</action>
+		<action path="/authoring/uploadOfflineFile"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			name="scratchieForm" 
+			scope="request" 
+			validate="false"
+			parameter="uploadOfflineFile">
+			<forward name="success" path="/pages/authoring/authoring.jsp" />
+		</action>
+		<action path="/authoring/deleteOnlineFile"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			name="scratchieForm" 
+			scope="request" 
+			validate="false"
+			parameter="deleteOnlineFile">
+			<forward name="success" path="/pages/authoring/parts/instructionfilelist.jsp" />
+		</action>
+		<action path="/authoring/deleteOfflineFile"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			name="scratchieForm" 
+			scope="request" 
+			validate="false"
+			parameter="deleteOfflineFile">
+			<forward name="success" path="/pages/authoring/parts/instructionfilelist.jsp" />
+		</action>
+		<!-- ==========  Scratchie Item : URL ========== -->
+		<action path="/authoring/addItem"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			scope="request" 
+			validate="false"			
+			parameter="addItem">
+			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
+		</action>
+		
+		<action path="/authoring/removeItem"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			scope="request" 
+			parameter="removeItem" 
+			validate="false">
+			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
+		</action>
+		
+		<action path="/authoring/upItem"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			parameter="upItem"
+			scope="request" 
+			validate="false">
+			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
+		</action>
+		<action path="/authoring/downItem"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			parameter="downItem">
+			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
+		</action>
+		
+		<!-- ==========  Scratchie Instruction Item  ========== -->
+		<action path="/authoring/initPedagogicalPlannerForm"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			name="pedagogicalPlannerForm" 
+			validate="false"
+			parameter="initPedagogicalPlannerForm"
+			scope="request">
+			<forward name="success" path="/pages/authoring/pedagogicalPlannerForm.jsp" />
+		</action>
+		
+		<action path="/authoring/saveOrUpdatePedagogicalPlannerForm"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			name="pedagogicalPlannerForm" 
+			validate="false"
+			parameter="saveOrUpdatePedagogicalPlannerForm"
+			scope="request">
+			<forward name="success" path="/pages/authoring/pedagogicalPlannerForm.jsp" />
+		</action>
+		
+		<action path="/authoring/createPedagogicalPlannerItem"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			name="pedagogicalPlannerForm" 
+			validate="false"
+			parameter="createPedagogicalPlannerItem"
+			scope="request">
+			<forward name="success" path="/pages/authoring/pedagogicalPlannerForm.jsp" />
+		</action>
+		
+		<!-- ========== BEGIN: Learning Definitions ============================== -->
+		<action path="/learning/start"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
+			parameter="start" >
+			<forward name="success" path="/pages/learning/start.jsp" />
+			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
+			<forward name="runOffline" path="/pages/learning/runoffline.jsp" />			
+		</action>
+		<action path="/learning/scratchItem"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
+			parameter="scratchItem" >
+		</action>
+		<action path="/learning/finish"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
+			input="/pages/learning/learning.jsp"
+			parameter="finish" >
+			<forward name="success" path="/pages/learning/finish.jsp" />
+		</action>
+		
+		<!--  ========= Reflection =============== -->
+		<action path="/learning/newReflection"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
+			name="reflectionForm" 
+			validate="false" 
+			parameter="newReflection" 
+			input="/pages/learning/learning.jsp" 
+			scope="request">
+			<forward name="success" path="/pages/learning/notebook.jsp" />
+		</action>
+		
+		<action path="/learning/submitReflection"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
+			name="reflectionForm" 
+			validate="false" 
+			input="/pages/learning/notebook.jsp"
+			parameter="submitReflection" 
+			scope="request">
+			<forward name="success" path="/pages/learning/finish.jsp" />
+
+		</action>
+		<!-- ========== BEGIN: Monitoring Definitions ============================== -->
+		<action path="/monitoring/summary"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
+			parameter="summary" >
+			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
+		</action>  
+		<action path="/monitoring/userMasterDetail"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
+			parameter="userMasterDetail" >
+			<forward name="success" path="/pages/monitoring/parts/masterDetailLoadUp.jsp" />
+		</action>
+		<action path="/monitoring/itemSummary"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
+			parameter="itemSummary" >
+			<forward name="success" path="/pages/monitoring/parts/itemSummary.jsp" />
+		</action>		
+		<action path="/monitoring/viewReflection"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
+			parameter="viewReflection">
+			<forward name="success" path="/pages/monitoring/notebook.jsp" />
+		</action>
+		<!-- ========== BEGIN: Common ============================== -->
+		<action path="/clearsession"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.ClearSessionAction">
+		</action>
+				

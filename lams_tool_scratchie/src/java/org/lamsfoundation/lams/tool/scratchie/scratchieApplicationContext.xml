@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<bean id="scratchieMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource">
+			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+				<property name="basename"><value>org.lamsfoundation.lams.tool.scratchie.ApplicationResources</value></property>
+			</bean>
+		</property>										
+	</bean>
+    <!-- core beans -->
+    <bean id="scratchieDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="scratchieItemDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieItemDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    <bean id="scratchieItemVisitDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieItemVisitDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="scratchieAttachmentDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieAttachmentDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="scratchieUserDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieUserDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+
+   <bean id="scratchieSessionDao" class="org.lamsfoundation.lams.tool.scratchie.dao.hibernate.ScratchieSessionDAOHibernate">
+        <property name="sessionFactory">
+            <ref bean="coreSessionFactory"/>
+        </property>
+    </bean>
+    
+    <bean id="scratchieOutputFactory" class="org.lamsfoundation.lams.tool.scratchie.service.ScratchieOutputFactory">  
+    	<property name="toolMessageService"><ref bean="scratchieMessageService"/></property>  
+	</bean> 
+
+
+    <!-- Managers -->
+	<bean id="scratchieToolContentHandler" class="org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler">
+	 		<property name="repositoryService"><ref bean="repositoryService"/></property>
+	</bean> 
+	
+    <bean id="scratchieManagerTarget" class="org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceImpl">
+        <property name="scratchieDao">
+            <ref local="scratchieDao"/>
+        </property>
+        <property name="scratchieItemDao">
+            <ref local="scratchieItemDao"/>
+        </property>
+        <property name="scratchieItemVisitDao">
+            <ref local="scratchieItemVisitDao"/>
+        </property>
+        <property name="scratchieAttachmentDao">
+            <ref local="scratchieAttachmentDao"/>
+        </property>
+        <property name="scratchieUserDao">
+            <ref local="scratchieUserDao"/>
+        </property>
+        <property name="scratchieSessionDao">
+            <ref local="scratchieSessionDao"/>
+        </property>
+        <property name="scratchieToolContentHandler">
+            <ref local="scratchieToolContentHandler"/>
+        </property>
+        <property name="repositoryService">
+            <ref bean="repositoryService"/>
+        </property>
+   		<property name="toolService">
+   			<ref bean="lamsToolService"/>
+   		</property>
+   		<property name="learnerService">
+   			<ref bean="learnerService"/>
+   		</property>
+   		<property name="auditService">
+   			<ref bean="auditService"/>
+   		</property>
+   		<property name="userManagementService">
+   			<ref bean="userManagementService"/>
+   		</property>
+   		<property name="exportContentService">
+   			<ref bean="exportToolContentService"/>
+   		</property>
+   		<property name="messageService"><ref bean="scratchieMessageService"/></property>
+		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   
+		<property name="eventNotificationService">
+			<ref bean="eventNotificationService"/>
+		</property>   
+		<property name="lessonService">
+   			<ref bean="lessonService"/>
+   		</property>
+				<property name="scratchieOutputFactory"><ref bean="scratchieOutputFactory"/></property>
+    </bean>
+
+    <bean id="scratchieService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager"><ref bean="transactionManager"/></property>
+        <property name="target">
+            <ref local="scratchieManagerTarget"/>
+        </property>
+        <property name="proxyTargetClass">
+            <value>false</value>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setAsRunOffline">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setItemComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setItemVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="setItemAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="leaveToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="finishToolSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+			    <prop key="importToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                
+                <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
+				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="setReflectiveData">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+            </props>
+        </property>
+    </bean>
+</beans>
+

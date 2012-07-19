@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+
+<%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.tool.scratchie.ScratchieConstants"%>
+
+<c:set var="lams"><lams:LAMSURL /></c:set>
+
+<lams:html>
+	<lams:head>
+		 <%@ include file="/common/tabbedheader.jsp" %>
+		<link type="text/css" href="${lams}css/jquery-ui-1.8.11.redmont-theme.css" rel="stylesheet">
+		<link type="text/css" href="${lams}css/thickbox.css" rel="stylesheet"  media="screen">
+		<link type="text/css" href="${lams}css/jquery.jqGrid-4.1.2.css" rel="stylesheet" />
+ 
+		<script type="text/javascript" src="${lams}includes/javascript/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
+ 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
+ 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.min.js"></script>
+ 		<script type="text/javascript"> 
+			var pathToImageFolder = "${lams}images/";
+		</script>
+ 		<script type="text/javascript" src="${lams}includes/javascript/thickbox.patched.js"></script>
+		 
+		 
+	 <script>
+			var initialTabId = "${initialTabId}";
+
+		   function init(){
+			 	if (initialTabId) {
+					selectTab(initialTabId);
+				} else {
+					selectTab(1);
+				}
+	        }     
+	        
+	        function doSelectTab(tabId) {
+		    	// end optional tab controller stuff
+		    	selectTab(tabId);
+	        } 
+	    </script>		 
+	</lams:head>
+	<body class="stripes" onLoad="init()">
+	<div id="page">
+		<h1>
+			<fmt:message key="label.authoring.heading" />
+		</h1>
+	<div id="header">
+		<lams:Tabs>
+			<lams:Tab id="1" key="monitoring.tab.summary" />
+			<lams:Tab id="2" key="monitoring.tab.instructions" />
+			<lams:Tab id="3" key="monitoring.tab.edit.activity" />			
+			<lams:Tab id="4" key="monitoring.tab.statistics" />
+		</lams:Tabs>
+	</div>
+	<div id="content">
+			<lams:help toolSignature="<%= ScratchieConstants.TOOL_SIGNATURE %>" module="monitoring"/>
+	
+			<lams:TabBody id="1" titleKey="monitoring.tab.summary" page="summary.jsp" />
+			<lams:TabBody id="2" titleKey="monitoring.tab.instructions" page="instructions.jsp"/>
+			<lams:TabBody id="3" titleKey="monitoring.tab.edit.activity" page="editactivity.jsp" />			
+			<lams:TabBody id="4" titleKey="monitoring.tab.statistics" page="statistic.jsp" />
+	</div>
+	<div id="footer"></div>
+	
+	</div>
+	</body>
+</lams:html>
