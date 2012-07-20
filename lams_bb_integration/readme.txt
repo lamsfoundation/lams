@@ -4,10 +4,7 @@ Blackboard - LAMS Integration Module
 By Luke Foxton <lfoxton@melcoe.mq.edu.au>
 LAMS Foundation Copyright (C) 2007 (http://lamsfoundation.org)
 
-Updated for the Blackboard 9.1 SP6 Building block by
-Richard Stals (www.stals.com.au)
-Edith Cowan University
-2011
+Updated for the Blackboard 9.1 SP6 Building block by Richard Stals (www.stals.com.au) Edith Cowan University 2011
 
 Contents
 ================================================================================
@@ -17,6 +14,9 @@ Contents
 2. Installing the module in Blackboard
 3. Configuring the module in Blackboard
 4. Configuring the LAMS Server for Blackboard Integration
+5. Creating BB course
+6. Creating LAMS lesson
+7. Accessing Gradebook marks
 
 
 1. Requirements
@@ -25,15 +25,16 @@ Contents
 		- Blackboard Learning System 9.1
 
 	1.2 Minimum requirement to build the module from source
-		- Java 2 Platform, Standard Edition, v 1.5
+		- Java 2 Platform, Standard Edition, v 1.6
 		- Ant 1.6
+
 
 2. Installing the module in Blackboard
 ================================================================================
 	1. Download lams2-bb-plugin-1.x.war
 	2. Log into Blackboard as Administrator
 	3. Click on 
-		System Admin->Building Blocks->Install Building Block
+		System Admin->Building Blocks->Installed Tools->Upload Building Block
 	4. Click on Browse and select lams2-bb-plugin-1.x.war 
 	5. Submit
 	6. Select "Available" in the Availability drop-down menu and click ok
@@ -43,7 +44,7 @@ Contents
 3. Configuring the module in Blackboard
 ================================================================================
 	1. Once the LAMS2 integration Block is installed, Goto
-		System Admin->Building Blocks
+		System Admin->Building Blocks->Installed Tools
 	2. Click the "Properties" button in the LAMS Module row
 	3. Fill in the LAMS server url, this is the url that points to the login
 	   page for LAMS. The same as the server URL set during LAMS installation
@@ -74,16 +75,27 @@ Contents
 	   (See step 7 of "Configuring the module in Blackboard")
 	8. You can optionally put a timeout URL and choose an organisation to add
 	   the integrated server to.
-	
-	
+ 
+ 
+5. Creating BB course
+================================================================================
+	1. Click on My Institution->Launch the Course Creation Wizard and follow all required steps.
+	2. To browse available courses head to Courses and there is a "Course List"
 
 
- 
- 
- 
- 
- 
- 
- 
- 
- 
+6. Creating LAMS lesson
+================================================================================
+	1. Create BB Course as described above
+	2. Go to Courses->${YOUR_COURSE_NAME}->Information->Tools->Lams2. 
+	If you don't have Lams2 in the list then something went wrong on installation of lams2-bb-plugin-1.x.war
+	3. Enter all necessary information and press submit.
+
+
+7. Accessing Gradebook marks
+================================================================================
+	1. Created LAMS lesson.
+	Once you created LAMS lesson it automatically adds grade to gradebook using the next algorithm: if LAMS lesson contains MCQ or Assessment
+	it creates scorable grade, otherwise - complete/incomplete grade.
+	2. Go to Courses->${YOUR_COURSE_NAME}->Grade Center->Full Grade Center. 
+	And you'll see there the grade with lesson's name. That is the column which will hold all the grades for that lesson.
+	* One note though: only learners receive grades (thus Administrators don't get one)

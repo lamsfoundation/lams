@@ -20,6 +20,8 @@
 <%@ page import="blackboard.data.content.*"%>
 <%@ page import="blackboard.persist.content.*"%>
 <%@ page import="blackboard.persist.navigation.CourseTocDbLoader"%>
+<%@ page import="blackboard.persist.gradebook.*"%>
+<%@ page import="blackboard.data.gradebook.*"%>
 <%@ page import="blackboard.db.*"%>
 <%@ page import="blackboard.base.*"%>
 <%@ page import="blackboard.platform.*"%>
@@ -83,6 +85,29 @@
     if (!isActive) {
         PlugInUtil.sendAccessDeniedRedirect(request, response);
     }
+    
+    String strIsDisplayDesignImage = request.getParameter("isDisplayDesignImage");
+    boolean isDisplayDesignImage = strIsDisplayDesignImage.equals("true")?true:false;
+    
+    String learningDesignImageUrl = "";
+    if (isDisplayDesignImage) {
+		String strLearningDesignId = request.getParameter("ldid").trim();
+	    long learningDesignId = Long.parseLong(strLearningDesignId);
+	    
+	    learningDesignImageUrl = LamsSecurityUtil.generateRequestLearningDesignImage(ctx, false) + "&ldId=" + learningDesignId;
+    }
+    
+    //check whether user has score for this lesson
+    String strLineitemId = request.getParameter("lineitemid").trim();
+    Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, strLineitemId);
+    ScoreDbLoader scoreLoader = (ScoreDbLoader) bbPm.getLoader(ScoreDbLoader.TYPE);
+    Score current_score = null;
+	try {
+	    current_score = scoreLoader.loadByCourseMembershipIdAndLineitemId(courseMembership.getId(), lineitemId);
+	} catch (KeyNotFoundException c) {
+	    //no score availalbe
+	}
+    boolean isScoreAvailable = (current_score != null);
 %>
 
     <%-- Breadcrumbs --%>
@@ -103,6 +128,26 @@
         <% } %>
         <bbNG:actionButton id="cancel" url="javascript:back();" title="Cancel" primary="false"/>                        <%-- Cancel (Go Back) --%>
     </bbNG:actionControlBar>
+    
+    <h2>
+    	<%=request.getParameter("title")%>
+    </h2>
+    <h4> 
+    	<%=request.getParameter("description")%> 
+    </h4>
+    
+    <% if(isDisplayDesignImage) { %>
+    	<div style="text-align: center; margin-top: 10px;">
+   			<img src="<%=learningDesignImageUrl%>">
+   		</div>
+    <% } %>
+     
+    <% if(isScoreAvailable) { %>
+    	<div style="text-align: center; margin-top: 10px;">
+   			You have completed this lesson.
+   		</div>
+    <% } %>
+    
 
     <bbNG:jsBlock>
         <script language="JavaScript" type="text/javascript">
@@ -130,7 +175,7 @@
                     }
                 } else {
                     try {
-                        learnerWin = window.open(learnerUrl,'lWin','width=800,height=600,resizable=1');
+                        learnerWin = window.open(learnerUrl,'lWin','width=1024,height=768,resizable=1');
                         learnerWin.focus();
                     } catch(e) {
                         // popups blocked by a 3rd party

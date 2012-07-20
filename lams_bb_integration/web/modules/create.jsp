@@ -10,8 +10,7 @@
     Then the user must select a LAMS lesson before proceeding to Step 2.
 
     Step 1 - create.jsp
-    Step 2 - start_lesson.jsp
-    Step 3 - start_lesson_proc.jsp
+    Step 2 - start_lesson_proc.jsp
 --%>
 <%@ page import="blackboard.platform.plugin.PlugInUtil"%>
 <%@ page import="blackboard.platform.plugin.PlugInException"%>
@@ -21,8 +20,11 @@
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 
 <bbNG:genericPage title="Add New LAMS" ctxId="ctx">
-    <bbNG:jsFile href="lib/tigra/tree.js" />
-    <bbNG:jsFile href="lib/tigra/tree_tpl.js" />
+<bbNG:jsFile href="lib/tree/yahoo-dom-event.js" />
+<bbNG:jsFile href="lib/tree/treeview-min.js" />
+
+<bbNG:cssFile href="css/treeview.css" />
+<bbNG:cssFile href="css/folders.css" />
 <%
     // SECURITY!
     // Authorise current user for Course Control Panel (automatic redirect)
@@ -38,11 +40,12 @@
     
     // Get the list of Learning Designs
     String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, 2);
-        // Error checking
-        if (learningDesigns.equals("error")) {
-            response.sendRedirect("lamsServerDown.jsp");
-            return;
-        }
+    // Error checking
+    if (learningDesigns.equals("error")) {
+        response.sendRedirect("lamsServerDown.jsp");
+        return;
+    }
+    String lamsServerUrl = LamsSecurityUtil.getServerAddress();
 
 %>
     <%-- Breadcrumbs --%>
@@ -55,38 +58,108 @@
         <bbNG:pageTitleBar title="Add New LAMS"/>
     </bbNG:pageHeader>
     
-    <%-- Action Control Bar --%>
-    <bbNG:actionControlBar>
-    	<bbNG:actionButton id="open_author" url="javascript:openAuthor();" title="Open Author" primary="true"/>     <%-- Open the LAMS Author Window --%>
-        <bbNG:actionButton id="refresh" url="javascript:refreshSeqList();" title="Refresh" primary="true"/>         <%-- Refresh the list of LAMS sequences --%>
-        <bbNG:actionButton id="next" url="javascript:openNext();" title="Next" primary="true"/>                     <%-- Go to Next Step --%>
-    </bbNG:actionControlBar>
-    
     <%-- Form to Collect ID of Selected LAMS Sequence --%>
-    <form name="workspace_form" id="workspace_form" action="start_lesson.jsp" method="post">
+    <form name="lesson_form" id="lesson_form" action="start_lesson_proc.jsp" method="post" onSubmit="return confirmSubmit();">
     	<input type="hidden" name="content_id" value="<%=request.getParameter("content_id")%>">
         <input type="hidden" name="course_id" value="<%=request.getParameter("course_id")%>">
     	<input type="hidden" name="sequence_id" id="sequence_id" value="0">
-        <%-- Display LAMS Sequence tree (Using tigra) --%>
-        <script language="JavaScript" type="text/javascript">
-            <!-- 
-                var TREE_ITEMS = <%=learningDesigns%>;            		
-                var tree = new tree(TREE_ITEMS, TREE_TPL);	
-            //-->
-        </script>
+    	
+    	<bbNG:dataCollection>
+		
+            <bbNG:step title="Name and describe the lesson">
+                <bbNG:dataElement label="Name" isRequired="true" labelFor="title">
+                    <input id="title" type="text" name="title" value="">
+                </bbNG:dataElement>
+                
+                <bbNG:dataElement label="Description" labelFor="description">
+                    <textarea name="description" rows="12" cols="35"></textarea>
+                </bbNG:dataElement>
+            </bbNG:step> 
+            
+            <bbNG:step title="Choose Lams sequence">
+            
+			    <%-- Preview and Author Buttons --%>
+			    <div id="buttons" style="float:right;">
+			    	<span id="previewbutton" style="visibility:hidden;" class="yui-button yui-link-button">
+			    		<span class="first-child">
+			    			<button onclick="openPreview(&quot;http:\/\/moodle.lamscommunity.org\/moodle2\/mod\/lamslesson\/preview.php?&quot;, &quot;preview&quot;, 0); return false;">
+			    				Preview this lesson
+			    			</button>
+			    		</span>
+			    	</span>
+			    	
+			    	<span id="authorbutton" class="yui-button yui-link-button">
+			    		<span class="first-child">
+			    			<button onclick="openAuthor(); return false;" >
+			    				Author new LAMS lessons
+			    			</button>
+			    		</span>
+			    	</span>
+			    </div> 
+            
+            	<div id="treeDiv"></div>
+				<div id="updatesequence"></div>
+				<div style="vertical-align: text-bottom; margin-top: 15px;">
+					<input type="checkbox" name="isDisplayDesignImage" value="true">  Display image design?
+				</div>
+				
+                <%-- Display LAMS Sequence tree (Using tigra) --%>
+		        <script language="JavaScript" type="text/javascript">
+		            <!-- 
+		     		var tree = new YAHOO.widget.TreeView("treeDiv", <%=learningDesigns%>);
+		        	tree.getNodeByIndex(1).expand(true);
+		        	tree.getNodeByIndex(2).expand(true);
+		           
+		            
+		            if (sequence_id > 0) {
+					  var node = tree.getNodeByProperty('id', sequence_id);
+					  var sequenceName = node.label;
+					  var updateDiv = document.createElement('div');
+					  updateDiv.setAttribute('class','note');
+					  updateDiv.setAttribute('id','currentsequence');
+					  updateDiv.innerHTML = '<p>' + updatewarning + '</p><strong>' + currentsequence + sequenceName +'</strong>';
+					  document.getElementById('updatesequence').appendChild(updateDiv);
+					}
+					tree.render();
+					tree.subscribe('clickEvent',function(oArgs) {
+					    selectSequence(oArgs.node.data.id, oArgs.node.label);
+					});
+		  
+				//-->
+		        </script>
+            </bbNG:step>
+                
+            <bbNG:step title="Lesson options">
+                <bbNG:dataElement label="Do you want to make this LAMS lesson visible?" labelFor="isAvailable">
+                    <input type="Radio" name="isAvailable" value="true" checked>Yes 
+                    <input type="Radio" name="isAvailable" value="false">No
+                </bbNG:dataElement>
+                <bbNG:dataElement label="Track number of views" labelFor="isTracked">
+                    <input type="radio" name="isTracked" value="true">Yes
+                    <input type="radio" name="isTracked" value="false" checked>No
+                </bbNG:dataElement>
+                <bbNG:dataElement label="Choose date restrictions">
+                    <bbNG:dateRangePicker baseFieldName="lessonAvailability" showTime="true"/>
+                </bbNG:dataElement>
+            </bbNG:step>
+            
+            <bbNG:stepSubmit title="Start Lesson" cancelOnClick="back();" />
+        
+    	</bbNG:dataCollection>
     </form>
-
 
     <bbNG:jsBlock>
         <script language="JavaScript" type="text/javascript">
         <!--
+        	
             var authorWin = null;
+        	var previewWin = null;
             var isSelected = false;
         
             // Open the LAMS Seuence Author Window
             function openAuthor() {
-                authorUrl = '<%=authorUrl%>';
-                authorUrl += "&notifyCloseURL=";
+                var authorUrl = '<%=authorUrl%>';
+                authorUrl += "&isPostMessageToParent=true";
                 
                 if(authorWin && authorWin.open && !authorWin.closed){
                     try {
@@ -98,38 +171,110 @@
                 }
                 else{
                     try {
-                        authorWin = window.open(authorUrl,'aWindow','width=800,height=600,resizable');
+                        authorWin = window.open(authorUrl,'aWindow','width=1024,height=768,resizable');
                         authorWin.focus();
                     }catch(e){
                         // popups blocked by a 3rd party
                         alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
                     }
                 }
+                return false;
+            }
+            
+            function unloadHandler(m){
+                
+            }
+            
+            // Open the LAMS Seuence Preview Window
+            function openPreview() {
+            	
+                var previewUrl = "preview.jsp?course_id=<%=request.getParameter("course_id")%>&ldId=" + document.getElementsByName("sequence_id")[0].value + "&title=" + document.lesson_form.title.value + "&description=" + document.lesson_form.description.value;
+                
+                //lams_central
+            	//if (parentURL != "") {
+            		//window.parent.opener.location.href = parentURL;
+            	//}
+
+                
+                if(previewWin && previewWin.open && !previewWin.closed){
+                    try {
+                        previewWin.focus();
+                    }catch(e){
+                        // popups blocked by a 3rd party
+                        alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
+                    }
+                }
+                else{
+                    try {
+                        previewWin = window.open(previewUrl,'pWindow','width=1024,height=768,resizable');
+                        previewWin.focus();
+                    }catch(e){
+                        // popups blocked by a 3rd party
+                        alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
+                    }
+                }
+                return false;
             }
             
             // Refresh the LAMS sequence list (tigra tree)
-            function refreshSeqList() {
-                document.getElementById("sequence_id").value="0";
-                document.location.reload();
-            }
+           function refreshSeqList() {
+               document.getElementById("sequence_id").value="0";
+               document.location.reload();
+           }
             
-            // Go to Step 2
-            function openNext() {
-                if(isSelected) {
-                    //Submit Form
-                    document.getElementById("workspace_form").submit();
+            function selectSequence(obj, name){
+                // if the selected object is a sequence (id!=0) then we assign the id to the hidden sequence_id
+                // also if the name is blank we just add the name of the sequence to the name too.
+				
+                document.getElementsByName("sequence_id")[0].value = obj;
+
+                if (obj!=0) {
+	            	if (document.getElementsByName("title")[0].value == '') {
+	            	    document.getElementsByName("title")[0].value = name;
+	            	}
+	            	isSelected = true;
+	            	document.getElementById('previewbutton').style.visibility='visible';
+	            	
                 } else {
-                    //Error Message
-                    alert("You must select a LAMS Sequence before continuing.");
+                	isSelected = false;
+            		document.getElementById('previewbutton').style.visibility='hidden';
                 }
             }
             
-            //Executed when a seuqence is selected
-            //Set the flag and form element
-            function selectSequence(id) {
-                document.getElementById("sequence_id").value=id;
-                isSelected = true;
+            // Do form vaildation
+            // Check that a title has been supplied
+            function confirmSubmit() {
+                var title = rettrim(document.lesson_form.title.value);
+				if ((title == "")||(title == null)) {
+                    alert("The title is empty. Please enter a title for the LAMS sequence.");
+                    return false;
+                }
+                if(!isSelected) {
+                    //Error Message
+                    alert("You must select a LAMS Sequence before continuing.");
+                    return false;
+                }
             }
+			
+            // Utility function to trim
+            function rettrim(stringToTrim) {
+                return stringToTrim.replace(/^\s+|\s+$/g,"");
+            }
+            
+            // Go back one page if the user clicks the Cancel Button
+            function back() {
+                history.go(-1);
+            }
+            
+            function receiveMessage(event) {
+            	var lamsServerUrl = "<%=lamsServerUrl%>";
+            	
+            	// verify the sender of this message
+            	if ((lamsServerUrl.substring(0, event.origin.length) === event.origin) && (event.data == "refresh")) {
+            		window.location.reload();
+            	}
+            }  
+            window.addEventListener("message", receiveMessage, false);
 
         //-->
         </script>
