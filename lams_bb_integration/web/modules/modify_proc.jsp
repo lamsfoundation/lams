@@ -66,7 +66,7 @@
         String strEndDate = request.getParameter("lessonAvailability_end_datetime");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Calendar startDate = Calendar.getInstance();
-	Calendar endDate = Calendar.getInstance();
+		Calendar endDate = Calendar.getInstance();
         startDate.setTime(formatter.parse(strStartDate));
         endDate.setTime(formatter.parse(strEndDate));
         

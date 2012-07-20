@@ -23,36 +23,38 @@
 package org.lamsfoundation.ld.integration;
 
 /**
- *  Constants used for blackboard integration
- *  
- *  @author <a href="mailto:lfoxton@melcoe.mq.edu.au">Luke Foxton</a>
+ * Constants used for blackboard integration
+ * 
+ * @author <a href="mailto:lfoxton@melcoe.mq.edu.au">Luke Foxton</a>
  */
 public class Constants {
-    
+
     public static final String PARAM_USER_ID = "uid";
     public static final String PARAM_SERVER_ID = "sid";
     public static final String PARAM_TIMESTAMP = "ts";
     public static final String PARAM_HASH = "hash";
-    //public static final String PARAM_URL = "url";
+    // public static final String PARAM_URL = "url";
     public static final String PARAM_METHOD = "method";
-    public static final String PARAM_LEARNING_SESSION_ID = "lsid";
+    public static final String PARAM_LESSON_ID = "lsId";
     public static final String PARAM_LEARNING_DESIGN_ID = "ldid";
     public static final String PARAM_COURSE_ID = "course_id";
 
-    
     public static final String SERVLET_LOGIN_REQUEST = "/lams/LoginRequest";
     public static final String SERVLET_ACTION_REQUEST = "/LamsActionRequest";
-    
+
     public static final String URLDECODER_CODING = "US-ASCII";
-    
+
     public static final String METHOD_AUTHOR = "author";
     public static final String METHOD_MONITOR = "monitor";
     public static final String METHOD_LEARNER = "learner";
     
-	// XML format constnats
-	public static final String ELEM_FOLDER 			= "Folder";
-	public static final String ELEM_LEARNING_DESIGN = "LearningDesign";
-	public static final String ATTR_NAME			= "name";
-	public static final String ATTR_RESOURCE_ID		= "resourceId";
-    
+    public static final String GRADEBOOK_LINEITEM_TYPE = "LAMS grades";
+    public static final int GRADEBOOK_POINTS_POSSIBLE = 100;
+
+    // XML format constnats
+    public static final String ELEM_FOLDER = "Folder";
+    public static final String ELEM_LEARNING_DESIGN = "LearningDesign";
+    public static final String ATTR_NAME = "name";
+    public static final String ATTR_RESOURCE_ID = "resourceId";
+
 }

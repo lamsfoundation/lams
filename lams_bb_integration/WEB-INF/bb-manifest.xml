@@ -5,7 +5,7 @@
     <name value= "LAMS2 Module"/>
     <handle value= "lamscontent"/>
     <description value= "LAMS2 and Blackboard integration allows LAMS2 leaning designs to be managed and views in a Blackboard Environment."/>
-    <version value= "1.1.0"/>
+    <version value= "1.2.0"/>
     <requires>
       <bbversion value="9.1.0"/>
     </requires>
@@ -27,6 +27,7 @@
             <http-actions>
                 <create value="modules/create.jsp" />
                 <modify value="modules/modify.jsp"/>
+                <remove value="modules/delete.jsp"/>
             </http-actions>
             <icons>
                 <toolbar value="/images/logo.gif" />
@@ -40,16 +41,16 @@
         <permission type="attribute" name="user.authinfo" actions="get"/>
         <permission type="persist" name="Content"  actions="create,modify,delete"/> 
         <permission type="persist" name="contenthandler" actions="modify"/>
-	<permission type="blackboard.data.AttributePermission" name="user.personalinfo" actions="get" />
+		<permission type="blackboard.data.AttributePermission" name="user.personalinfo" actions="get" />
 
         <!-- Permission for WebService -->
-	<permission type="java.lang.RuntimePermission" name="getClassLoader" />
-	<permission type="java.lang.RuntimePermission" name="createClassLoader" />
-	<permission type="java.lang.RuntimePermission" name="accessDeclaredMembers" actions=""/>
-	<permission type="java.net.SocketPermission" name="*" actions="connect"/>
-	<permission type="java.util.PropertyPermission" name="java.protocol.handler.pkgs" actions="write"/>
+		<permission type="java.lang.RuntimePermission" name="getClassLoader" />
+		<permission type="java.lang.RuntimePermission" name="createClassLoader" />
+		<permission type="java.lang.RuntimePermission" name="accessDeclaredMembers" actions=""/>
+		<permission type="java.net.SocketPermission" name="*" actions="connect"/>
+		<permission type="java.util.PropertyPermission" name="java.protocol.handler.pkgs" actions="write"/>
 		
-	<permission type="persist" name="Outcome" actions="create,modify,delete"/>
+		<permission type="persist" name="Outcome" actions="create,modify,delete"/>
     	<permission type="persist" name="OutcomeDefinition" actions="create,modify,delete"/>
     	<permission type="persist" name="OutcomeDefinitionCategory" actions="create,modify,delete"/>
     </permissions>
