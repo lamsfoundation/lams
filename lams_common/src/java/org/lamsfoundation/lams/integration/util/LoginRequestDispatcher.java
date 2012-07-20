@@ -62,6 +62,8 @@ public class LoginRequestDispatcher {
     public static final String PARAM_REQUEST_SRC = "requestSrc";
 
     public static final String PARAM_NOTIFY_CLOSE_URL = "notifyCloseURL";
+    
+    public static final String PARAM_IS_POST_MESSAGE_TO_PARENT = "isPostMessageToParent";
 
     public static final String PARAM_FIRST_NAME = "firstName";
 
@@ -128,6 +130,7 @@ public class LoginRequestDispatcher {
 	else if (METHOD_AUTHOR.equals(method)) {
 	    String requestSrc = request.getParameter(PARAM_REQUEST_SRC);
 	    String notifyCloseURL = request.getParameter(PARAM_NOTIFY_CLOSE_URL);
+	    String isPostMessageToParent = request.getParameter(PARAM_IS_POST_MESSAGE_TO_PARENT);
 
 	    // Custom CSV string to be used for tool adapters
 	    String customCSV = request.getParameter(PARAM_CUSTOM_CSV);
@@ -143,6 +146,7 @@ public class LoginRequestDispatcher {
 			+ URLEncoder.encode(requestSrc, "UTF8") : parameters;
 		parameters = notifyCloseURL != null ? parameters + "&" + PARAM_NOTIFY_CLOSE_URL + "="
 			+ URLEncoder.encode(notifyCloseURL, "UTF8") : parameters;
+		parameters = isPostMessageToParent != null ? parameters + "&" + PARAM_IS_POST_MESSAGE_TO_PARENT + "=" + isPostMessageToParent : parameters;
 	    } catch (UnsupportedEncodingException e) {
 		log.error(e);
 	    }
