@@ -19,7 +19,5 @@
 			<attribute name="javadoc_location" value="http://www.hibernate.org/hib_docs/v3/api/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/reload_2_0_1/reload-jdom.jar"/>
-	<classpathentry kind="lib" path="lib/reload_2_0_1/reload-moonunit.jar"/>
 	<classpathentry kind="output" path="build/classes/java"/>
 </classpath>

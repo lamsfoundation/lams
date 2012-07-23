@@ -78,6 +78,10 @@ mysql             mysql-connector-java-5.0.8-bin.jar    5.0.8-bin
 
 odmg              odmg-3.0.jar                          3.0                                                                                   
 
+reload			  reload-diva.jar						2.0.1				   MIT License					 Reload							  Suite of tools for viewing, editing and creating IMS and SCORM Content Packages
+				  reload-jdom.jar
+				  reload-moonunit.jar 
+
 quartz            quartz.jar                            1.5.2                                                OpenSymphony                     Quartz Enterprise Job Scheduler
 
 smack             smack.jar                                                                                                                   

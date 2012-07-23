@@ -36,6 +36,9 @@
         <archive path="/lams_build/lib/middlegen/middlegen-hibernate-plugin-2.1.jar"/>
         <archive path="/lams_build/lib/mysql/mysql-connector-java-5.0.8-bin.jar"/>
         <archive path="/lams_build/lib/odmg/odmg-3.0.jar"/>
+        <archive path="/lams_build/lib/reload/reload-diva.jar"/>
+        <archive path="/lams_build/lib/reload/reload-jdom.jar"/>
+        <archive path="/lams_build/lib/reload/reload-moonunit.jar"/>
         <archive javadoc="http://static.springframework.org/spring/docs/2.5.x/api/" path="/lams_build/lib/spring/spring.jar"/>
         <archive path="/lams_build/lib/struts/struts-el.jar"/>
         <archive javadoc="http://struts.apache.org/1.x/apidocs/" path="/lams_build/lib/struts/struts.jar" source="/lams_build/lib/struts/src/struts-1.2.9-src.zip"/>

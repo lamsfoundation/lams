@@ -24,8 +24,6 @@
 package org.eucm.lams.tool.eadventure.web.action; 
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -38,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
@@ -46,7 +43,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.util.LabelValueBean;
 import org.eucm.lams.tool.eadventure.EadventureConstants;
 import org.eucm.lams.tool.eadventure.dto.ExpressionInfo;
 import org.eucm.lams.tool.eadventure.model.EadventureCondition;
@@ -57,13 +53,10 @@ import org.eucm.lams.tool.eadventure.util.EadventureExpressionComparator;
 import org.eucm.lams.tool.eadventure.web.form.EadventureConditionForm;
 import org.eucm.lams.tool.eadventure.web.form.EadventureExpressionForm;
 import org.eucm.lams.tool.eadventure.web.form.EadventureForm;
-import org.exolab.castor.util.Iterator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
  
 /**
  * Auxiliary action in author mode. It contains operations with EadventureCondition. The rest of operations are located in

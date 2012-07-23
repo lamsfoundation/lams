@@ -167,6 +167,7 @@
 					<include name="jfreechart/*.jar" />
 					<include name="mysql/mysql-connector-java-*.jar" />
 					<include name="odmg/*.jar" />
+					<include name="reload/*.jar" />
 					<include name="smack/smack.jar"/>
 					<include name="smack/smackx.jar"/>
 					<include name="spring/*.jar" />
