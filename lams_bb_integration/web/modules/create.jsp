@@ -68,7 +68,7 @@
 		
             <bbNG:step title="Name and describe the lesson">
                 <bbNG:dataElement label="Name" isRequired="true" labelFor="title">
-                    <input id="title" type="text" name="title" value="">
+                    <input id="title" type="text" name="title" value="" size="70">
                 </bbNG:dataElement>
                 
                 <bbNG:dataElement label="Description" labelFor="description">
@@ -80,6 +80,7 @@
             
 			    <%-- Preview and Author Buttons --%>
 			    <div id="buttons" style="float:right;">
+			    
 			    	<span id="previewbutton" style="visibility:hidden;" class="yui-button yui-link-button">
 			    		<span class="first-child">
 			    			<button onclick="openPreview(&quot;http:\/\/moodle.lamscommunity.org\/moodle2\/mod\/lamslesson\/preview.php?&quot;, &quot;preview&quot;, 0); return false;">
@@ -92,6 +93,15 @@
 			    		<span class="first-child">
 			    			<button onclick="openAuthor(); return false;" >
 			    				Author new LAMS lessons
+			    			</button>
+			    		</span>
+			    	</span>
+			    	
+			    	
+			    	<span id="refresh-button" class="yui-button yui-link-button">
+			    		<span class="first-child">
+			    			<button onclick="window.location.reload(); return false;">
+			    				Refresh
 			    			</button>
 			    		</span>
 			    	</span>
