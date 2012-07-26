@@ -177,9 +177,9 @@ public class HomeAction extends DispatchAction {
 		
 		//show lesson intro page if required
 		if (lesson.isEnableLessonIntro()) {
-		    req.setAttribute("lessonName", lesson.getLessonName());
-		    req.setAttribute("lessonDescription", lesson.getLessonDescription());
+		    req.setAttribute("lesson", lesson);
 		    req.setAttribute("displayDesignImage", lesson.isDisplayDesignImage());
+		    req.setAttribute("isMonitor", lesson.getLessonClass().isStaffMember(getRealUser(user)));
 		    
 		    //check if we need to create learning design SVG
 		    if (lesson.isDisplayDesignImage()) {
