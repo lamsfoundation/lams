@@ -15,7 +15,13 @@
 
 	
 	<!-- Below are Tool specifc targets and targets overriding ones from the imported base file. -->
-	<target name="_copy-war-resources" depends="_copy-language">
+	<target name="_copy-planner" if="planner.available" depends="_copy-language">
+		<echo>Copying Pedagogical Planner files</echo>
+		<ant antfile="../${lams_planner}/build.xml" target="_copy-to-central" />
+	</target>
+	
+	
+	<target name="_copy-war-resources">
 		<!-- Internal target: Adds additional web content to Central -->
 		<echo>${ant.project.name}: Copying favicon from conf to assembly</echo>
 		<copy todir="${build.war.assembly}">
@@ -30,9 +36,6 @@
 				<include name="**/*.xml"/>
 			</fileset>
 		</copy>
-		
-		<echo>Copying Pedagogical Planner files, if available</echo>
-		<ant antfile="../${lams_planner}/build.xml" target="_copy-to-central" />
 	</target>
 	
 	
@@ -46,7 +49,7 @@
 	
 	
 	<target name="_build-war"
-	        depends="_build-webdoclet, _copy-war-resources, _jsp-plaincopy, _jsp-precompile">
+	        depends="_build-webdoclet, _copy-war-resources, _copy-planner, _jsp-plaincopy, _jsp-precompile">
 		
 		<!-- Internal target: Builds WAR without archivisation -->
 		<echo>${ant.project.name}: Building exploded WAR</echo>
