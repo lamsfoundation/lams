@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="tools_base" basedir="." default="print-usage">
+	<description>
+		This is a base for all LAMS Tool build.xml files.
+		It contains all tasks required to build a Tool.
+		Some Tools can have their private targets, test suites for example.
+	</description>
+	
+	<!-- Directory of this parent file -->
+	<dirname property="toolsbase.dir" file="${ant.file.tools_base}"/>
+	
+	<!-- Import another base file -->
+	<import file="${toolsbase.dir}/build_base.xml"/> 
+	
+	<path id="deploy.classpath">
+		<fileset dir="${deploy.tool.dir}/lib">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${sharedlib}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	
+	<!-- ================================================================ -->
+	<!-- Print information								                  -->
+	<!-- ================================================================ -->
+		
+	<target name="print-usage" depends="build_base.print-usage"
+	        description="Displays Ant targets descriptions">
+		<echo>
+		clean-db                --> Removes DB tables and entries
+		build-db                --> Creates database tables and entries
+		deploy-tool             --> Deploys all Tool content
+		</echo>	
+	</target>
+	
+	<!-- =================================================================== -->
+	<!-- Database Tasks                                             		 -->
+	<!-- =================================================================== -->
+		
+	<target name="clean-db" description="Deletes Tool Tables">
+		<echo>${ant.project.name}: Creating Tool database tables</echo>
+		<antcall target="_db-script">
+		    <param name="sql.script" value="${tool.build.sql.drop}"/>
+		</antcall>
+	</target>
+	
+	
+	<target name="build-db" description="Deletes and creates Tool tables and inserts default content.">
+		<echo>${ant.project.name}: Dropping Tool database tables</echo>
+		<antcall target="_db-script">
+		    <param name="sql.script" value="${tool.build.sql.create}"/>
+		</antcall>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- XDoclet tasks			                             				 -->
+	<!-- =================================================================== -->
+	
+	<!-- This target seems to be rarely used and, as SQL files are maintained manually, probably is obsolete
+	     but leave it for future reference and automatic DB model creation -->
+	<target name="_schema-export" depends="_clean-dirs, _build-hbm">
+		<!-- Internal target: Exports hbm.xml files to the specified database and outputs executed SQL to a file. -->
+		
+		<taskdef
+			name="schemaexport" 
+			classname="org.hibernate.tool.hbm2ddl.SchemaExportTask"
+		>
+			<classpath>
+				<path refid="logging.classpath"/>			
+				<path refid="product.classes.classpath"/>
+			</classpath>
+		</taskdef>
+			
+		<echo>${ant.project.name}: Preparing Hibernate connection configuration</echo>
+		<copy todir="${build}" overwrite="true" verbose="true">
+			<fileset dir="${conf.hibernate.mapping.dir}">
+				<include name="hibernate.cfg.xml" />
+			</fileset>
+	        <filterset>
+	        	<filter token="db.driver" value="${db.driver}"/>
+	        	<filter token="db.url.run" value="${db.url.run}"/>
+                <filter token="db.username" value="${db.username}"/>
+                <filter token="db.password" value="${db.password}"/>
+	        </filterset>
+		</copy>
+		
+		<echo>${ant.project.name}: Running schema export for all hbm.xml files in build dir</echo>
+		<schemaexport
+			config="${build}/hibernate.cfg.xml"
+			quiet="no"
+			text="no"
+			drop="no"
+			delimiter=";"
+			output="${db.scripts}/table-schema.sql">
+			<fileset dir="${build.classes.java}">
+				<include name="**/*.hbm.xml"/>
+			</fileset>
+		</schemaexport>	
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Product deployment			                                         -->
+	<!-- =================================================================== -->
+	
+	<target name="copy-to-lams-lib" depends="_target-not-available"
+			    description="Copies JAR file to lams_build/lib/lams for other projects to use.">
+		<echo>Tools JARs need not be copied to lams_build</echo>
+	</target>
+	
+
+	<target name="deploy-tool" depends="_package-create, _package-run" 
+	   description="Build Tool archives and run deployment. Do not run on a production environment." />
+	
+	
+	<target name="_package-create" depends="_build-jar, _build-war">
+		<!-- Internal target: Generates Tool deployment package. -->
+		<echo>${ant.project.name}: Creating deployment package</echo>
+
+		<echo>${ant.project.name}: Copying additional libraries and scripts for deployment</echo>
+		<copy todir="${build.deploy}" overwrite="true" verbose="true">
+			<fileset dir="${deploy.tool.dir}">
+				<include name="*.*" />
+			</fileset>
+		</copy>
+		
+		<echo>${ant.project.name}: Copying Tool SQL files</echo>
+		<copy overwrite="true" todir="${build.deploy.sql}" verbose="true">
+			<fileset dir="${db.scripts}/">
+				<include name="${tool.build.sql.drop}" />
+				<include name="${tool.build.sql.create}" />
+				<include name="activity_insert.sql" />
+				<include name="library_insert.sql" />
+			</fileset>
+		</copy>
+		
+		<copy todir="${build.deploy.sql}" overwrite="true" verbose="true">
+			<fileset dir="${db.scripts}/">
+				<include name="tool_insert.sql" />
+			</fileset>	
+			<filterset>
+				<filter token="tool_version" value="${tool.version}" />
+			</filterset>
+		</copy>
+		
+		<copy todir="${build.deploy.sql}" overwrite="true" verbose="true">
+			<fileset dir="${db.scripts}/">
+				<include name="db_version_insert.sql" />
+			</fileset>	
+			<filterset>
+				<filter token="tool_version" value="${tool.version}" />
+				<filter token="signature" value="${signature}" />
+			</filterset>
+		</copy>
+		
+		<copy todir="${build.deploy.sql}/updatescripts" overwrite="true">
+			<fileset dir="${db.scripts}/updatescripts" erroronmissingdir="false">
+				<include name="*.sql" />
+			</fileset>
+		</copy>
+		
+		<echo>${ant.project.name}: Copying Tool language files</echo>
+		<copy todir="${build.deploy.language}" overwrite="true">
+			<fileset dir="${conf.language.dir}">
+				<include name="*.properties" />
+				<include name="*.txt" />
+			</fileset>
+		</copy>
+		
+		<echo>${ant.project.name}: Copying Tool JAR and WAR</echo>
+		<copy todir="${build.deploy}" overwrite="true" verbose="true">
+			<fileset dir="${build.lib}">
+				<include name="*.jar"/>
+				<include name="*.war"/>
+			</fileset>
+		</copy>
+
+		<taskdef name="generateDeployProperties"
+		         classname="org.lamsfoundation.lams.tool.deploy.CreateToolPackageTask"
+			     classpathref="deploy.classpath" />
+
+		<echo>${ant.project.name}: Preparing Deployment Properties file</echo>
+		<generateDeployProperties depends="compile"
+			mode="development" 
+			outputPath="${build.deploy}" 
+			generateForInstallers="${generate.for.installers}"
+			dbPassword="${db.password}" 
+			dbUsername="${db.username}" 
+			dbDriverUrl="${db.url.build}" 
+			dbDriverClass="com.mysql.jdbc.Driver" 
+			deployFiles="${build.deploy}/${product}.war,${build.deploy}/${product}.jar" 
+			toolJarFileName="${product}.jar"
+			toolSignature="${signature}"
+			toolVersion="${tool.version}"
+			hideTool="${tool.hide}"
+			minServerVersionNumber="${min.server.version.number}"
+			toolUpdateScriptPath="${build.deploy.sql}/updatescripts/updateTo${tool.version}.sql"
+			toolTablesScriptPath="${build.deploy.sql}/${tool.build.sql.create}" 
+			toolTablesDeleteScriptPath="${build.deploy.sql}/${tool.build.sql.drop}" 
+			toolActivityInsertScriptPath="${build.deploy.sql}/activity_insert.sql" 
+			toolLibraryInsertScriptPath="${build.deploy.sql}/library_insert.sql" 
+			toolInsertScriptPath="${build.deploy.sql}/tool_insert.sql" 
+			toolDBVersionScriptPath="${build.deploy.sql}/db_version_insert.sql"
+			toolApplicationContextPath="/${product.path.filesystem}/${tool.application.context.file}"
+			lamsEarPath="${jboss.deploy}"
+			toolContext="${toolContext}" 
+			toolWebUri="${product}.war"
+			languageFilesPackage="${product.path.java}">
+			
+			<!-- Language files go as a fileset.
+			     Not nice but can't work out how to embed them in a tag. -->
+			<fileset dir="${build.deploy.language}">
+				<include name="**/*.properties" />
+				<include name="**/*.txt" />
+			</fileset>
+
+		</generateDeployProperties>
+	</target>
+
+	
+	<target name="_package-run">
+		<!-- Internal target: Deploys Tool package. -->
+		<echo>Deploying ${ant.project.name} package</echo>
+		<java classname="org.lamsfoundation.lams.tool.deploy.Deploy" classpathref="deploy.classpath" fork="true">
+			<arg file="${build.deploy}/deploy.xml" />
+			<arg value="True" /> <!-- forcedb -->
+		</java>
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Tests                                                     	 -->
+	<!-- =================================================================== -->
+	
+	<target name="test-report"
+		    depends="_compile-test, _build-hbm, build_base.test-report"
+		    description="Runs JUnit tests and generates report." />
+	
+</project>

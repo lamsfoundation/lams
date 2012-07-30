@@ -45,8 +45,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * Servlet for flash to call in order to initialise and create lesson classes
  * for multiple lessons.
  * 
- * @web:servlet name="initializeAndCreateLessons"
- * @web:servlet-mapping url-pattern="/initializeAndCreateLessons"
  */
 public class InitializeAndCreateLessons extends AbstractStoreWDDXPacketServlet {
     // ---------------------------------------------------------------------

@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="build_base" basedir="." default="print-usage">
+	<description>
+		This is a base for most LAMS build.xml files.
+		It contains several most common tasks.
+	</description>
+	
+	 <!-- Directory of this parent file -->
+	 <dirname property="base.dir" file="${ant.file.build_base}"/>
+	 
+	 <!-- Import project specific property file; base dir for this is the importing build.xml file -->
+	 <property file="build.properties" />
+	 <!-- Import common property files; base dir for this is the current file -->
+	 <property file="${base.dir}/common.properties"/>
+	 <property file="${base.dir}/${osPropertiesName}.properties"/>
+ 
+	
+	<!-- Set library paths -->
+	<path id="libs.classpath" >
+		<fileset dir="${sharedlib}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${j2eelibs}">
+			<include name="**/*.jar" />
+		</fileset>
+		<!-- Optional project own libraries -->
+		<fileset dir="lib" erroronmissingdir="false">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+	
+	<path id="product.classpath">
+		<path refid="libs.classpath"/>
+		<!-- Java CLASSPATH should be added as the last item -->
+		<!-- This property is supposed to be set in eclipse  -->
+		<pathelement location="${java.class.path}" />
+	</path>
+	
+	<path id="product.classes.classpath">
+		<path refid="product.classpath"/>
+		<pathelement location="${build.classes.java}"/>
+	</path>
+	
+	<path id="logging.classpath">
+		<fileset dir="${jboss.home}common/lib">
+			<include name="slf4j-api.jar" />
+			<include name="slf4j-jboss-logging.jar" />
+		</fileset>
+		<fileset dir="${jboss.home}lib">
+			<include name="jboss-logging-spi.jar" />
+		</fileset>
+	</path>
+
+	<fileset id="hbm.fileset" dir="${src.java.dir}"
+		     description="List of Java files for _build-hbm target.">
+		<include name="**/*.java" />
+	</fileset>
+	
+	<!-- ================================================================ -->
+	<!-- Print information								                  -->
+	<!-- ================================================================ -->
+	
+	<target name="print-usage" description="Displays Ant targets descriptions">
+		<echo>
+		${ant.project.name} build file
+		------------------------------------------------------
+		
+		Available targets are:
+			
+		print-usage				--> Display this information
+		copy-tags               --> Copies custom JSP tags from Central
+		deploy-jar         		--> Deploys JAR to EAR
+		deploy-war         		--> Deploys WAR to EAR
+		copy-to-lams-lib      --> Copies JAR to lams-build for other projects to use
+		explode-war             --> Unpacks WAR in EAR
+		explode-war-synchronize --> Updates web content in exploded WAR
+		explode-war-delete      --> Removes exploded WAR
+		test-report             --> Runs JUnit tests and generates report
+		</echo>	
+	</target>
+	
+	<target name="_print-classpath">
+		<!-- Internal target: Prints out paths to library and project classes. -->
+		<echo message="java.class.path = ${java.class.path}" />
+		<property name="product.classpath.string" refid="product.classpath" />
+		<echo message="product.classpath = ${product.classpath.string}" />
+	</target>
+	
+	
+	<target name="_target-not-available">
+		<echo>This target is not implemented or applicable for ${ant.project.name}</echo>
+	</target>
+	
+	<!-- ================================================================ -->
+	<!-- Preparations									                  -->
+	<!-- ================================================================ -->
+
+	<target name="_clean-dirs">
+		<!-- Internal target: Recreates dirs for compiled output files. -->
+		<echo>${ant.project.name}: Removing cache and build folders</echo>
+		<delete dir="${jboss.server.instance}/tmp" quiet="true" />
+		<delete dir="${jboss.server.instance}/work" quiet="true" />
+		<delete dir="${build}" quiet="true" />
+				
+		<echo>${ant.project.name}: Creating build dir structure</echo>
+		<mkdir dir="${build.classes.java}" />
+		<mkdir dir="${build.classes.test}" />
+		<mkdir dir="${build.report}"/>
+		<mkdir dir="${build.report}/html"/> 
+		<mkdir dir="${build.lib}" />
+		<mkdir dir="${build.deploy}" />
+		<mkdir dir="${build.deploy.sql}" />
+		<mkdir dir="${build.deploy.language}" />
+		<mkdir dir="${build.war}" />
+	</target>
+	
+	
+	<target name="copy-tags" description="Copies LAMS TLD and TAGs.">
+		<echo>${ant.project.name}: Copying tags from Central</echo>
+   		<copy todir="${conf.webinf.dir}/tlds/lams" 
+   			  file="${tag.web.dir}/tlds/lams/lams.tld" overwrite="true" verbose="true" />	
+		<copy todir="${conf.webinf.dir}/tags" overwrite="true" verbose="true">
+			<fileset dir="${tag.web.dir}/tags" />
+		</copy>
+	</target>
+	
+	<!-- =================================================================== -->
+	<!-- Database Tasks                                             		 -->
+	<!-- =================================================================== -->
+	
+	<target name="_db-script">
+		<!-- Internal target: Runs SQL script given by call parameter. -->
+		<sql driver="${db.driver}"
+		     url="${db.url.build}"
+			 userid="${db.username}"
+			 password="${db.password}"
+			 encoding="${db.encoding}">
+			<classpath>
+				<fileset dir="${db.driver.dir}" includes="*.jar"/> 
+			</classpath>
+			<transaction src="${db.scripts}/${sql.script}" />
+		</sql>
+	</target>
+	
+	<!-- ================================================================ -->
+	<!-- Compilations								                      -->
+	<!-- ================================================================ -->
+
+	<target name="_compile-java" depends="_clean-dirs">
+		<!-- Internal target: Compile Java sources. -->
+		<echo>${ant.project.name}: Compiling Java sources</echo>
+		<!-- Destdir is the same as Eclipse output path, maybe it shouldn't? -->
+		<javac srcdir="${src.java.dir}"
+			   compiler="modern"
+               source="1.5"
+               debug="on"
+			   debuglevel="lines,vars,source"
+               classpathref="product.classpath"
+               destdir="${build.classes.java}"
+		/>
+        
+		<echo>${ant.project.name}: Copying additional non-Java sources</echo>
+	 	<copy todir="${build.classes.java}" overwrite="true">
+			<fileset dir="${src.java.dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.properties"/>
+				<!-- Autopatch -->
+				<include name="**/*.sql"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	
+	<target name="_compile-test" depends="_compile-java">
+		<!-- Internal target: Compile test Java sources. -->
+		<javac srcdir="${src.test.dir}"
+			   compiler="modern"
+			   source="1.5"
+	           debug="on"
+			   debuglevel="lines,vars,source"
+			   destdir="${build.classes.test}"
+			   classpathref="product.classes.classpath" />
+			
+		<copy todir="${build.classes.test}" overwrite="true" verbose="true">
+			<fileset dir="${src.test.dir}">
+				<include name="**/*.xml" />
+				<include name="**/*.zip" />
+				<include name="**/*.txt"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<!-- =================================================================== -->
+	<!-- XDoclet tasks			                             				 -->
+	<!-- =================================================================== -->
+	
+	<taskdef name="webdoclet"
+		     classname="xdoclet.modules.web.WebDocletTask"
+		     classpathref="libs.classpath"
+	/>
+	<target name="_build-webdoclet" depends="_clean-dirs">
+		<!-- Internal target: Generates Struts XML files from Java source using XDoclet. -->
+		
+		<!-- First try to build struts-config.xml and web.xml from conf/xdoclet files
+		     If Tool is based on static (non-generated) version of these files, 
+		     they will still be generated, but will be overwritten by next step.
+		-->
+		<echo>${ant.project.name}: Building Struts XML files using XDoclet</echo>
+
+		<webdoclet destDir="${build.war}/WEB-INF"
+			       mergeDir="${conf.xdoclet.dir}"
+			       force="${xdoclet.force}">
+			<fileset dir="${src.java.dir}">
+				<include name="**/*.java" />
+				<exclude name="**/*Skeleton.java" />
+			</fileset>
+			<deploymentdescriptor sessiontimeout="${sessiontimeout}" servletspec="2.4" distributable="false" />
+			<strutsconfigxml version="1.2" validateXML="true" />
+			<strutsdynaformvalidationxml version="1.1.3"  />
+		</webdoclet>
+		
+		<echo>Overwriting generated code with custom files for ${ant.project.name}, if exist</echo>
+	 	<copy todir="${build.war}/WEB-INF" overwrite="true" verbose="true">
+			<fileset dir="${conf.webinf.dir}">
+				<include name="web.xml"/>
+				<include name="struts-config.xml"/>
+				<include name="validation.xml"/>
+			</fileset>
+	 	</copy>
+	</target>
+	
+	
+	<target name="_build-hbm">
+		<!-- Internal target: Generates Hibernate hbm.xml files from Java sources using XDoclet. -->
+		
+		<taskdef name="hibernatedoclet"
+			     classname="xdoclet.modules.hibernate.HibernateDocletTask"
+			     classpathref="libs.classpath"
+		/>
+		
+		<!-- Generate HBM files if annotations exist -->
+		<echo>${ant.project.name}: Building Hibernate XML files using XDoclet</echo>
+		<hibernatedoclet destdir="${build.classes.java}" excludedtags="@version,@author,@todo" force="true">
+			<fileset refid="hbm.fileset" />
+			<hibernate version="3.0" />
+		</hibernatedoclet>
+		
+		<!-- Copy remaining HBM non-generated files from conf directory -->
+		<echo>${ant.project.name}: Copying static Hibernate XML files</echo>
+		<copy todir="${build.classes.java}" overwrite="true">
+			<fileset dir="${conf.hibernate.mapping.dir}" erroronmissingdir="false">
+				<include name="**/*.hbm.xml"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<!-- ================================================================ -->
+	<!-- Build archives        		    	          					  -->
+	<!-- ================================================================ -->
+	
+	<target name="_copy-language" if="product.core">
+		<!-- Internal target: Copies language tags to build dir for easier EAR assembly.
+		     Required only for base products, not Tools -->
+		<echo>${ant.project.name}: Copying language files to build dir</echo>
+		<copy todir="${build.lib}/language/${product.path.filesystem}">
+			<fileset dir="${conf.language.dir}">
+				<include name="**/*.properties"/>
+				<include name="**/*.txt"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	
+	<target name="_build-jar" depends="_compile-java, _build-hbm, _copy-language">
+		<!-- Internal target: Creates JAR file. -->
+		<echo>${ant.project.name}: Building JAR</echo>
+		<jar jarfile="${build.lib}/${product}.jar"
+			 manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
+			<fileset dir="${build.classes.java}" />
+		</jar>
+	</target>
+
+	
+	<target name="_build-war" depends="_build-webdoclet, _copy-language, _jsp-plaincopy, _jsp-precompile">
+		<!-- Internal target: Creates WAR file. -->
+		<echo>${ant.project.name}: Building WAR</echo>
+		<war warfile="${build.lib}/${product}.war" 
+  		     webxml="${build.war}/WEB-INF/web.xml"
+			 manifest="${conf.dir}/war/META-INF/MANIFEST.MF">
+			<fileset dir="${build.war.assembly}">
+				<include name="**" />
+			</fileset>
+		</war>
+	</target>
+	
+	
+	<!-- This is needed for lams_build, otherwise building WAR deletes JAR and other way around -->
+	<target name="_build-product" depends="_build-jar, _build-war" />
+
+	<!-- =================================================================== -->
+	<!-- Product deployment			                                         -->
+	<!-- =================================================================== -->
+	
+	<target name="deploy-jar" depends="_build-jar" description="Deploys JAR.">
+		<echo>Removing cached files</echo>
+		<delete quiet="true">
+			<fileset dir="${jboss.deploy}/tmp"/>
+			<fileset dir="${jboss.deploy}/work"/>
+		</delete>
+		
+		<echo>${ant.project.name}: Deploying JAR</echo>
+		<copy file="${build.lib}/${product}.jar" todir="${jboss.deploy}" overwrite="true" verbose="true" />
+	</target>
+	
+	
+	<target name="deploy-war" depends="_build-war, explode-war-delete" description="Deploys WAR.">
+		<echo>${ant.project.name}: Deploying WAR</echo>
+		<copy file="${build.lib}/${product}.war" todir="${jboss.deploy}" overwrite="true" verbose="true" />
+		
+		<echo>Copying language files for ${ant.project.name}, if exist</echo>
+		<copy todir="${jboss.deploy}/lams-dictionary.jar/${product.path.filesystem}" overwrite="true">
+		   <fileset dir="${conf.language.dir}" erroronmissingdir="false">
+		    <include name="**/*.properties"/>
+		    <include name="**/*.txt"/>
+		   </fileset>
+		</copy>
+	</target>
+	
+	
+	<target name="copy-to-lams-lib" if="product.core" depends="_build-jar"
+		    description="Copies JAR file to lams_build/lib/lams for other projects to use.">
+  		<copy overwrite="yes" todir="${sharedlib}/lams">
+  			<fileset dir="${build.lib}">
+  				<include name="${product}.jar"/>
+  			</fileset>
+  		</copy>	
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Explode WAR                                        				 -->
+	<!-- =================================================================== -->
+	
+	<target name="explode-war" depends="explode-war-delete" description="Explodes deployed WAR to folder.">
+		<echo>${ant.project.name}: Renaming existing WAR</echo>
+		<move tofile="${jboss.deploy}/temp-${product}.war" file="${jboss.deploy}/${product}.war" />
+		<echo>${ant.project.name}: Exploding WAR to folder</echo>
+		<unjar src="${jboss.deploy}/temp-${product}.war" dest="${jboss.deploy}/${product}.war" />
+		<echo>${ant.project.name}: Removing temporary WAR</echo>
+		<delete>
+			<fileset dir="${jboss.deploy}">
+				<include name="temp-${product}.war" />
+			</fileset>
+		</delete>
+	</target>
+	
+	
+	<target name="explode-war-synchronize" description="Copies web files into exploded WAR folder.">
+		<echo>Overwriting deployed ${ant.project.name} web files with source files</echo>
+		<copy todir="${jboss.deploy}/${product}.war" overwrite="true" verbose="yes">
+			<fileset dir="${conf.web.dir}">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+	</target>
+	
+	
+	<target name="explode-war-delete" description="Deletes exploded WAR folder.">
+		<echo>${ant.project.name}: Removing WAR folder</echo>
+		<delete quiet="true" includeemptydirs="true">
+			<fileset dir="${jboss.deploy}/${product}.war">
+				<include name="**" />
+			</fileset>
+		</delete>
+		<echo>Removing temporary WAR  for ${ant.project.name}, if exists</echo>
+		<delete quiet="true" includeemptydirs="true">
+			<fileset dir="${jboss.deploy}/temp-${product}.war">
+				<include name="**" />
+			</fileset>
+		</delete>
+	</target>
+	
+	<!-- =================================================================== -->
+	<!-- Tests                                                     	 		 -->
+	<!-- =================================================================== -->
+	
+    <target name="_selenium-start">
+    	<!-- Internal target: Starts Selenium server. -->
+    	<echo>${ant.project.name}: Starting Selenium server</echo>
+        <java jar="${sharedlib}/selenium/selenium-server.jar" fork="true" spawn="true">
+            <arg line="-timeout 30" />
+        	<arg line="-port ${selenium.server.port}" />
+        	<arg line="-userExtensions ${sharedlib}/selenium/user-extensions.js" />
+        </java>
+
+        <waitfor maxwait="30" maxwaitunit="second">
+            <and>
+                 <socket server="localhost" port="${selenium.server.port}"/>
+                 <!-- this url will 403, so we say that it should start counting errors at 404 to skip -->
+                 <http url="http://localhost:${selenium.server.port}/" errorsBeginAt="404"/>
+            </and>
+        </waitfor>        	
+    </target>
+	
+	
+	<target name="_selenium-stop">
+		<!-- Internal target: Stops Selenium server. -->
+		<echo>${ant.project.name}: Stopping Selenium server</echo>
+		<get taskname="selenium-shutdown"
+	    	 src="http://localhost:${selenium.server.port}/selenium-server/driver/?cmd=shutDown"
+	         dest="${build.report}/selenium_result.txt"
+			 ignoreerrors="true" />
+    </target>
+	
+	
+	<target name="test-report" depends="_compile-test" description="Runs JUnit tests and generates report.">
+		<junit printsummary="yes"
+			   haltonerror="no"
+		       haltonfailure="no"
+		       errorProperty="test.failed"
+			   failureProperty="test.failed"
+			   fork="yes">
+			<!--
+			<jvmarg value="-Xms512M" />
+			<jvmarg value="-Xmx1024M" />
+			-->
+			<formatter type="plain" usefile="false" />
+			<formatter type="xml" />
+			<batchtest todir="${build.report}">
+				<fileset dir="${src.test.dir}">
+					<include name="**/*" />
+				</fileset>
+			</batchtest>
+			<classpath>
+				<pathelement location="${build.classes.test}" />
+				<pathelement location="${conf.dir}" />
+				<pathelement location="${jboss.home}lib/javassist.jar" />
+				<path refid="logging.classpath"/>	
+				<path refid="product.classes.classpath" />
+			</classpath>
+		</junit>
+		
+		<junitreport todir="${build.report}">
+			<fileset dir="${build.report}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report todir="${build.report}/html" />
+		</junitreport>
+	</target>
+	
+	<!-- =================================================================== -->
+	<!-- JSP precompilation                                   				 -->
+	<!-- =================================================================== -->
+	
+	<!-- Runs if jsp.precompile setting is set in lams_build/common.properties -->
+	<target name="_jsp-precompile" if="jsp.precompile">
+		<!-- Internal target: Precompiles JSP files. -->
+		<echo>${ant.project.name}: Precompiling JSP files</echo>
+		
+		<!-- Work on a copy of web files, not originals
+             Copy them to build.war directory first for processing -->
+		<echo>${ant.project.name}: Coping web files for building</echo>
+	 	<copy todir="${build.war}" overwrite="true">
+			<fileset dir="${conf.web.dir}">
+				<include name="**"/>
+				<!-- These were created or copied in _build-webdoclet task -->
+				<exclude name="WEB-INF/web.xml"/>
+				<exclude name="WEB-INF/struts-config.xml"/>
+				<exclude name="WEB-INF/validation.xml"/>
+			</fileset>
+	 	</copy>
+		
+		<!-- Define JSP compiler -->
+		<path id="jsp.precompile.classpath">
+			<path refid="product.classes.classpath"/>
+			<fileset dir="${jboss.home}/lib">
+				<include name="jboss-common-core.jar" />
+				<include name="jboss-logging-spi.jar" />
+			</fileset>
+			<fileset dir="${jboss.ear.deployers}/jbossweb.deployer">
+				<include name="*.jar" />
+			</fileset>
+	        <fileset dir="${jboss.ear.deploy}/jbossweb.sar">
+	            <include name="jbossweb.jar" />
+	        </fileset>
+		</path>
+		
+		<taskdef name="jasper2"
+				 classname="org.apache.jasper.JspC"
+			     classpathref="jsp.precompile.classpath"
+		/>
+		
+		<!-- Generate Java files and put servlet mappings in web.xml file -->
+		<echo>${ant.project.name}: Generating Java source files from JSP pages</echo>
+		<jasper2 uriroot="${build.war}"
+			webXmlFragment="${build.war}/WEB-INF/generated_web.xml"
+			outputDir="${build.war}/WEB-INF/src"
+			package="${product.path.jsp}"
+			addWebXmlMappings="true"
+			validateXml="false"
+			failOnError="true"
+		/>
+
+		<!-- Compile Java files generated from JSPs -->
+		<echo>${ant.project.name}: Compiling JSP classes</echo>
+		
+		<!-- Make src folder if it does not exist i.e. no JSPs were compiled in previous step -->
+		<mkdir dir="${build.war}/WEB-INF/src"/>
+		<mkdir dir="${build.war}/WEB-INF/classes"/>
+	    <javac destdir="${build.war}/WEB-INF/classes"
+	           debug="off"
+	    	   failonerror="true"
+	           srcdir="${build.war}/WEB-INF/src" 
+		  	   excludes="**/*.smap"
+	    	   classpathref="jsp.precompile.classpath">
+	      <include name="**" />
+	      <exclude name="tags/**" />
+	    </javac>
+		
+		<!-- Prepare files for WAR so copy processing results to assembly dir, excludi plain JSP and tags -->
+		<echo>${ant.project.name}: Copying compiled and remaining web resources</echo>
+		<copy todir="${build.war.assembly}">
+			<fileset dir="${build.war}">
+				<include name="**"/>
+				<exclude name="assembly/"/>
+				<exclude name="WEB-INF/src/"/>
+				<exclude name="WEB-INF/web.xml"/>
+				<exclude name="**/*.java"/>
+				<exclude name="**/*.jsp"/>
+				<exclude name="**/*.tag"/>
+				<exclude name="**/*.tld"/>
+			</fileset>
+		</copy>
+		
+		<echo>${ant.project.name}: Copying additional libraries</echo>
+	 	<copy todir="${build.war.assembly}/WEB-INF/lib" flatten="true" verbose="true">
+			<fileset dir="${basedir}/lib" erroronmissingdir="false">
+				<include name="**/*"/>
+			</fileset>
+	 	</copy>
+	</target>
+			
+	
+	<!-- Runs if jsp.precompile setting is NOT set in lams_build/common.properties 
+		 JSPs will be compiled at runtime, which is default behaviour allowing hotdeploy -->
+	<target name="_jsp-plaincopy" unless="jsp.precompile">
+		<!-- Internal target: Copies JSP files. -->
+		<echo>${ant.project.name}: Copying JSP files without precompilation</echo>
+
+		<!-- No processing is needed so copy files straight to assembly dir to create WAR -->
+		<echo>Copying web resources</echo>
+	 	<copy todir="${build.war.assembly}">
+			<fileset dir="${build.war}">
+				<!-- Some XML files were created or copied in _build-webdoclet task --> 
+				<include name="**"/>
+				<exclude name="assembly/"/>
+				<exclude name="WEB-INF/web.xml"/>
+			</fileset>
+			<fileset dir="${conf.web.dir}">
+				<include name="**"/>
+				<exclude name="WEB-INF/web.xml"/>
+				<exclude name="WEB-INF/struts-config.xml"/>
+				<exclude name="WEB-INF/validation.xml"/>
+			</fileset>
+	 	</copy>
+		
+		<echo>${ant.project.name}: Copying additional libraries</echo>
+	 	<copy todir="${build.war.assembly}/WEB-INF/lib" flatten="true" verbose="true">
+			<fileset dir="${basedir}/lib" erroronmissingdir="false">
+				<include name="**/*"/>
+			</fileset>
+	 	</copy>
+	</target>
+	
+</project>

@@ -1,87 +1,152 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
-<!-- 
-The DOCTYPE declaration declares the location of database-specific parts of the
-Ant build file. 
--->
-<project name="LAMS" basedir="." default="usage">
+<project name="LAMS Common" basedir="." default="print-usage">
+	
+	<import file="../lams_build/build_base.xml"/> 
 
-	<!-- import properties from the specified file -->
-	<property file="build.properties"/>
-	<property file="../lams_build/common.properties"/>
-	<property file="../lams_build/${osPropertiesName}.properties" />
+	<!-- Below are Tool specifc targets and targets overriding ones from the imported base file. -->
+	<fileset id="hbm.fileset" dir="${src.java.dir}"
+		     description="List of Java files for _build-hbm target.">
+		<!-- Configuration -->
+		<include name="**/ConfigurationItem.java" />
+		<include name="**/Registration.java" />
+		<include name="**/Timezone.java" />
+		<!-- Event Notification and Pedagogical Planner -->
+		<include name="**/Event.java" />
+		<include name="**/Subscription.java" />
+		<include name="**/LogEvent.java" />
+		<include name="**/PedagogicalPlanner*.java" />
+		<include name="**/DataFlowObject.java" />
+		<!-- Evaluation -->
+		<include name="**/ActivityEvaluation.java" />
+		<include name="**/GradebookUserActivity.java" />
+		<include name="**/GradebookUserLesson.java" />
+		<!-- Notebook -->
+		<include name="**/NotebookEntry.java" />
+	</fileset>
+	
+	
+	<target name="print-usage" depends="build_base.print-usage"
+	        description="Displays Ant targets descriptions">
+		<echo>
+		build-db-test           --> Inserts test data to database.
+		</echo>	
+	</target>
+		
+		
+	<target name="_build-jar" depends="_compile-java, _build-hbm, _copy-language">
+		<echo>${ant.project.name}: Building main JAR</echo>
+		<jar jarfile="${build.lib}/${product}.jar">
+			<fileset dir="${build.classes.java}">
+				<exclude name="**/LoginRequestValve.class"/>
+				<exclude name="**/SingleSignOn.class"/>
+			</fileset>
+		</jar>
+		
+		<echo>${ant.project.name}: Building Session JAR</echo>
+		<jar jarfile="${build.lib}/lams-session.jar">
+			<fileset dir="${build.classes.java}">
+				<include name="${product.path.filesystem}/web/session/*"/>
+			</fileset>
+		</jar>
+		
+		<echo>${ant.project.name}: Building Valve JAR</echo>
+		<jar jarfile="${build.lib}/lams-valve.jar">
+			<fileset dir="${build.classes.java}">
+				<include name="${product.path.filesystem}/integration/security/LoginRequestValve.class"/>
+				<include name="${product.path.filesystem}/integration/security/SingleSignOn.class"/>
+			</fileset>
+		</jar>
+	</target>
 
 	
-	<path id="all-libs">
-		<fileset dir="${sharedlib}">
-			<include name="**/*.jar"/>
-		</fileset>
-		<fileset dir="${j2eelibs}">
-			<include name="**/*.jar"/>
-		</fileset>
-	</path>
+	<target name="deploy-libraries" depends="_build-jar" description="Deploys library JARs.">
+		<echo>Deploying library JARs</echo>
+		<copy todir="${jboss.server.instance}/lib" overwrite="true" verbose="true">
+			<fileset dir="${build.lib}/">
+				<include name="lams-session.jar" />
+				<include name="lams-valve.jar" />
+			</fileset>
+		</copy>
+	</target>
 	
-	<path id="project.classpath">
-		<path refid="all-libs"/>
-		<!-- Java CLASSPATH should be added as the last item -->
-		<!-- This property is supposed to be set in eclipse  -->
-		<pathelement location="${java.class.path}"/>
-	</path>
-
-	<target name="usage">
-		<echo message=""/>
-		<echo message="${project} build file"/>
-		<echo message="------------------------------------------------------"/>
-		<echo message=""/>
-		<echo message="Among the available targets are:"/>
-		<echo message=""/>
-		<echo message="deploy-lams-jar --> Deploy lams jar to jboss"/>
-		<echo message="rebuild-db   --> Clean and rebuild the database"/>
-		<echo message="insert-test-data --> Insert test data to database"/>
-		<echo message="lams-jar  --> Make jar archive for deployment"/>
-		<echo message="middlegen-learningdesign --> Run middlegen for learningdesign tables"/>
-		<echo message="hbm2java-learningdesign  --> Run hbm2java for learningdesign mapping files"/>
-		<echo message=""/>
-	</target>
-
-	<target name="init">
-		<available property="xdoclet-jars-installed" file="${lib}/xdoclet/xdoclet-${xdoclet.version}.jar"/>
-	</target>
-
-	<!-- =================================================================== -->
-	<!-- Fails if XDoclet 1.2.x is not on classpath                          -->
-	<!-- =================================================================== -->
-	<target name="fail-if-no-xdoclet-1.2.x" unless="xdoclet-jars-installed">
-		<fail>
-	      You must download several jar files before you can build Middlegen.
-	      Execute the "download-deps" target. Then try to build again.
-
-	      If you are behind a proxy, you should define the properties
-	      http.proxyHost and http.proxyPort. Example:
-	      
-	      ant -Dhttp.proxyHost=foo.com -Dhttp.proxyPort=8080
-	      
-	      It's also possible to download the jars manually.
-	     </fail>
-	</target>
-
-	<target name="check-driver-present">
-		<available file="${db.driver.dir}" type="dir" property="driver.present"/>
-	</target>
-	<target name="panic-if-driver-not-present" unless="driver.present">
-		<fail>
-	      The JDBC driver you have specified by including one of the files in ${basedir}/config/database
-	      doesn't exist. You have to download this driver separately and put it in ${db.driver.dir}
-	      Please make sure you're using a version that is equal or superior to the one we looked for.
-	      If you name the driver jar file differently, please update the database.driver.jar property
-	      in the ${basedir}/config/database/xxx.xml file accordingly.
-	     </fail>
+	
+	<target name="build-db" depends="_clean-dirs"
+		description="Rebuilds LAMS database.">
+		
+		<echo>Rebuilding LAMS database</echo>
+		<tstamp/>
+		<copy todir="${build.sql}" overwrite="true" verbose="true">
+			<fileset dir="${db.scripts}/">
+				<include name="${lamsconf.table.sql}" />
+                <include name="create_lams_11_db.sql" />
+			</fileset>
+	        <filterset>
+	            <filter token="datetimestamp" value="${DSTAMP}${TSTAMP}"/>
+                    <filter token="dbname" value="${db.name}"/>
+	        </filterset>
+		</copy>
+		
+		<echo>Executing SQL scripts</echo>
+		<sql driver="${db.driver}"
+		     url="${db.url.build}"
+			 userid="${db.username}"
+			 password="${db.password}"
+			 encoding="${db.encoding}">
+			<classpath>
+				<fileset dir="${db.driver.dir}" includes="*.jar"/> 
+			</classpath>
+			
+			<transaction src="${build.sql}/create_lams_11_db.sql"/>
+			<transaction src="${db.scripts}/drop_lams_11_tables.sql"/>
+			<transaction src="${db.scripts}/create_lams_11_tables.sql"/>
+			<!-- Create tables for LAMS and other application's integration -->
+			<transaction src="${db.scripts}/create_integration_tables.sql"/>
+			<transaction src="${db.scripts}/insert_${conf.application}_users.sql"/> 
+			<transaction src="${db.scripts}/insert_types_data.sql"/>
+			<transaction src="${build.sql}/${lamsconf.table.sql}"/>
+			<!-- Create Quartz table --> 
+	    	<transaction src="${db.scripts}/create_quartz_table.sql"/>
+			<!-- Create tables for Core Notebook Service -->
+			<transaction src="${db.scripts}/create_notebook_tables.sql"/>
+			<!-- Create tables for Presence Chat Service -->
+			<transaction src="${db.scripts}/create_presence_chat_tables.sql"/>
+			<!-- Test the scripts for translations -->
+            <!-- <transaction src="${db.scripts}/shaun/all.sql"/> -->
+		</sql>
 	</target>
 
 
-	<!-- =================================================================== -->
-	<!-- Run Middlegen For LearningDesign                                                       -->
-	<!-- =================================================================== -->
+	<target name="_build-db-test">
+		<!-- Internal target: Inserts test data to database -->
+		<echo>${ant.project.name}: Inserting test data to database</echo>
+		<antcall target="_db-script">
+		    <param name="sql.script" value="${db.scripts}/insert_test_data.sql"/>
+		</antcall>
+	</target>
+	
+	
+	<target name="test-report" depends="_build-db-test, build_base.test-report"
+	        description="Runs JUnit tests and generates report." />
+
+
+	<target name="deploy-war" depends="_target-not-available"
+		    description="Deploys WAR." />
+	
+		
+	<target name="explode-war" depends="_target-not-available"
+		    description="Explodes deployed WAR to folder." />
+	
+	
+	<target name="explode-war-delete" depends="_target-not-available"
+		    description="Deletes exploded WAR folder." />
+	
+	
+	<target name="explode-war-synchronize" depends="_target-not-available"
+		    description="Copies web files into exploded WAR folder." />
+	
+	
+	<!-- This target seems obsolete but left for future reference.
 	<target 
       name="middlegen-learningdesign" 
       description="Run Middlegen For LearningDesign" 
@@ -122,385 +187,6 @@ Ant build file.
 			<table name="lams_grouping"/>
 
 		</middlegen-learningdesign>
-
-	</target>
-
-	<!-- =================================================================== -->
-	<!-- Run hbm2java for learningdesign   DOES NOT SUPPORT on Hibernate3-->
-	<!-- =================================================================== 
-	<target name="hbm2java-learningdesign" description="Generate .java from .hbm files.">
-		<taskdef
-         name="hbm2java-learningdesign"
-         classname="net.sf.hibernate.tool.hbm2java.Hbm2JavaTask"
-         classpathref="all-libs"
-      />
-		<hbm2java-learningdesign output="${src.java.dir}">
-			<fileset dir="${hbm}/${package.learningdesign}">
-				<include name="*.hbm.xml"/>
-			</fileset>
-		</hbm2java-learningdesign>
 	</target>
 	-->
-	<target name="print-classpath">
-		<echo message="java.class.path = ${java.class.path}"/>
-	</target>
-
-	<!-- ================================================================ -->
-	<!-- Preparations									                  -->
-	<!-- ================================================================ -->
-	<target name="preparedirs">
-		<mkdir dir="${build}"/>
-		<mkdir dir="${build.classes.java}"/>
-		<mkdir dir="${build.classes.test}"/>
-		<mkdir dir="${build.lib}"/>
-	</target>
-
-	<target name="clean" depends="preparedirs" description="removes all class files">
-		<delete>
-			<fileset dir="${build.classes.java}"/>
-			<fileset dir="${build.lib}"/>
-		</delete>
-		<mkdir dir="${build.classes.java}"/>
-		<mkdir dir="${build.lib}"/>
-	</target>
-	
-	<target name="compile" depends="clean" description="compile java sources">
-		<javac srcdir="${src.java.dir}" compiler="modern"
-	         	 	destdir="${build.classes.java}" deprecation="on" debug="on">
-			<classpath>
-				<pathelement location="${build.classes.java}"/>
-				<path refid="project.classpath"/>
-			</classpath>
-		</javac>
-		<!-- Spring files -->
-		<copy overwrite="yes" todir="${build.classes.java}/org/lamsfoundation/lams/">
-				<fileset dir="${src.java.dir}/org/lamsfoundation/lams/">
-						<include name="**/*.xml"/>
-						<include name="**/*.properties"/>
-				</fileset>
-		</copy>
-		<copy overwrite="yes" todir="${build.classes.java}" verbose="true">
-			<fileset dir="${src.java.dir}">
-				<include name="**/*.properties"/>
-				<!-- Autopatch -->
-				<include name="**/*.sql"/>
-			</fileset>
-		</copy>
-	</target>
-
-	<target name="compile.test" depends="compile">
-		<javac destdir="${build.classes.test}" compiler="modern">
-			<src path="${src.test.dir}"/>
-			<classpath>
-				<pathelement location="${build.classes.java}"/>
-				<path refid="project.classpath"/>
-			</classpath>
-		</javac>
-		<copy overwrite="yes" todir="${build.classes.test}">
-			<fileset dir="${src.test.dir}">
-				<include name="**/*.xml"/>
-				<include name="**/*.zip"/>
-				<include name="**/*.properties"/>
-			</fileset>
-		</copy>
-	</target>
-				
-        <!-- effectively a synonym for lams-jar 
-            required by the master build script
-        -->
-        <target name="build-jar" depends="copy-lams-jar-to-shared-lib"/>
-        
-	<!-- ================================================================ -->
-	<!-- Make jar archive for deployment        		    	          -->
-	<!-- ================================================================ -->
-	<target name="lams-jar" depends="compile,compile.test" description="creates jar file">
-		<delete file="${build.lib}/${product}.jar"/>
-		<delete file="${build.lib}/lams-session.jar"/>
-		<delete file="${build.lib}/lams-valve.jar"/>
-		<jar jarfile="${build.lib}/${product}.jar">
-			<fileset dir="${build.classes.java}">
-				<exclude name="org/lamsfoundation/lams/integration/security/LoginRequestValve.class"/>
-				<exclude name="org/lamsfoundation/lams/integration/security/SingleSignOn.class"/>
-			</fileset>
-			<fileset dir="${conf.hibernate.mapping.dir}"/>
-		</jar>
-		<jar jarfile="${build.lib}/lams-session.jar">
-			<fileset dir="${build.classes.java}">
-				<include name="org/lamsfoundation/lams/web/session/*"/>
-			</fileset>
-		</jar>
-		<jar jarfile="${build.lib}/lams-valve.jar">
-			<fileset dir="${build.classes.java}">
-				<include name="org/lamsfoundation/lams/integration/security/LoginRequestValve.class"/>
-				<include name="org/lamsfoundation/lams/integration/security/SingleSignOn.class"/>
-			</fileset>
-		</jar>
-		<copy overwrite="yes" todir="${build.lib}/language/org/lamsfoundation/lams">
-			<fileset dir="${conf.language.dir}">
-				<include name="**/*.properties"/>
-				<include name="**/*.txt"/>
-			</fileset>
-		</copy>
-	</target>
-	<!-- ================================================================ -->
-	<!-- copy jar archive of org.lamsfoundation.lams.web.session.* for    -->
- 	<!-- our own FormAuthenticator. Shared Session Necessary package  	  -->
-	<!-- ================================================================ -->
-	<target name="copy-shared-session-jar" depends="lams-jar" description="creates jar file">
-		<copy overwrite="yes" todir="${jboss.server.instance}/lib/">
-			<fileset dir="${build.lib}/">
-				<include name="lams-session.jar" />
-			</fileset>
-		</copy>
-	</target>
-	<!-- ================================================================ -->
-	<!-- copy lams valve to jboss for integration                         -->
-	<!-- ================================================================ -->
-	<target name="copy-lams-valve-jar" depends="lams-jar" description="copy lams-valve.jar to jboss">
-		<copy overwrite="yes" todir="${jboss.server.instance}/lib/">
-			<fileset dir="${build.lib}/">
-				<include name="lams-valve.jar" />
-			</fileset>
-		</copy>
-	</target>
-	<!-- =================================================================== -->
-	<!-- Deploy the project on windows                                       -->
-	<!-- =================================================================== -->
-	<target name="deploy-lams-jar" depends="lams-jar">
-		<delete quiet="true">
-			<fileset dir="${jboss.deploy}/tmp"/>
-			<fileset dir="${jboss.deploy}/work"/>
-		</delete>
-		<copy file="${build.lib}/${product}.jar"
-				todir="${jboss.deploy}"/>
-	</target>
-	<!-- =================================================================== -->
-	<!-- Deploy the project's jar file to the shared lib area				 -->
-	<!-- =================================================================== -->
-	<target name="copy-lams-jar-to-shared-lib" depends="lams-jar">
-		<copy file="${build.lib}/${product}.jar"
-				todir="${sharedlib}/lams"/>
-	</target>
-
-	<!-- =================================================================== -->
-	<!-- Clean and rebuild the database. Also cleans out content repository  -->
-	<!-- =================================================================== -->
-	<target name="rebuild-db" depends="preparedirs"
-		description="rebuild LAMS/RAMS database and clean out content repository. Mysql has to be running first">
-		<tstamp/>
-		<copy overwrite="yes" todir="${build}">
-			<fileset dir="${db.scripts}/">
-				<include name="${lamsconf.table.sql}" />
-                <include name="create_lams_11_db.sql" />
-			</fileset>
-	        <filterset>
-	            <filter token="datetimestamp" value="${DSTAMP}${TSTAMP}"/>
-                    <filter token="dbname" value="${db.name}"/>
-	        </filterset>
-		</copy>
-		
-		<!-- Copy connectors for embedded MySQL, if they are available -->
-		<copy todir="${db.driver.dir}" verbose="true" overwrite="false" failonerror="false">
-			<fileset dir="../mysql_embedded/connectors">
-				<include name="*-driver.jar" />
-				<include name="*-db-files-${osPropertiesName}.jar" />
-			</fileset>
-		</copy>
-		
-		<sql driver="${db.driver}" url="${db.url.init.build}" userid="${db.username}"
-				password="${db.password}" encoding="${db.encoding}" >
-			<classpath>
-				<fileset dir="${db.driver.dir}" includes="*.jar"/> 
-			</classpath>
-			<transaction src="${build}/create_lams_11_db.sql"/>
-			<transaction src="${db.scripts}/drop_lams_11_tables.sql"/>
-			<transaction src="${db.scripts}/create_lams_11_tables.sql"/>
-			<!-- Create tables for LAMS and other application's integration -->
-			<transaction src="${db.scripts}/create_integration_tables.sql"/>
-			<transaction src="${db.scripts}/insert_${conf.application}_users.sql"/> 
-			<transaction src="${db.scripts}/insert_types_data.sql"/>
-			<transaction src="${build}/${lamsconf.table.sql}"/>
-			<!-- Create Quartz table --> 
-	    	<transaction src="${db.scripts}/create_quartz_table.sql"/>
-			<!-- Create tables for Core Notebook Service -->
-			<transaction src="${db.scripts}/create_notebook_tables.sql"/>
-			<!-- Create tables for Presence Chat Service -->
-			<transaction src="${db.scripts}/create_presence_chat_tables.sql"/>
-			<!-- Test the scripts for translations -->
-            <!-- <transaction src="${db.scripts}/shaun/all.sql"/> -->
-		</sql>
-		
-		<!-- 2.0.3 overwrites files in the repository so we don't -->
-		<!-- have to keep deleting it every time. -->
-		<!-- <delete dir="${contentrepository.directory}"/> -->
-		
-        <delete file="${build}/create_lams_11_db.sql"/>
-	</target>
-
-	<!-- =================================================================== -->
-	<!-- Insert test data to lams database                                   -->
-	<!-- =================================================================== -->
-	<target name="insert-test-data" depends="rebuild-db"
-		description="insert test data to lams database">
-		<sql driver="${db.driver}" url="${db.url.build}" userid="${db.username}"
-				password="${db.password}"  encoding="${db.encoding}">
-			<classpath>
-				<fileset dir="${db.driver.dir}" includes="*.jar"/> 
-			</classpath>
-			<transaction src="${db.scripts}/insert_test_data.sql"/>
-		</sql>
-	</target>
-	<!-- =================================================================== -->
-	<!-- Run JUnit Tests                                                     -->
-	<!-- =================================================================== -->
-	<!-- * This task will fail unless you have junit.jar and the class files
-	     for the <junit> task in the same classpath. Read
-         http://ant.apache.org/manual/OptionalTasks/junit.html
-         for how you can do this.                                            -->
-	<!-- * For Eclipse, you have to add a junit.jar to its Runtime classpath.
-         E.g. Put D:\eclipse\plugins\org.junit_3.8.1\junit.jar
-         in the Preferences->Ant->Runtime->Classpath->Global Entries
-         by clicking "Add External JARS" and locating the junit.jar.         -->
-	<target name="test" depends="compile.test,insert-test-data"> 
-		<mkdir dir="${build.report}"/>
-		<junit printsummary="yes" haltonerror="no" haltonfailure="no"
-			   fork="yes">
-			<formatter type="plain" usefile="false"/>
-			<formatter type="xml"/>
-			<batchtest todir="${build.report}">
-				<fileset dir="${src.test.dir}">
-					<include name="**/Test*.java"/>
-					<exclude name="**/Test*All.java"/>
-					<exclude name="**/TestInitLesson.java"/>
-				</fileset>
-			</batchtest>
-			<classpath>
-				<pathelement location="${build.classes.java}"/>
-				<pathelement location="${build.classes.test}"/>
-				<pathelement location="${conf.hibernate.mapping.dir}"/>
-				<path refid="project.classpath"/>
-			</classpath>
-		</junit>
-	</target>
-	
-	<target name="test-report" depends="test">
-		<mkdir dir="${build.report}/html"/> 
-		<junitreport todir="${build.report}"> 
-			<fileset dir="${build.report}">
-				<include name="TEST-*.xml"/>
-			</fileset>
-			<report todir="${build.report}/html"/> 
-		</junitreport>
-	</target>
-	
-	<!-- =================================================================== -->
-	<!-- Generate Notebook hibernate xml files                             	 -->
-	<!-- =================================================================== -->
-	<target name="generate-notebook-hbm-files" description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)">
-
-		<taskdef name="hibernatedoclet" classname="xdoclet.modules.hibernate.HibernateDocletTask" classpathref="all-libs" />
-
-		<echo message="Building hbm.xml files using XDoclet" />
-
-		<hibernatedoclet destdir="${conf.hibernate.mapping.dir}" excludedtags="@version,@author,@todo" force="true" verbose="true">
-			<fileset dir="${src.java.dir}">
-				<include name="**/NotebookEntry.java" />
-			</fileset>
-			<hibernate version="3.0" />
-		</hibernatedoclet>
-	</target>
-	
-	<!-- =================================================================== -->
-	<!-- Generate Evaluation hibernate xml files                             	 -->
-	<!-- =================================================================== -->
-	<target name="generate-evaluation-hbm-files" description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)">
-
-		<taskdef name="hibernatedoclet" classname="xdoclet.modules.hibernate.HibernateDocletTask" classpathref="all-libs" />
-
-		<echo message="Building hbm.xml files for evaluation model using XDoclet" />
-
-		<hibernatedoclet destdir="${conf.hibernate.mapping.dir}" excludedtags="@version,@author,@todo" force="true" verbose="true">
-			<fileset dir="${src.java.dir}">
-				<include name="**/ActivityEvaluation.java" />
-				<include name="**/GradebookUserActivity.java" />
-				<include name="**/GradebookUserLesson.java" />
-			</fileset>
-			<hibernate version="3.0" />
-		</hibernatedoclet>
-	</target>
-	
-	<!-- =================================================================== -->
-	<!-- Generate Event Notification and Pedagogical Planner hibernate xml files                             	 -->
-	<!-- =================================================================== -->
-	<target name="generate-additional-hbm-files" description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)">
-
-		<taskdef name="hibernatedoclet" classname="xdoclet.modules.hibernate.HibernateDocletTask" classpathref="all-libs" />
-
-		<echo message="Building hbm.xml files using XDoclet" />
-
-		<hibernatedoclet destdir="${conf.hibernate.mapping.dir}" excludedtags="@version,@author,@todo" force="true" verbose="true">
-			<fileset dir="${src.java.dir}">
-				<include name="**/Event.java" />
-				<include name="**/Subscription.java" />
-				
-				<include name="**/LogEvent.java" />
-				
-				<include name="**/PedagogicalPlanner*.java" />
-				
-				<include name="**/DataFlowObject.java" />
-			</fileset>
-			<hibernate version="3.0" />
-		</hibernatedoclet>
-	</target>
-	
-	<!-- =================================================================== -->
-	<!-- Generate Notebook hibernate xml files                             	 -->
-	<!-- =================================================================== -->
-	<target name="generate-config-hbm-file" description="Generate the hibernate hbm.xml files from the Java source (using XDoclet)">
-
-		<taskdef name="hibernatedoclet" classname="xdoclet.modules.hibernate.HibernateDocletTask" classpathref="all-libs" />
-
-		<echo message="Building hbm.xml files using XDoclet" />
-
-		<hibernatedoclet destdir="${conf.hibernate.mapping.dir}" excludedtags="@version,@author,@todo" force="true" verbose="true">
-			<fileset dir="${src.java.dir}">
-				<include name="**/ConfigurationItem.java" />
-				<include name="**/Registration.java" />
-				<include name="**/Timezone.java" />
-			</fileset>
-			<hibernate version="3.0" />
-		</hibernatedoclet>
-	</target>
-	
-	<!-- =================================================================== -->
-	<!-- Notebook Schema export				                             	 -->
-	<!-- =================================================================== -->
-	<path id="schemaexport.classpath">
-		<path refid="project.classpath"/>
-		<pathelement location="${build.classes.java}"/>
-	</path>
-	
-	<!-- exports all the hbm mappings to the specified database -->
-	<target name="notebook-schemaexport" description="Exports all hbm.xml files in {conf.hibernate.mapping.dir}/hbm"
-		depends="generate-notebook-hbm-files">
-	    <echo message="Run the schema export for all hbm.xml files in ${conf.hibernate.mapping.dir}/hbm"/>
-		<taskdef
-			name="schemaexport"
-			classname="org.hibernate.tool.hbm2ddl.SchemaExportTask"
-			classpathref="schemaexport.classpath"
-			>
-		</taskdef>
-		<schemaexport
-			config="${conf.hibernate.mapping.dir}/hibernate.cfg.xml"
-			quiet="no"
-			text="no"
-			drop="no"
-			delimiter=";"
-			output="${db.scripts}/notebook_table-schema.sql">
-			<fileset dir="${conf.hibernate.mapping.dir}">
-				<include name="**/NotebookEntry.hbm.xml"/>
-			</fileset>
-		</schemaexport>	
-	</target>
 </project>
-

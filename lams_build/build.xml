@@ -1,600 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="LAMS-Build" default="usage" basedir=".">
+<project name="LAMS Build" basedir="." default="print-usage">
 
-	<!-- import properties from the shared and o/s specific files -->
+	<!-- Import properties from the shared and o/s specific files -->
 	<property file="common.properties" />
 	<property file="shared.properties" />
 	<property file="${osPropertiesName}.properties" />
+	
+	
+	<condition property="isRAMS">
+		<equals arg1="${conf.application}" arg2="rams" />
+	</condition>
+			
+	
+	<target name="print-usage" description="Displays Ant targets descriptions">
+		<echo>
+		LAMS main build file
+		------------------------------------------------------
+		
+		Available targets are:
+		print-usage               --> Display this information
+		copy-tags                 --> Copies custom JSP tags from Central to all other projects
+		build-tool-deploy-utility --> Rebuilds Tool deployer and updates copy in lams_build
+		build-db                  --> Creates database tables and entries
+		deploy-ear                --> Builds and deploys LAMS EAR
+		deploy-ear-updater        --> Builds and deploys LAMS EAR for updater
+		deploy-tools              --> Standard Tool deployment
+		deploy-tools-minimal      --> Deploys only Tools required to run LAMS
+		deploy-tools-updater      --> Deploys Tools for updater
+		deploy-learning-libraries --> Deploys complex Tools
+		lams-cruise               --> Runs full LAMS redeployment
+		lams-cruise-min-tools     --> Runs full LAMS redeployment with minimal Tools set
+		test-report               --> Runs tests in all LAMS projects
+		slim-jboss                --> Removes unused JBoss files
+		slim-jboss-revert         --> Puts back JBoss files removed in slimming process
+			
+		If you want to run full deployment, execute lams-cruise.
+		</echo>
+	</target>
 
-	<target name="init">
+	
+	<target name="_clean-dirs">
+		<!-- Internal target: Recreates dirs for compiled output files. -->
+		<echo>${ant.project.name}: Removing cache and build folders</echo>
+		<delete dir="${jboss.server.instance}/tmp" quiet="true" />
+		<delete dir="${jboss.server.instance}/work" quiet="true" />
+		<delete dir="${assembly}" />
+		
+		<echo>${ant.project.name}: Creating build dir structure</echo>
 		<mkdir dir="${assembly}" />
 	</target>
 
-	<target name="usage" description="print usage message">
-		<echo>------------ Utility Methods ------------------------</echo>
-		<echo>usage: this message</echo>
-		<echo>clean-core: clean sub project from LAMS Core</echo>
-		<echo>clean-tools: clean LAMS tools</echo>
-		<echo>clean-all: clean tools and core</echo>
-		<echo>build-subprojects: build sub projects</echo>
-		<echo>build-tool-deploy-utility: build the tool_deploy utility and update copy in lams_build</echo>
-		<echo>------------ Build/Deploy LAMS  ------------------------</echo>
-		<echo>assemble-ear: assemble ear structure</echo>
-		<echo>deploy-ear: copy ear to local jboss server</echo>
-		<echo>copyfiles: copy configuration files to local jboss server</echo>
-		<echo>----------------------------------------------------------</echo>
-		<echo>To deploy LAMS:</echo>
-		<echo>   1. copyfiles (this only needs to be done once, or when basic configuration the files change)</echo>
-		<echo>   2. assemble-ear</echo>
-		<echo>   3. manually refresh the project</echo>
-		<echo>   4. deploy-ear</echo>
-		<echo>   5. deploy-tools</echo>
-		<echo>Do not try to assemble and deploy in the same run - if you do,</echo>
-		<echo>Eclipse may not deploy all of the newly created files.</echo>
-	</target>
-
-	<!-- clean all LAMS -->
-
-	<target name="clean-all" description="cleans all projects including core" depends="clean-core, clean-tools" />
-
-
-	<!-- clean all core projects -->
 	
-	<target name="clean-core" description="Cleans Core projects">
-                <delete dir="../${lams_common}/build/" quiet="false"/>
-                <delete dir="../${lams_contentrepository}/build" quiet="false"/>
-                <delete dir="../${lams_central}/build" quiet="false"/>
-                <delete dir="../${lams_learning}/build" quiet="false"/>
-                <delete dir="../${lams_monitoring}/build" quiet="false"/>
-                <delete dir="../${lams_admin}/build" quiet="false"/>
-                <delete dir="../${lams_www}/build" quiet="false"/>
-                <delete dir="../${lams_gradebook}/build" quiet="false"/>
-                <delete dir="../${lams_gradebook}/build" quiet="false"/>
-                <delete dir="./build" quiet="false"/>
-                <delete dir="${assembly}" quiet="false"/>
-                <delete dir="${jboss.server.instance}/tmp" quiet="false"/>
-                <delete dir="${jboss.server.instance}/work" quiet="false"/>
-	</target>
-		
-	<!-- clean all tools -->
-
-	<target name="clean-tools" description="Cleans all tool projects">
-                        <delete dir="../${tool_forum_dir}/build" quiet="false" />
-                        <delete dir="../${tool_lanb_dir}/build" quiet="false" />
-                        <delete dir="../${tool_laqa_dir}/build" quiet="false" />
-                        <delete dir="../${tool_sbmt_dir}/build" quiet="false" />
-                        <delete dir="../${tool_chat_dir}/build" quiet="false" />
-                        <delete dir="../${tool_larsrc_dir}/build" quiet="false" />
-                        <delete dir="../${tool_vote_dir}/build" quiet="false" />
-                        <delete dir="../${tool_notebook_dir}/build" quiet="false" />
-                        <delete dir="../${tool_survey_dir}/build" quiet="false" />
-                        <delete dir="../${tool_scribe_dir}/build" quiet="false" />
-                        <delete dir="../${tool_task_dir}/build" quiet="false" />
-                        <delete dir="../${tool_gmap_dir}/build" quiet="false" />
-                        <delete dir="../${tool_spreadsheet_dir}/build" quiet="false" />
-                        <delete dir="../${tool_daco_dir}/build" quiet="false" />
-                        <delete dir="../${tool_wiki_dir}/build" quiet="false" />
-                        <delete dir="../${tool_images_dir}/build" quiet="false" />
-                        <delete dir="../${tool_videorecorder_dir}/build" quiet="false" />
-                        <delete dir="../${tool_mindmap_dir}/build" quiet="false" />
-                        <delete dir="../${tool_assessment_dir}/build" quiet="false" />
-                        <delete dir="../${tool_pixlr_dir}/build" quiet="false" />
-                        <delete dir="../${tool_eadventure_dir}/build" quiet="false" />
-                        <delete dir="../${tool_wookie_dir}/build" quiet="false" />
-                        <delete dir="../${tool_imscc_dir}/build" quiet="false" />
-                        <delete dir="../${tool_bbb_dir}/build" quiet="false" />
-	</target>
-
-	<!-- build sub-projects -->
-	<target name="build-subprojects" 
-		description="builds sub projects">
-		<ant antfile="../${lams_common}/build.xml" target="build-jar" inheritAll="false" />
-		<ant antfile="../${lams_contentrepository}/build.xml"
-			target="build-jar" inheritAll="false" />
-		<ant antfile="../${lams_central}/build.xml" target="build-war" inheritAll="false"/>
-		<ant antfile="../${lams_learning}/build.xml" target="build-war" inheritAll="false"/>
-		<ant antfile="../${lams_monitoring}/build.xml"  target="build-war" inheritAll="false"/>
-		<ant antfile="../${lams_admin}/build.xml" target="build-war" inheritAll="false"/>
-		<ant antfile="../${lams_www}/build.xml" target="build-war" inheritAll="false"/>
-		<ant antfile="../${lams_gradebook}/build.xml" target="build-jar" inheritAll="false"/>
-		<ant antfile="../${lams_gradebook}/build.xml" target="build-war" inheritAll="false"/>
-	</target>
-
-	<!-- build tool deployment utility -->
-	<target name="build-tool-deploy-utility"
-		description="builds the tool deploy utility and copy to lams_build">
-
-		<ant antfile="../${lams_tool_deploy}/build.xml" target="build"
-			inheritAll="false" />
-
-		<mkdir dir="${deploy.tool}" />
-		<mkdir dir="${deploy.tool}/lib" />
-		
-		<copy todir="${deploy.tool}" overwrite="yes" flatten="true">
-			<fileset dir="../${lams_tool_deploy}">
-				<include name="deploy.bat" />
-				<include name="deploy.sh" />
-			</fileset>
-		</copy>
-
-		<copy todir="${deploy.tool}/lib" overwrite="yes" flatten="true">
-			<fileset dir="../${lams_tool_deploy}/lib">
-				<include name="jakarta-commmons/*.jar" />
-			</fileset>
-		</copy>
-		
-		<copy todir="${deploy.tool}/lib" overwrite="yes" flatten="true">
-			<fileset dir="../${lams_tool_deploy}/build/lib">
-				<include name="lams-tool-deploy.jar" />
-			</fileset>
-		</copy>
-		
-	</target>
-
-	<!-- cruise control task : build lams -->
-	<target name="lams-cruise" depends="assemble-ear, rebuild-db, deploy-ear, copyfiles, deploy-tools" description="builds entire LAMS (used for CruiseControl instance)"> 
-		<echo>Building LAMS using CruiseControl</echo>
-	</target>
-	
-	<!-- cruise control task : build lams without tools -->
-	<target name="lams-cruise-min-tools" depends="assemble-ear, rebuild-db, deploy-ear, copyfiles, deploy-minimal-tools" description="builds entire LAMS without tools"> 
-		<echo>Building LAMS using CruiseControl</echo>
-	</target>
-	
-	<!-- assemble ear -->
-	<target name="assemble-ear" depends="init, clean-core, build-subprojects"
-		description="Assemble lams ear in exploded form">
-		<!-- have to copy the libs etc. to a temp location otherwise we end up with all the directories under lib as well-->
-		<mkdir dir="${assembly}/temp" />
-		<copy todir="${assembly}/temp" failonerror="true"
-			flatten="true">
-			<fileset dir="${lib}">
-				<patternset id="lib.jars">
-					<!--  the desired jars are nominated explicitly so -->
-					<!--  we don't release a build only one by accident -->
-					<include name="apache-poi/*.jar" />
-					<include name="aspirin/*.jar" />
-					<include name="autopatch/*.jar" />
-					<include name="axis/*.jar" />
-					<include name="batik/*.jar" />
-					<include name="cglib/*.jar" />
-					<include name="dom4j/*.jar" />
-					<include name="fckeditor/*.jar" />
-					<include name="jabber/*.jar" />
-					<include name="jakarta-commons/*.jar" />
-					<include name="jdom/*.jar" />
-					<include name="jfreechart/*.jar" />
-					<include name="mysql/mysql-connector-java-*.jar" />
-					<include name="odmg/*.jar" />
-					<include name="reload/*.jar" />
-					<include name="smack/smack.jar"/>
-					<include name="smack/smackx.jar"/>
-					<include name="spring/*.jar" />
-					<include name="struts/*.jar" />
-					<include name="wddx/*.jar" />
-					<include name="concurrent/*.jar" />	
-					<include name="xml-commons/*.jar" />
-					<include name="xstream/*.jar" />		
-					<include name="flagstone/*.jar" />
-					<include name="lucene/*.jar" />
-					<include name="excel/*.jar" />
-					<include name="csv/*.jar" />
-					<include name="joid/*.jar" />
-					<include name="urlrewritefilter/*.jar" />
-				</patternset>
-			</fileset> 
-			<fileset dir="..">
-				<include name="${lams_common}/${sub.build.lib}/lams.jar" />
-				<include name="${lams_contentrepository}/${sub.build.lib}/*.jar" />
-				<include name="${lams_central}/${sub.build.lib}/*.jar" />
-				<include name="${lams_monitoring}/${sub.build.lib}/*.jar"/>
-				<include name="${lams_monitoring}/${sub.build.lib}/*.war"/>
-				<include name="${lams_learning}/${sub.build.lib}/*.jar"/>
-				<include name="${lams_learning}/${sub.build.lib}/*.war"/>
-				<include name="${lams_admin}/${sub.build.lib}/*.jar"/>
-				<include name="${lams_admin}/${sub.build.lib}/*.war"/>
-				<include name="${lams_www}/${sub.build.lib}/*.war"/>
-				<include name="${lams_gradebook}/${sub.build.lib}/*.jar"/>
-				<include name="${lams_gradebook}/${sub.build.lib}/*.war"/>
-			</fileset>
-		</copy>
-		
-		<!-- Copy connectors for embedded MySQL, if they are available -->
-		<copy todir="${assembly}/temp" verbose="true" overwrite="false" failonerror="false">
-			<fileset dir="../mysql_embedded/connectors">
-				<include name="*-driver.jar" />
-				<include name="*-db-files-${osPropertiesName}.jar" />
-			</fileset>
-		</copy>
-
-		<!-- lams-central.war is already expanded -->
-		<copy todir="${assembly}/temp/" failonerror="true">
-			<fileset dir="../${lams_central}/${sub.build.lib}/">
-				<include name="lams-central.war/**/*.*" />
-			</fileset>
-		</copy>		
-		<!-- Pull out all the language files -->
-		<mkdir dir="${assembly}/temp/lams-dictionary.jar" />
-		<copy todir="${assembly}/temp/lams-dictionary.jar" failonerror="true">
-			<fileset dir="../${lams_common}/${sub.build.language}"><include name="**" /></fileset>
-			<fileset dir="../${lams_contentrepository}/${sub.build.language}"><include name="**" /></fileset> 
-			<fileset dir="../${lams_central}/${sub.build.language}"><include name="**" /></fileset>
-			<fileset dir="../${lams_monitoring}/${sub.build.language}"><include name="**" /></fileset>
-			<fileset dir="../${lams_learning}/${sub.build.language}"><include name="**" /></fileset>
-			<fileset dir="../${lams_admin}/${sub.build.language}"><include name="**" /></fileset>
-			<fileset dir="../${lams_gradebook}/${sub.build.language}"><include name="**" /></fileset>
-		</copy>
-
-		<!-- create a temporary ear -->
-		<ear destfile="${assembly.temp.ear}" compress="false"
-			appxml="${app.xml}">
-			<fileset dir="${assembly}/temp" includes="**" />
-		</ear>
-
-		<!-- remove temp lib -->
-		<!--		<delete dir="${assembly}/temp" includeEmptyDirs="true" /> -->
-		<!-- explode the ear (Why doesn't the EAR task support exploded format?) -->
-		<!-- lams-central.war is already exploded when copied -->
-		<unjar src="${assembly.temp.ear}" dest="${assembly.lams.ear}" />
-		<!-- Add local copy of XSD so developers with no internet access can still build the project -->
-		<copy todir="${assembly.lams.ear}/META-INF" failonerror="true">
-			<fileset dir="${app.xml.dir}">
-				<include name="application_5.xsd" />
-			</fileset>
-		</copy>
-		<move file="${assembly.lams.ear}/lams-www.war" tofile="${assembly.lams.ear}/temp.war"/>
-		<unjar src="${assembly.lams.ear}/temp.war" dest="${assembly.lams.ear}/lams-www.war"/>
-		<delete file="${assembly.lams.ear}/temp.war"/>
-		<!-- delete temp.ear -->
-		<delete file="${assembly.temp.ear}" />
-	</target>
-
-	<!-- ============================================================================== -->
-	<!-- Deploy the ear file to the server                                              -->
-	<!-- ============================================================================== -->
-
-	<target name="deploy-ear" 
-		description="Delete any old versions of the ear directory">
-		<delete dir="${jboss.deploy}"/>
-		<copy todir="${jboss.ear.deploy}" overwrite="true"
-			failonerror="true">
-			<fileset dir="${assembly}">
-				<include name="${lams.ear}/**/*.*" />
-			</fileset>
-		</copy>
-	</target>
-	
-	
-	<!-- ============================================================================== -->
-	<!-- Deploy the ear file to the win_installer directory                                             -->
-	<!-- ============================================================================== -->
-
-	<target name="deploy-ear-updater" depends="assemble-ear"
-		description="Delete any old versions of the ear directory">
-		<delete dir="../win_installer/assembly"/>
-		<copy todir="../win_installer/assembly" overwrite="true"
-			failonerror="true">
-			<fileset dir="${assembly}">
-				<include name="${lams.ear}/**/*.*" />
-			</fileset>
-		</copy>
-	</target>
-	
-	
-
-	<!-- ============================================================================== -->
-	<!-- Deploy the LAMS or RAMS set of tools to the deployed ear 				               			-->
-	<!--  Relies on the tools using the parameter jboss.deploy							-->						
-	<!-- ============================================================================== -->
-	<target name="deploy-common-tools" description="Deploy the tools shared between LAMS and RAMS. Called by deploy-lams-tools and deploy-rams-tools">
-		<ant antfile="../${tool_forum_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_lanb_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_laqa_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_sbmt_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-  		<ant antfile="../${tool_chat_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant> 
-		<ant antfile="../${tool_larsrc_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
- 		<ant antfile="../${tool_vote_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-  		<ant antfile="../${tool_notebook_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-  		<ant antfile="../${tool_survey_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-  		<ant antfile="../${tool_scribe_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-  		<ant antfile="../${tool_task_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_gmap_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_spreadsheet_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_daco_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_wiki_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_images_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_mindmap_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_assessment_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_pixlr_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_eadventure_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_wookie_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_imscc_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_bbb_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-	</target>
-
-	<target name="deploy-minimal-tools" description="Deploy the tools shared between LAMS and RAMS. Called by deploy-lams-tools and deploy-rams-tools">
-  		<ant antfile="../${tool_notebook_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="deploy-tool"
-						inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant>
-	</target>
-	
-	<target name="deploy-lams-tools" depends="test-application, deploy-common-tools" if="isLAMS"
-			description="Deploy the LAMS tools. Called by deploy-tools.">
-		<echo>Building the LAMS set of tools.</echo>
-		<ant antfile="../${tool_lamc_dir}/build.xml" target="deploy-tool"
-				inheritAll="false" >
-			<property name="jboss.deploy" location="${jboss.deploy}"/>
-			<property name="generate.for.installers" value="${generate.for.installers}"/>
-		</ant> 
-	</target>
-			
-	<target name="deploy-rams-tools" depends="test-application, deploy-common-tools" if="isRAMS"
-			description="Deploys the RAMS tools. Called by deploy-tools.">
-		<echo>Building the RAMS set of tools.</echo>
-		<!-- No RAMS specific tools yet -->
-	</target>
-	
-	<target name="test-application">
-		  <condition property="isLAMS">
-		  	<equals arg1="${conf.application}" arg2="lams" />
-		  </condition>
-		  <condition property="isRAMS">
-		  	<equals arg1="${conf.application}" arg2="rams" />
-		  </condition>
-		  <echo>isLAMS ${isLAMS}</echo>
-		  <echo>isRAMS ${isRAMS}</echo>
-	</target>
-	
-	<target name="deploy-tools" depends="deploy-lams-tools,deploy-rams-tools" 
-		description="Deploys the desired tools, working out automatically whether they should be the LAMS or RAMS set of tools. Includes any special parallel activities">
-		<ant target="deploy-learning-libraries"/>
-	</target>
-
-	<!-- use this target only if you are building the special deploy packages needed for the tool upgrader -->
-	<target name="deploy-tools-for-upgrader" depends="deploy-lams-tools,deploy-rams-tools" 
-		description="Deploys the desired tools, working out automatically whether they should be the LAMS or RAMS set of tools. Doesn't include parallel activities">
-	</target>
-
-	<!-- ============================================================================== -->
-	<!--  Rebuild the LAMS Database														-->						
-	<!-- ============================================================================== -->
-	<target name="rebuild-db" description="Rebuild the LAMS Database.">
-		<ant antfile="../${lams_common}/build.xml" target="rebuild-db" inheritAll="false" />
-	</target>
-	
-	<!-- ============================================================================== -->
-	<!-- Copy the third party jar files and cofiguration files for deployment           -->
-	<!-- ============================================================================== -->
-
-	<target name="copyfiles"
-		description="copy lib and config files">
-		<copy overwrite="yes" todir="${jboss.server.instance}/conf/">
-			<fileset dir="${conf.jboss}/">
-				<include name="login-config.xml" />
-				<include name="jboss-service.xml" />
-			</fileset>
-	        <filterset>
-	                <filter token="confdir" value="${jboss.server.instance}/conf"/>
-	        </filterset>
-		</copy>
-		
-		<copy overwrite="yes" todir="${jboss.server.instance}/conf/">
-			<fileset dir="${conf.jboss}/">
-				<include name="jboss-log4j.xml"/>
-			</fileset>
-			<filterset>
-				<filter token="application" value="${conf.application}"/>
-			</filterset>
-		</copy>
-
-		<copy overwrite="yes" todir="${jboss.ear.deploy}">
-			<fileset dir="${conf.jboss}/service">
-				<include name="mysql*.xml" />
-			</fileset>
-	        <filterset>
-	        	<filter token="db.driver" value="${db.driver}"/>
-	        	<filter token="db.url.run" value="${db.url.run}"/>
-	        	<filter token="db.location" value="${db.location}"/>
-                <filter token="db.username" value="${db.username}"/>
-                <filter token="db.password" value="${db.password}"/>
-	        </filterset>
-		</copy>
-		
-		<copy overwrite="yes" todir="${jboss.deploy}">
-			<fileset dir="${conf.jboss}/service">
-				<include name="treecache.xml" />
-			</fileset>
-		</copy>
-                	
-		
-		<copy overwrite="yes" todir="${jboss.ear.deployers}/jbossweb.deployer/META-INF">
-			<fileset dir="${conf.jboss}/jbossweb">
-				<include name="war-deployers-jboss-beans.xml" />
-			</fileset>
-		</copy>
-		<copy overwrite="yes" todir="${jboss.ear.deploy}/jbossweb.sar/">
-			<fileset dir="${conf.jboss}/jbossweb">
-				<include name="server.xml" />
-				<include name="context.xml" />
-			</fileset>
-		</copy>
-		
-		<ant antfile="../${lams_common}/build.xml" target="copy-shared-session-jar" inheritAll="false"/>
-		<ant antfile="../${lams_common}/build.xml" target="copy-lams-valve-jar" inheritAll="false"/>
-		<copy overwrite="yes" todir="${jboss.server.instance.lib}">	
-			<fileset dir="${lib}/jboss">
-				<include name="*.jar" />
-			</fileset>
-		</copy>
-		
-	</target>
-
-	<target name="test-report" description="Run all the test cases across the system. Takes a long time.">
-		<!-- Core projects first -->
- 		<ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
- 		<ant antfile="../${lams_common}/build.xml" target="test-report" inheritAll="false"/>
- 		<ant antfile="../${lams_contentrepository}/build.xml" target="test-report" inheritAll="false"/>
- 		<ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
-		<ant antfile="../${lams_central}/build.xml" target="test-report" inheritAll="false"/>
- 		<ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
- 		<ant antfile="../${tool_survey_dir}/build.xml" target="build-db" inheritAll="false"/> 
-<!--  		<ant antfile="../${tool_survey_dir}/build.xml" target="build-jar" inheritAll="false"/>  -->
-		<ant antfile="../${lams_monitoring}/build.xml" target="test-report" inheritAll="false"/> 
- 		<ant antfile="../${lams_learning}/build.xml" target="test-report" inheritAll="false"/> 
-
-		<!--  Now the tools -->
-<!-- 		<ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
-		<ant antfile="../${tool_forum_dir}/build.xml" target="test-report" inheritAll="false"/>
-		<ant antfile="../${tool_imscp_dir}/build.xml" target="test-report" inheritAll="false"/>
-		<ant antfile="../${tool_laqa_dir}/build.xml" target="test-report" inheritAll="false"/>
-		<ant antfile="../${tool_lanb_dir}/build.xml" target="test-report" inheritAll="false"/>
-		<ant antfile="../${tool_sbmt_dir}/build.xml" target="test-report" inheritAll="false"/>
-		<ant antfile="../${tool_survey_dir}/build.xml" target="test-report" inheritAll="false"/>
-	-->
-	</target>
-	
-	
-	<!-- Build and deploy the parallel activities and other complex activities. Must be done after -->
-	<!-- the tools are deployed -->
-	<target name="deploy-learning-libraries">
-
-		<echo>Deploying Library Activities</echo>
-		
-		<property name="dictionary.dir" value="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/library/" />
-
-		<!-- Generate the deployment package for share resources / forum parallel activity.-->
-		<ant antfile="buildcombinedtasks.xml" target="deploy-package-library">
-			<property name="assembly.activity" location="${basedir}/assembly/shareresourcesforum"/>
-			<property name="package.cfg" location="librarypackages/shareresourcesforum"/>
-			<property name="language.file.folder" value="librarypackages/shareresourcesforum/language/${conf.application}/" />
-			<property name="dest.language.file.folder" value="${dictionary.dir}/shareresourcesforum/"/>
-		</ant> 
- 
-		<!-- Generate the deployment package for chat / scribe parallel activity. -->
-		<ant antfile="buildcombinedtasks.xml" target="deploy-package-library">
-			<property name="assembly.activity" value="${basedir}/assembly/chatscribe"/>
-			<property name="package.cfg" value="librarypackages/chatscribe"/>
-			<property name="language.file.folder" value="librarypackages/chatscribe//language/${conf.application}/" />
-			<property name="dest.language.file.folder" value="${dictionary.dir}/chatscribe/"/>
-		</ant> 
-
-		<!-- Generate the deployment package for forum / scribe parallel activity. -->
-		<ant antfile="buildcombinedtasks.xml" target="deploy-package-library">
-			<property name="assembly.activity" value="${basedir}/assembly/forumscribe"/>
-			<property name="package.cfg" value="librarypackages/forumscribe"/>
-			<property name="language.file.folder" value="librarypackages/forumscribe/language/${conf.application}/" />
-			<property name="dest.language.file.folder" value="${dictionary.dir}/forumscribe/"/>
-		</ant> 
-		
-</target>
-
-	<!-- Copy lams.tld and the lams tags from lams-central to the other projects -->
-	<target name="copy-tags" description="Copy lams.tld and the lams tags from lams-central to the other projects">
+	<target name="copy-tags" description="Copies lams.tld and LAMS Tags from lams-central to other projects.">
 		<ant antfile="../${lams_admin}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${lams_learning}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${lams_monitoring}/build.xml"  target="copy-tags" inheritAll="false"/>
@@ -619,12 +77,412 @@
 		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_vote_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_wiki_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-                <ant antfile="../${tool_eadventure_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-                <ant antfile="../${tool_wookie_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-                <ant antfile="../${tool_imscc_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-                <ant antfile="../${tool_bbb_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		
+        <ant antfile="../${tool_eadventure_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+        <ant antfile="../${tool_wookie_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+        <ant antfile="../${tool_imscc_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+        <ant antfile="../${tool_bbb_dir}/build.xml" target="copy-tags" inheritAll="false"/>
 	</target>
+
+	
+	<target name="build-db" description="Rebuilds LAMS Database.">
+		<echo>Copying embedded MySQL drivers to library dir, if available</echo>
+		<copy todir="${db.driver.dir}" overwrite="false" verbose="true">
+			<fileset dir="../mysql_embedded/connectors" erroronmissingdir="false">
+				<include name="*-driver.jar" />
+				<include name="*-db-files-${osPropertiesName}.jar" />
+			</fileset>
+		</copy>
+		
+		<ant antfile="../${lams_common}/build.xml" target="build-db" inheritAll="false" />
+	</target>
+	
+			
+	<target name="_build-core">
+		<!-- Internal target: Builds LAMS core projects -->
+		<echo>Building LAMS core projects</echo>
+		<ant antfile="../${lams_common}/build.xml"            target="_build-jar"     inheritAll="false" />
+		<ant antfile="../${lams_contentrepository}/build.xml" target="_build-jar"     inheritAll="false" />
+		<ant antfile="../${lams_central}/build.xml"           target="_build-product" inheritAll="false" />
+		<ant antfile="../${lams_learning}/build.xml"          target="_build-product" inheritAll="false" />
+		<ant antfile="../${lams_monitoring}/build.xml"        target="_build-product" inheritAll="false" />
+		<ant antfile="../${lams_admin}/build.xml"             target="_build-product" inheritAll="false" />
+		<ant antfile="../${lams_www}/build.xml"               target="_build-war"     inheritAll="false" />
+		<ant antfile="../${lams_gradebook}/build.xml"         target="_build-product" inheritAll="false" />
+	</target>
+	
+	
+	<target name="copy-to-lams-lib"
+		    description="Copies LAMS core JARs to lams_build library for other projects to use">
+		<echo>Copying LAMS core projects' JARs to lams_build/lib/lams</echo>
+		<ant antfile="../${lams_common}/build.xml"            target="copy-to-lams-lib" inheritAll="false" />
+		<ant antfile="../${lams_central}/build.xml"           target="copy-to-lams-lib" inheritAll="false" />
+		<ant antfile="../${lams_contentrepository}/build.xml" target="copy-to-lams-lib" inheritAll="false" />
+		<ant antfile="../${lams_learning}/build.xml"          target="copy-to-lams-lib" inheritAll="false" />
+		<ant antfile="../${lams_monitoring}/build.xml"        target="copy-to-lams-lib" inheritAll="false" />
+		<ant antfile="../${lams_admin}/build.xml"             target="copy-to-lams-lib" inheritAll="false" />
+		<ant antfile="../${lams_gradebook}/build.xml"         target="copy-to-lams-lib" inheritAll="false" />
+	</target>
+	
+	
+	<target name="_build-ear" depends="_clean-dirs, _build-core">
+		<!-- Internal target: Assembles LAMS EAR in exploded form -->
+		<echo>${ant.project.name}: Copying libraries</echo>
+		<copy todir="${assembly.lams.ear}" flatten="true">
+			<fileset dir="${lib}">
+				<!--  the desired jars should be nominated explicitly -->
+				<include name="apache-poi/*.jar" />
+				<include name="aspirin/*.jar" />
+				<include name="autopatch/*.jar" />
+				<include name="axis/*.jar" />
+				<include name="batik/*.jar" />
+				<include name="cglib/*.jar" />
+				<include name="dom4j/*.jar" />
+				<include name="fckeditor/*.jar" />
+				<include name="jabber/*.jar" />
+				<include name="jakarta-commons/*.jar" />
+				<include name="jdom/*.jar" />
+				<include name="jfreechart/*.jar" />
+				<include name="mysql/*.jar" />
+				<include name="odmg/*.jar" />
+				<include name="reload/*.jar" />
+				<include name="smack/smack.jar"/>
+				<include name="smack/smackx.jar"/>
+				<include name="spring/*.jar" />
+				<include name="struts/*.jar" />
+				<include name="wddx/*.jar" />
+				<include name="concurrent/*.jar" />	
+				<include name="xml-commons/*.jar" />
+				<include name="xstream/*.jar" />		
+				<include name="flagstone/*.jar" />
+				<include name="lucene/*.jar" />
+				<include name="excel/*.jar" />
+				<include name="csv/*.jar" />
+				<include name="joid/*.jar" />
+				<include name="urlrewritefilter/*.jar" />
+			</fileset> 
+			<fileset dir="..">
+				<include name="${lams_common}/${sub.build.lib}/lams.jar" />
+				<include name="${lams_contentrepository}/${sub.build.lib}/*.jar" />
+				<include name="${lams_central}/${sub.build.lib}/*.jar" />
+				<include name="${lams_monitoring}/${sub.build.lib}/*.jar"/>
+				<include name="${lams_monitoring}/${sub.build.lib}/*.war"/>
+				<include name="${lams_learning}/${sub.build.lib}/*.jar"/>
+				<include name="${lams_learning}/${sub.build.lib}/*.war"/>
+				<include name="${lams_admin}/${sub.build.lib}/*.jar"/>
+				<include name="${lams_admin}/${sub.build.lib}/*.war"/>
+				<include name="${lams_gradebook}/${sub.build.lib}/*.jar"/>
+				<include name="${lams_gradebook}/${sub.build.lib}/*.war"/>
+			</fileset>
+		</copy>
+		
+
+		<echo>Copying lams-central.war</echo>
+		<copy todir="${assembly.lams.ear}/lams-central.war">
+			<fileset dir="../${lams_central}/${sub.build.lib}/lams-central.war" />
+		</copy>
+		
+		<echo>Expanding lams-www.war</echo>
+		<unjar src="../${lams_www}/${sub.build.lib}/lams-www.war" 
+			   dest="${assembly.lams.ear}/lams-www.war"
+		/>
+		
+		<echo>Copying language files</echo>
+		<copy todir="${assembly.lams.ear}/lams-dictionary.jar">
+			<fileset dir="../${lams_common}/${sub.build.language}" />
+			<fileset dir="../${lams_contentrepository}/${sub.build.language}" />
+			<fileset dir="../${lams_central}/${sub.build.language}" />
+			<fileset dir="../${lams_monitoring}/${sub.build.language}" />
+			<fileset dir="../${lams_learning}/${sub.build.language}" />
+			<fileset dir="../${lams_admin}/${sub.build.language}" />
+			<fileset dir="../${lams_gradebook}/${sub.build.language}" />
+		</copy>
+
+		<echo>Copying EAR configuration files</echo>
+		<copy file="${app.xml}" tofile="${assembly.lams.ear}/META-INF/application.xml" verbose="true" />
+		<copy todir="${assembly.lams.ear}/META-INF" verbose="true">
+			<fileset dir="${app.xml.dir}">
+				<include name="application_5.xsd" />
+				<include name="MANIFEST.MF" />
+			</fileset>
+		</copy>
+	</target>
+
+	
+	<target name="deploy-ear" depends="_build-ear" description="Deploys EAR.">
+		<echo>Deploying EAR</echo>
+		<delete dir="${jboss.deploy}"/>
+		<copy todir="${jboss.deploy}">
+			<fileset dir="${assembly}/${lams.ear}" />
+		</copy>
+	</target>
+	
+	
+	<target name="deploy-ear-updater" depends="_build-ear"
+		description="Deploys EAR file to the win_installer directory.">
+		<echo>Deploying EAR to Windows Installer dir</echo>
+		<delete dir="../win_installer/assembly"/>
+		<copy todir="../win_installer/assembly/${lams.ear}">
+			<fileset dir="${assembly}/${lams.ear}" />
+		</copy>
+	</target>
+
+	
+	<target name="deploy-tools-minimal" description="Deploys minimal set of Tools.">
+		<echo>Deploying minimal set of Tools</echo>
+  		<ant antfile="../${tool_notebook_dir}/build.xml"      target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="deploy-tool" inheritAll="false" />
+	</target>
+	
+	
+	<target name="_deploy-tools-common">
+		<!-- Internal target: Deploys Tools shared between LAMS and RAMS. 
+		     Called by deploy-tools-lams and deploy-tools-rams. -->
+		
+		<echo>Deploying common Tools</echo>
+		<ant antfile="../${tool_forum_dir}/build.xml"         target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_lanb_dir}/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_laqa_dir}/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_sbmt_dir}/build.xml"          target="deploy-tool" inheritAll="false" />
+  		<ant antfile="../${tool_chat_dir}/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_larsrc_dir}/build.xml"        target="deploy-tool" inheritAll="false" />
+ 		<ant antfile="../${tool_vote_dir}/build.xml"          target="deploy-tool" inheritAll="false" />
+  		<ant antfile="../${tool_notebook_dir}/build.xml"      target="deploy-tool" inheritAll="false" />
+  		<ant antfile="../${tool_survey_dir}/build.xml"        target="deploy-tool" inheritAll="false" />
+  		<ant antfile="../${tool_scribe_dir}/build.xml"        target="deploy-tool" inheritAll="false" />
+  		<ant antfile="../${tool_task_dir}/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_gmap_dir}/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_spreadsheet_dir}/build.xml"   target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_daco_dir}/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_wiki_dir}/build.xml"          target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_images_dir}/build.xml"        target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_mindmap_dir}/build.xml"       target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_assessment_dir}/build.xml"    target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_pixlr_dir}/build.xml"         target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_eadventure_dir}/build.xml"    target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_wookie_dir}/build.xml"        target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_imscc_dir}/build.xml"         target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_bbb_dir}/build.xml"           target="deploy-tool" inheritAll="false" />
+	</target>
+	
+	
+	<target name="_deploy-tools-lams" unless="isRAMS" depends="_deploy-tools-common">
+		<!-- Internal target: Deploys LAMS tools. -->
+		<echo>Deploying LAMS set of tools</echo>
+		<ant antfile="../${tool_lamc_dir}/build.xml" target="deploy-tool" inheritAll="false" />
+	</target>
+	
+
+	<target name="_deploy-tools-rams" if="isRAMS" depends="_deploy-tools-common">
+		<!-- Internal target: Deploys LAMS tools. -->
+		<echo>Deploying RAMS set of tools.</echo>
+	</target>
+
+	
+	<target name="deploy-tools" depends="_deploy-tools-lams, _deploy-tools-rams, deploy-learning-libraries" 
+		    description="Deploys LAMS or RAMS Tools and special parallel activities." />
+
+
+	<target name="deploy-tools-updater" depends="_deploy-tools-lams, _deploy-tools-rams" 
+		description="Deploys LAMS or RAMS Tools and special parallel activities. For upgrader only!">
+	</target>
+
+	
+	<target name="_deploy-learning-library">
+		<!-- Internal target: Deploys a parallel activity. -->
+		
+		<path id="deploy.classpath">
+			<fileset dir="${deploy.tool.dir}/lib">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="${sharedlib}">
+				<include name="**/*.jar" />
+			</fileset>
+		</path>
+		
+		<property name="dictionary.dir" value="" />
+
+		<property name="library.assembly"     value="${assembly}/${library.name}" />
+		<property name="library.basedir"      value="librarypackages/${library.name}" />
+		<property name="library.language.src" value="${library.basedir}/language/${conf.application}" />
+		<property name="library.language.dst" value="${jboss.deploy}/lams-dictionary.jar/org/lamsfoundation/lams/library/${library.name}" />
+
+		<copy todir="${library.assembly}/sql" overwrite="true" verbose="true">
+			<fileset dir="${library.basedir}">
+				<include name="*.sql"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${library.assembly}/language" overwrite="true">
+			<fileset dir="${library.language.src}" />
+		</copy>
+
+		<echo>Parsing deploy library XML</echo>
+		<copy file="${library.basedir}/deployLibrary.xml" tofile="${library.assembly}/deploy.xml" overwrite="true">
+		  	<!-- replace @assemblydir@ in the xml template - this allows it to run under any directory structure -->
+	        <filterchain>
+	            <striplinecomments>
+	               <comment value="!"/>
+	            </striplinecomments>
+	           <replacetokens>
+	                <token key="assemblydir" value="${library.assembly}/sql"/>
+	            </replacetokens>
+	            <replacetokens>
+		            <token key="assemblylangdir" value="${library.assembly}/language"/>
+		        </replacetokens>
+	            <replacetokens>
+		             <token key="lamsear" value="${jboss.deploy}"/>
+		        </replacetokens>
+	        </filterchain>
+	    </copy>
+
+		<echo>Generating properties XML file</echo>
+		<taskdef name="generateDeployLibraryProperties" 
+			classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.CreateLibraryPackageTask">
+		    <classpath refid="deploy.classpath"/>
+		</taskdef>
+		<generateDeployLibraryProperties depends="compile" 
+			mode="development" 
+			outputPath="${library.assembly}"
+			configFile="${library.assembly}/deploy.xml"
+			dbPassword="${db.password}"
+			dbUsername="${db.username}"
+			dbDriverUrl="${db.url.build}"
+			dbDriverClass="${db.driver}"	
+		/>
+	
+		<echo>Deploying language files</echo>
+		<copy todir="${library.language.dst}" overwrite="true">
+			<fileset dir="${library.language.src}" />
+		</copy>
+
+		<java
+			classname="org.lamsfoundation.lams.tool.deploy.libraryActivity.DeployLibrary"
+			classpathref="deploy.classpath"
+			fork="true">
+				<arg file="${library.assembly}/deploy.xml"/>
+				<arg file="${library.assembly}/language"/>
+		</java>
+	</target>
+	
+	
+	<target name="deploy-learning-libraries"
+		    description="Builds and deploys parallel and other complex activities. Can be done only after Tools are deployed">
+		<echo>${ant.project.name}: Deploying Library Activities</echo>
+
+		<echo>Generating deployment package for share resources / forum parallel activity</echo>
+		<antcall target="_deploy-learning-library">
+			<param name="library.name" value="shareresourcesforum"/>
+		</antcall> 
+ 
+		<echo>Generating deployment package for chat / scribe parallel activity</echo>
+		<antcall target="_deploy-learning-library">
+			<param name="library.name" value="chatscribe"/>
+		</antcall> 
+
+		<echo>Generating deployment package for forum / scribe parallel activity</echo>
+		<antcall target="_deploy-learning-library">
+			<param name="library.name" value="forumscribe"/>
+		 </antcall> 
+	</target>
+
+
+	<target name="_deploy-resources">
+		<!-- Internal target: Deploys third party JARs and cofiguration files -->
+		<echo>${ant.project.name}: Deploying additional JARs and configuration files</echo>
+		<copy todir="${jboss.server.instance}/conf" overwrite="true" verbose="true">
+			<fileset dir="${conf.jboss}">
+				<include name="login-config.xml" />
+				<include name="jboss-service.xml" />
+			</fileset>
+	        <filterset>
+	                <filter token="confdir" value="${jboss.server.instance}/conf" />
+	        </filterset>
+		</copy>
+		
+		<copy todir="${jboss.server.instance}/conf/" overwrite="true" verbose="true">
+			<fileset dir="${conf.jboss}">
+				<include name="jboss-log4j.xml" />
+			</fileset>
+			<filterset>
+				<filter token="application" value="${conf.application}"/>
+			</filterset>
+		</copy>
+
+		<copy todir="${jboss.ear.deploy}" overwrite="true" verbose="true">
+			<fileset dir="${conf.jboss}/service">
+				<include name="mysql*.xml" />
+			</fileset>
+	        <filterset>
+	        	<filter token="db.driver" value="${db.driver}"/>
+	        	<filter token="db.url.run" value="${db.url.run}"/>
+	        	<filter token="db.location" value="${db.location}"/>
+                <filter token="db.username" value="${db.username}"/>
+                <filter token="db.password" value="${db.password}"/>
+	        </filterset>
+		</copy>
+		
+		<copy todir="${jboss.deploy}" overwrite="true" verbose="true">
+			<fileset dir="${conf.jboss}/service">
+				<include name="treecache.xml" />
+			</fileset>
+		</copy>
+		
+		<copy todir="${jboss.ear.deployers}/jbossweb.deployer/META-INF" overwrite="true" verbose="true">
+			<fileset dir="${conf.jboss}/jbossweb">
+				<include name="war-deployers-jboss-beans.xml" />
+			</fileset>
+		</copy>
+		
+		<copy todir="${jboss.ear.deploy}/jbossweb.sar/" overwrite="true" verbose="true">
+			<fileset dir="${conf.jboss}/jbossweb">
+				<include name="server.xml" />
+				<include name="context.xml" />
+			</fileset>
+		</copy>
+		
+		<copy todir="${jboss.server.instance.lib}" overwrite="true">	
+			<fileset dir="${lib}/jboss">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+					
+		<ant antfile="../${lams_common}/build.xml" target="deploy-libraries" inheritAll="false"/>
+	</target>
+	
+	
+	<!-- cruise control task : build lams -->
+	<target name="lams-cruise" depends="_build-ear, build-db, deploy-ear, _deploy-resources, deploy-tools"
+		    description="Builds entire LAMS (used for CruiseControl instance)" />
+	
+	
+	<!-- cruise control task : build lams without tools -->
+	<target name="lams-cruise-min-tools" depends="_build-ear, build-db, deploy-ear, _deploy-resources, deploy-tools-minimal"
+	        description="Builds entire LAMS without tools (used for CruiseControl instance)" />
+
+	
+	<target name="test-report" description="Run all test cases across the system. Takes a long time.">
+		<echo>Running tests in all LAMS projects</echo>
+		<!-- Core projects first -->
+ 		<ant antfile="../${lams_common}/build.xml" target="test-report" inheritAll="false"/>
+ 		<ant antfile="../${lams_contentrepository}/build.xml" target="test-report" inheritAll="false"/>
+		<ant antfile="../${lams_central}/build.xml" target="test-report" inheritAll="false"/>
+ 		<!-- <ant antfile="../${tool_survey_dir}/build.xml" target="build-db" inheritAll="false"/> 
+	         <ant antfile="../${tool_survey_dir}/build.xml" target="build-jar" inheritAll="false"/>  -->
+		<ant antfile="../${lams_monitoring}/build.xml" target="test-report" inheritAll="false"/> 
+ 		<ant antfile="../${lams_learning}/build.xml" target="test-report" inheritAll="false"/> 
+
+		<!--  Now the tools
+		    <ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
+			<ant antfile="../${tool_forum_dir}/build.xml" target="test-report" inheritAll="false"/>
+			<ant antfile="../${tool_imscp_dir}/build.xml" target="test-report" inheritAll="false"/>
+			<ant antfile="../${tool_laqa_dir}/build.xml" target="test-report" inheritAll="false"/>
+			<ant antfile="../${tool_lanb_dir}/build.xml" target="test-report" inheritAll="false"/>
+			<ant antfile="../${tool_sbmt_dir}/build.xml" target="test-report" inheritAll="false"/>
+			<ant antfile="../${tool_survey_dir}/build.xml" target="test-report" inheritAll="false"/>
+		-->
+	</target>
+	
 	
 	<target name="slim-jboss" description="Makes a backup and removes unnecessary files from JBoss 5.1; do not run twice!">
 		<!-- Backup -->
@@ -884,6 +742,7 @@
 		    </fileset>
 		</delete>
 	</target>
+	
 	
 	<target name="slim-jboss-revert" description="Reverts changes made by slim-jboss task">
 		<copy overwrite="yes" todir="${jboss.home}" verbose="true">

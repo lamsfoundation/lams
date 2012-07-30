@@ -3,10 +3,10 @@
 DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
 	<session-factory>
-		<property name="connection.username">lams</property>
-		<property name="connection.password">lamsdemo</property>
-		<property name="connection.url">jdbc:mysql://localhost/lams</property>
-		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="connection.username">@db.username@</property>
+		<property name="connection.password">@db.password@</property>
+		<property name="connection.url">@db.url.run@</property>
+		<property name="connection.driver_class">@db.driver@</property>
 		<property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 		<mapping resource="org/lamsfoundation/lams/usermanagement/User.hbm.xml"/>
 		<mapping resource="org/lamsfoundation/lams/usermanagement/UserOrganisation.hbm.xml"/>
