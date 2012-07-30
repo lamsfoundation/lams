@@ -43,8 +43,8 @@
 	<target name="_clean-dirs">
 		<!-- Internal target: Recreates dirs for compiled output files. -->
 		<echo>${ant.project.name}: Removing cache and build folders</echo>
-		<delete dir="${jboss.server.instance}/tmp" quiet="true" />
-		<delete dir="${jboss.server.instance}/work" quiet="true" />
+		<delete dir="${jboss.server.instance}/tmp" />
+		<delete dir="${jboss.server.instance}/work" />
 		<delete dir="${assembly}" />
 		
 		<echo>${ant.project.name}: Creating build dir structure</echo>
@@ -52,35 +52,81 @@
 	</target>
 
 	
+	<target name="_clean-core" depends="_clean-dirs">
+		<!-- Internal target: Removes output dirs of Core projects -->
+		<ant antfile="../${lams_common}/build.xml"            target="_clean-dirs" inheritAll="false" />
+		<ant antfile="../${lams_contentrepository}/build.xml" target="_clean-dirs" inheritAll="false" />
+		<ant antfile="../${lams_central}/build.xml"           target="_clean-dirs" inheritAll="false" />
+		<ant antfile="../${lams_learning}/build.xml"          target="_clean-dirs" inheritAll="false" />
+		<ant antfile="../${lams_monitoring}/build.xml"        target="_clean-dirs" inheritAll="false" />
+		<ant antfile="../${lams_admin}/build.xml"             target="_clean-dirs" inheritAll="false" />
+		<ant antfile="../${lams_www}/build.xml"               target="_clean-dirs" inheritAll="false" />
+		<ant antfile="../${lams_gradebook}/build.xml"         target="_clean-dirs" inheritAll="false" />
+	</target>
+
+	
+	<target name="_clean-tools">
+		<!-- Internal target: Removes output dirs of Tools -->
+		<ant antfile="../${tool_assessment_dir}/build.xml"    target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_chat_dir}/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_daco_dir}/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_forum_dir}/build.xml"         target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_gmap_dir}/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_images_dir}/build.xml"        target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_lamc_dir}/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_laqa_dir}/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_larsrc_dir}/build.xml"        target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_lanb_dir}/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_notebook_dir}/build.xml"      target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_pixlr_dir}/build.xml"         target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_sbmt_dir}/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_scribe_dir}/build.xml"        target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_spreadsheet_dir}/build.xml"   target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_survey_dir}/build.xml"        target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_task_dir}/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_vote_dir}/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<ant antfile="../${tool_wiki_dir}/build.xml"          target="_clean-dirs" inheritAll="false"/>
+        <ant antfile="../${tool_eadventure_dir}/build.xml"    target="_clean-dirs" inheritAll="false"/>
+        <ant antfile="../${tool_wookie_dir}/build.xml"        target="_clean-dirs" inheritAll="false"/>
+        <ant antfile="../${tool_imscc_dir}/build.xml"         target="_clean-dirs" inheritAll="false"/>
+        <ant antfile="../${tool_bbb_dir}/build.xml"           target="_clean-dirs" inheritAll="false"/>
+	</target>
+	
+	
+	<target name="clean-all" depends="_clean-core, _clean-tools" 
+		    description="Removes output dirs of Core projects and Tools (used for CruiseControl instance)" />
+
+	
 	<target name="copy-tags" description="Copies lams.tld and LAMS Tags from lams-central to other projects.">
-		<ant antfile="../${lams_admin}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${lams_learning}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${lams_monitoring}/build.xml"  target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${lams_www}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_assessment_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_chat_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_daco_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_forum_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_gmap_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_images_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_lamc_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_laqa_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_larsrc_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_lanb_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_notebook_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_pixlr_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_sbmt_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_scribe_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_spreadsheet_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_survey_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_task_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${lams_admin}/build.xml"             target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${lams_learning}/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${lams_monitoring}/build.xml"        target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${lams_www}/build.xml"               target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_assessment_dir}/build.xml"    target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_chat_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_daco_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_forum_dir}/build.xml"         target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_gmap_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_images_dir}/build.xml"        target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_lamc_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_laqa_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_larsrc_dir}/build.xml"        target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_lanb_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_notebook_dir}/build.xml"      target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_pixlr_dir}/build.xml"         target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_sbmt_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_scribe_dir}/build.xml"        target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_spreadsheet_dir}/build.xml"   target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_survey_dir}/build.xml"        target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_task_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_vote_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_wiki_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-        <ant antfile="../${tool_eadventure_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-        <ant antfile="../${tool_wookie_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-        <ant antfile="../${tool_imscc_dir}/build.xml" target="copy-tags" inheritAll="false"/>
-        <ant antfile="../${tool_bbb_dir}/build.xml" target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_vote_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_wiki_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
+        <ant antfile="../${tool_eadventure_dir}/build.xml"    target="copy-tags" inheritAll="false"/>
+        <ant antfile="../${tool_wookie_dir}/build.xml"        target="copy-tags" inheritAll="false"/>
+        <ant antfile="../${tool_imscc_dir}/build.xml"         target="copy-tags" inheritAll="false"/>
+        <ant antfile="../${tool_bbb_dir}/build.xml"           target="copy-tags" inheritAll="false"/>
 	</target>
 
 	
