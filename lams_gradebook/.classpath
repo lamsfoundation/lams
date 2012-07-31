@@ -7,5 +7,5 @@
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-monitoring.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
-	<classpathentry kind="output" path="build/classes/java"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath> 

@@ -13,5 +13,5 @@
 			<attribute name="javadoc_location" value="http://www.hibernate.org/hib_docs/v3/api/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="output" path="build/classes/java"/>
+	<classpathentry kind="output" path="bin"/>
 <classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/></classpath>

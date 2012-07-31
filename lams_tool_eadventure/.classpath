@@ -15,5 +15,5 @@
 			<attribute name="javadoc_location" value="http://tomcat.apache.org/tomcat-5.5-doc/servletapi/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="output" path="build/classes"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

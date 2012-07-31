@@ -245,10 +245,20 @@
 
 		<echo>Copying EAR configuration files</echo>
 		<copy file="${app.xml}" tofile="${assembly.lams.ear}/META-INF/application.xml" verbose="true" />
+		
+		<copy tofile="${assembly.lams.ear}/META-INF/MANIFEST.MF" verbose="true">
+			<fileset dir="${app.xml.dir}">
+				<include name="MANIFEST-template.MF" />
+			</fileset>
+	        <filterset>
+	        	<filter token="product" value="${project}"/>
+	        	<filter token="version" value="${project.version}"/>
+	        </filterset>
+		</copy>
+		
 		<copy todir="${assembly.lams.ear}/META-INF" verbose="true">
 			<fileset dir="${app.xml.dir}">
 				<include name="application_5.xsd" />
-				<include name="MANIFEST.MF" />
 			</fileset>
 		</copy>
 	</target>

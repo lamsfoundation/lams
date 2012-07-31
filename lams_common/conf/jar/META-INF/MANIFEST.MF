@@ -1,4 +1,0 @@
-Implementation-Title: LAMS
-Implementation-Version: 2.1
-Implementation-Vendor: LAMS Foundation (http://lamsfoundation.org)
-Class-Path: jboss-cache.jar, jgroups.jar, jboss-serialization.jar

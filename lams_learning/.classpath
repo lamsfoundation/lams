@@ -9,5 +9,5 @@
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_gradebook"/>
-	<classpathentry kind="output" path="build/classes/java"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

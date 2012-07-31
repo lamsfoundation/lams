@@ -74,7 +74,7 @@
 		</taskdef>
 			
 		<echo>${ant.project.name}: Preparing Hibernate connection configuration</echo>
-		<copy todir="${build}" overwrite="true" verbose="true">
+		<copy todir="${build}" verbose="true">
 			<fileset dir="${conf.hibernate.mapping.dir}">
 				<include name="hibernate.cfg.xml" />
 			</fileset>

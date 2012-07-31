@@ -34,9 +34,10 @@
 	</target>
 		
 		
-	<target name="_build-jar" depends="_compile-java, _build-hbm, _copy-language">
+	<target name="_build-jar" depends="_compile-java, _build-hbm, _build-manifest, _copy-language">
 		<echo>${ant.project.name}: Building main JAR</echo>
-		<jar jarfile="${build.lib}/${product}.jar">
+		<jar jarfile="${build.lib}/${product}.jar"
+			 manifest="${build}/MANIFEST.MF">
 			<fileset dir="${build.classes.java}">
 				<exclude name="**/LoginRequestValve.class"/>
 				<exclude name="**/SingleSignOn.class"/>
@@ -44,14 +45,16 @@
 		</jar>
 		
 		<echo>${ant.project.name}: Building Session JAR</echo>
-		<jar jarfile="${build.lib}/lams-session.jar">
+		<jar jarfile="${build.lib}/lams-session.jar"
+			 manifest="${build}/MANIFEST.MF">
 			<fileset dir="${build.classes.java}">
 				<include name="${product.path.filesystem}/web/session/*"/>
 			</fileset>
 		</jar>
 		
 		<echo>${ant.project.name}: Building Valve JAR</echo>
-		<jar jarfile="${build.lib}/lams-valve.jar">
+		<jar jarfile="${build.lib}/lams-valve.jar"
+			 manifest="${build}/MANIFEST.MF">
 			<fileset dir="${build.classes.java}">
 				<include name="${product.path.filesystem}/integration/security/LoginRequestValve.class"/>
 				<include name="${product.path.filesystem}/integration/security/SingleSignOn.class"/>

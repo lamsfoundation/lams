@@ -4,63 +4,51 @@
 
 	<import file="../lams_build/build_base.xml"/> 
 
-	<!-- ================================================================ -->
-	<!-- Print information								                  -->
-	<!-- ================================================================ -->
-		
-	<target name="print-usage">
-		<echo>
-		LAMS WWW build file
-		------------------------------------------------------
-
-		Available targets are:
+	<!-- Below are Tool specifc targets and targets overriding ones from the imported base file. -->
+	<target name="_copy-war-resources">
+		<!-- Internal target: Adds additional web content to WAR -->
+		<echo>${ant.project.name}: Copying additional resources for WAR</echo>
+	 	<copy todir="${build.war}/WEB-INF">
+			<fileset dir="${conf.webinf.dir}">
+				<include name="*.xml"/>
+			</fileset>
+	 	</copy>
 			
-		copy-tags                --> Copies custom JSP tags from Central	
-		_build-war               --> Internal target: Generates WAR
-		</echo>
-	</target>
-	
-	<!-- ================================================================ -->
-	<!-- Build archives        		    	          					  -->
-	<!-- ================================================================ -->
-	
-	<target name="_build-war" depends="_clean-dirs, _jsp-plaincopy, _jsp-precompile">
-		<!-- Internal target: Creates WAR file. -->
-		<echo>${ant.project.name}: Copying additional resources</echo>
-		<copy todir="${build.war.assembly}/images" overwrite="yes">
+		<copy todir="${build.war.assembly}/images">
 			<fileset dir="${conf.dir}/${conf.application}">
 				<include name="*.swf" />
 			</fileset>
 		</copy>
 		
-		<copy todir="${build.war.assembly}" overwrite="yes">
+		<copy todir="${build.war.assembly}">
 			<fileset dir="${conf.dir}/${conf.application}">
 				<include name="news.html" />
 			</fileset>
 		</copy>
-
+	</target>
+		
+		
+	<target name="_build-war"
+			depends="_clean-dirs, _build-manifest, _copy-war-resources,
+			         _jsp-plaincopy, _jsp-precompile">
+		<!-- Internal target: Creates WAR file. -->	
 		<echo>${ant.project.name}: Building WAR</echo>
 		<war warfile="${build.lib}/${product}.war" 
-  			 webxml="${build.war}/WEB-INF/web.xml"
-			 manifest="${conf.dir}/war/META-INF/MANIFEST.MF">
+  		     webxml="${build.war}/WEB-INF/web.xml"
+			 manifest="${build}/MANIFEST.MF">
 			<fileset dir="${build.war.assembly}">
 				<include name="**" />
 			</fileset>
 		</war>
 	</target>
 	
-	<!-- =================================================================== -->
-	<!-- Product deployment			                                         -->
-	<!-- =================================================================== -->
-	
+
 	<target name="deploy-jar" depends="_target-not-available" description="Deploys JAR." />
 
+			
 	<target name="deploy-war" depends="_target-not-available" description="Deploys WAR." />
 
-	<!-- =================================================================== -->
-	<!-- Explode WAR                                        				 -->
-	<!-- =================================================================== -->
-	
+
 	<target name="explode-war" depends="_target-not-available"
 	        description="Explodes deployed WAR to folder." />
 	
@@ -72,34 +60,7 @@
 	<target name="explode-war-delete" depends="_target-not-available" 
 		    description="Deletes exploded WAR folder." />
 	
-	<!-- =================================================================== -->
-	<!-- Tests                                                     	 -->
-	<!-- =================================================================== -->
-	
+		
 	<target name="test-report" depends="_target-not-available" 
 		    description="Runs JUnit tests and generates report." />
-		
-	<!-- =================================================================== -->
-	<!-- JSP precompilation                                   				 -->
-	<!-- =================================================================== -->
-	
-	<target name="_jsp-configcopy">
-		<!-- Internal target: Copies configuration files for WAR. -->
-		<echo>${ant.project.name}: Coping configuration files</echo>
-	 	<copy todir="${build.war}/WEB-INF" overwrite="true">
-			<fileset dir="${conf.webinf.dir}">
-				<include name="*.xml"/>
-			</fileset>
-	 	</copy>
-	</target>
-	
-	
-	<!-- Runs if jsp.precompile setting is set in lams_build/common.properties -->
-	<target name="_jsp-precompile" if="jsp.precompile"
-		    depends="_jsp-configcopy, build_base._jsp-precompile" />
-	
-	<!-- Runs if jsp.precompile setting is NOT set in lams_build/common.properties 
-		 JSPs will be compiled at runtime, which is default behaviour allowing hotdeploy -->
-	<target name="_jsp-plaincopy" unless="jsp.precompile"
-	        depends="_jsp-configcopy, build_base._jsp-plaincopy" />
 </project>

@@ -12,5 +12,5 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/mail.jar"/>
-	<classpathentry kind="output" path="build/classes/java"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -10,5 +10,5 @@
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/quartz.jar" sourcepath="/LOCAL_SOURCE_CODE_REPO/quartz"/>
-	<classpathentry kind="output" path="build/classes/java"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

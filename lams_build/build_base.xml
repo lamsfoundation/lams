@@ -271,23 +271,38 @@
 		</copy>
 	</target>
 	
+	<target name="_build-manifest">
+		<!-- Internal target: Creates a JAR/WAR manifest out of a template. -->
+		<echo>${ant.project.name}: Preparing manifest</echo>
+		<copy tofile="${build}/MANIFEST.MF" verbose="true">
+			<fileset dir="${base.dir}/conf/j2ee">
+				<include name="MANIFEST-template.MF" />
+			</fileset>
+	        <filterset>
+	        	<filter token="product" value="${ant.project.name}"/>
+	        	<filter token="version" value="${project.version}"/>
+	        </filterset>
+		</copy>
+	</target>
 	
-	<target name="_build-jar" depends="_compile-java, _build-hbm, _copy-language">
+	
+	<target name="_build-jar" depends="_compile-java, _build-hbm, _build-manifest, _copy-language">
 		<!-- Internal target: Creates JAR file. -->
 		<echo>${ant.project.name}: Building JAR</echo>
 		<jar jarfile="${build.lib}/${product}.jar"
-			 manifest="${conf.dir}/jar/META-INF/MANIFEST.MF">
+			 manifest="${build}/MANIFEST.MF">
 			<fileset dir="${build.classes.java}" />
 		</jar>
 	</target>
 
 	
-	<target name="_build-war" depends="_build-webdoclet, _copy-language, _jsp-plaincopy, _jsp-precompile">
+	<target name="_build-war" 
+		    depends="_build-webdoclet, _build-manifest, _copy-language, _jsp-plaincopy, _jsp-precompile">
 		<!-- Internal target: Creates WAR file. -->
 		<echo>${ant.project.name}: Building WAR</echo>
 		<war warfile="${build.lib}/${product}.war" 
   		     webxml="${build.war}/WEB-INF/web.xml"
-			 manifest="${conf.dir}/war/META-INF/MANIFEST.MF">
+			 manifest="${build}/MANIFEST.MF">
 			<fileset dir="${build.war.assembly}">
 				<include name="**" />
 			</fileset>
@@ -524,7 +539,10 @@
 				<include name="**"/>
 				<exclude name="assembly/"/>
 				<exclude name="WEB-INF/src/"/>
+				<exclude name="WEB-INF/tags/"/>
+				<exclude name="WEB-INF/tlds/"/>
 				<exclude name="WEB-INF/web.xml"/>
+				<!-- Make double sure that unwanted files are not copies -->
 				<exclude name="**/*.java"/>
 				<exclude name="**/*.jsp"/>
 				<exclude name="**/*.tag"/>

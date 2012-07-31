@@ -12,5 +12,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
-	<classpathentry kind="output" path="build/classes/java"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

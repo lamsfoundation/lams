@@ -22,7 +22,7 @@
 	
 	
 	<target name="_copy-war-resources">
-		<!-- Internal target: Adds additional web content to Central -->
+		<!-- Internal target: Adds additional web content to WAR -->
 		<echo>${ant.project.name}: Copying favicon from conf to assembly</echo>
 		<copy todir="${build.war.assembly}">
 			<fileset dir="${conf.dir}/favicon/${conf.application}">
@@ -49,7 +49,7 @@
 	
 	
 	<target name="_build-war"
-	        depends="_build-webdoclet, _copy-war-resources, _copy-planner, _jsp-plaincopy, _jsp-precompile">
+	        depends="_build-webdoclet, _build-manifest, _copy-war-resources, _copy-planner, _jsp-plaincopy, _jsp-precompile">
 		
 		<!-- Internal target: Builds WAR without archivisation -->
 		<echo>${ant.project.name}: Building exploded WAR</echo>
@@ -60,11 +60,13 @@
 			<fileset dir="${build.war}">
 				<include name="WEB-INF/web.xml"/>
 			</fileset>
-			<fileset dir="${conf.dir}/war">
-				<include name="META-INF/MANIFEST.MF"/>
+		</copy>
+		<copy todir="${build.lib}/${product}.war/META-INF" verbose="true">
+			<fileset dir="${build}">
+				<include name="MANIFEST.MF"/>
 			</fileset>
 		</copy>
-		
+					
 		<antcall target="_update-logo-for-RAMS" />
 	</target>
 	
