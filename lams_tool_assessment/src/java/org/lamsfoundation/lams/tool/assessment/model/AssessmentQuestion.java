@@ -169,6 +169,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 	return new EqualsBuilder().append(this.getUid(), genericEntity.getUid()).append(this.getSequenceId(), genericEntity.getSequenceId()).isEquals();
     }
     
+    @Override
     public int compareTo(Object o) {
 	if ((o != null) && o instanceof AssessmentQuestion) {
 	    AssessmentQuestion anotherQuestion = (AssessmentQuestion) o;
