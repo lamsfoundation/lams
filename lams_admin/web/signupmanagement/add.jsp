@@ -45,7 +45,7 @@
 		</tr>
 		<tr>
 			<td><fmt:message key="admin.description.txt" />:</td>
-			<td><html:textarea property="blurb" /></td>
+			<td><html:textarea property="blurb" cols="40" rows="3"/></td>
 			<td></td>
 		</tr>
 		<tr>
