@@ -54,14 +54,14 @@ public class SignupManagementAction extends Action {
 
 	    String method = WebUtil.readStrParam(request, "method", true);
 
-	    if (StringUtils.equals(method, "edit")) {
+	    if (StringUtils.equals(method, "list") || isCancelled(request)) {
+		// do nothing
+	    } else if (StringUtils.equals(method, "edit")) {
 		return edit(mapping, form, request, response);
 	    } else if (StringUtils.equals(method, "add")) {
 		return add(mapping, form, request, response);
 	    } else if (StringUtils.equals(method, "delete")) {
 		return delete(mapping, form, request, response);
-	    } else if (StringUtils.equals(method, "list")) {
-		// do nothing
 	    }
 
 	    List signupOrganisations = signupService.getSignupOrganisations();

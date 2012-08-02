@@ -13,7 +13,7 @@
 	
 	<table>
 		<tr>
-			<td><fmt:message key="admin.group" />:</td>
+			<td style="width: 250px;"><fmt:message key="admin.group" />:</td>
 			<td>
 				<html:select property="organisationId">
 					<c:forEach items="${organisations}" var="organisation">
@@ -59,7 +59,11 @@
 			<td><html:errors property="context" /></td>
 		</tr>
 		<tr>
-			<td align="right"><html:submit styleClass="button"><fmt:message key="admin.submit" /></html:submit></td>
+			<td></td>
+			<td style="padding-left: 80px;">
+				<html:submit styleClass="button"><fmt:message key="admin.submit" /></html:submit>
+				<html:cancel styleClass="button"><fmt:message key="admin.cancel" /></html:cancel>
+			</td>
 			<td></td>
 		</tr>
 	</table>
