@@ -1,4 +1,10 @@
 <filter-mapping>
+	<filter-name>UrlRewriteFilter</filter-name>
+	<url-pattern>/signup/*</url-pattern>
+	<dispatcher>REQUEST</dispatcher>
+</filter-mapping>
+
+<filter-mapping>
 	<filter-name>SystemSessionFilter</filter-name>
 	<url-pattern>*.do</url-pattern>
 </filter-mapping>

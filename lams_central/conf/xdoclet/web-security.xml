@@ -95,7 +95,15 @@
     		<role-name>AUTHOR ADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
-
+    
+    <!-- Open access content -->
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Open access content</web-resource-name>
+			<url-pattern>/signup/*</url-pattern>
+		</web-resource-collection>
+	</security-constraint> 
+    
 	<!--  Login Configuration -->
   	<login-config>
    		<auth-method>FORM</auth-method>

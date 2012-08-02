@@ -201,4 +201,14 @@
 		<put name="content" value="timezoneServerManagement.jsp"/>
 	</definition>
 	
+	<definition name=".addSignupPage" path="/template.jsp">
+		<put name="title" value="admin.signup.title" />
+		<put name="content" value="signupmanagement/add.jsp" />
+	</definition>
+
+	<definition name=".signupPageList" path="/template.jsp">
+		<put name="title" value="admin.signup.title" />
+		<put name="content" value="signupmanagement/list.jsp" />
+	</definition>
+	
 </tiles-definitions>

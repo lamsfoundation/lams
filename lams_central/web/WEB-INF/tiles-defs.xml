@@ -61,4 +61,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="titleKey" value="heading.general.error"/>
 		<put name="content" value="msgContent.jsp" />
 	</definition>
+	
+	<definition name=".successfulSignup" path="/template.jsp">
+		<put name="titleKey" value="title.lams.signup" />
+		<put name="content" value="signup/successfulSignup.jsp" />
+	</definition>
+	
+	<definition name=".signup" path="/template.jsp">
+		<put name="titleKey" value="title.lams.signup" />
+		<put name="content" value="signup/signup.jsp" />
+	</definition>
 </tiles-definitions>

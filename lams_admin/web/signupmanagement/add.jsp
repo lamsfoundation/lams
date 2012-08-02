@@ -1,0 +1,67 @@
+<%@ include file="/taglibs.jsp"%>
+
+<h4>
+	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :
+	<a href="signupManagement.do"><fmt:message key="admin.signup.title" /></a>
+</h4>
+
+<h1><fmt:message key="admin.add.edit.signup.page" /></h1>
+
+<html:form action="/signupManagement.do" method="post">
+	<html:hidden property="method" value="add" />
+	<html:hidden property="signupOrganisationId" />
+	
+	<table>
+		<tr>
+			<td><fmt:message key="admin.group" />:</td>
+			<td>
+				<html:select property="organisationId">
+					<c:forEach items="${organisations}" var="organisation">
+						<html:option value="${organisation.organisationId}"><c:out value="${organisation.name}" /></html:option>
+					</c:forEach>
+				</html:select>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><fmt:message key="admin.lessons" />:</td>
+			<td><html:checkbox property="addToLessons" /></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><fmt:message key="admin.staff" />:</td>
+			<td><html:checkbox property="addAsStaff" /></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><fmt:message key="admin.course.key" />:</td>
+			<td><html:text property="courseKey" size="40" maxlength="255" /></td>
+			<td><html:errors property="courseKey" /></td>
+		</tr>
+		<tr>
+			<td><fmt:message key="admin.confirm.course.key" />:</td>
+			<td><html:text property="confirmCourseKey" size="40" maxlength="255" /></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><fmt:message key="admin.description.txt" />:</td>
+			<td><html:textarea property="blurb" /></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><fmt:message key="admin.disable.option" />:</td>
+			<td><html:checkbox property="disabled" /></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><fmt:message key="admin.context.path" />:</td>
+			<td><html:text property="context" /></td>
+			<td><html:errors property="context" /></td>
+		</tr>
+		<tr>
+			<td align="right"><html:submit styleClass="button"><fmt:message key="admin.submit" /></html:submit></td>
+			<td></td>
+		</tr>
+	</table>
+
+</html:form>

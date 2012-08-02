@@ -42,6 +42,21 @@
 	<form-property name="userFlashTheme" type="java.lang.Long" />
 </form-bean>
 
+<form-bean name="SignupForm" type="org.apache.struts.action.DynaActionForm">
+	<form-property name="username" type="java.lang.String" />
+	<form-property name="password" type="java.lang.String" />
+	<form-property name="confirmPassword" type="java.lang.String" />
+	<form-property name="firstName" type="java.lang.String" />
+	<form-property name="lastName" type="java.lang.String" />
+	<form-property name="email" type="java.lang.String" />
+	<form-property name="confirmEmail" type="java.lang.String" />
+	<form-property name="courseKey" type="java.lang.String" />
+	<form-property name="submitted" type="java.lang.Boolean" />
+	<form-property name="context" type="java.lang.String" />
+	<form-property name="usernameTab2" type="java.lang.String" />
+	<form-property name="passwordTab2" type="java.lang.String" />
+	<form-property name="courseKeyTab2" type="java.lang.String" />
+</form-bean>
 
 
 <!--  uncomment to use wddxPost   
