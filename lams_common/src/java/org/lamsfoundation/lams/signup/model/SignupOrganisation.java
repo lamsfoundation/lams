@@ -41,7 +41,7 @@ public class SignupOrganisation {
     }
 
     /**
-     * @hibernate.many-to-one not-null="true" cascade="all-delete-orphan" lazy="false"
+     * @hibernate.many-to-one not-null="true" cascade="delete" lazy="false"
      * @hibernate.column name="organisation_id"
      */
     public Organisation getOrganisation() {
