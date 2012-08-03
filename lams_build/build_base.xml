@@ -372,7 +372,7 @@
 	
 	<target name="explode-war-synchronize" description="Copies web files into exploded WAR folder.">
 		<echo>Overwriting deployed ${ant.project.name} web files with source files</echo>
-		<copy todir="${jboss.deploy}/${product}.war" overwrite="true" verbose="yes">
+		<copy todir="${jboss.deploy}/${product}.war" verbose="yes">
 			<fileset dir="${conf.web.dir}">
 				<include name="**/*.*" />
 			</fileset>
