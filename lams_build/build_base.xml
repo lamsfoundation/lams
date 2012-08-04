@@ -153,7 +153,7 @@
 		<!-- Destdir is the same as Eclipse output path, maybe it shouldn't? -->
 		<javac srcdir="${src.java.dir}"
 			   compiler="modern"
-               source="1.5"
+               source="1.6"
                debug="on"
 			   debuglevel="lines,vars,source"
                classpathref="product.classpath"
@@ -176,7 +176,7 @@
 		<!-- Internal target: Compile test Java sources. -->
 		<javac srcdir="${src.test.dir}"
 			   compiler="modern"
-			   source="1.5"
+			   source="1.6"
 	           debug="on"
 			   debuglevel="lines,vars,source"
 			   destdir="${build.classes.test}"
@@ -523,6 +523,8 @@
 		<mkdir dir="${build.war}/WEB-INF/src"/>
 		<mkdir dir="${build.war}/WEB-INF/classes"/>
 	    <javac destdir="${build.war}/WEB-INF/classes"
+			   compiler="modern"
+           	   source="1.6"
 	           debug="off"
 	    	   failonerror="true"
 	           srcdir="${build.war}/WEB-INF/src" 

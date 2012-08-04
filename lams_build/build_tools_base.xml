@@ -40,7 +40,7 @@
 	<!-- =================================================================== -->
 		
 	<target name="clean-db" description="Deletes Tool Tables">
-		<echo>${ant.project.name}: Creating Tool database tables</echo>
+		<echo>${ant.project.name}: Dropping Tool database tables</echo>
 		<antcall target="_db-script">
 		    <param name="sql.script" value="${tool.build.sql.drop}"/>
 		</antcall>
@@ -48,7 +48,7 @@
 	
 	
 	<target name="build-db" description="Deletes and creates Tool tables and inserts default content.">
-		<echo>${ant.project.name}: Dropping Tool database tables</echo>
+		<echo>${ant.project.name}: Creating Tool database tables</echo>
 		<antcall target="_db-script">
 		    <param name="sql.script" value="${tool.build.sql.create}"/>
 		</antcall>

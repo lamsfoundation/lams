@@ -57,7 +57,7 @@
 		<!-- Destdir is the same as Eclipse output path, maybe it shouldn't? -->
 		<javac srcdir="${src.java.dir}"
 			   compiler="modern"
-               source="1.5"
+               source="1.6"
                debug="${debug}"
 			   debuglevel="lines,vars,source"
                classpathref="libs.classpath"
