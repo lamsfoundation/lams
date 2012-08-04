@@ -23,8 +23,6 @@
 		<include name="**/GradebookUserLesson.java" />
 		<!-- Notebook -->
 		<include name="**/NotebookEntry.java" />
-		<!-- Signup -->
-		<include name="**/SignupOrganisation.java" />
 	</fileset>
 	
 	
