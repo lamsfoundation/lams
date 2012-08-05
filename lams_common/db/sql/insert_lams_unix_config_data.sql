@@ -275,19 +275,19 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('ProfilePartialEditEnable','true', 'config.profile.partial.edit.enable', 'config.header.features', 'BOOLEAN', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('KalturaServer','', 'config.kaltura.server', 'config.header.kaltura', 'STRING', 0);
+values ('KalturaServer','http://www.kaltura.com', 'config.kaltura.server', 'config.header.kaltura', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('KalturaPartnerId','', 'config.kaltura.partner.id', 'config.header.kaltura', 'STRING', 0);
+values ('KalturaPartnerId','1073272', 'config.kaltura.partner.id', 'config.header.kaltura', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('KalturaSubPartnerId','', 'config.kaltura.sub.partner.id', 'config.header.kaltura', 'STRING', 0);
+values ('KalturaSubPartnerId','107327200', 'config.kaltura.sub.partner.id', 'config.header.kaltura', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('KalturaUserSecret','', 'config.kaltura.user.secret', 'config.header.kaltura', 'STRING', 0);
+values ('KalturaUserSecret','f6b13f7e128e081b5cc9bb9664fd8717', 'config.kaltura.user.secret', 'config.header.kaltura', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('KalturaKCWUiConfId','', 'config.kaltura.kcw.uiconfid', 'config.header.kaltura', 'STRING', 0);
+values ('KalturaKCWUiConfId','1000741', 'config.kaltura.kcw.uiconfid', 'config.header.kaltura', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('KalturaKDPUiConfId','', 'config.kaltura.kdp.uiconfid', 'config.header.kaltura', 'STRING', 0);
+values ('KalturaKDPUiConfId','6308762', 'config.kaltura.kdp.uiconfid', 'config.header.kaltura', 'STRING', 0);

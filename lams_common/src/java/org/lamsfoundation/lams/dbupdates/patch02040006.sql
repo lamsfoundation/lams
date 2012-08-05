@@ -90,18 +90,18 @@ ALTER TABLE lams_lesson ADD COLUMN enable_lesson_notifications TINYINT(1) DEFAUL
 ALTER TABLE lams_organisation ADD COLUMN enable_course_notifications TINYINT(1) NOT NULL DEFAULT 0;
 
 -- LDEV-2756 Introducing Kaltura CKEditor plugin
-INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-VALUES ('KalturaServer','', 'config.kaltura.server', 'config.header.kaltura', 'STRING', 0);
-INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-VALUES ('KalturaPartnerId','', 'config.kaltura.partner.id', 'config.header.kaltura', 'STRING', 0);
-INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-VALUES ('KalturaSubPartnerId','', 'config.kaltura.sub.partner.id', 'config.header.kaltura', 'STRING', 0);
-INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-VALUES ('KalturaUserSecret','', 'config.kaltura.user.secret', 'config.header.kaltura', 'STRING', 0);
-INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-VALUES ('KalturaKCWUiConfId','', 'config.kaltura.kcw.uiconfid', 'config.header.kaltura', 'STRING', 0);
-INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-VALUES ('KalturaKDPUiConfId','', 'config.kaltura.kdp.uiconfid', 'config.header.kaltura', 'STRING', 0);
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('KalturaServer','http://www.kaltura.com', 'config.kaltura.server', 'config.header.kaltura', 'STRING', 0);
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('KalturaPartnerId','1073272', 'config.kaltura.partner.id', 'config.header.kaltura', 'STRING', 0);
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('KalturaSubPartnerId','107327200', 'config.kaltura.sub.partner.id', 'config.header.kaltura', 'STRING', 0);
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('KalturaUserSecret','f6b13f7e128e081b5cc9bb9664fd8717', 'config.kaltura.user.secret', 'config.header.kaltura', 'STRING', 0);
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('KalturaKCWUiConfId','1000741', 'config.kaltura.kcw.uiconfid', 'config.header.kaltura', 'STRING', 0);
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('KalturaKDPUiConfId','6308762', 'config.kaltura.kdp.uiconfid', 'config.header.kaltura', 'STRING', 0);
 
 -- LDEV-2560 Add original author information
 ALTER TABLE lams_learning_design ADD COLUMN original_user_id BIGINT(20) AFTER user_id;
