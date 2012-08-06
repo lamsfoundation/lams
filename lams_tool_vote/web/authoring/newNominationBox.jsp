@@ -48,6 +48,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<lams:CKEditor id="newNomination"
 				value="${voteGeneralAuthoringDTO.editableNominationText}"
 				contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"
+                height="370px"
 				resizeParentFrameName="messageArea">
 			</lams:CKEditor>
 			
