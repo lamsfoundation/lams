@@ -1,6 +1,9 @@
+<%@ page import="org.lamsfoundation.lams.signup.model.SignupOrganisation" %>
 <%@ include file="/taglibs.jsp"%>
 
 <h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
+
+<lams:help style="no-tabs" page="<%= SignupOrganisation.SIGNUP_HELP_PAGE %>"/>
 
 <h1><fmt:message key="admin.list.signup.pages"/></h1>
 

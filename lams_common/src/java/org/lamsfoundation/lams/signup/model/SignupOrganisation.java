@@ -14,7 +14,7 @@ public class SignupOrganisation {
     /**
      * Link on Lams wiki signup help page.
      */
-    public static String SIGNUP_HELP_PAGE = "LAMS+Configuration";
+    public static String SIGNUP_HELP_PAGE = "LAMS+Signup";
 
     /** identifier field */
     private Integer signupOrganisationId;

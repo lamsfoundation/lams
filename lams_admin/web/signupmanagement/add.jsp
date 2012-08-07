@@ -55,7 +55,7 @@
 		</tr>
 		<tr>
 			<td><fmt:message key="admin.context.path" />:</td>
-			<td><html:text property="context" /></td>
+			<td><lams:LAMSURL/>signup/<html:text property="context" /></td>
 			<td><html:errors property="context" /></td>
 		</tr>
 		<tr>
