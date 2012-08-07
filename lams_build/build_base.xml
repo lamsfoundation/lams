@@ -176,7 +176,7 @@
 		<!-- Internal target: Compile test Java sources. -->
 		<javac srcdir="${src.test.dir}"
 			   compiler="modern"
-			   source="1.6"
+			   source="1.5"
 	           debug="on"
 			   debuglevel="lines,vars,source"
 			   destdir="${build.classes.test}"
@@ -524,7 +524,7 @@
 		<mkdir dir="${build.war}/WEB-INF/classes"/>
 	    <javac destdir="${build.war}/WEB-INF/classes"
 			   compiler="modern"
-           	   source="1.6"
+           	   source="1.5"
 	           debug="off"
 	    	   failonerror="true"
 	           srcdir="${build.war}/WEB-INF/src" 
