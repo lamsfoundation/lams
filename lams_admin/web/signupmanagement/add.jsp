@@ -55,12 +55,12 @@
 		</tr>
 		<tr>
 			<td><fmt:message key="admin.context.path" />:</td>
-			<td><lams:LAMSURL/>signup/<html:text property="context" /></td>
+			<td style="vertical-align: middle;"><lams:LAMSURL/>signup/<html:text property="context" /></td>
 			<td><html:errors property="context" /></td>
 		</tr>
 		<tr>
 			<td></td>
-			<td style="padding-left: 80px;">
+			<td style="padding-left: 80px; padding-top: 15px;">
 				<html:submit styleClass="button"><fmt:message key="admin.submit" /></html:submit>
 				<html:cancel styleClass="button"><fmt:message key="admin.cancel" /></html:cancel>
 			</td>
