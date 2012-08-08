@@ -38,7 +38,6 @@ CKEDITOR.config.contentsCss = CKEDITOR.basePath + '../css/defaultHTML_learner.cs
 CKEDITOR.config.skin = 'office2003' ;
 CKEDITOR.config.disableNativeSpellChecker = false;
 CKEDITOR.config.browserContextMenuOnCtrl = true;
-// CKEDITOR.config.DefaultLinkTarget = "_blank";
 CKEDITOR.config.templates = CKEDITOR.basePath + '../www/htmltemplates.xml';
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.config.enterMode = 'div' ;
@@ -56,4 +55,20 @@ CKEDITOR.on('instanceCreated', function(e){
 
 CKEDITOR.on('instanceReady', function(e){
 	e.editor.element.$.style.display = '';
+	
+	// make all links open in new window
+	e.editor.on('getData', function(f){
+		// create a DOM element for easier manipulation
+		var tempDiv = document.createElement('div');
+		tempDiv.innerHTML = f.data.dataValue;
+		// this has to be here for parsing to be commenced!
+		tempDiv.childNodes;
+		
+		var anchors = tempDiv.getElementsByTagName('a');
+		for (var i = 0; i < anchors.length; i++) {
+			anchors[i].setAttribute('target', '_blank');
+		}
+		
+		f.data.dataValue = tempDiv.innerHTML;
+	});
 });
