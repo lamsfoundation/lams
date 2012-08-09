@@ -31,14 +31,14 @@ import java.util.Date;
  * 
  * @author Andrey Balan
  * 
- * @hibernate.class table="tl_lascrt11_item_log"
+ * @hibernate.class table="tl_lascrt11_answer_log"
  * 
  */
-public class ScratchieItemVisitLog {
+public class ScratchieAnswerVisitLog {
 
     private Long uid;
     private ScratchieUser user;
-    private ScratchieItem scratchieItem;
+    private ScratchieAnswer scratchieAnswer;
     private Date accessDate;
     private Long sessionId;
 
@@ -55,15 +55,15 @@ public class ScratchieItemVisitLog {
     }
 
     /**
-     * @hibernate.many-to-one column="scratchie_item_uid" cascade="none"
+     * @hibernate.many-to-one column="scratchie_answer_uid" cascade="none"
      * @return
      */
-    public ScratchieItem getScratchieItem() {
-	return scratchieItem;
+    public ScratchieAnswer getScratchieAnswer() {
+	return scratchieAnswer;
     }
 
-    public void setScratchieItem(ScratchieItem item) {
-	this.scratchieItem = item;
+    public void setScratchieAnswer(ScratchieAnswer item) {
+	this.scratchieAnswer = item;
     }
 
     /**

@@ -27,32 +27,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieItemVisitDAO;
+import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAnswerVisitDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItemVisitLog;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 
-public class ScratchieItemVisitDAOHibernate extends BaseDAOHibernate implements ScratchieItemVisitDAO {
+public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implements ScratchieAnswerVisitDAO {
 
-    private static final String FIND_BY_ITEM_AND_USER = "from " + ScratchieItemVisitLog.class.getName()
-	    + " as r where r.user.userId = ? and r.scratchieItem.uid=?";
+    private static final String FIND_BY_ITEM_AND_USER = "from " + ScratchieAnswerVisitLog.class.getName()
+	    + " as r where r.user.userId = ? and r.scratchieAnswer.uid=?";
 
-    private static final String FIND_BY_SESSION_AND_USER = "from " + ScratchieItemVisitLog.class.getName()
+    private static final String FIND_BY_SESSION_AND_USER = "from " + ScratchieAnswerVisitLog.class.getName()
 	    + " as r where r.sessionId = ? and r.user.userId=? order by r.accessDate asc";
 
     private static final String FIND_VIEW_COUNT_BY_USER = "select count(*) from "
-	    + ScratchieItemVisitLog.class.getName() + " as r where  r.sessionId=? and  r.user.userId =?";
+	    + ScratchieAnswerVisitLog.class.getName() + " as r where  r.sessionId=? and  r.user.userId =?";
 
-    private static final String FIND_SUMMARY = "select v.scratchieItem.uid, count(v.scratchieItem) from  "
-	    + ScratchieItemVisitLog.class.getName() + " as v , " + ScratchieSession.class.getName() + " as s, "
+    private static final String FIND_SUMMARY = "select v.scratchieAnswer.uid, count(v.scratchieAnswer) from  "
+	    + ScratchieAnswerVisitLog.class.getName() + " as v , " + ScratchieSession.class.getName() + " as s, "
 	    + Scratchie.class.getName() + "  as r " + " where v.sessionId = s.sessionId "
-	    + " and s.scratchie.uid = r.uid " + " and r.contentId =? " + " group by v.sessionId, v.scratchieItem.uid ";
+	    + " and s.scratchie.uid = r.uid " + " and r.contentId =? " + " group by v.sessionId, v.scratchieAnswer.uid ";
 
-    public ScratchieItemVisitLog getScratchieItemLog(Long itemUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_USER, new Object[] { userId, itemUid });
+    public ScratchieAnswerVisitLog getScratchieAnswerLog(Long answerUid, Long userId) {
+	List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_USER, new Object[] { userId, answerUid });
 	if (list == null || list.size() == 0)
 	    return null;
-	return (ScratchieItemVisitLog) list.get(0);
+	return (ScratchieAnswerVisitLog) list.get(0);
     }
 
     public int getUserViewLogCount(Long toolSessionId, Long userId) {
@@ -76,7 +76,7 @@ public class ScratchieItemVisitDAOHibernate extends BaseDAOHibernate implements 
 
     }
 
-    public List<ScratchieItemVisitLog> getLogsBySessionAndUser(Long sessionId, Long userId) {
+    public List<ScratchieAnswerVisitLog> getLogsBySessionAndUser(Long sessionId, Long userId) {
 	return getHibernateTemplate().find(FIND_BY_SESSION_AND_USER, new Object[] { sessionId, userId });
     }
 

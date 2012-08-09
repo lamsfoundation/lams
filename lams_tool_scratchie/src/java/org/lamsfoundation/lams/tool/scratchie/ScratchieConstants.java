@@ -31,6 +31,8 @@ public class ScratchieConstants {
     public static final String TOOL_CONTENT_HANDLER_NAME = "scratchieToolContentHandler";
 
     public static final int COMPLETED = 1;
+    
+    public static final int INITIAL_ANSWERS_NUMBER = 3;
 
     // for action forward name
     public static final String SUCCESS = "success";
@@ -53,6 +55,10 @@ public class ScratchieConstants {
     public static final String PARAM_ITEM_INDEX = "itemIndex";
 
     public static final String PARAM_ITEM_UID = "itemUid";
+    
+    public static final String PARAM_ANSWER_UID = "answerUid";
+    
+    public static final String PARAM_ANSWER_INDEX = "answerIndex";
 
     public static final String PARAM_RUN_OFFLINE = "runOffline";
 
@@ -65,15 +71,27 @@ public class ScratchieConstants {
     
     public static final String ATTR_ITEM_ORDER_ID_PREFIX = "itemOrderId";
     
+    public static final String ATTR_ITEM_TITLE_PREFIX = "itemTitle";
+    
     public static final String ATTR_ITEM_DESCRIPTION_PREFIX = "itemDescription";
     
-    public static final String ATTR_ITEM_CORRECT = "itemCorrect";
+    public static final String ATTR_ANSWER_CORRECT = "answerCorrect";
     
     public static final String ATTR_ITEM_COUNT = "itemCount";
+    
+    public static final String ATTR_ANSWER_LIST = "answerList";
+    
+    public static final String ATTR_ANSWER_COUNT = "answerCount";
+    
+    public static final String ATTR_ANSWER_DESCRIPTION_PREFIX = "answerDescription";
+    
+    public static final String ATTR_ANSWER_ORDER_ID_PREFIX = "answerOrderId";
 
     public static final String ATT_ATTACHMENT_LIST = "instructionAttachmentList";
 
     public static final String ATTR_DELETED_ITEM_LIST = "deleteItemList";
+    
+    public static final String ATTR_DELETED_ANSWER_LIST = "deleteAnswerList";
 
     public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
 

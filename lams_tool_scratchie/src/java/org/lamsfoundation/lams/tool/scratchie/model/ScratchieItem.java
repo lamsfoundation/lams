@@ -24,11 +24,14 @@
 package org.lamsfoundation.lams.tool.scratchie.model;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 /**
- * Scratchie
+ * Tool may contain several questions. Which in turn contain answers.
  * 
  * @author Andrey Balan
  * 
@@ -39,10 +42,10 @@ public class ScratchieItem implements Cloneable {
     private static final Logger log = Logger.getLogger(ScratchieItem.class);
 
     private Long uid;
+    
+    private String title;
 
     private String description;
-
-    private boolean correct;
 
     private Integer orderId;
 
@@ -50,27 +53,46 @@ public class ScratchieItem implements Cloneable {
 
     private Date createDate;
     private ScratchieUser createBy;
-
-    // ***********************************************
-    // DTO fields:
-    private boolean scratched;
-    private Date scratchedDate;
+    
+    // scratchie Items
+    private Set answers;
+    
+    /**
+     * Default contruction method.
+     * 
+     */
+    public ScratchieItem() {
+	answers = new HashSet();
+    }
 
     public Object clone() {
-	ScratchieItem obj = null;
+	ScratchieItem item = null;
 	try {
-	    obj = (ScratchieItem) super.clone();
+	    item = (ScratchieItem) super.clone();
 	    
-	    ((ScratchieItem) obj).setUid(null);
+	    ((ScratchieItem) item).setUid(null);
+	    
+	    if (answers != null) {
+		Iterator iter = answers.iterator();
+		Set set = new HashSet();
+		while (iter.hasNext()) {
+		    ScratchieAnswer answer = (ScratchieAnswer) iter.next();
+		    ScratchieAnswer newAnswer = (ScratchieAnswer) answer.clone();
+		    // just clone old file without duplicate it in repository
+		    set.add(newAnswer);
+		}
+		item.answers = set;
+	    }
+	    
 	    // clone ReourceUser as well
 	    if (this.createBy != null)
-		((ScratchieItem) obj).setCreateBy((ScratchieUser) this.createBy.clone());
+		((ScratchieItem) item).setCreateBy((ScratchieUser) this.createBy.clone());
 
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + ScratchieItem.class + " failed");
 	}
 
-	return obj;
+	return item;
     }
 
     // **********************************************************
@@ -91,9 +113,21 @@ public class ScratchieItem implements Cloneable {
     public void setUid(Long userID) {
 	this.uid = userID;
     }
+    
+    /**
+     * @hibernate.property column="title"
+     * @return
+     */
+    public String getTitle() {
+	return title;
+    }
+
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
     /**
-     * @hibernate.property column="description"
+     * @hibernate.property column="description" type="text"
      * @return
      */
     public String getDescription() {
@@ -140,18 +174,6 @@ public class ScratchieItem implements Cloneable {
     public void setCreateByAuthor(boolean isCreateByAuthor) {
 	this.isCreateByAuthor = isCreateByAuthor;
     }
-
-    /**
-     * @hibernate.property column="correct"
-     * @return
-     */
-    public boolean isCorrect() {
-	return correct;
-    }
-
-    public void setCorrect(boolean correctScratchie) {
-	this.correct = correctScratchie;
-    }
     
     /**
      * @hibernate.property column="order_id"
@@ -164,20 +186,19 @@ public class ScratchieItem implements Cloneable {
     public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
-
-    public void setScratched(boolean complete) {
-	this.scratched = complete;
-    }
-
-    public boolean isScratched() {
-	return scratched;
-    }
     
-    public Date getScratchedDate() {
-	return scratchedDate;
+    /**
+     * @hibernate.set inverse="false" cascade="all" order-by="order_id desc"
+     * @hibernate.collection-key column="scratchie_item_uid"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer"
+     * 
+     * @return
+     */
+    public Set getAnswers() {
+	return answers;
     }
 
-    public void setScratchedDate(Date scratchedDate) {
-	this.scratchedDate = scratchedDate;
+    public void setAnswers(Set answers) {
+	this.answers = answers;
     }
 }

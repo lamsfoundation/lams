@@ -39,11 +39,11 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
+import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.scratchie.model.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItemVisitLog;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
@@ -110,7 +110,7 @@ public class MonitoringAction extends Action {
 	    HttpServletResponse response) {
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
 	Long sessionId = WebUtil.readLongParam(request, ScratchieConstants.PARAM_SESSION_ID);
-	List<ScratchieItemVisitLog> logs = getScratchieService().getUserMasterDetail(sessionId, userId);
+	List<ScratchieAnswerVisitLog> logs = getScratchieService().getUserMasterDetail(sessionId, userId);
 
 	request.setAttribute(ScratchieConstants.ATTR_USER_SESSION_ID, sessionId);
 	request.setAttribute(ScratchieConstants.ATTR_VISIT_LOGS, logs);

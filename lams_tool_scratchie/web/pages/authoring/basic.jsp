@@ -10,74 +10,80 @@
 
 	var itemTargetDiv = "#itemArea";
 
-	function addItem(){
-		//check maximum number of answers
-		var numberOfAnswers = $("textarea[name^=itemDescription]").length;
-		if (numberOfAnswers >= 10) {
-			alert("<fmt:message key="label.authoring.maximum.answers.warning" />");
-			return;
-		}
+	function removeItem(idx){
+		var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
 		
-		var url= "<c:url value='/authoring/addItem.do'/>";
-		prepareItemEditorsForAjaxSubmit();
-		var itemList = $("#authoringForm").serialize(true);
+		if (deletionConfirmed) {
+			var url = "<c:url value="/authoring/removeItem.do"/>";
+			$(itemTargetDiv).load(
+				url,
+				{
+					itemIndex: idx,
+					sessionMapID: "${sessionMapID}"
+				},
+				function(){
+					refreshThickbox();
+				}
+			);
+		};
+	}
+	function upItem(idx){
+		var url = "<c:url value="/authoring/upItem.do"/>";
 		$(itemTargetDiv).load(
 			url,
 			{
-				sessionMapID: "${sessionMapID}",
-				itemList: itemList 
+				itemIndex: idx,
+				sessionMapID: "${sessionMapID}"
+			},
+			function(){
+				refreshThickbox();
 			}
 		);
 	}
-	function removeItem(idx){
-		var url= "<c:url value='/authoring/removeItem.do'/>";
-		prepareItemEditorsForAjaxSubmit();
-		var itemList = $("#authoringForm").serialize(true);
-		$(itemTargetDiv).load(
-				url,
-				{
-					sessionMapID: "${sessionMapID}",
-					itemIndex: idx,
-					itemList: itemList 
-				}
-		);
-	}
-	function upItem(idx){
-		var url= "<c:url value='/authoring/upItem.do'/>";
-		prepareItemEditorsForAjaxSubmit();
-		var itemList = $("#authoringForm").serialize(true);
-		$(itemTargetDiv).load(
-				url,
-				{
-					sessionMapID: "${sessionMapID}",
-					itemIndex: idx,
-					itemList: itemList 
-				}
-		);
-	}
 	function downItem(idx){
-		var url= "<c:url value='/authoring/downItem.do'/>";
-		prepareItemEditorsForAjaxSubmit();
-		var itemList = $("#authoringForm").serialize(true);
+		var url = "<c:url value="/authoring/downItem.do"/>";
 		$(itemTargetDiv).load(
-				url,
-				{
-					sessionMapID: "${sessionMapID}",
-					itemIndex: idx,
-					itemList: itemList 
-				}
+			url,
+			{
+				itemIndex: idx,
+				sessionMapID: "${sessionMapID}"
+			},
+			function(){
+				refreshThickbox();
+			}
 		);
 	}
 	
-	//in order to be able to use item's value, copy it from CKEditor to textarea
-	function prepareItemEditorsForAjaxSubmit(){
-		$("textarea[name^=itemDescription]").each(function() {
-			var ckeditorData = CKEDITOR.instances[this.name].getData();
-			//skip out empty values
-			this.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;
-		});
-	}
+	function resizeIframe() {
+		if (document.getElementById('TB_iframeContent') != null) {
+		    var height = top.window.innerHeight;
+		    if ( height == undefined || height == 0 ) {
+		    	// IE doesn't use window.innerHeight.
+		    	height = document.documentElement.clientHeight;
+		    	// alert("using clientHeight");
+		    }
+			// alert("doc height "+height);
+		    height -= document.getElementById('TB_iframeContent').offsetTop + 60;
+		    document.getElementById('TB_iframeContent').style.height = height +"px";
+	
+			TB_HEIGHT = height + 28;
+			tb_position();
+		}
+	};
+	window.onresize = resizeIframe;
 
+	function createNewQuestionInitHref() {
+		var questionTypeDropdown = document.getElementById("questionType");
+		var questionType = questionTypeDropdown.selectedIndex + 1;
+		var newQuestionInitHref = "${newQuestionInitUrl}&questionType=" + questionType + "&referenceGrades=" + encodeURIComponent(serializeReferenceGrades()) + "&KeepThis=true&TB_iframe=true&height=640&width=950&modal=true";
+		$("#newQuestionInitHref").attr("href", newQuestionInitHref)
+	};
+	
+	function refreshThickbox(){
+		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
+		imgLoader = new Image();// preload image
+		imgLoader.src = tb_pathToImage;
+	};
 
 </script>
 <!-- Basic Tab Content -->
@@ -109,8 +115,11 @@
 	</div>
 	
 	<div  style="margin: 0 40px 80px;">
-	<a href="javascript:;" onclick="addItem();" class="button-add-item right-buttons">
-		<fmt:message key="label.authoring.basic.add.another.scratchie" /> 
-	</a>
+		<c:set var="addItemUrl" >
+			<c:url value='/authoring/addItem.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true
+		</c:set>
+		<a href="${addItemUrl}" class="button-add-item right-buttons thickbox">
+			<fmt:message key="label.authoring.basic.add.another.scratchie" /> 
+		</a>
 	</div>
 </div>

@@ -30,42 +30,46 @@
 			
 			//hide finish button if user haven't guessed correct answer nor used all attempts
 			<c:if test="${! sessionMap.scratchingLock}">
-				$("#finishButton").hide();
+				//$("#finishButton").hide();
 			</c:if>
 
 		});
-		function scratchItem(itemUid){
+		function scratchItem(answerUid){
 			
 	        $.ajax({
 	        	async: false,
 	            url: '<c:url value="/learning/scratchItem.do"/>',
-	            data: 'sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&itemUid=' + itemUid,
+	            data: 'sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&answerUid=' + answerUid,
 	            dataType: 'json',
 	            type: 'post',
 	            success: function (json) {
-	            	if (json.itemCorrect) {
+	            	if (json.answerCorrect) {
 	            		//show animation
-	            		$('#image' + itemUid).attr("src", "<html:rewrite page='/includes/images/scratchie-correct-animation.gif'/>?reqID=" + (new Date()).getTime());
+	            		$('#image' + answerUid).attr("src", "<html:rewrite page='/includes/images/scratchie-correct-animation.gif'/>?reqID=" + (new Date()).getTime());
 	            		
 	            		disableScratching();
 	            	} else {
 	            		
 	            		//show animation, disable onclick, move to the bottom this item
-	            		$('#image' + itemUid).attr("src", "<html:rewrite page='/includes/images/scratchie-wrong-animation.gif'/>?reqID=" + (new Date()).getTime());
-	            		$('#imageLink' + itemUid).removeAttr('onclick');	            		
+	            		$('#image' + answerUid).attr("src", "<html:rewrite page='/includes/images/scratchie-wrong-animation.gif'/>?reqID=" + (new Date()).getTime());
+	            		$('#imageLink' + answerUid).removeAttr('onclick');	            		
 	            	}
 	            }
 	       	});
 		}
 		function disableScratching() {
-    		$("[id^=imageLink]").removeAttr('onclick');
-    		$("img", $("#scratches")).not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
-    		$("#finishButton").show();
+    		//$("[id^=imageLink]").removeAttr('onclick');
+    		//$("img", $("#scratches")).not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
+    		//$("#finishButton").show();
 		}
 		function finishSession(){
-			document.getElementById("finishButton").disabled = true;
-			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
-			return false;
+			//var	finishConfirmed = confirm("<fmt:message key="warning.msg.are.you.sure.you.want.to.finish"></fmt:message>");
+			
+			//if (finishConfirmed) {
+				document.getElementById("finishButton").disabled = true;
+				document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
+				return false;
+			//}
 		}
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
@@ -86,34 +90,40 @@
 
 		<%@ include file="/common/messages.jsp"%>
 
+		<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
+		<h3>${item.title}</h3>
+		<h4>${item.description}</h4>
+
 		<table id="scratches" class="alternative-color">
-			<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
-				<tr id="tr${item.uid}">
+			<c:forEach var="answer" items="${item.answers}" varStatus="status">
+				<tr id="tr${answer.uid}">
 					<td style="width: 40px;">
 						<c:choose>
-							<c:when test="${item.scratched && item.correct}">
+							<c:when test="${answer.scratched && answer.correct}">
 								<img src="<html:rewrite page='/includes/images/scratchie-correct.png'/>" class="scartchie-image">
 							</c:when>
-							<c:when test="${item.scratched && !item.correct}">
+							<c:when test="${answer.scratched && !answer.correct}">
 								<img src="<html:rewrite page='/includes/images/scratchie-wrong.png'/>" class="scartchie-image">
 							</c:when>
 							<c:when test="${sessionMap.scratchingLock}">
 								<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image">
 							</c:when>
 							<c:otherwise>
-								<a href="#nogo" onclick="scratchItem(${item.uid}); return false;" id="imageLink${item.uid}">
-									<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image" id="image${item.uid}" />
+								<a href="#nogo" onclick="scratchItem(${answer.uid}); return false;" id="imageLink${answer.uid}">
+									<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image" id="image${answer.uid}" />
 								</a>
 							</c:otherwise>
 						</c:choose>
 					</td>
 					
 					<td style="vertical-align: middle;">
-						${item.description} 
+						${answer.description} 
 					</td>
 				</tr>
 			</c:forEach>
 		</table>
+		
+		</c:forEach>
 
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">

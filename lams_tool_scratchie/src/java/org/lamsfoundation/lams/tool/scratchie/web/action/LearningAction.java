@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
@@ -197,11 +198,12 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
 	
 	boolean scratchingLock = isUserFinished;
-	for (ScratchieItem item : items) {
-	    if (item.isScratched() && item.isCorrect()) {
-		scratchingLock = true;
-	    }
-	}
+	//TODO!!!!
+//	for (ScratchieItem item : items) {
+//	    if (item.isScratched() && item.isCorrect()) {
+//		scratchingLock = true;
+//	    }
+//	}
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHING_LOCK, scratchingLock);
 	
 	
@@ -228,9 +230,9 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
-	Long itemUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_ITEM_UID));
+	Long answerUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_ANSWER_UID));
 	// get back the resource and item list and display them on page
-	ScratchieItem item = getScratchieService().getScratchieItemByUid(itemUid);
+	ScratchieAnswer answer = getScratchieService().getScratchieAnswerById(answerUid);
 
 	String toolSessionIdStr = request.getParameter(ScratchieConstants.ATTR_TOOL_SESSION_ID);
 	Long toolSessionId = NumberUtils.createLong(toolSessionIdStr);
@@ -239,15 +241,15 @@ public class LearningAction extends Action {
 	    HttpSession ss = SessionManager.getSession();
 	    // get back login user DTO
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    getScratchieService().setItemAccess(item.getUid(), new Long(user.getUserID().intValue()), toolSessionId);
+	    getScratchieService().setAnswerAccess(answer.getUid(), new Long(user.getUserID().intValue()), toolSessionId);
 	}
 
-	if (item == null) {
+	if (answer == null) {
 	    return mapping.findForward(ScratchieConstants.ERROR);
 	}
 	
 	JSONObject JSONObject = new JSONObject();  
-	JSONObject.put(ScratchieConstants.ATTR_ITEM_CORRECT, item.isCorrect());
+	JSONObject.put(ScratchieConstants.ATTR_ANSWER_CORRECT, answer.isCorrect());
 	response.setContentType("application/x-json");
 	response.getWriter().print(JSONObject);
 	return null;

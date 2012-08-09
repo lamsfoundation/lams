@@ -21,53 +21,25 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.tool.scratchie.model;
+package org.lamsfoundation.lams.tool.scratchie.util;
 
-import java.util.Collection;
+import java.util.Comparator;
 
-public class GroupSummary {
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 
-    private Long sessionId;
-    private String sessionName;
+public class ScratchieAnswerComparator implements Comparator<ScratchieAnswer> {
 
-    private Collection<ScratchieUser> users;
+    public int compare(ScratchieAnswer o1, ScratchieAnswer o2) {
 
-    /**
-     * Contruction method for monitoring summary function.
-     * 
-     * <B>Don't not set isInitGroup and viewNumber fields</B>
-     * 
-     * @param sessionName
-     * @param item
-     * @param isInitGroup
-     */
-    public GroupSummary(Long sessionId, String sessionName) {
-	this.sessionId = sessionId;
-	this.sessionName = sessionName;
+	if (o1 != null && o2 != null & o1.getOrderId() != null && o2.getOrderId() != null) {
+	    if (o1.getOrderId() > o2.getOrderId()) {
+		return 1;
+	    } else {
+		return -1;
+	    }
+	} else if (o1 != null)
+	    return 1;
+	else
+	    return -1;
     }
-
-    public Long getSessionId() {
-	return sessionId;
-    }
-
-    public void setSessionId(Long sessionId) {
-	this.sessionId = sessionId;
-    }
-
-    public String getSessionName() {
-	return sessionName;
-    }
-
-    public void setSessionName(String sessionName) {
-	this.sessionName = sessionName;
-    }
-
-    public Collection<ScratchieUser> getUsers() {
-	return users;
-    }
-
-    public void setUsers(Collection<ScratchieUser> users) {
-	this.users = users;
-    }
-
 }

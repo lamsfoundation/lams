@@ -31,13 +31,14 @@ import java.util.Set;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.Summary;
-import org.lamsfoundation.lams.tool.scratchie.model.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAttachment;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItemVisitLog;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAttachment;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -56,6 +57,8 @@ public interface IScratchieService {
      * @return
      */
     Scratchie getScratchieByContentId(Long contentId);
+    
+    ScratchieAnswer getScratchieAnswerById (Long answerUid);
 
     /**
      * Get a cloned copy of tool default tool content (Scratchie) and assign the toolContentId of that copy as the given
@@ -161,7 +164,7 @@ public interface IScratchieService {
 
     void retrieveScratched(Collection<ScratchieItem> scratchieItemList, ScratchieUser user);
 
-    void setItemAccess(Long scratchieItemUid, Long userId, Long sessionId);
+    void setAnswerAccess(Long scratchieItemUid, Long userId, Long sessionId);
     
     int getNumberAttempts(Long userId, Long sessionId);
 
@@ -178,7 +181,7 @@ public interface IScratchieService {
     
     List<GroupSummary> getMonitoringSummary(Long contentId);
     
-    List<ScratchieItemVisitLog> getUserMasterDetail(Long sessionId, Long userId);
+    List<ScratchieAnswerVisitLog> getUserMasterDetail(Long sessionId, Long userId);
     
     List<GroupSummary> getQuestionSummary(Long contentId, Long itemUid);
 

@@ -83,15 +83,6 @@
 		}
 	}
     function doSubmit_Form_Only() {
-		//check one answer should be selected as correct
-		var numberOfAnswers = $("input[name^=itemCorrect]:checked").length;
-		if (numberOfAnswers == 0) {
-			alert("<fmt:message key="label.authoring.specify.correct.answer.warning" />");
-			return;
-		}
-    	
-    	prepareItemEditorsForAjaxSubmit();
-    	$("#itemList").val($("#authoringForm").serialize(true));
     	document.getElementById("${formID}").submit();
     }
     function doCancel() {

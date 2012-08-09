@@ -26,11 +26,11 @@ package org.lamsfoundation.lams.tool.scratchie.dao;
 import java.util.List;
 import java.util.Map;
 
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItemVisitLog;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 
-public interface ScratchieItemVisitDAO extends DAO {
+public interface ScratchieAnswerVisitDAO extends DAO {
 
-    public ScratchieItemVisitLog getScratchieItemLog(Long itemUid, Long userId);
+    public ScratchieAnswerVisitLog getScratchieAnswerLog(Long itemUid, Long userId);
 
     public int getUserViewLogCount(Long sessionId, Long userId);
 
@@ -42,6 +42,6 @@ public interface ScratchieItemVisitDAO extends DAO {
      */
     public Map<Long, Integer> getSummary(Long contentId);
 
-    public List<ScratchieItemVisitLog> getLogsBySessionAndUser(Long sessionId, Long userId);
+    public List<ScratchieAnswerVisitLog> getLogsBySessionAndUser(Long sessionId, Long userId);
 
 }

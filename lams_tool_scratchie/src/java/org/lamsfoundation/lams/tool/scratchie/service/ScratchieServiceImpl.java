@@ -73,19 +73,20 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
+import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieItemDAO;
+import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAnswerVisitDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAttachmentDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieDAO;
-import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieItemDAO;
-import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieItemVisitDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieSessionDAO;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieUserDAO;
+import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.Summary;
-import org.lamsfoundation.lams.tool.scratchie.model.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAttachment;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItemVisitLog;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAttachment;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.util.ReflectDTOComparator;
@@ -102,7 +103,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 
 /**
  * 
- * @author Dapeng.Ni
+ * @author Andrey Balan
  */
 public class ScratchieServiceImpl implements IScratchieService, ToolContentManager, ToolSessionManager,
 	ToolContentImport102Manager {
@@ -118,7 +119,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     private ScratchieSessionDAO scratchieSessionDao;
 
-    private ScratchieItemVisitDAO scratchieItemVisitDao;
+    private ScratchieAnswerVisitDAO scratchieAnswerVisitDao;
 
     // tool service
     private ScratchieToolContentHandler scratchieToolContentHandler;
@@ -389,32 +390,39 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     public void retrieveScratched(Collection<ScratchieItem> items, ScratchieUser user) {
 	for (ScratchieItem item : items) {
-	    ScratchieItemVisitLog log = scratchieItemVisitDao.getScratchieItemLog(item.getUid(), user.getUserId());
-	    if (log == null) {
-		item.setScratched(false);
-	    } else {
-		item.setScratched(true);
-		item.setScratchedDate(log.getAccessDate());
+	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>)item.getAnswers()) {
+		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answer.getUid(),
+			user.getUserId());
+		if (log == null) {
+		    answer.setScratched(false);
+		} else {
+		    answer.setScratched(true);
+		    answer.setScratchedDate(log.getAccessDate());
+		}
 	    }
 	}
     }
 
-    public void setItemAccess(Long scratchieItemUid, Long userId, Long sessionId) {
-	ScratchieItemVisitLog log = scratchieItemVisitDao.getScratchieItemLog(scratchieItemUid, userId);
+    public void setAnswerAccess(Long answerUid, Long userId, Long sessionId) {
+	ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answerUid, userId);
 	if (log == null) {
-	    log = new ScratchieItemVisitLog();
-	    ScratchieItem item = scratchieItemDao.getByUid(scratchieItemUid);
-	    log.setScratchieItem(item);
+	    log = new ScratchieAnswerVisitLog();
+	    ScratchieAnswer answer = getScratchieAnswerById(answerUid);
+	    log.setScratchieAnswer(answer);
 	    ScratchieUser user = scratchieUserDao.getUserByUserIDAndSessionID(userId, sessionId);
 	    log.setUser(user);
 	    log.setSessionId(sessionId);
 	    log.setAccessDate(new Timestamp(new Date().getTime()));
-	    scratchieItemVisitDao.saveObject(log);
+	    scratchieAnswerVisitDao.saveObject(log);
 	}
     }
     
+    public ScratchieAnswer getScratchieAnswerById (Long answerUid) {
+	return  (ScratchieAnswer) userManagementService.findById(ScratchieAnswer.class, answerUid);
+    }
+    
     public int getNumberAttempts(Long userId, Long sessionId) {
-	return scratchieItemVisitDao.getUserViewLogCount(sessionId, userId);
+	return scratchieAnswerVisitDao.getUserViewLogCount(sessionId, userId);
     }
 
     public String finishToolSession(Long toolSessionId, Long userId) throws ScratchieApplicationException {
@@ -454,7 +462,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	    List<ScratchieUser> users = scratchieUserDao.getBySessionID(sessionId);
 	    for (ScratchieUser user : users) {
-		int attempts = scratchieItemVisitDao.getUserViewLogCount(sessionId, user.getUserId()); 
+		int attempts = scratchieAnswerVisitDao.getUserViewLogCount(sessionId, user.getUserId()); 
 		int mark = (attempts == 0) ? -1 : scratchie.getScratchieItems().size() - attempts + 1;
 		
 		user.setTotalAttempts(attempts);
@@ -468,8 +476,8 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	return groupSummaryList;
     }
     
-    public List<ScratchieItemVisitLog> getUserMasterDetail(Long sessionId, Long userId) {
-	List<ScratchieItemVisitLog> logs = scratchieItemVisitDao.getLogsBySessionAndUser(sessionId, userId);
+    public List<ScratchieAnswerVisitLog> getUserMasterDetail(Long sessionId, Long userId) {
+	List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySessionAndUser(sessionId, userId);
 
 	return logs;
     }
@@ -490,12 +498,12 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    for (ScratchieUser user : users) {
 				
 		int attemptNumber;
-		ScratchieItemVisitLog log = scratchieItemVisitDao.getScratchieItemLog(itemUid, user.getUserId());
+		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(itemUid, user.getUserId());
 		if (log == null) {
 		    //-1 if there is no log
 		    attemptNumber = -1;
 		} else {
-		    List<ScratchieItemVisitLog> allAttempts = scratchieItemVisitDao.getLogsBySessionAndUser(sessionId, user.getUserId());
+		    List<ScratchieAnswerVisitLog> allAttempts = scratchieAnswerVisitDao.getLogsBySessionAndUser(sessionId, user.getUserId());
 		    attemptNumber = allAttempts.indexOf(log);
 		}
 
@@ -663,8 +671,8 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	this.scratchieDao = scratchieDao;
     }
 
-    public void setScratchieItemDao(ScratchieItemDAO scratchieItemDao) {
-	this.scratchieItemDao = scratchieItemDao;
+    public void setScratchieItemDao(ScratchieItemDAO scratchieAnswerDao) {
+	this.scratchieItemDao = scratchieAnswerDao;
     }
 
     public void setScratchieSessionDao(ScratchieSessionDAO scratchieSessionDao) {
@@ -683,12 +691,12 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	this.toolService = toolService;
     }
 
-    public ScratchieItemVisitDAO getScratchieItemVisitDao() {
-	return scratchieItemVisitDao;
+    public ScratchieAnswerVisitDAO getScratchieAnswerVisitDao() {
+	return scratchieAnswerVisitDao;
     }
 
-    public void setScratchieItemVisitDao(ScratchieItemVisitDAO scratchieItemVisitDao) {
-	this.scratchieItemVisitDao = scratchieItemVisitDao;
+    public void setScratchieAnswerVisitDao(ScratchieAnswerVisitDAO scratchieItemVisitDao) {
+	this.scratchieAnswerVisitDao = scratchieItemVisitDao;
     }
 
     // *******************************************************************************
@@ -972,8 +980,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		    item.setDescription((String) urlMap.get(ToolContentImport102Manager.CONTENT_TITLE));
 		    item.setCreateBy(ruser);
 		    item.setCreateByAuthor(true);
-
-		    item.setCorrect(false);
 
 		    items.put(itemOrder, item);
 		}
