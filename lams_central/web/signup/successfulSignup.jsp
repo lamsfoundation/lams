@@ -15,5 +15,5 @@
 </c:if>
 
 <p>
-	<fmt:message key="success.msg1"/>: <a href="<lams:LAMSURL />"><fmt:message key="success.login"/></a>.
+	<fmt:message key="success.msg.1"/>: <a href="<lams:LAMSURL />"><fmt:message key="success.login"/></a>.
 </p>
