@@ -1,5 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<%-- If you change this file, remember to update the copy made for CNG-28 --%>
+
 <c:forEach var="msgDto" items="${topicThread}">
 	<c:set var="indentSize" value="${msgDto.level*3}" />
 	<c:set var="hidden" value="${msgDto.message.hideFlag}" />

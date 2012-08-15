@@ -5,6 +5,9 @@
 <%@ page import="org.lamsfoundation.lams.security.JspRedirectStrategy" %>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+
+<%-- If you change this file, remember to update the copy made for CNG-21 --%>
+
 <%	
 	if (JspRedirectStrategy.loginPageRedirected(request,response))
 	{

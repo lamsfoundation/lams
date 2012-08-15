@@ -1,5 +1,8 @@
 <%-- This is for AJAX call to refresh statistic page  --%>
 <%@ include file="/common/taglibs.jsp"%>
+
+<%-- If you change this file, remember to update the copy made for CNG-12 --%>
+
 <c:forEach var="element" items="${statisticList}">
 	<c:set var="sessionName" value="${element.key.sessionName}" />
 	<c:set var="statistic" value="${element.value}" />

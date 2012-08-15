@@ -1,5 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
 	"http://www.w3.org/TR/html4/loose.dtd">
+	
+<%-- If you change this file, remember to update the copy made for CNG-12 --%>
 
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMapID" value="${param.sessionMapID}"/>

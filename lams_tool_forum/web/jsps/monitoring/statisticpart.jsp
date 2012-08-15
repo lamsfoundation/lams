@@ -1,4 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
+
+<%-- If you change this file, remember to update the copy made for CNG-12 --%>
+
 <c:forEach var="element" items="${topicList}">
 	<c:set var="toolSessionDto" value="${element.key}" />
 	<c:set var="sessionTopicList" value="${element.value}" />

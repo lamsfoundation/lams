@@ -1,5 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<%-- If you change this file, remember to update the copy made for CNG-28 --%>
+
 <table cellpadding="0" class="alternative-color" cellspacing="0">
 	<tbody>
 		<tr>

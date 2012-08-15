@@ -9,6 +9,8 @@
 <%@ taglib uri="tags-function" prefix="fn"%>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
 
+<%-- If you change this file, remember to update the copy made for CNG-21 --%>
+
 <%JspRedirectStrategy.welcomePageStatusUpdate(request, response);%>
 <%HttpSessionManager.getInstance().updateHttpSessionByLogin(request.getSession(),request.getRemoteUser());%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
