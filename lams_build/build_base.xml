@@ -13,6 +13,7 @@
 	 <property file="build.properties" />
 	 <!-- Import common property files; base dir for this is the current file -->
 	 <property file="${base.dir}/common.properties"/>
+	 <property file="${base.dir}/build.properties"/>
 	 <property file="${base.dir}/${osPropertiesName}.properties"/>
  
 	

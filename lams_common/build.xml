@@ -85,8 +85,12 @@
                 <include name="create_lams_11_db.sql" />
 			</fileset>
 	        <filterset>
-	            <filter token="datetimestamp" value="${DSTAMP}${TSTAMP}"/>
-                    <filter token="dbname" value="${db.name}"/>
+	            <filter token="datetimestamp" value="${DSTAMP}${TSTAMP}" />
+                <filter token="dbname" value="${db.name}" />
+	        	<filter token="contentrepository.directory" value="${contentrepository.directory}" />
+                <filter token="temp.directory" value="${contentrepository.base}/temp" />
+                <filter token="dump.directory" value="${contentrepository.base}/dump" />
+	        	<filter token="ear.directory" value="${jboss.deploy}" />
 	        </filterset>
 		</copy>
 		

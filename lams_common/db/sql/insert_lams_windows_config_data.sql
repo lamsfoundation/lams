@@ -8,13 +8,13 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('Version','2.4', 'config.version', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('TempDir','C:/lams/temp', 'config.temp.dir', 'config.header.system', 'STRING', 1);
+values ('TempDir','@temp.directory@', 'config.temp.dir', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('DumpDir','C:/lams/dump', 'config.dump.dir', 'config.header.system', 'STRING', 1);
+values ('DumpDir','@dump.directory@', 'config.dump.dir', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('EARDir','D:/jboss-5/server/default/deploy/lams.ear', 'config.ear.dir', 'config.header.system', 'STRING', 1);
+values ('EARDir','@ear.directory@', 'config.ear.dir', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('InternalSMTPServer','true', 'config.use.internal.smtp.server', 'config.header.email', 'BOOLEAN', 0);
@@ -26,7 +26,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('LamsSupportEmail','', 'config.lams.support.email', 'config.header.email', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('ContentRepositoryPath','C:/lams/repository', 'config.content.repository.path', 'config.header.uploads', 'STRING', 1);
+values ('ContentRepositoryPath','@contentrepository.directory@', 'config.content.repository.path', 'config.header.uploads', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('UploadFileMaxSize','1048576', 'config.upload.file.max.size', 'config.header.uploads', 'LONG', 1);
@@ -274,20 +274,20 @@ values ('ProfileEditEnable','true', 'config.profile.edit.enable', 'config.header
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('ProfilePartialEditEnable','true', 'config.profile.partial.edit.enable', 'config.header.features', 'BOOLEAN', 1);
 
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('KalturaServer','http://www.kaltura.com', 'config.kaltura.server', 'config.header.kaltura', 'STRING', 0);
 
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('KalturaPartnerId','1073272', 'config.kaltura.partner.id', 'config.header.kaltura', 'STRING', 0);
 
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('KalturaSubPartnerId','107327200', 'config.kaltura.sub.partner.id', 'config.header.kaltura', 'STRING', 0);
 
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('KalturaUserSecret','f6b13f7e128e081b5cc9bb9664fd8717', 'config.kaltura.user.secret', 'config.header.kaltura', 'STRING', 0);
 
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('KalturaKCWUiConfId','1000741', 'config.kaltura.kcw.uiconfid', 'config.header.kaltura', 'STRING', 0);
 
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('KalturaKDPUiConfId','6308762', 'config.kaltura.kdp.uiconfid', 'config.header.kaltura', 'STRING', 0);

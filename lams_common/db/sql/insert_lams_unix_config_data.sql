@@ -1,5 +1,5 @@
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('ServerURL','http://137.111.246.19:8080/lams/', 'config.server.url', 'config.header.system', 'STRING', 1);
+values ('ServerURL','http://localhost:8080/lams/', 'config.server.url', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('ServerURLContextPath','lams/', 'config.server.url.context.path', 'config.header.system', 'STRING', 1);
@@ -8,13 +8,13 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('Version','2.4', 'config.version', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('TempDir','/var/opt/lams/temp', 'config.temp.dir', 'config.header.system', 'STRING', 1);
+values ('TempDir','@temp.directory@', 'config.temp.dir', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('DumpDir','/var/opt/lams/dump', 'config.dump.dir', 'config.header.system', 'STRING', 1);
+values ('DumpDir','@dump.directory@', 'config.dump.dir', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('EARDir','/usr/local/jboss-5.1/server/default/deploy/lams.ear/', 'config.ear.dir', 'config.header.system', 'STRING', 1);
+values ('EARDir','@ear.directory@', 'config.ear.dir', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
 values ('EnableServerRegistration', 'false', 'config.server2server.registration.enable', 'config.header.system', 'BOOLEAN', 1);
@@ -29,7 +29,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('LamsSupportEmail','', 'config.lams.support.email', 'config.header.email', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('ContentRepositoryPath','/var/opt/lams/repository', 'config.content.repository.path', 'config.header.uploads', 'STRING', 1);
+values ('ContentRepositoryPath','@contentrepository.directory@', 'config.content.repository.path', 'config.header.uploads', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('UploadFileMaxSize','1048576', 'config.upload.file.max.size', 'config.header.uploads', 'LONG', 1);
