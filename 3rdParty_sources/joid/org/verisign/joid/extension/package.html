@@ -1,0 +1,72 @@
+<html>
+<body>
+
+The JOID OpenID extensions package.
+
+This package contains code for OpenID extensions, and provides a
+convenient base class to derive extensions from.
+
+<p>
+To make use of the extensions classes, use the
+<code>getExtensions</code> and <code>addExtension</code> methods in
+the <code>AuthenticationRequest</code> and
+<code>AuthenticationResponse</code> classes.  Validate that the
+extension exists using the <code>Extension.isValid</code> method.
+</p>
+
+<p>
+Example of parsing incoming requests or responses:
+<pre>
+Request req = RequestFactory.parse(s);
+if (req instanceof AuthenticationRequest) {
+    AuthenticationRequest ar = (AuthenticationRequest) req;
+    PapeRequest pr = new PapeRequest(ar.getExtensions());
+    if (pr.isValid()) {
+        ...
+    }
+}
+</pre>
+and
+<pre>
+Response resp = ResponseFactory.parse(s);
+if (resp instanceof AuthenticationResponse) {
+    AuthenticationResponse ar = (AuthenticationResponse) resp;
+    PapeResponse pr = new PapeResponse(ar.getExtensions());
+    if (pr.isValid()) {
+        ...
+    }
+}
+</pre>
+</p>
+
+<p>
+Example of submitting extensions to outgoing requests or responses:
+<pre>
+AuthenticationRequest ar = AuthenticationRequest.create(identity,
+                                                        returnTo,
+                                                        trustRoot,
+                                                        assocHandle);
+PapeRequest pr = new PapeRequest();
+pr.setMaxAuthAge(3600);
+ar.addExtension(pr);
+</pre>
+and
+<pre>
+Response resp = request.processUsing(serverInfo);
+if (resp instanceof AuthenticationResponse) {
+    AuthenticationResponse ar = (AuthenticationResponse)resp;
+    PapeResponse pr = new PapeResponse();
+    pr.setAuthAge(3600);
+    pr.setAuthPolicies(new String[] 
+        { "http://schemas.openid.net/pape/policies/2007/06/phishing-resistant",
+          "http://schemas.openid.net/pape/policies/2007/06/multi-factor",
+          "http://schemas.openid.net/pape/policies/2007/06/multi-factor-physical" });
+    pr.setNistAuthLevel(4);
+    ar.addExtension(pr);
+}
+</pre>
+</p>
+
+</body>
+</html>
+

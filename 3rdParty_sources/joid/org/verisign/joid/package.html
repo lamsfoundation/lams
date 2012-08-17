@@ -1,0 +1,46 @@
+<html>
+<body>
+
+The JOID Java OpenID package.
+
+JOID processes messages by using a factory to parse the request, and then 
+use this request to generate a response. 
+
+There are two ways of using this package, depending on your needs.
+
+<h2>High level</h2>
+<pre>
+// Get a store implementation (used to handle associations).
+Store store = ...
+
+// Get an OpenID implementation
+OpenId openId = new OpenId(store);
+
+// Process the request into a response
+String response = openid.handleRequest(query);
+
+// then send the response back to the sender
+</pre>
+
+<h2>Slightly lower lever</h2>
+If you need to specify which type of crypto implementation to use,
+or if you need to inspect incoming requests or outgoing responses,
+you can operate on a slightly lower level
+
+<pre>
+// Parse the incoming message
+Request req = RequestFactory.parse(string);
+
+// Get a store implementation (used to handle associations) and a 
+// crypto implementation (to handle the OpenID protocol crypto)
+Store store = ...
+Crypto crypto = ...
+
+// Use the request and process with the store and crypto to
+// produce a response
+Response resp = req.processUsing(store, crypto);
+</pre>
+
+</body>
+</html>
+
