@@ -5,9 +5,17 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_monitoring"/>
-	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jbossweb">
+		<attributes>
+			<attribute name="javadoc_location" value="http://docs.oracle.com/cd/E17802_01/products/products/servlet/2.5/docs/servlet-2_5-mr2/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/log4j.jar"/>
-	<classpathentry kind="var" path="JBOSS_HOME/common/lib/quartz.jar"/>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/quartz.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/quartz">
+		<attributes>
+			<attribute name="javadoc_location" value="http://javasourcecode.org/html/open-source/quartz/quartz-1.5.2/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/mail.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
