@@ -1,3 +1,4 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <%--
     Original Version: 2007 LAMS Foundation
     Updated for Blackboard 9.1 SP6 (including new bbNG tag library) 2011
