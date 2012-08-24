@@ -1,3 +1,4 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <%--
     Original Version: 2007 LAMS Foundation
     Updated for Blackboard 9.1 SP6 (including new bbNG tag library) 2011
@@ -119,17 +120,6 @@
 		     		var tree = new YAHOO.widget.TreeView("treeDiv", <%=learningDesigns%>);
 		        	tree.getNodeByIndex(1).expand(true);
 		        	tree.getNodeByIndex(2).expand(true);
-		           
-		            
-		            if (sequence_id > 0) {
-					  var node = tree.getNodeByProperty('id', sequence_id);
-					  var sequenceName = node.label;
-					  var updateDiv = document.createElement('div');
-					  updateDiv.setAttribute('class','note');
-					  updateDiv.setAttribute('id','currentsequence');
-					  updateDiv.innerHTML = '<p>' + updatewarning + '</p><strong>' + currentsequence + sequenceName +'</strong>';
-					  document.getElementById('updatesequence').appendChild(updateDiv);
-					}
 					tree.render();
 					tree.subscribe('clickEvent',function(oArgs) {
 					    selectSequence(oArgs.node.data.id, oArgs.node.label);
@@ -283,8 +273,13 @@
             	if ((lamsServerUrl.substring(0, event.origin.length) === event.origin) && (event.data == "refresh")) {
             		window.location.reload();
             	}
-            }  
-            window.addEventListener("message", receiveMessage, false);
+            }
+			if (window.addEventListener){
+				window.addEventListener("message", receiveMessage, false);
+			} else if (window.attachEvent){
+				window.attachEvent("message", receiveMessage);
+			}
+            
 
         //-->
         </script>
