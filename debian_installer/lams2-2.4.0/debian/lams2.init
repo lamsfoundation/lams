@@ -29,9 +29,10 @@ LONGNAME="LAMS 2 Server"
 PIDFILE="/var/run/$NAME.pid"
 USER=lams
 GROUP=lams
-JBOSS_OPTS=
 # Use this when using a non-default server configuration in jboss
-#JBOSS_OPTS="-c <server>"
+#JBOSS_OPTS="-b 0.0.0 -c <server>"
+JBOSS_OPTS= -b 0.0.0.0
+# If you want to bind LAMS to an specific IP, change the 0.0.0.0 to the IP.
 
 test -x $JAVA || exit 0
 
@@ -67,7 +68,7 @@ fi
 DAEMON_OPTS="$JAVA_OPTS \
       -Djava.endorsed.dirs=$JBOSS_ENDORSED_DIRS \
       -classpath $JBOSS_CLASSPATH \
-      org.jboss.Main -b 0.0.0.0 $JBOSS_OPTS"
+      org.jboss.Main $JBOSS_OPTS"
 
 start() {
         start-stop-daemon --start --quiet --background --make-pidfile \
