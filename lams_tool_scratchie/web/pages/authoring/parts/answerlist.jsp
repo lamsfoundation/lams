@@ -23,7 +23,7 @@
 						</tr>
 						<tr>
 							<td style="border-bottom:0px; vertical-align:top; background:none;" class="right-buttons">
-								<input type="radio" name="answerCorrect" value="${answer.orderId}" <c:if test="${answer.correct == true}">checked="checked"</c:if> >
+								<input type="radio" alt="${status.index}" name="answerCorrect" value="${answer.orderId}" <c:if test="${answer.correct == true}">checked="checked"</c:if> >
 								
 								<span class="field-name">
 									<fmt:message key="label.authoring.basic.item.correct" />

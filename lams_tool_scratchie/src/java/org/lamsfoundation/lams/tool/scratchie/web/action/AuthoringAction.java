@@ -854,22 +854,22 @@ public class AuthoringAction extends Action {
     private ActionForward switchAnswer(ActionMapping mapping, HttpServletRequest request, boolean up) {
 	SortedSet<ScratchieAnswer> answerList = getAnswersFromRequest(request, false);
 	
-	int itemIndex = NumberUtils.stringToInt(request.getParameter(ScratchieConstants.PARAM_ITEM_INDEX), -1);
-	if (itemIndex != -1) {
+	int answerIndex = NumberUtils.stringToInt(request.getParameter(ScratchieConstants.PARAM_ANSWER_INDEX), -1);
+	if (answerIndex != -1) {
 	    List<ScratchieAnswer> rList = new ArrayList<ScratchieAnswer>(answerList);
 	    
 	    // get current and the target item, and switch their sequnece
-	    ScratchieAnswer item = rList.get(itemIndex);
-	    ScratchieAnswer repOption;
+	    ScratchieAnswer answer = rList.get(answerIndex);
+	    ScratchieAnswer repAnswer;
 	    if (up) {
-		repOption = rList.get(--itemIndex);
+		repAnswer = rList.get(--answerIndex);
 	    } else {
-		repOption = rList.get(++itemIndex);
+		repAnswer = rList.get(++answerIndex);
 	    }
 		
-	    int upSeqId = repOption.getOrderId();
-	    repOption.setOrderId(item.getOrderId());
-	    item.setOrderId(upSeqId);
+	    int upSeqId = repAnswer.getOrderId();
+	    repAnswer.setOrderId(answer.getOrderId());
+	    answer.setOrderId(upSeqId);
 
 	    // put back list, it will be sorted again
 	    answerList.clear();

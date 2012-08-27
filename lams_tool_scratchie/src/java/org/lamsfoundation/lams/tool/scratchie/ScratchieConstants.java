@@ -32,7 +32,7 @@ public class ScratchieConstants {
 
     public static final int COMPLETED = 1;
     
-    public static final int INITIAL_ANSWERS_NUMBER = 3;
+    public static final int INITIAL_ANSWERS_NUMBER = 5;
 
     // for action forward name
     public static final String SUCCESS = "success";
@@ -108,8 +108,6 @@ public class ScratchieConstants {
     public static final String ATTR_ITEM_SUMMARY = "itemSummary";
 
     public static final String ATTR_RESOURCE_INSTRUCTION = "instructions";
-    
-    public static final String ATTR_SCRATCHING_LOCK = "scratchingLock";
 
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
     

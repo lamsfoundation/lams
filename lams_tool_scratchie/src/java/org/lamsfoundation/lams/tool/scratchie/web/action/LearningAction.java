@@ -196,17 +196,6 @@ public class LearningAction extends Action {
 	Collection<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
 	items.addAll(initialItems);
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
-	
-	boolean scratchingLock = isUserFinished;
-	//TODO!!!!
-//	for (ScratchieItem item : items) {
-//	    if (item.isScratched() && item.isCorrect()) {
-//		scratchingLock = true;
-//	    }
-//	}
-	sessionMap.put(ScratchieConstants.ATTR_SCRATCHING_LOCK, scratchingLock);
-	
-	
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 
 	return mapping.findForward(ScratchieConstants.SUCCESS);

@@ -4,8 +4,14 @@
 <!-- Advance Tab Content -->
 
 <p>
-	<html:checkbox property="scratchie.reflectOnActivity" styleClass="noBorder" styleId="reflectOn">
-	</html:checkbox>
+	<html:checkbox property="scratchie.extraPoint" styleClass="noBorder" styleId="extraPoint"/>
+	<label for="extraPoint">
+		<fmt:message key="label.authoring.advanced.give.extra.point" />
+	</label>
+</p>
+
+<p>
+	<html:checkbox property="scratchie.reflectOnActivity" styleClass="noBorder" styleId="reflectOn"/>
 	<label for="reflectOn">
 		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 	</label>

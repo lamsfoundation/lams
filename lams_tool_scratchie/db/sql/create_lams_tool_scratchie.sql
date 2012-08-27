@@ -31,6 +31,7 @@ create table tl_lascrt11_scratchie (
    content_id bigint unique,
    reflect_instructions varchar(255), 
    reflect_on_activity smallint,
+   extra_point smallint,
    primary key (uid)
 )ENGINE=InnoDB;
 create table tl_lascrt11_scratchie_item (
@@ -96,13 +97,21 @@ alter table tl_lascrt11_user add index FK_NEW_610529188_30113BFC309ED320 (scratc
 
 
 INSERT INTO `tl_lascrt11_scratchie` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `run_offline`,
- `instructions`, `online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, `reflect_on_activity`) VALUES
-  (1,NULL,NULL,NULL,'Scratchie','0','Scenario explanation ', null,null,0,0,${default_content_id},0);
+ `instructions`, `online_instructions`, `offline_instructions`, `content_in_use`, `define_later`, `content_id`, `reflect_on_activity`, `extra_point`) VALUES
+  (1,NULL,NULL,NULL,'Scratchie','0','Scenario explanation ', null,null,0,0,${default_content_id},0, 0);
 
 INSERT INTO `tl_lascrt11_scratchie_item` (`uid`, `title`, `description`, `create_by`, `create_date`, `create_by_author`, `scratchie_uid`, `session_uid`, `order_id`) VALUES 
   (1, 'Question Title','Question Description',null,NOW(),1,1,NULL, 1);
   
 INSERT INTO `tl_lascrt11_scratchie_answer` (`uid`, `description`, `correct`, `scratchie_item_uid`, `order_id`) VALUES 
   (1, 'Question Answer A',1,1,0);
-    
+INSERT INTO `tl_lascrt11_scratchie_answer` (`uid`, `description`, `correct`, `scratchie_item_uid`, `order_id`) VALUES 
+  (2, 'Question Answer B',0,1,1);
+INSERT INTO `tl_lascrt11_scratchie_answer` (`uid`, `description`, `correct`, `scratchie_item_uid`, `order_id`) VALUES 
+  (3, 'Question Answer C',0,1,2);
+INSERT INTO `tl_lascrt11_scratchie_answer` (`uid`, `description`, `correct`, `scratchie_item_uid`, `order_id`) VALUES 
+  (4, 'Question Answer D',0,1,3);  
+INSERT INTO `tl_lascrt11_scratchie_answer` (`uid`, `description`, `correct`, `scratchie_item_uid`, `order_id`) VALUES 
+  (5, 'Question Answer E',0,1,4);  
+  
 SET FOREIGN_KEY_CHECKS=1;

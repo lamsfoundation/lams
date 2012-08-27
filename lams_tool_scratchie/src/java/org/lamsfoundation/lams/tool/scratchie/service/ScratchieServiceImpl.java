@@ -389,7 +389,11 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     public void retrieveScratched(Collection<ScratchieItem> items, ScratchieUser user) {
+	
+	
 	for (ScratchieItem item : items) {
+	    boolean isItemUnraveled = false;
+	    
 	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>)item.getAnswers()) {
 		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answer.getUid(),
 			user.getUserId());
@@ -398,9 +402,13 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		} else {
 		    answer.setScratched(true);
 		    answer.setScratchedDate(log.getAccessDate());
+		    isItemUnraveled |= answer.isCorrect();
 		}
 	    }
+	    item.setUnraveled(isItemUnraveled);
 	}
+	
+	
     }
 
     public void setAnswerAccess(Long answerUid, Long userId, Long sessionId) {
@@ -945,6 +953,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    toolContentObj.setRunOffline(Boolean.FALSE);
 	    toolContentObj.setUpdated(now);
 	    toolContentObj.setReflectOnActivity(Boolean.FALSE);
+	    toolContentObj.setExtraPoint(Boolean.FALSE);
 	    toolContentObj.setReflectInstructions(null);
 
 	    // leave as empty, no need to set them to anything.

@@ -153,16 +153,29 @@
 		    			title: "required",
 		    			hasAnswerFilled: {
 		    				required: function(element) {
+		    					//check there should be at least one answer filled
 				    			prepareAnswerEditorsForAjaxSubmit();
 		    		        	return $("textarea[name^=answerDescription]:filled").length < 1;
+			    		    }
+	    			    },
+	    			    hasFilledCorrectAnswer: {
+		    				required: function(element) {
+		    					//check one answer should be selected as correct (and be filled at the same time)
+		    					prepareAnswerEditorsForAjaxSubmit();
+		    					
+		    					var hasFilledCorrectAnswer = false;
+		    					$("input[name^=answerCorrect]:checked").each(function() {
+		    						var statusIndex = this.alt;
+		    						var answerDescription = $("textarea[name=answerDescription" + statusIndex + "]");
+		    						hasFilledCorrectAnswer = answerDescription.val() != "";
+		    					});
+		    					
+		    		        	return !hasFilledCorrectAnswer;
 			    		    }
 	    			    }
 		    		},
 		    		messages: {
-		    			title: "<fmt:message key='label.authoring.title.required'/>",
-		    			hasAnswerFilled: {
-		    				required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
-		    			}
+		    			title: "<fmt:message key='label.authoring.title.required'/>"
 		    		},
 		    	    invalidHandler: function(form, validator) {
 		    		      var errors = validator.numberOfInvalids();
@@ -230,6 +243,17 @@
 				<lams:CKEditor id="description" value="${formBean.description}"
 					contentFolderID="${formBean.contentFolderID}" >
 				</lams:CKEditor>
+				
+				<br><br>
+				<input type="hidden" name="hasAnswerFilled" id="hasAnswerFilled">
+				<div class="field-name space-top">
+					<fmt:message key="label.authoring.scratchie.answers" />
+				</div>
+				<label for="hasAnswerFilled" class="error" style="display: none;"><fmt:message key='label.authoring.error.possible.answer'/></label>
+				
+				<input type="hidden" name="hasFilledCorrectAnswer" id=hasFilledCorrectAnswer>
+				<label for="hasFilledCorrectAnswer" class="error" style="display: none;"><br><fmt:message key='label.authoring.error.correct.answer'/></label>
+				
 			</html:form>
 			
 			<!-- Answers -->

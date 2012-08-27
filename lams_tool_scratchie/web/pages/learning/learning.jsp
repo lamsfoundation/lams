@@ -26,15 +26,9 @@
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
 	<script type="text/javascript">
 	<!--
-		$(document).ready(function(){
-			
-			//hide finish button if user haven't guessed correct answer nor used all attempts
-			<c:if test="${! sessionMap.scratchingLock}">
-				//$("#finishButton").hide();
-			</c:if>
 
-		});
-		function scratchItem(answerUid){
+		function scratchItem(itemUid, answerUid){
+			var id = '-' + itemUid + '-' + answerUid;
 			
 	        $.ajax({
 	        	async: false,
@@ -45,31 +39,33 @@
 	            success: function (json) {
 	            	if (json.answerCorrect) {
 	            		//show animation
-	            		$('#image' + answerUid).attr("src", "<html:rewrite page='/includes/images/scratchie-correct-animation.gif'/>?reqID=" + (new Date()).getTime());
+	            		$('#image' + id).attr("src", "<html:rewrite page='/includes/images/scratchie-correct-animation.gif'/>?reqID=" + (new Date()).getTime());
 	            		
-	            		disableScratching();
+	            		//disable scratching
+	            		$("[id^=imageLink-" + itemUid + "]").removeAttr('onclick'); 
+	            		$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
+	            		$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
+
 	            	} else {
 	            		
-	            		//show animation, disable onclick, move to the bottom this item
-	            		$('#image' + answerUid).attr("src", "<html:rewrite page='/includes/images/scratchie-wrong-animation.gif'/>?reqID=" + (new Date()).getTime());
-	            		$('#imageLink' + answerUid).removeAttr('onclick');	            		
+	            		//show animation, disable onclick
+	            		$('#image' + id).attr("src", "<html:rewrite page='/includes/images/scratchie-wrong-animation.gif'/>?reqID=" + (new Date()).getTime());
+	            		$('#imageLink' + id).removeAttr('onclick');
+	            		$('#imageLink' + id).css('cursor','default');
 	            	}
 	            }
 	       	});
 		}
-		function disableScratching() {
-    		//$("[id^=imageLink]").removeAttr('onclick');
-    		//$("img", $("#scratches")).not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
-    		//$("#finishButton").show();
-		}
+
 		function finishSession(){
-			//var	finishConfirmed = confirm("<fmt:message key="warning.msg.are.you.sure.you.want.to.finish"></fmt:message>");
+			var numberOfAvailableScratches = $("[id^=imageLink-][onclick]").length;
+			var	finishConfirmed = (numberOfAvailableScratches > 0) ? confirm("<fmt:message key="label.one.or.more.questions.not.completed"></fmt:message>") : true;
 			
-			//if (finishConfirmed) {
+			if (finishConfirmed) {
 				document.getElementById("finishButton").disabled = true;
 				document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 				return false;
-			//}
+			}
 		}
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
@@ -103,14 +99,14 @@
 								<img src="<html:rewrite page='/includes/images/scratchie-correct.png'/>" class="scartchie-image">
 							</c:when>
 							<c:when test="${answer.scratched && !answer.correct}">
-								<img src="<html:rewrite page='/includes/images/scratchie-wrong.png'/>" class="scartchie-image">
+								<img src="<html:rewrite page='/includes/images/scratchie-wrong.png'/>" id="image-${item.uid}-${answer.uid}" class="scartchie-image">
 							</c:when>
-							<c:when test="${sessionMap.scratchingLock}">
+							<c:when test="${sessionMap.userFinished || item.unraveled}">
 								<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image">
 							</c:when>
 							<c:otherwise>
-								<a href="#nogo" onclick="scratchItem(${answer.uid}); return false;" id="imageLink${answer.uid}">
-									<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image" id="image${answer.uid}" />
+								<a href="#nogo" onclick="scratchItem(${item.uid}, ${answer.uid}); return false;" id="imageLink-${item.uid}-${answer.uid}">
+									<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image" id="image-${item.uid}-${answer.uid}" />
 								</a>
 							</c:otherwise>
 						</c:choose>

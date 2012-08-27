@@ -82,6 +82,8 @@ public class Scratchie implements Cloneable {
 
     // scratchie Items
     private Set scratchieItems;
+    
+    private boolean extraPoint;
 
     private boolean reflectOnActivity;
 
@@ -478,5 +480,17 @@ public class Scratchie implements Cloneable {
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
 	this.reflectOnActivity = reflectOnActivity;
+    }
+    
+    /**
+     * @hibernate.property column="extra_point"
+     * @return
+     */
+    public boolean isExtraPoint() {
+	return extraPoint;
+    }
+
+    public void setExtraPoint(boolean extraPoint) {
+	this.extraPoint = extraPoint;
     }
 }

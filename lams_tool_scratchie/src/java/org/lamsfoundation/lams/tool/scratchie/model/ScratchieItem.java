@@ -57,6 +57,10 @@ public class ScratchieItem implements Cloneable {
     // scratchie Items
     private Set answers;
     
+    // ***********************************************
+    // DTO fields:
+    private boolean isUnraveled;
+    
     /**
      * Default contruction method.
      * 
@@ -188,7 +192,7 @@ public class ScratchieItem implements Cloneable {
     }
     
     /**
-     * @hibernate.set inverse="false" cascade="all" order-by="order_id desc"
+     * @hibernate.set inverse="false" cascade="all" order-by="order_id asc"
      * @hibernate.collection-key column="scratchie_item_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer"
      * 
@@ -200,5 +204,13 @@ public class ScratchieItem implements Cloneable {
 
     public void setAnswers(Set answers) {
 	this.answers = answers;
+    }
+    
+    public boolean isUnraveled() {
+	return isUnraveled;
+    }
+
+    public void setUnraveled(boolean isUnraveled) {
+	this.isUnraveled = isUnraveled;
     }
 }
