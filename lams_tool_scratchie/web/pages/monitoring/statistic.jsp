@@ -37,7 +37,10 @@
 					${user.firstName} ${user.lastName}
 				</td>
 				<td>
-					${user.mark}
+					<c:choose>
+						<c:when test='${user.mark == -1}'>-</c:when> 
+						<c:otherwise>${user.mark}</c:otherwise>
+					</c:choose>
 				</td>
 			</tr>
 		</c:forEach>

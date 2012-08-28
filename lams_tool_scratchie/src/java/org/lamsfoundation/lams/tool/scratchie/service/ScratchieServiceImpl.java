@@ -390,7 +390,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     public void retrieveScratched(Collection<ScratchieItem> items, ScratchieUser user) {
 	
-	
 	for (ScratchieItem item : items) {
 	    boolean isItemUnraveled = false;
 	    
@@ -407,7 +406,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    }
 	    item.setUnraveled(isItemUnraveled);
 	}
-	
 	
     }
 
@@ -470,10 +468,34 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	    List<ScratchieUser> users = scratchieUserDao.getBySessionID(sessionId);
 	    for (ScratchieUser user : users) {
-		int attempts = scratchieAnswerVisitDao.getUserViewLogCount(sessionId, user.getUserId()); 
-		int mark = (attempts == 0) ? -1 : scratchie.getScratchieItems().size() - attempts + 1;
 		
-		user.setTotalAttempts(attempts);
+		int totalAttempts = scratchieAnswerVisitDao.getUserViewLogCount(sessionId, user.getUserId()); 
+		user.setTotalAttempts(totalAttempts);
+		
+		int mark = 0;
+		//for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
+		if (totalAttempts == 0) {
+		    mark = -1;
+		    
+		} else {
+		    Set<ScratchieItem> items = scratchie.getScratchieItems();
+		    retrieveScratched(items, user);
+		    
+		    for (ScratchieItem item : items) {
+			//add mark only if item was unraveled
+			if (item.isUnraveled()) {
+			    int attempts = scratchieAnswerVisitDao.getUserViewLogCount(sessionId, user.getUserId(),
+				    item.getUid());
+			    mark += item.getAnswers().size() - attempts;
+
+			    // add extra point if needed
+			    if (scratchie.isExtraPoint() && (attempts == 1)) {
+				mark++;
+			    }
+			}
+		    }
+		}
+		
 		user.setMark(mark);
 	    }
 	    

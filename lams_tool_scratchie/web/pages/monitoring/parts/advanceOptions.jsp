@@ -11,6 +11,23 @@
 
 <div class="monitoring-advanced" id="advancedDiv" style="display:none">
 <table class="alternative-color">
+
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advanced.give.extra.point" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${sessionMap.scratchie.extraPoint == true}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
 	
 	<tr>
 		<td>

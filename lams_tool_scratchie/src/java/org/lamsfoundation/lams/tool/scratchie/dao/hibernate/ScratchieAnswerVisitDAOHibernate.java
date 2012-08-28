@@ -30,6 +30,7 @@ import java.util.Map;
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAnswerVisitDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 
 public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implements ScratchieAnswerVisitDAO {
@@ -42,6 +43,9 @@ public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implement
 
     private static final String FIND_VIEW_COUNT_BY_USER = "select count(*) from "
 	    + ScratchieAnswerVisitLog.class.getName() + " as r where  r.sessionId=? and  r.user.userId =?";
+    
+    private static final String FIND_VIEW_COUNT_BY_USER_AND_ITEM = "select count(*) from "
+	    + ScratchieAnswerVisitLog.class.getName() + " as l where l.sessionId=? and l.user.userId =? and l.scratchieAnswer.scratchieItem.uid=?";
 
     private static final String FIND_SUMMARY = "select v.scratchieAnswer.uid, count(v.scratchieAnswer) from  "
 	    + ScratchieAnswerVisitLog.class.getName() + " as v , " + ScratchieSession.class.getName() + " as s, "
@@ -57,6 +61,13 @@ public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implement
 
     public int getUserViewLogCount(Long toolSessionId, Long userId) {
 	List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER, new Object[] { toolSessionId, userId });
+	if (list == null || list.size() == 0)
+	    return 0;
+	return ((Number) list.get(0)).intValue();
+    }
+    
+    public int getUserViewLogCount(Long toolSessionId, Long userId, Long itemUid) {
+	List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER_AND_ITEM, new Object[] { toolSessionId, userId, itemUid });
 	if (list == null || list.size() == 0)
 	    return 0;
 	return ((Number) list.get(0)).intValue();

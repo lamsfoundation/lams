@@ -162,6 +162,12 @@ public interface IScratchieService {
      */
     void saveOrUpdateScratchieSession(ScratchieSession resSession);
 
+    /**
+     * Fill in scratchieItems with information about whether they were unraveled; and answers with information on their scratched.
+     * 
+     * @param scratchieItemList
+     * @param user
+     */
     void retrieveScratched(Collection<ScratchieItem> scratchieItemList, ScratchieUser user);
 
     void setAnswerAccess(Long scratchieItemUid, Long userId, Long sessionId);

@@ -45,6 +45,8 @@ public class ScratchieAnswer implements Cloneable {
     private boolean correct;
 
     private Integer orderId;
+    
+    private ScratchieItem scratchieItem;
 
     // ***********************************************
     // DTO fields:
@@ -104,6 +106,17 @@ public class ScratchieAnswer implements Cloneable {
 
     public void setOrderId(Integer orderId) {
         this.orderId = orderId;
+    }
+    
+    /**
+     * @hibernate.many-to-one column="scratchie_item_uid" cascade="none"
+     */
+    public ScratchieItem getScratchieItem() {
+	return scratchieItem;
+    }
+
+    public void setScratchieItem(ScratchieItem scratchieItem) {
+	this.scratchieItem = scratchieItem;
     }
 
     public void setScratched(boolean complete) {
