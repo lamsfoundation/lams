@@ -172,7 +172,7 @@ public interface IScratchieService {
 
     void setAnswerAccess(Long scratchieItemUid, Long userId, Long sessionId);
     
-    int getNumberAttempts(Long userId, Long sessionId);
+    int getUserMark(Long sessionId, Long userId);
 
     /**
      * If success return next activity's url, otherwise return null.

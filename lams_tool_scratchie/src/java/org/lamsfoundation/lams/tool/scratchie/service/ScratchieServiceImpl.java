@@ -426,19 +426,11 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     public ScratchieAnswer getScratchieAnswerById (Long answerUid) {
 	return  (ScratchieAnswer) userManagementService.findById(ScratchieAnswer.class, answerUid);
     }
-    
-    public int getNumberAttempts(Long userId, Long sessionId) {
-	return scratchieAnswerVisitDao.getUserViewLogCount(sessionId, userId);
-    }
 
     public String finishToolSession(Long toolSessionId, Long userId) throws ScratchieApplicationException {
 	ScratchieUser user = scratchieUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(true);
 	scratchieUserDao.saveObject(user);
-
-	// ScratchieSession session = scratchieSessionDao.getSessionBySessionId(toolSessionId);
-	// session.setStatus(ScratchieConstants.COMPLETED);
-	// scratchieSessionDao.saveObject(session);
 
 	String nextUrl = null;
 	try {
@@ -472,30 +464,8 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		int totalAttempts = scratchieAnswerVisitDao.getUserViewLogCount(sessionId, user.getUserId()); 
 		user.setTotalAttempts(totalAttempts);
 		
-		int mark = 0;
 		//for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
-		if (totalAttempts == 0) {
-		    mark = -1;
-		    
-		} else {
-		    Set<ScratchieItem> items = scratchie.getScratchieItems();
-		    retrieveScratched(items, user);
-		    
-		    for (ScratchieItem item : items) {
-			//add mark only if item was unraveled
-			if (item.isUnraveled()) {
-			    int attempts = scratchieAnswerVisitDao.getUserViewLogCount(sessionId, user.getUserId(),
-				    item.getUid());
-			    mark += item.getAnswers().size() - attempts;
-
-			    // add extra point if needed
-			    if (scratchie.isExtraPoint() && (attempts == 1)) {
-				mark++;
-			    }
-			}
-		    }
-		}
-		
+		int mark = (totalAttempts == 0) ? -1 : getUserMark(sessionId, user.getUserId());		
 		user.setMark(mark);
 	    }
 	    
@@ -504,6 +474,30 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	}
 
 	return groupSummaryList;
+    }
+    
+    public int getUserMark(Long sessionId, Long userId) {
+	ScratchieUser user = getUserByIDAndSession(userId, sessionId);
+	ScratchieSession session = scratchieSessionDao.getSessionBySessionId(sessionId);
+	Scratchie scratchie = session.getScratchie();
+	Set<ScratchieItem> items = scratchie.getScratchieItems();
+	retrieveScratched(items, user);
+	
+	int mark = 0;
+	for (ScratchieItem item : items) {
+	    // add mark only if an item was unraveled
+	    if (item.isUnraveled()) {
+		int attempts = scratchieAnswerVisitDao.getUserViewLogCount(sessionId, userId, item.getUid());
+		mark += item.getAnswers().size() - attempts;
+
+		// add extra point if needed
+		if (scratchie.isExtraPoint() && (attempts == 1)) {
+		    mark++;
+		}
+	    }
+	}
+	
+	return mark;
     }
     
     public List<ScratchieAnswerVisitLog> getUserMasterDetail(Long sessionId, Long userId) {

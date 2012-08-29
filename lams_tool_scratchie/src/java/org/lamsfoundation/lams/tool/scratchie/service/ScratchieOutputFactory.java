@@ -42,15 +42,9 @@ public class ScratchieOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
 	    throws ToolException {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-	switch (definitionType) {
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
-	    break;
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
-	    ToolOutputDefinition definition = buildRangeDefinition(ScratchieConstants.LEARNER_NUMBER_ATTEMPTS,
-		    new Long(0), null);
-	    definitionMap.put(ScratchieConstants.LEARNER_NUMBER_ATTEMPTS, definition);
-	    break;
-	}
+	ToolOutputDefinition definition = buildRangeDefinition(ScratchieConstants.LEARNER_MARK, new Long(0), null);
+	definitionMap.put(ScratchieConstants.LEARNER_MARK, definition);
+
 	return definitionMap;
     }
 
@@ -64,10 +58,10 @@ public class ScratchieOutputFactory extends OutputFactory {
 	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
 	// tool output cache
 	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<String, ToolOutput>();
-	if (names == null || names.contains(ScratchieConstants.LEARNER_NUMBER_ATTEMPTS)) {
+	if (names == null || names.contains(ScratchieConstants.LEARNER_MARK)) {
 	    outputs.put(
-		    ScratchieConstants.LEARNER_NUMBER_ATTEMPTS,
-		    getToolOutput(ScratchieConstants.LEARNER_NUMBER_ATTEMPTS, scratchieService, toolSessionId,
+		    ScratchieConstants.LEARNER_MARK,
+		    getToolOutput(ScratchieConstants.LEARNER_MARK, scratchieService, toolSessionId,
 			    learnerId));
 	}
 
@@ -76,22 +70,22 @@ public class ScratchieOutputFactory extends OutputFactory {
     }
 
     public ToolOutput getToolOutput(String name, IScratchieService scratchieService, Long toolSessionId, Long learnerId) {
-	if (name.equals(ScratchieConstants.LEARNER_NUMBER_ATTEMPTS)) {
-	    return getNumberAttempts(scratchieService, toolSessionId, learnerId);
+	if (name.equals(ScratchieConstants.LEARNER_MARK)) {
+	    return getUserMark(scratchieService, toolSessionId, learnerId);
 	}
 
 	return null;
     }
 
     /**
-     * Get the number of attempts done by user. Will always return a ToolOutput object.
+     * Get the mark scored by user. Will always return a ToolOutput object.
      */
-    private ToolOutput getNumberAttempts(IScratchieService scratchieService, Long toolSessionId, Long learnerId) {
+    private ToolOutput getUserMark(IScratchieService scratchieService, Long toolSessionId, Long learnerId) {
 
-	int numberAttempts = scratchieService.getNumberAttempts(learnerId, toolSessionId);
+	int numberAttempts = scratchieService.getUserMark(toolSessionId, learnerId);
 
-	return new ToolOutput(ScratchieConstants.LEARNER_NUMBER_ATTEMPTS, getI18NText(
-		ScratchieConstants.LEARNER_NUMBER_ATTEMPTS, true), numberAttempts);
+	return new ToolOutput(ScratchieConstants.LEARNER_MARK, getI18NText(
+		ScratchieConstants.LEARNER_MARK, true), numberAttempts);
 
     }
 }

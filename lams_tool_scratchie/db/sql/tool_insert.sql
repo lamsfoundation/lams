@@ -29,7 +29,8 @@ pedagogical_planner_url,
 help_url,
 language_file,
 create_date_time,
-modified_date_time
+modified_date_time,
+supports_outputs
 )
 VALUES
 (
@@ -58,5 +59,6 @@ NULL,
 'http://wiki.lamsfoundation.org/display/lamsdocs/lascrt11',
 'org.lamsfoundation.lams.tool.scratchie.ApplicationResources',
 NOW(),
-NOW()
+NOW(),
+1
 )

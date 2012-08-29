@@ -137,5 +137,5 @@ public class ScratchieConstants {
 
     public static final String ATTR_USER_UID = "userUid";
 
-    public static final String LEARNER_NUMBER_ATTEMPTS = "learner.number.of.attempts";
+    public static final String LEARNER_MARK = "learner.mark";
 }
