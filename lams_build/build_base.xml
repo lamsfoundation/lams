@@ -151,7 +151,6 @@
 	<target name="_compile-java" depends="_clean-dirs">
 		<!-- Internal target: Compile Java sources. -->
 		<echo>${ant.project.name}: Compiling Java sources</echo>
-		<!-- Destdir is the same as Eclipse output path, maybe it shouldn't? -->
 		<javac srcdir="${src.java.dir}"
 			   compiler="modern"
                source="1.5"
@@ -201,13 +200,13 @@
 		     classpathref="libs.classpath"
 	/>
 	<target name="_build-webdoclet" depends="_clean-dirs">
-		<!-- Internal target: Generates Struts XML files from Java source using XDoclet. -->
+		<!-- Internal target: Generates XML files from Java source using XDoclet. -->
 		
 		<!-- First try to build struts-config.xml and web.xml from conf/xdoclet files
 		     If Tool is based on static (non-generated) version of these files, 
 		     they will still be generated, but will be overwritten by next step.
 		-->
-		<echo>${ant.project.name}: Building Struts XML files using XDoclet</echo>
+		<echo>${ant.project.name}: Building XML files using XDoclet</echo>
 
 		<webdoclet destDir="${build.war}/WEB-INF"
 			       mergeDir="${conf.xdoclet.dir}"
@@ -318,13 +317,7 @@
 	<!-- Product deployment			                                         -->
 	<!-- =================================================================== -->
 	
-	<target name="deploy-jar" depends="_build-jar" description="Deploys JAR.">
-		<echo>Removing cached files</echo>
-		<delete quiet="true">
-			<fileset dir="${jboss.deploy}/tmp"/>
-			<fileset dir="${jboss.deploy}/work"/>
-		</delete>
-		
+	<target name="deploy-jar" depends="_build-jar" description="Deploys JAR.">	
 		<echo>${ant.project.name}: Deploying JAR</echo>
 		<copy file="${build.lib}/${product}.jar" todir="${jboss.deploy}" overwrite="true" verbose="true" />
 	</target>
