@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 	<%-- param has higher level for request attribute --%>
@@ -33,7 +32,7 @@
 	        $.ajax({
 	        	async: false,
 	            url: '<c:url value="/learning/scratchItem.do"/>',
-	            data: 'sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&answerUid=' + answerUid,
+	            data: 'sessionMapID=${sessionMapID}&answerUid=' + answerUid,
 	            dataType: 'json',
 	            type: 'post',
 	            success: function (json) {
@@ -57,13 +56,18 @@
 	       	});
 		}
 
-		function finishSession(){
+		function finish(isShowResultsPage){
 			var numberOfAvailableScratches = $("[id^=imageLink-][onclick]").length;
 			var	finishConfirmed = (numberOfAvailableScratches > 0) ? confirm("<fmt:message key="label.one.or.more.questions.not.completed"></fmt:message>") : true;
 			
 			if (finishConfirmed) {
 				document.getElementById("finishButton").disabled = true;
-				document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
+				if (isShowResultsPage) {
+					document.location.href ='<c:url value="/learning/showResults.do?sessionMapID=${sessionMapID}"/>';
+				} else {
+					document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
+				}
+				
 				return false;
 			}
 		}
@@ -87,42 +91,42 @@
 		<%@ include file="/common/messages.jsp"%>
 
 		<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
-		<h3>${item.title}</h3>
-		<h4>${item.description}</h4>
-
-		<table id="scratches" class="alternative-color">
-			<c:forEach var="answer" items="${item.answers}" varStatus="status">
-				<tr id="tr${answer.uid}">
-					<td style="width: 40px;">
-						<c:choose>
-							<c:when test="${answer.scratched && answer.correct}">
-								<img src="<html:rewrite page='/includes/images/scratchie-correct.png'/>" class="scartchie-image">
-							</c:when>
-							<c:when test="${answer.scratched && !answer.correct}">
-								<img src="<html:rewrite page='/includes/images/scratchie-wrong.png'/>" id="image-${item.uid}-${answer.uid}" class="scartchie-image">
-							</c:when>
-							<c:when test="${sessionMap.userFinished || item.unraveled}">
-								<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image">
-							</c:when>
-							<c:otherwise>
-								<a href="#nogo" onclick="scratchItem(${item.uid}, ${answer.uid}); return false;" id="imageLink-${item.uid}-${answer.uid}">
-									<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image" id="image-${item.uid}-${answer.uid}" />
-								</a>
-							</c:otherwise>
-						</c:choose>
-					</td>
+			<h3>${item.title}</h3>
+			<i>${item.description}</i>
+	
+			<table id="scratches" class="alternative-color">
+				<c:forEach var="answer" items="${item.answers}" varStatus="status">
+					<tr id="tr${answer.uid}">
+						<td style="width: 40px;">
+							<c:choose>
+								<c:when test="${answer.scratched && answer.correct}">
+									<img src="<html:rewrite page='/includes/images/scratchie-correct.png'/>" class="scartchie-image">
+								</c:when>
+								<c:when test="${answer.scratched && !answer.correct}">
+									<img src="<html:rewrite page='/includes/images/scratchie-wrong.png'/>" id="image-${item.uid}-${answer.uid}" class="scartchie-image">
+								</c:when>
+								<c:when test="${sessionMap.userFinished || item.unraveled}">
+									<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image">
+								</c:when>
+								<c:otherwise>
+									<a href="#nogo" onclick="scratchItem(${item.uid}, ${answer.uid}); return false;" id="imageLink-${item.uid}-${answer.uid}">
+										<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image" id="image-${item.uid}-${answer.uid}" />
+									</a>
+								</c:otherwise>
+							</c:choose>
+						</td>
+						
+						<td style="vertical-align: middle;">
+							${answer.description} 
+						</td>
+					</tr>
+				</c:forEach>
+			</table>
 					
-					<td style="vertical-align: middle;">
-						${answer.description} 
-					</td>
-				</tr>
-			</c:forEach>
-		</table>
-		
 		</c:forEach>
 
 
-		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
+		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and !sessionMap.isShowResultsPage}">
 			<div class="small-space-top">
 				<h2>
 					${sessionMap.reflectInstructions}
@@ -153,15 +157,25 @@
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-right">
 				<c:choose>
-					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
+					<c:when test="${sessionMap.reflectOn && !sessionMap.userFinished and !sessionMap.isShowResultsPage}">
 						<html:button property="finishButton" styleId="finishButton" onclick="return continueReflect()" styleClass="button">
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
 					<c:otherwise>
-						<html:link href="#nogo" property="finishButton" styleId="finishButton" onclick="return finishSession()" styleClass="button">
-							<span class="nextActivity"><fmt:message key="label.finished" /></span>
-						</html:link>
+						<c:choose>
+							<c:when test="${sessionMap.isShowResultsPage}">
+								<html:button property="finishButton" styleId="finishButton" onclick="return finish(true)" styleClass="button">
+									<fmt:message key="label.submit" />
+								</html:button>
+							</c:when>
+							<c:otherwise>
+								<html:link href="#nogo" property="finishButton" styleId="finishButton" onclick="return finish(false)" styleClass="button">
+									<span class="nextActivity"><fmt:message key="label.finished" /></span>
+								</html:link>
+							</c:otherwise>
+						</c:choose>
+
 					</c:otherwise>
 				</c:choose>
 			</div>

@@ -88,6 +88,9 @@ public class LearningAction extends Action {
 	if (param.equals("finish")) {
 	    return finish(mapping, form, request, response);
 	}
+	if (param.equals("showResults")) {
+	    return showResults(mapping, form, request, response);
+	}
 
 	// ================ Reflection =======================
 	if (param.equals("newReflection")) {
@@ -113,15 +116,11 @@ public class LearningAction extends Action {
 	// initial Session Map
 	SessionMap sessionMap = new SessionMap();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	// save toolContentID into HTTPSession
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-
 	Long toolSessionId = new Long(request.getParameter(ScratchieConstants.PARAM_TOOL_SESSION_ID));
-
-	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	request.setAttribute(AttributeNames.ATTR_MODE, mode);
-	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 
 	// get back the scratchie and item list and display them on page
 	IScratchieService service = getScratchieService();
@@ -153,8 +152,7 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_INSTRUCTION, scratchie.getInstructions());
 	boolean isUserFinished = scratchieUser != null && scratchieUser.isSessionFinished();
 	sessionMap.put(ScratchieConstants.ATTR_USER_FINISHED, isUserFinished);
-	
-
+	sessionMap.put(ScratchieConstants.ATTR_IS_SHOW_RESULTS_PAGE, scratchie.isShowResultsPage());
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	// reflection information
@@ -214,22 +212,22 @@ public class LearningAction extends Action {
      */
     private ActionForward scratchItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
-	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 
 	Long answerUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_ANSWER_UID));
 	// get back the resource and item list and display them on page
 	ScratchieAnswer answer = getScratchieService().getScratchieAnswerById(answerUid);
-
-	String toolSessionIdStr = request.getParameter(ScratchieConstants.ATTR_TOOL_SESSION_ID);
-	Long toolSessionId = NumberUtils.createLong(toolSessionIdStr);
+	
 	// mark this item access flag if it is learner
-	if (ToolAccessMode.LEARNER.toString().equals(mode)) {
+	if (mode.isLearner()) {
 	    HttpSession ss = SessionManager.getSession();
 	    // get back login user DTO
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	    getScratchieService().setAnswerAccess(answer.getUid(), new Long(user.getUserID().intValue()), toolSessionId);
 	}
 
@@ -245,37 +243,35 @@ public class LearningAction extends Action {
 
     }
     
+    /**
+     * Finish learning session.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward showResults(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 
+	// get back SessionMap
+	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-//    /**
-//     * Set complete flag for given scratchie item.
-//     * 
-//     * @param request
-//     * @param sessionId
-//     */
-//    private void doComplete(HttpServletRequest request) {
-//	// get back sessionMap
-//	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
-//	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-//
-//	Long scratchieItemUid = new Long(request.getParameter(ScratchieConstants.PARAM_ITEM_UID));
-//	IScratchieService service = getScratchieService();
-//	HttpSession ss = SessionManager.getSession();
-//	// get back login user DTO
-//	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-//
-//	Long sessionId = (Long) sessionMap.get(ScratchieConstants.ATTR_TOOL_SESSION_ID);
-//	service.setItemComplete(scratchieItemUid, new Long(user.getUserID().intValue()), sessionId);
-//
-//	// set scratchie item complete tag
-//	SortedSet<ScratchieItem> scratchieItemList = getScratchieItemList(sessionMap);
-//	for (ScratchieItem item : scratchieItemList) {
-//	    if (item.getUid().equals(scratchieItemUid)) {
-//		item.setScratched(true);
-//		break;
-//	    }
-//	}
-//    }
+	IScratchieService service = getScratchieService();
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userId = new Long(user.getUserID().longValue());
+
+	service.setUserFinished(toolSessionId, userId);
+	Set<ScratchieItem> items = service.populateItemsResults(toolSessionId, userId);
+	request.setAttribute(ScratchieConstants.ATTR_ITEM_LIST, items);
+
+	return mapping.findForward(ScratchieConstants.SUCCESS);
+    }
 
     /**
      * Finish learning session.
@@ -292,7 +288,7 @@ public class LearningAction extends Action {
 	// get back SessionMap
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	IScratchieService service = getScratchieService();
 	// get sessionId from HttpServletRequest
@@ -302,7 +298,8 @@ public class LearningAction extends Action {
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    Long userID = new Long(user.getUserID().longValue());
 
-	    nextActivityUrl = service.finishToolSession(sessionId, userID);
+	    service.setUserFinished(toolSessionId, userID);
+	    nextActivityUrl = service.finishToolSession(toolSessionId, userID);
 	    request.setAttribute(ScratchieConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
 	} catch (ScratchieApplicationException e) {
 	    LearningAction.log.error("Failed get next activity url:" + e.getMessage());

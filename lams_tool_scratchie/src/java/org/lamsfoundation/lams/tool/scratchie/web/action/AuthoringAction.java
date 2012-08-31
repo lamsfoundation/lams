@@ -241,7 +241,13 @@ public class AuthoringAction extends Action {
 	    ScratchieUser scratchieUser = null;
 	    // handle system default question: createBy is null, now set it to
 	    // current user
-	    for (ScratchieItem item : items) {item.getAnswers();
+	    for (ScratchieItem item : items) {
+		
+		//sort answers by order id. it's needed only for the default answers. rest could be skipped
+		TreeSet<ScratchieAnswer> answerList = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
+		answerList.addAll(item.getAnswers());
+		item.setAnswers(answerList);
+		
 		if (item.getCreateBy() == null) {
 		    if (scratchieUser == null) {
 			// get back login user DTO

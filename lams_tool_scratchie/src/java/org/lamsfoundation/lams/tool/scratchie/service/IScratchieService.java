@@ -173,6 +173,14 @@ public interface IScratchieService {
     void setAnswerAccess(Long scratchieItemUid, Long userId, Long sessionId);
     
     int getUserMark(Long sessionId, Long userId);
+    
+    /**
+     * Mark user session as finished so that user can't continue scratching after this.
+     * 
+     * @param toolSessionId
+     * @param userId
+     */
+    void setUserFinished(Long toolSessionId, Long userId);
 
     /**
      * If success return next activity's url, otherwise return null.
@@ -277,4 +285,13 @@ public interface IScratchieService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Populates items with results, i.e. correctAnswer, userMark, userAttempts. Used for displaying this data on learner results page.
+     * 
+     * @param sessionId
+     * @param userId
+     * @return
+     */
+    Set<ScratchieItem> populateItemsResults(Long sessionId, Long userId);
 }

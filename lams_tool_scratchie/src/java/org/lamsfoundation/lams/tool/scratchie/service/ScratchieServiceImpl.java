@@ -388,27 +388,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	scratchieSessionDao.saveObject(resSession);
     }
 
-    public void retrieveScratched(Collection<ScratchieItem> items, ScratchieUser user) {
-	
-	for (ScratchieItem item : items) {
-	    boolean isItemUnraveled = false;
-	    
-	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>)item.getAnswers()) {
-		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answer.getUid(),
-			user.getUserId());
-		if (log == null) {
-		    answer.setScratched(false);
-		} else {
-		    answer.setScratched(true);
-		    answer.setScratchedDate(log.getAccessDate());
-		    isItemUnraveled |= answer.isCorrect();
-		}
-	    }
-	    item.setUnraveled(isItemUnraveled);
-	}
-	
-    }
-
     public void setAnswerAccess(Long answerUid, Long userId, Long sessionId) {
 	ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answerUid, userId);
 	if (log == null) {
@@ -426,12 +405,14 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     public ScratchieAnswer getScratchieAnswerById (Long answerUid) {
 	return  (ScratchieAnswer) userManagementService.findById(ScratchieAnswer.class, answerUid);
     }
-
-    public String finishToolSession(Long toolSessionId, Long userId) throws ScratchieApplicationException {
+    
+    public void setUserFinished(Long toolSessionId, Long userId) {
 	ScratchieUser user = scratchieUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(true);
 	scratchieUserDao.saveObject(user);
+    }
 
+    public String finishToolSession(Long toolSessionId, Long userId) throws ScratchieApplicationException {
 	String nextUrl = null;
 	try {
 	    nextUrl = this.leaveToolSession(toolSessionId, userId);
@@ -461,7 +442,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    List<ScratchieUser> users = scratchieUserDao.getBySessionID(sessionId);
 	    for (ScratchieUser user : users) {
 		
-		int totalAttempts = scratchieAnswerVisitDao.getUserViewLogCount(sessionId, user.getUserId()); 
+		int totalAttempts = scratchieAnswerVisitDao.getLogCountTotal(sessionId, user.getUserId()); 
 		user.setTotalAttempts(totalAttempts);
 		
 		//for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
@@ -476,28 +457,100 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	return groupSummaryList;
     }
     
+    public void retrieveScratched(Collection<ScratchieItem> items, ScratchieUser user) {
+	
+	for (ScratchieItem item : items) {
+	    
+	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>)item.getAnswers()) {
+		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answer.getUid(),
+			user.getUserId());
+		if (log == null) {
+		    answer.setScratched(false);
+		} else {
+		    answer.setScratched(true);
+		    answer.setScratchedDate(log.getAccessDate());
+		}
+	    }
+	    
+	    item.setUnraveled(isItemUnraveled(item, user.getUserId()));
+	}
+    }
+    
+    private boolean isItemUnraveled(ScratchieItem item, Long userId) {
+	boolean isItemUnraveled = false;
+
+	for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+	    ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answer.getUid(), userId);
+	    if (log != null) {
+		isItemUnraveled |= answer.isCorrect();
+	    }
+	}
+
+	return isItemUnraveled;
+    }
+    
     public int getUserMark(Long sessionId, Long userId) {
 	ScratchieUser user = getUserByIDAndSession(userId, sessionId);
 	ScratchieSession session = scratchieSessionDao.getSessionBySessionId(sessionId);
 	Scratchie scratchie = session.getScratchie();
 	Set<ScratchieItem> items = scratchie.getScratchieItems();
-	retrieveScratched(items, user);
 	
 	int mark = 0;
 	for (ScratchieItem item : items) {
-	    // add mark only if an item was unraveled
-	    if (item.isUnraveled()) {
-		int attempts = scratchieAnswerVisitDao.getUserViewLogCount(sessionId, userId, item.getUid());
-		mark += item.getAnswers().size() - attempts;
+	    mark += getUserMarkPerItem(scratchie, item, sessionId, userId);
+	}
+	
+	return mark;
+    }
+    
+    /**
+     * 
+     * 
+     * @param sessionId
+     * @param userId
+     * @param item
+     * @return
+     */
+    private int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, Long sessionId, Long userId) {
+	
+	int mark = 0;
+	// add mark only if an item was unraveled
+	if (isItemUnraveled(item, userId)) {
+	    int attempts = scratchieAnswerVisitDao.getLogCountPerItem(sessionId, userId, item.getUid());
+	    mark += item.getAnswers().size() - attempts;
 
-		// add extra point if needed
-		if (scratchie.isExtraPoint() && (attempts == 1)) {
-		    mark++;
-		}
+	    // add extra point if needed
+	    if (scratchie.isExtraPoint() && (attempts == 1)) {
+		mark++;
 	    }
 	}
 	
 	return mark;
+    }
+    
+    public Set<ScratchieItem> populateItemsResults(Long sessionId, Long userId) {
+	ScratchieUser user = getUserByIDAndSession(userId, sessionId);
+	ScratchieSession session = scratchieSessionDao.getSessionBySessionId(sessionId);
+	Scratchie scratchie = session.getScratchie();
+	Set<ScratchieItem> items = scratchie.getScratchieItems();
+	
+	for (ScratchieItem item : items) {
+	    int mark = getUserMarkPerItem(scratchie, item, sessionId, userId);
+	    item.setUserMark(mark);
+	    
+	    int attempts = scratchieAnswerVisitDao.getLogCountPerItem(sessionId, userId, item.getUid());
+	    item.setUserAttempts(attempts);
+	    
+	    String correctAnswer = "";
+	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>)item.getAnswers()) {
+		if (answer.isCorrect()) {
+		    correctAnswer = answer.getDescription();
+		}
+	    }
+	    item.setCorrectAnswer(correctAnswer);
+	}
+	
+	return items;
     }
     
     public List<ScratchieAnswerVisitLog> getUserMasterDetail(Long sessionId, Long userId) {
@@ -970,6 +1023,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    toolContentObj.setUpdated(now);
 	    toolContentObj.setReflectOnActivity(Boolean.FALSE);
 	    toolContentObj.setExtraPoint(Boolean.FALSE);
+	    toolContentObj.setShowResultsPage(Boolean.TRUE);
 	    toolContentObj.setReflectInstructions(null);
 
 	    // leave as empty, no need to set them to anything.

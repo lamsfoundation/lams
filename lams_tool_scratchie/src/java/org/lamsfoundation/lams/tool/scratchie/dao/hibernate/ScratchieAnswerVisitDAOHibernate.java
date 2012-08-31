@@ -59,14 +59,14 @@ public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implement
 	return (ScratchieAnswerVisitLog) list.get(0);
     }
 
-    public int getUserViewLogCount(Long toolSessionId, Long userId) {
+    public int getLogCountTotal(Long toolSessionId, Long userId) {
 	List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER, new Object[] { toolSessionId, userId });
 	if (list == null || list.size() == 0)
 	    return 0;
 	return ((Number) list.get(0)).intValue();
     }
     
-    public int getUserViewLogCount(Long toolSessionId, Long userId, Long itemUid) {
+    public int getLogCountPerItem(Long toolSessionId, Long userId, Long itemUid) {
 	List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER_AND_ITEM, new Object[] { toolSessionId, userId, itemUid });
 	if (list == null || list.size() == 0)
 	    return 0;
