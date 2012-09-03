@@ -43,6 +43,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionRedirect;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -196,7 +197,15 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 
-	return mapping.findForward(ScratchieConstants.SUCCESS);
+	boolean isScratchingFinished = scratchieUser != null && scratchieUser.isScratchingFinished();
+	if (isScratchingFinished) {
+	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
+	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	    return redirect;
+	} else {
+	    return mapping.findForward(ScratchieConstants.SUCCESS);
+	}
+	
     }
     
     /**
@@ -266,7 +275,7 @@ public class LearningAction extends Action {
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userId = new Long(user.getUserID().longValue());
 
-	service.setUserFinished(toolSessionId, userId);
+	service.setScratchingFinished(toolSessionId, userId);
 	Set<ScratchieItem> items = service.populateItemsResults(toolSessionId, userId);
 	request.setAttribute(ScratchieConstants.ATTR_ITEM_LIST, items);
 
@@ -298,7 +307,6 @@ public class LearningAction extends Action {
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    Long userID = new Long(user.getUserID().longValue());
 
-	    service.setUserFinished(toolSessionId, userID);
 	    nextActivityUrl = service.finishToolSession(toolSessionId, userID);
 	    request.setAttribute(ScratchieConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
 	} catch (ScratchieApplicationException e) {

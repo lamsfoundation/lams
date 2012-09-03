@@ -46,6 +46,7 @@ public class ScratchieUser implements Cloneable {
     private String lastName;
     private String loginName;
     private boolean sessionFinished;
+    private boolean scratchingFinished;
 
     private ScratchieSession session;
     private Scratchie scratchie;
@@ -202,6 +203,20 @@ public class ScratchieUser implements Cloneable {
 
     public void setSessionFinished(boolean sessionFinished) {
 	this.sessionFinished = sessionFinished;
+    }
+    
+    /**
+     * Indicates whether user pressed Submit button in learning.
+     * 
+     * @hibernate.property column="scratching_finished"
+     * @return
+     */
+    public boolean isScratchingFinished() {
+	return scratchingFinished;
+    }
+
+    public void setScratchingFinished(boolean scratchingFinished) {
+	this.scratchingFinished = scratchingFinished;
     }
 
     public boolean equals(Object obj) {

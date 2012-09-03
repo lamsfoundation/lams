@@ -80,6 +80,7 @@ create table tl_lascrt11_user (
    first_name varchar(255),
    login_name varchar(255),
    session_finished smallint,
+   scratching_finished smallint,
    session_uid bigint,
    scratchie_uid bigint,
    primary key (uid)

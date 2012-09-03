@@ -175,12 +175,12 @@ public interface IScratchieService {
     int getUserMark(Long sessionId, Long userId);
     
     /**
-     * Mark user session as finished so that user can't continue scratching after this.
+     * Mark user as ScratchingFinished so that user can't continue scratching after this.
      * 
      * @param toolSessionId
      * @param userId
      */
-    void setUserFinished(Long toolSessionId, Long userId);
+    void setScratchingFinished(Long toolSessionId, Long userId);
 
     /**
      * If success return next activity's url, otherwise return null.

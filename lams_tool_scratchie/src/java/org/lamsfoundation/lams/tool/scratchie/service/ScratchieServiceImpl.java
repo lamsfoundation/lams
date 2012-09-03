@@ -406,15 +406,19 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	return  (ScratchieAnswer) userManagementService.findById(ScratchieAnswer.class, answerUid);
     }
     
-    public void setUserFinished(Long toolSessionId, Long userId) {
+    public void setScratchingFinished(Long toolSessionId, Long userId) {
 	ScratchieUser user = scratchieUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
-	user.setSessionFinished(true);
+	user.setScratchingFinished(true);
 	scratchieUserDao.saveObject(user);
     }
 
     public String finishToolSession(Long toolSessionId, Long userId) throws ScratchieApplicationException {
 	String nextUrl = null;
 	try {
+	    ScratchieUser user = scratchieUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
+	    user.setSessionFinished(true);
+	    scratchieUserDao.saveObject(user);
+	    
 	    nextUrl = this.leaveToolSession(toolSessionId, userId);
 	} catch (DataMissingException e) {
 	    throw new ScratchieApplicationException(e);
