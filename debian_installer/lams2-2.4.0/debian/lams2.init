@@ -31,7 +31,7 @@ USER=lams
 GROUP=lams
 # Use this when using a non-default server configuration in jboss
 #JBOSS_OPTS="-b 0.0.0 -c <server>"
-JBOSS_OPTS= -b 0.0.0.0
+JBOSS_OPTS=" -b 0.0.0.0 "
 # If you want to bind LAMS to an specific IP, change the 0.0.0.0 to the IP.
 
 test -x $JAVA || exit 0
