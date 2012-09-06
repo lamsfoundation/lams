@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -494,7 +495,7 @@ public class GradebookService implements IGradebookService {
 	return lessonRows;
     }
     
-    public HashMap<ToolActivity, List<GBUserGridRowDTO>> getDataForExcelLessonGradebook(Lesson lesson) {
+    private HashMap<ToolActivity, List<GBUserGridRowDTO>> getDataForLessonGradebookExport(Lesson lesson) {
 	
 	HashMap<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = new HashMap<ToolActivity, List<GBUserGridRowDTO>>();
 
@@ -551,7 +552,6 @@ public class GradebookService implements IGradebookService {
 		if (gradebookUserActivity != null) {
 		    userDTO.setFeedback(gradebookUserActivity.getFeedback());
 		    userDTO.setMark(gradebookUserActivity.getMark());
-
 		}
 		userDTOs.add(userDTO);
 	    }
@@ -560,29 +560,110 @@ public class GradebookService implements IGradebookService {
 
 	return activityToUserDTOMap;
     }
+    
 
-    @SuppressWarnings("unchecked")
-    public ExcelCell[][] getActivityViewDataForExcel(HashMap<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap) {
-	ExcelCell[][] data = null;
-
+   @SuppressWarnings("unchecked")
+    public LinkedHashMap<String, ExcelCell[][]> exportLessonGradebook(Lesson lesson) {
+       
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+       
+	//-------------------- process summary excel page --------------------------------
+	
+	// The entire data list
 	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+
+	// Adding the lesson average data to the summary
+	ExcelCell[] lessonAverageMark = new ExcelCell[2];
+	lessonAverageMark[0] = new ExcelCell(getMessage("gradebook.export.average.lesson.mark"), true);
+	lessonAverageMark[1] = new ExcelCell(getAverageMarkForLesson(lesson.getLessonId()), false);
+	rowList.add(lessonAverageMark);
+
+	ExcelCell[] lessonAverageTimeTaken = new ExcelCell[2];
+	lessonAverageTimeTaken[0] = new ExcelCell(getMessage("gradebook.export.average.lesson.time.taken"), true);
+	lessonAverageTimeTaken[1] = new ExcelCell(gradebookDAO.getAverageDurationLesson(lesson.getLessonId()) / 1000,
+		false);
+	rowList.add(lessonAverageTimeTaken);
+	rowList.add(EMPTY_ROW);
+
+	// Adding the activity average data to the summary
+	List<GradebookGridRowDTO> activityRows = getGBActivityRowsForLesson(lesson);
+	ExcelCell[] activityAverageTitle = new ExcelCell[1];
+	activityAverageTitle[0] = new ExcelCell(getMessage("gradebook.export.activities"), true);
+	rowList.add(activityAverageTitle);
+
+	// Setting up the activity summary table
+	ExcelCell[] activityAverageRow = new ExcelCell[4];
+	activityAverageRow[0] = new ExcelCell(getMessage("gradebook.export.activity"), true);
+	activityAverageRow[1] = new ExcelCell(getMessage("gradebook.columntitle.competences"), true);
+	activityAverageRow[2] = new ExcelCell(getMessage("gradebook.export.average.time.taken.seconds"), true);
+	activityAverageRow[3] = new ExcelCell(getMessage("gradebook.columntitle.averageMark"), true);
+	rowList.add(activityAverageRow);
+
+	Iterator it = activityRows.iterator();
+	while (it.hasNext()) {
+	    GBActivityGridRowDTO activityRow = (GBActivityGridRowDTO) it.next();
+	    // Add the activity average data
+	    ExcelCell[] activityDataRow = new ExcelCell[4];
+	    activityDataRow[0] = new ExcelCell(activityRow.getRowName(), false);
+	    activityDataRow[1] = new ExcelCell(activityRow.getCompetences(), false);
+	    activityDataRow[2] = new ExcelCell(activityRow.getAverageTimeTakenSeconds(), false);
+	    activityDataRow[3] = new ExcelCell(activityRow.getAverageMark(), false);
+	    rowList.add(activityDataRow);
+	}
+	rowList.add(EMPTY_ROW);
+
+	// Adding the user lesson marks to the summary
+	ExcelCell[] userMarksTitle = new ExcelCell[1];
+	userMarksTitle[0] = new ExcelCell(getMessage("gradebook.export.total.marks.for.lesson"), true);
+	rowList.add(userMarksTitle);
+
+	// Fetching the user data
+	ArrayList<GBUserGridRowDTO> userRows = getGBUserRowsForLesson(lesson);
+
+	// Setting up the user marks table
+	ExcelCell[] userTitleRow = new ExcelCell[5];
+	userTitleRow[0] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
+	userTitleRow[1] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
+	userTitleRow[2] = new ExcelCell(getMessage("gradebook.exportcourse.progress"), true);
+	userTitleRow[3] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
+	userTitleRow[4] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
+	rowList.add(userTitleRow);
+
+	for (GBUserGridRowDTO userRow : userRows) {
+	    // Adding the user data for the lesson
+	    ExcelCell[] userDataRow = new ExcelCell[5];
+	    userDataRow[0] = new ExcelCell(userRow.getLastName(), false);
+	    userDataRow[1] = new ExcelCell(userRow.getFirstName(), false);
+	    userDataRow[2] = new ExcelCell(getProgressMessage(userRow), false);
+	    userDataRow[3] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
+	    userDataRow[4] = new ExcelCell(userRow.getMark(), false);
+	    rowList.add(userDataRow);
+	}
+
+	ExcelCell[][] summaryData = rowList.toArray(new ExcelCell[][] {});
+	dataToExport.put(getMessage("gradebook.export.lesson.summary"), summaryData);
+
+	//-------------------- process activity excel page --------------------------------
+
+	HashMap<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = getDataForLessonGradebookExport(lesson);
+	List<ExcelCell[]> rowList1 = new LinkedList<ExcelCell[]>();
 
 	for (Activity activity : activityToUserDTOMap.keySet()) {
 
 	    ExcelCell[] activityTitleRow = new ExcelCell[5];
 	    activityTitleRow[0] = new ExcelCell(activity.getTitle(), true);
-	    rowList.add(activityTitleRow);
+	    rowList1.add(activityTitleRow);
 	    ExcelCell[] titleRow = new ExcelCell[5];
 	    titleRow[0] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
 	    titleRow[1] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
 	    titleRow[2] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
 	    titleRow[3] = new ExcelCell(getMessage("gradebook.export.outputs"), true);
 	    titleRow[4] = new ExcelCell(getMessage("gradebook.columntitle.mark"), true);
-	    rowList.add(titleRow);
+	    rowList1.add(titleRow);
 
 	    // Get the rest of the data
-	    List<GBUserGridRowDTO> userRows = activityToUserDTOMap.get(activity);
-	    for (GBUserGridRowDTO userRow : userRows) {
+	    List<GBUserGridRowDTO> userRows2 = activityToUserDTOMap.get(activity);
+	    for (GBUserGridRowDTO userRow : userRows2) {
 		ExcelCell[] userDataRow = new ExcelCell[5];
 
 		userDataRow[0] = new ExcelCell(userRow.getLastName(), false);
@@ -590,31 +671,27 @@ public class GradebookService implements IGradebookService {
 		userDataRow[2] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
 		userDataRow[3] = new ExcelCell(userRow.getOutput(), false);
 		userDataRow[4] = new ExcelCell(userRow.getMark(), false);
-		rowList.add(userDataRow);
+		rowList1.add(userDataRow);
 	    }
 
-	    rowList.add(EMPTY_ROW);
+	    rowList1.add(EMPTY_ROW);
 	}
 
-	data = rowList.toArray(new ExcelCell[][] {});
+	ExcelCell[][] activityData = rowList1.toArray(new ExcelCell[][] {});
+	dataToExport.put(getMessage("gradebook.gridtitle.activitygrid"), activityData);
 
-	return data;
-    }
-
-    @SuppressWarnings("unchecked")
-    public ExcelCell[][] getUserViewDataForExcel(HashMap<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap, Lesson lesson) {
+	//-------------------- process user excel page --------------------------------
+	
 	Set<User> learners = lesson.getAllLearners();
 	if (learners == null) {
 	    learners = new TreeSet<User>();
 	}
-	ExcelCell[][] data = null;
 
-	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+	LinkedList<ExcelCell[]> rowList2 = new LinkedList<ExcelCell[]>();
 	for (User learner : learners) {
 
 	    List<GBActivityGridRowDTO> activityDTOs = new ArrayList<GBActivityGridRowDTO>();
 	    for (ToolActivity activity : activityToUserDTOMap.keySet()) {
-		
 		
 		List<GBUserGridRowDTO> userDTOs = activityToUserDTOMap.get(activity);
 		GBUserGridRowDTO userDTO = null;
@@ -648,14 +725,14 @@ public class GradebookService implements IGradebookService {
 
 	    ExcelCell[] activityTitleRow = new ExcelCell[4];
 	    activityTitleRow[0] = new ExcelCell(learner.getFullName(), true);
-	    rowList.add(activityTitleRow);
+	    rowList2.add(activityTitleRow);
 
 	    ExcelCell[] titleRow = new ExcelCell[4];
 	    titleRow[0] = new ExcelCell(getMessage("gradebook.export.activity"), true);
 	    titleRow[1] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
 	    titleRow[2] = new ExcelCell(getMessage("gradebook.export.outputs"), true);
 	    titleRow[3] = new ExcelCell(getMessage("gradebook.columntitle.mark"), true);
-	    rowList.add(titleRow);
+	    rowList2.add(titleRow);
 
 	    for (GBActivityGridRowDTO activityRow : activityDTOs) {
 		ExcelCell[] activityDataRow = new ExcelCell[4];
@@ -663,106 +740,27 @@ public class GradebookService implements IGradebookService {
 		activityDataRow[1] = new ExcelCell(activityRow.getTimeTakenSeconds(), false);
 		activityDataRow[2] = new ExcelCell(activityRow.getOutput(), false);
 		activityDataRow[3] = new ExcelCell(activityRow.getMark(), false);
-		rowList.add(activityDataRow);
+		rowList2.add(activityDataRow);
 	    }
 
-	    rowList.add(EMPTY_ROW);
+	    rowList2.add(EMPTY_ROW);
 	}
 
-	data = rowList.toArray(new ExcelCell[][] {});
-	return data;
-    }
-
-   @SuppressWarnings("unchecked")
-    public ExcelCell[][] getSummaryDataForExcel(Lesson lesson) {
-	ExcelCell[][] data = null;
-	if (lesson != null) {
-
-	    // The entire data list
-	    List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
-
-	    // Adding the lesson average data to the summary -------------------
-	    ExcelCell[] lessonAverageMark = new ExcelCell[2];
-	    lessonAverageMark[0] = new ExcelCell(getMessage("gradebook.export.average.lesson.mark"), true);
-	    lessonAverageMark[1] = new ExcelCell(getAverageMarkForLesson(lesson.getLessonId()), false);
-	    rowList.add(lessonAverageMark);
-
-	    ExcelCell[] lessonAverageTimeTaken = new ExcelCell[2];
-	    lessonAverageTimeTaken[0] = new ExcelCell(getMessage("gradebook.export.average.lesson.time.taken"), true);
-	    lessonAverageTimeTaken[1] = new ExcelCell(gradebookDAO.getAverageDurationLesson(lesson.getLessonId())/1000, false);
-	    rowList.add(lessonAverageTimeTaken);
-	    rowList.add(EMPTY_ROW);
-	    // ------------------------------------------------------------------
-
-	    // Adding the activity average data to the summary -----------------
-	    List<GradebookGridRowDTO> activityRows = getGBActivityRowsForLesson(lesson);
-	    ExcelCell[] activityAverageTitle = new ExcelCell[1];
-	    activityAverageTitle[0] = new ExcelCell(getMessage("gradebook.export.activities"), true);
-	    rowList.add(activityAverageTitle);
-
-	    // Setting up the activity summary table
-	    ExcelCell[] activityAverageRow = new ExcelCell[4];
-	    activityAverageRow[0] = new ExcelCell(getMessage("gradebook.export.activity"), true);
-	    activityAverageRow[1] = new ExcelCell(getMessage("gradebook.columntitle.competences"), true);
-	    activityAverageRow[2] = new ExcelCell(getMessage("gradebook.export.average.time.taken.seconds"), true);
-	    activityAverageRow[3] = new ExcelCell(getMessage("gradebook.columntitle.averageMark"), true);
-	    rowList.add(activityAverageRow);
-
-	    Iterator it = activityRows.iterator();
-	    while (it.hasNext()) {
-		GBActivityGridRowDTO activityRow = (GBActivityGridRowDTO) it.next();
-		// Add the activity average data
-		ExcelCell[] activityDataRow = new ExcelCell[4];
-		activityDataRow[0] = new ExcelCell(activityRow.getRowName(), false);
-		activityDataRow[1] = new ExcelCell(activityRow.getCompetences(), false);
-		activityDataRow[2] = new ExcelCell(activityRow.getAverageTimeTakenSeconds(), false);
-		activityDataRow[3] = new ExcelCell(activityRow.getAverageMark(), false);
-		rowList.add(activityDataRow);
-	    }
-	    rowList.add(EMPTY_ROW);
-	    // ------------------------------------------------------------------
-
-	    // Adding the user lesson marks to the summary----------------------
-	    ExcelCell[] userMarksTitle = new ExcelCell[1];
-	    userMarksTitle[0] = new ExcelCell(getMessage("gradebook.export.total.marks.for.lesson"), true);
-	    rowList.add(userMarksTitle);
-
-	    // Fetching the user data
-	    ArrayList<GBUserGridRowDTO> userRows = getGBUserRowsForLesson(lesson);
-
-	    // Setting up the user marks table
-	    ExcelCell[] userTitleRow = new ExcelCell[5];
-	    userTitleRow[0] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
-	    userTitleRow[1] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
-	    userTitleRow[2] = new ExcelCell(getMessage("gradebook.exportcourse.progress"), true);
-	    userTitleRow[3] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
-	    userTitleRow[4] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
-	    rowList.add(userTitleRow);
-
-	    for (GBUserGridRowDTO userRow : userRows) {
-		 // Adding the user data for the lesson
-		    ExcelCell[] userDataRow = new ExcelCell[5];
-		    userDataRow[0] = new ExcelCell(userRow.getLastName(), false);
-		    userDataRow[1] = new ExcelCell(userRow.getFirstName(), false);
-		    userDataRow[2] = new ExcelCell(getProgressMessage(userRow), false);
-		    userDataRow[3] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
-		    userDataRow[4] = new ExcelCell(userRow.getMark(), false);
-		    rowList.add(userDataRow);
-	    }
-	    // ------------------------------------------------------------------
-
-	    data = rowList.toArray(new ExcelCell[][] {});
-
-	}
-	return data;
+	ExcelCell[][] userData = rowList2.toArray(new ExcelCell[][] {});
+	dataToExport.put(getMessage("gradebook.export.learner.view"), userData);
+	
+	return dataToExport;
     }
     
     @SuppressWarnings("unchecked")
-    public ExcelCell[][] getCourseDataForExcel(Integer userId, Integer organisationId) {
+    public LinkedHashMap<String, ExcelCell[][]> exportCourseGradebook(Integer userId, Integer organisationId) {
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	
 	Organisation organisation = (Organisation) baseDAO.find(Organisation.class, organisationId);
 	
 	// The entire data list
 	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+	
 
 	User user = (User) getUserService().findById(User.class, userId);
 	Set<Lesson> lessonsFromDB = new TreeSet<Lesson>(new LessonComparator());
@@ -781,65 +779,66 @@ public class GradebookService implements IGradebookService {
 	    lessons.add(lesson);
 	}
 	
-	if (lessons == null || (lessons.size() == 0)) {
-	    return rowList.toArray(new ExcelCell[][] {});
-	}
-	
-	//collect users from all lessons
-	Set<User> allLearners = new LinkedHashSet<User>();
-	for (Lesson lesson : lessons) {
-	    Set dbLessonUsers = lesson.getAllLearners();
-	    allLearners.addAll(dbLessonUsers);
-	}
-	
-	int numberOfCellsInARow = 2 + lessons.size()*4;
-	
-	// Adding the user lesson marks to the summary----------------------
-	ExcelCell[] lessonsNames = new ExcelCell[numberOfCellsInARow];
-	int i = 0;
-	lessonsNames[i++] = new ExcelCell("", false);
-	lessonsNames[i++] = new ExcelCell("", false);
-	for (Lesson lesson : lessons) {
-	    lessonsNames[i++] = new ExcelCell(messageService.getMessage("gradebook.exportcourse.lesson",
-		    new Object[] { lesson.getLessonName() }), true);
-	    lessonsNames[i++] = new ExcelCell("", false);
-	    lessonsNames[i++] = new ExcelCell("", false);
-	    lessonsNames[i++] = new ExcelCell("", false);
-	}
-	rowList.add(lessonsNames);
-	
-	// Setting up the user marks table
-	ExcelCell[] headerRow = new ExcelCell[numberOfCellsInARow];
-	i = 0;
-	headerRow[i++] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
-	headerRow[i++] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
-	for (Lesson lesson : lessons) {
-	    headerRow[i++] = new ExcelCell(getMessage("gradebook.exportcourse.progress"), true);
-	    headerRow[i++] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
-	    headerRow[i++] = new ExcelCell(getMessage("gradebook.exportcourse.lessonFeedback"), true);
-	    headerRow[i++] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
-	}
-	rowList.add(headerRow);
-	
-	for (User learner : allLearners) {
-	    // Fetching the user data
-	    List<GBUserGridRowDTO> userRows = getGBUserRowsForUser(learner, lessons, organisationId);
-	    i = 0;
-	    ExcelCell[] userDataRow = new ExcelCell[numberOfCellsInARow];
-	    userDataRow[i++] = new ExcelCell(learner.getLastName(), false);
-	    userDataRow[i++] = new ExcelCell(learner.getFirstName(), false);
-	    
-	    for (GBUserGridRowDTO userRow : userRows) {
-		userDataRow[i++] = new ExcelCell(getProgressMessage(userRow), false);
-		userDataRow[i++] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
-		userDataRow[i++] = new ExcelCell(userRow.getFeedback(), false);
-		userDataRow[i++] = new ExcelCell(userRow.getMark(), false);
+	if (lessons != null && (lessons.size() > 0)) {
+
+	    // collect users from all lessons
+	    Set<User> allLearners = new LinkedHashSet<User>();
+	    for (Lesson lesson : lessons) {
+		Set dbLessonUsers = lesson.getAllLearners();
+		allLearners.addAll(dbLessonUsers);
 	    }
 
-	    rowList.add(userDataRow);
+	    int numberOfCellsInARow = 2 + lessons.size() * 4;
+
+	    // Adding the user lesson marks to the summary----------------------
+	    ExcelCell[] lessonsNames = new ExcelCell[numberOfCellsInARow];
+	    int i = 0;
+	    lessonsNames[i++] = new ExcelCell("", false);
+	    lessonsNames[i++] = new ExcelCell("", false);
+	    for (Lesson lesson : lessons) {
+		lessonsNames[i++] = new ExcelCell(messageService.getMessage("gradebook.exportcourse.lesson",
+			new Object[] { lesson.getLessonName() }), true);
+		lessonsNames[i++] = new ExcelCell("", false);
+		lessonsNames[i++] = new ExcelCell("", false);
+		lessonsNames[i++] = new ExcelCell("", false);
+	    }
+	    rowList.add(lessonsNames);
+
+	    // Setting up the user marks table
+	    ExcelCell[] headerRow = new ExcelCell[numberOfCellsInARow];
+	    i = 0;
+	    headerRow[i++] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
+	    headerRow[i++] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
+	    for (Lesson lesson : lessons) {
+		headerRow[i++] = new ExcelCell(getMessage("gradebook.exportcourse.progress"), true);
+		headerRow[i++] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
+		headerRow[i++] = new ExcelCell(getMessage("gradebook.exportcourse.lessonFeedback"), true);
+		headerRow[i++] = new ExcelCell(getMessage("gradebook.export.total.mark"), true);
+	    }
+	    rowList.add(headerRow);
+
+	    for (User learner : allLearners) {
+		// Fetching the user data
+		List<GBUserGridRowDTO> userRows = getGBUserRowsForUser(learner, lessons, organisationId);
+		i = 0;
+		ExcelCell[] userDataRow = new ExcelCell[numberOfCellsInARow];
+		userDataRow[i++] = new ExcelCell(learner.getLastName(), false);
+		userDataRow[i++] = new ExcelCell(learner.getFirstName(), false);
+
+		for (GBUserGridRowDTO userRow : userRows) {
+		    userDataRow[i++] = new ExcelCell(getProgressMessage(userRow), false);
+		    userDataRow[i++] = new ExcelCell(userRow.getTimeTakenSeconds(), false);
+		    userDataRow[i++] = new ExcelCell(userRow.getFeedback(), false);
+		    userDataRow[i++] = new ExcelCell(userRow.getMark(), false);
+		}
+
+		rowList.add(userDataRow);
+	    }
 	}
 	
-	return rowList.toArray(new ExcelCell[][] {});
+	ExcelCell[][] summaryData = rowList.toArray(new ExcelCell[][] {});
+	dataToExport.put(getMessage("gradebook.exportcourse.course.summary"), summaryData);
+	return dataToExport;
     }
 
     public void updateActivityMark(Double mark, String feedback, Integer userID, Long toolSessionID,
@@ -1263,12 +1262,9 @@ public class GradebookService implements IGradebookService {
 	    List<GradebookUserActivity> gradebookUserActivityList = baseDAO.find(query, new Object[] { activity.getActivityId() });
 	    
 	    if (gradebookUserActivityList != null && gradebookUserActivityList.size() > 0) {
-		MultiKeyMap aa = new MultiKeyMap();
-		
 		Map<Integer, GradebookUserActivity> map = new HashMap<Integer, GradebookUserActivity>();
 		for (GradebookUserActivity gradebookUserActivity : gradebookUserActivityList) {
 		    map.put(gradebookUserActivity.getLearner().getUserId(), gradebookUserActivity);
-		    aa.put(gradebookUserActivity.getLearner().getUserId(), gradebookUserActivity.getLearner().getUserId(), gradebookUserActivity);
 		}
 		return map;
 	    }

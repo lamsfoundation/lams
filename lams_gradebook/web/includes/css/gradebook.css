@@ -1,0 +1,15 @@
+#content {
+	margin-top:20px;
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:30px; 
+	width:707px; 
+	height:100%; 
+	border:1px solid #d4d8da;
+	background-color:#fff;
+	padding:20px 25px;
+}
+		
+#export-link-area {padding-bottom: 20px;}
+
+.grid-holder {width: 700px; margin-left: 10px; margin-right: 10px;}

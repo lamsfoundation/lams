@@ -294,46 +294,44 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 		return null;
 	}
 
-	/**
-	 * Exports Lesson Gradebook into excel.
-	 */
-	public ActionForward exportExcelLessonGradebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+    /**
+     * Exports Lesson Gradebook into excel.
+     */
+    public ActionForward exportExcelLessonGradebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
-		initServices();
+	initServices();
 
-		Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-		Lesson lesson = lessonService.getLesson(lessonID);
+	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Lesson lesson = lessonService.getLesson(lessonID);
 
-		if (lesson != null) {
-			String fileName = lesson.getLessonName().replaceAll(" ", "_") + ".xlsx";
-			fileName  = FileUtil.encodeFilenameForDownload(request, fileName);
-			
-			response.setContentType("application/x-download");
-			response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-			logger.debug("Exporting to a spreadsheet gradebook lesson: " + lessonID);
-			ServletOutputStream out = response.getOutputStream();
-
-			LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
-
-			ExcelCell[][] summaryData = gradebookService.getSummaryDataForExcel(lesson);
-			dataToExport.put(gradebookService.getMessage("gradebook.export.lesson.summary"), summaryData);
-
-			HashMap<ToolActivity, List<GBUserGridRowDTO>> data = gradebookService.getDataForExcelLessonGradebook(lesson);
-			ExcelCell[][] activityData = gradebookService.getActivityViewDataForExcel(data);
-			dataToExport.put(gradebookService.getMessage("gradebook.gridtitle.activitygrid"), activityData);
-
-			ExcelCell[][] userData = gradebookService.getUserViewDataForExcel(data, lesson);
-			dataToExport.put(gradebookService.getMessage("gradebook.export.learner.view"), userData);
-
-			GradebookUtil.exportGradebookLessonToExcel(out, gradebookService.getMessage("gradebook.export.dateheader"),
-					dataToExport);
-
-		} else {
-			throw new Exception("Attempt to retrieve gradebook data for null lesson");
-		}
-		return null;
+	if (lesson == null) {
+	    String errorMsg = "Attempt to retrieve gradebook data for null lesson";
+	    logger.error(errorMsg);
+	    throw new Exception(errorMsg);
 	}
+	
+	String fileName = lesson.getLessonName().replaceAll(" ", "_") + ".xlsx";
+	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
+
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+	logger.debug("Exporting to a spreadsheet gradebook lesson: " + lessonID);
+	ServletOutputStream out = response.getOutputStream();
+
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = gradebookService.exportLessonGradebook(lesson);
+
+	// set cookie that will tell JS script that export has been finished
+	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
+	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
+	fileDownloadTokenCookie.setPath("/");
+	response.addCookie(fileDownloadTokenCookie);
+
+	GradebookUtil.exportGradebookLessonToExcel(out, gradebookService.getMessage("gradebook.export.dateheader"),
+		dataToExport);
+
+	return null;
+    }
 	
     /**
      * Exports Course Gradebook into excel.
@@ -347,16 +345,15 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
 	Organisation organisation = (Organisation) userService.findById(Organisation.class, oranisationID);
 	if (organisation == null || user == null) {
-	    logger.error("Organisation " + oranisationID + " does not exist or user is null. Unable to load gradebook");
-	    return mapping.findForward("error");
+	    String errorMsg = "Organisation " + oranisationID + " does not exist or user is null. Unable to load gradebook";
+	    logger.error(errorMsg);
+	    throw new Exception(errorMsg);
 	}
 	
 	Integer organisationId = organisation.getOrganisationId();
 	logger.debug("Exporting to a spreadsheet course: " + organisationId);
 
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
-	ExcelCell[][] summaryData = gradebookService.getCourseDataForExcel(user.getUserId(), organisationId);
-	dataToExport.put(gradebookService.getMessage("gradebook.exportcourse.course.summary"), summaryData);
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = gradebookService.exportCourseGradebook(user.getUserId(), organisationId);
 
 	String fileName = organisation.getName().replaceAll(" ", "_") + ".xlsx";
 	fileName  = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -364,7 +361,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	response.setContentType("application/x-download");
 	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);	
 	
-	//downloadTokenValue will have been provided when requesting excel export
+	//set cookie that will tell JS script that export has been finished
 	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
 	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
 	fileDownloadTokenCookie.setPath("/");

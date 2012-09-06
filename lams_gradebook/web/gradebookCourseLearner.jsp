@@ -10,20 +10,12 @@
 <lams:html>
 <lams:head>
 	<title>Course Gradebook Learner</title>
+	
 	<lams:css />
+	<link type="text/css" href="includes/css/gradebook.css" rel="stylesheet" />
 	
 	<style>
-		#content {
-			margin-top:20px;
-			margin-left:auto;
-			margin-right:auto;
-			margin-bottom:30px; 
-			width:680px; 
-			height:100%; 
-			border:1px solid #d4d8da;
-			background-color:#fff;
-			padding:20px 25px;
-		}
+		#content {width:680px; }
 	</style>
 
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>

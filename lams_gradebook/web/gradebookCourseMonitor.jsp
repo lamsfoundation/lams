@@ -10,67 +10,21 @@
 <lams:html>
 <lams:head>
 	<title><fmt:message key="gradebook.title.window.courseMonitor"/></title>
-	<lams:css />
 	
-	<style>
-		#content {
-			margin-top:20px;
-			margin-left:auto;
-			margin-right:auto;
-			margin-bottom:30px; 
-			width:707px; 
-			height:100%; 
-			border:1px solid #d4d8da;
-			background-color:#fff;
-			padding:20px 25px;
-		}
-	</style>
+	<lams:css />
+	<link type="text/css" href="includes/css/gradebook.css" rel="stylesheet" />
 	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
+	<script type="text/javascript">
+		var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelCourseGradebook&organisationID=${organisationID}";
+		var languageLabelWait = "<fmt:message key='gradebook.coursemonitor.wait'/>";
+	</script>
+	<script type="text/javascript" src="includes/javascript/blockexportbutton.js"></script>
 
 	<script type="text/javascript">
 	
-		//Detecting-the-file-download-dialog-in-the-browser: http://geekswithblogs.net/GruffCode/archive/2010/10/28/detecting-the-file-download-dialog-in-the-browser.aspx
-		var fileDownloadCheckTimer;
-		function blockExportButton() {
-		    var token = new Date().getTime(); //use the current timestamp as the token value
-		    
-			$('#exportLinkArea').block({
-		    	message: '<h1 style="color:#fff";><fmt:message key="gradebook.coursemonitor.wait"/></h1>',
-		    	baseZ: 1000000,
-		    	fadeIn:  0, 
-			    css: { 
-		        	border: 'none', 
-		        	padding: '3px', 
-		        	backgroundColor: '#000', 
-		        	'-webkit-border-radius': '10px', 
-		        	'-moz-border-radius': '10px', 
-		        	opacity: .8 
-		    	},
-		    	overlayCSS: {
-			    	opacity: 0
-		    	}
-	        });
-		    
-		    fileDownloadCheckTimer = window.setInterval(function () {
-		    	var cookieValue = $.cookie('fileDownloadToken');
-		    	if (cookieValue == token) {
-		    		unBlockExportButton();
-		    	}
-		    }, 1000);
-			
-		    document.location.href = "<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelCourseGradebook&organisationID=${organisationID}&downloadTokenValue=" + token;
-			return false;
-		}
-		
-		function unBlockExportButton() {
-			window.clearInterval(fileDownloadCheckTimer);
-			$.cookie('fileDownloadToken', null); //clears this cookie value
-			$('#exportLinkArea').unblock();
-		} 
-		
 		jQuery(document).ready(function(){
 
 			// Create the lesson view grid with sub grid for users	
@@ -422,13 +376,14 @@
 			</h1>
 			<br />
 			
-			<div id="exportLinkArea" style="padding-bottom: 20px;">
-				<a href="#" onclick="JavaScript:blockExportButton();" >
-				<fmt:message key="gradebook.export.excel.1" />
-			</a> <fmt:message key="gradebook.export.excel.2" />
+			<div id="export-link-area">
+				<a href="#nogo" onclick="JavaScript:blockExportButton();" >
+					<fmt:message key="gradebook.export.excel.1" />
+				</a> 
+				<fmt:message key="gradebook.export.excel.2" />
 			</div>
 			
-			<div style="width: 700px; margin-left: 10px; margin-right: 10px;">
+			<div class="grid-holder">
 				<table id="organisationGrid" class="scroll"></table>
 				<div id="organisationGridPager" class="scroll"></div>
 				

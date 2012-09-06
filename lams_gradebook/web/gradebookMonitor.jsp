@@ -9,25 +9,19 @@
 <lams:html>
 <lams:head>
 	<title><fmt:message key="gradebook.title.window.lessonMonitor"/></title>
-	<lams:css/>
 	
-	<style>
-		#content {
-			margin-top:20px;
-			margin-left:auto;
-			margin-right:auto;
-			margin-bottom:30px; 
-			width:707px; 
-			height:100%; 
-			border:1px solid #d4d8da;
-			background-color:#fff;
-			padding:20px 25px;
-		}
-	</style>
+	<lams:css/>
+	<link type="text/css" href="includes/css/gradebook.css" rel="stylesheet" />
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
-	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
+	<script type="text/javascript">
+		var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelLessonGradebook&lessonID=${lessonDetails.lessonID}";
+		var languageLabelWait = "<fmt:message key='gradebook.coursemonitor.wait'/>";
+	</script>
+	<script type="text/javascript" src="includes/javascript/blockexportbutton.js"></script>
 	
 	<script type="text/javascript">
 	
@@ -482,13 +476,14 @@
 				<br />
 			</div>
 			
-			<a href="<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelLessonGradebook&lessonID=${lessonDetails.lessonID}">
-				<fmt:message key="gradebook.export.excel.1" />
-			</a> <fmt:message key="gradebook.export.excel.2" />
-			<br />
-			<br />
+			<div id="export-link-area">
+				<a href="#nogo" onclick="JavaScript:blockExportButton();" >
+					<fmt:message key="gradebook.export.excel.1" />
+				</a> 
+				<fmt:message key="gradebook.export.excel.2" />
+			</div>
 			
-			<div style="width: 700px; margin-left: 10px; margin-right: 10px;">
+			<div class="grid-holder">
 				<table id="userView" class="scroll" ></table>
 				<div id="userViewPager" class="scroll" ></div>
 				
