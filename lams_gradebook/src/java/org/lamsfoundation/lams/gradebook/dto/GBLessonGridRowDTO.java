@@ -32,17 +32,15 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
     public static final String VIEW_MONITOR = "monitorView";
     public static final String VIEW_LEARNER = "learnerView";
 
-    String subGroup;
-    String startDate;
+    private String subGroup;
+    private String startDate;
     
     // Only for monitor view
-    String gradebookMonitorURL;
+    private String gradebookMonitorURL;
     
     // Only for learner view
-    String gradebookLearnerURL;
-    String finishDate;
-    String status;
-    String feedback;
+    private String gradebookLearnerURL;
+    private String finishDate;
     
     public GBLessonGridRowDTO() {
     }
@@ -132,22 +130,6 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 
     public void setFinishDate(String finishDate) {
         this.finishDate = finishDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getFeedback() {
-        return feedback;
-    }
-
-    public void setFeedback(String feedback) {
-        this.feedback = feedback;
     }
     
     

@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.gradebook.service; 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
@@ -203,14 +204,14 @@ public interface IGradebookService {
      * @param lesson
      * @return
      */
-    public ExcelCell[][] getActivityViewDataForExcel(Lesson lesson);
+    public ExcelCell[][] getActivityViewDataForExcel(HashMap<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap);
     
     /**
      * Get the user view data in a 2d array format for an excel export
      * @param lesson
      * @return
      */
-    public ExcelCell[][] getUserViewDataForExcel(Lesson lesson);
+    public ExcelCell[][] getUserViewDataForExcel(HashMap<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap, Lesson lesson);
     
     /**
      * Get the summary data in a 2s array for an excel export
@@ -227,5 +228,7 @@ public interface IGradebookService {
      * @return
      */
     ExcelCell[][] getCourseDataForExcel(Integer userId, Integer organisationId);
+    
+    HashMap<ToolActivity, List<GBUserGridRowDTO>> getDataForExcelLessonGradebook(Lesson lesson);
 }
  

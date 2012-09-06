@@ -23,8 +23,9 @@
 /* $Id$ */
 package org.lamsfoundation.lams.gradebook.web.action;
 
-import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -37,11 +38,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.gradebook.dto.ExcelCell;
+import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -316,10 +319,11 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 			ExcelCell[][] summaryData = gradebookService.getSummaryDataForExcel(lesson);
 			dataToExport.put(gradebookService.getMessage("gradebook.export.lesson.summary"), summaryData);
 
-			ExcelCell[][] activityData = gradebookService.getActivityViewDataForExcel(lesson);
+			HashMap<ToolActivity, List<GBUserGridRowDTO>> data = gradebookService.getDataForExcelLessonGradebook(lesson);
+			ExcelCell[][] activityData = gradebookService.getActivityViewDataForExcel(data);
 			dataToExport.put(gradebookService.getMessage("gradebook.gridtitle.activitygrid"), activityData);
 
-			ExcelCell[][] userData = gradebookService.getUserViewDataForExcel(lesson);
+			ExcelCell[][] userData = gradebookService.getUserViewDataForExcel(data, lesson);
 			dataToExport.put(gradebookService.getMessage("gradebook.export.learner.view"), userData);
 
 			GradebookUtil.exportGradebookLessonToExcel(out, gradebookService.getMessage("gradebook.export.dateheader"),

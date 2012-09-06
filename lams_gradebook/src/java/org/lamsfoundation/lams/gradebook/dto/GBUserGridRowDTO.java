@@ -27,23 +27,28 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
+import org.lamsfoundation.lams.usermanagement.User;
 
 public class GBUserGridRowDTO extends GradebookGridRowDTO {
     
-    String status;
-    String feedback;
-
     // For activity view
-    Date startDate;
-    String output;
-    String activityUrl;
+    private Date startDate;
+    private String output;
+    private String activityUrl;
     
     // For excel export
-    String firstName;
-    String lastName;
-    String currentActivity;
+    private String firstName;
+    private String lastName;
+    private String currentActivity;
 
     public GBUserGridRowDTO() {
+    }
+    
+    public GBUserGridRowDTO(User user) {
+	this.id = user.getUserId().toString();
+	this.rowName = user.getLastName() + " " + user.getFirstName();
+	this.firstName = user.getFirstName();
+	this.lastName = user.getLastName();
     }
 
     @Override
@@ -88,22 +93,6 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	}
 
 	return ret;
-    }
-
-    public String getStatus() {
-	return status;
-    }
-
-    public void setStatus(String status) {
-	this.status = status;
-    }
-
-    public String getFeedback() {
-	return feedback;
-    }
-
-    public void setFeedback(String feedback) {
-	this.feedback = feedback;
     }
 
     public String getOutput() {

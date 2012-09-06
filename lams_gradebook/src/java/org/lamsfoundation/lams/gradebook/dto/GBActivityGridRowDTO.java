@@ -25,29 +25,27 @@ package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Set;
 
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
+import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
 public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 
     public static final String VIEW_USER = "userView";
     public static final String VIEW_ACTIVITY = "activityView";
     
-    String competences;
-    //String toolString;
+    private String competences;
 
     // Properties for user view
-    String status;
-    String output;
-    String activityUrl;
-    //double timeTaken;
-    String feedback;
-    Date startDate;
-
+    private String output;
+    private String activityUrl;
+    private Date startDate;
 
     // Properties for activity view
-    String monitorUrl;
-    Long groupId;
+    private String monitorUrl;
+    private Long groupId;
 
     public Long getGroupId() {
         return groupId;
@@ -57,7 +55,36 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
         this.groupId = groupId;
     }
 
-    public GBActivityGridRowDTO() {
+    public GBActivityGridRowDTO(ToolActivity activity, String groupName, Long groupId) {
+
+	if (groupName != null && groupId != null) {
+	    // Need to make the id unique, so appending the group id for this row
+	    this.id = activity.getActivityId().toString() + "_" + groupId.toString();
+	    
+	    this.groupId = groupId;
+	    // If grouped acitivty, append group name
+	    this.rowName = activity.getTitle() + " (" + groupName + ")";
+	} else {
+	    this.id = activity.getActivityId().toString();
+
+	    this.rowName = activity.getTitle();
+	}
+	
+	//Constructs the competences for this activity.
+	Set<CompetenceMapping> competenceMappings = activity.getCompetenceMappings();
+	String competenceMappingsStr = "";
+	if (competenceMappings != null) {
+	    for (CompetenceMapping mapping : competenceMappings) {
+		competenceMappingsStr += mapping.getCompetence().getTitle() + ", ";
+	    }
+
+	    // trim the last comma off
+	    if (competenceMappingsStr.length() > 0) {
+		competenceMappingsStr = competenceMappingsStr.substring(0, competenceMappingsStr.lastIndexOf(","));
+	    }
+	}
+
+	this.competences = competenceMappingsStr;
     }
 
     @Override
@@ -114,14 +141,6 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	return ret;
     }
 
-    public String getStatus() {
-	return status;
-    }
-
-    public void setStatus(String status) {
-	this.status = status;
-    }
-
     public String getOutput() {
 	return output;
     }
@@ -144,14 +163,6 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 
     public void setActivityUrl(String activityUrl) {
 	this.activityUrl = activityUrl;
-    }
-
-    public String getFeedback() {
-	return feedback;
-    }
-
-    public void setFeedback(String feedback) {
-	this.feedback = feedback;
     }
 
     public String getMonitorUrl() {

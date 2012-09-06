@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.gradebook.dto;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -35,32 +34,35 @@ public abstract class GradebookGridRowDTO {
 
     public abstract ArrayList<String> toStringArray(GBGridView view);
 
-    public static final String CELL_EMPTY = "-";
+    protected static final String CELL_EMPTY = "-";
 
-    public static final DateFormat DEFAULT_DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT,
+    protected static final DateFormat DEFAULT_DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.SHORT,
 	    DateFormat.SHORT);
 
     // The id for a row, might be activityId, userId, lessonID etc
-    public String id;
+    protected String id;
 
     // The name for the row, every gradebook row has some sort of name
     // Be it the user's name, the activity name, the lesson name etc
-    public String rowName;
+    protected String rowName;
 
     // A unit of time in milliseconds that  determines the time taken for the corressponding task
-    public Long timeTaken;
+    protected Long timeTaken;
 
     // Another unit of time that represents average time taken for a corresponding task
-    public Long averageTimeTaken;
+    protected Long averageTimeTaken;
 
     // The mark for the corresponding gradebook grid row task
-    public Double mark;
+    protected Double mark;
 
     // Average mark for the corresponding task
-    public Double averageMark;
+    protected Double averageMark;
 
     // Number of marks available where applicable
-    public Long marksAvailable;
+    protected Long marksAvailable;
+    
+    protected String status;
+    protected String feedback;
 
     /**
      * A shared function to convert milliseconds into a readable string
@@ -220,5 +222,21 @@ public abstract class GradebookGridRowDTO {
 
     public void setMarksAvailable(Long marksAvailable) {
 	this.marksAvailable = marksAvailable;
+    }
+
+    public String getStatus() {
+	return status;
+    }
+
+    public void setStatus(String status) {
+	this.status = status;
+    }
+
+    public String getFeedback() {
+	return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+	this.feedback = feedback;
     }
 }
