@@ -1,65 +1,33 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2010 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Locale;
 
+import org.joda.convert.FromString;
+import org.joda.convert.ToString;
 import org.joda.time.base.BaseDateTime;
 import org.joda.time.chrono.ISOChronology;
 import org.joda.time.field.AbstractReadableInstantFieldProperty;
 import org.joda.time.field.FieldUtils;
+import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 /**
@@ -69,7 +37,7 @@ import org.joda.time.format.ISODateTimeFormat;
  * This class uses a Chronology internally. The Chronology determines how the
  * millisecond instant value is converted into the date time fields.
  * The default Chronology is <code>ISOChronology</code> which is the agreed
- * international standard and compatable with the modern Gregorian calendar.
+ * international standard and compatible with the modern Gregorian calendar.
  * <p>
  * Each individual field can be accessed in two ways:
  * <ul>
@@ -83,7 +51,7 @@ import org.joda.time.format.ISODateTimeFormat;
  * <li>set numeric value
  * <li>add to numeric value
  * <li>add to numeric value wrapping with the field
- * <li>get text vlaue
+ * <li>get text value
  * <li>get short text value
  * <li>set text value
  * <li>field maximum value
@@ -97,6 +65,7 @@ import org.joda.time.format.ISODateTimeFormat;
  * @author Guy Allard
  * @author Brian S O'Neill
  * @author Stephen Colebourne
+ * @author Mike Schrag
  * @since 1.0
  * @see DateTime
  */
@@ -127,8 +96,77 @@ public class MutableDateTime
 
     //-----------------------------------------------------------------------
     /**
+     * Obtains a {@code MutableDateTime} set to the current system millisecond time
+     * using <code>ISOChronology</code> in the default time zone.
+     * 
+     * @return the current date-time, not null
+     * @since 2.0
+     */
+    public static MutableDateTime now() {
+        return new MutableDateTime();
+    }
+
+    /**
+     * Obtains a {@code MutableDateTime} set to the current system millisecond time
+     * using <code>ISOChronology</code> in the specified time zone.
+     *
+     * @param zone  the time zone, not null
+     * @return the current date-time, not null
+     * @since 2.0
+     */
+    public static MutableDateTime now(DateTimeZone zone) {
+        if (zone == null) {
+            throw new NullPointerException("Zone must not be null");
+        }
+        return new MutableDateTime(zone);
+    }
+
+    /**
+     * Obtains a {@code MutableDateTime} set to the current system millisecond time
+     * using the specified chronology.
+     *
+     * @param chronology  the chronology, not null
+     * @return the current date-time, not null
+     * @since 2.0
+     */
+    public static MutableDateTime now(Chronology chronology) {
+        if (chronology == null) {
+            throw new NullPointerException("Chronology must not be null");
+        }
+        return new MutableDateTime(chronology);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Parses a {@code MutableDateTime} from the specified string.
+     * <p>
+     * This uses {@link ISODateTimeFormat#dateTimeParser()}.
+     * 
+     * @param str  the string to parse, not null
+     * @since 2.0
+     */
+    @FromString
+    public static MutableDateTime parse(String str) {
+        return parse(str, ISODateTimeFormat.dateTimeParser().withOffsetParsed());
+    }
+
+    /**
+     * Parses a {@code MutableDateTime} from the specified string using a formatter.
+     * 
+     * @param str  the string to parse, not null
+     * @param formatter  the formatter to use, not null
+     * @since 2.0
+     */
+    public static MutableDateTime parse(String str, DateTimeFormatter formatter) {
+        return formatter.parseDateTime(str).toMutableDateTime();
+    }
+
+    //-----------------------------------------------------------------------
+    /**
      * Constructs an instance set to the current system millisecond time
      * using <code>ISOChronology</code> in the default time zone.
+     * 
+     * @see #now()
      */
     public MutableDateTime() {
         super();
@@ -141,6 +179,7 @@ public class MutableDateTime
      * If the specified time zone is null, the default zone is used.
      *
      * @param zone  the time zone, null means default zone
+     * @see #now(DateTimeZone)
      */
     public MutableDateTime(DateTimeZone zone) {
         super(zone);
@@ -154,6 +193,7 @@ public class MutableDateTime
      * in the default time zone is used.
      *
      * @param chronology  the chronology, null means ISOChronology in default zone
+     * @see #now(Chronology)
      */
     public MutableDateTime(Chronology chronology) {
         super(chronology);
@@ -965,6 +1005,25 @@ public class MutableDateTime
 
     //-----------------------------------------------------------------------
     /**
+     * Gets the property object for the specified type, which contains many useful methods.
+     *
+     * @param type  the field type to get the chronology for
+     * @return the property object
+     * @throws IllegalArgumentException if the field is null or unsupported
+     * @since 1.2
+     */
+    public Property property(DateTimeFieldType type) {
+        if (type == null) {
+            throw new IllegalArgumentException("The DateTimeFieldType must not be null");
+        }
+        DateTimeField field = type.getField(getChronology());
+        if (field.isSupported() == false) {
+            throw new IllegalArgumentException("Field '" + type + "' is not supported");
+        }
+        return new Property(this, field);
+    }
+
+    /**
      * Get the era property.
      * 
      * @return the era property
@@ -1156,12 +1215,13 @@ public class MutableDateTime
     }
 
     /**
-     * Output the date time in ISO8601 format (yyyy-MM-ddTHH:mm:ss.SSSZ).
+     * Output the date time in ISO8601 format (yyyy-MM-ddTHH:mm:ss.SSSZZ).
      * 
      * @return ISO8601 time formatted string.
      */
+    @ToString
     public String toString() {
-        return ISODateTimeFormat.getInstance().dateTime().print(this);
+        return ISODateTimeFormat.dateTime().print(this);
     }
 
     /**
@@ -1190,9 +1250,9 @@ public class MutableDateTime
         private static final long serialVersionUID = -4481126543819298617L;
         
         /** The instant this property is working against */
-        private final MutableDateTime iInstant;
+        private MutableDateTime iInstant;
         /** The field this property is working against */
-        private final DateTimeField iField;
+        private DateTimeField iField;
         
         /**
          * Constructor.
@@ -1206,6 +1266,23 @@ public class MutableDateTime
             iField = field;
         }
         
+        /**
+         * Writes the property in a safe serialization format.
+         */
+        private void writeObject(ObjectOutputStream oos) throws IOException {
+            oos.writeObject(iInstant);
+            oos.writeObject(iField.getType());
+        }
+
+        /**
+         * Reads the property from a safe serialization format.
+         */
+        private void readObject(ObjectInputStream oos) throws IOException, ClassNotFoundException {
+            iInstant = (MutableDateTime) oos.readObject();
+            DateTimeFieldType type = (DateTimeFieldType) oos.readObject();
+            iField = type.getField(iInstant.getChronology());
+        }
+
         //-----------------------------------------------------------------------
         /**
          * Gets the field being used.
@@ -1217,12 +1294,22 @@ public class MutableDateTime
         }
         
         /**
-         * Gets the instant being used.
+         * Gets the milliseconds of the datetime that this property is linked to.
          * 
-         * @return the instant
+         * @return the milliseconds
          */
-        public ReadableInstant getReadableInstant() {
-            return iInstant;
+        protected long getMillis() {
+            return iInstant.getMillis();
+        }
+        
+        /**
+         * Gets the chronology of the datetime that this property is linked to.
+         * 
+         * @return the chronology
+         * @since 1.4
+         */
+        protected Chronology getChronology() {
+            return iInstant.getChronology();
         }
         
         /**

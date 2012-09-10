@@ -22,6 +22,7 @@ import java.io.InputStream;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
@@ -49,7 +50,7 @@ public class HttpResource extends AbstractFilteredResource {
      */
     public HttpResource(String resource) {
         super();
-        
+
         resourceUrl = DatatypeHelper.safeTrimOrNullString(resource);
         if (resourceUrl == null) {
             throw new IllegalArgumentException("Resource URL may not be null or empty");
@@ -57,7 +58,7 @@ public class HttpResource extends AbstractFilteredResource {
 
         httpClient = new HttpClient();
     }
-    
+
     /**
      * Constructor.
      * 
@@ -68,7 +69,7 @@ public class HttpResource extends AbstractFilteredResource {
      */
     public HttpResource(String resource, ResourceFilter resourceFilter) {
         super(resourceFilter);
-        
+
         resourceUrl = DatatypeHelper.safeTrimOrNullString(resource);
         if (resourceUrl == null) {
             throw new IllegalArgumentException("Resource URL may not be null or empty");
@@ -80,6 +81,7 @@ public class HttpResource extends AbstractFilteredResource {
     /** {@inheritDoc} */
     public boolean exists() throws ResourceException {
         HeadMethod headMethod = new HeadMethod(resourceUrl);
+        headMethod.addRequestHeader("Connection", "close");
 
         try {
             httpClient.executeMethod(headMethod);
@@ -90,6 +92,8 @@ public class HttpResource extends AbstractFilteredResource {
             return true;
         } catch (IOException e) {
             throw new ResourceException("Unable to contact resource URL: " + resourceUrl, e);
+        } finally {
+            headMethod.releaseConnection();
         }
     }
 
@@ -97,7 +101,7 @@ public class HttpResource extends AbstractFilteredResource {
     public InputStream getInputStream() throws ResourceException {
         GetMethod getMethod = getResource();
         try {
-            return applyFilter(getMethod.getResponseBodyAsStream());
+            return new ConnectionClosingInputStream(getMethod, applyFilter(getMethod.getResponseBodyAsStream()));
         } catch (IOException e) {
             throw new ResourceException("Unable to read response", e);
         }
@@ -106,6 +110,7 @@ public class HttpResource extends AbstractFilteredResource {
     /** {@inheritDoc} */
     public DateTime getLastModifiedTime() throws ResourceException {
         HeadMethod headMethod = new HeadMethod(resourceUrl);
+        headMethod.addRequestHeader("Connection", "close");
 
         try {
             httpClient.executeMethod(headMethod);
@@ -114,7 +119,7 @@ public class HttpResource extends AbstractFilteredResource {
                         + ", received HTTP status code " + headMethod.getStatusCode());
             }
             Header lastModifiedHeader = headMethod.getResponseHeader("Last-Modified");
-            if (lastModifiedHeader != null  && ! DatatypeHelper.isEmpty(lastModifiedHeader.getValue())) {
+            if (lastModifiedHeader != null && !DatatypeHelper.isEmpty(lastModifiedHeader.getValue())) {
                 long lastModifiedTime = DateUtil.parseDate(lastModifiedHeader.getValue()).getTime();
                 return new DateTime(lastModifiedTime, ISOChronology.getInstanceUTC());
             }
@@ -124,6 +129,8 @@ public class HttpResource extends AbstractFilteredResource {
             throw new ResourceException("Unable to contact resource URL: " + resourceUrl, e);
         } catch (DateParseException e) {
             throw new ResourceException("Unable to parse last modified date for resource:" + resourceUrl, e);
+        } finally {
+            headMethod.releaseConnection();
         }
     }
 
@@ -164,6 +171,7 @@ public class HttpResource extends AbstractFilteredResource {
      */
     protected GetMethod getResource() throws ResourceException {
         GetMethod getMethod = new GetMethod(resourceUrl);
+        getMethod.addRequestHeader("Connection", "close");
 
         try {
             httpClient.executeMethod(getMethod);
@@ -174,6 +182,76 @@ public class HttpResource extends AbstractFilteredResource {
             return getMethod;
         } catch (IOException e) {
             throw new ResourceException("Unable to contact resource URL: " + resourceUrl, e);
+        }
+    }
+
+    /**
+     * A wrapper around the {@link InputStream} returned by a {@link HttpMethod} that closes the stream and releases the
+     * HTTP connection when {@link #close()} is invoked.
+     */
+    private static class ConnectionClosingInputStream extends InputStream {
+
+        /** HTTP method that was invoked. */
+        private final HttpMethod method;
+
+        /** Stream owned by the given HTTP method. */
+        private final InputStream stream;
+
+        /**
+         * Constructor.
+         *
+         * @param httpMethod HTTP method that was invoked
+         * @param returnedStream stream owned by the given HTTP method
+         */
+        public ConnectionClosingInputStream(HttpMethod httpMethod, InputStream returnedStream) {
+            method = httpMethod;
+            stream = returnedStream;
+        }
+
+        /** {@inheritDoc} */
+        public int available() throws IOException {
+            return stream.available();
+        }
+
+        /** {@inheritDoc} */
+        public void close() throws IOException {
+            stream.close();
+            method.releaseConnection();
+        }
+
+        /** {@inheritDoc} */
+        public void mark(int readLimit) {
+            stream.mark(readLimit);
+        }
+
+        /** {@inheritDoc} */
+        public boolean markSupported() {
+            return stream.markSupported();
+        }
+
+        /** {@inheritDoc} */
+        public int read() throws IOException {
+            return stream.read();
+        }
+
+        /** {@inheritDoc} */
+        public int read(byte[] b) throws IOException {
+            return stream.read(b);
+        }
+
+        /** {@inheritDoc} */
+        public int read(byte[] b, int off, int len) throws IOException {
+            return stream.read(b, off, len);
+        }
+
+        /** {@inheritDoc} */
+        public synchronized void reset() throws IOException {
+            stream.reset();
+        }
+
+        /** {@inheritDoc} */
+        public long skip(long n) throws IOException {
+            return stream.skip(n);
         }
     }
 }

@@ -1,55 +1,17 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2009 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.chrono;
 
@@ -62,17 +24,25 @@ import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DateTimeZone;
+import org.joda.time.field.DelegatedDateTimeField;
 import org.joda.time.field.DividedDateTimeField;
 import org.joda.time.field.OffsetDateTimeField;
 import org.joda.time.field.RemainderDateTimeField;
+import org.joda.time.field.SkipUndoDateTimeField;
 
 /**
- * Implements the Buddhist calendar system, which is similar to Gregorian/Julian,
- * except with the year offset by 543.
+ * A chronology that matches the BuddhistCalendar class supplied by Sun.
  * <p>
- * The Buddhist calendar differs from the Gregorian/Julian calendar only 
- * in the year. This class is compatable with the BuddhistCalendar class 
- * supplied by Sun.
+ * The chronology is identical to the Gregorian/Julian, except that the
+ * year is offset by +543 and the era is named 'BE' for Buddhist Era.
+ * <p>
+ * This class was intended by Sun to model the calendar used in Thailand.
+ * However, the actual rules for Thailand are much more involved than
+ * this class covers. (This class is accurate after 1941-01-01 ISO).
+ * <p>
+ * This chronlogy is being retained for those who want a same effect
+ * replacement for the Sun class. It is hoped that community support will
+ * enable a more accurate chronology for Thailand, to be developed.
  * <p>
  * BuddhistChronology is thread-safe and immutable.
  *
@@ -87,15 +57,18 @@ public final class BuddhistChronology extends AssembledChronology {
 
     /**
      * Constant value for 'Buddhist Era', equivalent to the value returned
-     * for AD/CE.
+     * for AD/CE. Note that this differs from the constant in BuddhistCalendar.
      */
     public static final int BE = DateTimeConstants.CE;
+
+    /** A singleton era field. */
+    private static final DateTimeField ERA_FIELD = new BasicSingleEraDateTimeField("BE");
 
     /** Number of years difference in calendars. */
     private static final int BUDDHIST_OFFSET = 543;
 
     /** Cache of zone to chronology */
-    private static final Map cCache = new HashMap();
+    private static final Map<DateTimeZone, BuddhistChronology> cCache = new HashMap<DateTimeZone, BuddhistChronology>();
 
     /** UTC instance of the chronology */
     private static final BuddhistChronology INSTANCE_UTC = getInstance(DateTimeZone.UTC);
@@ -131,7 +104,7 @@ public final class BuddhistChronology extends AssembledChronology {
         if (zone == null) {
             zone = DateTimeZone.getDefault();
         }
-        BuddhistChronology chrono = (BuddhistChronology) cCache.get(zone);
+        BuddhistChronology chrono = cCache.get(zone);
         if (chrono == null) {
             // First create without a lower limit.
             chrono = new BuddhistChronology(GJChronology.getInstance(zone, null), null);
@@ -190,6 +163,27 @@ public final class BuddhistChronology extends AssembledChronology {
         return getInstance(zone);
     }
 
+    /**
+     * Checks if this chronology instance equals another.
+     * 
+     * @param obj  the object to compare to
+     * @return true if equal
+     * @since 1.6
+     */
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    /**
+     * A suitable hash code for the chronology.
+     * 
+     * @return the hash code
+     * @since 1.6
+     */
+    public int hashCode() {
+        return "Buddhist".hashCode() * 11 + getZone().hashCode();
+    }
+
     // Output
     //-----------------------------------------------------------------------
     /**
@@ -208,15 +202,20 @@ public final class BuddhistChronology extends AssembledChronology {
 
     protected void assemble(Fields fields) {
         if (getParam() == null) {
+            // julian chrono removed zero, but we need to put it back
             DateTimeField field = fields.year;
-            fields.year = new OffsetDateTimeField(field, BUDDHIST_OFFSET);
+            fields.year = new OffsetDateTimeField(
+                    new SkipUndoDateTimeField(this, field), BUDDHIST_OFFSET);
             
+            // one era, so yearOfEra is the same
             field = fields.yearOfEra;
-            fields.yearOfEra = new OffsetDateTimeField(
-                fields.year, DateTimeFieldType.yearOfEra(), BUDDHIST_OFFSET);
+            fields.yearOfEra = new DelegatedDateTimeField(
+                fields.year, DateTimeFieldType.yearOfEra());
             
+            // julian chrono removed zero, but we need to put it back
             field = fields.weekyear;
-            fields.weekyear = new OffsetDateTimeField(field, BUDDHIST_OFFSET);
+            fields.weekyear = new OffsetDateTimeField(
+                    new SkipUndoDateTimeField(this, field), BUDDHIST_OFFSET);
             
             field = new OffsetDateTimeField(fields.yearOfEra, 99);
             fields.centuryOfEra = new DividedDateTimeField(
@@ -232,7 +231,7 @@ public final class BuddhistChronology extends AssembledChronology {
             fields.weekyearOfCentury = new OffsetDateTimeField(
                 field, DateTimeFieldType.weekyearOfCentury(), 1);
             
-            fields.era = BuddhistEraDateTimeField.INSTANCE;
+            fields.era = ERA_FIELD;
         }
     }
    

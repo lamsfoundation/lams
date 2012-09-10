@@ -1,55 +1,17 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2009 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.tz;
 
@@ -59,10 +21,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.joda.time.DateTimeZone;
 
@@ -73,29 +35,18 @@ import org.joda.time.DateTimeZone;
  * ZoneInfoProvider is thread-safe and publicly immutable.
  *
  * @author Brian S O'Neill
+ * @since 1.0
  */
 public class ZoneInfoProvider implements Provider {
-    private static Map loadZoneInfoMap(InputStream in) throws IOException {
-        Map map = new TreeMap(String.CASE_INSENSITIVE_ORDER);
-        DataInputStream din = new DataInputStream(in);
-        try {
-            ZoneInfoCompiler.readZoneInfoMap(din, map);
-        } finally {
-            try {
-                din.close();
-            } catch (IOException e) {
-            }
-        }
-        map.put("UTC", new SoftReference(DateTimeZone.UTC));
-        return map;
-    }
 
+    /** The directory where the files are held. */
     private final File iFileDir;
+    /** The resource path. */
     private final String iResourcePath;
+    /** The class loader to use. */
     private final ClassLoader iLoader;
-
-    // Maps ids to strings or SoftReferences to DateTimeZones.
-    private final Map iZoneInfoMap;
+    /** Maps ids to strings or SoftReferences to DateTimeZones. */
+    private final Map<String, Object> iZoneInfoMap;
 
     /**
      * ZoneInfoProvider searches the given directory for compiled data files.
@@ -172,12 +123,16 @@ public class ZoneInfoProvider implements Provider {
         iZoneInfoMap = loadZoneInfoMap(openResource("ZoneInfoMap"));
     }
 
+    //-----------------------------------------------------------------------
     /**
      * If an error is thrown while loading zone data, uncaughtException is
      * called to log the error and null is returned for this and all future
      * requests.
+     * 
+     * @param id  the id to load
+     * @return the loaded zone
      */
-    public synchronized DateTimeZone getZone(String id) {
+    public DateTimeZone getZone(String id) {
         if (id == null) {
             return null;
         }
@@ -192,8 +147,10 @@ public class ZoneInfoProvider implements Provider {
             return loadZoneData(id);
         }
 
-        if (obj instanceof SoftReference) {
-            DateTimeZone tz = (DateTimeZone)((SoftReference)obj).get();
+        if (obj instanceof SoftReference<?>) {
+            @SuppressWarnings("unchecked")
+            SoftReference<DateTimeZone> ref = (SoftReference<DateTimeZone>) obj;
+            DateTimeZone tz = ref.get();
             if (tz != null) {
                 return tz;
             }
@@ -205,19 +162,35 @@ public class ZoneInfoProvider implements Provider {
         return getZone((String)obj);
     }
 
-    public synchronized Set getAvailableIDs() {
-        return Collections.unmodifiableSet(iZoneInfoMap.keySet());
+    /**
+     * Gets a list of all the available zone ids.
+     * 
+     * @return the zone ids
+     */
+    public Set<String> getAvailableIDs() {
+        // Return a copy of the keys rather than an umodifiable collection.
+        // This prevents ConcurrentModificationExceptions from being thrown by
+        // some JVMs if zones are opened while this set is iterated over.
+        return new TreeSet<String>(iZoneInfoMap.keySet());
     }
 
     /**
-     * Called if an exception is thrown from getZone while loading zone
-     * data.
+     * Called if an exception is thrown from getZone while loading zone data.
+     * 
+     * @param ex  the exception
      */
-    protected void uncaughtException(Exception e) {
+    protected void uncaughtException(Exception ex) {
         Thread t = Thread.currentThread();
-        t.getThreadGroup().uncaughtException(t, e);
+        t.getThreadGroup().uncaughtException(t, ex);
     }
 
+    /**
+     * Opens a resource from file or classpath.
+     * 
+     * @param name  the name to open
+     * @return the input stream
+     * @throws IOException if an error occurs
+     */
     private InputStream openResource(String name) throws IOException {
         InputStream in;
         if (iFileDir != null) {
@@ -230,26 +203,32 @@ public class ZoneInfoProvider implements Provider {
                 in = ClassLoader.getSystemResourceAsStream(path);
             }
             if (in == null) {
-                StringBuffer buf = new StringBuffer(40);
-                buf.append("Resource not found: \"");
-                buf.append(path);
-                buf.append("\" ClassLoader: ");
-                buf.append(iLoader != null ? iLoader.toString() : "system");
+                StringBuffer buf = new StringBuffer(40)
+                    .append("Resource not found: \"")
+                    .append(path)
+                    .append("\" ClassLoader: ")
+                    .append(iLoader != null ? iLoader.toString() : "system");
                 throw new IOException(buf.toString());
             }
         }
         return in;
     }
 
+    /**
+     * Loads the time zone data for one id.
+     * 
+     * @param id  the id to load
+     * @return the zone
+     */
     private DateTimeZone loadZoneData(String id) {
         InputStream in = null;
         try {
             in = openResource(id);
             DateTimeZone tz = DateTimeZoneBuilder.readFrom(in, id);
-            iZoneInfoMap.put(id, new SoftReference(tz));
+            iZoneInfoMap.put(id, new SoftReference<DateTimeZone>(tz));
             return tz;
-        } catch (IOException e) {
-            uncaughtException(e);
+        } catch (IOException ex) {
+            uncaughtException(ex);
             iZoneInfoMap.remove(id);
             return null;
         } finally {
@@ -257,8 +236,56 @@ public class ZoneInfoProvider implements Provider {
                 if (in != null) {
                     in.close();
                 }
-            } catch (IOException e) {
+            } catch (IOException ex) {
             }
         }
     }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Loads the zone info map.
+     * 
+     * @param in  the input stream
+     * @return the map
+     */
+    private static Map<String, Object> loadZoneInfoMap(InputStream in) throws IOException {
+        Map<String, Object> map = new ConcurrentHashMap<String, Object>();
+        DataInputStream din = new DataInputStream(in);
+        try {
+            readZoneInfoMap(din, map);
+        } finally {
+            try {
+                din.close();
+            } catch (IOException ex) {
+            }
+        }
+        map.put("UTC", new SoftReference<DateTimeZone>(DateTimeZone.UTC));
+        return map;
+    }
+
+    /**
+     * Reads the zone info map from file.
+     * 
+     * @param din  the input stream
+     * @param zimap  gets filled with string id to string id mappings
+     */
+    private static void readZoneInfoMap(DataInputStream din, Map<String, Object> zimap) throws IOException {
+        // Read the string pool.
+        int size = din.readUnsignedShort();
+        String[] pool = new String[size];
+        for (int i=0; i<size; i++) {
+            pool[i] = din.readUTF().intern();
+        }
+
+        // Read the mappings.
+        size = din.readUnsignedShort();
+        for (int i=0; i<size; i++) {
+            try {
+                zimap.put(pool[din.readUnsignedShort()], pool[din.readUnsignedShort()]);
+            } catch (ArrayIndexOutOfBoundsException ex) {
+                throw new IOException("Corrupt zone info map");
+            }
+        }
+    }
+
 }

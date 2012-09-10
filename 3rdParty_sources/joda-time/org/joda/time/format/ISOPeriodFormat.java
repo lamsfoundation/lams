@@ -1,60 +1,26 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2005 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.format;
 
 /**
- * ISOPeriodFormat provides factory methods for the ISO8601 standard.
+ * Factory that creates instances of PeriodFormatter for the ISO8601 standard.
+ * <p>
+ * Period formatting is performed by the {@link PeriodFormatter} class.
+ * Three classes provide factory methods to create formatters, and this is one.
+ * The others are {@link PeriodFormat} and {@link PeriodFormatterBuilder}.
  * <p>
  * ISOPeriodFormat is thread-safe and immutable, and the formatters it
  * returns are as well.
@@ -66,25 +32,27 @@ package org.joda.time.format;
  */
 public class ISOPeriodFormat {
 
-    private static final ISOPeriodFormat INSTANCE = new ISOPeriodFormat();
+    /** Cache of standard format. */
+    private static PeriodFormatter cStandard;
+    /** Cache of alternate months format. */
+    private static PeriodFormatter cAlternate;
+    /** Cache of alternate extended months format. */
+    private static PeriodFormatter cAlternateExtended;
+    /** Cache of alternate weeks format. */
+    private static PeriodFormatter cAlternateWithWeeks;
+    /** Cache of alternate extended weeks format. */
+    private static PeriodFormatter cAlternateExtendedWihWeeks;
 
     /**
-     * Returns a singleton instance of ISOPeriodFormat.
+     * Constructor.
+     *
+     * @since 1.1 (previously private)
      */
-    public static ISOPeriodFormat getInstance() {
-        return INSTANCE;
+    protected ISOPeriodFormat() {
+        super();
     }
 
-    private transient PeriodFormatter
-        iStandard,
-        iAlternate,
-        iAlternateExtended,
-        iAlternateWithWeeks,
-        iAlternateExtendedWihWeeks;
-
-    private ISOPeriodFormat() {
-    }
-
+    //-----------------------------------------------------------------------
     /**
      * The standard ISO format - PyYmMwWdDThHmMsS.
      * Milliseconds are not output.
@@ -93,9 +61,9 @@ public class ISOPeriodFormat {
      * 
      * @return the formatter
      */
-    public PeriodFormatter standard() {
-        if (iStandard == null) {
-            iStandard = new PeriodFormatterBuilder()
+    public static PeriodFormatter standard() {
+        if (cStandard == null) {
+            cStandard = new PeriodFormatterBuilder()
                 .appendLiteral("P")
                 .appendYears()
                 .appendSuffix("Y")
@@ -114,7 +82,7 @@ public class ISOPeriodFormat {
                 .appendSuffix("S")
                 .toFormatter();
         }
-        return iStandard;
+        return cStandard;
     }
 
     /**
@@ -125,9 +93,9 @@ public class ISOPeriodFormat {
      * 
      * @return the formatter
      */
-    public PeriodFormatter alternate() {
-        if (iAlternate == null) {
-            iAlternate = new PeriodFormatterBuilder()
+    public static PeriodFormatter alternate() {
+        if (cAlternate == null) {
+            cAlternate = new PeriodFormatterBuilder()
                 .appendLiteral("P")
                 .printZeroAlways()
                 .minimumPrintedDigits(4)
@@ -141,7 +109,7 @@ public class ISOPeriodFormat {
                 .appendSecondsWithOptionalMillis()
                 .toFormatter();
         }
-        return iAlternate;
+        return cAlternate;
     }
 
     /**
@@ -152,9 +120,9 @@ public class ISOPeriodFormat {
      * 
      * @return the formatter
      */
-    public PeriodFormatter alternateExtended() {
-        if (iAlternateExtended == null) {
-            iAlternateExtended = new PeriodFormatterBuilder()
+    public static PeriodFormatter alternateExtended() {
+        if (cAlternateExtended == null) {
+            cAlternateExtended = new PeriodFormatterBuilder()
                 .appendLiteral("P")
                 .printZeroAlways()
                 .minimumPrintedDigits(4)
@@ -172,7 +140,7 @@ public class ISOPeriodFormat {
                 .appendSecondsWithOptionalMillis()
                 .toFormatter();
         }
-        return iAlternateExtended;
+        return cAlternateExtended;
     }
 
     /**
@@ -183,9 +151,9 @@ public class ISOPeriodFormat {
      * 
      * @return the formatter
      */
-    public PeriodFormatter alternateWithWeeks() {
-        if (iAlternateWithWeeks == null) {
-            iAlternateWithWeeks = new PeriodFormatterBuilder()
+    public static PeriodFormatter alternateWithWeeks() {
+        if (cAlternateWithWeeks == null) {
+            cAlternateWithWeeks = new PeriodFormatterBuilder()
                 .appendLiteral("P")
                 .printZeroAlways()
                 .minimumPrintedDigits(4)
@@ -200,7 +168,7 @@ public class ISOPeriodFormat {
                 .appendSecondsWithOptionalMillis()
                 .toFormatter();
         }
-        return iAlternateWithWeeks;
+        return cAlternateWithWeeks;
     }
 
     /**
@@ -211,9 +179,9 @@ public class ISOPeriodFormat {
      * 
      * @return the formatter
      */
-    public PeriodFormatter alternateExtendedWithWeeks() {
-        if (iAlternateExtendedWihWeeks == null) {
-            iAlternateExtendedWihWeeks = new PeriodFormatterBuilder()
+    public static PeriodFormatter alternateExtendedWithWeeks() {
+        if (cAlternateExtendedWihWeeks == null) {
+            cAlternateExtendedWihWeeks = new PeriodFormatterBuilder()
                 .appendLiteral("P")
                 .printZeroAlways()
                 .minimumPrintedDigits(4)
@@ -232,7 +200,7 @@ public class ISOPeriodFormat {
                 .appendSecondsWithOptionalMillis()
                 .toFormatter();
         }
-        return iAlternateExtendedWihWeeks;
+        return cAlternateExtendedWihWeeks;
     }
 
 }

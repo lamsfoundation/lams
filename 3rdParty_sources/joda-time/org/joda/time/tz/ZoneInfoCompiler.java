@@ -1,60 +1,21 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2010 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.tz;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,22 +26,23 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
 import org.joda.time.MutableDateTime;
-import org.joda.time.format.DateTimeParser;
-import org.joda.time.format.ISODateTimeFormat;
-import org.joda.time.chrono.LenientChronology;
 import org.joda.time.chrono.ISOChronology;
+import org.joda.time.chrono.LenientChronology;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * Compiles Olson ZoneInfo database files into binary files for each time zone
@@ -96,12 +58,27 @@ import org.joda.time.chrono.ISOChronology;
  * may be safely invoked by multiple threads.
  *
  * @author Brian S O'Neill
+ * @since 1.0
  */
 public class ZoneInfoCompiler {
     static DateTimeOfYear cStartOfYear;
 
     static Chronology cLenientISO;
 
+    static ThreadLocal<Boolean> cVerbose = new ThreadLocal<Boolean>();
+    static {
+        cVerbose.set(Boolean.FALSE);
+    }
+
+    /**
+     * Gets a flag indicating that verbose logging is required.
+     * @return true to log verbosely
+     */
+    public static boolean verbose() {
+        return cVerbose.get();
+    }
+
+    //-----------------------------------------------------------------------
     /**
      * Launches the ZoneInfoCompiler tool.
      *
@@ -110,6 +87,7 @@ public class ZoneInfoCompiler {
      * where possible options include:
      *   -src &lt;directory&gt;    Specify where to read source files
      *   -dst &lt;directory&gt;    Specify where to write generated files
+     *   -verbose            Output verbosely (default false)
      * </pre>
      */
     public static void main(String[] args) throws Exception {
@@ -120,6 +98,7 @@ public class ZoneInfoCompiler {
 
         File inputDir = null;
         File outputDir = null;
+        boolean verbose = false;
 
         int i;
         for (i=0; i<args.length; i++) {
@@ -128,6 +107,8 @@ public class ZoneInfoCompiler {
                     inputDir = new File(args[++i]);
                 } else if ("-dst".equals(args[i])) {
                     outputDir = new File(args[++i]);
+                } else if ("-verbose".equals(args[i])) {
+                    verbose = true;
                 } else if ("-?".equals(args[i])) {
                     printUsage();
                     return;
@@ -150,6 +131,7 @@ public class ZoneInfoCompiler {
             sources[j] = inputDir == null ? new File(args[i]) : new File(inputDir, args[i]);
         }
 
+        cVerbose.set(verbose);
         ZoneInfoCompiler zic = new ZoneInfoCompiler();
         zic.compile(outputDir, sources);
     }
@@ -159,6 +141,7 @@ public class ZoneInfoCompiler {
         System.out.println("where possible options include:");
         System.out.println("  -src <directory>    Specify where to read source files");
         System.out.println("  -dst <directory>    Specify where to write generated files");
+        System.out.println("  -verbose            Output verbosely (default false)");
     }
 
     static DateTimeOfYear getStartOfYear() {
@@ -178,18 +161,16 @@ public class ZoneInfoCompiler {
     /**
      * @param zimap maps string ids to DateTimeZone objects.
      */
-    static void writeZoneInfoMap(DataOutputStream dout, Map zimap) throws IOException {
+    static void writeZoneInfoMap(DataOutputStream dout, Map<String, DateTimeZone> zimap) throws IOException {
         // Build the string pool.
-        Map idToIndex = new HashMap(zimap.size());
-        TreeMap indexToId = new TreeMap();
+        Map<String, Short> idToIndex = new HashMap<String, Short>(zimap.size());
+        TreeMap<Short, String> indexToId = new TreeMap<Short, String>();
 
-        Iterator it = zimap.entrySet().iterator();
         short count = 0;
-        while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry)it.next();
+        for (Entry<String, DateTimeZone> entry : zimap.entrySet()) {
             String id = (String)entry.getKey();
             if (!idToIndex.containsKey(id)) {
-                Short index = new Short(count);
+                Short index = Short.valueOf(count);
                 idToIndex.put(id, index);
                 indexToId.put(index, id);
                 if (++count == 0) {
@@ -198,7 +179,7 @@ public class ZoneInfoCompiler {
             }
             id = ((DateTimeZone)entry.getValue()).getID();
             if (!idToIndex.containsKey(id)) {
-                Short index = new Short(count);
+                Short index = Short.valueOf(count);
                 idToIndex.put(id, index);
                 indexToId.put(index, id);
                 if (++count == 0) {
@@ -209,42 +190,17 @@ public class ZoneInfoCompiler {
 
         // Write the string pool, ordered by index.
         dout.writeShort(indexToId.size());
-        it = indexToId.values().iterator();
-        while (it.hasNext()) {
-            dout.writeUTF((String)it.next());
+        for (String id : indexToId.values()) {
+            dout.writeUTF(id);
         }
 
         // Write the mappings.
         dout.writeShort(zimap.size());
-        it = zimap.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry)it.next();
-            String id = (String)entry.getKey();
-            dout.writeShort(((Short)idToIndex.get(id)).shortValue());
-            id = ((DateTimeZone)entry.getValue()).getID();
-            dout.writeShort(((Short)idToIndex.get(id)).shortValue());
-        }
-    }
-
-    /**
-     * @param zimap gets filled with string id to string id mappings
-     */
-    static void readZoneInfoMap(DataInputStream din, Map zimap) throws IOException {
-        // Read the string pool.
-        int size = din.readUnsignedShort();
-        String[] pool = new String[size];
-        for (int i=0; i<size; i++) {
-            pool[i] = din.readUTF().intern();
-        }
-
-        // Read the mappings.
-        size = din.readUnsignedShort();
-        for (int i=0; i<size; i++) {
-            try {
-                zimap.put(pool[din.readUnsignedShort()], pool[din.readUnsignedShort()]);
-            } catch (ArrayIndexOutOfBoundsException e) {
-                throw new IOException("Corrupt zone info map");
-            }
+        for (Entry<String, DateTimeZone> entry : zimap.entrySet()) {
+            String id = entry.getKey();
+            dout.writeShort(idToIndex.get(id).shortValue());
+            id = entry.getValue().getID();
+            dout.writeShort(idToIndex.get(id).shortValue());
         }
     }
 
@@ -275,7 +231,7 @@ public class ZoneInfoCompiler {
     }
 
     static int parseTime(String str) {
-        DateTimeParser p = ISODateTimeFormat.getInstance().hourMinuteSecondFraction();
+        DateTimeFormatter p = ISODateTimeFormat.hourMinuteSecondFraction();
         MutableDateTime mdt = new MutableDateTime(0, getLenientISOChronology());
         int pos = 0;
         if (str.startsWith("-")) {
@@ -320,10 +276,9 @@ public class ZoneInfoCompiler {
         long end = ISOChronology.getInstanceUTC().year().set(0, 2050);
 
         int offset = tz.getOffset(millis);
-        int standardOffset = tz.getStandardOffset(millis);
         String key = tz.getNameKey(millis);
 
-        List transitions = new ArrayList();
+        List<Long> transitions = new ArrayList<Long>();
 
         while (true) {
             long next = tz.nextTransition(millis);
@@ -352,7 +307,7 @@ public class ZoneInfoCompiler {
                 return false;
             }
 
-            transitions.add(new Long(millis));
+            transitions.add(Long.valueOf(millis));
 
             offset = nextOffset;
             key = nextKey;
@@ -371,7 +326,7 @@ public class ZoneInfoCompiler {
 
             millis = prev;
 
-            long trans = ((Long)transitions.get(i)).longValue();
+            long trans = transitions.get(i).longValue();
             
             if (trans - 1 != millis) {
                 System.out.println("*r* Error in " + tz.getID() + " "
@@ -388,18 +343,18 @@ public class ZoneInfoCompiler {
     }
 
     // Maps names to RuleSets.
-    private Map iRuleSets;
+    private Map<String, RuleSet> iRuleSets;
 
     // List of Zone objects.
-    private List iZones;
+    private List<Zone> iZones;
 
     // List String pairs to link.
-    private List iLinks;
+    private List<String> iLinks;
 
     public ZoneInfoCompiler() {
-        iRuleSets = new HashMap();
-        iZones = new ArrayList();
-        iLinks = new ArrayList();
+        iRuleSets = new HashMap<String, RuleSet>();
+        iZones = new ArrayList<Zone>();
+        iLinks = new ArrayList<String>();
     }
 
     /**
@@ -408,7 +363,7 @@ public class ZoneInfoCompiler {
      * @param outputDir optional directory to write compiled data files to
      * @param sources optional list of source files to parse
      */
-    public Map compile(File outputDir, File[] sources) throws IOException {
+    public Map<String, DateTimeZone> compile(File outputDir, File[] sources) throws IOException {
         if (sources != null) {
             for (int i=0; i<sources.length; i++) {
                 BufferedReader in = new BufferedReader(new FileReader(sources[i]));
@@ -426,25 +381,31 @@ public class ZoneInfoCompiler {
             }
         }
 
-        Map map = new TreeMap();
+        Map<String, DateTimeZone> map = new TreeMap<String, DateTimeZone>();
 
+        System.out.println("Writing zoneinfo files");
         for (int i=0; i<iZones.size(); i++) {
-            Zone zone = (Zone)iZones.get(i);
+            Zone zone = iZones.get(i);
             DateTimeZoneBuilder builder = new DateTimeZoneBuilder();
             zone.addToBuilder(builder, iRuleSets);
-            final DateTimeZone original = builder.toDateTimeZone(zone.iName);
+            final DateTimeZone original = builder.toDateTimeZone(zone.iName, true);
             DateTimeZone tz = original;
             if (test(tz.getID(), tz)) {
                 map.put(tz.getID(), tz);
                 if (outputDir != null) {
-                    System.out.println("Writing " + tz.getID());
+                    if (ZoneInfoCompiler.verbose()) {
+                        System.out.println("Writing " + tz.getID());
+                    }
                     File file = new File(outputDir, tz.getID());
                     if (!file.getParentFile().exists()) {
                         file.getParentFile().mkdirs();
                     }
                     OutputStream out = new FileOutputStream(file);
-                    builder.writeTo(out);
-                    out.close();
+                    try {
+                        builder.writeTo(zone.iName, out);
+                    } finally {
+                        out.close();
+                    }
 
                     // Test if it can be read back.
                     InputStream in = new FileInputStream(file);
@@ -461,9 +422,9 @@ public class ZoneInfoCompiler {
 
         for (int pass=0; pass<2; pass++) {
             for (int i=0; i<iLinks.size(); i += 2) {
-                String id = (String)iLinks.get(i);
-                String alias = (String)iLinks.get(i + 1);
-                DateTimeZone tz = (DateTimeZone)map.get(id);
+                String id = iLinks.get(i);
+                String alias = iLinks.get(i + 1);
+                DateTimeZone tz = map.get(id);
                 if (tz == null) {
                     if (pass > 0) {
                         System.out.println("Cannot find time zone '" + id +
@@ -484,11 +445,14 @@ public class ZoneInfoCompiler {
 
             OutputStream out = new FileOutputStream(file);
             DataOutputStream dout = new DataOutputStream(out);
-            // Sort and filter out any duplicates that match case.
-            Map zimap = new TreeMap(String.CASE_INSENSITIVE_ORDER);
-            zimap.putAll(map);
-            writeZoneInfoMap(dout, zimap);
-            dout.close();
+            try {
+                // Sort and filter out any duplicates that match case.
+                Map<String, DateTimeZone> zimap = new TreeMap<String, DateTimeZone>(String.CASE_INSENSITIVE_ORDER);
+                zimap.putAll(map);
+                writeZoneInfoMap(dout, zimap);
+            } finally {
+                dout.close();
+            }
         }
 
         return map;
@@ -498,7 +462,8 @@ public class ZoneInfoCompiler {
         Zone zone = null;
         String line;
         while ((line = in.readLine()) != null) {
-            if (line.length() == 0 || line.charAt(0) == '#') {
+            String trimmed = line.trim();
+            if (trimmed.length() == 0 || trimmed.charAt(0) == '#') {
                 continue;
             }
 
@@ -528,7 +493,7 @@ public class ZoneInfoCompiler {
                 String token = st.nextToken();
                 if (token.equalsIgnoreCase("Rule")) {
                     Rule r = new Rule(st);
-                    RuleSet rs = (RuleSet)iRuleSets.get(r.iName);
+                    RuleSet rs = iRuleSets.get(r.iName);
                     if (rs == null) {
                         rs = new RuleSet(r);
                         iRuleSets.put(r.iName, rs);
@@ -551,7 +516,7 @@ public class ZoneInfoCompiler {
         }
     }
 
-    private static class DateTimeOfYear {
+    static class DateTimeOfYear {
         public final int iMonthOfYear;
         public final int iDayOfMonth;
         public final int iDayOfWeek;
@@ -612,7 +577,17 @@ public class ZoneInfoCompiler {
                     if (st.hasMoreTokens()) {
                         str = st.nextToken();
                         zoneChar = parseZoneChar(str.charAt(str.length() - 1));
-                        millis = parseTime(str);
+                        if (str.equals("24:00")) {
+                            LocalDate date = (day == -1 ?
+                                    new LocalDate(2001, month, 1).plusMonths(1) :
+                                    new LocalDate(2001, month, day).plusDays(1));
+                            advance = (day != -1);
+                            month = date.getMonthOfYear();
+                            day = date.getDayOfMonth();
+                            dayOfWeek = ((dayOfWeek - 1 + 1) % 7) + 1;
+                        } else {
+                            millis = parseTime(str);
+                        }
                     }
                 }
             }
@@ -735,15 +710,15 @@ public class ZoneInfoCompiler {
     }
 
     private static class RuleSet {
-        private List iRules;
+        private List<Rule> iRules;
 
         RuleSet(Rule rule) {
-            iRules = new ArrayList();
+            iRules = new ArrayList<Rule>();
             iRules.add(rule);
         }
 
         void addRule(Rule rule) {
-            if (!(rule.iName.equals(((Rule)iRules.get(0)).iName))) {
+            if (!(rule.iName.equals(iRules.get(0).iName))) {
                 throw new IllegalArgumentException("Rule name mismatch");
             }
             iRules.add(rule);
@@ -754,7 +729,7 @@ public class ZoneInfoCompiler {
          */
         public void addRecurring(DateTimeZoneBuilder builder, String nameFormat) {
             for (int i=0; i<iRules.size(); i++) {
-                Rule rule = (Rule)iRules.get(i);
+                Rule rule = iRules.get(i);
                 rule.addRecurring(builder, nameFormat);
             }
         }
@@ -802,22 +777,24 @@ public class ZoneInfoCompiler {
             }
         }
 
+        /*
         public DateTimeZone buildDateTimeZone(Map ruleSets) {
             DateTimeZoneBuilder builder = new DateTimeZoneBuilder();
             addToBuilder(builder, ruleSets);
             return builder.toDateTimeZone(iName);
         }
+        */
 
         /**
          * Adds zone info to the builder.
          */
-        public void addToBuilder(DateTimeZoneBuilder builder, Map ruleSets) {
+        public void addToBuilder(DateTimeZoneBuilder builder, Map<String, RuleSet> ruleSets) {
             addToBuilder(this, builder, ruleSets);
         }
 
         private static void addToBuilder(Zone zone,
                                          DateTimeZoneBuilder builder,
-                                         Map ruleSets)
+                                         Map<String, RuleSet> ruleSets)
         {
             for (; zone != null; zone = zone.iNext) {
                 builder.setStandardOffset(zone.iOffsetMillis);
@@ -831,7 +808,7 @@ public class ZoneInfoCompiler {
                         builder.setFixedSavings(zone.iFormat, saveMillis);
                     }
                     catch (Exception e) {
-                        RuleSet rs = (RuleSet)ruleSets.get(zone.iRules);
+                        RuleSet rs = ruleSets.get(zone.iRules);
                         if (rs == null) {
                             throw new IllegalArgumentException
                                 ("Rules not found: " + zone.iRules);

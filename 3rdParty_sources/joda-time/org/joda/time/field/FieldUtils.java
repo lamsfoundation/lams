@@ -1,59 +1,23 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2005 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.field;
 
 import org.joda.time.DateTimeField;
+import org.joda.time.DateTimeFieldType;
+import org.joda.time.IllegalFieldValueException;
 
 /**
  * General utilities that don't fit elsewhere.
@@ -74,18 +38,18 @@ public class FieldUtils {
     
     //------------------------------------------------------------------------
     /**
-     * Add two values throwing an exception if overflow occurs.
+     * Negates the input throwing an exception if it can't negate it.
      * 
-     * @param val1  the first value
-     * @param val2  the second value
-     * @return the new total
+     * @param value  the value to negate
+     * @return the negated value
+     * @throws ArithmeticException if the value is Integer.MIN_VALUE
+     * @since 1.1
      */
-    public static int safeAdd(int val1, int val2) {
-        long total = ((long) val1) + ((long) val2);
-        if (total < Integer.MIN_VALUE || total > Integer.MAX_VALUE) {
-            throw new ArithmeticException("The calculation caused an overflow: " + val1 +" + " + val2);
+    public static int safeNegate(int value) {
+        if (value == Integer.MIN_VALUE) {
+            throw new ArithmeticException("Integer.MIN_VALUE cannot be negated");
         }
-        return (int) total;
+        return -value;
     }
     
     /**
@@ -94,16 +58,34 @@ public class FieldUtils {
      * @param val1  the first value
      * @param val2  the second value
      * @return the new total
+     * @throws ArithmeticException if the value is too big or too small
+     */
+    public static int safeAdd(int val1, int val2) {
+        int sum = val1 + val2;
+        // If there is a sign change, but the two values have the same sign...
+        if ((val1 ^ sum) < 0 && (val1 ^ val2) >= 0) {
+            throw new ArithmeticException
+                ("The calculation caused an overflow: " + val1 + " + " + val2);
+        }
+        return sum;
+    }
+    
+    /**
+     * Add two values throwing an exception if overflow occurs.
+     * 
+     * @param val1  the first value
+     * @param val2  the second value
+     * @return the new total
+     * @throws ArithmeticException if the value is too big or too small
      */
     public static long safeAdd(long val1, long val2) {
-        long total = val1 + val2;
-        if (val1 > 0 && val2 > 0 && total < 0) {
-            throw new ArithmeticException("The calculation caused an overflow: " + val1 +" + " + val2);
+        long sum = val1 + val2;
+        // If there is a sign change, but the two values have the same sign...
+        if ((val1 ^ sum) < 0 && (val1 ^ val2) >= 0) {
+            throw new ArithmeticException
+                ("The calculation caused an overflow: " + val1 + " + " + val2);
         }
-        if (val1 < 0 && val2 < 0 && total > 0) {
-            throw new ArithmeticException("The calculation caused an overflow: " + val1 +" + " + val2);
-        }
-        return total;
+        return sum;
     }
     
     /**
@@ -112,15 +94,16 @@ public class FieldUtils {
      * @param val1  the first value, to be taken away from
      * @param val2  the second value, the amount to take away
      * @return the new total
+     * @throws ArithmeticException if the value is too big or too small
      */
     public static long safeSubtract(long val1, long val2) {
-        if (val2 == Long.MIN_VALUE) {
-            if (val1 <= 0L) {
-                return (val1 - val2);
-            }
-            throw new ArithmeticException("The calculation caused an overflow: " + val1 +" - " + val2);
+        long diff = val1 - val2;
+        // If there is a sign change, but the two values have different signs...
+        if ((val1 ^ diff) < 0 && (val1 ^ val2) < 0) {
+            throw new ArithmeticException
+                ("The calculation caused an overflow: " + val1 + " - " + val2);
         }
-        return safeAdd(val1, -val2);
+        return diff;
     }
     
     /**
@@ -129,14 +112,65 @@ public class FieldUtils {
      * @param val1  the first value
      * @param val2  the second value
      * @return the new total
+     * @throws ArithmeticException if the value is too big or too small
+     * @since 1.2
+     */
+    public static int safeMultiply(int val1, int val2) {
+        long total = (long) val1 * (long) val2;
+        if (total < Integer.MIN_VALUE || total > Integer.MAX_VALUE) {
+            throw new ArithmeticException
+                ("The calculation caused an overflow: " + val1 + " * " + val2);
+        }
+        return (int) total;
+    }
+
+    /**
+     * Multiply two values throwing an exception if overflow occurs.
+     * 
+     * @param val1  the first value
+     * @param scalar  the second value
+     * @return the new total
+     * @throws ArithmeticException if the value is too big or too small
+     * @since 1.2
+     */
+    public static long safeMultiply(long val1, int scalar) {
+        switch (scalar) {
+        case -1:
+            return -val1;
+        case 0:
+            return 0L;
+        case 1:
+            return val1;
+        }
+        long total = val1 * scalar;
+        if (total / scalar != val1) {
+            throw new ArithmeticException
+                ("The calculation caused an overflow: " + val1 + " * " + scalar);
+        }
+        return total;
+    }
+
+    /**
+     * Multiply two values throwing an exception if overflow occurs.
+     * 
+     * @param val1  the first value
+     * @param val2  the second value
+     * @return the new total
+     * @throws ArithmeticException if the value is too big or too small
      */
     public static long safeMultiply(long val1, long val2) {
-        if (val1 == 0  || val2 == 0) {
-            return 0L;
+        if (val2 == 1) {
+            return val1;
+        }
+        if (val1 == 1) {
+            return val2;
+        }
+        if (val1 == 0 || val2 == 0) {
+            return 0;
         }
         long total = val1 * val2;
-        if (total / val2 != val1) {
-            throw new ArithmeticException("The calculation caused an overflow: " + val1 +" * " + val2);
+        if (total / val2 != val1 || val1 == Long.MIN_VALUE && val2 == -1 || val2 == Long.MIN_VALUE && val1 == -1) {
+            throw new ArithmeticException("Multiplication overflows a long: " + val1 + " * " + val2);
         }
         return total;
     }
@@ -146,6 +180,7 @@ public class FieldUtils {
      * 
      * @param value  the value
      * @return the value as an int
+     * @throws ArithmeticException if the value is too big or too small
      */
     public static int safeToInt(long value) {
         if (Integer.MIN_VALUE <= value && value <= Integer.MAX_VALUE) {
@@ -160,33 +195,28 @@ public class FieldUtils {
      * @param val1  the first value
      * @param val2  the second value
      * @return the new total
+     * @throws ArithmeticException if the value is too big or too small
      */
     public static int safeMultiplyToInt(long val1, long val2) {
         long val = FieldUtils.safeMultiply(val1, val2);
         return FieldUtils.safeToInt(val);
     }
-    
+
+    //-----------------------------------------------------------------------
     /**
      * Verify that input values are within specified bounds.
      * 
      * @param value  the value to check
      * @param lowerBound  the lower bound allowed for value
      * @param upperBound  the upper bound allowed for value
-     * @throws IllegalArgumentException if value is not in the specified bounds
+     * @throws IllegalFieldValueException if value is not in the specified bounds
      */
     public static void verifyValueBounds(DateTimeField field, 
                                          int value, int lowerBound, int upperBound) {
         if ((value < lowerBound) || (value > upperBound)) {
-            throw new IllegalArgumentException(
-                "Value "
-                    + value
-                    + " for "
-                    + field.getName()
-                    + " must be in the range ["
-                    + lowerBound
-                    + ','
-                    + upperBound
-                    + ']');
+            throw new IllegalFieldValueException
+                (field.getType(), Integer.valueOf(value),
+                 Integer.valueOf(lowerBound), Integer.valueOf(upperBound));
         }
     }
 
@@ -196,21 +226,32 @@ public class FieldUtils {
      * @param value  the value to check
      * @param lowerBound  the lower bound allowed for value
      * @param upperBound  the upper bound allowed for value
-     * @throws IllegalArgumentException if value is not in the specified bounds
+     * @throws IllegalFieldValueException if value is not in the specified bounds
+     * @since 1.1
+     */
+    public static void verifyValueBounds(DateTimeFieldType fieldType, 
+                                         int value, int lowerBound, int upperBound) {
+        if ((value < lowerBound) || (value > upperBound)) {
+            throw new IllegalFieldValueException
+                (fieldType, Integer.valueOf(value),
+                 Integer.valueOf(lowerBound), Integer.valueOf(upperBound));
+        }
+    }
+
+    /**
+     * Verify that input values are within specified bounds.
+     * 
+     * @param value  the value to check
+     * @param lowerBound  the lower bound allowed for value
+     * @param upperBound  the upper bound allowed for value
+     * @throws IllegalFieldValueException if value is not in the specified bounds
      */
     public static void verifyValueBounds(String fieldName,
                                          int value, int lowerBound, int upperBound) {
         if ((value < lowerBound) || (value > upperBound)) {
-            throw new IllegalArgumentException(
-                "Value "
-                    + value
-                    + " for "
-                    + fieldName
-                    + " must be in the range ["
-                    + lowerBound
-                    + ','
-                    + upperBound
-                    + ']');
+            throw new IllegalFieldValueException
+                (fieldName, Integer.valueOf(value),
+                 Integer.valueOf(lowerBound), Integer.valueOf(upperBound));
         }
     }
 
@@ -264,6 +305,25 @@ public class FieldUtils {
             return 0 + minValue;
         }
         return (wrapRange - remByRange) + minValue;
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Compares two objects as equals handling null.
+     * 
+     * @param object1  the first object
+     * @param object2  the second object
+     * @return true if equal
+     * @since 1.4
+     */
+    public static boolean equals(Object object1, Object object2) {
+        if (object1 == object2) {
+            return true;
+        }
+        if (object1 == null || object2 == null) {
+            return false;
+        }
+        return object1.equals(object2);
     }
 
 }

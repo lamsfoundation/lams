@@ -24,7 +24,7 @@ Jexcelapi 2.6
 
 jgroups 2.6.10
 
-Joda Time 0.98
+Joda Time 2.1
 
 Joid 1.1
 
@@ -35,9 +35,9 @@ MySQL Connector/J 5.0.8
 
 opencsv 1.8
 
-opensaml 2.5.2
+opensaml 2.5.3
 
-openws 1.4.3
+openws 1.4.4
 
 Quartz 1.5.2
 
@@ -47,4 +47,6 @@ Struts 1.2.9
 
 Strutstest 2.1.3
 
-xmltooling 1.3.3
+xmltooling 1.3.4
+
+XStream 1.1.3

@@ -1,55 +1,17 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2011 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.base;
 
@@ -64,7 +26,9 @@ import org.joda.time.PeriodType;
 import org.joda.time.ReadWritablePeriod;
 import org.joda.time.ReadableDuration;
 import org.joda.time.ReadableInstant;
+import org.joda.time.ReadablePartial;
 import org.joda.time.ReadablePeriod;
+import org.joda.time.chrono.ISOChronology;
 import org.joda.time.convert.ConverterManager;
 import org.joda.time.convert.PeriodConverter;
 import org.joda.time.field.FieldUtils;
@@ -89,11 +53,20 @@ public abstract class BasePeriod
 
     /** Serialization version */
     private static final long serialVersionUID = -2110953284060001145L;
+    /** Serialization version */
+    private static final ReadablePeriod DUMMY_PERIOD = new AbstractPeriod() {
+        public int getValue(int index) {
+            return 0;
+        }
+        public PeriodType getPeriodType() {
+            return PeriodType.time();
+        }
+    };
 
     /** The type of period */
-    private PeriodType iType;
+    private final PeriodType iType;
     /** The values */
-    private int[] iValues;
+    private final int[] iValues;
 
     //-----------------------------------------------------------------------
     /**
@@ -112,12 +85,12 @@ public abstract class BasePeriod
      * @throws IllegalArgumentException if an unsupported field's value is non-zero
      */
     protected BasePeriod(int years, int months, int weeks, int days,
-                            int hours, int minutes, int seconds, int millis,
-                            PeriodType type) {
+                         int hours, int minutes, int seconds, int millis,
+                         PeriodType type) {
         super();
         type = checkPeriodType(type);
         iType = type;
-        setPeriodInternal(years, months, weeks, days, hours, minutes, seconds, millis); // internal method
+        iValues = setPeriodInternal(years, months, weeks, days, hours, minutes, seconds, millis); // internal method
     }
 
     /**
@@ -155,9 +128,58 @@ public abstract class BasePeriod
             long startMillis = DateTimeUtils.getInstantMillis(startInstant);
             long endMillis = DateTimeUtils.getInstantMillis(endInstant);
             Chronology chrono = DateTimeUtils.getIntervalChronology(startInstant, endInstant);
+            iType = type;
+            iValues = chrono.get(this, startMillis, endMillis);
+        }
+    }
+
+    /**
+     * Creates a period from the given duration and end point.
+     * <p>
+     * The two partials must contain the same fields, thus you can
+     * specify two <code>LocalDate</code> objects, or two <code>LocalTime</code>
+     * objects, but not one of each.
+     * As these are Partial objects, time zones have no effect on the result.
+     * <p>
+     * The two partials must also both be contiguous - see
+     * {@link DateTimeUtils#isContiguous(ReadablePartial)} for a
+     * definition. Both <code>LocalDate</code> and <code>LocalTime</code> are contiguous.
+     *
+     * @param start  the start of the period, must not be null
+     * @param end  the end of the period, must not be null
+     * @param type  which set of fields this period supports, null means standard
+     * @throws IllegalArgumentException if the partials are null or invalid
+     * @since 1.1
+     */
+    protected BasePeriod(ReadablePartial start, ReadablePartial end, PeriodType type) {
+        super();
+        if (start == null || end == null) {
+            throw new IllegalArgumentException("ReadablePartial objects must not be null");
+        }
+        if (start instanceof BaseLocal && end instanceof BaseLocal && start.getClass() == end.getClass()) {
+            // for performance
+            type = checkPeriodType(type);
+            long startMillis = ((BaseLocal) start).getLocalMillis();
+            long endMillis = ((BaseLocal) end).getLocalMillis();
+            Chronology chrono = start.getChronology();
             chrono = DateTimeUtils.getChronology(chrono);
             iType = type;
             iValues = chrono.get(this, startMillis, endMillis);
+        } else {
+            if (start.size() != end.size()) {
+                throw new IllegalArgumentException("ReadablePartial objects must have the same set of fields");
+            }
+            for (int i = 0, isize = start.size(); i < isize; i++) {
+                if (start.getFieldType(i) != end.getFieldType(i)) {
+                    throw new IllegalArgumentException("ReadablePartial objects must have the same set of fields");
+                }
+            }
+            if (DateTimeUtils.isContiguous(start) == false) {
+                throw new IllegalArgumentException("ReadablePartial objects must be contiguous");
+            }
+            iType = checkPeriodType(type);
+            Chronology chrono = DateTimeUtils.getChronology(start.getChronology()).withUTC();
+            iValues = chrono.get(this, chrono.set(start, 0L), chrono.set(end, 0L));
         }
     }
 
@@ -177,6 +199,43 @@ public abstract class BasePeriod
         Chronology chrono = DateTimeUtils.getInstantChronology(startInstant);
         iType = type;
         iValues = chrono.get(this, startMillis, endMillis);
+    }
+
+    /**
+     * Creates a period from the given duration and end point.
+     *
+     * @param duration  the duration of the interval, null means zero-length
+     * @param endInstant  the interval end, null means now
+     * @param type  which set of fields this period supports, null means standard
+     */
+    protected BasePeriod(ReadableDuration duration, ReadableInstant endInstant, PeriodType type) {
+        super();
+        type = checkPeriodType(type);
+        long durationMillis = DateTimeUtils.getDurationMillis(duration);
+        long endMillis = DateTimeUtils.getInstantMillis(endInstant);
+        long startMillis = FieldUtils.safeSubtract(endMillis, durationMillis);
+        Chronology chrono = DateTimeUtils.getInstantChronology(endInstant);
+        iType = type;
+        iValues = chrono.get(this, startMillis, endMillis);
+    }
+
+    /**
+     * Creates a period from the given millisecond duration with the standard period type
+     * and ISO rules, ensuring that the calculation is performed with the time-only period type.
+     * <p>
+     * The calculation uses the hour, minute, second and millisecond fields.
+     *
+     * @param duration  the duration, in milliseconds
+     */
+    protected BasePeriod(long duration) {
+        super();
+        // bug [3264409]
+        // calculation uses period type from a period object (bad design)
+        // thus we use a dummy period object with the time type
+        iType = PeriodType.standard();
+        int[] values = ISOChronology.getInstanceUTC().get(DUMMY_PERIOD, duration);
+        iValues = new int[8];
+        System.arraycopy(values, 0, iValues, 4, 4);
     }
 
     /**
@@ -259,27 +318,6 @@ public abstract class BasePeriod
         return iType;
     }
 
-    //-----------------------------------------------------------------------
-    /**
-     * Gets the number of fields that this period supports.
-     *
-     * @return the number of fields supported
-     */
-    public int size() {
-        return iType.size();
-    }
-
-    /**
-     * Gets the field type at the specified index.
-     *
-     * @param index  the index to retrieve
-     * @return the field at the specified index
-     * @throws IndexOutOfBoundsException if the index is invalid
-     */
-    public DurationFieldType getFieldType(int index) {
-        return iType.getFieldType(index);
-    }
-
     /**
      * Gets the value at the specified index.
      *
@@ -295,8 +333,14 @@ public abstract class BasePeriod
     /**
      * Gets the total millisecond duration of this period relative to a start instant.
      * <p>
-     * This method adds the period to the specifed instant.
-     * The difference between the start instant and the result of the add is the duration
+     * This method adds the period to the specified instant in order to
+     * calculate the duration.
+     * <p>
+     * An instant must be supplied as the duration of a period varies.
+     * For example, a period of 1 month could vary between the equivalent of
+     * 28 and 31 days in milliseconds due to different length months.
+     * Similarly, a day can vary at Daylight Savings cutover, typically between
+     * 23 and 25 hours.
      *
      * @param startInstant  the instant to add the period to, thus obtaining the duration
      * @return the total length of the period as a duration relative to the start instant
@@ -309,10 +353,34 @@ public abstract class BasePeriod
         return new Duration(startMillis, endMillis);
     }
 
+    /**
+     * Gets the total millisecond duration of this period relative to an
+     * end instant.
+     * <p>
+     * This method subtracts the period from the specified instant in order
+     * to calculate the duration.
+     * <p>
+     * An instant must be supplied as the duration of a period varies.
+     * For example, a period of 1 month could vary between the equivalent of
+     * 28 and 31 days in milliseconds due to different length months.
+     * Similarly, a day can vary at Daylight Savings cutover, typically between
+     * 23 and 25 hours.
+     *
+     * @param endInstant  the instant to subtract the period from, thus obtaining the duration
+     * @return the total length of the period as a duration relative to the end instant
+     * @throws ArithmeticException if the millis exceeds the capacity of the duration
+     */
+    public Duration toDurationTo(ReadableInstant endInstant) {
+        long endMillis = DateTimeUtils.getInstantMillis(endInstant);
+        Chronology chrono = DateTimeUtils.getInstantChronology(endInstant);
+        long startMillis = chrono.add(this, endMillis, -1);
+        return new Duration(startMillis, endMillis);
+    }
+
     //-----------------------------------------------------------------------
     /**
      * Checks whether a field type is supported, and if so adds the new value
-     * to the relevent index in the specified array.
+     * to the relevant index in the specified array.
      * 
      * @param type  the field type
      * @param values  the array to update
@@ -355,7 +423,7 @@ public abstract class BasePeriod
             int value = period.getValue(i);
             checkAndUpdate(type, newValues, value);
         }
-        iValues = newValues;
+        setValues(newValues);
     }
 
     /**
@@ -373,13 +441,14 @@ public abstract class BasePeriod
      */
     protected void setPeriod(int years, int months, int weeks, int days,
                              int hours, int minutes, int seconds, int millis) {
-        setPeriodInternal(years, months, weeks, days, hours, minutes, seconds, millis);
+        int[] newValues = setPeriodInternal(years, months, weeks, days, hours, minutes, seconds, millis);
+        setValues(newValues);
     }
 
     /**
      * Private method called from constructor.
      */
-    private void setPeriodInternal(int years, int months, int weeks, int days,
+    private int[] setPeriodInternal(int years, int months, int weeks, int days,
                                    int hours, int minutes, int seconds, int millis) {
         int[] newValues = new int[size()];
         checkAndUpdate(DurationFieldType.years(), newValues, years);
@@ -390,7 +459,7 @@ public abstract class BasePeriod
         checkAndUpdate(DurationFieldType.minutes(), newValues, minutes);
         checkAndUpdate(DurationFieldType.seconds(), newValues, seconds);
         checkAndUpdate(DurationFieldType.millis(), newValues, millis);
-        iValues = newValues;
+        return newValues;
     }
 
     //-----------------------------------------------------------------------
@@ -464,7 +533,7 @@ public abstract class BasePeriod
      */
     protected void mergePeriod(ReadablePeriod period) {
         if (period != null) {
-            iValues = mergePeriodInto(getValues(), period);
+            setValues(mergePeriodInto(getValues(), period));
         }
     }
 
@@ -477,12 +546,12 @@ public abstract class BasePeriod
      * @throws IllegalArgumentException if an unsupported field's value is non-zero
      */
     protected int[] mergePeriodInto(int[] values, ReadablePeriod period) {
-         for (int i = 0, isize = period.size(); i < isize; i++) {
-             DurationFieldType type = period.getFieldType(i);
-             int value = period.getValue(i);
-             checkAndUpdate(type, values, value);
-         }
-         return values;
+        for (int i = 0, isize = period.size(); i < isize; i++) {
+            DurationFieldType type = period.getFieldType(i);
+            int value = period.getValue(i);
+            checkAndUpdate(type, values, value);
+        }
+        return values;
     }
 
     /**
@@ -493,7 +562,7 @@ public abstract class BasePeriod
      */
     protected void addPeriod(ReadablePeriod period) {
         if (period != null) {
-            iValues = addPeriodInto(getValues(), period);
+            setValues(addPeriodInto(getValues(), period));
         }
     }
 
@@ -506,25 +575,25 @@ public abstract class BasePeriod
      * @throws IllegalArgumentException if an unsupported field's value is non-zero
      */
     protected int[] addPeriodInto(int[] values, ReadablePeriod period) {
-         for (int i = 0, isize = period.size(); i < isize; i++) {
-             DurationFieldType type = period.getFieldType(i);
-             int value = period.getValue(i);
-             if (value != 0) {
-                 int index = indexOf(type);
-                 if (index == -1) {
-                     throw new IllegalArgumentException(
-                         "Period does not support field '" + type.getName() + "'");
-                 } else {
-                     values[index] = FieldUtils.safeAdd(getValue(index), value);
-                 }
-             }
-         }
-         return values;
+        for (int i = 0, isize = period.size(); i < isize; i++) {
+            DurationFieldType type = period.getFieldType(i);
+            int value = period.getValue(i);
+            if (value != 0) {
+                int index = indexOf(type);
+                if (index == -1) {
+                    throw new IllegalArgumentException(
+                        "Period does not support field '" + type.getName() + "'");
+                } else {
+                    values[index] = FieldUtils.safeAdd(getValue(index), value);
+                }
+            }
+        }
+        return values;
     }
 
     //-----------------------------------------------------------------------
     /**
-     * Sets the value of the field at the specifed index.
+     * Sets the value of the field at the specified index.
      * 
      * @param index  the index
      * @param value  the value to set
@@ -536,11 +605,15 @@ public abstract class BasePeriod
 
     /**
      * Sets the values of all fields.
+     * <p>
+     * In version 2.0 and later, this method copies the array into the original.
+     * This is because the instance variable has been changed to be final to satisfy the Java Memory Model.
+     * This only impacts subclasses that are mutable.
      * 
      * @param values  the array of values
      */
     protected void setValues(int[] values) {
-        iValues = values;
+        System.arraycopy(values, 0, iValues, 0, iValues.length);
     }
 
 }

@@ -62,16 +62,16 @@ public abstract class AbstractReloadingMetadataProvider extends AbstractObservab
     /** Current task to refresh metadata. */
     private RefreshMetadataTask refresMetadataTask;
 
-    /** Factor used to compute when the next refresh interval will occur. Default value: {@value} */
+    /** Factor used to compute when the next refresh interval will occur. Default value: 0.75 */
     private float refreshDelayFactor = 0.75f;
 
     /**
      * Refresh interval used when metadata does not contain any validUntil or cacheDuration information. Default value:
-     * * {@value} ms
+     * 14400000ms
      */
     private long maxRefreshDelay = 14400000;
 
-    /** Floor, in milliseconds, for the refresh interval. Default value: {@value} ms */
+    /** Floor, in milliseconds, for the refresh interval. Default value: 300000ms */
     private int minRefreshDelay = 300000;
 
     /** Time when the currently cached metadata file expires. */

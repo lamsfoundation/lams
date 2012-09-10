@@ -1,61 +1,26 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2011 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.tz;
 
 import java.text.DateFormatSymbols;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+
+import org.joda.time.DateTimeUtils;
 
 /**
  * The default name provider acquires localized names from
@@ -64,10 +29,12 @@ import java.util.Locale;
  * DefaultNameProvider is thread-safe and immutable.
  *
  * @author Brian S O'Neill
+ * @since 1.0
  */
+@SuppressWarnings("unchecked")
 public class DefaultNameProvider implements NameProvider {
     // locale -> (id -> (nameKey -> [shortName, name]))
-    private HashMap iByLocaleCache = createCache();
+    private HashMap<Locale, Map<String, Map<String, Object>>> iByLocaleCache = createCache();
 
     public DefaultNameProvider() {
     }
@@ -87,25 +54,45 @@ public class DefaultNameProvider implements NameProvider {
             return null;
         }
 
-        HashMap byIdCache = (HashMap)iByLocaleCache.get(locale);
+        Map<String, Map<String, Object>> byIdCache = iByLocaleCache.get(locale);
         if (byIdCache == null) {
             iByLocaleCache.put(locale, byIdCache = createCache());
         }
 
-        HashMap byNameKeyCache = (HashMap)byIdCache.get(id);
+        Map<String, Object> byNameKeyCache = byIdCache.get(id);
         if (byNameKeyCache == null) {
             byIdCache.put(id, byNameKeyCache = createCache());
-            String[][] zoneStrings = new DateFormatSymbols(locale).getZoneStrings();
-            for (int i=0; i<zoneStrings.length; i++) {
-                String[] set = zoneStrings[i];
-                if (set != null && set.length == 5 && id.equals(set[0])) {
-                    byNameKeyCache.put(set[2], new String[] {set[2], set[1]});
-                    byNameKeyCache.put(set[4], new String[] {set[4], set[3]});
-                }
+            
+            String[][] zoneStringsEn = DateTimeUtils.getDateFormatSymbols(Locale.ENGLISH).getZoneStrings();
+            String[] setEn = null;
+            for (String[] strings : zoneStringsEn) {
+              if (strings != null && strings.length == 5 && id.equals(strings[0])) {
+                setEn = strings;
+                break;
+              }
+            }
+            String[][] zoneStringsLoc = DateTimeUtils.getDateFormatSymbols(locale).getZoneStrings();
+            String[] setLoc = null;
+            for (String[] strings : zoneStringsLoc) {
+              if (strings != null && strings.length == 5 && id.equals(strings[0])) {
+                setLoc = strings;
+                break;
+              }
+            }
+            
+            if (setEn != null && setLoc != null) {
+              byNameKeyCache.put(setEn[2], new String[] {setLoc[2], setLoc[1]});
+              // need to handle case where summer and winter have the same
+              // abbreviation, such as EST in Australia [1716305]
+              // we handle this by appending "-Summer", cf ZoneInfoCompiler
+              if (setEn[2].equals(setEn[4])) {
+                  byNameKeyCache.put(setEn[4] + "-Summer", new String[] {setLoc[4], setLoc[3]});
+              } else {
+                  byNameKeyCache.put(setEn[4], new String[] {setLoc[4], setLoc[3]});
+              }
             }
         }
-
-        return (String[])byNameKeyCache.get(nameKey);
+        return (String[]) byNameKeyCache.get(nameKey);
     }
 
     private HashMap createCache() {

@@ -1,55 +1,17 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2009 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.chrono;
 
@@ -58,10 +20,10 @@ import java.util.Map;
 
 import org.joda.time.Chronology;
 import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeField;
+import org.joda.time.DateTimeFieldType;
 import org.joda.time.DateTimeZone;
-import org.joda.time.field.DelegatedDateTimeField;
-import org.joda.time.field.FieldUtils;
+import org.joda.time.IllegalFieldValueException;
+import org.joda.time.field.SkipDateTimeField;
 
 /**
  * Implements a pure proleptic Julian calendar system, which defines every
@@ -85,7 +47,7 @@ import org.joda.time.field.FieldUtils;
  * @author Stephen Colebourne
  * @since 1.0
  */
-public final class JulianChronology extends BaseGJChronology {
+public final class JulianChronology extends BasicGJChronology {
 
     /** Serialization lock */
     private static final long serialVersionUID = -8731039522547897247L;
@@ -96,11 +58,17 @@ public final class JulianChronology extends BaseGJChronology {
     private static final long MILLIS_PER_MONTH =
         (long) (365.25 * DateTimeConstants.MILLIS_PER_DAY / 12);
 
+    /** The lowest year that can be fully supported. */
+    private static final int MIN_YEAR = -292269054;
+
+    /** The highest year that can be fully supported. */
+    private static final int MAX_YEAR = 292272992;
+
     /** Singleton instance of a UTC JulianChronology */
     private static final JulianChronology INSTANCE_UTC;
 
     /** Cache of zone to chronology arrays */
-    private static final Map cCache = new HashMap();
+    private static final Map<DateTimeZone, JulianChronology[]> cCache = new HashMap<DateTimeZone, JulianChronology[]>();
 
     static {
         INSTANCE_UTC = getInstance(DateTimeZone.UTC);
@@ -109,7 +77,8 @@ public final class JulianChronology extends BaseGJChronology {
     static int adjustYearForSet(int year) {
         if (year <= 0) {
             if (year == 0) {
-                throw new IllegalArgumentException("Invalid year: " + year);
+                throw new IllegalFieldValueException
+                    (DateTimeFieldType.year(), Integer.valueOf(year), null, null);
             }
             year++;
         }
@@ -158,7 +127,7 @@ public final class JulianChronology extends BaseGJChronology {
         }
         JulianChronology chrono;
         synchronized (cCache) {
-            JulianChronology[] chronos = (JulianChronology[]) cCache.get(zone);
+            JulianChronology[] chronos = cCache.get(zone);
             if (chronos == null) {
                 chronos = new JulianChronology[7];
                 cCache.put(zone, chronos);
@@ -198,7 +167,11 @@ public final class JulianChronology extends BaseGJChronology {
      */
     private Object readResolve() {
         Chronology base = getBase();
-        return base == null ? getInstanceUTC() : getInstance(base.getZone());
+        int minDays = getMinimumDaysInFirstWeek();
+        minDays = (minDays == 0 ? 4 : minDays);  // handle rename of BaseGJChronology
+        return base == null ?
+                getInstance(DateTimeZone.UTC, minDays) :
+                    getInstance(base.getZone(), minDays);
     }
 
     // Conversion
@@ -257,8 +230,7 @@ public final class JulianChronology extends BaseGJChronology {
             }
         }
         
-        long millis = (relativeYear * 365L + leapYears)
-            * (long)DateTimeConstants.MILLIS_PER_DAY;
+        long millis = (relativeYear * 365L + leapYears) * (long)DateTimeConstants.MILLIS_PER_DAY;
 
         // Adjust to account for difference between 1968-01-01 and 1969-12-19.
 
@@ -266,86 +238,35 @@ public final class JulianChronology extends BaseGJChronology {
     }
 
     int getMinYear() {
-        // The lowest year that can be fully supported.
-        return -292269054;
+        return MIN_YEAR;
     }
 
     int getMaxYear() {
-        // The highest year that can be fully supported.
-        return 292271022;
+        return MAX_YEAR;
     }
 
     long getAverageMillisPerYear() {
         return MILLIS_PER_YEAR;
     }
 
+    long getAverageMillisPerYearDividedByTwo() {
+        return MILLIS_PER_YEAR / 2;
+    }
+
     long getAverageMillisPerMonth() {
         return MILLIS_PER_MONTH;
     }
 
-    long getApproxMillisAtEpoch() {
-        return 1969L * MILLIS_PER_YEAR + 352L * DateTimeConstants.MILLIS_PER_DAY;
+    long getApproxMillisAtEpochDividedByTwo() {
+        return (1969L * MILLIS_PER_YEAR + 352L * DateTimeConstants.MILLIS_PER_DAY) / 2;
     }
 
     protected void assemble(Fields fields) {
         if (getBase() == null) {
             super.assemble(fields);
             // Julian chronology has no year zero.
-            fields.year = new NoYearZeroField(this, fields.year);
-            fields.weekyear = new NoWeekyearZeroField(this, fields.weekyear);
-        }
-    }
-
-    static class NoYearZeroField extends DelegatedDateTimeField {
-        private static final long serialVersionUID = -8869148464118507846L;
-
-        final BaseGJChronology iChronology;
-        private transient int iMinYear;
-
-        NoYearZeroField(BaseGJChronology chronology, DateTimeField field) {
-            super(field);
-            iChronology = chronology;
-            int min = super.getMinimumValue();
-            if (min < 0) {
-                iMinYear = min - 1;
-            } else if (min == 0) {
-                iMinYear = 1;
-            } else {
-                iMinYear = min;
-            }
-        }
-        
-        public int get(long millis) {
-            int year = super.get(millis);
-            if (year <= 0) {
-                year--;
-            }
-            return year;
-        }
-
-        public long set(long millis, int year) {
-            FieldUtils.verifyValueBounds(this, year, iMinYear, getMaximumValue());
-            return super.set(millis, adjustYearForSet(year));
-        }
-
-        public int getMinimumValue() {
-            return iMinYear;
-        }
-
-        private Object readResolve() {
-            return iChronology.year();
-        }
-    }
-
-    static class NoWeekyearZeroField extends NoYearZeroField {
-        private static final long serialVersionUID = -5013429014495501104L;
-
-        NoWeekyearZeroField(BaseGJChronology chronology, DateTimeField field) {
-            super(chronology, field);
-        }
-        
-        private Object readResolve() {
-            return iChronology.weekyear();
+            fields.year = new SkipDateTimeField(this, fields.year);
+            fields.weekyear = new SkipDateTimeField(this, fields.weekyear);
         }
     }
 

@@ -22,6 +22,7 @@ import org.opensaml.saml1.core.ConfirmationMethod;
 import org.opensaml.saml1.core.SubjectConfirmation;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.io.UnmarshallingException;
+import org.opensaml.xml.signature.KeyInfo;
 
 /**
  * A thread-safe Unmarshaller for {@link org.opensaml.saml1.core.SubjectConfirmation} objects.
@@ -36,6 +37,8 @@ public class SubjectConfirmationUnmarshaller extends AbstractSAMLObjectUnmarshal
 
         if (childSAMLObject instanceof ConfirmationMethod) {
             subjectConfirmation.getConfirmationMethods().add((ConfirmationMethod) childSAMLObject);
+        } else if(childSAMLObject instanceof KeyInfo) {
+            subjectConfirmation.setKeyInfo((KeyInfo)childSAMLObject);
         } else {
             subjectConfirmation.setSubjectConfirmationData(childSAMLObject);
         }

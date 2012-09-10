@@ -1,55 +1,17 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2009 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.convert;
 
@@ -58,12 +20,12 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.ReadWritableInterval;
 import org.joda.time.ReadWritablePeriod;
+import org.joda.time.ReadablePartial;
 import org.joda.time.field.FieldUtils;
-import org.joda.time.format.DateTimeParser;
+import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.ISOPeriodFormat;
 import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodParser;
 
 /**
  * StringConverter converts from a String to an instant, partial,
@@ -99,8 +61,31 @@ class StringConverter extends AbstractConverter
      */
     public long getInstantMillis(Object object, Chronology chrono) {
         String str = (String) object;
-        DateTimeParser p = ISODateTimeFormat.getInstance().dateTimeParser();
-        return p.parseMillis(str, chrono);
+        DateTimeFormatter p = ISODateTimeFormat.dateTimeParser();
+        return p.withChronology(chrono).parseMillis(str);
+    }
+
+    /**
+     * Extracts the values of the partial from an object of this converter's type.
+     * This method checks if the parser has a zone, and uses it if present.
+     * This is most useful for parsing local times with UTC.
+     * 
+     * @param fieldSource  a partial that provides access to the fields.
+     *  This partial may be incomplete and only getFieldType(int) should be used
+     * @param object  the object to convert
+     * @param chrono  the chronology to use, which is the non-null result of getChronology()
+     * @param parser the parser to use, may be null
+     * @return the array of field values that match the fieldSource, must be non-null valid
+     * @throws ClassCastException if the object is invalid
+     * @throws IllegalArgumentException if the value if invalid
+     * @since 1.3
+     */
+    public int[] getPartialValues(ReadablePartial fieldSource, Object object, Chronology chrono, DateTimeFormatter parser) {
+        if (parser.getZone() != null) {
+            chrono = chrono.withZone(parser.getZone());
+        }
+        long millis = parser.withChronology(chrono).parseMillis((String) object);
+        return chrono.get(fieldSource, millis);
     }
 
     //-----------------------------------------------------------------------
@@ -169,13 +154,13 @@ class StringConverter extends AbstractConverter
      */
     public void setInto(ReadWritablePeriod period, Object object, Chronology chrono) {
         String str = (String) object;
-        PeriodParser parser = ISOPeriodFormat.getInstance().standard();
+        PeriodFormatter parser = ISOPeriodFormat.standard();
         period.clear();
         int pos = parser.parseInto(period, str, 0);
         if (pos < str.length()) {
             if (pos < 0) {
                 // Parse again to get a better exception thrown.
-                parser.parseMutablePeriod(period.getPeriodType(), str);
+                parser.withParseType(period.getPeriodType()).parseMutablePeriod(str);
             }
             throw new IllegalArgumentException("Invalid format: \"" + str + '"');
         }
@@ -206,8 +191,9 @@ class StringConverter extends AbstractConverter
             throw new IllegalArgumentException("Format invalid: " + str);
         }
 
-        DateTimeParser dateTimeParser = ISODateTimeFormat.getInstance().dateTimeParser();
-        PeriodFormatter periodParser = ISOPeriodFormat.getInstance().standard();
+        DateTimeFormatter dateTimeParser = ISODateTimeFormat.dateTimeParser();
+        dateTimeParser = dateTimeParser.withChronology(chrono);
+        PeriodFormatter periodParser = ISOPeriodFormat.standard();
         long startInstant = 0, endInstant = 0;
         Period period = null;
         Chronology parsedChrono = null;
@@ -215,9 +201,9 @@ class StringConverter extends AbstractConverter
         // before slash
         char c = leftStr.charAt(0);
         if (c == 'P' || c == 'p') {
-            period = periodParser.parsePeriod(getPeriodType(leftStr), leftStr);
+            period = periodParser.withParseType(getPeriodType(leftStr)).parsePeriod(leftStr);
         } else {
-            DateTime start = dateTimeParser.parseDateTime(leftStr, chrono);
+            DateTime start = dateTimeParser.parseDateTime(leftStr);
             startInstant = start.getMillis();
             parsedChrono = start.getChronology();
         }
@@ -228,11 +214,11 @@ class StringConverter extends AbstractConverter
             if (period != null) {
                 throw new IllegalArgumentException("Interval composed of two durations: " + str);
             }
-            period = periodParser.parsePeriod(getPeriodType(rightStr), rightStr);
+            period = periodParser.withParseType(getPeriodType(rightStr)).parsePeriod(rightStr);
             chrono = (chrono != null ? chrono : parsedChrono);
             endInstant = chrono.add(period, startInstant, 1);
         } else {
-            DateTime end = dateTimeParser.parseDateTime(rightStr, chrono);
+            DateTime end = dateTimeParser.parseDateTime(rightStr);
             endInstant = end.getMillis();
             parsedChrono = (parsedChrono != null ? parsedChrono : end.getChronology());
             chrono = (chrono != null ? chrono : parsedChrono);
@@ -251,7 +237,7 @@ class StringConverter extends AbstractConverter
      * 
      * @return String.class
      */
-    public Class getSupportedType() {
+    public Class<?> getSupportedType() {
         return String.class;
     }
 

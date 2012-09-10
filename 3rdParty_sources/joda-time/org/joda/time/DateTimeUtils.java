@@ -1,62 +1,28 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2010 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time;
+
+import java.lang.reflect.Method;
+import java.text.DateFormatSymbols;
+import java.util.Locale;
 
 import org.joda.time.chrono.ISOChronology;
 
 /**
- * DateTimeUtils provide public utility methods for the datetime library.
+ * DateTimeUtils provide public utility methods for the date-time library.
  * <p>
  * DateTimeUtils is thread-safe although shared static variables are used.
  *
@@ -65,11 +31,10 @@ import org.joda.time.chrono.ISOChronology;
  */
 public class DateTimeUtils {
 
-    /** The singleton instance of the system millisecond provider */
+    /** The singleton instance of the system millisecond provider. */
     private static final SystemMillisProvider SYSTEM_MILLIS_PROVIDER = new SystemMillisProvider();
-    
-    /** The millisecond provider currently in use */
-    private static MillisProvider cMillisProvider = SYSTEM_MILLIS_PROVIDER;
+    /** The millisecond provider currently in use. */
+    private static volatile MillisProvider cMillisProvider = SYSTEM_MILLIS_PROVIDER;
 
     /**
      * Restrictive constructor
@@ -130,7 +95,29 @@ public class DateTimeUtils {
      */
     public static final void setCurrentMillisOffset(long offsetMillis) throws SecurityException {
         checkPermission();
-        cMillisProvider = new OffsetMillisProvider(offsetMillis);
+        if (offsetMillis == 0) {
+            cMillisProvider = SYSTEM_MILLIS_PROVIDER;
+        } else {
+            cMillisProvider = new OffsetMillisProvider(offsetMillis);
+        }
+    }
+
+    /**
+     * Sets the provider of the current time to class specified.
+     * <p>
+     * This method changes the behaviour of {@link #currentTimeMillis()}.
+     * Whenever the current time is queried, the specified class will be called.
+     * 
+     * @param millisProvider  the provider of the current time to use, not null
+     * @throws SecurityException if the application does not have sufficient security rights
+     * @since 2.0
+     */
+    public static final void setCurrentMillisProvider(MillisProvider millisProvider) throws SecurityException {
+        if (millisProvider == null) {
+            throw new IllegalArgumentException("The MillisProvider must not be null");
+        }
+        checkPermission();
+        cMillisProvider = millisProvider;
     }
 
     /**
@@ -233,6 +220,26 @@ public class DateTimeUtils {
 
     //-----------------------------------------------------------------------
     /**
+     * Gets the interval handling null.
+     * <p>
+     * If the interval is <code>null</code>, an interval representing now
+     * to now in the {@link ISOChronology#getInstance() ISOChronology}
+     * will be returned. Otherwise, the interval specified is returned.
+     * 
+     * @param interval  the interval to use, null means now to now
+     * @return the interval, never null
+     * @since 1.1
+     */
+    public static final ReadableInterval getReadableInterval(ReadableInterval interval) {
+        if (interval == null) {
+            long now = DateTimeUtils.currentTimeMillis();
+            interval = new Interval(now, now);
+        }
+        return interval;
+    }
+
+    //-----------------------------------------------------------------------
+    /**
      * Gets the chronology handling null.
      * <p>
      * If the chronology is <code>null</code>, {@link ISOChronology#getInstance()}
@@ -301,25 +308,94 @@ public class DateTimeUtils {
 
     //-----------------------------------------------------------------------
     /**
-     * Base class defining a millisecond provider.
+     * Checks whether the partial is contiguous.
+     * <p>
+     * A partial is contiguous if one field starts where another ends.
+     * <p>
+     * For example <code>LocalDate</code> is contiguous because DayOfMonth has
+     * the same range (Month) as the unit of the next field (MonthOfYear), and
+     * MonthOfYear has the same range (Year) as the unit of the next field (Year).
+     * <p>
+     * Similarly, <code>LocalTime</code> is contiguous, as it consists of
+     * MillisOfSecond, SecondOfMinute, MinuteOfHour and HourOfDay (note how
+     * the names of each field 'join up').
+     * <p>
+     * However, a Year/HourOfDay partial is not contiguous because the range
+     * field Day is not equal to the next field Year.
+     * Similarly, a DayOfWeek/DayOfMonth partial is not contiguous because
+     * the range Month is not equal to the next field Day.
+     * 
+     * @param partial  the partial to check
+     * @return true if the partial is contiguous
+     * @throws IllegalArgumentException if the partial is null
+     * @since 1.1
      */
-    abstract static class MillisProvider {
+    public static final boolean isContiguous(ReadablePartial partial) {
+        if (partial == null) {
+            throw new IllegalArgumentException("Partial must not be null");
+        }
+        DurationFieldType lastType = null;
+        for (int i = 0; i < partial.size(); i++) {
+            DateTimeField loopField = partial.getField(i);
+            if (i > 0) {
+                if (loopField.getRangeDurationField().getType() != lastType) {
+                    return false;
+                }
+            }
+            lastType = loopField.getDurationField().getType();
+        }
+        return true;
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Gets the {@link DateFormatSymbols} based on the given locale.
+     * <p>
+     * If JDK 6 or newer is being used, DateFormatSymbols.getInstance(locale) will
+     * be used in order to allow the use of locales defined as extensions.
+     * Otherwise, new DateFormatSymbols(locale) will be used.
+     * See JDK 6 {@link DateFormatSymbols} for further information.
+     * 
+     * @param locale  the {@link Locale} used to get the correct {@link DateFormatSymbols}
+     * @return the symbols
+     * @since 2.0
+     */
+    public static final DateFormatSymbols getDateFormatSymbols(Locale locale) {
+        try {
+            Method method = DateFormatSymbols.class.getMethod("getInstance", new Class[] {Locale.class});
+            return (DateFormatSymbols) method.invoke(null, new Object[] {locale});
+        } catch (Exception ex) {
+            return new DateFormatSymbols(locale);
+        }
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * A millisecond provider, allowing control of the system clock.
+     * 
+     * @author Stephen Colebourne
+     * @since 2.0 (previously private)
+     */
+    public static interface MillisProvider {
         /**
          * Gets the current time.
-         * @return the current time in millis
+         * <p>
+         * Implementations of this method must be thread-safe.
+         * 
+         * @return the current time in milliseconds
          */
-        abstract long getMillis();
+        long getMillis();
     }
 
     /**
      * System millis provider.
      */
-    static class SystemMillisProvider extends MillisProvider {
+    static class SystemMillisProvider implements MillisProvider {
         /**
          * Gets the current time.
          * @return the current time in millis
          */
-        long getMillis() {
+        public long getMillis() {
             return System.currentTimeMillis();
         }
     }
@@ -327,7 +403,7 @@ public class DateTimeUtils {
     /**
      * Fixed millisecond provider.
      */
-    static class FixedMillisProvider extends MillisProvider {
+    static class FixedMillisProvider implements MillisProvider {
         /** The fixed millis value. */
         private final long iMillis;
         
@@ -343,7 +419,7 @@ public class DateTimeUtils {
          * Gets the current time.
          * @return the current time in millis
          */
-        long getMillis() {
+        public long getMillis() {
             return iMillis;
         }
     }
@@ -351,7 +427,7 @@ public class DateTimeUtils {
     /**
      * Offset from system millis provider.
      */
-    static class OffsetMillisProvider extends MillisProvider {
+    static class OffsetMillisProvider implements MillisProvider {
         /** The millis offset. */
         private final long iMillis;
         
@@ -367,7 +443,7 @@ public class DateTimeUtils {
          * Gets the current time.
          * @return the current time in millis
          */
-        long getMillis() {
+        public long getMillis() {
             return System.currentTimeMillis() + iMillis;
         }
     }

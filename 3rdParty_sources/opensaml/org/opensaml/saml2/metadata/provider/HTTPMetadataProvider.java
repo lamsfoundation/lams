@@ -272,6 +272,8 @@ public class HTTPMetadataProvider extends AbstractReloadingMetadataProvider {
             String errMsg = "Error retrieving metadata from " + metadataURI;
             log.error(errMsg, e);
             throw new MetadataProviderException(errMsg, e);
+        }finally{
+            getMethod.releaseConnection();
         }
     }
 
@@ -284,6 +286,7 @@ public class HTTPMetadataProvider extends AbstractReloadingMetadataProvider {
      */
     protected GetMethod buildGetMethod() {
         GetMethod getMethod = new GetMethod(getMetadataURI());
+        getMethod.addRequestHeader("Connection", "close");
 
         getMethod.setRequestHeader("Accept-Encoding", "gzip,deflate");
         if (cachedMetadataETag != null) {

@@ -1,68 +1,38 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2011 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time;
 
 import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import org.joda.time.base.BasePartial;
+import org.joda.time.chrono.ISOChronology;
 import org.joda.time.field.AbstractPartialFieldProperty;
+import org.joda.time.field.FieldUtils;
 import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * TimeOfDay is an immutable partial supporting the hour, minute, second
  * and millisecond fields.
+ * <p>
+ * NOTE: This class only supports the four fields listed above. Thus, you
+ * cannot query the millisOfDay or secondOfDay fields for example.
+ * The new <code>LocalTime</code> class removes this restriction.
  * <p>
  * Calculations on TimeOfDay are performed using a {@link Chronology}.
  * This chronology is set to be in the UTC time zone for all calculations.
@@ -89,7 +59,10 @@ import org.joda.time.format.ISODateTimeFormat;
  * @author Stephen Colebourne
  * @author Brian S O'Neill
  * @since 1.0
+ * @deprecated Use LocalTime which has a much better internal implementation and
+ *  has been available since 1.3
  */
+@Deprecated
 public final class TimeOfDay
         extends BasePartial
         implements ReadablePartial, Serializable {
@@ -117,6 +90,68 @@ public final class TimeOfDay
     public static final int SECOND_OF_MINUTE = 2;
     /** The index of the millisOfSecond field in the field array */
     public static final int MILLIS_OF_SECOND = 3;
+
+    //-----------------------------------------------------------------------
+    /**
+     * Constructs a TimeOfDay from a <code>java.util.Calendar</code>
+     * using exactly the same field values avoiding any time zone effects.
+     * <p>
+     * Each field is queried from the Calendar and assigned to the TimeOfDay.
+     * This is useful to ensure that the field values are the same in the
+     * created TimeOfDay no matter what the time zone is. For example, if
+     * the Calendar states that the time is 04:29, then the created TimeOfDay
+     * will always have the time 04:29 irrespective of time zone issues.
+     * <p>
+     * This factory method ignores the type of the calendar and always
+     * creates a TimeOfDay with ISO chronology.
+     *
+     * @param calendar  the Calendar to extract fields from
+     * @return the created TimeOfDay
+     * @throws IllegalArgumentException if the calendar is null
+     * @throws IllegalArgumentException if the time is invalid for the ISO chronology
+     * @since 1.2
+     */
+    public static TimeOfDay fromCalendarFields(Calendar calendar) {
+        if (calendar == null) {
+            throw new IllegalArgumentException("The calendar must not be null");
+        }
+        return new TimeOfDay(
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            calendar.get(Calendar.SECOND),
+            calendar.get(Calendar.MILLISECOND)
+        );
+    }
+
+    /**
+     * Constructs a TimeOfDay from a <code>java.util.Date</code>
+     * using exactly the same field values avoiding any time zone effects.
+     * <p>
+     * Each field is queried from the Date and assigned to the TimeOfDay.
+     * This is useful to ensure that the field values are the same in the
+     * created TimeOfDay no matter what the time zone is. For example, if
+     * the Calendar states that the time is 04:29, then the created TimeOfDay
+     * will always have the time 04:29 irrespective of time zone issues.
+     * <p>
+     * This factory method always creates a TimeOfDay with ISO chronology.
+     *
+     * @param date  the Date to extract fields from
+     * @return the created TimeOfDay
+     * @throws IllegalArgumentException if the calendar is null
+     * @throws IllegalArgumentException if the date is invalid for the ISO chronology
+     * @since 1.2
+     */
+    public static TimeOfDay fromDateFields(Date date) {
+        if (date == null) {
+            throw new IllegalArgumentException("The date must not be null");
+        }
+        return new TimeOfDay(
+            date.getHours(),
+            date.getMinutes(),
+            date.getSeconds(),
+            (((int) (date.getTime() % 1000)) + 1000) % 1000
+        );
+    }
 
     //-----------------------------------------------------------------------
     /**
@@ -162,6 +197,21 @@ public final class TimeOfDay
      */
     public TimeOfDay() {
         super();
+    }
+
+    /**
+     * Constructs a TimeOfDay with the current time, using ISOChronology in
+     * the specified zone to extract the fields.
+     * <p>
+     * The constructor uses the specified time zone to obtain the current time.
+     * Once the constructor is complete, all further calculations
+     * are performed without reference to a timezone (by switching to UTC).
+     * 
+     * @param zone  the zone to use, null means default zone
+     * @since 1.1
+     */
+    public TimeOfDay(DateTimeZone zone) {
+        super(ISOChronology.getInstance(zone));
     }
 
     /**
@@ -213,14 +263,18 @@ public final class TimeOfDay
      * The recognised object types are defined in
      * {@link org.joda.time.convert.ConverterManager ConverterManager} and
      * include ReadableInstant, String, Calendar and Date.
+     * The String formats are described by {@link ISODateTimeFormat#timeParser()}.
      * <p>
      * The chronology used will be derived from the object, defaulting to ISO.
+     * <p>
+     * NOTE: Prior to v1.3 the string format was described by
+     * {@link ISODateTimeFormat#dateTimeParser()}. Dates are now rejected.
      *
      * @param instant  the datetime object, null means now
      * @throws IllegalArgumentException if the instant is invalid
      */
     public TimeOfDay(Object instant) {
-        super(instant, null);
+        super(instant, null, ISODateTimeFormat.timeParser());
     }
 
     /**
@@ -230,18 +284,22 @@ public final class TimeOfDay
      * The recognised object types are defined in
      * {@link org.joda.time.convert.ConverterManager ConverterManager} and
      * include ReadableInstant, String, Calendar and Date.
+     * The String formats are described by {@link ISODateTimeFormat#timeParser()}.
      * <p>
      * The constructor uses the time zone of the chronology specified.
      * Once the constructor is complete, all further calculations are performed
      * without reference to a timezone (by switching to UTC).
      * The specified chronology overrides that of the object.
+     * <p>
+     * NOTE: Prior to v1.3 the string format was described by
+     * {@link ISODateTimeFormat#dateTimeParser()}. Dates are now rejected.
      *
      * @param instant  the datetime object, null means now
      * @param chronology  the chronology, null means ISO default
      * @throws IllegalArgumentException if the instant is invalid
      */
     public TimeOfDay(Object instant, Chronology chronology) {
-        super(instant, DateTimeUtils.getChronology(chronology));
+        super(instant, DateTimeUtils.getChronology(chronology), ISODateTimeFormat.timeParser());
     }
 
     /**
@@ -419,7 +477,7 @@ public final class TimeOfDay
 
     //-----------------------------------------------------------------------
     /**
-     * Creates a new TimeOfDay instance with the specified chronology.
+     * Returns a copy of this time with the specified chronology.
      * This instance is immutable and unaffected by this method call.
      * <p>
      * This method retains the values of the fields, thus the result will
@@ -430,6 +488,7 @@ public final class TimeOfDay
      *
      * @param newChronology  the new chronology, null means ISO
      * @return a copy of this datetime with a different chronology
+     * @throws IllegalArgumentException if the values are invalid for the new chronology
      */
     public TimeOfDay withChronologyRetainFields(Chronology newChronology) {
         newChronology = DateTimeUtils.getChronology(newChronology);
@@ -437,19 +496,355 @@ public final class TimeOfDay
         if (newChronology == getChronology()) {
             return this;
         } else {
-            return new TimeOfDay(this, newChronology);
+            TimeOfDay newTimeOfDay = new TimeOfDay(this, newChronology);
+            newChronology.validate(newTimeOfDay, getValues());
+            return newTimeOfDay;
         }
     }
 
     /**
-     * Gets the property object for the specified type, which contains many useful methods.
+     * Returns a copy of this time with the specified field set to a new value.
+     * <p>
+     * For example, if the field type is <code>minuteOfHour</code> then the day
+     * would be changed in the returned instance.
+     * <p>
+     * These three lines are equivalent:
+     * <pre>
+     * TimeOfDay updated = tod.withField(DateTimeFieldType.minuteOfHour(), 6);
+     * TimeOfDay updated = tod.minuteOfHour().setCopy(6);
+     * TimeOfDay updated = tod.property(DateTimeFieldType.minuteOfHour()).setCopy(6);
+     * </pre>
      *
-     * @param type  the field type to get the chronology for
+     * @param fieldType  the field type to set, not null
+     * @param value  the value to set
+     * @return a copy of this instance with the field set
+     * @throws IllegalArgumentException if the value is null or invalid
+     */
+    public TimeOfDay withField(DateTimeFieldType fieldType, int value) {
+        int index = indexOfSupported(fieldType);
+        if (value == getValue(index)) {
+            return this;
+        }
+        int[] newValues = getValues();
+        newValues = getField(index).set(this, index, newValues, value);
+        return new TimeOfDay(this, newValues);
+    }
+
+    /**
+     * Returns a copy of this time with the value of the specified field increased,
+     * wrapping to what would be a new day if required.
+     * <p>
+     * If the addition is zero, then <code>this</code> is returned.
+     * <p>
+     * These three lines are equivalent:
+     * <pre>
+     * TimeOfDay added = tod.withFieldAdded(DurationFieldType.minutes(), 6);
+     * TimeOfDay added = tod.plusMinutes(6);
+     * TimeOfDay added = tod.minuteOfHour().addToCopy(6);
+     * </pre>
+     * 
+     * @param fieldType  the field type to add to, not null
+     * @param amount  the amount to add
+     * @return a copy of this instance with the field updated
+     * @throws IllegalArgumentException if the value is null or invalid
+     * @throws ArithmeticException if the new datetime exceeds the capacity
+     */
+    public TimeOfDay withFieldAdded(DurationFieldType fieldType, int amount) {
+        int index = indexOfSupported(fieldType);
+        if (amount == 0) {
+            return this;
+        }
+        int[] newValues = getValues();
+        newValues = getField(index).addWrapPartial(this, index, newValues, amount);
+        return new TimeOfDay(this, newValues);
+    }
+
+    /**
+     * Returns a copy of this time with the specified period added,
+     * wrapping to what would be a new day if required.
+     * <p>
+     * If the addition is zero, then <code>this</code> is returned.
+     * Fields in the period that aren't present in the partial are ignored.
+     * <p>
+     * This method is typically used to add multiple copies of complex
+     * period instances. Adding one field is best achieved using methods
+     * like {@link #withFieldAdded(DurationFieldType, int)}
+     * or {@link #plusHours(int)}.
+     * 
+     * @param period  the period to add to this one, null means zero
+     * @param scalar  the amount of times to add, such as -1 to subtract once
+     * @return a copy of this instance with the period added
+     * @throws ArithmeticException if the new datetime exceeds the capacity
+     */
+    public TimeOfDay withPeriodAdded(ReadablePeriod period, int scalar) {
+        if (period == null || scalar == 0) {
+            return this;
+        }
+        int[] newValues = getValues();
+        for (int i = 0; i < period.size(); i++) {
+            DurationFieldType fieldType = period.getFieldType(i);
+            int index = indexOf(fieldType);
+            if (index >= 0) {
+                newValues = getField(index).addWrapPartial(this, index, newValues,
+                        FieldUtils.safeMultiply(period.getValue(i), scalar));
+            }
+        }
+        return new TimeOfDay(this, newValues);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Returns a copy of this time with the specified period added,
+     * wrapping to what would be a new day if required.
+     * <p>
+     * If the amount is zero or null, then <code>this</code> is returned.
+     * <p>
+     * This method is typically used to add complex period instances.
+     * Adding one field is best achieved using methods
+     * like {@link #plusHours(int)}.
+     * 
+     * @param period  the duration to add to this one, null means zero
+     * @return a copy of this instance with the period added
+     * @throws ArithmeticException if the new datetime exceeds the capacity of a long
+     */
+    public TimeOfDay plus(ReadablePeriod period) {
+        return withPeriodAdded(period, 1);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Returns a copy of this time plus the specified number of hours.
+     * <p>
+     * This time instance is immutable and unaffected by this method call.
+     * <p>
+     * The following three lines are identical in effect:
+     * <pre>
+     * TimeOfDay added = dt.plusHours(6);
+     * TimeOfDay added = dt.plus(Period.hours(6));
+     * TimeOfDay added = dt.withFieldAdded(DurationFieldType.hours(), 6);
+     * </pre>
+     *
+     * @param hours  the amount of hours to add, may be negative
+     * @return the new time plus the increased hours
+     * @since 1.1
+     */
+    public TimeOfDay plusHours(int hours) {
+        return withFieldAdded(DurationFieldType.hours(), hours);
+    }
+
+    /**
+     * Returns a copy of this time plus the specified number of minutes.
+     * <p>
+     * This time instance is immutable and unaffected by this method call.
+     * <p>
+     * The following three lines are identical in effect:
+     * <pre>
+     * TimeOfDay added = dt.plusMinutes(6);
+     * TimeOfDay added = dt.plus(Period.minutes(6));
+     * TimeOfDay added = dt.withFieldAdded(DurationFieldType.minutes(), 6);
+     * </pre>
+     *
+     * @param minutes  the amount of minutes to add, may be negative
+     * @return the new time plus the increased minutes
+     * @since 1.1
+     */
+    public TimeOfDay plusMinutes(int minutes) {
+        return withFieldAdded(DurationFieldType.minutes(), minutes);
+    }
+
+    /**
+     * Returns a copy of this time plus the specified number of seconds.
+     * <p>
+     * This time instance is immutable and unaffected by this method call.
+     * <p>
+     * The following three lines are identical in effect:
+     * <pre>
+     * TimeOfDay added = dt.plusSeconds(6);
+     * TimeOfDay added = dt.plus(Period.seconds(6));
+     * TimeOfDay added = dt.withFieldAdded(DurationFieldType.seconds(), 6);
+     * </pre>
+     *
+     * @param seconds  the amount of seconds to add, may be negative
+     * @return the new time plus the increased seconds
+     * @since 1.1
+     */
+    public TimeOfDay plusSeconds(int seconds) {
+        return withFieldAdded(DurationFieldType.seconds(), seconds);
+    }
+
+    /**
+     * Returns a copy of this time plus the specified number of millis.
+     * <p>
+     * This time instance is immutable and unaffected by this method call.
+     * <p>
+     * The following three lines are identical in effect:
+     * <pre>
+     * TimeOfDay added = dt.plusMillis(6);
+     * TimeOfDay added = dt.plus(Period.millis(6));
+     * TimeOfDay added = dt.withFieldAdded(DurationFieldType.millis(), 6);
+     * </pre>
+     *
+     * @param millis  the amount of millis to add, may be negative
+     * @return the new time plus the increased millis
+     * @since 1.1
+     */
+    public TimeOfDay plusMillis(int millis) {
+        return withFieldAdded(DurationFieldType.millis(), millis);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Returns a copy of this time with the specified period taken away,
+     * wrapping to what would be a new day if required.
+     * <p>
+     * If the amount is zero or null, then <code>this</code> is returned.
+     * <p>
+     * This method is typically used to subtract complex period instances.
+     * Subtracting one field is best achieved using methods
+     * like {@link #minusHours(int)}.
+     * 
+     * @param period  the period to reduce this instant by
+     * @return a copy of this instance with the period taken away
+     * @throws ArithmeticException if the new time exceeds capacity
+     */
+    public TimeOfDay minus(ReadablePeriod period) {
+        return withPeriodAdded(period, -1);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Returns a copy of this time minus the specified number of hours.
+     * <p>
+     * This time instance is immutable and unaffected by this method call.
+     * <p>
+     * The following three lines are identical in effect:
+     * <pre>
+     * TimeOfDay subtracted = dt.minusHours(6);
+     * TimeOfDay subtracted = dt.minus(Period.hours(6));
+     * TimeOfDay subtracted = dt.withFieldAdded(DurationFieldType.hours(), -6);
+     * </pre>
+     *
+     * @param hours  the amount of hours to subtract, may be negative
+     * @return the new time minus the increased hours
+     * @since 1.1
+     */
+    public TimeOfDay minusHours(int hours) {
+        return withFieldAdded(DurationFieldType.hours(), FieldUtils.safeNegate(hours));
+    }
+
+    /**
+     * Returns a copy of this time minus the specified number of minutes.
+     * <p>
+     * This time instance is immutable and unaffected by this method call.
+     * <p>
+     * The following three lines are identical in effect:
+     * <pre>
+     * TimeOfDay subtracted = dt.minusMinutes(6);
+     * TimeOfDay subtracted = dt.minus(Period.minutes(6));
+     * TimeOfDay subtracted = dt.withFieldAdded(DurationFieldType.minutes(), -6);
+     * </pre>
+     *
+     * @param minutes  the amount of minutes to subtract, may be negative
+     * @return the new time minus the increased minutes
+     * @since 1.1
+     */
+    public TimeOfDay minusMinutes(int minutes) {
+        return withFieldAdded(DurationFieldType.minutes(), FieldUtils.safeNegate(minutes));
+    }
+
+    /**
+     * Returns a copy of this time minus the specified number of seconds.
+     * <p>
+     * This time instance is immutable and unaffected by this method call.
+     * <p>
+     * The following three lines are identical in effect:
+     * <pre>
+     * TimeOfDay subtracted = dt.minusSeconds(6);
+     * TimeOfDay subtracted = dt.minus(Period.seconds(6));
+     * TimeOfDay subtracted = dt.withFieldAdded(DurationFieldType.seconds(), -6);
+     * </pre>
+     *
+     * @param seconds  the amount of seconds to subtract, may be negative
+     * @return the new time minus the increased seconds
+     * @since 1.1
+     */
+    public TimeOfDay minusSeconds(int seconds) {
+        return withFieldAdded(DurationFieldType.seconds(), FieldUtils.safeNegate(seconds));
+    }
+
+    /**
+     * Returns a copy of this time minus the specified number of millis.
+     * <p>
+     * This time instance is immutable and unaffected by this method call.
+     * <p>
+     * The following three lines are identical in effect:
+     * <pre>
+     * TimeOfDay subtracted = dt.minusMillis(6);
+     * TimeOfDay subtracted = dt.minus(Period.millis(6));
+     * TimeOfDay subtracted = dt.withFieldAdded(DurationFieldType.millis(), -6);
+     * </pre>
+     *
+     * @param millis  the amount of millis to subtract, may be negative
+     * @return the new time minus the increased millis
+     * @since 1.1
+     */
+    public TimeOfDay minusMillis(int millis) {
+        return withFieldAdded(DurationFieldType.millis(), FieldUtils.safeNegate(millis));
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Gets the property object for the specified type, which contains
+     * many useful methods.
+     *
+     * @param type  the field type to get the property for
      * @return the property object
      * @throws IllegalArgumentException if the field is null or unsupported
      */
     public Property property(DateTimeFieldType type) {
         return new Property(this, indexOfSupported(type));
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Converts this object to a LocalTime with the same time and chronology.
+     *
+     * @return a LocalTime with the same time and chronology
+     * @since 1.3
+     */
+    public LocalTime toLocalTime() {
+        return new LocalTime(getHourOfDay(), getMinuteOfHour(),
+                getSecondOfMinute(), getMillisOfSecond(), getChronology());
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Converts this partial to a full datetime using the default time zone
+     * setting the time fields from this instance and the date fields from
+     * the current time.
+     *
+     * @return this date as a datetime with the time as the current time
+     */
+    public DateTime toDateTimeToday() {
+        return toDateTimeToday(null);
+    }
+
+    /**
+     * Converts this partial to a full datetime using the specified time zone
+     * setting the time fields from this instance and the date fields from
+     * the current time.
+     * <p>
+     * This method uses the chronology from this instance plus the time zone
+     * specified.
+     *
+     * @param zone  the zone to use, null means default
+     * @return this date as a datetime with the time as the current time
+     */
+    public DateTime toDateTimeToday(DateTimeZone zone) {
+        Chronology chrono = getChronology().withZone(zone);
+        long instantMillis = DateTimeUtils.currentTimeMillis();
+        long resolved = chrono.set(this, instantMillis);
+        return new DateTime(resolved, chrono);
     }
 
     //-----------------------------------------------------------------------
@@ -491,7 +886,80 @@ public final class TimeOfDay
 
     //-----------------------------------------------------------------------
     /**
-     * Get the hour of day (0-23) field property
+     * Returns a copy of this time with the hour of day field updated.
+     * <p>
+     * TimeOfDay is immutable, so there are no set methods.
+     * Instead, this method returns a new instance with the value of
+     * hour of day changed.
+     *
+     * @param hour  the hour of day to set
+     * @return a copy of this object with the field set
+     * @throws IllegalArgumentException if the value is invalid
+     * @since 1.3
+     */
+    public TimeOfDay withHourOfDay(int hour) {
+        int[] newValues = getValues();
+        newValues = getChronology().hourOfDay().set(this, HOUR_OF_DAY, newValues, hour);
+        return new TimeOfDay(this, newValues);
+    }
+
+    /**
+     * Returns a copy of this time with the minute of hour field updated.
+     * <p>
+     * TimeOfDay is immutable, so there are no set methods.
+     * Instead, this method returns a new instance with the value of
+     * minute of hour changed.
+     *
+     * @param minute  the minute of hour to set
+     * @return a copy of this object with the field set
+     * @throws IllegalArgumentException if the value is invalid
+     * @since 1.3
+     */
+    public TimeOfDay withMinuteOfHour(int minute) {
+        int[] newValues = getValues();
+        newValues = getChronology().minuteOfHour().set(this, MINUTE_OF_HOUR, newValues, minute);
+        return new TimeOfDay(this, newValues);
+    }
+
+    /**
+     * Returns a copy of this time with the second of minute field updated.
+     * <p>
+     * TimeOfDay is immutable, so there are no set methods.
+     * Instead, this method returns a new instance with the value of
+     * second of minute changed.
+     *
+     * @param second  the second of minute to set
+     * @return a copy of this object with the field set
+     * @throws IllegalArgumentException if the value is invalid
+     * @since 1.3
+     */
+    public TimeOfDay withSecondOfMinute(int second) {
+        int[] newValues = getValues();
+        newValues = getChronology().secondOfMinute().set(this, SECOND_OF_MINUTE, newValues, second);
+        return new TimeOfDay(this, newValues);
+    }
+
+    /**
+     * Returns a copy of this time with the millis of second field updated.
+     * <p>
+     * TimeOfDay is immutable, so there are no set methods.
+     * Instead, this method returns a new instance with the value of
+     * millis of second changed.
+     *
+     * @param millis  the millis of second to set
+     * @return a copy of this object with the field set
+     * @throws IllegalArgumentException if the value is invalid
+     * @since 1.3
+     */
+    public TimeOfDay withMillisOfSecond(int millis) {
+        int[] newValues = getValues();
+        newValues = getChronology().millisOfSecond().set(this, MILLIS_OF_SECOND, newValues, millis);
+        return new TimeOfDay(this, newValues);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Get the hour of day field property which provides access to advanced functionality.
      * 
      * @return the hour of day property
      */
@@ -500,7 +968,7 @@ public final class TimeOfDay
     }
 
     /**
-     * Get the minute of hour field property
+     * Get the minute of hour field property which provides access to advanced functionality.
      * 
      * @return the minute of hour property
      */
@@ -509,7 +977,7 @@ public final class TimeOfDay
     }
 
     /**
-     * Get the second of minute field property
+     * Get the second of minute field property which provides access to advanced functionality.
      * 
      * @return the second of minute property
      */
@@ -518,7 +986,7 @@ public final class TimeOfDay
     }
 
     /**
-     * Get the millis of second property
+     * Get the millis of second property which provides access to advanced functionality.
      * 
      * @return the millis of second property
      */
@@ -533,7 +1001,7 @@ public final class TimeOfDay
      * @return ISO8601 formatted string
      */
     public String toString() {
-        return ISODateTimeFormat.getInstance().tTime().print(this);
+        return ISODateTimeFormat.tTime().print(this);
     }
 
     //-----------------------------------------------------------------------
@@ -544,7 +1012,9 @@ public final class TimeOfDay
      * 
      * @author Stephen Colebourne
      * @since 1.0
+     * @deprecated Use LocalTime which has a much better internal implementation
      */
+    @Deprecated
     public static class Property extends AbstractPartialFieldProperty implements Serializable {
 
         /** Serialization version */
@@ -581,7 +1051,7 @@ public final class TimeOfDay
          * 
          * @return the partial
          */
-        public ReadablePartial getReadablePartial() {
+        protected ReadablePartial getReadablePartial() {
             return iTimeOfDay;
         }
 
@@ -605,14 +1075,16 @@ public final class TimeOfDay
 
         //-----------------------------------------------------------------------
         /**
-         * Adds to the value of this field in a copy of this TimeOfDay.
+         * Adds to the value of this field in a copy of this TimeOfDay,
+         * wrapping to what would be the next day if necessary.
          * <p>
          * The value will be added to this field. If the value is too large to be
          * added solely to this field then it will affect larger fields.
          * Smaller fields are unaffected.
          * <p>
-         * If the result would be too large, beyond 23:59:59:999, then an
-         * IllegalArgumentException is thrown.
+         * If the result would be too large, beyond 23:59:59:999, then the
+         * calculation wraps to 00:00:00.000. For the alternate strict behaviour
+         * with no wrapping see {@link #addNoWrapToCopy(int)}.
          * <p>
          * The TimeOfDay attached to this property is unchanged by this call.
          * Instead, a new instance is returned.
@@ -622,6 +1094,32 @@ public final class TimeOfDay
          * @throws IllegalArgumentException if the value isn't valid
          */
         public TimeOfDay addToCopy(int valueToAdd) {
+            int[] newValues = iTimeOfDay.getValues();
+            newValues = getField().addWrapPartial(iTimeOfDay, iFieldIndex, newValues, valueToAdd);
+            return new TimeOfDay(iTimeOfDay, newValues);
+        }
+
+        /**
+         * Adds to the value of this field in a copy of this TimeOfDay,
+         * throwing an Exception if the bounds are exceeded.
+         * <p>
+         * The value will be added to this field. If the value is too large to be
+         * added solely to this field then it will affect larger fields.
+         * Smaller fields are unaffected.
+         * <p>
+         * If the result would be too large (beyond 23:59:59:999) or too
+         * small (less than 00:00:00.000) then an Execption is thrown.
+         * For the alternate behaviour which wraps to the next 'day',
+         * see {@link #addToCopy(int)}.
+         * <p>
+         * The TimeOfDay attached to this property is unchanged by this call.
+         * Instead, a new instance is returned.
+         * 
+         * @param valueToAdd  the value to add to the field in the copy
+         * @return a copy of the TimeOfDay with the field value changed
+         * @throws IllegalArgumentException if the value isn't valid
+         */
+        public TimeOfDay addNoWrapToCopy(int valueToAdd) {
             int[] newValues = iTimeOfDay.getValues();
             newValues = getField().add(iTimeOfDay, iFieldIndex, newValues, valueToAdd);
             return new TimeOfDay(iTimeOfDay, newValues);
@@ -697,6 +1195,33 @@ public final class TimeOfDay
          */
         public TimeOfDay setCopy(String text) {
             return setCopy(text, null);
+        }
+
+        //-----------------------------------------------------------------------
+        /**
+         * Returns a new TimeOfDay with this field set to the maximum value
+         * for this field.
+         * <p>
+         * The TimeOfDay attached to this property is unchanged by this call.
+         *
+         * @return a copy of the TimeOfDay with this field set to its maximum
+         * @since 1.2
+         */
+        public TimeOfDay withMaximumValue() {
+            return setCopy(getMaximumValue());
+        }
+
+        /**
+         * Returns a new TimeOfDay with this field set to the minimum value
+         * for this field.
+         * <p>
+         * The TimeOfDay attached to this property is unchanged by this call.
+         *
+         * @return a copy of the TimeOfDay with this field set to its minimum
+         * @since 1.2
+         */
+        public TimeOfDay withMinimumValue() {
+            return setCopy(getMinimumValue());
         }
     }
 

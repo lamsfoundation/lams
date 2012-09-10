@@ -1,4 +1,7 @@
-# @(#)antarctica	7.23
+# <pre>
+# @(#)antarctica	8.9
+# This file is in the public domain, so clarified as of
+# 2009-05-17 by Arthur David Olson.
 
 # From Paul Eggert (1999-11-15):
 # To keep things manageable, we list only locations occupied year-round; see
@@ -16,36 +19,59 @@
 # I made up all time zone abbreviations mentioned here; corrections welcome!
 # FORMAT is `zzz' and GMTOFF is 0 for locations while uninhabited.
 
-# These rules are stolen from the `europe' file.
-# Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
-Rule	RussAQ	1981	1984	-	Apr	 1	 0:00	1:00	S
-Rule	RussAQ	1981	1983	-	Oct	 1	 0:00	0	-
-Rule	RussAQ	1984	1991	-	Sep	lastSun	 2:00s	0	-
-Rule	RussAQ	1985	1991	-	Mar	lastSun	 2:00s	1:00	S
-Rule	RussAQ	1992	only	-	Mar	lastSat	 23:00	1:00	S
-Rule	RussAQ	1992	only	-	Sep	lastSat	 23:00	0	-
-Rule	RussAQ	1993	max	-	Mar	lastSun	 2:00s	1:00	S
-Rule	RussAQ	1993	1995	-	Sep	lastSun	 2:00s	0	-
-Rule	RussAQ	1996	max	-	Oct	lastSun	 2:00s	0	-
-
 # These rules are stolen from the `southamerica' file.
 # Rule	NAME	FROM	TO	TYPE	IN	ON	AT	SAVE	LETTER/S
 Rule	ArgAQ	1964	1966	-	Mar	 1	0:00	0	-
 Rule	ArgAQ	1964	1966	-	Oct	15	0:00	1:00	S
-Rule	ArgAQ	1967	only	-	Apr	 1	0:00	0	-
-Rule	ArgAQ	1967	1968	-	Oct	Sun<=7	0:00	1:00	S
-Rule	ArgAQ	1968	1969	-	Apr	Sun<=7	0:00	0	-
+Rule	ArgAQ	1967	only	-	Apr	 2	0:00	0	-
+Rule	ArgAQ	1967	1968	-	Oct	Sun>=1	0:00	1:00	S
+Rule	ArgAQ	1968	1969	-	Apr	Sun>=1	0:00	0	-
 Rule	ArgAQ	1974	only	-	Jan	23	0:00	1:00	S
 Rule	ArgAQ	1974	only	-	May	 1	0:00	0	-
-Rule	ArgAQ	1974	1976	-	Oct	Sun<=7	0:00	1:00	S
-Rule	ArgAQ	1975	1977	-	Apr	Sun<=7	0:00	0	-
-Rule	ChileAQ	1966	1997	-	Oct	Sun>=9	0:00	1:00	S
-Rule	ChileAQ	1967	1998	-	Mar	Sun>=9	0:00	0	-
-Rule	ChileAQ	1998	only	-	Sep	27	0:00	1:00	S
-Rule	ChileAQ	1999	only	-	Apr	 4	0:00	0	-
-Rule	ChileAQ	1999	max	-	Oct	Sun>=9	0:00	1:00	S
-Rule	ChileAQ	2000	max	-	Mar	Sun>=9	0:00	0	-
+Rule	ChileAQ	1972	1986	-	Mar	Sun>=9	3:00u	0	-
+Rule	ChileAQ	1974	1987	-	Oct	Sun>=9	4:00u	1:00	S
+Rule	ChileAQ	1987	only	-	Apr	12	3:00u	0	-
+Rule	ChileAQ	1988	1989	-	Mar	Sun>=9	3:00u	0	-
+Rule	ChileAQ	1988	only	-	Oct	Sun>=1	4:00u	1:00	S
+Rule	ChileAQ	1989	only	-	Oct	Sun>=9	4:00u	1:00	S
+Rule	ChileAQ	1990	only	-	Mar	18	3:00u	0	-
+Rule	ChileAQ	1990	only	-	Sep	16	4:00u	1:00	S
+Rule	ChileAQ	1991	1996	-	Mar	Sun>=9	3:00u	0	-
+Rule	ChileAQ	1991	1997	-	Oct	Sun>=9	4:00u	1:00	S
+Rule	ChileAQ	1997	only	-	Mar	30	3:00u	0	-
+Rule	ChileAQ	1998	only	-	Mar	Sun>=9	3:00u	0	-
+Rule	ChileAQ	1998	only	-	Sep	27	4:00u	1:00	S
+Rule	ChileAQ	1999	only	-	Apr	 4	3:00u	0	-
+Rule	ChileAQ	1999	max	-	Oct	Sun>=9	4:00u	1:00	S
+Rule	ChileAQ	2000	max	-	Mar	Sun>=9	3:00u	0	-
 
+# These rules are stolen from the `australasia' file.
+Rule	AusAQ	1917	only	-	Jan	 1	0:01	1:00	-
+Rule	AusAQ	1917	only	-	Mar	25	2:00	0	-
+Rule	AusAQ	1942	only	-	Jan	 1	2:00	1:00	-
+Rule	AusAQ	1942	only	-	Mar	29	2:00	0	-
+Rule	AusAQ	1942	only	-	Sep	27	2:00	1:00	-
+Rule	AusAQ	1943	1944	-	Mar	lastSun	2:00	0	-
+Rule	AusAQ	1943	only	-	Oct	 3	2:00	1:00	-
+Rule	ATAQ	1967	only	-	Oct	Sun>=1	2:00s	1:00	-
+Rule	ATAQ	1968	only	-	Mar	lastSun	2:00s	0	-
+Rule	ATAQ	1968	1985	-	Oct	lastSun	2:00s	1:00	-
+Rule	ATAQ	1969	1971	-	Mar	Sun>=8	2:00s	0	-
+Rule	ATAQ	1972	only	-	Feb	lastSun	2:00s	0	-
+Rule	ATAQ	1973	1981	-	Mar	Sun>=1	2:00s	0	-
+Rule	ATAQ	1982	1983	-	Mar	lastSun	2:00s	0	-
+Rule	ATAQ	1984	1986	-	Mar	Sun>=1	2:00s	0	-
+Rule	ATAQ	1986	only	-	Oct	Sun>=15	2:00s	1:00	-
+Rule	ATAQ	1987	1990	-	Mar	Sun>=15	2:00s	0	-
+Rule	ATAQ	1987	only	-	Oct	Sun>=22	2:00s	1:00	-
+Rule	ATAQ	1988	1990	-	Oct	lastSun	2:00s	1:00	-
+Rule	ATAQ	1991	1999	-	Oct	Sun>=1	2:00s	1:00	-
+Rule	ATAQ	1991	2005	-	Mar	lastSun	2:00s	0	-
+Rule	ATAQ	2000	only	-	Aug	lastSun	2:00s	1:00	-
+Rule	ATAQ	2001	max	-	Oct	Sun>=1	2:00s	1:00	-
+Rule	ATAQ	2006	only	-	Apr	Sun>=1	2:00s	0	-
+Rule	ATAQ	2007	only	-	Mar	lastSun	2:00s	0	-
+Rule	ATAQ	2008	max	-	Apr	Sun>=1	2:00s	0	-
 
 # Argentina - year-round bases
 # Belgrano II, Confin Coast, -770227-0343737, since 1972-02-05
@@ -59,7 +85,7 @@ Rule	ChileAQ	2000	max	-	Mar	Sun>=9	0:00	0	-
 # Australia - territories
 # Heard Island, McDonald Islands (uninhabited)
 #	previously sealers and scientific personnel wintered
-#	<a href="http://www.dstc.qut.edu.au/DST/marg/daylight.html">
+#	<a href="http://web.archive.org/web/20021204222245/http://www.dstc.qut.edu.au/DST/marg/daylight.html">
 #	Margaret Turner reports
 #	</a> (1999-09-30) that they're UTC+5, with no DST;
 #	presumably this is when they have visitors.
@@ -69,15 +95,70 @@ Rule	ChileAQ	2000	max	-	Mar	Sun>=9	0:00	0	-
 # Davis, Vestfold Hills, -6835+07759, since 1957-01-13
 #	(except 1964-11 - 1969-02)
 # Mawson, Holme Bay, -6736+06253, since 1954-02-13
+
+# From Steffen Thorsen (2009-03-11):
+# Three Australian stations in Antarctica have changed their time zone:
+# Casey moved from UTC+8 to UTC+11
+# Davis moved from UTC+7 to UTC+5
+# Mawson moved from UTC+6 to UTC+5
+# The changes occurred on 2009-10-18 at 02:00 (local times).
+#
+# Government source: (Australian Antarctic Division)
+# <a href="http://www.aad.gov.au/default.asp?casid=37079">
+# http://www.aad.gov.au/default.asp?casid=37079
+# </a>
+#
+# We have more background information here:
+# <a href="http://www.timeanddate.com/news/time/antarctica-new-times.html">
+# http://www.timeanddate.com/news/time/antarctica-new-times.html
+# </a>
+
+# From Steffen Thorsen (2010-03-10):
+# We got these changes from the Australian Antarctic Division:
+# - Macquarie Island will stay on UTC+11 for winter and therefore not
+# switch back from daylight savings time when other parts of Australia do
+# on 4 April.
+#
+# - Casey station reverted to its normal time of UTC+8 on 5 March 2010.
+# The change to UTC+11 is being considered as a regular summer thing but
+# has not been decided yet.
+#
+# - Davis station will revert to its normal time of UTC+7 at 10 March 2010
+# 20:00 UTC.
+#
+# - Mawson station stays on UTC+5.
+#
+# In addition to the Rule changes for Casey/Davis, it means that Macquarie
+# will no longer be like Hobart and will have to have its own Zone created.
+#
+# Background:
+# <a href="http://www.timeanddate.com/news/time/antartica-time-changes-2010.html">
+# http://www.timeanddate.com/news/time/antartica-time-changes-2010.html
+# </a>
+
 # Zone	NAME		GMTOFF	RULES	FORMAT	[UNTIL]
 Zone Antarctica/Casey	0	-	zzz	1969
-			8:00	-	WST	# Western (Aus) Standard Time
+			8:00	-	WST	2009 Oct 18 2:00
+						# Western (Aus) Standard Time
+			11:00	-	CAST	2010 Mar 5 2:00
+						# Casey Time
+			8:00	-	WST
 Zone Antarctica/Davis	0	-	zzz	1957 Jan 13
 			7:00	-	DAVT	1964 Nov # Davis Time
 			0	-	zzz	1969 Feb
+			7:00	-	DAVT	2009 Oct 18 2:00
+			5:00	-	DAVT	2010 Mar 10 20:00u
 			7:00	-	DAVT
 Zone Antarctica/Mawson	0	-	zzz	1954 Feb 13
-			6:00	-	MAWT	# Mawson Time
+			6:00	-	MAWT	2009 Oct 18 2:00
+						# Mawson Time
+			5:00	-	MAWT
+Zone Antarctica/Macquarie 0	-	zzz	1911
+			10:00	-	EST	1916 Oct 1 2:00
+			10:00	1:00	EST	1917 Feb
+			10:00	AusAQ	EST	1967
+			10:00	ATAQ	EST	2010 Apr 4 3:00
+			11:00	-	MIST	# Macquarie Island Time
 # References:
 # <a href="http://www.antdiv.gov.au/aad/exop/sfo/casey/casey_aws.html">
 # Casey Weather (1998-02-26)
@@ -90,23 +171,23 @@ Zone Antarctica/Mawson	0	-	zzz	1954 Feb 13
 # </a>
 
 # Brazil - year-round base
-# Ferraz, King George Island, since 1983/4
+# Comandante Ferraz, King George Island, -6205+05824, since 1983/4
 
 # Chile - year-round bases and towns
 # Escudero, South Shetland Is, -621157-0585735, since 1994
-# Frei, King George Island, -6214-05848, since 1969-03-07
-# O'Higgins, Antarctic Peninsula, -6319-05704, since 1948-02
-# Prat, -6230-05941
-# Villa Las Estrellas (a town), King George Island, since 1984-04-09
+# Presidente Eduadro Frei, King George Island, -6214-05848, since 1969-03-07
+# General Bernardo O'Higgins, Antarctic Peninsula, -6319-05704, since 1948-02
+# Capitan Arturo Prat, -6230-05941
+# Villa Las Estrellas (a town), around the Frei base, since 1984-04-09
 # These locations have always used Santiago time; use TZ='America/Santiago'.
 
 # China - year-round bases
-# Great Wall, King George Island, since 1985-02-20
-# Zhongshan, Larsemann Hills, Prydz Bay, since 1989-02-26
+# Great Wall, King George Island, -6213-05858, since 1985-02-20
+# Zhongshan, Larsemann Hills, Prydz Bay, -6922+07623, since 1989-02-26
 
 # France - year-round bases
 #
-# From Antoine Leca <Antoine.Leca@Renault.FR> (1997-01-20):
+# From Antoine Leca (1997-01-20):
 # Time data are from Nicole Pailleau at the IFRTP
 # (French Institute for Polar Research and Technology).
 # She confirms that French Southern Territories and Terre Adelie bases
@@ -139,25 +220,22 @@ Zone Antarctica/DumontDUrville 0 -	zzz	1947
 			0	-	zzz	1956 Nov
 			10:00	-	DDUT	# Dumont-d'Urville Time
 # Reference:
-# <a href="http://www.icair.iac.org.nz/science/reports/fr/IFRTP.html">
-# Support and Development of Polar Research and Technology (1997-02-03)
+# <a href="http://en.wikipedia.org/wiki/Dumont_d'Urville_Station">
+# Dumont d'Urville Station (2005-12-05)
 # </a>
 
-
 # Germany - year-round base
-# Georg von Neumayer
+# Georg von Neumayer, -7039-00815
 
 # India - year-round base
-# Dakshin Gangotri
+# Dakshin Gangotri, -7005+01200
 
 # Japan - year-round bases
-# Dome Fuji
-# Syowa
+# Dome Fuji, -7719+03942
+# Syowa, -690022+0393524
 #
 # From Hideyuki Suzuki (1999-02-06):
-# In all Japanese stations, +0300 is used as the standard time.  [See]
-# <a href="http://www.crl.go.jp/uk/uk201/basyo.htm">[reference in Japanese]</a>
-# and information from KAMO Hiroyasu <wd@ics.nara-wu.ac.jp>.
+# In all Japanese stations, +0300 is used as the standard time.
 #
 # Syowa station, which is the first antarctic station of Japan,
 # was established on 1957-01-29.  Since Syowa station is still the main
@@ -171,7 +249,7 @@ Zone Antarctica/Syowa	0	-	zzz	1957 Jan 29
 # </a>
 
 # S Korea - year-round base
-# King Sejong, King George Island, since 1988
+# King Sejong, King George Island, -6213-05847, since 1988
 
 # New Zealand - claims
 # Balleny Islands (never inhabited)
@@ -185,10 +263,12 @@ Zone Antarctica/Syowa	0	-	zzz	1957 Jan 29
 Rule	NZAQ	1974	only	-	Nov	 3	2:00s	1:00	D
 Rule	NZAQ	1975	1988	-	Oct	lastSun	2:00s	1:00	D
 Rule	NZAQ	1989	only	-	Oct	 8	2:00s	1:00	D
-Rule	NZAQ	1990	max	-	Oct	Sun>=1	2:00s	1:00	D
+Rule	NZAQ	1990	2006	-	Oct	Sun>=1	2:00s	1:00	D
 Rule	NZAQ	1975	only	-	Feb	23	2:00s	0	S
 Rule	NZAQ	1976	1989	-	Mar	Sun>=1	2:00s	0	S
-Rule	NZAQ	1990	max	-	Mar	Sun>=15	2:00s	0	S
+Rule	NZAQ	1990	2007	-	Mar	Sun>=15	2:00s	0	S
+Rule	NZAQ	2007	max	-	Sep	lastSun	2:00s	1:00	D
+Rule	NZAQ	2008	max	-	Apr	Sun>=1	2:00s	0	S
 
 # Norway - territories
 # Bouvet (never inhabited)
@@ -202,7 +282,8 @@ Rule	NZAQ	1990	max	-	Mar	Sun>=15	2:00s	0	S
 # Russia - year-round bases
 # Bellingshausen, King George Island, -621159-0585337, since 1968-02-22
 # Mirny, Davis coast, -6633+09301, since 1956-02
-# Molodezhnaya, Alasheyev Bay, year-round from 1962-02 to 1999-07-01
+# Molodezhnaya, Alasheyev Bay, -6740+04551,
+#	year-round from 1962-02 to 1999-07-01
 # Novolazarevskaya, Queen Maud Land, -7046+01150,
 #	year-round from 1960/61 to 1992
 
@@ -234,8 +315,8 @@ Zone Antarctica/Vostok	0	-	zzz	1957 Dec 16
 			6:00	-	VOST	# Vostok time
 
 # S Africa - year-round bases
-# Marion Island
-# Sanae
+# Marion Island, -4653+03752
+# Sanae, -7141-00250
 
 # UK
 #
@@ -270,7 +351,7 @@ Zone Antarctica/Rothera	0	-	zzz	1976 Dec  1
 #
 # Palmer, Anvers Island, since 1965 (moved 2 miles in 1968)
 #
-# From Ethan Dicks <erd@mcmsun5.mcmurdo.gov> (1996-10-06):
+# From Ethan Dicks (1996-10-06):
 # It keeps the same time as Punta Arenas, Chile, because, just like us
 # and the South Pole, that's the other end of their supply line....
 # I verified with someone who was there that since 1980,
@@ -295,7 +376,7 @@ Zone Antarctica/McMurdo	0	-	zzz	1956
 # Normally it wouldn't have a separate entry, since it's like the
 # larger Antarctica/McMurdo since 1970, but it's too famous to omit.
 #
-# From Chris Carrier <72157.3334@CompuServe.COM> (1996-06-27):
+# From Chris Carrier (1996-06-27):
 # Siple, the first commander of the South Pole station,
 # stated that he would have liked to have kept GMT at the station,
 # but that he found it more convenient to keep GMT+12

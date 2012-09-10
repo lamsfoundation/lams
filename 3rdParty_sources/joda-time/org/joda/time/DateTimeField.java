@@ -1,55 +1,17 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2005 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time;
 
@@ -155,6 +117,16 @@ public abstract class DateTimeField {
     public abstract String getAsText(ReadablePartial partial, Locale locale);
 
     /**
+     * Get the human-readable, text value of this field from the field value.
+     * If the specified locale is null, the default locale is used.
+     *
+     * @param fieldValue  the numeric value to convert to text
+     * @param locale the locale to use for selecting a text symbol, null for default
+     * @return the text value of the field
+     */
+    public abstract String getAsText(int fieldValue, Locale locale);
+
+    /**
      * Get the human-readable, short text value of this field from the
      * milliseconds.  If the specified locale is null, the default locale is used.
      *
@@ -193,6 +165,16 @@ public abstract class DateTimeField {
      * @return the text value of the field
      */
     public abstract String getAsShortText(ReadablePartial partial, Locale locale);
+
+    /**
+     * Get the human-readable, short text value of this field from the field value.
+     * If the specified locale is null, the default locale is used.
+     *
+     * @param fieldValue  the numeric value to convert to text
+     * @param locale the locale to use for selecting a text symbol, null for default
+     * @return the text value of the field
+     */
+    public abstract String getAsShortText(int fieldValue, Locale locale);
 
     /**
      * Adds a value (which may be negative) to the millis value,
@@ -257,6 +239,35 @@ public abstract class DateTimeField {
      * @throws IllegalArgumentException if the value is invalid or the maximum instant is reached
      */
     public abstract int[] add(ReadablePartial instant, int fieldIndex, int[] values, int valueToAdd);
+
+    /**
+     * Adds a value (which may be negative) to the partial instant,
+     * wrapping the whole partial if the maximum size of the partial is reached.
+     * <p>
+     * The value will be added to this field, overflowing into larger fields
+     * if necessary. Smaller fields should be unaffected, except where the
+     * result would be an invalid value for a smaller field. In this case the
+     * smaller field is adjusted to be in range.
+     * <p>
+     * Partial instants only contain some fields. This may result in a maximum
+     * possible value, such as TimeOfDay normally being limited to 23:59:59:999.
+     * If ths limit is reached by the addition, this method will wrap back to
+     * 00:00:00.000. In fact, you would generally only use this method for
+     * classes that have a limitation such as this.
+     * <p>
+     * For example, in the ISO chronology:<br>
+     * 10:20:30 add 20 minutes is 10:40:30<br>
+     * 10:20:30 add 45 minutes is 11:05:30<br>
+     * 10:20:30 add 16 hours is 02:20:30<br>
+     * 
+     * @param instant  the partial instant
+     * @param fieldIndex  the index of this field in the partial
+     * @param values  the values of the partial instant which should be updated
+     * @param valueToAdd  the value to add, in the units of the field
+     * @return the passed in values
+     * @throws IllegalArgumentException if the value is invalid or the maximum instant is reached
+     */
+    public abstract int[] addWrapPartial(ReadablePartial instant, int fieldIndex, int[] values, int valueToAdd);
 
     /**
      * Adds a value (which may be negative) to the millis value,

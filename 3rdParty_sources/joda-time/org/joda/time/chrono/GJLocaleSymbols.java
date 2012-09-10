@@ -1,83 +1,54 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2009 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.chrono;
 
 import java.lang.ref.WeakReference;
 import java.text.DateFormatSymbols;
-import java.util.WeakHashMap;
 import java.util.Locale;
+import java.util.TreeMap;
+import java.util.WeakHashMap;
+
+import org.joda.time.DateTimeFieldType;
+import org.joda.time.DateTimeUtils;
+import org.joda.time.IllegalFieldValueException;
 
 /**
  * Utility class used by a few of the GJDateTimeFields.
  *
  * @author Brian S O'Neill
+ * @since 1.0
  */
 class GJLocaleSymbols {
     private static final int FAST_CACHE_SIZE = 64;
 
     private static final GJLocaleSymbols[] cFastCache = new GJLocaleSymbols[FAST_CACHE_SIZE];
 
-    private static WeakHashMap cCache = new WeakHashMap();
+    private static WeakHashMap<Locale, GJLocaleSymbols> cCache = new WeakHashMap<Locale, GJLocaleSymbols>();
 
     public static GJLocaleSymbols forLocale(Locale locale) {
+        if (locale == null) {
+            locale = Locale.getDefault();
+        }
         int index = System.identityHashCode(locale) & (FAST_CACHE_SIZE - 1);
         GJLocaleSymbols symbols = cFastCache[index];
         if (symbols != null && symbols.iLocale.get() == locale) {
             return symbols;
         }
         synchronized (cCache) {
-            symbols = (GJLocaleSymbols) cCache.get(locale);
+            symbols = cCache.get(locale);
             if (symbols == null) {
                 symbols = new GJLocaleSymbols(locale);
                 cCache.put(locale, symbols);
@@ -103,6 +74,21 @@ class GJLocaleSymbols {
         return a;
     }
 
+    private static void addSymbols(TreeMap<String, Integer> map, String[] symbols, Integer[] integers) {
+        for (int i=symbols.length; --i>=0; ) {
+            String symbol = symbols[i];
+            if (symbol != null) {
+                map.put(symbol, integers[i]);
+            }
+        }
+    }
+
+    private static void addNumerals(TreeMap<String, Integer> map, int start, int end, Integer[] integers) {
+        for (int i=start; i<=end; i++) {
+            map.put(String.valueOf(i).intern(), integers[i]);
+        }
+    }
+
     private static int maxLength(String[] a) {
         int max = 0;
         for (int i=a.length; --i>=0; ) {
@@ -117,7 +103,7 @@ class GJLocaleSymbols {
         return max;
     }
 
-    private final WeakReference iLocale;
+    private final WeakReference<Locale> iLocale;
 
     private final String[] iEras;
     private final String[] iDaysOfWeek;
@@ -126,6 +112,10 @@ class GJLocaleSymbols {
     private final String[] iShortMonths;
     private final String[] iHalfday;
 
+    private final TreeMap<String, Integer> iParseEras;
+    private final TreeMap<String, Integer> iParseDaysOfWeek;
+    private final TreeMap<String, Integer> iParseMonths;
+
     private final int iMaxEraLength;
     private final int iMaxDayOfWeekLength;
     private final int iMaxShortDayOfWeekLength;
@@ -133,21 +123,45 @@ class GJLocaleSymbols {
     private final int iMaxShortMonthLength;
     private final int iMaxHalfdayLength;
 
+    /**
+     * @param locale must not be null
+     */
     private GJLocaleSymbols(Locale locale) {
-        if (locale == null) {
-            locale = Locale.getDefault();
-        }
-
-        iLocale = new WeakReference(locale);
-
-        DateFormatSymbols dfs = new DateFormatSymbols(locale);
-
+        iLocale = new WeakReference<Locale>(locale);
+        
+        DateFormatSymbols dfs = DateTimeUtils.getDateFormatSymbols(locale);
+        
         iEras = dfs.getEras();
         iDaysOfWeek = realignDaysOfWeek(dfs.getWeekdays());
         iShortDaysOfWeek = realignDaysOfWeek(dfs.getShortWeekdays());
         iMonths = realignMonths(dfs.getMonths());
         iShortMonths = realignMonths(dfs.getShortMonths());
         iHalfday = dfs.getAmPmStrings();
+
+        Integer[] integers = new Integer[13];
+        for (int i=0; i<13; i++) {
+            integers[i] = Integer.valueOf(i);
+        }
+
+        iParseEras = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
+        addSymbols(iParseEras, iEras, integers);
+        if ("en".equals(locale.getLanguage())) {
+            // Include support for parsing "BCE" and "CE" if the language is
+            // English. At some point Joda-Time will need an independent set of
+            // localized symbols and not depend on java.text.DateFormatSymbols.
+            iParseEras.put("BCE", integers[0]);
+            iParseEras.put("CE", integers[1]);
+        }
+
+        iParseDaysOfWeek = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
+        addSymbols(iParseDaysOfWeek, iDaysOfWeek, integers);
+        addSymbols(iParseDaysOfWeek, iShortDaysOfWeek, integers);
+        addNumerals(iParseDaysOfWeek, 1, 7, integers);
+
+        iParseMonths = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
+        addSymbols(iParseMonths, iMonths, integers);
+        addSymbols(iParseMonths, iShortMonths, integers);
+        addNumerals(iParseMonths, 1, 12, integers);
 
         iMaxEraLength = maxLength(iEras);
         iMaxDayOfWeekLength = maxLength(iDaysOfWeek);
@@ -162,13 +176,11 @@ class GJLocaleSymbols {
     }
 
     public int eraTextToValue(String text) {
-        String[] eras = iEras;
-        for (int i=eras.length; --i>=0; ) {
-            if (eras[i].equalsIgnoreCase(text)) {
-                return i;
-            }
+        Integer era = iParseEras.get(text);
+        if (era != null) {
+            return era.intValue();
         }
-        throw new IllegalArgumentException("Illegal era text: " + text);
+        throw new IllegalFieldValueException(DateTimeFieldType.era(), text);
     }
 
     public int getEraMaxTextLength() {
@@ -184,27 +196,11 @@ class GJLocaleSymbols {
     }
 
     public int monthOfYearTextToValue(String text) {
-        String[] months = iMonths;
-        for (int i=months.length; --i>=1; ) {
-            if (months[i].equalsIgnoreCase(text)) {
-                return i;
-            }
+        Integer month = iParseMonths.get(text);
+        if (month != null) {
+            return month.intValue();
         }
-        months = iShortMonths;
-        for (int i=months.length; --i>=1; ) {
-            if (months[i].equalsIgnoreCase(text)) {
-                return i;
-            }
-        }
-        try {
-            int month = Integer.parseInt(text);
-            if (month >= 1 && month <= 12) {
-                return month;
-            }
-        } catch (NumberFormatException ex) {
-            // ignore
-        }
-        throw new IllegalArgumentException("Illegal monthOfYear text: " + text);
+        throw new IllegalFieldValueException(DateTimeFieldType.monthOfYear(), text);
     }
 
     public int getMonthMaxTextLength() {
@@ -224,27 +220,11 @@ class GJLocaleSymbols {
     }
 
     public int dayOfWeekTextToValue(String text) {
-        String[] daysOfWeek = iDaysOfWeek;
-        for (int i=daysOfWeek.length; --i>=1; ) {
-            if (daysOfWeek[i].equalsIgnoreCase(text)) {
-                return i;
-            }
+        Integer day = iParseDaysOfWeek.get(text);
+        if (day != null) {
+            return day.intValue();
         }
-        daysOfWeek = iShortDaysOfWeek;
-        for (int i=daysOfWeek.length; --i>=1; ) {
-            if (daysOfWeek[i].equalsIgnoreCase(text)) {
-                return i;
-            }
-        }
-        try {
-            int day = Integer.parseInt(text);
-            if (day >= 1 && day <= 7) {
-                return day;
-            }
-        } catch (NumberFormatException ex) {
-            // ignore
-        }
-        throw new IllegalArgumentException("Illegal dayOfWeek text: " + text);
+        throw new IllegalFieldValueException(DateTimeFieldType.dayOfWeek(), text);
     }
 
     public int getDayOfWeekMaxTextLength() {
@@ -266,7 +246,7 @@ class GJLocaleSymbols {
                 return i;
             }
         }
-        throw new IllegalArgumentException("Illegal halfday text: " + text);
+        throw new IllegalFieldValueException(DateTimeFieldType.halfdayOfDay(), text);
     }
 
     public int getHalfdayMaxTextLength() {

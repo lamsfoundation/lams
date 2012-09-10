@@ -1,78 +1,47 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2010 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time;
 
 import java.io.Serializable;
 
+import org.joda.convert.FromString;
 import org.joda.time.base.AbstractInstant;
+import org.joda.time.chrono.ISOChronology;
 import org.joda.time.convert.ConverterManager;
 import org.joda.time.convert.InstantConverter;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * Instant is the standard implementation of a fully immutable instant in time.
- * It holds the instant as milliseconds from the Java Epoch of 1970-01-01T00:00:00Z.
  * <p>
- * The chronology used is always ISO in the UTC time zone.
- * This corresponds to the definition of the Java Epoch.
+ * <code>Instant</code> is an implementation of {@link ReadableInstant}.
+ * As with all instants, it represents an exact point on the time-line,
+ * but limited to the precision of milliseconds. An <code>Instant</code>
+ * should be used to represent a point in time irrespective of any other
+ * factor, such as chronology or time zone.
  * <p>
- * An Instant can be used to compare two <code>DateTime</code> objects:
+ * Internally, the class holds one piece of data, the instant as milliseconds
+ * from the Java epoch of 1970-01-01T00:00:00Z.
+ * <p>
+ * For example, an Instant can be used to compare two <code>DateTime</code>
+ * objects irrespective of chronology or time zone.
  * <pre>
  * boolean sameInstant = dt1.toInstant().equals(dt2.toInstant());
  * </pre>
- * This code will return true if the two <code>DateTime</code> objects represent
- * the same instant regardless of chronology or time zone.
- * <p>
  * Note that the following code will also perform the same check:
  * <pre>
  * boolean sameInstant = dt1.isEqual(dt2);
@@ -95,7 +64,45 @@ public final class Instant
 
     //-----------------------------------------------------------------------
     /**
+     * Obtains an {@code Instant} set to the current system millisecond time.
+     * 
+     * @return the current instant, not null
+     * @since 2.0
+     */
+    public static Instant now() {
+        return new Instant();
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Parses a {@code Instant} from the specified string.
+     * <p>
+     * This uses {@link ISODateTimeFormat#dateTimeParser()}.
+     * 
+     * @param str  the string to parse, not null
+     * @since 2.0
+     */
+    @FromString
+    public static Instant parse(String str) {
+        return parse(str, ISODateTimeFormat.dateTimeParser());
+    }
+
+    /**
+     * Parses a {@code Instant} from the specified string using a formatter.
+     * 
+     * @param str  the string to parse, not null
+     * @param formatter  the formatter to use, not null
+     * @since 2.0
+     */
+    public static Instant parse(String str, DateTimeFormatter formatter) {
+        return formatter.parseDateTime(str).toInstant();
+    }
+
+    //-----------------------------------------------------------------------
+    /**
      * Constructs an instance set to the current system millisecond time.
+     * 
+     * @see #now()
      */
     public Instant() {
         super();
@@ -124,7 +131,7 @@ public final class Instant
     public Instant(Object instant) {
         super();
         InstantConverter converter = ConverterManager.getInstance().getInstantConverter(instant);
-        iMillis = converter.getInstantMillis(instant, Chronology.getISOUTC());
+        iMillis = converter.getInstantMillis(instant, ISOChronology.getInstanceUTC());
     }
 
     //-----------------------------------------------------------------------
@@ -251,11 +258,107 @@ public final class Instant
 
     /**
      * Gets the chronology of the instant, which is ISO in the UTC zone.
+     * <p>
+     * This method returns {@link ISOChronology#getInstanceUTC()} which
+     * corresponds to the definition of the Java epoch 1970-01-01T00:00:00Z.
      * 
      * @return ISO in the UTC zone
      */
     public Chronology getChronology() {
-        return Chronology.getISOUTC();
+        return ISOChronology.getInstanceUTC();
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Get this object as a DateTime using ISOChronology in the default zone.
+     * <p>
+     * This method returns a DateTime object in the default zone.
+     * This differs from the similarly named method on DateTime, DateMidnight
+     * or MutableDateTime which retains the time zone. The difference is
+     * because Instant really represents a time <i>without</i> a zone,
+     * thus calling this method we really have no zone to 'retain' and
+     * hence expect to switch to the default zone.
+     * <p>
+     * This method definition preserves compatibility with earlier versions
+     * of Joda-Time.
+     *
+     * @return a DateTime using the same millis
+     */
+    public DateTime toDateTime() {
+        return new DateTime(getMillis(), ISOChronology.getInstance());
+    }
+
+    /**
+     * Get this object as a DateTime using ISOChronology in the default zone.
+     * This method is identical to <code>toDateTime()</code>.
+     * <p>
+     * This method returns a DateTime object in the default zone.
+     * This differs from the similarly named method on DateTime, DateMidnight
+     * or MutableDateTime which retains the time zone. The difference is
+     * because Instant really represents a time <i>without</i> a zone,
+     * thus calling this method we really have no zone to 'retain' and
+     * hence expect to switch to the default zone.
+     * <p>
+     * This method is deprecated because it is a duplicate of {@link #toDateTime()}.
+     * However, removing it would cause the superclass implementation to be used,
+     * which would create silent bugs in any caller depending on this implementation.
+     * As such, the method itself is not currently planned to be removed.
+     * <p>
+     * This method definition preserves compatibility with earlier versions
+     * of Joda-Time.
+     *
+     * @return a DateTime using the same millis with ISOChronology
+     * @deprecated Use toDateTime() as it is identical
+     */
+    @Deprecated
+    public DateTime toDateTimeISO() {
+        return toDateTime();
+    }
+
+    /**
+     * Get this object as a MutableDateTime using ISOChronology in the default zone.
+     * <p>
+     * This method returns a MutableDateTime object in the default zone.
+     * This differs from the similarly named method on DateTime, DateMidnight
+     * or MutableDateTime which retains the time zone. The difference is
+     * because Instant really represents a time <i>without</i> a zone,
+     * thus calling this method we really have no zone to 'retain' and
+     * hence expect to switch to the default zone.
+     * <p>
+     * This method definition preserves compatibility with earlier versions
+     * of Joda-Time.
+     *
+     * @return a MutableDateTime using the same millis
+     */
+    public MutableDateTime toMutableDateTime() {
+        return new MutableDateTime(getMillis(), ISOChronology.getInstance());
+    }
+
+    /**
+     * Get this object as a MutableDateTime using ISOChronology in the default zone.
+     * This method is identical to <code>toMutableDateTime()</code>.
+     * <p>
+     * This method returns a MutableDateTime object in the default zone.
+     * This differs from the similarly named method on DateTime, DateMidnight
+     * or MutableDateTime which retains the time zone. The difference is
+     * because Instant really represents a time <i>without</i> a zone,
+     * thus calling this method we really have no zone to 'retain' and
+     * hence expect to switch to the default zone.
+     * <p>
+     * This method is deprecated because it is a duplicate of {@link #toMutableDateTime()}.
+     * However, removing it would cause the superclass implementation to be used,
+     * which would create silent bugs in any caller depending on this implementation.
+     * As such, the method itself is not currently planned to be removed.
+     * <p>
+     * This method definition preserves compatibility with earlier versions
+     * of Joda-Time.
+     *
+     * @return a MutableDateTime using the same millis with ISOChronology
+     * @deprecated Use toMutableDateTime() as it is identical
+     */
+    @Deprecated
+    public MutableDateTime toMutableDateTimeISO() {
+        return toMutableDateTime();
     }
 
 }

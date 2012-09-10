@@ -1,55 +1,17 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2009 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.chrono;
 
@@ -59,11 +21,9 @@ import java.util.Map;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
+import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeZone;
-import org.joda.time.DurationField;
-import org.joda.time.DurationFieldType;
-import org.joda.time.field.FieldUtils;
-import org.joda.time.field.PreciseDurationField;
+import org.joda.time.field.SkipDateTimeField;
 
 /**
  * Implements the Coptic calendar system, which defines every fourth year as
@@ -75,6 +35,11 @@ import org.joda.time.field.PreciseDurationField;
  * Coptic years do not begin at the same time as Julian years. This chronology
  * is not proleptic, as it does not allow dates before the first Coptic year.
  * <p>
+ * This implementation defines a day as midnight to midnight exactly as per
+ * the ISO chronology. Some references indicate that a coptic day starts at
+ * sunset on the previous ISO day, but this has not been confirmed and is not
+ * implemented.
+ * <p>
  * CopticChronology is thread-safe and immutable.
  *
  * @see <a href="http://en.wikipedia.org/wiki/Coptic_calendar">Wikipedia</a>
@@ -83,7 +48,7 @@ import org.joda.time.field.PreciseDurationField;
  * @author Brian S O'Neill
  * @since 1.0
  */
-public final class CopticChronology extends BaseGJChronology {
+public final class CopticChronology extends BasicFixedMonthChronology {
 
     /** Serialization lock */
     private static final long serialVersionUID = -5972804258688333942L;
@@ -94,26 +59,26 @@ public final class CopticChronology extends BaseGJChronology {
      */
     public static final int AM = DateTimeConstants.CE;
 
-    private static final long MILLIS_PER_YEAR =
-        (long) (365.25 * DateTimeConstants.MILLIS_PER_DAY);
+    /** A singleton era field. */
+    private static final DateTimeField ERA_FIELD = new BasicSingleEraDateTimeField("AM");
 
-    private static final long MILLIS_PER_MONTH =
-        (long) (365.25 * DateTimeConstants.MILLIS_PER_DAY / 12);
+    /** The lowest year that can be fully supported. */
+    private static final int MIN_YEAR = -292269337;
 
-    private static final DurationField cMonthsField;
+    /** The highest year that can be fully supported. */
+    private static final int MAX_YEAR = 292272708;
+
+    /** Cache of zone to chronology arrays */
+    private static final Map<DateTimeZone, CopticChronology[]> cCache = new HashMap<DateTimeZone, CopticChronology[]>();
 
     /** Singleton instance of a UTC CopticChronology */
     private static final CopticChronology INSTANCE_UTC;
-
-    /** Cache of zone to chronology arrays */
-    private static final Map cCache = new HashMap();
-
     static {
-        cMonthsField =  new PreciseDurationField
-            (DurationFieldType.months(), 30L * DateTimeConstants.MILLIS_PER_DAY);
+        // init after static fields
         INSTANCE_UTC = getInstance(DateTimeZone.UTC);
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Gets an instance of the CopticChronology.
      * The time zone of the returned instance is UTC.
@@ -156,7 +121,7 @@ public final class CopticChronology extends BaseGJChronology {
         }
         CopticChronology chrono;
         synchronized (cCache) {
-            CopticChronology[] chronos = (CopticChronology[]) cCache.get(zone);
+            CopticChronology[] chronos = cCache.get(zone);
             if (chronos == null) {
                 chronos = new CopticChronology[7];
                 cCache.put(zone, chronos);
@@ -189,20 +154,23 @@ public final class CopticChronology extends BaseGJChronology {
 
     // Constructors and instance variables
     //-----------------------------------------------------------------------
-
     /**
-     * Restricted constructor
+     * Restricted constructor.
      */
     CopticChronology(Chronology base, Object param, int minDaysInFirstWeek) {
         super(base, param, minDaysInFirstWeek);
     }
 
     /**
-     * Serialization singleton
+     * Serialization singleton.
      */
     private Object readResolve() {
         Chronology base = getBase();
-        return base == null ? getInstanceUTC() : getInstance(base.getZone());
+        int minDays = getMinimumDaysInFirstWeek();
+        minDays = (minDays == 0 ? 4 : minDays);  // handle rename of BaseGJChronology
+        return base == null ?
+                getInstance(DateTimeZone.UTC, minDays) :
+                    getInstance(base.getZone(), minDays);
     }
 
     // Conversion
@@ -232,32 +200,7 @@ public final class CopticChronology extends BaseGJChronology {
         return getInstance(zone);
     }
 
-    long getDateMidnightMillis(int year, int monthOfYear, int dayOfMonth)
-        throws IllegalArgumentException
-    {
-        FieldUtils.verifyValueBounds("year", year, getMinYear(), getMaxYear());
-        FieldUtils.verifyValueBounds("monthOfYear", monthOfYear, 1, 13);
-
-        int dayLimit = (monthOfYear != 13) ? 30 : (isLeapYear(year) ? 6 : 5);
-        FieldUtils.verifyValueBounds("dayOfMonth", dayOfMonth, 1, dayLimit);
-
-        long instant = getYearMillis(year);
-
-        if (monthOfYear > 1) {
-            instant += (monthOfYear - 1) * 30L * DateTimeConstants.MILLIS_PER_DAY;
-        }
-
-        if (dayOfMonth != 1) {
-            instant += (dayOfMonth - 1) * (long)DateTimeConstants.MILLIS_PER_DAY;
-        }
-
-        return instant;
-    }
-
-    boolean isLeapYear(int year) {
-        return (year & 3) == 3;
-    }
-
+    //-----------------------------------------------------------------------
     long calculateFirstDayOfYearMillis(int year) {
         // Java epoch is 1970-01-01 Gregorian which is 1686-04-23 Coptic.
         // Calculate relative to the nearest leap year and account for the
@@ -285,43 +228,33 @@ public final class CopticChronology extends BaseGJChronology {
         return millis + (365L - 112) * DateTimeConstants.MILLIS_PER_DAY;
     }
 
+    //-----------------------------------------------------------------------
     int getMinYear() {
-        // The lowest year that can be fully supported.
-        return -292269337;
+        return MIN_YEAR;
     }
 
+    //-----------------------------------------------------------------------
     int getMaxYear() {
-        // The highest year that can be fully supported.
-        return 292271022;
+        return MAX_YEAR;
     }
 
-    long getAverageMillisPerYear() {
-        return MILLIS_PER_YEAR;
+    //-----------------------------------------------------------------------
+    long getApproxMillisAtEpochDividedByTwo() {
+        return (1686L * MILLIS_PER_YEAR + 112L * DateTimeConstants.MILLIS_PER_DAY) / 2;
     }
 
-    long getAverageMillisPerMonth() {
-        return MILLIS_PER_MONTH;
-    }
-
-    long getApproxMillisAtEpoch() {
-        return 1686L * MILLIS_PER_YEAR + 112L * DateTimeConstants.MILLIS_PER_DAY;
-    }
-
+    //-----------------------------------------------------------------------
     protected void assemble(Fields fields) {
         if (getBase() == null) {
             super.assemble(fields);
 
-            fields.year = new CopticYearDateTimeField(this);
-            fields.years = fields.year.getDurationField();
-
             // Coptic, like Julian, has no year zero.
-            fields.year = new JulianChronology.NoYearZeroField(this, fields.year);
-            fields.weekyear = new JulianChronology.NoWeekyearZeroField(this, fields.weekyear);
+            fields.year = new SkipDateTimeField(this, fields.year);
+            fields.weekyear = new SkipDateTimeField(this, fields.weekyear);
             
-            fields.era = CopticEraDateTimeField.INSTANCE;
-            fields.months = cMonthsField;
-            fields.monthOfYear = new CopticMonthOfYearDateTimeField(this, cMonthsField);
-            fields.dayOfMonth = new CopticDayOfMonthDateTimeField(this, fields.days);
+            fields.era = ERA_FIELD;
+            fields.monthOfYear = new BasicMonthOfYearDateTimeField(this, 13);
+            fields.months = fields.monthOfYear.getDurationField();
         }
     }
 

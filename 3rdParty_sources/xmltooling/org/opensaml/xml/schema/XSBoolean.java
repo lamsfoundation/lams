@@ -17,13 +17,20 @@
 
 package org.opensaml.xml.schema;
 
+import javax.xml.namespace.QName;
+
+import org.opensaml.xml.util.XMLConstants;
 import org.opensaml.xml.validation.ValidatingXMLObject;
 
-/**
- * XSBoolean is the <code>xs:boolean</code> schema type.
- */
+/** XSBoolean is the <code>xs:boolean</code> schema type. */
 public abstract interface XSBoolean extends ValidatingXMLObject {
 
+    /** Local name of the XSI type. */
+    public static final String TYPE_LOCAL_NAME = "boolean"; 
+            
+    /** QName of the XSI type. */
+    public static final QName TYPE_NAME = new QName(XMLConstants.XSD_NS, TYPE_LOCAL_NAME, XMLConstants.XSD_PREFIX);
+    
     /**
      * Returns the XSBooleanValue value.
      * 

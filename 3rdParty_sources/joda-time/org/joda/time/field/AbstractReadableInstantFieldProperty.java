@@ -1,55 +1,17 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2005 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.field;
 
@@ -61,6 +23,7 @@ import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DurationField;
+import org.joda.time.Interval;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
 
@@ -77,10 +40,11 @@ import org.joda.time.ReadablePartial;
  *
  * @author Stephen Colebourne
  * @author Brian S O'Neill
+ * @author Mike Schrag
  * @since 1.0
  */
 public abstract class AbstractReadableInstantFieldProperty implements Serializable {
-    
+
     /** Serialization version. */
     private static final long serialVersionUID = 1971226328211649661L;
 
@@ -118,63 +82,120 @@ public abstract class AbstractReadableInstantFieldProperty implements Serializab
     }
 
     /**
-     * Gets the instant being used.
+     * Gets the milliseconds of the datetime that this property is linked to.
      * 
-     * @return the instant
+     * @return the milliseconds
      */
-    public abstract ReadableInstant getReadableInstant();
+    protected abstract long getMillis();
+
+    /**
+     * Gets the chronology of the datetime that this property is linked to.
+     * <p>
+     * This implementation throws UnsupportedOperationException, and must be
+     * implemented by subclasses to enable the equals() and hashCode() methods.
+     * 
+     * @return the chronology
+     * @since 1.4
+     */
+    protected Chronology getChronology() {
+        throw new UnsupportedOperationException(
+                "The method getChronology() was added in v1.4 and needs " +
+                "to be implemented by subclasses of AbstractReadableInstantFieldProperty");
+    }
 
     //-----------------------------------------------------------------------
     /**
-     * Gets a value from the instant.
+     * Gets the value of this property from the instant.
+     * <p>
+     * For example, the following two lines of code are equivalent:
+     * <pre>
+     * datetime.getDayOfMonth();
+     * datetime.dayOfMonth().get();
+     * </pre>
      * 
      * @return the current value
      * @see DateTimeField#get
      */
     public int get() {
-        return getField().get(getReadableInstant().getMillis());
+        return getField().get(getMillis());
     }
 
     /**
-     * Gets a text value from the instant.
+     * Gets the value of this property from the instant as a string.
+     * <p>
+     * This method returns the value converted to a <code>String</code>
+     * using <code>Integer.toString</code>. This method does NOT return
+     * textual descriptions such as 'Monday' or 'January'.
+     * See {@link #getAsText()} and {@link #getAsShortText()} for those.
      * 
-     * @param locale  optional locale to use for selecting a text symbol
-     * @return the current text value
-     * @see DateTimeField#getAsText
+     * @return the current value
+     * @see DateTimeField#get
+     * @since 1.1
      */
-    public String getAsText(Locale locale) {
-        return getField().getAsText(getReadableInstant().getMillis(), locale);
+    public String getAsString() {
+        return Integer.toString(get());
     }
 
     /**
-     * Gets a text value from the instant.
+     * Gets the textual value of this property from the instant as a
+     * string in the default locale.
+     * <p>
+     * This method returns the value converted to a <code>String</code>
+     * returning the appropriate textual description wherever possible.
+     * Thus, a day of week of 1 would return 'Monday' in English.
      * 
      * @return the current text value
      * @see DateTimeField#getAsText
      */
-    public final String getAsText() {
+    public String getAsText() {
         return getAsText(null);
     }
 
     /**
-     * Gets a short text value from the instant.
+     * Gets the textual value of this property from the instant as a
+     * string in the specified locale.
+     * <p>
+     * This method returns the value converted to a <code>String</code>
+     * returning the appropriate textual description wherever possible.
+     * Thus, a day of week of 1 would return 'Monday' in English.
      * 
-     * @param locale  optional locale to use for selecting a text symbol
+     * @param locale  locale to use for selecting a text symbol, null means default
+     * @return the current text value
+     * @see DateTimeField#getAsText
+     */
+    public String getAsText(Locale locale) {
+        return getField().getAsText(getMillis(), locale);
+    }
+
+    /**
+     * Gets the short textual value of this property from the instant as a
+     * string in the default locale.
+     * <p>
+     * This method returns the value converted to a <code>String</code>
+     * returning the appropriate textual description wherever possible.
+     * Thus, a day of week of 1 would return 'Mon' in English.
+     * 
+     * @return the current text value
+     * @see DateTimeField#getAsShortText
+     */
+    public String getAsShortText() {
+        return getAsShortText(null);
+    }
+
+    /**
+     * Gets the short textual value of this property from the instant as a
+     * string in the specified locale.
+     * <p>
+     * This method returns the value converted to a <code>String</code>
+     * returning the appropriate textual description wherever possible.
+     * Thus, a day of week of 1 would return 'Mon' in English.
+     * 
+     * @param locale  locale to use for selecting a text symbol, null means default
      * @return the current text value
      * @see DateTimeField#getAsShortText
      */
     public String getAsShortText(Locale locale) {
-        return getField().getAsShortText(getReadableInstant().getMillis(), locale);
-    }
-
-    /**
-     * Gets a short text value from the instant.
-     * 
-     * @return the current text value
-     * @see DateTimeField#getAsShortText
-     */
-    public final String getAsShortText() {
-        return getAsShortText(null);
+        return getField().getAsShortText(getMillis(), locale);
     }
 
     //-----------------------------------------------------------------------
@@ -190,9 +211,9 @@ public abstract class AbstractReadableInstantFieldProperty implements Serializab
      */
     public int getDifference(ReadableInstant instant) {
         if (instant == null) {
-            return getField().getDifference(getReadableInstant().getMillis(), DateTimeUtils.currentTimeMillis());
+            return getField().getDifference(getMillis(), DateTimeUtils.currentTimeMillis());
         }
-        return getField().getDifference(getReadableInstant().getMillis(), instant.getMillis());
+        return getField().getDifference(getMillis(), instant.getMillis());
     }
 
     /**
@@ -207,9 +228,9 @@ public abstract class AbstractReadableInstantFieldProperty implements Serializab
      */
     public long getDifferenceAsLong(ReadableInstant instant) {
         if (instant == null) {
-            return getField().getDifferenceAsLong(getReadableInstant().getMillis(), DateTimeUtils.currentTimeMillis());
+            return getField().getDifferenceAsLong(getMillis(), DateTimeUtils.currentTimeMillis());
         }
-        return getField().getDifferenceAsLong(getReadableInstant().getMillis(), instant.getMillis());
+        return getField().getDifferenceAsLong(getMillis(), instant.getMillis());
     }
 
     //-----------------------------------------------------------------------
@@ -240,7 +261,7 @@ public abstract class AbstractReadableInstantFieldProperty implements Serializab
      * @see DateTimeField#isLeap
      */
     public boolean isLeap() {
-        return getField().isLeap(getReadableInstant().getMillis());
+        return getField().isLeap(getMillis());
     }
 
     /**
@@ -250,7 +271,7 @@ public abstract class AbstractReadableInstantFieldProperty implements Serializab
      * @see DateTimeField#getLeapAmount
      */
     public int getLeapAmount() {
-        return getField().getLeapAmount(getReadableInstant().getMillis());
+        return getField().getLeapAmount(getMillis());
     }
 
     /**
@@ -279,7 +300,7 @@ public abstract class AbstractReadableInstantFieldProperty implements Serializab
      * @see DateTimeField#getMinimumValue
      */
     public int getMinimumValue() {
-        return getField().getMinimumValue(getReadableInstant().getMillis());
+        return getField().getMinimumValue(getMillis());
     }
 
     /**
@@ -299,7 +320,7 @@ public abstract class AbstractReadableInstantFieldProperty implements Serializab
      * @see DateTimeField#getMaximumValue
      */
     public int getMaximumValue() {
-        return getField().getMaximumValue(getReadableInstant().getMillis());
+        return getField().getMaximumValue(getMillis());
     }
 
     /**
@@ -332,7 +353,25 @@ public abstract class AbstractReadableInstantFieldProperty implements Serializab
      * @return remainder duration, in milliseconds
      */
     public long remainder() {
-        return getField().remainder(getReadableInstant().getMillis());
+        return getField().remainder(getMillis());
+    }
+
+    /**
+     * Returns the interval that represents the range of the minimum
+     * and maximum values of this field.
+     * <p>
+     * For example, <code>datetime.monthOfYear().toInterval()</code>
+     * will return an interval over the whole month.
+     *
+     * @return the interval of this field
+     * @since 1.2
+     */
+    public Interval toInterval() {
+        DateTimeField field = getField();
+        long start = field.roundFloor(getMillis());
+        long end = field.add(start, 1);
+        Interval interval = new Interval(start, end);
+        return interval;
     }
 
     //-----------------------------------------------------------------------
@@ -353,8 +392,7 @@ public abstract class AbstractReadableInstantFieldProperty implements Serializab
             throw new IllegalArgumentException("The instant must not be null");
         }
         int thisValue = get();
-        Chronology chrono = DateTimeUtils.getChronology(instant.getChronology());
-        int otherValue = getFieldType().getField(chrono).get(instant.getMillis());
+        int otherValue = instant.get(getFieldType());
         if (thisValue < otherValue) {
             return -1;
         } else if (thisValue > otherValue) {
@@ -364,6 +402,7 @@ public abstract class AbstractReadableInstantFieldProperty implements Serializab
         }
     }
 
+    //-----------------------------------------------------------------------
     /**
      * Compare this field to the same field on another partial instant.
      * <p>
@@ -374,13 +413,12 @@ public abstract class AbstractReadableInstantFieldProperty implements Serializab
      * 
      * @param partial  the partial to compare to
      * @return negative value if this is less, 0 if equal, or positive value if greater
-     * @throws IllegalArgumentException if the instant is null
-     * @throws IllegalArgumentException if the field of this property cannot be queried
-     *  on the specified instant
+     * @throws IllegalArgumentException if the partial is null
+     * @throws IllegalArgumentException if the partial doesn't support this field
      */
     public int compareTo(ReadablePartial partial) {
         if (partial == null) {
-            throw new IllegalArgumentException("The instant must not be null");
+            throw new IllegalArgumentException("The partial must not be null");
         }
         int thisValue = get();
         int otherValue = partial.get(getFieldType());
@@ -404,15 +442,23 @@ public abstract class AbstractReadableInstantFieldProperty implements Serializab
         if (this == object) {
             return true;
         }
-        if (object instanceof AbstractReadableInstantFieldProperty) {
-            AbstractReadableInstantFieldProperty other = (AbstractReadableInstantFieldProperty) object;
-            if (get() == other.get() &&
-                getFieldType() == other.getFieldType() &&
-                getReadableInstant().getChronology() == other.getReadableInstant().getChronology()) {
-                return true;
-            }
+        if (object instanceof AbstractReadableInstantFieldProperty == false) {
+            return false;
         }
-        return false;
+        AbstractReadableInstantFieldProperty other = (AbstractReadableInstantFieldProperty) object;
+        return 
+            get() == other.get() &&
+            getFieldType().equals(other.getFieldType()) &&
+            FieldUtils.equals(getChronology(), other.getChronology());
+    }
+
+    /**
+     * Returns a hashcode compatible with the equals method.
+     * 
+     * @return the hashcode
+     */
+    public int hashCode() {
+        return get() * 17 + getFieldType().hashCode() + getChronology().hashCode();
     }
 
     //-----------------------------------------------------------------------

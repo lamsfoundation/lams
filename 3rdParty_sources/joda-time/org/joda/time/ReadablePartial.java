@@ -1,55 +1,17 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2011 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time;
 
@@ -57,18 +19,23 @@ package org.joda.time;
  * Defines a partial time that does not support every datetime field, and is
  * thus a local time.
  * <p>
- * A <code>ReadablePartial</code> supports a subset of those fields on the chronology.
- * It cannot be compared to a <code>ReadableInstant</code>, as it does not fully
+ * A {@code ReadablePartial} supports a subset of those fields on the chronology.
+ * It cannot be compared to a {@code ReadableInstant}, as it does not fully
  * specify an instant in time. The time it does specify is a local time, and does
  * not include a time zone.
  * <p>
- * A <code>ReadablePartial</code> can be converted to a <code>ReadableInstant</code>
- * using one of the <code>resolve</code> methods. These work by providing a full base
+ * A {@code ReadablePartial} can be converted to a {@code ReadableInstant}
+ * using the {@code toDateTime} method. This works by providing a full base
  * instant that can be used to 'fill in the gaps' and specify a time zone.
+ * <p>
+ * {@code ReadablePartial} is {@code Comparable} from v2.0.
+ * The comparison is based on the fields, compared in order, from largest to smallest.
+ * The first field that is non-equal is used to determine the result.
  *
  * @author Stephen Colebourne
+ * @since 1.0
  */
-public interface ReadablePartial {
+public interface ReadablePartial extends Comparable<ReadablePartial> {
 
     /**
      * Gets the number of fields that this partial supports.
@@ -134,23 +101,6 @@ public interface ReadablePartial {
     boolean isSupported(DateTimeFieldType field);
 
     /**
-     * Converts this partial to a full datetime using the specified time zone and
-     * filing in any gaps using the current datetime.
-     * <p>
-     * This method obtains the current datetime, creates a chronology from that
-     * on this instance plus the time zone specified, and then sets the fields
-     * from this instant on top.
-     * <p>
-     * For example, if this partial represents a time, then the result of this
-     * method will be the datetime from the specified base instant plus the
-     * time from this partial.
-     *
-     * @param zone  the zone to use, null means default
-     * @return the combined datetime
-     */
-    DateTime toDateTime(DateTimeZone zone);
-
-    /**
      * Converts this partial to a full datetime by resolving it against another
      * datetime.
      * <p>
@@ -197,6 +147,30 @@ public interface ReadablePartial {
      * @return a suitable hash code
      */
     int hashCode();
+
+    //-----------------------------------------------------------------------
+//  This is commented out to improve backwards compatibility
+//    /**
+//     * Compares this partial with another returning an integer
+//     * indicating the order.
+//     * <p>
+//     * The fields are compared in order, from largest to smallest.
+//     * The first field that is non-equal is used to determine the result.
+//     * Thus a year-hour partial will first be compared on the year, and then
+//     * on the hour.
+//     * <p>
+//     * The specified object must be a partial instance whose field types
+//     * match those of this partial. If the partial instance has different
+//     * fields then a {@code ClassCastException} is thrown.
+//     *
+//     * @param partial  an object to check against
+//     * @return negative if this is less, zero if equal, positive if greater
+//     * @throws ClassCastException if the partial is the wrong class
+//     *  or if it has field types that don't match
+//     * @throws NullPointerException if the partial is null
+//     * @since 2.0, previously on {@code AbstractPartial}
+//     */
+//    int compareTo(ReadablePartial partial);
 
     //-----------------------------------------------------------------------
     /**

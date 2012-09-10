@@ -1,60 +1,23 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2010 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.base;
 
 import java.util.Date;
 
+import org.joda.convert.ToString;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeField;
@@ -65,6 +28,8 @@ import org.joda.time.Instant;
 import org.joda.time.MutableDateTime;
 import org.joda.time.ReadableInstant;
 import org.joda.time.chrono.ISOChronology;
+import org.joda.time.field.FieldUtils;
+import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 /**
@@ -128,6 +93,20 @@ public abstract class AbstractInstant implements ReadableInstant {
     }
 
     /**
+     * Checks if the field type specified is supported by this instant and chronology.
+     * This can be used to avoid exceptions in {@link #get(DateTimeFieldType)}.
+     *
+     * @param type  a field type, usually obtained from DateTimeFieldType
+     * @return true if the field type is supported
+     */
+    public boolean isSupported(DateTimeFieldType type) {
+        if (type == null) {
+            return false;
+        }
+        return type.getField(getChronology()).isSupported();
+    }
+
+    /**
      * Get the value of one of the fields of a datetime.
      * <p>
      * This could be used to get a field using a different Chronology.
@@ -159,21 +138,21 @@ public abstract class AbstractInstant implements ReadableInstant {
     }
 
     /**
-     * Get this object as a DateTime.
-     * 
+     * Get this object as a DateTime in the same zone.
+     *
      * @return a DateTime using the same millis
      */
     public DateTime toDateTime() {
-        return new DateTime(getMillis());
+        return new DateTime(getMillis(), getZone());
     }
 
     /**
-     * Get this object as a DateTime using ISOChronology in the default zone.
-     * 
-     * @return a DateTime using the same millis with ISOChronology in the default zone.
+     * Get this object as a DateTime using ISOChronology in the same zone.
+     *
+     * @return a DateTime using the same millis with ISOChronology
      */
     public DateTime toDateTimeISO() {
-        return new DateTime(getMillis(), ISOChronology.getInstance());
+        return new DateTime(getMillis(), ISOChronology.getInstance(getZone()));
     }
 
     /**
@@ -189,7 +168,7 @@ public abstract class AbstractInstant implements ReadableInstant {
     }
 
     /**
-     * Get this object as a DateTime.
+     * Get this object as a DateTime using the given chronology and its zone.
      * 
      * @param chronology chronology to apply, or ISOChronology if null
      * @return a DateTime using the same millis
@@ -204,21 +183,21 @@ public abstract class AbstractInstant implements ReadableInstant {
     // returning a copy prevents this.
 
     /**
-     * Get this object as a MutableDateTime.
-     * 
+     * Get this object as a MutableDateTime in the same zone.
+     *
      * @return a MutableDateTime using the same millis
      */
     public MutableDateTime toMutableDateTime() {
-        return new MutableDateTime(getMillis());
+        return new MutableDateTime(getMillis(), getZone());
     }
 
     /**
-     * Get this object as a MutableDateTime using ISOChronology in the default zone.
-     * 
-     * @return a MutableDateTime using the same millis with ISOChronology in the default zone.
+     * Get this object as a MutableDateTime using ISOChronology in the same zone.
+     *
+     * @return a MutableDateTime using the same millis with ISOChronology
      */
     public MutableDateTime toMutableDateTimeISO() {
-        return new MutableDateTime(getMillis(), ISOChronology.getInstance());
+        return new MutableDateTime(getMillis(), ISOChronology.getInstance(getZone()));
     }
 
     /**
@@ -234,7 +213,7 @@ public abstract class AbstractInstant implements ReadableInstant {
     }
 
     /**
-     * Get this object as a MutableDateTime.
+     * Get this object as a MutableDateTime using the given chronology and its zone.
      * 
      * @param chronology chronology to apply, or ISOChronology if null
      * @return a MutableDateTime using the same millis
@@ -246,7 +225,10 @@ public abstract class AbstractInstant implements ReadableInstant {
     //-----------------------------------------------------------------------
     /**
      * Get the date time as a <code>java.util.Date</code>.
-     * 
+     * <p>
+     * The <code>Date</code> object created has exactly the same millisecond
+     * instant as this object.
+     *
      * @return a Date initialised with this datetime
      */
     public Date toDate() {
@@ -256,12 +238,17 @@ public abstract class AbstractInstant implements ReadableInstant {
     //-----------------------------------------------------------------------
     /**
      * Compares this object with the specified object for equality based
-     * on the millisecond instant and the Chronology.
+     * on the millisecond instant, chronology and time zone.
      * <p>
-     * All ReadableInstant instances are accepted.
+     * Two objects which represent the same instant in time, but are in
+     * different time zones (based on time zone id), will be considered to
+     * be different. Only two objects with the same {@link DateTimeZone},
+     * {@link Chronology} and instant are equal.
      * <p>
      * See {@link #isEqual(ReadableInstant)} for an equals method that
-     * ignores the Chronology.
+     * ignores the Chronology and time zone.
+     * <p>
+     * All ReadableInstant instances are accepted.
      *
      * @param readableInstant  a readable instant to check against
      * @return true if millisecond and chronology are equal, false if
@@ -272,19 +259,13 @@ public abstract class AbstractInstant implements ReadableInstant {
         if (this == readableInstant) {
             return true;
         }
-        if (readableInstant instanceof ReadableInstant) {
-            ReadableInstant otherInstant = (ReadableInstant) readableInstant;
-            if (getMillis() == otherInstant.getMillis()) {
-                Chronology chrono = getChronology();
-                if (chrono == otherInstant.getChronology()) {
-                    return true;
-                }
-                if (chrono != null && chrono.equals(otherInstant.getChronology())) {
-                    return true;
-                }
-            }
+        if (readableInstant instanceof ReadableInstant == false) {
+            return false;
         }
-        return false;
+        ReadableInstant otherInstant = (ReadableInstant) readableInstant;
+        return
+            getMillis() == otherInstant.getMillis() &&
+            FieldUtils.equals(getChronology(), otherInstant.getChronology());
     }
 
     /**
@@ -306,19 +287,17 @@ public abstract class AbstractInstant implements ReadableInstant {
      * <p>
      * All ReadableInstant instances are accepted.
      *
-     * @param instant  a readable instant to check against
+     * @param other  a readable instant to check against
      * @return negative value if this is less, 0 if equal, or positive value if greater
      * @throws NullPointerException if the object is null
      * @throws ClassCastException if the object type is not supported
      */
-    public int compareTo(Object instant) {
-        if (this == instant) {
+    public int compareTo(ReadableInstant other) {
+        if (this == other) {
             return 0;
         }
         
-        ReadableInstant otherInstant = (ReadableInstant) instant;
-        
-        long otherMillis = otherInstant.getMillis();
+        long otherMillis = other.getMillis();
         long thisMillis = getMillis();
         
         // cannot do (thisMillis - otherMillis) as can overflow
@@ -436,12 +415,28 @@ public abstract class AbstractInstant implements ReadableInstant {
 
     //-----------------------------------------------------------------------
     /**
-     * Output the date time in ISO8601 format (yyyy-MM-ddTHH:mm:ss.SSSZ).
+     * Output the date time in ISO8601 format (yyyy-MM-ddTHH:mm:ss.SSSZZ).
      * 
      * @return ISO8601 time formatted string.
      */
+    @ToString
     public String toString() {
-        return ISODateTimeFormat.getInstance().dateTime().print(this);
+        return ISODateTimeFormat.dateTime().print(this);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Uses the specified formatter to convert this partial to a String.
+     *
+     * @param formatter  the formatter to use, null means use <code>toString()</code>.
+     * @return the formatted string
+     * @since 1.1
+     */
+    public String toString(DateTimeFormatter formatter) {
+        if (formatter == null) {
+            return toString();
+        }
+        return formatter.print(this);
     }
 
 }

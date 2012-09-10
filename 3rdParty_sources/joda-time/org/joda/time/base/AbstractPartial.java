@@ -1,55 +1,17 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2011 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.base;
 
@@ -58,9 +20,11 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
+import org.joda.time.DurationFieldType;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
+import org.joda.time.field.FieldUtils;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * AbstractPartial provides a standard base implementation of most methods
@@ -69,16 +33,18 @@ import org.joda.time.ReadablePartial;
  * Calculations on are performed using a {@link Chronology}.
  * This chronology is set to be in the UTC time zone for all calculations.
  * <p>
- * The methods on this class uses {@link ReadablePartial#size()},
- * {@link ReadablePartial#getField(int)} and {@link ReadablePartial#getValue(int)}
- * to calculate their results. Subclasses may have a better implementation.
+ * The methods on this class use {@link ReadablePartial#size()},
+ * {@link AbstractPartial#getField(int, Chronology)} and
+ * {@link ReadablePartial#getValue(int)} to calculate their results.
+ * Subclasses may have a better implementation.
  * <p>
  * AbstractPartial allows subclasses may be mutable and not thread-safe.
  *
  * @author Stephen Colebourne
  * @since 1.0
  */
-public abstract class AbstractPartial implements ReadablePartial {
+public abstract class AbstractPartial
+        implements ReadablePartial, Comparable<ReadablePartial> {
 
     //-----------------------------------------------------------------------
     /**
@@ -213,8 +179,8 @@ public abstract class AbstractPartial implements ReadablePartial {
      * Gets the index of the specified field, throwing an exception if the
      * field is unsupported.
      *
-     * @param type  the type to check, may be null which returns -1
-     * @return the index of the field, -1 if unsupported
+     * @param type  the type to check, not null
+     * @return the index of the field
      * @throws IllegalArgumentException if the field is null or not supported
      */
     protected int indexOfSupported(DateTimeFieldType type) {
@@ -225,29 +191,39 @@ public abstract class AbstractPartial implements ReadablePartial {
         return index;
     }
 
-    //-----------------------------------------------------------------------
     /**
-     * Converts this partial to a full datetime using the specified time zone and
-     * filing in any gaps using the current datetime.
-     * <p>
-     * This method obtains the current datetime, creates a chronology from that
-     * on this instance plus the time zone specified, and then sets the fields
-     * from this instant on top.
-     * <p>
-     * For example, if this partial represents a time, then the result of this
-     * method will be the datetime from the specified base instant plus the
-     * time from this partial.
+     * Gets the index of the first fields to have the specified duration,
+     * or -1 if the field is unsupported.
      *
-     * @param zone  the zone to use, null means default
-     * @return the combined datetime
+     * @param type  the type to check, may be null which returns -1
+     * @return the index of the field, -1 if unsupported
      */
-    public DateTime toDateTime(DateTimeZone zone) {
-        Chronology chrono = getChronology().withZone(zone);
-        long instantMillis = DateTimeUtils.currentTimeMillis();
-        long resolved = chrono.set(this, instantMillis);
-        return new DateTime(resolved, chrono);
+    protected int indexOf(DurationFieldType type) {
+        for (int i = 0, isize = size(); i < isize; i++) {
+            if (getFieldType(i).getDurationType() == type) {
+                return i;
+            }
+        }
+        return -1;
     }
 
+    /**
+     * Gets the index of the first fields to have the specified duration,
+     * throwing an exception if the field is unsupported.
+     *
+     * @param type  the type to check, not null
+     * @return the index of the field
+     * @throws IllegalArgumentException if the field is null or not supported
+     */
+    protected int indexOfSupported(DurationFieldType type) {
+        int index = indexOf(type);
+        if (index == -1) {
+            throw new IllegalArgumentException("Field '" + type + "' is not supported");
+        }
+        return index;
+    }
+
+    //-----------------------------------------------------------------------
     /**
      * Resolves this partial against another complete instant to create a new
      * full instant. The combination is performed using the chronology of the
@@ -291,7 +267,7 @@ public abstract class AbstractPartial implements ReadablePartial {
                 return false;
             }
         }
-        return (getChronology() == other.getChronology());
+        return FieldUtils.equals(getChronology(), other.getChronology());
     }
 
     /**
@@ -308,6 +284,132 @@ public abstract class AbstractPartial implements ReadablePartial {
         }
         total += getChronology().hashCode();
         return total;
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Compares this partial with another returning an integer
+     * indicating the order.
+     * <p>
+     * The fields are compared in order, from largest to smallest.
+     * The first field that is non-equal is used to determine the result.
+     * <p>
+     * The specified object must be a partial instance whose field types
+     * match those of this partial.
+     * <p>
+     * NOTE: Prior to v2.0, the {@code Comparable} interface was only implemented
+     * in this class and not in the {@code ReadablePartial} interface.
+     *
+     * @param other  an object to check against
+     * @return negative if this is less, zero if equal, positive if greater
+     * @throws ClassCastException if the partial is the wrong class
+     *  or if it has field types that don't match
+     * @throws NullPointerException if the partial is null
+     * @since 1.1
+     */
+    public int compareTo(ReadablePartial other) {
+        if (this == other) {
+            return 0;
+        }
+        if (size() != other.size()) {
+            throw new ClassCastException("ReadablePartial objects must have matching field types");
+        }
+        for (int i = 0, isize = size(); i < isize; i++) {
+            if (getFieldType(i) != other.getFieldType(i)) {
+                throw new ClassCastException("ReadablePartial objects must have matching field types");
+            }
+        }
+        // fields are ordered largest first
+        for (int i = 0, isize = size(); i < isize; i++) {
+            if (getValue(i) > other.getValue(i)) {
+                return 1;
+            }
+            if (getValue(i) < other.getValue(i)) {
+                return -1;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Is this partial later than the specified partial.
+     * <p>
+     * The fields are compared in order, from largest to smallest.
+     * The first field that is non-equal is used to determine the result.
+     * <p>
+     * You may not pass null into this method. This is because you need
+     * a time zone to accurately determine the current date.
+     *
+     * @param partial  a partial to check against, must not be null
+     * @return true if this date is after the date passed in
+     * @throws IllegalArgumentException if the specified partial is null
+     * @throws ClassCastException if the partial has field types that don't match
+     * @since 1.1
+     */
+    public boolean isAfter(ReadablePartial partial) {
+        if (partial == null) {
+            throw new IllegalArgumentException("Partial cannot be null");
+        }
+        return compareTo(partial) > 0;
+    }
+
+    /**
+     * Is this partial earlier than the specified partial.
+     * <p>
+     * The fields are compared in order, from largest to smallest.
+     * The first field that is non-equal is used to determine the result.
+     * <p>
+     * You may not pass null into this method. This is because you need
+     * a time zone to accurately determine the current date.
+     *
+     * @param partial  a partial to check against, must not be null
+     * @return true if this date is before the date passed in
+     * @throws IllegalArgumentException if the specified partial is null
+     * @throws ClassCastException if the partial has field types that don't match
+     * @since 1.1
+     */
+    public boolean isBefore(ReadablePartial partial) {
+        if (partial == null) {
+            throw new IllegalArgumentException("Partial cannot be null");
+        }
+        return compareTo(partial) < 0;
+    }
+
+    /**
+     * Is this partial the same as the specified partial.
+     * <p>
+     * The fields are compared in order, from largest to smallest.
+     * If all fields are equal, the result is true.
+     * <p>
+     * You may not pass null into this method. This is because you need
+     * a time zone to accurately determine the current date.
+     *
+     * @param partial  a partial to check against, must not be null
+     * @return true if this date is the same as the date passed in
+     * @throws IllegalArgumentException if the specified partial is null
+     * @throws ClassCastException if the partial has field types that don't match
+     * @since 1.1
+     */
+    public boolean isEqual(ReadablePartial partial) {
+        if (partial == null) {
+            throw new IllegalArgumentException("Partial cannot be null");
+        }
+        return compareTo(partial) == 0;
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Uses the specified formatter to convert this partial to a String.
+     *
+     * @param formatter  the formatter to use, null means use <code>toString()</code>.
+     * @return the formatted string
+     * @since 1.1
+     */
+    public String toString(DateTimeFormatter formatter) {
+        if (formatter == null) {
+            return toString();
+        }
+        return formatter.print(this);
     }
 
 }

@@ -1,65 +1,49 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2011 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time;
 
 import java.io.Serializable;
 
+import org.joda.convert.FromString;
 import org.joda.time.base.BasePeriod;
 import org.joda.time.field.FieldUtils;
+import org.joda.time.format.ISOPeriodFormat;
+import org.joda.time.format.PeriodFormatter;
 
 /**
  * Standard mutable time period implementation.
+ * <p>
+ * A time period is divided into a number of fields, such as hours and seconds.
+ * Which fields are supported is defined by the PeriodType class.
+ * The default is the standard period type, which supports years, months, weeks, days,
+ * hours, minutes, seconds and millis.
+ * <p>
+ * When this time period is added to an instant, the effect is of adding each field in turn.
+ * As a result, this takes into account daylight savings time.
+ * Adding a time period of 1 day to the day before daylight savings starts will only add
+ * 23 hours rather than 24 to ensure that the time remains the same.
+ * If this is not the behaviour you want, then see {@link Duration}.
+ * <p>
+ * The definition of a period also affects the equals method. A period of 1
+ * day is not equal to a period of 24 hours, nor 1 hour equal to 60 minutes.
+ * This is because periods represent an abstracted definition of a time period
+ * (eg. a day may not actually be 24 hours, it might be 23 or 25 at daylight
+ * savings boundary). To compare the actual duration of two periods, convert
+ * both to durations using toDuration, an operation that emphasises that the
+ * result may differ according to the date you choose.
  * <p>
  * MutablePeriod is mutable and not thread-safe, unless concurrent threads
  * are not invoking mutator methods.
@@ -76,6 +60,32 @@ public class MutablePeriod
     /** Serialization version */
     private static final long serialVersionUID = 3436451121567212165L;
 
+    //-----------------------------------------------------------------------
+    /**
+     * Parses a {@code MutablePeriod} from the specified string.
+     * <p>
+     * This uses {@link ISOPeriodFormat#standard()}.
+     * 
+     * @param str  the string to parse, not null
+     * @since 2.0
+     */
+    @FromString
+    public static MutablePeriod parse(String str) {
+        return parse(str, ISOPeriodFormat.standard());
+    }
+
+    /**
+     * Parses a {@code MutablePeriod} from the specified string using a formatter.
+     * 
+     * @param str  the string to parse, not null
+     * @param formatter  the formatter to use, not null
+     * @since 2.0
+     */
+    public static MutablePeriod parse(String str, PeriodFormatter formatter) {
+        return formatter.parsePeriod(str).toMutablePeriod();
+    }
+
+    //-----------------------------------------------------------------------
     /**
      * Creates a zero-length period using the standard period type.
      */
@@ -167,7 +177,7 @@ public class MutablePeriod
      * @param duration  the duration, in milliseconds
      */
     public MutablePeriod(long duration) {
-        super(duration, null, null);
+        super(duration);
     }
 
     /**
@@ -328,8 +338,33 @@ public class MutablePeriod
     }
 
     /**
-     * Creates a period from the specified object using the
-     * {@link org.joda.time.convert.ConverterManager ConverterManager}.
+     * Creates a period from the given duration and end point.
+     *
+     * @param duration  the duration of the interval, null means zero-length
+     * @param endInstant  the interval end, null means now
+     */
+    public MutablePeriod(ReadableDuration duration, ReadableInstant endInstant) {
+        super(duration, endInstant, null);
+    }
+
+    /**
+     * Creates a period from the given duration and end point.
+     *
+     * @param duration  the duration of the interval, null means zero-length
+     * @param endInstant  the interval end, null means now
+     * @param type  which set of fields this period supports, null means standard
+     */
+    public MutablePeriod(ReadableDuration duration, ReadableInstant endInstant, PeriodType type) {
+        super(duration, endInstant, type);
+    }
+
+    /**
+     * Creates a period by converting or copying from another object.
+     * <p>
+     * The recognised object types are defined in
+     * {@link org.joda.time.convert.ConverterManager ConverterManager} and
+     * include ReadablePeriod, ReadableInterval and String.
+     * The String formats are described by {@link ISOPeriodFormat#standard()}.
      *
      * @param period  period to convert
      * @throws IllegalArgumentException if period is invalid
@@ -340,8 +375,12 @@ public class MutablePeriod
     }
 
     /**
-     * Creates a period from the specified object using the
-     * {@link org.joda.time.convert.ConverterManager ConverterManager}.
+     * Creates a period by converting or copying from another object.
+     * <p>
+     * The recognised object types are defined in
+     * {@link org.joda.time.convert.ConverterManager ConverterManager} and
+     * include ReadablePeriod, ReadableInterval and String.
+     * The String formats are described by {@link ISOPeriodFormat#standard()}.
      *
      * @param period  period to convert
      * @param type  which set of fields this period supports, null means use converter
@@ -353,8 +392,12 @@ public class MutablePeriod
     }
 
     /**
-     * Creates a period from the specified object using the
-     * {@link org.joda.time.convert.ConverterManager ConverterManager}.
+     * Creates a period by converting or copying from another object.
+     * <p>
+     * The recognised object types are defined in
+     * {@link org.joda.time.convert.ConverterManager ConverterManager} and
+     * include ReadablePeriod, ReadableInterval and String.
+     * The String formats are described by {@link ISOPeriodFormat#standard()}.
      *
      * @param period  period to convert
      * @param chrono  the chronology to use, null means ISO in default zone
@@ -366,8 +409,12 @@ public class MutablePeriod
     }
 
     /**
-     * Creates a period from the specified object using the
-     * {@link org.joda.time.convert.ConverterManager ConverterManager}.
+     * Creates a period by converting or copying from another object.
+     * <p>
+     * The recognised object types are defined in
+     * {@link org.joda.time.convert.ConverterManager ConverterManager} and
+     * include ReadablePeriod, ReadableInterval and String.
+     * The String formats are described by {@link ISOPeriodFormat#standard()}.
      *
      * @param period  period to convert
      * @param type  which set of fields this period supports, null means use converter
@@ -493,7 +540,7 @@ public class MutablePeriod
      * 
      * @param startInstant  interval start, in milliseconds
      * @param endInstant  interval end, in milliseconds
-     * @param chrono  the chronology to use, not null
+     * @param chrono  the chronology to use, null means ISO chronology
      * @throws ArithmeticException if the set exceeds the capacity of the period
      */
     public void setPeriod(long startInstant, long endInstant, Chronology chrono) {
@@ -556,7 +603,7 @@ public class MutablePeriod
      * available precise field.
      * 
      * @param duration  the duration, in milliseconds
-     * @param chrono  the chronology to use, not null
+     * @param chrono  the chronology to use, null means ISO chronology
      * @throws ArithmeticException if the set exceeds the capacity of the period
      */
     public void setPeriod(long duration, Chronology chrono) {

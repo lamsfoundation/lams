@@ -50,7 +50,10 @@ public class CertPathPKIXTrustEvaluator implements PKIXTrustEvaluator {
     /** Class logger. */
     private final Logger log = LoggerFactory.getLogger(CertPathPKIXTrustEvaluator.class);
     
-    /** Responsible for parsing and serializing X.500 names to/from {@link X500Principal} instances. */
+    /** 
+     * Responsible for parsing and serializing X.500 names to/from {@link javax.security.auth.x500.X500Principal} 
+     * instances.
+     */
     private X500DNHandler x500DNHandler;
     
     /** Options influencing processing behavior. */

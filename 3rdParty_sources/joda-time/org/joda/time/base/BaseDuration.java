@@ -1,55 +1,17 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2011 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.base;
 
@@ -88,7 +50,7 @@ public abstract class BaseDuration
     private static final long serialVersionUID = 2581698638990L;
 
     /** The duration length */
-    private long iMillis;
+    private volatile long iMillis;
 
     /**
      * Creates a duration from the given millisecond duration.
@@ -192,7 +154,8 @@ public abstract class BaseDuration
      * However, ISO UTC also has precise days and weeks.
      * <p>
      * For more control over the conversion process, you must pair the duration with
-     * an instant, see {@link #toPeriodFrom(ReadableInstant)}.
+     * an instant, see {@link #toPeriodFrom(ReadableInstant)} and
+     * {@link #toPeriodTo(ReadableInstant)}
      * 
      * @param chrono  the chronology to use, null means ISO default
      * @return a Period created using the millisecond duration from this instance
@@ -211,7 +174,8 @@ public abstract class BaseDuration
      * However, ISO UTC also has precise days and weeks.
      * <p>
      * For more control over the conversion process, you must pair the duration with
-     * an instant, see {@link #toPeriodFrom(ReadableInstant, PeriodType)}.
+     * an instant, see {@link #toPeriodFrom(ReadableInstant, PeriodType)} and
+     * {@link #toPeriodTo(ReadableInstant, PeriodType)}
      * 
      * @param type  the period type to use, null means standard
      * @param chrono  the chronology to use, null means ISO default
@@ -253,13 +217,56 @@ public abstract class BaseDuration
     }
 
     /**
+     * Converts this duration to a Period instance by subtracting the duration
+     * from an end instant to obtain an interval using the standard period
+     * type.
+     * <p>
+     * This conversion will determine the fields of a period accurately.
+     * The results are based on the instant millis, the chronology of the instant,
+     * the standard period type and the length of this duration.
+     * 
+     * @param endInstant  the instant to calculate the period to, null means now
+     * @return a Period created using the millisecond duration from this instance
+     */
+    public Period toPeriodTo(ReadableInstant endInstant) {
+        return new Period(this, endInstant);
+    }
+
+    /**
+     * Converts this duration to a Period instance by subtracting the duration
+     * from an end instant to obtain an interval using the standard period
+     * type.
+     * <p>
+     * This conversion will determine the fields of a period accurately.
+     * The results are based on the instant millis, the chronology of the instant,
+     * the period type and the length of this duration.
+     * 
+     * @param endInstant  the instant to calculate the period to, null means now
+     * @param type  the period type determining how to split the duration into fields, null means All type
+     * @return a Period created using the millisecond duration from this instance
+     */
+    public Period toPeriodTo(ReadableInstant endInstant, PeriodType type) {
+        return new Period(this, endInstant, type);
+    }
+
+    /**
      * Converts this duration to an Interval starting at the specified instant.
      * 
-     * @param startInstant  the instant to start the instant from, null means now
+     * @param startInstant  the instant to start the interval at, null means now
      * @return an Interval starting at the specified instant
      */
     public Interval toIntervalFrom(ReadableInstant startInstant) {
         return new Interval(startInstant, this);
+    }
+
+    /**
+     * Converts this duration to an Interval ending at the specified instant.
+     * 
+     * @param endInstant  the instant to end the interval at, null means now
+     * @return an Interval ending at the specified instant
+     */
+    public Interval toIntervalTo(ReadableInstant endInstant) {
+        return new Interval(this, endInstant);
     }
 
 }

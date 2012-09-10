@@ -1,60 +1,26 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2009 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.joda.time.field.FieldUtils;
 
@@ -65,8 +31,11 @@ import org.joda.time.field.FieldUtils;
  * <ul>
  * <li>Standard - years, months, weeks, days, hours, minutes, seconds, millis
  * <li>YearMonthDayTime - years, months, days, hours, minutes, seconds, millis
+ * <li>YearMonthDay - years, months, days
  * <li>YearWeekDayTime - years, weeks, days, hours, minutes, seconds, millis
+ * <li>YearWeekDay - years, weeks, days
  * <li>YearDayTime - years, days, hours, minutes, seconds, millis
+ * <li>YearDay - years, days, hours
  * <li>DayTime - days, hours, minutes, seconds, millis
  * <li>Time - hours, minutes, seconds, millis
  * <li>plus one for each single type
@@ -83,6 +52,9 @@ public class PeriodType implements Serializable {
     /** Serialization version */
     private static final long serialVersionUID = 2274324892792009998L;
 
+    /** Cache of all the known types. */
+    private static final Map<PeriodType, Object> cTypes = new HashMap<PeriodType, Object>(32);
+
     static int YEAR_INDEX = 0;
     static int MONTH_INDEX = 1;
     static int WEEK_INDEX = 2;
@@ -94,8 +66,11 @@ public class PeriodType implements Serializable {
     
     private static PeriodType cStandard;
     private static PeriodType cYMDTime;
+    private static PeriodType cYMD;
     private static PeriodType cYWDTime;
+    private static PeriodType cYWD;
     private static PeriodType cYDTime;
+    private static PeriodType cYD;
     private static PeriodType cDTime;
     private static PeriodType cTime;
     
@@ -174,6 +149,33 @@ public class PeriodType implements Serializable {
     }
 
     /**
+     * Gets a type that defines the year, month and day fields.
+     * <ul>
+     * <li>years
+     * <li>months
+     * <li>days
+     * </ul>
+     *
+     * @return the period type
+     * @since 1.1
+     */
+    public static PeriodType yearMonthDay() {
+        PeriodType type = cYMD;
+        if (type == null) {
+            type = new PeriodType(
+                "YearMonthDay",
+                new DurationFieldType[] {
+                    DurationFieldType.years(), DurationFieldType.months(),
+                    DurationFieldType.days(),
+                },
+                new int[] { 0, 1, -1, 2, -1, -1, -1, -1, }
+            );
+            cYMD = type;
+        }
+        return type;
+    }
+
+    /**
      * Gets a type that defines all standard fields except months.
      * <ul>
      * <li>years
@@ -206,6 +208,33 @@ public class PeriodType implements Serializable {
     }
 
     /**
+     * Gets a type that defines year, week and day fields.
+     * <ul>
+     * <li>years
+     * <li>weeks
+     * <li>days
+     * </ul>
+     *
+     * @return the period type
+     * @since 1.1
+     */
+    public static PeriodType yearWeekDay() {
+        PeriodType type = cYWD;
+        if (type == null) {
+            type = new PeriodType(
+                "YearWeekDay",
+                new DurationFieldType[] {
+                    DurationFieldType.years(),
+                    DurationFieldType.weeks(), DurationFieldType.days(),
+                },
+                new int[] { 0, -1, 1, 2, -1, -1, -1, -1, }
+            );
+            cYWD = type;
+        }
+        return type;
+    }
+
+    /**
      * Gets a type that defines all standard fields except months and weeks.
      * <ul>
      * <li>years
@@ -231,6 +260,31 @@ public class PeriodType implements Serializable {
                 new int[] { 0, -1, -1, 1, 2, 3, 4, 5, }
             );
             cYDTime = type;
+        }
+        return type;
+    }
+
+    /**
+     * Gets a type that defines the year and day fields.
+     * <ul>
+     * <li>years
+     * <li>days
+     * </ul>
+     *
+     * @return the period type
+     * @since 1.1
+     */
+    public static PeriodType yearDay() {
+        PeriodType type = cYD;
+        if (type == null) {
+            type = new PeriodType(
+                "YearDay",
+                new DurationFieldType[] {
+                    DurationFieldType.years(), DurationFieldType.days(),
+                },
+                new int[] { 0, -1, -1, 1, -1, -1, -1, -1, }
+            );
+            cYD = type;
         }
         return type;
     }
@@ -435,6 +489,93 @@ public class PeriodType implements Serializable {
         return type;
     }
 
+    /**
+     * Gets a period type that contains the duration types of the array.
+     * <p>
+     * Only the 8 standard duration field types are supported.
+     *
+     * @param types  the types to include in the array.
+     * @return the period type
+     * @since 1.1
+     */
+    public static synchronized PeriodType forFields(DurationFieldType[] types) {
+        if (types == null || types.length == 0) {
+            throw new IllegalArgumentException("Types array must not be null or empty");
+        }
+        for (int i = 0; i < types.length; i++) {
+            if (types[i] == null) {
+                throw new IllegalArgumentException("Types array must not contain null");
+            }
+        }
+        Map<PeriodType, Object> cache = cTypes;
+        if (cache.isEmpty()) {
+            cache.put(standard(), standard());
+            cache.put(yearMonthDayTime(), yearMonthDayTime());
+            cache.put(yearMonthDay(), yearMonthDay());
+            cache.put(yearWeekDayTime(), yearWeekDayTime());
+            cache.put(yearWeekDay(), yearWeekDay());
+            cache.put(yearDayTime(), yearDayTime());
+            cache.put(yearDay(), yearDay());
+            cache.put(dayTime(), dayTime());
+            cache.put(time(), time());
+            cache.put(years(), years());
+            cache.put(months(), months());
+            cache.put(weeks(), weeks());
+            cache.put(days(), days());
+            cache.put(hours(), hours());
+            cache.put(minutes(), minutes());
+            cache.put(seconds(), seconds());
+            cache.put(millis(), millis());
+        }
+        PeriodType inPartType = new PeriodType(null, types, null);
+        Object cached = cache.get(inPartType);
+        if (cached instanceof PeriodType) {
+            return (PeriodType) cached;
+        }
+        if (cached != null) {
+            throw new IllegalArgumentException("PeriodType does not support fields: " + cached);
+        }
+        PeriodType type = standard();
+        List<DurationFieldType> list = new ArrayList<DurationFieldType>(Arrays.asList(types));
+        if (list.remove(DurationFieldType.years()) == false) {
+            type = type.withYearsRemoved();
+        }
+        if (list.remove(DurationFieldType.months()) == false) {
+            type = type.withMonthsRemoved();
+        }
+        if (list.remove(DurationFieldType.weeks()) == false) {
+            type = type.withWeeksRemoved();
+        }
+        if (list.remove(DurationFieldType.days()) == false) {
+            type = type.withDaysRemoved();
+        }
+        if (list.remove(DurationFieldType.hours()) == false) {
+            type = type.withHoursRemoved();
+        }
+        if (list.remove(DurationFieldType.minutes()) == false) {
+            type = type.withMinutesRemoved();
+        }
+        if (list.remove(DurationFieldType.seconds()) == false) {
+            type = type.withSecondsRemoved();
+        }
+        if (list.remove(DurationFieldType.millis()) == false) {
+            type = type.withMillisRemoved();
+        }
+        if (list.size() > 0) {
+            cache.put(inPartType, list);
+            throw new IllegalArgumentException("PeriodType does not support fields: " + list);
+        }
+        // recheck cache in case initial array order was wrong
+        PeriodType checkPartType = new PeriodType(null, type.iTypes, null);
+        PeriodType checkedType = (PeriodType) cache.get(checkPartType);
+        if (checkedType != null) {
+            cache.put(checkPartType, checkedType);
+            return checkedType;
+        }
+        cache.put(checkPartType, type);
+        return type;
+    }
+
     //-----------------------------------------------------------------------    
     /** The name of the type */
     private final String iName;
@@ -518,7 +659,6 @@ public class PeriodType implements Serializable {
      * @return a string
      */
     public String toString() {
-        String name = getName();
         return "PeriodType[" + getName() + "]";
     }
 
@@ -542,12 +682,12 @@ public class PeriodType implements Serializable {
      * @param index  the index to use
      * @param values  the array to populate
      * @param newValue  the value to set
-     * @throws IllegalArgumentException if not supported
+     * @throws UnsupportedOperationException if not supported
      */
     boolean setIndexedField(ReadablePeriod period, int index, int[] values, int newValue) {
         int realIndex = iIndices[index];
         if (realIndex == -1) {
-            throw new IllegalArgumentException("Field is not supported");
+            throw new UnsupportedOperationException("Field is not supported");
         }
         values[realIndex] = newValue;
         return true;
@@ -560,12 +700,16 @@ public class PeriodType implements Serializable {
      * @param index  the index to use
      * @param values  the array to populate
      * @param valueToAdd  the value to add
-     * @throws IllegalArgumentException if not supported
+     * @return true if the array is updated
+     * @throws UnsupportedOperationException if not supported
      */
     boolean addIndexedField(ReadablePeriod period, int index, int[] values, int valueToAdd) {
+        if (valueToAdd == 0) {
+            return false;
+        }
         int realIndex = iIndices[index];
         if (realIndex == -1) {
-            throw new IllegalArgumentException("Field is not supported");
+            throw new UnsupportedOperationException("Field is not supported");
         }
         values[realIndex] = FieldUtils.safeAdd(values[realIndex], valueToAdd);
         return true;

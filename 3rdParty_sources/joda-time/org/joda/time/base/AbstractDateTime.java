@@ -1,55 +1,17 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2011 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.base;
 
@@ -82,7 +44,6 @@ public abstract class AbstractDateTime
         extends AbstractInstant
         implements ReadableDateTime {
 
-    //-----------------------------------------------------------------------
     /**
      * Constructor.
      */
@@ -156,6 +117,12 @@ public abstract class AbstractDateTime
 
     /**
      * Get the weekyear field value.
+     * <p>
+     * The weekyear is the year that matches with the weekOfWeekyear field.
+     * In the standard ISO8601 week algorithm, the first week of the year
+     * is that in which at least 4 days are in the year. As a result of this
+     * definition, day 1 of the first week may be in the previous year.
+     * The weekyear allows you to query the effective year for that day.
      * 
      * @return the year of a week based year
      */
@@ -174,6 +141,11 @@ public abstract class AbstractDateTime
 
     /**
      * Get the week of weekyear field value.
+     * <p>
+     * This field is associated with the "weekyear" via {@link #getWeekyear()}.
+     * In the standard ISO8601 week algorithm, the first week of the year
+     * is that in which at least 4 days are in the year. As a result of this
+     * definition, day 1 of the first week may be in the previous year.
      * 
      * @return the week of a week based year
      */
@@ -278,10 +250,19 @@ public abstract class AbstractDateTime
 
     //-----------------------------------------------------------------------
     /**
-     * Get the date time as a <code>java.util.Calendar</code>.
+     * Get the date time as a <code>java.util.Calendar</code>, assigning
+     * exactly the same millisecond instant.
      * The locale is passed in, enabling Calendar to select the correct
      * localized subclass.
-     * 
+     * <p>
+     * The JDK and Joda-Time both have time zone implementations and these
+     * differ in accuracy. Joda-Time's implementation is generally more up to
+     * date and thus more accurate - for example JDK1.3 has no historical data.
+     * The effect of this is that the field values of the <code>Calendar</code>
+     * may differ from those of this object, even though the milliseond value
+     * is the same. Most of the time this just means that the JDK field values
+     * are wrong, as our time zone information is more up to date.
+     *
      * @param locale  the locale to get the Calendar for, or default if null
      * @return a localized Calendar initialised with this datetime
      */
@@ -296,8 +277,17 @@ public abstract class AbstractDateTime
     }
 
     /**
-     * Get the date time as a <code>java.util.GregorianCalendar</code>.
-     * 
+     * Get the date time as a <code>java.util.GregorianCalendar</code>,
+     * assigning exactly the same millisecond instant.
+     * <p>
+     * The JDK and Joda-Time both have time zone implementations and these
+     * differ in accuracy. Joda-Time's implementation is generally more up to
+     * date and thus more accurate - for example JDK1.3 has no historical data.
+     * The effect of this is that the field values of the <code>Calendar</code>
+     * may differ from those of this object, even though the milliseond value
+     * is the same. Most of the time this just means that the JDK field values
+     * are wrong, as our time zone information is more up to date.
+     *
      * @return a GregorianCalendar initialised with this datetime
      */
     public GregorianCalendar toGregorianCalendar() {
@@ -318,7 +308,7 @@ public abstract class AbstractDateTime
         if (pattern == null) {
             return toString();
         }
-        return DateTimeFormat.getInstance().forPattern(pattern).print(this);
+        return DateTimeFormat.forPattern(pattern).print(this);
     }
 
     /**
@@ -332,7 +322,7 @@ public abstract class AbstractDateTime
         if (pattern == null) {
             return toString();
         }
-        return DateTimeFormat.getInstance(locale).forPattern(pattern).print(this);
+        return DateTimeFormat.forPattern(pattern).withLocale(locale).print(this);
     }
 
 }

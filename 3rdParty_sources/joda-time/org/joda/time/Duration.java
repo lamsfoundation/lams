@@ -1,60 +1,23 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2010 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time;
 
 import java.io.Serializable;
 
+import org.joda.convert.FromString;
 import org.joda.time.base.BaseDuration;
 import org.joda.time.field.FieldUtils;
 
@@ -82,6 +45,128 @@ public final class Duration
     /** Serialization version */
     private static final long serialVersionUID = 2471658376918L;
 
+    //-----------------------------------------------------------------------
+    /**
+     * Parses a {@code Duration} from the specified string.
+     * <p>
+     * This parses the format {@code PTa.bS}, as per {@link #toString()}.
+     * 
+     * @param str  the string to parse, not null
+     * @since 2.0
+     */
+    @FromString
+    public static Duration parse(String str) {
+        return new Duration(str);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Create a duration with the specified number of days assuming that
+     * there are the standard number of milliseconds in a day.
+     * <p>
+     * This method assumes that there are 24 hours in a day,
+     * 60 minutes in an hour, 60 seconds in a minute and 1000 milliseconds in
+     * a second. This will be true for most days, however days with Daylight
+     * Savings changes will not have 24 hours, so use this method with care.
+     * <p>
+     * A Duration is a representation of an amount of time. If you want to express
+     * the concepts of 'days' you should consider using the {@link Days} class.
+     *
+     * @param days  the number of standard days in this duration
+     * @return the duration, never null
+     * @throws ArithmeticException if the days value is too large
+     * @since 1.6
+     */
+    public static Duration standardDays(long days) {
+        if (days == 0) {
+            return ZERO;
+        }
+        return new Duration(FieldUtils.safeMultiply(days, DateTimeConstants.MILLIS_PER_DAY));
+    }
+
+    /**
+     * Create a duration with the specified number of hours assuming that
+     * there are the standard number of milliseconds in an hour.
+     * <p>
+     * This method assumes that there are 60 minutes in an hour,
+     * 60 seconds in a minute and 1000 milliseconds in a second.
+     * All currently supplied chronologies use this definition.
+     * <p>
+     * A Duration is a representation of an amount of time. If you want to express
+     * the concepts of 'hours' you should consider using the {@link Hours} class.
+     *
+     * @param hours  the number of standard hours in this duration
+     * @return the duration, never null
+     * @throws ArithmeticException if the hours value is too large
+     * @since 1.6
+     */
+    public static Duration standardHours(long hours) {
+        if (hours == 0) {
+            return ZERO;
+        }
+        return new Duration(FieldUtils.safeMultiply(hours, DateTimeConstants.MILLIS_PER_HOUR));
+    }
+
+    /**
+     * Create a duration with the specified number of minutes assuming that
+     * there are the standard number of milliseconds in a minute.
+     * <p>
+     * This method assumes that there are 60 seconds in a minute and
+     * 1000 milliseconds in a second.
+     * All currently supplied chronologies use this definition.
+     * <p>
+     * A Duration is a representation of an amount of time. If you want to express
+     * the concepts of 'minutes' you should consider using the {@link Minutes} class.
+     *
+     * @param minutes  the number of standard minutes in this duration
+     * @return the duration, never null
+     * @throws ArithmeticException if the minutes value is too large
+     * @since 1.6
+     */
+    public static Duration standardMinutes(long minutes) {
+        if (minutes == 0) {
+            return ZERO;
+        }
+        return new Duration(FieldUtils.safeMultiply(minutes, DateTimeConstants.MILLIS_PER_MINUTE));
+    }
+
+    /**
+     * Create a duration with the specified number of seconds assuming that
+     * there are the standard number of milliseconds in a second.
+     * <p>
+     * This method assumes that there are 1000 milliseconds in a second.
+     * All currently supplied chronologies use this definition.
+     * <p>
+     * A Duration is a representation of an amount of time. If you want to express
+     * the concepts of 'seconds' you should consider using the {@link Seconds} class.
+     *
+     * @param seconds  the number of standard seconds in this duration
+     * @return the duration, never null
+     * @throws ArithmeticException if the seconds value is too large
+     * @since 1.6
+     */
+    public static Duration standardSeconds(long seconds) {
+        if (seconds == 0) {
+            return ZERO;
+        }
+        return new Duration(FieldUtils.safeMultiply(seconds, DateTimeConstants.MILLIS_PER_SECOND));
+    }
+
+    /**
+     * Create a duration with the specified number of milliseconds.
+     *
+     * @param millis  the number of standard milliseconds in this duration
+     * @return the duration, never null
+     * @since 2.0
+     */
+    public static Duration millis(long millis) {
+        if (millis == 0) {
+            return ZERO;
+        }
+        return new Duration(millis);
+    }
+
+    //-----------------------------------------------------------------------
     /**
      * Creates a duration from the given millisecond duration.
      *
@@ -126,6 +211,79 @@ public final class Duration
 
     //-----------------------------------------------------------------------
     /**
+     * Gets the length of this duration in days assuming that there are the
+     * standard number of milliseconds in a day.
+     * <p>
+     * This method assumes that there are 24 hours in a day,
+     * 60 minutes in an hour, 60 seconds in a minute and 1000 milliseconds in
+     * a second. This will be true for most days, however days with Daylight
+     * Savings changes will not have 24 hours, so use this method with care.
+     * <p>
+     * This returns <code>getMillis() / MILLIS_PER_DAY</code>.
+     * The result is an integer division, thus excess milliseconds are truncated.
+     *
+     * @return the length of the duration in standard seconds
+     * @since 2.0
+     */
+    public long getStandardDays() {
+        return getMillis() / DateTimeConstants.MILLIS_PER_DAY;
+    }
+
+    /**
+     * Gets the length of this duration in hours assuming that there are the
+     * standard number of milliseconds in an hour.
+     * <p>
+     * This method assumes that there are 60 minutes in an hour,
+     * 60 seconds in a minute and 1000 milliseconds in a second.
+     * All currently supplied chronologies use this definition.
+     * <p>
+     * This returns <code>getMillis() / MILLIS_PER_HOUR</code>.
+     * The result is an integer division, thus excess milliseconds are truncated.
+     *
+     * @return the length of the duration in standard seconds
+     * @since 2.0
+     */
+    public long getStandardHours() {
+        return getMillis() / DateTimeConstants.MILLIS_PER_HOUR;
+    }
+
+    /**
+     * Gets the length of this duration in minutes assuming that there are the
+     * standard number of milliseconds in a minute.
+     * <p>
+     * This method assumes that there are 60 seconds in a minute and
+     * 1000 milliseconds in a second.
+     * All currently supplied chronologies use this definition.
+     * <p>
+     * This returns <code>getMillis() / 60000</code>.
+     * The result is an integer division, thus excess milliseconds are truncated.
+     *
+     * @return the length of the duration in standard seconds
+     * @since 2.0
+     */
+    public long getStandardMinutes() {
+        return getMillis() / DateTimeConstants.MILLIS_PER_MINUTE;
+    }
+
+    /**
+     * Gets the length of this duration in seconds assuming that there are the
+     * standard number of milliseconds in a second.
+     * <p>
+     * This method assumes that there are 1000 milliseconds in a second.
+     * All currently supplied chronologies use this definition.
+     * <p>
+     * This returns <code>getMillis() / 1000</code>.
+     * The result is an integer division, so 2999 millis returns 2 seconds.
+     *
+     * @return the length of the duration in standard seconds
+     * @since 1.6
+     */
+    public long getStandardSeconds() {
+        return getMillis() / DateTimeConstants.MILLIS_PER_SECOND;
+    }
+
+    //-----------------------------------------------------------------------
+    /**
      * Get this duration as an immutable <code>Duration</code> object
      * by returning <code>this</code>.
      * 
@@ -133,6 +291,74 @@ public final class Duration
      */
     public Duration toDuration() {
         return this;
+    }
+
+    /**
+     * Converts this duration to a period in days assuming that there are the
+     * standard number of milliseconds in a day.
+     * <p>
+     * This method assumes that there are 24 hours in a day,
+     * 60 minutes in an hour, 60 seconds in a minute and 1000 milliseconds in
+     * a second. This will be true for most days, however days with Daylight
+     * Savings changes will not have 24 hours, so use this method with care.
+     * 
+     * @return a period representing the number of standard days in this period, never null
+     * @throws ArithmeticException if the number of days is too large to be represented
+     * @since 2.0
+     */
+    public Days toStandardDays() {
+        long days = getStandardDays();
+        return Days.days(FieldUtils.safeToInt(days));
+    }
+
+    /**
+     * Converts this duration to a period in hours assuming that there are the
+     * standard number of milliseconds in an hour.
+     * <p>
+     * This method assumes that there are 60 minutes in an hour,
+     * 60 seconds in a minute and 1000 milliseconds in a second.
+     * All currently supplied chronologies use this definition.
+     * 
+     * @return a period representing the number of standard hours in this period, never null
+     * @throws ArithmeticException if the number of hours is too large to be represented
+     * @since 2.0
+     */
+    public Hours toStandardHours() {
+        long hours = getStandardHours();
+        return Hours.hours(FieldUtils.safeToInt(hours));
+    }
+
+    /**
+     * Converts this duration to a period in minutes assuming that there are the
+     * standard number of milliseconds in a minute.
+     * <p>
+     * This method assumes that there are 60 seconds in a minute and
+     * 1000 milliseconds in a second.
+     * All currently supplied chronologies use this definition.
+     * 
+     * @return a period representing the number of standard minutes in this period, never null
+     * @throws ArithmeticException if the number of minutes is too large to be represented
+     * @since 2.0
+     */
+    public Minutes toStandardMinutes() {
+        long minutes = getStandardMinutes();
+        return Minutes.minutes(FieldUtils.safeToInt(minutes));
+    }
+
+    /**
+     * Converts this duration to a period in seconds assuming that there are the
+     * standard number of milliseconds in a second.
+     * <p>
+     * This method assumes that there are 1000 milliseconds in a second.
+     * All currently supplied chronologies use this definition.
+     * 
+     * @return a period representing the number of standard seconds in this period, never null
+     * @throws ArithmeticException if the number of seconds is too large to be represented
+     * @since 1.6
+     */
+    public Seconds toStandardSeconds() {
+        long seconds = getStandardSeconds();
+        return Seconds.seconds(FieldUtils.safeToInt(seconds));
     }
 
     //-----------------------------------------------------------------------

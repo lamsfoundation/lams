@@ -1,64 +1,24 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2006 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.field;
 
 import java.util.Locale;
 
-import org.joda.time.Chronology;
 import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DurationField;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
@@ -114,29 +74,45 @@ public abstract class AbstractPartialFieldProperty {
      * 
      * @return the partial instant
      */
-    public abstract ReadablePartial getReadablePartial();
+    protected abstract ReadablePartial getReadablePartial();
 
     //-----------------------------------------------------------------------
     /**
-     * Gets a value from the partial instant.
+     * Gets the value of this property from the instant.
+     * <p>
+     * For example, the following two lines of code are equivalent:
+     * <pre>
+     * partial.getDayOfMonth();
+     * partial.dayOfMonth().get();
+     * </pre>
      * 
      * @return the current value
      */
     public abstract int get();
 
     /**
-     * Gets a text value from the partial instant.
+     * Gets the value of this property from the instant as a string.
+     * <p>
+     * This method returns the value converted to a <code>String</code>
+     * using <code>Integer.toString</code>. This method does NOT return
+     * textual descriptions such as 'Monday' or 'January'.
+     * See {@link #getAsText()} and {@link #getAsShortText()} for those.
      * 
-     * @param locale  optional locale to use for selecting a text symbol
-     * @return the current text value
-     * @see DateTimeField#getAsText
+     * @return the current value
+     * @see DateTimeField#get
+     * @since 1.1
      */
-    public String getAsText(Locale locale) {
-        return getField().getAsText(getReadablePartial(), get(), locale);
+    public String getAsString() {
+        return Integer.toString(get());
     }
 
     /**
-     * Gets a text value from the partial instant.
+     * Gets the textual value of this property from the instant as a
+     * string in the default locale.
+     * <p>
+     * This method returns the value converted to a <code>String</code>
+     * returning the appropriate textual description wherever possible.
+     * Thus, a day of week of 1 would return 'Monday' in English.
      * 
      * @return the current text value
      * @see DateTimeField#getAsText
@@ -146,24 +122,50 @@ public abstract class AbstractPartialFieldProperty {
     }
 
     /**
-     * Gets a short text value from the partial instant.
+     * Gets the textual value of this property from the instant as a
+     * string in the specified locale.
+     * <p>
+     * This method returns the value converted to a <code>String</code>
+     * returning the appropriate textual description wherever possible.
+     * Thus, a day of week of 1 would return 'Monday' in English.
      * 
-     * @param locale  optional locale to use for selecting a text symbol
+     * @param locale  locale to use for selecting a text symbol, null means default
      * @return the current text value
-     * @see DateTimeField#getAsShortText
+     * @see DateTimeField#getAsText
      */
-    public String getAsShortText(Locale locale) {
-        return getField().getAsShortText(getReadablePartial(), get(), locale);
+    public String getAsText(Locale locale) {
+        return getField().getAsText(getReadablePartial(), get(), locale);
     }
 
     /**
-     * Gets a short text value from the partial instant.
+     * Gets the short textual value of this property from the instant as a
+     * string in the default locale.
+     * <p>
+     * This method returns the value converted to a <code>String</code>
+     * returning the appropriate textual description wherever possible.
+     * Thus, a day of week of 1 would return 'Mon' in English.
      * 
      * @return the current text value
      * @see DateTimeField#getAsShortText
      */
     public String getAsShortText() {
         return getAsShortText(null);
+    }
+
+    /**
+     * Gets the short textual value of this property from the instant as a
+     * string in the specified locale.
+     * <p>
+     * This method returns the value converted to a <code>String</code>
+     * returning the appropriate textual description wherever possible.
+     * Thus, a day of week of 1 would return 'Mon' in English.
+     * 
+     * @param locale  locale to use for selecting a text symbol, null means default
+     * @return the current text value
+     * @see DateTimeField#getAsShortText
+     */
+    public String getAsShortText(Locale locale) {
+        return getField().getAsShortText(getReadablePartial(), get(), locale);
     }
 
     //-----------------------------------------------------------------------
@@ -270,8 +272,7 @@ public abstract class AbstractPartialFieldProperty {
             throw new IllegalArgumentException("The instant must not be null");
         }
         int thisValue = get();
-        Chronology chrono = DateTimeUtils.getChronology(instant.getChronology());
-        int otherValue = getFieldType().getField(chrono).get(instant.getMillis());
+        int otherValue = instant.get(getFieldType());
         if (thisValue < otherValue) {
             return -1;
         } else if (thisValue > otherValue) {
@@ -321,15 +322,29 @@ public abstract class AbstractPartialFieldProperty {
         if (this == object) {
             return true;
         }
-        if (object instanceof AbstractPartialFieldProperty) {
-            AbstractPartialFieldProperty other = (AbstractPartialFieldProperty) object;
-            if (get() == other.get() &&
-                getFieldType() == other.getFieldType() &&
-                getReadablePartial().getChronology() == other.getReadablePartial().getChronology()) {
-                return true;
-            }
+        if (object instanceof AbstractPartialFieldProperty == false) {
+            return false;
         }
-        return false;
+        AbstractPartialFieldProperty other = (AbstractPartialFieldProperty) object;
+        return
+            get() == other.get() &&
+            getFieldType() == other.getFieldType() &&
+            FieldUtils.equals(getReadablePartial().getChronology(), other.getReadablePartial().getChronology());
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Gets a suitable hashcode for the object.
+     * 
+     * @return the hashcode
+     * @since 1.3
+     */
+    public int hashCode() {
+        int hash = 19;
+        hash = 13 * hash + get();
+        hash = 13 * hash + getFieldType().hashCode();
+        hash = 13 * hash + getReadablePartial().getChronology().hashCode();
+        return hash;
     }
 
     //-----------------------------------------------------------------------

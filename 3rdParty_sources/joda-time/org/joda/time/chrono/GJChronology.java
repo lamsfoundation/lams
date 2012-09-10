@@ -1,55 +1,17 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2009 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.chrono;
 
@@ -63,11 +25,13 @@ import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.DurationField;
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.Instant;
 import org.joda.time.ReadableInstant;
+import org.joda.time.ReadablePartial;
 import org.joda.time.field.BaseDateTimeField;
 import org.joda.time.field.DecoratedDurationField;
-import org.joda.time.format.DateTimePrinter;
+import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 /**
@@ -141,7 +105,7 @@ public final class GJChronology extends AssembledChronology {
     static final Instant DEFAULT_CUTOVER = new Instant(-12219292800000L);
 
     /** Cache of zone to chronology list */
-    private static final Map cCache = new HashMap();
+    private static final Map<DateTimeZone, ArrayList<GJChronology>> cCache = new HashMap<DateTimeZone, ArrayList<GJChronology>>();
 
     /**
      * Factory method returns instances of the default GJ cutover
@@ -232,13 +196,13 @@ public final class GJChronology extends AssembledChronology {
 
         GJChronology chrono;
 
-        ArrayList chronos = (ArrayList)cCache.get(zone);
+        ArrayList<GJChronology> chronos = cCache.get(zone);
         if (chronos == null) {
-            chronos = new ArrayList(2);
+            chronos = new ArrayList<GJChronology>(2);
             cCache.put(zone, chronos);
         } else {
             for (int i=chronos.size(); --i>=0; ) {
-                chrono = (GJChronology)chronos.get(i);
+                chrono = chronos.get(i);
                 if (minDaysInFirstWeek == chrono.getMinimumDaysInFirstWeek() &&
                     cutoverInstant.equals(chrono.getGregorianCutover())) {
                     
@@ -396,9 +360,22 @@ public final class GJChronology extends AssembledChronology {
         }
 
         // Assume date is Gregorian.
-        long instant = iGregorianChronology.getDateTimeMillis
-            (year, monthOfYear, dayOfMonth,
-             hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+        long instant;
+        try {
+            instant = iGregorianChronology.getDateTimeMillis
+                (year, monthOfYear, dayOfMonth,
+                 hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+        } catch (IllegalFieldValueException ex) {
+            if (monthOfYear != 2 || dayOfMonth != 29) {
+                throw ex;
+            }
+            instant = iGregorianChronology.getDateTimeMillis
+                (year, monthOfYear, 28,
+                 hourOfDay, minuteOfHour, secondOfMinute, millisOfSecond);
+            if (instant >= iCutoverMillis) {
+                throw ex;
+            }
+        }
         if (instant < iCutoverMillis) {
             // Maybe it's Julian.
             instant = iJulianChronology.getDateTimeMillis
@@ -429,6 +406,28 @@ public final class GJChronology extends AssembledChronology {
         return iGregorianChronology.getMinimumDaysInFirstWeek();
     }
 
+    /**
+     * Checks if this chronology instance equals another.
+     * 
+     * @param obj  the object to compare to
+     * @return true if equal
+     * @since 1.6
+     */
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    /**
+     * A suitable hash code for the chronology.
+     * 
+     * @return the hash code
+     * @since 1.6
+     */
+    public int hashCode() {
+        return "GJ".hashCode() * 11 + iJulianChronology.hashCode() +
+            iGregorianChronology.hashCode() + iCutoverInstant.hashCode();
+    }
+
     // Output
     //-----------------------------------------------------------------------
     /**
@@ -444,13 +443,13 @@ public final class GJChronology extends AssembledChronology {
         
         if (iCutoverMillis != DEFAULT_CUTOVER.getMillis()) {
             sb.append(",cutover=");
-            DateTimePrinter printer;
+            DateTimeFormatter printer;
             if (withUTC().dayOfYear().remainder(iCutoverMillis) == 0) {
-                printer = ISODateTimeFormat.getInstance().date();
+                printer = ISODateTimeFormat.date();
             } else {
-                printer = ISODateTimeFormat.getInstance().dateTime();
+                printer = ISODateTimeFormat.dateTime();
             }
-            printer.printTo(sb, iCutoverMillis, withUTC());
+            printer.withChronology(withUTC()).printTo(sb, iCutoverMillis);
         }
         
         if (getMinimumDaysInFirstWeek() != 4) {
@@ -516,7 +515,6 @@ public final class GJChronology extends AssembledChronology {
         // These fields just require basic cutover support.
         {
             fields.era = new CutoverField(julian.era(), fields.era, iCutoverMillis);
-            fields.dayOfMonth = new CutoverField(julian.dayOfMonth(), fields.dayOfMonth, iCutoverMillis);
         }
 
         // DayOfYear and weekOfWeekyear require special handling since cutover
@@ -562,6 +560,15 @@ public final class GJChronology extends AssembledChronology {
                 julian.weekyearOfCentury(), fields.weekyearOfCentury, fields.weekyears, iCutoverMillis);
             fields.weekyears = fields.weekyear.getDurationField();
         }
+
+        // These fields require basic cutover support, except they must link to
+        // imprecise durations.
+        {
+            CutoverField cf = new CutoverField
+                (julian.dayOfMonth(), fields.dayOfMonth, iCutoverMillis);
+            cf.iRangeDurationField = fields.months;
+            fields.dayOfMonth = cf;
+        }
     }
 
     long julianToGregorianByYear(long instant) {
@@ -594,6 +601,7 @@ public final class GJChronology extends AssembledChronology {
         final boolean iConvertByWeekyear;
 
         protected DurationField iDurationField;
+        protected DurationField iRangeDurationField;
 
         /**
          * @param julianField field from the chronology used before the cutover instant
@@ -620,6 +628,12 @@ public final class GJChronology extends AssembledChronology {
             // Although average length of Julian and Gregorian years differ,
             // use the Gregorian duration field because it is more accurate.
             iDurationField = gregorianField.getDurationField();
+
+            DurationField rangeField = gregorianField.getRangeDurationField();
+            if (rangeField == null) {
+                rangeField = julianField.getRangeDurationField();
+            }
+            iRangeDurationField = rangeField;
         }
 
         public boolean isLenient() {
@@ -642,6 +656,10 @@ public final class GJChronology extends AssembledChronology {
             }
         }
 
+        public String getAsText(int fieldValue, Locale locale) {
+            return iGregorianField.getAsText(fieldValue, locale);
+        }
+
         public String getAsShortText(long instant, Locale locale) {
             if (instant >= iCutover) {
                 return iGregorianField.getAsShortText(instant, locale);
@@ -650,12 +668,34 @@ public final class GJChronology extends AssembledChronology {
             }
         }
 
+        public String getAsShortText(int fieldValue, Locale locale) {
+            return iGregorianField.getAsShortText(fieldValue, locale);
+        }
+
         public long add(long instant, int value) {
             return iGregorianField.add(instant, value);
         }
 
         public long add(long instant, long value) {
             return iGregorianField.add(instant, value);
+        }
+
+        public int[] add(ReadablePartial partial, int fieldIndex, int[] values, int valueToAdd) {
+            // overridden as superclass algorithm can't handle
+            // 2004-02-29 + 48 months -> 2008-02-29 type dates
+            if (valueToAdd == 0) {
+                return values;
+            }
+            if (DateTimeUtils.isContiguous(partial)) {
+                long instant = 0L;
+                for (int i = 0, isize = partial.size(); i < isize; i++) {
+                    instant = partial.getFieldType(i).getField(GJChronology.this).set(instant, values[i]);
+                }
+                instant = add(instant, valueToAdd);
+                return GJChronology.this.get(partial, instant);
+            } else {
+                return super.add(partial, fieldIndex, values, valueToAdd);
+            }
         }
 
         public int getDifference(long minuendInstant, long subtrahendInstant) {
@@ -676,8 +716,8 @@ public final class GJChronology extends AssembledChronology {
                     }
                     // Verify that new value stuck.
                     if (get(instant) != value) {
-                        throw new IllegalArgumentException
-                            ("Illegal value for " + iGregorianField.getName() + ": " + value);
+                        throw new IllegalFieldValueException
+                            (iGregorianField.getType(), Integer.valueOf(value), null, null);
                     }
                 }
             } else {
@@ -689,8 +729,8 @@ public final class GJChronology extends AssembledChronology {
                     }
                     // Verify that new value stuck.
                     if (get(instant) != value) {
-                        throw new IllegalArgumentException
-                            ("Illegal value for " + iJulianField.getName() + ": " + value);
+                       throw new IllegalFieldValueException
+                            (iJulianField.getType(), Integer.valueOf(value), null, null);
                     }
                 }
             }
@@ -725,11 +765,7 @@ public final class GJChronology extends AssembledChronology {
         }
 
         public DurationField getRangeDurationField() {
-            DurationField rangeField = iGregorianField.getRangeDurationField();
-            if (rangeField == null) {
-                rangeField = iJulianField.getRangeDurationField();
-            }
-            return rangeField;
+            return iRangeDurationField;
         }
 
         public boolean isLeap(long instant) {
@@ -758,7 +794,15 @@ public final class GJChronology extends AssembledChronology {
             // identical. Choose Julian to tighten up the year limits.
             return iJulianField.getMinimumValue();
         }
-        
+
+        public int getMinimumValue(ReadablePartial partial) {
+            return iJulianField.getMinimumValue(partial);
+        }
+
+        public int getMinimumValue(ReadablePartial partial, int[] values) {
+            return iJulianField.getMinimumValue(partial, values);
+        }
+
         public int getMinimumValue(long instant) {
             if (instant < iCutover) {
                 return iJulianField.getMinimumValue(instant);
@@ -797,6 +841,23 @@ public final class GJChronology extends AssembledChronology {
             }
 
             return max;
+        }
+
+        public int getMaximumValue(ReadablePartial partial) {
+            long instant = GJChronology.getInstanceUTC().set(partial, 0L);
+            return getMaximumValue(instant);
+        }
+
+        public int getMaximumValue(ReadablePartial partial, int[] values) {
+            Chronology chrono = GJChronology.getInstanceUTC();
+            long instant = 0L;
+            for (int i = 0, isize = partial.size(); i < isize; i++) {
+                DateTimeField field = partial.getFieldType(i).getField(chrono);
+                if (values[i] <= field.getMaximumValue(instant)) {
+                    instant = field.set(instant, values[i]);
+                }
+            }
+            return getMaximumValue(instant);
         }
 
         public long roundFloor(long instant) {

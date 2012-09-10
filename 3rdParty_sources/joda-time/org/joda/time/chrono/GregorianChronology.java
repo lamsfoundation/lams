@@ -1,55 +1,17 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2009 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.chrono;
 
@@ -80,7 +42,7 @@ import org.joda.time.DateTimeZone;
  * @author Brian S O'Neill
  * @since 1.0
  */
-public final class GregorianChronology extends BaseGJChronology {
+public final class GregorianChronology extends BasicGJChronology {
 
     /** Serialization lock */
     private static final long serialVersionUID = -861407383323710522L;
@@ -91,11 +53,19 @@ public final class GregorianChronology extends BaseGJChronology {
     private static final long MILLIS_PER_MONTH =
         (long) (365.2425 * DateTimeConstants.MILLIS_PER_DAY / 12);
 
+    private static final int DAYS_0000_TO_1970 = 719527;
+
+    /** The lowest year that can be fully supported. */
+    private static final int MIN_YEAR = -292275054;
+
+    /** The highest year that can be fully supported. */
+    private static final int MAX_YEAR = 292278993;
+
     /** Singleton instance of a UTC GregorianChronology */
     private static final GregorianChronology INSTANCE_UTC;
 
     /** Cache of zone to chronology arrays */
-    private static final Map cCache = new HashMap();
+    private static final Map<DateTimeZone, GregorianChronology[]> cCache = new HashMap<DateTimeZone, GregorianChronology[]>();
 
     static {
         INSTANCE_UTC = getInstance(DateTimeZone.UTC);
@@ -143,7 +113,7 @@ public final class GregorianChronology extends BaseGJChronology {
         }
         GregorianChronology chrono;
         synchronized (cCache) {
-            GregorianChronology[] chronos = (GregorianChronology[]) cCache.get(zone);
+            GregorianChronology[] chronos = cCache.get(zone);
             if (chronos == null) {
                 chronos = new GregorianChronology[7];
                 cCache.put(zone, chronos);
@@ -183,7 +153,11 @@ public final class GregorianChronology extends BaseGJChronology {
      */
     private Object readResolve() {
         Chronology base = getBase();
-        return base == null ? getInstanceUTC() : getInstance(base.getZone());
+        int minDays = getMinimumDaysInFirstWeek();
+        minDays = (minDays == 0 ? 4 : minDays);  // handle rename of BaseGJChronology
+        return base == null ?
+                getInstance(DateTimeZone.UTC, minDays) :
+                    getInstance(base.getZone(), minDays);
     }
 
     // Conversion
@@ -224,56 +198,47 @@ public final class GregorianChronology extends BaseGJChronology {
     }
 
     long calculateFirstDayOfYearMillis(int year) {
-        // Calculate relative to 2000 as that is on a 400 year boundary
-        // and that makes the sum easier
-        int relativeYear = year - 2000;
         // Initial value is just temporary.
-        int leapYears = relativeYear / 100;
-        if (relativeYear <= 0) {
+        int leapYears = year / 100;
+        if (year < 0) {
             // Add 3 before shifting right since /4 and >>2 behave differently
             // on negative numbers. When the expression is written as
-            // (relativeYear / 4) - (relativeYear / 100) + (relativeYear / 400),
+            // (year / 4) - (year / 100) + (year / 400),
             // it works for both positive and negative values, except this optimization
             // eliminates two divisions.
-            leapYears = ((relativeYear + 3) >> 2) - leapYears + ((leapYears + 3) >> 2);
+            leapYears = ((year + 3) >> 2) - leapYears + ((leapYears + 3) >> 2) - 1;
         } else {
-            leapYears = (relativeYear >> 2) - leapYears + (leapYears >> 2);
-            // For post 2000 an adjustment is needed as jan1st is before leap day
-            if (!isLeapYear(year)) {
-                leapYears++;
+            leapYears = (year >> 2) - leapYears + (leapYears >> 2);
+            if (isLeapYear(year)) {
+                leapYears--;
             }
         }
-        
-        long millis = (relativeYear * 365L + leapYears)
-            * (long)DateTimeConstants.MILLIS_PER_DAY;
-        
-        // Previous line was reduced from this to eliminate a multiplication.
-        // millis = ((relativeYear - leapYears) * 365L + leapYears * 366) * MILLIS_PER_DAY;
-        // (x - y)*c + y*(c + 1) => x*c - y*c + y*c + y => x*c + y
-        
-        return millis + MILLIS_1970_TO_2000;
+
+        return (year * 365L + (leapYears - DAYS_0000_TO_1970)) * DateTimeConstants.MILLIS_PER_DAY;
     }
 
     int getMinYear() {
-        // The lowest year that can be fully supported.
-        return -292275054;
+        return MIN_YEAR;
     }
 
     int getMaxYear() {
-        // The highest year that can be fully supported.
-        return 292277023;
+        return MAX_YEAR;
     }
 
     long getAverageMillisPerYear() {
         return MILLIS_PER_YEAR;
     }
 
+    long getAverageMillisPerYearDividedByTwo() {
+        return MILLIS_PER_YEAR / 2;
+    }
+
     long getAverageMillisPerMonth() {
         return MILLIS_PER_MONTH;
     }
 
-    long getApproxMillisAtEpoch() {
-        return 1970L * MILLIS_PER_YEAR;
+    long getApproxMillisAtEpochDividedByTwo() {
+        return (1970L * MILLIS_PER_YEAR) / 2;
     }
 
 }

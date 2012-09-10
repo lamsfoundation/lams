@@ -1,61 +1,26 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2006 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time;
 
 import java.io.Serializable;
 
 import org.joda.time.base.BaseInterval;
+import org.joda.time.chrono.ISOChronology;
+import org.joda.time.format.ISODateTimeFormat;
+import org.joda.time.format.ISOPeriodFormat;
 
 /**
  * Interval is the standard implementation of an immutable time interval.
@@ -79,6 +44,7 @@ import org.joda.time.base.BaseInterval;
  * @author Brian S O'Neill
  * @author Sean Geoghegan
  * @author Stephen Colebourne
+ * @author Julen Parra
  * @since 1.0
  */
 public final class Interval
@@ -90,7 +56,23 @@ public final class Interval
 
     //-----------------------------------------------------------------------
     /**
-     * Constructs an interval from a start and end instant with the ISO default chronology.
+     * Parses a {@code Interval} from the specified string.
+     * <p>
+     * The String formats are described by {@link ISODateTimeFormat#dateTimeParser()}
+     * and {@link ISOPeriodFormat#standard()}, and may be 'datetime/datetime',
+     * 'datetime/period' or 'period/datetime'.
+     * 
+     * @param str  the string to parse, not null
+     * @since 2.0
+     */
+    public static Interval parse(String str) {
+        return new Interval(str);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Constructs an interval from a start and end instant with the ISO
+     * default chronology in the default time zone.
      * 
      * @param startInstant  start of this interval, as milliseconds from 1970-01-01T00:00:00Z.
      * @param endInstant  end of this interval, as milliseconds from 1970-01-01T00:00:00Z.
@@ -101,7 +83,22 @@ public final class Interval
     }
 
     /**
-     * Constructs an interval from a start and end instant with a chronology.
+     * Constructs an interval from a start and end instant with the ISO
+     * default chronology in the specified time zone.
+     * 
+     * @param startInstant  start of this interval, as milliseconds from 1970-01-01T00:00:00Z.
+     * @param endInstant  end of this interval, as milliseconds from 1970-01-01T00:00:00Z.
+     * @param zone  the time zone to use, null means default zone
+     * @throws IllegalArgumentException if the end is before the start
+     * @since 1.5
+     */
+    public Interval(long startInstant, long endInstant, DateTimeZone zone) {
+        super(startInstant, endInstant, ISOChronology.getInstance(zone));
+    }
+
+    /**
+     * Constructs an interval from a start and end instant with the
+     * specified chronology.
      * 
      * @param chronology  the chronology to use, null is ISO default
      * @param startInstant  start of this interval, as milliseconds from 1970-01-01T00:00:00Z.
@@ -181,6 +178,13 @@ public final class Interval
 
     /**
      * Constructs a time interval by converting or copying from another object.
+     * <p>
+     * The recognised object types are defined in
+     * {@link org.joda.time.convert.ConverterManager ConverterManager} and
+     * include ReadableInterval and String.
+     * The String formats are described by {@link ISODateTimeFormat#dateTimeParser()}
+     * and {@link ISOPeriodFormat#standard()}, and may be 'datetime/datetime',
+     * 'datetime/period' or 'period/datetime'.
      * 
      * @param interval  the time interval to copy
      * @throws IllegalArgumentException if the interval is invalid
@@ -192,6 +196,13 @@ public final class Interval
     /**
      * Constructs a time interval by converting or copying from another object,
      * overriding the chronology.
+     * <p>
+     * The recognised object types are defined in
+     * {@link org.joda.time.convert.ConverterManager ConverterManager} and
+     * include ReadableInterval and String.
+     * The String formats are described by {@link ISODateTimeFormat#dateTimeParser()}
+     * and {@link ISOPeriodFormat#standard()}, and may be 'datetime/datetime',
+     * 'datetime/period' or 'period/datetime'.
      * 
      * @param interval  the time interval to copy
      * @param chronology  the chronology to use, null means ISO default
@@ -210,6 +221,127 @@ public final class Interval
      */
     public Interval toInterval() {
         return this;
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Gets the overlap between this interval and another interval.
+     * <p>
+     * Intervals are inclusive of the start instant and exclusive of the end.
+     * An interval overlaps another if it shares some common part of the
+     * datetime continuum. This method returns the amount of the overlap,
+     * only if the intervals actually do overlap.
+     * If the intervals do not overlap, then null is returned.
+     * <p>
+     * When two intervals are compared the result is one of three states:
+     * (a) they abut, (b) there is a gap between them, (c) they overlap.
+     * The abuts state takes precedence over the other two, thus a zero duration
+     * interval at the start of a larger interval abuts and does not overlap.
+     * <p>
+     * The chronology of the returned interval is the same as that of
+     * this interval (the chronology of the interval parameter is not used).
+     * Note that the use of the chronology was only correctly implemented
+     * in version 1.3.
+     *
+     * @param interval  the interval to examine, null means now
+     * @return the overlap interval, null if no overlap
+     * @since 1.1
+     */
+    public Interval overlap(ReadableInterval interval) {
+        interval = DateTimeUtils.getReadableInterval(interval);
+        if (overlaps(interval) == false) {
+            return null;
+        }
+        long start = Math.max(getStartMillis(), interval.getStartMillis());
+        long end = Math.min(getEndMillis(), interval.getEndMillis());
+        return new Interval(start, end, getChronology());
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Gets the gap between this interval and another interval.
+     * The other interval can be either before or after this interval.
+     * <p>
+     * Intervals are inclusive of the start instant and exclusive of the end.
+     * An interval has a gap to another interval if there is a non-zero
+     * duration between them. This method returns the amount of the gap only
+     * if the intervals do actually have a gap between them.
+     * If the intervals overlap or abut, then null is returned.
+     * <p>
+     * When two intervals are compared the result is one of three states:
+     * (a) they abut, (b) there is a gap between them, (c) they overlap.
+     * The abuts state takes precedence over the other two, thus a zero duration
+     * interval at the start of a larger interval abuts and does not overlap.
+     * <p>
+     * The chronology of the returned interval is the same as that of
+     * this interval (the chronology of the interval parameter is not used).
+     * Note that the use of the chronology was only correctly implemented
+     * in version 1.3.
+     *
+     * @param interval  the interval to examine, null means now
+     * @return the gap interval, null if no gap
+     * @since 1.1
+     */
+    public Interval gap(ReadableInterval interval) {
+        interval = DateTimeUtils.getReadableInterval(interval);
+        long otherStart = interval.getStartMillis();
+        long otherEnd = interval.getEndMillis();
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        if (thisStart > otherEnd) {
+            return new Interval(otherEnd, thisStart, getChronology());
+        } else if (otherStart > thisEnd) {
+            return new Interval(thisEnd, otherStart, getChronology());
+        } else {
+            return null;
+        }
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Does this interval abut with the interval specified.
+     * <p>
+     * Intervals are inclusive of the start instant and exclusive of the end.
+     * An interval abuts if it starts immediately after, or ends immediately
+     * before this interval without overlap.
+     * A zero duration interval abuts with itself.
+     * <p>
+     * When two intervals are compared the result is one of three states:
+     * (a) they abut, (b) there is a gap between them, (c) they overlap.
+     * The abuts state takes precedence over the other two, thus a zero duration
+     * interval at the start of a larger interval abuts and does not overlap.
+     * <p>
+     * For example:
+     * <pre>
+     * [09:00 to 10:00) abuts [08:00 to 08:30)  = false (completely before)
+     * [09:00 to 10:00) abuts [08:00 to 09:00)  = true
+     * [09:00 to 10:00) abuts [08:00 to 09:01)  = false (overlaps)
+     * 
+     * [09:00 to 10:00) abuts [09:00 to 09:00)  = true
+     * [09:00 to 10:00) abuts [09:00 to 09:01)  = false (overlaps)
+     * 
+     * [09:00 to 10:00) abuts [10:00 to 10:00)  = true
+     * [09:00 to 10:00) abuts [10:00 to 10:30)  = true
+     * 
+     * [09:00 to 10:00) abuts [10:30 to 11:00)  = false (completely after)
+     * 
+     * [14:00 to 14:00) abuts [14:00 to 14:00)  = true
+     * [14:00 to 14:00) abuts [14:00 to 15:00)  = true
+     * [14:00 to 14:00) abuts [13:00 to 14:00)  = true
+     * </pre>
+     *
+     * @param interval  the interval to examine, null means now
+     * @return true if the interval abuts
+     * @since 1.1
+     */
+    public boolean abuts(ReadableInterval interval) {
+        if (interval == null) {
+            long now = DateTimeUtils.currentTimeMillis();
+            return (getStartMillis() == now || getEndMillis() == now);
+        } else {
+            return (interval.getEndMillis() == getStartMillis() ||
+                    getEndMillis() == interval.getStartMillis());
+        }
     }
 
     //-----------------------------------------------------------------------

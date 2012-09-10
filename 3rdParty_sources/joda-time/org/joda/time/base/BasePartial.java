@@ -1,75 +1,38 @@
 /*
- * Joda Software License, Version 1.0
+ *  Copyright 2001-2011 Stephen Colebourne
  *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Copyright (c) 2001-2004 Stephen Colebourne.  
- * All rights reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution,
- *    if any, must include the following acknowledgment:  
- *       "This product includes software developed by the
- *        Joda project (http://www.joda.org/)."
- *    Alternately, this acknowledgment may appear in the software itself,
- *    if and wherever such third-party acknowledgments normally appear.
- *
- * 4. The name "Joda" must not be used to endorse or promote products
- *    derived from this software without prior written permission. For
- *    written permission, please contact licence@joda.org.
- *
- * 5. Products derived from this software may not be called "Joda",
- *    nor may "Joda" appear in their name, without prior written
- *    permission of the Joda project.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE JODA AUTHORS OR THE PROJECT
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Joda project and was originally 
- * created by Stephen Colebourne <scolebourne@joda.org>. For more
- * information on the Joda project, please see <http://www.joda.org/>.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package org.joda.time.base;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 import org.joda.time.Chronology;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeUtils;
-import org.joda.time.DateTimeZone;
 import org.joda.time.ReadablePartial;
 import org.joda.time.convert.ConverterManager;
 import org.joda.time.convert.PartialConverter;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * BasePartial is an abstract implementation of ReadablePartial that stores
  * data in array and <code>Chronology</code> fields.
  * <p>
  * This class should generally not be used directly by API users.
- * The {@link org.joda.time.ReadablePeriod} interface should be used when different 
+ * The {@link org.joda.time.ReadablePartial} interface should be used when different 
  * kinds of partial objects are to be referenced.
  * <p>
  * BasePartial subclasses may be mutable and not thread-safe.
@@ -85,9 +48,9 @@ public abstract class BasePartial
     private static final long serialVersionUID = 2353678632973660L;
 
     /** The chronology in use */
-    private Chronology iChronology;
+    private final Chronology iChronology;
     /** The values of each field in this partial */
-    private int[] iValues;
+    private final int[] iValues;
 
     //-----------------------------------------------------------------------
     /**
@@ -171,6 +134,33 @@ public abstract class BasePartial
         chronology = DateTimeUtils.getChronology(chronology);
         iChronology = chronology.withUTC();
         iValues = converter.getPartialValues(this, instant, chronology);
+    }
+
+    /**
+     * Constructs a partial from an Object that represents a time, using the
+     * specified chronology.
+     * <p>
+     * The recognised object types are defined in
+     * {@link org.joda.time.convert.ConverterManager ConverterManager} and
+     * include ReadableInstant, String, Calendar and Date.
+     * <p>
+     * The constructor uses the time zone of the chronology specified.
+     * Once the constructor is complete, all further calculations are performed
+     * without reference to a timezone (by switching to UTC).
+     *
+     * @param instant  the datetime object
+     * @param chronology  the chronology, null means use converter
+     * @param parser  if converting from a String, the given parser is preferred
+     * @throws IllegalArgumentException if the date is invalid
+     * @since 1.3
+     */
+    protected BasePartial(Object instant, Chronology chronology, DateTimeFormatter parser) {
+        super();
+        PartialConverter converter = ConverterManager.getInstance().getPartialConverter(instant);
+        chronology = converter.getChronology(instant, chronology);
+        chronology = DateTimeUtils.getChronology(chronology);
+        iChronology = chronology.withUTC();
+        iValues = converter.getPartialValues(this, instant, chronology, parser);
     }
 
     /**
@@ -261,7 +251,11 @@ public abstract class BasePartial
 
     //-----------------------------------------------------------------------
     /**
-     * Sets the value of the field at the specifed index.
+     * Sets the value of the field at the specified index.
+     * <p>
+     * In version 2.0 and later, this method copies the array into the original.
+     * This is because the instance variable has been changed to be final to satisfy the Java Memory Model.
+     * This only impacts subclasses that are mutable.
      * 
      * @param index  the index
      * @param value  the value to set
@@ -269,28 +263,50 @@ public abstract class BasePartial
      */
     protected void setValue(int index, int value) {
         DateTimeField field = getField(index);
-        iValues = field.set(this, index, iValues, value);
+        int[] values = field.set(this, index, iValues, value);
+        System.arraycopy(values, 0, iValues, 0, iValues.length);
     }
 
     /**
      * Sets the values of all fields.
+     * <p>
+     * In version 2.0 and later, this method copies the array into the original.
+     * This is because the instance variable has been changed to be final to satisfy the Java Memory Model.
+     * This only impacts subclasses that are mutable.
      * 
      * @param values  the array of values
      */
     protected void setValues(int[] values) {
         getChronology().validate(this, values);
-        iValues = values;
+        System.arraycopy(values, 0, iValues, 0, iValues.length);
     }
 
     //-----------------------------------------------------------------------
     /**
-     * Converts this object to a DateTime using the current date to fill in the
-     * missing fields and using the default time zone.
+     * Output the date using the specified format pattern.
      *
-     * @return the DateTime instance
+     * @param pattern  the pattern specification, null means use <code>toString</code>
+     * @see org.joda.time.format.DateTimeFormat
      */
-    public DateTime toDateTime() {
-        return toDateTime((DateTimeZone) null);
+    public String toString(String pattern) {
+        if (pattern == null) {
+            return toString();
+        }
+        return DateTimeFormat.forPattern(pattern).print(this);
+    }
+
+    /**
+     * Output the date using the specified format pattern.
+     *
+     * @param pattern  the pattern specification, null means use <code>toString</code>
+     * @param locale  Locale to use, null means default
+     * @see org.joda.time.format.DateTimeFormat
+     */
+    public String toString(String pattern, Locale locale) throws IllegalArgumentException {
+        if (pattern == null) {
+            return toString();
+        }
+        return DateTimeFormat.forPattern(pattern).withLocale(locale).print(this);
     }
 
 }

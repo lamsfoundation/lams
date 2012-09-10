@@ -17,7 +17,6 @@
 
 package org.opensaml.xacml.policy.impl;
 
-import org.opensaml.saml1.core.AttributeDesignator;
 import org.opensaml.xacml.impl.AbstractXACMLObjectBuilder;
 import org.opensaml.xacml.policy.AttributeDesignatorType;
 
@@ -33,7 +32,7 @@ public class AttributeDesignatorTypeImplBuilder extends AbstractXACMLObjectBuild
 
     /** {@inheritDoc} */
     public AttributeDesignatorType buildObject() {
-        return buildObject(AttributeDesignator.DEFAULT_ELEMENT_NAME);
+        return buildObject(AttributeDesignatorType.DEFAULT_ELEMENT_NAME_XACML20);
     }
 
 }
