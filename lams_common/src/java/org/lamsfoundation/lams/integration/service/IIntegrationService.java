@@ -53,6 +53,8 @@ public interface IIntegrationService {
 			String extCourseId, String extCourseName, String countryIsoCode, String langIsoCode,
 			String parentOrgId, Boolean isTeacher, Boolean prefix);
 	
+	ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, boolean prefix) throws UserInfoFetchException;
+	    
 	ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException;
 	
 	ExtUserUseridMap getExistingExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException;

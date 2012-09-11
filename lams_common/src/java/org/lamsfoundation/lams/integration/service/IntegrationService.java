@@ -172,17 +172,22 @@ public class IntegrationService implements IIntegrationService {
 	service.save(user);
     }
 
-    public ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
+    public ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, boolean prefix)
 	    throws UserInfoFetchException {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("extServerOrgMap.sid", serverMap.getSid());
 	properties.put("extUsername", extUsername);
 	List list = service.findByProperties(ExtUserUseridMap.class, properties);
 	if (list == null || list.size() == 0) {
-	    return createExtUserUseridMap(serverMap, extUsername);
+	    return createExtUserUseridMap(serverMap, extUsername, prefix);
 	} else {
 	    return (ExtUserUseridMap) list.get(0);
 	}
+    }
+
+    public ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
+	    throws UserInfoFetchException {
+	return getExtUserUseridMap(serverMap, extUsername, true);
     }
 
     public ExtUserUseridMap getExistingExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
@@ -307,11 +312,11 @@ public class IntegrationService implements IIntegrationService {
     }
 
     // compatibility method to support integrations
-    private ExtUserUseridMap createExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
+    private ExtUserUseridMap createExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, boolean prefix)
 	    throws UserInfoFetchException {
 	String[] userData = getUserDataFromExtServer(serverMap, extUsername);
 	String password = HashUtil.sha1(RandomPasswordGenerator.nextPassword(10));
-	return createExtUserUseridMap(serverMap, extUsername, password, userData, true);
+	return createExtUserUseridMap(serverMap, extUsername, password, userData, prefix);
     }
 
     // compatibility method

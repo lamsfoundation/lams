@@ -135,20 +135,20 @@ public class LoginRequestServlet extends HttpServlet {
 	}
 
 	ExtServerOrgMap serverMap = getService().getExtServerOrgMap(serverId);
-
+	boolean prefix = Boolean.parseBoolean(usePrefix);
 	try {
 	    ExtUserUseridMap userMap = null;
-
 	    if ((firstName == null) && (lastName == null)) {
-		userMap = getService().getExtUserUseridMap(serverMap, extUsername);
+		userMap = getService().getExtUserUseridMap(serverMap, extUsername, prefix);
 	    } else {
 		userMap = getService().getImplicitExtUserUseridMap(serverMap, extUsername, firstName, lastName,
 			langIsoCode, countryIsoCode, email);
 	    }
 
+	    
 	    Authenticator.authenticate(serverMap, timestamp, extUsername, method, hash);
 	    ExtCourseClassMap orgMap = getService().getExtCourseClassMap(serverMap, userMap, extCourseId,
-		    countryIsoCode, langIsoCode, courseName, method, Boolean.parseBoolean(usePrefix));
+		    countryIsoCode, langIsoCode, courseName, method, prefix);
 	    User user = userMap.getUser();
 	    String login = user.getLogin();
 	    // was using hses.inNew() API to check if the external user has logged in yet,
