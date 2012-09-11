@@ -5,17 +5,7 @@
 	<import file="../lams_build/build_base.xml"/>
 	
 	<!-- Below are Tool specifc targets and targets overriding ones from the imported base file. -->
-	<target name="deploy-war"  depends="build_base.deploy-war" description="Deploys WAR.">
-		<echo message="Enable lams-signup in JBoss config files" />
-		<replaceregexp flags="gi"
-				 match="(?:&lt;!--)?lams-signup - do not uncomment manually(?:--&gt;)?"
-				 replace="&lt;!-- lams-signup --&gt;">
-		 	<fileset dir="${jboss.deploy}">
-				<include name="META-INF/application.xml" />
-		 		<include name="lams-central.war/WEB-INF/web.xml" />
-		 	</fileset>
-		</replaceregexp>
-	</target>
+	<target name="deploy-war"  depends="build_base.deploy-war, _deploy-module-conf" description="Deploys WAR." />
 	
 
 	<target name="test-report" depends="_target-not-available"

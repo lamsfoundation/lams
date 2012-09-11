@@ -50,24 +50,8 @@
 		</web>
     </module>
     
-    <!--SAML Integration - do not uncomment manually
-    <module>
-        <web>
-            <web-uri>lams-saml.war</web-uri>
-            <context-root>/lams/saml</context-root>
-        </web>
-    </module>
-    SAML Integration - do not uncomment manually-->
-    
-    <!--Mindapp Integration - do not uncomment manually
-    <module>
-        <web>
-            <web-uri>lams-mindapp.war</web-uri>
-            <context-root>/lams/mindapp</context-root>
-        </web>
-    </module>
-    Mindapp Integration - do not uncomment manually-->
-    
+	<!-- Optional Module Placeholder - do not remove -->
+	
     <!-- 
     	======================================================== 
 	 	  Tool modules and Security Roles 
