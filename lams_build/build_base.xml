@@ -15,10 +15,6 @@
 	<property file="${base.dir}/common.properties"/>
 	<property file="${base.dir}/build.properties"/>
 	<property file="${base.dir}/${osPropertiesName}.properties"/>
-	 
-	<!-- Used by subprojects to add their modules to LAMS EAR application.xml -->
-	<property name="moduleActivationPlaceholder" value="&lt;!-- Optional Module Placeholder - do not remove --&gt;" />
-	<loadfile srcFile="conf/moduleActivation.xml" property="moduleActivationEntry" failonerror="false" />
 	
 	<!-- Set library paths -->
 	<path id="libs.classpath" >
@@ -352,12 +348,20 @@
 	
 	<target name="_deploy-module-conf">
 		<!-- Internal target: Adds subprojects' JAR/WAR to LAMS EAR application.xml -->
+		<property name="moduleActivationPlaceholder" value="&lt;!-- Optional Module Placeholder - do not remove --&gt;" />
+		<loadfile srcFile="conf/moduleActivation.xml" property="moduleActivationEntry" failonerror="false" />
 		<echo>${ant.project.name}: Enable module in JBoss config files</echo>
-		<replaceregexp match="(${moduleActivationPlaceholder})" replace="${moduleActivationEntry}    \1">
-			<fileset dir="${jboss.deploy}">
-				<include name="META-INF/application.xml" />
-			</fileset>
-		</replaceregexp>
+		<!-- Remove existing entries first, so it is possible to run target multiple times -->
+		<replaceregexp file="${jboss.deploy}/META-INF/application.xml"
+					   flags="gi"
+		               match="${moduleActivationEntry}" 
+			           replace=""
+		/>
+		<replaceregexp file="${jboss.deploy}/META-INF/application.xml"
+			 		   flags="i"
+			           match="(${moduleActivationPlaceholder})"
+			           replace="${moduleActivationEntry}    \1"
+		/>
 	</target>
 
 	<!-- =================================================================== -->
