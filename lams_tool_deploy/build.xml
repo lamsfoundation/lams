@@ -31,7 +31,7 @@
 		</fileset>
 	</path>
 
-	<path id="product.classes.classpath">
+	<path id="product.classpath">
 		<pathelement location="${build.classes.java}" />
 		<path refid="libs.classpath" />
 	</path>
@@ -80,7 +80,7 @@
 	           debug="${debug}"
 			   debuglevel="lines,vars,source"
 			   destdir="${build.classes.test}"
-			   classpathref="product.classes.classpath" />
+			   classpathref="product.classpath" />
 	</target>
 	
 	
@@ -122,7 +122,7 @@
 			</batchtest>
 			<classpath>
 				<pathelement location="${build.classes.test}" />
-				<path refid="product.classes.classpath" />
+				<path refid="product.classpath" />
 				<fileset dir="${test.file.dir}" />
 			</classpath>
 		</junit>

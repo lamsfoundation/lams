@@ -69,7 +69,7 @@
 		>
 			<classpath>
 				<path refid="logging.classpath"/>			
-				<path refid="product.classes.classpath"/>
+				<path refid="product.classpath"/>
 			</classpath>
 		</taskdef>
 			

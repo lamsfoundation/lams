@@ -32,13 +32,6 @@
 	
 	<path id="product.classpath">
 		<path refid="libs.classpath"/>
-		<!-- Java CLASSPATH should be added as the last item -->
-		<!-- This property is supposed to be set in eclipse  -->
-		<pathelement location="${java.class.path}" />
-	</path>
-	
-	<path id="product.classes.classpath">
-		<path refid="product.classpath"/>
 		<pathelement location="${build.classes.java}"/>
 	</path>
 	
@@ -83,8 +76,8 @@
 	<target name="_print-classpath">
 		<!-- Internal target: Prints out paths to library and project classes. -->
 		<echo message="java.class.path = ${java.class.path}" />
-		<property name="product.classpath.string" refid="product.classpath" />
-		<echo message="product.classpath = ${product.classpath.string}" />
+		<property name="libs.classpath.string" refid="libs.classpath" />
+		<echo message="libs.classpath = ${libs.classpath.string}" />
 	</target>
 	
 	
@@ -155,7 +148,7 @@
                source="1.5"
                debug="on"
 			   debuglevel="lines,vars,source"
-               classpathref="product.classpath"
+               classpathref="libs.classpath"
                destdir="${build.classes.java}"
 		/>
         
@@ -179,7 +172,7 @@
 	           debug="on"
 			   debuglevel="lines,vars,source"
 			   destdir="${build.classes.test}"
-			   classpathref="product.classes.classpath" />
+			   classpathref="product.classpath" />
 			
 		<copy todir="${build.classes.test}" overwrite="true" verbose="true">
 			<fileset dir="${src.test.dir}">
@@ -350,7 +343,7 @@
 		<!-- Internal target: Adds subprojects' JAR/WAR to LAMS EAR application.xml -->
 		<property name="moduleActivationPlaceholder" value="&lt;!-- Optional Module Placeholder - do not remove --&gt;" />
 		<loadfile srcFile="conf/moduleActivation.xml" property="moduleActivationEntry" failonerror="false" />
-		<echo>${ant.project.name}: Enable module in JBoss config files</echo>
+		<echo>${ant.project.name}: Enable module in EAR config files</echo>
 		<!-- Remove existing entries first, so it is possible to run target multiple times -->
 		<replaceregexp file="${jboss.deploy}/META-INF/application.xml"
 					   flags="gi"
@@ -463,7 +456,7 @@
 				<pathelement location="${conf.dir}" />
 				<pathelement location="${jboss.home}lib/javassist.jar" />
 				<path refid="logging.classpath"/>	
-				<path refid="product.classes.classpath" />
+				<path refid="product.classpath" />
 			</classpath>
 		</junit>
 		
@@ -499,7 +492,7 @@
 		
 		<!-- Define JSP compiler -->
 		<path id="jsp.precompile.classpath">
-			<path refid="product.classes.classpath"/>
+			<path refid="product.classpath"/>
 			<fileset dir="${jboss.home}/lib">
 				<include name="jboss-common-core.jar" />
 				<include name="jboss-logging-spi.jar" />
