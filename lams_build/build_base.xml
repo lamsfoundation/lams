@@ -132,7 +132,7 @@
 			<classpath>
 				<fileset dir="${db.driver.dir}" includes="*.jar"/> 
 			</classpath>
-			<transaction src="${db.scripts}/${sql.script}" />
+			<transaction src="${sql.script}" />
 		</sql>
 	</target>
 	
