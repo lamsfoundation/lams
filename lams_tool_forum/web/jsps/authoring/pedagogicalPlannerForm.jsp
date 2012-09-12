@@ -88,7 +88,7 @@
                width="${param.plannerCKEditorLongWidth}" displayExpanded="false">
 		</lams:CKEditor>
 		
-		<h4 class="space-left small-space-top"><fmt:message key="label.planner.topic"/></h4>
+		<h4 class="space-left small-space-top"><fmt:message key="lable.topic.title.subject"/></h4>
 		<table id="topicTable" cellpadding="0" cellspacing="0">
 			<c:forEach var="topicIndex" begin="1" end="${formBean.topicCount}">
 				<tr>
