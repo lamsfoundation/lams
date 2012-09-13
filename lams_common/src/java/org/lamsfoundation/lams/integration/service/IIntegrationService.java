@@ -69,7 +69,8 @@ public interface IIntegrationService {
 			String lastName,
 			String language,
 			String country,
-			String email) 
+			String email,
+			boolean prefix) 
 			throws UserInfoFetchException; 
 	
 	ExtUserUseridMap getImplicitExtUserUseridMap(

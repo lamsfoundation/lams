@@ -135,14 +135,14 @@ public class LoginRequestServlet extends HttpServlet {
 	}
 
 	ExtServerOrgMap serverMap = getService().getExtServerOrgMap(serverId);
-	boolean prefix = Boolean.parseBoolean(usePrefix);
+	boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
 	try {
 	    ExtUserUseridMap userMap = null;
 	    if ((firstName == null) && (lastName == null)) {
 		userMap = getService().getExtUserUseridMap(serverMap, extUsername, prefix);
 	    } else {
 		userMap = getService().getImplicitExtUserUseridMap(serverMap, extUsername, firstName, lastName,
-			langIsoCode, countryIsoCode, email);
+			langIsoCode, countryIsoCode, email, prefix);
 	    }
 
 	    
