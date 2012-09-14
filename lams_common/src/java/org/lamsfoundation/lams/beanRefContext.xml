@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-	<!-- This file contains bean definitions that are application contexts. Currently there is single refBeanContext.xml file,
+	<!-- This file contains bean definitions that are application contexts. Currently there is single beanRefContext.xml file,
 		 but there can be several of them in classpath. If so, they will be collected by locatorFactorySelector
 		 and put together, creating one definition of beans.
 		 Each bean takes a list of XML files as a constructor argument. These XML files are "real" application context files -
-		 - they contain definitions of service, DAO etc. beans. Each bean in refBeanContext.xml is an application context
+		 - they contain definitions of service, DAO etc. beans. Each bean in beanRefContext.xml is an application context
 		 containing in result all beans from the listed XML files.
 		 Each bean from this file is a singleton, meaning that these large application contexts are created only once,
 		 at start up.
@@ -27,11 +27,7 @@
 		 This entry:
 		 <value>classpath*:org/lamsfoundation/lams/tool/**/*pplicationContext.xml</value>
 		 collects all application context files from all deployed lams tools.
-		 
-		  JBoss 5.1.0.CR1 had bugs when it comes ot Ant-style pattern resolution, like the one above.
-		  Fortunatelly, a quick reaction from JBoss developers brought a solution,
-		  the new class, VFSClassPathXmlApplicationContext, which is currently used.	 
-		 
+
 		 If new application context file is used in development and its beans need to be added to shared context,
 		 just add it to the end (or wherever it is suitable) of the list.
 	 -->
@@ -46,33 +42,8 @@
 			<value>/org/lamsfoundation/lams/lesson/lessonApplicationContext.xml</value>
 			<value>/org/lamsfoundation/lams/learning/learningApplicationContext.xml</value>
 			
-			 <value>classpath*:org/lamsfoundation/lams/tool/**/*pplicationContext.xml</value>
-			 <value>classpath*:org/eucm/lams/tool/**/*pplicationContext.xml</value>
-			 
-			 <!-- 
-			 <value>/org/lamsfoundation/lams/tool/pixlr/pixlrApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/videoRecorder/videoRecorderApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/assessment/assessmentApplicationContext.xml</value>
-			 
-			 <value>/org/lamsfoundation/lams/tool/mc/mcApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/forum/forumApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/noticeboard/nbApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/gmap/gmapApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/imageGallery/imageGalleryApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/qa/qaApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/rsrc/rsrcApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/dimdim/dimdimApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/notebook/notebookApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/sbmt/submitFilesApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/daco/dacoApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/scribe/scribeApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/spreadsheet/spreadsheetApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/survey/surveyApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/taskList/taskListApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/vote/voteApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/wiki/wikiApplicationContext.xml</value>
-			 <value>/org/lamsfoundation/lams/tool/chat/chatApplicationContext.xml</value>
-			-->
+			<value>classpath*:org/lamsfoundation/lams/tool/**/*pplicationContext.xml</value>
+			<value>classpath*:org/eucm/lams/tool/**/*pplicationContext.xml</value>
 			
 			<value>/org/lamsfoundation/lams/authoring/authoringApplicationContext.xml</value>
 			<value>/org/lamsfoundation/lams/monitoring/monitoringApplicationContext.xml</value>
@@ -81,6 +52,10 @@
 			<value>/org/lamsfoundation/lams/integrationContext.xml</value>
 			<value>/org/lamsfoundation/lams/usermanagement/ldapContext.xml</value>
 			<value>/org/lamsfoundation/lams/gradebook/gradebookApplicationContext.xml</value>
+			
+			<!-- Extra entry for LAMS subprojects that are not in the standard build -->
+			<value>classpath*:**/optionalModuleApplicationContext.xml</value>
+			
        </list>
 	 </constructor-arg>
 	</bean>
