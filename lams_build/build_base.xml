@@ -339,7 +339,7 @@
 	</target>
 	
 	
-	<target name="_deploy-module-conf">
+	<target name="_add-conf-module">
 		<!-- Internal target: Adds subprojects' JAR/WAR to LAMS EAR application.xml -->
 		<property name="moduleActivationPlaceholder" value="&lt;!-- Optional Module Placeholder - do not remove --&gt;" />
 		<loadfile srcFile="conf/moduleActivation.xml" property="moduleActivationEntry" failonerror="false" />

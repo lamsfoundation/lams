@@ -5,7 +5,7 @@
 	<import file="../lams_build/build_base.xml"/>
 	
 	<!-- Below are Tool specifc targets and targets overriding ones from the imported base file. -->
-	<target name="deploy-war"  depends="build_base.deploy-war, _deploy-module-conf" description="Deploys WAR." />
+	<target name="deploy-war"  depends="build_base.deploy-war, _add-conf-module" description="Deploys WAR." />
 	
 
 	<target name="test-report" depends="_target-not-available"
