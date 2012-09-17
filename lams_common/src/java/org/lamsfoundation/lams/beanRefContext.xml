@@ -54,7 +54,7 @@
 			<value>/org/lamsfoundation/lams/gradebook/gradebookApplicationContext.xml</value>
 			
 			<!-- Extra entry for LAMS subprojects that are not in the standard build -->
-			<value>classpath*:**/optionalModuleApplicationContext.xml</value>
+			<value>classpath*:org/lamsfoundation/lams/**/optionalModuleApplicationContext.xml</value>
 			
        </list>
 	 </constructor-arg>
