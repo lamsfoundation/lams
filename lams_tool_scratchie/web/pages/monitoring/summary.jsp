@@ -30,24 +30,7 @@
 			   		{name:'totalAttempts',index:'totalAttempts', width:100,align:"right",sorttype:"int"},
 			   		{name:'mark',index:'mark', width:100,align:"right",sorttype:"int"}		
 			   	],
-			   	caption: "${summary.sessionName}",
-			  	onSelectRow: function(rowid) { 
-			  	    if(rowid == null) { 
-			  	    	rowid=0; 
-			  	    } 
-			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
-			   		var sessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
-					var userMasterDetailUrl = '<c:url value="/monitoring/userMasterDetail.do"/>';
-		  	        jQuery("#userSummary${summary.sessionId}").clearGridData().setGridParam({gridstate: "visible"}).trigger("reloadGrid");
-		  	        $("#masterDetailArea").load(
-		  	        	userMasterDetailUrl,
-		  	        	{
-		  	        		userID: userId,
-		  	        		sessionId: sessionId
-		  	       		}
-		  	       	);
-				  	        
-	  	  		} 
+			   	caption: "${summary.sessionName}"
 			}).hideCol("id").hideCol("userId").hideCol("sessionId");
 			
    	        <c:forEach var="user" items="${summary.users}" varStatus="i">
@@ -60,35 +43,11 @@
    	   				mark:"<c:choose> <c:when test='${user.mark == -1}'>-</c:when> <c:otherwise>${user.mark}</c:otherwise> </c:choose>"
    	   	   	    });
 	        </c:forEach>
-	        
-	        var oldValue = 0;
-			jQuery("#userSummary${summary.sessionId}").jqGrid({
-				datatype: "local",
-				gridstate:"hidden",
-				//hiddengrid:true,
-				height: 90,
-				width: 630,
-				shrinkToFit: true,
-				scrollOffset: 0,
-				caption: "<fmt:message key="label.monitoring.summary.learners.summary" />",
-			   	colNames:['<fmt:message key="label.monitoring.summary.attempt" />',
-  						'<fmt:message key="label.monitoring.summary.scratchie" />',
-  						'<fmt:message key="label.monitoring.summary.correct" />',
-  						'<fmt:message key="label.monitoring.summary.date" />'],
-					    
-			   	colModel:[
-	  			   		{name:'attempt', index:'attempt', width:50, sorttype:"int"},
-	  			   		{name:'scratchie', index:'scatchie', width: 300},
-	  			   		{name:'correct', index:'correct', width:60, sortable:false, align:"center"},
-	  			   		{name:'date', index:'date', width:120, sorttype:"date", datefmt:'Y-m-d' }
-			   	],
-			   	multiselect: false
-			});
 			
 		</c:forEach>
 
 		$("#itemUid").change(function() {
-			var itemUid = $("#itemUid").val();
+			var itemUid = $(this).val();
 			if (itemUid != -1) {
 				var itemSummaryUrl = '<c:url value="/monitoring/itemSummary.do?sessionMapID=${sessionMapID}"/>';
 				var itemSummaryHref = itemSummaryUrl + "&itemUid=" + itemUid + "&KeepThis=true&TB_iframe=true&height=400&width=650";
@@ -97,7 +56,18 @@
 				//return;
 				$("#itemSummaryHref").click(); 		 
 			}
-	    }); 
+	    });
+		
+		$("#userIdDropdown").change(function() {
+			var userId = $(this).val();
+			
+			if (userId != -1) {
+				var toolSessionId = $(this).find('option:selected').attr("alt");
+				var userSummaryUrl = "<c:url value='/learning/start.do'/>?userID=" + userId + "&toolSessionID=" + toolSessionId + "&mode=teacher";
+	
+				launchPopup(userSummaryUrl, "MonitoringReview");
+			}
+	    });
 	});
 
 	function resizeIframe() {
@@ -135,10 +105,6 @@
 		<div style="padding-left: 30px; font-size: small; margin-bottom: 20px; font-style: italic;">
 			<fmt:message key="label.monitoring.summary.select.student" />
 		</div>
-			
-		<div id="masterDetailArea">
-			<%@ include file="parts/masterDetailLoadUp.jsp"%>
-		</div>	
 	
 		<c:forEach var="summary" items="${summaryList}" varStatus="status">
 			<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
@@ -149,31 +115,43 @@
 				</c:if>
 				
 				<table id="list${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-				<div style="margin-top: 10px;">
-					<table id="userSummary${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-				</div>
-			</div>	
-			<c:if test="${! status.last}">
-			
-			</c:if>
-		</c:forEach>	
+			</div>
+		</c:forEach>
+		
+		<!-- Dropdown menu for choosing scratchie item -->
 		
 		<div style="padding-left: 20px; margin-bottom: 15px; margin-top: 30px;">
 			<H1><fmt:message key="label.monitoring.summary.report.by.scratchie" /></H1>
 		</div>
 		
-		<!-- Dropdown menu for choosing a item type -->
-		
-		<div style="padding-left: 30px; margin-top: 10px; margin-bottom: 25px;">
+		<div style="padding-left: 30px; margin-top: -5px; margin-bottom: 25px;">
 
 			<select id="itemUid" style="float: left">
 				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
     			<c:forEach var="item" items="${scratchie.scratchieItems}">
-					<option value="${item.uid}">${item.description}</option>
+					<option value="${item.uid}">${item.title}</option>
 			   	</c:forEach>
 			</select>
 			
 			<a href="#nogo" class="thickbox" id="itemSummaryHref" style="display: none;"></a>
+		</div>
+		
+		<!-- Dropdown menu for choosing user -->
+		
+		<div style="padding-left: 20px; margin-bottom: 15px; margin-top: 60px;">
+			<H1><fmt:message key="label.monitoring.summary.report.by.user" /></H1>
+		</div>
+		
+		<div style="padding-left: 30px; margin-top: -5px; margin-bottom: 25px;">
+
+			<select id="userIdDropdown" style="float: left">
+				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
+    			<c:forEach var="learner" items="${sessionMap.learners}">
+					<option value="${learner.userId}" alt="${learner.session.sessionId}">${learner.firstName} ${learner.lastName}</option>
+			   	</c:forEach>
+			</select>
+			
+			<a href="#nogo" id="userSummaryHref" style="display: none;"></a>
 		</div>
 	
 	</c:otherwise>

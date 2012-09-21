@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.scratchie.web.action;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -66,8 +67,8 @@ public class MonitoringAction extends Action {
 	if (param.equals("summary")) {
 	    return summary(mapping, form, request, response);
 	}
-	if (param.equals("userMasterDetail")) {
-	    return userMasterDetail(mapping, form, request, response);
+	if (param.equals("userSummary")) {
+	    return userSummary(mapping, form, request, response);
 	}
 	if (param.equals("itemSummary")) {
 	    return itemSummary(mapping, form, request, response);
@@ -92,6 +93,7 @@ public class MonitoringAction extends Action {
 
 	Scratchie scratchie = service.getScratchieByContentId(contentId);
 	scratchie.toDTO();
+	Set<ScratchieUser> learners = service.getAllLearners(contentId);
 
 	// cache into sessionMap
 	boolean isGroupedActivity = service.isGroupedActivity(contentId);
@@ -99,6 +101,7 @@ public class MonitoringAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_SUMMARY_LIST, summaryList);
 	sessionMap.put(ScratchieConstants.PAGE_EDITABLE, scratchie.isContentInUse());
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
+	sessionMap.put(ScratchieConstants.ATTR_LEARNERS, learners);
 	sessionMap.put(ScratchieConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
 		AttributeNames.PARAM_CONTENT_FOLDER_ID));
@@ -106,15 +109,29 @@ public class MonitoringAction extends Action {
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
 
-    private ActionForward userMasterDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward userSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
-	Long sessionId = WebUtil.readLongParam(request, ScratchieConstants.PARAM_SESSION_ID);
-	List<ScratchieAnswerVisitLog> logs = getScratchieService().getUserMasterDetail(sessionId, userId);
+	Long itemUid = WebUtil.readLongParam(request, ScratchieConstants.ATTR_ITEM_UID);
+	if (itemUid.equals(-1)) {
+	    return null;
+	}
+	
+	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
-	request.setAttribute(ScratchieConstants.ATTR_USER_SESSION_ID, sessionId);
-	request.setAttribute(ScratchieConstants.ATTR_VISIT_LOGS, logs);
-	return (logs.isEmpty()) ? null : mapping.findForward(ScratchieConstants.SUCCESS);
+	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
+	if (userId.equals(-1)) {
+	    return null;
+	}
+	ScratchieItem item = getScratchieService().getScratchieItemByUid(itemUid);
+	request.setAttribute(ScratchieConstants.ATTR_ITEM, item);
+	
+	Long contentId = (Long) sessionMap.get(ScratchieConstants.ATTR_TOOL_CONTENT_ID);
+	List<GroupSummary> summaryList = getScratchieService().getQuestionSummary(contentId, itemUid);
+
+	request.setAttribute(ScratchieConstants.ATTR_SUMMARY_LIST, summaryList);
+	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
 
     private ActionForward itemSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,

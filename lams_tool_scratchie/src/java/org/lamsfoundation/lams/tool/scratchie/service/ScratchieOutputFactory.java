@@ -82,10 +82,10 @@ public class ScratchieOutputFactory extends OutputFactory {
      */
     private ToolOutput getUserMark(IScratchieService scratchieService, Long toolSessionId, Long learnerId) {
 
-	int numberAttempts = scratchieService.getUserMark(toolSessionId, learnerId);
+	int userMark = scratchieService.getUserMark(toolSessionId, learnerId);
 
 	return new ToolOutput(ScratchieConstants.LEARNER_MARK, getI18NText(
-		ScratchieConstants.LEARNER_MARK, true), numberAttempts);
+		ScratchieConstants.LEARNER_MARK, true), userMark);
 
     }
 }

@@ -105,7 +105,7 @@
 								<c:when test="${answer.scratched && !answer.correct}">
 									<img src="<html:rewrite page='/includes/images/scratchie-wrong.png'/>" id="image-${item.uid}-${answer.uid}" class="scartchie-image">
 								</c:when>
-								<c:when test="${sessionMap.userFinished || item.unraveled}">
+								<c:when test="${sessionMap.userFinished || item.unraveled || (mode == 'teacher')}">
 									<img src="<html:rewrite page='/includes/images/answer-${status.index + 1}.png'/>" class="scartchie-image">
 								</c:when>
 								<c:otherwise>

@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 
 public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implements ScratchieAnswerVisitDAO {
 
-    private static final String FIND_BY_ITEM_AND_USER = "from " + ScratchieAnswerVisitLog.class.getName()
+    private static final String FIND_BY_ANSWER_AND_USER = "from " + ScratchieAnswerVisitLog.class.getName()
 	    + " as r where r.user.userId = ? and r.scratchieAnswer.uid=?";
 
     private static final String FIND_BY_SESSION_AND_USER = "from " + ScratchieAnswerVisitLog.class.getName()
@@ -47,13 +47,8 @@ public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implement
     private static final String FIND_VIEW_COUNT_BY_USER_AND_ITEM = "select count(*) from "
 	    + ScratchieAnswerVisitLog.class.getName() + " as l where l.sessionId=? and l.user.userId =? and l.scratchieAnswer.scratchieItem.uid=?";
 
-    private static final String FIND_SUMMARY = "select v.scratchieAnswer.uid, count(v.scratchieAnswer) from  "
-	    + ScratchieAnswerVisitLog.class.getName() + " as v , " + ScratchieSession.class.getName() + " as s, "
-	    + Scratchie.class.getName() + "  as r " + " where v.sessionId = s.sessionId "
-	    + " and s.scratchie.uid = r.uid " + " and r.contentId =? " + " group by v.sessionId, v.scratchieAnswer.uid ";
-
     public ScratchieAnswerVisitLog getScratchieAnswerLog(Long answerUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_USER, new Object[] { userId, answerUid });
+	List list = getHibernateTemplate().find(FIND_BY_ANSWER_AND_USER, new Object[] { userId, answerUid });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (ScratchieAnswerVisitLog) list.get(0);
@@ -71,20 +66,6 @@ public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implement
 	if (list == null || list.size() == 0)
 	    return 0;
 	return ((Number) list.get(0)).intValue();
-    }
-
-    public Map<Long, Integer> getSummary(Long contentId) {
-
-	// Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
-	List<Object[]> result = getHibernateTemplate().find(FIND_SUMMARY, contentId);
-	Map<Long, Integer> summaryList = new HashMap<Long, Integer>(result.size());
-	for (Object[] list : result) {
-	    if (list[1] != null) {
-		summaryList.put((Long) list[0], new Integer(((Number) list[1]).intValue()));
-	    }
-	}
-	return summaryList;
-
     }
 
     public List<ScratchieAnswerVisitLog> getLogsBySessionAndUser(Long sessionId, Long userId) {

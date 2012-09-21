@@ -151,6 +151,7 @@ public class LearningAction extends Action {
 	// basic information
 	sessionMap.put(ScratchieConstants.ATTR_TITLE, scratchie.getTitle());
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_INSTRUCTION, scratchie.getInstructions());
+	sessionMap.put(ScratchieConstants.ATTR_USER_ID, scratchieUser.getUserId());
 	boolean isUserFinished = scratchieUser != null && scratchieUser.isSessionFinished();
 	sessionMap.put(ScratchieConstants.ATTR_USER_FINISHED, isUserFinished);
 	sessionMap.put(ScratchieConstants.ATTR_IS_SHOW_RESULTS_PAGE, scratchie.isShowResultsPage());
@@ -201,6 +202,7 @@ public class LearningAction extends Action {
 	if (isScratchingFinished) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
 	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
 	    return redirect;
 	} else {
 	    return mapping.findForward(ScratchieConstants.SUCCESS);
@@ -269,13 +271,15 @@ public class LearningAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 
 	IScratchieService service = getScratchieService();
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userId = new Long(user.getUserID().longValue());
+	Long userId = (Long) sessionMap.get(ScratchieConstants.ATTR_USER_ID);
+	
+	if (mode == null || !mode.isTeacher()) {
+	    service.setScratchingFinished(toolSessionId, userId);
+	}
 
-	service.setScratchingFinished(toolSessionId, userId);
 	Set<ScratchieItem> items = service.populateItemsResults(toolSessionId, userId);
 	request.setAttribute(ScratchieConstants.ATTR_ITEM_LIST, items);
 

@@ -228,10 +228,10 @@
 			parameter="summary" >
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>  
-		<action path="/monitoring/userMasterDetail"
+		<action path="/monitoring/userSummary"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
-			parameter="userMasterDetail" >
-			<forward name="success" path="/pages/monitoring/parts/masterDetailLoadUp.jsp" />
+			parameter="userSummary" >
+			<forward name="success" path="/pages/monitoring/parts/userSummary.jsp" />
 		</action>
 		<action path="/monitoring/itemSummary"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"

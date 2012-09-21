@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.tool.scratchie.dto;
 
 import java.util.Collection;
 
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 
 public class GroupSummary {
@@ -33,6 +35,7 @@ public class GroupSummary {
     private String sessionName;
 
     private Collection<ScratchieUser> users;
+    private Collection<ScratchieAnswer> answers;
 
     /**
      * Contruction method for monitoring summary function.
@@ -72,4 +75,11 @@ public class GroupSummary {
 	this.users = users;
     }
 
+    public Collection<ScratchieAnswer> getAnswers() {
+	return answers;
+    }
+
+    public void setAnswers(Collection<ScratchieAnswer> answers) {
+	this.answers = answers;
+    }
 }

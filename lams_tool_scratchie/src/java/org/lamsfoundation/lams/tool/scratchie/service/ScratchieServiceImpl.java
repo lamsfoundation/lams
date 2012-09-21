@@ -90,6 +90,8 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAttachment;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.util.ReflectDTOComparator;
+import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
+import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -432,6 +434,22 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	return scratchieItemDao.getByUid(itemUid);
     }
     
+    @Override
+    public Set<ScratchieUser> getAllLearners(Long contentId) {
+
+	Scratchie scratchie = scratchieDao.getByContentId(contentId);
+	Set<ScratchieUser> users = new TreeSet<ScratchieUser>();
+	
+	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
+	for (ScratchieSession session : sessionList) {
+	    Long sessionId = session.getSessionId();
+	    List<ScratchieUser> sessionUsers = scratchieUserDao.getBySessionID(sessionId);
+	    users.addAll(sessionUsers);
+	}
+	
+	return users;
+    }
+    
     public List<GroupSummary> getMonitoringSummary(Long contentId) {
 	List<GroupSummary> groupSummaryList = new ArrayList<GroupSummary>();
 
@@ -557,41 +575,48 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	return items;
     }
     
-    public List<ScratchieAnswerVisitLog> getUserMasterDetail(Long sessionId, Long userId) {
-	List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsBySessionAndUser(sessionId, userId);
-
-	return logs;
-    }
-    
     public List<GroupSummary> getQuestionSummary(Long contentId, Long itemUid) {
 	
 	List<GroupSummary> groupSummaryList = new ArrayList<GroupSummary>();
 
 	Scratchie scratchie = scratchieDao.getByContentId(contentId);
+	ScratchieItem item = scratchieItemDao.getByUid(itemUid);
+	Collection<ScratchieAnswer> answers = item.getAnswers();
 	
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
 	for (ScratchieSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
+	    
 	    // one new summary for one session.
 	    GroupSummary groupSummary = new GroupSummary(sessionId, session.getSessionName());
+	    
+	    Map<Long, ScratchieAnswer> answerMap = new HashMap<Long, ScratchieAnswer>();
+	    for (ScratchieAnswer dbAnswer : (Set<ScratchieAnswer>)answers) {
+		
+		//clone it so it doesn't interfere with values from other sessions
+		ScratchieAnswer answer = (ScratchieAnswer) dbAnswer.clone();
+		int[] attempts = new int[answers.size()];
+		answer.setAttempts(attempts);
+		answerMap.put(dbAnswer.getUid(), answer);
+	    }
 
 	    List<ScratchieUser> users = scratchieUserDao.getBySessionID(sessionId);
+	    //calculate attempts table
 	    for (ScratchieUser user : users) {
-				
-		int attemptNumber;
-		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(itemUid, user.getUserId());
-		if (log == null) {
-		    //-1 if there is no log
-		    attemptNumber = -1;
-		} else {
-		    List<ScratchieAnswerVisitLog> allAttempts = scratchieAnswerVisitDao.getLogsBySessionAndUser(sessionId, user.getUserId());
-		    attemptNumber = allAttempts.indexOf(log);
+		
+		int attemptNumber = 0;
+		List<ScratchieAnswerVisitLog> userAttempts = scratchieAnswerVisitDao.getLogsBySessionAndUser(sessionId, user.getUserId());
+		for (ScratchieAnswerVisitLog userAttempt : userAttempts) {
+		    ScratchieAnswer answer = answerMap.get(userAttempt.getScratchieAnswer().getUid());
+		    int[] attempts = answer.getAttempts();
+		    //+1 for corresponding choice
+		    attempts[attemptNumber++]++;
 		}
-
-		user.setAttemptNumber(attemptNumber);
 	    }
 	    
-	    groupSummary.setUsers(users);
+	    Collection<ScratchieAnswer> sortedAnswers = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
+	    sortedAnswers.addAll(answerMap.values());
+	    groupSummary.setAnswers(sortedAnswers);
 	    groupSummaryList.add(groupSummary);
 	}
 

@@ -97,6 +97,8 @@ public class ScratchieConstants {
 
     public static final String ATTR_SCRATCHIE = "scratchie";
     
+    public static final String ATTR_LEARNERS = "learners";
+    
     public static final String ATTR_VISIT_LOGS = "visitLogs";
 
     public static final String ATTR_ITEM_UID = "itemUid";
@@ -138,6 +140,8 @@ public class ScratchieConstants {
     public static final String ATTR_REFLECT_LIST = "reflectList";
 
     public static final String ATTR_USER_UID = "userUid";
+    
+    public static final String ATTR_USER_ID = "userId";
 
     public static final String LEARNER_MARK = "learner.mark";
 }

@@ -36,14 +36,6 @@ public interface ScratchieAnswerVisitDAO extends DAO {
     
     int getLogCountPerItem(Long toolSessionId, Long userId, Long itemUid);
 
-    /**
-     * Return list which contains key pair which key is scratchie item uid, value is number view.
-     * 
-     * @param contentId
-     * @return
-     */
-    public Map<Long, Integer> getSummary(Long contentId);
-
     public List<ScratchieAnswerVisitLog> getLogsBySessionAndUser(Long sessionId, Long userId);
 
 }

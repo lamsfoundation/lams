@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.scratchie.model;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -36,7 +37,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * @hibernate.class table="tl_lascrt11_user"
  * 
  */
-public class ScratchieUser implements Cloneable {
+public class ScratchieUser implements Cloneable, Comparable {
     private static final long serialVersionUID = -7043502180037866257L;
     private static Logger log = Logger.getLogger(ScratchieUser.class);
 
@@ -52,10 +53,8 @@ public class ScratchieUser implements Cloneable {
     private Scratchie scratchie;
 
     // =============== NON Persisit value: for display use ===========
-    // the user access some reousrce item date time. Use in monitoring summary page
     private int mark;
     private int totalAttempts;
-    private int attemptNumber;
 
     public ScratchieUser() {
     }
@@ -96,6 +95,11 @@ public class ScratchieUser implements Cloneable {
 	}
 
 	return user;
+    }
+    
+    public int compareTo(Object user) {
+	ScratchieUser u = (ScratchieUser) user;
+	return loginName.compareTo(u.getLoginName());
     }
 
     // **********************************************************
@@ -250,14 +254,6 @@ public class ScratchieUser implements Cloneable {
 
     public void setTotalAttempts(int totalAttempts) {
 	this.totalAttempts = totalAttempts;
-    }
-    
-    public int getAttemptNumber() {
-	return attemptNumber;
-    }
-
-    public void setAttemptNumber(int attemptNumber) {
-	this.attemptNumber = attemptNumber;
     }
 
 }

@@ -195,8 +195,6 @@ public interface IScratchieService {
     
     List<GroupSummary> getMonitoringSummary(Long contentId);
     
-    List<ScratchieAnswerVisitLog> getUserMasterDetail(Long sessionId, Long userId);
-    
     List<GroupSummary> getQuestionSummary(Long contentId, Long itemUid);
 
     /**
@@ -294,4 +292,12 @@ public interface IScratchieService {
      * @return
      */
     Set<ScratchieItem> populateItemsResults(Long sessionId, Long userId);
+    
+    /**
+     * Return all learners in activity
+     * 
+     * @param contentId
+     * @return
+     */
+    Set<ScratchieUser> getAllLearners(Long contentId);
 }

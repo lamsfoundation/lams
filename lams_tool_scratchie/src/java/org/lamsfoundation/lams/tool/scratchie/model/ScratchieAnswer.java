@@ -52,6 +52,7 @@ public class ScratchieAnswer implements Cloneable {
     // DTO fields:
     private boolean scratched;
     private Date scratchedDate;
+    private int[] attempts;
 
     // **********************************************************
     // Get/Set methods
@@ -133,6 +134,14 @@ public class ScratchieAnswer implements Cloneable {
 
     public void setScratchedDate(Date scratchedDate) {
 	this.scratchedDate = scratchedDate;
+    }
+
+    public int[] getAttempts() {
+	return attempts;
+    }
+
+    public void setAttempts(int[] attempts) {
+	this.attempts = attempts;
     }
     
     @Override
