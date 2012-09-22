@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -83,21 +84,19 @@ public class FileUtil {
     public static final String LAMS_WWW_SECURE_DIR = "secure";
     public static final String LAMS_WWW_DIR = "lams-www.war";
     private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
+    private static final int FILE_COPY_BUFFER_SIZE = 1024;
 
     protected static final String prefix = "lamstmp_"; // protected rather than private to suit junit test
 
     /**
-     * Deleting a directory using File.delete() only works if the directory is
-     * empty. This method deletes a directory and all of its contained files.
+     * Deleting a directory using File.delete() only works if the directory is empty. This method deletes a directory
+     * and all of its contained files.
      * 
-     * This method is not transactional - if it fails to delete some contained
-     * files or directories, it will continue deleting all the other files in
-     * the directory. If only a partial deletion is done, then the files and
-     * directories that could not be deleted are listed in the log file, and the
-     * method returns false.
+     * This method is not transactional - if it fails to delete some contained files or directories, it will continue
+     * deleting all the other files in the directory. If only a partial deletion is done, then the files and directories
+     * that could not be deleted are listed in the log file, and the method returns false.
      * 
-     * This method has not been tested in Linux or Unix systems, so the
-     * behaviour across symbolic links is unknown.
+     * This method has not been tested in Linux or Unix systems, so the behaviour across symbolic links is unknown.
      */
     public static boolean deleteDirectory(File directory) {
 	boolean retValue = true;
@@ -135,11 +134,9 @@ public class FileUtil {
     }
 
     /**
-     * Check if this directory is empty. If checkSubdirectories = true, then it
-     * also checks its subdirectories to make sure they aren't empty. If
-     * checkSubdirectories = true and the directory contains empty
-     * subdirectories it will return true. If checkSubdirectories = false and
-     * the directory contains empty subdirectories it will return false.
+     * Check if this directory is empty. If checkSubdirectories = true, then it also checks its subdirectories to make
+     * sure they aren't empty. If checkSubdirectories = true and the directory contains empty subdirectories it will
+     * return true. If checkSubdirectories = false and the directory contains empty subdirectories it will return false.
      */
     public static boolean isEmptyDirectory(String directoryName, boolean checkSubdirectories) throws FileUtilException {
 
@@ -177,17 +174,15 @@ public class FileUtil {
     }
 
     /**
-     * Create a temporary directory with the name in the form
-     * lamstmp_timestamp_suffix inside the default temporary-file directory for
-     * the system. This method is protected (rather than private) so that it may
-     * be called by the junit tests for this class.
+     * Create a temporary directory with the name in the form lamstmp_timestamp_suffix inside the default temporary-file
+     * directory for the system. This method is protected (rather than private) so that it may be called by the junit
+     * tests for this class.
      * 
      * @param zipFileName
      * @return name of the new directory
      * @throws ZipFileUtilException
-     *             if the java io temp directory is not defined, or we are
-     *             unable to calculate a unique name for the expanded directory,
-     *             or an IOException occurs.
+     *             if the java io temp directory is not defined, or we are unable to calculate a unique name for the
+     *             expanded directory, or an IOException occurs.
      */
     public static String createTempDirectory(String suffix) throws FileUtilException {
 
@@ -230,16 +225,14 @@ public class FileUtil {
     }
 
     /**
-     * This method creates a directory with the name <code>directoryName</code>.
-     * Also creates any necessary parent directories that may not yet exist.
+     * This method creates a directory with the name <code>directoryName</code>. Also creates any necessary parent
+     * directories that may not yet exist.
      * 
-     * If the directoryname is null or an empty string, a FileUtilException is
-     * thrown
+     * If the directoryname is null or an empty string, a FileUtilException is thrown
      * 
      * @param directoryName
      *            the name of the directory to create
-     * @return boolean. Returns true if the directory is created and false
-     *         otherwise
+     * @return boolean. Returns true if the directory is created and false otherwise
      * @throws FileUtilException
      *             if the directory name is null or an empty string
      */
@@ -257,20 +250,17 @@ public class FileUtil {
     }
 
     /**
-     * Creates a subdirectory under the parent directory
-     * <code>parentDirName</code> If the parent or child directory is null,
-     * FileUtilException is thrown.
+     * Creates a subdirectory under the parent directory <code>parentDirName</code> If the parent or child directory is
+     * null, FileUtilException is thrown.
      * 
      * If the parent directory has not been created yet, it will be created.
      * 
      * 
      * @param parentDirName
-     *            The name of the parent directory in which the subdirectory
-     *            should be created in
+     *            The name of the parent directory in which the subdirectory should be created in
      * @param subDirName
      *            The name of the subdirectory to create
-     * @return boolean. Returns true if the subdirectory was created and false
-     *         otherwise
+     * @return boolean. Returns true if the subdirectory was created and false otherwise
      * @throws FileUtilException
      *             if the parent/child directory name is null or empty.
      */
@@ -302,10 +292,9 @@ public class FileUtil {
     }
 
     /**
-     * If the directory name specified has a slash at the end of it such as
-     * "directoryName/", then the slash will be removed and "directoryName" will
-     * be returned. The createDirectory(parentdir, childdir) method requires
-     * that there is no slash at the end of the directory name.
+     * If the directory name specified has a slash at the end of it such as "directoryName/", then the slash will be
+     * removed and "directoryName" will be returned. The createDirectory(parentdir, childdir) method requires that there
+     * is no slash at the end of the directory name.
      * 
      * @param stringToModify
      * @return
@@ -320,8 +309,7 @@ public class FileUtil {
      * 
      * @param stringToCheck
      *            the directoryName to check
-     * @return boolean. Returns true if there is a slash at the end and false if
-     *         not.
+     * @return boolean. Returns true if there is a slash at the end and false if not.
      */
     public static boolean trailingForwardSlashPresent(String stringToCheck) {
 	int indexOfSlash = stringToCheck.lastIndexOf("/");
@@ -364,24 +352,20 @@ public class FileUtil {
     }
 
     /**
-     * Dump some data to a file in the Dump Directory. The directory is set in
-     * the LAMS configuration file. These dumps are primarily for
-     * support/debugging/problem reporting uses.
+     * Dump some data to a file in the Dump Directory. The directory is set in the LAMS configuration file. These dumps
+     * are primarily for support/debugging/problem reporting uses.
      * 
-     * If the dump directory is not set, it will revert to the system temp
-     * directory.
+     * If the dump directory is not set, it will revert to the system temp directory.
      * 
-     * Used by the FlashCrashDump servlet initially, may be used by other dump
-     * methods in future.
+     * Used by the FlashCrashDump servlet initially, may be used by other dump methods in future.
      * 
      * @param data
      *            data to dump
      * @param id
-     *            some identification name for the string. Does not need to be
-     *            unique. e.g. FLASH_jsmith
+     *            some identification name for the string. Does not need to be unique. e.g. FLASH_jsmith
      * @param extension
-     *            optional extension to be added to filename e.g. xml. Note: do
-     *            not include the "." - that will be added automatically.
+     *            optional extension to be added to filename e.g. xml. Note: do not include the "." - that will be added
+     *            automatically.
      * 
      * @author Fiona Malikoff
      * @throws FileUtilException
@@ -402,8 +386,8 @@ public class FileUtil {
 		    dumpFile.close();
 		}
 	    } catch (IOException e) {
-		FileUtil.log.error("Unable to close dump file. ID: " + id + " Dump: " + data + " Exception "
-			+ e.getMessage(), e);
+		FileUtil.log.error(
+			"Unable to close dump file. ID: " + id + " Dump: " + data + " Exception " + e.getMessage(), e);
 		throw new FileUtilException(e);
 	    }
 	}
@@ -411,9 +395,8 @@ public class FileUtil {
     }
 
     /**
-     * get file name from a string which may include directory information. For
-     * example : "c:\\dir\\ndp\\pp.txt"; will return pp.txt.? If file has no
-     * path infomation, then just return input fileName.
+     * get file name from a string which may include directory information. For example : "c:\\dir\\ndp\\pp.txt"; will
+     * return pp.txt.? If file has no path infomation, then just return input fileName.
      * 
      */
     public static String getFileName(String fileName) {
@@ -459,8 +442,7 @@ public class FileUtil {
     }
 
     /**
-     * Merge two input parameter into full path and adjust File.separator to OS
-     * default separator as well.
+     * Merge two input parameter into full path and adjust File.separator to OS default separator as well.
      * 
      * @param path
      * @param file
@@ -498,8 +480,53 @@ public class FileUtil {
     }
 
     /**
-     * get file extension name from a String, such as from "textabc.doc", return
-     * "doc" fileName also can contain directory infomation.
+     * Copies a file using the provided input stream.
+     * 
+     * @param inputStream
+     * @param targetFile
+     * @return size of copied file
+     * @throws IOException
+     */
+    public static long copyFile(InputStream inputStream, File targetFile) throws IOException {
+	long result = 0;
+	FileOutputStream fileOutputStream = new FileOutputStream(targetFile);
+	byte[] data = new byte[FileUtil.FILE_COPY_BUFFER_SIZE];
+	int read = 0;
+	do {
+	    read = inputStream.read(data);
+	    if (read > 0) {
+		fileOutputStream.write(data, 0, read);
+		result += read;
+	    }
+	} while (read > 0);
+	fileOutputStream.close();
+	inputStream.close();
+	return result;
+    }
+
+    /**
+     * Copies a file to the given outputStream.
+     */
+    public static long copyFile(File sourceFile, OutputStream outputStream) throws IOException {
+	long result = 0;
+	FileInputStream fileInputStream = new FileInputStream(sourceFile);
+	byte[] data = new byte[FileUtil.FILE_COPY_BUFFER_SIZE];
+	int read = 0;
+	do {
+	    read = fileInputStream.read(data);
+	    if (read > 0) {
+		outputStream.write(data, 0, read);
+		result += read;
+	    }
+	} while (read > 0);
+	outputStream.close();
+	fileInputStream.close();
+	return result;
+    }
+
+    /**
+     * get file extension name from a String, such as from "textabc.doc", return "doc" fileName also can contain
+     * directory infomation.
      */
     public static String getFileExtension(String fileName) {
 	if (fileName == null) {
@@ -515,8 +542,8 @@ public class FileUtil {
     }
 
     /**
-     * Check whether file is executable according to its extenstion and
-     * executable extension name list from LAMS configuaration.
+     * Check whether file is executable according to its extenstion and executable extension name list from LAMS
+     * configuaration.
      * 
      * @param filename
      * @return
@@ -544,14 +571,11 @@ public class FileUtil {
     }
 
     /**
-     * Clean up any old directories in the java tmp directory, where the
-     * directory name starts with lamszip_ or lamstmp_ and is <numdays> days old
-     * or older. This has the potential to be a heavy call - it has to do
-     * complete directory listing and then recursively delete the files and
-     * directories as needed.
+     * Clean up any old directories in the java tmp directory, where the directory name starts with lamszip_ or lamstmp_
+     * and is <numdays> days old or older. This has the potential to be a heavy call - it has to do complete directory
+     * listing and then recursively delete the files and directories as needed.
      * 
-     * Note: this method has not been tested as it is rather hard to write a
-     * junit test for!
+     * Note: this method has not been tested as it is rather hard to write a junit test for!
      * 
      * @param directories
      * @return number of directories deleted
@@ -576,8 +600,7 @@ public class FileUtil {
      * List files in temp directory older than numDays.
      * 
      * @param numDays
-     *            Number of days old that the directory should be to be deleted.
-     *            Must be greater than 0
+     *            Number of days old that the directory should be to be deleted. Must be greater than 0
      * @return array of files older than input date
      * @throws FileUtilException
      *             if numDays <= 0
@@ -651,9 +674,8 @@ public class FileUtil {
     }
 
     /**
-     * Encode a filename in such a way that the UTF-8 characters won't be munged
-     * during the download by a browser. Need the request to work out the user's
-     * browser type
+     * Encode a filename in such a way that the UTF-8 characters won't be munged during the download by a browser. Need
+     * the request to work out the user's browser type
      * 
      * @return encoded filename
      * @throws UnsupportedEncodingException
@@ -697,14 +719,13 @@ public class FileUtil {
     }
 
     /**
-     * Call xstream to get the POJOs from the XML file. To make it backwardly
-     * compatible we catch any exceptions due to added fields, remove the field
-     * using the ToolContentVersionFilter functionality and try to reparse. We
-     * can't nominate the problem fields in advance as we are making XML created
-     * by newer versions of LAMS compatible with an older version.
+     * Call xstream to get the POJOs from the XML file. To make it backwardly compatible we catch any exceptions due to
+     * added fields, remove the field using the ToolContentVersionFilter functionality and try to reparse. We can't
+     * nominate the problem fields in advance as we are making XML created by newer versions of LAMS compatible with an
+     * older version.
      * 
-     * This logic depends on the exception message containing the text. When we
-     * upgrade xstream, we must check that this message doesn't change.
+     * This logic depends on the exception message containing the text. When we upgrade xstream, we must check that this
+     * message doesn't change.
      * 
      * <pre>
      * 	com.thoughtworks.xstream.converters.ConversionException: unknownField : unknownField
@@ -822,24 +843,20 @@ public class FileUtil {
      * Exports data in MS Excel (.xls) format.
      * 
      * @param out
-     *            output stream to which the file written; usually taken from
-     *            HTTP response; it is not closed afterwards
+     *            output stream to which the file written; usually taken from HTTP response; it is not closed afterwards
      * @param sheetName
-     *            name of first sheet in Excel workbook; data will be stored in
-     *            this sheet
+     *            name of first sheet in Excel workbook; data will be stored in this sheet
      * @param title
      *            title printed in the first (0,0) cell
      * @param dateHeader
-     *            text describing current date; if <code>NULL</code> then no
-     *            date is printed; if not <code>NULL</code> then text is written
-     *            out along with current date in the cell; the date is formatted
-     *            according to {@link #EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT}
+     *            text describing current date; if <code>NULL</code> then no date is printed; if not <code>NULL</code>
+     *            then text is written out along with current date in the cell; the date is formatted according to
+     *            {@link #EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT}
      * @param columnNames
      *            name of the columns that describe <code>data</code> parameter
      * @param data
-     *            array of data to print out; first index of array describes a
-     *            row, second a column; dates are formatted according to
-     *            {@link #EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT}
+     *            array of data to print out; first index of array describes a row, second a column; dates are formatted
+     *            according to {@link #EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT}
      * @throws IOException
      * @throws JXLException
      */
@@ -899,25 +916,21 @@ public class FileUtil {
     }
 
     /**
-     * Exports data in CSV format. It uses UTF-8 character set and semicolon as
-     * separator.
+     * Exports data in CSV format. It uses UTF-8 character set and semicolon as separator.
      * 
      * @param out
-     *            output stream to which the file written; usually taken from
-     *            HTTP response; it is not closed afterwards
+     *            output stream to which the file written; usually taken from HTTP response; it is not closed afterwards
      * @param title
      *            title printed in the first (0,0) cell
      * @param dateHeader
-     *            text describing current date; if <code>NULL</code> then no
-     *            date is printed; if not <code>NULL</code> then text is written
-     *            out along with current date in the cell; the date is formatted
-     *            according to {@link #EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT}
+     *            text describing current date; if <code>NULL</code> then no date is printed; if not <code>NULL</code>
+     *            then text is written out along with current date in the cell; the date is formatted according to
+     *            {@link #EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT}
      * @param columnNames
      *            name of the columns that describe <code>data</code> parameter
      * @param data
-     *            array of data to print out; first index of array describes a
-     *            row, second a column; dates are formatted according to
-     *            {@link #EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT}
+     *            array of data to print out; first index of array describes a row, second a column; dates are formatted
+     *            according to {@link #EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT}
      * @throws IOException
      */
     public static void exportToolToCSV(OutputStream out, String title, String dateHeader, String[] columnNames,
@@ -965,31 +978,32 @@ public class FileUtil {
 	}
 	csv.close();
     }
-    
+
     /**
-	* Gets the temp dir, creates if not exists, returns java system temp dir if inaccessible
-	* @return
-	*/
-	public static String getTempDir() {
-		                
-		String ret = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
-	 	File tempDir = new File(ret);
-	 	
-	 	// Create if not exists
-	 	if (!tempDir.exists()) {
-		 	boolean success = tempDir.mkdirs();
-		 	if (!success) {
-		 		log.error("Could not create temp directory: " + ret);
-		 		return System.getProperty("java.io.tmpdir");
-		 	}
-	 	}
-	 	
-	 	// Return java temp dir if not accessible
-	 	if (!tempDir.canWrite()) {
-	 		return System.getProperty("java.io.tmpdir");
-	 	} else {
-	 		return ret;
-	 	}
-	                
+     * Gets the temp dir, creates if not exists, returns java system temp dir if inaccessible
+     * 
+     * @return
+     */
+    public static String getTempDir() {
+
+	String ret = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
+	File tempDir = new File(ret);
+
+	// Create if not exists
+	if (!tempDir.exists()) {
+	    boolean success = tempDir.mkdirs();
+	    if (!success) {
+		log.error("Could not create temp directory: " + ret);
+		return System.getProperty("java.io.tmpdir");
+	    }
 	}
+
+	// Return java temp dir if not accessible
+	if (!tempDir.canWrite()) {
+	    return System.getProperty("java.io.tmpdir");
+	} else {
+	    return ret;
+	}
+
+    }
 }

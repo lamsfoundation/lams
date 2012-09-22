@@ -342,7 +342,7 @@
 	<target name="_add-conf-module">
 		<!-- Internal target: Adds subprojects' JAR/WAR to LAMS EAR application.xml -->
 		<property name="moduleActivationPlaceholder" value="&lt;!-- Optional Module Placeholder - do not remove --&gt;" />
-		<loadfile srcFile="conf/moduleActivation.xml" property="moduleActivationEntry" failonerror="false" />
+		<loadfile srcFile="conf/moduleActivation.xml" property="moduleActivationEntry" quiet="true" />
 		<echo>${ant.project.name}: Enable module in EAR config files</echo>
 		<!-- Remove existing entries first, so it is possible to run target multiple times -->
 		<replaceregexp file="${jboss.deploy}/META-INF/application.xml"

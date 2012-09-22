@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
@@ -224,8 +225,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     private static final String DIR_UPLOADED_NODE_SUFFIX = "_uploaded_node";
     private static final String EXPORT_NODE_ZIP_PREFIX = "lams_planner_node_";
     private static final String PLANNER_FOLDER_NAME = "Preview Planner";
-
-    private static final int FILE_COPY_BUFFER_SIZE = 1024;
 
     // Filter constants
     private static final String FIELD_NAME_TITLE = "title";
@@ -948,7 +947,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		File sourceFile = new File(FileUtil.getTempDir(), file.getFileName());
 
 		try {
-		    copyFileFromStream(inputStream, sourceFile);
+		    FileUtil.copyFile(inputStream, sourceFile);
 		} catch (Exception e) {
 		    PedagogicalPlannerAction.log.error(e, e);
 		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
@@ -1273,7 +1272,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 		// Copy the submitted file to the hard drive
 		InputStream inputStream = nodeForm.getFile().getInputStream();
-		copyFileFromStream(inputStream, importFile);
+		FileUtil.copyFile(inputStream, importFile);
 
 		nodeForm.setFile(null);
 
@@ -1456,7 +1455,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
 		PedagogicalPlannerAction.log.debug("Preparing for zipping the template file: "
 			+ node.getLearningDesignTitle());
-		copyFileFromStream(inputStream, targetFile);
+		FileUtil.copyFile(inputStream, targetFile);
 	    }
 	}
     }
@@ -1493,30 +1492,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		node.setLearningDesignTitle(learningDesign.getTitle());
 	    }
 	}
-    }
-
-    /**
-     * Copies a file using the provided input stream.
-     * 
-     * @param inputStream
-     * @param targetFile
-     * @throws RepositoryCheckedException
-     * @throws IOException
-     */
-    private void copyFileFromStream(InputStream inputStream, File targetFile) throws RepositoryCheckedException,
-	    IOException {
-
-	FileOutputStream fileOutputStream = new FileOutputStream(targetFile);
-	byte[] data = new byte[PedagogicalPlannerAction.FILE_COPY_BUFFER_SIZE];
-	int read = 0;
-	do {
-	    read = inputStream.read(data);
-	    if (read > 0) {
-		fileOutputStream.write(data, 0, read);
-	    }
-	} while (read > 0);
-	fileOutputStream.close();
-	inputStream.close();
     }
 
     /**
