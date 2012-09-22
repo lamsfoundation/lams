@@ -49,7 +49,6 @@
 								jQuery(groupIcon).html("<img src='images/tree_closed.gif'/>");
 							}
 						}
-						makeAllUnsortable();
 					});
 				}
 				
