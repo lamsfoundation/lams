@@ -32,6 +32,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -165,8 +166,8 @@ public class GradebookServlet extends HttpServlet {
 	    
 	    NodeList activities = document.getDocumentElement().getFirstChild().getChildNodes();
 
-	    int maxResult = 0;
-	    int userResult = 0;
+	    float maxResult = 0;
+	    float userResult = 0;
 	    for (int i = 0; i < activities.getLength(); i++) {
 		Node activity = activities.item(i);
 		
@@ -181,51 +182,12 @@ public class GradebookServlet extends HttpServlet {
 			String userResultStr = toolOutput.getAttributes().getNamedItem("output").getNodeValue();
 			String maxResultStr = toolOutput.getAttributes().getNamedItem("marksPossible").getNodeValue();
 			
-			userResult += Integer.parseInt(userResultStr);
-			maxResult += Integer.parseInt(maxResultStr);
+			userResult += Float.parseFloat(userResultStr);
+			maxResult += Float.parseFloat(maxResultStr);
 		    }
 		}
 		
 	    }
-	    
-                
-                
-		
-		
-		
-		
-		    // Get the content ID for this item 
-//		    Container bbContainer = bbPm.getContainer();
-		    //Id lessonId = new PkId( bbContainer, CourseDocument.DATA_TYPE, lessonIdStr );    
-//		    Id.generateId(new DataType(Lineitem.class),lid)
-		    
-		    
-		    //Id userId = new PkId( bbContainer, CourseDocument.DATA_TYPE, userName );    
-//	            CourseDbLoader cLoader = CourseDbLoader.Default.getInstance();
-//	            ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
-//	            List<Course> userCourses = cLoader.loadByUserId(user.getId());
-//	            response.getWriter().print("!!!!!!!"+userCourses.size());
-//	            System.out.println("!!!!!!!"+userCourses.size());
-//	            Content lesson = null;
-//	            for (Course userCourse: userCourses) {
-//	        	//userCourse.getClassification().gDefaultViewContent().gCartridge().get
-//	        	
-//	        	// Load the Course Document (Lams Lesson)
-//	        	 List<Content> lessons = courseDocumentLoader.loadMapView(user.getId(), userCourse.getId(), null);
-//	        	 response.getWriter().print("Xxx"+lessons.size());
-//	        	 System.out.println("Xxx"+lessons.size());
-//	        	 for (Content lessonIter: lessons) {
-//	        	     if (lessonIter.getLinkRef() != null && lessonIter.getLinkRef().equals(lessonIdStr)) {
-//	        		 lesson = lessonIter;
-//	        		 break;
-//	        	     }
-//	        	  
-//	        	 }
-//	            }
-//		    
-//		    if (lesson == null) {
-//			throw new ServletException("lesson not found");
-//		    }
                 
 		
 	    CourseDbLoader cLoader = CourseDbLoader.Default.getInstance();
@@ -267,11 +229,11 @@ public class GradebookServlet extends HttpServlet {
 	    }
 
 	    //set score grade. if Lams supplies one (and lineitem will have score type) we set score; otherwise (and lineitme of type Complete/Incomplete) we set 0
-	    int gradebookMark = 0;
+	    float gradebookMark = 0;
 	    if (maxResult > 0) {
 		gradebookMark = (userResult / maxResult) * Constants.GRADEBOOK_POINTS_POSSIBLE;
 	    }
-	    current_score.setGrade("" + gradebookMark);
+	    current_score.setGrade(new DecimalFormat("##.##").format(gradebookMark));
 	    current_score.validate();
 	    scorePersister.persist(current_score);
 
@@ -321,73 +283,6 @@ public class GradebookServlet extends HttpServlet {
 	response.setContentType("text/html");
 	PrintWriter out = response.getWriter();
         out.write("OK");
-        
-        
-        
-//        blackboard.data.content.CourseDocument l = null;
-//        
-//        
-//	String externalLessonId = request.getParameter("content_id");
-//	String courseId = request.getParameter("course_id");
-//	
-//	
-//	try {
-//	    PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
-//	    ExtraInfo ei = pei.getExtraInfo();
-//	    ei.setValue(l.getId().toString(), less);
-//	    ei.setValue("value2", request.getParameter("value2"));
-//	    PortalUtil.savePortalExtraInfo(pei);
-//	} catch (PersistenceException e) {
-//	    e.printStackTrace();
-//	}
-//	
-//        blackboard.data.content.CourseDocument ss;
-//        PkId pkId = (PkId) ss.getId();
-//        String s = "_" + pkId.getPk1() + "_" + pkId.getPk2();
-//        
-//	try {
-//	    PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, " LamsStorage ");
-//	    ExtraInfo ei = pei.getExtraInfo();
-//	    String value1 = ei.getValue("value1");
-//	    String value2 = ei.getValue("value2");
-//	} catch (PersistenceException e) {
-//	    e.printStackTrace();
-//	}
-//	Lineitem lineitem = null;
-//	    LineitemDbPersister linePersister= (LineitemDbPersister) bbPm.getPersister( LineitemDbPersister.TYPE );
-//	    linePersister.deleteById(lineitem.getId().g);
-    
-    
-//    may be store lessonIdInternal --> lessonIdExternal in course object
-//    and then you'll be able to find lineitem
-    
-    
-    
-//	CourseDbLoader cLoader = CourseDbLoader.Default.getInstance();
-//	LineitemDbLoader lineitemLoader = LineitemDbLoader.Default.getInstance();
-//
-//	List<Course> userCourses = cLoader.loadByUserId(ctx.getUserId());
-//
-//	//search for appropriate lineitem
-//	Lineitem lineitem = null;
-//	for (Course userCourse : userCourses) {
-//	    userCourse.s
-//	    
-//	    List<Lineitem> lineitems = lineitemLoader.loadByCourseId(userCourse.getId());
-//
-//	    for (Lineitem lineitemIter : lineitems) {
-//		if (lineitemIter.getAssessmentId() != null
-//			&& lineitemIter.getAssessmentId().equals(lessonIdStr)) {
-//		    lineitem = lineitemIter;
-//		    break;
-//		}
-//	    }
-//
-//	}
-//    
-//	if (lineitem == null) {
-//	    throw new ServletException("lineitem not found");
-//	}
     }
 
     private String sha1(String str) {
