@@ -115,26 +115,19 @@
 						jQuery("div.j-subgroup-lessons>table.lesson-table tbody", org).each(function() {
 							makeSortable(jQuery(this));
 						});
-						jQuery("div.mycourses-right-buttons", jLessons).html("<a class=\"sorting\" title=\""+getSortingEnabledText()+"\"><img src=\"images/sorting_enabled.gif\"></a>");
+						jQuery("div.mycourses-right-buttons", jLessons).html("<a class=\"sorting\" onclick=\"makeOrgUnsortable(" + orgId + ")\" title=\""+getDisableSortingText()+"\"><img src=\"images/sorting_enabled.gif\"></a>");
 					}
 				}
 				
-				function makeAllUnsortable() {
-					jQuery("div.course-bg").each(function() {
-						var orgId = this.id;
-						if (jQuery("div.j-lessons", this).size() > 0) {
-							var jLessons = jQuery("div.j-lessons#"+orgId+"-lessons")
-							var jLessonsTable = jQuery("table.lesson-table",jLessons);
-							var link = jQuery("div.mycourses-right-buttons", jLessons);
-							if (link.html().indexOf(getSortingEnabledText()) >= 0) {
-								jLessonsTable.SortableDestroy();
-								link.html("<a class=\"sorting\" onclick=\"makeOrgSortable("+orgId+")\" title=\""+getEnableSortingText()+"\"><img src=\"images/sorting_disabled.gif\"></a>");
-								jQuery("div.j-subgroup-lessons>table.lesson-table tbody", this).each(function() {
-									jQuery(this).SortableDestroy();
-								});
-							}
-						}
+				function makeOrgUnsortable(orgId) {
+					var org = jQuery("div.course-bg#"+orgId);
+					var jLessons = jQuery("div.j-lessons#"+orgId+"-lessons");
+					var jLessonsTable = jQuery("table.lesson-table tbody",jLessons);
+					jLessonsTable.sortable("destroy");
+					jQuery("div.j-subgroup-lessons>table.lesson-table tbody", org).each(function() {
+						jQuery(this).sortable("destroy");
 					});
+					jQuery("div.mycourses-right-buttons", jLessons).html("<a class=\"sorting\" onclick=\"makeOrgSortable(" + orgId + ")\" title=\""+getEnableSortingText()+"\"><img src=\"images/sorting_disabled.gif\"></a>");
 				}
 				
 				function makeSortable(element) {

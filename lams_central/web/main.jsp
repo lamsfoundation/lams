@@ -83,8 +83,8 @@
 				return "<fmt:message key="label.enable.lesson.sorting"/>";
 			}
 			
-			function getSortingEnabledText() {
-				return "<fmt:message key="label.lesson.sorting.enabled"/>";
+			function getDisableSortingText() {
+				return "<fmt:message key="label.disable.lesson.sorting"/>";
 			}
 			
 			function refresh(){

@@ -10,7 +10,7 @@
 	<div class="sequence-name">
 		<div id="<c:out value="${orgBean.id}"/>-lessons" class="j-lessons">
 		<c:if test="${allowSorting}">
-			<div class="mycourses-right-buttons" style="display:none;">
+			<div id="sorter-div-${orgBean.id}" class="mycourses-right-buttons" style="display:none;">
 				<a class="sorting" onclick="makeOrgSortable(<c:out value="${orgBean.id}"/>)" title="<fmt:message key="label.enable.lesson.sorting"/>">
 					<img src="<lams:LAMSURL/>/images/sorting_disabled.gif">
 				</a>
@@ -195,8 +195,8 @@
 	
 </div>
 
-<c:if test="${allowSorting}"><c:if test="${hasLessonToSort eq 'true'}">
+<c:if test="${allowSorting && (hasLessonToSort eq 'true')}">
 <script>
-	jQuery("div.mycourses-right-buttons").show();
+	jQuery("#sorter-div-${orgBean.id}").show();
 </script>
-</c:if></c:if>
+</c:if>
