@@ -10,6 +10,7 @@
 				var c = table.config;
 				c.size = size;
 				c.totalPages = Math.ceil(c.totalRows / c.size);
+				c.pagerPositionSet = false;
 				moveToPage(table);
 				fixPosition(table);
 			}
@@ -21,7 +22,7 @@
 					if(o.offset) {
 						c.container.css({
 							top: o.offset().top + o.height() + 'px',
-							position: 'absolute'
+							//position: 'absolute'
 						});
 					}
 					c.pagerPositionSet = true;
@@ -71,10 +72,6 @@
 			function renderTable(table,rows) {
 				
 				var c = table.config;
-				// following 2 lines use value of pagesize for initial display
-				// instead of default
-				c.size = parseInt($(".pagesize").val());
-                c.totalPages = Math.ceil(c.totalRows / c.size);
 				var l = rows.length;
 				var s = (c.page * c.size);
 				var e = (s + c.size);
@@ -172,18 +169,6 @@
 					});
 					$(config.cssPageSize,pager).change(function() {
 						setPageSize(table,parseInt($(this).val()));
-						return false;
-					});
-					// allow navigation to custom page
-					$(config.cssPageDisplay,pager).change(function() {
-						var inputPage = $(this).val();
-						inputPage = inputPage.substr(0, inputPage.indexOf(config.seperator));
-						if(isNaN(inputPage)) {
-							config.page = 0;
-						} else {
-							config.page = inputPage-1;
-						}
-						moveToPage(table);
 						return false;
 					});
 				});

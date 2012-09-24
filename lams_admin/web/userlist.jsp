@@ -6,8 +6,12 @@
 <script>
 	<!--
 	jQuery(document).ready(function() {
-		jQuery("table.tablesorter-admin").tablesorter({widthFixed:true, sortList:[[0,0]], headers:{4:{sorter:false}}})
-			.tablesorterPager({container: jQuery("#pager")});
+		jQuery("table.tablesorter-admin").tablesorter({widthFixed:true, headers:{4:{sorter:false}}});
+		//sort table only in case there is a data inside (it's a tablesorter bug)
+		if (jQuery("table.tablesorter-admin tbody tr").length > 0) {
+			jQuery("table.tablesorter-admin").tablesorterPager({container: jQuery("#pager")});
+			$("table.tablesorter-admin").trigger("sorton", [[[0, 0]]]);
+		}
 	});
 	//-->
 </script>

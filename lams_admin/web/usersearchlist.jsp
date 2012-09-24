@@ -3,14 +3,19 @@
 <c:set var="useInternalSMTPServer"><lams:Configuration key="InternalSMTPServer"/></c:set>
 <c:set var="smtpServer"><lams:Configuration key="SMTPServer"/></c:set>
 
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-1.1.4.pack.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pack.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pager.js"></script>
 <script language="JavaScript" type="text/javascript">
 	<!--
 	jQuery(document).ready(function() {
-		jQuery("table.tablesorter-admin").tablesorter({widthFixed:true, sortList:[[0,0]], headers:{0:{sorter:'integer'},5:{sorter:false}}})
-			.tablesorterPager({container: jQuery("#pager")});
+		jQuery("table.tablesorter-admin").tablesorter({widthFixed:true, headers:{0:{sorter:'digit'},5:{sorter:false}}});
+
+		//sort table only in case there is a data inside (it's a tablesorter bug)
+		if (jQuery("table.tablesorter-admin tbody tr").length > 0) {
+			jQuery("table.tablesorter-admin").tablesorterPager({container: jQuery("#pager")});
+			$("table.tablesorter-admin").trigger("sorton", [[[0, 0]]]);
+		}
 	});
 	//-->
 </script>
@@ -54,14 +59,13 @@
 </tr>
 </thead>
 <tbody>
-<script language="JavaScript" type="text/javascript">
-<!--
-if (jQuery.browser.msie) {
-	document.write('<tr><td/><td/><td/><td/><td/><td/></tr>');
-}
-//-->
-</script>
-<logic:notEmpty name="userList">
+	<script language="JavaScript" type="text/javascript">
+	<!--
+	if (jQuery.browser.msie) {
+		document.write('<tr><td/><td/><td/><td/><td/><td/></tr>');
+	}
+	//-->
+	</script>
 	<c:forEach var="user" items="${userList}">
 		<tr>
 			<td>
@@ -84,7 +88,7 @@ if (jQuery.browser.msie) {
 				&nbsp;
 				[<a href="user.do?method=remove&userId=<c:out value="${user.userId}"/>"><fmt:message key="admin.user.delete"/></a>]
 				&nbsp;
-				[<a href="<lams:LAMSURL/>/loginas.do?login=<c:out value="${user.login}"/>"><fmt:message key="label.login.as"/></a>]
+				[<a href="<lams:LAMSURL/>/cloud/loginas.do?login=<c:out value="${user.login}"/>"><fmt:message key="label.login.as"/></a>]
 				
 				<c:if test="${(not empty user.email) && (useInternalSMTPServer || not empty smtpServer)}">
 					[<a href="emailUser.do?method=composeMail&userId=<c:out value="${user.userId}"/>"><fmt:message key="label.email"/></a>]
@@ -92,7 +96,6 @@ if (jQuery.browser.msie) {
 			</td>
 		</tr>
 	</c:forEach>
-</logic:notEmpty>
 </tbody>
 
 </table>

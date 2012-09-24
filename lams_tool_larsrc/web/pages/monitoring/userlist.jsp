@@ -14,7 +14,7 @@
 
  	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-1.1.4.pack.js"></script>
+	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrccommon.js'/>"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
 	    
@@ -23,8 +23,11 @@
 	<script language="JavaScript" type="text/javascript">
 		<!--
 		jQuery(document).ready(function() {
-			jQuery("table.tablesorter-admin").tablesorter({widthFixed:true})
-				.tablesorterPager({container: jQuery("#pager")});
+			jQuery("table.tablesorter-admin").tablesorter({widthFixed:true});
+			//sort table only in case there is a data inside (it's a tablesorter bug)
+			if (jQuery("table.tablesorter-admin tbody tr").length > 0) {
+				jQuery("table.tablesorter-admin").tablesorterPager({container: jQuery("#pager")});
+			}
 		});
 		//-->
 	</script>

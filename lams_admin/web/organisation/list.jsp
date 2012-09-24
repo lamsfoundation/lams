@@ -1,14 +1,18 @@
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.usermanagement.Role" %>
 
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-1.1.4.pack.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pack.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pager.js"></script>
 <script>
 	<!--
 	jQuery(document).ready(function() {
-		jQuery("table.tablesorter-admin").tablesorter({widthFixed:true, sortList:[[1,0]], textExtraction:'complex'})
-			.tablesorterPager({container: jQuery("#pager")});
+		jQuery("table.tablesorter-admin").tablesorter({widthFixed:true, textExtraction:'complex'});
+		//sort table only in case there is a data inside (it's a tablesorter bug)
+		if (jQuery("table.tablesorter-admin tbody tr").length > 0) {
+			jQuery("table.tablesorter-admin").tablesorterPager({container: jQuery("#pager")});
+			$("table.tablesorter-admin").trigger("sorton", [[[1, 0]]]);
+		}
 	});
 	//-->
 </script>

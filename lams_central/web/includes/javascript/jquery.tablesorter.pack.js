@@ -1,1 +1,852 @@
-eval(function(p,a,c,k,e,d){e=function(c){return(c<a?"":e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--){d[e(c)]=k[c]||e(c)}k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1};while(c--){if(k[c]){p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c])}}return p}('(8($){$.1L({L:D 8(){7 C=[],1a=[];k.2z={2e:"45",2F:"3Y",2D:"2W",2d:"2X",2I:"2Y",1S:1t,1s:"2q",C:{},1a:[],1p:{Y:["2y","2O"]},x:{},2l:K,2N:Z,u:[],1D:[],1m:"2R",I:K};8 19(s,d){1l(s+","+(D X().1f()-d.1f())+"2Z")}k.19=19;8 1l(s){q(1B 1R!="24"&&1B 1R.I!="24"){1R.1l(s)}M{30(s)}}8 1T(6,$x){q(6.f.I){7 1P=""}7 F=6.J[0].F;q(6.J[0].F[0]){7 13=[],14=F[0].14,l=14.w;y(7 i=0;i<l;i++){7 p=K;q($.1q&&($($x[i]).17()&&$($x[i]).17().1e)){p=1O($($x[i]).17().1e)}M q((6.f.x[i]&&6.f.x[i].1e)){p=1O(6.f.x[i].1e)}q(!p){p=2p(6.f,14[i])}q(6.f.I){1P+="1I:"+i+" 1G:"+p.B+"\\n"}13.R(p)}}q(6.f.I){1l(1P)}m 13};8 2p(f,V){7 l=C.w;y(7 i=1;i<l;i++){q(C[i].Q($.1Q(1N(f,V)))){m C[i]}}m C[0]}8 1O(1w){7 l=C.w;y(7 i=0;i<l;i++){q(C[i].B.15()==1w.15()){m C[i]}}m K}8 1U(6){q(6.f.I){7 28=D X()}7 1b=(6.J[0]&&6.J[0].F.w)||0,26=(6.J[0].F[0]&&6.J[0].F[0].14.w)||0,C=6.f.C,G={W:[],1n:[]};y(7 i=0;i<1b;++i){7 c=6.J[0].F[i],1h=[];G.W.R($(c));y(7 j=0;j<26;++j){1h.R(C[j].H(1N(6.f,c.14[j]),6,c.14[j]))}1h.R(i);G.1n.R(1h);1h=1t};q(6.f.I){19("31 G y "+1b+" F:",28)}m G};8 1N(f,V){q(!V)m"";7 t="";q(f.1s=="2q"){q(V.1X[0]&&V.1X[0].3j()){t=V.1X[0].23}M{t=V.23}}M{q(1B(f.1s)=="8"){t=f.1s(V)}M{t=$(V).1k()}}m t}8 1H(6,G){q(6.f.I){7 2c=D X()}7 c=G,r=c.W,n=c.1n,1b=n.w,1K=(n[0].w-1),2g=$(6.J[0]),F=[];y(7 i=0;i<1b;i++){F.R(r[n[i][1K]]);q(!6.f.21){7 o=r[n[i][1K]];7 l=o.w;y(7 j=0;j<l;j++){2g[0].3u(o[j])}}}q(6.f.21){6.f.21(6,F)}F=1t;q(6.f.I){19("38 6:",2c)}1F(6)};8 2a(6){q(6.f.I){7 1g=D X()}7 1q=($.1q)?Z:K,1W=[];y(7 i=0;i<6.1i.F.w;i++){1W[i]=0};$1E=$(1V(6,1W,0,6.1i.F[0].14.w));$1E.1x(8(1u){k.1c=0;k.1I=1u;k.18=2k(6.f.2d);q(2C(k)||2i(6,1u))k.1C=Z;q(!k.1C){$(k).1y(6.f.2e)}6.f.1D[1u]=k});q(6.f.I){19("3c x:",1g);1l($1E)}m $1E};8 1V(6,1r,W){7 1j=[],r=6.1i.F,c=r[W].14;y(7 i=1r[W];i<c.w;i++){7 S=c[i];q(S.3d>1){1j=1j.3e(1V(6,1r,W+S.2h))}M{q(6.1i.w==1||(S.2h>1||!r[W+1])){1j.R(S)}1r[W]=(i+W)}}m 1j};8 2C(S){q(($.1q)&&($(S).17().1e===K)){m Z};m K}8 2i(6,i){q((6.f.x[i])&&(6.f.x[i].1e===K)){m Z};m K}8 1F(6){7 c=6.f.1a;7 l=c.w;y(7 i=0;i<l;i++){22(c[i]).H(6)}}8 22(1w){7 l=1a.w;y(7 i=0;i<l;i++){q(1a[i].B.15()==1w.15()){m 1a[i]}}};8 2k(v){q(1B(v)!="3k"){i=(v.15()=="3l")?1:0}M{i=(v==(0||1))?v:0}m i}8 2V(v,a){7 l=a.w;y(7 i=0;i<l;i++){q(a[i][0]==v){m Z}}m K}8 1Y(6,$x,13,Y){$x.1A(Y[0]).1A(Y[1]);7 h=[];$x.1x(8(3m){q(!k.1C){h[k.1I]=$(k)}});7 l=13.w;y(7 i=0;i<l;i++){h[13[i][0]].1y(Y[13[i][1]])}}8 2G(6,$x){7 c=6.f;q(c.2l){7 1z=$(\'<1z>\');$("2o:3D 3C",6.J[0]).1x(8(){1z.3q($(\'<3r>\').Y(\'2n\',$(k).2n()))});$(6).3s(1z)}}8 2Q(6,u){7 c=6.f,l=u.w;y(7 i=0;i<l;i++){7 s=u[i],o=c.1D[s[0]];o.1c=s[1];o.1c++}}8 20(6,u,G){q(6.f.I){7 2s=D X()}7 12="7 2r = 8(a,b) {",l=u.w;y(7 i=0;i<l;i++){7 c=u[i][0];7 18=u[i][1];7 s=(2x(6.f.C,c)=="1k")?((18==0)?"2t":"2u"):((18==0)?"2v":"2w");7 e="e"+i;12+="7 "+e+" = "+s+"(a["+c+"],b["+c+"]); ";12+="q("+e+") { m "+e+"; } ";12+="M { "}7 1J=G.1n[0].w-1;12+="m a["+1J+"]-b["+1J+"];";y(7 i=0;i<l;i++){12+="}; "}12+="m 0; ";12+="}; ";3v(12);G.1n.3x(2r);q(6.f.I){19("3y 3A "+u.3B()+" 3F 3G "+18+" 1g:",2s)}m G};8 2t(a,b){m((a<b)?-1:((a>b)?1:0))};8 2u(a,b){m((b<a)?-1:((b>a)?1:0))};8 2v(a,b){m a-b};8 2w(a,b){m b-a};8 2x(C,i){m C[i].O};k.2j=8(2A){m k.1x(8(){7 $k,$3J,$x,G,f,3K=0,3L;k.f={};f=$.1L(k.f,$.L.2z,2A);q(!k.1i||!k.J)m Z;$k=$(k);$x=2a(k);k.f.C=1T(k,$x);G=1U(k);7 1Z=[f.2D,f.2F];2G(k);$x.3P(8(e){7 1b=($k[0].J[0]&&$k[0].J[0].F.w)||0;q(!k.1C&&1b>0){7 $S=$(k);7 i=k.1I;k.18=k.1c++%2;q(!e[f.2I]){f.u=[];q(f.1S!=1t){7 a=f.1S;y(7 j=0;j<a.w;j++){f.u.R(a[j])}}f.u.R([i,k.18])}M{q(2V(i,f.u)){y(7 j=0;j<f.u.w;j++){7 s=f.u[j],o=f.1D[s[0]];q(s[0]==i){o.1c=s[1];o.1c++;s[1]=o.1c%2}}}M{f.u.R([i,k.18])}};1Y($k[0],$x,f.u,1Z);1H($k[0],20($k[0],f.u,G));m K}}).3U(8(){q(f.2N){k.3V=8(){m K};m K}});$k.1o("3W",8(){k.f.C=1T(k,$x);G=1U(k)}).1o("2K",8(e,13){f.u=13;7 u=f.u;2Q(k,u);1Y(k,$x,u,1Z);1H(k,20(k,u,G))}).1o("41",8(){1H(k,G)}).1o("42",8(e,B){22(B).H(k)}).1o("44",8(){1F(k)});q($.1q&&($(k).17()&&$(k).17().2S)){f.u=$(k).17().2S}q(f.u.w>0){$k.46("2K",[f.u])}1F(k)})};k.P=8(1G){7 l=C.w,a=Z;y(7 i=0;i<l;i++){q(C[i].B.15()==1G.B.15()){a=K}}q(a){C.R(1G)}};k.2T=8(1M){1a.R(1M)};k.T=8(s){7 i=32(s);m(29(i))?0:i};k.34=8(s){7 i=35(s);m(29(i))?0:i};k.36=8(6){q($.37.39){8 2P(){3a(k.2f)k.3b(k.2f)}2P.3f(6.J[0])}M{6.J[0].23=""}}}});$.3h.1L({L:$.L.2j});7 N=$.L;N.P({B:"1k",Q:8(s){m Z},H:8(s){m $.1Q(s.15())},O:"1k"});N.P({B:"3H",Q:8(s){m/^\\d+$/.16(s)},H:8(s){m $.L.T(s)},O:"U"});N.P({B:"3n",Q:8(s){m/^[£$€?.]/.16(s)},H:8(s){m $.L.T(s.11(D 1d(/[^0-9.]/g),""))},O:"U"});N.P({B:"3p",Q:8(s){m s.2J(D 1d(/^(\\+|-)?[0-9]+\\.[0-9]+((E|e)(\\+|-)?[0-9]+)?$/))},H:8(s){m $.L.T(s.11(D 1d(/,/),""))},O:"U"});N.P({B:"3t",Q:8(s){m/^\\d{2,3}[\\.]\\d{2,3}[\\.]\\d{2,3}[\\.]\\d{2,3}$/.16(s)},H:8(s){7 a=s.3w("."),r="",l=a.w;y(7 i=0;i<l;i++){7 1v=a[i];q(1v.w==2){r+="0"+1v}M{r+=1v}}m $.L.T(r)},O:"U"});N.P({B:"3I",Q:8(s){m/^(2b?|2B|2E):\\/\\/$/.16(s)},H:8(s){m 2U.1Q(s.11(D 1d(/(2b?|2B|2E):\\/\\//),\'\'))},O:"1k"});N.P({B:"3Q",Q:8(s){m/^\\d{4}[\\/-]\\d{1,2}[\\/-]\\d{1,2}$/.16(s)},H:8(s){m $.L.T((s!="")?D X(s.11(D 1d(/-/g),"/")).1f():"0")},O:"U"});N.P({B:"3R",Q:8(s){m/^\\d{1,3}%$/.16(s)},H:8(s){m $.L.T(s.11(D 1d(/%/g),""))},O:"U"});N.P({B:"3S",Q:8(s){m s.2J(D 1d(/^[A-3T-z]{3,10}\\.? [0-9]{1,2}, ([0-9]{4}|\'?[0-9]{2}) (([0-2]?[0-9]:[0-5][0-9])|([0-1]?[0-9]:[0-5][0-9]\\s(3X|3Z)))$/))},H:8(s){m $.L.T(D X(s).1f())},O:"U"});N.P({B:"40",Q:8(s){m/\\d{1,2}[\\/\\-]\\d{1,2}[\\/\\-]\\d{2,4}/.16(s)},H:8(s,6){7 c=6.f;s=s.11(/\\-/g,"/");q(c.1m=="2R"){s=s.11(/(\\d{1,2})[\\/\\-](\\d{1,2})[\\/\\-](\\d{4})/,"$3/$1/$2")}M q(c.1m=="43"){s=s.11(/(\\d{1,2})[\\/\\-](\\d{1,2})[\\/\\-](\\d{4})/,"$3/$2/$1")}M q(c.1m=="2M/25/27"||c.1m=="2M-25-27"){s=s.11(/(\\d{1,2})[\\/\\-](\\d{1,2})[\\/\\-](\\d{2})/,"$1/$2/$3")}m $.L.T(D X(s).1f())},O:"U"});N.P({B:"1g",Q:8(s){m/^(([0-2]?[0-9]:[0-5][0-9])|([0-1]?[0-9]:[0-5][0-9]\\s(3g|3i)))$/.16(s)},H:8(s){m $.L.T(D X("3o/2m/2m "+s).1f())},O:"U"});N.P({B:"3E",Q:8(s){m K},H:8(s,6,S){7 c=6.f,p=(!c.2H)?\'3M\':c.2H;m $(S).17()[p]},O:"U"});N.2T({B:"33",H:8(6){q(6.f.I){7 1g=D X()}$("2o:3z",6.J[0]).2L(\':2y\').1A(6.f.1p.Y[1]).1y(6.f.1p.Y[0]).3O().2L(\':2O\').1A(6.f.1p.Y[0]).1y(6.f.1p.Y[1]);q(6.f.I){$.L.19("3N 47 1M",1g)}}})})(2U);',62,256,'||||||table|var|function|||||||config|||||this||return||||if||||sortList||length|headers|for|||id|parsers|new||rows|cache|format|debug|tBodies|false|tablesorter|else|ts|type|addParser|is|push|cell|formatFloat|numeric|node|row|Date|css|true||replace|dynamicExp|list|cells|toLowerCase|test|data|order|benchmark|widgets|totalRows|count|RegExp|sorter|getTime|time|cols|tHead|arr|text|log|dateFormat|normalized|bind|widgetZebra|meta|headerArr|textExtraction|null|index|item|name|each|addClass|colgroup|removeClass|typeof|sortDisabled|headerList|tableHeaders|applyWidget|parser|appendToTable|column|orgOrderCol|checkCell|extend|widget|getElementText|getParserById|parsersDebug|trim|console|sortForce|buildParserCache|buildCache|checkCellColSpan|tableHeadersRows|childNodes|setHeadersCss|sortCSS|multisort|appender|getWidgetById|innerHTML|undefined|mm|totalCells|yy|cacheTime|isNaN|buildHeaders|https|appendTime|sortInitialOrder|cssHeader|firstChild|tableBody|rowSpan|checkHeaderOptions|construct|formatSortingOrder|widthFixed|01|width|tr|detectParserForColumn|simple|sortWrapper|sortTime|sortText|sortTextDesc|sortNumeric|sortNumericDesc|getCachedSortType|even|defaults|settings|ftp|checkHeaderMetadata|cssDesc|file|cssAsc|fixColumnWidth|parserMetadataName|sortMultiSortKey|match|sorton|filter|dd|cancelSelection|odd|empty|updateHeaderSortCount|us|sortlist|addWidget|jQuery|isValueInArray|headerSortDown|asc|shiftKey|ms|alert|Building|parseFloat|zebra|formatInt|parseInt|clearTableBody|browser|Rebuilt|msie|while|removeChild|Built|colSpan|concat|apply|am|fn|pm|hasChildNodes|Number|desc|offset|currency|2000|floating|append|col|prepend|ipAddress|appendChild|eval|split|sort|Sorting|visible|on|toString|td|first|metadata|and|dir|integer|url|document|shiftDown|sortOrder|sortValue|Applying|end|click|isoDate|percent|usLongDate|Za|mousedown|onselectstart|update|AM|headerSortUp|PM|shortDate|appendCache|applyWidgetId|uk|applyWidgets|header|trigger|Zebra'.split('|'),0,{}))
+/*
+ * 
+ * TableSorter 2.0 - Client-side table sorting with ease!
+ * Version 2.0.3
+ * @requires jQuery v1.2.3
+ * 
+ * Copyright (c) 2007 Christian Bach
+ * Examples and docs at: http://tablesorter.com
+ * Dual licensed under the MIT and GPL licenses:
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://www.gnu.org/licenses/gpl.html
+ * 
+ */
+/**
+ *
+ * @description Create a sortable table with multi-column sorting capabilitys
+ * 
+ * @example $('table').tablesorter();
+ * @desc Create a simple tablesorter interface.
+ *
+ * @example $('table').tablesorter({ sortList:[[0,0],[1,0]] });
+ * @desc Create a tablesorter interface and sort on the first and secound column in ascending order.
+ * 
+ * @example $('table').tablesorter({ headers: { 0: { sorter: false}, 1: {sorter: false} } });
+ * @desc Create a tablesorter interface and disableing the first and secound column headers.
+ * 
+ * @example $('table').tablesorter({ 0: {sorter:"integer"}, 1: {sorter:"currency"} });
+ * @desc Create a tablesorter interface and set a column parser for the first and secound column.
+ * 
+ * 
+ * @param Object settings An object literal containing key/value pairs to provide optional settings.
+ * 
+ * @option String cssHeader (optional) 			A string of the class name to be appended to sortable tr elements in the thead of the table. 
+ * 												Default value: "header"
+ * 
+ * @option String cssAsc (optional) 			A string of the class name to be appended to sortable tr elements in the thead on a ascending sort. 
+ * 												Default value: "headerSortUp"
+ * 
+ * @option String cssDesc (optional) 			A string of the class name to be appended to sortable tr elements in the thead on a descending sort. 
+ * 												Default value: "headerSortDown"
+ * 
+ * @option String sortInitialOrder (optional) 	A string of the inital sorting order can be asc or desc. 
+ * 												Default value: "asc"
+ * 
+ * @option String sortMultisortKey (optional) 	A string of the multi-column sort key. 
+ * 												Default value: "shiftKey"
+ * 
+ * @option String textExtraction (optional) 	A string of the text-extraction method to use. 
+ * 												For complex html structures inside td cell set this option to "complex", 
+ * 												on large tables the complex option can be slow. 
+ * 												Default value: "simple"
+ * 
+ * @option Object headers (optional) 			An array containing the forces sorting rules. 
+ * 												This option let's you specify a default sorting rule. 
+ * 												Default value: null
+ * 
+ * @option Array sortList (optional) 			An array containing the forces sorting rules. 
+ * 												This option let's you specify a default sorting rule. 
+ * 												Default value: null
+ * 
+ * @option Array sortForce (optional) 			An array containing forced sorting rules. 
+ * 												This option let's you specify a default sorting rule, which is prepended to user-selected rules.
+ * 												Default value: null
+ *  
+  * @option Array sortAppend (optional) 			An array containing forced sorting rules. 
+ * 												This option let's you specify a default sorting rule, which is appended to user-selected rules.
+ * 												Default value: null
+ * 
+ * @option Boolean widthFixed (optional) 		Boolean flag indicating if tablesorter should apply fixed widths to the table columns.
+ * 												This is usefull when using the pager companion plugin.
+ * 												This options requires the dimension jquery plugin.
+ * 												Default value: false
+ *
+ * @option Boolean cancelSelection (optional) 	Boolean flag indicating if tablesorter should cancel selection of the table headers text.
+ * 												Default value: true
+ *
+ * @option Boolean debug (optional) 			Boolean flag indicating if tablesorter should display debuging information usefull for development.
+ *
+ * @type jQuery
+ *
+ * @name tablesorter
+ * 
+ * @cat Plugins/Tablesorter
+ * 
+ * @author Christian Bach/christian.bach@polyester.se
+ */
+
+(function($) {
+	$.extend({
+		tablesorter: new function() {
+			
+			var parsers = [], widgets = [];
+			
+			this.defaults = {
+				cssHeader: "header",
+				cssAsc: "headerSortUp",
+				cssDesc: "headerSortDown",
+				sortInitialOrder: "asc",
+				sortMultiSortKey: "shiftKey",
+				sortForce: null,
+				sortAppend: null,
+				textExtraction: "simple",
+				parsers: {}, 
+				widgets: [],		
+				widgetZebra: {css: ["even","odd"]},
+				headers: {},
+				widthFixed: false,
+				cancelSelection: true,
+				sortList: [],
+				headerList: [],
+				dateFormat: "us",
+				decimal: '.',
+				debug: false
+			};
+			
+			/* debuging utils */
+			function benchmark(s,d) {
+				log(s + "," + (new Date().getTime() - d.getTime()) + "ms");
+			}
+			
+			this.benchmark = benchmark;
+			
+			function log(s) {
+				if (typeof console != "undefined" && typeof console.debug != "undefined") {
+					console.log(s);
+				} else {
+					alert(s);
+				}
+			}
+						
+			/* parsers utils */
+			function buildParserCache(table,$headers) {
+				
+				if(table.config.debug) { var parsersDebug = ""; }
+				
+				var rows = table.tBodies[0].rows;
+				
+				if(table.tBodies[0].rows[0]) {
+
+					var list = [], cells = rows[0].cells, l = cells.length;
+					
+					for (var i=0;i < l; i++) {
+						var p = false;
+						
+						if($.metadata && ($($headers[i]).metadata() && $($headers[i]).metadata().sorter)  ) {
+						
+							p = getParserById($($headers[i]).metadata().sorter);	
+						
+						} else if((table.config.headers[i] && table.config.headers[i].sorter)) {
+	
+							p = getParserById(table.config.headers[i].sorter);
+						}
+						if(!p) {
+							p = detectParserForColumn(table,cells[i]);
+						}
+	
+						if(table.config.debug) { parsersDebug += "column:" + i + " parser:" +p.id + "\n"; }
+	
+						list.push(p);
+					}
+				}
+				
+				if(table.config.debug) { log(parsersDebug); }
+
+				return list;
+			};
+			
+			function detectParserForColumn(table,node) {
+				var l = parsers.length;
+				for(var i=1; i < l; i++) {
+					if(parsers[i].is($.trim(getElementText(table.config,node)),table,node)) {
+						return parsers[i];
+					}
+				}
+				// 0 is always the generic parser (text)
+				return parsers[0];
+			}
+			
+			function getParserById(name) {
+				var l = parsers.length;
+				for(var i=0; i < l; i++) {
+					if(parsers[i].id.toLowerCase() == name.toLowerCase()) {	
+						return parsers[i];
+					}
+				}
+				return false;
+			}
+			
+			/* utils */
+			function buildCache(table) {
+				
+				if(table.config.debug) { var cacheTime = new Date(); }
+				
+				
+				var totalRows = (table.tBodies[0] && table.tBodies[0].rows.length) || 0,
+					totalCells = (table.tBodies[0].rows[0] && table.tBodies[0].rows[0].cells.length) || 0,
+					parsers = table.config.parsers, 
+					cache = {row: [], normalized: []};
+				
+					for (var i=0;i < totalRows; ++i) {
+					
+						/** Add the table data to main data array */
+						var c = table.tBodies[0].rows[i], cols = [];
+					
+						cache.row.push($(c));
+						
+						for(var j=0; j < totalCells; ++j) {
+							cols.push(parsers[j].format(getElementText(table.config,c.cells[j]),table,c.cells[j]));	
+						}
+												
+						cols.push(i); // add position for rowCache
+						cache.normalized.push(cols);
+						cols = null;
+					};
+				
+				if(table.config.debug) { benchmark("Building cache for " + totalRows + " rows:", cacheTime); }
+				
+				return cache;
+			};
+			
+			function getElementText(config,node) {
+				
+				if(!node) return "";
+								
+				var t = "";
+				
+				if(config.textExtraction == "simple") {
+					if(node.childNodes[0] && node.childNodes[0].hasChildNodes()) {
+						t = node.childNodes[0].innerHTML;
+					} else {
+						t = node.innerHTML;
+					}
+				} else {
+					if(typeof(config.textExtraction) == "function") {
+						t = config.textExtraction(node);
+					} else { 
+						t = $(node).text();
+					}	
+				}
+				return t;
+			}
+			
+			function appendToTable(table,cache) {
+				
+				if(table.config.debug) {var appendTime = new Date()}
+				
+				var c = cache, 
+					r = c.row, 
+					n= c.normalized, 
+					totalRows = n.length, 
+					checkCell = (n[0].length-1), 
+					tableBody = $(table.tBodies[0]),
+					rows = [];
+				
+				for (var i=0;i < totalRows; i++) {
+					rows.push(r[n[i][checkCell]]);	
+					if(!table.config.appender) {
+						
+						var o = r[n[i][checkCell]];
+						var l = o.length;
+						for(var j=0; j < l; j++) {
+							
+							tableBody[0].appendChild(o[j]);
+						
+						}
+						
+						//tableBody.append(r[n[i][checkCell]]);
+					}
+				}	
+				
+				if(table.config.appender) {
+				
+					table.config.appender(table,rows);	
+				}
+				
+				rows = null;
+				
+				if(table.config.debug) { benchmark("Rebuilt table:", appendTime); }
+								
+				//apply table widgets
+				applyWidget(table);
+				
+				// trigger sortend
+				setTimeout(function() {
+					$(table).trigger("sortEnd");	
+				},0);
+				
+			};
+			
+			function buildHeaders(table) {
+				
+				if(table.config.debug) { var time = new Date(); }
+				
+				var meta = ($.metadata) ? true : false, tableHeadersRows = [];
+			
+				for(var i = 0; i < table.tHead.rows.length; i++) { tableHeadersRows[i]=0; };
+				
+				$tableHeaders = $("thead th",table);
+		
+				$tableHeaders.each(function(index) {
+							
+					this.count = 0;
+					this.column = index;
+					this.order = formatSortingOrder(table.config.sortInitialOrder);
+					
+					if(checkHeaderMetadata(this) || checkHeaderOptions(table,index)) this.sortDisabled = true;
+					
+					if(!this.sortDisabled) {
+						$(this).addClass(table.config.cssHeader);
+					}
+					
+					// add cell to headerList
+					table.config.headerList[index]= this;
+				});
+				
+				if(table.config.debug) { benchmark("Built headers:", time); log($tableHeaders); }
+				
+				return $tableHeaders;
+				
+			};
+						
+		   	function checkCellColSpan(table, rows, row) {
+                var arr = [], r = table.tHead.rows, c = r[row].cells;
+				
+				for(var i=0; i < c.length; i++) {
+					var cell = c[i];
+					
+					if ( cell.colSpan > 1) { 
+						arr = arr.concat(checkCellColSpan(table, headerArr,row++));
+					} else  {
+						if(table.tHead.length == 1 || (cell.rowSpan > 1 || !r[row+1])) {
+							arr.push(cell);
+						}
+						//headerArr[row] = (i+row);
+					}
+				}
+				return arr;
+			};
+			
+			function checkHeaderMetadata(cell) {
+				if(($.metadata) && ($(cell).metadata().sorter === false)) { return true; };
+				return false;
+			}
+			
+			function checkHeaderOptions(table,i) {	
+				if((table.config.headers[i]) && (table.config.headers[i].sorter === false)) { return true; };
+				return false;
+			}
+			
+			function applyWidget(table) {
+				var c = table.config.widgets;
+				var l = c.length;
+				for(var i=0; i < l; i++) {
+					
+					getWidgetById(c[i]).format(table);
+				}
+				
+			}
+			
+			function getWidgetById(name) {
+				var l = widgets.length;
+				for(var i=0; i < l; i++) {
+					if(widgets[i].id.toLowerCase() == name.toLowerCase() ) {
+						return widgets[i]; 
+					}
+				}
+			};
+			
+			function formatSortingOrder(v) {
+				
+				if(typeof(v) != "Number") {
+					i = (v.toLowerCase() == "desc") ? 1 : 0;
+				} else {
+					i = (v == (0 || 1)) ? v : 0;
+				}
+				return i;
+			}
+			
+			function isValueInArray(v, a) {
+				var l = a.length;
+				for(var i=0; i < l; i++) {
+					if(a[i][0] == v) {
+						return true;	
+					}
+				}
+				return false;
+			}
+				
+			function setHeadersCss(table,$headers, list, css) {
+				// remove all header information
+				$headers.removeClass(css[0]).removeClass(css[1]);
+				
+				var h = [];
+				$headers.each(function(offset) {
+						if(!this.sortDisabled) {
+							h[this.column] = $(this);					
+						}
+				});
+				
+				var l = list.length; 
+				for(var i=0; i < l; i++) {
+					h[list[i][0]].addClass(css[list[i][1]]);
+				}
+			}
+			
+			function fixColumnWidth(table,$headers) {
+				var c = table.config;
+				if(c.widthFixed) {
+					var colgroup = $('<colgroup>');
+					$("tr:first td",table.tBodies[0]).each(function() {
+						colgroup.append($('<col>').css('width',$(this).width()));
+					});
+					$(table).prepend(colgroup);
+				};
+			}
+			
+			function updateHeaderSortCount(table,sortList) {
+				var c = table.config, l = sortList.length;
+				for(var i=0; i < l; i++) {
+					var s = sortList[i], o = c.headerList[s[0]];
+					o.count = s[1];
+					o.count++;
+				}
+			}
+			
+			/* sorting methods */
+			function multisort(table,sortList,cache) {
+				
+				if(table.config.debug) { var sortTime = new Date(); }
+				
+				var dynamicExp = "var sortWrapper = function(a,b) {", l = sortList.length;
+					
+				for(var i=0; i < l; i++) {
+					
+					var c = sortList[i][0];
+					var order = sortList[i][1];
+					var s = (getCachedSortType(table.config.parsers,c) == "text") ? ((order == 0) ? "sortText" : "sortTextDesc") : ((order == 0) ? "sortNumeric" : "sortNumericDesc");
+					
+					var e = "e" + i;
+					
+					dynamicExp += "var " + e + " = " + s + "(a[" + c + "],b[" + c + "]); ";
+					dynamicExp += "if(" + e + ") { return " + e + "; } ";
+					dynamicExp += "else { ";
+				}
+				
+				// if value is the same keep orignal order	
+				var orgOrderCol = cache.normalized[0].length - 1;
+				dynamicExp += "return a[" + orgOrderCol + "]-b[" + orgOrderCol + "];";
+						
+				for(var i=0; i < l; i++) {
+					dynamicExp += "}; ";
+				}
+				
+				dynamicExp += "return 0; ";	
+				dynamicExp += "}; ";	
+				
+				eval(dynamicExp);
+				
+				cache.normalized.sort(sortWrapper);
+				
+				if(table.config.debug) { benchmark("Sorting on " + sortList.toString() + " and dir " + order+ " time:", sortTime); }
+				
+				return cache;
+			};
+			
+			function sortText(a,b) {
+				return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+			};
+			
+			function sortTextDesc(a,b) {
+				return ((b < a) ? -1 : ((b > a) ? 1 : 0));
+			};	
+			
+	 		function sortNumeric(a,b) {
+				return a-b;
+			};
+			
+			function sortNumericDesc(a,b) {
+				return b-a;
+			};
+			
+			function getCachedSortType(parsers,i) {
+				return parsers[i].type;
+			};
+			
+			/* public methods */
+			this.construct = function(settings) {
+
+				return this.each(function() {
+					
+					if(!this.tHead || !this.tBodies) return;
+					
+					var $this, $document,$headers, cache, config, shiftDown = 0, sortOrder;
+					
+					this.config = {};
+					
+					config = $.extend(this.config, $.tablesorter.defaults, settings);
+					
+					// store common expression for speed					
+					$this = $(this);
+					
+					// build headers
+					$headers = buildHeaders(this);
+					
+					// try to auto detect column type, and store in tables config
+					this.config.parsers = buildParserCache(this,$headers);
+					
+					
+					// build the cache for the tbody cells
+					cache = buildCache(this);
+					
+					// get the css class names, could be done else where.
+					var sortCSS = [config.cssDesc,config.cssAsc];
+					
+					// fixate columns if the users supplies the fixedWidth option
+					fixColumnWidth(this);
+					
+					// apply event handling to headers
+					// this is to big, perhaps break it out?
+					$headers.click(function(e) {
+						
+						$this.trigger("sortStart");
+						
+						var totalRows = ($this[0].tBodies[0] && $this[0].tBodies[0].rows.length) || 0;
+						
+						if(!this.sortDisabled && totalRows > 0) {
+							
+							
+							// store exp, for speed
+							var $cell = $(this);
+	
+							// get current column index
+							var i = this.column;
+							
+							// get current column sort order
+							this.order = this.count++ % 2;
+							
+							// user only whants to sort on one column
+							if(!e[config.sortMultiSortKey]) {
+								
+								// flush the sort list
+								config.sortList = [];
+								
+								if(config.sortForce != null) {
+									var a = config.sortForce; 
+									for(var j=0; j < a.length; j++) {
+										if(a[j][0] != i) {
+											config.sortList.push(a[j]);
+										}
+									}
+								}
+								
+								// add column to sort list
+								config.sortList.push([i,this.order]);
+							
+							// multi column sorting
+							} else {
+								// the user has clicked on an all ready sortet column.
+								if(isValueInArray(i,config.sortList)) {	 
+									
+									// revers the sorting direction for all tables.
+									for(var j=0; j < config.sortList.length; j++) {
+										var s = config.sortList[j], o = config.headerList[s[0]];
+										if(s[0] == i) {
+											o.count = s[1];
+											o.count++;
+											s[1] = o.count % 2;
+										}
+									}	
+								} else {
+									// add column to sort list array
+									config.sortList.push([i,this.order]);
+								}
+							};
+							setTimeout(function() {
+								//set css for headers
+								setHeadersCss($this[0],$headers,config.sortList,sortCSS);
+								appendToTable($this[0],multisort($this[0],config.sortList,cache));
+							},1);
+							// stop normal event by returning false
+							return false;
+						}
+					// cancel selection	
+					}).mousedown(function() {
+						if(config.cancelSelection) {
+							this.onselectstart = function() {return false};
+							return false;
+						}
+					});
+					
+					// apply easy methods that trigger binded events
+					$this.bind("update",function() {
+						
+						// rebuild parsers.
+						this.config.parsers = buildParserCache(this,$headers);
+						
+						// rebuild the cache map
+						cache = buildCache(this);
+						
+					}).bind("sorton",function(e,list) {
+						
+						$(this).trigger("sortStart");
+						
+						config.sortList = list;
+						
+						// update and store the sortlist
+						var sortList = config.sortList;
+						
+						// update header count index
+						updateHeaderSortCount(this,sortList);
+						
+						//set css for headers
+						setHeadersCss(this,$headers,sortList,sortCSS);
+						
+						
+						// sort the table and append it to the dom
+						appendToTable(this,multisort(this,sortList,cache));
+
+					}).bind("appendCache",function() {
+						
+						appendToTable(this,cache);
+					
+					}).bind("applyWidgetId",function(e,id) {
+						
+						getWidgetById(id).format(this);
+						
+					}).bind("applyWidgets",function() {
+						// apply widgets
+						applyWidget(this);
+					});
+					
+					if($.metadata && ($(this).metadata() && $(this).metadata().sortlist)) {
+						config.sortList = $(this).metadata().sortlist;
+					}
+					// if user has supplied a sort list to constructor.
+					if(config.sortList.length > 0) {
+						$this.trigger("sorton",[config.sortList]);	
+					}
+					
+					// apply widgets
+					applyWidget(this);
+				});
+			};
+			
+			this.addParser = function(parser) {
+				var l = parsers.length, a = true;
+				for(var i=0; i < l; i++) {
+					if(parsers[i].id.toLowerCase() == parser.id.toLowerCase()) {
+						a = false;
+					}
+				}
+				if(a) { parsers.push(parser); };
+			};
+			
+			this.addWidget = function(widget) {
+				widgets.push(widget);
+			};
+			
+			this.formatFloat = function(s) {
+				var i = parseFloat(s);
+				return (isNaN(i)) ? 0 : i;
+			};
+			this.formatInt = function(s) {
+				var i = parseInt(s);
+				return (isNaN(i)) ? 0 : i;
+			};
+			
+			this.isDigit = function(s,config) {
+				var DECIMAL = '\\' + config.decimal;
+				var exp = '/(^[+]?0(' + DECIMAL +'0+)?$)|(^([-+]?[1-9][0-9]*)$)|(^([-+]?((0?|[1-9][0-9]*)' + DECIMAL +'(0*[1-9][0-9]*)))$)|(^[-+]?[1-9]+[0-9]*' + DECIMAL +'0+$)/';
+				return RegExp(exp).test($.trim(s));
+			};
+			
+			this.clearTableBody = function(table) {
+				if($.browser.msie) {
+					function empty() {
+						while ( this.firstChild ) this.removeChild( this.firstChild );
+					}
+					empty.apply(table.tBodies[0]);
+				} else {
+					table.tBodies[0].innerHTML = "";
+				}
+			};
+		}
+	});
+	
+	// extend plugin scope
+	$.fn.extend({
+        tablesorter: $.tablesorter.construct
+	});
+	
+	var ts = $.tablesorter;
+	
+	// add default parsers
+	ts.addParser({
+		id: "text",
+		is: function(s) {
+			return true;
+		},
+		format: function(s) {
+			return $.trim(s.toLowerCase());
+		},
+		type: "text"
+	});
+	
+	ts.addParser({
+		id: "digit",
+		is: function(s,table) {
+			var c = table.config;
+			return $.tablesorter.isDigit(s,c);
+		},
+		format: function(s) {
+			return $.tablesorter.formatFloat(s);
+		},
+		type: "numeric"
+	});
+	
+	ts.addParser({
+		id: "currency",
+		is: function(s) {
+			return /^[ВЈ$в‚¬?.]/.test(s);
+		},
+		format: function(s) {
+			return $.tablesorter.formatFloat(s.replace(new RegExp(/[^0-9.]/g),""));
+		},
+		type: "numeric"
+	});
+	
+	ts.addParser({
+		id: "ipAddress",
+		is: function(s) {
+			return /^\d{2,3}[\.]\d{2,3}[\.]\d{2,3}[\.]\d{2,3}$/.test(s);
+		},
+		format: function(s) {
+			var a = s.split("."), r = "", l = a.length;
+			for(var i = 0; i < l; i++) {
+				var item = a[i];
+			   	if(item.length == 2) {
+					r += "0" + item;
+			   	} else {
+					r += item;
+			   	}
+			}
+			return $.tablesorter.formatFloat(r);
+		},
+		type: "numeric"
+	});
+	
+	ts.addParser({
+		id: "url",
+		is: function(s) {
+			return /^(https?|ftp|file):\/\/$/.test(s);
+		},
+		format: function(s) {
+			return jQuery.trim(s.replace(new RegExp(/(https?|ftp|file):\/\//),''));
+		},
+		type: "text"
+	});
+	
+	ts.addParser({
+		id: "isoDate",
+		is: function(s) {
+			return /^\d{4}[\/-]\d{1,2}[\/-]\d{1,2}$/.test(s);
+		},
+		format: function(s) {
+			return $.tablesorter.formatFloat((s != "") ? new Date(s.replace(new RegExp(/-/g),"/")).getTime() : "0");
+		},
+		type: "numeric"
+	});
+		
+	ts.addParser({
+		id: "percent",
+		is: function(s) { 
+			return /\%$/.test($.trim(s));
+		},
+		format: function(s) {
+			return $.tablesorter.formatFloat(s.replace(new RegExp(/%/g),""));
+		},
+		type: "numeric"
+	});
+
+	ts.addParser({
+		id: "usLongDate",
+		is: function(s) {
+			return s.match(new RegExp(/^[A-Za-z]{3,10}\.? [0-9]{1,2}, ([0-9]{4}|'?[0-9]{2}) (([0-2]?[0-9]:[0-5][0-9])|([0-1]?[0-9]:[0-5][0-9]\s(AM|PM)))$/));
+		},
+		format: function(s) {
+			return $.tablesorter.formatFloat(new Date(s).getTime());
+		},
+		type: "numeric"
+	});
+
+	ts.addParser({
+		id: "shortDate",
+		is: function(s) {
+			return /\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/.test(s);
+		},
+		format: function(s,table) {
+			var c = table.config;
+			s = s.replace(/\-/g,"/");
+			if(c.dateFormat == "us") {
+				// reformat the string in ISO format
+				s = s.replace(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/, "$3/$1/$2");
+			} else if(c.dateFormat == "uk") {
+				//reformat the string in ISO format
+				s = s.replace(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/, "$3/$2/$1");
+			} else if(c.dateFormat == "dd/mm/yy" || c.dateFormat == "dd-mm-yy") {
+				s = s.replace(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})/, "$1/$2/$3");	
+			}
+			return $.tablesorter.formatFloat(new Date(s).getTime());
+		},
+		type: "numeric"
+	});
+
+	ts.addParser({
+	    id: "time",
+	    is: function(s) {
+	        return /^(([0-2]?[0-9]:[0-5][0-9])|([0-1]?[0-9]:[0-5][0-9]\s(am|pm)))$/.test(s);
+	    },
+	    format: function(s) {
+	        return $.tablesorter.formatFloat(new Date("2000/01/01 " + s).getTime());
+	    },
+	  type: "numeric"
+	});
+	
+	
+	ts.addParser({
+	    id: "metadata",
+	    is: function(s) {
+	        return false;
+	    },
+	    format: function(s,table,cell) {
+			var c = table.config, p = (!c.parserMetadataName) ? 'sortValue' : c.parserMetadataName;
+	        return $(cell).metadata()[p];
+	    },
+	  type: "numeric"
+	});
+	
+	// add default widgets
+	ts.addWidget({
+		id: "zebra",
+		format: function(table) {
+			if(table.config.debug) { var time = new Date(); }
+			$("tr:visible",table.tBodies[0])
+	        .filter(':even')
+	        .removeClass(table.config.widgetZebra.css[1]).addClass(table.config.widgetZebra.css[0])
+	        .end().filter(':odd')
+	        .removeClass(table.config.widgetZebra.css[0]).addClass(table.config.widgetZebra.css[1]);
+			if(table.config.debug) { $.tablesorter.benchmark("Applying Zebra widget", time); }
+		}
+	});	
+})(jQuery);
