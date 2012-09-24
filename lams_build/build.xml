@@ -286,8 +286,8 @@
 	
 	<target name="deploy-tools-minimal" description="Deploys minimal set of Tools.">
 		<echo>Deploying minimal set of Tools</echo>
-  		<ant antfile="../${tool_notebook_dir}/build.xml"      target="deploy-tool" inheritAll="false" />
-		<ant antfile="../${tool_videorecorder_dir}/build.xml" target="deploy-tool" inheritAll="false" />
+  		<ant antfile="../${tool_notebook_dir}/build.xml" target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_wiki_dir}/build.xml" 	 target="deploy-tool" inheritAll="false" />
 	</target>
 	
 	
