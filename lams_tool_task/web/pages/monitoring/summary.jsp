@@ -20,7 +20,7 @@
 		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
 	};
 </script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-latest.pack.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui-timepicker-addon.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>  
