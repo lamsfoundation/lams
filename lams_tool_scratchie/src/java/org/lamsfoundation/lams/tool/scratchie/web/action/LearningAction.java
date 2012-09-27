@@ -199,7 +199,7 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 
 	boolean isScratchingFinished = scratchieUser != null && scratchieUser.isScratchingFinished();
-	if (isScratchingFinished || mode.isTeacher()) {
+	if (isScratchingFinished && !mode.isTeacher()) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
 	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
