@@ -75,12 +75,12 @@
     	}	    
     </style>
     
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>" ></script>    
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>   
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.galleria.js'/>" ></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.jcarousel.pack.js'/>"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.MetaData.js'/>"></script>
  	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.rating.1.1.js'/>"></script>
- 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.form.js'/>"></script>
+ 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript">
 		var pathToImageFolder = "<lams:LAMSURL/>images/";
 	</script>

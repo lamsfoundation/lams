@@ -89,9 +89,10 @@ public class ForumBundler extends Bundler {
 	final String includesFolder = getToolFolder() + "includes" + URL_SEPARATOR;
 	
 	// JS files
-	String urlToConnectTo = includesFolder + "javascript" + URL_SEPARATOR + "jquery.js";
+	String urlToConnectTo = getServerUrl() + "includes" + URL_SEPARATOR + "javascript" + URL_SEPARATOR + "jquery.js";
 	String directoryToStoreFile = outputDirectory + File.separator + "javascript";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.js", cookies); 
+	
 	urlToConnectTo = includesFolder + "javascript" + URL_SEPARATOR + "jRating.jquery.js";
 	directoryToStoreFile = outputDirectory + File.separator + "javascript";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jRating.jquery.js", cookies); 
@@ -100,6 +101,7 @@ public class ForumBundler extends Bundler {
 	urlToConnectTo = includesFolder + "css" + URL_SEPARATOR + "jRating.jquery.css";
 	directoryToStoreFile = outputDirectory + File.separator + "css";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jRating.jquery.css", cookies); 
+	
 	urlToConnectTo = includesFolder + "css" + URL_SEPARATOR + "ratingStars.css";
 	directoryToStoreFile = outputDirectory + File.separator + "css";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "ratingStars.css", cookies); 
@@ -107,17 +109,21 @@ public class ForumBundler extends Bundler {
     }
 
     private String getToolFolder() {
-	String serverUrlPath = Configuration.get(ConfigurationKeys.SERVER_URL);
-	if (serverUrlPath == null) {
+	String toolFolder = getServerUrl() + "tool" + URL_SEPARATOR + ForumConstants.TOOL_SIGNATURE + URL_SEPARATOR;
+	return toolFolder;
+    }
+
+    private String getServerUrl() {
+	String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
+	if (serverUrl == null) {
 	    log.error("Unable to get path to the LAMS Server URL from the configuration table. Q&A javascript files export failed");
 	    return "";
 	} else {
-	    if (!serverUrlPath.endsWith("/")) {
-		serverUrlPath += "/";
+	    if (!serverUrl.endsWith("/")) {
+		serverUrl += "/";
 	    }
-
-	    return serverUrlPath + "tool" + URL_SEPARATOR + ForumConstants.TOOL_SIGNATURE + URL_SEPARATOR;
 	}
+	return serverUrl;
     }
 
 }

@@ -21,7 +21,7 @@
 
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
-		<script src="${lams}includes/javascript/jquery-1.7.1.min.js"></script>
+		<script src="${lams}includes/javascript/jquery.js"></script>
 		<script src="${lams}includes/javascript/jquery.mobile.js"></script>		
 		
 	</lams:head>

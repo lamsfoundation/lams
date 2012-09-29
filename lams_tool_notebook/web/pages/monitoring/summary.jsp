@@ -3,8 +3,8 @@
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
 <link rel="stylesheet" href="${lams}/css/thickbox.css" type="text/css" media="screen">
-<link type="text/css" href="${lams}/css/jquery-ui-1.8.11.flick-theme.css" rel="stylesheet">
-<link type="text/css" href="${lams}/css/jquery-ui-timepicker-addon.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 
 <script type="text/javascript">
 <!--
@@ -22,9 +22,9 @@
 	};
 //-->	
 </script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 <script type="text/javascript" src="${lams}/includes/javascript/thickbox-compressed.js"></script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>

@@ -12,5 +12,5 @@
 
 <link type="text/css" href="${tool}/css/wookie.css" rel="stylesheet" />
 
-<script type="text/javascript" src="${lams}/includes/javascript/jquery-latest.pack.js" ></script>
+<script type="text/javascript" src="${lams}/includes/javascript/jquery.js" ></script>
 <script type="text/javascript" src="${tool}/includes/javascript/jquery.pager.js" ></script>

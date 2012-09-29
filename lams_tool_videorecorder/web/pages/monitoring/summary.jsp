@@ -2,7 +2,7 @@
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ include file="/common/taglibs.jsp"%>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js" ></script>
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js" ></script>
 <script src="<lams:LAMSURL/>includes/javascript/AC_OETags.js" type="text/javascript"></script>
 <script lang="javascript">
 <!-- 

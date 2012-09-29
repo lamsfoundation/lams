@@ -19,21 +19,19 @@
 		<fmt:message key="index.searchlesson" />
 	</title>
 
-	<link rel="stylesheet"
-		href="${lams}/includes/javascript/jquery-ui/themes/default/ui.all.css"
-		type="text/css" media="screen" title="Flora (Default)" >
+	<link rel="stylesheet"	href="${lams}/css/jquery-ui-smoothness-theme.css" type="text/css" media="screen"  >
+	<style media="screen,projection" type="text/css">
+		li.ui-menu-item {
+		    list-style: none;
+		}
+	</style>
 
-	<script type="text/javascript"
-		src="${lams}/includes/javascript/getSysInfo.js"></script>
-	<script language="javascript" type="text/javascript"
-		src="${lams}/loadVars.jsp"></script>
-
-	<script type="text/javascript"
-		src="${lams}/includes/javascript/openUrls.js"></script>
-	<script type="text/javascript"
-		src="${lams}/includes/javascript/jquery-latest.pack.js"></script>
-	<script type="text/javascript"
-		src="${lams}/includes/javascript/jquery-ui/jquery-ui-autocomplete-1.6rc2.min.js"></script>
+	<script type="text/javascript" src="${lams}/includes/javascript/getSysInfo.js"></script>
+	<script language="javascript" type="text/javascript" src="${lams}/loadVars.jsp"></script>
+	<script type="text/javascript" src="${lams}/includes/javascript/openUrls.js"></script>
+	<script type="text/javascript" src="${lams}/includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}/includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}/includes/javascript/jquery-ui.autocomplete.js"></script>
 
 	<script type="text/javascript">
 	window.onload = ( function() {
@@ -43,7 +41,7 @@
 			var url = "${lams}/findUserLessons.do?courseID=${courseID}&dispatch=autocomplete";
 
 			$("#query").autocomplete( {
-				url :url
+				source :url
 			});
 		} catch (e) {
 		}
@@ -60,11 +58,12 @@
 
 <p><fmt:message key="lessonsearch.instuctions" /></p>
 
-<form action="${lams}/findUserLessons.do"><input type="hidden"
-	name="dispatch" value="getResults"> <input type="text"
-	id="query" name="query"> <input type="submit" value="Search"
-	class="button"> <input type="hidden" name="courseID"
-	value="${courseID}"></form>
+<form action="${lams}/findUserLessons.do">
+	<input type="hidden" name="dispatch" value="getResults"> 
+	<input type="text"	id="query" name="query"> 
+	<input type="submit" value="Search" class="button"> 
+	<input type="hidden" name="courseID" value="${courseID}">
+</form>
 
 <div class="space-bottom-top"></div>
 

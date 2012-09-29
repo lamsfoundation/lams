@@ -45,7 +45,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:set var="notifyCloseURL" value="${param.notifyCloseURL}" scope="request" />
 		</c:if>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/AC_RunActiveContent.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.layout.js"></script>
 		<script language="JavaScript" type="text/JavaScript">		
 			var thePopUp = null;

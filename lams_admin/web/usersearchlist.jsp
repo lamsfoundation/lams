@@ -3,7 +3,7 @@
 <c:set var="useInternalSMTPServer"><lams:Configuration key="InternalSMTPServer"/></c:set>
 <c:set var="smtpServer"><lams:Configuration key="SMTPServer"/></c:set>
 
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pack.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pager.js"></script>
 <script language="JavaScript" type="text/javascript">

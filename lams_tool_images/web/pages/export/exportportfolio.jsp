@@ -15,7 +15,7 @@
 			<lams:LAMSURL />
 		</c:set>
 		
-		<script type="text/javascript" src="./javascript/jquery-1.2.6.pack.js" ></script>
+		<script type="text/javascript" src="./javascript/jquery.js" ></script>
 	 	<script type="text/javascript" src="./javascript/jquery.rating.1.1.js"></script>
 	 	<link rel="stylesheet" type="text/css" href="./css/jquery.rating.css"/>
 	 	

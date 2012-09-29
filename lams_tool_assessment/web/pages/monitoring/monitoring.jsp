@@ -9,18 +9,17 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/tabbedheader.jsp" %>
-		<link type="text/css" href="${lams}/css/jquery-ui-1.8.11.flick-theme.css" rel="stylesheet">
-		<link type="text/css" href="${lams}/css/jquery-ui-timepicker-addon.css" rel="stylesheet">
-		<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
-		<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery-ui-1.8.6.custom.css'/>" />
-		<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/ui.jqgrid.css'/>" />
+		<link href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" >
+		<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css" >
+		<link href="${lams}css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
+		<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>
  
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.4.2.min.js'/>"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui-timepicker-addon.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
- 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/grid.locale-en.js'/>"></script>
- 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.jqGrid.min.js'/>"></script>
+ 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
+ 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
  		<script type="text/javascript"> 
 			var pathToImageFolder = "<lams:LAMSURL/>images/";
 		</script>

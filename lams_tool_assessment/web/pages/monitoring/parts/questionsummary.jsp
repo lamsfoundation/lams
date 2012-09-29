@@ -10,11 +10,11 @@
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 		<c:set var="assessment" value="${sessionMap.assessment}"/>
 		
-		<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery-ui-1.8.6.custom.css'/>" />
-		<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/ui.jqgrid.css'/>" />
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.4.2.min.js'/>"></script>
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/grid.locale-en.js'/>"></script>
-	 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.jqGrid.min.js'/>"></script>
+		<link type="text/css" href="<lams:LAMSURL />css/jquery-ui-redmond-theme.css" rel="stylesheet">
+		<link type="text/css" href="<lams:LAMSURL />css/jquery.jqGrid.css" rel="stylesheet" />
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.locale-en.js"></script>
+	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
 
   	    <script>
   	    	<!--

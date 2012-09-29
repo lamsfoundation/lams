@@ -1,14 +1,13 @@
 			<%-- css --%>
-			<link type="text/css" rel="stylesheet" href="<lams:LAMSURL/>includes/javascript/jquery-ui/themes/cupertino/ui.all.css" />
-			<link type="text/css" rel="stylesheet" href="<lams:LAMSURL/>includes/javascript/jquery-ui/ui/plugins/jquery.contextMenu.css" />
+			<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+			<link type="text/css" rel="stylesheet" href="/lams/learning/includes/jquery-contextmenu/jquery.contextMenu.css" />
 			<link type="text/css" rel="stylesheet" href="/lams/learning/includes/presence.css" />
 			
 			<%-- javascript --%>
 			<script type="text/javascript" src="/lams/learning/includes/presence.js"></script>
 			<script type="text/javascript" src="/lams/learning/includes/jsjac-1.3.1/jsjac.js"></script>
-			<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui/ui/ui.core.js"></script>
-			<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui/ui/ui.tabs.scrollable.js"></script>
-			<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui/ui/plugins/jquery.contextMenu.js"></script>
+			<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+			<script type="text/javascript" src="/lams/learning/includes/jquery-contextmenu/jquery.contextMenu.js"></script>
 			
 			<script type="text/javascript">
 				// populated from jsp

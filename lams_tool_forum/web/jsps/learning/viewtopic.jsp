@@ -34,8 +34,8 @@
 		<script type="text/javascript">
 			var pathToImageFolder = "<html:rewrite page='/images/'/>"; 
 			var removeItemAttachmentUrl = "<html:rewrite page="/learning/deleteAttachment.do" />";
-		</script>		
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.js'/>"></script>
+		</script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jRating.jquery.js'/>"></script>
 		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 		<script type="text/javascript">

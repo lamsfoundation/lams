@@ -17,7 +17,7 @@
 	
 	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
-	<script src="${lams}includes/javascript/jquery-1.7.1.min.js"></script>
+	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
 	<script language="JavaScript" type="text/JavaScript">
 		function submitLearningMethod(actionMethod) {

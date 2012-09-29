@@ -25,10 +25,10 @@
 	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
 	
-	<script src="${lams}includes/javascript/jquery-1.7.1.min.js"></script>
+	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
- 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.form.js'/>"></script>
- 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.blockUI.js'/>"></script>	
+ 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
+ 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
 	

@@ -28,7 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         <%@ include file="/includes/jsp/qaWizardCommon.jsp"%>
         
         <lams:css style="tabbed" />
-        <script src="<lams:LAMSURL />/includes/javascript/jqgrid/js/jquery-1.2.6.pack.js"></script>
+        <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
         <script language="JavaScript" type="text/JavaScript">
 
             function submitMethod() {

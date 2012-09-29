@@ -28,7 +28,7 @@
 		}
 	</style>
 	
-	<script type="text/javascript" src="includes/javascript/jquery-latest.pack.js"></script>
+	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
 		var lessonId="${lsId}";
 		var edit="${edit}";

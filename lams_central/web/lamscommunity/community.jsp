@@ -10,7 +10,7 @@
 	overflow-y: scroll;
 	}
 </style> 
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jqgrid/js/jquery-1.2.6.pack.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 
 <script type="text/javascript">
 <!-- Common Javascript functions for LAMS -->

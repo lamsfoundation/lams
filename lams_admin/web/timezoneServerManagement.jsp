@@ -22,7 +22,7 @@
 		}	
 	</style>	
 
-	<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
 		function changeServerTimezone() {
 			parent.document.location.href ='<c:url value="/timezonemanagement.do?method=changeServerTimezone&timeZoneId="/>' + $("#timeZoneId").val();

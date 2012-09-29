@@ -24,7 +24,7 @@
 	<script type="text/javascript"> 
 		var pathToImageFolder = "<html:rewrite page='/images/'/>"; 
 	</script>
-	<script src="${lams}includes/javascript/jquery-1.7.1.min.js"></script>
+	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jRating.jquery.js'/>"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
 	<script language="JavaScript" type="text/JavaScript">

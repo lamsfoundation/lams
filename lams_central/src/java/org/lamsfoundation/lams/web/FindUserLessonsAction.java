@@ -17,6 +17,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
@@ -35,7 +37,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action path="/findUserLessons" parameter="dispatch" validate="false"
  * 
  * @struts.action-forward name="success-getResults" path="/findUserLessons.jsp"
- * @struts.action-forward name="success-autocomplete" path="/findUserLessonsAutocomplete.jsp"
  */
 public class FindUserLessonsAction extends DispatchAction {
 
@@ -106,13 +107,6 @@ public class FindUserLessonsAction extends DispatchAction {
 	return mapping.findForward("success-getResults");
     }
 
-    private Set<Organisation> getOrgSet(Organisation rootOrg) {
-	Set<Organisation> orgSet = new HashSet<Organisation>();
-	orgSet.add(rootOrg);
-	orgSet.addAll(rootOrg.getChildOrganisations());
-	return orgSet;
-    }
-
     private Set<User> getUserSet(String query, Organisation rootOrg) {
 
 	Set<User> userSet = new HashSet<User>();
@@ -129,22 +123,24 @@ public class FindUserLessonsAction extends DispatchAction {
     public ActionForward autocomplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	String query = WebUtil.readStrParam(request, "q", true);
+	String query = WebUtil.readStrParam(request, "term", true);
 	Integer courseID = WebUtil.readIntParam(request, "courseID", true);
 
 	Organisation rootOrg = (Organisation) userManagementService.findById(Organisation.class, courseID);
 
 	Set<User> userSet = getUserSet(query, rootOrg);
 
-	List<String> list = new LinkedList<String>();
-
+	JSONArray jsonArray=new JSONArray();
 	for (User user : userSet) {
-	    list.add(user.getFirstName() + " " + user.getLastName());
+	    JSONObject jsonObject = new JSONObject();
+	    jsonObject.put("value", user.getFirstName() + " " + user.getLastName());
+	    jsonArray.put(jsonObject);
 	}
-
-	request.setAttribute("results", list);
-
-	return mapping.findForward("success-autocomplete");
+	
+	response.setContentType("application/x-json");
+	response.getWriter().print(jsonArray);
+	
+	return null;
     }
 
     private void setupService() {

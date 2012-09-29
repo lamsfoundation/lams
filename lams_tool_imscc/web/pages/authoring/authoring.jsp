@@ -13,7 +13,7 @@
 	
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/thickbox.css'/>" />
 	
-	<script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript"> 
 		var pathToImageFolder = "<html:rewrite page='/includes/images/'/>"; 
 	</script>

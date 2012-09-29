@@ -13,7 +13,6 @@
 	<lams:css/>
 	<link type="text/css" href="includes/css/gradebook.css" rel="stylesheet" />
 	
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-latest.pack.js"></script>
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
@@ -76,7 +75,6 @@
 			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monUserView&lessonID=${lessonDetails.lessonID}",
 			    height: "100%",
 			    width: 670,
-			    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 			    cellEdit: true,
 			    viewrecords: true,
 			    sortorder: "asc", 
@@ -114,9 +112,8 @@
 						     datatype: "xml",
 						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&lessonID=${lessonDetails.lessonID}&view=monUserView&userID=" + userID,
 						     height: "100%",
-						     width: 620,
+						     autowidth:true,
 						     cellEdit:true,
-						     imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 						     pager: subgrid_table_id + "_pager",
 							 rowList:[5,10,20,30],
 							 rowNum:10,
@@ -293,7 +290,6 @@
 			    		jQuery("#activityView").clearGridData();
 			    		info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
 			    	},
-				    imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 				    subGrid: true,
 					subGridRowExpanded: function(subgrid_id, row_id) {
 					   var subgrid_table_id;
@@ -306,9 +302,8 @@
 						     datatype: "xml",
 						     url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monActivityView&lessonID=${lessonDetails.lessonID}&activityID=" + activityID + "&groupId=" + groupID,
 						     height: "100%",
-						     width: 580,
+						     autowidth:true,
 						     cellEdit:true,
-						     imgpath: '<lams:LAMSURL />includes/javascript/jqgrid/themes/basic/images',
 						     cellurl: "<lams:LAMSURL />/gradebook/gradebookMonitoring.do?dispatch=updateUserActivityGradebookData&lessonID=${lessonDetails.lessonID}&view=monActivityView&activityID=" + activityID,
 						     sortorder: "asc", 
 							 sortname: "fullName", 

@@ -89,46 +89,44 @@ public class AssessmentBundler extends Bundler {
 		"ui-icons_f9bd01_256x240.png" };
 	
 	for (String imageName : imageNames) {
-	    String urlToConnectTo = getIncludesFolder() + "images" + URL_SEPARATOR + "jquery-ui-redmond-theme" + URL_SEPARATOR + imageName;
+	    String urlToConnectTo = getServerUrl() + "images" + URL_SEPARATOR +"css" + URL_SEPARATOR + "jquery-ui-redmond-theme" + URL_SEPARATOR + imageName;
 	    String directoryToStoreFile = outputDirectory + File. separator + "javascript" + File.separator  + "images" + File.separator + "jquery-ui-redmond-theme";
 	    HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, imageName, cookies);// cookies aren't really needed here.
 	}
 	
-	String urlToConnectTo = getIncludesFolder() + "javascript" + URL_SEPARATOR + "grid.locale-en.js";
+	String urlToConnectTo = getServerUrl() + "includes" + URL_SEPARATOR + "javascript" + URL_SEPARATOR + "jquery.jqGrid.locale-en.js";
 	String directoryToStoreFile = outputDirectory + File.separator + "javascript";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "grid.locale-en.js", cookies); 
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.jqGrid.locale-en.js", cookies); 
 	
-	urlToConnectTo = getIncludesFolder() + "javascript" + URL_SEPARATOR + "jquery.jqGrid.min.js";
+	urlToConnectTo = getServerUrl() + "includes" + URL_SEPARATOR + "javascript" + URL_SEPARATOR + "jquery.jqGrid.js";
 	directoryToStoreFile = outputDirectory + File.separator + "javascript";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.jqGrid.min.js", cookies); 
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.jqGrid.js", cookies); 
 
-	urlToConnectTo = getIncludesFolder() + "javascript" + URL_SEPARATOR + "jquery-1.4.2.min.js";
+	urlToConnectTo = getServerUrl() +"includes" + URL_SEPARATOR + "javascript" + URL_SEPARATOR + "jquery.js";
 	directoryToStoreFile = outputDirectory + File.separator + "javascript";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery-1.4.2.min.js", cookies); 
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.js", cookies); 
 	
-	urlToConnectTo = getIncludesFolder() + "css" + URL_SEPARATOR + "jquery-ui-1.8.6.custom.css";
+	urlToConnectTo = getServerUrl() + "css" + URL_SEPARATOR + "jquery-ui-redmond-theme.css";
 	directoryToStoreFile = outputDirectory + File.separator + "javascript" + File.separator + "css";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery-ui-1.8.6.custom.css", cookies); 
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery-ui-redmond-theme.css", cookies); 
 	
-	urlToConnectTo = getIncludesFolder() + "css" + URL_SEPARATOR + "ui.jqgrid.css";
+	urlToConnectTo = getServerUrl() + "css" + URL_SEPARATOR + "jquery.jqGrid.css";
 	directoryToStoreFile = outputDirectory + File.separator + "javascript" + File.separator + "css";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "ui.jqgrid.css", cookies); 
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.jqGrid.css", cookies); 
 
     }
-
-    private String getIncludesFolder() {
-	String spreadsheetUrlPath = Configuration.get(ConfigurationKeys.SERVER_URL);
-	if (spreadsheetUrlPath == null) {
+    
+    private String getServerUrl() {
+	String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
+	if (serverUrl == null) {
 	    log.error("Unable to get path to the LAMS Spreadsheet URL from the configuration table. Spreadsheet javascript files export failed");
 	    return "";
 	} else {
 	    
-	    if (!spreadsheetUrlPath.endsWith("/")) {
-		spreadsheetUrlPath += "/";
+	    if (!serverUrl.endsWith("/")) {
+		serverUrl += "/";
 	    }
-	    spreadsheetUrlPath = spreadsheetUrlPath + "tool" + URL_SEPARATOR + AssessmentConstants.TOOL_SIGNATURE
-		    + URL_SEPARATOR + "includes" + URL_SEPARATOR;
-	    return spreadsheetUrlPath;
+	    return serverUrl;
 	}
     }
 

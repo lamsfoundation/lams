@@ -14,8 +14,8 @@
 	<title><fmt:message key="${title}"/></title>
 	
 	<lams:css style="learner"/>
-	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-1.8.11.redmont-theme.css" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>/css/jquery.jqGrid-4.1.2.css" />	
+	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>/css/jquery.jqGrid.css" />	
 	<style media="screen,projection" type="text/css">
 		div#content {min-height: 250px; }
 		#emailTextareaDiv {float: right;}
@@ -40,11 +40,11 @@
 		#listEmailsHref {border-bottom: 1px dotted #47BC23;color: #47BC23;text-decoration: none;}
 	</style>	
 	
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/monitorToolSummaryAdvanced.js "></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jqGrid.locale-en.js"></script>
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jqGrid.min.js"></script>
+	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jqGrid.js"></script>
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jstepper.min.js"></script>
 	<script language="JavaScript" type="text/javascript">
 	<!--

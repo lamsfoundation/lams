@@ -35,9 +35,9 @@
 	
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.countdown.css'/>" />
 
-	<script type="text/javascript" src="${lams}includes/javascript/jquery-1.7.1.min.js"></script> 
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script> 
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.countdown.js'/>"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.blockUI.js'/>"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript">
 	<!--	
 		<c:if test="${not finishedLock && assessment.timeLimit > 0}">	

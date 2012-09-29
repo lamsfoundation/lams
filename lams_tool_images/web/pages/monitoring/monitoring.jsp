@@ -12,7 +12,7 @@
 		<%@ include file="/common/tabbedheader.jsp" %>
 		
 		<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery-1.2.6.pack.js'/>" ></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	  	<script type="text/javascript">
 			var pathToImageFolder = "<lams:LAMSURL/>images/";
 	 	</script>

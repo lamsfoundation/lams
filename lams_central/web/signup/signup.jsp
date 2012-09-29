@@ -3,7 +3,7 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 
-<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-1.8.11.redmont-theme.css" rel="stylesheet" />
+<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" rel="stylesheet" />
 <style media="screen,projection" type="text/css">
 	#tabs {width: 90%; margin: 10px 25px ;}
 	#tabs-1, #tabs-2 {padding: 0;}
@@ -19,8 +19,8 @@
 	#selectLoginTabA {cursor: pointer; color: #47bc23;}
 </style>	
 
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-1.5.1.min.js"></script>
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 <script language="JavaScript" type="text/javascript">
 	<!--
 		jQuery(document).ready(function(){

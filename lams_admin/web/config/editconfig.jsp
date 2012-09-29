@@ -2,7 +2,7 @@
 <%@ page import="org.lamsfoundation.lams.config.ConfigurationItem" %>
 <%@ include file="/taglibs.jsp"%>
 
-<script src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js" type="text/javascript"></script>
+<script src="<lams:LAMSURL/>/includes/javascript/jquery.js" type="text/javascript"></script>
 <script type="text/javascript">
 <!--
 	/**

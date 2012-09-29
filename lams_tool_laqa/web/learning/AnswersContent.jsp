@@ -46,9 +46,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</style>
 	
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery-latest.pack.js"></script>
- 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.form.js'/>"></script>
- 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.blockUI.js'/>"></script>	
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+ 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
+ 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
 	<script language="JavaScript" type="text/JavaScript">
 	
 		var interval = "30000"; // = 30 seconds

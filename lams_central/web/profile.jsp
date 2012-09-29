@@ -11,9 +11,9 @@
 		 
 <c:set var="showAllMyLessonLink"><%=Configuration.get(ConfigurationKeys.SHOW_ALL_MY_LESSON_LINK)%></c:set>
 
-<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-1.7.1.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery.js"></script>
 <c:if test="${not empty collapsedOrgDTOs}">
-<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
 <script language="JavaScript" type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
 </c:if>
 	

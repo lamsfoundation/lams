@@ -5,7 +5,7 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
-<link type="text/css" href="css/jquery-ui-1.8.11.redmont-theme.css" rel="stylesheet">
+<link type="text/css" href="css/jquery-ui-redmond-theme.css" rel="stylesheet">
 <style media="screen,projection" type="text/css">
 	.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited, .ui-state-active a:hover  {
 	    color: #47bc23 !important;
@@ -22,7 +22,7 @@
 </style>
 
 <script language="JavaScript" type="text/javascript" src="includes/javascript/jquery.blockUI.js"></script>
-<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
 <script language="JavaScript" type="text/javascript" src="includes/javascript/webcam.js"></script>	
 <script language="JavaScript">
 	webcam.set_swf_url( "includes/flash/webcam.swf" );

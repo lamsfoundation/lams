@@ -8,12 +8,11 @@
 		
 		<title><fmt:message key="pageTitle.admin" /></title>
 		<lams:css/>
+		<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 		
-		<script src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-ui/jquery-ui-dialog-1.5.2.packed.js"></script>
+		<script src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
+		<script src="<lams:LAMSURL/>/includes/javascript/jquery-ui.js"></script>
 
-		<link type="text/css" href="<lams:LAMSURL/>/includes/javascript/jquery-ui/themes/default/ui.dialog.css" rel="stylesheet">
-		
 		<script type="text/javascript">
 		<!--
 			// Creating a 3-dimentional javascript array for category/cognitive skill/question

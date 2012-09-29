@@ -32,7 +32,7 @@ Learn more about Flex at http://flex.org
 
 <title></title>
 <script src="<lams:LAMSURL/>includes/javascript/AC_OETags.js" type="text/javascript"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
 
 <!--  BEGIN Browser History required section -->
 <script src="history/history.js" language="javascript"></script>

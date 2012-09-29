@@ -38,7 +38,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
 	
-	<script src="${lams}includes/javascript/jquery-1.7.1.min.js"></script>
+	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
 	<script type="text/javascript">
 		function disableFinishButton() {
@@ -54,7 +54,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</script>
 </lams:head>
 
-<body>
+<body class="large-font">
 <div data-role="page" data-cache="false">
 
 	<div data-role="header" data-theme="b" data-nobackbtn="true">

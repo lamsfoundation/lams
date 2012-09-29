@@ -10,11 +10,11 @@
 		<c:set var="questionSummaryList" value="${sessionMap.questionSummaryList}"/>
 		<c:set var="assessment" value="${sessionMap.assessment}"/>
 		
-		<link rel="stylesheet" type="text/css" href="./javascript/css/jquery-ui-1.8.6.custom.css" />
-		<link rel="stylesheet" type="text/css" href="./javascript/css/ui.jqgrid.css" />
-		<script type="text/javascript" src="./javascript/jquery-1.4.2.min.js"></script>
-		<script type="text/javascript" src="./javascript/grid.locale-en.js"></script>
-	 	<script type="text/javascript" src="./javascript/jquery.jqGrid.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="./javascript/css/jquery-ui-redmond-theme.css" />
+		<link rel="stylesheet" type="text/css" href="./javascript/css/jquery.jqGrid.css" />
+		<script type="text/javascript" src="./javascript/jquery.js"></script>
+		<script type="text/javascript" src="./javascript/jquery.jqGrid.locale-en.js"></script>
+	 	<script type="text/javascript" src="./javascript/jquery.jqGrid.js"></script>
 
   	    <script>
   			<!--	

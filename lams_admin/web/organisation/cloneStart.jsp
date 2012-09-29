@@ -1,19 +1,18 @@
 <%@ include file="/taglibs.jsp"%>
 
-<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>/includes/javascript/jquery-ui/themes/base/jquery-ui.css">
+<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+
 <style type="text/css">
-.clone-box {
-	border: 1px solid grey; padding: 10px; margin-top: 10px;
-}
-.padding-bottom {
-	padding-bottom: 20px;
-}
+	.clone-box {
+		border: 1px solid grey; padding: 10px; margin-top: 10px;
+	}
+	.padding-bottom {
+		padding-bottom: 20px;
+	}
 </style>
 
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js"></script>
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-ui/ui/ui.core.js"></script>
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-ui/ui/ui.dialog.js"></script>
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-ui/ui/ui.resizable.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-ui.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pack.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pager.js"></script>
 <script language="JavaScript" type="text/javascript">

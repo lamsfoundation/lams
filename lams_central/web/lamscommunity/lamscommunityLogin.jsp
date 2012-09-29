@@ -12,7 +12,7 @@
 	<title><fmt:message key="index.welcome" /></title>
 	<lams:css/>
 	
-	<script src="<lams:LAMSURL/>/includes/javascript/jquery-latest.pack.js" type="text/javascript"></script>
+	<script src="<lams:LAMSURL/>/includes/javascript/jquery.js" type="text/javascript"></script>
 	<script src="<lams:LAMSURL/>/includes/javascript/jquery.validate.pack.js" type="text/javascript"></script>
 	<script language="JavaScript" type="text/javascript">
 		function submitForm()

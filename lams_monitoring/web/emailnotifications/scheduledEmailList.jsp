@@ -17,7 +17,7 @@
 	</c:if>	
 	
 	<lams:css style="main" />	
-	<link type="text/css" href="<lams:LAMSURL/>/css/jquery-ui-1.8.11.redmont-theme.css" rel="stylesheet" />	
+	<link type="text/css" href="<lams:LAMSURL/>/css/jquery-ui-redmond-theme.css" rel="stylesheet" />	
 	<style media="screen,projection" type="text/css">
 		html {margin: 0;overflow:auto;background: none;}
 		body {background: none;	min-height: 100%;width: 100%;}	

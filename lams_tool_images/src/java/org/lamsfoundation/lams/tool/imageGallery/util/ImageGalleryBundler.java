@@ -28,9 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -89,9 +87,9 @@ public class ImageGalleryBundler extends Bundler {
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.rating.1.1.js", cookies); 
 	log.debug("Copying image from source: " + urlToConnectTo + "to desitnation: " + directoryToStoreFile);
 
-	urlToConnectTo = getImagesUrlDir() + "javascript" + URL_SEPARATOR + "jquery-1.2.6.pack.js";
+	urlToConnectTo = getServerUrl() + "includes" + URL_SEPARATOR + "javascript" + URL_SEPARATOR + "jquery.js";
 	directoryToStoreFile = outputDirectory + File.separator + "javascript";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery-1.2.6.pack.js", cookies); 
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.js", cookies); 
 	log.debug("Copying image from source: " + urlToConnectTo + "to desitnation: " + directoryToStoreFile);
 	
 	urlToConnectTo = getImagesUrlDir() + "css" + URL_SEPARATOR + "jquery.rating.css";
@@ -105,21 +103,23 @@ public class ImageGalleryBundler extends Bundler {
 	log.debug("Copying image from source: " + urlToConnectTo + "to desitnation: " + directoryToStoreFile);
 
     }
-
+    
     private String getImagesUrlDir() {
-	String imageGalleryUrlPath = Configuration.get(ConfigurationKeys.SERVER_URL);
-	if (imageGalleryUrlPath == null) {
-	    log.error("Unable to get path to the LAMS ImageGallery URL from the configuration table. ImageGallery javascript files export failed");
+	String toolFolder = getServerUrl() + "tool" + URL_SEPARATOR + ImageGalleryConstants.TOOL_SIGNATURE + URL_SEPARATOR + "includes" + URL_SEPARATOR;
+	return toolFolder;
+    }
+
+    private String getServerUrl() {
+	String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
+	if (serverUrl == null) {
+	    log.error("Unable to get path to the LAMS Server URL from the configuration table. ImageGallery javascript files export failed");
 	    return "";
 	} else {
-	    if (!imageGalleryUrlPath.endsWith("/")) {
-		imageGalleryUrlPath += "/";
+	    if (!serverUrl.endsWith("/")) {
+		serverUrl += "/";
 	    }
-	    
-	    imageGalleryUrlPath = imageGalleryUrlPath + "tool" + URL_SEPARATOR
-		    + ImageGalleryConstants.TOOL_SIGNATURE + URL_SEPARATOR + "includes" + URL_SEPARATOR;
-	    return imageGalleryUrlPath;
 	}
+	return serverUrl;
     }
 
 }

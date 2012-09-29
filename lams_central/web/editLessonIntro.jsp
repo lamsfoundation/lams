@@ -12,7 +12,7 @@
 <lams:head>
 	<TITLE><fmt:message key="title.learner.window"/></TITLE>
 	
-	<script type="text/javascript" src="includes/javascript/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery.form.js"></script>
 	<script language="JavaScript" type="text/javascript">
 	<!--

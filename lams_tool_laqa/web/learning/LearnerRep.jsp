@@ -43,7 +43,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script type="text/javascript"> 
 		var pathToImageFolder = "<html:rewrite page='/images/'/>"; 
 	</script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.js'/>"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jRating.jquery.js'/>"></script>
 	<script language="JavaScript" type="text/JavaScript">
 	  	$(document).ready(function(){

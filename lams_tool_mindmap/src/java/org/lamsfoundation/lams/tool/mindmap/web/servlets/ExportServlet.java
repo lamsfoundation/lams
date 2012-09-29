@@ -84,7 +84,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    writeResponseToFile(basePath + "/includes/javascript/swfobject.js", directoryName, "swfobject.js", cookies);
 	    writeResponseToFile(basePath + "/includes/javascript/mindmap.resize.js", directoryName, "resize.js", cookies);
 	    writeResponseToFile(Configuration.get(ConfigurationKeys.SERVER_URL)
-		+ "includes/javascript/jquery-latest.pack.js", directoryName, "jquery.js", cookies);
+		+ "includes/javascript/jquery.js", directoryName, "jquery.js", cookies);
 	    
 	    try {
 		File localeFile = new File(directoryName + "/locale.xml");

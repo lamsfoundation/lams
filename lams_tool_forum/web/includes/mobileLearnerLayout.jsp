@@ -39,7 +39,7 @@
 		</script>	
 		
 		<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
-		<script src="${lams}includes/javascript/jquery-1.7.1.min.js"></script>
+		<script src="${lams}includes/javascript/jquery.js"></script>
 		<script src="${lams}includes/javascript/jquery.mobile.js"></script>		
 		
 	</lams:head>

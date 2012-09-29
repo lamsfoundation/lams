@@ -39,7 +39,7 @@
 		</script>		
 		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>	
 		<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
-		<script src="${lams}includes/javascript/jquery-1.7.1.min.js"></script>
+		<script src="${lams}includes/javascript/jquery.js"></script>
 		<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jRating.jquery.js'/>"></script>
 		<script type="text/javascript">

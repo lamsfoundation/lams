@@ -13,8 +13,8 @@
 
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/commonCartridgeItem.js'/>"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery-1.5.1.min.js"></script>
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.form.js'/>"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 		<script type="text/javascript">
     		function formSubmit(){
     			$('#itemForm').ajaxSubmit({
