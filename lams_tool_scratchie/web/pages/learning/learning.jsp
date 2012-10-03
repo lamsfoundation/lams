@@ -22,7 +22,7 @@
     	.scartchie-image {border: 0;}
     </style>
 
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui-1.8.11.custom.min.js"></script>
+	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript">
 	<!--
 
@@ -118,6 +118,12 @@
 						
 						<td style="vertical-align: middle;">
 							${answer.description} 
+							
+							<c:if test="${(mode == 'teacher') && (answer.attemptOrder != -1)}">
+								<fmt:message key="label.choice.number" >
+									<fmt:param>${answer.attemptOrder}</fmt:param>
+								</fmt:message>
+							</c:if>
 						</td>
 					</tr>
 				</c:forEach>

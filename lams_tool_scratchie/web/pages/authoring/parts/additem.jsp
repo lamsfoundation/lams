@@ -19,7 +19,7 @@
 		
 		<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 
-		<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-1.7.1.min.js"></script>
+		<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.pack.js"></script>
 		<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 		<script type="text/javascript">

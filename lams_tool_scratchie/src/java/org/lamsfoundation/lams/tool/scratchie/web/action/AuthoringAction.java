@@ -403,9 +403,9 @@ public class AuthoringAction extends Action {
 	while (iter.hasNext()) {
 	    ScratchieItem item = (ScratchieItem) iter.next();
 	    if (item != null) {
-		// This flushs user UID info to message if this user is a new
-		// user.
+		// This flushs user UID info to message if this user is a new user.
 		item.setCreateBy(scratchieUser);
+		removeNewLineCharacters(item);
 		itemList.add(item);
 	    }
 	}
@@ -1044,6 +1044,25 @@ public class AuthoringAction extends Action {
 	    }
 	}
 	return paramMap;
+    }
+    
+    /**
+     * Removes redundant new line characters from options left by CKEditor (otherwise it will break Javascript in
+     * monitor)
+     */
+    private void removeNewLineCharacters(ScratchieItem item) {
+	Set<ScratchieAnswer> answers = item.getAnswers();
+	if (answers != null) {
+	    for (ScratchieAnswer answer : answers) {
+		String answerDescription = answer.getDescription();
+		if (answerDescription != null) {
+		    answerDescription = answerDescription.replaceAll("[\n\r\f]", "");
+		    answerDescription = answerDescription.replaceAll("[\"]", "&quot;");
+		    answer.setDescription(answerDescription);
+		}
+	    }
+	    
+	}
     }
 
     /**

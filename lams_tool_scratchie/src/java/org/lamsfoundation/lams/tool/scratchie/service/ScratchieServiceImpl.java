@@ -479,6 +479,29 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	return groupSummaryList;
     }
     
+    public void retrieveScratchesOrder(Collection<ScratchieItem> items, ScratchieUser user) {
+	
+	for (ScratchieItem item : items) {
+	    List<ScratchieAnswerVisitLog> itemLogs = scratchieAnswerVisitDao.getLogsByScratchieUserAndItem(user.getUid(), item.getUid());
+	    
+	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+
+		int attemptNumber;
+		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answer.getUid(), user.getUserId());
+		if (log == null) {
+		    // -1 if there is no log
+		    attemptNumber = -1;
+		} else {
+		    //adding 1 to start from 1.
+		    attemptNumber = itemLogs.indexOf(log) + 1;
+		}
+
+		answer.setAttemptOrder(attemptNumber);
+	    }
+	}
+	
+    }
+    
     public void retrieveScratched(Collection<ScratchieItem> items, ScratchieUser user) {
 	
 	for (ScratchieItem item : items) {
@@ -490,7 +513,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		    answer.setScratched(false);
 		} else {
 		    answer.setScratched(true);
-		    answer.setScratchedDate(log.getAccessDate());
 		}
 	    }
 	    
@@ -605,7 +627,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    for (ScratchieUser user : users) {
 		
 		int attemptNumber = 0;
-		List<ScratchieAnswerVisitLog> userAttempts = scratchieAnswerVisitDao.getLogsBySessionAndUser(sessionId, user.getUserId());
+		List<ScratchieAnswerVisitLog> userAttempts = scratchieAnswerVisitDao.getLogsByScratchieUserAndItem(user.getUid(), itemUid);
 		for (ScratchieAnswerVisitLog userAttempt : userAttempts) {
 		    ScratchieAnswer answer = answerMap.get(userAttempt.getScratchieAnswer().getUid());
 		    int[] attempts = answer.getAttempts();

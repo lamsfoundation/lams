@@ -12,7 +12,7 @@
 	<%@ include file="/common/tabbedheader.jsp"%>
 	<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
 	
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-1.7.1.min.js"></script>
+	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
 		var tb_pathToImage = "<lams:LAMSURL/>images/loadingAnimation.gif";
 	</script>

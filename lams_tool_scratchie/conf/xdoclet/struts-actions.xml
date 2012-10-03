@@ -227,12 +227,7 @@
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
 			parameter="summary" >
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
-		</action>  
-		<action path="/monitoring/userSummary"
-			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
-			parameter="userSummary" >
-			<forward name="success" path="/pages/monitoring/parts/userSummary.jsp" />
-		</action>
+		</action> 
 		<action path="/monitoring/itemSummary"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
 			parameter="itemSummary" >

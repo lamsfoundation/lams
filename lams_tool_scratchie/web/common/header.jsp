@@ -10,7 +10,7 @@
 
  	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-1.7.1.min.js"></script>
+	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/scratchiecommon.js'/>"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
 

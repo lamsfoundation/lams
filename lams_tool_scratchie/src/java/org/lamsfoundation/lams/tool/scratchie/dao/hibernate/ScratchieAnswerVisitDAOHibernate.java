@@ -37,9 +37,9 @@ public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implement
 
     private static final String FIND_BY_ANSWER_AND_USER = "from " + ScratchieAnswerVisitLog.class.getName()
 	    + " as r where r.user.userId = ? and r.scratchieAnswer.uid=?";
-
-    private static final String FIND_BY_SESSION_AND_USER = "from " + ScratchieAnswerVisitLog.class.getName()
-	    + " as r where r.sessionId = ? and r.user.userId=? order by r.accessDate asc";
+    
+    private static final String FIND_BY_SCRATCHIE_USER_AND_ITEM = "from " + ScratchieAnswerVisitLog.class.getName()
+	    + " as r where r.user.uid=? and r.scratchieAnswer.scratchieItem.uid = ?  order by r.accessDate asc";
 
     private static final String FIND_VIEW_COUNT_BY_USER = "select count(*) from "
 	    + ScratchieAnswerVisitLog.class.getName() + " as r where  r.sessionId=? and  r.user.userId =?";
@@ -67,9 +67,9 @@ public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implement
 	    return 0;
 	return ((Number) list.get(0)).intValue();
     }
-
-    public List<ScratchieAnswerVisitLog> getLogsBySessionAndUser(Long sessionId, Long userId) {
-	return getHibernateTemplate().find(FIND_BY_SESSION_AND_USER, new Object[] { sessionId, userId });
+    
+    public List<ScratchieAnswerVisitLog> getLogsByScratchieUserAndItem(Long userUid, Long itemUid) {
+	return getHibernateTemplate().find(FIND_BY_SCRATCHIE_USER_AND_ITEM, new Object[] { userUid, itemUid });
     }
 
 }

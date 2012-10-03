@@ -161,6 +161,14 @@ public interface IScratchieService {
      * @param resSession
      */
     void saveOrUpdateScratchieSession(ScratchieSession resSession);
+    
+    /**
+     * Fills in which order the student selects answers
+     * 
+     * @param items
+     * @param user
+     */
+    void retrieveScratchesOrder(Collection<ScratchieItem> items, ScratchieUser user);
 
     /**
      * Fill in scratchieItems with information about whether they were unraveled; and answers with information on their scratched.

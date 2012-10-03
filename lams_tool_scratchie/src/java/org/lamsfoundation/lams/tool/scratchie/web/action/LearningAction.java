@@ -125,14 +125,14 @@ public class LearningAction extends Action {
 
 	// get back the scratchie and item list and display them on page
 	IScratchieService service = getScratchieService();
-	ScratchieUser scratchieUser = null;
+	ScratchieUser user = null;
 	if (mode != null && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // scratchieUser may be null if the user was force completed.
-	    scratchieUser = getSpecifiedUser(service, toolSessionId,
+	    user = getSpecifiedUser(service, toolSessionId,
 		    WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
-	    scratchieUser = getCurrentUser(service, toolSessionId);
+	    user = getCurrentUser(service, toolSessionId);
 	}
 
 	Scratchie scratchie = service.getScratchieBySessionId(toolSessionId);
@@ -140,9 +140,9 @@ public class LearningAction extends Action {
 
 	// get notebook entry
 	String entryText = new String();
-	if (scratchieUser != null) {
+	if (user != null) {
 	    NotebookEntry notebookEntry = service.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ScratchieConstants.TOOL_SIGNATURE, scratchieUser.getUserId().intValue());
+		    ScratchieConstants.TOOL_SIGNATURE, user.getUserId().intValue());
 	    if (notebookEntry != null) {
 		entryText = notebookEntry.getEntry();
 	    }
@@ -151,8 +151,8 @@ public class LearningAction extends Action {
 	// basic information
 	sessionMap.put(ScratchieConstants.ATTR_TITLE, scratchie.getTitle());
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_INSTRUCTION, scratchie.getInstructions());
-	sessionMap.put(ScratchieConstants.ATTR_USER_ID, scratchieUser.getUserId());
-	boolean isUserFinished = scratchieUser != null && scratchieUser.isSessionFinished();
+	sessionMap.put(ScratchieConstants.ATTR_USER_ID, user.getUserId());
+	boolean isUserFinished = user != null && user.isSessionFinished();
 	sessionMap.put(ScratchieConstants.ATTR_USER_FINISHED, isUserFinished);
 	sessionMap.put(ScratchieConstants.ATTR_IS_SHOW_RESULTS_PAGE, scratchie.isShowResultsPage());
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
@@ -185,11 +185,16 @@ public class LearningAction extends Action {
 	    if (item.getCreateBy() != null) {
 		item.getCreateBy().getLoginName();
 	    }
-	}   
+	}
+	
+	// for teacher in monitoring display the number of atempt.
+	if (mode.isTeacher()) {
+	    service.retrieveScratchesOrder(initialItems, user);
+	}
 
 	// set complete flag for display purpose
-	if (scratchieUser != null) {
-	    service.retrieveScratched(initialItems, scratchieUser);
+	if (user != null) {
+	    service.retrieveScratched(initialItems, user);
 	}
 	
 	//randomize order if needed
@@ -198,7 +203,7 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 
-	boolean isScratchingFinished = scratchieUser != null && scratchieUser.isScratchingFinished();
+	boolean isScratchingFinished = user != null && user.isScratchingFinished();
 	if (isScratchingFinished && !mode.isTeacher()) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
 	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());

@@ -51,7 +51,7 @@ public class ScratchieAnswer implements Cloneable {
     // ***********************************************
     // DTO fields:
     private boolean scratched;
-    private Date scratchedDate;
+    private int attemptOrder;
     private int[] attempts;
 
     // **********************************************************
@@ -128,14 +128,22 @@ public class ScratchieAnswer implements Cloneable {
 	return scratched;
     }
     
-    public Date getScratchedDate() {
-	return scratchedDate;
+    /**
+     * @return in which order the student selected it
+     */
+    public int getAttemptOrder() {
+	return attemptOrder;
     }
 
-    public void setScratchedDate(Date scratchedDate) {
-	this.scratchedDate = scratchedDate;
+    public void setAttemptOrder(int attemptOrder) {
+	this.attemptOrder = attemptOrder;
     }
 
+    /**
+     * Used for item summary page in monitor
+     * 
+     * @return
+     */
     public int[] getAttempts() {
 	return attempts;
     }

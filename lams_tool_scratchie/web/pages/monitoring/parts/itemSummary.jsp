@@ -11,12 +11,12 @@
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		
-		<link type="text/css" href="${lams}css/jquery-ui-1.8.11.redmont-theme.css" rel="stylesheet">
-		<link type="text/css" href="${lams}css/jquery.jqGrid-4.1.2.css" rel="stylesheet" />
+		<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
+		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 		
-		<script type="text/javascript" src="${lams}includes/javascript/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
- 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.min.js"></script>
+ 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 
   	    <script>
   	    	<!-- 

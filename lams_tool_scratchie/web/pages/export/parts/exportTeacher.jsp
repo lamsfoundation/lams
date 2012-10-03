@@ -8,13 +8,13 @@
 <lams:head>
 	<title><fmt:message key="export.title" /> </title>
 
-		<link type="text/css" href="./includes/jquery-ui-1.8.11.redmont-theme.css" rel="stylesheet">
-		<link type="text/css" href="./includes/jquery.jqGrid-4.1.2.css" rel="stylesheet" />
+		<link type="text/css" href="./includes/jquery-ui-redmond-theme.css" rel="stylesheet">
+		<link type="text/css" href="./includes/jquery.jqGrid.css" rel="stylesheet" />
  
-		<script type="text/javascript" src="./includes/jquery-1.7.1.min.js"></script>
-		<script type="text/javascript" src="./includes/jquery-ui-1.8.11.custom.min.js"></script>
+		<script type="text/javascript" src="./includes/jquery.js"></script>
+		<script type="text/javascript" src="./includes/jquery-ui.js"></script>
  		<script type="text/javascript" src="./includes/jquery.jqGrid.locale-en.js"></script>
- 		<script type="text/javascript" src="./includes/jquery.jqGrid.min.js"></script>
+ 		<script type="text/javascript" src="./includes/jquery.jqGrid.js"></script>
  		<script type="text/javascript">
 		<!--	
 		$(document).ready(function(){

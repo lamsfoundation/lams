@@ -30,12 +30,12 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 
 public interface ScratchieAnswerVisitDAO extends DAO {
 
-    public ScratchieAnswerVisitLog getScratchieAnswerLog(Long itemUid, Long userId);
+    ScratchieAnswerVisitLog getScratchieAnswerLog(Long answerUid, Long userId);
 
-    public int getLogCountTotal(Long sessionId, Long userId);
+    int getLogCountTotal(Long sessionId, Long userId);
     
     int getLogCountPerItem(Long toolSessionId, Long userId, Long itemUid);
-
-    public List<ScratchieAnswerVisitLog> getLogsBySessionAndUser(Long sessionId, Long userId);
+    
+    List<ScratchieAnswerVisitLog> getLogsByScratchieUserAndItem(Long userUid, Long itemUid);
 
 }

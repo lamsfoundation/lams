@@ -94,23 +94,23 @@ public class ScratchieBundler extends Bundler {
 	final String IMAGE_FOLDER = getServerUrl() + "tool" + URL_SEPARATOR + ScratchieConstants.TOOL_SIGNATURE
 		+ URL_SEPARATOR + "includes" + URL_SEPARATOR + "images" + URL_SEPARATOR;
 
-	String urlToConnectTo = JAVASCRIPT_FOLDER + "jquery.jqGrid.min.js";
+	String urlToConnectTo = JAVASCRIPT_FOLDER + "jquery.jqGrid.js";
 	HttpUrlConnectionUtil
-		.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery.jqGrid.min.js", cookies);
+		.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery.jqGrid.js", cookies);
 	urlToConnectTo = JAVASCRIPT_FOLDER + "jquery.jqGrid.locale-en.js";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery.jqGrid.locale-en.js",
 		cookies);
-	urlToConnectTo = JAVASCRIPT_FOLDER + "jquery-1.7.1.min.js";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery-1.7.1.min.js", cookies);
-	urlToConnectTo = JAVASCRIPT_FOLDER + "jquery-ui-1.8.11.custom.min.js";
+	urlToConnectTo = JAVASCRIPT_FOLDER + "jquery.js";
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery.js", cookies);
+	urlToConnectTo = JAVASCRIPT_FOLDER + "jquery-ui.js";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE,
-		"jquery-ui-1.8.11.custom.min.js", cookies);
+		"jquery-ui.js", cookies);
 
-	urlToConnectTo = CSS_FOLDER + "jquery-ui-1.8.11.redmont-theme.css";
+	urlToConnectTo = CSS_FOLDER + "jquery-ui-redmond-theme.css";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE,
-		"jquery-ui-1.8.11.redmont-theme.css", cookies);
-	urlToConnectTo = CSS_FOLDER + "jquery.jqGrid-4.1.2.css";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery.jqGrid-4.1.2.css",
+		"jquery-ui-redmond-theme.css", cookies);
+	urlToConnectTo = CSS_FOLDER + "jquery.jqGrid.css";
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery.jqGrid.css",
 		cookies);
 
 	urlToConnectTo = IMAGE_FOLDER + "scratchie-correct.gif";
