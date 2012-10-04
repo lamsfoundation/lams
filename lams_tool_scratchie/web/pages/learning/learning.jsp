@@ -114,16 +114,18 @@
 									</a>
 								</c:otherwise>
 							</c:choose>
+							
+							<c:if test="${(mode == 'teacher') && (answer.attemptOrder != -1)}">
+								<div style="text-align: center; margin-top: 2px;">
+									<fmt:message key="label.choice.number" >
+										<fmt:param>${answer.attemptOrder}</fmt:param>
+									</fmt:message>
+								</div>
+							</c:if>
 						</td>
 						
 						<td style="vertical-align: middle;">
 							${answer.description} 
-							
-							<c:if test="${(mode == 'teacher') && (answer.attemptOrder != -1)}">
-								<fmt:message key="label.choice.number" >
-									<fmt:param>${answer.attemptOrder}</fmt:param>
-								</fmt:message>
-							</c:if>
 						</td>
 					</tr>
 				</c:forEach>
