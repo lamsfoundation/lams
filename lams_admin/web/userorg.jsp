@@ -79,7 +79,7 @@
 	
 	function loadSearchResultsCallback(potential) {
 		updatePotentialTotal();
-		jQuery("li", this).each(function() {
+		jQuery("li", "div#potential").each(function() {
 			var rowHtml = jQuery(this).html();
 			jQuery(this).html("<a class='addLink'>"+rowHtml+"</a>");
 		});
