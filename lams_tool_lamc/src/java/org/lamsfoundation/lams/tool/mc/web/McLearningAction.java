@@ -1098,7 +1098,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
      */
     public void prepareViewAnswersData(ActionMapping mapping, McLearningForm mcLearningForm,
 	    HttpServletRequest request, HttpServletResponse response) {
-	McLearningAction.logger.debug("running  prepareViewAnswersData..." + mcLearningForm);
 
 	// may have to get service from the form - if class has been created by starter action, rather than by struts
 	IMcService mcService = null;
@@ -1113,11 +1112,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
 	McContent mcContent = mcService.retrieveMc(new Long(toolContentId));
-
-	if (McLearningAction.logger.isDebugEnabled()) {
-	    McLearningAction.logger.debug("retrieving mcSession: " + mcSession);
-	    McLearningAction.logger.debug("mcContent: " + mcContent);
-	}
 
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
 
@@ -1143,19 +1137,12 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	mcGeneralLearnerFlowDTO.setLearnerProgress(learnerProgress);
 
 	Boolean learnerProgressOn = Boolean.parseBoolean(learnerProgress);
-	McLearningAction.logger.debug("learnerProgressOn:" + learnerProgressOn);
 
 	McQueUsr mcQueUsr = null;
 	if (learnerProgressOn.equals(Boolean.FALSE)) {
-	    McLearningAction.logger.debug("learnerProgress off, using user from session");
 	    mcQueUsr = LearningUtil.getUser(request, mcService, toolSessionID);
 	} else {
-	    McLearningAction.logger.debug("using learnerProgressUserId: " + learnerProgressUserId);
 	    mcQueUsr = mcService.getMcUserBySession(new Long(learnerProgressUserId), mcSession.getUid());
-	}
-
-	if (McLearningAction.logger.isDebugEnabled()) {
-	    McLearningAction.logger.debug("final mcQueUsr: " + mcQueUsr);
 	}
 
 	Long toolContentUID = mcContent.getUid();
@@ -1180,7 +1167,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
 	}
 
-	mcGeneralLearnerFlowDTO.setReportViewOnly(mcLearningForm.getReportViewOnly());
 	mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
 	mcGeneralLearnerFlowDTO.setPassMarkApplicable(new Boolean(mcContent.isPassMarkApplicable()).toString());
 	mcGeneralLearnerFlowDTO.setUserOverPassMark(new Boolean(mcQueUsr.isLastAttemptMarkPassed()).toString());
@@ -1199,12 +1185,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    mcGeneralLearnerFlowDTO.setAverageMark(zero);
 	}
 
-	McLearningAction.logger.debug("mcGeneralLearnerFlowDTO for jsp: " + mcGeneralLearnerFlowDTO);
-
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
-	McLearningAction.logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: "
-		+ request.getAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO));
-	McLearningAction.logger.debug("end of prepareViewAnswersData.");
     }
 
     /**
@@ -1220,11 +1201,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
      */
     public ActionForward viewAnswers(ActionMapping mapping, McLearningForm mcLearningForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McLearningAction.logger.debug("dispatching viewLearnerProgress..." + mcLearningForm);
-	McLearningAction.logger.debug("mcLearningForm :" + mcLearningForm);
 
 	prepareViewAnswersData(mapping, mcLearningForm, request, response);
-	McLearningAction.logger.debug("post prepareViewAnswersData");
 	return mapping.findForward(McAppConstants.VIEW_ANSWERS);
     }
 

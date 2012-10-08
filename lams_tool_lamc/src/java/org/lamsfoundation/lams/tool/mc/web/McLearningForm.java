@@ -31,490 +31,551 @@ import org.lamsfoundation.lams.tool.mc.service.IMcService;
 
 /**
  * @author Ozgur Demirtas
- *
- * ActionForm for the Learning environment
+ * 
+ *  ActionForm for the Learning environment
  */
 public class McLearningForm extends ActionForm implements McAppConstants {
-	protected String continueOptions;
-	protected String nextOptions;
-	protected String continueOptionsCombined;
-	protected String redoQuestions;
-	protected String viewSummary;
-	protected String viewAnswers;
-	protected String learnerFinished;
-	protected String redoQuestionsOk;
-	protected String donePreview;
-	protected String doneLearnerProgress;
-	protected String submitReflection;
-	protected String forwardtoReflection;
-	
-	protected String[] checkedCa;
-	protected String[] sequentialCheckedCa;
+    protected String continueOptions;
+    protected String nextOptions;
+    protected String continueOptionsCombined;
+    protected String redoQuestions;
+    protected String viewSummary;
+    protected String viewAnswers;
+    protected String learnerFinished;
+    protected String redoQuestionsOk;
+    protected String donePreview;
+    protected String doneLearnerProgress;
+    protected String submitReflection;
+    protected String forwardtoReflection;
 
-	protected String userID;
+    protected String[] checkedCa;
+    protected String[] sequentialCheckedCa;
+
+    protected String userID;
     protected String toolContentID;
-	protected String toolContentUID;
-	protected String toolSessionID;
-	
-	protected String learningMode;
-	protected String currentQuestionIndex;
-	
-	/**put tghese under SessionMap*/
-	protected String userOverPassMark;
-	protected String passMarkApplicable;
+    protected String toolContentUID;
+    protected String toolSessionID;
+
+    protected String learningMode;
+    protected String currentQuestionIndex;
+
+    /** put tghese under SessionMap */
+    protected String userOverPassMark;
+    protected String passMarkApplicable;
     protected String learnerProgress;
     protected String learnerProgressUserId;
-    protected String reportViewOnly;
-    
+
     protected String questionListingMode;
-    
+
     protected String entryText;
 
     protected String questionIndex;
     protected String nextQuestionSelected;
     protected String httpSessionID;
-    
+
     protected String responseId;
     protected String sessionId;
-    
+
     public IMcService mcService;
-    
-    	
+
     public void resetCa(ActionMapping mapping, HttpServletRequest request) {
- 	   checkedCa = new String[0];
-	}
+	checkedCa = new String[0];
+    }
 
-	
-	public void resetCommands()
-	{
-		this.setContinueOptions(null);
-		this.setNextOptions(null);
-		this.setContinueOptionsCombined(null);
-		this.setRedoQuestions( null); 
-		this.setViewSummary(null);
-		this.setViewAnswers(null);
-		this.setRedoQuestionsOk(null);
-		this.setLearnerFinished(null);
-		this.setDonePreview(null);
-		this.setDoneLearnerProgress(null);
-	}
+    public void resetCommands() {
+	this.setContinueOptions(null);
+	this.setNextOptions(null);
+	this.setContinueOptionsCombined(null);
+	this.setRedoQuestions(null);
+	this.setViewSummary(null);
+	this.setViewAnswers(null);
+	this.setRedoQuestionsOk(null);
+	this.setLearnerFinished(null);
+	this.setDonePreview(null);
+	this.setDoneLearnerProgress(null);
+    }
 
-	public void resetParameters()
-	{
-	    this.setNextQuestionSelected(null);
-	}
+    public void resetParameters() {
+	this.setNextQuestionSelected(null);
+    }
 
+    /**
+     * @return Returns the continueOptions.
+     */
+    public String getContinueOptions() {
+	return continueOptions;
+    }
 
-	/**
-	 * @return Returns the continueOptions.
-	 */
-	public String getContinueOptions() {
-		return continueOptions;
-	}
-	/**
-	 * @param continueOptions The continueOptions to set.
-	 */
-	public void setContinueOptions(String continueOptions) {
-		this.continueOptions = continueOptions;
-	}
+    /**
+     * @param continueOptions
+     *            The continueOptions to set.
+     */
+    public void setContinueOptions(String continueOptions) {
+	this.continueOptions = continueOptions;
+    }
 
-	
-	/**
-	 * @return Returns the viewSummary.
-	 */
-	public String getViewSummary() {
-		return viewSummary;
-	}
-	/**
-	 * @param viewSummary The viewSummary to set.
-	 */
-	public void setViewSummary(String viewSummary) {
-		this.viewSummary = viewSummary;
-	}
-	/**
-	 * @return Returns the continueOptionsCombined.
-	 */
-	public String getContinueOptionsCombined() {
-		return continueOptionsCombined;
-	}
-	/**
-	 * @param continueOptionsCombined The continueOptionsCombined to set.
-	 */
-	public void setContinueOptionsCombined(String continueOptionsCombined) {
-		this.continueOptionsCombined = continueOptionsCombined;
-	}
-	/**
-	 * @return Returns the redoQuestions.
-	 */
-	public String getRedoQuestions() {
-		return redoQuestions;
-	}
-	/**
-	 * @param redoQuestions The redoQuestions to set.
-	 */
-	public void setRedoQuestions(String redoQuestions) {
-		this.redoQuestions = redoQuestions;
-	}
-	/**
-	 * @return Returns the viewAnswers.
-	 */
-	public String getViewAnswers() {
-		return viewAnswers;
-	}
-	/**
-	 * @param viewAnswers The viewAnswers to set.
-	 */
-	public void setViewAnswers(String viewAnswers) {
-		this.viewAnswers = viewAnswers;
-	}
-	/**
-	 * @return Returns the redoQuestionsOk.
-	 */
-	public String getRedoQuestionsOk() {
-		return redoQuestionsOk;
-	}
-	/**
-	 * @param redoQuestionsOk The redoQuestionsOk to set.
-	 */
-	public void setRedoQuestionsOk(String redoQuestionsOk) {
-		this.redoQuestionsOk = redoQuestionsOk;
-	}
-	/**
-	 * @return Returns the nextOptions.
-	 */
-	public String getNextOptions() {
-		return nextOptions;
-	}
-	/**
-	 * @param nextOptions The nextOptions to set.
-	 */
-	public void setNextOptions(String nextOptions) {
-		this.nextOptions = nextOptions;
-	}
-	/**
-	 * @return Returns the learnerFinished.
-	 */
-	public String getLearnerFinished() {
-		return learnerFinished;
-	}
-	/**
-	 * @param learnerFinished The learnerFinished to set.
-	 */
-	public void setLearnerFinished(String learnerFinished) {
-		this.learnerFinished = learnerFinished;
-	}
-	/**
-	 * @return Returns the donePreview.
-	 */
-	public String getDonePreview() {
-		return donePreview;
-	}
-	/**
-	 * @param donePreview The donePreview to set.
-	 */
-	public void setDonePreview(String donePreview) {
-		this.donePreview = donePreview;
-	}
-	/**
-	 * @return Returns the doneLearnerProgress.
-	 */
-	public String getDoneLearnerProgress() {
-		return doneLearnerProgress;
-	}
-	/**
-	 * @param doneLearnerProgress The doneLearnerProgress to set.
-	 */
-	public void setDoneLearnerProgress(String doneLearnerProgress) {
-		this.doneLearnerProgress = doneLearnerProgress;
-	}
+    /**
+     * @return Returns the viewSummary.
+     */
+    public String getViewSummary() {
+	return viewSummary;
+    }
+
+    /**
+     * @param viewSummary
+     *            The viewSummary to set.
+     */
+    public void setViewSummary(String viewSummary) {
+	this.viewSummary = viewSummary;
+    }
+
+    /**
+     * @return Returns the continueOptionsCombined.
+     */
+    public String getContinueOptionsCombined() {
+	return continueOptionsCombined;
+    }
+
+    /**
+     * @param continueOptionsCombined
+     *            The continueOptionsCombined to set.
+     */
+    public void setContinueOptionsCombined(String continueOptionsCombined) {
+	this.continueOptionsCombined = continueOptionsCombined;
+    }
+
+    /**
+     * @return Returns the redoQuestions.
+     */
+    public String getRedoQuestions() {
+	return redoQuestions;
+    }
+
+    /**
+     * @param redoQuestions
+     *            The redoQuestions to set.
+     */
+    public void setRedoQuestions(String redoQuestions) {
+	this.redoQuestions = redoQuestions;
+    }
+
+    /**
+     * @return Returns the viewAnswers.
+     */
+    public String getViewAnswers() {
+	return viewAnswers;
+    }
+
+    /**
+     * @param viewAnswers
+     *            The viewAnswers to set.
+     */
+    public void setViewAnswers(String viewAnswers) {
+	this.viewAnswers = viewAnswers;
+    }
+
+    /**
+     * @return Returns the redoQuestionsOk.
+     */
+    public String getRedoQuestionsOk() {
+	return redoQuestionsOk;
+    }
+
+    /**
+     * @param redoQuestionsOk
+     *            The redoQuestionsOk to set.
+     */
+    public void setRedoQuestionsOk(String redoQuestionsOk) {
+	this.redoQuestionsOk = redoQuestionsOk;
+    }
+
+    /**
+     * @return Returns the nextOptions.
+     */
+    public String getNextOptions() {
+	return nextOptions;
+    }
+
+    /**
+     * @param nextOptions
+     *            The nextOptions to set.
+     */
+    public void setNextOptions(String nextOptions) {
+	this.nextOptions = nextOptions;
+    }
+
+    /**
+     * @return Returns the learnerFinished.
+     */
+    public String getLearnerFinished() {
+	return learnerFinished;
+    }
+
+    /**
+     * @param learnerFinished
+     *            The learnerFinished to set.
+     */
+    public void setLearnerFinished(String learnerFinished) {
+	this.learnerFinished = learnerFinished;
+    }
+
+    /**
+     * @return Returns the donePreview.
+     */
+    public String getDonePreview() {
+	return donePreview;
+    }
+
+    /**
+     * @param donePreview
+     *            The donePreview to set.
+     */
+    public void setDonePreview(String donePreview) {
+	this.donePreview = donePreview;
+    }
+
+    /**
+     * @return Returns the doneLearnerProgress.
+     */
+    public String getDoneLearnerProgress() {
+	return doneLearnerProgress;
+    }
+
+    /**
+     * @param doneLearnerProgress
+     *            The doneLearnerProgress to set.
+     */
+    public void setDoneLearnerProgress(String doneLearnerProgress) {
+	this.doneLearnerProgress = doneLearnerProgress;
+    }
+
     /**
      * @return Returns the userOverPassMark.
      */
     public String getUserOverPassMark() {
-        return userOverPassMark;
+	return userOverPassMark;
     }
+
     /**
-     * @param userOverPassMark The userOverPassMark to set.
+     * @param userOverPassMark
+     *            The userOverPassMark to set.
      */
     public void setUserOverPassMark(String userOverPassMark) {
-        this.userOverPassMark = userOverPassMark;
+	this.userOverPassMark = userOverPassMark;
     }
+
     /**
      * @return Returns the passMarkApplicable.
      */
     public String getPassMarkApplicable() {
-        return passMarkApplicable;
+	return passMarkApplicable;
     }
+
     /**
-     * @param passMarkApplicable The passMarkApplicable to set.
+     * @param passMarkApplicable
+     *            The passMarkApplicable to set.
      */
     public void setPassMarkApplicable(String passMarkApplicable) {
-        this.passMarkApplicable = passMarkApplicable;
+	this.passMarkApplicable = passMarkApplicable;
     }
+
     /**
      * @return Returns the checkedCa.
      */
     public String[] getCheckedCa() {
-        return checkedCa;
+	return checkedCa;
     }
+
     /**
-     * @param checkedCa The checkedCa to set.
+     * @param checkedCa
+     *            The checkedCa to set.
      */
     public void setCheckedCa(String[] checkedCa) {
-        this.checkedCa = checkedCa;
+	this.checkedCa = checkedCa;
     }
 
     /**
      * @return Returns the learningMode.
      */
     public String getLearningMode() {
-        return learningMode;
+	return learningMode;
     }
+
     /**
-     * @param learningMode The learningMode to set.
+     * @param learningMode
+     *            The learningMode to set.
      */
     public void setLearningMode(String learningMode) {
-        this.learningMode = learningMode;
+	this.learningMode = learningMode;
     }
-    
+
     /**
      * @return Returns the toolContentUID.
      */
     public String getToolContentUID() {
-        return toolContentUID;
+	return toolContentUID;
     }
+
     /**
-     * @param toolContentUID The toolContentUID to set.
+     * @param toolContentUID
+     *            The toolContentUID to set.
      */
     public void setToolContentUID(String toolContentUID) {
-        this.toolContentUID = toolContentUID;
+	this.toolContentUID = toolContentUID;
     }
 
     /**
      * @return Returns the currentQuestionIndex.
      */
     public String getCurrentQuestionIndex() {
-        return currentQuestionIndex;
+	return currentQuestionIndex;
     }
+
     /**
-     * @param currentQuestionIndex The currentQuestionIndex to set.
+     * @param currentQuestionIndex
+     *            The currentQuestionIndex to set.
      */
     public void setCurrentQuestionIndex(String currentQuestionIndex) {
-        this.currentQuestionIndex = currentQuestionIndex;
+	this.currentQuestionIndex = currentQuestionIndex;
     }
-    
+
     /**
      * @return Returns the learnerProgress.
      */
     public String getLearnerProgress() {
-        return learnerProgress;
+	return learnerProgress;
     }
+
     /**
-     * @param learnerProgress The learnerProgress to set.
+     * @param learnerProgress
+     *            The learnerProgress to set.
      */
     public void setLearnerProgress(String learnerProgress) {
-        this.learnerProgress = learnerProgress;
+	this.learnerProgress = learnerProgress;
     }
+
     /**
      * @return Returns the learnerProgressUserId.
      */
     public String getLearnerProgressUserId() {
-        return learnerProgressUserId;
+	return learnerProgressUserId;
     }
+
     /**
-     * @param learnerProgressUserId The learnerProgressUserId to set.
+     * @param learnerProgressUserId
+     *            The learnerProgressUserId to set.
      */
     public void setLearnerProgressUserId(String learnerProgressUserId) {
-        this.learnerProgressUserId = learnerProgressUserId;
+	this.learnerProgressUserId = learnerProgressUserId;
     }
-    
+
     /**
      * @return Returns the nextQuestionSelected.
      */
     public String getNextQuestionSelected() {
-        return nextQuestionSelected;
+	return nextQuestionSelected;
     }
+
     /**
-     * @param nextQuestionSelected The nextQuestionSelected to set.
+     * @param nextQuestionSelected
+     *            The nextQuestionSelected to set.
      */
     public void setNextQuestionSelected(String nextQuestionSelected) {
-        this.nextQuestionSelected = nextQuestionSelected;
+	this.nextQuestionSelected = nextQuestionSelected;
     }
-    
+
     /**
      * @return Returns the questionIndex.
      */
     public String getQuestionIndex() {
-        return questionIndex;
+	return questionIndex;
     }
+
     /**
-     * @param questionIndex The questionIndex to set.
+     * @param questionIndex
+     *            The questionIndex to set.
      */
     public void setQuestionIndex(String questionIndex) {
-        this.questionIndex = questionIndex;
+	this.questionIndex = questionIndex;
     }
-    
+
     /**
      * @return Returns the questionListingMode.
      */
     public String getQuestionListingMode() {
-        return questionListingMode;
+	return questionListingMode;
     }
+
     /**
-     * @param questionListingMode The questionListingMode to set.
+     * @param questionListingMode
+     *            The questionListingMode to set.
      */
     public void setQuestionListingMode(String questionListingMode) {
-        this.questionListingMode = questionListingMode;
+	this.questionListingMode = questionListingMode;
     }
-    
 
     /**
      * @return Returns the toolContentID.
      */
     public String getToolContentID() {
-        return toolContentID;
+	return toolContentID;
     }
+
     /**
-     * @param toolContentID The toolContentID to set.
+     * @param toolContentID
+     *            The toolContentID to set.
      */
     public void setToolContentID(String toolContentID) {
-        this.toolContentID = toolContentID;
+	this.toolContentID = toolContentID;
     }
+
     /**
      * @return Returns the toolSessionID.
      */
     public String getToolSessionID() {
-        return toolSessionID;
+	return toolSessionID;
     }
+
     /**
-     * @param toolSessionID The toolSessionID to set.
+     * @param toolSessionID
+     *            The toolSessionID to set.
      */
     public void setToolSessionID(String toolSessionID) {
-        this.toolSessionID = toolSessionID;
+	this.toolSessionID = toolSessionID;
     }
+
     /**
      * @return Returns the httpSessionID.
      */
     public String getHttpSessionID() {
-        return httpSessionID;
+	return httpSessionID;
     }
+
     /**
-     * @param httpSessionID The httpSessionID to set.
+     * @param httpSessionID
+     *            The httpSessionID to set.
      */
     public void setHttpSessionID(String httpSessionID) {
-        this.httpSessionID = httpSessionID;
+	this.httpSessionID = httpSessionID;
     }
 
     /**
      * @return Returns the sequentialCheckedCa.
      */
     public String[] getSequentialCheckedCa() {
-        return sequentialCheckedCa;
+	return sequentialCheckedCa;
     }
+
     /**
-     * @param sequentialCheckedCa The sequentialCheckedCa to set.
+     * @param sequentialCheckedCa
+     *            The sequentialCheckedCa to set.
      */
     public void setSequentialCheckedCa(String[] sequentialCheckedCa) {
-        this.sequentialCheckedCa = sequentialCheckedCa;
+	this.sequentialCheckedCa = sequentialCheckedCa;
     }
-    
+
     /**
      * @return Returns the mcService.
      */
     public IMcService getMcService() {
-        return mcService;
-    }
-    /**
-     * @param mcService The mcService to set.
-     */
-    public void setMcService(IMcService mcService) {
-        this.mcService = mcService;
+	return mcService;
     }
 
     /**
-     * @return Returns the reportViewOnly.
+     * @param mcService
+     *            The mcService to set.
      */
-    public String getReportViewOnly() {
-        return reportViewOnly;
+    public void setMcService(IMcService mcService) {
+	this.mcService = mcService;
     }
-    /**
-     * @param reportViewOnly The reportViewOnly to set.
-     */
-    public void setReportViewOnly(String reportViewOnly) {
-        this.reportViewOnly = reportViewOnly;
-    }
+
     /**
      * @return Returns the userID.
      */
     public String getUserID() {
-        return userID;
+	return userID;
     }
+
     /**
-     * @param userID The userID to set.
+     * @param userID
+     *            The userID to set.
      */
     public void setUserID(String userID) {
-        this.userID = userID;
+	this.userID = userID;
     }
-    
+
     /**
      * @return Returns the submitReflection.
      */
     public String getSubmitReflection() {
-        return submitReflection;
+	return submitReflection;
     }
+
     /**
-     * @param submitReflection The submitReflection to set.
+     * @param submitReflection
+     *            The submitReflection to set.
      */
     public void setSubmitReflection(String submitReflection) {
-        this.submitReflection = submitReflection;
+	this.submitReflection = submitReflection;
     }
-    
+
     /**
      * @return Returns the forwardtoReflection.
      */
     public String getForwardtoReflection() {
-        return forwardtoReflection;
+	return forwardtoReflection;
     }
+
     /**
-     * @param forwardtoReflection The forwardtoReflection to set.
+     * @param forwardtoReflection
+     *            The forwardtoReflection to set.
      */
     public void setForwardtoReflection(String forwardtoReflection) {
-        this.forwardtoReflection = forwardtoReflection;
+	this.forwardtoReflection = forwardtoReflection;
     }
+
     /**
      * @return Returns the entryText.
      */
     public String getEntryText() {
-        return entryText;
+	return entryText;
     }
+
     /**
-     * @param entryText The entryText to set.
+     * @param entryText
+     *            The entryText to set.
      */
     public void setEntryText(String entryText) {
-        this.entryText = entryText;
+	this.entryText = entryText;
     }
+
     /**
      * @return Returns the responseId.
      */
     public String getResponseId() {
-        return responseId;
+	return responseId;
     }
+
     /**
-     * @param responseId The responseId to set.
+     * @param responseId
+     *            The responseId to set.
      */
     public void setResponseId(String responseId) {
-        this.responseId = responseId;
+	this.responseId = responseId;
     }
+
     /**
      * @return Returns the sessionId.
      */
     public String getSessionId() {
-        return sessionId;
+	return sessionId;
     }
+
     /**
-     * @param sessionId The sessionId to set.
+     * @param sessionId
+     *            The sessionId to set.
      */
     public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+	this.sessionId = sessionId;
     }
 }

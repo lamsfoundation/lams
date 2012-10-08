@@ -177,19 +177,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</table>
 				</c:if>				
 
-			<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
-				<c:if test="${mcGeneralLearnerFlowDTO.reportViewOnly != 'true'}">
-					<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
-						<html:submit property="redoQuestions" styleClass="button">
-							<fmt:message key="label.redo.questions" />
-						</html:submit>
-					</c:if>
-				</c:if>
+			<c:if test="${(mcGeneralLearnerFlowDTO.learnerProgress != 'true') && (mcGeneralLearnerFlowDTO.retries == 'true')}">
+				<html:submit property="redoQuestions" styleClass="button">
+					<fmt:message key="label.redo.questions" />
+				</html:submit>
 			</c:if>
 									
 			<c:if test="${mcGeneralLearnerFlowDTO.reflection}">
 				<h2>
-							<c:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />											
+					<c:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />											
 				</h2>
 
 				<p>
@@ -206,49 +202,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</c:if>
 
 			<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
-			
-				<c:choose>
-					<c:when test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.reportViewOnly!='true'}">
-						<div class="space-bottom-top align-right">
-							<c:if
-								test="${((mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true'))}">
-								<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
-									<html:hidden property="learnerFinished" value="Finished" />
+				<c:if test="${(mcGeneralLearnerFlowDTO.retries != 'true') || (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true')}">
+
+					<div class="space-bottom-top align-right">
+						<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
+							<html:hidden property="learnerFinished" value="Finished" />
 									
-									<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish'); return false;">
-										<span class="nextActivity"><fmt:message key="label.finished" /></span>
-									</html:link>
-								</c:if>
+							<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish'); return false;">
+								<span class="nextActivity"><fmt:message key="label.finished" /></span>
+							</html:link>
+						</c:if>
 
-								<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}">
-									<html:submit property="forwardtoReflection" styleClass="button">
-										<fmt:message key="label.continue" />
-									</html:submit>
-								</c:if>
-							</c:if>
-						</div>
-					</c:when>
+						<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}">
+							<html:submit property="forwardtoReflection" styleClass="button">
+								<fmt:message key="label.continue" />
+							</html:submit>
+						</c:if>
+					</div>
 					
-					<c:otherwise>
-						<div class="space-bottom-top align-right">
-							<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
-								<html:hidden property="learnerFinished" value="Finished" />
-																  			  		
-									<html:link href="#" styleClass="button" styleId="finishButton" onclick="javascript:submitForm('finish'); return false;">
-										<span class="nextActivity"><fmt:message key="label.finished" /></span>
-									</html:link>
-
-							</c:if>
-
-							<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}">
-								<html:submit property="forwardtoReflection" styleClass="button">
-									<fmt:message key="label.continue" />
-								</html:submit>
-							</c:if>
-						</div>
-					</c:otherwise>	
-				</c:choose>
-
+				</c:if>
 			</c:if>
 
 			<p>							
@@ -260,14 +232,3 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</div>
 </body>
 </lams:html>
-
-
-
-
-
-	
-
-
-
-
-
