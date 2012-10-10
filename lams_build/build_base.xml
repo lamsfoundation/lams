@@ -479,7 +479,7 @@
 		
 		<!-- Work on a copy of web files, not originals
              Copy them to build.war directory first for processing -->
-		<echo>${ant.project.name}: Coping web files for building</echo>
+		<echo>${ant.project.name}: Copying web files for building</echo>
 	 	<copy todir="${build.war}" overwrite="true">
 			<fileset dir="${conf.web.dir}">
 				<include name="**"/>
