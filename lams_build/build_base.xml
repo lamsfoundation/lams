@@ -539,7 +539,8 @@
 	      <exclude name="tags/**" />
 	    </javac>
 		
-		<!-- Prepare files for WAR so copy processing results to assembly dir, excludi plain JSP and tags -->
+		<!-- Prepare files for WAR so copy processing results to assembly dir,
+		     excluding plain JSP and tags -->
 		<echo>${ant.project.name}: Copying compiled and remaining web resources</echo>
 		<copy todir="${build.war.assembly}">
 			<fileset dir="${build.war}">
@@ -549,7 +550,7 @@
 				<exclude name="WEB-INF/tags/"/>
 				<exclude name="WEB-INF/tlds/"/>
 				<exclude name="WEB-INF/web.xml"/>
-				<!-- Make double sure that unwanted files are not copies -->
+				<!-- Make double sure that unwanted files are not copied -->
 				<exclude name="**/*.java"/>
 				<exclude name="**/*.jsp"/>
 				<exclude name="**/*.tag"/>
