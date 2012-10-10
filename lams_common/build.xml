@@ -96,7 +96,7 @@
 		
 		<echo>Executing SQL scripts</echo>
 		<sql driver="${db.driver}"
-		     url="${db.url.build}"
+		     url="${db.url.init.build}"
 			 userid="${db.username}"
 			 password="${db.password}"
 			 encoding="${db.encoding}">
