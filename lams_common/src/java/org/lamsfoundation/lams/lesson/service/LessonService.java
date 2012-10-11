@@ -106,40 +106,22 @@ public class LessonService implements ILessonService {
 	this.baseDAO = baseDAO;
     }
 
-    /*  Service methods */
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.lesson.service.ILessonService#getActiveLessonLearners(java.lang.Long)
-     */
+    @Override
     public List getActiveLessonLearners(Long lessonId) {
 	return lessonDAO.getActiveLearnerByLesson(lessonId);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.lesson.service.ILessonService#getActiveLessonLearnersByGroup(java.lang.Long,
-     * java.lang.Long)
-     */
+    @Override
     public List getActiveLessonLearnersByGroup(Long lessonId, Long groupId) {
 	return lessonDAO.getActiveLearnerByLessonAndGroup(lessonId, groupId);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.lesson.service.ILessonService#getCountActiveLessonLearners(java.lang.Long)
-     */
+    @Override
     public Integer getCountActiveLessonLearners(Long lessonId) {
 	return lessonDAO.getCountActiveLearnerByLesson(lessonId);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.lesson.service.ILessonService#getLessonDetails(java.lang.Long)
-     */
+    @Override
     public LessonDetailsDTO getLessonDetails(Long lessonId) {
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 	LessonDetailsDTO dto = null;
@@ -151,11 +133,7 @@ public class LessonService implements ILessonService {
 	return dto;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.lesson.service.ILessonService#getLessonData(java.lang.Long)
-     */
+    @Override
     public LessonDTO getLessonData(Long lessonId) {
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 	LessonDTO dto = null;
@@ -165,29 +143,12 @@ public class LessonService implements ILessonService {
 	return dto;
     }
 
-    /**
-     * Get the lesson object.
-     * 
-     * @param lessonId
-     * @return lesson details
-     */
+    @Override
     public Lesson getLesson(Long lessonId) {
 	return lessonDAO.getLesson(lessonId);
     }
 
-    /**
-     * If the supplied learner is not already in a group, then perform grouping for the learners who have started the
-     * lesson, based on the grouping activity. The grouper decides who goes in which group.
-     * 
-     * Can only be run on a Random Grouping
-     * 
-     * @param lessonId
-     *            lesson id (mandatory)
-     * @param groupingActivity
-     *            the activity that has create grouping. (mandatory)
-     * @param learner
-     *            the learner to be check before grouping. (mandatory)
-     */
+    @Override
     public void performGrouping(Long lessonId, GroupingActivity groupingActivity, User learner)
 	    throws LessonServiceException {
 	Grouping grouping = groupingActivity.getCreateGrouping();
@@ -221,16 +182,7 @@ public class LessonService implements ILessonService {
 	}
     }
 
-    /**
-     * Perform the grouping, setting the given list of learners as one group.
-     * 
-     * @param groupingActivity
-     *            the activity that has create grouping. (mandatory)
-     * @param groupName
-     *            (optional)
-     * @param learners
-     *            to form one group (mandatory)
-     */
+    @Override
     public void performGrouping(GroupingActivity groupingActivity, String groupName, List learners)
 	    throws LessonServiceException {
 
@@ -238,17 +190,7 @@ public class LessonService implements ILessonService {
 	performGrouping(grouping, groupName, learners);
     }
 
-    /**
-     * Perform the grouping, setting the given list of learners as one group. Used in situations where there is a
-     * grouping but no grouping activity (e.g. in branching).
-     * 
-     * @param groupingActivity
-     *            the activity that has create grouping. (mandatory)
-     * @param groupName
-     *            (optional)
-     * @param learners
-     *            to form one group (mandatory)
-     */
+    @Override
     public void performGrouping(Grouping grouping, String groupName, List learners) throws LessonServiceException {
 
 	if (grouping != null) {
@@ -267,17 +209,7 @@ public class LessonService implements ILessonService {
 	}
     }
 
-    /**
-     * Perform grouping for the given learner.
-     * 
-     * @param grouping
-     *            the object on which to perform the grouing. (mandatory)
-     * @param groupId
-     *            group id (mandatory)
-     * @param learner
-     *            learner to group (mandatory)
-     * @throws LessonServiceException
-     */
+    @Override
     public void performGrouping(Grouping grouping, Long groupId, User learner) throws LessonServiceException {
 	if (grouping != null) {
 	    // Ensure we have a real grouping object, not just a CGLIB version (LDEV-1817)
@@ -297,18 +229,7 @@ public class LessonService implements ILessonService {
 	}
     }
 
-    /**
-     * Perform the grouping, setting the given list of learners as one group. Currently used for chosen grouping and
-     * teacher chosen branching, and for group based branching in preview (when the user selects a branch that would not
-     * be their normal branch).
-     * 
-     * @param grouping
-     *            The grouping that needs to have the grouping performed.. (mandatory)
-     * @param the
-     *            id of the preferred group (optional)
-     * @param learners
-     *            to form one group (mandatory)
-     */
+    @Override
     public void performGrouping(Grouping grouping, Long groupId, List learners) throws LessonServiceException {
 	if (grouping != null) {
 	    Grouper grouper = grouping.getGrouper();
@@ -329,16 +250,7 @@ public class LessonService implements ILessonService {
 	}
     }
 
-    /**
-     * Remove learners from the given group.
-     * 
-     * @param grouping
-     *            the grouping that contains the users to be removed (mandatory)
-     * @param groupID
-     *            if not null only remove user from this group, if null remove learner from any group.
-     * @param learners
-     *            the learners to be removed (mandatory)
-     */
+    @Override
     public void removeLearnersFromGroup(Grouping grouping, Long groupID, List<User> learners)
 	    throws LessonServiceException {
 	if (grouping != null) {
@@ -356,16 +268,7 @@ public class LessonService implements ILessonService {
 	}
     }
 
-    /**
-     * Create an empty group for the given grouping. Create an empty group for the given grouping. If the group name
-     * already exists then it will force the name to be unique.
-     * 
-     * @param grouping
-     *            the grouping. (mandatory)
-     * @param groupName
-     *            (mandatory)
-     * @return the new group
-     */
+    @Override
     public Group createGroup(Grouping grouping, String name) throws LessonServiceException {
 	Group newGroup = null;
 	if (grouping != null) {
@@ -384,15 +287,7 @@ public class LessonService implements ILessonService {
 	return newGroup;
     }
 
-    /**
-     * Remove a group for the given grouping. If the group is already used (e.g. a tool session exists) then it throws a
-     * GroupingException.
-     * 
-     * @param grouping
-     *            the grouping that contains the group to be removed (mandatory)
-     * @param groupID
-     *            (mandatory)
-     */
+    @Override
     public void removeGroup(Grouping grouping, Long groupID) throws LessonServiceException {
 	if (grouping != null) {
 	    // get the real objects, not the CGLIB version
@@ -409,13 +304,7 @@ public class LessonService implements ILessonService {
 	}
     }
 
-    /**
-     * Add a learner to the lesson class. Checks for duplicates.
-     * 
-     * @param userId
-     *            new learner id
-     * @return true if added user, returns false if the user already a learner and hence not added.
-     */
+    @Override
     public boolean addLearner(Long lessonId, Integer userId) throws LessonServiceException {
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 	if (lesson == null) {
@@ -444,17 +333,7 @@ public class LessonService implements ILessonService {
 	return ret;
     }
 
-    /**
-     * Add a set of learners to the lesson class.
-     * 
-     * If version of the method is designed to be called from Moodle or some other external system, and is less
-     * efficient in that it has to look up the user from the user id. If we don't do this, then we may get a a session
-     * closed issue if this code is called from the LoginRequestValve (as the users will be from a previous session)
-     * 
-     * @param lessonId
-     * @param userIds
-     *            array of new learner ids
-     */
+    @Override
     public void addLearners(Long lessonId, Integer[] userIds) throws LessonServiceException {
 
 	Lesson lesson = lessonDAO.getLesson(lessonId);
@@ -483,15 +362,7 @@ public class LessonService implements ILessonService {
 	addLearners(lesson, users);
     }
 
-    /**
-     * Add a set of learners to the lesson class. To be called within LAMS - see addLearners(Long lessonId, Integer[]
-     * userIds) if calling from an external system.
-     * 
-     * @param lesson
-     *            lesson
-     * @param users
-     *            the users to add as learners
-     */
+    @Override
     public void addLearners(Lesson lesson, Collection<User> users) throws LessonServiceException {
 
 	LessonClass lessonClass = lesson.getLessonClass();
@@ -504,14 +375,7 @@ public class LessonService implements ILessonService {
 	}
     }
     
-    /**
-     * Set the learners in a lesson class. To be called within LAMS.
-     * 
-     * @param lesson
-     *            lesson
-     * @param users
-     *            the users to set as learners
-     */
+    @Override
     public void setLearners(Lesson lesson, Collection<User> users) throws LessonServiceException {
 	LessonClass lessonClass = lesson.getLessonClass();
 	int numberOfLearners = lessonClass.setLearners(users);
@@ -522,13 +386,7 @@ public class LessonService implements ILessonService {
 	}
     }
 
-    /**
-     * Add a new staff member to the lesson class. Checks for duplicates.
-     * 
-     * @param userId
-     *            new learner id
-     * @return true if added user, returns false if the user already a staff member and hence not added.
-     */
+    @Override
     public boolean addStaffMember(Long lessonId, Integer userId) {
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 	if (lesson == null) {
@@ -553,17 +411,7 @@ public class LessonService implements ILessonService {
 	return ret;
     }
 
-    /**
-     * Add a set of staff to the lesson class.
-     * 
-     * If version of the method is designed to be called from Moodle or some other external system, and is less
-     * efficient in that it has to look up the user from the user id. If we don't do this, then we may get a a session
-     * closed issue if this code is called from the LoginRequestValve (as the users will be from a previous session)
-     * 
-     * @param lessonId
-     * @param userIds
-     *            array of new staff ids
-     */
+    @Override
     public void addStaffMembers(Long lessonId, Integer[] userIds) throws LessonServiceException {
 
 	Lesson lesson = lessonDAO.getLesson(lessonId);
@@ -589,15 +437,7 @@ public class LessonService implements ILessonService {
 	addStaffMembers(lesson, users);
     }
 
-    /**
-     * Add a set of staff members to the lesson class. To be called within LAMS - see addLearners(Long lessonId,
-     * Integer[] userIds) if calling from an external system.
-     * 
-     * @param lesson
-     *            lesson
-     * @param users
-     *            the users to add as learners
-     */
+    @Override
     public void addStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException {
 
 	LessonClass lessonClass = lesson.getLessonClass();
@@ -611,14 +451,7 @@ public class LessonService implements ILessonService {
 	}
     }
     
-    /**
-     * Set the staff members in a lesson class. To be called within LAMS.
-     * 
-     * @param lesson
-     *            lesson
-     * @param users
-     *            the users to set as staff
-     */
+    @Override
     public void setStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException {
 
 	LessonClass lessonClass = lesson.getLessonClass();
@@ -630,13 +463,7 @@ public class LessonService implements ILessonService {
 	}
     }
 
-    /**
-     * Remove references to an activity from all learner progress entries. Used by Live Edit, to remove any references
-     * to the system gates
-     * 
-     * @param activity
-     *            The activity for which learner progress references should be removed.
-     */
+    @Override
     public void removeProgressReferencesToActivity(Activity activity) throws LessonServiceException {
 	if (activity != null) {
 	    LessonService.log.debug("Processing learner progress for activity " + activity.getActivityId());
@@ -696,13 +523,7 @@ public class LessonService implements ILessonService {
 	return recordUpdated;
     }
 
-    /**
-     * Mark any learner progresses for this lesson as not completed. Called when Live Edit ends, to ensure that if there
-     * were any completed progress records, and the design was extended, then they are no longer marked as completed.
-     * 
-     * @param lessonId
-     *            The lesson for which learner progress entries should be updated.
-     */
+    @Override
     public void performMarkLessonUncompleted(Long lessonId) throws LessonServiceException {
 	int count = 0;
 	if (lessonId != null) {
@@ -725,42 +546,27 @@ public class LessonService implements ILessonService {
 	}
     }
 
-    /**
-     * Get the list of users who have attempted an activity. This is based on the progress engine records. This will
-     * give the users in all tool sessions for an activity (if it is a tool activity) or it will give all the users who
-     * have attempted an activity that doesn't have any tool sessions, i.e. system activities such as branching.
-     */
+    @Override
     public List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException {
 	return learnerProgressDAO.getLearnersHaveAttemptedActivity(activity);
     }
 
-    /**
-     * Get the list of users who have completed an activity. This is based on the progress engine records. This will
-     * give the users in all tool sessions for an activity (if it is a tool activity) or it will give all the users who
-     * have attempted an activity that doesn't have any tool sessions, i.e. system activities such as branching.
-     */
+    @Override
     public List<User> getLearnersHaveCompletedActivity(Activity activity) throws LessonServiceException {
 	return learnerProgressDAO.getLearnersHaveCompletedActivity(activity);
     }
 
-    /**
-     * Gets the count of the users who have attempted an activity. This is based on the progress engine records. This
-     * will work on all activities, including ones that don't have any tool sessions, i.e. system activities such as
-     * branching.
-     */
+    @Override
     public Integer getCountLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException {
 	return learnerProgressDAO.getNumUsersAttemptedActivity(activity);
     }
 
-    /**
-     * Gets the count of the users who have completed an activity. This is based on the progress engine records. This
-     * will work on all activities, including ones that don't have any tool sessions, i.e. system activities such as
-     * branching.
-     */
+    @Override
     public Integer getCountLearnersHaveCompletedActivity(Activity activity) throws LessonServiceException {
 	return learnerProgressDAO.getNumUsersCompletedActivity(activity);
     }
 
+    @Override
     public Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId,
 	    Integer userRole) {
 	TreeMap<Long, IndexLessonBean> map = new TreeMap<Long, IndexLessonBean>();
@@ -788,48 +594,45 @@ public class LessonService implements ILessonService {
 	return map;
     }
 
+    @Override
     public List<Lesson> getLessonsByGroupAndUser(Integer userId, Integer organisationId) {
 	List<Lesson> list = lessonDAO.getLessonsByGroupAndUser(userId, organisationId);
 	return list;
     }
     
+    @Override
     public List<Lesson> getLessonsByGroup(Integer organisationId) {
 	List<Lesson> list = lessonDAO.getLessonsByGroup(organisationId);
 	return list;
     }
 
-    /**
-     * Gets the learner's progress details for a particular lesson. Will return null if the user has not started the
-     * lesson.
-     * 
-     * @param learnerId
-     *            user's id
-     * @param lessonId
-     *            lesson's id
-     * @return learner's progress or null
-     */
+    @Override
     public LearnerProgress getUserProgressForLesson(Integer learnerId, Long lessonId) {
 	return learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
     }
-
-    /**
-     * Gets list of lessons which are originally based on the given learning design id.
-     */
+    
+    @Override
+    public List<LearnerProgress> getUserProgressForLesson(Long lessonId) {
+	List<LearnerProgress> list = learnerProgressDAO.getLearnerProgressForLesson(lessonId);
+	return list;
+    }
+    
+    @Override
     public List getLessonsByOriginalLearningDesign(Long ldId, Integer orgId) {
 	return lessonDAO.getLessonsByOriginalLearningDesign(ldId, orgId);
     }
 
+    @Override
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return lessonDAO.getMonitorsByToolSessionId(sessionId);
     }
 
+    @Override
     public List<Lesson> getActiveLessonsForLearner(Integer learnerId, Integer organisationId) {
 	return lessonDAO.getActiveLessonsForLearner(learnerId, organisationId);
     }
     
-    /**
-     * @see org.lamsfoundation.lams.lesson.service.ILessonService#getLessonDetailsFromSessionID(java.lang.Long)
-     */
+    @Override
     public LessonDetailsDTO getLessonDetailsFromSessionID(Long toolSessionID) {
 	Lesson lesson = this.lessonDAO.getLessonFromSessionID(toolSessionID);
 	if (lesson != null) {
@@ -838,9 +641,7 @@ public class LessonService implements ILessonService {
 	return null;
     }
     
-    /**
-     * Check if preceding lessons have been completed and the given lesson is available to the user.
-     */
+    @Override
     public boolean checkLessonReleaseConditions(Long lessonId, Integer learnerId) {
 	Lesson lesson = getLesson(lessonId);
 	if (lesson != null) {
@@ -854,9 +655,7 @@ public class LessonService implements ILessonService {
 	return true;
     }
     
-    /**
-     * Find lessons which just got available after the given lesson has been completed.
-     */
+    @Override
     public Set<Lesson> getReleasedSucceedingLessons(Long completedLessonId, Integer learnerId) {
 	Set<Lesson> releasedSucceedingLessons = new HashSet<Lesson>();
 	Lesson lesson = getLesson(completedLessonId);

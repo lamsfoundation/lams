@@ -35,109 +35,129 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
  * Inteface defines Lesson DAO Methods
+ * 
  * @author chris
  */
-public interface ILearnerProgressDAO
-{
-    
+public interface ILearnerProgressDAO {
+
     /**
      * Retrieves the Lesson
-     * @param lessonId identifies the lesson to get
+     * 
+     * @param lessonId
+     *            identifies the lesson to get
      * @return the lesson
      */
-    public LearnerProgress getLearnerProgress(Long learnerProgressId);
-    
+    LearnerProgress getLearnerProgress(Long learnerProgressId);
+
     /**
      * Retrieves the learner progress object for user in a lesson.
-     * @param learnerId the user who owns the learner progress data.
-     * @param lessonId the lesson for which the progress data applies
+     * 
+     * @param learnerId
+     *            the user who owns the learner progress data.
+     * @param lessonId
+     *            the lesson for which the progress data applies
      * @return the user's progress data
      */
-    public LearnerProgress getLearnerProgressByLearner(final Integer learnerId, final Long lessonId);
-        
+    LearnerProgress getLearnerProgressByLearner(final Integer learnerId, final Long lessonId);
+
     /**
      * Saves or Updates learner progress data.
-     * @param learnerProgress holds the learne progress data
+     * 
+     * @param learnerProgress
+     *            holds the learne progress data
      */
-    public void saveLearnerProgress(LearnerProgress learnerProgress);
-    
+    void saveLearnerProgress(LearnerProgress learnerProgress);
+
     /**
      * Deletes a LearnerProgress data <b>permanently</b>.
-     * @param learnerProgress 
-     */
-    public void deleteLearnerProgress(LearnerProgress learnerProgress);
-    
-    /**
-     * Update learner progress data.
+     * 
      * @param learnerProgress
      */
-    public void updateLearnerProgress(LearnerProgress learnerProgress);
+    void deleteLearnerProgress(LearnerProgress learnerProgress);
+
+    /**
+     * Update learner progress data.
+     * 
+     * @param learnerProgress
+     */
+    void updateLearnerProgress(LearnerProgress learnerProgress);
 
     /**
      * Get all the learner progress records where the current, previous or next activity is the given activity.
+     * 
      * @param activity
      * @return List<LearnerProgress>
      */
-    public List getLearnerProgressReferringToActivity(final Activity activity);
-    
+    List getLearnerProgressReferringToActivity(final Activity activity);
+
     /**
      * Get all the learner progress records for a lesson where the progress is marked as completed.
+     * 
      * @param lessonId
      * @return List<LearnerProgress>
      */
-    public List getCompletedLearnerProgressForLesson(final Long lessonId);
- 
+    List getCompletedLearnerProgressForLesson(final Long lessonId);
+    
     /**
-     * Get all the users records where the user has attempted the given activity. Uses the progress records
-     * to determine the users.
+     * Get all the learner progress records for a lesson.
+     * 
+     * @param lessonId
+     * @return
+     */
+    List getLearnerProgressForLesson(final Long lessonId);
+
+    /**
+     * Get all the users records where the user has attempted the given activity. Uses the progress records to determine
+     * the users.
      * 
      * @param activityId
      * @return List<User>
      */
-	public List<User> getLearnersHaveAttemptedActivity(final Activity activity);
-	
-	/**
-     * Get all the users records where the user has completed the given activity. Uses the progress records
-     * to determine the users.
+    List<User> getLearnersHaveAttemptedActivity(final Activity activity);
+
+    /**
+     * Get all the users records where the user has completed the given activity. Uses the progress records to determine
+     * the users.
      * 
      * @param activityId
      * @return List<User>
      */
-	public List<User> getLearnersHaveCompletedActivity(final Activity activity);
-	
-	/**
-     * Count of the number of users that have attempted or completed an activity. Useful for activities that don't have 
+    List<User> getLearnersHaveCompletedActivity(final Activity activity);
+
+    /**
+     * Count of the number of users that have attempted or completed an activity. Useful for activities that don't have
      * tool sessions.
      * 
      * @param activityId
      * @return List<User>
      */
-	public Integer getNumUsersAttemptedActivity(final Activity activity);
+    Integer getNumUsersAttemptedActivity(final Activity activity);
 
-
-	/**
-     * Count of the number of users that have completed an activity. Useful for activities that don't have 
-     * tool sessions.
+    /**
+     * Count of the number of users that have completed an activity. Useful for activities that don't have tool
+     * sessions.
      * 
      * @param activityId
      * @return List<User>
      */
-	public Integer getNumUsersCompletedActivity(final Activity activity) ;
-	
-	/**
+    Integer getNumUsersCompletedActivity(final Activity activity);
+
+    /**
      * Get the count of all learner progress records for an lesson without loading the records.
+     * 
      * @return Number of learner progress records for this lesson
      */
-	public Integer getNumAllLearnerProgress(final Long lessonId);
+    Integer getNumAllLearnerProgress(final Long lessonId);
 
-	/**
-     * Get a batch of learner progress records (size batchSize) for an lesson, sorted by surname and the first name. Start at the beginning
-     * of the table if no previousUserId is given, otherwise get the batch after lastUserId.
+    /**
+     * Get a batch of learner progress records (size batchSize) for an lesson, sorted by surname and the first name.
+     * Start at the beginning of the table if no previousUserId is given, otherwise get the batch after lastUserId.
+     * 
      * @param lessonId
      * @param lastUserId
      * @param batchSize
      * @return List<LearnerProgress>
      */
-	public List<LearnerProgress> getBatchLearnerProgress(final Long lessonId, final User lastUser, final int batchSize);
+    List<LearnerProgress> getBatchLearnerProgress(final Long lessonId, final User lastUser, final int batchSize);
 
- }
+}

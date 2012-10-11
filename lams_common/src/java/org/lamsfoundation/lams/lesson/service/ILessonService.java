@@ -55,25 +55,24 @@ import org.lamsfoundation.lams.usermanagement.User;
  * the functionality at present. If this is required later it should be combined with the user's shared session logic
  * and will need to purge users who haven't done anything for a while - otherwise a user whose PC has crashed and then
  * never returns to a lesson will staying in the cache forever.
- */
-/**
+ * 
  * @author lfoxton
- *
+ * 
  */
 public interface ILessonService {
 
     /** Get all the learners who have started the lesson. They may not be currently online. */
-    public abstract List getActiveLessonLearners(Long lessonId);
+    abstract List getActiveLessonLearners(Long lessonId);
 
     /**
      * Get all the learners who have started the lesson and are part of a given group. They may not be currently online.
      */
-    public abstract List getActiveLessonLearnersByGroup(Long lessonId, Long groupId);
+    abstract List getActiveLessonLearnersByGroup(Long lessonId, Long groupId);
 
     /**
      * Get the count of all the learners who have started the lesson. They may not be currently online.
      */
-    public Integer getCountActiveLessonLearners(Long lessonId);
+    Integer getCountActiveLessonLearners(Long lessonId);
 
     /**
      * Get the lesson details for the LAMS client. Suitable for the monitoring client. Contains a count of the total
@@ -83,7 +82,7 @@ public interface ILessonService {
      * @param lessonId
      * @return lesson details
      */
-    public abstract LessonDetailsDTO getLessonDetails(Long lessonId);
+    abstract LessonDetailsDTO getLessonDetails(Long lessonId);
 
     /**
      * Get the lesson object.
@@ -91,7 +90,7 @@ public interface ILessonService {
      * @param lessonId
      * @return lesson details
      */
-    public abstract Lesson getLesson(Long lessonId);
+    abstract Lesson getLesson(Long lessonId);
 
     /**
      * Get the lesson details for the LAMS client. Suitable for the learner client. Contains a reduced number of fields
@@ -100,7 +99,7 @@ public interface ILessonService {
      * @param lessonId
      * @return lesson details
      */
-    public abstract LessonDTO getLessonData(Long lessonId);
+    abstract LessonDTO getLessonData(Long lessonId);
 
     /**
      * If the supplied learner is not already in a group, then perform grouping for the learners who have started the
@@ -115,8 +114,7 @@ public interface ILessonService {
      * @param learner
      *            the learner to be check before grouping. (mandatory)
      */
-    public void performGrouping(Long lessonId, GroupingActivity groupingActivity, User learner)
-	    throws LessonServiceException;
+    void performGrouping(Long lessonId, GroupingActivity groupingActivity, User learner) throws LessonServiceException;
 
     /**
      * Perform the grouping, setting the given list of learners as one group.
@@ -128,7 +126,7 @@ public interface ILessonService {
      * @param learners
      *            to form one group (mandatory)
      */
-    public void performGrouping(GroupingActivity groupingActivity, String groupName, List learners)
+    void performGrouping(GroupingActivity groupingActivity, String groupName, List learners)
 	    throws LessonServiceException;
 
     /**
@@ -142,7 +140,7 @@ public interface ILessonService {
      * @param learners
      *            to form one group (mandatory)
      */
-    public void performGrouping(Grouping grouping, String groupName, List learners) throws LessonServiceException;
+    void performGrouping(Grouping grouping, String groupName, List learners) throws LessonServiceException;
 
     /**
      * Perform grouping for all the learners who have started the lesson, based on the grouping. Currently used for
@@ -155,7 +153,7 @@ public interface ILessonService {
      * @param grouping
      *            the object on which to perform the grouing. (mandatory)
      */
-    public void performGrouping(Grouping grouping, Long groupId, List learners) throws LessonServiceException;
+    void performGrouping(Grouping grouping, Long groupId, List learners) throws LessonServiceException;
 
     /**
      * Perform grouping for the given learner.
@@ -168,7 +166,7 @@ public interface ILessonService {
      *            learner to group (mandatory)
      * @throws LessonServiceException
      */
-    public void performGrouping(Grouping grouping, Long groupId, User learner) throws LessonServiceException;
+    void performGrouping(Grouping grouping, Long groupId, User learner) throws LessonServiceException;
 
     /**
      * Remove learners from the given group.
@@ -180,8 +178,7 @@ public interface ILessonService {
      * @param learners
      *            the learners to be removed (mandatory)
      */
-    public void removeLearnersFromGroup(Grouping grouping, Long groupId, List<User> learners)
-	    throws LessonServiceException;
+    void removeLearnersFromGroup(Grouping grouping, Long groupId, List<User> learners) throws LessonServiceException;
 
     /**
      * Create an empty group for the given grouping. If the group name already exists then it will force the name to be
@@ -193,7 +190,7 @@ public interface ILessonService {
      *            (mandatory)
      * @return the new group
      */
-    public Group createGroup(Grouping grouping, String name) throws LessonServiceException;
+    Group createGroup(Grouping grouping, String name) throws LessonServiceException;
 
     /**
      * Remove a group for the given grouping. If the group is already used (e.g. a tool session exists) then it throws a
@@ -204,7 +201,7 @@ public interface ILessonService {
      * @param groupName
      *            (mandatory)
      */
-    public void removeGroup(Grouping grouping, Long groupId) throws LessonServiceException;
+    void removeGroup(Grouping grouping, Long groupId) throws LessonServiceException;
 
     /**
      * Add a learner to the lesson class. Checks for duplicates.
@@ -212,7 +209,7 @@ public interface ILessonService {
      * @paran userId new learner id
      * @return true if added user, returns false if the user already a learner and hence not added.
      */
-    public boolean addLearner(Long lessonId, Integer userId) throws LessonServiceException;
+    boolean addLearner(Long lessonId, Integer userId) throws LessonServiceException;
 
     /**
      * Add a set of learners to the lesson class.
@@ -226,7 +223,7 @@ public interface ILessonService {
      * @param userIds
      *            array of new learner ids
      */
-    public void addLearners(Long lessonId, Integer[] userIds) throws LessonServiceException;
+    void addLearners(Long lessonId, Integer[] userIds) throws LessonServiceException;
 
     /**
      * Add a set of learners to the lesson class. To be called within LAMS - see addLearners(Long lessonId, Integer[]
@@ -237,26 +234,26 @@ public interface ILessonService {
      * @param users
      *            the users to add as learners
      */
-    public void addLearners(Lesson lesson, Collection<User> users) throws LessonServiceException;
+    void addLearners(Lesson lesson, Collection<User> users) throws LessonServiceException;
 
     /**
-     * Set the learners in a lesson class. Learners not in the users collection will be removed. 
-     * To be called within LAMS.
+     * Set the learners in a lesson class. Learners not in the users collection will be removed. To be called within
+     * LAMS.
      * 
      * @param lesson
      *            lesson
      * @param users
      *            the users to set as staff
      */
-    public void setLearners(Lesson lesson, Collection<User> users) throws LessonServiceException;
-    
+    void setLearners(Lesson lesson, Collection<User> users) throws LessonServiceException;
+
     /**
      * Add a new staff member to the lesson class. Checks for duplicates.
      * 
      * @paran userId new learner id
      * @return true if added user, returns false if the user already a staff member and hence not added.
      */
-    public boolean addStaffMember(Long lessonId, Integer userId) throws LessonServiceException;
+    boolean addStaffMember(Long lessonId, Integer userId) throws LessonServiceException;
 
     /**
      * Add a set of staff to the lesson class.
@@ -269,7 +266,7 @@ public interface ILessonService {
      * @param userIds
      *            array of new staff ids
      */
-    public void addStaffMembers(Long lessonId, Integer[] userIds) throws LessonServiceException;
+    void addStaffMembers(Long lessonId, Integer[] userIds) throws LessonServiceException;
 
     /**
      * Add a set of staff members to the lesson class. To be called within LAMS - see addLearners(Long lessonId,
@@ -280,19 +277,19 @@ public interface ILessonService {
      * @param users
      *            the users to add as learners
      */
-    public void addStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException;
-    
+    void addStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException;
+
     /**
-     * Set the staff members in a lesson class. Staff members not in the users collection will be removed. 
-     * To be called within LAMS.
+     * Set the staff members in a lesson class. Staff members not in the users collection will be removed. To be called
+     * within LAMS.
      * 
      * @param lesson
      *            lesson
      * @param users
      *            the users to set as staff
      */
-    public void setStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException;
-    
+    void setStaffMembers(Lesson lesson, Collection<User> users) throws LessonServiceException;
+
     /**
      * Remove references to an activity from all learner progress entries. Used by Live Edit, to remove any references
      * to the system gates
@@ -300,7 +297,7 @@ public interface ILessonService {
      * @param activity
      *            The activity for which learner progress references should be removed.
      */
-    public void removeProgressReferencesToActivity(Activity activity) throws LessonServiceException;
+    void removeProgressReferencesToActivity(Activity activity) throws LessonServiceException;
 
     /**
      * Mark any learner progresses for this lesson as not completed. Called when Live Edit ends, to ensure that if there
@@ -309,46 +306,48 @@ public interface ILessonService {
      * @param lessonId
      *            The lesson for which learner progress entries should be updated.
      */
-    public void performMarkLessonUncompleted(Long lessonId) throws LessonServiceException;
+    void performMarkLessonUncompleted(Long lessonId) throws LessonServiceException;
 
     /**
      * Get the list of users who have attempted an activity. This is based on the progress engine records. This will
      * give the users in all tool sessions for an activity (if it is a tool activity) or it will give all the users who
      * have attempted an activity that doesn't have any tool sessions, i.e. system activities such as branching.
      */
-    public List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
+    List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
 
     /**
      * Get the list of users who have completed an activity. This is based on the progress engine records. This will
      * give the users in all tool sessions for an activity (if it is a tool activity) or it will give all the users who
      * have attempted an activity that doesn't have any tool sessions, i.e. system activities such as branching.
      */
-    public List<User> getLearnersHaveCompletedActivity(Activity activity) throws LessonServiceException;
+    List<User> getLearnersHaveCompletedActivity(Activity activity) throws LessonServiceException;
 
     /**
      * Gets the count of the users who have attempted an activity. This is based on the progress engine records. This
      * will work on all activities, including ones that don't have any tool sessions, i.e. system activities such as
      * branching.
      */
-    public Integer getCountLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
+    Integer getCountLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException;
 
     /**
      * Gets the count of the users who have completed an activity. This is based on the progress engine records. This
      * will work on all activities, including ones that don't have any tool sessions, i.e. system activities such as
      * branching.
      */
-    public Integer getCountLearnersHaveCompletedActivity(Activity activity) throws LessonServiceException;
+    Integer getCountLearnersHaveCompletedActivity(Activity activity) throws LessonServiceException;
 
     /**
      * Returns map of lessons in an organisation for a particular learner or staff user.
      * 
-     * @param userId user's id
-     * @param orgId  org's id
-     * @param userRole return lessons where user is learner or monitor. or returns all lessons in case of group manager
+     * @param userId
+     *            user's id
+     * @param orgId
+     *            org's id
+     * @param userRole
+     *            return lessons where user is learner or monitor. or returns all lessons in case of group manager
      * @return map of lesson beans used in the index page
      */
-    public Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId,
-	    Integer userRole);
+    Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, Integer userRole);
 
     /**
      * 
@@ -358,7 +357,7 @@ public interface ILessonService {
      * @param organisationId
      * @return list of lessons
      */
-    public abstract List<Lesson> getLessonsByGroupAndUser(Integer userId, Integer organisationId);
+    abstract List<Lesson> getLessonsByGroupAndUser(Integer userId, Integer organisationId);
 
     /**
      * Return list of organisation's non-removed lessons.
@@ -366,8 +365,8 @@ public interface ILessonService {
      * @param organisationId
      * @return list of lessons
      */
-    public List<Lesson> getLessonsByGroup(Integer organisationId);
-    
+    List<Lesson> getLessonsByGroup(Integer organisationId);
+
     /**
      * Gets the learner's progress details for a particular lesson. Will return null if the user has not started the
      * lesson.
@@ -378,7 +377,16 @@ public interface ILessonService {
      *            lesson's id
      * @return learner's progress or null
      */
-    public LearnerProgress getUserProgressForLesson(Integer learnerId, Long lessonId);
+    LearnerProgress getUserProgressForLesson(Integer learnerId, Long lessonId);
+
+    /**
+     * Gets the progresses for learners in a particular lesson.
+     * 
+     * @param lessonId
+     *            lesson's id
+     * @return learner's progress
+     */
+    List<LearnerProgress> getUserProgressForLesson(Long lessonId);
 
     /**
      * Gets list of lessons which are originally based on the given learning design id.
@@ -387,7 +395,7 @@ public interface ILessonService {
      * @param orgId
      * @return list of lessons
      */
-    public List getLessonsByOriginalLearningDesign(Long ldId, Integer orgId);
+    List getLessonsByOriginalLearningDesign(Long ldId, Integer orgId);
 
     /**
      * Finds out which lesson the given tool content belongs to and returns its monitoring users.
@@ -396,7 +404,7 @@ public interface ILessonService {
      *            tool session ID
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
-    public List<User> getMonitorsByToolSessionId(Long sessionId);
+    List<User> getMonitorsByToolSessionId(Long sessionId);
 
     /**
      * Gets all lessons that are active for a learner, in a given organisation
@@ -407,24 +415,23 @@ public interface ILessonService {
      *            the desired organisation.
      * @return a List with all active lessons in it.
      */
-    public List<Lesson> getActiveLessonsForLearner(final Integer learnerId, final Integer organisationId);
-    
-    
+    List<Lesson> getActiveLessonsForLearner(final Integer learnerId, final Integer organisationId);
+
     /**
      * Gets lesson details for tools based on toolSessionID
      * 
      * @param sessionID
      * @return
      */
-    public LessonDetailsDTO getLessonDetailsFromSessionID(Long toolSessionID);
-    
+    LessonDetailsDTO getLessonDetailsFromSessionID(Long toolSessionID);
+
     /**
      * Check if preceding lessons have been completed and the given lesson is available to the user.
      */
-    public boolean checkLessonReleaseConditions(Long lessonId, Integer learnerId);
-    
+    boolean checkLessonReleaseConditions(Long lessonId, Integer learnerId);
+
     /**
      * Find lessons which just got available after the given lesson has been completed.
      */
-    public Set<Lesson> getReleasedSucceedingLessons(Long completedLessonId, Integer learnerId);
+    Set<Lesson> getReleasedSucceedingLessons(Long completedLessonId, Integer learnerId);
 }
