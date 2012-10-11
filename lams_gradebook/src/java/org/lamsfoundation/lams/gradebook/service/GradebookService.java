@@ -135,7 +135,7 @@ public class GradebookService implements IGradebookService {
 		activityDTO.setFeedback(gradebookActivity.getFeedback());
 	    }
 
-	    LearnerProgress learnerProgress = getLearnerProgress(lesson, learner);
+	    LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(learner.getUserId(), lesson.getLessonId());
 	    // Setting status
 	    activityDTO.setStartDate(getActivityStartDate(learnerProgress, activity, learner.getTimeZone()));
 	    activityDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
@@ -465,7 +465,7 @@ public class GradebookService implements IGradebookService {
 			    lessonRow.setFeedback(gbLesson.getFeedback());
 			}
 
-			LearnerProgress learnerProgress = getLearnerProgress(lesson, user);
+			LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(user.getUserId(), lesson.getLessonId());
 			lessonRow.setStatus(getLessonStatusStr(learnerProgress));
 			if (learnerProgress != null) {
 			    if (learnerProgress.getStartDate() != null && learnerProgress.getFinishDate() != null) {
@@ -1213,23 +1213,6 @@ public class GradebookService implements IGradebookService {
 	}
 	return null;
     }
-
-    private LearnerProgress getLearnerProgress(Lesson lesson, User user) {
-	if (lesson != null && user != null) {
-	    Map<String, Object> properties = new HashMap<String, Object>();
-	    properties.put("lesson", lesson);
-	    properties.put("user", user);
-	    List learnerProgressList = baseDAO.findByProperties(LearnerProgress.class, properties);
-
-	    if (learnerProgressList != null && learnerProgressList.size() > 0) {
-		return (LearnerProgress) learnerProgressList.get(0);
-	    } else {
-		return null;
-	    }
-	} else {
-	    return null;
-	}
-    }
     
     /**
      * Returns map containing (userId -> LearnerProgressMap) pairs. It serves merely for optimizing amount of db queries.
@@ -1237,8 +1220,7 @@ public class GradebookService implements IGradebookService {
     private Map<Integer, LearnerProgress> getUserToLearnerProgressMap(Lesson lesson) {
 	
 	if (lesson != null) {
-	    String query = "select lp from LearnerProgress lp where lp.lesson.lessonId=?";
-	    List<LearnerProgress> learnerProgressList = baseDAO.find(query, new Object[] { lesson.getLessonId() });
+	    List<LearnerProgress> learnerProgressList = lessonService.getUserProgressForLesson(lesson.getLessonId());
 	    
 	    if (learnerProgressList != null && learnerProgressList.size() > 0) {
 		Map<Integer, LearnerProgress> map = new HashMap<Integer, LearnerProgress>();
