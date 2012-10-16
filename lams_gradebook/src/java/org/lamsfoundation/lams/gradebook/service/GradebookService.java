@@ -204,7 +204,7 @@ public class GradebookService implements IGradebookService {
 
 	Set<User> learners = null;
 	if (groupId != null) {
-	    Group group = (Group) baseDAO.find(Group.class, groupId);
+	    Group group = (Group) userService.findById(Group.class, groupId);
 	    if (group != null) {
 		learners = group.getUsers();
 	    } else {
@@ -756,13 +756,13 @@ public class GradebookService implements IGradebookService {
     public LinkedHashMap<String, ExcelCell[][]> exportCourseGradebook(Integer userId, Integer organisationId) {
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 	
-	Organisation organisation = (Organisation) baseDAO.find(Organisation.class, organisationId);
+	Organisation organisation = (Organisation) userService.findById(Organisation.class, organisationId);
 	
 	// The entire data list
 	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
 	
 
-	User user = (User) getUserService().findById(User.class, userId);
+	User user = (User) userService.findById(User.class, userId);
 	Set<Lesson> lessonsFromDB = new TreeSet<Lesson>(new LessonComparator());
 	lessonsFromDB.addAll(lessonService.getLessonsByGroupAndUser(userId, organisationId));
 		
@@ -1240,12 +1240,12 @@ public class GradebookService implements IGradebookService {
     private Map<Integer, GradebookUserActivity> getUserToGradebookUserActivityMap(Activity activity) {
 	
 	if (activity != null) {
-	    String query = "select gua from GradebookUserActivity gua where gua.activity.activityId=?";
-	    List<GradebookUserActivity> gradebookUserActivityList = baseDAO.find(query, new Object[] { activity.getActivityId() });
+	   
+	    List<GradebookUserActivity> gradebookUserActivities = gradebookDAO.getAllGradebookUserActivitiesForActivity(activity.getActivityId());
 	    
-	    if (gradebookUserActivityList != null && gradebookUserActivityList.size() > 0) {
+	    if (gradebookUserActivities != null && gradebookUserActivities.size() > 0) {
 		Map<Integer, GradebookUserActivity> map = new HashMap<Integer, GradebookUserActivity>();
-		for (GradebookUserActivity gradebookUserActivity : gradebookUserActivityList) {
+		for (GradebookUserActivity gradebookUserActivity : gradebookUserActivities) {
 		    map.put(gradebookUserActivity.getLearner().getUserId(), gradebookUserActivity);
 		}
 		return map;
