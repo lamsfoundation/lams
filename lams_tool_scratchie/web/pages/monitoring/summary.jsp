@@ -14,6 +14,13 @@
 				height: 'auto',
 				width: 900,
 				shrinkToFit: true,
+			   	ondblClickRow: function(rowid) {
+			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
+			   		var toolSessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
+
+			   		var userSummaryUrl = "<c:url value='/learning/start.do'/>?userID=" + userId + "&toolSessionID=" + toolSessionId + "&mode=teacher&reqId=" + (new Date()).getTime();
+					launchPopup(userSummaryUrl, "MonitoringReview");		
+			  	},
 				
 			   	colNames:['#',
 						'userId',
@@ -152,6 +159,12 @@
 			</select>
 			
 			<a href="#nogo" id="userSummaryHref" style="display: none;"></a>
+		</div>
+		
+		<div style="margin: 50px 20px 0px; padding-bottom: 20px;">
+			<a href="<c:url value='/monitoring/manageLeaders.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=400&width=650" class="button thickbox" style="float: right;" <fmt:message key="label.manage.leaders" />>
+				<fmt:message key="label.manage.leaders" />
+			</a>
 		</div>
 	
 	</c:otherwise>

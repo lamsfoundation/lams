@@ -48,6 +48,7 @@ public class ScratchieUser implements Cloneable, Comparable {
     private String loginName;
     private boolean sessionFinished;
     private boolean scratchingFinished;
+    private boolean leader;
 
     private ScratchieSession session;
     private Scratchie scratchie;
@@ -221,6 +222,20 @@ public class ScratchieUser implements Cloneable, Comparable {
 
     public void setScratchingFinished(boolean scratchingFinished) {
 	this.scratchingFinished = scratchingFinished;
+    }
+    
+    /**
+     * Indicates whether user is leader of his group.
+     * 
+     * @hibernate.property column="leader"
+     * @return
+     */
+    public boolean isLeader() {
+	return leader;
+    }
+
+    public void setLeader(boolean leader) {
+	this.leader = leader;
     }
 
     public boolean equals(Object obj) {

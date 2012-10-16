@@ -70,6 +70,12 @@ public class MonitoringAction extends Action {
 	if (param.equals("itemSummary")) {
 	    return itemSummary(mapping, form, request, response);
 	}
+	if (param.equals("manageLeaders")) {
+	    return manageLeaders(mapping, form, request, response);
+	}
+	if (param.equals("saveLeaders")) {
+	    return saveLeaders(mapping, form, request, response);
+	}
 	if (param.equals("viewReflection")) {
 	    return viewReflection(mapping, form, request, response);
 	}
@@ -124,6 +130,46 @@ public class MonitoringAction extends Action {
 
 	request.setAttribute(ScratchieConstants.ATTR_SUMMARY_LIST, summaryList);
 	return mapping.findForward(ScratchieConstants.SUCCESS);
+    }
+    
+    /**
+     * Show leaders manage page
+     */
+    private ActionForward manageLeaders(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	return mapping.findForward(ScratchieConstants.SUCCESS);
+    }
+    
+    /**
+     * Save selected users as a leaders
+     */
+    private ActionForward saveLeaders(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	IScratchieService service = getScratchieService();
+	
+	List<GroupSummary> summaryList = (List<GroupSummary>) sessionMap.get(ScratchieConstants.ATTR_SUMMARY_LIST);
+	for (GroupSummary summary: summaryList) {
+	    Long toolSessionId = summary.getSessionId();
+	    Long leaderUserId = WebUtil.readLongParam(request, "sessionId" + toolSessionId, true);
+	    
+	    //save selected users as a leaders
+	    if (leaderUserId != null) {
+		service.setGroupLeader(leaderUserId, toolSessionId);
+	    }
+	}
+		
+	//refresh users leadership status in summaryList
+	Long contentId = (Long) sessionMap.get(ScratchieConstants.ATTR_TOOL_CONTENT_ID);
+	summaryList = service.getMonitoringSummary(contentId);
+	sessionMap.put(ScratchieConstants.ATTR_SUMMARY_LIST, summaryList);
+	
+	return null;
     }
 
     private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,

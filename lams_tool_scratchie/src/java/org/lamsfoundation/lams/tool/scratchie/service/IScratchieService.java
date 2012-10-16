@@ -58,7 +58,29 @@ public interface IScratchieService {
      */
     Scratchie getScratchieByContentId(Long contentId);
     
+    /**
+     * @param toolSessionId
+     * @return group leader if available, null otherwise
+     */
+    ScratchieUser getGroupLeader(Long toolSessionId);
+    
+    /**
+     * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
+     * 
+     * @param userId
+     * @param toolSessionId
+     */
+    void setGroupLeader(Long userId, Long toolSessionId);
+    
     ScratchieAnswer getScratchieAnswerById (Long answerUid);
+    
+    /**
+     * Check user has the same scrathes logs as group leader. If not - creates missing ones. 
+     * 
+     * @param user
+     * @param leader
+     */
+    void copyScratchesFromLeader(ScratchieUser user, ScratchieUser leader);
 
     /**
      * Get a cloned copy of tool default tool content (Scratchie) and assign the toolContentId of that copy as the given
@@ -110,6 +132,22 @@ public interface IScratchieService {
      * @return
      */
     ScratchieUser getUserByIDAndSession(Long long1, Long sessionId);
+    
+    /**
+     * Get users by given toolSessionId.
+     * 
+     * @param long1
+     * @return
+     */
+    List<ScratchieUser> getUsersBySession(Long toolSessionId);
+    
+    /**
+     * Save specified user.
+     * 
+     * @param long1
+     * @return
+     */
+    void saveUser(ScratchieUser user);
 
     // ********** Repository methods ***********************
     /**
@@ -178,17 +216,19 @@ public interface IScratchieService {
      */
     void retrieveScratched(Collection<ScratchieItem> scratchieItemList, ScratchieUser user);
 
-    void setAnswerAccess(Long scratchieItemUid, Long userId, Long sessionId);
+    /**
+     * Leader has scratched the specified answer. Will store this scratch for all users in his group.
+     */
+    void setAnswerAccess(Long scratchieItemUid, Long sessionId);
     
     int getUserMark(Long sessionId, Long userId);
     
     /**
-     * Mark user as ScratchingFinished so that user can't continue scratching after this.
+     * Mark all users in agroup as ScratchingFinished so that users can't continue scratching after this.
      * 
      * @param toolSessionId
-     * @param userId
      */
-    void setScratchingFinished(Long toolSessionId, Long userId);
+    void setScratchingFinished(Long toolSessionId);
 
     /**
      * If success return next activity's url, otherwise return null.

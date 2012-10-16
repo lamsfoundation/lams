@@ -37,5 +37,7 @@ public interface ScratchieAnswerVisitDAO extends DAO {
     int getLogCountPerItem(Long toolSessionId, Long userId, Long itemUid);
     
     List<ScratchieAnswerVisitLog> getLogsByScratchieUserAndItem(Long userUid, Long itemUid);
+    
+    List<ScratchieAnswerVisitLog> getLogsByScratchieUser(Long userUid);
 
 }

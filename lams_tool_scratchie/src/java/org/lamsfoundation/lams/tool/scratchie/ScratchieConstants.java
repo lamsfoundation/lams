@@ -79,6 +79,8 @@ public class ScratchieConstants {
     
     public static final String ATTR_ITEM_COUNT = "itemCount";
     
+    public static final String ATTR_GROUP_USERS = "groupUsers";
+    
     public static final String ATTR_ANSWER_LIST = "answerList";
     
     public static final String ATTR_ANSWER_COUNT = "answerCount";
@@ -96,6 +98,8 @@ public class ScratchieConstants {
     public static final String ATTR_DELETED_ATTACHMENT_LIST = "deletedAttachmmentList";
 
     public static final String ATTR_SCRATCHIE = "scratchie";
+    
+    public static final String ATTR_IS_SCRATCHING_FINISHED = "isScratchingFinished";
     
     public static final String ATTR_LEARNERS = "learners";
     
@@ -142,6 +146,10 @@ public class ScratchieConstants {
     public static final String ATTR_USER_UID = "userUid";
     
     public static final String ATTR_USER_ID = "userId";
+    
+    public static final String ATTR_USER = "user";
+    
+    public static final String ATTR_GROUP_LEADER = "groupLeader";
 
     public static final String LEARNER_MARK = "learner.mark";
 }

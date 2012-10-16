@@ -279,6 +279,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     }
 
+    @Override
     public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws ScratchieApplicationException {
 	ITicket ticket = getRepositoryLoginTicket();
 	try {
@@ -305,7 +306,69 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     public void deleteScratchieItem(Long uid) {
 	scratchieItemDao.removeObject(ScratchieItem.class, uid);
     }
+    
+    @Override
+    public ScratchieUser getGroupLeader(Long toolSessionId) {
+	List<ScratchieUser> users = scratchieUserDao.getBySessionID(toolSessionId);
+	
+	ScratchieUser groupLeader = null;
+	for (ScratchieUser user : users) {
+	    if (user.isLeader()) {
+		groupLeader = user;
+		break;
+	    }
+	}
+	
+	return groupLeader;
+    }
+    
+    @Override
+    public void setGroupLeader(Long userId, Long toolSessionId) {
+	if (userId==null || toolSessionId==null) {
+	    return;
+	}
+	
+	ScratchieUser leader = getUserByIDAndSession(userId, toolSessionId);
+	if (!leader.isLeader()) {
+	    // set previous leader set as a non-leader
+	    ScratchieUser previousGroupLeader = getGroupLeader(toolSessionId);
+	    if ((previousGroupLeader != null) && !previousGroupLeader.equals(leader)) {
+		previousGroupLeader.setLeader(false);
+		saveUser(previousGroupLeader);
+	    }
+	    
+	    //mark user as a leader
+	    leader.setLeader(true);
+	    saveUser(leader);
+	}
+    }   
+    
+    @Override
+    public void copyScratchesFromLeader(ScratchieUser user, ScratchieUser leader) {
+	
+	if ((user == null) || (leader == null) || user.equals(leader)) {
+	    return;
+	}
+	
+	List<ScratchieAnswerVisitLog> leaderLogs = scratchieAnswerVisitDao.getLogsByScratchieUser(leader.getUid());
+	
+	for (ScratchieAnswerVisitLog leaderLog : leaderLogs) {
+	    ScratchieAnswer answer = leaderLog.getScratchieAnswer();
+	    ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answer.getUid(), user.getUserId());
+	    
+	    //create and save new ScratchieAnswerVisitLog
+	    if (log == null) {
+		log = new ScratchieAnswerVisitLog();
+		log.setScratchieAnswer(answer);
+		log.setUser(user);
+		log.setSessionId(user.getSession().getSessionId());
+		log.setAccessDate(leaderLog.getAccessDate());
+		scratchieAnswerVisitDao.saveObject(log);
+	    }
+	}
+    }
 
+    @Override
     public List<Summary> exportBySessionId(Long sessionId) {
 	ScratchieSession session = scratchieSessionDao.getSessionBySessionId(sessionId);
 	if (session == null) {
@@ -337,6 +400,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	return itemList;
     }
 
+    @Override
     public List<List<Summary>> exportByContentId(Long contentId) {
 	Scratchie scratchie = scratchieDao.getByContentId(contentId);
 	List<List<Summary>> groupList = new ArrayList();
@@ -390,30 +454,40 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	scratchieSessionDao.saveObject(resSession);
     }
 
-    public void setAnswerAccess(Long answerUid, Long userId, Long sessionId) {
-	ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answerUid, userId);
-	if (log == null) {
-	    log = new ScratchieAnswerVisitLog();
-	    ScratchieAnswer answer = getScratchieAnswerById(answerUid);
-	    log.setScratchieAnswer(answer);
-	    ScratchieUser user = scratchieUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-	    log.setUser(user);
-	    log.setSessionId(sessionId);
-	    log.setAccessDate(new Timestamp(new Date().getTime()));
-	    scratchieAnswerVisitDao.saveObject(log);
+    @Override
+    public void setAnswerAccess(Long answerUid, Long sessionId) {
+	
+	List<ScratchieUser> users = getUsersBySession(sessionId);
+	for (ScratchieUser user : users) {
+	    ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answerUid, user.getUserId());
+	    if (log == null) {
+		log = new ScratchieAnswerVisitLog();
+		ScratchieAnswer answer = getScratchieAnswerById(answerUid);
+		log.setScratchieAnswer(answer);
+		log.setUser(user);
+		log.setSessionId(sessionId);
+		log.setAccessDate(new Timestamp(new Date().getTime()));
+		scratchieAnswerVisitDao.saveObject(log);
+	    }
 	}
+
     }
     
+    @Override
     public ScratchieAnswer getScratchieAnswerById (Long answerUid) {
 	return  (ScratchieAnswer) userManagementService.findById(ScratchieAnswer.class, answerUid);
     }
     
-    public void setScratchingFinished(Long toolSessionId, Long userId) {
-	ScratchieUser user = scratchieUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
-	user.setScratchingFinished(true);
-	scratchieUserDao.saveObject(user);
+    @Override
+    public void setScratchingFinished(Long toolSessionId) {
+	List<ScratchieUser> users = getUsersBySession(toolSessionId);
+	for (ScratchieUser user : users) {
+	    user.setScratchingFinished(true);
+	    scratchieUserDao.saveObject(user);
+	}
     }
 
+    @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws ScratchieApplicationException {
 	String nextUrl = null;
 	try {
@@ -430,6 +504,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	return nextUrl;
     }
 
+    @Override
     public ScratchieItem getScratchieItemByUid(Long itemUid) {
 	return scratchieItemDao.getByUid(itemUid);
     }
@@ -450,6 +525,17 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	return users;
     }
     
+    @Override
+    public List<ScratchieUser> getUsersBySession(Long toolSessionId) {
+	return scratchieUserDao.getBySessionID(toolSessionId);
+    }
+    
+    @Override
+    public void saveUser(ScratchieUser user) {
+	scratchieUserDao.saveObject(user);
+    }
+    
+    @Override
     public List<GroupSummary> getMonitoringSummary(Long contentId) {
 	List<GroupSummary> groupSummaryList = new ArrayList<GroupSummary>();
 
@@ -479,6 +565,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	return groupSummaryList;
     }
     
+    @Override
     public void retrieveScratchesOrder(Collection<ScratchieItem> items, ScratchieUser user) {
 	
 	for (ScratchieItem item : items) {
