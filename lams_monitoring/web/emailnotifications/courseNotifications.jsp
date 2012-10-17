@@ -143,7 +143,7 @@
     				params = "&searchType=" + searchType + "&scheduleDate=" + scheduleDate + getSearchParams(); 
     			}
     			
-    			var emailBody = escape(document.getElementById("emailBody").value);
+    			var emailBody = encodeURIComponent(document.getElementById("emailBody").value);
     			var scheduleDate = $("#datePicker").datepicker( "getDate" );
     			scheduleDate = (scheduleDate == null) ? "" : scheduleDate.getTime();
     	        $.ajax({

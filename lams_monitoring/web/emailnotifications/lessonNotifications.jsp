@@ -123,7 +123,7 @@
     				params = "&searchType=" + searchType + "&scheduleDate=" + scheduleDate + getSearchParams(); 
     			}
     			
-    			var emailBody = escape(document.getElementById("emailBody").value);
+    			var emailBody = encodeURIComponent(document.getElementById("emailBody").value);
     			
     	        $.ajax({
     	        	async: false,
