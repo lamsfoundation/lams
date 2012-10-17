@@ -1,3 +1,4 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
