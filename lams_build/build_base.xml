@@ -361,7 +361,9 @@
 	<!-- Explode WAR                                        				 -->
 	<!-- =================================================================== -->
 	
-	<target name="explode-war" depends="explode-war-delete" description="Explodes deployed WAR to folder.">
+	<available property="product.war.exists" file="${jboss.deploy}/${product}.war" type="file" />
+	
+	<target name="explode-war" if="product.war.exists" description="Explodes deployed WAR to folder.">
 		<echo>${ant.project.name}: Renaming existing WAR</echo>
 		<move tofile="${jboss.deploy}/temp-${product}.war" file="${jboss.deploy}/${product}.war" />
 		<echo>${ant.project.name}: Exploding WAR to folder</echo>
@@ -387,17 +389,10 @@
 	
 	<target name="explode-war-delete" description="Deletes exploded WAR folder.">
 		<echo>${ant.project.name}: Removing WAR folder</echo>
-		<delete quiet="true" includeemptydirs="true">
-			<fileset dir="${jboss.deploy}/${product}.war">
-				<include name="**" />
-			</fileset>
-		</delete>
-		<echo>Removing temporary WAR  for ${ant.project.name}, if exists</echo>
-		<delete quiet="true" includeemptydirs="true">
-			<fileset dir="${jboss.deploy}/temp-${product}.war">
-				<include name="**" />
-			</fileset>
-		</delete>
+		<delete dir="${jboss.deploy}/${product}.war" quiet="true" />
+
+		<echo>Removing temporary WAR for ${ant.project.name}, if exists</echo>
+		<delete file="${jboss.deploy}/temp-${product}.war" quiet="true" />
 	</target>
 	
 	<!-- =================================================================== -->
