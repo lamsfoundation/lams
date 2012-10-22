@@ -86,7 +86,8 @@
 			$("#questionListArea").load(
 				url,
 				{
-					sessionMapID: "${sessionMapID}"
+					sessionMapID: "${sessionMapID}",
+					reqId: (new Date()).getTime()
 				},
 				function(){
 					//reinitializePassingMarkSelect(false);
