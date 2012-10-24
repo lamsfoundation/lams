@@ -25,17 +25,26 @@
 package org.lamsfoundation.lams.tool.chat.web.actions;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -43,6 +52,7 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.chat.dto.ChatDTO;
 import org.lamsfoundation.lams.tool.chat.dto.ChatUserDTO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
+import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.service.ChatServiceProxy;
@@ -53,11 +63,8 @@ import org.lamsfoundation.lams.tool.chat.web.forms.LearningForm;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.XMPPUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -78,6 +85,10 @@ public class LearningAction extends LamsDispatchAction {
 
     private IChatService chatService;
 
+    private static final Map<Long, Map<String, Long>> presence = Collections
+	    .synchronizedMap(new HashMap<Long, Map<String, Long>>());
+
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	// 'toolSessionID' and 'mode' paramters are expected to be present.
@@ -108,24 +119,8 @@ public class LearningAction extends LamsDispatchAction {
 
 	request.setAttribute("MODE", mode.toString());
 
-	// Create the room if it doesn't exist
-	log.debug(chatSession.isRoomCreated());
-	if (!chatSession.isRoomCreated()) {
-	    if (XMPPUtil.createMultiUserChat(chatSession.getJabberRoom())) {
-	    	chatSession.setRoomCreated(true);
-	    } else {
-		chatSession.setRoomCreated(false);
-	    	log.error("Unable to create chat room " + chatSession.getJabberRoom());
-	    }
-
-	    chatService.saveOrUpdateChatSession(chatSession);
-	}
-
 	ChatDTO chatDTO = new ChatDTO(chat);
 	request.setAttribute("chatDTO", chatDTO);
-
-	request.setAttribute("XMPPDOMAIN", Configuration.get(ConfigurationKeys.XMPP_DOMAIN));
-	request.setAttribute("CONFERENCEROOM", chatSession.getJabberRoom());
 
 	ChatUserDTO chatUserDTO = new ChatUserDTO(chatUser);
 	if (chatUser.isFinishedActivity()) {
@@ -150,46 +145,28 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	/* Check if submission deadline is null */
-	
+
 	Date submissionDeadline = chatDTO.getSubmissionDeadline();
 	request.setAttribute("chatDTO", chatDTO);
-	
+
 	if (submissionDeadline != null) {
 
-		HttpSession ss = SessionManager.getSession();
-		UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		TimeZone learnerTimeZone = learnerDto.getTimeZone();
-		Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
-		Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
-		request.setAttribute("submissionDeadline", submissionDeadline);
-		
-		//calculate whether submission deadline has passed, and if so forward to "runOffline"
-		if (currentLearnerDate.after(tzSubmissionDeadline)) {
-			return mapping.findForward("runOffline");
-			
-		}
-	
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+	    request.setAttribute("submissionDeadline", submissionDeadline);
+
+	    // calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
+		return mapping.findForward("runOffline");
+
+	    }
+
 	}
 
-
-	
 	return mapping.findForward("learning");
-
-    }
-
-    private ChatUser getCurrentUser(Long toolSessionId) {
-	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-
-	// attempt to retrieve user using userId and toolSessionId
-	ChatUser chatUser = chatService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
-		toolSessionId);
-
-	if (chatUser == null) {
-	    ChatSession chatSession = chatService.getSessionBySessionId(toolSessionId);
-	    chatUser = chatService.createChatUser(user, chatSession);
-	}
-
-	return chatUser;
     }
 
     public ActionForward finishActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -203,7 +180,7 @@ public class LearningAction extends LamsDispatchAction {
 	    chatUser.setFinishedActivity(true);
 	    chatService.saveOrUpdateChatUser(chatUser);
 	} else {
-	    log.error("finishActivity(): couldn't find ChatUser with uid: " + lrnForm.getChatUserUID());
+	    LearningAction.log.error("finishActivity(): couldn't find ChatUser with uid: " + lrnForm.getChatUserUID());
 	}
 
 	ToolSessionManager sessionMgrService = ChatServiceProxy.getChatSessionManager(getServlet().getServletContext());
@@ -276,5 +253,134 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	return finishActivity(mapping, form, request, response);
+    }
+
+    /**
+     * Get data displayed in Learner Chat screen.
+     */
+    public ActionForward getChatContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	ChatUser chatUser = getCurrentUser(toolSessionID);
+	Long lastMessageUid = WebUtil.readLongParam(request, "lastMessageUid", true);
+
+	// build JSON object for Javascript to understand
+	JSONObject responseJSON = new JSONObject();
+	getMessages(lastMessageUid, chatUser, responseJSON);
+	getRoster(chatUser, responseJSON);
+
+	response.getWriter().write(responseJSON.toString());
+	return null;
+    }
+
+    /**
+     * Stores message sent by user.
+     */
+    public ActionForward sendMessage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	String message = request.getParameter("message");
+	if (StringUtils.isBlank(message)) {
+	    return null;
+	}
+	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+
+	ChatUser toChatUser = null;
+	String toUser = request.getParameter(AttributeNames.USER);
+	if (!StringUtils.isBlank(toUser)) {
+	    toChatUser = chatService.getUserByNicknameAndSessionID(toUser, toolSessionID);
+	    if (toChatUser == null) {
+		// there should be an user, but he could not be found, so don't send the message to everyone
+		LearningAction.log.error("Could not find nick: " + toUser + " in session: " + toolSessionID);
+		return null;
+	    }
+	}
+
+	ChatUser chatUser = getCurrentUser(toolSessionID);
+
+	ChatMessage chatMessage = new ChatMessage();
+	chatMessage.setFromUser(chatUser);
+	chatMessage.setChatSession(chatUser.getChatSession());
+	chatMessage.setToUser(toChatUser);
+	chatMessage.setType(toChatUser == null ? ChatMessage.MESSAGE_TYPE_PUBLIC : ChatMessage.MESSAGE_TYPE_PRIVATE);
+	chatMessage.setBody(message);
+	chatMessage.setSendDate(new Date());
+	chatMessage.setHidden(Boolean.FALSE);
+	chatService.saveOrUpdateChatMessage(chatMessage);
+
+	return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void getMessages(Long lastMessageUid, ChatUser chatUser, JSONObject responseJSON) throws JSONException {
+	List<ChatMessage> messages = chatService.getMessagesForUser(chatUser);
+	if (!messages.isEmpty()) {
+	    // if last message which is already displayed on Chat screen
+	    // is the same as newest message in DB, there is nothing new for user, so don't send him anything
+	    ChatMessage lastMessage = messages.get(messages.size() - 1);
+	    Long currentLastMessageUid = lastMessage.getUid();
+	    if ((lastMessageUid == null) || (currentLastMessageUid > lastMessageUid)) {
+		responseJSON.put("lastMessageUid", currentLastMessageUid);
+
+		for (ChatMessage message : messages) {
+		    // all messasges need to be written out, not only new ones,
+		    // as old ones could have been edited or hidden by Monitor
+		    if (!message.isHidden()) {
+			String filteredMessage = chatService.filterMessage(message.getBody(), chatUser.getChatSession()
+				.getChat());
+
+			JSONObject messageJSON = new JSONObject();
+			messageJSON.put("body", filteredMessage);
+			messageJSON.put("from", message.getFromUser().getNickname());
+			messageJSON.put("type", message.getType());
+			responseJSON.append("messages", messageJSON);
+		    }
+		}
+	    }
+	}
+    }
+
+    /**
+     * Gets users currently using the Chat instance.
+     */
+    private void getRoster(ChatUser chatUser, JSONObject responseJSON) throws JSONException {
+	Long sessionId = chatUser.getChatSession().getSessionId();
+	// this is equivalent of a chat room
+	Map<String, Long> sessionRoster = LearningAction.presence.get(sessionId);
+	if (sessionRoster == null) {
+	    sessionRoster = Collections.synchronizedMap(new LinkedHashMap<String, Long>());
+	    LearningAction.presence.put(sessionId, sessionRoster);
+	}
+
+	// store when the user polled messages the last time
+	long currentTime = System.currentTimeMillis();
+	sessionRoster.put(chatUser.getNickname(), currentTime);
+
+	synchronized (sessionRoster) {
+	    Iterator<String> nickIterator = sessionRoster.keySet().iterator();
+	    while (nickIterator.hasNext()) {
+		String nick = nickIterator.next();
+		// if user did not poll messages for some time, he left the chat and is unavailable
+		if (currentTime - sessionRoster.get(nick) < ChatConstants.PRESENCE_IDLE_TIMEOUT) {
+		    responseJSON.append("roster", nick);
+		} else {
+		    nickIterator.remove();
+		}
+	    }
+	}
+    }
+
+    private ChatUser getCurrentUser(Long toolSessionId) {
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+
+	// attempt to retrieve user using userId and toolSessionId
+	ChatUser chatUser = chatService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
+		toolSessionId);
+
+	if (chatUser == null) {
+	    ChatSession chatSession = chatService.getSessionBySessionId(toolSessionId);
+	    chatUser = chatService.createChatUser(user, chatSession);
+	}
+
+	return chatUser;
     }
 }

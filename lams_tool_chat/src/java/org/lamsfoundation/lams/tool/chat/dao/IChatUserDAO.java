@@ -52,14 +52,6 @@ public interface IChatUserDAO extends IBaseDAO{
 
 	/**
 	 * 
-	 * @param jabberID
-	 * @param jabberRoom
-	 * @return
-	 */
-	ChatUser getByJabberIDAndJabberRoom(String jabberID, String jabberRoom);
-	
-	/**
-	 * 
 	 * @param uid 
 	 * @return
 	 */
@@ -67,9 +59,9 @@ public interface IChatUserDAO extends IBaseDAO{
 
 	/**
 	 * 
-	 * @param jabberNickname
+	 * @param nickname
 	 * @param chatSession
 	 * @return
 	 */
-	ChatUser getByJabberNicknameAndSessionID(String jabberNickname, Long sessionID);
+	ChatUser getByNicknameAndSessionID(String nickname, Long sessionID);
 }

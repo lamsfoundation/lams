@@ -1,33 +1,33 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="lams">
-	<lams:LAMSURL/>
-</c:set>
-
-<!--  JsJaC Library -->
-<script type="text/javascript"
-	src="${lams}includes/javascript/jsjac.js"></script>
-<!--  <script language="JavaScript" type="text/javascript" src="Debugger.js"></script> -->
-
-<!--  Chat Config -->
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="includes/javascript/learning.js"></script>	
 <script type="text/javascript">
-	var HTTPBASE = "${tool}JHB/";
-	var XMPPDOMAIN = "${XMPPDOMAIN}";
-	var USERNAME = "${chatUserDTO.userID}";
-	var PASSWORD = "${chatUserDTO.userID}";
-	var CONFERENCEROOM = "${CONFERENCEROOM}";
-	var NICK = "${chatUserDTO.jabberNickname}";
-	var RESOURCE = "lams_chatclient";
 	var MODE = "${MODE}";
-	var USER_UID = "${chatUserDTO.uid}";	
-	var LEARNER_FINISHED = "${chatUserDTO.finishedActivity}";
-	var LOCK_ON_FINISHED = "${chatDTO.lockOnFinish}";
-	var REFLECT_ON_ACTIVITY = "${chatDTO.reflectOnActivity}";	
-</script>
+	var TOOL_SESSION_ID = '${param.toolSessionID}';
+	var LEARNING_ACTION = "<c:url value='/learning.do'/>";
+	var MESSAGE_POLL_INTERVAL = 2 * 1000; // poll every 2 seconds
+	
+	$(document).ready(function() {
+		messageDiv = $("#messages");
+		rosterDiv = $("#roster");
+		sendToUserSpan = $('#sendToUser');
+		sendToEveryoneSpan = $('#sendToEveryone');
+		sendMessageArea = $('#sendMessageArea');
+		sendMessageButton = $('#sendMessageButton');
+		
+		updateChat();
+		setInterval(updateChat, MESSAGE_POLL_INTERVAL);
 
-<!--  Chat Client -->
-<script type="text/javascript"
-	src="${tool}includes/javascript/learning.js"></script>
+		// react to Enter key
+		sendMessageArea.keydown(function(e) {
+			if (e.which == 13) {
+				e.preventDefault();
+				sendMessage();
+			}
+		});
+	});
+</script>
 
 <div id="content">
 	<h1>
@@ -59,54 +59,38 @@
 		</div>
 	</c:if>	
    </c:if>
-	&nbsp;	
-	
-	<div id="chat_content">
 
-		<form name="sendForm" action="" onSubmit="return sendMsg(this);">
-			<div>
-
-
-				<div id="roster"></div>
-				<div id="iResp">
-					<fmt:message>message.loading</fmt:message>
-				</div>
-
-				<br />
-
-				<c:if test="${MODE == 'teacher' }">
+	<table id="chatContent">
+		<tr>
+			<td style="width: 75%"><div id="messages"> </div></td>
+			<td><div id="roster"> </div></td>
+		</tr>
+		
+		<c:if test="${MODE == 'teacher'}">
+			<tr>
+				<td colspan="2" />
 					<div class="field-name">
-						<fmt:message>label.sendMessageTo</fmt:message>
-						<span id="sendToEveryone"><fmt:message>label.everyone</fmt:message>
-						</span><span id="sendToUser" style="display: none"></span>
+						<fmt:message key="label.sendMessageTo" />
+						<span id="sendToEveryone"><fmt:message key="label.everyone" /></span>
+						<span id="sendToUser" style="display: none"></span>
 					</div>
-				</c:if>
-
-				<div>
-
-					<table cellpadding="0" cellspacing="0">
-						<tr>
-							<td>
-								<textarea id="msgArea" name="msg"
-									onKeyPress="return checkEnter(event);" rows="2" cols="2"></textarea>
-							</td>
-
-							<td valign="middle" width="105px">
-								<input id="sendButton" class="button" type="submit"
-									value="<fmt:message>button.send</fmt:message>" />
-
-							</td>
-						</tr>
-
-					</table>
-
-				</div>
-			</div>
-		</form>
-
-		<c:if test="${MODE == 'learner' || MODE == 'author'}">
-			<%@ include file="parts/finishButton.jsp"%>
+				</td>
+			</tr>
 		</c:if>
-	</div>
-</div>
+		
+		<c:if test="${MODE != 'learner' || !chatDTO.lockOnFinish || !chatUserDTO.finishedActivity}">
+			<tr>
+				<td><textarea id="sendMessageArea" rows="3"></textarea></td>
+				<td id="sendMessageButtonCell"><input id="sendMessageButton" class="button" type="button"
+						   onclick="javascript:sendMessage()"
+						   value='<fmt:message key="button.send"/>' />
+				</td>
+			</tr>
+		</c:if>
+		
+	</table>
 
+	<c:if test="${MODE == 'learner' || MODE == 'author'}">
+		<%@ include file="parts/finishButton.jsp"%>
+	</c:if>
+</div>

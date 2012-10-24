@@ -14,10 +14,14 @@
 
 /* ==================== LEARNING PAGE STYLES ==================== */
 
+#chatContent {
+	table-layout: fixed;
+	margin-top: 10px;
+	border-spacing: 10px;
+}
 
-#iResp {
+#messages {
 	height: 260px;
-	width: 75%;
 	overflow: auto;
 	border: 1px solid #999;
 	padding: 2px;
@@ -25,24 +29,24 @@
 }
 
 #roster {
-	width: 20%;
 	height: 260px;
 	overflow: auto;
 	border: 1px solid #999;
 	font-weight: bold;
 	padding: 2px;
-	float: left;
 }
 
-#send-button {
-	float: left;
-	width: 105px;
-	overflow: auto;
+#sendMessageArea {
+	border: 1px solid #999;
+	width: 99%;
 }
-	
-#send-message-area {
-	margin-left: 12px;
-	overflow: auto;
+
+#sendMessageButtonCell {
+	text-align: right;
+}
+
+#sendMessageButton {
+	width: 100%;
 }
 
 .selected {
@@ -55,13 +59,6 @@
 	background-color: white;
 	padding: 2px;
 	cursor: pointer;
-}
-
-#msgArea {
-	width: 95%;
-	margin:0;
-	margin-left:20px;
-	border: 1px solid #999;
 }
 
 /* ================== MONITORING ================== */

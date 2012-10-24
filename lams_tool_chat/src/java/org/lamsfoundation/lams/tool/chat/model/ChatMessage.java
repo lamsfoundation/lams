@@ -30,7 +30,7 @@ import java.util.Date;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * Represents a jabber message sent by a user toUser a groupchat session
+ * Represents a message sent by a user toUser a groupchat session
  * 
  * @author Anthony Sukkar
  * 
@@ -42,6 +42,10 @@ public class ChatMessage implements java.io.Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -3976906267301586708L;
+    
+        public static final String MESSAGE_TYPE_PUBLIC = "groupchat";
+    
+        public static final String MESSAGE_TYPE_PRIVATE = "chat";
 
 	// Fields
 	private Long uid;

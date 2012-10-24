@@ -44,7 +44,7 @@ public class ChatMessageDTO implements Comparable{
 	public Boolean hidden;
 
 	public ChatMessageDTO(ChatMessage chatMessage) {
-		this.from = chatMessage.getFromUser().getJabberNickname();
+		this.from = chatMessage.getFromUser().getNickname();
 		this.body = chatMessage.getBody();
 		this.type = chatMessage.getType();
 		this.sendDate = chatMessage.getSendDate();

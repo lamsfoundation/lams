@@ -209,7 +209,7 @@
 			<c:forEach var="user" items="${session.userDTOs}">
 				<tr>
 					<td>
-						${user.jabberNickname}
+						${user.nickname}
 					</td>
 					<td>
 						${user.postCount}

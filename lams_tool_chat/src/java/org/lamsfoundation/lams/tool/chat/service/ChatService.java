@@ -26,14 +26,11 @@ package org.lamsfoundation.lams.tool.chat.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
@@ -41,17 +38,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
-import org.hibernate.Hibernate;
-import org.hibernate.id.Configurable;
-import org.hibernate.id.IdentifierGenerator;
-import org.hibernate.id.UUIDHexGenerator;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -96,19 +85,13 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.XMPPUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 
 /**
  * An implementation of the IChatService interface.
@@ -148,17 +131,6 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 
     private Random generator = new Random();
 
-    //
-    private IdentifierGenerator idGenerator;
-
-    public ChatService() {
-	super();
-
-	// configure the indentifier generator
-	idGenerator = new UUIDHexGenerator();
-	((Configurable) idGenerator).configure(Hibernate.STRING, new Properties(), null);
-    }
-
     /* Methods from ToolSessionManager */
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (ChatService.logger.isDebugEnabled()) {
@@ -169,13 +141,6 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	ChatSession session = new ChatSession();
 	session.setSessionId(toolSessionId);
 	session.setSessionName(toolSessionName);
-
-	String jabberRoom = (String) idGenerator.generate(null, null) + "@"
-		+ Configuration.get(ConfigurationKeys.XMPP_CONFERENCE);
-	session.setJabberRoom(jabberRoom);
-
-	// the jabber room is created when the first learner starts
-	session.setRoomCreated(false);
 
 	Chat chat = chatDAO.getByContentId(toolContentId);
 	session.setChat(chat);
@@ -235,7 +200,6 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
 	chatSessionDAO.deleteBySessionID(toolSessionId);
 	// TODO check if cascade worked
-	// do we need to remove room on jabber server ?
     }
 
     /**
@@ -450,14 +414,6 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return chatSession;
     }
 
-    public ChatSession getSessionByJabberRoom(String jabberRoom) {
-	ChatSession chatSession = chatSessionDAO.getByJabberRoom(jabberRoom);
-	if (chatSession == null) {
-	    ChatService.logger.debug("Could not find the chat session with jabberRoom:" + jabberRoom);
-	}
-	return chatSession;
-    }
-
     public ChatUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
 	return chatUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
     }
@@ -466,16 +422,12 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return chatUserDAO.getByLoginNameAndSessionId(loginName, toolSessionId);
     }
 
-    public ChatUser getUserByJabberIDAndJabberRoom(String jabberID, String jabberRoom) {
-	return chatUserDAO.getByJabberIDAndJabberRoom(jabberID, jabberRoom);
-    }
-
     public ChatUser getUserByUID(Long uid) {
 	return chatUserDAO.getByUID(uid);
     }
 
-    public ChatUser getUserByJabberNicknameAndSessionID(String jabberNickname, Long sessionID) {
-	return chatUserDAO.getByJabberNicknameAndSessionID(jabberNickname, sessionID);
+    public ChatUser getUserByNicknameAndSessionID(String nickname, Long sessionID) {
+	return chatUserDAO.getByNicknameAndSessionID(nickname, sessionID);
     }
 
     public List getMessagesForUser(ChatUser chatUser) {
@@ -539,249 +491,44 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 
     public synchronized ChatUser createChatUser(UserDTO user, ChatSession chatSession) {
 	ChatUser chatUser = new ChatUser(user, chatSession);
-	String jabberId = XMPPUtil.createId(user);
-	if (jabberId == null) {
-	    ChatService.logger.error("Unable to create jabber id for user: " + user.getUserID());
-	}
-	chatUser.setJabberId(jabberId);
-	chatUser.setJabberNickname(createJabberNickname(chatUser));
+
+	chatUser.setNickname(createNickname(chatUser));
 	saveOrUpdateChatUser(chatUser);
 	return chatUser;
     }
 
-    public String createJabberNickname(ChatUser chatUser) {
-	String desiredJabberNickname = chatUser.getFirstName() + " " + chatUser.getLastName();
-	String jabberNickname = desiredJabberNickname;
+    private String createNickname(ChatUser chatUser) {
+	String desiredNickname = chatUser.getFirstName() + " " + chatUser.getLastName();
+	String nickname = desiredNickname;
 
 	boolean valid = false;
 	int count = 1;
 
 	// TODO may need max tries to prevent possibly entering infinite loop.
 	while (!valid) {
-	    if (getUserByJabberNicknameAndSessionID(jabberNickname, chatUser.getChatSession().getSessionId()) == null) {
-		// jabberNickname is available
+	    if (getUserByNicknameAndSessionID(nickname, chatUser.getChatSession().getSessionId()) == null) {
+		// nickname is available
 		valid = true;
 	    } else {
-		jabberNickname = desiredJabberNickname + " " + count;
+		nickname = desiredNickname + " " + count;
 		count++;
 	    }
 	}
 
-	return jabberNickname;
+	return nickname;
     }
 
-    public void processIncomingMessages(NodeList messageElems) {
-
-	for (int i = 0; i < messageElems.getLength(); i++) {
-	    // extract message attributes
-	    Node message = messageElems.item(i);
-	    NamedNodeMap nnm = message.getAttributes();
-
-	    Node from = nnm.getNamedItem("from");
-	    Node to = nnm.getNamedItem("to");
-	    Node type = nnm.getNamedItem("type");
-
-	    Node body = getBodyElement(message);
-
-	    // save the messages.
-	    ChatMessage chatMessage = new ChatMessage();
-	    String jabberRoom;
-	    String toNick = "";
-
-	    // setting to field
-	    if (type.getNodeValue().equals("chat")) {
-		// we are sending to an individual user.
-		// extract the jabber room from the to field.
-		// format is room@domain/nick
-		int index = to.getNodeValue().lastIndexOf("/");
-		if (index == -1) {
-		    ChatService.logger.debug("processIncomingMessages: malformed 'to' attribute :" + to.getNodeValue());
-		    return; // somethings wrong, ignore packet
-		}
-		jabberRoom = to.getNodeValue().substring(0, index);
-		toNick = to.getNodeValue().substring(index + 1);
-	    } else if (type.getNodeValue().equals("groupchat")) {
-		// we are sending to the whole room.
-		// format is room@domain
-		jabberRoom = to.getNodeValue();
-	    } else {
-		ChatService.logger.debug("processIncomingMessages: unknown type: " + type.getNodeValue());
-		return;
-	    }
-
-	    ChatSession chatSession = this.getSessionByJabberRoom(jabberRoom);
-	    ChatUser toChatUser = getUserByJabberNicknameAndSessionID(toNick, chatSession.getSessionId());
-	    chatMessage.setChatSession(chatSession);
-	    chatMessage.setToUser(toChatUser);
-
-	    // setting from field
-	    int index = from.getNodeValue().lastIndexOf("@");
-	    if (index == -1) {
-		ChatService.logger.debug("processIncomingMessages: malformed 'from' attribute :" + from.getNodeValue());
-		return; // somethings wrong, ignore packet
-	    }
-	    String JidUsername = from.getNodeValue().substring(0, index);
-	    // NB: JID and userId are the same.
-	    Long userId;
-	    try {
-		userId = new Long(JidUsername);
-	    } catch (NumberFormatException e) {
-		ChatService.logger.debug("processIncomingMessages: malformed JID username: " + JidUsername);
-		return;
-	    }
-	    ChatUser fromUser = getUserByUserIdAndSessionId(userId, chatSession.getSessionId());
-	    chatMessage.setFromUser(fromUser);
-
-	    chatMessage.setType(type.getNodeValue());
-	    Node bodyText = body.getFirstChild();
-	    String bodyTextStr = "";
-	    if (bodyText != null) {
-		bodyTextStr = bodyText.getNodeValue();
-	    }
-	    chatMessage.setBody(bodyTextStr);
-	    chatMessage.setSendDate(new Date());
-	    chatMessage.setHidden(Boolean.FALSE);
-	    saveOrUpdateChatMessage(chatMessage);
-	}
-    }
-
-    public List<Node> processIncomingPresence(Node presence) {
-	NamedNodeMap nnm = presence.getAttributes();
-
-	Node from = nnm.getNamedItem("from");
-	Node to = nnm.getNamedItem("to");
-	if (from == null || to == null) {
-	    // somethings wrong, return empty list
-	    ChatService.logger.debug("malformed presence xml: no from or to attributes present");
-	    return null;
-	}
-	/*
-	 * // Note: Removed xmlns check due to problems with firefox 3 // checking presence packet for correct values
-	 * Node xElem = presence.getFirstChild(); if (xElem == null) { logger.debug("malformed presence xml: no x
-	 * element present"); } nnm = xElem.getAttributes(); Node xmlns = nnm.getNamedItem("xmlns"); if (xmlns == null ||
-	 * !xmlns.getNodeValue().equals( "http://jabber.org/protocol/muc")) { logger .debug("malformed presence xml:
-	 * xmlns attribute for x element not available or incorrect"); return null; }
-	 */
-
-	// get the Chat User
-	String jabberID = from.getNodeValue().split("/")[0];
-	String jabberRoom = to.getNodeValue().split("/")[0];
-
-	ChatUser chatUser = getUserByJabberIDAndJabberRoom(jabberID, jabberRoom);
-
-	List chatMessageList = getMessagesForUser(chatUser);
-	ChatService.logger.debug("MESSAGE COUNT" + chatMessageList.size());
-
-	List<Node> xmlMessageList = new ArrayList<Node>();
-	try {
-	    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	    DocumentBuilder builder = factory.newDocumentBuilder();
-	    Document document = builder.newDocument();
-	    for (Iterator iter = chatMessageList.iterator(); iter.hasNext();) {
-		ChatMessage message = (ChatMessage) iter.next();
-
-		Element messageElement = document.createElement("message");
-		messageElement.setAttribute("from", jabberRoom + "/" + message.getFromUser().getJabberNickname());
-		messageElement.setAttribute("to", jabberID + "/lams_chatclient");
-		messageElement.setAttribute("type", message.getType());
-
-		Element bodyElement = document.createElement("body");
-		Text bodyText = document.createTextNode(message.getBody());
-		bodyElement.appendChild(bodyText);
-
-		Element xElement = document.createElement("x");
-		xElement.setAttribute("xmlns", "jabber:x:delay");
-		xElement.setAttribute("stamp", "TODO"); // TODO generate the
-		// stamp attribute
-		xElement.setAttribute("from", jabberRoom + "/" + message.getFromUser().getJabberNickname());
-
-		messageElement.appendChild(bodyElement);
-		messageElement.appendChild(xElement);
-		filterMessage(messageElement, chatUser.getChatSession().getChat());
-
-		xmlMessageList.add(messageElement);
-		// printXMLNode(messageElement, "");
-	    }
-	} catch (ParserConfigurationException e) {
-	    e.printStackTrace();
-	    ChatService.logger.debug("parser configuration exception");
-	    return null;
-	}
-	return xmlMessageList;
-    }
-
-    private void printXMLNode(Node node, String tab) {
-	System.out.print(tab + node.getNodeName() + ":");
-
-	NamedNodeMap nnm = node.getAttributes();
-	for (int j = 0; j < nnm.getLength(); j++) {
-	    Node m = nnm.item(j);
-	    System.out.print(" " + m.getNodeName() + "=" + m.getNodeValue());
-	}
-	System.out.print(" => " + node.getNodeValue() + "\n");
-
-	NodeList nl = node.getChildNodes();
-	for (int i = 0; i < nl.getLength(); i++) {
-	    Node n = nl.item(i);
-	    printXMLNode(n, tab + "    ");
-	}
-
-    }
-
-    public void filterMessage(Node message, Chat chat) {
-	Pattern pattern = getFilterPattern(chat);
-	if (pattern == null) {
-	    return;
-	}
-
-	// get the message body node
-	Node body = getBodyElement(message);
-	if (body == null) {
-	    // no body node present
-	    return;
-	}
-
-	// get the text node
-	Node bodyText = body.getFirstChild();
-	if (bodyText == null) {
-	    // no text present
-	    return;
-	}
-
-	// filter the message.
-	Matcher matcher = pattern.matcher(bodyText.getNodeValue());
-	bodyText.setNodeValue(matcher.replaceAll(ChatConstants.FILTER_REPLACE_TEXT));
-    }
-
-    public void filterMessage(Node message) {
-	NamedNodeMap nnm = message.getAttributes();
-	String from = nnm.getNamedItem("from").getNodeValue();
-
-	// extracting jabber room.
-	int index = from.lastIndexOf("/");
-	String jabberRoom;
-	if (index != -1) {
-	    jabberRoom = from.substring(0, index);
-	} else {
-	    jabberRoom = from;
-	}
-
-	// get the chat content3
-	Chat chat = getSessionByJabberRoom(jabberRoom).getChat();
-	filterMessage(message, chat);
-    }
-
-    public void filterMessage(ChatMessageDTO messageDTO, Chat chat) {
+    public String filterMessage(String message, Chat chat) {
 	Pattern pattern = getFilterPattern(chat);
 
 	if (pattern == null) {
-	    return;
+	    return message;
 	}
 
-	Matcher matcher = pattern.matcher(messageDTO.getBody());
-	messageDTO.setBody(matcher.replaceAll(ChatConstants.FILTER_REPLACE_TEXT));
+	Matcher matcher = pattern.matcher(message);
+	return matcher.replaceAll(ChatConstants.FILTER_REPLACE_TEXT);
     }
-
+    
     private Pattern getFilterPattern(Chat chat) {
 	if (!chat.isFilteringEnabled()) {
 	    return null;
@@ -856,25 +603,6 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 
     /* Private methods */
     private Map<Long, ChatMessageFilter> messageFilters = new ConcurrentHashMap<Long, ChatMessageFilter>();
-
-    private Node getBodyElement(Node message) {
-	// get the body element
-	NodeList nl = message.getChildNodes();
-	Node body = null;
-	for (int j = 0; j < nl.getLength(); j++) {
-	    // We are looking for the <body> element.
-	    // More than one may exists, we will take the first one we see
-	    // We ignore <subject> and <thread> elements
-	    // TODO check that the first one is right. may have problems with
-	    // multiple langauges.
-	    Node msgChild = nl.item(j);
-	    if (msgChild.getNodeName() == "body") {
-		body = msgChild;
-		break;
-	    }
-	}
-	return body;
-    }
 
     private NodeKey processFile(FormFile file, String type) {
 	NodeKey node = null;

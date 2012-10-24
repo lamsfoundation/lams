@@ -38,9 +38,6 @@ public class ChatSessionDAO extends BaseDAO implements IChatSessionDAO {
 	public static final String SQL_QUERY_FIND_BY_SESSION_ID = "from "
 			+ ChatSession.class.getName() + " where session_id=?";
 
-	public static final String SQL_QUERY_FIND_BY_JABBER_ROOM = "from "
-			+ ChatSession.class.getName() + " where jabber_room=?";
-
 	public void saveOrUpdate(ChatSession session) {
 		this.getHibernateTemplate().saveOrUpdate(session);
 		this.getHibernateTemplate().flush();
@@ -49,14 +46,6 @@ public class ChatSessionDAO extends BaseDAO implements IChatSessionDAO {
 	public ChatSession getBySessionId(Long toolSessionId) {
 		List list = this.getHibernateTemplate().find(
 				SQL_QUERY_FIND_BY_SESSION_ID, toolSessionId);
-		if (list == null || list.isEmpty())
-			return null;
-		return (ChatSession) list.get(0);
-	}
-
-	public ChatSession getByJabberRoom(String jabberRoom) {
-		List list = this.getHibernateTemplate().find(
-				SQL_QUERY_FIND_BY_JABBER_ROOM, jabberRoom);
 		if (list == null || list.isEmpty())
 			return null;
 		return (ChatSession) list.get(0);

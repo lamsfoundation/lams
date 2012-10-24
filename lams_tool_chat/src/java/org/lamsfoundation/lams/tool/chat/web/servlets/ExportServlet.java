@@ -162,10 +162,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			sessionDTO.getUserDTOs().add(chatUserDTO);
 		}
 
-		// filter messages
-		for (ChatMessageDTO msg : sessionDTO.getMessageDTOs()) {
-			chatService.filterMessage(msg, chatSession.getChat());
-		}
+        	// filter messages
+        	for (ChatMessageDTO msg : sessionDTO.getMessageDTOs()) {
+        	    msg.setBody(chatService.filterMessage(msg.getBody(), chatSession.getChat()));
+        	}
 
 		ChatDTO chatDTO = new ChatDTO(chatSession.getChat());
 		chatDTO.getSessionDTOs().add(sessionDTO);

@@ -41,7 +41,6 @@ import org.lamsfoundation.lams.tool.chat.util.ChatException;
 import org.lamsfoundation.lams.tool.chat.util.ChatMessageFilter;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Defines the services available to the web layer from the Chat Service
@@ -108,13 +107,6 @@ public interface IChatService {
     public ChatSession getSessionBySessionId(Long toolSessionId);
 
     /**
-     * 
-     * @param jabberRoom
-     * @return
-     */
-    public ChatSession getSessionByJabberRoom(String jabberRoom);
-
-    /**
      * @param chatSession
      */
     public void saveOrUpdateChatSession(ChatSession chatSession);
@@ -137,14 +129,6 @@ public interface IChatService {
 
     /**
      * 
-     * @param jabberID
-     * @param jabberRoom
-     * @return
-     */
-    public ChatUser getUserByJabberIDAndJabberRoom(String jabberID, String jabberRoom);
-
-    /**
-     * 
      * @param uid
      * @return
      */
@@ -152,11 +136,11 @@ public interface IChatService {
 
     /**
      * 
-     * @param jabberNickname
+     * @param nickname
      * @param sessionID
      * @return
      */
-    public ChatUser getUserByJabberNicknameAndSessionID(String jabberNickname, Long sessionID);
+    public ChatUser getUserByNicknameAndSessionID(String nickname, Long sessionID);
 
     /**
      * 
@@ -187,43 +171,13 @@ public interface IChatService {
 
     /**
      * 
-     * @param messageElems
-     */
-    public void processIncomingMessages(NodeList messageElems);
-
-    /**
-     * 
-     * @param presenceElems
-     */
-    public List<Node> processIncomingPresence(Node presence);
-
-    /**
-     * 
      * @param toolContentID
      * @param pattern
      */
     public ChatMessageFilter updateMessageFilters(Chat chat);
 
-    /**
-     * 
-     * @param node
-     */
-    public void filterMessage(Node message);
-
-    /**
-     * 
-     * @param message
-     * @param chat
-     */
-    public void filterMessage(Node message, Chat chat);
-
-    /**
-     * 
-     * @param messageDTO
-     * @param chat
-     */
-    public void filterMessage(ChatMessageDTO messageDTO, Chat chat);
-
+    public String filterMessage(String message, Chat chat);
+    
     /**
      * 
      * @param messageUID

@@ -40,6 +40,8 @@ public interface ChatConstants {
 
     public static final int MONITORING_SUMMARY_MAX_MESSAGES = 5;
 
+    public static final long PRESENCE_IDLE_TIMEOUT = 20 * 1000;
+
     // Attribute names
     public static final String ATTR_MESSAGE = "message";
     public static final String ATTR_SESSION_MAP = "sessionMap";

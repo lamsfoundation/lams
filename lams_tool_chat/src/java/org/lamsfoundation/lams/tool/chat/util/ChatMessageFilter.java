@@ -41,7 +41,7 @@ public class ChatMessageFilter {
 			regex = regex.replaceAll("[" + "\\(" + "\\)" + "\\[" + "\\]"
 					+ "\\{" + "\\}" + "\\\\" + "\\^" + "\\$" + "\\|" + "\\?"
 					+ "\\*" + "\\+" + "\\." + "]+", " ");
-			regex = regex.replaceAll("[\\s]+", " ");
+			regex = regex.replaceAll("[\\s,]+", " ");
 			regex = regex.trim();
 			regex = regex.replaceAll(" ", "|");
 

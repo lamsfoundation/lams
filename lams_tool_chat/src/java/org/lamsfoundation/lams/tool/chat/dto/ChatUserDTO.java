@@ -33,7 +33,7 @@ public class ChatUserDTO implements Comparable{
 	
 	public String loginName;
 	
-	public String jabberNickname;
+	public String nickname;
 	
 	public String firstName;
 	
@@ -52,7 +52,7 @@ public class ChatUserDTO implements Comparable{
 	public ChatUserDTO(ChatUser user) {
 		this.uid = user.getUid();
 		this.loginName = user.getLoginName();
-		this.jabberNickname = user.getJabberNickname();
+		this.nickname = user.getNickname();
 		this.firstName = user.getFirstName();
 		this.lastName = user.getLastName();
 		this.userID = user.getUserId();
@@ -78,12 +78,12 @@ public class ChatUserDTO implements Comparable{
 		this.firstName = firstName;
 	}
 
-	public String getJabberNickname() {
-		return jabberNickname;
+	public String getNickname() {
+		return nickname;
 	}
 
-	public void setJabberNickname(String jabberNickname) {
-		this.jabberNickname = jabberNickname;
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
 	}
 
 	public String getLastName() {
