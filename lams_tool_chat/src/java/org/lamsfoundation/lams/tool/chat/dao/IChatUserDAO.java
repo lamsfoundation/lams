@@ -24,44 +24,49 @@
 
 package org.lamsfoundation.lams.tool.chat.dao;
 
+import java.util.Date;
+import java.util.List;
+
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 
 /**
- * DAO for accessing the ChatUser objects - interface defining
- * methods to be implemented by the Hibernate or other implementation.
+ * DAO for accessing the ChatUser objects - interface defining methods to be implemented by the Hibernate or other
+ * implementation.
  */
-public interface IChatUserDAO extends IBaseDAO{
-	/**
-	 * 
-	 * @param userId
-	 * @param toolSessionId
-	 * @return
-	 */
-	ChatUser getByUserIdAndSessionId(Long userId, Long toolSessionId);
+public interface IChatUserDAO extends IBaseDAO {
+    /**
+     * 
+     * @param userId
+     * @param toolSessionId
+     * @return
+     */
+    ChatUser getByUserIdAndSessionId(Long userId, Long toolSessionId);
 
-	void saveOrUpdate(ChatUser chatUser);
+    void saveOrUpdate(ChatUser chatUser);
 
-	/**
-	 * 
-	 * @param loginName
-	 * @param sessionID
-	 * @return
-	 */
-	ChatUser getByLoginNameAndSessionId(String loginName, Long toolSessionId);
+    /**
+     * 
+     * @param loginName
+     * @param sessionID
+     * @return
+     */
+    ChatUser getByLoginNameAndSessionId(String loginName, Long toolSessionId);
 
-	/**
-	 * 
-	 * @param uid 
-	 * @return
-	 */
-	ChatUser getByUID(Long uid);
+    /**
+     * 
+     * @param uid
+     * @return
+     */
+    ChatUser getByUID(Long uid);
 
-	/**
-	 * 
-	 * @param nickname
-	 * @param chatSession
-	 * @return
-	 */
-	ChatUser getByNicknameAndSessionID(String nickname, Long sessionID);
+    /**
+     * 
+     * @param nickname
+     * @param chatSession
+     * @return
+     */
+    ChatUser getByNicknameAndSessionID(String nickname, Long toolSessionID);
+
+    List<ChatUser> getBySessionIdAndLastPresence(Long toolSessionID, Date oldestLastPresence);
 }

@@ -4,7 +4,8 @@ SET AUTOCOMMIT = 0;
 ----------------------Put all sql statements below here-------------------------
 
 ALTER TABLE tl_lachat11_user DROP COLUMN jabber_id,
-							 CHANGE COLUMN jabber_nickname nickname varchar(255);
+							 CHANGE COLUMN jabber_nickname nickname varchar(255),
+							 ADD COLUMN last_presence datetime;
 						
 ALTER TABLE tl_lachat11_session DROP COLUMN jabber_room,
 								DROP COLUMN room_created;

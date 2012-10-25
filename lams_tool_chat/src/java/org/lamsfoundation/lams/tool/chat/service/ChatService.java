@@ -414,6 +414,11 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return chatSession;
     }
 
+    public List<ChatUser> getUsersActiveBySessionId(Long toolSessionId) {
+	Date oldestLastPresence = new Date(System.currentTimeMillis() - ChatConstants.PRESENCE_IDLE_TIMEOUT);
+	return chatUserDAO.getBySessionIdAndLastPresence(toolSessionId, oldestLastPresence);
+    }
+
     public ChatUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId) {
 	return chatUserDAO.getByUserIdAndSessionId(userId, toolSessionId);
     }
@@ -430,7 +435,18 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return chatUserDAO.getByNicknameAndSessionID(nickname, sessionID);
     }
 
-    public List getMessagesForUser(ChatUser chatUser) {
+    /*
+     * Stores information when users with given UIDs were last seen in their Chat session.
+     */
+    public void updateUserPresence(Map<Long, Date> presence) {
+	for (Long userUid : presence.keySet()) {
+	    ChatUser chatUser = chatUserDAO.getByUID(userUid);
+	    chatUser.setLastPresence(presence.get(userUid));
+	    saveOrUpdateChatUser(chatUser);
+	}
+    }
+
+    public List<ChatMessage> getMessagesForUser(ChatUser chatUser) {
 	return chatMessageDAO.getForUser(chatUser);
     }
 

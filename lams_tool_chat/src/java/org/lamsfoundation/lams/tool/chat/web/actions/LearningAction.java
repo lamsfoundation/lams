@@ -28,10 +28,10 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,6 +43,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -81,12 +82,47 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class LearningAction extends LamsDispatchAction {
 
+    /**
+     * Keeps information of users present in a Chat session. Needs to work with DB so presence is visible on clustered
+     * environment.
+     */
+    private class Roster {
+	private long lastCheckTime = 0;
+	// users who currently poll messasages
+	private final Map<Long, Date> activeUsers = new HashMap<Long, Date>();
+	private final Set<String> roster = new HashSet<String>();
+
+	private synchronized JSONArray getRosterJSON(ChatUser user) {
+	    long currentTime = System.currentTimeMillis();
+	    activeUsers.put(user.getUid(), new Date(currentTime));
+
+	    if (currentTime - lastCheckTime > ChatConstants.PRESENCE_IDLE_TIMEOUT) {
+		// store active users
+		chatService.updateUserPresence(activeUsers);
+		activeUsers.clear();
+
+		// read active users from all nodes
+		List<ChatUser> storedActiveUsers = chatService.getUsersActiveBySessionId(user.getChatSession()
+			.getSessionId());
+		roster.clear();
+		for (ChatUser activeUser : storedActiveUsers) {
+		    roster.add(activeUser.getNickname());
+		}
+
+		lastCheckTime = currentTime;
+	    } else {
+		roster.add(user.getNickname());
+	    }
+
+	    return new JSONArray(roster);
+	}
+    }
+
     private static Logger log = Logger.getLogger(LearningAction.class);
 
     private IChatService chatService;
 
-    private static final Map<Long, Map<String, Long>> presence = Collections
-	    .synchronizedMap(new HashMap<Long, Map<String, Long>>());
+    private static final Map<Long, Roster> rosters = Collections.synchronizedMap(new HashMap<Long, Roster>());
 
     @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -310,7 +346,6 @@ public class LearningAction extends LamsDispatchAction {
 	return null;
     }
 
-    @SuppressWarnings("unchecked")
     private void getMessages(Long lastMessageUid, ChatUser chatUser, JSONObject responseJSON) throws JSONException {
 	List<ChatMessage> messages = chatService.getMessagesForUser(chatUser);
 	if (!messages.isEmpty()) {
@@ -345,28 +380,13 @@ public class LearningAction extends LamsDispatchAction {
     private void getRoster(ChatUser chatUser, JSONObject responseJSON) throws JSONException {
 	Long sessionId = chatUser.getChatSession().getSessionId();
 	// this is equivalent of a chat room
-	Map<String, Long> sessionRoster = LearningAction.presence.get(sessionId);
+	Roster sessionRoster = LearningAction.rosters.get(sessionId);
 	if (sessionRoster == null) {
-	    sessionRoster = Collections.synchronizedMap(new LinkedHashMap<String, Long>());
-	    LearningAction.presence.put(sessionId, sessionRoster);
+	    sessionRoster = new Roster();
+	    LearningAction.rosters.put(sessionId, sessionRoster);
 	}
 
-	// store when the user polled messages the last time
-	long currentTime = System.currentTimeMillis();
-	sessionRoster.put(chatUser.getNickname(), currentTime);
-
-	synchronized (sessionRoster) {
-	    Iterator<String> nickIterator = sessionRoster.keySet().iterator();
-	    while (nickIterator.hasNext()) {
-		String nick = nickIterator.next();
-		// if user did not poll messages for some time, he left the chat and is unavailable
-		if (currentTime - sessionRoster.get(nick) < ChatConstants.PRESENCE_IDLE_TIMEOUT) {
-		    responseJSON.append("roster", nick);
-		} else {
-		    nickIterator.remove();
-		}
-	    }
-	}
+	responseJSON.put("roster", sessionRoster.getRosterJSON(chatUser));
     }
 
     private ChatUser getCurrentUser(Long toolSessionId) {

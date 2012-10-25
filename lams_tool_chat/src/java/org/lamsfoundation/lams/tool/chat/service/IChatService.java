@@ -25,12 +25,12 @@
 package org.lamsfoundation.lams.tool.chat.service;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.chat.dto.ChatMessageDTO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
 import org.lamsfoundation.lams.tool.chat.model.ChatCondition;
@@ -40,7 +40,6 @@ import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.util.ChatException;
 import org.lamsfoundation.lams.tool.chat.util.ChatMessageFilter;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.w3c.dom.Node;
 
 /**
  * Defines the services available to the web layer from the Chat Service
@@ -111,6 +110,8 @@ public interface IChatService {
      */
     public void saveOrUpdateChatSession(ChatSession chatSession);
 
+    public List<ChatUser> getUsersActiveBySessionId(Long toolSessionId);
+
     /**
      * 
      * @param userId
@@ -142,6 +143,8 @@ public interface IChatService {
      */
     public ChatUser getUserByNicknameAndSessionID(String nickname, Long sessionID);
 
+    public void updateUserPresence(Map<Long, Date> presence);
+
     /**
      * 
      * @param chatUser
@@ -153,7 +156,7 @@ public interface IChatService {
      * @param chatUser
      * @return
      */
-    public List getMessagesForUser(ChatUser chatUser);
+    public List<ChatMessage> getMessagesForUser(ChatUser chatUser);
 
     /**
      * 
@@ -177,7 +180,7 @@ public interface IChatService {
     public ChatMessageFilter updateMessageFilters(Chat chat);
 
     public String filterMessage(String message, Chat chat);
-    
+
     /**
      * 
      * @param messageUID
@@ -185,7 +188,7 @@ public interface IChatService {
      */
     public ChatMessage getMessageByUID(Long messageUID);
 
-    public List getLastestMessages(ChatSession chatSession, int max);
+    public List<ChatMessage> getLastestMessages(ChatSession chatSession, int max);
 
     public void auditEditMessage(ChatMessage chatMessage, String messageBody);
 
@@ -209,12 +212,12 @@ public interface IChatService {
      * Gets all messages sent by the given user.
      * 
      * @param userUid
-     *                UID of the user
+     *            UID of the user
      * @return list of his/hers messages
      */
     public List<ChatMessage> getMessagesSentByUser(Long userUid);
 
     void releaseConditionsFromCache(Chat chat);
-    
+
     boolean isGroupedActivity(long toolContentID);
 }
