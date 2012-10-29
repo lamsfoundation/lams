@@ -88,7 +88,7 @@
 				&nbsp;
 				[<a href="user.do?method=remove&userId=<c:out value="${user.userId}"/>"><fmt:message key="admin.user.delete"/></a>]
 				&nbsp;
-				[<a href="<lams:LAMSURL/>/cloud/loginas.do?login=<c:out value="${user.login}"/>"><fmt:message key="label.login.as"/></a>]
+				[<a href="<lams:LAMSURL/>/loginas.do?login=<c:out value="${user.login}"/>"><fmt:message key="label.login.as"/></a>]
 				
 				<c:if test="${(not empty user.email) && (useInternalSMTPServer || not empty smtpServer)}">
 					[<a href="emailUser.do?method=composeMail&userId=<c:out value="${user.userId}"/>"><fmt:message key="label.email"/></a>]
