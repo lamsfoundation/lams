@@ -52,17 +52,17 @@ function handleUpdateChatResult(result) {
   }
   
   rosterDiv.html('');
-  jQuery.each(result.roster, function(){
+  jQuery.each(result.roster, function(index, value){
 	var userDiv = $('<div />', {
-		'class' : (this == selectedUser ? 'selected' : 'unselected'),
-		'text'  : this
-	}).css('color', getColour(this))
+		'class' : (value == selectedUser ? 'selected' : 'unselected'),
+		'text'  : value
+	}).css('color', getColour(value))
 	 .appendTo(rosterDiv);
 	
 	// only Monitor can send a personal message
 	if (MODE == 'teacher') {
 		userDiv.click(function(){
-			userSelected($(this));
+			userSelected($(value));
 		});
 	}
   });

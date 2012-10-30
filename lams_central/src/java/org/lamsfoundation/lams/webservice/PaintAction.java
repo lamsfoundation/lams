@@ -55,7 +55,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 */
 public class PaintAction extends LamsDispatchAction {
 	
-	private static Logger logger = Logger.getLogger(PresenceChatLoggerAction.class);
+	private static Logger logger = Logger.getLogger(PaintAction.class);
 	
 	/**
 	* @deprecated

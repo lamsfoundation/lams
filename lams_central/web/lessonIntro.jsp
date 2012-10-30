@@ -7,7 +7,7 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 <c:set var="lams" ><lams:LAMSURL/></c:set>
-<c:set var="startLessonParams">mode=${mode}&portfolioEnabled=${portfolioEnabled}&presenceEnabledPatch=${presenceEnabledPatch}&presenceImEnabled=${presenceImEnabled}&title=${title}&createDateTime=${createDateTime}&serverUrl=${serverUrl}&presenceUrl=${presenceUrl}&lessonID=${lessonID}</c:set>
+<c:set var="startLessonParams">mode=${mode}&portfolioEnabled=${portfolioEnabled}&presenceEnabledPatch=${presenceEnabledPatch}&presenceImEnabled=${presenceImEnabled}&title=${title}&createDateTime=${createDateTime}&serverUrl=${serverUrl}&lessonID=${lessonID}</c:set>
 <c:set var="pngImageSrc" value="${lams}www/secure/learning-design-images/${learningDesignID}.png" />
 <c:set var="svgImageSrc" value="${lams}www/secure/learning-design-images/${learningDesignID}.svg" />
 

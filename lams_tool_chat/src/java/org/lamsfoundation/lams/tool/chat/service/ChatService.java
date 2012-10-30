@@ -435,7 +435,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return chatUserDAO.getByNicknameAndSessionID(nickname, sessionID);
     }
 
-    /*
+    /**
      * Stores information when users with given UIDs were last seen in their Chat session.
      */
     public void updateUserPresence(Map<Long, Date> presence) {

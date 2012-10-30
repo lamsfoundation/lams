@@ -28,44 +28,34 @@ package org.lamsfoundation.lams.presence.model;
 import java.util.Date;
 
 /**
- * @hibernate.class table="lams_presence_chat_msgs"
+ * @hibernate.class table="lams_presence_user"
  */
-public class PresenceChatMessage implements java.io.Serializable, Cloneable {
+public class PresenceChatUser implements java.io.Serializable, Cloneable {
 
-    private Long uid;
+    private String nickname;
 
     private Long lessonId;
 
-    private String from;
+    private Date lastPresence;
 
-    private String to;
-
-    private Date dateSent;
-
-    private String message;
-
-    public PresenceChatMessage() {
-
+    public PresenceChatUser() {
     }
 
-    public PresenceChatMessage(Long lessonId, String from, String to, Date dateSent, String message) {
-	super();
+    public PresenceChatUser(String nickname, Long lessonId, Date lastPresence) {
+	this.nickname = nickname;
 	this.lessonId = lessonId;
-	this.from = from;
-	this.to = to;
-	this.dateSent = dateSent;
-	this.message = message;
+	this.lastPresence = lastPresence;
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     * @hibernate.id generator-class="assigned" column="nickname"
      */
-    public Long getUid() {
-	return uid;
+    public String getNickname() {
+	return nickname;
     }
 
-    public void setUid(Long uid) {
-	this.uid = uid;
+    public void setNickname(String nickname) {
+	this.nickname = nickname;
     }
 
     /**
@@ -80,47 +70,13 @@ public class PresenceChatMessage implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * @hibernate.property column="from_user"
+     * @hibernate.property column="last_presence"
      */
-    public String getFrom() {
-	return from;
+    public Date getLastPresence() {
+	return lastPresence;
     }
 
-    public void setFrom(String from) {
-	this.from = from;
+    public void setLastPresence(Date lastPresence) {
+	this.lastPresence = lastPresence;
     }
-
-    /**
-     * @hibernate.property column="to_user"
-     */
-    public String getTo() {
-	return to;
-    }
-
-    public void setTo(String to) {
-	this.to = to;
-    }
-
-    /**
-     * @hibernate.property column="date_sent"
-     */
-    public Date getDateSent() {
-	return dateSent;
-    }
-
-    public void setDateSent(Date dateSent) {
-	this.dateSent = dateSent;
-    }
-
-    /**
-     * @hibernate.property column="message"
-     */
-    public String getMessage() {
-	return message;
-    }
-
-    public void setMessage(String message) {
-	this.message = message;
-    }
-
 }

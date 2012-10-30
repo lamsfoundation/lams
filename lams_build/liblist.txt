@@ -83,9 +83,7 @@ reload			  reload-diva.jar						2.0.1				   MIT License					 Reload							  Suit
 				  reload-moonunit.jar 
 
 quartz            quartz.jar                            1.5.2                                                OpenSymphony                     Quartz Enterprise Job Scheduler
-
-smack             smack.jar                                                                                                                   
-                  smackx.jar                                                                                                                  
+                                                                                                          
 
 spring            spring.jar                            1.2.8                                                                                 Spring Framework
 

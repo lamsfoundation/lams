@@ -21,114 +21,32 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Vector;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.dto.LessonDTO;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
-import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.XMPPUtil;
-import org.lamsfoundation.lams.util.wddx.FlashMessage;
 
 /**
  * @author Paul Georges
- * @struts.action 
- * 				  path = "/Presence"
- * 				  parameter = "method"
- * 				  validate = "false"
+ * @struts.action path = "/Presence" parameter = "method" validate = "false"
  * @struts.action-forward name = "success" path = "/index.jsp"
  */
 
-public class PresenceServlet extends LamsDispatchAction{
-	
-	protected Logger log = Logger.getLogger(WorkspaceAction.class.getName());
-	
-	/** Send the flash message back to Flash */
-	private ActionForward returnWDDXPacket(FlashMessage flashMessage, HttpServletResponse response) throws IOException {
-	        PrintWriter writer = response.getWriter();
-	        writer.println(flashMessage.serializeMessage());
-	        return null;
-	}
+public class PresenceServlet extends LamsDispatchAction {
 
-	/** Send the flash message back to Flash */
-	private ActionForward returnWDDXPacket(String serializedFlashMessage, HttpServletResponse response) throws IOException {
-	        PrintWriter writer = response.getWriter();
-	        writer.println(serializedFlashMessage);
-	        return null;
-	}
-	
-	public ActionForward createXmppId(ActionMapping mapping,
-			  ActionForm form,
-			  HttpServletRequest request,
-			  HttpServletResponse response)throws Exception{
-		
-		
-		HttpSession ss = SessionManager.getSession();
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		String xmppIdCreated = XMPPUtil.createId(user);
-		
-		FlashMessage flashMessage = null; 
-		try {
-			flashMessage = new FlashMessage("createXmppId", xmppIdCreated);
-		} catch (Exception e) {
-		}
-		
-		String wddxPacket = flashMessage.serializeMessage();
-		return returnWDDXPacket(wddxPacket, response);
-	}
-	
-	public ActionForward createXmppRoom(ActionMapping mapping,
-			  ActionForm form,
-			  HttpServletRequest request,
-			  HttpServletResponse response)throws Exception{
-		
-		ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-		
-		/* Date Format for Chat room append */
-		DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
-		Long lessonId = (Long)WebUtil.readLongParam(request,"lessonId");
-		Lesson lesson = learnerService.getLesson(lessonId);
-		String createDateTimeStr = sfm.format(lesson.getCreateDateTime());
-		
-		String xmppRoomName = lessonId + "_" + createDateTimeStr + "@" + Configuration.get(ConfigurationKeys.XMPP_CONFERENCE);
-		xmppRoomName = xmppRoomName.replace(" ", "_");
-		xmppRoomName = xmppRoomName.replace(":", "_");
-		Boolean xmppRoomCreated = XMPPUtil.createMultiUserChat(xmppRoomName);
-		
-		FlashMessage flashMessage = null; 
-		try {
-			flashMessage = new FlashMessage("createXmppRoom", xmppRoomCreated);
-		} catch (Exception e) {
-		}
-		
-		String wddxPacket = flashMessage.serializeMessage();
-		return returnWDDXPacket(wddxPacket, response);
-	}
+    public ActionForward createXmppId(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	return null;
+    }
+
+    public ActionForward createXmppRoom(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	return null;
+    }
 }

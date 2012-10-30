@@ -200,9 +200,8 @@
 	</bean>
 	
 	<!--  Presence Chat Service -->
-	<bean id="presenceChatLoggerService" class="org.lamsfoundation.lams.presence.service.PresenceChatLoggerService">
-		<property name="messageService"><ref bean="commonMessageService"/></property>
-		<property name="presenceChatMessageDAO"><ref bean="presenceChatMessageDAO" /></property>
+	<bean id="presenceChatService" class="org.lamsfoundation.lams.presence.service.PresenceChatService">
+		<property name="presenceChatDAO"><ref bean="presenceChatDAO" /></property>
 	</bean>
 	
 	<bean id="coreNotebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -373,7 +372,7 @@
 	</bean>	
 	
 	<!-- Presence Chat related beans -->
-	<bean id="presenceChatMessageDAO" class="org.lamsfoundation.lams.presence.dao.hibernate.PresenceChatMessageDAO">
+	<bean id="presenceChatDAO" class="org.lamsfoundation.lams.presence.dao.hibernate.PresenceChatDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>	
 	

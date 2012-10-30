@@ -185,15 +185,12 @@
 				<include name="cglib/*.jar" />
 				<include name="dom4j/*.jar" />
 				<include name="fckeditor/*.jar" />
-				<include name="jabber/*.jar" />
 				<include name="jakarta-commons/*.jar" />
 				<include name="jdom/*.jar" />
 				<include name="jfreechart/*.jar" />
 				<include name="mysql/*.jar" />
 				<include name="odmg/*.jar" />
 				<include name="reload/*.jar" />
-				<include name="smack/smack.jar"/>
-				<include name="smack/smackx.jar"/>
 				<include name="spring/*.jar" />
 				<include name="struts/*.jar" />
 				<include name="wddx/*.jar" />

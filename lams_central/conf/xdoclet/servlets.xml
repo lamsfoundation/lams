@@ -94,11 +94,6 @@
 </servlet>
 
 <servlet>
-    <servlet-name>JabberHTTPBindingServlet</servlet-name>
-    <servlet-class>org.jabber.JabberHTTPBind.JHBServlet</servlet-class>
-</servlet>
-
-<servlet>
 	<servlet-name>OpenIDServlet</servlet-name>
 	<servlet-class>
 		org.lamsfoundation.lams.web.SIFOpenIDServlet

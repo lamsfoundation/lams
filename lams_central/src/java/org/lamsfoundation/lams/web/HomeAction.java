@@ -171,8 +171,6 @@ public class HomeAction extends DispatchAction {
 		
 		String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 		req.setAttribute("serverUrl", serverUrl);
-		String presenceUrl = Configuration.get(ConfigurationKeys.XMPP_DOMAIN);
-		req.setAttribute("presenceUrl", presenceUrl);
 		req.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 		
 		//show lesson intro page if required

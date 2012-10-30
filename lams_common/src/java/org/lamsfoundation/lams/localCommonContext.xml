@@ -103,6 +103,7 @@
 				
 				<!-- Presence Chat Service related mapping files -->
 				<value>classpath:org/lamsfoundation/lams/presence/model/PresenceChatMessage.hbm.xml</value>
+				<value>classpath:org/lamsfoundation/lams/presence/model/PresenceChatRoster.hbm.xml</value>
 				
 				<!-- Event notification service related mapping files-->
 				<value>classpath:org/lamsfoundation/lams/events/Event.hbm.xml</value>
@@ -283,9 +284,8 @@
 	</bean>
 	
 	<!--  Presence Chat Service -->
-	<bean id="presenceChatLoggerService" class="org.lamsfoundation.lams.presence.service.PresenceChatLoggerService">
-		<property name="messageService"><ref bean="commonMessageService"/></property>
-		<property name="presenceChatMessageDAO"><ref bean="presenceChatMessageDAO" /></property>
+	<bean id="presenceChatService" class="org.lamsfoundation.lams.presence.service.PresenceChatService">
+		<property name="presenceChatDAO"><ref bean="presenceChatDAO" /></property>
 	</bean>
 	
 	<bean id="coreNotebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -417,7 +417,7 @@
 	</bean>	
 	
 	<!-- Presence Chat related beans -->
-	<bean id="presenceChatMessageDAO" class="org.lamsfoundation.lams.presence.dao.hibernate.PresenceChatMessageDAO">
+	<bean id="presenceChatDAO" class="org.lamsfoundation.lams.presence.dao.hibernate.PresenceChatDAO">
 		<property name="sessionFactory"><ref local="coreSessionFactory"/></property>
 	</bean>	
 	

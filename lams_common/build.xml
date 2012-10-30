@@ -23,6 +23,8 @@
 		<include name="**/GradebookUserLesson.java" />
 		<!-- Notebook -->
 		<include name="**/NotebookEntry.java" />
+		<!-- Presence Chat -->
+		<include name="**/model/PresenceChat*.java" />
 	</fileset>
 	
 	

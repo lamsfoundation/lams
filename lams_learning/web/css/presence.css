@@ -26,17 +26,13 @@ Presence stylesheet
 	right: 18px;
 	z-index: 10;
 	padding: 10px 10px 10px 40px;
-	margin: 0;
-}
-
-.startHidden {
-	display: none;
+	margin: 0px;
 }
 
 #presenceChatTabs {
 	position: absolute;
-	bottom: 0;
-	left: 0;
+	bottom: 0px;
+	left: 0px;
 	width: 73%;
 	height: 260px;
 }
@@ -60,6 +56,35 @@ Presence stylesheet
 	top: 0px;
 	right:0px;
 }
+
+#tabsHolder {
+	float: left;
+	width: 90%;
+	overflow:hidden;
+}
+
+#leftSliderDiv {
+	float: left;
+	width: 5%;
+	text-align: left;
+}
+
+#rightSliderDiv {
+	float: left;
+	width: 5%;
+	text-align: right;
+}
+
+.smallImage {
+	width: 16px;
+	height: 16px;
+	border: none;
+}
+
+.startHidden {
+	display: none;
+}
+
 .presenceListing {
 	width:"100%";
 }
@@ -93,7 +118,7 @@ Presence stylesheet
 
 .chatPanel {
 	width: 95%;
-	height: 80%;
+	height: 220px;
 }
 
 .messageArea {

@@ -51,11 +51,6 @@
 </servlet-mapping>
 
 <servlet-mapping>
-	<servlet-name>JabberHTTPBindingServlet</servlet-name>
-	<url-pattern>/JHB/*</url-pattern>
-</servlet-mapping>
-
-<servlet-mapping>
     <servlet-name>OpenIDServlet</servlet-name>
     <url-pattern>/OpenIDServlet</url-pattern>
 </servlet-mapping>

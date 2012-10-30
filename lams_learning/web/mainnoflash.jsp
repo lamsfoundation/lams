@@ -68,10 +68,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<a href="#" onclick="javascript:window.open('notebook.do?method=viewAll&lessonID=<c:out value="${param.lessonID}"/>')"><fmt:message key="mynotes.title"/></a> &nbsp;&nbsp;
 		<lams:help style="small" page="learner"/>
 		</div>
-		
-		<c:set var="presenceUrl" scope="request"><c:out value="${param.presenceUrl}"/></c:set>
+
 		<c:if test="${param.presenceEnabledPatch}">
-		    <%@ include file="/includes/presenceChat.jsp" %>
+		    <%@ include file="presenceChat.jsp" %>
 		</c:if>
 		
 		<iframe onload="javascript:resizeIframe()" id="contentFrame" name="contentFrame" frameborder="no" scrolling="auto"  src="learner.do?method=joinLesson&lessonID=<c:out value="${param.lessonID}"/>" width="100%" ></iframe>

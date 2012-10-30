@@ -166,11 +166,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		String clientVersion = Configuration.get(ConfigurationKeys.LEARNER_CLIENT_VERSION);
 		String serverLanguage = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 		String languageDate = Configuration.get(ConfigurationKeys.DICTIONARY_DATE_CREATED);
-		String jabberServer = Configuration.get(ConfigurationKeys.XMPP_DOMAIN);
 		%>
 
 
-		<c:set var="learnerurl_params">?userID=<lams:user property="userID"/>&firstName=<lams:user property="firstName"/>&lastName=<lams:user property="lastName"/>&serverURL=<lams:LAMSURL/>&presenceServerUrl=<%=jabberServer%>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&uniqueID=<c:out value="${randomID}"/><c:if test="${param.mode != null}">&mode=<c:out value="${param.mode}"/></c:if></c:set>
+		<c:set var="learnerurl_params">?userID=<lams:user property="userID"/>&firstName=<lams:user property="firstName"/>&lastName=<lams:user property="lastName"/>&serverURL=<lams:LAMSURL/>&build=<%=clientVersion%>&lang=<lams:user property="localeLanguage"/>&country=<lams:user property="localeCountry"/>&langDate=<%=languageDate%>&theme=<lams:user property="flashTheme"/>&lessonID=<c:out value="${param.lessonID}"/>&uniqueID=<c:out value="${randomID}"/><c:if test="${param.mode != null}">&mode=<c:out value="${param.mode}"/></c:if></c:set>
 		<c:set var="learnerurl_js">lams_learner<c:out value="${learnerurl_params}"/></c:set>
 		<c:set var="learnerurl_nojs">lams_learner.swf<c:out value="${learnerurl_params}"/></c:set>
 		
@@ -209,9 +208,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</noscript>
 		</div>
 
-		<c:set var="presenceUrl" scope="request"><c:out value="${param.presenceUrl}"/></c:set>
 		<c:if test="${param.presenceEnabledPatch}">
-    		<%@ include file="/includes/presenceChat.jsp" %>
+    		<%@ include file="presenceChat.jsp" %>
 		</c:if>
 		<iframe onload="javascript:resizeIframe()" id="contentFrame" name="contentFrame" class="ui-layout-center" src="content.do?lessonID=<c:out value="${param.lessonID}"/>" scrolling="auto">
 		</iframe>		

@@ -52,12 +52,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</lams:head>
 
 	<body class="stripes" onload="resizeFrame()">
-		<%
-			String jabberServer = Configuration.get(ConfigurationKeys.XMPP_DOMAIN);
-		%>
-		<c:set var="presenceUrl" scope="request"><%=jabberServer%></c:set>
 		<c:if test="${param.presenceEnabledPatch}">
-		    <%@ include file="/includes/presenceChat.jsp" %>
+		    <%@ include file="presenceChat.jsp" %>
 		</c:if>
 	 </body>
 
