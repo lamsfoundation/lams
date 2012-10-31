@@ -62,7 +62,7 @@ function handleUpdateChatResult(result) {
 	// only Monitor can send a personal message
 	if (MODE == 'teacher') {
 		userDiv.click(function(){
-			userSelected($(value));
+			userSelected($(this));
 		});
 	}
   });
