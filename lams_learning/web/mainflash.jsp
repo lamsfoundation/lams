@@ -125,7 +125,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			        $('body').layout({
 				        	west: {
 						        	applyDefaultStyles:   	true,
-						        	initClosed:			  	true,
+						        	initClosed:			  	false,
 						        	resizable:	          	false,
 						        	slidable:			 	false,
 						        	size:					160,
@@ -143,11 +143,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						        }
 					        });
 			        
-			       /* Because of initClosed parameter, controlFrame is not displayed in the beginning
-			          and embedded Flash loads (sometimes slowly) only when the pane is openened.
-			          Below is a trick to load the content but not show it.
-			       */
-			       $('#controlFrame').css('display','block').css('visibility','hidden');
 			    });
 			}
 		</script>
