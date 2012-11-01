@@ -64,6 +64,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 
 public class LessonManagerServlet extends HttpServlet {
@@ -250,9 +251,10 @@ public class LessonManagerServlet extends HttpServlet {
 	    // write out the xml document.
 	    DOMImplementationLS domImplementation = (DOMImplementationLS) document.getImplementation();
 	    LSSerializer lsSerializer = domImplementation.createLSSerializer();
-	    String documentStr = lsSerializer.writeToString(document);
-
-	    out.write(documentStr);
+	    LSOutput lsOutput = domImplementation.createLSOutput();
+	    lsOutput.setEncoding("UTF-8");
+	    lsOutput.setCharacterStream(out);
+	    lsSerializer.write(document, lsOutput);
 
 	} catch (NumberFormatException nfe) {
 	    LessonManagerServlet.log.error("lsId or ldId is not an integer" + lsIdStr + ldIdStr, nfe);
