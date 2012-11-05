@@ -47,7 +47,7 @@ CKEDITOR.plugins.add( 'skype',
 							},
 							{
 								type : 'html',
-								html : '<a style="text-decoration:underline !important;"target="_blank" href="http://yahoo.com">'+ editor.lang.skype.SkypeHelp+'</a>'
+								html : '<a style="text-decoration:underline !important;"target="_blank" href="http://wiki.lamsfoundation.org/x/AIGI">'+ editor.lang.skype.SkypeHelp+'</a>'
 							}
 						]
 					}
