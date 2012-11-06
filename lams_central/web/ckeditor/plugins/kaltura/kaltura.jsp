@@ -69,10 +69,10 @@
 		
 		function onSessionCreated(isSuccess, kSession) {
 			if (! isSuccess) {
-				alert("Sorry, there was an error");
+				alert('<fmt:message key="kaltura.error"/>');
 				return;
 			} else if (kSession.code != null) {
-				alert("Sorry, there was an error: " + kSession.message);
+				alert('<fmt:message key="kaltura.error"/>' + kSession.message);
 				return;
 			}
 			
@@ -112,7 +112,7 @@
 			for(var i = 0; i < entries.length; i++) {
 				var entryId = entries[i].entryId;
 				if ((entryId == null) || (entryId == "")) {
-					alert("An error occurred processing this video. Please, reupload it.");
+					alert('<fmt:message key="kaltura.upload.error"/>');
 					return;
 				}
 			}
@@ -173,7 +173,7 @@
 	<div id="kcw"></div>
 	<br/><br/>
 	<div id="explanationNotes">
-		<span>Select Upload tab to upload videos or Webcam to start webcam recording. After you've done with this press Next button. Assign a title to your video and press Next button again.</span>
+		<span><fmt:message key="kaltura.select.upload"/></span>
 	</div>
 </body>
 </lams:html>
