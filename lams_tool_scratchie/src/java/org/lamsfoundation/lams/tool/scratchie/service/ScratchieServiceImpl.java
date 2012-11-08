@@ -704,6 +704,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		
 		//clone it so it doesn't interfere with values from other sessions
 		ScratchieAnswer answer = (ScratchieAnswer) dbAnswer.clone();
+		answer.setUid(dbAnswer.getUid());
 		int[] attempts = new int[answers.size()];
 		answer.setAttempts(attempts);
 		answerMap.put(dbAnswer.getUid(), answer);
@@ -728,7 +729,40 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    groupSummary.setAnswers(sortedAnswers);
 	    groupSummaryList.add(groupSummary);
 	}
+	
+	//show total groupSummary if there is more than 1 group available
+	if (sessionList.size() > 1) {
+	    Long sessionId = new Long(0);
+	    GroupSummary groupSummaryTotal = new GroupSummary(sessionId, "Summary");
 
+	    Map<Long, ScratchieAnswer> answerMapTotal = new HashMap<Long, ScratchieAnswer>();
+	    for (ScratchieAnswer dbAnswer : (Set<ScratchieAnswer>) answers) {
+		// clone it so it doesn't interfere with values from other sessions
+		ScratchieAnswer answer = (ScratchieAnswer) dbAnswer.clone();
+		int[] attempts = new int[answers.size()];
+		answer.setAttempts(attempts);
+		answerMapTotal.put(dbAnswer.getUid(), answer);
+	    }
+
+	    for (GroupSummary groupSummary : groupSummaryList) {
+		Collection<ScratchieAnswer> sortedAnswers = groupSummary.getAnswers();
+		for (ScratchieAnswer sortedAnswer : sortedAnswers) {
+		    int[] attempts = sortedAnswer.getAttempts();
+		    
+		    ScratchieAnswer answerTotal = answerMapTotal.get(sortedAnswer.getUid());
+		    int[] attemptsTotal = answerTotal.getAttempts();
+		    for  (int i = 0; i < attempts.length; i++) {
+			attemptsTotal[i] += attempts[i];
+		    }
+		}
+	    }
+
+	    Collection<ScratchieAnswer> sortedAnswers = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
+	    sortedAnswers.addAll(answerMapTotal.values());
+	    groupSummaryTotal.setAnswers(sortedAnswers);
+	    groupSummaryList.add(0, groupSummaryTotal);
+	}
+	
 	return groupSummaryList;
     }
 
