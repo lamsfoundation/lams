@@ -37,6 +37,7 @@ public class ImageGalleryItemDAOHibernate extends BaseDAOHibernate implements Im
 	return this.getHibernateTemplate().find(FIND_AUTHORING_ITEMS, imageGalleryUid);
     }
 
+    @Override
     public ImageGalleryItem getByUid(Long imageGalleryItemUid) {
 	return (ImageGalleryItem) this.getObject(ImageGalleryItem.class, imageGalleryItemUid);
     }

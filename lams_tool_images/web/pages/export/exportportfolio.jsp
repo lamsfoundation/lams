@@ -21,7 +21,7 @@
 	 	
 	 	<script type="text/javascript">
 			$(document).ready(function(){
-		 		$('input[@type=radio].star').rating({
+		 		$('input[type=radio].star').rating({
 					readOnly: true
 				});
 			});

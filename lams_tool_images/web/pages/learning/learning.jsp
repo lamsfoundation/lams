@@ -285,7 +285,7 @@
 				var checked = (currentRating == i) ? "checked = 'checked' " : "";
 				$('#rating_stars_inputs').append('<input class="star" type="radio" name="rating" value="' + i + '"' + checked + '/>');
 			}
-			$('input[@type=radio].star').rating({
+			$('input[type=radio].star').rating({
 				readOnly: ${finishedLock},
 				callback: function() {
 			    	var options = { 

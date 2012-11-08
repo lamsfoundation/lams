@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.tool.imageGallery.web.action;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;

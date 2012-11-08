@@ -23,14 +23,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.imageGallery.dao.hibernate;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryItemVisitDAO;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItemVisitLog;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 
 public class ImageGalleryItemVisitDAOHibernate extends BaseDAOHibernate implements ImageGalleryItemVisitDAO {
 

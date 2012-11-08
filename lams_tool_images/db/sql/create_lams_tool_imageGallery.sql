@@ -5,7 +5,7 @@ drop table if exists tl_laimag10_imageGallery_item;
 drop table if exists tl_laimag10_image_comment;
 drop table if exists tl_laimag10_image_rating;
 drop table if exists tl_laimag10_image_vote;
-drop table if exists tl_laimag10_imageGallery_item_visit_log;
+drop table if exists tl_laimag10_item_log;
 drop table if exists tl_laimag10_session;
 drop table if exists tl_laimag10_user;
 drop table if exists tl_laimag10_configuration;

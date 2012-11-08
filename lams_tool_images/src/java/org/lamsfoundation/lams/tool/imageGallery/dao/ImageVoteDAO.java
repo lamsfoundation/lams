@@ -23,8 +23,6 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.imageGallery.dao;  
 
-import java.util.List;
-
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
  
 /**
