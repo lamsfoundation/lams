@@ -26,12 +26,51 @@
 
 <p>
 	<html:checkbox property="forum.allowRateMessages" styleClass="noBorder"
-		styleId="allowRateMessages">
+		styleId="allowRateMessages" onclick="checkRating()" >
 	</html:checkbox>
 	<label for="allowRateMessages">
 		<fmt:message key="label.authoring.advance.allow.rate.postings" />
 	</label>
 </p>
+
+<p style="margin-left:60px;">
+	<fmt:message key="label.authoring.advance.minimum.reply" />
+	<html:select property="forum.minimumRate" styleId="minimumRate"  onmouseup="validateRatings()">
+		<html:option value="0">
+			<fmt:message key="label.authoring.advance.no.minimum" />
+		</html:option>
+		<html:option value="1">1</html:option>
+		<html:option value="2">2</html:option>
+		<html:option value="3">3</html:option>
+		<html:option value="4">4</html:option>
+		<html:option value="5">5</html:option>
+		<html:option value="6">6</html:option>
+		<html:option value="7">7</html:option>
+		<html:option value="8">8</html:option>
+		<html:option value="9">9</html:option>
+		<html:option value="10">10</html:option>
+	</html:select>
+
+
+	<fmt:message key="label.authoring.advance.maximum.reply" />
+	<html:select property="forum.maximumRate" styleId="maximumRate"   onmouseup="validateRatings()">
+		<html:option value="0">
+			<fmt:message key="label.authoring.advance.no.maximum" />
+		</html:option>
+		<html:option value="1">1</html:option>
+		<html:option value="2">2</html:option>
+		<html:option value="3">3</html:option>
+		<html:option value="4">4</html:option>
+		<html:option value="5">5</html:option>
+		<html:option value="6">6</html:option>
+		<html:option value="7">7</html:option>
+		<html:option value="8">8</html:option>
+		<html:option value="9">9</html:option>
+		<html:option value="10">10</html:option>
+	</html:select>
+
+</p>
+
 
 <p>
 	<html:checkbox property="forum.allowUpload" styleClass="noBorder"
@@ -218,8 +257,8 @@
 				var allowNew = document.getElementsByName("forum.allowNewTopic");
 				var min= document.getElementById("minimumReply");
 				var max= document.getElementById("maximumReply");
-				
-				//disable reply limited drop list
+								
+				//enable if rate is on
 				if(allowNew[0].checked){
 					min.disabled=true;
 					max.disabled=true;
@@ -231,6 +270,34 @@
 				}
 			}
 			allowNewTopic();
+
+			function checkRating(){
+				var allowRate = document.getElementsByName("forum.allowRateMessages");
+				var min= document.getElementById("minimumRate");
+				var max= document.getElementById("maximumRate");
+				
+			
+				if(allowRate[0].checked){
+					min.disabled=false;
+					max.disabled=false;
+				} else {
+					min.disabled=true;
+					max.disabled=true;
+				}
+			}
+			checkRating();
+			
+			function validateRatings() {
+				var minRateDropDown = document.getElementById("minimumRate");
+				var minRatings  = minRateDropDown.options[minRateDropDown.selectedIndex].value;
+				var maxRateDropDown  = document.getElementById("maximumRate");
+				var maxRatings = maxRateDropDown.options[maxRateDropDown.selectedIndex].value;
+				
+				if((minRatings > maxRatings) && !(maxRatings == 0)){
+					alert('<fmt:message key="js.error.validate.number"/>');
+				}
+				
+			}
 			
 			function checkReflection(){
 				var ropt = document.getElementById("reflectOn");

@@ -59,8 +59,38 @@
 				</fmt:message>
 			</div>
 		</c:if>
+		
+		<!-- Rating announcements -->
 
+		<c:if test="${sessionMap.allowRateMessages and (sessionMap.minimumRate ne 0 and sessionMap.maximumRate ne 0)}">
+			<div class="info">
+				<fmt:message key="label.rateLimits.forum.reminder">
+					<fmt:param value="${sessionMap.minimumRate}"></fmt:param>
+					<fmt:param value="${sessionMap.maximumRate}"></fmt:param>
+				</fmt:message>			
+			</div>
+		</c:if>		
+		
+		<c:if test="${sessionMap.allowRateMessages and (sessionMap.minimumRate ne 0 and sessionMap.maximumRate eq 0)}">
+			<div class="info">
+				<fmt:message key="label.rateLimits.forum.reminder.min">
+					<fmt:param value="${sessionMap.minimumRate}"></fmt:param>
+				</fmt:message>			
+			</div>
+		</c:if>				
+
+		<c:if test="${sessionMap.allowRateMessages and (sessionMap.minimumRate eq 0 and sessionMap.maximumRate ne 0)}">
+			<div class="info">
+				<fmt:message key="label.rateLimits.forum.reminder.max">
+					<fmt:param value="${sessionMap.maximumRate}"></fmt:param>
+				</fmt:message>					
+			</div>
+		</c:if>		
+
+		
 	</c:if>
+
+
 
 	<%@ include file="/common/messages.jsp"%>
 

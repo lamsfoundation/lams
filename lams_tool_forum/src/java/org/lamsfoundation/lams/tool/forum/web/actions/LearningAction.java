@@ -221,6 +221,8 @@ public class LearningAction extends Action {
 	sessionMap.put(ForumConstants.ATTR_ALLOW_EDIT, forum.isAllowEdit());
 	sessionMap.put(ForumConstants.ATTR_ALLOW_UPLOAD, forum.isAllowUpload());
 	sessionMap.put(ForumConstants.ATTR_ALLOW_RATE_MESSAGES, forum.isAllowRateMessages());
+	sessionMap.put(ForumConstants.ATTR_MINIMUM_RATE, forum.getMinimumRate());
+	sessionMap.put(ForumConstants.ATTR_MAXIMUM_RATE, forum.getMaximumRate());
 	sessionMap.put(ForumConstants.ATTR_ALLOW_NEW_TOPICS, forum.isAllowNewTopic());
 	sessionMap.put(ForumConstants.ATTR_ALLOW_RICH_EDITOR, allowRichEditor);
 	sessionMap.put(ForumConstants.ATTR_LIMITED_CHARS, new Integer(allowNumber));

@@ -73,6 +73,10 @@ public class Forum implements Cloneable {
     private int maximumReply;
 
     private int minimumReply;
+    
+    private int maximumRate;
+
+    private int minimumRate;
 
     private boolean allowRichEditor;
 
@@ -676,5 +680,29 @@ public class Forum implements Cloneable {
 	
 	public void setSubmissionDeadline(Date submissionDeadline) {
 		this.submissionDeadline = submissionDeadline;
+	}
+
+    /**
+     * @hibernate.property column="maximum_rate"
+     * @return
+     */
+	public int getMaximumRate() {
+		return maximumRate;
+	}
+
+	public void setMaximumRate(int maximumRate) {
+		this.maximumRate = maximumRate;
+	}
+
+    /**
+     * @hibernate.property column="minimum_rate"
+     * @return
+     */	
+	public int getMinimumRate() {
+		return minimumRate;
+	}
+
+	public void setMinimumRate(int minimumRate) {
+		this.minimumRate = minimumRate;
 	}
 }
