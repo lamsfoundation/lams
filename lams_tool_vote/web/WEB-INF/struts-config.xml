@@ -432,6 +432,12 @@
 		    redirect="false"
 	  	/>
 	</action>  
+
+   <action 	path="/chartGenerator" 
+   			type="org.lamsfoundation.lams.tool.vote.web.VoteChartGeneratorAction"
+   			parameter="dispatch"
+      		validate="false">
+	</action>
 	
    <action 	path="/clearsession" 
    			type="org.lamsfoundation.lams.tool.vote.web.ClearSessionAction"> 

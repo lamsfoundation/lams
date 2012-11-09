@@ -48,7 +48,6 @@ public interface VoteAppConstants {
     public static final String LEARNING_STARTER = "learningStarter";
     public static final String MONITORING_STARTER = "monitoringStarter";
     public static final String LOAD_LEARNER = "loadLearner";
-    public static final String GENERATE_CHART = "generateChart";
     public static final String ALL_NOMINATIONS = "allNominations";
     public static final String LOAD_MONITORING_CONTENT = "loadMonitoring";
     public static final String LOAD_MONITORING_CONTENT_EDITACTIVITY = "loadMonitoringEditActivity";

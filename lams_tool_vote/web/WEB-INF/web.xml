@@ -143,11 +143,6 @@ http://www.gnu.org/licenses/gpl.txt
 		<servlet-name>exportPortfolio</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.tool.vote.web.ExportServlet</servlet-class>
 	</servlet>
-	
-	<servlet>
-		<servlet-name>chartGenerator</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.tool.vote.web.VoteChartGenerator</servlet-class>
-	</servlet>
 
 
 <!--  FCKEditor Connector Configuration -->
@@ -178,11 +173,6 @@ http://www.gnu.org/licenses/gpl.txt
   	<servlet-mapping>
 		<servlet-name>exportPortfolio</servlet-name>
 		<url-pattern>/exportPortfolio/*</url-pattern>
-  	</servlet-mapping>
-
-  	<servlet-mapping>
-		<servlet-name>chartGenerator</servlet-name>
-		<url-pattern>/chartGenerator/*</url-pattern>
   	</servlet-mapping>
 
 	<servlet-mapping>

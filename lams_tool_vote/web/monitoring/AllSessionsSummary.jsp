@@ -168,10 +168,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														<tr> 
 															<td> </td>
 															<td  valign=top class="align-left" >
-																<c:set scope="request" var="viewURL">
-																	<html:rewrite page="/chartGenerator?type=pie&currentSessionId=${currentSessionId}"/>
-																</c:set>
-																<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+																<a href="javascript:drawChart('pie', '${currentSessionId}')">
 																	 <fmt:message key="label.view.piechart"/>  
 																</a>
 															</td>
@@ -179,12 +176,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														<tr> 
 															<td> </td>
 															<td  valign=top class="align-left" >
-																<c:set scope="request" var="viewURL">
-																	<html:rewrite page="/chartGenerator?type=bar&currentSessionId=${currentSessionId}"/>
-																</c:set>
-																<a href="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+																<a href="javascript:drawChart('bar', '${currentSessionId}')">
 																	 <fmt:message key="label.view.barchart"/>  
 																</a>
+															</td>
+														</tr>
+														<tr>
+															<td id="chartDiv" style="height: 220px; display: none" colspan="2">
 															</td>
 														</tr>
 													</c:if> 

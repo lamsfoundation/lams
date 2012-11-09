@@ -41,8 +41,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/g.raphael.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/g.pie.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/g.bar.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/chart.js"></script>
 	
 	<script language="JavaScript" type="text/JavaScript">
+		var TOOL_URL = '<lams:WebAppURL />';
+	
 		function submitMethod(actionMethod) 
 		{
 			if (actionMethod == "learnerFinished") {

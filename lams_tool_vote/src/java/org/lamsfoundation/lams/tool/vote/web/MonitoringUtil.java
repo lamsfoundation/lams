@@ -634,7 +634,7 @@ public class MonitoringUtil implements VoteAppConstants {
     }
 
     /**
-     * Generates JFreeChart data for all sessions in the Monitoring Summary.
+     * Generates chart data for all sessions in the Monitoring Summary.
      * 
      * @param request
      * @param voteService
@@ -837,7 +837,7 @@ public class MonitoringUtil implements VoteAppConstants {
     }
 
     /**
-     * Generates JFreeChart data for the learner module and monitoring module
+     * Generates chart data for the learner module and monitoring module
      * Summary tab (Individual Sessions mode)
      * 
      * @param request
@@ -1068,130 +1068,6 @@ public class MonitoringUtil implements VoteAppConstants {
 
 	logger.debug("end of prepareChartData,  voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 	request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
-    }
-
-    /**
-     * generates JFreeChart for the teacher export portfolio
-     * 
-     * @param request
-     * @param voteService
-     * @param voteMonitoringForm
-     * @param toolContentID
-     * @param toolSessionUid
-     */
-    public static void prepareChartDataForExportTeacher(HttpServletRequest request, IVoteService voteService,
-	    VoteMonitoringForm voteMonitoringForm, Long toolContentID, Long toolSessionUid,
-	    ExportPortfolioDTO exportPortfolioDTO, MessageService messageService) {
-	logger.debug("starting prepareChartDataForExportTeacher, toolContentID: " + toolContentID);
-	logger.debug("starting prepareChartDataForExportTeacher, toolSessionUid: " + toolSessionUid);
-	logger.debug("pased exportPortfolioDTO: " + exportPortfolioDTO);
-
-	VoteContent voteContent = voteService.retrieveVote(toolContentID);
-	logger.debug("starting prepareChartData, voteContent uid: " + voteContent.getUid());
-	logger.debug("starting prepareChartDataForExport, voteMonitoringForm: " + voteMonitoringForm);
-	logger.debug("existing voteContent:" + voteContent);
-
-	Map mapOptionsContent = new TreeMap(new VoteComparator());
-	Map mapVoteRatesContent = new TreeMap(new VoteComparator());
-	Map mapStandardUserCount = new TreeMap(new VoteComparator());
-
-	Iterator queIterator = voteContent.getVoteQueContents().iterator();
-	Long mapIndex = new Long(1);
-	int totalStandardVotesCount = 0;
-	int totalStandardContentVotesCount = 0;
-	int entriesCount = 0;
-
-	logger.debug("get all entries for content: " + voteContent);
-	entriesCount = voteService.getUserEnteredVotesCountForContent(voteContent.getUid());
-	logger.debug("entriesCount: " + entriesCount);
-
-	Map mapStandardNominationsHTMLedContent = new TreeMap(new VoteComparator());
-
-	while (queIterator.hasNext()) {
-	    VoteQueContent voteQueContent = (VoteQueContent) queIterator.next();
-	    if (voteQueContent != null) {
-		logger.debug("question: " + voteQueContent.getQuestion());
-		mapStandardNominationsHTMLedContent.put(mapIndex.toString(), voteQueContent.getQuestion());
-		String noHTMLNomination = VoteUtils.stripHTML(voteQueContent.getQuestion());
-		logger.debug("noHTMLNomination: " + noHTMLNomination);
-		mapOptionsContent.put(mapIndex.toString(), noHTMLNomination);
-
-		int votesCount = voteService.getStandardAttemptsForQuestionContentAndContentUid(
-			voteQueContent.getUid(), voteContent.getUid());
-		logger.debug("standardContentAttemptCount: " + votesCount);
-
-		mapStandardUserCount.put(mapIndex.toString(), new Integer(votesCount).toString());
-		totalStandardVotesCount = totalStandardVotesCount + votesCount;
-
-		double voteRate = 0d;
-		double doubleVotesCount = votesCount * 1d;
-		logger.debug("doubleVotesCount: " + doubleVotesCount);
-		double doubleEntriesCount = entriesCount * 1d;
-		logger.debug("doubleEntriesCount: " + doubleEntriesCount);
-		if (entriesCount != 0) {
-		    voteRate = ((doubleVotesCount * 100) / doubleEntriesCount);
-		}
-
-		logger.debug("voteRate" + voteRate);
-		String stringVoteRate = new Double(voteRate).toString();
-		int lengthVoteRate = stringVoteRate.length();
-		logger.debug("lengthVoteRate" + lengthVoteRate);
-		if (lengthVoteRate > 5)
-		    stringVoteRate = stringVoteRate.substring(0, 6);
-
-		mapVoteRatesContent.put(mapIndex.toString(), stringVoteRate);
-		mapIndex = new Long(mapIndex.longValue() + 1);
-	    }
-	}
-	logger.debug("test1: Map initialized with existing contentid to: " + mapOptionsContent);
-	Map mapStandardNominationsContent = new TreeMap(new VoteComparator());
-	mapStandardNominationsContent = mapOptionsContent;
-	logger.debug("mapStandardNominationsContent: " + mapStandardNominationsContent);
-	logger.debug("mapStandardNominationsHTMLedContent: " + mapStandardNominationsHTMLedContent);
-
-	Map mapStandardRatesContent = new TreeMap(new VoteComparator());
-	mapStandardRatesContent = mapVoteRatesContent;
-	logger.debug("test1: mapStandardRatesContent: " + mapStandardRatesContent);
-	logger.debug("test1: mapStandardUserCount: " + mapStandardUserCount);
-
-	int mapVoteRatesSize = mapVoteRatesContent.size();
-	logger.debug("mapVoteRatesSize: " + mapVoteRatesSize);
-	mapIndex = new Long(mapVoteRatesSize + 1);
-	logger.debug("updated mapIndex: " + mapIndex);
-
-	double total = MonitoringUtil.calculateTotal(mapVoteRatesContent);
-	logger.debug("updated mapIndex: " + mapIndex);
-	double share = 100d - total;
-	logger.debug("share: " + share);
-
-	logger.debug("totalStandardVotesCount: " + totalStandardVotesCount);
-	int userEnteredVotesCount = entriesCount - totalStandardVotesCount;
-	logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
-
-	if (userEnteredVotesCount != 0) {
-	    share = ((userEnteredVotesCount * 100) / entriesCount);
-	    logger.debug("calculated share normally, userEnteredVotesCount: " + userEnteredVotesCount);
-	    logger.debug("calculated share normally, entriesCount: " + entriesCount);
-	} else {
-	    share = 0;
-	    logger.debug("reset share");
-	}
-	logger.debug("final share: " + share);
-
-	if (voteContent.isAllowText()) {
-	    mapStandardNominationsContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
-	    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
-	}
-	mapStandardRatesContent.put(mapIndex.toString(), new Double(share).toString());
-	mapStandardUserCount.put(mapIndex.toString(), new Integer(userEnteredVotesCount).toString());
-
-	if (exportPortfolioDTO != null) {
-	    exportPortfolioDTO.setMapStandardNominationsHTMLedContent(mapStandardNominationsHTMLedContent);
-	    exportPortfolioDTO.setMapStandardRatesContent(mapStandardRatesContent);
-	    exportPortfolioDTO.setMapStandardUserCount(mapStandardUserCount);
-	    exportPortfolioDTO.setMapStandardNominationsContent(mapStandardNominationsContent);
-	}
-	logger.debug("ending prepareChartDataForExportTeacher, exportPortfolioDTO: " + exportPortfolioDTO);
     }
 
     public static boolean notebookEntriesExist(IVoteService voteService, VoteContent voteContent) {

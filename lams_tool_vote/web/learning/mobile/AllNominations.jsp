@@ -42,7 +42,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>		
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script language="JavaScript" type="text/JavaScript">
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/g.raphael.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/g.pie.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/g.bar.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/chart.js"></script>
+	
+	<script type="text/javascript">
 		function submitMethod(actionMethod) 
 		{
 			if (actionMethod == 'learnerFinished') {
@@ -167,24 +173,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<div>
 				<div class="float-right">
-
-					<c:set scope="request" var="viewURL">
-						<html:rewrite page="/chartGenerator?type=pie" />
-					</c:set>
-
 					<img src='<c:out value="${tool}"/>images/piechart.gif' width="30"
 						title="<fmt:message key='label.tip.displayPieChart'/>"
 						style="cursor: pointer;" height="30" border="0"
-						onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
-
-					<c:set scope="request" var="viewURL">
-						<html:rewrite page="/chartGenerator?type=bar" />
-					</c:set>
+						onclick="javascript:drawChart('pie')">
 
 					<img src='<c:out value="${tool}"/>images/columnchart.gif' width="30"
 						title="<fmt:message key='label.tip.displayBarChart'/>" 
 						style="cursor: pointer;" height="30" border="0"
-						onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')">
+						onclick="javascript:drawChart('bar')">
 				</div>
 				
 				<c:if test="${VoteLearningForm.allowTextEntry}">
@@ -236,8 +233,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
 						escapeXml="false" />
 				</p>
-			</c:if>							
-
+			</c:if>			
+							
+			<div id="chartDiv" style="height: 220px; display: none;"></div>
+				
 			<div class="space-bottom-top button-inside">
 				<c:if test="${voteGeneralLearnerFlowDTO.reportViewOnly != 'true' }">
 					<button name="refreshVotes"

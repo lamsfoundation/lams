@@ -108,24 +108,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<div>
 				<div class="float-right">
-
-					<c:set scope="request" var="viewURL">
-						<html:rewrite page="/chartGenerator?type=pie" />
-					</c:set>
-
-					<img src="<c:out value="${tool}"/>images/piechart.gif" width=30
+					<img src='<c:out value="${tool}"/>images/piechart.gif' width="30"
 						title="<fmt:message key='label.tip.displayPieChart'/>"
-						onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')"
-						height="30" border="0" style="cursor: pointer;">
+						style="cursor: pointer;" height="30" border="0"
+						onclick="javascript:drawChart('pie')">
 
-					<c:set scope="request" var="viewURL">
-						<html:rewrite page="/chartGenerator?type=bar" />
-					</c:set>
-
-					<img src="<c:out value="${tool}"/>images/columnchart.gif" width=30
-						title="<fmt:message key='label.tip.displayBarChart'/>"
-						onclick="javascript:launchInstructionsPopup('<c:out value='${viewURL}' escapeXml='false'/>')"
-						height=30 border="0" style="cursor: pointer;">
+					<img src='<c:out value="${tool}"/>images/columnchart.gif' width="30"
+						title="<fmt:message key='label.tip.displayBarChart'/>" 
+						style="cursor: pointer;" height="30" border="0"
+						onclick="javascript:drawChart('bar')">
 				</div>
 				
 				<c:if test="${VoteLearningForm.allowTextEntry}">
@@ -158,4 +149,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<div>
 					<c:out value="${VoteLearningForm.userEntry}" />
 				</div>
+				
+				<div id="chartDiv" style="height: 220px; display: none;"></div>
 		</div>
