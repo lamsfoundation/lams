@@ -119,10 +119,11 @@ public abstract class GradebookGridRowDTO {
 
     protected String markToString() {
 	if (mark != null) {
-	    if (marksAvailable != null) {
-		return "<font color='green'>" + mark.toString() + "/" + marksAvailable.toString() + "</font>";
+	    String markStr = new DecimalFormat("##0.00").format(mark);
+		if (marksAvailable != null) {
+		return "<font color='green'>" + markStr + "/" + marksAvailable.toString() + "</font>";
 	    } else {
-		return mark.toString();
+		return markStr;
 	    }
 	} else {
 	    if (marksAvailable != null) {
@@ -137,7 +138,7 @@ public abstract class GradebookGridRowDTO {
 
     protected String averageMarkToString() {
 	if (averageMark != null) {
-	    String avgStr = new DecimalFormat("###.00").format(averageMark);
+	    String avgStr = new DecimalFormat("##0.00").format(averageMark);
 	    if (marksAvailable != null) {
 		return avgStr + "/" + marksAvailable.toString();
 	    } else {
