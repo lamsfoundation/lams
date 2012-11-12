@@ -42,13 +42,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>		
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael.js"></script>
-	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/g.raphael.js"></script>
-	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/g.pie.js"></script>
-	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/g.bar.js"></script>
-	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/chart.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/raphael.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.raphael.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.pie.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.bar.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/chart.js"></script>
 	
 	<script type="text/javascript">
+		var chartDataUrl = '<lams:WebAppURL />chartGenerator.do';
+		
 		function submitMethod(actionMethod) 
 		{
 			if (actionMethod == 'learnerFinished') {
@@ -176,12 +178,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<img src='<c:out value="${tool}"/>images/piechart.gif' width="30"
 						title="<fmt:message key='label.tip.displayPieChart'/>"
 						style="cursor: pointer;" height="30" border="0"
-						onclick="javascript:drawChart('pie')">
+						onclick="javascript:drawChart('pie', 0)">
 
 					<img src='<c:out value="${tool}"/>images/columnchart.gif' width="30"
 						title="<fmt:message key='label.tip.displayBarChart'/>" 
 						style="cursor: pointer;" height="30" border="0"
-						onclick="javascript:drawChart('bar')">
+						onclick="javascript:drawChart('bar', 0)">
 				</div>
 				
 				<c:if test="${VoteLearningForm.allowTextEntry}">
@@ -235,7 +237,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</p>
 			</c:if>			
 							
-			<div id="chartDiv" style="height: 220px; display: none;"></div>
+			<div id="chartDiv0" style="height: 220px; display: none;"></div>
 				
 			<div class="space-bottom-top button-inside">
 				<c:if test="${voteGeneralLearnerFlowDTO.reportViewOnly != 'true' }">

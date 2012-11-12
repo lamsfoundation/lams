@@ -267,11 +267,6 @@
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
 		
-		<action path="/monitoring/viewChartReport"
-			type="org.lamsfoundation.lams.tool.survey.web.action.MonitoringAction"
-			parameter="viewChartReport" >
-			<forward name="success" path="/pages/monitoring/chartreport.jsp" />
-		</action>
 		<action path="/showChart"
 			type="org.lamsfoundation.lams.tool.survey.web.action.ChartAction">
 		</action>

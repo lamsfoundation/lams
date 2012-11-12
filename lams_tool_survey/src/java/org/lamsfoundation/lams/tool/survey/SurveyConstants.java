@@ -162,8 +162,6 @@ public class SurveyConstants {
 
     public static final String ATTR_CURRENT_QUESTIONS_IDX = "currentIdx";
 
-    public static final String CHART_TYPE = "chartType";
-
     public static final String ATTR_QUESTION_UID = "questionUid";
 
     public static final String ATTR_SUMMARY_LIST = "summaryList";

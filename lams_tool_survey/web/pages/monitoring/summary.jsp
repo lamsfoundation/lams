@@ -26,8 +26,15 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/raphael.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.raphael.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.pie.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/chart.js"></script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
+	var chartDataUrl = '<lams:WebAppURL />showChart.do';
+	var alwaysFetchChartValues = true;
+	
 	function exportSurvey(sessionId){
 		var url = "<c:url value="/monitoring/exportSurvey.do"/>";
 	    var reqIDVar = new Date();
@@ -175,23 +182,15 @@
 					</a>
 					<div style="float:right">
 					<%-- Only show pie/bar chart when question is single/multiple choics type --%>
-					<c:if test="${question.type !=3}">
-						<a href="javascript:;" onclick="launchPopup('<c:url value="/monitoring/viewChartReport.do?chartType=pie&"/>toolSessionID=${surveySession.sessionId}&questionUid=${question.uid}')">
-							<img src="${tool}/includes/images/piechart.gif" title="<fmt:message key='message.view.pie.chart'/>" height="22" width="25" border="0">
-						</a>
-						<a href="javascript:;" onclick="launchPopup('<c:url value="/monitoring/viewChartReport.do?chartType=bar&"/>toolSessionID=${surveySession.sessionId}&questionUid=${question.uid}')">
-							<img src="${tool}/includes/images/columnchart.gif" title="<fmt:message key='message.view.bar.chart'/>" height="22" width="25" border="0">
-						</a>
+					<c:if test="${question.type != 3}">
+						<img src='<c:out value="${tool}"/>includes/images/piechart.gif'
+							title="<fmt:message key='message.view.pie.chart'/>"
+							style="cursor: pointer; width: 30px; border: none"
+							onclick="javascript:drawChart('pie', ${queStatus.index}, {'toolSessionID' : '${surveySession.sessionId}','questionUid' : '${question.uid}'})">
 					</c:if>
 					</div>
 				</th>
 			</tr>
-			<%-- 
-			<tr>
-				<td><fmt:message key="message.possible.answers"/></td>
-				<td><fmt:message key="message.total.user.response"/></td>
-			</tr>
-			--%>
 			<c:set var="optSize" value="${fn:length(question.options)}" />
 			<c:forEach var="option" items="${question.options}"  varStatus="optStatus">
 				<tr>
@@ -211,6 +210,10 @@
 					</td>
 				</tr>
 			</c:forEach>
+			<tr>
+				<td id="chartDiv${queStatus.index}" style="height: 220px; display: none" colspan="2">
+				</td>
+			</tr>
 			<c:if test="${question.appendText}">
 				<tr>
 					<td><fmt:message key="label.open.response"/></td>

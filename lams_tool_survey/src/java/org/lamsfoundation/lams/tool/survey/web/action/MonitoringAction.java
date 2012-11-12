@@ -95,10 +95,6 @@ public class MonitoringAction extends Action {
 	    return summary(mapping, form, request, response);
 	}
 
-	if (param.equals("viewChartReport")) {
-	    return viewChartReport(mapping, form, request, response);
-	}
-
 	if (param.equals("listAnswers")) {
 	    return listAnswers(mapping, form, request, response);
 	}
@@ -182,33 +178,6 @@ public class MonitoringAction extends Action {
 	    sessionMap.put(SurveyConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
 
 	}	
-
-	return mapping.findForward(SurveyConstants.SUCCESS);
-    }
-
-    /**
-     * Display pie chart or bar chart for one question.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward viewChartReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	String type = WebUtil.readStrParam(request, SurveyConstants.CHART_TYPE);
-
-	Long questionUid = WebUtil.readLongParam(request, SurveyConstants.ATTR_QUESTION_UID);
-	ISurveyService service = getSurveyService();
-	// get question
-	SurveyQuestion question = service.getQuestion(questionUid);
-
-	// set all attribute to request for show
-	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
-	request.setAttribute(SurveyConstants.CHART_TYPE, type);
-	request.setAttribute(SurveyConstants.ATTR_QUESTION, question);
 
 	return mapping.findForward(SurveyConstants.SUCCESS);
     }

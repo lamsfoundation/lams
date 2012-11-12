@@ -98,8 +98,6 @@
         <archive path="/lams_build/lib/xstream/xml-writer-0.2.jar"/>
         <archive path="/lams_build/lib/xstream/xom-1.0b3.jar"/>
         <archive path="/lams_build/lib/xstream/xpp3-1.1.3.4d_b4_min.jar"/>
-        <archive path="/lams_build/lib/jfreechart/jfreechart-1.0.1.jar"/>
-        <archive path="/lams_build/lib/jfreechart/jcommon-1.0.0.jar"/>
         <archive path="/lams_build/lib/flagstone/transform.jar"/>
         <archive path="/lams_build/lib/flagstone/translate.jar"/>
         <archive path="/lams_build/lib/selenium/selenium-java-client-driver.jar" source="/lams_build/lib/selenium/selenium-java-client-driver-sources.jar"/>

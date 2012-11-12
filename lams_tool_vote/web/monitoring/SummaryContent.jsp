@@ -29,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 
 <script type="text/javascript"> 
-	var TOOL_URL = '<lams:WebAppURL />';
+	var chartDataUrl = '<lams:WebAppURL />chartGenerator.do';
 
 	//pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
@@ -46,11 +46,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>  
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael.js"></script>
-<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/g.raphael.js"></script>
-<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/g.pie.js"></script>
-<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/g.bar.js"></script>
-<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/chart.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/raphael.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.raphael.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.pie.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/g.bar.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/raphael/chart.js"></script>
+	
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
 <h1 style="padding-bottom: 10px;">

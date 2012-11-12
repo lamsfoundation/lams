@@ -23,20 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.survey.web.action;
 
-import static org.lamsfoundation.lams.tool.survey.SurveyConstants.ATTR_QUESTION_UID;
-import static org.lamsfoundation.lams.tool.survey.SurveyConstants.CHART_TYPE;
-import static org.lamsfoundation.lams.tool.survey.SurveyConstants.ERROR_MSG_CHART_ERROR;
-import static org.lamsfoundation.lams.tool.survey.SurveyConstants.MSG_BARCHART_CATEGORY_AXIS_LABEL;
-import static org.lamsfoundation.lams.tool.survey.SurveyConstants.MSG_BARCHART_TITLE;
-import static org.lamsfoundation.lams.tool.survey.SurveyConstants.MSG_BARCHART_VALUE_AXIS_LABEL;
-import static org.lamsfoundation.lams.tool.survey.SurveyConstants.MSG_OPEN_RESPONSE;
-import static org.lamsfoundation.lams.tool.survey.SurveyConstants.MSG_PIECHART_TITLE;
-import static org.lamsfoundation.lams.tool.survey.SurveyConstants.QUESTION_TYPE_TEXT_ENTRY;
-import static org.lamsfoundation.lams.tool.survey.SurveyConstants.SURVEY_SERVICE;
-import static org.lamsfoundation.lams.tool.survey.SurveyConstants.OPTION_SHORT_HEADER;
-
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -49,113 +36,75 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.MessageResources;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultPieDataset;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
-import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.service.ISurveyService;
-import org.lamsfoundation.lams.util.ChartUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
 /**
  * Display chart image by request.
  * 
  * @author Steve.Ni
- * 
- * @version $Revision$
  */
-public class ChartAction extends  Action {
-    
-	static Logger logger = Logger.getLogger(ChartAction.class);
-	
-	private MessageResources resource;
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		
-		resource = getResources(request);
-        OutputStream out= response.getOutputStream(); 
-        
-        String type= WebUtil.readStrParam(request, CHART_TYPE);
-        Long sessionId= WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-        Long questionUid= WebUtil.readLongParam(request, ATTR_QUESTION_UID);
-        
-    	ISurveyService service = getSurveyService();
-		
-		AnswerDTO answer =service.getQuestionResponse(sessionId,questionUid);
-		if(answer.getType() == QUESTION_TYPE_TEXT_ENTRY){
-			logger.error("Error question type : Text entry can not generate chart.");
-			response.getWriter().print(resource.getMessage(ERROR_MSG_CHART_ERROR));
-			return null;
-		}
-			
-		//Try to create chart
-		try {
-	    	if (type.equals(ChartUtil.CHART_TYPE_PIE)){
-	    		DefaultPieDataset data = createPieDataset (answer);
-	    	    ChartUtil.outputPieChart(response, out, resource.getMessage(MSG_PIECHART_TITLE,answer.getSequenceId()), data);
-	    	}else if (type.equals(ChartUtil.CHART_TYPE_BAR)){
-	    		DefaultCategoryDataset data = createBarDataset(answer);    
-	    		ChartUtil.outputBarChart( response, out, resource.getMessage(MSG_BARCHART_TITLE,answer.getSequenceId()), data, 
-	    				resource.getMessage(MSG_BARCHART_CATEGORY_AXIS_LABEL), resource.getMessage(MSG_BARCHART_VALUE_AXIS_LABEL) ); 
-	    	}
-		} catch ( IOException e ) {
-			logger.error("Error creating chart for sessionId "+sessionId,e);
-			response.getWriter().print(resource.getMessage(ERROR_MSG_CHART_ERROR));
-		}
-		
-        return null;
-    }
+public class ChartAction extends Action {
 
+    static Logger logger = Logger.getLogger(ChartAction.class);
 
-    public DefaultPieDataset createPieDataset(AnswerDTO answer){
-    
-        DefaultPieDataset data= new DefaultPieDataset();
-        
-        Set<SurveyOption> options = answer.getOptions();
-		int optIdx = 1;
-		for (SurveyOption option : options) {
-			data.setValue(OPTION_SHORT_HEADER + optIdx, (Number) option.getResponse());
-			optIdx++;
-  		}
-          
-        if(answer.isAppendText())
-          	 data.setValue(resource.getMessage(MSG_OPEN_RESPONSE), (Number)answer.getOpenResponse());
-          
-        return data;
-    }
-    
-    public DefaultCategoryDataset createBarDataset(AnswerDTO answer){
-        
-    	DefaultCategoryDataset data= new DefaultCategoryDataset();
-      
-        Set<SurveyOption> options = answer.getOptions();
-        int optIdx = 1;
-        for (SurveyOption option : options) {
-            data.setValue((Number)option.getResponse(), OPTION_SHORT_HEADER + optIdx, OPTION_SHORT_HEADER + optIdx);
-            optIdx++;
-		}
-        
-        if(answer.isAppendText())
-        	 data.setValue((Number)answer.getOpenResponse(), resource.getMessage(MSG_OPEN_RESPONSE), resource.getMessage(MSG_OPEN_RESPONSE));
-        
-   	    return data;
-    }
-	//*************************************************************************************
-	// Private method 
-	//*************************************************************************************
-	/**
-	 * Return SurveyService bean.
-	 */
-	private ISurveyService getSurveyService() {
-	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-	      return (ISurveyService) wac.getBean(SURVEY_SERVICE);
+    private static ISurveyService surveyService;
+    private MessageResources resource;
+
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	resource = getResources(request);
+
+	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	Long questionUid = WebUtil.readLongParam(request, SurveyConstants.ATTR_QUESTION_UID);
+
+	AnswerDTO answer = getSurveyService().getQuestionResponse(sessionId, questionUid);
+	if (answer.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
+	    ChartAction.logger.error("Error question type : Text entry can not generate chart.");
+	    response.getWriter().print(resource.getMessage(SurveyConstants.ERROR_MSG_CHART_ERROR));
+	    return null;
 	}
-    
+
+	JSONObject responseJSON = new JSONObject();
+	Set<SurveyOption> options = answer.getOptions();
+	try {
+	    for (SurveyOption option : options) {
+		JSONObject nomination = new JSONObject();
+		// nominations' names and values go separately
+		nomination.put("name", option.getDescription());
+		nomination.put("value", (Number) option.getResponse());
+		responseJSON.append("data", nomination);
+	    }
+
+	    if (answer.isAppendText()) {
+		JSONObject nomination = new JSONObject();
+		nomination.put("name", resource.getMessage(SurveyConstants.MSG_OPEN_RESPONSE));
+		nomination.put("value", (Number) answer.getOpenResponse());
+		responseJSON.append("data", nomination);
+	    }
+	} catch (JSONException e) {
+	    ChartAction.logger.error("Error while generating pie chart for Survey Tool: " + sessionId);
+	}
+
+	response.getWriter().write(responseJSON.toString());
+	return null;
+    }
+
+    private ISurveyService getSurveyService() {
+	if (ChartAction.surveyService == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    ChartAction.surveyService = (ISurveyService) wac.getBean(SurveyConstants.SURVEY_SERVICE);
+	}
+	return ChartAction.surveyService;
+    }
 }

@@ -159,7 +159,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<tr> 
 									<td> </td>
 									<td  valign=top class="align-left" >
-										<a href="javascript:drawChart('pie')">
+										<a href="javascript:drawChart('pie', 0)">
 											 	<fmt:message key="label.view.piechart"/>  
 										</a>
 									</td>
@@ -167,13 +167,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<tr> 
 									<td> </td>
 									<td  valign=top class="align-left" >
-										<a href="javascript:drawChart('bar')">
+										<a href="javascript:drawChart('bar', 0)">
 											 <fmt:message key="label.view.barchart"/>  
 										</a>
 									</td>
 								</tr>
 								<tr>
-									<td id="chartDiv" style="height: 220px; display: none" colspan="2">
+									<td id="chartDiv0" style="height: 220px; display: none" colspan="2">
 									</td>
 								</tr>
 							</c:if> 								
