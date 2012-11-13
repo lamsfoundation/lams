@@ -65,7 +65,6 @@ public class SysAdminStartAction extends Action {
 			links.add(new LinkBean("usersearch.do", "admin.user.find"));
 			links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));
 			links.add(new LinkBean("importexcel.do", "admin.user.import"));
-			links.add(new LinkBean("importv1.do", "admin.importv1.title"));
 			links.add(new LinkBean("ldap.do", "sysadmin.ldap.configuration"));
 			links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
 			links.add(new LinkBean("loginmaintain.do", "sysadmin.maintain.loginpage"));
@@ -88,7 +87,6 @@ public class SysAdminStartAction extends Action {
 			links.add(linkBean);
 			links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));
 			links.add(new LinkBean("importexcel.do", "admin.user.import"));
-			links.add(new LinkBean("importv1.do", "admin.importv1.title"));
 			links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
 		} else {
 			request.setAttribute("errorName", "SysAdminStartAction");
