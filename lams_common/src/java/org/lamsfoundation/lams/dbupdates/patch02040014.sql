@@ -1,7 +1,9 @@
 -- Turn off autocommit, so nothing is committed if there is an error
-SET AUTOCOMMIT = 0;
 
+SET AUTOCOMMIT = 0;
+SET FOREIGN_KEY_CHECKS=0;
 -- LDEV-2949
+UPDATE lams_presence_chat_msgs SET room_name=SUBSTRING_INDEX(room_name, '-', 1);
 UPDATE lams_presence_chat_msgs SET room_name=SUBSTRING_INDEX(room_name, '_', 1);
 
 ALTER TABLE lams_presence_chat_msgs CHANGE COLUMN room_name lesson_id BIGINT(20) NOT NULL,
@@ -23,5 +25,6 @@ CREATE TABLE lams_presence_user (
 DELETE FROM lams_configuration WHERE header_name='config.header.chat';
 
 -- If there were no errors, commit and restore autocommit to on
+SET FOREIGN_KEY_CHECKS=0;
 COMMIT;
 SET AUTOCOMMIT = 1;
