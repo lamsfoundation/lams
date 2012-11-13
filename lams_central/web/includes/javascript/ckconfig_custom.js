@@ -1,7 +1,9 @@
 CKEDITOR.config.toolbar_Default = [
 	['Source','-','Maximize', 'Preview','PasteFromWord','Undo','Redo','Bold','Italic','Underline', '-','Subscript','Superscript','NumberedList','BulletedList','-','Outdent','Indent','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','TextColor','BGColor','equation','-','Skype'], 
-	['Paint_Button','MoviePlayer','VideoRecorder','Kaltura','Image','Link','Table','HorizontalRule','Smiley','SpecialChar','Templates','Format','Font','FontSize','About']
+	['Paint_Button','MoviePlayer','Kaltura','Image','Link','Table','HorizontalRule','Smiley','SpecialChar','Templates','Format','Font','FontSize','About']
 ] ;
+// removing Video Recorder from default tool bar LDEV-2961
+// To include it back, just add 'VideoRecorder' in between the MoviePlayer and Kaltura
 
 CKEDITOR.config.toolbar_DefaultLearner = [
 	['Preview','PasteFromWord'],
