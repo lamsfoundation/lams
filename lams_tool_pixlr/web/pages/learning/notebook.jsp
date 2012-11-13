@@ -16,7 +16,6 @@
 			<fmt:message>pageTitle.monitoring.notebook</fmt:message>
 		</title>
 		
-		<link href="${tool}pages/learning/pixlr_style.css" rel="stylesheet" type="text/css">
 		<lams:css/>
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 		

@@ -16,7 +16,6 @@
 			<fmt:message>learner.title.viewAll</fmt:message>
 		</title>
 		
-		<link href="${tool}pages/learning/pixlr_style.css" rel="stylesheet" type="text/css">
 		<lams:css/>
 		
 	</lams:head>

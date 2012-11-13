@@ -6,8 +6,6 @@
 
 <lams:head>
 	<title><fmt:message key="activity.title" /></title>
-	<link href="${tool}pages/learning/bbb_style.css" rel="stylesheet"
-		type="text/css">
 	<lams:headItems />
 	<tiles:insert attribute="headItems" />
 </lams:head>

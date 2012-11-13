@@ -11,7 +11,6 @@
 	<title>
 		<fmt:message key="activity.title" />
 	</title>
-	<link href="${tool}pages/learning/mindmap_style.css" rel="stylesheet" type="text/css">
 	<lams:css/>
 
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>

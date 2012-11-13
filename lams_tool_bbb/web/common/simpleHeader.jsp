@@ -13,7 +13,6 @@
 	</title>
 	
 	<lams:css/>
-	<link href="${tool}pages/learning/bbb_style.css" rel="stylesheet" type="text/css">
 	
 	<%-- TODO is this the best place to import these scripts ?	--%>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
