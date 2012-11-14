@@ -271,7 +271,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    }
 	}
 
-	response.setContentType("application/x-json");
+	response.setContentType("application/x-json;charset=utf-8");
 	response.getWriter().print(JSONObject);
 	return null;
     }
@@ -316,8 +316,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    cellarray.put(cellobj);
 	}
 	responcedata.put("rows", cellarray);
-	response.setContentType("application/x-json");
-	response.getWriter().print(responcedata);
+	response.setContentType("application/x-json;charset=utf-8");
+	response.getWriter().print(new String(responcedata.toString()));
 	return null;
      }
     
