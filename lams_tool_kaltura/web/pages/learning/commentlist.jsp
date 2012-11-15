@@ -29,26 +29,29 @@
 						<lams:Date value="${comment.createDate}" />
 					
 					</div>
-					<div class="float-right comment-hide-management">
-						
-						<c:choose>
-							<c:when test="${comment.hidden}">
-								<span class="comment-by-text">
-									<fmt:message key="label.comment.is.hidden" />
-								</span>
-										
-								<a href="#nogo" onclick="return hideComment(${comment.uid}, false);">
-							       	<fmt:message key="label.unhide" />
-						    	</a>
-							</c:when>
-							<c:otherwise>
-								<a href="#nogo" onclick="return hideComment(${comment.uid}, true);">
-							       	<fmt:message key="label.hide" />
-							   	</a>
-							</c:otherwise>
-						</c:choose>
 					
-					</div>
+					<c:if test="${isGroupMonitoring}">
+						<div class="float-right comment-hide-management">
+							
+							<c:choose>
+								<c:when test="${comment.hidden}">
+									<span class="comment-by-text">
+										<fmt:message key="label.comment.is.hidden" />
+									</span>
+											
+									<a href="#nogo" onclick="return hideComment(${comment.uid}, false);">
+								       	<fmt:message key="label.unhide" />
+							    	</a>
+								</c:when>
+								<c:otherwise>
+									<a href="#nogo" onclick="return hideComment(${comment.uid}, true);">
+								       	<fmt:message key="label.hide" />
+								   	</a>
+								</c:otherwise>
+							</c:choose>
+						
+						</div>
+					</c:if>
 				</td>
 			</tr>
 		
