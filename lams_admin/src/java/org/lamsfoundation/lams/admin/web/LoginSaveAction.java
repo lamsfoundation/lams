@@ -71,18 +71,13 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  */
 public class LoginSaveAction extends LamsDispatchAction {
 
-	private static final String LOGO_TAG = "<img src=\"<lams:LAMSURL/>";
-
-	private static final String ALPHABET = "ABCDEFGHIJKLMOPQRSTUWVXYZabcdefghijklmnopqrstuvwxyz_1234567890";
-
 	private static final String IMAGE_FOLDER_SUFFIX = File.separatorChar 
 			+ "lams-www.war" + File.separatorChar + "images";
 
-	private static final String LOGIN_PAGE_PATH_SUFFIX = File.separatorChar
-			+ "lams-central.war" + File.separatorChar + "login.jsp";
-
 	private static final String NEWS_PAGE_PATH_SUFFIX = File.separatorChar
 			+ "lams-www.war" + File.separatorChar + "news.html";
+	
+	private static final String LOGO_FILENAME = "lams_login.gif";
 
 	public ActionForward save(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -100,9 +95,8 @@ public class LoginSaveAction extends LamsDispatchAction {
 		}
 		if (errors.isEmpty()) {
 			if ((file != null) && (file.getFileSize() != 0)) {
-				String fileName = fixBuggyFileName(file.getFileName());
-				createImageFile(file, fileName);
-				updateLoginPage(buildURL(fileName));
+				updateImageFile(file, LOGO_FILENAME);
+				
 			}
 			updateNewsPage(loginMaintainForm.getString("news"));
 		} else {
@@ -110,28 +104,6 @@ public class LoginSaveAction extends LamsDispatchAction {
 			return mapping.findForward("loginmaintain");
 		}
 		return mapping.findForward("sysadmin");
-	}
-
-	private String fixBuggyFileName(String fileName) {
-		fileName = generateRandomFileName() + fileName.substring(fileName.lastIndexOf('.'));
-		int i=0;
-		while(new File(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) 
-				+ IMAGE_FOLDER_SUFFIX + File.separatorChar + fileName).exists()){
-			fileName = fileName.replace(".", new Integer(i).toString());
-			i++;
-		}
-		log.debug("generated filename " + fileName);
-		return fileName;
-	}
-
-	private String generateRandomFileName() {
-		StringBuilder name = new StringBuilder();
-		int length = 1 + new Random().nextInt(ALPHABET.length());
-		for (int i = 0; i < length; i++) {
-			name.append(ALPHABET.charAt(new Random().nextInt(ALPHABET.length())));
-		}
-		log.debug("generated random name " + name);
-		return name.toString();
 	}
 
 	private void updateNewsPage(String news) throws IOException {
@@ -149,42 +121,8 @@ public class LoginSaveAction extends LamsDispatchAction {
 		}
 	}
 
-	private void updateLoginPage(String url) throws IOException {
-		BufferedReader bReader = null;
-		BufferedWriter bWriter = null;
-		try {
-			bReader = new BufferedReader(new FileReader(
-					Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + LOGIN_PAGE_PATH_SUFFIX));
-			StringBuilder source = new StringBuilder();
-			String line = bReader.readLine();
-			while (line != null) {
-				source.append(line).append('\n');
-				line = bReader.readLine();
-			}
-			int index = source.indexOf(LOGO_TAG);
-			if (index != -1) {
-				int startIndex = index + LOGO_TAG.length();
-				int endIndex = source.indexOf("\"", startIndex);
-				source.replace(startIndex, endIndex, url);
-				bWriter = new BufferedWriter(new FileWriter(
-						Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + LOGIN_PAGE_PATH_SUFFIX));
-				bWriter.write(source.toString());
-				bWriter.flush();
-			}
-		} finally {
-			if (bReader != null)
-				bReader.close();
-			if(bWriter != null)
-				bWriter.close();
-		}
-	}
 
-	private static String buildURL(String fileName)
-			throws UnsupportedEncodingException {
-		return "/www/images/" + fileName;
-	}
-
-	private void createImageFile(FormFile file, String fileName)
+	private void updateImageFile(FormFile file, String fileName)
 			throws IOException {
 		File imagesFolder = new File(
 				Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + IMAGE_FOLDER_SUFFIX);
