@@ -75,7 +75,7 @@ j_security_login_page
 	  <div id="login-content">	
 		   
 			  <div id="login-left-col">
-			    <h1><img src="<lams:LAMSURL/>/images/css/lams_login.gif" alt="LAMS - Learning Activity Management System" /></h1>
+			    <h1><img src="<lams:LAMSURL/>/www/images/lams_login.gif" alt="LAMS - Learning Activity Management System" /></h1>
 			  	<!--Test if the browsers flash player meets requirements-->
 			  	<script language="JavaScript" type="text/javascript">
 			  		<!--			  		
