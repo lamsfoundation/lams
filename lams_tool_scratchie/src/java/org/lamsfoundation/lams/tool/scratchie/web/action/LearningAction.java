@@ -342,7 +342,7 @@ public class LearningAction extends Action {
 
 	JSONObject JSONObject = new JSONObject();  
 	JSONObject.put(ScratchieConstants.ATTR_ANSWER_CORRECT, answer.isCorrect());
-	response.setContentType("application/x-json");
+	response.setContentType("application/x-json;charset=utf-8");
 	response.getWriter().print(JSONObject);
 	return null;
 
