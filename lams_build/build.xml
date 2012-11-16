@@ -9,11 +9,6 @@
 	<property file="${osPropertiesName}.properties" />
 	
 	
-	<condition property="isRAMS">
-		<equals arg1="${conf.application}" arg2="rams" />
-	</condition>
-			
-	
 	<target name="print-usage" description="Displays Ant targets descriptions">
 		<echo>
 		LAMS main build file
@@ -289,8 +284,6 @@
 	
 	
 	<target name="_deploy-tools-common">
-		<!-- Internal target: Deploys Tools shared between LAMS and RAMS. 
-		     Called by deploy-tools-lams and deploy-tools-rams. -->
 		
 		<echo>Deploying common Tools</echo>
 		<ant antfile="../${tool_forum_dir}/build.xml"         target="deploy-tool" inheritAll="false" />
@@ -327,17 +320,11 @@
 	</target>
 	
 
-	<target name="_deploy-tools-rams" if="isRAMS" depends="_deploy-tools-common">
-		<!-- Internal target: Deploys LAMS tools. -->
-		<echo>Deploying RAMS set of tools.</echo>
-	</target>
-
-	
-	<target name="deploy-tools" depends="_deploy-tools-lams, _deploy-tools-rams, deploy-learning-libraries" 
+	<target name="deploy-tools" depends="_deploy-tools-lams, deploy-learning-libraries" 
 		    description="Deploys LAMS or RAMS Tools and special parallel activities." />
 
 
-	<target name="deploy-tools-updater" depends="_deploy-tools-lams, _deploy-tools-rams" 
+	<target name="deploy-tools-updater" depends="_deploy-tools-lams" 
 		description="Deploys LAMS or RAMS Tools and special parallel activities. For upgrader only!">
 	</target>
 
