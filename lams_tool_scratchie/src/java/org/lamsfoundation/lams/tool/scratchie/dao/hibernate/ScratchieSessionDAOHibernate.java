@@ -33,7 +33,7 @@ public class ScratchieSessionDAOHibernate extends BaseDAOHibernate implements Sc
     private static final String FIND_BY_SESSION_ID = "from " + ScratchieSession.class.getName()
 	    + " as p where p.sessionId=?";
     private static final String FIND_BY_CONTENT_ID = "from " + ScratchieSession.class.getName()
-	    + " as p where p.scratchie.contentId=?";
+	    + " as p where p.scratchie.contentId=? order by p.sessionName asc";
 
     public ScratchieSession getSessionBySessionId(Long sessionId) {
 	List list = getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
