@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,6 +48,7 @@ import org.lamsfoundation.lams.tool.kaltura.model.KalturaUser;
 import org.lamsfoundation.lams.tool.kaltura.service.IKalturaService;
 import org.lamsfoundation.lams.tool.kaltura.service.KalturaServiceProxy;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaConstants;
+import org.lamsfoundation.lams.tool.kaltura.util.KalturaSessionDTOComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -86,7 +88,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute("contentFolderID", contentFolderID);
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
 	
-	List<KalturaSessionDTO> sessionDTOs = new ArrayList<KalturaSessionDTO>();
+	Set<KalturaSessionDTO> sessionDTOs = new TreeSet<KalturaSessionDTO>(new KalturaSessionDTOComparator());
 	for (KalturaSession session : (Set<KalturaSession>)kaltura.getKalturaSessions()) {
 	    KalturaSessionDTO sessionDTO = new KalturaSessionDTO(session);
 	    sessionDTOs.add(sessionDTO);

@@ -28,11 +28,15 @@ import java.util.List;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.kaltura.dao.IKalturaItemDAO;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaItem;
+import org.lamsfoundation.lams.tool.kaltura.model.KalturaItemVisitLog;
 
 public class KalturaItemDAO extends BaseDAO implements IKalturaItemDAO {
 
     private static final String FIND_AUTHORING_ITEMS = "from " + KalturaItem.class.getName()
 	    + " where kaltura_uid = ? and create_by_author = 1 order by create_date asc";
+    
+    private static final String FIND_ITEMS_COUNT_BY_USER = "select count(*) from "
+	    + KalturaItem.class.getName() + " as r where  r.createdBy.session.sessionId=? and  r.createdBy.userId =?";
 
     @Override
     public List getAuthoringItems(Long kalturaUid) {
@@ -42,5 +46,13 @@ public class KalturaItemDAO extends BaseDAO implements IKalturaItemDAO {
     @Override
     public KalturaItem getByUid(Long kalturaItemUid) {
 	return (KalturaItem) this.getHibernateTemplate().get(KalturaItem.class, kalturaItemUid);
+    }
+    
+    @Override
+    public int getItemsCountByUser(Long toolSessionId, Long userId) {
+	List list = getHibernateTemplate().find(FIND_ITEMS_COUNT_BY_USER, new Object[] { toolSessionId, userId });
+	if (list == null || list.size() == 0)
+	    return 0;
+	return ((Number) list.get(0)).intValue();
     }
 }

@@ -34,106 +34,79 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaConstants;
 
 /**
- * Output factory for Kaltura tool. Currently it provides only one type of output - the entry that user provided.
+ * Output factory for Kaltura tool. Currently it provides two types of output - Number of videos viewed and Number of videos uploaded.
  * 
  * @author Andrey Balan
  */
 public class KalturaOutputFactory extends OutputFactory {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
 	    throws ToolException {
+	
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-	Class stringArrayClass = new String[] {}.getClass();
-	switch (definitionType) {
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
-	    if (toolContentObject != null) {
-		ToolOutputDefinition kalturaEntryDefinition = buildStringOutputDefinition(KalturaConstants.USER_ENTRY_DEFINITION_NAME);
-		kalturaEntryDefinition.setShowConditionNameOnly(true);
-		definitionMap.put(KalturaConstants.USER_ENTRY_DEFINITION_NAME, kalturaEntryDefinition);
-	    }
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
-	    ToolOutputDefinition allUsersEntriesDefinition = buildComplexOutputDefinition(
-		    KalturaConstants.ALL_USERS_ENTRIES_DEFINITION_NAME, stringArrayClass);
-	    definitionMap.put(KalturaConstants.ALL_USERS_ENTRIES_DEFINITION_NAME, allUsersEntriesDefinition);
-	    break;
-	}
+	
+	ToolOutputDefinition viewedDefinition = buildRangeDefinition(KalturaConstants.LEARNER_NUMBER_VIEWED_VIDEOS, new Long(0), null);
+	definitionMap.put(KalturaConstants.LEARNER_NUMBER_VIEWED_VIDEOS, viewedDefinition);
+	
+	ToolOutputDefinition uploadedDefinition = buildRangeDefinition(KalturaConstants.LEARNER_NUMBER_UPLOADED_VIDEOS, new Long(0), null);
+	definitionMap.put(KalturaConstants.LEARNER_NUMBER_UPLOADED_VIDEOS, uploadedDefinition);
 
 	return definitionMap;
     }
 
     /**
-     * Follows {@link KalturaService#getToolOutput(List, Long, Long)}.
-     * 
+     * Follows {@link PixlrService#getToolOutput(List, Long, Long)}.
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IKalturaService kalturaService,
 	    Long toolSessionId, Long learnerId) {
 
 	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
 	// tool output cache
-	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<String, ToolOutput>();
-	if (names == null) {
-	    // TODO have a look if we'll have any outputs what should be done
-	} else {
-	    for (String name : names) {
-		String[] nameParts = splitConditionName(name);
-		if (baseOutputs.get(nameParts[0]) != null) {
-		    outputs.put(name, baseOutputs.get(nameParts[0]));
-		} else {
-		    ToolOutput output = getToolOutput(name, kalturaService, toolSessionId, learnerId);
-		    if (output != null) {
-			outputs.put(name, output);
-			baseOutputs.put(nameParts[0], output);
-		    }
-		}
-	    }
+	if (names == null || names.contains(KalturaConstants.LEARNER_NUMBER_VIEWED_VIDEOS)) {
+	    outputs.put(KalturaConstants.LEARNER_NUMBER_VIEWED_VIDEOS,
+		    getToolOutput(KalturaConstants.LEARNER_NUMBER_VIEWED_VIDEOS, kalturaService, toolSessionId, learnerId));
 	}
+	if (names == null || names.contains(KalturaConstants.LEARNER_NUMBER_UPLOADED_VIDEOS)) {
+	    outputs.put(KalturaConstants.LEARNER_NUMBER_UPLOADED_VIDEOS,
+		    getToolOutput(KalturaConstants.LEARNER_NUMBER_UPLOADED_VIDEOS, kalturaService, toolSessionId, learnerId));
+	}
+	
 	return outputs;
 
     }
 
     public ToolOutput getToolOutput(String name, IKalturaService kalturaService, Long toolSessionId, Long learnerId) {
-	String[] nameParts = splitConditionName(name);
-//	if (KalturaConstants.USER_ENTRY_DEFINITION_NAME.equals(nameParts[0])) {
-//	    // entry is loaded from DB
-//	    Kaltura kaltura = kalturaService.getSessionBySessionId(toolSessionId).getKaltura();
-//
-//	    KalturaUser user = kalturaService.getUserByUserIdAndSessionId(learnerId, toolSessionId);
-//
-//	    if (user != null) {
-//		NotebookEntry entry = kalturaService.getEntry(user.getEntryUID());
-//
-//		String value = entry == null ? null : entry.getEntry();
-//
-//		return new ToolOutput(name, getI18NText(KalturaConstants.USER_ENTRY_DEFINITION_NAME, true), value);
-//	    }
-//	} else if (KalturaConstants.ALL_USERS_ENTRIES_DEFINITION_NAME.equals(nameParts[0])) {
-//	    Set<KalturaUser> users = kalturaService.getSessionBySessionId(toolSessionId).getKalturaUsers();
-//	    String[] usersEntries = new String[users.size()];
-//	    int userIndex = 0;
-//	    for (KalturaUser user : users) {
-//		Long entryUid = user.getEntryUID();
-//		if (entryUid != null) {
-//		    NotebookEntry entry = kalturaService.getEntry(entryUid);
-//		    usersEntries[userIndex] = entry.getEntry();
-//		}
-//		userIndex++;
-//	    }
-//	    return new ToolOutput(name, getI18NText(KalturaConstants.ALL_USERS_ENTRIES_DEFINITION_NAME, true),
-//		    usersEntries, false);
-//	}
+	if (name.equals(KalturaConstants.LEARNER_NUMBER_VIEWED_VIDEOS)) {
+	    return getNumberViewedVideos(kalturaService, toolSessionId, learnerId);
+	} else if (name.equals(KalturaConstants.LEARNER_NUMBER_UPLOADED_VIDEOS)) {
+	    return getNumberUploadedVideos(kalturaService, toolSessionId, learnerId);
+	}
+
 	return null;
     }
 
-    @Override
-    protected String[] splitConditionName(String conditionName) {
-	return super.splitConditionName(conditionName);
-    }
+    /**
+     * Get the number of videos viewed.
+     */
+    private ToolOutput getNumberViewedVideos(IKalturaService kalturaService, Long toolSessionId, Long learnerId) {
 
-    protected String buildUserEntryConditionName(String uniquePart) {
-	return super.buildConditionName(KalturaConstants.USER_ENTRY_DEFINITION_NAME, uniquePart);
+	int numberViewedVideos = kalturaService.getNumberViewedVideos(toolSessionId, learnerId);
+
+	return new ToolOutput(KalturaConstants.LEARNER_NUMBER_VIEWED_VIDEOS, getI18NText(
+		KalturaConstants.LEARNER_NUMBER_VIEWED_VIDEOS, true), numberViewedVideos);
+
+    }
+    
+    /**
+     * Get the number of videos uploaded.
+     */
+    private ToolOutput getNumberUploadedVideos(IKalturaService kalturaService, Long toolSessionId, Long learnerId) {
+
+	int numberUploadedVideos = kalturaService.getNumberUploadedVideos(toolSessionId, learnerId);
+
+	return new ToolOutput(KalturaConstants.LEARNER_NUMBER_UPLOADED_VIDEOS, getI18NText(
+		KalturaConstants.LEARNER_NUMBER_UPLOADED_VIDEOS, true), numberUploadedVideos);
+
     }
 }

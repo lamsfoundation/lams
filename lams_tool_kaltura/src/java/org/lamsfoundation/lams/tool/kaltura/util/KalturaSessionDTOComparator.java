@@ -18,26 +18,25 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */
-
-/* $Id$ */
+ */  
+ 
+/* $Id$ */  
 package org.lamsfoundation.lams.tool.kaltura.util;
 
 import java.util.Comparator;
 
+import org.lamsfoundation.lams.tool.kaltura.dto.KalturaSessionDTO;
 import org.lamsfoundation.lams.tool.kaltura.model.KalturaComment;
 
 /**
- * Comparator for <code>KalturaComment</code>.
- * 
- * @author Andrey Balan
+ * Comparator for <code>ImageComment</code>.
  */
-public class KalturaCommentComparator implements Comparator<KalturaComment> {
+public class KalturaSessionDTOComparator implements Comparator<KalturaSessionDTO> {
 
     @Override
-    public int compare(KalturaComment o1, KalturaComment o2) {
+    public int compare(KalturaSessionDTO o1, KalturaSessionDTO o2) {
 	if (o1 != null && o2 != null) {
-	    return o1.getCreateDate().compareTo(o2.getCreateDate());
+	    return o1.getSessionName().compareTo(o2.getSessionName());
 	} else if (o1 != null)
 	    return 1;
 	else

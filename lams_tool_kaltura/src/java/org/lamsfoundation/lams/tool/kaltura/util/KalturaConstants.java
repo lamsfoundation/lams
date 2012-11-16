@@ -27,21 +27,7 @@ package org.lamsfoundation.lams.tool.kaltura.util;
 public interface KalturaConstants {
     public static final String TOOL_SIGNATURE = "lakalt11";
 
-    // Kaltura session status
-    public static final Integer SESSION_NOT_STARTED = new Integer(0);
-    public static final Integer SESSION_IN_PROGRESS = new Integer(1);
-    public static final Integer SESSION_COMPLETED = new Integer(2);
-
-    public static final String AUTHORING_DEFAULT_TAB = "1";
-    public static final String ATTACHMENT_LIST = "attachmentList";
-    public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
-    public static final String AUTH_SESSION_ID_COUNTER = "authoringSessionIdCounter";
-    public static final String AUTH_SESSION_ID = "authoringSessionId";
-
-    public static final int MONITORING_SUMMARY_MAX_MESSAGES = 5;
-
     // Attribute names
-    public static final String ATTR_MESSAGE = "message";
     public static final String ATTR_SESSION_MAP = "sessionMap";
     public static final String ATTR_KALTURA = "kaltura";
     public static final String ATTR_ITEM = "item";
@@ -54,7 +40,6 @@ public interface KalturaConstants {
     public static final String ATTR_REFLECTION_ON = "reflectOn";
     public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
     public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
-    public static final String ATTR_REFLECT_LIST = "reflectList";
     public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
     public static final String ATTR_FINISHED_LOCK = "finishedLock";
     public static final String ATTR_LOCK_ON_FINISH = "lockOnFinish";
@@ -65,8 +50,6 @@ public interface KalturaConstants {
     public static final String ATTR_IS_GROUP_MONITORING = "isGroupMonitoring";
     
     // Parameter names
-    public static final String PARAM_PARENT_PAGE = "parentPage";
-    public static final String PARAM_ORDER_ID = "orderId";
     public static final String PARAM_ITEM_INDEX = "itemIndex";
     public static final String PARAM_ITEM_UID = "itemUid";
     public static final String PARAM_ITEM_TITLE = "itemTitle";
@@ -74,9 +57,10 @@ public interface KalturaConstants {
     public static final String PARAM_ITEM_ENTRY_ID = "itemEntryId";
     public static final String PARAM_COMMENT_UID = "commentUid";
     public static final String PARAM_IS_HIDING = "isHiding";
-    public static final String USER_ENTRY_DEFINITION_NAME = "user.entry.output.definition.kaltura";
-    public static final String USER_ENTRY_DEFAULT_CONDITION_DISPLAY_NAME_KEY = "user.entry.output.definition.kaltura.default.condition";
-    public static final String ALL_USERS_ENTRIES_DEFINITION_NAME = "all.users.entries.definition.kaltura";
+    
+    //tool outputs
+    public static final String LEARNER_NUMBER_VIEWED_VIDEOS = "learner.number.viewed.videos";
+    public static final String LEARNER_NUMBER_UPLOADED_VIDEOS = "learner.number.uploaded.videos";
     
     //forward names
     public static final String SUCCESS = "success";
@@ -88,9 +72,6 @@ public interface KalturaConstants {
     public static final String FINISH = "finish";    
     public static final String GROUP_LEARNING = "groupLearning";
     
-    public static final String ERROR_MSG_CONDITION = "error.condition";
-    public static final String ERROR_MSG_NAME_BLANK = "error.condition.name.blank";
-    public static final String ERROR_MSG_NAME_DUPLICATED = "error.condition.duplicated.name";
     public static final String ERROR_MSG_COMMENT_BLANK = "error.resource.image.comment.blank";
 
 }

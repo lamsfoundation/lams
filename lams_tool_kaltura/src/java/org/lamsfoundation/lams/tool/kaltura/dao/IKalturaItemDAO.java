@@ -45,5 +45,14 @@ public interface IKalturaItemDAO extends IBaseDAO {
     List getAuthoringItems(Long kalturaUid);
 
     KalturaItem getByUid(Long kalturaItemUid);
+    
+    /**
+     * Returns number of uploads made by user.
+     * 
+     * @param toolSessionId
+     * @param userId
+     * @return
+     */
+    int getItemsCountByUser(Long toolSessionId, Long userId);
 
 }

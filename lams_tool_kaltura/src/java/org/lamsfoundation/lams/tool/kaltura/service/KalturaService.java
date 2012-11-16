@@ -470,6 +470,16 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	    kalturaCommentDao.update(comment);
 	}
     }
+    
+    @Override
+    public int getNumberViewedVideos(Long toolSessionId, Long userId) {
+	return kalturaItemVisitDao.getUserViewLogCount(toolSessionId, userId);
+    }
+    
+    @Override
+    public int getNumberUploadedVideos(Long toolSessionId, Long userId) {
+	return kalturaItemDao.getItemsCountByUser(toolSessionId, userId);
+    }
 
     @Override
     public Long getDefaultContentIdBySignature(String toolSignature) {

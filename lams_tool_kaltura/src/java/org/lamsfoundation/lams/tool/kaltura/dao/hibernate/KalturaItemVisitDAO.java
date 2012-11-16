@@ -53,8 +53,8 @@ public class KalturaItemVisitDAO extends BaseDAO implements IKalturaItemVisitDAO
 	return (KalturaItemVisitLog) list.get(0);
     }
 
-    public int getUserViewLogCount(Long toolSessionId, Long userUid) {
-	List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER, new Object[] { toolSessionId, userUid });
+    public int getUserViewLogCount(Long toolSessionId, Long userId) {
+	List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER, new Object[] { toolSessionId, userId });
 	if (list == null || list.size() == 0)
 	    return 0;
 	return ((Number) list.get(0)).intValue();

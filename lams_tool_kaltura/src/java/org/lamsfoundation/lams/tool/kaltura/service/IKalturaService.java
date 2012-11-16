@@ -219,5 +219,23 @@ public interface IKalturaService {
      * @param isHiding true if comment needs to be hidden, false - otherwise
      */
     void hideComment(Long commentUid, boolean isHiding);
+    
+    /**
+     * Return Number of videos viewed by user.
+     * 
+     * @param toolSessionId
+     * @param userId
+     * @return
+     */
+    int getNumberViewedVideos(Long toolSessionId, Long userId);
+    
+    /**
+     * Return Number of videos uploaded/created by user.
+     * 
+     * @param toolSessionId
+     * @param userId
+     * @return
+     */
+    int getNumberUploadedVideos(Long toolSessionId, Long userId);
 
 }

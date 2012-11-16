@@ -38,7 +38,7 @@ public interface IKalturaItemVisitDAO extends IBaseDAO {
 
     KalturaItemVisitLog getKalturaItemLog(Long itemUid, Long userId);
 
-    int getUserViewLogCount(Long sessionId, Long userUid);
+    int getUserViewLogCount(Long sessionId, Long userId);
 
     List<KalturaItemVisitLog> getKalturaItemLogBySession(Long sessionId, Long itemUid);
 
