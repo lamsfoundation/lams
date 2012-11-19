@@ -255,10 +255,11 @@
 			<div class="field-name">
 				<fmt:message key="label.authoring.basic.video"/>
 			</div>
-			
+			<center>
 			<div id="kcwHolder">		
 				<div id="kcw"></div>
 			</div>
+			</center>
 				
 			<div id="kcwOpener" style="display: none;">
 				<a href="#nogo" onclick="javascript: return displayKCW();">
