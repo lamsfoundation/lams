@@ -40,7 +40,6 @@ public interface IImportService {
 	
 	public static final String SEPARATOR = "|";
 	public static final String IMPORT_HELP_PAGE = "Import+Users";
-	public static final String IMPORTV1_HELP_PAGE = "Import+LAMS+1+Users";
 	public static final String IMPORT_GROUPS_HELP_PAGE = "Import+Groups";
 	public static final String STATUS_IMPORT_TOTAL = "importTotal";
 	public static final String STATUS_IMPORTED = "imported";
@@ -79,14 +78,6 @@ public interface IImportService {
 	 * @throws IOException
 	 */
 	public List parseGroupSpreadsheet(FormFile fileItem) throws IOException;
-	
-	/**
-	 * Returns list of V1 users and orgs after parsing the output of a mysql dump.
-	 * @param fileItem
-	 * @return
-	 * @throws IOException
-	 */
-	public List<List> parseV1UsersFile(FormFile fileItem, boolean includeIntegrated) throws IOException;
 	
 	/**
 	 * Returns number of rows found in spreadsheet.
