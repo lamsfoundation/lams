@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,8 +36,11 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -521,6 +525,43 @@ public class LearnerAction extends LamsDispatchAction {
 	request.setAttribute("currentActivityID", ret[1]);
 
 	return mapping.findForward("displayProgress");
+    }
+    
+    @SuppressWarnings("unchecked")
+    public ActionForward displayProgressJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	Integer learnerId = LearningWebUtil.getUserId();
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+
+	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);
+
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("currentActivityId", ret[1]);
+	for (ActivityURL activity : (List<ActivityURL>) ret[0]) {
+	    if (activity.getFloating()) {
+		// these are support activities
+		for (ActivityURL childActivity : activity.getChildActivities()) {
+		    responseJSON.append("support", activityToJSON(childActivity));
+		}
+	    } else {
+		responseJSON.append("activities", activityToJSON(activity));
+	    }
+	}
+
+	response.setContentType("application/x-json;charset=utf-8");
+	response.getWriter().print(responseJSON.toString());
+
+	return null;
+    }
+
+    private JSONObject activityToJSON(ActivityURL activity) throws JSONException {
+	JSONObject activityJSON = new JSONObject();
+	activityJSON.put("id", activity.getActivityId());
+	activityJSON.put("name", activity.getTitle());
+	activityJSON.put("status", activity.getStatus());
+	activityJSON.put("url", activity.getUrl());
+	return activityJSON;
     }
 
     /**

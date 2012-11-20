@@ -250,8 +250,8 @@ public class NotebookAction extends LamsDispatchAction
 		notebookService.createNotebookEntry(id, CoreNotebookConstants.SCRATCH_PAD, signature,
 				userID, title, entry);
 		
-        return viewAll(mapping, actionForm, request, response);
-		
+		boolean skipViewAll = WebUtil.readBooleanParam(request, "skipViewAll", false);
+		return skipViewAll ? null : viewAll(mapping, actionForm, request, response);
 	}
 	
 	/**
