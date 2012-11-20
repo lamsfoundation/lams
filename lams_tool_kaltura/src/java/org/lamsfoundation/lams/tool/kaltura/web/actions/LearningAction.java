@@ -114,7 +114,9 @@ public class LearningAction extends LamsDispatchAction {
 	}
 	Kaltura kaltura = kalturaSession.getKaltura();
 	//init getCreatedBy to avoid session close error in proxy object
-	kaltura.getCreatedBy().getLoginName();
+	if (kaltura.getCreatedBy() != null) {
+	    kaltura.getCreatedBy().getLoginName();
+	}
 	
 	//if this parameter true - this request is sent when Monitoring Group
 	boolean isGroupMonitoring = WebUtil.readBooleanParam(request, KalturaConstants.ATTR_IS_GROUP_MONITORING, false);
@@ -234,7 +236,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 	
 	if (kaltura.isAllowRatings()) {
-	    boolean isUserItemAuthor = (item.getCreatedBy() == null) && kaltura.getCreatedBy().getUserId().equals(userId) 
+	    boolean isUserItemAuthor = (item.getCreatedBy() == null) && (kaltura.getCreatedBy() != null) && kaltura.getCreatedBy().getUserId().equals(userId) 
 		    || (item.getCreatedBy() != null) && item.getCreatedBy().equals(user);
 	    sessionMap.put(KalturaConstants.ATTR_IS_USER_ITEM_AUTHOR, isUserItemAuthor);
 	    
