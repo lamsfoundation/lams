@@ -23,7 +23,7 @@
 		${kaltura.title}
 	</h1>
 </div>
-
+	
 <div data-role="content">
 	<c:choose>
 		<c:when test="${empty sessionMap.submissionDeadline}">
@@ -40,11 +40,11 @@
 		</c:otherwise>		
 	</c:choose>
 </div>
-
-
+	
+	
 <div data-role="footer" data-theme="b" class="ui-bar">
 	<span class="ui-finishbtn-right">
-	
+		
 		<c:if test="${mode == 'learner' || mode == 'author'}">
 			<html:form action="/learning" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
 				<html:hidden property="dispatch" value="finishActivity" />
@@ -55,10 +55,9 @@
 				</a>
 			</html:form>
 		</c:if>
-		
+			
 	</span>
 </div>
-
 
 	
 

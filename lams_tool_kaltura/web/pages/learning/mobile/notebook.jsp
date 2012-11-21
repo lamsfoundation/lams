@@ -19,21 +19,21 @@
 		${kaltura.title}
 	</h1>
 </div>
-
+	
 <div data-role="content">
 	<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
 		<html:hidden property="userID" />
 		<html:hidden property="sessionMapID" />
-
-
+	
+	
 		<%@ include file="/common/messages.jsp"%>
-
+	
 		<p>
 			<lams:out value="${kaltura.reflectInstructions}" />
 		</p>
-
+	
 		<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area" />
-
+	
 		<div class="space-bottom-top align-right">
 			<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
 				<span class="nextActivity"><fmt:message key="button.finish" /></span>
@@ -41,7 +41,7 @@
 		</div>
 	</html:form>
 </div>
-	
+		
 <div data-role="footer" data-theme="b">
 	<h2>&nbsp;</h2>
 </div>

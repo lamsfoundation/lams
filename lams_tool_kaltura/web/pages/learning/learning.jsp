@@ -54,9 +54,10 @@
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 <script type="text/javascript" src="includes/javascript/instantedit.js"></script>
 <script type="text/javascript">
+	//var for thickbox.js
 	var tb_pathToImage = "<lams:LAMSURL/>images/loadingAnimation.gif";
+	//var for jquery.jRating.js
 	var pathToImageFolder = "<lams:LAMSURL/>images/css/";
-	
 	//var for instantedit.js
 	var urlBase = '<c:url value="/monitoring.do"/>';
 </script>
@@ -343,44 +344,44 @@
 	
 	<div id="player-bottombar">
 		
-	<%--"Check for new" and "Add new image" buttons---------------%>
+		<%--"Check for new" and "Add new image" buttons---------------%>
 	
-	<div id="add-new-item">
-		<c:if test="${sessionMap.isAllowUpload && (not finishedLock)}">
-			<a href="<c:url value='/pages/learning/uploaditem.jsp'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=570&width=740&modal=true" class="button-add-item thickbox">  
-				<fmt:message key="label.learning.add.new.image" />
-			</a>
-		</c:if>
-		
-		<c:if test="${sessionMap.isAllowUpload}">
-			<a href="#nogo" onclick="return checkNew()" class="button check_for_new space-left" style="visibility: hidden;"> 
-				<fmt:message key="label.check.for.new" /> 
-			</a>
-		</c:if>
-		
-		<c:if test="${sessionMap.isGroupMonitoring}">
-			<fmt:message key="label.mark" />
-			 
-			<c:choose>
-				<c:when test="${item.mark == null}">
-					<c:set var="itemMark" value="0"/>	
-				</c:when>
-				<c:otherwise>
-					<c:set var="itemMark" value="${item.mark}"/>			
-				</c:otherwise>
-			</c:choose>
-			<span id="itemMark">${itemMark}</span>
+		<div id="add-new-item">
+			<c:if test="${sessionMap.isAllowUpload && (not finishedLock)}">
+				<a href="<c:url value='/pages/learning/uploaditem.jsp'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=570&width=740&modal=true" class="button-add-item thickbox">  
+					<fmt:message key="label.learning.add.new.image" />
+				</a>
+			</c:if>
 			
-			<sup><a href="javascript:;" id="editItemMark"><fmt:message key="label.mark.edit" /></a></sup>
+			<c:if test="${sessionMap.isAllowUpload}">
+				<a href="#nogo" onclick="return checkNew()" class="button check_for_new space-left" style="visibility: hidden;"> 
+					<fmt:message key="label.check.for.new" /> 
+				</a>
+			</c:if>
+			
+			<c:if test="${sessionMap.isGroupMonitoring}">
+				<fmt:message key="label.mark" />
+				 
+				<c:choose>
+					<c:when test="${item.mark == null}">
+						<c:set var="itemMark" value="0"/>	
+					</c:when>
+					<c:otherwise>
+						<c:set var="itemMark" value="${item.mark}"/>			
+					</c:otherwise>
+				</c:choose>
+				<span id="itemMark">${itemMark}</span>
+				
+				<sup><a href="javascript:;" id="editItemMark"><fmt:message key="label.mark.edit" /></a></sup>
+			</c:if>
+		</div>
+	
+		<!--  Rating stars -->
+	
+		<c:if test="${kaltura.allowRatings && (item.uid != -1)}">
+			<%@ include file="/pages/learning/ratingStars.jsp"%>
 		</c:if>
 	</div>
-	
-	<!--  Rating stars -->
-	
-	<c:if test="${kaltura.allowRatings && (item.uid != -1)}">
-		<%@ include file="/pages/learning/ratingStars.jsp"%>
-	</c:if>
-</div>
 	    	
     <%--Comments area----------------------------------------------%>	
     	
