@@ -83,7 +83,8 @@ public class VoteChartGeneratorAction extends LamsDispatchAction {
 	    nomination.put("value", nominationVotes.get(index));
 	    responseJSON.append("data", nomination);
 	}
-
+	
+	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 	return null;
     }

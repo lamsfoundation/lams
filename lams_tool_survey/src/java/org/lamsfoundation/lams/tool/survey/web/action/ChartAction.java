@@ -94,7 +94,8 @@ public class ChartAction extends Action {
 	} catch (JSONException e) {
 	    ChartAction.logger.error("Error while generating pie chart for Survey Tool: " + sessionId);
 	}
-
+	
+	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 	return null;
     }
