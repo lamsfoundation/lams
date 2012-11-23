@@ -23,25 +23,31 @@
 <link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
 
 <style media="screen,projection" type="text/css">
-	#content {min-width: 725px;}
-	#player-block {width: 725px; margin-top: 25px; clear: both; position: relative;}
-	#player-wrap {width: 450px; height: 376px; clear: both; margin-bottom: 20px; background: black;}
-	#player-bottombar {width: 450px; }
-	#comments-area { padding: 65px 0 20px; width: 447px;}
-	#comments-table {border-spacing: 10px; margin-bottom: 0; margin-top: 0;}
+	#content {min-width: 600px;}
+	
+	#container{width: 100%; position: relative; display: inline-block; margin-top: 25px;}
+	#player-block {  clear: both; position: absolute; top: 0; bottom: 0; left: 0; right: 0;}
+	#dummy {padding-top: 52%; /* aspect ratio */}
+	#player-wrap {width: 60%; height: 100%; clear: both; margin-bottom: 20px; background: black;}
+	#player-bottombar {width: 60%; margin-top: 15px;}
+	
+	#comments-area { padding: 75px 0 20px; min-width: 431px; width: 60%;}
+	#comments-table {border-spacing: 3px; margin-top: 0; padding-right: 3px;}
+	#comment-textarea textarea {width: 99%;}
+	#comment-textarea input {margin-top: 2px;}
 	.rating-stars-div {float: right; margin-bottom: 10px; min-height: 50px; padding-right: 0;}
 	.rating-stars-caption { text-align: left; padding-left: 30px; }
 	.rating-stars-disabled-small {padding: 2px 5px;}
-	#add-new-item {float: left;}
+	#add-new-item {float: left; margin-top: 2px;}
 	.comment-by {font-size: .9166em; color: #8E8E8E; margin-top: 3px;}
 	.comment-by-text {color: #8E8E8E;}
 	.item-hidden {background: #FFB3B3!important;}
 
-	#player-sidebar {position: absolute; width: 275px; top: 0; right: 0; }
-	#player-sidebar ul {width: 261px; height: 375px; overflow: auto; clear: both; position: relative; list-style: none outside none; margin-left: 15px;}
+	#player-sidebar {position: absolute; top: 0; right: 0; width: 40%; height: 100%;}
+	#player-sidebar ul {overflow: auto; clear: both; position: relative; list-style: none outside none; margin-left: 15px; margin-right: 0; min-width: 242px; height: 100%;}
 	#player-sidebar ul li:hover {background-color:#D0D0D0;cursor:pointer}
 	#player-sidebar ul li:hover .jRatingColor, #player-sidebar ul li:hover .jStar, .item-hidden .jRatingColor, .item-hidden .jStar {opacity: 0.3;}
-	#player-sidebar ul li { overflow: hidden; padding: 5px 0 5px 5px; clear: both; margin-bottom: 10px; }
+	#player-sidebar ul li { overflow: hidden; padding: 5px 0 5px 5px; clear: both; margin-bottom: 10px; list-style: none outside none;}
 	#player-sidebar ul li a .review-item-link { background: transparent; border-bottom: none; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; -webkit-transition: background .15s ease-in-out; position: relative; overflow: hidden; color: #333; zoom: 1;}
 	.thumb-wrap {float: left; margin: 0 8px 0 0; position: relative; display: inline-block;	background: transparent; }
 	.duration {padding: 0 4px; font-weight: bold; font-size: 11px; moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px; background-color: black; color: white!important; height: 14px; line-height: 14px; opacity: 0.75; display: inline-block; vertical-align: top; zoom: 1; right: 2px; bottom: 2px; position: absolute;}
@@ -103,11 +109,6 @@
 		entryId:  "${item.entryId}"
 	};	
 	swfobject.embedSWF(KALTURA_SERVER + '/kwidget/wid/_' + PARTNER_ID + '/uiconf_id/' + KDP_UI_CONF_ID, "kplayer", "100%", "100%", "9.0.0", "includes/expressInstall.swf", flashVars, params);
-
-	function checkNew(){
-		document.location.href = '<c:url value="/learning.do"/>?dispatch=viewItem&sessionMapID=${sessionMapID}&itemUid=${item.uid}';
-		return false;
-	}
 	
 	function finishActivity(){
 		$('#finishButton').prop('disabled', true);
@@ -255,91 +256,97 @@
 		</div>
 	</c:if>
 	
-	<div id="player-block">
-		<div id="player-wrap">
-		    
-			<div id="kplayer">
-				<object height="100%" width="100%">
-					<embed height="100%" type="application/x-shockwave-flash" width="100%" src="#"></embed>
-				</object>
+	<div id="container">
+		<div id="dummy"></div>
+	
+		<div id="player-block">
+			
+			<div id="player-wrap">
+			    
+				<div id="kplayer">
+					<object height="100%" width="100%">
+						<embed height="100%" type="application/x-shockwave-flash" width="100%" src="#"></embed>
+					</object>
+				</div>
+					
 			</div>
-				
-		</div>
-		    
-		<div id="player-sidebar">
-		    <ul>
-		    	<c:forEach var="previewItem" items="${sessionMap.items}" varStatus="status">
-		    		<li id="previewItem${previewItem.uid}" <c:if test="${previewItem.hidden}"> class="item-hidden" </c:if>>
-		    			<a href="<c:url value='/learning.do'/>?dispatch=viewItem&sessionMapID=${sessionMapID}&itemUid=${previewItem.uid}" class="review-item-link">
-		    				<span class="thumb-wrap">
-						        <img src="http://cdnbakmi.kaltura.com/p/${PARTNER_ID}/sp/${SUB_PARTNER_ID}/thumbnail/entry_id/${previewItem.entryId}/version/100001/width/100!/height/68!" height="68" width="100" alt="Video">
-						        <em></em>
-						        <span class="duration">
-						        	<fmt:formatDate value="${previewItem.durationDate}" pattern="m:ss" />
-								</span>
-						    </span>
-						    <span class="thumb-title">${previewItem.title}</span>
-						    
-						    <span class="thumb-stat">
-						    	<c:choose>
-									<c:when test="${empty previewItem.createdBy}">
-										<c:set var="videoAuthor" >
-											<fmt:message key="label.uploaded.by.instructor" />
-										</c:set>
-									</c:when>
-									<c:otherwise>
-										<c:set var="videoAuthor" >
-											${previewItem.createdBy.firstName} ${previewItem.createdBy.lastName}
-										</c:set>
-									</c:otherwise>
-								</c:choose>
-								
-						        <fmt:message key="label.uploaded.by" >
-						        	<fmt:param>${videoAuthor}</fmt:param>
-						        </fmt:message>
-						    </span>
-						    
-						    <c:if test="${kaltura.allowRatings}">
+			    
+			<div id="player-sidebar">
+			    <ul>
+			    	<c:forEach var="previewItem" items="${sessionMap.items}" varStatus="status">
+			    		<li id="previewItem${previewItem.uid}" <c:if test="${previewItem.hidden}"> class="item-hidden" </c:if>>
+			    			<a href="<c:url value='/learning.do'/>?dispatch=viewItem&sessionMapID=${sessionMapID}&itemUid=${previewItem.uid}" class="review-item-link">
+			    				<span class="thumb-wrap">
+							        <img src="http://cdnbakmi.kaltura.com/p/${PARTNER_ID}/sp/${SUB_PARTNER_ID}/thumbnail/entry_id/${previewItem.entryId}/version/100001/width/100!/height/68!" height="68" width="100" alt="Video">
+							        <em></em>
+							        <span class="duration">
+							        	<fmt:formatDate value="${previewItem.durationDate}" pattern="m:ss" />
+									</span>
+							    </span>
+							    <span class="thumb-title">${previewItem.title}</span>
+							    
 							    <span class="thumb-stat">
-							    	<span class="float-left"><fmt:message key="label.rating" /></span>
-							        <div class="rating-stars-disabled-small" id="${previewItem.averageRatingDto.rating}_00${previewItem.uid}"></div>
-								</span>
+							    	<c:choose>
+										<c:when test="${empty previewItem.createdBy}">
+											<c:set var="videoAuthor" >
+												<fmt:message key="label.uploaded.by.instructor" />
+											</c:set>
+										</c:when>
+										<c:otherwise>
+											<c:set var="videoAuthor" >
+												${previewItem.createdBy.firstName} ${previewItem.createdBy.lastName}
+											</c:set>
+										</c:otherwise>
+									</c:choose>
+									
+							        <fmt:message key="label.uploaded.by" >
+							        	<fmt:param>${videoAuthor}</fmt:param>
+							        </fmt:message>
+							    </span>
+							    
+							    <c:if test="${kaltura.allowRatings}">
+								    <span class="thumb-stat">
+								    	<span class="float-left"><fmt:message key="label.rating" /></span>
+								        <div class="rating-stars-disabled-small" id="${previewItem.averageRatingDto.rating}_00${previewItem.uid}"></div>
+									</span>
+								</c:if>
+							    
+							    <c:if test="${kaltura.allowComments && (not empty previewItem.groupComments)}">
+								    <span class="thumb-stat">
+								        <fmt:message key="label.number.of.comments" >
+								        	<fmt:param>${fn:length(previewItem.groupComments)}</fmt:param>
+								    	</fmt:message>
+									</span>
+								</c:if>
+							</a>
+							
+							<c:if test="${sessionMap.isGroupMonitoring}">
+							    <span class="float-right align-right item-hide-management">
+								   	<c:choose>
+										<c:when test="${previewItem.hidden}">
+											<div class="thumb-text">
+												<fmt:message key="label.video.is.hidden" />
+											</div>
+											
+											<a href="#nogo" onclick="return hideItem(${previewItem.uid}, false);">
+								       			<fmt:message key="label.unhide" />
+							    			</a>
+										</c:when>
+										<c:otherwise>
+											<a href="#nogo" onclick="return hideItem(${previewItem.uid}, true);">
+								       			<fmt:message key="label.hide" />
+								   			</a>
+										</c:otherwise>
+									</c:choose>
+								</span>							
 							</c:if>
-						    
-						    <c:if test="${kaltura.allowComments && (not empty previewItem.groupComments)}">
-							    <span class="thumb-stat">
-							        <fmt:message key="label.number.of.comments" >
-							        	<fmt:param>${fn:length(previewItem.groupComments)}</fmt:param>
-							    	</fmt:message>
-								</span>
-							</c:if>
-						</a>
-						
-						<c:if test="${sessionMap.isGroupMonitoring}">
-						    <span class="float-right align-right item-hide-management">
-							   	<c:choose>
-									<c:when test="${previewItem.hidden}">
-										<div class="thumb-text">
-											<fmt:message key="label.video.is.hidden" />
-										</div>
-										
-										<a href="#nogo" onclick="return hideItem(${previewItem.uid}, false);">
-							       			<fmt:message key="label.unhide" />
-						    			</a>
-									</c:when>
-									<c:otherwise>
-										<a href="#nogo" onclick="return hideItem(${previewItem.uid}, true);">
-							       			<fmt:message key="label.hide" />
-							   			</a>
-									</c:otherwise>
-								</c:choose>
-							</span>							
-						</c:if>
-						
-		    		</li>
-		    	</c:forEach>
-			</ul>
+							
+			    		</li>
+			    	</c:forEach>
+				</ul>
+			</div>
 		</div>
+		
 	</div>
 	
 	<div id="player-bottombar">
@@ -350,12 +357,6 @@
 			<c:if test="${sessionMap.isAllowUpload && (not finishedLock)}">
 				<a href="<c:url value='/pages/learning/uploaditem.jsp'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=570&width=740&modal=true" class="button-add-item thickbox">  
 					<fmt:message key="label.learning.add.new.image" />
-				</a>
-			</c:if>
-			
-			<c:if test="${sessionMap.isAllowUpload}">
-				<a href="#nogo" onclick="return checkNew()" class="button check_for_new space-left" style="visibility: hidden;"> 
-					<fmt:message key="label.check.for.new" /> 
 				</a>
 			</c:if>
 			

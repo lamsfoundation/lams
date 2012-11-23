@@ -59,8 +59,8 @@
 </table>
 
 <c:if test="${isGroupMonitoring || (mode != 'teacher') && !finishedLock}">
-	<div >
-		<lams:STRUTS-textarea property="comment" rows="3" cols="53" styleId="comment-textarea" style="margin-right:10px;" value=""/>		
+	<div id="comment-textarea">
+		<lams:STRUTS-textarea property="comment" rows="3" value=""/>		
 		
 		<div class="float-right">
 			<html:button property="commentButton" onclick="javascript:addNewComment(document.getElementById('comment__lamshidden').value);" styleClass="button" style="vertical-align:bottom;">
