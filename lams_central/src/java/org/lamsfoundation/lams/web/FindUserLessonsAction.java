@@ -137,7 +137,7 @@ public class FindUserLessonsAction extends DispatchAction {
 	    jsonArray.put(jsonObject);
 	}
 	
-	response.setContentType("application/x-json;charset=utf-8");
+	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(jsonArray);
 	
 	return null;

@@ -906,7 +906,7 @@ public class LearningAction extends Action {
 	JSONObject JSONObject = new JSONObject();
 	JSONObject.put("averageRating", averageRatingDTO.getRating());
 	JSONObject.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
-	response.setContentType("application/x-json;charset=utf-8");
+	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(JSONObject);
 	return null;
     }

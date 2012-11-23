@@ -314,7 +314,7 @@ public class LearningAction extends LamsDispatchAction {
 	
 	JSONObject JSONObject = new JSONObject();
 	JSONObject.put(KalturaConstants.PARAM_ITEM_UID, item.getUid());
-	response.setContentType("application/x-json;charset=utf-8");
+	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(JSONObject);
 	return null;
     }
@@ -401,7 +401,7 @@ public class LearningAction extends LamsDispatchAction {
 	JSONObject JSONObject = new JSONObject();
 	JSONObject.put("averageRating", averageRatingDto.getRating());
 	JSONObject.put("numberOfVotes", averageRatingDto.getNumberOfVotes());
-	response.setContentType("application/x-json;charset=utf-8");
+	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(JSONObject);
 	return null;
     }
