@@ -549,7 +549,7 @@ public class LearnerAction extends LamsDispatchAction {
 	    }
 	}
 
-	response.setContentType("application/x-json;charset=utf-8");
+	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(responseJSON.toString());
 
 	return null;
