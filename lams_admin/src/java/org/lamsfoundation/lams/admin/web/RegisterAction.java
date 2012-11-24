@@ -56,7 +56,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import sun.misc.BASE64Decoder;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * ConfigAction
@@ -284,8 +284,7 @@ public class RegisterAction extends LamsDispatchAction {
 	IvParameterSpec ivSpec = new IvParameterSpec(keyBytes);
 	cipher.init(Cipher.DECRYPT_MODE,keySpec,ivSpec);
 	
-	BASE64Decoder decoder = new BASE64Decoder();
-	byte [] results = cipher.doFinal(decoder.decodeBuffer(text));
+	byte [] results = cipher.doFinal(Base64.decodeBase64(text.getBytes()));
 	return new String(results,"UTF-8");
     }
 
