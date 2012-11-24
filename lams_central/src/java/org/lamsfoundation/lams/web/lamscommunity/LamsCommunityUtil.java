@@ -40,7 +40,7 @@ import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
-import sun.misc.BASE64Encoder;
+import org.apache.commons.codec.binary.Base64;
 
 public class LamsCommunityUtil {
 
@@ -100,8 +100,10 @@ public class LamsCommunityUtil {
 
 	cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
 	byte[] results = cipher.doFinal(text.getBytes("UTF-8"));
-	BASE64Encoder encoder = new BASE64Encoder();
-	return encoder.encode(results);
+	byte[] encodedBytes = Base64.encodeBase64(results);
+	String encodedString = new String(encodedBytes);
+	
+	return encodedString;
     }
 
     /**

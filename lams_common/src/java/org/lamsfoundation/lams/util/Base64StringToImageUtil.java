@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 
-import sun.misc.BASE64Decoder;
+import org.apache.commons.codec.binary.Base64;
 
 public class Base64StringToImageUtil {
 	private static Logger log = Logger.getLogger(Base64StringToImageUtil.class);
@@ -21,8 +21,7 @@ public class Base64StringToImageUtil {
 			File fileDir = new File(dir);
 			fileDir.mkdirs();
 			
-			BASE64Decoder decoder = new BASE64Decoder();
-			byte[] byteArray = decoder.decodeBuffer(data);
+			byte[] byteArray = Base64.decodeBase64(data.getBytes());
 
 			InputStream in = new ByteArrayInputStream(byteArray);
 			BufferedImage image = javax.imageio.ImageIO.read(in);
