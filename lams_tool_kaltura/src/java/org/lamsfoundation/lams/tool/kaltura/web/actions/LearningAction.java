@@ -78,7 +78,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * @struts.action path="/learning" parameter="dispatch" scope="request" name="reflectionForm" validate="false"
  * @struts.action-forward name="success" path="tiles:/learning/main"
  * @struts:action-forward name ="viewitem" path="/learning.do?dispatch=viewItem" redirect="true"
- * @struts.action-forward name="commentlist" path="/pages/learning/commentlist.jsp"
+ * @struts.action-forward name="commentlist" path="tiles:/learning/commentlist"
  * @struts.action-forward name="runOffline" path="tiles:/learning/runOffline"
  * @struts.action-forward name="defineLater" path="tiles:/learning/defineLater"
  * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
@@ -333,6 +333,7 @@ public class LearningAction extends LamsDispatchAction {
 	initKalturaService();
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	request.setAttribute(KalturaConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	String commentMessage = WebUtil.readStrParam(request, KalturaConstants.ATTR_COMMENT, true);
@@ -341,7 +342,7 @@ public class LearningAction extends LamsDispatchAction {
 	    ActionErrors errors = new ActionErrors();
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(KalturaConstants.ERROR_MSG_COMMENT_BLANK));
 	    this.addErrors(request, errors);
-	    return mapping.findForward(KalturaConstants.SUCCESS);
+	    return mapping.findForward(KalturaConstants.COMMENT_LIST);
 	}
 
 	KalturaComment comment = new KalturaComment();
@@ -363,7 +364,6 @@ public class LearningAction extends LamsDispatchAction {
 	Set<KalturaComment> groupComments = getGroupComments(item, toolSessionId, mode);
 	sessionMapItem.setGroupComments(groupComments);
 
-	request.setAttribute(KalturaConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(KalturaConstants.COMMENT_LIST);
     }
 
