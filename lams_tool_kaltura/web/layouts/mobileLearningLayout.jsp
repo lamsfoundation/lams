@@ -26,7 +26,7 @@
 		
 	</lams:head>
 	<body class="large-font">
-		<div data-role="page" data-cache="false">
+		<div data-role="page" data-dom-cache="false">
 			<tiles:insert attribute="bodyMobile" />
 		</div>
 	</body>

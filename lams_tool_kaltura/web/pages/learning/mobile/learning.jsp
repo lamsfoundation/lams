@@ -94,11 +94,6 @@
 	};	
 	swfobject.embedSWF(KALTURA_SERVER + '/kwidget/wid/_' + PARTNER_ID + '/uiconf_id/' + KDP_UI_CONF_ID, "kplayer", "100%", "100%", "9.0.0", "includes/expressInstall.swf", flashVars, params);
 	
-	function checkNew(){
-		document.location.href = '<c:url value="/learning.do"/>?dispatch=viewItem&sessionMapID=${sessionMapID}&itemUid=${item.uid}';
-		return false;
-	}
-	
 	function finishActivity(){
 		$('#finishButton').prop('disabled', true);
 		document.location.href ='<c:url value="/learning.do"/>?dispatch=finishActivity&sessionMapID=${sessionMapID}';
@@ -116,10 +111,11 @@
 				dispatch: "commentItem",
 				itemUid: ${item.uid}, 
 				comment: comment,
-				sessionMapID: "${sessionMapID}"
+				sessionMapID: "${sessionMapID}",
+				reqID: (new Date()).getTime()
 			},
-			function(data) {
-				$("#comments-area").trigger( "create" );
+			function() {
+				$(this).trigger( "create" );
 			}
 			
 		);
@@ -233,7 +229,7 @@
 				    <ul>
 				    	<c:forEach var="previewItem" items="${sessionMap.items}" varStatus="status">
 				    		<li id="previewItem${previewItem.uid}" <c:if test="${previewItem.hidden}"> class="item-hidden" </c:if>>
-				    			<a href="<c:url value='/learning.do'/>?dispatch=viewItem&sessionMapID=${sessionMapID}&itemUid=${previewItem.uid}" class="review-item-link">
+				    			<a href="<c:url value='/learning.do'/>?dispatch=viewItem&sessionMapID=${sessionMapID}&itemUid=${previewItem.uid}" class="review-item-link" data-ajax="false">
 				    				<span class="thumb-wrap">
 								        <img src="http://cdnbakmi.kaltura.com/p/${PARTNER_ID}/sp/${SUB_PARTNER_ID}/thumbnail/entry_id/${previewItem.entryId}/version/100001/width/150!/height/100!" height="100" width="150" alt="Video">
 								        <em></em>

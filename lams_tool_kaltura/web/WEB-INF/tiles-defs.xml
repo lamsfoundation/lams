@@ -83,8 +83,9 @@
 		<put name="body" value="/pages/learning/finish.jsp" />
 		<put name="bodyMobile" value="/pages/learning/mobile/finish.jsp"/>
 	</definition>
+	
+	<definition name="tiles:/learning/commentlist" path="/pages/learning/commentlist.jsp" />
 	<!-- End: Learning -->
-
 
 	<!-- Begin: Monitoring -->
 	<definition name="tiles:/monitoring/main" extends="tiles:/layout:tab">
