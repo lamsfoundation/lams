@@ -83,7 +83,11 @@
 		}
 	}
     function doSubmit_Form_Only() {
-    	document.getElementById("${formID}").submit();
+    	var save = serialiseMarkers();
+    	if (save) {
+    		saveMapState();
+    		document.getElementById("${formID}").submit();
+    	}
     }
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
