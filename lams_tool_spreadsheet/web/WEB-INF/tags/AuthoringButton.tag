@@ -83,6 +83,8 @@
 		}
 	}
     function doSubmit_Form_Only() {
+    	var code = window.frames["externalSpreadsheet"].cellsToJS();
+    	document.getElementById("spreadsheet.code").value = code;
     	document.getElementById("${formID}").submit();
     }
     function doCancel() {
