@@ -139,6 +139,40 @@
 	
 	<tr>
 		<td>
+			<fmt:message key="label.authoring.advance.minimum.reply" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${forum.minimumRate == 0}">
+					<fmt:message key="label.authoring.advance.no.minimum" />
+				</c:when>
+				<c:otherwise>
+					${forum.minimumRate}
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advance.maximum.reply" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${forum.maximumRate == 0}">
+					<fmt:message key="label.authoring.advance.no.maximum" />
+				</c:when>
+				<c:otherwise>
+					${forum.maximumRate}
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
 			<fmt:message key="label.authoring.advance.allow.upload" />
 		</td>
 		
