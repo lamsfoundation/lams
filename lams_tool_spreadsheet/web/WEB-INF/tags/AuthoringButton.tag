@@ -83,9 +83,11 @@
 		}
 	}
     function doSubmit_Form_Only() {
-    	var code = window.frames["externalSpreadsheet"].cellsToJS();
-    	document.getElementById("spreadsheet.code").value = code;
-    	document.getElementById("${formID}").submit();
+    	var form = document.getElementById("${formID}");
+    	//invoke onsubmit event if it's available, submit form afterwards
+    	if (form.onsubmit == null || (form.onsubmit != null) && form.onsubmit()) {
+    		form.submit();
+    	}
     }
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){

@@ -2,8 +2,20 @@
 
 <%@ page import="org.lamsfoundation.lams.tool.gmap.util.GmapConstants"%>
 
+<script type="text/javascript">
+	function onSubmitHandler() {
 
-<html:form action="/authoring" styleId="authoringForm" method="post" enctype="multipart/form-data">
+		//boolean indicating whether we can proceed
+    	var save = serialiseMarkers();
+    	if (save) {
+    		saveMapState();
+    	}
+    	return save;
+    	
+	}
+</script>
+
+<html:form action="/authoring" styleId="authoringForm" method="post" enctype="multipart/form-data" onsubmit="return onSubmitHandler()">
 
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />

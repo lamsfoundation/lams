@@ -40,6 +40,12 @@
         	myForm.submit();
         }
         
+    	function onSubmitHandler() {
+        	var code = window.frames["externalSpreadsheet"].cellsToJS();
+        	document.getElementById("spreadsheet.code").value = code;
+        	return true;
+    	}
+        
     </script>
 	<!-- ******************** END CK Editor related javascript & HTML ********************** -->
 
@@ -62,7 +68,7 @@
 		
 	<%@ include file="/common/messages.jsp"%>
 
-	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
+	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data" onsubmit="return onSubmitHandler();">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<html:hidden property="spreadsheet.contentId" />
 		<html:hidden property="sessionMapID" />

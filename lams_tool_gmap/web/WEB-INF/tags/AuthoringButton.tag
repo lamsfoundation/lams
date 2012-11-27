@@ -83,10 +83,10 @@
 		}
 	}
     function doSubmit_Form_Only() {
-    	var save = serialiseMarkers();
-    	if (save) {
-    		saveMapState();
-    		document.getElementById("${formID}").submit();
+    	var form = document.getElementById("${formID}");
+    	//invoke onsubmit event if it's available, submit form afterwards
+    	if (form.onsubmit == null || (form.onsubmit != null) && form.onsubmit()) {
+    		form.submit();
     	}
     }
     function doCancel() {
