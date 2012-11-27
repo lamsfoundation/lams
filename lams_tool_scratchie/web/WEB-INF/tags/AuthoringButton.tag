@@ -72,7 +72,7 @@
 <script type="text/javascript">
 	//we set LAMS_AUTHORING_SUCCESS_FLAG to true in AuthoringAction.update() method 
 	if(<c:choose><c:when test="${LAMS_AUTHORING_SUCCESS_FLAG == true}">true</c:when><c:otherwise>false</c:otherwise></c:choose>){
-
+		
 		//if defineLater is true close current window
 		if (("${defineLater}" == "true") || ("${defineLater}" == "yes")) {
 			closeWindow("defineLater");
@@ -91,7 +91,9 @@
     	}
     }
     function closeWindow(nextAction) {
-		var notifyCloseURL = "${notifyCloseURL}";
+        // notifyCloseURL needs to be encoded in Java *twice*, otherwise it won't work
+        // for both AuthoringButton.tag and authoringConfirm.jsp
+		var notifyCloseURL = decodeURIComponent("${notifyCloseURL}");
 		if (notifyCloseURL == ""){
 			if (nextAction == "defineLater") {
 				refreshParentMonitoringWindow();
@@ -99,7 +101,9 @@
 			var clearSessionUrl = "<c:url value='${clearSessionActionUrl}?action=" + nextAction + "&mode=${accessMode}&defineLater=${defineLater}&customiseSessionID=${customiseSessionID}&signature=${toolSignature}&toolContentID=${toolContentID}'/>";
 			doAjaxCall(clearSessionUrl);
 		} else {
-			if (window.parent.opener == null){
+			if ('${param.noopener}' == 'true' || notifyCloseURL.indexOf('noopener=true') >= 0) {
+				window.location.href = notifyCloseURL;
+			} else if (window.parent.opener == null){
 				doAjaxCall(notifyCloseURL);
 			} else {
 				window.parent.opener.location.href = notifyCloseURL;
