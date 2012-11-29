@@ -365,6 +365,8 @@ public class LearningWebUtil {
     public static ActivityURL getActivityURL(ActivityMapping activityMapping, LearnerProgress learnerProgress,
 	    Activity activity, boolean defaultURL, boolean isFloating) {
 	ActivityURL activityURL = new ActivityURL();
+	activityURL.setType(activity.getClass().getSimpleName());
+	
 	String url = activityMapping.getActivityURL(activity);
 	activityURL.setUrl(url);
 	activityURL.setActivityId(activity.getActivityId());

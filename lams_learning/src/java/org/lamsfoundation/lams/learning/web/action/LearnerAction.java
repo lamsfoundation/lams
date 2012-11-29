@@ -542,10 +542,10 @@ public class LearnerAction extends LamsDispatchAction {
 	    if (activity.getFloating()) {
 		// these are support activities
 		for (ActivityURL childActivity : activity.getChildActivities()) {
-		    responseJSON.append("support", activityToJSON(childActivity));
+		    responseJSON.append("support", activityToJSON(childActivity, null));
 		}
 	    } else {
-		responseJSON.append("activities", activityToJSON(activity));
+		responseJSON.append("activities", activityToJSON(activity, (Long) ret[1]));
 	    }
 	}
 
@@ -555,12 +555,33 @@ public class LearnerAction extends LamsDispatchAction {
 	return null;
     }
 
-    private JSONObject activityToJSON(ActivityURL activity) throws JSONException {
+    private JSONObject activityToJSON(ActivityURL activity, Long currentActivityId) throws JSONException {
 	JSONObject activityJSON = new JSONObject();
-	activityJSON.put("id", activity.getActivityId());
 	activityJSON.put("name", activity.getTitle());
-	activityJSON.put("status", activity.getStatus());
-	activityJSON.put("url", activity.getUrl());
+	activityJSON.put("status", activity.getActivityId().equals(currentActivityId) ? 0 : activity.getStatus());
+
+	if (activity.getUrl() != null) {
+	    activityJSON.put("url", activity.getUrl());
+	}
+
+	String actType = activity.getType().toLowerCase();
+	String type = "a";
+	if (actType.contains("gate")) {
+	    type = "g";
+	} else if (actType.contains("options")) {
+	    type = "o";
+	} else if (actType.contains("branching")) {
+	    type = "b";
+	}
+
+	activityJSON.put("type", type);
+	
+	if (activity.getChildActivities() != null) {
+	    for (ActivityURL childActivity : activity.getChildActivities()) {
+		activityJSON.append("childActivities", activityToJSON(childActivity, currentActivityId));
+	    }
+	}
+	
 	return activityJSON;
     }
 

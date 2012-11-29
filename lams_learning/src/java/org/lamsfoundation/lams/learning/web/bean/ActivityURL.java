@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.learning.web.bean;
 
 import java.util.List;
@@ -29,107 +29,124 @@ import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * Display bean for an activity. Holds the URL used to display the activity along
- * with title, description and a completion flag.
+ * Display bean for an activity. Holds the URL used to display the activity along with title, description and a
+ * completion flag.
  * 
  * If used for the learner progress screen, the defaultURL will always be false.
  * 
  * @author daveg
- *
+ * 
  */
 public class ActivityURL {
-	
-	private Long activityId;
-	private String url;
-	private String title;
-	private String description;
-	private boolean complete;
-	private boolean floating;
-	private byte status;
-	private boolean defaultURL;
-	private List<ActivityURL> childActivities;
+    private String type;
+    private Long activityId;
+    private String url;
+    private String title;
+    private String description;
+    private boolean complete;
+    private boolean floating;
+    private byte status;
+    private boolean defaultURL;
+    private List<ActivityURL> childActivities;
 
-	public ActivityURL(){}
-	
-	public ActivityURL(Long activityId,
-	                   String url)
-	{
-	    this.activityId = activityId;
-	    this.url = url;
-	    this.floating = false;
-	}
-	
-	public boolean isComplete() {
-		return complete;
-	}
-	public void setComplete(boolean complete) {
-		this.complete = complete;
-	}
-	public boolean isFloating() {
-		return floating;
-	}
-	public boolean getFloating() {
-		return floating;
-	}
-	public void setFloating(boolean floating) {
-		this.floating = floating;
-	}
-	public String getTitle() {
-		return title;
-	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	public Long getActivityId() {
-		return activityId;
-	}
-	public void setActivityId(Long activityId) {
-		this.activityId = activityId;
-	}
-	public String getUrl() {
-		return url;
-	}
-	public void setUrl(String url) {
-		this.url = url;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public ActivityURL() {
+    }
 
-	public boolean isDefaultURL() {
-		return defaultURL;
-	}
+    public ActivityURL(Long activityId, String url) {
+	this.activityId = activityId;
+	this.url = url;
+	this.floating = false;
+    }
 
-	public void setDefaultURL(boolean defaultURL) {
-		this.defaultURL = defaultURL;
-	}
+    public String getType() {
+	return type;
+    }
 
-	public byte getStatus() {
-		return status;
-	}
+    public void setType(String type) {
+	this.type = type;
+    }
 
-	public void setStatus(byte status) {
-		this.status = status;
-	}
+    public boolean isComplete() {
+	return complete;
+    }
 
-	/** Get a list of the urls for the child activities. Only used on the jsp progress display page */
-	public List<ActivityURL> getChildActivities() {
-		return childActivities;
-	}
+    public void setComplete(boolean complete) {
+	this.complete = complete;
+    }
 
-	public void setChildActivities(List<ActivityURL> childActivities) {
-		this.childActivities = childActivities;
-	}
-	
-	public String toString() {
-		return new ToStringBuilder(this)
-			.append("activityId", activityId)
-			.append("title", title)
-			.append("url", url)
-			.toString();
-	}
+    public boolean isFloating() {
+	return floating;
+    }
+
+    public boolean getFloating() {
+	return floating;
+    }
+
+    public void setFloating(boolean floating) {
+	this.floating = floating;
+    }
+
+    public String getTitle() {
+	return title;
+    }
+
+    public void setTitle(String title) {
+	this.title = title;
+    }
+
+    public Long getActivityId() {
+	return activityId;
+    }
+
+    public void setActivityId(Long activityId) {
+	this.activityId = activityId;
+    }
+
+    public String getUrl() {
+	return url;
+    }
+
+    public void setUrl(String url) {
+	this.url = url;
+    }
+
+    public String getDescription() {
+	return description;
+    }
+
+    public void setDescription(String description) {
+	this.description = description;
+    }
+
+    public boolean isDefaultURL() {
+	return defaultURL;
+    }
+
+    public void setDefaultURL(boolean defaultURL) {
+	this.defaultURL = defaultURL;
+    }
+
+    public byte getStatus() {
+	return status;
+    }
+
+    public void setStatus(byte status) {
+	this.status = status;
+    }
+
+    /** Get a list of the urls for the child activities. Only used on the jsp progress display page */
+    public List<ActivityURL> getChildActivities() {
+	return childActivities;
+    }
+
+    public void setChildActivities(List<ActivityURL> childActivities) {
+	this.childActivities = childActivities;
+    }
+
+    @Override
+    public String toString() {
+	return new ToStringBuilder(this).append("activityId", activityId).append("title", title).append("url", url)
+		.toString();
+    }
 
 }

@@ -104,9 +104,7 @@ public class ProgressBuilder extends LearningDesignProcessor {
 		activityListStack.push(currentActivityList);
 		currentActivityList = new ArrayList<ActivityURL>();
 
-		if ( activity.isSequenceActivity() ) {
-			return ( progress.getProgressState(activity) != LearnerProgress.ACTIVITY_NOT_ATTEMPTED );
-		} else if ( activity.isFloatingActivity() ) {
+		if ( activity.isFloatingActivity() ) {
 			isFloating = true;
 		}
 		return true;
