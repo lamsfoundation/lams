@@ -28,6 +28,25 @@
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jRating.jquery.js'/>"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
 	<script language="JavaScript" type="text/JavaScript">
+	  	$(document).bind('pageinit', function(){
+		    $(".ratingStars").jRating({
+		    	phpPath : "<c:url value='/learning.do'/>?method=rateResponse&toolSessionID=" + $("#toolSessionID").val(),
+		    	rateMax : 5,
+		    	decimalLength : 1,
+			  	onSuccess : function(data, responseUid){
+			    	$("#averageRating" + responseUid).html(data.averageRating);
+			    	$("#numberOfVotes" + responseUid).html(data.numberOfVotes);
+				},
+			  	onError : function(){
+			    	jError('Error : please retry');
+			  	}
+			});
+		    $(".ratingStarsDisabled").jRating({
+		    	rateMax : 5,
+		    	isDisabled : true
+		    });
+		 });
+
 		function submitLearningMethod(actionMethod) {	
 			if (actionMethod == 'endLearning') {
 				$("#finishButton").attr("disabled", true);
