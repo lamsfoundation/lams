@@ -1,6 +1,4 @@
-﻿var isInternetExplorer = navigator.appName.indexOf("Microsoft") != -1;
-
-// ----- WINDOW MANIPULATION -----
+﻿// ----- WINDOW MANIPULATION -----
 
 function openPopUp(args, title, h, w, status) {
 	window.open(args, title, "HEIGHT=" + h + ",WIDTH=" + w
@@ -449,7 +447,6 @@ var ActivityUtils = {
 			// hide glow if shown (IE)
 			ActivityUtils.removeHover(activity.shape);
 			$('div.optionalActivity').hide();
-			
 			if (!activity.optionalContent) {
 				var containerName = 'optionalActivityContent' + activity.y;
 				activity.optionalContent = $('<div />')
@@ -497,10 +494,12 @@ var ActivityUtils = {
 				childActivity.shape = childActivity.paper.path(childActivity.path);
 				childActivity.shape.attr(ActivityUtils.getShapeAttributes(childActivity));
 				ActivityUtils.addDecoration(childActivity, true);
-				var label = childActivity.paper.text(35,
-						                (isInternetExplorer ? 3 : 11) + childActivity.y,
-						                (isNested ? '- ' : '') + childActivity.name)
-						                .attr('text-anchor', 'start');
+				var label =	childActivity.paper.text(35,
+			                childActivity.y + 11,
+			                (isNested ? '- ' : '') + childActivity.name)
+			                .attr('text-anchor', 'start');
+				$('tspan', label.node).attr('dy', 0);
+				
 				var click = null;
 				if (!isNested) {
 					if (childActivityIndex == 0) {
