@@ -22,9 +22,6 @@
 				contentFolderID: contentFolderID,
 				questionType: questionType,
 				optionList: optionList 
-			},
-			function(){
-				reinitializeOptionEditors(oldOptionIds);
 			}
 		);
 	}
@@ -40,9 +37,6 @@
 					questionType: questionType,
 					optionIndex: idx,
 					optionList: optionList 
-				},
-				function(){
-					reinitializeOptionEditors(null);
 				}
 		);
 	}
@@ -58,9 +52,6 @@
 					questionType: questionType,
 					optionIndex: idx,
 					optionList: optionList 
-				},
-				function(){
-					reinitializeOptionEditors(null);
 				}
 		);
 	}
@@ -76,33 +67,8 @@
 					questionType: questionType,
 					optionIndex: idx,
 					optionList: optionList 
-				},
-				function(){
-					reinitializeOptionEditors(null);
 				}
 		);
-	}
-	
-	//reinitialize all CKEditors responsible for options after Ajax call has done
-	function reinitializeOptionEditors(optionIds){
-		if (optionIds == null) {
-			optionIds = CKEDITOR.instances;
-		}
-		
-		for (var instanceId in optionIds){
-			//skip general fckeditors
-			if (instanceId.match("^(optionString|optionQuestion|optionFeedback)")) { 
-				if (instanceId == null) continue;
-				var instance = CKEDITOR.instances[instanceId];
-				if (instance == null) continue;
-				var initializeFunction = instance.initializeFunction;
-				CKEDITOR.remove(instance);
-				//don't initialize elements that were deleted
-				if ($("#" + instanceId).length == 0) continue;
-				instance = initializeFunction();
-				instance.initializeFunction = initializeFunction;
-			}
-		}
 	}
 	
 	//in order to be able to use option's value, copy it from CKEditor to textarea
