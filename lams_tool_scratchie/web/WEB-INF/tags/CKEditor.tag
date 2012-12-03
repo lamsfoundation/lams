@@ -55,7 +55,7 @@
 	    
 	    var editor = CKEDITOR.instances["${id}"];
 	    if (editor) { editor.destroy(true); }
-	    //CKEDITOR.replace(name);
+	    
 		var instance = CKEDITOR.replace( "${id}", {
 				width                         : "${width}",
 				height                        : "${height}",
