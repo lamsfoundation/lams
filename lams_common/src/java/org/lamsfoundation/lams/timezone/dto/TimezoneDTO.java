@@ -23,12 +23,8 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.timezone.dto;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
-
-import sun.util.calendar.CalendarUtils;
 
 /**
  * DTO object for {@link org.lamsfoundation.lams.timezone.Timezone}
