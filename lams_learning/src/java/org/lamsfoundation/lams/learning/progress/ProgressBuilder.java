@@ -119,8 +119,9 @@ public class ProgressBuilder extends LearningDesignProcessor {
 		// have to check the children as the branching activity is attempted but no child is attempted if a user
 		// is sitting on the waiting screen.
 		// if a branch has been attempted, then we only want to show its children.
-		if ( activity.isBranchingActivity() ) {
-			boolean branchStarted = false;
+	    	boolean branchStarted = false;
+	    	// always display all branches if in Preview mode
+		if (!previewMode && activity.isBranchingActivity() ) {
 			Iterator iter = currentActivityList.iterator();
 			while (!branchStarted && iter.hasNext()) {
 				ActivityURL sequenceURL = (ActivityURL) iter.next();
@@ -130,12 +131,9 @@ public class ProgressBuilder extends LearningDesignProcessor {
 					currentActivityList.addAll(sequenceURL.getChildActivities());
 				}
 			}
-			if ( !branchStarted) {
-				currentActivityList = (ArrayList<ActivityURL>) activityListStack.pop();
-				currentActivityList.add(createActivityURL(activity));
-			}
-			
-		} else {
+		}
+		
+		if (!branchStarted){
 			ActivityURL complexActivityURL = createActivityURL(activity);
 			complexActivityURL.setChildActivities(currentActivityList);
 			currentActivityList = (ArrayList<ActivityURL>) activityListStack.pop();

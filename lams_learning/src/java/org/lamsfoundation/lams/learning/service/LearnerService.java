@@ -435,11 +435,12 @@ public class LearnerService implements ICoreLearnerService {
 	ProgressBuilder builder = new ProgressBuilder(progress, activityDAO, activityMapping);
 	builder.parseLearningDesign();
 
-	Object[] retValue = new Object[2];
+	Object[] retValue = new Object[3];
 	retValue[0] = builder.getActivityList();
 
 	retValue[1] = progress.getCurrentActivity() != null ? progress.getCurrentActivity().getActivityId() : null;
-
+	retValue[2] = lesson.isPreviewLesson();
+	
 	return retValue;
     }
 

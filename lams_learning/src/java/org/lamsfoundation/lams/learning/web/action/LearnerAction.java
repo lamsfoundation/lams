@@ -538,6 +538,7 @@ public class LearnerAction extends LamsDispatchAction {
 
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("currentActivityId", ret[1]);
+	responseJSON.put("isPreview", ret[2]);
 	for (ActivityURL activity : (List<ActivityURL>) ret[0]) {
 	    if (activity.getFloating()) {
 		// these are support activities
@@ -557,6 +558,7 @@ public class LearnerAction extends LamsDispatchAction {
 
     private JSONObject activityToJSON(ActivityURL activity, Long currentActivityId) throws JSONException {
 	JSONObject activityJSON = new JSONObject();
+	activityJSON.put("id", activity.getActivityId());
 	activityJSON.put("name", activity.getTitle());
 	activityJSON.put("status", activity.getActivityId().equals(currentActivityId) ? 0 : activity.getStatus());
 
