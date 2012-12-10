@@ -1711,6 +1711,7 @@ ul.more-actions-list li {
     border: 0px;
     border-spacing:  0px;
     table-layout: auto;
+    clear: both;
 }
 .td-lesson {
     padding: 2px;
