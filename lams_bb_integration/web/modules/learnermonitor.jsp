@@ -88,7 +88,7 @@
     }
     
     String strIsDisplayDesignImage = request.getParameter("isDisplayDesignImage");
-    boolean isDisplayDesignImage = strIsDisplayDesignImage.equals("true")?true:false;
+    boolean isDisplayDesignImage = "true".equals(strIsDisplayDesignImage)?true:false;
     
     String learningDesignImageUrl = "";
     if (isDisplayDesignImage) {
@@ -99,15 +99,19 @@
     }
     
     //check whether user has score for this lesson
-    String strLineitemId = request.getParameter("lineitemid").trim();
-    Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, strLineitemId);
-    ScoreDbLoader scoreLoader = (ScoreDbLoader) bbPm.getLoader(ScoreDbLoader.TYPE);
     Score current_score = null;
-	try {
-	    current_score = scoreLoader.loadByCourseMembershipIdAndLineitemId(courseMembership.getId(), lineitemId);
-	} catch (KeyNotFoundException c) {
-	    //no score availalbe
+    String strLineitemId = request.getParameter("lineitemid");
+	if (strLineitemId != null) { // there won't be "lineitemid" parameter in case lesson had been created in LAMS building block version prior to 1.2 
+	    
+	    Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, strLineitemId.trim());
+	    ScoreDbLoader scoreLoader = (ScoreDbLoader) bbPm.getLoader(ScoreDbLoader.TYPE);
+		try {
+		    current_score = scoreLoader.loadByCourseMembershipIdAndLineitemId(courseMembership.getId(), lineitemId);
+		} catch (KeyNotFoundException c) {
+		    //no score availalbe
+		}
 	}
+
     boolean isScoreAvailable = (current_score != null);
 %>
 
