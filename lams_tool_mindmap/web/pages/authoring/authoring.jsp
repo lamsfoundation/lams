@@ -3,7 +3,7 @@
 <%@ page import="org.lamsfoundation.lams.tool.mindmap.util.MindmapConstants"%>
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="includes/javascript/swfobject.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
 <script type="text/javascript" src="includes/javascript/mindmap.resize.js"></script>
 
 <script type="text/javascript">

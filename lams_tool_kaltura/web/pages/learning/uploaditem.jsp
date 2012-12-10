@@ -17,7 +17,7 @@
 
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/kaltura.min.js"></script>
-		<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/swfobject.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
 		<script language="JavaScript" type="text/javascript">
 			<!--
 			//Specify Kaltura settings

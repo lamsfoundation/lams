@@ -67,10 +67,10 @@
 	//var for instantedit.js
 	var urlBase = '<c:url value="/monitoring.do"/>';
 </script>
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox-compressed.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox-compressed.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jRating.js"></script>
 
-<script type="text/javascript" src="includes/javascript/swfobject.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
 <script type="text/javascript" src="http://cdnbakmi.kaltura.com/html5/html5lib/v1.6.10.4/mwEmbedLoader.php"></script>
 
 <script type="text/javascript">

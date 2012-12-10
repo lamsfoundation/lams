@@ -9,7 +9,7 @@
 			<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 			<meta content="noindex, nofollow" name="robots">
 			
-			<script language="javascript" src="swfobject.js"></script>
+			<script language="javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
 			<script language="javascript">
 				
 				function triggerOK(){

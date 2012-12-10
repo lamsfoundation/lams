@@ -25,7 +25,7 @@
 	</style>
 		
 	<script type="text/javascript" src="kaltura.min.js"></script>
-	<script type="text/javascript" src="swfobject/swfobject.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
 	<script language="JavaScript" type="text/javascript">
 	<!--
 		//Specify Kaltura settings

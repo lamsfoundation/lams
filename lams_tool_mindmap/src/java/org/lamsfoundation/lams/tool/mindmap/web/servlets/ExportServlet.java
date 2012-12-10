@@ -81,10 +81,12 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	try {
 	    // exporting Flash and JavaScript files
 	    writeResponseToFile(basePath + "/images/mindmap_locked.swf", directoryName, "mindmap.swf", cookies);
-	    writeResponseToFile(basePath + "/includes/javascript/swfobject.js", directoryName, "swfobject.js", cookies);
-	    writeResponseToFile(basePath + "/includes/javascript/mindmap.resize.js", directoryName, "resize.js", cookies);
-	    writeResponseToFile(Configuration.get(ConfigurationKeys.SERVER_URL)
-		+ "includes/javascript/jquery.js", directoryName, "jquery.js", cookies);
+	    writeResponseToFile(Configuration.get(ConfigurationKeys.SERVER_URL) + "includes/javascript/swfobject.js",
+		    directoryName, "swfobject.js", cookies);
+	    writeResponseToFile(basePath + "/includes/javascript/mindmap.resize.js", directoryName, "resize.js",
+		    cookies);
+	    writeResponseToFile(Configuration.get(ConfigurationKeys.SERVER_URL) + "includes/javascript/jquery.js",
+		    directoryName, "jquery.js", cookies);
 	    
 	    try {
 		File localeFile = new File(directoryName + "/locale.xml");
