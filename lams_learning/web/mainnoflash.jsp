@@ -39,7 +39,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 		
 		<script type="text/javascript">
-			var tb_pathToImage = "<lams:LAMSURL/>/images/loadingAnimation.gif";
 
 			function resizeIframe() {
 			    var height = $(window).height();
