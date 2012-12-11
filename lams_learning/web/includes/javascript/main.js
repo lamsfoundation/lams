@@ -1,5 +1,39 @@
-﻿// ----- WINDOW MANIPULATION -----
+﻿// ------- GLOBAL VARIABLES ----------
 
+// colors used in shapes
+// dark red
+var COLOR_CURRENT_ACTIVITY = "rgb(187,0,0)";
+// dark blue
+var COLOR_COMPLETED_ACTIVITY = "rgb(0,0,153)";
+// green
+var	COLOR_TOSTART_ACTIVITY = "rgb(0,153,0)";
+// black
+var COLOR_STROKE_ACTIVITY = "rgb(0,0,0)";
+// red
+var	COLOR_GATE = "rgb(255,0,0)";
+// white
+var	COLOR_GATE_TEXT = "rgb(255,255,255)";
+// gray
+var COLOR_COMPLEX_BACKGROUND = "rgb(153,153,153)";
+
+// SVG paths for activity shapes
+var PATH_SQUARE = " v16 h16 v-16 z";
+var PATH_BIG_SQUARE = " v26 h26 v-26 z";
+var PATH_CIRCLE = " m -8 0 a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0";
+var PATH_QUARTER_CIRCLE = " a16 16 0 0 0 16 16 v-16 z";
+var	PATH_TRIANGLE = " l8 16 l8 -16 z";
+var	PATH_OCTAGON = " l-7 7 v12 l7 7 h12 l7 -7 v-12 l-7 -7 z";
+
+// other variables
+var paper = null;
+var controlFramePadding = null;
+var currentActivityId = null;
+var isPreview = false;
+var activities = [];
+
+// ----- CONTROL FRAME & WINDOW MANIPULATION -----
+
+// generic function for opening a pop up
 function openPopUp(args, title, h, w, status) {
 	window.open(args, title, "HEIGHT=" + h + ",WIDTH=" + w
 			+ ",resizable=yes,scrollbars=yes,status="
@@ -20,6 +54,7 @@ function openActivity(url) {
 			"yes");
 }
 
+// loads a new activity to main content frame; alternative to opening in pop up
 function loadFrame(url) {
 	$('#contentFrame').attr('src', url);
 }
@@ -47,10 +82,11 @@ function closeWindow() {
 	top.window.close();
 }
 
-
+// adjusts elements after window resize
 function resizeElements() {
 	var width = $(window).width() - 160;
 	var height = $(window).height();
+	// resize main content frame
 	$('#contentFrame').css({
 		'width' : width + "px",
 		'height' : height + "px",
@@ -59,8 +95,8 @@ function resizeElements() {
 
 	if (progressPanelEnabled) {
 		if (!controlFramePadding) {
-			// calculate only once
-			// there can be miscalculations when trying to repeat this in the middle of resizing
+			// calculate only once in the beginning
+			// there will be miscalculations when trying to repeat this in the middle of resizing
 			 controlFramePadding = $('#controlFrame').outerHeight(true) - $('#controlFrame').height();
 		}
 		
@@ -68,6 +104,7 @@ function resizeElements() {
 		var progressBarHeight = height - controlFramePadding;
 		$('.progressStaticHeight').each(function(){
 			var elem = $(this);
+			// are notebook and/or support activities hidden?
 			if (elem.is(':visible')) {
 				progressBarHeight -= elem.outerHeight(true);
 			}
@@ -77,11 +114,12 @@ function resizeElements() {
 	}
 	
 	if (presenceEnabled){
+		// resize chat frame only if it exists
 		resizeChat();
 	}
 }
 
-// open/close Notebook or Support frames
+// open/close Notebook or Support Activity frames
 function toggleBarPart(name) {
 	var part = $('#' + name + 'Part');
 	var togglerCell = $('#' + name + 'TogglerCell');
@@ -98,23 +136,27 @@ function toggleBarPart(name) {
 function validateNotebookForm(fields) {
 	var formFilled = false;
 	$.each(fields,function(index, field){
+		// if title and text are blank, do not submit
 		if ((field.name == 'title' || field.name == 'entry') 
 				&& field.value) {
 			formFilled = true;
+			// stop iterating
 			return false;
 		}
 	});
 	return formFilled;
 }
 
-// double click triggers also single click event, this method prevents it
+// double click triggers also single click event, this method helps
 function handleClicks(elem, click, dblclick) {
 	if (click) {
 		elem.click(function(e) {
 		    setTimeout(function() {
+		    	// if double clicked, just reduce the counter
 		        if (elem.clickcounter) {
 		        	elem.clickcounter--;
 		        } else {
+		        	// no double click, so execute
 		            click.call();
 		        }
 		    }, 300);
@@ -129,32 +171,6 @@ function handleClicks(elem, click, dblclick) {
 }
 
 //------------- RAPHAEL --------------
-var PATH_SQUARE = " v16 h16 v-16 z";
-var PATH_BIG_SQUARE = " v26 h26 v-26 z";
-var PATH_CIRCLE = " m -8 0 a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0";
-var	PATH_TRIANGLE = " l8 16 l8 -16 z";
-var	PATH_OCTAGON = " l-7 7 v12 l7 7 h12 l7 -7 v-12 l-7 -7 z";
-
-// dark red
-var COLOR_CURRENT_ACTIVITY = "rgb(187,0,0)";
-// dark blue
-var COLOR_COMPLETED_ACTIVITY = "rgb(0,0,153)";
-// green
-var	COLOR_TOSTART_ACTIVITY = "rgb(0,153,0)";
-// black
-var COLOR_STROKE_ACTIVITY = "rgb(0,0,0)";
-// red
-var	COLOR_GATE = "rgb(255,0,0)";
-// white
-var	COLOR_GATE_TEXT = "rgb(255,255,255)";
-// gray
-var COLOR_COMPLEX_BACKGROUND = "rgb(153,153,153)";
-
-var paper = null;
-var controlFramePadding = null;
-var currentActivityId = null;
-var isPreview = false;
-var activities = [];
 
 // This should be the super class for Activities, but it's hard to accomplish in JS
 // It is a set of common methods instead.
@@ -198,10 +214,11 @@ var ActivityUtils = {
 			// this and similar methods are run when activity shape is drawn for real
 			activity.addDecoration = function(act) {
 				act.decoration = act.paper.set();
-				// get exact Y where square was drawn
-				// it is different than activity.y in OptionalActivity because of gray square behind it
+				// get exact Y where inner shape was drawn
+				// it is different than activity.y in OptionalActivity
+				// because of gray square around it
 				var y = act.shape.attr('path')[0][2];
-				var arc = act.paper.path("M" + (act.middle - 8) + " " + y + " a16 16 0 0 0 16 16 v-16 z");
+				var arc = act.paper.path("M" + (act.middle - 8) + " " + y + PATH_QUARTER_CIRCLE);
 				arc.attr({
 					'fill'    : COLOR_CURRENT_ACTIVITY,
 					'opacity' : 0,
@@ -220,13 +237,14 @@ var ActivityUtils = {
 		},
 		
 		shapeGateActivity : function(activity) {
-			// red octagon
+			// red octagon for STOP road sign
 			activity.path = "M" + (activity.middle - 6) + " " + activity.y + PATH_OCTAGON;
 			activity.fill = COLOR_GATE;
 			
 			activity.addDecoration = function(act) {
 				act.decoration = activity.paper.set();
 				
+				// should be internationalised?
 				var text = act.paper.text(act.middle, act.y + 13, "STOP");
 				text.attr({
 					'opacity'   : 0,
@@ -238,7 +256,7 @@ var ActivityUtils = {
 				act.decoration.push(text);
 				
 				if (act.status == 0) {
-					// dark red edge when current activity
+					// add dark red edge when current activity
 					act.statusTooltip = LABEL_CURRENT_ACTIVITY;
 					
 					var edge = act.paper.path(act.path);
@@ -263,7 +281,7 @@ var ActivityUtils = {
 					addDecoration(act);
 				}
 				
-				// gray squar in background
+				// gray square in background
 				var square = act.paper.path("M" + (act.middle - 13) + " " + act.y + PATH_BIG_SQUARE);
 				square.attr({
 					'opacity'      : 0,
@@ -271,7 +289,7 @@ var ActivityUtils = {
 					'cursor'       : 'pointer'
 				});
 				
-				// so it goes behind, not to front like other decoration
+				// inform that it goes behind, not to front like other decoration
 				act.decorationWraps = true;
 				square.decorationWraps = true;
 				
@@ -291,12 +309,15 @@ var ActivityUtils = {
 				'cursor'       : 'pointer'
 			}
 		},
-		
+	
+		// does the actual drawing, based on info in Activity object
 		drawActivity : function(activity, quick, isLast) {
 			activities[activity.index] = activity;
+			// all elements that activity consists of, so they all can be moved at once
 			activity.elements = activity.paper.set();
 			// only now do the read drawing, add event handlers etc.
 			activity.shape = activity.paper.path(activity.path);
+			// add Activity attributes
 			activity.shape.attr(ActivityUtils.getShapeAttributes(activity));
 			activity.elements.push(activity.shape);
 			// label underneath the shape
@@ -304,20 +325,25 @@ var ActivityUtils = {
 					               activity.name);
 			activity.elements.push(label);
 			if (!isLast) {
-				// line between activities
+				// line between activities; last activity does not have it
 				var line = paper.path("M " + activity.middle + " " + (50 + 60 * (activity.index - 1) + activity.height)
 						   + " v" + (90 - activity.height));
 				activity.elements.push(line);
 			}
 			
 			if (!quick) {
+				// slowly show the activity
 				activity.elements.forEach(function(elem) {
+					// hide first
 					elem.attr('opacity', 0);
+					// show in 1 second
 					elem.animate({'opacity' : 1}, 1000, "linear");
 				});
 			}
 			
+			// add additional elements
 			ActivityUtils.addDecoration(activity, null, quick);
+			// add hover, click etc. handlers
 			ActivityUtils.addEffects(activity);
 		},
 		
@@ -329,6 +355,7 @@ var ActivityUtils = {
 			ActivityUtils.removeHover(activity.shape);
 			if (activity.shape.events) {
 		        while (activity.shape.events.length){
+		        	// iterate over any handlers bound
 		        	activity.shape.events.pop().unbind();
 		        }
 			}
@@ -337,10 +364,11 @@ var ActivityUtils = {
 				// add glowing effect on hover
 				if (activity.decorationWraps) {
 					activity.decoration.forEach(function(elem){
+						// check which decoration element should glow
 						if (elem.decorationWraps) {
 							// glow the wrapping decoration element
 							// for example gray square in Optonal Activity container
-							// bigger than inner activity shape
+							// is bigger than inner activity shape, so it should glow
 							activity.shape.glowRef = elem.glow({
 								color : elem.attr('fill')
 							});
@@ -362,6 +390,7 @@ var ActivityUtils = {
 			}
 
 			var mouseout = function() {
+				// remove glow
 				ActivityUtils.removeHover(activity.shape);
 			}
 			
@@ -372,6 +401,7 @@ var ActivityUtils = {
 					openActivity(activity.url);
 					
 					if (isSupportActivity) {
+						// do not ask server, just mark the activity as attempted
 						activity.transformToAttempted();
 					}
 				} else {
@@ -381,12 +411,15 @@ var ActivityUtils = {
 			
 			
 			var click = activity.isComplex ? function() {
+				// show complex (Optional, Branching) activity inner content
 				ActivityUtils.showComplexContent(activity);
 			} : null;
 			
+			// assign handlers
 			activity.shape.hover(mouseover, mouseout);
 			handleClicks(activity.shape, click, dblclick);
 			if (activity.decoration) {
+				// add handlers not only to shape, but also to all decoration elements
 				activity.decoration.forEach(function(elem){
 					elem.hover(mouseover, mouseout);
 					handleClicks(elem, click, dblclick);
@@ -394,6 +427,7 @@ var ActivityUtils = {
 			}
 		},
 		
+		// remove glow when mouse leaves shape
 		removeHover : function(shape){
 			if (shape.glowRef) {
 				shape.glowRef.remove();
@@ -406,7 +440,9 @@ var ActivityUtils = {
 		transform : function(sourceActivity, targetActivity) {
 			var gotCompleted = false;
 			
+			// modify only if anything changed
 			if (sourceActivity.status != targetActivity.status) {
+				// was just completed
 				gotCompleted = targetActivity.status == 1;
 				
 				sourceActivity.height = targetActivity.height;
@@ -418,24 +454,29 @@ var ActivityUtils = {
 				sourceActivity.statusTooltip = targetActivity.statusTooltip;
 				sourceActivity.addDecoration = targetActivity.addDecoration;
 				
+				// transform current shape to the new one
 				ActivityUtils.animate(sourceActivity, sourceActivity.decoration);
 			}
 			
 			var isCurrent = targetActivity.status == 0;
-			if (sourceActivity.childActivities) {	
+			if (sourceActivity.childActivities) {
+				// run for all inner activities (Optional, Branching)
 				$.each(sourceActivity.childActivities, function(childActivityIndex, childActivity){
 					var targetChildActivity = targetActivity.childActivities[childActivityIndex];
+					// if child activity is current, parent activity is current as well
 					isCurrent |= targetChildActivity.status == 0;
 					ActivityUtils.transform(childActivity, targetChildActivity);
 				});
 			}
 			
 			if (isCurrent) {
+				// shows box with inner activities, if not open yet
 				ActivityUtils.showComplexContent(sourceActivity);
 				 if (sourceActivity.toggleChildren) {
 					// complex sequence just became current, show it
 					sourceActivity.toggleChildren('open');
 				 }
+			// close box with inner activities, if finished
 			} else if (gotCompleted) {
 				if (sourceActivity.isComplex) {
 					ActivityUtils.hideOtherComplexContent();
@@ -447,18 +488,23 @@ var ActivityUtils = {
 		
 		animate : function(activity, oldDecoration){
 			if (activity.shape) {
+				// remove old decoration and start showin new one
 				ActivityUtils.addDecoration(activity, oldDecoration, false);
+				// transform the shape
 				activity.shape.animate(ActivityUtils.getShapeAttributes(activity), 2000, "linear", function() {
 					if(!(activity instanceof OptionalActivity)){
+						// inner activities do not have glow and tooltip effects
 						ActivityUtils.addEffects(activity);
 					}
 				});
 			}
 		},
 		
+		// adds additional elements to activity basic shape
 		// quick is for inital drawing, no nice effect is needed
 		addDecoration : function(activity, oldDecoration, quick){
 			if (oldDecoration) {
+				// hide existing decoration
 				oldDecoration.forEach(function(elem){
 					if (activity.elements) {
 						activity.elements.exclude(elem);
@@ -469,6 +515,7 @@ var ActivityUtils = {
 				});
 			}
 			
+			// run function that draws decoration
 			if (activity.addDecoration) {
 				var animation = Raphael.animation({'opacity' : 1}, quick ? 0 : 1000, "linear");
 				
@@ -499,15 +546,17 @@ var ActivityUtils = {
 			});
 		},
 		
-		// draw pop up with optional activities
+		// draw box with inner activities
 		showComplexContent : function(activity) {
 			if (activity.isComplex) {
 				// hide glow if shown (IE)
 				ActivityUtils.removeHover(activity.shape);
+				// remove other boxes, if shown
 				ActivityUtils.hideOtherComplexContent
 					(activity.optionalContent ? activity.optionalContent.attr('id') : null);
 						
 				if (!activity.optionalContent) {
+					// build box HTML
 					var containerName = 'optionalActivityContent' + activity.y;
 					activity.optionalContent = $('<div />')
 											  .attr('id', containerName)
@@ -535,9 +584,9 @@ var ActivityUtils = {
 				var row = $('<tr />');
 				var parentId = null;
 				if (isNested) {
-					// second tier, a part of optional sequence
+					// second tier, a part of optional sequence or branching
 					parentId = $('td', parent).attr('id');
-					// find last activity from sequence and put current after it to keep ordering
+					// find last activity from sequence and put current one after it to keep ordering
 					row.insertAfter($('td[id^=' + parentId + ']', container).last().parent());
 					isCurrent |= childActivity.status == 0;
 				} else {
@@ -551,31 +600,39 @@ var ActivityUtils = {
 					cell.hide();
 				}
 				
+				// each row has its own paper
 				childActivity.paper = Raphael(cellId, 145, 23);
+				// draw the inner activity
 				childActivity.shape = childActivity.paper.path(childActivity.path);
 				childActivity.shape.attr(ActivityUtils.getShapeAttributes(childActivity));
 				ActivityUtils.addDecoration(childActivity, null, true);
 				var label =	childActivity.paper.text(35,
 			                childActivity.y + 11,
+			                // add dash before name
 			                (isNested ? '- ' : '') + childActivity.name)
+			                // align to left
 			                .attr('text-anchor', 'start');
+				// fix a bug in FF layout
 				$('tspan', label.node).attr('dy', 0);
 				
 				var click = null;
 				if (!isNested) {
+					// only first tier inner activities
 					if (childActivityIndex == 0) {
 						click = function(){
+							// first row is the parent activity itself; hide content box when clicked
 							container.slideUp();
 						}
 					} else if (childActivity.childActivities){
+						// show/hide 2nd tier inner activities
 						childActivity.toggleChildren = function(forceCommand){
 							if (cell.is(':visible')) {
-								// show/hide optional sequence content
 								var childCells = $('td[id^=' + cellId + 'child]', parent);
 								var isOpen = childCells.is(':visible');
 								if (!forceCommand || (isOpen ? forceCommand == 'close' : forceCommand == 'open')) {
 									var containerHeightDelta = 27 * childCells.length;
 									childCells.toggle();
+									// resize inner content box
 									container.height(container.height() + 
 											        (isOpen ? -containerHeightDelta : containerHeightDelta));
 								}
@@ -583,6 +640,7 @@ var ActivityUtils = {
 						}
 						
 						click = function(){
+							// show 2nd tier when 1st tier activity is clicked
 							childActivity.toggleChildren();
 						}
 					} 
@@ -615,9 +673,11 @@ var ActivityUtils = {
 			ActivityUtils.hideOtherComplexContent();
 			
 			var activityShift = branchActivities.length - 1;
+			// how many pixels move subsequent activities down
 			var yShift = 60*activityShift;
+			// activity just after branching
 			var afterBranchActivity = null;
-			// move down existing activities that come after Branching
+			// move down existing activities that come after Branching; start with the last one
 			for (var activityIndex = activities.length - 1; activityIndex > branchIndex; activityIndex--) {
 				afterBranchActivity = activities[activityIndex];
 				activities[activityIndex + activityShift] = afterBranchActivity;
@@ -637,14 +697,14 @@ var ActivityUtils = {
 				});
 			}
 			
-			// remove Branching activity
+			// smoothly remove Branching activity
 			activities[branchIndex].elements.forEach(function(elem) {
 				elem.animate({'opacity' : 0} , 2000, "linear" , function() {
 					elem.remove();
 				});
 			});
 			
-			// create branch activities structure
+			// create branch activities structures
 			for (var activityIndex = 0; activityIndex < branchActivities.length; activityIndex ++){
 				var activityData = branchActivities[activityIndex];
 				var activity = new Activity(paper, activityIndex + branchIndex, activityData.id,
@@ -657,7 +717,7 @@ var ActivityUtils = {
 				}
 			}
 			
-			// draw branch activities
+			// smoothly draw branch activities
 			setTimeout(function(){
 				for (var activityIndex = 0; activityIndex < branchActivities.length; activityIndex ++){			
 					ActivityUtils.drawActivity(activities[activityIndex + branchIndex], false,
@@ -679,9 +739,11 @@ function Activity(paper, index, id, type, name, status, url, childActivitiesData
 	
 	// Optional Activities, Optional Sequences or Branching in preview mode
 	this.isComplex = type == 'o' || (isPreview && type == 'b');
+	// X positioning
 	this.middle = 70;
 	this.height = 60;
 	// 20 is the first line segment and following activities take 60 px each
+	// (together with following vertical line)
 	this.y = 20 + this.height * index;
 	
 	// first draw the inner shape, then put back the realY for background gray square
@@ -691,6 +753,7 @@ function Activity(paper, index, id, type, name, status, url, childActivitiesData
 	}
 	
 	if (type == 'g') {
+		// gate activity
 		this.height = 70;
 		ActivityUtils.shapeGateActivity(this);
 	} else {
@@ -698,7 +761,7 @@ function Activity(paper, index, id, type, name, status, url, childActivitiesData
 	}
 	
 	
-	// special behaviour for optional activities
+	// special behaviour for complex activities
 	if (this.isComplex) {
 		this.height = 70;
 		this.y = finalY;
@@ -714,6 +777,7 @@ function Activity(paper, index, id, type, name, status, url, childActivitiesData
 	}
 }
 
+// Support (floating) activities are show in separate box and behave differently
 function SupportActivity(paper, index, name, status, url) {
 	this.paper = paper;
 	this.name = name;
@@ -739,6 +803,7 @@ function SupportActivity(paper, index, name, status, url) {
 	}
 }
 
+// Optional and Branching inner activities
 function OptionalActivity(name, status, url, childActivitiesData, isNested) {
 	this.name = name;
 	this.status = status;
@@ -749,6 +814,7 @@ function OptionalActivity(name, status, url, childActivitiesData, isNested) {
 	
 	ActivityUtils.shapeByStatus(this);
 	
+	// if Sequence or Branching, this is the 2nd tier of inner activities
 	if (childActivitiesData) {
 		this.childActivities = [];
 		var childActivities = this.childActivities;
@@ -789,6 +855,7 @@ function fillProgressBar() {
 				
 				for (var activityIndex = 0; activityIndex < result.activities.length; activityIndex++) {
 					var activityData = result.activities[activityIndex];
+					// prepare the Activity descriptor, but do not draw yet
 					var activity = new Activity(paper, activityIndex, activityData.id,
 											    activityData.type, activityData.name,
 											    activityData.status, activityData.url,
@@ -799,7 +866,7 @@ function fillProgressBar() {
 					
 					var existingActivity = activities[activityIndex];
 					if (existingActivity) {
-						// if in preview mode, always display all options, i.e. never expand
+						// if in preview mode, always display all inner activities, i.e. never expand
 						if (!isPreview && existingActivity.type == 'b' && existingActivity.id != activity.id) {
 							
 							var branchActivityId = activityIndex;
@@ -808,6 +875,7 @@ function fillProgressBar() {
 							var branchActivities = [activity];
 							activityIndex++;
 							
+							// find which activities are new (branch) and which ones already existed
 							while (activityIndex < result.activities.length) {
 								activityData = result.activities[activityIndex];
 								var activity = new Activity(paper, activityIndex, activityData.id,
@@ -815,6 +883,7 @@ function fillProgressBar() {
 														    activityData.status, activityData.url,
 														    activityData.childActivities);
 								if (activity.id == afterBranchActivityId) {
+									// prepare for the next big loop iteration, which executes normally
 									activityIndex--;
 									break;
 								} else {
@@ -823,13 +892,15 @@ function fillProgressBar() {
 								}
 							}
 							
+							// resize main paper to accomodate new activities
 							paper.setSize(140, 60 * (activities.length + branchActivities.length - 1));
 							ActivityUtils.expandBranch(branchActivityId, branchActivities);
 						} else {
-							// we are refreshing existing bar, so animate if needed
+							// refresh existing bar, transform activities if needed
 							ActivityUtils.transform(existingActivity, activity);
 						}
 					} else {
+						// draw new activity
 						ActivityUtils.drawActivity(activity, true,
 												   activityIndex == result.activities.length - 1);
 					}
@@ -840,6 +911,7 @@ function fillProgressBar() {
 					supportSeparatorRow.show();
 					supportPart.height(17 + 33 * result.support.length).show();
 					
+					// separate paper for Suppor Activities frame
 					var supportPaper = Raphael('supportPart');
 					
 					jQuery.each(result.support, function(activityIndex, activityData) {
