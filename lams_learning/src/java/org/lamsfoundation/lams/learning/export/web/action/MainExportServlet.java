@@ -163,8 +163,7 @@ public class MainExportServlet extends HttpServlet {
 	    }
 
 	    // correct all image links in created htmls.
-	    replaceImageFolderLinks(portfolios.getContentFolderID(),
-		    Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH));
+	    replaceImageFolderLinks(portfolios.getContentFolderID());
 
 	    // bundle the stylesheet with the package
 	    CSSBundler bundler = new CSSBundler(request, cookies, exportTmpDir, exportService.getUserThemes());
@@ -199,10 +198,8 @@ public class MainExportServlet extends HttpServlet {
      * 
      * @param contentFolderI
      *            32-character content folder name
-     * @param lamsOrRams
-     *            "/rams" if we are running rams and "/lams" otherwise
      */
-    private void replaceImageFolderLinks(String contentFolderID, String lamsOrRams) {
+    private void replaceImageFolderLinks(String contentFolderID) {
 	File tempDir = new File(exportTmpDir);
 
 	// finds all the html extension files
@@ -212,7 +209,7 @@ public class MainExportServlet extends HttpServlet {
 	for (Iterator it = jspFiles.iterator(); it.hasNext();) {
 	    Object element = it.next();
 	    MainExportServlet.log.debug("Correcting links in file " + element.toString());
-	    replaceImageFolderLinks(element.toString(), contentFolderID, lamsOrRams);
+	    replaceImageFolderLinks(element.toString(), contentFolderID);
 	}
     }
 
@@ -226,13 +223,13 @@ public class MainExportServlet extends HttpServlet {
      * @param lamsOrRams
      *            "rams/" if we are running rams and "lams/" otherwise
      */
-    private void replaceImageFolderLinks(String filename, String contentFolderID, String lamsOrRams) {
+    private void replaceImageFolderLinks(String filename, String contentFolderID) {
 	try {
 	    // String to find
-	    String ckeditorpath = "/" + lamsOrRams + "/www/secure/" + contentFolderID;
+	    String ckeditorpath = "/lams/www/secure/" + contentFolderID;
 	    String ckeditorrecpath = "../" + contentFolderID + "/Recordings";
-	    String ckeditorsmiley = "/" + lamsOrRams + "/ckeditor/images/smiley";
-	    String ckeditorvr = "/" + lamsOrRams + "/ckeditor/plugins/videorecorder";
+	    String ckeditorsmiley = "/lams/ckeditor/images/smiley";
+	    String ckeditorvr = "/lams/ckeditor/plugins/videorecorder";
 
 	    // Replacing string
 	    String newckeditorpath = "../" + contentFolderID;

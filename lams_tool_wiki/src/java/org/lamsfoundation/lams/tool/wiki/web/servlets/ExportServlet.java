@@ -184,8 +184,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	    // Update image links
 	    WikiPageContentDTO contentDTO = wikiPageDTO.getCurrentWikiContentDTO();
-	    contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID(),
-		    Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH)));
+	    contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID()));
 	    wikiPageDTO.setCurrentWikiContentDTO(contentDTO);
 
 	    wikiPageDTOs.add(wikiPageDTO);
@@ -286,8 +285,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		// Update image links
 		WikiPageContentDTO contentDTO = wikiPageDTO.getCurrentWikiContentDTO();
-		contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID(),
-			Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH)));
+		contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID()));
 		wikiPageDTO.setCurrentWikiContentDTO(contentDTO);
 
 		wikiPageDTOs.add(wikiPageDTO);
@@ -322,11 +320,11 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
      * @param contentFolderID
      * @return
      */
-    private String replaceImageFolderLinks(String body, String contentFolderID, String lamsOrRams) {
-	String ckeditorpath = "/" + lamsOrRams + "/www/secure/" + contentFolderID;
+    private String replaceImageFolderLinks(String body, String contentFolderID) {
+	String ckeditorpath = "/lams/www/secure/" + contentFolderID;
 	String newckeditorpath = "./" + contentFolderID;
 
-	String ckeditorsmiley = "/" + lamsOrRams + "/ckeditor/images/smiley";
+	String ckeditorsmiley = "/lams/ckeditor/images/smiley";
 	String newckeditorsmiley = "./ckeditor/images/smiley";
 
 	// The pattern matches control characters

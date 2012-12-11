@@ -8,11 +8,7 @@
 	<property file="../lams_build/shared.properties"/>
 	
 	<available file="../${lams_planner}/build.xml" property="planner.available" />
-	
-	<condition property="isRAMS">
-		<equals arg1="${conf.application}" arg2="rams" />
-	</condition>
-
+		
 	
 	<!-- Below are Tool specifc targets and targets overriding ones from the imported base file. -->
 	<target name="_copy-planner" if="planner.available" depends="_copy-language">
@@ -39,15 +35,6 @@
 	</target>
 	
 	
-	<target name="_update-logo-for-RAMS" if="isRAMS">
-		<!-- Internal target: updates logo in built WAR for RAMS project -->
-		<echo>Setting login logo to RAMS</echo>
-		<move tofile="${build.lib}/${product}.war/images/css/lams_login.gif"
-			  file="${conf.web.dir}/images/ramsthemecss/rams_login.gif" 
-		      overwrite="true" verbose="true" />
-	</target>
-	
-	
 	<target name="_build-war"
 	        depends="_build-webdoclet, _build-manifest, _copy-war-resources, _copy-planner, _jsp-plaincopy, _jsp-precompile">
 		
@@ -66,8 +53,6 @@
 				<include name="MANIFEST.MF"/>
 			</fileset>
 		</copy>
-					
-		<antcall target="_update-logo-for-RAMS" />
 	</target>
 	
 	

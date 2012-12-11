@@ -283,9 +283,8 @@
 	</target>
 	
 	
-	<target name="_deploy-tools-common">
-		
-		<echo>Deploying common Tools</echo>
+	<target name="_deploy-tools-lams">
+		<echo>Deploying Tools</echo>
 		<ant antfile="../${tool_forum_dir}/build.xml"         target="deploy-tool" inheritAll="false" />
 		<ant antfile="../${tool_lanb_dir}/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../${tool_laqa_dir}/build.xml"          target="deploy-tool" inheritAll="false" />
@@ -310,22 +309,16 @@
 		<ant antfile="../${tool_wookie_dir}/build.xml"        target="deploy-tool" inheritAll="false" />
 		<ant antfile="../${tool_imscc_dir}/build.xml"         target="deploy-tool" inheritAll="false" />
 		<ant antfile="../${tool_bbb_dir}/build.xml"           target="deploy-tool" inheritAll="false" />
-	</target>
-	
-	
-	<target name="_deploy-tools-lams" unless="isRAMS" depends="_deploy-tools-common">
-		<!-- Internal target: Deploys LAMS tools. -->
-		<echo>Deploying LAMS set of tools</echo>
-		<ant antfile="../${tool_lamc_dir}/build.xml" target="deploy-tool" inheritAll="false" />
+		<ant antfile="../${tool_lamc_dir}/build.xml"          target="deploy-tool" inheritAll="false" />
 	</target>
 	
 
 	<target name="deploy-tools" depends="_deploy-tools-lams, deploy-learning-libraries" 
-		    description="Deploys LAMS or RAMS Tools and special parallel activities." />
+		    description="Deploys LAMS Tools and special parallel activities." />
 
 
 	<target name="deploy-tools-updater" depends="_deploy-tools-lams" 
-		description="Deploys LAMS or RAMS Tools and special parallel activities. For upgrader only!">
+		description="Deploys LAMS Tools. For upgrader only!">
 	</target>
 
 	
