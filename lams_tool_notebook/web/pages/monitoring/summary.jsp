@@ -8,8 +8,6 @@
 
 <script type="text/javascript">
 <!--
-	var tb_pathToImage = "${lams}/images/loadingAnimation.gif";
-	
 	//pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
 		lams: '${lams}',
@@ -26,7 +24,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-<script type="text/javascript" src="${lams}/includes/javascript/thickbox-compressed.js"></script>
+<script type="text/javascript" src="${lams}/includes/javascript/thickbox.js"></script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
 <!--

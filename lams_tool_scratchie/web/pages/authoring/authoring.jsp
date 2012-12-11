@@ -13,10 +13,7 @@
 	<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
 	
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript">
-		var tb_pathToImage = "<lams:LAMSURL/>images/loadingAnimation.gif";
-	</script>
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox-compressed.js"></script>
+	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	
 	<script>
         function init(){

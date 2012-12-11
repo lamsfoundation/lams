@@ -14,10 +14,7 @@
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/thickbox.css'/>" />
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript"> 
-		var pathToImageFolder = "<html:rewrite page='/includes/images/'/>"; 
-	</script>
- 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>
+ 	<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 
 	<script>
         function init(){

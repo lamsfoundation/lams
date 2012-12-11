@@ -16,7 +16,7 @@
 	<TITLE><fmt:message key="title.learner.window"/></TITLE>
 	
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/thickbox.patched.js"></script>
+	<script type="text/javascript" src="includes/javascript/thickbox.js"></script>
 	
 	<lams:css/>
 	<link rel="stylesheet" href="css/thickbox.css" type="text/css" media="screen">

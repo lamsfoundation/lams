@@ -17,11 +17,7 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
- 		<script type="text/javascript"> 
-			var pathToImageFolder = "${lams}images/";
-		</script>
- 		<script type="text/javascript" src="${lams}includes/javascript/thickbox.patched.js"></script>
-		 
+ 		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 		 
 	 <script>
 			var initialTabId = "${initialTabId}";

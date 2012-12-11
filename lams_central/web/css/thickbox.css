@@ -110,6 +110,7 @@ margin-top: expression(0 - parseInt(this.offsetHeight / 2) + (TBWindowMargin = d
   top: 50%;
   left: 50%;
   margin: -6px 0 0 -104px; /* -height/2 0 0 -width/2 */
+  background-image: url(../images/loadingAnimation.gif); /* modified by LAMS */
 }
 * html #TB_load { /* ie6 hack */
 position: absolute;

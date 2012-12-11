@@ -2,10 +2,7 @@
 <%@ include file="/taglibs.jsp"%>
 <link rel="stylesheet" href="<lams:LAMSURL/>/css/thickbox.css" type="text/css" media="screen">
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
-<script type="text/javascript">
-	var tb_pathToImage ='<lams:LAMSURL/>images/loadingAnimation.gif';
-</script>
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox-compressed.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox.js"></script>
 
 <h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
 <lams:help style="no-tabs" page="<%= Timezone.TIMEZONE_HELP_PAGE %>"/>

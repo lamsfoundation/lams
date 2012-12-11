@@ -60,14 +60,12 @@
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 <script type="text/javascript" src="includes/javascript/instantedit.js"></script>
 <script type="text/javascript">
-	//var for thickbox.js
-	var tb_pathToImage = "<lams:LAMSURL/>images/loadingAnimation.gif";
 	//var for jquery.jRating.js
 	var pathToImageFolder = "<lams:LAMSURL/>images/css/";
 	//var for instantedit.js
 	var urlBase = '<c:url value="/monitoring.do"/>';
 </script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox-compressed.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jRating.js"></script>
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>

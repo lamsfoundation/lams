@@ -13,10 +13,7 @@
 		
 		<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	  	<script type="text/javascript">
-			var pathToImageFolder = "<lams:LAMSURL/>images/";
-	 	</script>
- 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>	
+ 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>	
  			
 		<script>
 			var initialTabId = "${initialTabId}";
