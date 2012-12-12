@@ -4,7 +4,7 @@
 	<description>
 		This is a base for all LAMS Tool build.xml files.
 		It contains all tasks required to build a Tool.
-		Some Tools can have their private targets, test suites for example.
+		Some Tools can have their own private targets.
 	</description>
 	
 	<!-- Directory of this parent file -->
@@ -227,13 +227,4 @@
 			<arg value="True" /> <!-- forcedb -->
 		</java>
 	</target>
-
-	<!-- =================================================================== -->
-	<!-- Tests                                                     	 -->
-	<!-- =================================================================== -->
-	
-	<target name="test-report"
-		    depends="_compile-test, _build-hbm, build_base.test-report"
-		    description="Runs JUnit tests and generates report." />
-	
 </project>

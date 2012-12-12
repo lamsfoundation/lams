@@ -4,38 +4,4 @@
 	
 	<import file="../lams_build/build_base.xml"/> 
 	
-	
-	<!-- ================================================================ -->
-	<!-- Print information								                  -->
-	<!-- ================================================================ -->
-	
-	<target name="print-usage">
-		<echo>
-		${ant.project.name} build file
-		------------------------------------------------------
-		
-		Available targets are:
-			
-		print-usage             --> Display this information
-		copy-tags               --> Copies custom JSP tags from Central
-		deploy-jar              --> Deploys JAR to EAR
-		deploy-war              --> Deploys WAR to EAR
-		copy-to-lams-lib      --> Copies JAR to lams-build for other projects to use
-		explode-war             --> Unpacks WAR in EAR
-		explode-war-synchronize --> Updates web content in exploded WAR
-		explode-war-delete      --> Removes exploded WAR
-		test-report             --> Runs JUnit tests and generates report
-		</echo>	
-	</target>
-	
-   <!-- =================================================================== -->
-   <!-- Tests                                   							-->
-   <!-- =================================================================== -->
-	
-	<!-- Tests for this project require lams-tool-survey.jar to be in classpath.
-	     As tests are not in use now, the JAR was removed from this project:
-	     it should be taken straight from Survey Tool anyway
-	     and not copied to lams_monitoring/lib every time.
-	-->
-	
 </project>

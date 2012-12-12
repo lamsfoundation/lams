@@ -15,9 +15,4 @@
 			</fileset>
 		</copy>
 	</target>
-
-
-	<target name="test-report" depends="_target-not-available"
-			description="Runs JUnit tests and generates report." />
-	
 </project>

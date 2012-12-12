@@ -26,14 +26,6 @@
 		<!-- Presence Chat -->
 		<include name="**/model/PresenceChat*.java" />
 	</fileset>
-	
-	
-	<target name="print-usage" depends="build_base.print-usage"
-	        description="Displays Ant targets descriptions">
-		<echo>
-		build-db-test           --> Inserts test data to database.
-		</echo>	
-	</target>
 		
 		
 	<target name="_build-jar" depends="_compile-java, _build-hbm, _build-manifest, _copy-language">
@@ -120,24 +112,9 @@
 			<transaction src="${db.scripts}/create_notebook_tables.sql"/>
 			<!-- Create tables for Presence Chat Service -->
 			<transaction src="${db.scripts}/create_presence_chat_tables.sql"/>
-			<!-- Test the scripts for translations -->
-            <!-- <transaction src="${db.scripts}/shaun/all.sql"/> -->
 		</sql>
 	</target>
-
-
-	<target name="_build-db-test">
-		<!-- Internal target: Inserts test data to database -->
-		<echo>${ant.project.name}: Inserting test data to database</echo>
-		<antcall target="_db-script">
-		    <param name="sql.script" value="${db.scripts}/insert_test_data.sql"/>
-		</antcall>
-	</target>
-	
-	
-	<target name="test-report" depends="_build-db-test, build_base.test-report"
-	        description="Runs JUnit tests and generates report." />
-
+				
 
 	<target name="deploy-war" depends="_target-not-available"
 		    description="Deploys WAR." />

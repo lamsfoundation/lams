@@ -1,48 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="LAMS Tool Multiple Choice" basedir="."> 
+<project name="LAMS Tool Multiple Choice" basedir=".">
+	
 	<import file="../lams_build/build_tools_base.xml"/>
 	
-	<!-- This does not seem to work at all, but leave it for future reference -->
-	<target name="test-report" depends="_compile-test, _build-hbm"
-		    description="Tool custom test suite."> 
-		<copy file="${conf.webinf.dir}/web.xml" todir="${testwebinf}" overwrite="true"/>		
-		<copy file="${conf.webinf.dir}/struts-config.xml" todir="${testwebinf}" overwrite="true"/>			
-		<copy file="${conf.webinf.dir}/tiles-defs.xml" todir="${testwebinf}" overwrite="true"/>			
-		<copy overwrite="yes" todir="${build.classes.test}/org/lamsfoundation/lams/tool/mc/">
-						<fileset dir="${src.test.dir}/org/lamsfoundation/lams/tool/mc/">
-								<include name="*.xml"/>
-								<include name="*.properties"/>
-			   				    <exclude name="web.xml"/>
-						</fileset>
-		</copy>						
-		
-		<junit printsummary="yes"
-		       haltonerror="no"
-			   haltonfailure="no"
-			   fork="yes">
-			<formatter type="plain" usefile="false"/>
-			<formatter type="xml"/>
-			<batchtest todir="${build.report}">
-				<fileset dir="${src.test.dir}">
-					<include name="**/TestMcContent.java"/>
-				</fileset>
-			</batchtest>
-			<classpath>
-				<pathelement location="${build.classes.test}"/>
-				<pathelement location="${testweb}"/>
-				<path refid="logging.classpath"/>	
-				<path refid="project.classes.classpath" />
-			</classpath>
-		</junit>
-		
-		<junitreport todir="${build.report}"> 
-			<fileset dir="${build.report}">
-				<include name="TEST-*.xml"/>
-			</fileset>
-			<report todir="${build.report}/html"/> 
-		</junitreport>
-
-	</target>
-
 </project>

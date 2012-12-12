@@ -69,7 +69,6 @@
 		explode-war             --> Unpacks WAR in EAR
 		explode-war-synchronize --> Updates web content in exploded WAR
 		explode-war-delete      --> Removes exploded WAR
-		test-report             --> Runs JUnit tests and generates report
 		</echo>	
 	</target>
 	
@@ -98,9 +97,6 @@
 				
 		<echo>${ant.project.name}: Creating build dir structure</echo>
 		<mkdir dir="${build.classes.java}" />
-		<mkdir dir="${build.classes.test}" />
-		<mkdir dir="${build.report}"/>
-		<mkdir dir="${build.report}/html"/> 
 		<mkdir dir="${build.lib}" />
 		<mkdir dir="${build.deploy}" />
 		<mkdir dir="${build.deploy.sql}" />
@@ -162,27 +158,7 @@
 			</fileset>
 		</copy>
 	</target>
-	
-	
-	<target name="_compile-test" depends="_compile-java">
-		<!-- Internal target: Compile test Java sources. -->
-		<javac srcdir="${src.test.dir}"
-			   compiler="modern"
-			   source="1.5"
-	           debug="on"
-			   debuglevel="lines,vars,source"
-			   destdir="${build.classes.test}"
-			   classpathref="product.classpath" />
-			
-		<copy todir="${build.classes.test}" overwrite="true" verbose="true">
-			<fileset dir="${src.test.dir}">
-				<include name="**/*.xml" />
-				<include name="**/*.zip" />
-				<include name="**/*.txt"/>
-			</fileset>
-		</copy>
-	</target>
-	
+
 	<!-- =================================================================== -->
 	<!-- XDoclet tasks			                             				 -->
 	<!-- =================================================================== -->
@@ -395,73 +371,6 @@
 		<delete file="${jboss.deploy}/temp-${product}.war" quiet="true" />
 	</target>
 	
-	<!-- =================================================================== -->
-	<!-- Tests                                                     	 		 -->
-	<!-- =================================================================== -->
-	
-    <target name="_selenium-start">
-    	<!-- Internal target: Starts Selenium server. -->
-    	<echo>${ant.project.name}: Starting Selenium server</echo>
-        <java jar="${sharedlib}/selenium/selenium-server.jar" fork="true" spawn="true">
-            <arg line="-timeout 30" />
-        	<arg line="-port ${selenium.server.port}" />
-        	<arg line="-userExtensions ${sharedlib}/selenium/user-extensions.js" />
-        </java>
-
-        <waitfor maxwait="30" maxwaitunit="second">
-            <and>
-                 <socket server="localhost" port="${selenium.server.port}"/>
-                 <!-- this url will 403, so we say that it should start counting errors at 404 to skip -->
-                 <http url="http://localhost:${selenium.server.port}/" errorsBeginAt="404"/>
-            </and>
-        </waitfor>        	
-    </target>
-	
-	
-	<target name="_selenium-stop">
-		<!-- Internal target: Stops Selenium server. -->
-		<echo>${ant.project.name}: Stopping Selenium server</echo>
-		<get taskname="selenium-shutdown"
-	    	 src="http://localhost:${selenium.server.port}/selenium-server/driver/?cmd=shutDown"
-	         dest="${build.report}/selenium_result.txt"
-			 ignoreerrors="true" />
-    </target>
-	
-	
-	<target name="test-report" depends="_compile-test" description="Runs JUnit tests and generates report.">
-		<junit printsummary="yes"
-			   haltonerror="no"
-		       haltonfailure="no"
-		       errorProperty="test.failed"
-			   failureProperty="test.failed"
-			   fork="yes">
-			<!--
-			<jvmarg value="-Xms512M" />
-			<jvmarg value="-Xmx1024M" />
-			-->
-			<formatter type="plain" usefile="false" />
-			<formatter type="xml" />
-			<batchtest todir="${build.report}">
-				<fileset dir="${src.test.dir}">
-					<include name="**/*" />
-				</fileset>
-			</batchtest>
-			<classpath>
-				<pathelement location="${build.classes.test}" />
-				<pathelement location="${conf.dir}" />
-				<pathelement location="${jboss.home}lib/javassist.jar" />
-				<path refid="logging.classpath"/>	
-				<path refid="product.classpath" />
-			</classpath>
-		</junit>
-		
-		<junitreport todir="${build.report}">
-			<fileset dir="${build.report}">
-				<include name="TEST-*.xml" />
-			</fileset>
-			<report todir="${build.report}/html" />
-		</junitreport>
-	</target>
 	
 	<!-- =================================================================== -->
 	<!-- JSP precompilation                                   				 -->

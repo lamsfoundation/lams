@@ -59,8 +59,4 @@
 	
 	<target name="explode-war-delete" depends="_target-not-available" 
 		    description="Deletes exploded WAR folder." />
-	
-		
-	<target name="test-report" depends="_target-not-available" 
-		    description="Runs JUnit tests and generates report." />
 </project>

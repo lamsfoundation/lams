@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="LAMS Tool Spreadsheet" basedir="."> 
+<project name="LAMS Tool Spreadsheet" basedir=".">
+
 	<import file="../lams_build/build_tools_base.xml"/>
-	
-	<!-- Below are Tool specifc targets and targets overriding ones from the imported base file. -->
-	<target name="test-report" depends="_target-not-available"
-			description="Runs JUnit tests and generates report." />
-	
+
 </project>

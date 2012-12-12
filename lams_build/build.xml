@@ -27,7 +27,6 @@
 		deploy-learning-libraries --> Deploys complex Tools
 		lams-cruise               --> Runs full LAMS redeployment
 		lams-cruise-min-tools     --> Runs full LAMS redeployment with minimal Tools set
-		test-report               --> Runs tests in all LAMS projects
 		slim-jboss                --> Removes unused JBoss files
 		slim-jboss-revert         --> Puts back JBoss files removed in slimming process
 			
@@ -488,29 +487,6 @@
 	<!-- cruise control task : build lams without tools -->
 	<target name="lams-cruise-min-tools" depends="_build-ear, build-db, deploy-ear, _deploy-resources, deploy-tools-minimal"
 	        description="Builds entire LAMS without tools (used for CruiseControl instance)" />
-
-	
-	<target name="test-report" description="Run all test cases across the system. Takes a long time.">
-		<echo>Running tests in all LAMS projects</echo>
-		<!-- Core projects first -->
- 		<ant antfile="../${lams_common}/build.xml" target="test-report" inheritAll="false"/>
- 		<ant antfile="../${lams_contentrepository}/build.xml" target="test-report" inheritAll="false"/>
-		<ant antfile="../${lams_central}/build.xml" target="test-report" inheritAll="false"/>
- 		<!-- <ant antfile="../${tool_survey_dir}/build.xml" target="build-db" inheritAll="false"/> 
-	         <ant antfile="../${tool_survey_dir}/build.xml" target="build-jar" inheritAll="false"/>  -->
-		<ant antfile="../${lams_monitoring}/build.xml" target="test-report" inheritAll="false"/> 
- 		<ant antfile="../${lams_learning}/build.xml" target="test-report" inheritAll="false"/> 
-
-		<!--  Now the tools
-		    <ant antfile="../${lams_common}/build.xml" target="insert-test-data" inheritAll="false"/>
-			<ant antfile="../${tool_forum_dir}/build.xml" target="test-report" inheritAll="false"/>
-			<ant antfile="../${tool_imscp_dir}/build.xml" target="test-report" inheritAll="false"/>
-			<ant antfile="../${tool_laqa_dir}/build.xml" target="test-report" inheritAll="false"/>
-			<ant antfile="../${tool_lanb_dir}/build.xml" target="test-report" inheritAll="false"/>
-			<ant antfile="../${tool_sbmt_dir}/build.xml" target="test-report" inheritAll="false"/>
-			<ant antfile="../${tool_survey_dir}/build.xml" target="test-report" inheritAll="false"/>
-		-->
-	</target>
 	
 	
 	<target name="slim-jboss" description="Makes a backup and removes unnecessary files from JBoss 5.1; do not run twice!">
