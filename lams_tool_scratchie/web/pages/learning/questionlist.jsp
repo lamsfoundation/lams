@@ -55,7 +55,7 @@
 					
 		</c:forEach>
 
-		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and !sessionMap.isShowResultsPage}">
+		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and (!sessionMap.isShowResultsPage or (mode == 'teacher'))}">
 			<div class="small-space-top">
 				<h2>
 					${sessionMap.reflectInstructions}
