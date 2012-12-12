@@ -1446,6 +1446,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		if (parentActivity != null) {
 			newActivity.setParentActivity(parentActivity);
 			newActivity.setParentUIID(parentActivity.getActivityUIID());
+			((ComplexActivity)parentActivity).getActivities().add(newActivity);
 		}
 
 		if (!(newActivity.isFloatingActivity() && newLearningDesign
