@@ -321,8 +321,9 @@ public class GradebookUtil {
 	    throw new IllegalArgumentException("[" + view + "] is not a legal gradebook view");
     }
 
-    public static void exportGradebookLessonToExcel(OutputStream out, String dateHeader,
-	    LinkedHashMap<String, ExcelCell[][]> dataToExport) throws IOException {
+    public static void exportGradebookLessonToExcel(OutputStream out,
+	    LinkedHashMap<String, ExcelCell[][]> dataToExport, String dateHeader, boolean displaySheetTitle)
+	    throws IOException {
 	Workbook workbook = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
 	
 	boldStyle = workbook.createCellStyle();
@@ -333,7 +334,8 @@ public class GradebookUtil {
 	int i = 0;
 	for (String sheetName : dataToExport.keySet()) {
 	    if (dataToExport.get(sheetName) != null) {
-		createSheet(workbook, sheetName, sheetName, i, dateHeader, dataToExport.get(sheetName));
+		String sheetTitle = (displaySheetTitle) ? sheetName : null; 
+		createSheet(workbook, sheetName, sheetTitle, i, dateHeader, dataToExport.get(sheetName));
 		i++;
 	    }
 	}
@@ -365,7 +367,11 @@ public class GradebookUtil {
 	if (data != null) {
 	    // Print data
 	    for (int rowIndex = 0; rowIndex < data.length; rowIndex++) {
-		Row row = sheet.createRow(rowIndex + 4);
+		
+		//in case there is a sheet title or dateHeader available start from 4th row
+		int rowIndexOffset = (StringUtils.isBlank(sheetTitle) && StringUtils.isBlank(dateHeader)) ? 0 : 4;
+		
+		Row row = sheet.createRow(rowIndex + rowIndexOffset);
 		
 		for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++) {
 		    ExcelCell excelCell = data[rowIndex][columnIndex];

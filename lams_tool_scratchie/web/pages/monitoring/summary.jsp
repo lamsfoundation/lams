@@ -4,6 +4,11 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="scratchie" value="${sessionMap.scratchie}"/>
 
+<style media="screen,projection" type="text/css">
+	#user-dropdown-div {padding-left: 30px; margin-top: -5px; margin-bottom: 50px;}
+	.bottom-buttons {margin: 20px 20px 0px; padding-bottom: 20px;}
+</style>
+
 <script type="text/javascript">
 	<!--	
 	$(document).ready(function(){
@@ -53,19 +58,19 @@
 			
 		</c:forEach>
 
-		$("#itemUid").change(function() {
+		$("#item-uid").change(function() {
 			var itemUid = $(this).val();
 			if (itemUid != -1) {
 				var itemSummaryUrl = '<c:url value="/monitoring/itemSummary.do?sessionMapID=${sessionMapID}"/>';
 				var itemSummaryHref = itemSummaryUrl + "&itemUid=" + itemUid + "&KeepThis=true&TB_iframe=true&height=400&width=650";
-				$("#itemSummaryHref").attr("href", itemSummaryHref);	
+				$("#item-summary-href").attr("href", itemSummaryHref);	
 
 				//return;
-				$("#itemSummaryHref").click(); 		 
+				$("#item-summary-href").click(); 		 
 			}
 	    });
 		
-		$("#userIdDropdown").change(function() {
+		$("#userid-dropdown").change(function() {
 			var userId = $(this).val();
 			
 			if (userId != -1) {
@@ -76,6 +81,10 @@
 			}
 	    });
 	});
+	
+	function exportExcel(){
+		location.href = "<c:url value='/monitoring/exportExcel.do'/>?sessionMapID=${sessionMapID}&reqID=" + (new Date()).getTime();
+	};
 
 	function resizeIframe() {
 		if (document.getElementById('TB_iframeContent') != null) {
@@ -133,14 +142,14 @@
 		
 		<div style="padding-left: 30px; margin-top: -5px; margin-bottom: 25px;">
 
-			<select id="itemUid" style="float: left">
+			<select id="item-uid" style="float: left">
 				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
     			<c:forEach var="item" items="${scratchie.scratchieItems}">
 					<option value="${item.uid}">${item.title}</option>
 			   	</c:forEach>
 			</select>
 			
-			<a href="#nogo" class="thickbox" id="itemSummaryHref" style="display: none;"></a>
+			<a href="#nogo" class="thickbox" id="item-summary-href" style="display: none;"></a>
 		</div>
 		
 		<!-- Dropdown menu for choosing user -->
@@ -149,20 +158,21 @@
 			<H1><fmt:message key="label.monitoring.summary.report.by.user" /></H1>
 		</div>
 		
-		<div style="padding-left: 30px; margin-top: -5px; margin-bottom: 25px;">
+		<div id="user-dropdown-div">
 
-			<select id="userIdDropdown" style="float: left">
+			<select id="userid-dropdown" class="float-left">
 				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
     			<c:forEach var="learner" items="${sessionMap.learners}">
 					<option value="${learner.userId}" alt="${learner.session.sessionId}">${learner.firstName} ${learner.lastName}</option>
 			   	</c:forEach>
 			</select>
-			
-			<a href="#nogo" id="userSummaryHref" style="display: none;"></a>
 		</div>
 		
-		<div style="margin: 50px 20px 0px; padding-bottom: 20px;">
-			<a href="<c:url value='/monitoring/manageLeaders.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=400&width=650" class="button thickbox" style="float: right;" <fmt:message key="label.manage.leaders" />>
+		<div class="bottom-buttons">
+			<html:link href="javascript:exportExcel();" styleClass="button float-right space-left">
+				<fmt:message key="label.export.excel" />
+			</html:link>
+			<a href="<c:url value='/monitoring/manageLeaders.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=400&width=650" class="float-right button thickbox" <fmt:message key="label.manage.leaders" />>
 				<fmt:message key="label.manage.leaders" />
 			</a>
 		</div>

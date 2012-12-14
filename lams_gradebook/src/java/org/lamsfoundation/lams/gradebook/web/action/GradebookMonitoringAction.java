@@ -327,8 +327,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	fileDownloadTokenCookie.setPath("/");
 	response.addCookie(fileDownloadTokenCookie);
 
-	GradebookUtil.exportGradebookLessonToExcel(out, gradebookService.getMessage("gradebook.export.dateheader"),
-		dataToExport);
+	GradebookUtil.exportGradebookLessonToExcel(out, dataToExport,
+		gradebookService.getMessage("gradebook.export.dateheader"), true);
 
 	return null;
     }
@@ -369,8 +369,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	
 	//Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
-	GradebookUtil.exportGradebookLessonToExcel(out, gradebookService.getMessage("gradebook.export.dateheader"),
-		dataToExport);
+	GradebookUtil.exportGradebookLessonToExcel(out, dataToExport,
+		gradebookService.getMessage("gradebook.export.dateheader"), true);
 
 	return null;
     }

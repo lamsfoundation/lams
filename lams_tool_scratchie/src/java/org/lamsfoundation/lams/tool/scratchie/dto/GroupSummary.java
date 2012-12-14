@@ -35,6 +35,7 @@ public class GroupSummary {
     private String sessionName;
 
     private Collection<ScratchieUser> users;
+    private Collection<ScratchieItem> items;
     private Collection<ScratchieAnswer> answers;
 
     /**
@@ -69,6 +70,14 @@ public class GroupSummary {
 
     public Collection<ScratchieUser> getUsers() {
 	return users;
+    }
+
+    public void setItems(Collection<ScratchieItem> items) {
+	this.items = items;
+    }
+    
+    public Collection<ScratchieItem> getItems() {
+	return items;
     }
 
     public void setUsers(Collection<ScratchieUser> users) {

@@ -24,12 +24,14 @@
 package org.lamsfoundation.lams.tool.scratchie.service;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.gradebook.dto.ExcelCell;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
@@ -244,6 +246,14 @@ public interface IScratchieService {
     List<GroupSummary> getMonitoringSummary(Long contentId);
     
     List<GroupSummary> getQuestionSummary(Long contentId, Long itemUid);
+    
+    /**
+     * Export excel spreadheet
+     * 
+     * @param scratchie
+     * @return
+     */
+    LinkedHashMap<String, ExcelCell[][]> exportExcel(Long contentId);
 
     /**
      * Get scratchie item <code>Summary</code> list according to sessionId and skipHide flag.
@@ -309,11 +319,9 @@ public interface IScratchieService {
      * 
      * @param key
      *                key of the message
-     * @param args
-     *                arguments for the message
      * @return message content
      */
-    String getLocalisedMessage(String key, Object[] args);
+    String getMessage(String key);
 
     /**
      * Finds out which lesson the given tool content belongs to and returns its monitoring users.
