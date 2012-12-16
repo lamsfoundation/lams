@@ -7,6 +7,7 @@
 <style media="screen,projection" type="text/css">
 	#user-dropdown-div {padding-left: 30px; margin-top: -5px; margin-bottom: 50px;}
 	.bottom-buttons {margin: 20px 20px 0px; padding-bottom: 20px;}
+	.section-header {padding-left: 20px; margin-bottom: 15px; margin-top: 60px;}
 </style>
 
 <script type="text/javascript">
@@ -154,7 +155,7 @@
 		
 		<!-- Dropdown menu for choosing user -->
 		
-		<div style="padding-left: 20px; margin-bottom: 15px; margin-top: 60px;">
+		<div class="section-header">
 			<H1><fmt:message key="label.monitoring.summary.report.by.user" /></H1>
 		</div>
 		
@@ -167,6 +168,30 @@
 			   	</c:forEach>
 			</select>
 		</div>
+		
+		<!-- Display reflection entries -->
+		
+		<c:if test="${sessionMap.reflectOn}">
+		
+			<div class="section-header">
+				<H1><fmt:message key="label.learners.feedback" /></H1>
+			</div>
+		
+			<c:forEach var="reflectDTO" items="${sessionMap.reflections}">
+				<div style="padding-left: 30px;">
+					<b>
+						${reflectDTO.fullName}
+					</b>
+					
+					<c:if test="${reflectDTO.groupLeader}">
+						(<fmt:message key="label.monitoring.team.leader" />)
+					</c:if>
+					
+					: <lams:out value="${reflectDTO.reflection}" escapeHtml="true" />
+				</div>
+			</c:forEach>
+			
+		</c:if>
 		
 		<div class="bottom-buttons">
 			<html:link href="javascript:exportExcel();" styleClass="button float-right space-left">

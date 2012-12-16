@@ -746,7 +746,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    for (ScratchieUser user : users) {
 		NotebookEntry notebookEntry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 			ScratchieConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		if (notebookEntry != null) {
+		if ((notebookEntry != null) && StringUtils.isNotBlank(notebookEntry.getEntry())) {
 		    ReflectDTO reflectDTO = new ReflectDTO(notebookEntry.getUser());
 		    reflectDTO.setReflection(notebookEntry.getEntry());
 		    reflectDTO.setIsGroupLeader(user.isLeader());

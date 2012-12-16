@@ -23,15 +23,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.scratchie.dao.hibernate;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.lamsfoundation.lams.tool.scratchie.dao.ScratchieAnswerVisitDAO;
-import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 
 public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implements ScratchieAnswerVisitDAO {
 

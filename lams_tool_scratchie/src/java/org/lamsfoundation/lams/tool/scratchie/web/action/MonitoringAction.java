@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.scratchie.web.action;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -80,9 +81,6 @@ public class MonitoringAction extends Action {
 	if (param.equals("saveLeaders")) {
 	    return saveLeaders(mapping, form, request, response);
 	}
-	if (param.equals("viewReflection")) {
-	    return viewReflection(mapping, form, request, response);
-	}
 	if (param.equals("exportExcel")) {
 	    return exportExcel(mapping, form, request, response);
 	}
@@ -115,6 +113,14 @@ public class MonitoringAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
+	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ON, scratchie.isReflectOnActivity());
+
+	// Create reflectList if reflection is enabled.
+	if (scratchie.isReflectOnActivity()) {
+	    
+	    List<ReflectDTO> reflections = service.getReflectionList(contentId);
+	    sessionMap.put(ScratchieConstants.ATTR_REFLECTIONS, reflections);
+	}
 
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
@@ -192,17 +198,6 @@ public class MonitoringAction extends Action {
 
 	ScratchieSession session = service.getScratchieSessionBySessionId(sessionID);
 
-	ReflectDTO refDTO = new ReflectDTO(user);
-	if (notebookEntry == null) {
-	    refDTO.setFinishReflection(false);
-	    refDTO.setReflect(null);
-	} else {
-	    refDTO.setFinishReflection(true);
-	    refDTO.setReflect(notebookEntry.getEntry());
-	}
-	refDTO.setReflectInstrctions(session.getScratchie().getReflectInstructions());
-
-	request.setAttribute("userDTO", refDTO);
 	return mapping.findForward("success");
     }
 

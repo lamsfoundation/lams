@@ -1,32 +1,19 @@
 package org.lamsfoundation.lams.tool.scratchie.dto;
 
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * 
  * @author Andrey Balan
  */
 public class ReflectDTO {
-    private Long userUid;
     private String fullName;
-    private String loginName;
-    private boolean hasRefection;
-    private String reflectInstrctions;
-    private boolean finishReflection;
-    private String reflect;
+    private boolean isGroupLeader;
+    
+    private String reflection;
 
-    public ReflectDTO(ScratchieUser user) {
-	this.setLoginName(user.getLoginName());
+    public ReflectDTO(User user) {
 	this.setFullName(user.getFirstName() + " " + user.getLastName());
-	this.setUserUid(user.getUid());
-    }
-
-    public boolean isFinishReflection() {
-	return finishReflection;
-    }
-
-    public void setFinishReflection(boolean finishReflection) {
-	this.finishReflection = finishReflection;
     }
 
     public String getFullName() {
@@ -36,44 +23,20 @@ public class ReflectDTO {
     public void setFullName(String fullName) {
 	this.fullName = fullName;
     }
-
-    public boolean isHasRefection() {
-	return hasRefection;
+    
+    public boolean isGroupLeader() {
+	return isGroupLeader;
     }
 
-    public void setHasRefection(boolean hasRefection) {
-	this.hasRefection = hasRefection;
+    public void setIsGroupLeader(boolean isGroupLeader) {
+	this.isGroupLeader = isGroupLeader;
+    }
+    
+    public String getReflection() {
+	return reflection;
     }
 
-    public String getLoginName() {
-	return loginName;
-    }
-
-    public void setLoginName(String loginName) {
-	this.loginName = loginName;
-    }
-
-    public String getReflect() {
-	return reflect;
-    }
-
-    public void setReflect(String reflect) {
-	this.reflect = reflect;
-    }
-
-    public String getReflectInstrctions() {
-	return reflectInstrctions;
-    }
-
-    public void setReflectInstrctions(String reflectInstrctions) {
-	this.reflectInstrctions = reflectInstrctions;
-    }
-
-    public Long getUserUid() {
-	return userUid;
-    }
-
-    public void setUserUid(Long userUid) {
-	this.userUid = userUid;
+    public void setReflection(String reflection) {
+	this.reflection = reflection;
     }
 }

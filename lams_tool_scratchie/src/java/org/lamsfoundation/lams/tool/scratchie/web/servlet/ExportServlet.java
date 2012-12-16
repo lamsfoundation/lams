@@ -28,7 +28,6 @@ package org.lamsfoundation.lams.tool.scratchie.web.servlet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -39,12 +38,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
-import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
@@ -52,15 +48,12 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.service.ScratchieApplicationException;
 import org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceProxy;
-import org.lamsfoundation.lams.tool.scratchie.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieBundler;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Export portfolio servlet to export all scratchie into offline HTML package.
@@ -179,19 +172,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	// Add flag to indicate whether to render user notebook entries
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, content);
-
-	// Create reflectList if reflection is enabled.
-	if (content.isReflectOnActivity()) {
-	    // Create reflectList, need to follow same structure used in teacher
-	    // see service.getReflectList();
-	    Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
-	    Set<ReflectDTO> reflectDTOSet = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
-	    reflectDTOSet.add(getReflectionEntry(learner));
-	    map.put(toolSessionID, reflectDTOSet);
-
-	    // Add reflectList to sessionMap
-	    sessionMap.put(ScratchieConstants.ATTR_REFLECT_LIST, map);
-	}
     }
 
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName,
@@ -223,38 +203,5 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	sessionMap.put(ScratchieConstants.PAGE_EDITABLE, content.isContentInUse());
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, content);
 	sessionMap.put(ScratchieConstants.ATTR_TOOL_CONTENT_ID, toolContentID);
-
-	// Add flag to indicate whether to render user notebook entries
-	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
-
-	// Create reflectList if reflection is enabled.
-	if (content.isReflectOnActivity()) {
-	    Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(content.getContentId(), true);
-	    // Add reflectList to sessionMap
-	    sessionMap.put(ScratchieConstants.ATTR_REFLECT_LIST, reflectList);
-	}
-    }
-
-    private ScratchieToolContentHandler getToolContentHandler() {
-	if (handler == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this
-		    .getServletContext());
-	    handler = (ScratchieToolContentHandler) wac.getBean(ScratchieConstants.TOOL_CONTENT_HANDLER_NAME);
-	}
-	return handler;
-    }
-
-    private ReflectDTO getReflectionEntry(ScratchieUser scratchieUser) {
-	ReflectDTO reflectDTO = new ReflectDTO(scratchieUser);
-	NotebookEntry notebookEntry = service.getEntry(scratchieUser.getSession().getSessionId(),
-		CoreNotebookConstants.NOTEBOOK_TOOL, ScratchieConstants.TOOL_SIGNATURE, scratchieUser.getUserId()
-			.intValue());
-
-	// check notebookEntry is not null
-	if (notebookEntry != null) {
-	    reflectDTO.setReflect(notebookEntry.getEntry());
-	    logger.debug("Could not find notebookEntry for ScratchieUser: " + scratchieUser.getUid());
-	}
-	return reflectDTO;
     }
 }
