@@ -90,7 +90,6 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAttachment;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
-import org.lamsfoundation.lams.tool.scratchie.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
@@ -734,34 +733,31 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
-	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
+    public List<ReflectDTO> getReflectionList(Long contentId) {
+	
+	ArrayList<ReflectDTO> reflections = new ArrayList<ReflectDTO>();
 
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
 	for (ScratchieSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
-	    boolean hasRefection = session.getScratchie().isReflectOnActivity();
-	    Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
-	    // get all users in this session
+	    
 	    List<ScratchieUser> users = scratchieUserDao.getBySessionID(sessionId);
+	    
 	    for (ScratchieUser user : users) {
-		ReflectDTO ref = new ReflectDTO(user);
+		NotebookEntry notebookEntry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+			ScratchieConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+		if (notebookEntry != null) {
+		    ReflectDTO reflectDTO = new ReflectDTO(notebookEntry.getUser());
+		    reflectDTO.setReflection(notebookEntry.getEntry());
+		    reflectDTO.setIsGroupLeader(user.isLeader());
 
-		if (setEntry) {
-		    NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			    ScratchieConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		    if (entry != null) {
-			ref.setReflect(entry.getEntry());
-		    }
+		    reflections.add(reflectDTO);
 		}
-
-		ref.setHasRefection(hasRefection);
-		list.add(ref);
 	    }
-	    map.put(sessionId, list);
+	    
 	}
 
-	return map;
+	return reflections;
     }
 
     @Override

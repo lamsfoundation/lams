@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.scratchie.service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,9 +39,8 @@ import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.Summary;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAttachment;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -264,9 +264,9 @@ public interface IScratchieService {
      *                scratchie item
      * @return
      */
-    public List<Summary> exportBySessionId(Long sessionId);
+    List<Summary> exportBySessionId(Long sessionId);
 
-    public List<List<Summary>> exportByContentId(Long contentId);
+    List<List<Summary>> exportByContentId(Long contentId);
 
     /**
      * Create refection entry into notebook tool.
@@ -277,7 +277,7 @@ public interface IScratchieService {
      * @param userId
      * @param entryText
      */
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
+    Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText);
 
     /**
@@ -289,20 +289,20 @@ public interface IScratchieService {
      * @param userID
      * @return
      */
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
+    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 
     /**
      * @param notebookEntry
      */
-    public void updateEntry(NotebookEntry notebookEntry);
+    void updateEntry(NotebookEntry notebookEntry);
 
     /**
-     * Get Reflect DTO list grouped by sessionID.
+     * Get Reflection list grouped by sessionID.
      * 
      * @param contentId
      * @return
      */
-    Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
+    List<ReflectDTO> getReflectionList(Long contentId);
 
     /**
      * Get user by UID
@@ -312,7 +312,7 @@ public interface IScratchieService {
      */
     ScratchieUser getUser(Long uid);
 
-    public IEventNotificationService getEventNotificationService();
+    IEventNotificationService getEventNotificationService();
 
     /**
      * Gets a message from scratchie bundle. Same as <code><fmt:message></code> in JSP pages.
@@ -330,7 +330,7 @@ public interface IScratchieService {
      *                tool session ID
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
-    public List<User> getMonitorsByToolSessionId(Long sessionId);
+    List<User> getMonitorsByToolSessionId(Long sessionId);
     
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
