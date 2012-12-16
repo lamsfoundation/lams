@@ -154,6 +154,12 @@ public class LearningAction extends Action {
 	//in case user joins the lesson after leader has scratched some answers already - we need to make sure he has the same scratches as leader 
 	if (!mode.isTeacher()) {
 	    service.copyScratchesFromLeader(user, groupLeader);
+	    
+	    //if user joins a lesson after leader has already finished an activity set his scratchingFinished parameter to true
+	    if (groupLeader.isScratchingFinished()) {
+		user.setScratchingFinished(true);
+		service.saveUser(user);
+	    }
 	}
 	
 	// initial Session Map
@@ -365,7 +371,6 @@ public class LearningAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 
 	IScratchieService service = getScratchieService();
 	Long userId = (Long) sessionMap.get(ScratchieConstants.ATTR_USER_ID);
