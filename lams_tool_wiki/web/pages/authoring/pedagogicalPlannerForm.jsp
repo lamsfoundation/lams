@@ -19,7 +19,7 @@
 	<script type="text/javascript">
 	function prepareFormData(){
 		//CKeditor content is not submitted when sending by jQuery; we need to do this
-		var content = CKEDITOR.instances('wikiBody').getData();
+		var content = CKEDITOR.instances["wikiBody"].getData();
 		document.getElementById("wikiBody").value=content;
 	}
 	</script>
