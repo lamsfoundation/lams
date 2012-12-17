@@ -46,6 +46,7 @@
 	}
 	//The panel of imageGallery list panel
 	var imageGalleryListTargetDiv = "imageGalleryListArea";
+	
 	function deleteItem(idx,sessionMapID){
 
 		var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");

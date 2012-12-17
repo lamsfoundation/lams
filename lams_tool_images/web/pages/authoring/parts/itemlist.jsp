@@ -1,12 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="ctxPath" value="${pageContext.request.contextPath}"
-	scope="request" />
-
+<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
-
 
 <div id="itemList" >
 	<h2 class="spacer-left">
@@ -83,22 +80,10 @@
 <script lang="javascript">
 	if(window.top != null){
 		window.top.hideMessage();
-		//alert(window.top != null);
 		var obj = window.top.document.getElementById('imageGalleryListArea');
-		//alert(obj.innerHTML);
 		obj.innerHTML= document.getElementById("itemList").innerHTML;
-		//alert(obj.innerHTML);
-
-		//var reourceInputArea = window.top.document.getElementById("reourceInputArea");
-		//document.getElementById('check').;
-		//alert(obj.innerHTML);
-		//alert(reourceInputArea);
-		//if (reourceInputArea.style.display=="block") {
-			//initLytebox();
-		//}
-
-	} else {
-		alert("ss");
-		initLytebox();
+		
+		//call it from parent window as this one was just hidden
+		window.top.initLytebox();
 	}
 </script>
