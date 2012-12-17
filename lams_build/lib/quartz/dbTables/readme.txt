@@ -1,1 +1,0 @@
-Quartz 1.5.2 persist table for various database. So far, LAMS 1.1 just use mysql database. Please change relative table definition in lams_common/db/create_lams_11_table if adopting different database in the future.

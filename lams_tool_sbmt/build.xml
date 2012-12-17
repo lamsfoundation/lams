@@ -1,33 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="LAMS Tool Submit Files" basedir="."> 
+<project name="LAMS Tool Submit Files" basedir=".">
+	
 	<import file="../lams_build/build_tools_base.xml"/>
 	
-	<!-- This is probably obsolete but left for future reference -->
-	<target name="_schema-middlegen"
-		    description="Generates Hibernate hbm.xml files from Java sources using Middlegen.">
-		<taskdef name="middlegen" classname="middlegen.MiddlegenTask" classpathref="libs.classpath" />
-		
-		<middlegen appname="lams_tool_${tool.short.name}" 
-				   prefsdir="${conf.middlegen.dir}"
-				   gui="${middlegen.gui}"
-				   databaseurl="${db.url.build}"
-				   driver="${db.driver}"
-				   username="${db.username}"
-				   password="${db.password}"
-				   includeViews="false"
-		>
-
-			<hibernate destination="${conf.hibernate.mapping.dir}"
-					   package="${product.path.filesystem}" 
-					   genXDocletTags="true"
-					   javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
-			/>
-			
-			<table name="tl_lasbmt11_content"/>
-			<table name="tl_lasbmt11_report"/>
-			<table name="tl_lasbmt11_session"/>
-			<table name="tl_lasbmt11_submission_details"/>
-		</middlegen>
-	</target>
 </project>

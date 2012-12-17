@@ -130,49 +130,4 @@
 	
 	<target name="explode-war-synchronize" depends="_target-not-available"
 		    description="Copies web files into exploded WAR folder." />
-	
-	
-	<!-- This target seems obsolete but left for future reference.
-	<target 
-      name="middlegen-learningdesign" 
-      description="Run Middlegen For LearningDesign" 
-      unless="middlegen.skip"
-      depends="init,fail-if-no-xdoclet-1.2.x,check-driver-present,panic-if-driver-not-present"
-    >
-		<taskdef
-         name="middlegen-learningdesign"
-         classname="middlegen.MiddlegenTask"
-         classpathref="all-libs"
-        />
-
-		<middlegen-learningdesign
-         appname="learningdesign"
-         prefsdir="${middlegen}"
-         gui="${middlegen.gui}"
-         databaseurl="${db.url.build}"
-         driver="${db.driver}"
-         username="${db.username}"
-         password="${db.password}"
-         schema="${db.schema}"
-         catalog="${db.catalog}"
-         includeViews="false"
-        >
-
-			<hibernate 
-			destination="${conf.hibernate.mapping.dir}"
-			package="${package.learningdesign.name}"
-            genXDocletTags="true"
-            javaTypeMapper="middlegen.plugins.hibernate.HibernateJavaTypeMapper"
-            />
-
-			<table name="lams_learning_activity"/>
-			<table name="lams_learning_design"/>
-			<table name="lams_learning_library"/>
-			<table name="lams_learning_transition"/>
-			<table name="lams_group"/>
-			<table name="lams_grouping"/>
-
-		</middlegen-learningdesign>
-	</target>
-	-->
 </project>

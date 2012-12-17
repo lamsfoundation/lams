@@ -22,7 +22,13 @@
 			<include name="**/*.jar" />
 		</fileset>
 		<fileset dir="${j2eelibs}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${jbosslibs}">
 			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${jbossweblibs}">
+			<include name="*.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->
 		<fileset dir="lib" erroronmissingdir="false">
