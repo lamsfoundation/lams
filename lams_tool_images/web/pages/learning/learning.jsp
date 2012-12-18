@@ -81,7 +81,7 @@
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.MetaData.js'/>"></script>
  	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.rating.1.1.js'/>"></script>
  	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
- 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>	
+ 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>	
  	
 	<script type="text/javascript">
 	
