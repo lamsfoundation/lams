@@ -242,6 +242,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     public static final String PARAM_REQUEST_SRC = "requestSrc";
     public static final String PARAM_NOTIFY_CLOSE_URL = "notifyCloseURL";
     public static final String PARAM_FORBID_BUTTONS = "forbidButtons";
+    public static final String PARAM_RETURN_TO_PARENT = "returnToParent";
     
     // Template copy mode values
     public static final String COPY_MODE_EDIT_CURRENT = "editCurrent";
@@ -433,10 +434,14 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		boolean isEditor = canEditNode(request, nodeUid);
 		Integer nodePermissions = node.getPermissions();
 		planner.setPermissions(nodePermissions, isEditor);
-		
-		// set it here rather than in JSP page
-		if (StringUtils.isBlank(node.getFullDescription())) {
-		    planner.setNodeUid(node.getParent().getUid());
+
+		boolean returnToParent = WebUtil.readBooleanParam(request, PARAM_RETURN_TO_PARENT, false);
+		// after editing the node, should user return to parent or to current node
+		if (returnToParent) {
+		    // if parent is null, do not set anything and user will return to root node
+		    if (node.getParent() != null) {
+			planner.setNodeUid(node.getParent().getUid());
+		    }
 		} else {
 		    planner.setNodeUid(node.getUid());
 		}
