@@ -84,46 +84,50 @@
  	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>	
  	
 	<script type="text/javascript">
-	$(document).ready(function(){
-
+	
+	$(document).ready(function(){ 
 		$('ul.gallery_demo').galleria({
 			history   : true, // activates the history object for bookmarking, back-button etc.
 			clickNext : ${fn:length(sessionMap.imageGalleryList) > 1}, // sets helper for making the image clickable only if there is more than 1 image
 			insert    : '#main_image', // the containing selector for our main image
 			onImage   : function(image,caption,thumb) {
-
-				// fetch the thumbnail container
-				var _li = thumb.parents('li');
-				// fade out inactive thumbnail
-				_li.siblings().children('img.selected').fadeTo(500,0.3);
-				// fade in active thumbnail
-				thumb.fadeTo('fast',1).addClass('selected');
-				// add a title for the clickable image
-				image.attr('title','Next image >>');
-
-				//positioning image title, description and rating
-				caption.css('left',image.width() + 20);
-				$('#description').html("");
-				$("#description").css('left', image.width() + 20);
-				$("#description").css('top', caption.height() + 10);
-
-				var linkLeftPosition = ($("#openOriginalSizeLink_size").width() >= image.width()) ? 0 : ((image.width() - $("#openOriginalSizeLink_size").width())/2);
-				$("#openOriginalSizeLink").css('left', linkLeftPosition);
-				$("#openOriginalSizeLink").css('top', image.height() + 10);
-				$("#openOriginalSizeLink").width(image.width());
 				
-				$("#delete_button").hide();
-				$("#delete_button").css('left', image.width() - 30);
-						
-				setStarRatingChecked(0);
-				$("#rating_stars").css('left', image.width() + 20);					
-				$("#rating_stars").css('top', image.height() - 40);
-				
-				//adjust #main_image height to real image size
-				var newHeight = (image.height() >= ${(mediumImageDimensions*3)/4}) ? ${mediumImageDimensions} : ${(mediumImageDimensions*3)/4};
-			    $('#main_image').css('height', newHeight + 40);
+				//do further calculations only after picture is loaded so we know its width and height
+				image.load(function (){
+					// fetch the thumbnail container
+					var _li = thumb.parents('li');
+					// fade out inactive thumbnail
+					_li.siblings().children('img.selected').fadeTo(500,0.3);
+					// fade in active thumbnail
+					thumb.fadeTo('fast',1).addClass('selected');
+					// add a title for the clickable image
+					image.attr('title','Next image >>');
 
-			    loadImageData(thumb.attr('id'));
+					//positioning image title, description and rating
+					caption.css('left',image.width() + 20);
+					$('#description').html("");
+					$("#description").css('left', image.width() + 20);
+					$("#description").css('top', caption.height() + 10);
+
+					var linkLeftPosition = ($("#openOriginalSizeLink_size").width() >= image.width()) ? 0 : ((image.width() - $("#openOriginalSizeLink_size").width())/2);
+					$("#openOriginalSizeLink").css('left', linkLeftPosition);
+					$("#openOriginalSizeLink").css('top', image.height() + 10);
+					$("#openOriginalSizeLink").width(image.width());
+					
+					$("#delete_button").hide();
+					$("#delete_button").css('left', image.width() - 30);
+							
+					setStarRatingChecked(0);
+					$("#rating_stars").css('left', image.width() + 20);					
+					$("#rating_stars").css('top', image.height() - 40);
+					
+					//adjust #main_image height to real image size
+					var newHeight = (image.height() >= ${(mediumImageDimensions*3)/4}) ? ${mediumImageDimensions} : ${(mediumImageDimensions*3)/4};
+				    $('#main_image').css('height', newHeight + 40);
+
+				    loadImageData(thumb.attr('id'));
+				});
+
 			},
 			onThumb : function(thumb) { // thumbnail effects goes here
 				// fetch the thumbnail container
