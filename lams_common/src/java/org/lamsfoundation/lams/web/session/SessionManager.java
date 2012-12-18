@@ -26,6 +26,8 @@ package org.lamsfoundation.lams.web.session;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
@@ -43,8 +45,6 @@ import org.hibernate.id.UUIDHexGenerator;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentReaderHashMap;
-
 /**
  * 
  * @author Steve.Ni
@@ -59,9 +59,9 @@ public class SessionManager {
     private static SessionManager sessionMgr;
     // KEY: sessionId, each session will have an identified id. VALUE: SessionImpl instance, which contains
     // true session key/value pairs.
-    private Map sessionContainer = new ConcurrentReaderHashMap();
+    private Map<String, HttpSession> sessionContainer = new ConcurrentHashMap<String, HttpSession>();
     // Save current session id
-    private ThreadLocal currentSessionIdContainer = new ThreadLocal();
+    private ThreadLocal<String> currentSessionIdContainer = new ThreadLocal<String>();
 
     // The system monitoring thread instance
     private Monitor monitor;
@@ -88,8 +88,8 @@ public class SessionManager {
      * @return HttpSession instanceof org.lamsfoundation.lams.systemsession.SessionManager#SessionImpl
      */
     public static HttpSession getSession() {
-	String sessionId = (String) getInstance().currentSessionIdContainer.get();
-	return getSession(sessionId);
+	String sessionId = SessionManager.getInstance().currentSessionIdContainer.get();
+	return SessionManager.getSession(sessionId);
     }
 
     /**
@@ -103,24 +103,24 @@ public class SessionManager {
 	    SessionManager.log.debug("Failed on finding current system session with null sessionId");
 	    return null;
 	}
-	return (HttpSession) getInstance().sessionContainer.get(sessionId);
+	return SessionManager.getInstance().sessionContainer.get(sessionId);
 
     }
 
     static void createSession(String sessionId) {
 	// initialize a new one
-	HttpSession session = getInstance().new SessionImpl(sessionId);
-	getInstance().sessionContainer.put(sessionId, session);
+	HttpSession session = SessionManager.getInstance().new SessionImpl(sessionId);
+	SessionManager.getInstance().sessionContainer.put(sessionId, session);
     }
 
     /**
-     * Return <code>SessionVisitor</code> of <code>currentSessionId</code>. <strong>An internal method, only
-     * available in package.</strong>
+     * Return <code>SessionVisitor</code> of <code>currentSessionId</code>. <strong>An internal method, only available
+     * in package.</strong>
      * 
      * @return
      */
     static SessionVisitor getSessionVisitor() {
-	return (SessionVisitor) getSession();
+	return (SessionVisitor) SessionManager.getSession();
     }
 
     /**
@@ -129,7 +129,7 @@ public class SessionManager {
      * @param currentSessionId
      */
     static void setCurrentSessionId(String currentSessionId) {
-	getInstance().currentSessionIdContainer.set(currentSessionId);
+	SessionManager.getInstance().currentSessionIdContainer.set(currentSessionId);
     }
 
     /**
@@ -174,42 +174,44 @@ public class SessionManager {
      * @param res
      */
     public static void startSession(ServletRequest req, ServletResponse res) {
-	Cookie ssoCookie = findCookie((HttpServletRequest) req, SystemSessionFilter.SSO_SESSION_COOKIE);
+	Cookie ssoCookie = SessionManager.findCookie((HttpServletRequest) req, SystemSessionFilter.SSO_SESSION_COOKIE);
 	String currentSessionId = null;
 	if (ssoCookie != null) {
 	    currentSessionId = ssoCookie.getValue();
-	    Object obj = getSession(currentSessionId);
-	    //log.debug(ssoCookie.getName() + " cookie exists, value " + currentSessionId);
+	    Object obj = SessionManager.getSession(currentSessionId);
+	    // log.debug(ssoCookie.getName() + " cookie exists, value " + currentSessionId);
 	    // if cookie exists, but session does not - usually means session expired.
 	    // delete the cookie first and set it to null in order to create a new one
 	    if (obj == null) {
-		log.debug(SystemSessionFilter.SSO_SESSION_COOKIE + " " + currentSessionId 
+		SessionManager.log.debug(SystemSessionFilter.SSO_SESSION_COOKIE + " " + currentSessionId
 			+ " cookie exists, but corresponding session doesn't exist, removing cookie");
-		removeCookie((HttpServletResponse) res,SystemSessionFilter.SSO_SESSION_COOKIE);
+		SessionManager.removeCookie((HttpServletResponse) res, SystemSessionFilter.SSO_SESSION_COOKIE);
 		ssoCookie = null;
 	    }
 	}
 	if (ssoCookie == null) {
 	    currentSessionId = (String) new UUIDHexGenerator().generate(null, null);
 	    // create new session and set it into cookie
-	    createSession(currentSessionId);
-	    ssoCookie = createCookie((HttpServletResponse) res, SystemSessionFilter.SSO_SESSION_COOKIE, currentSessionId);
-	    SessionManager.log.debug("==>Creating new " + SystemSessionFilter.SSO_SESSION_COOKIE + " - " + ssoCookie.getValue());
+	    SessionManager.createSession(currentSessionId);
+	    ssoCookie = SessionManager.createCookie((HttpServletResponse) res, SystemSessionFilter.SSO_SESSION_COOKIE,
+		    currentSessionId);
+	    SessionManager.log.debug("==>Creating new " + SystemSessionFilter.SSO_SESSION_COOKIE + " - "
+		    + ssoCookie.getValue());
 	}
-	
-	Cookie cookie = findCookie((HttpServletRequest) req, SystemSessionFilter.SYS_SESSION_COOKIE);
+
+	Cookie cookie = SessionManager.findCookie((HttpServletRequest) req, SystemSessionFilter.SYS_SESSION_COOKIE);
 	if (cookie == null) {
 	    // If a session exists in the request without a corresponding JSESSIONID cookie, assume
 	    // user lost their cookie or closed their browser, so invalidate the session
-	    HttpSession session = ((HttpServletRequest)req).getSession(false);
+	    HttpSession session = ((HttpServletRequest) req).getSession(false);
 	    if (session != null) {
 		session.invalidate();
 	    }
 	}
-	 
-	setCurrentSessionId(currentSessionId);
+
+	SessionManager.setCurrentSessionId(currentSessionId);
 	// reset session last access time
-	SessionVisitor sessionVisitor = getSessionVisitor();
+	SessionVisitor sessionVisitor = SessionManager.getSessionVisitor();
 	sessionVisitor.accessed();
     }
 
@@ -218,7 +220,7 @@ public class SessionManager {
      * session after this method is called.
      */
     public static void endSession() {
-	setCurrentSessionId(null);
+	SessionManager.setCurrentSessionId(null);
     }
 
     /**
@@ -226,7 +228,7 @@ public class SessionManager {
      * 
      * @param req
      * @param name
-     *                The cookie name
+     *            The cookie name
      * @return The cookie of this name in the request, or null if not found.
      */
     private static Cookie findCookie(HttpServletRequest req, String name) {
@@ -263,15 +265,15 @@ public class SessionManager {
      * 
      * @param res
      * @param name
-     *                cookie name
+     *            cookie name
      * @param value
-     *                cookie value
+     *            cookie value
      * @return the created cookie.
      */
     private static Cookie createCookie(HttpServletResponse res, String name, String value) {
 	Cookie cookie = new Cookie(name, value);
 	cookie.setPath("/");
-	//cookie.setMaxAge(Configuration.getAsInt(ConfigurationKeys.INACTIVE_TIME));
+	// cookie.setMaxAge(Configuration.getAsInt(ConfigurationKeys.INACTIVE_TIME));
 	res.addCookie(cookie);
 
 	return cookie;
@@ -291,11 +293,12 @@ public class SessionManager {
 	    monitoringThread.start();
 	}
 
+	@Override
 	public void run() {
 	    while (!stopSign) {
 		try {
 		    // check whether session is expired
-		    Iterator iter = sessionContainer.values().iterator();
+		    Iterator<HttpSession> iter = sessionContainer.values().iterator();
 		    while (iter.hasNext()) {
 			SessionImpl session = (SessionImpl) iter.next();
 			if (session.getMaxInactiveInterval() > 0) {
@@ -343,19 +346,20 @@ public class SessionManager {
 	private long accessTime;
 	private int timeout;
 
-	private Map valueMap;
+	private Map<String, Object> valueMap;
 
 	public SessionImpl(String sessionId) {
 	    this.sessionId = sessionId;
 	    createTime = System.currentTimeMillis();
 	    accessTime = createTime;
 	    timeout = Configuration.getAsInt(ConfigurationKeys.INACTIVE_TIME);
-	    valueMap = new ConcurrentReaderHashMap();
+	    valueMap = new ConcurrentHashMap<String, Object>();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public long getCreationTime() {
 	    return createTime;
 	}
@@ -363,6 +367,7 @@ public class SessionManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String getId() {
 	    return sessionId;
 	}
@@ -370,6 +375,7 @@ public class SessionManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public long getLastAccessedTime() {
 	    return accessTime;
 	}
@@ -377,6 +383,7 @@ public class SessionManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMaxInactiveInterval(int timeout) {
 	    this.timeout = timeout;
 	}
@@ -384,6 +391,7 @@ public class SessionManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int getMaxInactiveInterval() {
 	    return timeout;
 	}
@@ -391,6 +399,7 @@ public class SessionManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Object getAttribute(String name) {
 	    return valueMap.get(name);
 	}
@@ -398,16 +407,18 @@ public class SessionManager {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Enumeration getAttributeNames() {
+	@Override
+	public Enumeration<String> getAttributeNames() {
+	    return new Enumeration<String>() {
+		Iterator<String> iter = valueMap.keySet().iterator();
 
-	    return new Enumeration() {
-		Iterator iter = valueMap.keySet().iterator();
-
+		@Override
 		public boolean hasMoreElements() {
 		    return iter.hasNext();
 		}
 
-		public Object nextElement() {
+		@Override
+		public String nextElement() {
 		    return iter.next();
 		}
 
@@ -417,6 +428,7 @@ public class SessionManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void setAttribute(String name, Object value) {
 	    if (value == null) {
 		removeAttribute(name);
@@ -434,6 +446,7 @@ public class SessionManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void removeAttribute(String name) {
 	    Object value = valueMap.remove(name);
 	    if (value != null) {
@@ -444,11 +457,12 @@ public class SessionManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void invalidate() {
-	    Iterator iter = valueMap.entrySet().iterator();
+	    Iterator<Entry<String, Object>> iter = valueMap.entrySet().iterator();
 	    while (iter.hasNext()) {
-		Map.Entry entry = (Map.Entry) iter.next();
-		fireUnbound((String) entry.getKey(), entry.getValue());
+		Entry<String, Object> entry = iter.next();
+		fireUnbound(entry.getKey(), entry.getValue());
 	    }
 	    valueMap.clear();
 	    // remove from map
@@ -458,6 +472,7 @@ public class SessionManager {
 	/**
 	 * Notice: This method always return <strong>false</strong> {@inheritDoc}
 	 */
+	@Override
 	public boolean isNew() {
 	    return false;
 	}
@@ -465,6 +480,7 @@ public class SessionManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void putValue(String name, Object value) {
 	    setAttribute(name, value);
 	}
@@ -472,6 +488,7 @@ public class SessionManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void removeValue(String name) {
 	    removeAttribute(name);
 	}
@@ -479,6 +496,7 @@ public class SessionManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Object getValue(String name) {
 	    return getAttribute(name);
 	}
@@ -486,26 +504,32 @@ public class SessionManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public String[] getValueNames() {
-	    return (String[]) valueMap.keySet().toArray(new String[valueMap.size()]);
+	    return valueMap.keySet().toArray(new String[valueMap.size()]);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public HttpSessionContext getSessionContext() {
 	    return new HttpSessionContext() {
 
+		@Override
 		public HttpSession getSession(String sessionId) {
 		    return SessionImpl.this;
 		}
 
+		@Override
 		public Enumeration getIds() {
 		    return new Enumeration() {
+			@Override
 			public boolean hasMoreElements() {
 			    return false;
 			}
 
+			@Override
 			public Object nextElement() {
 			    return null;
 			}
@@ -518,12 +542,14 @@ public class SessionManager {
 	/**
 	 * Notice: This method always return null. {@inheritDoc}
 	 */
+	@Override
 	public ServletContext getServletContext() {
 	    return null;
 	}
 
 	// **********************************************************
 	// SessionVisitor method
+	@Override
 	public void accessed() {
 	    accessTime = System.currentTimeMillis();
 	}
@@ -545,5 +571,4 @@ public class SessionManager {
 	}
 
     }
-
 }
