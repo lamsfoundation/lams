@@ -134,12 +134,17 @@
         <bbNG:actionButton id="cancel" url="javascript:back();" title="Cancel" primary="false"/>                        <%-- Cancel (Go Back) --%>
     </bbNG:actionControlBar>
     
-    <h2>
-    	<%=request.getParameter("title")%>
-    </h2>
-    <h4> 
-    	<%=request.getParameter("description")%> 
-    </h4>
+    <% if(request.getParameter("title") != null) { %>
+	    <h2>
+	    	<%=request.getParameter("title")%>
+	    </h2>
+    <% } %>
+    
+    <% if(request.getParameter("description") != null) { %>
+	    <h4> 
+	    	<%=request.getParameter("description")%> 
+	    </h4>
+    <% } %>
     
     <% if(isDisplayDesignImage) { %>
     	<div style="text-align: center; margin-top: 10px;">
