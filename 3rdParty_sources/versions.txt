@@ -33,8 +33,6 @@ contains lucene-snowball 2.4.0
 
 MySQL Connector/J 5.0.8
 
-opencsv 1.8
-
 opensaml 2.5.3
 
 openws 1.4.4
