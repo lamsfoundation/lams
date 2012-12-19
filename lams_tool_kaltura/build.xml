@@ -2,39 +2,4 @@
 
 <project name="LAMS Tool Kaltura" basedir="."> 
 	<import file="../lams_build/build_tools_base.xml"/>
-	
-	<!-- Below are Tool specifc targets and targets overriding ones from the imported base file. -->
-	<target name="test-report" depends="_compile-test, _build-hbm">
-		<antcall target="_selenium-start"/>
-		
-		<junit printsummary="yes"
-		       errorProperty="test.failed"
-			   failureProperty="test.failed"
-			   fork="yes">
-			<formatter type="plain" usefile="false"/>
-			<formatter type="xml"/>
-			<batchtest todir="${build.report}">
-				<fileset dir="${src.test.dir}">
-	                 <include name="**/*.*"/>
-				</fileset>
-			</batchtest>
-			<classpath>
-				<pathelement location="${build.classes.test}"/>
-				<pathelement location="${conf.web.dir}"/>
-				<pathelement location="${jboss.home}lib/javassist.jar" />	
-				<path refid="logging.classpath"/>
-				<path refid="project.classes.classpath"/>
-			</classpath>
-		</junit>
-
-		<junitreport todir="${build.report}"> 
-			<fileset dir="${build.report}">
-				<include name="TEST-*.xml"/>
-			</fileset>
-			<report todir="${build.report}/html"/> 
-		</junitreport>
-		
-		<antcall target="_selenium-stop"/>
-		<fail message="Tests failed. Check log and/or reports" if="test.failed"/>
-	</target>
 </project>
