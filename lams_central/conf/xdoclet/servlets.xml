@@ -92,10 +92,3 @@
 		org.lamsfoundation.lams.web.GradebookServlet
 	</servlet-class>
 </servlet>
-
-<servlet>
-	<servlet-name>OpenIDServlet</servlet-name>
-	<servlet-class>
-		org.lamsfoundation.lams.web.SIFOpenIDServlet
-</servlet-class>
-</servlet>

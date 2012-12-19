@@ -35,8 +35,6 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
-import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * When j_security_check authentication is successful the user is redirected to the original requested URL. The
@@ -46,147 +44,91 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class LoginRequestValve extends ValveBase {
 
-	private static final Logger log = Logger.getLogger(LoginRequestValve.class);
+    private static final Logger log = Logger.getLogger(LoginRequestValve.class);
 
-	// Declare the constants
-	private static final String PARAM_USERID = "uid";
-	
-	private static final String PARAM_OPENID_URL = "openid_url";
+    // Declare the constants
+    private static final String PARAM_USERID = "uid";
 
-	private static final String LOGIN_REQUEST = "LoginRequest";
+    private static final String PARAM_OPENID_URL = "openid_url";
 
-	private static final String OPENID_REQUEST = "OpenIDServlet";
+    private static final String LOGIN_REQUEST = "LoginRequest";
 
-	public void invoke(Request request, Response response) throws IOException, ServletException {
-		// Skip logging for non-HTTP requests and responses
-		if (!(request instanceof HttpServletRequest) || !(response instanceof HttpServletResponse)) {
-			return;
-		}
-
-		// get HttpServletRequest
-		HttpServletRequest hreq = request.getRequest();
-
-		// invoke next valve,
-		// so we can get internal session and manager
-		getNext().invoke(request, response);
-
-		// when coming back from LoginRequest save the redirect to catalina
-		// internal session
-		if (hreq.getRequestURI().endsWith(LOGIN_REQUEST)) {
-			// Looking at response header to determine redirect location
-			boolean isLoginSuccessful = false;
-			String[] headerNames = response.getHeaderNames();
-			log.info("There are " + headerNames.length + " headers in the response");
-			for (String name : headerNames) {
-				String[] values = response.getHeaderValues(name);
-				if (values.length > 0) {
-					log.info(name + " = " + values[0]);
-					if (name.toLowerCase().equals("location") && values[0].matches(".*" + Constants.FORM_ACTION + ".*")) {
-						isLoginSuccessful = true;
-					}
-				} else {
-					log.info("empty header-" + name);
-				}
-			}
-
-			// if login request is successful then it will redirected the page
-			// to j_security_check otherwise it's unsuccessful.
-			if (!isLoginSuccessful) {
-				log.info("LOGIN REQUEST DETECTED - BUT NO LOGIN IS CARRIED OUT");
-			} else {
-
-				HttpSession hses = hreq.getSession(false);
-				log.debug("Session Id - " + hses.getId());
-				String userid = hreq.getParameter(PARAM_USERID);
-				
-                		// get the location from an explicit parameter
-                		String redirect = hreq.getParameter("redirectURL");
-                		if (redirect == null) {
-                		    // get the redirect url from RequestDispatcher
-                		    // The RequestDispatcher also setup any session variable
-                		    // required to carryout the method
-                		    redirect = LoginRequestDispatcher.getRequestURL(hreq);
-                		}
-
-				// check required parameters
-				if (userid != null && redirect != null && hses != null) {
-					log.info("LOGIN REQUEST DETECTED - LOGIN SUCCESSFUL");
-					log.info("character encoding of the request - " + request.getCharacterEncoding());
-					// redirect = URLDecoder.decode(redirect, "US-ASCII");
-					log.info("Redirect URL - " + redirect);
-					// create catalina internal session
-					Session session = request.getContext().getManager().findSession(hses.getId());
-					// Create and populate a SavedRequest object for this
-					// request
-					SavedRequest saved = new SavedRequest();
-
-					// saved.setMethod("POST");
-					// saved.setQueryString("");
-					saved.setRequestURI(redirect);
-
-					// Tomcat's FormAuthenticator looks at
-					// Constants.FORM_REQUEST_NOTE
-					// for the redirect object
-					session.setNote(Constants.FORM_REQUEST_NOTE, saved);
-				} else {
-					log.info("LOGIN REQUEST DETECTED - BUT MISSING REQUIRED PARAM");
-				}
-			}
-		} else if (hreq.getRequestURI().endsWith(OPENID_REQUEST)) {
-			boolean isLoginSuccessful = false;
-			String[] headerNames = response.getHeaderNames();
-			log.info("There are " + headerNames.length + " headers in the response");
-			for (String name : headerNames) {
-				String[] values = response.getHeaderValues(name);
-				if (values.length > 0) {
-					log.info(name + " = " + values[0]);
-					if (name.toLowerCase().equals("location") && values[0].matches(".*" + Constants.FORM_ACTION + ".*")) {
-						isLoginSuccessful = true;
-					}
-				} else {
-					log.info("empty header-" + name);
-				}
-			}
-
-			if (!isLoginSuccessful) {
-				log.info("OPENID REQUEST DETECTED - BUT NO LOGIN IS CARRIED OUT");
-			} else {
-
-				HttpSession hses = hreq.getSession(false);
-				log.debug("Session Id - " + hses.getId());
-				
-				Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
-
-				// check required parameters
-				if (hses != null) {
-					log.info("OPENID REQUEST DETECTED - LOGIN SUCCESSFUL");
-					
-					String relURL;
-					
-					if (lessonID != null) {
-						// Launch learner
-						relURL = request.getContextPath() + "/launchlearner.do?" + AttributeNames.PARAM_LESSON_ID +"=" + lessonID;
-					} else {
-						// Go to LAMS home
-						relURL = request.getContextPath() + "/index.do";
-					}
-					
-					log.debug("Redirect URL - " + relURL);
-					
-					// create catalina internal session
-					Session session = request.getContext().getManager().findSession(hses.getId());
-
-					// Create and populate a SavedRequest object for this request
-					SavedRequest saved = new SavedRequest();
-					saved.setRequestURI(relURL);
-
-					// Tomcat's FormAuthenticator looks at Constants.FORM_REQUEST_NOTEfor the redirect object
-					session.setNote(Constants.FORM_REQUEST_NOTE, saved);
-				} else {
-					log.error("LOGIN REQUEST DETECTED - BUT MISSING REQUIRED PARAM");
-				}
-			}
-		}
+    @Override
+    public void invoke(Request request, Response response) throws IOException, ServletException {
+	// Skip logging for non-HTTP requests and responses
+	if (!(request instanceof HttpServletRequest) || !(response instanceof HttpServletResponse)) {
+	    return;
 	}
 
+	// get HttpServletRequest
+	HttpServletRequest hreq = request.getRequest();
+
+	// invoke next valve,
+	// so we can get internal session and manager
+	getNext().invoke(request, response);
+
+	// when coming back from LoginRequest save the redirect to catalina
+	// internal session
+	if (hreq.getRequestURI().endsWith(LoginRequestValve.LOGIN_REQUEST)) {
+	    // Looking at response header to determine redirect location
+	    boolean isLoginSuccessful = false;
+	    String[] headerNames = response.getHeaderNames();
+	    LoginRequestValve.log.info("There are " + headerNames.length + " headers in the response");
+	    for (String name : headerNames) {
+		String[] values = response.getHeaderValues(name);
+		if (values.length > 0) {
+		    LoginRequestValve.log.info(name + " = " + values[0]);
+		    if (name.toLowerCase().equals("location") && values[0].matches(".*" + Constants.FORM_ACTION + ".*")) {
+			isLoginSuccessful = true;
+		    }
+		} else {
+		    LoginRequestValve.log.info("empty header-" + name);
+		}
+	    }
+
+	    // if login request is successful then it will redirected the page
+	    // to j_security_check otherwise it's unsuccessful.
+	    if (!isLoginSuccessful) {
+		LoginRequestValve.log.info("LOGIN REQUEST DETECTED - BUT NO LOGIN IS CARRIED OUT");
+	    } else {
+
+		HttpSession hses = hreq.getSession(false);
+		LoginRequestValve.log.debug("Session Id - " + hses.getId());
+		String userid = hreq.getParameter(LoginRequestValve.PARAM_USERID);
+
+		// get the location from an explicit parameter
+		String redirect = hreq.getParameter("redirectURL");
+		if (redirect == null) {
+		    // get the redirect url from RequestDispatcher
+		    // The RequestDispatcher also setup any session variable
+		    // required to carryout the method
+		    redirect = LoginRequestDispatcher.getRequestURL(hreq);
+		}
+
+		// check required parameters
+		if ((userid != null) && (redirect != null) && (hses != null)) {
+		    LoginRequestValve.log.info("LOGIN REQUEST DETECTED - LOGIN SUCCESSFUL");
+		    LoginRequestValve.log.info("character encoding of the request - " + request.getCharacterEncoding());
+		    // redirect = URLDecoder.decode(redirect, "US-ASCII");
+		    LoginRequestValve.log.info("Redirect URL - " + redirect);
+		    // create catalina internal session
+		    Session session = request.getContext().getManager().findSession(hses.getId());
+		    // Create and populate a SavedRequest object for this
+		    // request
+		    SavedRequest saved = new SavedRequest();
+
+		    // saved.setMethod("POST");
+		    // saved.setQueryString("");
+		    saved.setRequestURI(redirect);
+
+		    // Tomcat's FormAuthenticator looks at
+		    // Constants.FORM_REQUEST_NOTE
+		    // for the redirect object
+		    session.setNote(Constants.FORM_REQUEST_NOTE, saved);
+		} else {
+		    LoginRequestValve.log.info("LOGIN REQUEST DETECTED - BUT MISSING REQUIRED PARAM");
+		}
+	    }
+	}
+    }
 }

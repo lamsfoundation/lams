@@ -113,13 +113,3 @@
 	<filter-name>LocaleFilter</filter-name>
 	<url-pattern>/ckeditor/*</url-pattern>
 </filter-mapping>
-
-<filter-mapping>
-	<filter-name>OpenIdFilter</filter-name>
-<url-pattern>/OpenIDServlet</url-pattern>
-</filter-mapping>
-
-<filter-mapping>
-    <filter-name>hibernateFilter</filter-name>
-    <url-pattern>/OpenIDServlet</url-pattern>
-</filter-mapping>

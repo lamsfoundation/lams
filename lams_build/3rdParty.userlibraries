@@ -45,7 +45,6 @@
         <archive javadoc="http://jexcelapi.sourceforge.net/resources/javadocs/current/docs/" path="/lams_build/lib/excel/jxl.jar" source="/3rdParty_sources/jexcelapi"/>
         <archive javadoc="http://www.jboss.org/file-access/default/members/jbosscache/freezone/docs/3.1.0.CR1/apidocs" path="/lams_build/lib/jboss/jbosscache-core.jar" source="/3rdParty_sources/jbosscache"/>
         <archive javadoc="http://www.jgroups.org/javadoc/" path="/lams_build/lib/jboss/jgroups-all.jar" source="/3rdParty_sources/jgroups"/>
-        <archive path="/lams_build/lib/joid/joid.jar" source="/3rdParty_sources/joid"/>
         <archive javadoc="http://hc.apache.org/httpclient-3.x/apidocs/" path="/lams_build/lib/jakarta-commons/commons-httpclient-3.0.jar" source="/3rdParty_sources/commons-httpclient"/>
         <archive javadoc="http://joda-time.sourceforge.net/api-release/" path="/lams_build/lib/xstream/joda-time-2.1.jar" source="/3rdParty_sources/joda-time"/>
     </library>

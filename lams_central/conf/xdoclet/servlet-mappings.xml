@@ -49,8 +49,3 @@
 	<servlet-name>GradebookServlet</servlet-name>
 	<url-pattern>/services/Gradebook</url-pattern>
 </servlet-mapping>
-
-<servlet-mapping>
-    <servlet-name>OpenIDServlet</servlet-name>
-    <url-pattern>/OpenIDServlet</url-pattern>
-</servlet-mapping>
