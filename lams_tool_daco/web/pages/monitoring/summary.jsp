@@ -6,6 +6,11 @@
 <c:set var="daco" value="${sessionMap.daco}"/>
 
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js"></script>
+<script type="text/javascript">
+	function exportSummary(){
+		location.href = "<c:url value='/monitoring/exportToSpreadsheet.do'/>?sessionMapID=${sessionMapID}&reqID=" + (new Date()).getTime();
+	};
+</script>
 
 <h2>
 	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" 
@@ -200,19 +205,18 @@
 	</c:otherwise>
 </c:choose>
 <p>
-	<a href="#"  class="button" onclick="javascript:document.location.href='${refreshSummaryUrl}';">
+	<a href="#nogo"  class="button" onclick="javascript:document.location.href='${refreshSummaryUrl}';">
 		<fmt:message key="label.common.summary.refresh" />
 	</a>
 	<c:if  test="${anyRecordsAvailable}">
 		<c:url var="viewRecordList" value="/monitoring/listRecords.do?sessionMapID=${sessionMapID}" />
-		<a href="#" onclick="javascript:launchPopup('${viewRecordList}','RecordList')" class="button space-left">
+		<a href="#nogo" onclick="javascript:launchPopup('${viewRecordList}','RecordList')" class="button space-left">
 			<fmt:message key="label.monitoring.viewrecords.all" />
 		</a>
-		<c:url var="exportToSpreadsheetUrl" value="/pages/export/exportToSpreadsheet.jsp">
-			<c:param name="sessionMapID" value="${sessionMapID}"></c:param>
-		</c:url>
-		<a href="#" onclick="javascript:window.open('${exportToSpreadsheetUrl}','ExportToSpreadsheet','width=796,height=250')" class="button space-left">
+		
+		<html:link href="javascript:exportSummary();" styleClass="button space-left">
 			<fmt:message key="button.export" />
-		</a>
+		</html:link>
+		
 	</c:if>
 </p>

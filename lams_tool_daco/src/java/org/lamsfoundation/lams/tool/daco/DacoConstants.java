@@ -295,8 +295,6 @@ public class DacoConstants {
 
     public static final String EXPORT_TO_SPREADSHEET_FILE_NAME = "Data_Collection_Export";
 
-    public static final String PARAM_FORMAT = "format";
-
     public static final String KEY_LABEL_EXPORT_FILE_SHEET = "label.export.file.sheet";
 
     public static final String KEY_LABEL_LEARNING_LONGLAT_LATITUDE_UNIT = "label.learning.longlat.latitude.unit";

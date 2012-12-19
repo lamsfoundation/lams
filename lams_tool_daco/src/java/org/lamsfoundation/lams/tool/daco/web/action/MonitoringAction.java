@@ -59,6 +59,7 @@ import org.lamsfoundation.lams.tool.daco.model.DacoAnswerOption;
 import org.lamsfoundation.lams.tool.daco.model.DacoQuestion;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
 import org.lamsfoundation.lams.tool.daco.service.IDacoService;
+import org.lamsfoundation.lams.tool.daco.util.DacoExcelUtil;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -233,7 +234,6 @@ public class MonitoringAction extends Action {
 	String sessionMapID = request.getParameter(DacoConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
-	int format = WebUtil.readIntParam(request, DacoConstants.PARAM_FORMAT);
 	IDacoService service = getDacoService();
 
 	// Prepare headers and column names
@@ -392,8 +392,7 @@ public class MonitoringAction extends Action {
 	Object[][] data = rows.toArray(new Object[][] {});
 
 	// Prepare response headers
-	String fileName = DacoConstants.EXPORT_TO_SPREADSHEET_FILE_NAME
-		+ (format == 1 ? CentralConstants.FILE_EXTENSION_XLS : CentralConstants.FILE_EXTENSION_CSV);
+	String fileName = DacoConstants.EXPORT_TO_SPREADSHEET_FILE_NAME + CentralConstants.FILE_EXTENSION_XLS;
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
 	response.setContentType(CentralConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
 	response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION, CentralConstants.HEADER_CONTENT_ATTACHMENT
@@ -401,17 +400,10 @@ public class MonitoringAction extends Action {
 	MonitoringAction.log.debug("Exporting to a spreadsheet tool content with UID: " + daco.getUid());
 	ServletOutputStream out = response.getOutputStream();
 
-	switch (format) {
-	case 1:
-	    // Export to XLS
-	    String sheetName = service.getLocalisedMessage(DacoConstants.KEY_LABEL_EXPORT_FILE_SHEET, null);
-	    FileUtil.exportToolToExcel(out, sheetName, title, dateHeader, columnNames, data);
-	    break;
-	case 2:
-	    // Export to CSV
-	    FileUtil.exportToolToCSV(out, title, dateHeader, columnNames, data);
-	    break;
-	}
+	// Export to XLS
+	String sheetName = service.getLocalisedMessage(DacoConstants.KEY_LABEL_EXPORT_FILE_SHEET, null);
+	DacoExcelUtil.exportToolToExcel(out, sheetName, title, dateHeader, columnNames, data);
+
 	// Return the file inside response, but not any JSP page
 	return null;
     }

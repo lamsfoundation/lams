@@ -30,30 +30,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
 
 import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletRequest;
-
-import jxl.CellView;
-import jxl.JXLException;
-import jxl.Workbook;
-import jxl.format.Font;
-import jxl.write.Label;
-import jxl.write.WritableCell;
-import jxl.write.WritableCellFormat;
-import jxl.write.WritableFont;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -64,8 +49,6 @@ import org.hibernate.id.UUIDHexGenerator;
 import org.jdom.JDOMException;
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
-
-import au.com.bytecode.opencsv.CSVWriter;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.ConversionException;
@@ -837,146 +820,6 @@ public class FileUtil {
 		    + classname + ". Aborting retry.", e);
 	    return null;
 	}
-    }
-
-    /**
-     * Exports data in MS Excel (.xls) format.
-     * 
-     * @param out
-     *            output stream to which the file written; usually taken from HTTP response; it is not closed afterwards
-     * @param sheetName
-     *            name of first sheet in Excel workbook; data will be stored in this sheet
-     * @param title
-     *            title printed in the first (0,0) cell
-     * @param dateHeader
-     *            text describing current date; if <code>NULL</code> then no date is printed; if not <code>NULL</code>
-     *            then text is written out along with current date in the cell; the date is formatted according to
-     *            {@link #EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT}
-     * @param columnNames
-     *            name of the columns that describe <code>data</code> parameter
-     * @param data
-     *            array of data to print out; first index of array describes a row, second a column; dates are formatted
-     *            according to {@link #EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT}
-     * @throws IOException
-     * @throws JXLException
-     */
-    public static void exportToolToExcel(OutputStream out, String sheetName, String title, String dateHeader,
-	    String[] columnNames, Object[][] data) throws IOException, JXLException {
-	WritableWorkbook workbook = Workbook.createWorkbook(out);
-	WritableSheet sheet = workbook.createSheet(sheetName, 0);
-	// Prepare cell formatter used in all columns
-	CellView stretchedCellView = new CellView();
-	stretchedCellView.setAutosize(true);
-	// Pring title in bold, if needed
-	if (!StringUtils.isBlank(title)) {
-	    Label titleCell = new Label(0, 0, title);
-	    Font font = titleCell.getCellFormat().getFont();
-	    WritableFont titleFont = new WritableFont(font);
-	    titleFont.setBoldStyle(WritableFont.BOLD);
-	    WritableCellFormat titleCellFormat = new WritableCellFormat(titleFont);
-	    titleCell.setCellFormat(titleCellFormat);
-	    sheet.addCell(titleCell);
-	}
-	// Print current date, if needed
-	if (!StringUtils.isBlank(dateHeader)) {
-	    sheet.addCell(new Label(0, 1, dateHeader));
-	    SimpleDateFormat titleDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
-	    sheet.addCell(new Label(1, 1, titleDateFormat.format(new Date())));
-	}
-	// Print column names, if needed
-	if (columnNames != null) {
-	    for (int columnIndex = 0; columnIndex < columnNames.length; columnIndex++) {
-		sheet.addCell(new Label(columnIndex, 3, columnNames[columnIndex]));
-		sheet.setColumnView(columnIndex, stretchedCellView);
-	    }
-	}
-	SimpleDateFormat cellDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT);
-	Calendar calendar = Calendar.getInstance();
-	if (data != null) {
-	    // Print data
-	    for (int rowIndex = 0; rowIndex < data.length; rowIndex++) {
-		int sheetRowIndex = rowIndex + 4;
-		for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++) {
-		    Object content = data[rowIndex][columnIndex];
-		    if (content != null) {
-			WritableCell cell = null;
-			if (content instanceof Date) {
-			    Date date = (Date) content;
-			    cell = new Label(columnIndex, sheetRowIndex, cellDateFormat.format(date));
-			} else {
-			    cell = new Label(columnIndex, sheetRowIndex, content.toString());
-			}
-			sheet.addCell(cell);
-		    }
-		}
-	    }
-	}
-	workbook.write();
-	workbook.close();
-    }
-
-    /**
-     * Exports data in CSV format. It uses UTF-8 character set and semicolon as separator.
-     * 
-     * @param out
-     *            output stream to which the file written; usually taken from HTTP response; it is not closed afterwards
-     * @param title
-     *            title printed in the first (0,0) cell
-     * @param dateHeader
-     *            text describing current date; if <code>NULL</code> then no date is printed; if not <code>NULL</code>
-     *            then text is written out along with current date in the cell; the date is formatted according to
-     *            {@link #EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT}
-     * @param columnNames
-     *            name of the columns that describe <code>data</code> parameter
-     * @param data
-     *            array of data to print out; first index of array describes a row, second a column; dates are formatted
-     *            according to {@link #EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT}
-     * @throws IOException
-     */
-    public static void exportToolToCSV(OutputStream out, String title, String dateHeader, String[] columnNames,
-	    Object[][] data) throws IOException {
-	Writer writer = new OutputStreamWriter(out, FileUtil.ENCODING_UTF_8);
-	CSVWriter csv = new CSVWriter(writer, ';');
-	String[] line = null;
-	// Print title, if needed
-	if (!StringUtils.isBlank(title)) {
-	    line = new String[] { title };
-	    csv.writeNext(line);
-	}
-	// Print current date,if needed
-	if (!StringUtils.isBlank(dateHeader)) {
-	    String date = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT).format(new Date());
-	    line = new String[] { dateHeader, date };
-	    csv.writeNext(line);
-	}
-	// Separator
-	line = new String[] {};
-	csv.writeNext(line);
-
-	// Print column names, if needed
-	if (columnNames != null) {
-	    csv.writeNext(columnNames);
-	}
-	SimpleDateFormat cellDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT);
-	// Print data
-	if (data != null) {
-	    for (int rowIndex = 0; rowIndex < data.length; rowIndex++) {
-		line = new String[data[rowIndex].length];
-		for (int columnIndex = 0; columnIndex < line.length; columnIndex++) {
-		    Object content = data[rowIndex][columnIndex];
-		    if (content != null) {
-			if (content instanceof Date) {
-			    Date date = (Date) content;
-			    line[columnIndex] = cellDateFormat.format(date);
-			} else {
-			    line[columnIndex] = content.toString();
-			}
-		    }
-		}
-		csv.writeNext(line);
-	    }
-	}
-	csv.close();
     }
 
     /**

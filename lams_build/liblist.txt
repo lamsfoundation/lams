@@ -24,8 +24,6 @@ batik             batik-1.7.jar                         1.7                    A
 
 cglib             cglib_jboss404GA.jar                  4.0.4.GA               Apache License 2.0            Apache                           bytecode manipulation framework
 
-csv				  opencsv-1.8.jar					    1.8					   Apache License 2.0			 Sourceforge, Sean Sullivan       comma-separated values parser library for Java
-
 excel			  jxl.jar													   LGPL 2.0														  JExcelApi - libary to work with Microsoft Excel spreadsheets
 
 fckeditor         fckeditor-java-core-2.6.jar           2.6					   GPL, LGPL, MPL				 Frederico Caldeira Knabben       Java connector for CKEditor                                                        
