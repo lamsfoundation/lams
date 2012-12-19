@@ -391,6 +391,13 @@ public class DisplayGroupAction extends Action {
 		lessonLinks.add(new IndexLinkBean("index.conditions", conditionsLink, "thickbox" + orgId,
 			"mycourses-conditions-img", "index.conditions.tooltip"));
 	    }
+	    
+	    // Add delete lesson option
+	    if (isGroupManagerOrMonitor) {
+		String removeLessonLink = "javascript:removeLesson(" + bean.getId() + ")";
+		lessonLinks.add(new IndexLinkBean("index.remove.lesson", removeLessonLink, null,
+			"mycourses-removelesson-img", "index.remove.lesson.tooltip"));
+	    }
 
 	    if (lessonLinks.size() > 0) {
 		bean.setLinks(lessonLinks);

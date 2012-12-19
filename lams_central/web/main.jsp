@@ -76,6 +76,28 @@
 	           });
 			});
 		
+			function removeLesson(lessonID) {
+				
+				if (confirm("<fmt:message key="index.remove.lesson.confirm1"/>")) {
+					if (confirm("<fmt:message key="index.remove.lesson.confirm2"/>")) {
+				        $.ajax({
+				        	async: false,
+				            url: "<lams:LAMSURL/>monitoring/monitoring.do",
+				            data: "method=removeLessonJson&lessonID=" + lessonID,
+				            type: "post",
+				            success: function (json) {
+					            if (json.removeLesson == "true") {
+					            	refresh();	
+								} else {
+									alert(json.removeLesson);
+								}
+				            }
+				       	});
+					}
+				}
+
+			}
+		
 			function getEnableSortingText() {
 				return "<fmt:message key="label.enable.lesson.sorting"/>";
 			}
