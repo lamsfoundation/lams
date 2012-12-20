@@ -39,8 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import jxl.JXLException;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -76,7 +74,7 @@ public class MonitoringAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JXLException, ParseException {
+	    HttpServletResponse response) throws IOException, ServletException, ParseException {
 	String param = mapping.getParameter();
 
 	if (param.equals("summary")) {
@@ -229,7 +227,7 @@ public class MonitoringAction extends Action {
      * @throws ParseException
      */
     protected ActionForward exportToSpreadsheet(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, JXLException, ParseException {
+	    throws IOException, ParseException {
 	// Get required parameters
 	String sessionMapID = request.getParameter(DacoConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -392,7 +390,7 @@ public class MonitoringAction extends Action {
 	Object[][] data = rows.toArray(new Object[][] {});
 
 	// Prepare response headers
-	String fileName = DacoConstants.EXPORT_TO_SPREADSHEET_FILE_NAME + CentralConstants.FILE_EXTENSION_XLS;
+	String fileName = DacoConstants.EXPORT_TO_SPREADSHEET_FILE_NAME;
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
 	response.setContentType(CentralConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
 	response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION, CentralConstants.HEADER_CONTENT_ATTACHMENT
@@ -402,7 +400,7 @@ public class MonitoringAction extends Action {
 
 	// Export to XLS
 	String sheetName = service.getLocalisedMessage(DacoConstants.KEY_LABEL_EXPORT_FILE_SHEET, null);
-	DacoExcelUtil.exportToolToExcel(out, sheetName, title, dateHeader, columnNames, data);
+	DacoExcelUtil.exportToExcel(out, sheetName, title, dateHeader, columnNames, data);
 
 	// Return the file inside response, but not any JSP page
 	return null;

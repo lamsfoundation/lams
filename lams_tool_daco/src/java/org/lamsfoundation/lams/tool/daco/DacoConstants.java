@@ -293,7 +293,7 @@ public class DacoConstants {
 
     // for export to spreadsheet
 
-    public static final String EXPORT_TO_SPREADSHEET_FILE_NAME = "Data_Collection_Export";
+    public static final String EXPORT_TO_SPREADSHEET_FILE_NAME = "Data_Collection_Export.xlsx";
 
     public static final String KEY_LABEL_EXPORT_FILE_SHEET = "label.export.file.sheet";
 

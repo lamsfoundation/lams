@@ -52,7 +52,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.lamsfoundation.lams.gradebook.dto.ExcelCell;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBAverageMarkComparator;
 import org.lamsfoundation.lams.gradebook.dto.comparators.GBAverageTimeTakenComparator;
@@ -67,8 +66,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class GradebookUtil {
-    
-    private static CellStyle boldStyle;
 
     /**
      * Wrapper method for printing the xml for grid rows
@@ -320,87 +317,4 @@ public class GradebookUtil {
 	else
 	    throw new IllegalArgumentException("[" + view + "] is not a legal gradebook view");
     }
-
-    public static void exportGradebookLessonToExcel(OutputStream out,
-	    LinkedHashMap<String, ExcelCell[][]> dataToExport, String dateHeader, boolean displaySheetTitle)
-	    throws IOException {
-	Workbook workbook = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
-	
-	boldStyle = workbook.createCellStyle();
-	Font font = workbook.createFont();
-	font.setBoldweight(Font.BOLDWEIGHT_BOLD);
-	boldStyle.setFont(font);
-
-	int i = 0;
-	for (String sheetName : dataToExport.keySet()) {
-	    if (dataToExport.get(sheetName) != null) {
-		String sheetTitle = (displaySheetTitle) ? sheetName : null; 
-		createSheet(workbook, sheetName, sheetTitle, i, dateHeader, dataToExport.get(sheetName));
-		i++;
-	    }
-	}
-
-	workbook.write(out);
-	out.close();
-    }
-
-    public static void createSheet(Workbook workbook, String sheetName, String sheetTitle, int sheetIndex,
-	    String dateHeader, ExcelCell[][] data) throws IOException {
-	Sheet sheet = workbook.createSheet(sheetName);
-	
-
-	// Print title in bold, if needed
-	if (!StringUtils.isBlank(sheetTitle)) {
-	    Row row = sheet.createRow(0);
-	    createCell(new ExcelCell(sheetTitle, true), 0, row);
-	}
-
-	// Print current date, if needed
-	if (!StringUtils.isBlank(dateHeader)) {
-	    Row row = sheet.createRow(1);
-	    createCell(new ExcelCell(dateHeader, false), 0, row);
-	    
-	    SimpleDateFormat titleDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
-	    createCell(new ExcelCell(titleDateFormat.format(new Date()), false), 1, row);
-	}
-
-	if (data != null) {
-	    // Print data
-	    for (int rowIndex = 0; rowIndex < data.length; rowIndex++) {
-		
-		//in case there is a sheet title or dateHeader available start from 4th row
-		int rowIndexOffset = (StringUtils.isBlank(sheetTitle) && StringUtils.isBlank(dateHeader)) ? 0 : 4;
-		
-		Row row = sheet.createRow(rowIndex + rowIndexOffset);
-		
-		for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++) {
-		    ExcelCell excelCell = data[rowIndex][columnIndex];
-		    createCell(excelCell, columnIndex, row);
-		}
-	    }
-	}
-    }
-
-    public static void createCell(ExcelCell excelCell, int cellnum, Row row) {
-
-	if (excelCell != null) {
-	    Cell cell = row.createCell(cellnum);
-	    if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof Date) {
-		SimpleDateFormat cellDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT);
-		cell.setCellValue(cellDateFormat.format(excelCell.getCellValue()));
-	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Double) {
-		cell.setCellValue((Double) excelCell.getCellValue());
-	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Long) {
-		cell.setCellValue(((Long) excelCell.getCellValue()).doubleValue());
-	    } else if (excelCell.getCellValue() != null) {
-		cell.setCellValue(excelCell.getCellValue().toString());
-	    }
-
-	    if (excelCell.getIsBold()) {
-		cell.setCellStyle(boldStyle);
-	    }
-	}
-    }
-
-
 }

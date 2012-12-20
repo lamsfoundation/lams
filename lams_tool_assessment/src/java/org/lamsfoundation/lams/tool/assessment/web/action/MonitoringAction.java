@@ -39,8 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import jxl.JXLException;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -49,7 +47,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
-import org.lamsfoundation.lams.tool.assessment.dto.ExcelCell;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
@@ -62,9 +59,10 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
-import org.lamsfoundation.lams.tool.assessment.util.AssessmentExportXLSUtil;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -279,9 +277,9 @@ public class MonitoringAction extends Action {
 
 		// Setting the filename if it wasn't passed in the request
 		if (fileName == null && assessment.getTitle() != null) {
-		    fileName = assessment.getTitle().replaceAll(" ", "_") + "_export.xls";
+		    fileName = assessment.getTitle().replaceAll(" ", "_") + "_export.xlsx";
 		} else if (fileName == null) {
-		    fileName = "assessment_export.xls";
+		    fileName = "assessment_export.xlsx";
 		}
 
 		response.setContentType("application/x-download");
@@ -289,13 +287,9 @@ public class MonitoringAction extends Action {
 		log.debug("Exporting assessment to a spreadsheet: " + assessment.getContentId());
 		ServletOutputStream out = response.getOutputStream();
 
-		AssessmentExportXLSUtil.exportAssessmentToExcel(out, service.getMessage("label.export.exported.on"),
-			dataToExport);
+		ExcelUtil.createExcel(out, dataToExport, service.getMessage("label.export.exported.on"), true);
 
 	    } catch (IOException e) {
-		MonitoringAction.log.error(e);
-		errors = new ActionMessage("error.monitoring.export.excel", e.toString()).toString();
-	    } catch (JXLException e) {
 		MonitoringAction.log.error(e);
 		errors = new ActionMessage("error.monitoring.export.excel", e.toString()).toString();
 	    }

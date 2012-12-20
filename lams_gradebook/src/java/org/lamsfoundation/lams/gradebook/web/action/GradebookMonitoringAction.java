@@ -23,9 +23,7 @@
 /* $Id$ */
 package org.lamsfoundation.lams.gradebook.web.action;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -37,14 +35,11 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.gradebook.dto.ExcelCell;
-import org.lamsfoundation.lams.gradebook.dto.GBUserGridRowDTO;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -53,6 +48,8 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -327,8 +324,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	fileDownloadTokenCookie.setPath("/");
 	response.addCookie(fileDownloadTokenCookie);
 
-	GradebookUtil.exportGradebookLessonToExcel(out, dataToExport,
-		gradebookService.getMessage("gradebook.export.dateheader"), true);
+	ExcelUtil.createExcel(out, dataToExport, gradebookService.getMessage("gradebook.export.dateheader"), true);
 
 	return null;
     }
@@ -369,8 +365,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	
 	//Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
-	GradebookUtil.exportGradebookLessonToExcel(out, dataToExport,
-		gradebookService.getMessage("gradebook.export.dateheader"), true);
+	ExcelUtil.createExcel(out, dataToExport, gradebookService.getMessage("gradebook.export.dateheader"), true);
 
 	return null;
     }

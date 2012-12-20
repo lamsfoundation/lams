@@ -25,22 +25,11 @@ package org.lamsfoundation.lams.tool.daco.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
-import jxl.CellView;
-import jxl.JXLException;
-import jxl.Workbook;
-import jxl.format.Font;
-import jxl.write.Label;
-import jxl.write.WritableCell;
-import jxl.write.WritableCellFormat;
-import jxl.write.WritableFont;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-
-import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.ExcelUtil;
 
 public class DacoExcelUtil {
 
@@ -59,63 +48,45 @@ public class DacoExcelUtil {
      *            {@link #EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT}
      * @param columnNames
      *            name of the columns that describe <code>data</code> parameter
-     * @param data
+     * @param inputData
      *            array of data to print out; first index of array describes a row, second a column; dates are formatted
      *            according to {@link #EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT}
      * @throws IOException
      * @throws JXLException
      */
-    public static void exportToolToExcel(OutputStream out, String sheetName, String title, String dateHeader,
-	    String[] columnNames, Object[][] data) throws IOException, JXLException {
-	WritableWorkbook workbook = Workbook.createWorkbook(out);
-	WritableSheet sheet = workbook.createSheet(sheetName, 0);
-	// Prepare cell formatter used in all columns
-	CellView stretchedCellView = new CellView();
-	stretchedCellView.setAutosize(true);
-	// Pring title in bold, if needed
-	if (!StringUtils.isBlank(title)) {
-	    Label titleCell = new Label(0, 0, title);
-	    Font font = titleCell.getCellFormat().getFont();
-	    WritableFont titleFont = new WritableFont(font);
-	    titleFont.setBoldStyle(WritableFont.BOLD);
-	    WritableCellFormat titleCellFormat = new WritableCellFormat(titleFont);
-	    titleCell.setCellFormat(titleCellFormat);
-	    sheet.addCell(titleCell);
+    public static void exportToExcel(OutputStream out, String sheetName, String title, String dateHeader,
+	    String[] columnNames, Object[][] inputData) throws IOException {
+	
+	
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	
+	ArrayList<ExcelCell[]> data = new ArrayList<ExcelCell[]>();
+	
+	ExcelCell[] summaryRowTitle = new ExcelCell[columnNames.length];
+	for (int columnIndex = 0; columnIndex < columnNames.length; columnIndex++) {
+	    String columnName = columnNames[columnIndex];
+	    summaryRowTitle[columnIndex] = new ExcelCell(columnName, true);
 	}
-	// Print current date, if needed
-	if (!StringUtils.isBlank(dateHeader)) {
-	    sheet.addCell(new Label(0, 1, dateHeader));
-	    SimpleDateFormat titleDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
-	    sheet.addCell(new Label(1, 1, titleDateFormat.format(new Date())));
-	}
-	// Print column names, if needed
-	if (columnNames != null) {
-	    for (int columnIndex = 0; columnIndex < columnNames.length; columnIndex++) {
-		sheet.addCell(new Label(columnIndex, 3, columnNames[columnIndex]));
-		sheet.setColumnView(columnIndex, stretchedCellView);
-	    }
-	}
-	SimpleDateFormat cellDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT);
-	if (data != null) {
+	data.add(summaryRowTitle);
+	
+	if (inputData != null) {
 	    // Print data
-	    for (int rowIndex = 0; rowIndex < data.length; rowIndex++) {
-		int sheetRowIndex = rowIndex + 4;
-		for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++) {
-		    Object content = data[rowIndex][columnIndex];
+	    for (int rowIndex = 0; rowIndex < inputData.length; rowIndex++) {
+		ExcelCell[] row = new ExcelCell[columnNames.length];
+		
+		for (int columnIndex = 0; columnIndex < inputData[rowIndex].length; columnIndex++) {
+		    
+		    Object content = inputData[rowIndex][columnIndex];
 		    if (content != null) {
-			WritableCell cell = null;
-			if (content instanceof Date) {
-			    Date date = (Date) content;
-			    cell = new Label(columnIndex, sheetRowIndex, cellDateFormat.format(date));
-			} else {
-			    cell = new Label(columnIndex, sheetRowIndex, content.toString());
-			}
-			sheet.addCell(cell);
+			row[columnIndex] = new ExcelCell(content, false);
 		    }
 		}
+		data.add(row);
 	    }
 	}
-	workbook.write();
-	workbook.close();
+	
+	dataToExport.put(title, data.toArray(new ExcelCell[][] {}));
+	
+	ExcelUtil.createExcel(out, dataToExport, dateHeader, true);
     }
 }
