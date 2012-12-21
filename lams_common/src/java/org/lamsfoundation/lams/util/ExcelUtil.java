@@ -1,0 +1,142 @@
+/**************************************************************** 
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
+ * ============================================================= 
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
+ * 
+ * This program is free software; you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License version 2.0 
+ * as published by the Free Software Foundation. 
+ * 
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * GNU General Public License for more details. 
+ * 
+ * You should have received a copy of the GNU General Public License 
+ * along with this program; if not, write to the Free Software 
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
+ * 
+ * http://www.gnu.org/licenses/gpl.txt 
+ * **************************************************************** 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.util;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedHashMap;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+
+/**
+ * Utilities for producing .xlsx files.
+ */
+public class ExcelUtil {
+
+    private static CellStyle boldStyle;
+
+    /**
+     * Create .xlsx file out of provided data and then write out it to an OutputStream.
+     * 
+     * @param out
+     *            output stream to which the file written; usually taken from HTTP response
+     * @param dataToExport
+     *            array of data to print out; first index of array describes a row, second a column
+     * @param dateHeader
+     *            text describing current date; if <code>NULL</code> then no date is printed; if not <code>NULL</code>
+     *            then text is written out along with current date in the cell; the date is formatted according to
+     *            {@link #EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT}
+     * @param displaySheetTitle
+     *            whether to display title (printed in the first (0,0) cell)
+     * @throws IOException
+     */
+    public static void createExcel(OutputStream out, LinkedHashMap<String, ExcelCell[][]> dataToExport,
+	    String dateHeader, boolean displaySheetTitle) throws IOException {
+	Workbook workbook = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
+
+	boldStyle = workbook.createCellStyle();
+	Font font = workbook.createFont();
+	font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+	boldStyle.setFont(font);
+
+	int i = 0;
+	for (String sheetName : dataToExport.keySet()) {
+	    if (dataToExport.get(sheetName) != null) {
+		String sheetTitle = (displaySheetTitle) ? sheetName : null;
+		createSheet(workbook, sheetName, sheetTitle, i, dateHeader, dataToExport.get(sheetName));
+		i++;
+	    }
+	}
+
+	workbook.write(out);
+	out.close();
+    }
+
+    public static void createSheet(Workbook workbook, String sheetName, String sheetTitle, int sheetIndex,
+	    String dateHeader, ExcelCell[][] data) throws IOException {
+	Sheet sheet = workbook.createSheet(sheetName);
+
+	// Print title in bold, if needed
+	if (!StringUtils.isBlank(sheetTitle)) {
+	    Row row = sheet.createRow(0);
+	    createCell(new ExcelCell(sheetTitle, true), 0, row);
+	}
+
+	// Print current date, if needed
+	if (!StringUtils.isBlank(dateHeader)) {
+	    Row row = sheet.createRow(1);
+	    createCell(new ExcelCell(dateHeader, false), 0, row);
+
+	    SimpleDateFormat titleDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
+	    createCell(new ExcelCell(titleDateFormat.format(new Date()), false), 1, row);
+	}
+
+	if (data != null) {
+	    // Print data
+	    for (int rowIndex = 0; rowIndex < data.length; rowIndex++) {
+
+		// in case there is a sheet title or dateHeader available start from 4th row
+		int rowIndexOffset = (StringUtils.isBlank(sheetTitle) && StringUtils.isBlank(dateHeader)) ? 0 : 4;
+
+		Row row = sheet.createRow(rowIndex + rowIndexOffset);
+
+		for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++) {
+		    ExcelCell excelCell = data[rowIndex][columnIndex];
+		    createCell(excelCell, columnIndex, row);
+		}
+	    }
+	}
+    }
+
+    public static void createCell(ExcelCell excelCell, int cellnum, Row row) {
+
+	if (excelCell != null) {
+	    Cell cell = row.createCell(cellnum);
+	    if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof Date) {
+		SimpleDateFormat cellDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT);
+		cell.setCellValue(cellDateFormat.format(excelCell.getCellValue()));
+	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Double) {
+		cell.setCellValue((Double) excelCell.getCellValue());
+	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Long) {
+		cell.setCellValue(((Long) excelCell.getCellValue()).doubleValue());
+	    } else if (excelCell.getCellValue() != null) {
+		cell.setCellValue(excelCell.getCellValue().toString());
+	    }
+
+	    if (excelCell.getIsBold()) {
+		cell.setCellStyle(boldStyle);
+	    }
+	}
+    }
+
+}
