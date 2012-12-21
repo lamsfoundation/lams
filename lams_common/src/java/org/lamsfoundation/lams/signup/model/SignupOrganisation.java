@@ -5,11 +5,11 @@ import java.util.Date;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 
 /**
- * SignupOrganisation. 
- * 
- * @hibernate.class table="lams_signup_organisation"
+ * Signup organisation. 
  */
 public class SignupOrganisation {
+    
+    //There is no XDoclet annotations as it can't produce lazy="false" for Organisation
     
     /**
      * Link on Lams wiki signup help page.
@@ -27,11 +27,9 @@ public class SignupOrganisation {
     private String blurb;
     private Date createDate;
     private Boolean disabled;
+    private Boolean loginTabActive;
     private String context;
 
-    /**
-     * @hibernate.id generator-class="native" type="java.lang.Integer" column="signup_organisation_id"
-     */
     public Integer getSignupOrganisationId() {
 	return signupOrganisationId;
     }
@@ -40,10 +38,6 @@ public class SignupOrganisation {
 	this.signupOrganisationId = signupOrganisationId;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true" cascade="delete" lazy="false"
-     * @hibernate.column name="organisation_id"
-     */
     public Organisation getOrganisation() {
 	return organisation;
     }
@@ -52,9 +46,6 @@ public class SignupOrganisation {
 	this.organisation = organisation;
     }
 
-    /**
-     * @hibernate.property column="add_to_lessons" length="1"
-     */
     public Boolean getAddToLessons() {
 	return addToLessons;
     }
@@ -63,9 +54,6 @@ public class SignupOrganisation {
 	this.addToLessons = addToLessons;
     }
 
-    /**
-     * @hibernate.property column="add_as_staff" length="1"
-     */
     public Boolean getAddAsStaff() {
 	return addAsStaff;
     }
@@ -74,9 +62,6 @@ public class SignupOrganisation {
 	this.addAsStaff = addAsStaff;
     }
 
-    /**
-     * @hibernate.property column="add_with_author" length="1"
-     */
     public Boolean getAddWithAuthor() {
         return addWithAuthor;
     }
@@ -85,9 +70,6 @@ public class SignupOrganisation {
         this.addWithAuthor = addWithAuthor;
     }
 
-    /**
-     * @hibernate.property column="add_with_monitor" length="1"
-     */
     public Boolean getAddWithMonitor() {
         return addWithMonitor;
     }
@@ -96,9 +78,6 @@ public class SignupOrganisation {
         this.addWithMonitor = addWithMonitor;
     }
 
-    /**
-     * @hibernate.property column="course_key" length="255"
-     */
     public String getCourseKey() {
 	return courseKey;
     }
@@ -107,9 +86,6 @@ public class SignupOrganisation {
 	this.courseKey = courseKey;
     }
 
-    /**
-     * @hibernate.property column="blurb" length="2147483647"
-     */
     public String getBlurb() {
 	return blurb;
     }
@@ -118,9 +94,6 @@ public class SignupOrganisation {
 	this.blurb = blurb;
     }
 
-    /**
-     * @hibernate.property column="create_date" length="19" not-null="true"
-     */
     public Date getCreateDate() {
 	return createDate;
     }
@@ -129,9 +102,6 @@ public class SignupOrganisation {
 	this.createDate = createDate;
     }
 
-    /**
-     * @hibernate.property column="disabled" length="1"
-     */
     public Boolean getDisabled() {
 	return disabled;
     }
@@ -139,10 +109,15 @@ public class SignupOrganisation {
     public void setDisabled(Boolean disabled) {
 	this.disabled = disabled;
     }
+    
+    public Boolean getLoginTabActive() {
+	return loginTabActive;
+    }
 
-    /**
-     * @hibernate.property column="context" length="255"
-     */
+    public void setLoginTabActive(Boolean loginTabActive) {
+	this.loginTabActive = loginTabActive;
+    }
+
     public String getContext() {
         return context;
     }

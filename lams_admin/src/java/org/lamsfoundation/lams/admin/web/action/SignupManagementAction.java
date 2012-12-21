@@ -93,6 +93,7 @@ public class SignupManagementAction extends Action {
 		signupForm.set("courseKey", signup.getCourseKey());
 		signupForm.set("blurb", signup.getBlurb());
 		signupForm.set("disabled", signup.getDisabled());
+		signupForm.set("loginTabActive", signup.getLoginTabActive());
 		signupForm.set("context", signup.getContext());
 
 		List organisations = signupService.getOrganisationCandidates();
@@ -141,6 +142,7 @@ public class SignupManagementAction extends Action {
 		signup.setAddWithAuthor((Boolean) signupForm.get("addWithAuthor"));
 		signup.setAddWithMonitor((Boolean) signupForm.get("addWithMonitor"));
 		signup.setDisabled((Boolean) signupForm.get("disabled"));
+		signup.setLoginTabActive((Boolean) signupForm.get("loginTabActive"));
 		signup.setOrganisation((Organisation) userManagementService.findById(Organisation.class,
 			(Integer) signupForm.get("organisationId")));
 		signup.setCourseKey(signupForm.getString("courseKey"));

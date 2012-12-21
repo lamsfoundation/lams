@@ -111,6 +111,15 @@
             column="disabled"
             length="1"
         />
+        
+        <property
+            name="loginTabActive"
+            type="java.lang.Boolean"
+            update="true"
+            insert="true"
+            column="login_tab_active"
+            length="1"
+        />
 
         <property
             name="context"

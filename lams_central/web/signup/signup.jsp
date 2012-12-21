@@ -22,17 +22,12 @@
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 <script language="JavaScript" type="text/javascript">
-	<!--
-		jQuery(document).ready(function(){
-			var selectedTab = ('${param.selectedTab}' == '') ? 1 : '${param.selectedTab}';
-			$("#tabs").tabs({
-				selected: selectedTab
-			});
+	jQuery(document).ready(function(){
+		var selectedTab = (${(signupOrganisation != null) && signupOrganisation.loginTabActive}) ? 1 : 0;
+		$("#tabs").tabs({
+			selected: selectedTab
 		});
-		function selectSignupTab() {
-			$("#tabs").tabs( "select" , 0 );
-		}
-	//-->
+	});
 </script>
 
 <h1 align="center">

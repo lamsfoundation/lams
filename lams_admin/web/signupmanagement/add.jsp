@@ -54,6 +54,11 @@
 			<td></td>
 		</tr>
 		<tr>
+			<td><fmt:message key="admin.login.tab" />:</td>
+			<td><html:checkbox property="loginTabActive" /></td>
+			<td></td>
+		</tr>		
+		<tr>
 			<td><fmt:message key="admin.context.path" />:</td>
 			<td style="vertical-align: middle;"><lams:LAMSURL/>signup/<html:text property="context" /></td>
 			<td><html:errors property="context" /></td>

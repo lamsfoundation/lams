@@ -119,5 +119,6 @@
 	<form-property name="confirmCourseKey" type="java.lang.String" />
 	<form-property name="blurb" type="java.lang.String" />
 	<form-property name="disabled" type="java.lang.Boolean" initial="0" />
+	<form-property name="loginTabActive" type="java.lang.Boolean" initial="0" />
 	<form-property name="context" type="java.lang.String" />
 </form-bean>

@@ -56,11 +56,6 @@ public class SignupAction extends Action {
 	    SignupOrganisation signupOrganisation = signupService.getSignupOrganisation(context);
 	    request.setAttribute("signupOrganisation", signupOrganisation);
 	}
-	
-	String selectedTab = WebUtil.readStrParam(request, "selectedTab", true);
-	if (StringUtils.isNotBlank(selectedTab)) {
-	   request.setAttribute("selectedTab", selectedTab);
-	}
 
 	DynaActionForm signupForm = (DynaActionForm) form;
 	String method = WebUtil.readStrParam(request, "method", true);
