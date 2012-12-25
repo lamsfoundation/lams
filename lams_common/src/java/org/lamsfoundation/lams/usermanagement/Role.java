@@ -31,11 +31,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-/** 
- *        @hibernate.class
- *         table="lams_role"
- *     
-*/
 public class Role implements Serializable,Comparable{
 
 	public static final String LEARNER = "LEARNER";
@@ -102,13 +97,6 @@ public class Role implements Serializable,Comparable{
         this.userOrganisationRoles = userOrganisationRoles;
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Integer"
-     *             column="role_id"
-     *         
-     */
     public Integer getRoleId() {
         return this.roleId;
     }
@@ -117,13 +105,6 @@ public class Role implements Serializable,Comparable{
         this.roleId = roleId;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="name"
-     *             length="64"
-     *             not-null="true"
-     *         
-     */
     public String getName() {
         return this.name;
     }
@@ -132,12 +113,6 @@ public class Role implements Serializable,Comparable{
         this.name = name;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="description"
-     *             length="65535"
-     *         
-     */
     public String getDescription() {
         return this.description;
     }
@@ -146,17 +121,6 @@ public class Role implements Serializable,Comparable{
         this.description = description;
     }
 
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="delete-orphan"
-     *            @hibernate.collection-key
-     *             column="role_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.UserOrganisationRole"
-     *         
-     */
     public Set getUserOrganisationRoles() {
         return this.userOrganisationRoles;
     }
@@ -164,18 +128,7 @@ public class Role implements Serializable,Comparable{
     public void setUserOrganisationRoles(Set userOrganisationRoles) {
         this.userOrganisationRoles = userOrganisationRoles;
     }
-    
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="delete-orphan"
-     *            @hibernate.collection-key
-     *             column="role_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.RolePrivilege"
-     *         
-     */
+
     public Set getRolePrivileges() {
 		return rolePrivileges;
 	}

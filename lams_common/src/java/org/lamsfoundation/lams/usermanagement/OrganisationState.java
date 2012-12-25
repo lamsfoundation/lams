@@ -4,12 +4,6 @@ import java.io.Serializable;
 import java.util.Set;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-/** 
- *        @hibernate.class
- *         table="lams_organisation_state"
- *     
-*/
 public class OrganisationState implements Serializable {
 	
 	public static final Integer ACTIVE = 1;
@@ -41,13 +35,6 @@ public class OrganisationState implements Serializable {
         this.Organisations = Organisations;
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Integer"
-     *             column="organisation_state_id"
-     *         
-     */
     public Integer getOrganisationStateId() {
         return this.organisationStateId;
     }
@@ -56,12 +43,6 @@ public class OrganisationState implements Serializable {
         this.organisationStateId = organisationStateId;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="description"
-     *             length="255"
-     *         
-     */
     public String getDescription() {
         return this.description;
     }
@@ -70,17 +51,6 @@ public class OrganisationState implements Serializable {
         this.description = description;
     }
 
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="organisation_state_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.Organisation"
-     *         
-     */
     public Set getOrganisations() {
         return this.Organisations;
     }

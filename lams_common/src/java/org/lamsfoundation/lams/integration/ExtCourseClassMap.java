@@ -4,17 +4,11 @@ import java.io.Serializable;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 
-
-/** 
- *        @hibernate.class
- *         table="lams_ext_course_class_map"
- *     
-*/
 public class ExtCourseClassMap implements Serializable {
 
-	private static final long serialVersionUID = -6179393464356966543L;
+    private static final long serialVersionUID = -6179393464356966543L;
 
-	/** identifier field */
+    /** identifier field */
     private Integer sid;
 
     /** persistent field */
@@ -28,79 +22,49 @@ public class ExtCourseClassMap implements Serializable {
 
     /** full constructor */
     public ExtCourseClassMap(String courseid, ExtServerOrgMap extServerOrgMap, Organisation organisation) {
-        this.courseid = courseid;
-        this.extServerOrgMap = extServerOrgMap;
-        this.organisation = organisation;
+	this.courseid = courseid;
+	this.extServerOrgMap = extServerOrgMap;
+	this.organisation = organisation;
     }
 
     /** default constructor */
     public ExtCourseClassMap() {
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Integer"
-     *             column="sid"
-     *         
-     */
     public Integer getSid() {
-        return this.sid;
+	return this.sid;
     }
 
     public void setSid(Integer sid) {
-        this.sid = sid;
+	this.sid = sid;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="courseid"
-     *             length="255"
-     *             not-null="true"
-     *         
-     */
     public String getCourseid() {
-        return this.courseid;
+	return this.courseid;
     }
 
     public void setCourseid(String courseid) {
-        this.courseid = courseid;
+	this.courseid = courseid;
     }
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="ext_server_org_map_id"         
-     *         
-     */
     public ExtServerOrgMap getExtServerOrgMap() {
-        return this.extServerOrgMap;
+	return this.extServerOrgMap;
     }
 
     public void setExtServerOrgMap(ExtServerOrgMap extServerOrgMap) {
-        this.extServerOrgMap = extServerOrgMap;
+	this.extServerOrgMap = extServerOrgMap;
     }
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="classid"
-     *             lazy="true"         
-     *         
-     */
     public Organisation getOrganisation() {
-        return this.organisation;
+	return this.organisation;
     }
 
     public void setOrganisation(Organisation organisation) {
-        this.organisation = organisation;
+	this.organisation = organisation;
     }
 
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("sid", getSid())
-            .append("courseid", getCourseid())
-            .toString();
+	return new ToStringBuilder(this).append("sid", getSid()).append("courseid", getCourseid()).toString();
     }
 
 }

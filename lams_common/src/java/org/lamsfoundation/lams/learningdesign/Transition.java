@@ -33,8 +33,6 @@ import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
 
 /**
  * @author Manpreet Minhas
- * @hibernate.class table="lams_learning_transition"
- * 
  */
 public class Transition implements Serializable {
     // LAMS 2.4 introduced different transition types; "classical" one is progress type; now we also have data flow; see
@@ -140,10 +138,6 @@ public class Transition implements Serializable {
 	return newTransition;
     }
 
-    /**
-     * @hibernate.transitionUIID generator-class="native" type="java.lang.Long" column="transition_id"
-     * 
-     */
     public Long getTransitionId() {
 	return transitionId;
     }
@@ -152,10 +146,6 @@ public class Transition implements Serializable {
 	this.transitionId = transitionId;
     }
 
-    /**
-     * @hibernate.property column="transitionUIID" length="11"
-     * 
-     */
     public Integer getTransitionUIID() {
 	return transitionUIID;
     }
@@ -164,10 +154,6 @@ public class Transition implements Serializable {
 	transitionUIID = id;
     }
 
-    /**
-     * @hibernate.property column="description" length="65535"
-     * 
-     */
     public String getDescription() {
 	return description;
     }
@@ -176,10 +162,6 @@ public class Transition implements Serializable {
 	this.description = description;
     }
 
-    /**
-     * @hibernate.property column="title" length="255"
-     * 
-     */
     public String getTitle() {
 	return title;
     }
@@ -188,10 +170,6 @@ public class Transition implements Serializable {
 	this.title = title;
     }
 
-    /**
-     * @hibernate.property column="create_date_time" length="19" not-null="true"
-     * 
-     */
     public Date getCreateDateTime() {
 	return createDateTime;
     }
@@ -200,11 +178,6 @@ public class Transition implements Serializable {
 	this.createDateTime = createDateTime != null ? createDateTime : new Date();
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="to_activity_id"
-     * 
-     */
     public org.lamsfoundation.lams.learningdesign.Activity getToActivity() {
 	return toActivity;
     }
@@ -213,11 +186,6 @@ public class Transition implements Serializable {
 	this.toActivity = toActivity;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="from_activity_id"
-     * 
-     */
     public org.lamsfoundation.lams.learningdesign.Activity getFromActivity() {
 	return fromActivity;
     }
@@ -226,11 +194,6 @@ public class Transition implements Serializable {
 	this.fromActivity = fromActivity;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="learning_design_id"
-     * 
-     */
     public org.lamsfoundation.lams.learningdesign.LearningDesign getLearningDesign() {
 	return learningDesign;
     }
@@ -289,11 +252,6 @@ public class Transition implements Serializable {
 	return transitionType.equals(Transition.PROGRESS_TRANSITION_TYPE);
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="transition_type"
-     * 
-     */
     public Integer getTransitionType() {
 	return transitionType;
     }

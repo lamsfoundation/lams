@@ -27,35 +27,35 @@ package org.lamsfoundation.lams.integration;
  * <p>
  * <a href="UserInfoFetchException.java.html"><i>View Source</i><a>
  * </p>
- *
+ * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 @SuppressWarnings("serial")
 public class UserInfoFetchException extends Exception {
 
-	public UserInfoFetchException() {
-	}
+    public UserInfoFetchException() {
+    }
 
-	/**
-	 * @param message
-	 */
-	public UserInfoFetchException(String message) {
-		super(message);
-	}
+    /**
+     * @param message
+     */
+    public UserInfoFetchException(String message) {
+	super(message);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public UserInfoFetchException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public UserInfoFetchException(Throwable cause) {
+	super(cause);
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public UserInfoFetchException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public UserInfoFetchException(String message, Throwable cause) {
+	super(message, cause);
+    }
 
 }

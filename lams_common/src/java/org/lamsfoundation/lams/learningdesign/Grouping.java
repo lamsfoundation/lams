@@ -39,9 +39,6 @@ import org.lamsfoundation.lams.lesson.LessonClass;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
- * 
- * @hibernate.class table="lams_grouping"
- * 
  * @author Jacky Fang
  */
 public abstract class Grouping implements Serializable {

@@ -88,10 +88,6 @@ public class BranchCondition implements Comparable {
 		conditionDTO.getEndValue(), conditionDTO.getExactMatchValue());
     }
 
-    /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="condition_id"
-     * 
-     */
     public Long getConditionId() {
 	return conditionId;
     }
@@ -100,10 +96,6 @@ public class BranchCondition implements Comparable {
 	this.conditionId = conditionId;
     }
 
-    /**
-     * @hibernate.property column="condition_ui_id" length="11"
-     * 
-     */
     public Integer getConditionUIID() {
 	return conditionUIID;
     }
@@ -112,9 +104,6 @@ public class BranchCondition implements Comparable {
 	this.conditionUIID = conditionUIID;
     }
 
-    /**
-     * @hibernate.property column="order_id" length="11"
-     */
     public Integer getOrderId() {
 	return orderId;
     }
@@ -123,9 +112,6 @@ public class BranchCondition implements Comparable {
 	this.orderId = orderId;
     }
 
-    /**
-     * @hibernate.property column="name" length="255"
-     */
     public String getName() {
 	return name;
     }
@@ -134,11 +120,6 @@ public class BranchCondition implements Comparable {
 	this.name = name;
     }
 
-    /**
-     * The display name is a name shown to the user so they can link a condition to a branch.
-     * 
-     * @hibernate.property column="display_name" length="255"
-     */
     public String getDisplayName() {
 	return displayName;
     }
@@ -147,9 +128,6 @@ public class BranchCondition implements Comparable {
 	this.displayName = displayName;
     }
 
-    /**
-     * @hibernate.property column="type" length="255"
-     */
     public String getType() {
 	return type;
     }
@@ -158,9 +136,6 @@ public class BranchCondition implements Comparable {
 	this.type = type;
     }
 
-    /**
-     * @hibernate.property column="start_value" length="255"
-     */
     public String getStartValue() {
 	return startValue;
     }
@@ -169,9 +144,6 @@ public class BranchCondition implements Comparable {
 	this.startValue = startValue;
     }
 
-    /**
-     * @hibernate.property column="end_value" length="255"
-     */
     public String getEndValue() {
 	return endValue;
     }
@@ -180,9 +152,6 @@ public class BranchCondition implements Comparable {
 	this.endValue = endValue;
     }
 
-    /**
-     * @hibernate.property column="exact_match_value" length="255"
-     */
     public String getExactMatchValue() {
 	return exactMatchValue;
     }

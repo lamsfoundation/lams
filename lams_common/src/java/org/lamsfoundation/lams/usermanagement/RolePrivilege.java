@@ -4,11 +4,6 @@ import java.io.Serializable;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
-/** 
- *        @hibernate.class
- *         table="lams_role_privilege"
- *     
-*/
 public class RolePrivilege implements Serializable {
 
     /** identifier field */
@@ -30,13 +25,6 @@ public class RolePrivilege implements Serializable {
     public RolePrivilege() {
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="rp_id"
-     *         
-     */
     public Long getRpId() {
         return this.rpId;
     }
@@ -45,12 +33,6 @@ public class RolePrivilege implements Serializable {
         this.rpId = rpId;
     }
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="privilege_id"         
-     *         
-     */
     public Privilege getPrivilege() {
         return this.privilege;
     }
@@ -59,12 +41,6 @@ public class RolePrivilege implements Serializable {
         this.privilege = privilege;
     }
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="role_id"         
-     *         
-     */
     public Role getRole() {
         return this.role;
     }

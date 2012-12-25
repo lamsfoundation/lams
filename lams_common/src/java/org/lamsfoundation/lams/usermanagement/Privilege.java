@@ -4,12 +4,6 @@ import java.io.Serializable;
 import java.util.Set;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-/** 
- *        @hibernate.class
- *         table="lams_privilege"
- *     
-*/
 public class Privilege implements Serializable {
 
     /** identifier field */
@@ -41,13 +35,6 @@ public class Privilege implements Serializable {
         this.rolePrivileges = rolePrivileges;
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="privilege_id"
-     *         
-     */
     public Long getPrivilegeId() {
         return this.privilegeId;
     }
@@ -56,14 +43,6 @@ public class Privilege implements Serializable {
         this.privilegeId = privilegeId;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="code"
-     *             unique="true"
-     *             length="10"
-     *             not-null="true"
-     *         
-     */
     public String getCode() {
         return this.code;
     }
@@ -72,12 +51,6 @@ public class Privilege implements Serializable {
         this.code = code;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="description"
-     *             length="255"
-     *         
-     */
     public String getDescription() {
         return this.description;
     }
@@ -86,17 +59,6 @@ public class Privilege implements Serializable {
         this.description = description;
     }
 
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="delete-orphan"
-     *            @hibernate.collection-key
-     *             column="privilege_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.RolePrivilege"
-     *         
-     */
     public Set getRolePrivileges() {
         return this.rolePrivileges;
     }

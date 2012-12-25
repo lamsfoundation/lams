@@ -9,8 +9,6 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
  */
 public class SignupOrganisation {
     
-    //There is no XDoclet annotations as it can't produce lazy="false" for Organisation
-    
     /**
      * Link on Lams wiki signup help page.
      */

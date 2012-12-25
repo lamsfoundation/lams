@@ -43,8 +43,6 @@ import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 
 /**
  * @author Manpreet Minhas
- * @hibernate.class table="lams_learning_design"
- *  
  */
 public class LearningDesign implements Serializable {
 

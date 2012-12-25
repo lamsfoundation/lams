@@ -5,10 +5,6 @@ import java.util.Set;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 
-/**
- * @hibernate.class table="lams_ext_server_org_map"
- * 
- */
 public class ExtServerOrgMap implements Serializable, Comparable {
 
     private static final long serialVersionUID = 337894825609071182L;
@@ -93,11 +89,6 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 	this.extUserUseridMaps = extUserUseridMaps;
     }
 
-    /**
-     * @hibernate.id generator-class="native" type="java.lang.Integer"
-     *               column="sid"
-     * 
-     */
     public Integer getSid() {
 	return this.sid;
     }
@@ -106,11 +97,6 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 	this.sid = sid;
     }
 
-    /**
-     * @hibernate.property column="serverid" unique="true" length="255"
-     *                     not-null="true"
-     * 
-     */
     public String getServerid() {
 	return this.serverid;
     }
@@ -119,10 +105,6 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 	this.serverid = serverid;
     }
 
-    /**
-     * @hibernate.property column="serverkey" length="65535" not-null="true"
-     * 
-     */
     public String getServerkey() {
 	return this.serverkey;
     }
@@ -131,10 +113,6 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 	this.serverkey = serverkey;
     }
 
-    /**
-     * @hibernate.property column="servername" length="255" not-null="true"
-     * 
-     */
     public String getServername() {
 	return this.servername;
     }
@@ -143,10 +121,6 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 	this.servername = servername;
     }
 
-    /**
-     * @hibernate.property column="serverdesc" length="65535"
-     * 
-     */
     public String getServerdesc() {
 	return this.serverdesc;
     }
@@ -155,11 +129,6 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 	this.serverdesc = serverdesc;
     }
 
-    /**
-     * @hibernate.property column="prefix" unique="true" length="11"
-     *                     not-null="true"
-     * 
-     */
     public String getPrefix() {
 	return this.prefix;
     }
@@ -168,10 +137,6 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 	this.prefix = prefix;
     }
 
-    /**
-     * @hibernate.property column="userinfo_url" length="65535" not-null="true"
-     * 
-     */
     public String getUserinfoUrl() {
 	return this.userinfoUrl;
     }
@@ -179,11 +144,7 @@ public class ExtServerOrgMap implements Serializable, Comparable {
     public void setUserinfoUrl(String userinfoUrl) {
 	this.userinfoUrl = userinfoUrl;
     }
-    
-    /**
-     * @hibernate.property column="server_url" length="255" not-null="false"
-     * 
-     */
+
     public String getServerUrl() {
 	return this.serverUrl;
     }
@@ -192,10 +153,6 @@ public class ExtServerOrgMap implements Serializable, Comparable {
         this.serverUrl = serverUrl;
     }
 
-    /**
-     * @hibernate.property column="timeout_url" length="65535" not-null="true"
-     * 
-     */
     public String getTimeoutUrl() {
 	return this.timeoutUrl;
     }
@@ -203,11 +160,7 @@ public class ExtServerOrgMap implements Serializable, Comparable {
     public void setTimeoutUrl(String timeoutUrl) {
 	this.timeoutUrl = timeoutUrl;
     }
-    
-    /**
-     * @hibernate.property column="lesson_finish_url" length="65535" not-null="false"
-     * 
-     */
+
     public String getLessonFinishUrl() {
 	return this.lessonFinishUrl;
     }
@@ -216,10 +169,6 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 	this.lessonFinishUrl = lessonFinishUrl;
     }
 
-    /**
-     * @hibernate.property column="disabled" length="1" not-null="true"
-     * 
-     */
     public Boolean getDisabled() {
 	return this.disabled;
     }
@@ -228,11 +177,6 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 	this.disabled = disabled;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="orgid" lazy="true"
-     * 
-     */
     public Organisation getOrganisation() {
 	return this.organisation;
     }
@@ -241,12 +185,6 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 	this.organisation = organisation;
     }
 
-    /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="ext_server_org_map_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.integration.ExtCourseClassMap"
-     * 
-     */
     public Set getExtCourseClassMaps() {
 	return this.extCourseClassMaps;
     }
@@ -255,12 +193,6 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 	this.extCourseClassMaps = extCourseClassMaps;
     }
 
-    /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="ext_server_org_map_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.integration.ExtUserUseridMap"
-     * 
-     */
     public Set getExtUserUseridMaps() {
 	return this.extUserUseridMaps;
     }

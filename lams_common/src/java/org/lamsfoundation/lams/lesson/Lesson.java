@@ -267,9 +267,6 @@ public class Lesson implements Serializable {
     // ---------------------------------------------------------------------
     // Getters and Setters
     // ---------------------------------------------------------------------
-    /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="lesson_id"
-     */
     public Long getLessonId() {
 	return this.lessonId;
     }
@@ -280,8 +277,6 @@ public class Lesson implements Serializable {
 
     /**
      * Hibernate version column - updated automatically
-     * 
-     * @hibernate.version type="java.lang.Integer" column="version"
      */
     public Integer getVersion() {
 	return this.version;
@@ -292,7 +287,6 @@ public class Lesson implements Serializable {
     }
 
     /**
-     * @hibernate.property column="name" length="255" not-null="true"
      * @return Returns the lessonName.
      */
     public String getLessonName() {
@@ -308,7 +302,6 @@ public class Lesson implements Serializable {
     }
 
     /**
-     * @hibernate.property column="description" length="65535"
      * @return Returns the lessonDescription.
      */
     public String getLessonDescription() {
@@ -323,9 +316,6 @@ public class Lesson implements Serializable {
 	this.lessonDescription = lessonDescription;
     }
 
-    /**
-     * @hibernate.property type="java.sql.Timestamp" column="create_date_time" length="19"
-     */
     public Date getCreateDateTime() {
 	return this.createDateTime;
     }
@@ -334,9 +324,6 @@ public class Lesson implements Serializable {
 	this.createDateTime = createDateTime;
     }
 
-    /**
-     * @hibernate.property type="java.sql.Timestamp" column="start_date_time" length="19"
-     */
     public Date getStartDateTime() {
 	return this.startDateTime;
     }
@@ -345,9 +332,6 @@ public class Lesson implements Serializable {
 	this.startDateTime = startDateTime;
     }
 
-    /**
-     * @hibernate.property type="java.sql.Timestamp" column="end_date_time" length="19"
-     */
     public Date getEndDateTime() {
 	return this.endDateTime;
     }
@@ -357,8 +341,6 @@ public class Lesson implements Serializable {
     }
 
     /**
-     * @hibernate.property type="java.sql.Timestamp" column="schedule_end_date_time" length="19"
-     * 
      * @return Returns the scheduleEndDate.
      */
     public Date getScheduleEndDate() {
@@ -381,8 +363,6 @@ public class Lesson implements Serializable {
     }
 
     /**
-     * @hibernate.property type="java.lang.Integer" column="scheduled_number_days_to_lesson_finish" length="3"
-     * 
      * @return Returns the number of days the lesson will be available to user since he starts it. (It's ON only if the
      *         lesson was scheduled to be finished and individual option was selected)
      */
@@ -400,7 +380,6 @@ public class Lesson implements Serializable {
     }
 
     /**
-     * @hibernate.property type="java.sql.Timestamp" column="schedule_start_date_time" length="19"
      * @return Returns the scheduleStartDate.
      */
     public Date getScheduleStartDate() {
@@ -415,10 +394,6 @@ public class Lesson implements Serializable {
 	this.scheduleStartDate = scheduleStartDate;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="user_id"
-     */
     public User getUser() {
 	return this.user;
     }
@@ -427,9 +402,6 @@ public class Lesson implements Serializable {
 	this.user = user;
     }
 
-    /**
-     * @hibernate.property type="java.lang.Integer" column="lesson_state_id" length="3"
-     */
     public Integer getLessonStateId() {
 	return this.lessonStateId;
     }
@@ -438,9 +410,6 @@ public class Lesson implements Serializable {
 	this.lessonStateId = lessonStateId;
     }
 
-    /**
-     * @hibernate.property type="java.lang.Integer" column="previous_state_id" length="3"
-     */
     public Integer getPreviousLessonStateId() {
 	return this.previousLessonStateId;
     }
@@ -449,9 +418,6 @@ public class Lesson implements Serializable {
 	this.previousLessonStateId = previousLessonStateId;
     }
     
-    /**
-     * @hibernate.property type="java.lang.Boolean" column="enable_lesson_intro" length="1"
-     */
     public Boolean isEnableLessonIntro() {
 	return enableLessonIntro;
     }
@@ -460,9 +426,6 @@ public class Lesson implements Serializable {
 	this.enableLessonIntro = enableLessonIntro;
     }
 
-    /**
-     * @hibernate.property type="java.lang.Boolean" column="display_design_image" length="1"
-     */
     public Boolean isDisplayDesignImage() {
 	return displayDesignImage;
     }
@@ -471,9 +434,6 @@ public class Lesson implements Serializable {
 	this.displayDesignImage = displayDesignImage;
     }
 
-    /**
-     * @hibernate.property type="java.lang.Boolean" column="learner_exportport_avail" length="1"
-     */
     public Boolean getLearnerExportAvailable() {
 	return learnerExportAvailable;
     }
@@ -482,9 +442,6 @@ public class Lesson implements Serializable {
 	this.learnerExportAvailable = learnerExportAvailable;
     }
 
-    /**
-     * @hibernate.property type="java.lang.Boolean" column="learner_presence_avail" length="1"
-     */
     public Boolean getLearnerPresenceAvailable() {
 	return learnerPresenceAvailable;
     }
@@ -493,9 +450,6 @@ public class Lesson implements Serializable {
 	this.learnerPresenceAvailable = learnerPresenceAvailable;
     }
 
-    /**
-     * @hibernate.property type="java.lang.Boolean" column="learner_exportport_avail" length="1"
-     */
     public Boolean getLearnerImAvailable() {
 	return learnerImAvailable;
     }
@@ -504,9 +458,6 @@ public class Lesson implements Serializable {
 	this.learnerImAvailable = learnerImAvailable;
     }
 
-    /**
-     * @hibernate.property type="java.lang.Boolean" column="live_edit_enabled" length="1"
-     */
     public Boolean getLiveEditEnabled() {
 	return liveEditEnabled;
     }
@@ -515,9 +466,6 @@ public class Lesson implements Serializable {
 	this.liveEditEnabled = liveEditEnabled;
     }
 
-    /**
-     * @hibernate.property type="java.lang.Boolean" column="enable_lesson_notifications" length="1"
-     */
     public Boolean getEnableLessonNotifications() {
 	return enableLessonNotifications;
     }
@@ -526,9 +474,6 @@ public class Lesson implements Serializable {
 	this.enableLessonNotifications = enableLessonNotifications;
     }
 
-    /**
-     * @hibernate.property type="java.lang.Boolean" column="locked_for_edit" length="1"
-     */
     public Boolean getLockedForEdit() {
 	return lockedForEdit;
     }
@@ -537,10 +482,6 @@ public class Lesson implements Serializable {
 	this.lockedForEdit = lockedForEdit;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true" cascade="none"
-     * @hibernate.column name="learning_design_id"
-     */
     public LearningDesign getLearningDesign() {
 	return this.learningDesign;
     }
@@ -549,10 +490,6 @@ public class Lesson implements Serializable {
 	this.learningDesign = learningDesign;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="false" unique="true" cascade = "save-update"
-     * @hibernate.column name="learning_design_id"
-     */
     public LessonClass getLessonClass() {
         return this.lessonClass;
     }
@@ -561,10 +498,6 @@ public class Lesson implements Serializable {
         this.lessonClass = lessonClass;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="false" cascade="none"
-     * @hibernate.column name="organisation_id"
-     */
     public Organisation getOrganisation() {
 	return this.organisation;
     }
@@ -573,11 +506,6 @@ public class Lesson implements Serializable {
 	this.organisation = organisation;
     }
 
-    /**
-     * @hibernate.set lazy="false" inverse="true" cascade="none"
-     * @hibernate.collection-key column="lesson_id"
-     * @@hibernate.collection-one-to-many class="org.lamsfoundation.lams.lesson.LearnerProgress"
-     */
     public Set getLearnerProgresses() {
         return this.learnerProgresses;
     }
@@ -659,9 +587,6 @@ public class Lesson implements Serializable {
 	this.gradebookUserLessons = gradebookUserLessons;
     }
 
-    /**
-     * @hibernate.property type="java.lang.Boolean" column="marks_released" length="1"
-     */
     public Boolean getMarksReleased() {
 	return marksReleased;
     }

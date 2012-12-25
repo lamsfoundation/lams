@@ -4,12 +4,6 @@ import java.io.Serializable;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-/** 
- *        @hibernate.class
- *         table="lams_supported_locale"
- *     
-*/
 public class SupportedLocale implements Serializable,Comparable {
 
 	/**
@@ -48,13 +42,6 @@ public class SupportedLocale implements Serializable,Comparable {
     public SupportedLocale() {
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Integer"
-     *             column="locale_id"
-     *         
-     */
     public Integer getLocaleId() {
         return this.localeId;
     }
@@ -63,14 +50,6 @@ public class SupportedLocale implements Serializable,Comparable {
         this.localeId = localeId;
     }
 
-	/** 
-     *            @hibernate.property
-     *             column="language_iso_code"
-     *             unique="false"
-     *             length="2"
-     *             not-null="true"
-     *         
-     */
 	public String getLanguageIsoCode() {
 		return languageIsoCode;
 	}
@@ -79,14 +58,6 @@ public class SupportedLocale implements Serializable,Comparable {
 		this.languageIsoCode = languageIsoCode;
 	}
 
-    /** 
-     *            @hibernate.property
-     *             column="country_iso_code"
-     *             unique="false"
-     *             length="2"
-     *             not-null="false"
-     *         
-     */
  	public String getCountryIsoCode() {
 		return countryIsoCode;
 	}
@@ -95,14 +66,6 @@ public class SupportedLocale implements Serializable,Comparable {
 		this.countryIsoCode = countryIsoCode;
 	}
 
-	/** 
-     *            @hibernate.property
-     *             column="description"
-     *             unique="false"
-     *             length="255"
-     *             not-null="true"
-     *         
-     */
 	public String getDescription() {
 		return description;
 	}
@@ -110,15 +73,7 @@ public class SupportedLocale implements Serializable,Comparable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
- 
-	/** 
-     *            @hibernate.property
-     *             column="direction"
-     *             unique="false"
-     *             length="3"
-     *             not-null="true"
-     *         
-     */
+
 	public String getDirection() {
 		return direction;
 	}

@@ -33,8 +33,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /**
  * Represents the URLs for the internal functionality such as grouping and gates. Eventually these will become
  * "pluggable" tools, so that we can have other types of grouping/gates, without making changes to the core.
- * 
- * @hibernate.class table="lams_system_tool"
  */
 public class SystemTool implements Serializable {
 
@@ -127,9 +125,6 @@ public class SystemTool implements Serializable {
     public SystemTool() {
     }
 
-    /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="system_tool_id"
-     */
     public Long getSystemToolId() {
 	return systemToolId;
     }
@@ -138,9 +133,6 @@ public class SystemTool implements Serializable {
 	this.systemToolId = systemToolId;
     }
 
-    /**
-     * @hibernate.property column="learning_activity_type_id" type="java.lang.Integer" not-null="true"
-     */
     public Integer getActivityTypeId() {
 	return activityTypeId;
     }
@@ -149,9 +141,6 @@ public class SystemTool implements Serializable {
 	this.activityTypeId = activityTypeId;
     }
 
-    /**
-     * @hibernate.property column="tool_display_name" length="255" not-null="true"
-     */
     public String getToolDisplayName() {
 	return toolDisplayName;
     }
@@ -160,9 +149,6 @@ public class SystemTool implements Serializable {
 	this.toolDisplayName = toolDisplayName;
     }
 
-    /**
-     * @hibernate.property column="description" length="65535"
-     */
     public String getDescription() {
 	return description;
     }
@@ -171,9 +157,6 @@ public class SystemTool implements Serializable {
 	this.description = description;
     }
 
-    /**
-     * @hibernate.property column="learner_url" length="65535" not-null="true"
-     */
     public String getLearnerUrl() {
 	return learnerUrl;
     }
@@ -182,9 +165,6 @@ public class SystemTool implements Serializable {
 	this.learnerUrl = learnerUrl;
     }
 
-    /**
-     * @hibernate.property column="learner_preview_url" length="65535" not-null="false"
-     */
     public String getLearnerPreviewUrl() {
 	return learnerPreviewUrl;
     }
@@ -193,9 +173,6 @@ public class SystemTool implements Serializable {
 	this.learnerPreviewUrl = learnerPreviewUrl;
     }
 
-    /**
-     * @hibernate.property column="learner_progress_url" length="65535" not-null="false"
-     */
     public String getLearnerProgressUrl() {
 	return learnerProgressUrl;
     }
@@ -204,9 +181,6 @@ public class SystemTool implements Serializable {
 	this.learnerProgressUrl = learnerProgressUrl;
     }
 
-    /**
-     * @hibernate.property column="export_pfolio_learner_url" length="65535" not-null="false"
-     */
     public String getExportPortfolioLearnerUrl() {
 	return exportPortfolioLearnerUrl;
     }
@@ -215,9 +189,6 @@ public class SystemTool implements Serializable {
 	this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
     }
 
-    /**
-     * @hibernate.property column="export_pfolio_class_url" length="65535" not-null="false"
-     */
     public String getExportPortfolioClassUrl() {
 	return exportPortfolioClassUrl;
     }
@@ -227,7 +198,6 @@ public class SystemTool implements Serializable {
     }
 
     /**
-     * @hibernate.property column="admin_url" length="65535" not-null="false"
      * @return Returns the helpUrl.
      */
     public String getAdminUrl() {
@@ -243,7 +213,6 @@ public class SystemTool implements Serializable {
     }
 
     /**
-     * @hibernate.property column="create_date_time" length="19" not-null="true"
      * @return Returns the createDateTime.
      */
     public Date getCreateDateTime() {
@@ -267,7 +236,6 @@ public class SystemTool implements Serializable {
     }
 
     /**
-     * @hibernate.property column="contribute_url" length="65535" not-null="false"
      * @return Returns the contributeUrl.
      */
     public String getContributeUrl() {
@@ -283,7 +251,6 @@ public class SystemTool implements Serializable {
     }
 
     /**
-     * @hibernate.property column="monitor_url" length="65535" not-null="false"
      * @return Returns the monitorUrl.
      */
     public String getMonitorUrl() {
@@ -299,7 +266,6 @@ public class SystemTool implements Serializable {
     }
 
     /**
-     * @hibernate.property column="help_url" length="65535" not-null="false"
      * @return Returns the helpUrl.
      */
     public String getHelpUrl() {
@@ -337,9 +303,6 @@ public class SystemTool implements Serializable {
 	return new HashCodeBuilder().append(getSystemToolId()).toHashCode();
     }
 
-    /**
-     * @hibernate.property column="pedagogical_planner_url" length="65535" not-null="false"
-     */
     public String getPedagogicalPlannerUrl() {
 	return pedagogicalPlannerUrl;
     }

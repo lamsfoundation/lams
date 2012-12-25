@@ -35,8 +35,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 
 /**
- * @hibernate.class table="lams_workspace_folder"
- * 
  * @author Fei Yang,Manpreet Minhas
  *     
 */
@@ -150,13 +148,6 @@ public class WorkspaceFolder implements Serializable {
     public WorkspaceFolder() {
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Integer"
-     *             column="workspace_folder_id"
-     *         
-     */
     public Integer getWorkspaceFolderId() {
         return this.workspaceFolderId;
     }
@@ -165,13 +156,6 @@ public class WorkspaceFolder implements Serializable {
         this.workspaceFolderId = workspaceFolderId;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="name"
-     *             length="255"
-     *             not-null="true"
-     *         
-     */
     public String getName() {
         return this.name;
     }
@@ -179,11 +163,7 @@ public class WorkspaceFolder implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
-    /** 
-     *            @hibernate.many-to-one
-     *            @hibernate.column name="parent_folder_id"         
-     *         
-     */
+
     public WorkspaceFolder getParentWorkspaceFolder() {
         return this.parentWorkspaceFolder;
     }
@@ -194,9 +174,6 @@ public class WorkspaceFolder implements Serializable {
 
     /**
      * WorkspaceWorkspaceFolder is a join object that links a workspace folder to its workspaces. 
-	 *	@hibernate.set inverse="false" cascade="all-delete-orphan"
-     *  @hibernate.collection-key column="workspace_folder"
-     *  @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder"
      */
     protected Set getWorkspaceWorkspaceFolders() {
         return workspaceWorkspaceFolders;	
@@ -219,18 +196,7 @@ public class WorkspaceFolder implements Serializable {
     	}
     	return set;
     }
-    
-	/** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="parent_folder_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.WorkspaceFolder"
-     *         
-     */
+
     public Set getChildWorkspaceFolders() {
         return this.childWorkspaceFolders;
     }

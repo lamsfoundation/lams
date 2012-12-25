@@ -48,8 +48,6 @@ import org.lamsfoundation.lams.util.Nullable;
 /**
  * Base class for all activities. If you add another subclass, you must update
  * ActivityDAO.getActivityByActivityId() and add a ACTIVITY_TYPE constant.
- * 
- * @hibernate.class table="lams_learning_activity"
  */
 public abstract class Activity implements Serializable, Nullable, Comparable<Activity> {
 
@@ -394,10 +392,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     // ---------------------------------------------------------------------
     // Getters and Setters
     // ---------------------------------------------------------------------
-    /**
-     * @hibernate.activityUIID generator-class="native" type="java.lang.Long"
-     *                         column="activity_id"
-     */
     public Long getActivityId() {
 	return activityId;
     }
@@ -406,9 +400,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.activityId = activityId;
     }
 
-    /**
-     * @hibernate.property column="activityUIID" length="11"
-     */
     public Integer getActivityUIID() {
 	return activityUIID;
     }
@@ -417,9 +408,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	activityUIID = id;
     }
 
-    /**
-     * @hibernate.property column="description" length="65535"
-     */
     public String getDescription() {
 	return description;
     }
@@ -428,9 +416,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.description = description;
     }
 
-    /**
-     * @hibernate.property column="title" length="255"
-     */
     public String getTitle() {
 	return title;
     }
@@ -439,9 +424,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.title = title;
     }
 
-    /**
-     * @hibernate.property column="xcoord" length="11"
-     */
     public Integer getXcoord() {
 	return xcoord;
     }
@@ -450,9 +432,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.xcoord = xcoord;
     }
 
-    /**
-     * @hibernate.property column="ycoord" length="11"
-     */
     public Integer getYcoord() {
 	return ycoord;
     }
@@ -461,9 +440,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.ycoord = ycoord;
     }
 
-    /**
-     * @hibernate.property column="order_id" length="11"
-     */
     public Integer getOrderId() {
 	return orderId;
     }
@@ -472,9 +448,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.orderId = orderId;
     }
 
-    /**
-     * @hibernate.property column="define_later_flag" length="4" not-null="true"
-     */
     public Boolean getDefineLater() {
 	return defineLater;
     }
@@ -483,9 +456,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.defineLater = defineLater;
     }
 
-    /**
-     * @hibernate.property column="create_date_time" length="19" not-null="true"
-     */
     public Date getCreateDateTime() {
 	return createDateTime;
     }
@@ -495,11 +465,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.createDateTime = createDateTime != null ? createDateTime : new Date();
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="learning_library_id"
-     * 
-     */
     public org.lamsfoundation.lams.learningdesign.LearningLibrary getLearningLibrary() {
 	return learningLibrary;
     }
@@ -508,11 +473,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.learningLibrary = learningLibrary;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="parent_activity_id"
-     * 
-     */
     public org.lamsfoundation.lams.learningdesign.Activity getParentActivity() {
 	return parentActivity;
     }
@@ -521,12 +481,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.parentActivity = parentActivity;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="learning_design_id"
-     * 
-     */
-    public org.lamsfoundation.lams.learningdesign.LearningDesign getLearningDesign() {
+   public org.lamsfoundation.lams.learningdesign.LearningDesign getLearningDesign() {
 	return learningDesign;
     }
 
@@ -534,11 +489,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.learningDesign = learningDesign;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="grouping_id"
-     * 
-     */
     public org.lamsfoundation.lams.learningdesign.Grouping getGrouping() {
 	return grouping;
     }
@@ -547,11 +497,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.grouping = grouping;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="learning_activity_type_id"
-     * 
-     */
     public Integer getActivityTypeId() {
 	return activityTypeId;
     }
@@ -693,7 +638,6 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     /**
-     * @hibernate.property column="library_activity_ui_image" length="255"
      * @return Returns the libraryActivityUiImage.
      */
     public String getLibraryActivityUiImage() {

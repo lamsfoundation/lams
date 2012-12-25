@@ -36,12 +36,6 @@ import org.lamsfoundation.lams.learningdesign.dto.GroupDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Nullable;
 
-
-/** 
- *        @hibernate.class
- *         table="lams_group"
- *     
-*/
 public class Group implements Serializable,Nullable,Comparable {
 
     public final static int STAFF_GROUP_ORDER_ID = 1;
@@ -146,22 +140,10 @@ public class Group implements Serializable,Nullable,Comparable {
     // Field Access Methods
     //---------------------------------------------------------------------
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="group_id"
-     *         
-     */
     public Long getGroupId() {
         return this.groupId;
     }
-    /**
-     * @hibernate.property
-     * 	 column="group_name"
-     * 	 
-     * @return
-     */
+
     public String getGroupName() {
 		return groupName;
 	}
@@ -174,13 +156,6 @@ public class Group implements Serializable,Nullable,Comparable {
         this.groupId = groupId;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="order_id"
-     *             length="6"
-     *             not-null="true"
-     *         
-     */
     public int getOrderId() {
         return this.orderId;
     }
@@ -189,9 +164,6 @@ public class Group implements Serializable,Nullable,Comparable {
         this.orderId = orderId;
     }
 
-	/**
-	 * @hibernate.property column="group_ui_id" length="11"
-	 */
 	public Integer getGroupUIID() {
 		return this.groupUIID;
 	}
@@ -200,12 +172,6 @@ public class Group implements Serializable,Nullable,Comparable {
 		this.groupUIID = uiId;
 	}
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="grouping_id"         
-     *         
-     */
     public org.lamsfoundation.lams.learningdesign.Grouping getGrouping() {
         return this.grouping;
     }

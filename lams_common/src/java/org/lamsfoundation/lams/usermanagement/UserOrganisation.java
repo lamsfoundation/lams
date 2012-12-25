@@ -30,11 +30,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-/** 
- *        @hibernate.class
- *         table="lams_user_organisation"
- *     
-*/
 public class UserOrganisation implements Serializable {
 
     /** identifier field */
@@ -68,13 +63,6 @@ public class UserOrganisation implements Serializable {
     public UserOrganisation() {
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Integer"
-     *             column="user_organisation_id"
-     *         
-     */
     public Integer getUserOrganisationId() {
         return this.userOrganisationId;
     }
@@ -83,12 +71,6 @@ public class UserOrganisation implements Serializable {
         this.userOrganisationId = userOrganisationId;
     }
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="user_id"         
-     *         
-     */
     public User getUser() {
         return this.user;
     }
@@ -97,12 +79,6 @@ public class UserOrganisation implements Serializable {
         this.user = user;
     }
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="organisation_id"         
-     *         
-     */
     public Organisation getOrganisation() {
         return this.organisation;
     }
@@ -111,13 +87,6 @@ public class UserOrganisation implements Serializable {
         this.organisation = organisation;
     }
 
-    /**
-     * 			@hibernate.one-to-one
-     * 				name="userOrganisationCollapsed"
-     * 				class="org.lamsfoundation.lams.usermanagement.UserOrganisationCollapsed"
-     * 				cascade="all"
-     * 
-     */
     public UserOrganisationCollapsed getUserOrganisationCollapsed() {
     	return this.userOrganisationCollapsed;
     }
@@ -125,18 +94,7 @@ public class UserOrganisation implements Serializable {
     public void setUserOrganisationCollapsed(UserOrganisationCollapsed uoc) {
     	this.userOrganisationCollapsed = uoc;
     }
-    
-    /** 
-     *            @hibernate.set
-     *             lazy="false"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="user_organisation_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.hibernate.userOrganisationRole"
-     *         
-     */
+
     public Set getUserOrganisationRoles() {
         return this.userOrganisationRoles;
     }

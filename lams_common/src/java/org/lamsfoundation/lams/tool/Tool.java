@@ -34,10 +34,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.tool.dto.AuthoringToolDTO;
 
-/**
- * 
- * @hibernate.class table="lams_tool"
- */
 public class Tool implements Serializable {
 
     /** identifier field */
@@ -207,9 +203,6 @@ public class Tool implements Serializable {
 	this.mappedServers = new HashSet<ExtServerToolAdapterMap>();
     }
 
-    /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="tool_id"
-     */
     public Long getToolId() {
 	return toolId;
     }
@@ -218,9 +211,6 @@ public class Tool implements Serializable {
 	this.toolId = toolId;
     }
 
-    /**
-     * @hibernate.property column="learner_url" length="65535" not-null="true"
-     */
     public String getLearnerUrl() {
 	return learnerUrl;
     }
@@ -229,9 +219,6 @@ public class Tool implements Serializable {
 	this.learnerUrl = learnerUrl;
     }
 
-    /**
-     * @hibernate.property column="learner_preview_url" length="65535" not-null="false"
-     */
     public String getLearnerPreviewUrl() {
 	return learnerPreviewUrl;
     }
@@ -240,9 +227,6 @@ public class Tool implements Serializable {
 	this.learnerPreviewUrl = learnerPreviewUrl;
     }
 
-    /**
-     * @hibernate.property column="learner_progress_url" length="65535" not-null="false"
-     */
     public String getLearnerProgressUrl() {
 	return learnerProgressUrl;
     }
@@ -259,9 +243,6 @@ public class Tool implements Serializable {
 	return contributeURL != null && contributeURL.trim().length() > 0;
     }
 
-    /**
-     * @hibernate.property column="author_url" length="65535" not-null="true"
-     */
     public String getAuthorUrl() {
 	return authorUrl;
     }
@@ -287,7 +268,6 @@ public class Tool implements Serializable {
     }
 
     /**
-     * @hibernate.property column="supports_run_offline_flag" length="1" not-null="true"
      * @return Returns the supportsRunOffline.
      */
     public boolean getSupportsRunOffline() {
@@ -302,9 +282,6 @@ public class Tool implements Serializable {
 	this.supportsRunOffline = supportsRunOffline;
     }
 
-    /**
-     * @hibernate.property column="define_later_url" length="65535" not-null="false"
-     */
     public String getDefineLaterUrl() {
 	return defineLaterUrl;
     }
@@ -313,9 +290,6 @@ public class Tool implements Serializable {
 	this.defineLaterUrl = defineLaterUrl;
     }
 
-    /**
-     * @hibernate.property column="default_tool_content_id" length="20" not-null="false"
-     */
     public long getDefaultToolContentId() {
 	return defaultToolContentId;
     }
@@ -324,9 +298,6 @@ public class Tool implements Serializable {
 	this.defaultToolContentId = defaultToolContentId;
     }
 
-    /**
-     * @hibernate.property column="tool_signature" length="64" not-null="true"
-     */
     public String getToolSignature() {
 	return toolSignature;
     }
@@ -335,9 +306,6 @@ public class Tool implements Serializable {
 	this.toolSignature = toolSignature;
     }
 
-    /**
-     * @hibernate.property column="tool_display_name" length="255" not-null="true"
-     */
     public String getToolDisplayName() {
 	return toolDisplayName;
     }
@@ -346,9 +314,6 @@ public class Tool implements Serializable {
 	this.toolDisplayName = toolDisplayName;
     }
 
-    /**
-     * @hibernate.property column="description" length="65535"
-     */
     public String getDescription() {
 	return description;
     }
@@ -357,9 +322,6 @@ public class Tool implements Serializable {
 	this.description = description;
     }
 
-    /**
-     * @hibernate.property column="service_name" length="65535" not-null="true"
-     */
     public String getServiceName() {
 	return serviceName;
     }
@@ -368,9 +330,6 @@ public class Tool implements Serializable {
 	this.serviceName = serviceName;
     }
 
-    /**
-     * @hibernate.property column="export_pfolio_learner_url" length="65535" not-null="false"
-     */
     public String getExportPortfolioLearnerUrl() {
 	return exportPortfolioLearnerUrl;
     }
@@ -379,9 +338,6 @@ public class Tool implements Serializable {
 	this.exportPortfolioLearnerUrl = exportPortfolioLearnerUrl;
     }
 
-    /**
-     * @hibernate.property column="export_pfolio_class_url" length="65535" not-null="false"
-     */
     public String getExportPortfolioClassUrl() {
 	return exportPortfolioClassUrl;
     }
@@ -390,12 +346,6 @@ public class Tool implements Serializable {
 	this.exportPortfolioClassUrl = exportPortfolioClassUrl;
     }
 
-    /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="tool_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"
-     * 
-     */
     public Set getActivities() {
 	return activities;
     }
@@ -405,7 +355,6 @@ public class Tool implements Serializable {
     }
 
     /**
-     * @hibernate.property column="valid_flag" length="1" not-null="true"
      * @return Returns the valid.
      */
     public boolean isValid() {
@@ -436,7 +385,6 @@ public class Tool implements Serializable {
     }
 
     /**
-     * @hibernate.property column="create_date_time" length="19" not-null="true"
      * @return Returns the createDateTime.
      */
     public Date getCreateDateTime() {
@@ -452,7 +400,6 @@ public class Tool implements Serializable {
     }
 
     /**
-     * @hibernate.property column="contribute_url" length="65535" not-null="false"
      * @return Returns the contributeUrl.
      */
     public String getContributeUrl() {
@@ -468,7 +415,6 @@ public class Tool implements Serializable {
     }
 
     /**
-     * @hibernate.property column="moderation_url" length="65535" not-null="false"
      * @return Returns the moderationUrl.
      */
     public String getModerationUrl() {
@@ -484,7 +430,6 @@ public class Tool implements Serializable {
     }
 
     /**
-     * @hibernate.property column="monitor_url" length="65535" not-null="false"
      * @return Returns the monitorUrl.
      */
     public String getMonitorUrl() {
@@ -500,7 +445,6 @@ public class Tool implements Serializable {
     }
 
     /**
-     * @hibernate.property column="help_url" length="65535" not-null="false"
      * @return Returns the helpUrl.
      */
     public String getHelpUrl() {
@@ -516,7 +460,6 @@ public class Tool implements Serializable {
     }
 
     /**
-     * @hibernate.property column="admin_url" length="65535" not-null="false"
      * @return Returns the helpUrl.
      */
     public String getAdminUrl() {
@@ -531,9 +474,6 @@ public class Tool implements Serializable {
 	this.adminUrl = adminUrl;
     }
 
-    /**
-     * @hibernate.property column="tool_identifier" length="64"
-     */
     public String getToolIdentifier() {
 	return toolIdentifier;
     }
@@ -542,9 +482,6 @@ public class Tool implements Serializable {
 	this.toolIdentifier = toolIdentifier;
     }
 
-    /**
-     * @hibernate.property column="tool_version" length="10"
-     */
     public String getToolVersion() {
 	return toolVersion;
     }
@@ -553,9 +490,6 @@ public class Tool implements Serializable {
 	this.toolVersion = toolVersion;
     }
 
-    /**
-     * @hibernate.property column="language_file" length="255" not-null="false"
-     */
     public String getLanguageFile() {
 	return languageFile;
     }
@@ -565,7 +499,6 @@ public class Tool implements Serializable {
     }
 
     /**
-     * @hibernate.property column="supports_outputs" length="1"
      * @return Returns the supportsOutputs.
      */
     public boolean getSupportsOutputs() {
@@ -580,9 +513,6 @@ public class Tool implements Serializable {
 	this.supportsOutputs = supportsOutputs;
     }
 
-    /**
-     * @hibernate.property column="ext_lms_id" length="255" not-null="false"
-     */
     public String getExtLmsId() {
 	return extLmsId;
     }
@@ -626,9 +556,6 @@ public class Tool implements Serializable {
 	return vo;
     }
 
-    /**
-     * @hibernate.property column="pedagogical_planner_url" length="65535" not-null="false"
-     */
     public String getPedagogicalPlannerUrl() {
 	return pedagogicalPlannerUrl;
     }

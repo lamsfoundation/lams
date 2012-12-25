@@ -29,11 +29,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-/** 
- *        @hibernate.class
- *         table="lams_organisation_type"
- *     
-*/
 public class OrganisationType implements Serializable {
 	
 	public static final Integer ROOT_TYPE = 1;
@@ -67,13 +62,6 @@ public class OrganisationType implements Serializable {
     public OrganisationType() {
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="increment"
-     *             type="java.lang.Integer"
-     *             column="organisation_type_id"
-     *         
-     */
     public Integer getOrganisationTypeId() {
         return this.organisationTypeId;
     }
@@ -82,14 +70,6 @@ public class OrganisationType implements Serializable {
         this.organisationTypeId = organisationTypeId;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="name"
-     *             unique="true"
-     *             length="64"
-     *             not-null="true"
-     *         
-     */
     public String getName() {
         return this.name;
     }
@@ -98,13 +78,6 @@ public class OrganisationType implements Serializable {
         this.name = name;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="description"
-     *             length="255"
-     *             not-null="true"
-     *         
-     */
     public String getDescription() {
         return this.description;
     }
@@ -113,17 +86,6 @@ public class OrganisationType implements Serializable {
         this.description = description;
     }
 
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="organisation_type_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.Organisation"
-     *         
-     */
     public Set getOrganisations() {
         return this.organisations;
     }

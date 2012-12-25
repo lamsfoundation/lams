@@ -33,10 +33,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Join table that maps workspace to workspace folders. Was having trouble getting Hibernate 
  * to persist the join table.
  * 
- * @hibernate.class table="lams_wkspc_wkspc_folder"
- * 
  * @author Fiona Malikoff
- *     
 */
 public class WorkspaceWorkspaceFolder implements Serializable {
 	
@@ -60,12 +57,7 @@ public class WorkspaceWorkspaceFolder implements Serializable {
 		this.workspace = workspace;	
 		this.workspaceFolder = workspaceFolder;
 	}
-	
-    /**    @hibernate.id
-     *		generator-class="native"
-	  * 	type="java.lang.Integer"
-	  *		column="id"
-	*/
+
    public Integer getId() {
 		return id;
 	}
@@ -73,12 +65,7 @@ public class WorkspaceWorkspaceFolder implements Serializable {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-    /** 
-     *  	@hibernate.many-to-one
-     *	        not-null="true"
-	 * 			lazy="false"	
-	 * 		@hibernate.column name="workspace_folder_id"         
-     */
+
     public WorkspaceFolder getWorkspaceFolder() {
         return this.workspaceFolder;
     }
@@ -87,12 +74,6 @@ public class WorkspaceWorkspaceFolder implements Serializable {
         this.workspaceFolder = workspaceFolder;
     }
 
-    /** 
-     *  	@hibernate.many-to-one
-     *	        not-null="true"
-	 * 			lazy="false"	
-	 * 		@hibernate.column name="workspace_id"         
-     */
     public Workspace getWorkspace() {
         return this.workspace;
     }

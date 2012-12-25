@@ -44,10 +44,6 @@ public class ExtServerToolAdapterMap {
 	this.extServer = extServer;
     }
 
-    public Tool getTool() {
-	return tool;
-    }
-
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
      * 
@@ -65,6 +61,9 @@ public class ExtServerToolAdapterMap {
      * @hibernate.column name="tool_id"
      * 
      */
+    public Tool getTool() {
+	return tool;
+    }
     public void setTool(Tool tool) {
 	this.tool = tool;
     }

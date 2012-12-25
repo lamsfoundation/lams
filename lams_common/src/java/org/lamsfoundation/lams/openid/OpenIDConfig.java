@@ -1,5 +1,8 @@
 package org.lamsfoundation.lams.openid;
 
+/**
+ * @hibernate.class table="lams_openid_config"
+ */
 public class OpenIDConfig {
 	private String configKey;
 	private String configValue;
@@ -12,7 +15,7 @@ public class OpenIDConfig {
 	}
 
 	/**
-	 * @hibernate.id type="java.lang.Long" column="config_key"
+	 * @hibernate.id column="config_key" length="20"
 	 */
 	public String getConfigKey() {
 		return configKey;

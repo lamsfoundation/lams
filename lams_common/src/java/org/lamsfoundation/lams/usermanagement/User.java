@@ -41,10 +41,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.util.LanguageUtil;
 
-/**
- * @hibernate.class table="lams_user"
- * 
- */
 public class User implements Serializable, Comparable {
 
     /** identifier field */
@@ -185,10 +181,6 @@ public class User implements Serializable, Comparable {
 	changePassword = false;
     }
 
-    /**
-     * @hibernate.id generator-class="native" type="java.lang.Integer" column="user_id"
-     * 
-     */
     public Integer getUserId() {
 	return userId;
     }
@@ -197,10 +189,6 @@ public class User implements Serializable, Comparable {
 	this.userId = userId;
     }
 
-    /**
-     * @hibernate.property column="login" length="255" unique="true" not-null="true"
-     * 
-     */
     public String getLogin() {
 	return login;
     }
@@ -209,10 +197,6 @@ public class User implements Serializable, Comparable {
 	this.login = login;
     }
 
-    /**
-     * @hibernate.property column="password" length="50" not-null="true"
-     * 
-     */
     public String getPassword() {
 	return password;
     }
@@ -221,10 +205,6 @@ public class User implements Serializable, Comparable {
 	this.password = password;
     }
 
-    /**
-     * @hibernate.property column="title" length="32"
-     * 
-     */
     public String getTitle() {
 	return title;
     }
@@ -233,10 +213,6 @@ public class User implements Serializable, Comparable {
 	this.title = title;
     }
 
-    /**
-     * @hibernate.property column="first_name" length="128"
-     * 
-     */
     public String getFirstName() {
 	return firstName;
     }
@@ -245,10 +221,6 @@ public class User implements Serializable, Comparable {
 	this.firstName = firstName;
     }
 
-    /**
-     * @hibernate.property column="last_name" length="128"
-     * 
-     */
     public String getLastName() {
 	return lastName;
     }
@@ -261,10 +233,6 @@ public class User implements Serializable, Comparable {
 	return this.getFirstName() + " " + this.getLastName();
     }
 
-    /**
-     * @hibernate.property column="address_line_1" length="64"
-     * 
-     */
     public String getAddressLine1() {
 	return addressLine1;
     }
@@ -273,10 +241,6 @@ public class User implements Serializable, Comparable {
 	this.addressLine1 = addressLine1;
     }
 
-    /**
-     * @hibernate.property column="address_line_2" length="64"
-     * 
-     */
     public String getAddressLine2() {
 	return addressLine2;
     }
@@ -285,10 +249,6 @@ public class User implements Serializable, Comparable {
 	this.addressLine2 = addressLine2;
     }
 
-    /**
-     * @hibernate.property column="address_line_3" length="64"
-     * 
-     */
     public String getAddressLine3() {
 	return addressLine3;
     }
@@ -297,10 +257,6 @@ public class User implements Serializable, Comparable {
 	this.addressLine3 = addressLine3;
     }
 
-    /**
-     * @hibernate.property column="city" length="64"
-     * 
-     */
     public String getCity() {
 	return city;
     }
@@ -309,10 +265,6 @@ public class User implements Serializable, Comparable {
 	this.city = city;
     }
 
-    /**
-     * @hibernate.property column="state" length="64"
-     * 
-     */
     public String getState() {
 	return state;
     }
@@ -321,10 +273,6 @@ public class User implements Serializable, Comparable {
 	this.state = state;
     }
 
-    /**
-     * @hibernate.property column="postcode" length="10"
-     * 
-     */
     public String getPostcode() {
 	return postcode;
     }
@@ -333,10 +281,6 @@ public class User implements Serializable, Comparable {
 	this.postcode = postcode;
     }
 
-    /**
-     * @hibernate.property column="country" length="64"
-     * 
-     */
     public String getCountry() {
 	return country;
     }
@@ -345,10 +289,6 @@ public class User implements Serializable, Comparable {
 	this.country = country;
     }
 
-    /**
-     * @hibernate.property column="day_phone" length="64"
-     * 
-     */
     public String getDayPhone() {
 	return dayPhone;
     }
@@ -357,10 +297,6 @@ public class User implements Serializable, Comparable {
 	this.dayPhone = dayPhone;
     }
 
-    /**
-     * @hibernate.property column="evening_phone" length="64"
-     * 
-     */
     public String getEveningPhone() {
 	return eveningPhone;
     }
@@ -369,10 +305,6 @@ public class User implements Serializable, Comparable {
 	this.eveningPhone = eveningPhone;
     }
 
-    /**
-     * @hibernate.property column="mobile_phone" length="64"
-     * 
-     */
     public String getMobilePhone() {
 	return mobilePhone;
     }
@@ -381,10 +313,6 @@ public class User implements Serializable, Comparable {
 	this.mobilePhone = mobilePhone;
     }
 
-    /**
-     * @hibernate.property column="fax" length="64"
-     * 
-     */
     public String getFax() {
 	return fax;
     }
@@ -393,10 +321,6 @@ public class User implements Serializable, Comparable {
 	this.fax = fax;
     }
 
-    /**
-     * @hibernate.property column="email" length="128"
-     * 
-     */
     public String getEmail() {
 	return email;
     }
@@ -405,10 +329,6 @@ public class User implements Serializable, Comparable {
 	this.email = email;
     }
 
-    /**
-     * @hibernate.property column="disabled_flag" length="1" not-null="true"
-     * 
-     */
     public Boolean getDisabledFlag() {
 	return disabledFlag;
     }
@@ -417,10 +337,6 @@ public class User implements Serializable, Comparable {
 	this.disabledFlag = disabledFlag;
     }
 
-    /**
-     * @hibernate.property column="create_date" length="19" not-null="true"
-     * 
-     */
     public Date getCreateDate() {
 	return createDate;
     }
@@ -429,11 +345,6 @@ public class User implements Serializable, Comparable {
 	this.createDate = createDate;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true" lazy="false" cascade="all"
-     * @hibernate.column name="workspace_id"
-     * 
-     */
     public Workspace getWorkspace() {
 	return workspace;
     }
@@ -442,11 +353,6 @@ public class User implements Serializable, Comparable {
 	this.workspace = workspace;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true" lazy="false"
-     * @hibernate.column name="authentication_method_id"
-     * 
-     */
     public AuthenticationMethod getAuthenticationMethod() {
 	return authenticationMethod;
     }
@@ -455,11 +361,6 @@ public class User implements Serializable, Comparable {
 	this.authenticationMethod = authenticationMethod;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="false"
-     * @hibernate.column name="flash_theme_id"
-     * 
-     */
     public Theme getFlashTheme() {
 	return flashTheme;
     }
@@ -468,11 +369,6 @@ public class User implements Serializable, Comparable {
 	this.flashTheme = flashTheme;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="false"
-     * @hibernate.column name="html_theme_id"
-     * 
-     */
     public Theme getHtmlTheme() {
 	return htmlTheme;
     }
@@ -481,10 +377,6 @@ public class User implements Serializable, Comparable {
 	this.htmlTheme = htmlTheme;
     }
 
-    /**
-     * @hibernate.property column="chat_id" length="255"
-     * 
-     */
     public String getChatId() {
 	return chatId;
     }
@@ -493,12 +385,6 @@ public class User implements Serializable, Comparable {
 	this.chatId = chatId;
     }
 
-    /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="user_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.UserOrganisation"
-     * 
-     */
     public Set getUserOrganisations() {
 	return userOrganisations;
     }
@@ -515,12 +401,6 @@ public class User implements Serializable, Comparable {
 	userOrganisations.add(userOrganisation);
     }
 
-    /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="user_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.lesson.LearnerProgress"
-     * 
-     */
     public Set getLearnerProgresses() {
 	return learnerProgresses;
     }
@@ -529,12 +409,6 @@ public class User implements Serializable, Comparable {
 	this.learnerProgresses = learnerProgresses;
     }
 
-    /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="user_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.lesson.UserToolSession"
-     * 
-     */
     public Set getUserToolSessions() {
 	return userToolSessions;
     }
@@ -543,12 +417,6 @@ public class User implements Serializable, Comparable {
 	this.userToolSessions = userToolSessions;
     }
 
-    /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="user_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.LearningDesign"
-     * 
-     */
     public Set getLearningDesigns() {
 	return learningDesigns;
     }
@@ -557,12 +425,6 @@ public class User implements Serializable, Comparable {
 	this.learningDesigns = learningDesigns;
     }
 
-    /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="user_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.Lesson"
-     * 
-     */
     public Set getLessons() {
 	return lessons;
     }
@@ -692,11 +554,6 @@ public class User implements Serializable, Comparable {
 	return foundMemberFolder;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true" lazy="false"
-     * @hibernate.column name="locale_id"
-     * @param localeCountry
-     */
     public SupportedLocale getLocale() {
 	return locale;
     }
@@ -705,10 +562,6 @@ public class User implements Serializable, Comparable {
 	this.locale = locale;
     }
 
-    /**
-     * @hibernate.property column="portrait_uuid" length="20"
-     * 
-     */
     public Long getPortraitUuid() {
 	return portraitUuid;
     }
@@ -717,10 +570,6 @@ public class User implements Serializable, Comparable {
 	this.portraitUuid = portraitUuid;
     }
 
-    /**
-     * @hibernate.property column="change_password" length="1" not-null="true"
-     * 
-     */
     public Boolean getChangePassword() {
 	return changePassword;
     }
@@ -729,10 +578,6 @@ public class User implements Serializable, Comparable {
 	this.changePassword = changePassword;
     }
 
-    /**
-     * @hibernate.property column="enable_flash" length="1" not-null="true"
-     * 
-     */
     public Boolean getEnableFlash() {
 	return enableFlash;
     }
@@ -741,10 +586,6 @@ public class User implements Serializable, Comparable {
 	this.enableFlash = enableFlash;
     }
 
-    /**
-     * @hibernate.property column="lams_community_token" length="255" not-null="false"
-     * 
-     */
     public String getLamsCommunityToken() {
 	return lamsCommunityToken;
     }
@@ -753,10 +594,6 @@ public class User implements Serializable, Comparable {
 	this.lamsCommunityToken = lamsCommunityToken;
     }
 
-    /**
-     * @hibernate.property column="lams_community_username" length="255" not-null="false"
-     * 
-     */
     public String getLamsCommunityUsername() {
 	return lamsCommunityUsername;
     }
@@ -765,12 +602,6 @@ public class User implements Serializable, Comparable {
 	this.lamsCommunityUsername = lamsCommunityUsername;
     }
 
-    /**
-     * Returns user's time zone. If NULL, returns server default time zone. 
-     * 
-     * @hibernate.property column="timezone" length="255"
-     * 
-     */
     public String getTimeZone() {
 	if (timeZone == null) {
 	    timeZone = TimeZone.getDefault().getID();
@@ -782,10 +613,6 @@ public class User implements Serializable, Comparable {
 	this.timeZone = timeZone;
     }
 
-    /**
-     * @hibernate.property column="tutorials_disabled" length="1"
-     * 
-     */
     public Boolean getTutorialsDisabled() {
 	return tutorialsDisabled;
     }
@@ -794,11 +621,6 @@ public class User implements Serializable, Comparable {
 	this.tutorialsDisabled = tutorialsDisabled;
     }
 
-    /**
-     * @hibernate.set lazy="false" cascade="all-delete-orphan"
-     * @hibernate.collection-key column="user_id"
-     * @hibernate.collection-element column="page_str" type="string" length="5" not-null="true"
-     */
     public Set<String> getPagesWithDisabledTutorials() {
 	return pagesWithDisabledTutorials;
     }
@@ -807,10 +629,6 @@ public class User implements Serializable, Comparable {
 	this.pagesWithDisabledTutorials = pagesWithDisabledTutorials;
     }
 
-    /**
-     * @hibernate.property column="first_login" length="1"
-     * 
-     */
     public Boolean isFirstLogin() {
 	return firstLogin;
     }
@@ -819,12 +637,6 @@ public class User implements Serializable, Comparable {
 	this.firstLogin = firstLogin;
     }
 
-    /**
-     * @hibernate.set lazy="true" table="lams_planner_recent_learning_designs" cascade="all-delete-orphan"
-     *                order-by="last_modified_date DESC"
-     * @hibernate.collection-key column="user_id"
-     * @hibernate.collection-element column="learning_design_id" type="long" not-null="true"
-     */
     public Set<Long> getRecentlyModifiedLearningDesigns() {
 	return recentlyModifiedLearningDesigns;
     }
@@ -833,10 +645,6 @@ public class User implements Serializable, Comparable {
 	this.recentlyModifiedLearningDesigns = recentlyModifiedLearningDesigns;
     }
 
-    /**
-     * @hibernate.property column="modified_date" length="19" not-null="false"
-     * @return
-     */
     public Date getModifiedDate() {
         return modifiedDate;
     }
@@ -845,10 +653,6 @@ public class User implements Serializable, Comparable {
         this.modifiedDate = modifiedDate;
     }
 
-    /**
-     * @hibernate.property column="openid_url" not-null="false"
-     * @return
-     */
     public String getOpenidURL() {
 		return openidURL;
 	}

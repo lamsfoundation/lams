@@ -4,17 +4,14 @@ import java.io.Serializable;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.usermanagement.User;
 
-
-/** 
- *        @hibernate.class
- *         table="lams_ext_user_userid_map"
- *     
-*/
+/**
+ * @hibernate.class table="lams_ext_user_userid_map"
+ */
 public class ExtUserUseridMap implements Serializable {
 
-	private static final long serialVersionUID = 1755818193730728064L;
+    private static final long serialVersionUID = 1755818193730728064L;
 
-	/** identifier field */
+    /** identifier field */
     private Integer sid;
 
     /** persistent field */
@@ -28,79 +25,67 @@ public class ExtUserUseridMap implements Serializable {
 
     /** full constructor */
     public ExtUserUseridMap(String extUsername, User user, ExtServerOrgMap extServerOrgMap) {
-        this.extUsername = extUsername;
-        this.user = user;
-        this.extServerOrgMap = extServerOrgMap;
+	this.extUsername = extUsername;
+	this.user = user;
+	this.extServerOrgMap = extServerOrgMap;
     }
 
     /** default constructor */
     public ExtUserUseridMap() {
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Integer"
-     *             column="sid"
-     *         
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Integer" column="sid"
+     * 
      */
     public Integer getSid() {
-        return this.sid;
+	return this.sid;
     }
 
     public void setSid(Integer sid) {
-        this.sid = sid;
+	this.sid = sid;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="external_username"
-     *             length="250"
-     *             not-null="true"
-     *         
+    /**
+     * @hibernate.property column="external_username" length="250" not-null="true"
+     * 
      */
     public String getExtUsername() {
-        return this.extUsername;
+	return this.extUsername;
     }
 
     public void setExtUsername(String extUsername) {
-        this.extUsername = extUsername;
+	this.extUsername = extUsername;
     }
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="user_id"
-     *             lazy="true"         
-     *         
+    /**
+     * @hibernate.many-to-one not-null="true"
+     * @hibernate.column name="user_id" lazy="true"
+     * 
      */
     public User getUser() {
-        return this.user;
+	return this.user;
     }
 
     public void setUser(User user) {
-        this.user = user;
+	this.user = user;
     }
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="ext_server_org_map_id"         
-     *         
+    /**
+     * @hibernate.many-to-one not-null="true"
+     * @hibernate.column name="ext_server_org_map_id"
+     * 
      */
     public ExtServerOrgMap getExtServerOrgMap() {
-        return this.extServerOrgMap;
+	return this.extServerOrgMap;
     }
 
     public void setExtServerOrgMap(ExtServerOrgMap extServerOrgMap) {
-        this.extServerOrgMap = extServerOrgMap;
+	this.extServerOrgMap = extServerOrgMap;
     }
 
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("sid", getSid())
-            .append("extUsername", getExtUsername())
-            .toString();
+	return new ToStringBuilder(this).append("sid", getSid()).append("extUsername", getExtUsername()).toString();
     }
 
 }

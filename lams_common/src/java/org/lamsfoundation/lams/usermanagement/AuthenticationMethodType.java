@@ -29,11 +29,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-/** 
- *        @hibernate.class
- *         table="lams_auth_method_type"
- *     
-*/
 public class AuthenticationMethodType implements Serializable {
 	
 	public static final String LAMS = "LAMS";
@@ -59,13 +54,6 @@ public class AuthenticationMethodType implements Serializable {
     public AuthenticationMethodType() {
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Integer"
-     *             column="authentication_method_type_id"
-     *         
-     */
     public Integer getAuthenticationMethodTypeId() {
         return this.authenticationMethodTypeId;
     }
@@ -74,13 +62,6 @@ public class AuthenticationMethodType implements Serializable {
         this.authenticationMethodTypeId = authenticationMethodTypeId;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="description"
-     *             length="64"
-     *             not-null="true"
-     *         
-     */
     public String getDescription() {
         return this.description;
     }
@@ -89,17 +70,6 @@ public class AuthenticationMethodType implements Serializable {
         this.description = description;
     }
 
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="authentication_method_type_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.AuthenticationMethod"
-     *         
-     */
     public Set getAuthenticationMethods() {
         return this.authenticationMethods;
     }

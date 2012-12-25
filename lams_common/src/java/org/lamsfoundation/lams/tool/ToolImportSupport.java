@@ -29,19 +29,18 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-/** 
- * When importing data, which "tool signatures" does a tool support. This maps the 
- * 1.0.2 tool types to 2.0 tool signatures, and may be used for 2.1 tool versions to automatically
- * support 2.0 tool data, even if the tools themselves have changed.
- *  
+/**
+ * When importing data, which "tool signatures" does a tool support. This maps the 1.0.2 tool types to 2.0 tool
+ * signatures, and may be used for 2.1 tool versions to automatically support 2.0 tool data, even if the tools
+ * themselves have changed.
+ * 
  * @hibernate.class table="lams_tool_import_support"
  */
 public class ToolImportSupport implements Serializable {
 
- 	private static final long serialVersionUID = -6212324577067151495L;
+    private static final long serialVersionUID = -6212324577067151495L;
 
-	/** identifier field */
+    /** identifier field */
     private Long id;
 
     /** persistent field */
@@ -51,13 +50,10 @@ public class ToolImportSupport implements Serializable {
     private String supportsToolSignature;
 
     /** full constructor */
-    public ToolImportSupport(Long id, 
-                String installedToolSignature, 
-                String supportsToolSignature) 
-    {
-        this.id = id;
-        this.installedToolSignature = installedToolSignature;
-        this.supportsToolSignature = supportsToolSignature;
+    public ToolImportSupport(Long id, String installedToolSignature, String supportsToolSignature) {
+	this.id = id;
+	this.installedToolSignature = installedToolSignature;
+	this.supportsToolSignature = supportsToolSignature;
 
     }
 
@@ -65,68 +61,58 @@ public class ToolImportSupport implements Serializable {
     public ToolImportSupport() {
     }
 
-
-    /** 
-     * @hibernate.id generator-class="native" type="java.lang.Long"
-     *             	 column="id"      
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="id"
      */
     public Long getId() {
-        return this.id;
+	return this.id;
     }
 
     public void setId(Long id) {
-        this.id = id;
+	this.id = id;
     }
 
-    /** 
-     * @hibernate.property column="installed_tool_signature"
-            length="15"
-            not-null="true" 
+    /**
+     * @hibernate.property column="installed_tool_signature" length="15" not-null="true"
      */
     public String getInstalledToolSignature() {
-        return this.installedToolSignature;
+	return this.installedToolSignature;
     }
 
     public void setInstalledToolSignature(String installedToolSignature) {
-        this.installedToolSignature = installedToolSignature;
+	this.installedToolSignature = installedToolSignature;
     }
 
-    /** 
-     * @hibernate.property column="supports_tool_signature"
-            length="50"
-            not-null="true"
+    /**
+     * @hibernate.property column="supports_tool_signature" length="50" not-null="true"
      */
     public String getSupportsToolSignature() {
-        return this.supportsToolSignature;
+	return this.supportsToolSignature;
     }
 
     public void setSupportsToolSignature(String supportsToolSignature) {
-        this.supportsToolSignature = supportsToolSignature;
+	this.supportsToolSignature = supportsToolSignature;
     }
 
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("id", getId())
-            .append("installedToolSignature", getInstalledToolSignature())
-            .append("supportsToolSignature", getSupportsToolSignature())
-            .toString();
+	return new ToStringBuilder(this).append("id", getId())
+		.append("installedToolSignature", getInstalledToolSignature())
+		.append("supportsToolSignature", getSupportsToolSignature()).toString();
     }
 
     public boolean equals(Object other) {
-        if ( (this == other ) ) return true;
-        if ( !(other instanceof ToolImportSupport) ) return false;
-        ToolImportSupport castOther = (ToolImportSupport) other;
-        return new EqualsBuilder()
-            .append(this.getId(), castOther.getId())
-            .append(this.getInstalledToolSignature(), castOther.getInstalledToolSignature())
-            .append(this.getSupportsToolSignature(), castOther.getSupportsToolSignature())
-            .isEquals();
+	if ((this == other))
+	    return true;
+	if (!(other instanceof ToolImportSupport))
+	    return false;
+	ToolImportSupport castOther = (ToolImportSupport) other;
+	return new EqualsBuilder().append(this.getId(), castOther.getId())
+		.append(this.getInstalledToolSignature(), castOther.getInstalledToolSignature())
+		.append(this.getSupportsToolSignature(), castOther.getSupportsToolSignature()).isEquals();
     }
 
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(getId())
-            .toHashCode();
+	return new HashCodeBuilder().append(getId()).toHashCode();
     }
 
 }

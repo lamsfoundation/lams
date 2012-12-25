@@ -26,15 +26,13 @@ package org.lamsfoundation.lams.themes;
 /**
  * @author lfoxton
  * 
- * Model for theme whether it be flash, css or other
- * 
- * @hibernate.class table="lams_theme"
+ *         Model for theme whether it be flash, css or other
  */
 public class Theme {
 
     public static final int TYPE_CSS = 1;
     public static final int TYPE_FLASH = 2;
-    
+
     /** identifier field */
     private Long themeId;
 
@@ -43,16 +41,16 @@ public class Theme {
 
     /** nullable persistent field */
     private String description;
-    
+
     /** persistent field */
     private String imageDirectory;
-    
+
     /** persistent field */
     private Integer type;
-    
+
     /** non-persistent field */
     private Boolean currentDefaultTheme;
-    
+
     /** non-persistent field */
     private Boolean notEditable;
 
@@ -60,76 +58,59 @@ public class Theme {
     public Theme() {
     }
 
-    /** 
-     * @hibernate.id generator-class="assigned"  type="java.lang.Long" column="theme_id"   
-     */
     public Long getThemeId() {
-        return themeId;
+	return themeId;
     }
 
     public void setThemeId(Long themeId) {
-        this.themeId = themeId;
+	this.themeId = themeId;
     }
 
-    /** 
-     *  @hibernate.property column="name" length="100" not-null="true"   
-     */
     public String getName() {
-        return this.name;
+	return this.name;
     }
-
 
     public void setName(String name) {
-        this.name = name;
+	this.name = name;
     }
 
-    /** 
-     * @hibernate.property  column="description" length="100"
-     *         
-     */
     public String getDescription() {
-        return this.description;
+	return this.description;
     }
 
     public void setDescription(String description) {
-        this.description = description;
+	this.description = description;
     }
 
-    /** 
-     * @hibernate.property column="image_directory" length="100"      
-     */
     public String getImageDirectory() {
-        return this.imageDirectory;
+	return this.imageDirectory;
     }
 
     public void setImageDirectory(String imageDirectory) {
-        this.imageDirectory = imageDirectory;
+	this.imageDirectory = imageDirectory;
     }
 
-    /**
-     * @hibernate.property column="theme_type" length="11"      
-     */
     public Integer getType() {
-        return type;
+	return type;
     }
 
     public void setType(Integer type) {
-        this.type = type;
+	this.type = type;
     }
 
     public Boolean getCurrentDefaultTheme() {
-        return currentDefaultTheme;
+	return currentDefaultTheme;
     }
 
     public void setCurrentDefaultTheme(Boolean currentDefaultTheme) {
-        this.currentDefaultTheme = currentDefaultTheme;
+	this.currentDefaultTheme = currentDefaultTheme;
     }
 
     public Boolean getNotEditable() {
-        return notEditable;
+	return notEditable;
     }
 
     public void setNotEditable(Boolean notEditable) {
-        this.notEditable = notEditable;
+	this.notEditable = notEditable;
     }
 }

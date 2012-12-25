@@ -36,9 +36,6 @@ import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 
 /** 
  * @author Manpreet Minhas
- *        @hibernate.class
- *         table="lams_learning_library"
- *     
 */
 public class LearningLibrary implements Serializable {
 	
@@ -88,13 +85,6 @@ public class LearningLibrary implements Serializable {
         this.activities = activities;
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="learning_library_id"
-     *         
-     */
     public Long getLearningLibraryId() {
         return this.learningLibraryId;
     }
@@ -103,12 +93,6 @@ public class LearningLibrary implements Serializable {
         this.learningLibraryId = learningLibraryId;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="description"
-     *             length="65535"
-     *         
-     */
     public String getDescription() {
         return this.description;
     }
@@ -117,12 +101,6 @@ public class LearningLibrary implements Serializable {
         this.description = description;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="title"
-     *             length="255"
-     *         
-     */
     public String getTitle() {
         return this.title;
     }
@@ -131,13 +109,6 @@ public class LearningLibrary implements Serializable {
         this.title = title;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="create_date_time"
-     *             length="19"
-     *             not-null="true"
-     *         
-     */
     public Date getCreateDateTime() {
         return this.createDateTime;
     }
@@ -146,17 +117,6 @@ public class LearningLibrary implements Serializable {
         this.createDateTime = createDateTime != null ? createDateTime : new Date();
     }
 
-    /** 
-     *            @hibernate.set
-     *             lazy="false"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="learning_library_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.learningdesign.Activity"
-     *         
-     */
     public Set getActivities() {
         return this.activities;
     }

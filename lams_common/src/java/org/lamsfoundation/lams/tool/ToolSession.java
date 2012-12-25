@@ -34,10 +34,6 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
-/**
- * @hibernate.class table="lams_tool_session"
- * 
- */
 public abstract class ToolSession implements Serializable {
 
     /** Tool session type id for grouped */
@@ -87,11 +83,6 @@ public abstract class ToolSession implements Serializable {
     public ToolSession() {
     }
 
-    /**
-     * @hibernate.id generator-class="native" type="java.lang.Long"
-     *               column="tool_session_id"
-     * 
-     */
     public Long getToolSessionId() {
 	return this.toolSessionId;
     }
@@ -100,11 +91,6 @@ public abstract class ToolSession implements Serializable {
 	this.toolSessionId = toolSessionId;
     }
 
-    /**
-     * 
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="activity_id"
-     */
     public ToolActivity getToolActivity() {
 	return this.toolActivity;
     }
@@ -113,9 +99,6 @@ public abstract class ToolSession implements Serializable {
 	this.toolActivity = toolActivity;
     }
 
-    /**
-     * @hibernate.property column="create_date_time" length="19" not-null="true"
-     */
     public Date getCreateDateTime() {
 	return this.createDateTime;
     }
@@ -125,7 +108,6 @@ public abstract class ToolSession implements Serializable {
     }
 
     /**
-     * @hibernate.property column="unique_key" length="128" not-null="true"
      * @return Returns the uniqueKey.
      */
     public String getUniqueKey() {
@@ -140,11 +122,6 @@ public abstract class ToolSession implements Serializable {
 	this.uniqueKey = uniqueKey;
     }
 
-    /**
-     * @hibernate.property column="tool_session_name" length="255"
-     *                     not-null="true"
-     * @return
-     */
     public String getToolSessionName() {
 	return toolSessionName;
     }
@@ -153,11 +130,6 @@ public abstract class ToolSession implements Serializable {
 	this.toolSessionName = toolSessionName;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="tool_session_state_id"
-     * 
-     */
     public int getToolSessionStateId() {
 	return this.toolSessionStateId;
     }

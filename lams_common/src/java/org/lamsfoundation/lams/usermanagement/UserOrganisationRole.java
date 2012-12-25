@@ -28,11 +28,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-/** 
- *        @hibernate.class
- *         table="lams_user_organisation_role"
- *     
-*/
 public class UserOrganisationRole implements Serializable {
 
     /** identifier field */
@@ -54,13 +49,6 @@ public class UserOrganisationRole implements Serializable {
     public UserOrganisationRole() {
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Integer"
-     *             column="user_organisation_role_id"
-     *         
-     */
     public Integer getUserOrganisationRoleId() {
         return this.userOrganisationRoleId;
     }
@@ -69,12 +57,6 @@ public class UserOrganisationRole implements Serializable {
         this.userOrganisationRoleId = userOrganisationRoleId;
     }
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="user_organisation_id"         
-     *         
-     */
     public UserOrganisation getUserOrganisation() {
         return this.userOrganisation;
     }
@@ -83,12 +65,6 @@ public class UserOrganisationRole implements Serializable {
         this.userOrganisation = userOrganisation;
     }
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *            @hibernate.column name="role_id"         
-     *         
-     */
     public Role getRole() {
         return this.role;
     }

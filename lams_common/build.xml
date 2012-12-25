@@ -11,20 +11,31 @@
 		<include name="**/ConfigurationItem.java" />
 		<include name="**/Registration.java" />
 		<include name="**/Timezone.java" />
+		<include name="**/OpenIDConfig.java" />
 		<!-- Event Notification and Pedagogical Planner -->
 		<include name="**/Event.java" />
 		<include name="**/Subscription.java" />
 		<include name="**/LogEvent.java" />
 		<include name="**/PedagogicalPlanner*.java" />
 		<include name="**/DataFlowObject.java" />
-		<!-- Evaluation -->
-		<include name="**/ActivityEvaluation.java" />
+		<!-- Gradebook -->
 		<include name="**/GradebookUserActivity.java" />
 		<include name="**/GradebookUserLesson.java" />
+		<!-- Integration -->
+		<include name="**/ExtServerLessonMap.java" />
+		<include name="**/ExtServerToolAdapterMap.java" />
+		<include name="**/ExtUserUseridMap.java" />
+		<!-- Learning Design -->
+		<include name="**/Competence.java" />
+		<include name="**/ActivityEvaluation.java" />
+		<include name="**/CompetenceMapping.java" />
 		<!-- Notebook -->
 		<include name="**/NotebookEntry.java" />
 		<!-- Presence Chat -->
 		<include name="**/model/PresenceChat*.java" />
+		<include name="**/AuthenticationMethod*.java" />
+		<!-- Tool -->
+		<include name="**/ToolImportSupport.java" />
 	</fileset>
 		
 		

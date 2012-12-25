@@ -32,10 +32,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 
-/**
- * @hibernate.class table="lams_organisation"
- * 
- */
 public class Organisation implements Serializable, Comparable {
 
     private static final long serialVersionUID = -6742443056151585129L;
@@ -174,10 +170,6 @@ public class Organisation implements Serializable, Comparable {
 	this.organisationType = organisationType;
     }
 
-    /**
-     * @hibernate.id generator-class="native" type="java.lang.Integer" column="organisation_id"
-     * 
-     */
     public Integer getOrganisationId() {
 	return this.organisationId;
     }
@@ -186,10 +178,6 @@ public class Organisation implements Serializable, Comparable {
 	this.organisationId = organisationId;
     }
 
-    /**
-     * @hibernate.property column="name" length="250"
-     * 
-     */
     public String getName() {
 	return this.name;
     }
@@ -198,10 +186,6 @@ public class Organisation implements Serializable, Comparable {
 	this.name = name;
     }
 
-    /**
-     * @hibernate.property column="code" length="20"
-     * 
-     */
     public String getCode() {
 	return this.code;
     }
@@ -210,10 +194,6 @@ public class Organisation implements Serializable, Comparable {
 	this.code = code;
     }
 
-    /**
-     * @hibernate.property column="description" length="250"
-     * 
-     */
     public String getDescription() {
 	return this.description;
     }
@@ -222,11 +202,6 @@ public class Organisation implements Serializable, Comparable {
 	this.description = description;
     }
 
-    /**
-     * @hibernate.many-to-one
-     * @hibernate.column name="parent_organisation_id"
-     * 
-     */
     public Organisation getParentOrganisation() {
 	return this.parentOrganisation;
     }
@@ -235,10 +210,6 @@ public class Organisation implements Serializable, Comparable {
 	this.parentOrganisation = parentOrganisation;
     }
 
-    /**
-     * @hibernate.property column="create_date" length="19" not-null="true"
-     * 
-     */
     public Date getCreateDate() {
 	return this.createDate;
     }
@@ -247,11 +218,6 @@ public class Organisation implements Serializable, Comparable {
 	this.createDate = createDate;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="created_by"
-     * 
-     */
     public User getCreatedBy() {
 	return this.createdBy;
     }
@@ -260,11 +226,6 @@ public class Organisation implements Serializable, Comparable {
 	this.createdBy = createdBy;
     }
 
-    /**
-     * @hibernate.many-to-one cascade="all" not-null="false"
-     * @hibernate.column name="workspace_id"
-     * 
-     */
     public Workspace getWorkspace() {
 	return this.workspace;
     }
@@ -273,10 +234,6 @@ public class Organisation implements Serializable, Comparable {
 	this.workspace = workspace;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * 
-     */
     public OrganisationType getOrganisationType() {
 	return this.organisationType;
     }
@@ -285,12 +242,6 @@ public class Organisation implements Serializable, Comparable {
 	this.organisationType = organisationType;
     }
 
-    /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="organisation_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.UserOrganisation"
-     * 
-     */
     public Set getUserOrganisations() {
 	return this.userOrganisations;
     }
@@ -299,12 +250,6 @@ public class Organisation implements Serializable, Comparable {
 	this.userOrganisations = userOrganisations;
     }
 
-    /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="parent_organisation_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.Organisation"
-     * 
-     */
     public Set getChildOrganisations() {
 	return childOrganisations;
     }
@@ -313,12 +258,6 @@ public class Organisation implements Serializable, Comparable {
 	this.childOrganisations = childOrganisations;
     }
 
-    /**
-     * @hibernate.set lazy="true" inverse="true" cascade="none"
-     * @hibernate.collection-key column="organisation_id"
-     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.lesson.Lesson"
-     * 
-     */
     public Set getLessons() {
 	return this.lessons;
     }
@@ -327,11 +266,6 @@ public class Organisation implements Serializable, Comparable {
 	this.lessons = lessons;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="organisation_state_id"
-     * 
-     */
     public OrganisationState getOrganisationState() {
 	return this.organisationState;
     }
@@ -340,10 +274,6 @@ public class Organisation implements Serializable, Comparable {
 	this.organisationState = organisationState;
     }
 
-    /**
-     * @hibernate.property column="admin_add_new_users" length="1" not-null="true"
-     * 
-     */
     public Boolean getCourseAdminCanAddNewUsers() {
 	return this.courseAdminCanAddNewUsers;
     }
@@ -352,10 +282,6 @@ public class Organisation implements Serializable, Comparable {
 	this.courseAdminCanAddNewUsers = courseAdminCanAddNewUsers;
     }
 
-    /**
-     * @hibernate.property column="admin_browse_all_users" length="1" not-null="true"
-     * 
-     */
     public Boolean getCourseAdminCanBrowseAllUsers() {
 	return this.courseAdminCanBrowseAllUsers;
     }
@@ -364,10 +290,6 @@ public class Organisation implements Serializable, Comparable {
 	this.courseAdminCanBrowseAllUsers = courseAdminCanBrowseAllUsers;
     }
 
-    /**
-     * @hibernate.property column="admin_change_status" length="1" not-null="true"
-     * 
-     */
     public Boolean getCourseAdminCanChangeStatusOfCourse() {
 	return this.courseAdminCanChangeStatusOfCourse;
     }
@@ -376,10 +298,6 @@ public class Organisation implements Serializable, Comparable {
 	this.courseAdminCanChangeStatusOfCourse = courseAdminCanChangeStatusOfCourse;
     }
 
-    /**
-     * @hibernate.property column="admin_create_guest" length="1" not-null="true"
-     * 
-     */
     public Boolean getCourseAdminCanCreateGuestAccounts() {
 	return this.courseAdminCanCreateGuestAccounts;
     }
@@ -388,10 +306,6 @@ public class Organisation implements Serializable, Comparable {
 	this.courseAdminCanCreateGuestAccounts = courseAdminCanCreateGuestAccounts;
     }
 
-    /**
-     * @hibernate.property column="enable_course_notifications" length="1" not-null="true"
-     * 
-     */
     public Boolean getEnableCourseNotifications() {
 	return this.enableCourseNotifications;
     }
@@ -419,11 +333,6 @@ public class Organisation implements Serializable, Comparable {
 	return new OrganisationDTO(this);
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true" lazy="false"
-     * @hibernate.column name="locale_id"
-     * @param localeCountry
-     */
     public SupportedLocale getLocale() {
 	return locale;
     }
@@ -436,10 +345,6 @@ public class Organisation implements Serializable, Comparable {
 	return name.compareToIgnoreCase(((Organisation) o).getName());
     }
 
-    /**
-     * @hibernate.property column="archived_date" length="19" not-null="false"
-     * 
-     */
     public Date getArchivedDate() {
 	return this.archivedDate;
     }
@@ -448,9 +353,6 @@ public class Organisation implements Serializable, Comparable {
 	this.archivedDate = archivedDate;
     }
 
-    /**
-     * @hibernate.property column="ordered_lesson_ids" length="65535"
-     */
     public String getOrderedLessonIds() {
 	return orderedLessonIds;
     }
@@ -459,10 +361,6 @@ public class Organisation implements Serializable, Comparable {
 	this.orderedLessonIds = orderedLessonIds;
     }
 
-    /**
-     * @hibernate.property column="enable_teacher_gradebook" length="1" not-null="true"
-     * 
-     */
     public Boolean getEnableGradebookForMonitors() {
 	return enableGradebookForMonitors;
     }
@@ -471,10 +369,6 @@ public class Organisation implements Serializable, Comparable {
 	this.enableGradebookForMonitors = enableGradebookForMonitors;
     }
 
-    /**
-     * @hibernate.property column="enable_learner_gradebook" length="1" not-null="true"
-     * 
-     */
     public Boolean getEnableGradebookForLearners() {
 	return enableGradebookForLearners;
     }

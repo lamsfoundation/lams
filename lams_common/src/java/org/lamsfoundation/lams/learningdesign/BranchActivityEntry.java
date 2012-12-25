@@ -41,8 +41,6 @@ import org.lamsfoundation.lams.learningdesign.dto.ToolOutputGateActivityEntryDTO
  * 
  * @author Fiona Malikoff
  * @version 2.1
- * 
- * @hibernate.class table="lams_branch_activity_entry"
  */
 public class BranchActivityEntry {
 
@@ -97,10 +95,6 @@ public class BranchActivityEntry {
 	this.condition = condition;
     }
 
-    /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="entry_id"
-     * 
-     */
     public Long getEntryId() {
 	return entryId;
     }
@@ -109,9 +103,6 @@ public class BranchActivityEntry {
 	entryId = id;
     }
 
-    /**
-     * @hibernate.property column="entry_ui_id" length="11"
-     */
     public Integer getEntryUIID() {
 	return entryUIID;
     }
@@ -120,11 +111,6 @@ public class BranchActivityEntry {
 	this.entryUIID = entryUIID;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="sequence_activity_id"
-     * 
-     */
     public org.lamsfoundation.lams.learningdesign.SequenceActivity getBranchSequenceActivity() {
 	return branchSequenceActivity;
     }
@@ -133,11 +119,6 @@ public class BranchActivityEntry {
 	this.branchSequenceActivity = branchSequenceActivity;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="branch_activity_id"
-     * 
-     */
     public org.lamsfoundation.lams.learningdesign.Activity getBranchingActivity() {
 	return branchingActivity;
     }
@@ -146,11 +127,6 @@ public class BranchActivityEntry {
 	this.branchingActivity = branchingActivity;
     }
 
-    /**
-     * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="group_id"
-     * 
-     */
     public org.lamsfoundation.lams.learningdesign.Group getGroup() {
 	return group;
     }
@@ -159,13 +135,6 @@ public class BranchActivityEntry {
 	this.group = group;
     }
 
-    /**
-     * Used for tool output based branching only
-     * 
-     * @hibernate.many-to-one not-null="true" cascade="all-delete-orphan"
-     * @hibernate.column name="condition_id"
-     * 
-     */
     public BranchCondition getCondition() {
 	return condition;
     }
@@ -237,10 +206,6 @@ public class BranchActivityEntry {
 		.toString();
     }
 
-    /**
-     * @hibernate.property column="open_gate"
-     * @return
-     */
     public Boolean getGateOpenWhenConditionMet() {
 	return gateOpenWhenConditionMet;
     }

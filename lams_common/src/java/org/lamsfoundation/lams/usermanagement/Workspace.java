@@ -32,11 +32,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.usermanagement.dto.WorkspaceDTO;
 
-/** 
- *        @hibernate.class
- *         table="lams_workspace"
- *     
-*/
 public class Workspace implements Serializable {
 
     /** identifier field */
@@ -76,13 +71,6 @@ public class Workspace implements Serializable {
     public Workspace() {
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Integer"
-     *             column="workspace_id"
-     *         
-     */
     public Integer getWorkspaceId() {
         return this.workspaceId;
     }
@@ -91,13 +79,6 @@ public class Workspace implements Serializable {
         this.workspaceId = workspaceId;
     }
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *			   lazy="false"
-     *            @hibernate.column name="default_fld_id"         
-     *         
-     */
     public WorkspaceFolder getDefaultFolder() {
         return this.defaultFolder;
     }
@@ -108,9 +89,6 @@ public class Workspace implements Serializable {
 
     /**
      * WorkspaceWorkspaceFolder is a join object that links a workspace folder to its workspaces. 
-	 *	@hibernate.set inverse="false" cascade="all-delete-orphan"
-     *  @hibernate.collection-key column="workspace_id"
-     *  @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder"
      */
     public Set getWorkspaceWorkspaceFolders() {
         return workspaceWorkspaceFolders;	
@@ -155,13 +133,6 @@ public class Workspace implements Serializable {
     	getWorkspaceWorkspaceFolders().add(wwf);
     }
 
-    /** 
-     *            @hibernate.many-to-one
-     *             not-null="true"
-     *			   lazy="false"
-     *            @hibernate.column name="def_run_seq_fld_id"         
-     *         
-     */
     public WorkspaceFolder getDefaultRunSequencesFolder() {
         return defaultRunSequencesFolder;	
     }
@@ -170,18 +141,6 @@ public class Workspace implements Serializable {
         this.defaultRunSequencesFolder = defaultRunSequencesFolder;	
     }
 
-
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="workspace_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.User"
-     *         
-     */
     public Set getUsers() {
         return this.users;
     }
@@ -190,17 +149,6 @@ public class Workspace implements Serializable {
         this.users = users;
     }
 
-    /** 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="workspace_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.usermanagement.Organisation"
-     *         
-     */
     public Set getOrganisations() {
         return this.organisations;
     }
