@@ -544,11 +544,7 @@ public class VoteContent implements Serializable {
    	public void setSubmissionDeadline(Date submissionDeadline) {
 		this.submissionDeadline = submissionDeadline;
 	}
-	
-	/**
-	 * @hibernate.property column="submission_deadline"
-	 * @return date submissionDeadline
-	 */
+
 	public Date getSubmissionDeadline() {
 		return submissionDeadline;
 	}
