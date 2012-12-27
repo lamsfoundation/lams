@@ -280,14 +280,10 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	// First we check if a tutorial video should be displayed
 	HttpSession session = SessionManager.getSession();
 	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
-
 	boolean doNotShowAgain = userDto.getPagesWithDisabledTutorials() != null
 		&& userDto.getPagesWithDisabledTutorials().contains(PedagogicalPlannerAction.PAGE_STRING_START_PLANNER);
 	boolean showTutorial = !(userDto.getTutorialsDisabled() || doNotShowAgain);
-
-	request.setAttribute(AttributeNames.ATTR_PAGE_STR, PedagogicalPlannerAction.PAGE_STRING_START_PLANNER);
 	request.setAttribute(AttributeNames.ATTR_SHOW_TUTORIAL, showTutorial);
-	request.setAttribute(AttributeNames.ATTR_DO_NOT_SHOW_AGAIN, doNotShowAgain);
 	
 	//process requestSrc and notifyCloseURL parameters (if any)
 	String requestSrc = request.getParameter(PARAM_REQUEST_SRC);
@@ -840,8 +836,15 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	dto.setIsEditor(canEdit);
 	dto.setImportNode(importNode);
 	dto.setTitlePath(titlePath);
-
 	request.setAttribute(CentralConstants.ATTR_NODE, dto);
+	
+	// Set doNotShowAgain parameter
+	HttpSession session = SessionManager.getSession();
+	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+	boolean doNotShowAgain = userDto.getPagesWithDisabledTutorials() != null
+		&& userDto.getPagesWithDisabledTutorials().contains(PedagogicalPlannerAction.PAGE_STRING_START_PLANNER);
+	request.setAttribute(AttributeNames.ATTR_DO_NOT_SHOW_AGAIN, doNotShowAgain);
+	request.setAttribute(AttributeNames.ATTR_PAGE_STR, PedagogicalPlannerAction.PAGE_STRING_START_PLANNER);
 
 	if (edit) {
 	    // If we are in edit mode, the node form is displayed, requiring additional parameters
