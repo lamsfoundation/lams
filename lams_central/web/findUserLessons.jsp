@@ -31,7 +31,6 @@
 	<script type="text/javascript" src="${lams}/includes/javascript/openUrls.js"></script>
 	<script type="text/javascript" src="${lams}/includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}/includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="${lams}/includes/javascript/jquery-ui.autocomplete.js"></script>
 
 	<script type="text/javascript">
 	window.onload = ( function() {

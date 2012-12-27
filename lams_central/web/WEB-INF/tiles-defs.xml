@@ -67,8 +67,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="content" value="signup/successfulSignup.jsp" />
 	</definition>
 	
-	<definition name=".signup" path="/template.jsp">
-		<put name="titleKey" value="title.lams.signup" />
-		<put name="content" value="signup/signup.jsp" />
+	<definition name=".signup" path="/signup/signup.jsp">
 	</definition>
 </tiles-definitions>
