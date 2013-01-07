@@ -7,4 +7,3 @@
 </c:set>
 
 <script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
