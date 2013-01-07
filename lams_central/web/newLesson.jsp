@@ -22,8 +22,6 @@
 	<script type="text/javascript" src="includes/javascript/yui/treeview-min.js" ></script>
 	<script type="text/javascript" src="includes/javascript/newLesson.js"></script>
 	<script type="text/javascript">
-		var tree;
-		var lastSelectedUsers = [];
 		var userId = '<lams:user property="userID"/>';
 		var folderContents = ${folderContents};
 		var users = ${users};
@@ -74,6 +72,7 @@
 		<table class="tabTable">
 			<tr>
 				<td id="learningDesignTreeCell" rowspan="3">
+					<div id="learningDesignTree"></div>
 				</td>
 				<td id="canvasControlCell">
 					<a id="toggleCanvasResizeLink" href="#"></a>
@@ -168,8 +167,6 @@
 			<input id="schedulingDatetimeField" name="schedulingDatetime" disabled="disabled" />
 		</form>
 	</div>
-	
-	
 </div>
 </body>
 </lams:html>

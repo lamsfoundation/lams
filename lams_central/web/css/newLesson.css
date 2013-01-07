@@ -69,6 +69,11 @@ td#learningDesignTreeCell {
 	border-right: thin dotted #2E6E9E;
 }
 
+div#learningDesignTree {
+	overflow: auto;
+	height: 385px;
+}
+
 .ygtv-highlight1, .ygtv-highlight1 .ygtvlabel {
 	background-color: #dfeffc;
 }
@@ -94,6 +99,10 @@ div#canvasDiv {
 
 .ldChoiceDependentCanvasElement {
 	display: none;
+}
+
+img#ldScreenshotLoading, div#ldNotChosenError  {
+	padding-top: 140px;
 }
 
 td#lessonNameCell {

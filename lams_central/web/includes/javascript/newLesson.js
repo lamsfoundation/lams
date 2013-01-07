@@ -1,5 +1,8 @@
 // ********** MAIN FUNCTIONS **********
-
+var tree;
+var lastSelectedUsers = [];
+var submitInProgress = false;
+		
 function initLessonTab(){
 	$('#ldScreenshotAuthor').load(function(){
 		// hide "loading" animation
@@ -16,7 +19,7 @@ function initLessonTab(){
 	var treeNodes = parseFolderTreeNode(folderContents);
 	// there should be no focus, just highlight
 	YAHOO.widget.TreeView.FOCUS_CLASS_NAME = null;
-	tree = new YAHOO.widget.TreeView('learningDesignTreeCell', treeNodes);
+	tree = new YAHOO.widget.TreeView('learningDesignTree', treeNodes);
 	tree.singleNodeHighlight = true;
 	tree.subscribe('clickEvent', function(event){
 		if (!event.node.data.learningDesignId){
@@ -32,6 +35,8 @@ function initLessonTab(){
 			$('#ldScreenshotLoading').css('display', 'inline');
 			$('#ldScreenshotAuthor').attr('src', LD_THUMBNAIL_URL_BASE + event.node.data.learningDesignId);
 			$('#ldScreenshotAuthor').css('width', 'auto').css('height', 'auto');
+		} else {
+			toggleCanvasResize(CANVAS_RESIZE_OPTION_NONE);
 		}
 	});
 	tree.subscribe('clickEvent',tree.onEventToggleHighlight);
@@ -179,7 +184,7 @@ function initAdvancedTab(){
 	});
 	
 	$('#schedulingEnableField').change(function(){
-		$('#schedulingDatetimeField').prop('disabled', !$(this).is(':checked'));
+		$('#schedulingDatetimeField').val(null).prop('disabled', !$(this).is(':checked'));
 	});
 	
 	$('#startMonitorField').change(function(){
@@ -187,16 +192,21 @@ function initAdvancedTab(){
 		var schedulingEnableField = $('#schedulingEnableField');
 		if (!checked) {
 			schedulingEnableField.attr('checked', false);
-			$('#schedulingDatetimeField').prop('disabled', true);
+			$('#schedulingDatetimeField').val(null).prop('disabled', true);
 		}
 		schedulingEnableField.prop('disabled', !checked);
 	});
 	
-	$('#schedulingDatetimeField').datetimepicker();
+	$('#schedulingDatetimeField').datetimepicker({
+		'minDate' : 0
+	});
 }
 
 
 function addLesson(){
+	if (submitInProgress) {
+		return;
+	}
 	// some validation at first
 	var lessonName = $('#lessonNameInput').val();
 	if (lessonName){
@@ -246,6 +256,7 @@ function addLesson(){
 		$('#splitNumberLessonsField').val(instances);
 	}
 	
+	submitInProgress = true;
 	$('#lessonForm').ajaxSubmit({
 		'success' : function(){
 			window.parent.closeAddLessonDialog(true);
