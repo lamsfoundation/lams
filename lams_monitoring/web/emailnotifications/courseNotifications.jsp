@@ -265,7 +265,7 @@
 				
 				<table id="lessonsTable"></table>
 				<br/>
-				<input style="margin-left: 230px;" class="button small-space-bottom" type="button" value="<meta http-equiv="content-type" content="text/html; charset=UTF-8">" onclick="getUsers();"  />			
+				<input style="margin-left: 230px;" class="button small-space-bottom" type="button" value="<fmt:message key="button.ok"/>" onclick="getUsers();"  />			
 			</div>
 		</div>
 
