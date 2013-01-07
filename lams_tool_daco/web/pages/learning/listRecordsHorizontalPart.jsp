@@ -4,6 +4,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/prototype.js"></script>
 	<%@ include file="/common/header.jsp"%>
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />

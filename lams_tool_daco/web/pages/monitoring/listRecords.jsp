@@ -21,7 +21,8 @@
 		</c:if>
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 		<c:set var="monitoringSummary" value="${sessionMap.monitoringSummary}" />
-								
+			
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/prototype.js"></script>					
 		<%@ include file="/common/header.jsp"%>
 
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoMonitoring.js'/>"></script>
