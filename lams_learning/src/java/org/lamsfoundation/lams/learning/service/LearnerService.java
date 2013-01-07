@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.learning.service;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -78,7 +77,6 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
 import org.lamsfoundation.lams.tool.ToolSession;
-import org.lamsfoundation.lams.tool.dao.IToolSessionDAO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
@@ -104,7 +102,6 @@ public class LearnerService implements ICoreLearnerService {
     private IGroupingDAO groupingDAO;
     private IGroupUserDAO groupUserDAO;
     private ProgressEngine progressEngine;
-    private IToolSessionDAO toolSessionDAO;
     private IDataFlowDAO dataFlowDAO;
     private ILamsCoreToolService lamsCoreToolService;
     private ActivityMapping activityMapping;
@@ -143,14 +140,6 @@ public class LearnerService implements ICoreLearnerService {
 
     public MessageService getMessageService() {
 	return messageService;
-    }
-
-    /**
-     * @param toolSessionDAO
-     *                The toolSessionDAO to set.
-     */
-    public void setToolSessionDAO(IToolSessionDAO toolSessionDAO) {
-	this.toolSessionDAO = toolSessionDAO;
     }
 
     /**

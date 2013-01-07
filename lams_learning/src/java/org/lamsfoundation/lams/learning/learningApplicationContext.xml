@@ -28,7 +28,6 @@
 			<bean class="org.lamsfoundation.lams.learning.service.LearnerService">
 				<property name="progressEngine"><ref bean="progressEngine"/></property>
 				<property name="lessonDAO"><ref bean="lessonDAO"/></property>
-				<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
 				<property name="learnerProgressDAO"><ref bean="learnerProgressDAO"/></property>
 				<property name="lamsCoreToolService"><ref bean="lamsCoreToolService"/></property>
 				<property name="activityDAO"><ref bean="activityDAO"/></property>
