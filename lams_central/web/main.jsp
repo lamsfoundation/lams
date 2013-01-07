@@ -29,17 +29,39 @@
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>/css/thickbox.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen">
+	<style type="text/css">
+		div#addLessonDialog {
+			display: none;
+		}
+		
+		#addLessonFrame {
+			width: 100%;
+			height: 100%;
+			border: none;
+		}
+	</style>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="javascript" type="text/javascript" src="loadVars.jsp"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery.js"></script>
+	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
     <script language="JavaScript" type="text/javascript" src="includes/javascript/thickbox.js"></script>
 	<c:if test="${empty tab}">
-	
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
+		<script language="JavaScript" type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
 	</c:if>
 	<script language="javascript" type="text/javascript">
+		function showAddLessonDialog(orgID){
+			$("#addLessonDialog").dialog('option', 'orgID', orgID)
+								 .dialog('open');
+		}
+		
+		function closeAddLessonDialog(refresh) {
+			$('#addLessonFrame').attr('src', null);
+			$("#addLessonDialog").dialog('option', 'refresh', refresh ? true : false)
+								 .dialog('close');
+		}
+	
 		<!--
 			jQuery(document).ready(function(){
 				<c:if test="${not empty collapsedOrgDTOs}">
@@ -74,6 +96,30 @@
 		       $("html").click(function() {
 	                $(".split-menu-button>ul>li>ul").hide();
 	           });
+				
+		       
+		        // initialise lesson dialog
+				var dialog = $('#addLessonDialog').dialog({
+ 					'autoOpen'  : false,
+ 					'height'    : 480,
+ 					'width'     : 610,
+ 					'modal'     : true,
+ 					'resizable' : false,
+ 					'show'      : 'fold',
+ 					'hide'      : 'fold',
+ 					'open'      : function(){
+ 						// load contents after opening the dialog
+ 						$('#addLessonFrame').attr('src', '<lams:LAMSURL/>home.do?method=newLesson&organisationID='
+ 								                         + $(this).dialog('option', 'orgID'));
+ 					},
+ 					'close' : function() {
+ 						// refresh if lesson was added
+ 						if($(this).dialog('option', 'refresh')){
+ 							refresh();
+ 						}
+ 					}
+ 				// tabs are the title bar, so remove dialog's one
+ 				}).closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
 			});
 		
 			function removeLesson(lessonID) {
@@ -97,7 +143,7 @@
 				}
 
 			}
-		
+			
 			function getEnableSortingText() {
 				return "<fmt:message key="label.enable.lesson.sorting"/>";
 			}
@@ -256,6 +302,9 @@
 	</div>
 </div>
 
+<div id="addLessonDialog">
+	<iframe id="addLessonFrame"></iframe>
+</div>
+
 </body>
 </lams:html>
-

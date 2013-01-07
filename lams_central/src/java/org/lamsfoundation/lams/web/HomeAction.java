@@ -23,22 +23,31 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.web;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
+import org.jdom.JDOMException;
+import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
@@ -47,20 +56,29 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
+import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.svg.SVGGenerator;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
+import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
+import org.lamsfoundation.lams.workspace.service.WorkspaceManagementService;
+import org.lamsfoundation.lams.workspace.web.WorkspaceAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * this is an action where all lams client environments launch. initial
- * configuration of the individual environment setting is done here.
+ * this is an action where all lams client environments launch. initial configuration of the individual environment
+ * setting is done here.
  * 
  * @struts:action path="/home" validate="false" parameter="method"
  * @struts:action-forward name="sysadmin" path="/sysadmin.jsp"
@@ -69,6 +87,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action-forward name="author" path="/author.jsp"
  * @struts:action-forward name="monitorLesson" path="/monitorLesson.jsp"
  * @struts:action-forward name="addLesson" path="/addLesson.jsp"
+ * @struts:action-forward name="newLesson" path="/newLesson.jsp"
  * @struts:action-forward name="error" path=".error"
  * @struts:action-forward name="message" path=".message"
  * @struts:action-forward name="passwordChange" path=".passwordChange"
@@ -83,6 +102,7 @@ public class HomeAction extends DispatchAction {
     private static ILessonService lessonService;
     private static ILearningDesignService learningDesignService;
     private static IGroupUserDAO groupUserDAO;
+    private static IWorkspaceManagementService workspaceManagementService;
 
     /**
      * request for sysadmin environment
@@ -91,23 +111,23 @@ public class HomeAction extends DispatchAction {
 	    HttpServletResponse res) throws IOException, ServletException {
 
 	try {
-	    log.debug("request sysadmin");
+	    HomeAction.log.debug("request sysadmin");
 	    int orgId = new Integer(req.getParameter("orgId")).intValue();
 	    UserDTO user = getUser();
 	    if (user == null) {
-		log.error("admin: User missing from session. ");
+		HomeAction.log.error("admin: User missing from session. ");
 		return mapping.findForward("error");
 	    } else if (getService().isUserInRole(user.getUserID(), orgId, Role.SYSADMIN)) {
-		log.debug("user is sysadmin");
+		HomeAction.log.debug("user is sysadmin");
 		return mapping.findForward("sysadmin");
 	    } else {
-		log.error("User " + user.getLogin()
+		HomeAction.log.error("User " + user.getLogin()
 			+ " tried to get sysadmin screen but isn't sysadmin in organisation: " + orgId);
 		return displayMessage(mapping, req, "error.authorisation");
 	    }
 
 	} catch (Exception e) {
-	    log.error("Failed to load sysadmin", e);
+	    HomeAction.log.error("Failed to load sysadmin", e);
 	    return mapping.findForward("error");
 	}
     }
@@ -119,67 +139,68 @@ public class HomeAction extends DispatchAction {
 	    throws IOException, ServletException {
 
 	try {
-	    log.debug("request learner");
+	    HomeAction.log.debug("request learner");
 
 	    Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
 	    String mode = WebUtil.readStrParam(req, AttributeNames.PARAM_MODE, true);
 
 	    UserDTO user = getUser();
 	    if (user == null) {
-		log.error("learner: User missing from session. ");
+		HomeAction.log.error("learner: User missing from session. ");
 		return mapping.findForward("error");
 	    } else {
 		Lesson lesson = lessonId != null ? getLessonService().getLesson(lessonId) : null;
-		if (lesson == null || !lesson.isLessonStarted()) {
+		if ((lesson == null) || !lesson.isLessonStarted()) {
 		    return displayMessage(mapping, req, "message.lesson.not.started.cannot.participate");
 		}
 		if (!getLessonService().checkLessonReleaseConditions(lessonId, user.getUserID())) {
 		    return displayMessage(mapping, req, "message.preceding.lessons.not.finished.cannot.participate");
 		}
-		
 
-		if (lesson.getLessonClass() == null
+		if ((lesson.getLessonClass() == null)
 			|| !lesson.getLessonClass().getLearners().contains(getRealUser(user))) {
-		    log.error("learner: User " + user.getLogin()
+		    HomeAction.log.error("learner: User " + user.getLogin()
 			    + " is not a learner in the requested lesson. Cannot access the lesson.");
 		    return displayMessage(mapping, req, "error.authorisation");
 		}
-		
-		//check if the lesson is scheduled to be finished to individual users  
+
+		// check if the lesson is scheduled to be finished to individual users
 		if (lesson.isScheduledToCloseForIndividuals()) {
 		    GroupUser groupUser = getGroupUserDAO().getGroupUser(lesson, user.getUserID());
-		    if ((groupUser != null) && (groupUser.getScheduledLessonEndDate() != null) && groupUser.getScheduledLessonEndDate().before(new Date())) {
-			log.error("learner: User " + user.getLogin()
+		    if ((groupUser != null) && (groupUser.getScheduledLessonEndDate() != null)
+			    && groupUser.getScheduledLessonEndDate().before(new Date())) {
+			HomeAction.log.error("learner: User " + user.getLogin()
 				+ " cannot access the lesson due to lesson end date has passed.");
 			return displayMessage(mapping, req, "error.finish.date.passed");
 
 		    }
 		}
 
-		if (mode != null)
+		if (mode != null) {
 		    req.setAttribute(AttributeNames.PARAM_MODE, mode);
+		}
 
 		req.setAttribute(AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED,
 			lesson.getLearnerExportAvailable() != null ? lesson.getLearnerExportAvailable() : Boolean.TRUE);
 		req.setAttribute(AttributeNames.PARAM_PRESENCE_ENABLED, lesson.getLearnerPresenceAvailable());
 		req.setAttribute(AttributeNames.PARAM_PRESENCE_IM_ENABLED, lesson.getLearnerImAvailable());
 		req.setAttribute(AttributeNames.PARAM_TITLE, lesson.getLessonName());
-		
+
 		/* Date Format for Chat room append */
 		DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
 		req.setAttribute(AttributeNames.PARAM_CREATE_DATE_TIME, sfm.format(lesson.getCreateDateTime()));
-		
+
 		String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 		req.setAttribute("serverUrl", serverUrl);
 		req.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
-		
-		//show lesson intro page if required
+
+		// show lesson intro page if required
 		if (lesson.isEnableLessonIntro()) {
 		    req.setAttribute("lesson", lesson);
 		    req.setAttribute("displayDesignImage", lesson.isDisplayDesignImage());
 		    req.setAttribute("isMonitor", lesson.getLessonClass().isStaffMember(getRealUser(user)));
-		    
-		    //check if we need to create learning design SVG
+
+		    // check if we need to create learning design SVG
 		    if (lesson.isDisplayDesignImage()) {
 			Long learningDesignId = lesson.getLearningDesign().getLearningDesignId();
 			req.setAttribute(AttributeNames.PARAM_LEARNINGDESIGN_ID, learningDesignId);
@@ -190,17 +211,17 @@ public class HomeAction extends DispatchAction {
 				    SVGGenerator.OUTPUT_FORMAT_SVG);
 			    getLearningDesignService().createLearningDesignSVG(learningDesignId,
 				    SVGGenerator.OUTPUT_FORMAT_PNG);
-			}		
+			}
 		    }
 		    return mapping.findForward("lessonIntro");
 		} else {
 		    return mapping.findForward("learner");
 		}
-		
+
 	    }
 
 	} catch (Exception e) {
-	    log.error("Failed to load learner", e);
+	    HomeAction.log.error("Failed to load learner", e);
 	    return mapping.findForward("error");
 	}
     }
@@ -212,10 +233,10 @@ public class HomeAction extends DispatchAction {
 	    throws IOException, ServletException {
 
 	try {
-	    log.debug("request author");
+	    HomeAction.log.debug("request author");
 	    UserDTO user = getUser();
 	    if (user == null) {
-		log.error("admin: User missing from session. ");
+		HomeAction.log.error("admin: User missing from session. ");
 		return mapping.findForward("error");
 	    } else {
 		Long learningDesignID = null;
@@ -229,20 +250,25 @@ public class HomeAction extends DispatchAction {
 		String customCSV = req.getParameter(AttributeNames.PARAM_CUSTOM_CSV);
 		String extLmsId = req.getParameter(AttributeNames.PARAM_EXT_LMS_ID);
 
-		if (req.getParameter("learningDesignID") != null)
+		if (req.getParameter("learningDesignID") != null) {
 		    learningDesignID = WebUtil.readLongParam(req, "learningDesignID");
+		}
 
-		if (req.getParameter("layout") != null)
+		if (req.getParameter("layout") != null) {
 		    layout = WebUtil.readStrParam(req, "layout");
+		}
 
-		if (layout != null)
+		if (layout != null) {
 		    req.setAttribute("layout", layout);
+		}
 
-		if (req.getParameter("learningDesignID") != null)
+		if (req.getParameter("learningDesignID") != null) {
 		    learningDesignID = WebUtil.readLongParam(req, "learningDesignID");
+		}
 
-		if (learningDesignID != null)
+		if (learningDesignID != null) {
 		    req.setAttribute("learningDesignID", learningDesignID);
+		}
 
 		req.setAttribute("requestSrc", requestSrc);
 		req.setAttribute("notifyCloseURL", notifyCloseURL);
@@ -254,7 +280,7 @@ public class HomeAction extends DispatchAction {
 	    }
 
 	} catch (Exception e) {
-	    log.error("Failed to load author", e);
+	    HomeAction.log.error("Failed to load author", e);
 	    return mapping.findForward("error");
 	}
     }
@@ -266,34 +292,36 @@ public class HomeAction extends DispatchAction {
 	    HttpServletResponse res) throws IOException, ServletException {
 
 	try {
-	    log.debug("request monitorLesson");
+	    HomeAction.log.debug("request monitorLesson");
 	    Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
 	    UserDTO user = getUser();
 	    if (user == null) {
-		log.error("admin: User missing from session. ");
+		HomeAction.log.error("admin: User missing from session. ");
 		return mapping.findForward("error");
 	    } else {
 		Lesson lesson = lessonId != null ? getLessonService().getLesson(lessonId) : null;
 		if (lesson == null) {
-		    log.error("monitorLesson: Lesson " + lessonId + " does not exist. Unable to monitor lesson");
+		    HomeAction.log.error("monitorLesson: Lesson " + lessonId
+			    + " does not exist. Unable to monitor lesson");
 		    return mapping.findForward("error");
 		}
 
-		if (lesson.getLessonClass() == null || !lesson.getLessonClass().isStaffMember(getRealUser(user))
-			&& !req.isUserInRole(Role.GROUP_MANAGER)) {
-		    log.error("learner: User " + user.getLogin()
+		if ((lesson.getLessonClass() == null)
+			|| (!lesson.getLessonClass().isStaffMember(getRealUser(user)) && !req
+				.isUserInRole(Role.GROUP_MANAGER))) {
+		    HomeAction.log.error("learner: User " + user.getLogin()
 			    + " is not a learner in the requested lesson. Cannot access the lesson.");
 		    return displayMessage(mapping, req, "error.authorisation");
 		}
 
-		log.debug("user is staff");
+		HomeAction.log.debug("user is staff");
 		String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 		req.setAttribute("serverUrl", serverUrl);
 		req.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 		return mapping.findForward("monitorLesson");
 	    }
 	} catch (Exception e) {
-	    log.error("Failed to load monitor lesson", e);
+	    HomeAction.log.error("Failed to load monitor lesson", e);
 	    return mapping.findForward("error");
 	}
     }
@@ -305,60 +333,187 @@ public class HomeAction extends DispatchAction {
 	    HttpServletResponse res) throws IOException, ServletException {
 
 	try {
-	    log.debug("request addLesson");
-	    
+	    HomeAction.log.debug("request addLesson");
+
 	    Integer courseId = WebUtil.readIntParam(req, AttributeNames.PARAM_COURSE_ID, false);
 	    Integer classId = WebUtil.readIntParam(req, AttributeNames.PARAM_CLASS_ID, true);
-	    
+
 	    UserDTO user = getUser();
 	    if (user == null) {
-		log.error("admin: User missing from session. ");
+		HomeAction.log.error("admin: User missing from session. ");
 		return mapping.findForward("error");
 	    } else {
 		Integer orgId = classId != null ? classId : courseId;
 		if (getService().isUserInRole(user.getUserID(), orgId, Role.MONITOR)
 			|| getService().isUserInRole(user.getUserID(), orgId, Role.GROUP_MANAGER)) {
-		    log.debug("user is staff");
+		    HomeAction.log.debug("user is staff");
 		    String orgName = ((Organisation) getService().findById(Organisation.class, orgId)).getName();
-		    
+
 		    req.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, orgId);
 		    req.setAttribute(AttributeNames.PARAM_ORGANISATION_NAME, orgName);
-		   
+
 		    return mapping.findForward("addLesson");
 		} else {
-		    log.error("User " + user.getLogin()
+		    HomeAction.log.error("User " + user.getLogin()
 			    + " tried to get staff screen but isn't staff in organisation: " + orgId);
 		    return displayMessage(mapping, req, "error.authorisation");
 		}
 	    }
 
 	} catch (Exception e) {
-	    log.error("Failed to load add lesson", e);
+	    HomeAction.log.error("Failed to load add lesson", e);
 	    return mapping.findForward("error");
 	}
+    }
+
+    public ActionForward newLesson(ActionMapping mapping, ActionForm form, HttpServletRequest req,
+	    HttpServletResponse res) throws IOException, UserAccessDeniedException, JSONException,
+	    RepositoryCheckedException {
+	UserDTO userDTO = getUser();
+
+	// get all user accessible folders and LD descriptions as JSON
+	JSONObject learningDesigns = getDeepFolderContents(userDTO.getUserID(), null);
+	req.setAttribute("folderContents", learningDesigns.toString());
+
+	Integer organisationID = new Integer(WebUtil.readIntParam(req, "organisationID"));
+	JSONObject users = new JSONObject();
+
+	// get learners available for newly created lesson
+	Vector<UserFlashDTO> learners = getWorkspaceManagementService().getUsersFromOrganisationByRole(organisationID,
+		"LEARNER");
+	for (UserFlashDTO user : learners) {
+	    JSONObject userJSON = new JSONObject();
+	    userJSON.put("userID", user.getUserID());
+	    userJSON.put("firstName", user.getFirstName());
+	    userJSON.put("lastName", user.getLastName());
+	    userJSON.put("login", user.getLogin());
+	    
+	    users.append("selectedLearners", userJSON);
+	}
+
+	Vector<UserFlashDTO> monitors = getWorkspaceManagementService().getUsersFromOrganisationByRole(organisationID,
+		"MONITOR");
+	for (UserFlashDTO user : monitors) {
+	    JSONObject userJSON = new JSONObject();
+	    userJSON.put("userID", user.getUserID());
+	    userJSON.put("firstName", user.getFirstName());
+	    userJSON.put("lastName", user.getLastName());
+	    userJSON.put("login", user.getLogin());
+	    
+	    if (userDTO.getUserID().equals(user.getUserID())) {
+		// creator is always selected
+		users.append("selectedMonitors", userJSON);
+	    } else {
+		users.append("unselectedMonitors", userJSON);
+	    }
+	}
+	
+	req.setAttribute("users", users.toString());
+
+	return mapping.findForward("newLesson");
+    }
+
+    public ActionForward createLearningDesignThumbnail(ActionMapping mapping, ActionForm form, HttpServletRequest req,
+	    HttpServletResponse res) throws JDOMException, IOException, TranscoderException {
+	Long learningDesignId = WebUtil.readLongParam(req, CentralConstants.PARAM_LEARNING_DESIGN_ID);
+	String imagePath = getLearningDesignService().createLearningDesignSVG(learningDesignId,
+		SVGGenerator.OUTPUT_FORMAT_PNG);
+
+	res.setContentType("image/png");
+	OutputStream output = res.getOutputStream();
+	FileInputStream input = new FileInputStream(imagePath);
+	IOUtils.copy(input, output);
+	IOUtils.closeQuietly(input);
+	IOUtils.closeQuietly(output);
+
+	return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private JSONObject getDeepFolderContents(Integer userID, Integer folderID) throws JSONException, IOException,
+	    UserAccessDeniedException, RepositoryCheckedException {
+	JSONObject result = new JSONObject();
+	Vector<FolderContentDTO> folderContents = null;
+
+	// get use accessible folders in the start
+	if (folderID == null) {
+	    folderContents = new Vector<FolderContentDTO>(3);
+	    MessageService msgService = getWorkspaceManagementService().getMessageService();
+
+	    FolderContentDTO userFolder = getWorkspaceManagementService().getUserWorkspaceFolder(userID);
+	    if (userFolder != null) {
+		folderContents.add(userFolder);
+	    }
+
+	    FolderContentDTO myGroupsFolder = new FolderContentDTO(msgService.getMessage("organisations"),
+		    msgService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
+		    WorkspaceAction.ORG_FOLDER_ID.longValue(), WorkspaceFolder.READ_ACCESS, null);
+
+	    folderContents.add(myGroupsFolder);
+
+	    FolderContentDTO publicFolder = getWorkspaceManagementService().getPublicWorkspaceFolder(userID);
+	    if (publicFolder != null) {
+		folderContents.add(publicFolder);
+	    }
+	 // special behaviour for organisation folders
+	} else if (folderID.equals(WorkspaceAction.ORG_FOLDER_ID)) {
+	    folderContents = getWorkspaceManagementService().getAccessibleOrganisationWorkspaceFolders(userID);
+
+	    if (folderContents.size() == 1) {
+		FolderContentDTO folder = folderContents.firstElement();
+		if (folder.getResourceID().equals(WorkspaceAction.ROOT_ORG_FOLDER_ID)) {
+		    return getDeepFolderContents(userID, WorkspaceAction.ROOT_ORG_FOLDER_ID);
+		}
+	    }
+	} else {
+	    WorkspaceFolder folder = getWorkspaceManagementService().getWorkspaceFolder(folderID);
+	    folderContents = getWorkspaceManagementService().getFolderContents(userID, folder,
+		    WorkspaceManagementService.AUTHORING);
+	}
+
+	// recursively check folders, building a tree
+	for (FolderContentDTO folderContent : folderContents) {
+	    String contentType = folderContent.getResourceType();
+	    if (FolderContentDTO.FOLDER.equals(contentType)) {
+		JSONObject subfolder = getDeepFolderContents(userID, folderContent.getResourceID().intValue());
+		subfolder.put("name", folderContent.getName());
+		result.append("folders", subfolder);
+	    } else if (FolderContentDTO.DESIGN.equals(contentType)) {
+		JSONObject learningDesign = new JSONObject();
+		learningDesign.put("learningDesignId", folderContent.getResourceID());
+		learningDesign.put("name", folderContent.getName());
+		result.append("learningDesigns", learningDesign);
+	    } else {
+		if (HomeAction.log.isDebugEnabled()) {
+		    HomeAction.log.debug("Unsupported folder content found, named \"" + folderContent.getName() + "\"");
+		}
+	    }
+	}
+
+	return result;
     }
 
     public ActionForward logout(ActionMapping mapping, ActionForm form, HttpServletRequest req, HttpServletResponse res)
 	    throws IOException, ServletException {
 
 	UserDTO userDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	if (userDTO.getLoggedIntoLamsCommunity() != null && userDTO.getLoggedIntoLamsCommunity()) {
-	    log.debug("Need to log out user from lamscoomunity");
+	if ((userDTO.getLoggedIntoLamsCommunity() != null) && userDTO.getLoggedIntoLamsCommunity()) {
+	    HomeAction.log.debug("Need to log out user from lamscoomunity");
 	    req.getSession().invalidate();
 
-	    //clear system shared session.
+	    // clear system shared session.
 	    SessionManager.getSession().invalidate();
-	    
+
 	    // redirect to lamscommunity logout servlet to log out.
 	    String url = "http://lamscommunity.org/register/logout?return_url=";
 	    url += URLEncoder.encode(Configuration.get(ConfigurationKeys.SERVER_URL), "UTF8");
 	    res.sendRedirect(url);
 	    return null;
-	    
+
 	} else {
 	    req.getSession().invalidate();
 
-	    //clear system shared session.
+	    // clear system shared session.
 	    SessionManager.getSession().invalidate();
 
 	    return mapping.findForward("index");
@@ -369,41 +524,52 @@ public class HomeAction extends DispatchAction {
 	req.setAttribute("messageKey", messageKey);
 	return mapping.findForward("message");
     }
-    
+
     private IUserManagementService getService() {
-	if (service == null) {
+	if (HomeAction.service == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
-	    service = (IUserManagementService) ctx.getBean("userManagementService");
+	    HomeAction.service = (IUserManagementService) ctx.getBean("userManagementService");
 	}
-	return service;
+	return HomeAction.service;
     }
 
     private ILessonService getLessonService() {
-	if (lessonService == null) {
+	if (HomeAction.lessonService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
-	    lessonService = (ILessonService) ctx.getBean("lessonService");
+	    HomeAction.lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
-	return lessonService;
+	return HomeAction.lessonService;
     }
-    
+
     private ILearningDesignService getLearningDesignService() {
-	if (learningDesignService == null) {
+	if (HomeAction.learningDesignService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
-	    learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
+	    HomeAction.learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
 	}
-	return learningDesignService;
+	return HomeAction.learningDesignService;
     }
-    
+
     private IGroupUserDAO getGroupUserDAO() {
-	if (groupUserDAO == null) {
+	if (HomeAction.groupUserDAO == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
-	    groupUserDAO = (IGroupUserDAO) ctx.getBean("groupUserDAO");
+	    HomeAction.groupUserDAO = (IGroupUserDAO) ctx.getBean("groupUserDAO");
 	}
-	return groupUserDAO;
+	return HomeAction.groupUserDAO;
+    }
+
+    private IWorkspaceManagementService getWorkspaceManagementService() {
+	if (HomeAction.workspaceManagementService == null) {
+	    WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    HomeAction.workspaceManagementService = (IWorkspaceManagementService) webContext
+		    .getBean("workspaceManagementService");
+	}
+
+	return HomeAction.workspaceManagementService;
     }
 
     private UserDTO getUser() {

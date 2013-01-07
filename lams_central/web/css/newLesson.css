@@ -1,0 +1,202 @@
+div#tabs {
+	width: 578px;
+	height: 450px;
+}
+
+div#tabs > div {
+	height: 420px;
+}
+
+.ui-tabs .ui-tabs-panel {
+	padding: 0px;
+}
+
+div#tabs ul li a, a.ygtvspacer, a#closeButton, a#addButton {
+	border-bottom: none;
+}
+
+a#closeButton {
+	position: absolute;
+	right: 10px;
+	top: 11px;
+	width: 19px;
+	height: 18px;
+}
+
+a#closeButton span {
+	background-color: #D0E5F5;
+}
+
+a#addButton {
+	position: absolute;
+	right: 60px;
+	top: 6px;
+	width: 80px;
+	padding: 5px 0 5px 25px;
+	vertical-align: center;
+	font-weight:bolder;
+	border: thin solid #2E6E9E;
+	background-color: #D0E5F5;
+}
+
+table.tabTable {
+	height: 393px;
+	table-layout: fixed;
+	border-top: thin dotted #2E6E9E;
+}
+
+div.tabTitle {
+	padding: 5px 0px 5px 0px;
+	font-size: small;
+	font-weight: bold;
+	text-align: center;
+}
+
+.errorMessage {
+	font-weight: bold;
+	color: red;
+}
+
+.errorField {
+	border: thick solid red;
+}
+
+
+td#learningDesignTreeCell {
+	padding: 2px 2px 0px 5px;
+	vertical-align: top;
+	width: 30%;
+	border-right: thin dotted #2E6E9E;
+}
+
+.ygtv-highlight1, .ygtv-highlight1 .ygtvlabel {
+	background-color: #dfeffc;
+}
+
+td#canvasControlCell {
+	padding: 2px 0px 0px 10px;
+	height: 15px;
+}
+
+td#canvasControlCell a {
+	color: #47BC23;
+}
+
+td#canvasCell {
+	text-align: center;
+	padding: 10px 0px 0px 10px;
+}
+
+div#canvasDiv {
+	overflow: visible;
+	height: 330px;
+}
+
+.ldChoiceDependentCanvasElement {
+	display: none;
+}
+
+td#lessonNameCell {
+	height: 20px;
+	padding: 0px 0px 5px 10px;
+}
+
+#lessonNameInput {
+	width: 250px;
+	margin-left: 10px;
+}
+	
+
+table#classTable td {
+	width: 50%;
+	vertical-align: top;
+	padding: 5px 10px 0px 10px;
+}
+
+.draggableUser {
+	padding: 3px 0px 3px 0px;
+	cursor: default;
+}
+
+.userContainer {
+	height: 150px;
+	overflow: auto;
+	border: thin solid black;
+	padding : 5px;
+}
+
+.userContainerTitle {
+	padding: 0px 0px 5px 0px;
+	height: 15px;
+	font-size: small;
+	font-weight: bold;
+	text-align: center;
+}
+
+.droppableHighlight {
+	padding : 1px;
+	border: 5px solid #5c9ccc;
+}
+
+.draggableUserSelected {
+	background-color: #5c9ccc !important;
+	color: white !important;
+}
+
+	
+div#tabAdvanced {
+	padding-left: 30px;
+}
+
+div#tabAdvanced input[type="checkbox"] {
+	margin: 5px 5px 0px 0px;
+	border: none;
+}
+
+.fieldSectionTitle {
+	padding: 15px 0px 5px 15px;
+	font-size: small;
+	font-weight: bold;
+}
+
+.fieldInnerSection {
+	padding-left: 30px;
+}
+
+div#introSection {
+	padding-top: 5px;
+}
+
+div#introSection span {
+	vertical-align: top;
+}
+
+textarea#introDescriptionField {
+	width: 200px;
+}
+
+table#splitLearnersTable {
+	height: 40px;
+}
+
+td#splitLearnersCell {
+	padding: 0px 0px 0px 30px;
+}
+
+#splitLearnersCountField {
+	width: 50px;
+	margin: 0px 0px 0px 5px !important;
+}
+
+td#splitLearnersDescriptionCell {
+	padding: 0px;
+}
+
+span#splitLearnersDescription {
+	font-style: italic;
+	display: none;
+}
+
+#schedulingDatetimeField {
+	margin-left: 40px;
+}

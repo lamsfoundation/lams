@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.monitoring.service;
 import javax.servlet.ServletContext;
 
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -67,6 +68,11 @@ public class MonitoringServiceProxy
     {
         return (ICoreLearnerService)getDomainService(servletContext,"learnerService");
     }
+    
+    public static final IUserManagementService getUserManagementService(ServletContext servletContext) {
+	return (IUserManagementService) getDomainService(servletContext, "userManagementService");
+    }
+
     /**
      * Retrieve the proper Spring bean from bean factory. 
      * @param servletContext the servletContext for current application

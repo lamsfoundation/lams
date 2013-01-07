@@ -18,7 +18,7 @@
 		</a>
 	</div>
 </c:if> 
-
+	
 	<c:forEach var="link" items="${orgBean.links}">
 		<c:set var="tooltip" value="" />
 		<c:if test="${link.tooltip ne null}">
@@ -50,5 +50,10 @@
 				</a>
 			</li>
 		</c:forEach>
+		<li>
+			<a class="add-lesson-button" href="javascript:showAddLessonDialog(${orgBean.id})">
+				<fmt:message key="index.addlesson" />
+			</a>
+		</li>
 	</ul>
 </div>
