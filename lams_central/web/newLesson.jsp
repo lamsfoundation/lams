@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-core" prefix="c"%>
 
 <!DOCTYPE HTML>
 <lams:html>
@@ -45,6 +46,7 @@
 			initLessonTab();
 			initClassTab();
 			initAdvancedTab();
+			initConditionsTab();
 		});
 	</script>
 </lams:head>
@@ -63,6 +65,7 @@
 		<li><a href="#tabLesson"><fmt:message key="label.tab.lesson" /></a></li>
 		<li><a href="#tabClass"><fmt:message key="label.tab.class" /></a></li>
 		<li><a href="#tabAdvanced"><fmt:message key="label.tab.advanced" /></a></li>
+		<li><a href="#tabConditions"><fmt:message key="label.tab.conditions" /></a></li>
 	</ul>
 	
 	<!-- Tab contents -->
@@ -122,9 +125,8 @@
 		</table>
 	</div>
 	
-	
+	<form id="lessonForm" action="<lams:LAMSURL/>monitoring/monitoring.do" method="POST">
 	<div id="tabAdvanced">
-		<form id="lessonForm" action="<lams:LAMSURL/>monitoring/monitoring.do" method="POST">
 			<input name="method" value="newLesson" type="hidden" />
 			<input name="organisationID" value="${param.organisationID}" type="hidden" />
 			<input id="ldIdField" name="learningDesignID" type="hidden" />
@@ -136,12 +138,12 @@
 
 			<div class="fieldSectionTitle"><fmt:message key="label.tab.advanced.details" /></div>
 			<input id="introEnableField" name="introEnable" value="true" type="checkbox"><fmt:message key="label.tab.advanced.intro.enable" /></input>
-			<div id="introSection" class="fieldInnerSection">
+			<div class="fieldInnerSection">
 				<span><fmt:message key="label.tab.advanced.intro.description" /></span>
 				<textarea id="introDescriptionField" name="introDescription" disabled="disabled"></textarea>
 				<br />
 				<input id="introImageField" name="introImage" value="true" type="checkbox"
-				       disabled="disabled" class="fieldInnerSection"><fmt:message key="label.tab.advanced.intro.image" /></input>
+				       disabled="disabled"><fmt:message key="label.tab.advanced.intro.image" /></input>
 			</div>
 
 			
@@ -152,7 +154,7 @@
 			<input name="portfolioEnable" value="true" type="checkbox" checked="checked"><fmt:message key="label.tab.advanced.field.export" /></input><br />
 			<input id="presenceEnableField" name="presenceEnable" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.presence" /></input><br />
 			<input id="imEnableField" name="imEnable" value="true" type="checkbox" disabled="disabled"><fmt:message key="label.tab.advanced.field.im" /></input><br />
-			<input id="splitLearnersField" type="checkbox" ><fmt:message key="label.tab.advanced.field.split" /></input><br />
+			<input id="splitLearnersField" type="checkbox"><fmt:message key="label.tab.advanced.field.split" /></input><br />
 			<table id="splitLearnersTable">
 				<tr>
 					<td id="splitLearnersCell">
@@ -165,8 +167,29 @@
 			</table>
 			<input id="schedulingEnableField" name="schedulingEnable" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.scheduling" /></input>
 			<input id="schedulingDatetimeField" name="schedulingDatetime" disabled="disabled" />
-		</form>
 	</div>
+	
+	<div id="tabConditions">
+		<div class="fieldSectionTitle"><fmt:message key="label.tab.conditions.dependencies" /></div>
+		<div class="fieldSectionDescription"><fmt:message key="label.tab.conditions.dependencies.desc" /></div>
+		<input id="precedingLessonEnableField" name="precedingLessonEnable"
+		       type="checkbox"><fmt:message key="label.tab.conditions.enable" /></input>
+		<select id="precedingLessonIdField" name="precedingLessonId" disabled="disabled">
+			<c:forEach var="availableLesson" items="${availablePrecedingLessons}">
+				<option value="${availableLesson.lessonID}"><c:out value="${availableLesson.lessonName}" /></option>
+			</c:forEach>
+		</select>
+		
+		<div class="fieldSectionTitle"><fmt:message key="label.tab.conditions.timelimit" /></div>
+		<div class="fieldSectionDescription"><fmt:message key="label.tab.conditions.timelimit.desc" /></div>
+		<input id="timeLimitEnableField" name="timeLimitEnable" value="true" type="checkbox"><fmt:message key="label.tab.conditions.enable" /></input>
+		<div class="fieldInnerSection">
+			<fmt:message key="label.tab.conditions.timelimit.days" /> <input id="timeLimitDaysField" name="timeLimitDays" /><br />
+			<input id="timeLimitIndividualField" name="timeLimitIndividual" disabled="disabled" value="true"
+			       type="checkbox"><fmt:message key="label.tab.conditions.timelimit.individual" /></input>
+		</div>
+	</div>
+	</form>
 </div>
 </body>
 </lams:html>

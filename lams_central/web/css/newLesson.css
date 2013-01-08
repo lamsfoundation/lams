@@ -11,6 +11,10 @@ div#tabs > div {
 	padding: 0px;
 }
 
+.ui-spinner {
+	margin-left: 10px;
+}
+
 div#tabs ul li a, a.ygtvspacer, a#closeButton, a#addButton {
 	border-bottom: none;
 }
@@ -153,11 +157,11 @@ table#classTable td {
 }
 
 	
-div#tabAdvanced {
+div#tabAdvanced, div#tabConditions {
 	padding-left: 30px;
 }
 
-div#tabAdvanced input[type="checkbox"] {
+input[type="checkbox"] {
 	margin: 5px 5px 0px 0px;
 	border: none;
 }
@@ -168,15 +172,15 @@ div#tabAdvanced input[type="checkbox"] {
 	font-weight: bold;
 }
 
+.fieldSectionDescription {
+	padding: 10px 0px 10px 0px;
+}
+
 .fieldInnerSection {
-	padding-left: 30px;
+	padding: 10px 0px 0px 30px;
 }
 
-div#introSection {
-	padding-top: 5px;
-}
-
-div#introSection span {
+div.fieldInnerSection span {
 	vertical-align: top;
 }
 
@@ -207,5 +211,19 @@ span#splitLearnersDescription {
 }
 
 #schedulingDatetimeField {
-	margin-left: 40px;
+	margin-left: 50px;
+}
+
+
+#precedingLessonIdField {
+	margin: 0px 0px 0px 70px;
+}
+
+#timeLimitDaysField {
+	width: 50px;
+	margin: 0px 0px 0px 5px !important;
+}
+
+#timeLimitIndividualField {
+	margin-top: 15px;
 }

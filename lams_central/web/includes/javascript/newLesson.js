@@ -189,16 +189,36 @@ function initAdvancedTab(){
 	
 	$('#startMonitorField').change(function(){
 		var checked = !$(this).is(':checked');
-		var schedulingEnableField = $('#schedulingEnableField');
 		if (!checked) {
-			schedulingEnableField.attr('checked', false);
-			$('#schedulingDatetimeField').val(null).prop('disabled', true);
+			$('#schedulingEnableField, #precedingLessonEnableField, ' +
+	          '#timeLimitEnableField, #timeLimitIndividualField').attr('checked', false);
+			$('#timeLimitIndividualField, #precedingLessonIdField, #schedulingDatetimeField').prop('disabled', true);
+			$('#timeLimitDaysField').spinner('disable');
+			$('#schedulingDatetimeField').val(null);
 		}
-		schedulingEnableField.prop('disabled', !checked);
+		
+		$('#schedulingEnableField, #precedingLessonEnableField, #timeLimitEnableField').prop('disabled', !checked);
 	});
 	
 	$('#schedulingDatetimeField').datetimepicker({
 		'minDate' : 0
+	});
+}
+
+function initConditionsTab(){
+	$('#precedingLessonEnableField').change(function(){
+		$('#precedingLessonIdField').prop('disabled', !$(this).is(':checked'));
+	});
+	
+	$('#timeLimitDaysField').spinner({
+		'disabled'    : true,
+		'min'         : 0,
+		'max'         : 180
+	}).spinner('value', 30);
+	
+	$('#timeLimitEnableField').change(function(){
+		$('#timeLimitDaysField').spinner($(this).is(':checked') ? 'enable' : 'disable');
+		$('#timeLimitIndividualField').prop('disabled', !$(this).is(':checked'));
 	});
 }
 

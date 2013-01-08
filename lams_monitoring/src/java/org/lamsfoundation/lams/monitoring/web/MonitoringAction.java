@@ -262,6 +262,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	String lessonName = request.getParameter("lessonName");
 	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
+
 	boolean introEnable = WebUtil.readBooleanParam(request, "introEnable", false);
 	String introDescription = request.getParameter("introDescription");
 	boolean introImage = WebUtil.readBooleanParam(request, "introImage", false);
@@ -275,6 +276,14 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean schedulingEnable = WebUtil.readBooleanParam(request, "schedulingEnable", false);
 	Date schedulingDatetime = schedulingEnable ? MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(request
 		.getParameter("schedulingDatetime")) : null;
+
+	boolean precedingLessonEnable = WebUtil.readBooleanParam(request, "precedingLessonEnable", false);
+	Long precedingLessonId = WebUtil.readLongParam(request, "precedingLessonId", true);
+	boolean timeLimitEnableField = WebUtil.readBooleanParam(request, "timeLimitEnableField", false);
+	Integer timeLimitDaysField = WebUtil.readIntParam(request, "timeLimitDaysField", true);
+	boolean timeLimitIndividualField = WebUtil.readBooleanParam(request, "timeLimitIndividualField", false);
+	Integer timeLimitIndividual = timeLimitEnableField && timeLimitIndividualField ? timeLimitDaysField : null;
+	Integer timeLimitLesson = timeLimitEnableField && !timeLimitIndividualField ? timeLimitDaysField : null;
 
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
@@ -338,7 +347,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 	    Lesson lesson = monitoringService.initializeLesson(lessonInstanceName, introDescription, ldId,
 		    organisationId, userId, null, introEnable, introImage, portfolioEnable, presenceEnable, imEnable,
-		    enableLiveEdit, notificationsEnable, null, null);
+		    enableLiveEdit, notificationsEnable, timeLimitIndividual, precedingLessonId);
 
 	    monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation, learnerGroupInstanceName,
 		    lessonInstanceLearners, staffGroupInstanceName, staff, userId);
@@ -347,7 +356,13 @@ public class MonitoringAction extends LamsDispatchAction {
 		if (schedulingDatetime == null) {
 		    monitoringService.startLesson(lesson.getLessonId(), userId);
 		} else {
+		    // if lesson should start in few days, set it here
 		    monitoringService.startLessonOnSchedule(lesson.getLessonId(), schedulingDatetime, userId);
+		}
+
+		// if lesson should finish in few days, set it here
+		if (timeLimitLesson != null) {
+		    monitoringService.finishLessonOnSchedule(lesson.getLessonId(), timeLimitLesson, userId);
 		}
 	    }
 	}
@@ -670,7 +685,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	response.getWriter().print(jsonObject);
 	return null;
     }
-    
+
     /**
      * <P>
      * </P>

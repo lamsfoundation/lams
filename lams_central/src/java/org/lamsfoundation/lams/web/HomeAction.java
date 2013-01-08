@@ -30,6 +30,9 @@ import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.servlet.ServletException;
@@ -52,7 +55,9 @@ import org.lamsfoundation.lams.learningdesign.GroupUser;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dto.LessonDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.lesson.util.LessonDTOComparator;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -366,6 +371,7 @@ public class HomeAction extends DispatchAction {
 	}
     }
 
+    @SuppressWarnings("unchecked")
     public ActionForward newLesson(ActionMapping mapping, ActionForm form, HttpServletRequest req,
 	    HttpServletResponse res) throws IOException, UserAccessDeniedException, JSONException,
 	    RepositoryCheckedException {
@@ -387,7 +393,7 @@ public class HomeAction extends DispatchAction {
 	    userJSON.put("firstName", user.getFirstName());
 	    userJSON.put("lastName", user.getLastName());
 	    userJSON.put("login", user.getLogin());
-	    
+
 	    users.append("selectedLearners", userJSON);
 	}
 
@@ -399,7 +405,7 @@ public class HomeAction extends DispatchAction {
 	    userJSON.put("firstName", user.getFirstName());
 	    userJSON.put("lastName", user.getLastName());
 	    userJSON.put("login", user.getLogin());
-	    
+
 	    if (userDTO.getUserID().equals(user.getUserID())) {
 		// creator is always selected
 		users.append("selectedMonitors", userJSON);
@@ -407,8 +413,20 @@ public class HomeAction extends DispatchAction {
 		users.append("unselectedMonitors", userJSON);
 	    }
 	}
-	
+
 	req.setAttribute("users", users.toString());
+
+	// find lessons which can be set as preceding ones for newly created lesson
+	Organisation organisation = (Organisation) getService().findById(Organisation.class, organisationID);
+	Set<LessonDTO> availableLessons = new TreeSet<LessonDTO>(new LessonDTOComparator());
+	for (Lesson availableLesson : (Set<Lesson>) organisation.getLessons()) {
+	    Integer availableLessonState = availableLesson.getLessonStateId();
+	    if (!Lesson.REMOVED_STATE.equals(availableLessonState)
+		    && !Lesson.FINISHED_STATE.equals(availableLessonState)) {
+		availableLessons.add(new LessonDTO(availableLesson));
+	    }
+	}
+	req.setAttribute("availablePrecedingLessons", availableLessons);
 
 	return mapping.findForward("newLesson");
     }
@@ -455,7 +473,7 @@ public class HomeAction extends DispatchAction {
 	    if (publicFolder != null) {
 		folderContents.add(publicFolder);
 	    }
-	 // special behaviour for organisation folders
+	    // special behaviour for organisation folders
 	} else if (folderID.equals(WorkspaceAction.ORG_FOLDER_ID)) {
 	    folderContents = getWorkspaceManagementService().getAccessibleOrganisationWorkspaceFolders(userID);
 
