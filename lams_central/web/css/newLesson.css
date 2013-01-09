@@ -146,6 +146,13 @@ table#classTable td {
 	text-align: center;
 }
 
+.sortUsersButton {
+	text-align: right;
+	padding-right: 3px;
+	float: right;
+	cursor: pointer;
+}
+
 .droppableHighlight {
 	padding : 1px;
 	border: 5px solid #5c9ccc;

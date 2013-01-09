@@ -1,6 +1,7 @@
-// ********** MAIN FUNCTIONS **********
+﻿// ********** MAIN FUNCTIONS **********
 var tree;
-var lastSelectedUsers = [];
+var lastSelectedUsers = {};
+var sortOrderDescending = {};
 var submitInProgress = false;
 		
 function initLessonTab(){
@@ -159,6 +160,8 @@ function initClassTab(){
 						   }
 		});
 	});
+	
+	$('.sortUsersButton').click(sortUsers);
 }
 
 
@@ -176,7 +179,7 @@ function initAdvancedTab(){
 	});
 	
 	$('#introEnableField').change(function(){
-		$('#introSection input, #introSection textarea').prop('disabled', !$(this).is(':checked'));
+		$('#introDescriptionField, #introImageField').prop('disabled', !$(this).is(':checked'));
 	});
 	
 	$('#presenceEnableField').change(function(){
@@ -367,7 +370,10 @@ function fillUserContainer(users, containerID) {
 	if (users) {
 		// create user DIVs
 		$.each(users, function(index, userJSON) {
-			$('#' + containerID).append($('<div />').attr('userId', userJSON.userID)
+			$('#' + containerID).append($('<div />').attr({
+											'userId'  : userJSON.userID,
+											'sortKey' : userJSON.lastName
+											})
 					                      .addClass('draggableUser')
             						      .text(userJSON.firstName + ' ' + userJSON.lastName 
             						    		  + ' (' + userJSON.login + ')')
@@ -399,6 +405,36 @@ function getSelectedUserList(containerId) {
 		list += $(this).attr('userId') + ',';
 	});
 	return list;
+}
+
+function sortUsers() {
+	var buttonId = $(this).attr('id');
+	var container = $('#' + buttonId.substring(buttonId.indexOf('-') + 1));
+	var users = container.children('div.draggableUser');
+	if (users.length > 1) {
+		var sortOrderDesc = sortOrderDescending[buttonId];
+		
+		users.each(function(){
+			$(this).detach();
+		}).sort(function(a, b){
+			var keyA = $(a).attr('sortKey');
+			var keyB = $(b).attr('sortKey');
+			var result = keyA > keyB ? 1 : keyA < keyB ? -1 : 0;
+			return sortOrderDesc ? result : -result;
+		}).each(function(){
+			$(this).appendTo(container);
+		});
+		
+		if (sortOrderDesc) {
+			$(this).html('▲');
+			sortOrderDescending[buttonId] = false;
+		} else {
+			$(this).html('▼');
+			sortOrderDescending[buttonId] = true;
+		}
+		
+		colorDraggableUsers(container);
+	}
 }
 
 // ********** ADVANCED TAB FUNCTIONS **********

@@ -104,21 +104,33 @@
 		<table id="classTable" class="tabTable">
 			<tr>
 				<td>
-					<div class="userContainerTitle"><fmt:message key="label.tab.class.monitors.unselected" /></div>
+					<div class="userContainerTitle">
+						<fmt:message key="label.tab.class.monitors.unselected" />
+						<span id="sort-unselected-monitors" class="sortUsersButton"/>▲</span>
+					</div>
 					<div id="unselected-monitors" class="userContainer"></div>
 				</td>
 				<td>
-					<div class="userContainerTitle"><fmt:message key="label.tab.class.monitors.selected" /></div>
+					<div class="userContainerTitle">
+						<fmt:message key="label.tab.class.monitors.selected" />
+						<span id="sort-selected-monitors" class="sortUsersButton"/>▲</span>
+					</div>
 					<div id="selected-monitors" class="userContainer"></div>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<div class="userContainerTitle"><fmt:message key="label.tab.class.monitors.unselected" /></div>
+					<div class="userContainerTitle">
+						<span id="sort-unselected-learners" class="sortUsersButton"/>▲</span>
+						<fmt:message key="label.tab.class.learners.unselected" />
+					</div>
 					<div id="unselected-learners" class="userContainer"></div>
 				</td>
 				<td>
-					<div class="userContainerTitle"><fmt:message key="label.tab.class.monitors.selected" /></div>
+					<div class="userContainerTitle">
+						<span id="sort-selected-learners" class="sortUsersButton"/>▲</span>
+						<fmt:message key="label.tab.class.learners.selected" />
+					</div>
 					<div id="selected-learners" class="userContainer"></div>
 				</td>
 			</tr>
