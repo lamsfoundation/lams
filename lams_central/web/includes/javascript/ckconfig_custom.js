@@ -35,6 +35,15 @@ CKEDITOR.config.toolbar_CustomPedplanner = [
 	['Image','Link','Table','Smiley','Font','FontSize']
 ] ;
 
+CKEDITOR.config.toolbar_LessonDescription = [
+    ['Bold','Italic','Underline', '-','Subscript','Superscript'],
+	['NumberedList','BulletedList','-','Outdent','Indent'],
+	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+	['TextColor','BGColor'],
+	['Table','HorizontalRule','Smiley','SpecialChar'],
+	['Format','Font','FontSize']
+] ;
+
 
 CKEDITOR.config.contentsCss = CKEDITOR.basePath + '../css/defaultHTML_learner.css' ;
 CKEDITOR.config.skin = 'office2003' ;

@@ -1,7 +1,7 @@
 ﻿// ********** MAIN FUNCTIONS **********
 var tree;
 var lastSelectedUsers = {};
-var sortOrderDescending = {};
+var sortOrderAscending = {};
 var submitInProgress = false;
 		
 function initLessonTab(){
@@ -11,7 +11,7 @@ function initLessonTab(){
 		// show the thumbnail
 		$('#ldScreenshotAuthor').css('display', 'inline');
 		// resize if needed
-		var resized = resizeImage('ldScreenshotAuthor', 400, null);
+		var resized = resizeImage('ldScreenshotAuthor', 383, null);
 		toggleCanvasResize(resized ? CANVAS_RESIZE_OPTION_FIT
 				: CANVAS_RESIZE_OPTION_NONE);
 	});
@@ -125,14 +125,14 @@ function initClassTab(){
 	});
 	
 	$('.userContainer').each(function(){
-		colorDraggableUsers(this);
+		var containerId = $(this).attr('id');
 		
-		$(this).droppable({'scope'       : $(this).attr('id'),
+		$(this).droppable({'scope'       : containerId,
 						   'activeClass' : 'droppableHighlight',
 						   'tolerance'   : 'touch',
 						   'accept'      : function (draggable) {
 							   // forbid current user from being removed from monitors
-							   return $(this).attr('id') != 'unselected-monitors'
+							   return containerId != 'unselected-monitors'
 							       || $(draggable).attr('userId') != userId;
 						   },
 						   'drop'        : function (event, ui) {
@@ -153,7 +153,7 @@ function initClassTab(){
 							   colorDraggableUsers(this);
 							   colorDraggableUsers(previousContainer);
 							   
-							   if ($(this).attr('id').indexOf('learners') > 0) {
+							   if (containerId.indexOf('learners') > 0) {
 								   // number of selected learners changed, so update this control too
 								   updateSplitLearnersFields();
 							   }
@@ -161,11 +161,18 @@ function initClassTab(){
 		});
 	});
 	
-	$('.sortUsersButton').click(sortUsers);
+	$('.sortUsersButton').click(function(){
+		sortUsers($(this).attr('id'));
+	});
 }
 
 
 function initAdvancedTab(){
+	CKEDITOR.on('instanceReady', function(e){
+		// disable by default
+		e.editor.setReadOnly(true);
+	});
+	
 	$('#splitLearnersCountField').spinner({
 		'disabled'    : true,
 		'incremental' : false,
@@ -179,7 +186,25 @@ function initAdvancedTab(){
 	});
 	
 	$('#introEnableField').change(function(){
-		$('#introDescriptionField, #introImageField').prop('disabled', !$(this).is(':checked'));
+		var checked = $(this).is(':checked');
+		$('#introImageField').prop('disabled', !checked);
+		
+		// show/hide full CKEditor
+		var editor = CKEDITOR.instances['introDescription'];
+		var  collapsed = $('.cke_toolbox_collapser_min').length > 0;
+		if (checked) {
+			editor.setReadOnly(false);
+			if (collapsed) {
+				 $('.cke_toolbox_collapser').trigger('click');
+			}
+			editor.resize(420, 250);
+		} else {
+			editor.setReadOnly(true);
+			if (!collapsed) {
+				$('.cke_toolbox_collapser').trigger('click');
+			}
+			editor.resize(50, 20);
+		}
 	});
 	
 	$('#presenceEnableField').change(function(){
@@ -279,6 +304,9 @@ function addLesson(){
 		$('#splitNumberLessonsField').val(instances);
 	}
 	
+	// copy CKEditor contents to textarea for submit
+	$('#introDescription').val(CKEDITOR.instances['introDescription'].getData());
+
 	submitInProgress = true;
 	$('#lessonForm').ajaxSubmit({
 		'success' : function(){
@@ -309,7 +337,6 @@ function toggleCanvasResize(mode) {
 	switch (mode) {
 	case CANVAS_RESIZE_OPTION_NONE:
 		toggleCanvasResizeLink.css('display', 'none');
-		$('#canvasDiv').css('overflow', 'visible');
 		break;
 	case CANVAS_RESIZE_OPTION_FIT:
 		toggleCanvasResizeLink.html(CANVAS_RESIZE_LABEL_FULL).one('click',
@@ -317,8 +344,7 @@ function toggleCanvasResize(mode) {
 					toggleCanvasResize(CANVAS_RESIZE_OPTION_FULL)
 				});
 		toggleCanvasResizeLink.css('display', 'inline');
-		resizeImage('ldScreenshotAuthor', 385, null);
-		$('#canvasDiv').css('overflow', 'visible');
+		resizeImage('ldScreenshotAuthor', 383, null);
 		break;
 	case CANVAS_RESIZE_OPTION_FULL:
 		toggleCanvasResizeLink.html(CANVAS_RESIZE_LABEL_FIT).one('click',
@@ -327,7 +353,6 @@ function toggleCanvasResize(mode) {
 				});
 		toggleCanvasResizeLink.css('display', 'inline');
 		$('#ldScreenshotAuthor').css('width', 'auto').css('height', 'auto');
-		$('#canvasDiv').css('overflow', 'auto');
 		break;
 	}
 }
@@ -366,19 +391,21 @@ function parseFolderTreeNode(nodeJSON) {
 
 // ********** CLASS TAB FUNCTIONS **********
 
-function fillUserContainer(users, containerID) {
+function fillUserContainer(users, containerId) {
 	if (users) {
 		// create user DIVs
 		$.each(users, function(index, userJSON) {
-			$('#' + containerID).append($('<div />').attr({
+			$('#' + containerId).append($('<div />').attr({
 											'userId'  : userJSON.userID,
-											'sortKey' : userJSON.lastName
+											'sortKey' : userJSON.lastName+userJSON.firstName
 											})
 					                      .addClass('draggableUser')
             						      .text(userJSON.firstName + ' ' + userJSON.lastName 
             						    		  + ' (' + userJSON.login + ')')
             						   );
 		});
+		
+		sortUsers('sort-' + containerId);
 	}
 }
 
@@ -392,7 +419,7 @@ function getDraggableScope(containerId) {
 
 function colorDraggableUsers(container) {
 	// every second line is different
-	$(container).find('div').each(function(index, userDiv){
+	$(container).find('div.draggableUser').each(function(index, userDiv){
 		// exact colour should be defined in CSS, but it's easier this way...
 		$(this).css('background-color', index % 2 ? '#dfeffc' : 'inherit');
 	});
@@ -407,12 +434,11 @@ function getSelectedUserList(containerId) {
 	return list;
 }
 
-function sortUsers() {
-	var buttonId = $(this).attr('id');
+function sortUsers(buttonId) {
 	var container = $('#' + buttonId.substring(buttonId.indexOf('-') + 1));
 	var users = container.children('div.draggableUser');
 	if (users.length > 1) {
-		var sortOrderDesc = sortOrderDescending[buttonId];
+		var sortOrderAsc = sortOrderAscending[buttonId];
 		
 		users.each(function(){
 			$(this).detach();
@@ -420,17 +446,18 @@ function sortUsers() {
 			var keyA = $(a).attr('sortKey');
 			var keyB = $(b).attr('sortKey');
 			var result = keyA > keyB ? 1 : keyA < keyB ? -1 : 0;
-			return sortOrderDesc ? result : -result;
+			return sortOrderAsc ? -result : result;
 		}).each(function(){
 			$(this).appendTo(container);
 		});
 		
-		if (sortOrderDesc) {
-			$(this).html('▲');
-			sortOrderDescending[buttonId] = false;
+		var button = $('#' + buttonId);
+		if (sortOrderAsc) {
+			button.html('▼');
+			sortOrderAscending[buttonId] = false;
 		} else {
-			$(this).html('▼');
-			sortOrderDescending[buttonId] = true;
+			button.html('▲');
+			sortOrderAscending[buttonId] = true;
 		}
 		
 		colorDraggableUsers(container);

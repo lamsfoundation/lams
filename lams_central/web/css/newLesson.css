@@ -3,8 +3,9 @@ div#tabs {
 	height: 450px;
 }
 
-div#tabs > div {
-	height: 420px;
+div.tabContent {
+	height: 417px;
+	overflow: auto;
 }
 
 .ui-tabs .ui-tabs-panel {
@@ -44,7 +45,7 @@ a#addButton {
 }
 
 table.tabTable {
-	height: 393px;
+	height: 390px;
 	table-layout: fixed;
 	border-top: thin dotted #2E6E9E;
 }
@@ -75,7 +76,7 @@ td#learningDesignTreeCell {
 
 div#learningDesignTree {
 	overflow: auto;
-	height: 385px;
+	height: 384px;
 }
 
 .ygtv-highlight1, .ygtv-highlight1 .ygtvlabel {
@@ -97,8 +98,8 @@ td#canvasCell {
 }
 
 div#canvasDiv {
-	overflow: visible;
-	height: 330px;
+	overflow: auto;
+	height: 327px;
 }
 
 .ldChoiceDependentCanvasElement {
@@ -183,16 +184,29 @@ input[type="checkbox"] {
 	padding: 10px 0px 10px 0px;
 }
 
-.fieldInnerSection {
-	padding: 10px 0px 0px 30px;
+table#introDescriptionTable {
+	padding-left: 30px;
 }
 
-div.fieldInnerSection span {
-	vertical-align: top;
+textarea#introDescription {
+	display: none;
 }
 
-textarea#introDescriptionField {
-	width: 200px;
+table#introDescriptionTable td {
+	padding: 0px;
+}
+
+td#introDescriptionLabelCell {
+	width: 80px;
+}
+
+.cke_resizer {
+	height: 10px !important;
+	margin-top: 0px !important;
+}
+
+#introImageField {
+	margin-top: 8px;
 }
 
 table#splitLearnersTable {
@@ -218,12 +232,16 @@ span#splitLearnersDescription {
 }
 
 #schedulingDatetimeField {
-	margin-left: 50px;
+	margin: 0px 0px 10px 50px;
 }
 
 
 #precedingLessonIdField {
 	margin: 0px 0px 0px 70px;
+}
+
+div#timeLimitDiv {
+	padding: 10px 0px 0px 30px;
 }
 
 #timeLimitDaysField {

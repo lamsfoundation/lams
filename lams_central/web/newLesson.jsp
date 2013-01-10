@@ -70,7 +70,7 @@
 	
 	<!-- Tab contents -->
 	
-	<div id="tabLesson">
+	<div id="tabLesson" class="tabContent">
 		<div class="tabTitle"><fmt:message key="label.tab.lesson.title" /></div>
 		<table class="tabTable">
 			<tr>
@@ -99,7 +99,7 @@
 	</div>
 	
 	
-	<div id="tabClass">
+	<div id="tabClass" class="tabContent">
 		<div class="tabTitle"><fmt:message key="label.tab.class.title" /></div>
 		<table id="classTable" class="tabTable">
 			<tr>
@@ -138,7 +138,7 @@
 	</div>
 	
 	<form id="lessonForm" action="<lams:LAMSURL/>monitoring/monitoring.do" method="POST">
-	<div id="tabAdvanced">
+	<div id="tabAdvanced" class="tabContent">
 			<input name="method" value="newLesson" type="hidden" />
 			<input name="organisationID" value="${param.organisationID}" type="hidden" />
 			<input id="ldIdField" name="learningDesignID" type="hidden" />
@@ -150,13 +150,25 @@
 
 			<div class="fieldSectionTitle"><fmt:message key="label.tab.advanced.details" /></div>
 			<input id="introEnableField" name="introEnable" value="true" type="checkbox"><fmt:message key="label.tab.advanced.intro.enable" /></input>
-			<div class="fieldInnerSection">
-				<span><fmt:message key="label.tab.advanced.intro.description" /></span>
-				<textarea id="introDescriptionField" name="introDescription" disabled="disabled"></textarea>
-				<br />
-				<input id="introImageField" name="introImage" value="true" type="checkbox"
-				       disabled="disabled"><fmt:message key="label.tab.advanced.intro.image" /></input>
-			</div>
+			<table id="introDescriptionTable">
+				<tr>
+					<td id="introDescriptionLabelCell">
+						<fmt:message key="label.tab.advanced.intro.description" />
+					</td>
+					<td>
+						<lams:CKEditor id="introDescription" toolbarSet="LessonDescription" 
+				                       width="50px" height="10px" displayExpanded="false" value="">
+						</lams:CKEditor>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<input id="introImageField" name="introImage" value="true" type="checkbox"
+					          disabled="disabled"><fmt:message key="label.tab.advanced.intro.image" />
+					    </input>
+					</td>
+				</tr>
+			</table>
 
 			
 			<div class="fieldSectionTitle"><fmt:message key="label.tab.advanced.section.advanced" /></div>
@@ -181,7 +193,7 @@
 			<input id="schedulingDatetimeField" name="schedulingDatetime" disabled="disabled" />
 	</div>
 	
-	<div id="tabConditions">
+	<div id="tabConditions" class="tabContent">
 		<div class="fieldSectionTitle"><fmt:message key="label.tab.conditions.dependencies" /></div>
 		<div class="fieldSectionDescription"><fmt:message key="label.tab.conditions.dependencies.desc" /></div>
 		<input id="precedingLessonEnableField" name="precedingLessonEnable"
@@ -195,7 +207,7 @@
 		<div class="fieldSectionTitle"><fmt:message key="label.tab.conditions.timelimit" /></div>
 		<div class="fieldSectionDescription"><fmt:message key="label.tab.conditions.timelimit.desc" /></div>
 		<input id="timeLimitEnableField" name="timeLimitEnable" value="true" type="checkbox"><fmt:message key="label.tab.conditions.enable" /></input>
-		<div class="fieldInnerSection">
+		<div id="timeLimitDiv">
 			<fmt:message key="label.tab.conditions.timelimit.days" /> <input id="timeLimitDaysField" name="timeLimitDays" /><br />
 			<input id="timeLimitIndividualField" name="timeLimitIndividual" disabled="disabled" value="true"
 			       type="checkbox"><fmt:message key="label.tab.conditions.timelimit.individual" /></input>
