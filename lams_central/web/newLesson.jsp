@@ -103,14 +103,18 @@
 		<div class="tabTitle"><fmt:message key="label.tab.class.title" /></div>
 		<table id="classTable" class="tabTable">
 			<tr>
-				<td>
+				<td class="userContainerCell" rowspan="2">
 					<div class="userContainerTitle">
 						<fmt:message key="label.tab.class.monitors.unselected" />
 						<span id="sort-unselected-monitors" class="sortUsersButton"/>▲</span>
 					</div>
 					<div id="unselected-monitors" class="userContainer"></div>
 				</td>
-				<td>
+				<td class="userConainterTransferCell userConainterTransferTopCell">
+					<img src="images/css/blue_arrow_right.gif"
+					     onClick="javascript:transferUsers('selected-monitors')" />
+				</td>
+				<td class="userContainerCell" rowspan="2">
 					<div class="userContainerTitle">
 						<fmt:message key="label.tab.class.monitors.selected" />
 						<span id="sort-selected-monitors" class="sortUsersButton"/>▲</span>
@@ -119,19 +123,35 @@
 				</td>
 			</tr>
 			<tr>
-				<td>
+				<td class="userConainterTransferCell">
+					<img src="images/blue_arrow_left.gif" 
+					     onClick="javascript:transferUsers('unselected-monitors')" />	
+				</td>
+			</tr>
+			<tr>
+				<td class="userContainerCell" rowspan="2">
 					<div class="userContainerTitle">
 						<span id="sort-unselected-learners" class="sortUsersButton"/>▲</span>
 						<fmt:message key="label.tab.class.learners.unselected" />
 					</div>
 					<div id="unselected-learners" class="userContainer"></div>
 				</td>
-				<td>
+				<td class="userConainterTransferCell userConainterTransferTopCell" >
+					<img src="images/css/blue_arrow_right.gif"
+					     onClick="javascript:transferUsers('selected-learners')" />
+				</td>
+				<td class="userContainerCell" rowspan="2">
 					<div class="userContainerTitle">
 						<span id="sort-selected-learners" class="sortUsersButton"/>▲</span>
 						<fmt:message key="label.tab.class.learners.selected" />
 					</div>
 					<div id="selected-learners" class="userContainer"></div>
+				</td>
+			</tr>
+			<tr>
+				<td class="userConainterTransferCell">
+					<img src="images/blue_arrow_left.gif" 
+					     onClick="javascript:transferUsers('unselected-learners')" />
 				</td>
 			</tr>
 		</table>

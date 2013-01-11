@@ -131,32 +131,10 @@ function initClassTab(){
 						   'activeClass' : 'droppableHighlight',
 						   'tolerance'   : 'touch',
 						   'accept'      : function (draggable) {
-							   // forbid current user from being removed from monitors
-							   return containerId != 'unselected-monitors'
-							       || $(draggable).attr('userId') != userId;
+							   return acceptDraggable(draggable, containerId);
 						   },
-						   'drop'        : function (event, ui) {
-							   // remove error message, if exists
-							   $(this).children('.errorMessage').remove();
-							   
-							   // move the selected users
-							   var previousContainer = ui.draggable.parent();
-							   previousContainer.children('.draggableUserSelected')
-							            .css({'top'  : '0px',
-								              'left' : '0px',
-							                 })
-							            .draggable('option', 'scope', getDraggableScope($(this).attr('id')))
-							            .appendTo(this);
-							   
-							   // recolour both containers
-							   $(this).children().removeClass('draggableUserSelected');
-							   colorDraggableUsers(this);
-							   colorDraggableUsers(previousContainer);
-							   
-							   if (containerId.indexOf('learners') > 0) {
-								   // number of selected learners changed, so update this control too
-								   updateSplitLearnersFields();
-							   }
+						   'drop'        : function () {
+							   transferUsers(containerId);
 						   }
 		});
 	});
@@ -461,6 +439,45 @@ function sortUsers(buttonId) {
 		}
 		
 		colorDraggableUsers(container);
+	}
+}
+
+function acceptDraggable(draggable, toContainerId) {
+	// forbid current user from being removed from monitors
+	return toContainerId != 'unselected-monitors'
+		|| $(draggable).attr('userId') != userId;
+}
+
+function transferUsers(toContainerId) {
+	var toContainer = $('#' + toContainerId);
+	var fromContainerId = getDraggableScope(toContainerId);
+	var fromContainer = $('#' + fromContainerId);
+	var selectedUsers =  fromContainer.children('.draggableUserSelected');
+	if (selectedUsers.length > 0){
+	   // remove error message, if exists
+	   toContainer.children('.errorMessage').remove();
+	   
+	   // move the selected users
+	   selectedUsers.each(function(){
+		   if (acceptDraggable(this, toContainerId)) {
+			  $(this).css({'top'  : '0px',
+	              		   'left' : '0px',
+	          })
+	          .draggable('option', 'scope', fromContainerId)
+	          .appendTo(toContainer);
+		   }
+	   });
+	            
+	   
+	   // recolour both containers
+	   toContainer.children().removeClass('draggableUserSelected');
+	   colorDraggableUsers(toContainer);
+	   colorDraggableUsers(fromContainer);
+	   
+	   if (toContainerId.indexOf('learners') > 0) {
+		   // number of selected learners changed, so update this control too
+		   updateSplitLearnersFields();
+	   }
 	}
 }
 

@@ -121,10 +121,24 @@ td#lessonNameCell {
 }
 	
 
-table#classTable td {
-	width: 50%;
+td.userContainerCell {
 	vertical-align: top;
-	padding: 5px 10px 0px 10px;
+	padding: 5px 5px 0px 5px;
+}
+
+td.userConainterTransferCell {
+	height: 69px;
+	width: 16px;
+	padding: 18px 3px 8px 3px;
+	vertical-align: top;
+}
+
+td.userConainterTransferTopCell {
+	vertical-align: bottom;
+}
+
+td.userConainterTransferCell img {
+	cursor: pointer;
 }
 
 .draggableUser {
