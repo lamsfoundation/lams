@@ -145,7 +145,7 @@
 		
 		for (var i = 1; i<=maxGrade; i++) {
 			var isSelected = (oldValue == i);
-		    $('#passingMark').append( new Option(i,i,isSelected) );
+		    $('#passingMark').append( new Option(i, i, isSelected, isSelected) );
 		}
 	};	
 

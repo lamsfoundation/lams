@@ -5,18 +5,18 @@
 	$(document).ready(function(){
 		$("#attemptsAllowedRadio").click(function() {
 			$("#passingMark").val("0");
-			$("#passingMark").attr("disabled", "disabled");
-			$("#attemptsAllowed").attr("disabled", "");
+			$("#passingMark").prop("disabled", true);
+			$("#attemptsAllowed").prop("disabled", false);
 		});
 		
 		$("#passingMarkRadio").click(function() {
 			$("#attemptsAllowed").val("0");
-			$("#attemptsAllowed").attr("disabled", "disabled");
-			$("#passingMark").attr("disabled", "");
+			$("#attemptsAllowed").prop("disabled", true);
+			$("#passingMark").prop("disabled", false);
 		});
 		
-		<c:if test="${formBean.assessment.passingMark == 0}">$("#passingMark").attr("disabled", "disabled");</c:if>
-		<c:if test="${formBean.assessment.passingMark > 0}">$("#attemptsAllowed").attr("disabled", "disabled");</c:if>
+		<c:if test="${formBean.assessment.passingMark == 0}">$("#passingMark").prop("disabled", true);</c:if>
+		<c:if test="${formBean.assessment.passingMark > 0}">$("#attemptsAllowed").prop("disabled", true);</c:if>
 	});
 
 </script>
