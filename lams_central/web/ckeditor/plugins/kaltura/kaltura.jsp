@@ -117,7 +117,7 @@
 				}
 			}
 			
-			var swfobject = CKGlobal.dom.element.createFromHtml( '<script type="text/javascript" src="' + CKGlobal.plugins.getPath('kaltura') + '/swfobject/swfobject.js"><\/script>' );
+			var swfobject = CKGlobal.dom.element.createFromHtml( '<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"><\/script>' );
 			CK.document.getBody().append(swfobject);
 			
 			//enable HTML5 support
