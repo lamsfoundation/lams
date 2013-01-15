@@ -101,8 +101,8 @@
 		        // initialise lesson dialog
 				var dialog = $('#addLessonDialog').dialog({
  					'autoOpen'  : false,
- 					'height'    : 480,
- 					'width'     : 610,
+ 					'height'    : 600,
+ 					'width'     : 800,
  					'modal'     : true,
  					'resizable' : false,
  					'show'      : 'fold',

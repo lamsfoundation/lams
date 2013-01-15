@@ -278,7 +278,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		.getParameter("schedulingDatetime")) : null;
 
 	boolean precedingLessonEnable = WebUtil.readBooleanParam(request, "precedingLessonEnable", false);
-	Long precedingLessonId = WebUtil.readLongParam(request, "precedingLessonId", true);
+	Long precedingLessonId = precedingLessonEnable ? WebUtil.readLongParam(request, "precedingLessonId", true) : null;
 	boolean timeLimitEnableField = WebUtil.readBooleanParam(request, "timeLimitEnableField", false);
 	Integer timeLimitDaysField = WebUtil.readIntParam(request, "timeLimitDaysField", true);
 	boolean timeLimitIndividualField = WebUtil.readBooleanParam(request, "timeLimitIndividualField", false);

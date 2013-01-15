@@ -1,10 +1,10 @@
 div#tabs {
-	width: 578px;
-	height: 450px;
+	width: 768px;
+	height: 574px;
 }
 
 div.tabContent {
-	height: 417px;
+	height: 543px;
 	overflow: auto;
 }
 
@@ -45,7 +45,7 @@ a#addButton {
 }
 
 table.tabTable {
-	height: 390px;
+	height: 517px;
 	table-layout: fixed;
 	border-top: thin dotted #2E6E9E;
 }
@@ -70,13 +70,13 @@ div.tabTitle {
 td#learningDesignTreeCell {
 	padding: 2px 2px 0px 5px;
 	vertical-align: top;
-	width: 30%;
+	width: 35%;
 	border-right: thin dotted #2E6E9E;
 }
 
 div#learningDesignTree {
 	overflow: auto;
-	height: 384px;
+	height: 510px;
 }
 
 .ygtv-highlight1, .ygtv-highlight1 .ygtvlabel {
@@ -99,7 +99,7 @@ td#canvasCell {
 
 div#canvasDiv {
 	overflow: auto;
-	height: 327px;
+	height: 452px;
 }
 
 .ldChoiceDependentCanvasElement {
@@ -107,7 +107,7 @@ div#canvasDiv {
 }
 
 img#ldScreenshotLoading, div#ldNotChosenError  {
-	padding-top: 140px;
+	padding-top: 200px;
 }
 
 td#lessonNameCell {
@@ -116,7 +116,7 @@ td#lessonNameCell {
 }
 
 #lessonNameInput {
-	width: 250px;
+	width:370px;
 	margin-left: 10px;
 }
 	
@@ -127,7 +127,7 @@ td.userContainerCell {
 }
 
 td.userConainterTransferCell {
-	height: 69px;
+	height: 100px;
 	width: 16px;
 	padding: 18px 3px 8px 3px;
 	vertical-align: top;
@@ -147,7 +147,7 @@ td.userConainterTransferCell img {
 }
 
 .userContainer {
-	height: 150px;
+	height: 210px;
 	overflow: auto;
 	border: thin solid black;
 	padding : 5px;
@@ -184,7 +184,7 @@ div#tabAdvanced, div#tabConditions {
 }
 
 input[type="checkbox"] {
-	margin: 5px 5px 0px 0px;
+	margin: 10px 5px 0px 0px;
 	border: none;
 }
 
@@ -198,33 +198,25 @@ input[type="checkbox"] {
 	padding: 10px 0px 10px 0px;
 }
 
-table#introDescriptionTable {
-	padding-left: 30px;
+div#introDescriptionDiv {
+	padding: 0px 10px 0px 30px;
+}
+
+div#introDescriptionLabelDiv {
+	padding: 5px 0px 15px 0px;
 }
 
 textarea#introDescription {
 	display: none;
 }
 
-table#introDescriptionTable td {
-	padding: 0px;
-}
-
-td#introDescriptionLabelCell {
-	width: 80px;
-}
-
-.cke_resizer {
-	height: 10px !important;
-	margin-top: 0px !important;
-}
-
 #introImageField {
-	margin-top: 8px;
+	margin-top: 20px;
 }
 
 table#splitLearnersTable {
 	height: 40px;
+	display: none;
 }
 
 td#splitLearnersCell {
@@ -242,20 +234,26 @@ td#splitLearnersDescriptionCell {
 
 span#splitLearnersDescription {
 	font-style: italic;
-	display: none;
+}
+
+#schedulingEnableField {
+	margin-bottom: 15px;
 }
 
 #schedulingDatetimeField {
 	margin: 0px 0px 10px 50px;
+	display: none;
 }
 
 
 #precedingLessonIdField {
 	margin: 0px 0px 0px 70px;
+	display: none;
 }
 
 div#timeLimitDiv {
 	padding: 10px 0px 0px 30px;
+	display: none;
 }
 
 #timeLimitDaysField {

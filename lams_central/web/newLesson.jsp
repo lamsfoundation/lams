@@ -170,26 +170,17 @@
 
 			<div class="fieldSectionTitle"><fmt:message key="label.tab.advanced.details" /></div>
 			<input id="introEnableField" name="introEnable" value="true" type="checkbox"><fmt:message key="label.tab.advanced.intro.enable" /></input>
-			<table id="introDescriptionTable">
-				<tr>
-					<td id="introDescriptionLabelCell">
-						<fmt:message key="label.tab.advanced.intro.description" />
-					</td>
-					<td>
-						<lams:CKEditor id="introDescription" toolbarSet="LessonDescription" 
-				                       width="50px" height="10px" displayExpanded="false" value="">
-						</lams:CKEditor>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="2">
-						<input id="introImageField" name="introImage" value="true" type="checkbox"
-					          disabled="disabled"><fmt:message key="label.tab.advanced.intro.image" />
-					    </input>
-					</td>
-				</tr>
-			</table>
-
+			<div   id="introDescriptionDiv">
+				<div id="introDescriptionLabelDiv">
+				 <fmt:message key="label.tab.advanced.intro.description" />
+				</div>
+				<lams:CKEditor id="introDescription" toolbarSet="LessonDescription" 
+				               height="150px" value="">
+				</lams:CKEditor>
+				<input id="introImageField" name="introImage" value="true" type="checkbox">
+					  <fmt:message key="label.tab.advanced.intro.image" />
+				</input>
+			</div>
 			
 			<div class="fieldSectionTitle"><fmt:message key="label.tab.advanced.section.advanced" /></div>
 			<input id="startMonitorField" name="startMonitor" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.monitor" /></input><br />
@@ -210,7 +201,7 @@
 				</tr>
 			</table>
 			<input id="schedulingEnableField" name="schedulingEnable" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.scheduling" /></input>
-			<input id="schedulingDatetimeField" name="schedulingDatetime" disabled="disabled" />
+			<input id="schedulingDatetimeField" name="schedulingDatetime" />
 	</div>
 	
 	<div id="tabConditions" class="tabContent">
@@ -218,7 +209,7 @@
 		<div class="fieldSectionDescription"><fmt:message key="label.tab.conditions.dependencies.desc" /></div>
 		<input id="precedingLessonEnableField" name="precedingLessonEnable"
 		       type="checkbox"><fmt:message key="label.tab.conditions.enable" /></input>
-		<select id="precedingLessonIdField" name="precedingLessonId" disabled="disabled">
+		<select id="precedingLessonIdField" name="precedingLessonId">
 			<c:forEach var="availableLesson" items="${availablePrecedingLessons}">
 				<option value="${availableLesson.lessonID}"><c:out value="${availableLesson.lessonName}" /></option>
 			</c:forEach>
@@ -229,7 +220,7 @@
 		<input id="timeLimitEnableField" name="timeLimitEnable" value="true" type="checkbox"><fmt:message key="label.tab.conditions.enable" /></input>
 		<div id="timeLimitDiv">
 			<fmt:message key="label.tab.conditions.timelimit.days" /> <input id="timeLimitDaysField" name="timeLimitDays" /><br />
-			<input id="timeLimitIndividualField" name="timeLimitIndividual" disabled="disabled" value="true"
+			<input id="timeLimitIndividualField" name="timeLimitIndividual" value="true"
 			       type="checkbox"><fmt:message key="label.tab.conditions.timelimit.individual" /></input>
 		</div>
 	</div>

@@ -11,7 +11,7 @@ function initLessonTab(){
 		// show the thumbnail
 		$('#ldScreenshotAuthor').css('display', 'inline');
 		// resize if needed
-		var resized = resizeImage('ldScreenshotAuthor', 383, null);
+		var resized = resizeImage('ldScreenshotAuthor', 477, null);
 		toggleCanvasResize(resized ? CANVAS_RESIZE_OPTION_FIT
 				: CANVAS_RESIZE_OPTION_NONE);
 	});
@@ -147,12 +147,11 @@ function initClassTab(){
 
 function initAdvancedTab(){
 	CKEDITOR.on('instanceReady', function(e){
-		// disable by default
-		e.editor.setReadOnly(true);
+		// CKEditor needs to load first, then only hide the whole div to prevent errors
+		$('#introDescriptionDiv').hide();
 	});
 	
 	$('#splitLearnersCountField').spinner({
-		'disabled'    : true,
 		'incremental' : false,
 		'min'         : 1,
 		'max'         : users.selectedLearners ? users.selectedLearners.length : 1,
@@ -160,28 +159,19 @@ function initAdvancedTab(){
 	}).spinner('value', 1);
 	
 	$('#splitLearnersField').change(function(){
-		updateSplitLearnersFields();
+		if ($(this).is(':checked')) {
+			$('#splitLearnersTable').show('slow');
+			updateSplitLearnersFields();
+		} else {
+			$('#splitLearnersTable').hide('slow');
+		}
 	});
 	
 	$('#introEnableField').change(function(){
-		var checked = $(this).is(':checked');
-		$('#introImageField').prop('disabled', !checked);
-		
-		// show/hide full CKEditor
-		var editor = CKEDITOR.instances['introDescription'];
-		var  collapsed = $('.cke_toolbox_collapser_min').length > 0;
-		if (checked) {
-			editor.setReadOnly(false);
-			if (collapsed) {
-				 $('.cke_toolbox_collapser').trigger('click');
-			}
-			editor.resize(420, 250);
+		if ($(this).is(':checked')) {
+			$('#introDescriptionDiv').show('slow');
 		} else {
-			editor.setReadOnly(true);
-			if (!collapsed) {
-				$('.cke_toolbox_collapser').trigger('click');
-			}
-			editor.resize(50, 20);
+			$('#introDescriptionDiv').hide('slow');
 		}
 	});
 	
@@ -190,7 +180,11 @@ function initAdvancedTab(){
 	});
 	
 	$('#schedulingEnableField').change(function(){
-		$('#schedulingDatetimeField').val(null).prop('disabled', !$(this).is(':checked'));
+		if ($(this).is(':checked')) {
+			$('#schedulingDatetimeField').show('slow');
+		} else {
+			$('#schedulingDatetimeField').hide('slow');
+		}
 	});
 	
 	$('#startMonitorField').change(function(){
@@ -213,18 +207,24 @@ function initAdvancedTab(){
 
 function initConditionsTab(){
 	$('#precedingLessonEnableField').change(function(){
-		$('#precedingLessonIdField').prop('disabled', !$(this).is(':checked'));
+		if ($(this).is(':checked')) {
+			$('#precedingLessonIdField').show('slow');
+		} else {
+			$('#precedingLessonIdField').hide('slow');
+		}
 	});
 	
 	$('#timeLimitDaysField').spinner({
-		'disabled'    : true,
 		'min'         : 0,
 		'max'         : 180
 	}).spinner('value', 30);
 	
 	$('#timeLimitEnableField').change(function(){
-		$('#timeLimitDaysField').spinner($(this).is(':checked') ? 'enable' : 'disable');
-		$('#timeLimitIndividualField').prop('disabled', !$(this).is(':checked'));
+		if ($(this).is(':checked')) {
+			$('#timeLimitDiv').show('slow');
+		} else {
+			$('#timeLimitDiv').hide('slow');
+		}
 	});
 }
 
@@ -322,7 +322,7 @@ function toggleCanvasResize(mode) {
 					toggleCanvasResize(CANVAS_RESIZE_OPTION_FULL)
 				});
 		toggleCanvasResizeLink.css('display', 'inline');
-		resizeImage('ldScreenshotAuthor', 383, null);
+		resizeImage('ldScreenshotAuthor', 477, null);
 		break;
 	case CANVAS_RESIZE_OPTION_FULL:
 		toggleCanvasResizeLink.html(CANVAS_RESIZE_LABEL_FIT).one('click',
@@ -484,10 +484,7 @@ function transferUsers(toContainerId) {
 // ********** ADVANCED TAB FUNCTIONS **********
 
 function updateSplitLearnersFields(){
-	var splitEnabled = $('#splitLearnersField').is(':checked');
-	if (splitEnabled) {
-		$('#splitLearnersCountField').spinner('enable');
-		
+	if ($('#splitLearnersField').is(':checked')) {
 		// put users into groups
 		var maxLearnerCount = $('#selected-learners div.draggableUser').length;
 		var learnerCount = $('#splitLearnersCountField').spinner('option', 'max', maxLearnerCount < 1 ? 1 : maxLearnerCount)
@@ -495,9 +492,6 @@ function updateSplitLearnersFields(){
 		var instances = Math.ceil(maxLearnerCount/learnerCount);
 		learnerCount = Math.ceil(maxLearnerCount/instances);
 		var description = SPLIT_LEARNERS_DESCRIPTION.replace('[0]', instances).replace('[1]', learnerCount);
-		$('#splitLearnersDescription').html(description).show();
-	} else {
-		$('#splitLearnersCountField').spinner('disable');
-		$('#splitLearnersDescription').hide();
+		$('#splitLearnersDescription').html(description);
 	}
 }
