@@ -16,8 +16,8 @@
 
 <script type="text/javascript" src="includes/javascript/kaltura.min.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
-<script language="JavaScript" type="text/javascript">
-	<!--
+<script type="text/javascript">
+
 	//Specify Kaltura settings
 	//kaltura server 
 	var KALTURA_SERVER = "${KALTURA_SERVER}";
@@ -222,7 +222,6 @@
 	};
 	window.onresize = resizeIframe;
 
-	// -->
 </script>
 
 
