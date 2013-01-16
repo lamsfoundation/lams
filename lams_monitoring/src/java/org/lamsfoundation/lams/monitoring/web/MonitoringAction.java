@@ -152,69 +152,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
     }
 
-    // ---------------------------------------------------------------------
-    // Struts Dispatch Method
-    // ---------------------------------------------------------------------
-    /**
-     * This STRUTS action method will initialize a lesson for specific learning design with the given lesson title and
-     * lesson description.
-     * <p>
-     * If initialization is successed, this method will return a WDDX message which includes the ID of new lesson.
-     * 
-     * @param mapping
-     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
-     *            the end-user.
-     * 
-     * @param form
-     *            The ActionForm class that will contain any data submitted by the end-user via a form.
-     * @param request
-     *            A standard Servlet HttpServletRequest class.
-     * @param response
-     *            A standard Servlet HttpServletResponse class.
-     * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
-     *         next.
-     * @throws IOException
-     * @throws ServletException
-     * @deprecated
-     */
-    public ActionForward initializeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	FlashMessage flashMessage = null;
-
-	try {
-	    String title = WebUtil.readStrParam(request, "lessonName");
-	    if (title == null) {
-		title = "lesson";
-	    }
-	    String desc = WebUtil.readStrParam(request, "lessonDescription", true);
-	    if (desc == null) {
-		desc = "description";
-	    }
-	    Integer organisationId = WebUtil.readIntParam(request, "organisationID", true);
-	    long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
-	    Boolean learnerExportAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
-	    Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresenceAvailable", false);
-	    Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImAvailable", false);
-	    Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
-	    Lesson newLesson = monitoringService.initializeLesson(title, desc, ldId, organisationId, getUserId(), null,
-		    Boolean.FALSE, Boolean.FALSE, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
-		    liveEditEnabled, Boolean.FALSE, null, null);
-
-	    flashMessage = new FlashMessage("initializeLesson", newLesson.getLessonId());
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "initializeLesson", monitoringService);
-	}
-
-	String message = flashMessage.serializeMessage();
-
-	PrintWriter writer = response.getWriter();
-	writer.println(message);
-	return null;
-    }
-
     /**
      * The Struts dispatch method that starts a lesson that has been created beforehand. Most likely, the request to
      * start lesson should be triggered by the flash component. This method will delegate to the Spring service bean to
@@ -257,7 +194,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
-    public ActionForward newLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward addLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, ParseException {
 	String lessonName = request.getParameter("lessonName");
 	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
@@ -405,48 +342,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	    flashMessage = new FlashMessage("startOnScheduleLesson", Boolean.TRUE);
 	} catch (Exception e) {
 	    flashMessage = handleException(e, "startOnScheduleLesson", monitoringService);
-	}
-
-	String message = flashMessage.serializeMessage();
-
-	PrintWriter writer = response.getWriter();
-	writer.println(message);
-	return null;
-    }
-
-    /**
-     * The Struts dispatch method that finsh a lesson on schedule that has been started beforehand.
-     * 
-     * @param mapping
-     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
-     *            the end-user.
-     * 
-     * @param form
-     *            The ActionForm class that will contain any data submitted by the end-user via a form.
-     * @param request
-     *            A standard Servlet HttpServletRequest class.
-     * @param response
-     *            A standard Servlet HttpServletResponse class.
-     * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
-     *         next.
-     * @throws IOException
-     * @throws ServletException
-     * @throws
-     */
-    public ActionForward finishOnScheduleLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	FlashMessage flashMessage = null;
-
-	try {
-	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    int scheduledNumberDaysToLessonFinish = WebUtil.readIntParam(request,
-		    MonitoringConstants.PARAM_SCHEDULED_NUMBER_DAYS_TO_LESSON_FINISH);
-	    monitoringService.finishLessonOnSchedule(lessonId, scheduledNumberDaysToLessonFinish, getUserId());
-	    flashMessage = new FlashMessage("finishOnScheduleLesson", Boolean.TRUE);
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "finishOnScheduleLesson", monitoringService);
 	}
 
 	String message = flashMessage.serializeMessage();

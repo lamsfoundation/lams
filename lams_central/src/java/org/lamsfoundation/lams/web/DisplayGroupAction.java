@@ -170,10 +170,8 @@ public class DisplayGroupAction extends Action {
 			    + org.getOrganisationId() + ")", "manage-group-button", null, null));
 		}
 		if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))
-		    links.add(new IndexLinkBean("index.addlesson", Configuration.get(ConfigurationKeys.SERVER_URL)
-			    + "/home.do?method=addLesson&courseID=" + org.getOrganisationId() + "&classID=" + ""
-			    + "&KeepThis=true&TB_iframe=true&height=480&width=610", "add-lesson-button thickbox"
-			    + org.getOrganisationId(), null, null));
+		    links.add(new IndexLinkBean("index.addlesson", "javascript:showAddLessonDialog("
+			    + org.getOrganisationId() + ")", "add-lesson-button", null, null));
 		moreLinks.add(new IndexLinkBean("index.searchlesson", Configuration.get(ConfigurationKeys.SERVER_URL)
 			+ "/findUserLessons.do?dispatch=getResults&courseID=" + org.getOrganisationId()
 			+ "&KeepThis=true&TB_iframe=true&height=400&width=600", "search-lesson thickbox"
@@ -206,11 +204,8 @@ public class DisplayGroupAction extends Action {
 
 	    } else {//CLASS_TYPE
 		if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))
-		    links.add(new IndexLinkBean("index.addlesson", Configuration.get(ConfigurationKeys.SERVER_URL)
-			    + "/home.do?method=addLesson&courseID=" + org.getParentOrganisation().getOrganisationId()
-			    + "&classID=" + org.getOrganisationId()
-			    + "&KeepThis=true&TB_iframe=true&height=480&width=610", "add-lesson-button thickbox"
-			    + org.getOrganisationId(), null, null));
+		    links.add(new IndexLinkBean("index.addlesson", "javascript:showAddLessonDialog("
+			    + org.getOrganisationId() + ")", "add-lesson-button", null, null));
 
 		// Adding gradebook course monitor links if enabled
 		if (org.getParentOrganisation().getEnableGradebookForMonitors()

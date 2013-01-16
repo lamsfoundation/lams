@@ -118,32 +118,6 @@ public interface IMonitoringService {
 	    Integer userID, String customCSV, Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled);
 
     /**
-     * Create a lession according to the input lession WDDX package. The sample
-     * package is following: <code>
-     * <pre>
-     * <wddxPacket version="1.0"><header /><data><struct>
-     * 	<var name="lessonID"><number>135</number></var>
-     * 	<var name="organisationID"><number>10</number></var>
-     * 	<var name="staff"><array length="2"><number>7</number><number>8</number></array></var>
-     * 	<var name="learners"><array length="6"><number>1</number><number>2</number>
-     * 			<number>3</number><number>4</number><number>5</number><number>6</number></array></var>
-     * 	</struct></data></wddxPacket>
-     * </pre>
-	 * </code>
-     * <P>
-     * The lesson will includes creator who create this lesson as staff and
-     * learner.
-     * 
-     * @param creatorUserId
-     *            The lesson creator, who will be add to lesson as staff and
-     *            learner.
-     * @param lessionPackage
-     * @return
-     */
-    public String createLessonClassForLessonWDDX(Integer creatorUserId, String lessionPackage)
-	    throws UserAccessDeniedException;
-
-    /**
      * Setup the lesson class and organization for a lesson according to the
      * input from monitoring GUI interface.
      * 
@@ -887,11 +861,6 @@ public interface IMonitoringService {
     /** Get the record of the learner's progress for a particular lesson */
     public LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId);
 
-    /**
-     * Initialize and create multiple lessons in one call.
-     */
-    public List<Long> initializeAndCreateLessons(Integer creatorUserId, String lessonPacket) throws Exception;
-    
     /**
      * Set a groups name
      */

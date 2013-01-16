@@ -30,7 +30,6 @@ import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -92,7 +91,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action-forward name="author" path="/author.jsp"
  * @struts:action-forward name="monitorLesson" path="/monitorLesson.jsp"
  * @struts:action-forward name="addLesson" path="/addLesson.jsp"
- * @struts:action-forward name="newLesson" path="/newLesson.jsp"
  * @struts:action-forward name="error" path=".error"
  * @struts:action-forward name="message" path=".message"
  * @struts:action-forward name="passwordChange" path=".passwordChange"
@@ -331,48 +329,8 @@ public class HomeAction extends DispatchAction {
 	}
     }
 
-    /**
-     * request for add lesson wizard
-     */
-    public ActionForward addLesson(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws IOException, ServletException {
-
-	try {
-	    HomeAction.log.debug("request addLesson");
-
-	    Integer courseId = WebUtil.readIntParam(req, AttributeNames.PARAM_COURSE_ID, false);
-	    Integer classId = WebUtil.readIntParam(req, AttributeNames.PARAM_CLASS_ID, true);
-
-	    UserDTO user = getUser();
-	    if (user == null) {
-		HomeAction.log.error("admin: User missing from session. ");
-		return mapping.findForward("error");
-	    } else {
-		Integer orgId = classId != null ? classId : courseId;
-		if (getService().isUserInRole(user.getUserID(), orgId, Role.MONITOR)
-			|| getService().isUserInRole(user.getUserID(), orgId, Role.GROUP_MANAGER)) {
-		    HomeAction.log.debug("user is staff");
-		    String orgName = ((Organisation) getService().findById(Organisation.class, orgId)).getName();
-
-		    req.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, orgId);
-		    req.setAttribute(AttributeNames.PARAM_ORGANISATION_NAME, orgName);
-
-		    return mapping.findForward("addLesson");
-		} else {
-		    HomeAction.log.error("User " + user.getLogin()
-			    + " tried to get staff screen but isn't staff in organisation: " + orgId);
-		    return displayMessage(mapping, req, "error.authorisation");
-		}
-	    }
-
-	} catch (Exception e) {
-	    HomeAction.log.error("Failed to load add lesson", e);
-	    return mapping.findForward("error");
-	}
-    }
-
     @SuppressWarnings("unchecked")
-    public ActionForward newLesson(ActionMapping mapping, ActionForm form, HttpServletRequest req,
+    public ActionForward addLesson(ActionMapping mapping, ActionForm form, HttpServletRequest req,
 	    HttpServletResponse res) throws IOException, UserAccessDeniedException, JSONException,
 	    RepositoryCheckedException {
 	UserDTO userDTO = getUser();
@@ -428,7 +386,7 @@ public class HomeAction extends DispatchAction {
 	}
 	req.setAttribute("availablePrecedingLessons", availableLessons);
 
-	return mapping.findForward("newLesson");
+	return mapping.findForward("addLesson");
     }
 
     public ActionForward createLearningDesignThumbnail(ActionMapping mapping, ActionForm form, HttpServletRequest req,

@@ -58,6 +58,7 @@
 		
 		function closeAddLessonDialog(refresh) {
 			$('#addLessonFrame').attr('src', null);
+			// was the dialog just closed or a new lesson really added? if latter, refresh the list
 			$("#addLessonDialog").dialog('option', 'refresh', refresh ? true : false)
 								 .dialog('close');
 		}
@@ -109,7 +110,7 @@
  					'hide'      : 'fold',
  					'open'      : function(){
  						// load contents after opening the dialog
- 						$('#addLessonFrame').attr('src', '<lams:LAMSURL/>home.do?method=newLesson&organisationID='
+ 						$('#addLessonFrame').attr('src', '<lams:LAMSURL/>home.do?method=addLesson&organisationID='
  								                         + $(this).dialog('option', 'orgID'));
  					},
  					'close' : function() {
