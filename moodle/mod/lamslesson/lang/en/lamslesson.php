@@ -31,7 +31,17 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['modulename'] = 'LAMS Lesson';
 $string['modulenameplural'] = 'LAMS Lessons';
-$string['modulename_help'] = 'The LAMS Lesson module allows teachers to create LAMS lessons in Moodle.';
+$string['modulename_help'] = 'The LAMS Lesson module allows teachers to create LAMS lessons within Moodle.
+
+LAMS provides teachers with an intuitive visual authoring environment for creating sequences of learning activities. These activities can include a range of individual tasks, small group work and whole class activities based on both content and collaboration.
+
+Once a sequence is created, it can reuse in one or many courses. 
+
+Additionally LAMS provides a real-time followup and tracking monitoring interface where teachers can interact with students as they go thru the learning activities. 
+
+For further information visit: lamsfoundation.org.
+
+';
 $string['modulename_link'] = 'lamslesson';
 $string['lamslessonfieldset'] = 'Custom example fieldset';
 $string['lamslessonname'] = 'Lesson name';
