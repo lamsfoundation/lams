@@ -29,9 +29,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$PAGE->requires->yui2_lib('yahoo-dom-event');
-$PAGE->requires->yui2_lib('treeview');
-
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 class mod_lamslesson_mod_form extends moodleform_mod {
@@ -110,13 +107,13 @@ class mod_lamslesson_mod_form extends moodleform_mod {
 
         $authorpreviewbutton .= html_writer::start_tag('div', array('id' => 'buttons', 'style' => 'float:right;'));
         // Preview button
-        $authorpreviewbutton .= html_writer::start_tag('span', array('id' => 'previewbutton', 'style' => 'visibility:hidden;', 'class' => 'yui-button yui-link-button'));
+        $authorpreviewbutton .= html_writer::start_tag('span', array('id' => 'previewbutton', 'style' => 'visibility:hidden;', 'class' => 'yui3-button yui3-link-button'));
         $authorpreviewbutton .= html_writer::start_tag('span', array('class' => 'first-child'));
         $authorpreviewbutton .= html_writer::link('#nogo', $openpreviewlabel, array('onclick' => js_writer::function_call('openPreview', array('1' => $previewurl, '2' => 'preview', '3' => 0))));
         $authorpreviewbutton .= html_writer::end_tag('span');
         $authorpreviewbutton .= html_writer::end_tag('span');
 	//Authoring button
-        $authorpreviewbutton .= html_writer::start_tag('span', array('id' => 'authorbutton', 'class' => 'yui-button yui-link-button'));
+        $authorpreviewbutton .= html_writer::start_tag('span', array('id' => 'authorbutton', 'class' => 'yui3-button yui3-link-button'));
         $authorpreviewbutton .= html_writer::start_tag('span', array('class' => 'first-child'));
         $authorpreviewbutton .= html_writer::link('#nogo', $openauthorlabel, array('onclick' => js_writer::function_call('openAuthor', array('1' => $authorurl, '2' => 'author', '3' => 0))));
         $authorpreviewbutton .= html_writer::end_tag('span');
@@ -128,9 +125,8 @@ class mod_lamslesson_mod_form extends moodleform_mod {
     	$treecomponent = html_writer::tag('div', '' , array('id' => 'treeDiv'));
     	$treecomponent .= html_writer::tag('div', '' , array('id' => 'updatesequence'));
 
-    	$treecomponent .= html_writer::tag('script', 'var tree = new YAHOO.widget.TreeView("treeDiv",['. $lds .']);tree.getNodeByIndex(1).expand(true);tree.getNodeByIndex(2).expand(true);', array('type' => 'text/javascript'));
-    	$treecomponent .= html_writer::script('', $CFG->wwwroot.'/mod/lamslesson/tree.js');
-
+    	$treecomponent .= html_writer::tag('script', 'YUI().use("yui2-treeview","yui2-dom-event", function(Y) {var YAHOO = Y.YUI2; var tree = new YAHOO.widget.TreeView("treeDiv",['. $lds .']);tree.getNodeByIndex(1).expand(true);tree.getNodeByIndex(2).expand(true);tree.render();tree.subscribe("clickEvent",function(oArgs) {selectSequence(oArgs.node.data.id, oArgs.node.label);})});', array('type' => 'text/javascript'));
+	
     	// Now we put the two html chunks together
     	$html = $authorpreviewbutton . $treecomponent;
 

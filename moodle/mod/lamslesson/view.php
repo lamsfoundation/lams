@@ -97,7 +97,7 @@ echo $OUTPUT->box_start('generalbox', 'intro');
 if ($canparticipate || $canmanage) {
   $learnerurl = lamslesson_get_url($USER->username, $locale['lang'], $locale['country'], $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_LEARNER_METHOD);
   echo '<div class="centerlink">';
-  echo '<span id="learnerbutton" class="yui-button yui-link-button"><span class="first-child"> ';
+  echo '<span id="learnerbutton" class="yui3-button yui3-link-button"><span class="first-child"> ';
   echo $OUTPUT->action_link($learnerurl, get_string('openlesson', 'lamslesson'), new popup_action('click', $learnerurl, '', array('height' => 600, 'width' => 996)));
   echo '</span></span>';
   echo '</div>';
@@ -105,7 +105,7 @@ if ($canparticipate || $canmanage) {
 if ($canmanage) {
     $monitorurl = lamslesson_get_url($USER->username, $locale['lang'], $locale['country'], $lamslesson->lesson_id, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_MONITOR_METHOD);
   echo '<div class="centerlink">';
-  echo '<span id="monitorbutton" class="yui-button yui-link-button"><span class="first-child"> ';
+  echo '<span id="monitorbutton" class="yui3-button yui3-link-button"><span class="first-child"> ';
   echo $OUTPUT->action_link($monitorurl, get_string('openmonitor', 'lamslesson'), new popup_action('click', $monitorurl, '', array('height' => 600, 'width' => 996)));
   echo '</span></span>';
   echo '</div>';
