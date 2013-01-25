@@ -133,11 +133,11 @@
     	            type: 'post',
     	            success: function (json) {
     		            if (json.isSuccessfullySent) {
-    		            	alert('<fmt:message key="email.notifications.emails.successfully.sent" />');
+    		            	alert("<fmt:message key="email.notifications.emails.successfully.sent" />");
     					} else if (json.isSuccessfullyScheduled) {
-    		            	alert('<fmt:message key="email.notifications.emails.successfully.scheduled" />');
+    		            	alert("<fmt:message key="email.notifications.emails.successfully.scheduled" />");
     					} else {
-    						alert('<fmt:message key="email.notifications.problems.sending.emails" />');
+    						alert("<fmt:message key="email.notifications.problems.sending.emails" />");
     					}
     	            }
     	       	});
