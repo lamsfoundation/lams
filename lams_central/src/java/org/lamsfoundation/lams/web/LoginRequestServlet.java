@@ -92,14 +92,9 @@ public class LoginRequestServlet extends HttpServlet {
      * @throws IOException
      *             if an error occurred
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	// create http session required by the valve
-	// since valve can't create session
-	/*
-	 * HttpSession hses = request.getSession(); if(hses!=null) hses.invalidate(); HttpSession sharedsession =
-	 * SessionManager.getSession(); if(sharedsession!=null) sharedsession.invalidate();
-	 */
 	HttpSession hses = request.getSession(true);
 
 	String extUsername = request.getParameter(LoginRequestDispatcher.PARAM_USER_ID);
@@ -118,8 +113,7 @@ public class LoginRequestServlet extends HttpServlet {
 	String lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
 	String email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
 
-	if ((extUsername == null) || (method == null) || (serverId == null) || (timestamp == null) || (hash == null)
-		|| (extCourseId == null)) {
+	if ((extUsername == null) || (method == null) || (serverId == null) || (timestamp == null) || (hash == null)) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - login parameters missing");
 	    return;
 	}
@@ -145,15 +139,10 @@ public class LoginRequestServlet extends HttpServlet {
 			langIsoCode, countryIsoCode, email, prefix);
 	    }
 
-	    
 	    Authenticator.authenticate(serverMap, timestamp, extUsername, method, hash);
-	    ExtCourseClassMap orgMap = getService().getExtCourseClassMap(serverMap, userMap, extCourseId,
-		    countryIsoCode, langIsoCode, courseName, method, prefix);
 	    User user = userMap.getUser();
 	    String login = user.getLogin();
-	    // was using hses.inNew() API to check if the external user has logged in yet,
-	    // but it seems not working. The "extUser" attribute works as a flag to indicate
-	    // if the user has logged in
+	    // The "extUser" attribute works as a flag to indicate if the user has logged in
 	    String loginRequestUsername = (String) hses.getAttribute("extUser");
 	    if ((loginRequestUsername != null) && loginRequestUsername.equals(login)) {
 		String url = LoginRequestDispatcher.getRequestURL(request);
@@ -163,24 +152,32 @@ public class LoginRequestServlet extends HttpServlet {
 		    .equals(login)) {
 		hses = recreateSession(request, response);
 	    }
-	    Organisation org = orgMap.getOrganisation();
-	    IUserManagementService userManagementService = LoginRequestServlet.integrationService.getService();
-	    UserOrganisation uo = userManagementService.getUserOrganisation(user.getUserId(), org.getOrganisationId());
-	    // make sure external user has minimal set of roles, i.e. learner
-	    Integer[] roleIds = new Integer[] { Role.ROLE_LEARNER };
-	    // we have to assign all the roles to the external user here, because once the user logged in, the roles
-	    // are cached in JBoss, all the calls of request.isUserInRole() will be based on the cached roles
-	    Map<String, Object> properties = new HashMap<String, Object>();
-	    properties.put("userOrganisation.userOrganisationId", uo.getUserOrganisationId());
-	    for (Integer roleId : roleIds) {
-		properties.put("role.roleId", roleId);
-		List list = userManagementService.findByProperties(UserOrganisationRole.class, properties);
-		if ((list == null) || (list.size() == 0)) {
-		    UserOrganisationRole uor = new UserOrganisationRole(uo, (Role) userManagementService.findById(
-			    Role.class, roleId));
-		    userManagementService.save(uor);
+
+	    if (extCourseId != null) {
+		ExtCourseClassMap orgMap = getService().getExtCourseClassMap(serverMap, userMap, extCourseId,
+			countryIsoCode, langIsoCode, courseName, method, prefix);
+		Organisation org = orgMap.getOrganisation();
+		IUserManagementService userManagementService = LoginRequestServlet.integrationService.getService();
+		UserOrganisation uo = userManagementService.getUserOrganisation(user.getUserId(),
+			org.getOrganisationId());
+		// make sure external user has minimal set of roles, i.e. learner
+		Integer[] roleIds = new Integer[] { Role.ROLE_LEARNER };
+		// we have to assign all the roles to the external user here, because once the user logged in, the roles
+		// are cached in JBoss, all the calls of request.isUserInRole() will be based on the cached roles
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put("userOrganisation.userOrganisationId", uo.getUserOrganisationId());
+		for (Integer roleId : roleIds) {
+		    properties.put("role.roleId", roleId);
+		    List<UserOrganisationRole> list = userManagementService.findByProperties(
+			    UserOrganisationRole.class, properties);
+		    if ((list == null) || (list.size() == 0)) {
+			UserOrganisationRole uor = new UserOrganisationRole(uo, (Role) userManagementService.findById(
+				Role.class, roleId));
+			userManagementService.save(uor);
+		    }
 		}
 	    }
+
 	    LoginRequestServlet.log.debug("Session Id - " + hses.getId());
 	    // connect to DB and get password here
 	    String pass = getUserPassword(userMap.getUser().getLogin());
