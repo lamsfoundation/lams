@@ -51,12 +51,14 @@ function initLessonTab(){
 		return firstNode && firstNode.data.isDummy;
 	});
 	
-	$.each(emptyFolderNodes, function(){
-		this.setDynamicLoad(function(node, callback){
-			tree.removeChildren(node);
-			callback();
+	if (emptyFolderNodes) {
+		$.each(emptyFolderNodes, function(){
+			this.setDynamicLoad(function(node, callback){
+				tree.removeChildren(node);
+				callback();
+			});
 		});
-	});
+	}
 	
 	tree.getRoot().children[0].expand();
 }
