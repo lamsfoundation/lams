@@ -19,6 +19,7 @@ https://bugs.lamsfoundation.org/browse/<bug reference>
 		  	exception
 
 1.1.0 Fixes / Changes for Blackboard 9.1 (SP6)
+===================
 * Removed references to the AccessManagerService class (deprecated)
 * Replaced references to deprecated COURSE_DOCUMENT_DATA_TYPE and COURSE_DATA_TYPE to DATA_TYPE
 * PlugInUtil.getEditableContentReturnURL() now requires two mandatory parameters (previously only required one), code now supplies both
@@ -29,6 +30,10 @@ https://bugs.lamsfoundation.org/browse/<bug reference>
 * Updated and increased level of code comments in jsp pages for future maintenance
 * Deleted all unused jsp pages.
 
-
-
-
+1.2.0 Release Fixes
+===================
+* LDEV-2896 Improved lesson creation page and added gradebook support
+* LDEV-2898 Added option to refresh the YUI tree
+* LDEV-2911 Fixed JS exceptions with IE: sequence_id, window.addEventListener, Doctypes
+* LDEV-2897 Fixed Blackboard gradebook error (occured on Assessment tool outputs)
+* LDEV-2896 Added support for lessons created in LAMS building block version prior to 1.2. Also if there is no title or description don't display them
