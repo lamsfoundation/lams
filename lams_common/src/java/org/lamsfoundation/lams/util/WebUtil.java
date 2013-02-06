@@ -602,5 +602,20 @@ public class WebUtil {
 
 	return conn.getInputStream();
     }
+    
+    public static String extractParameterValue(String url, String param) {
+	if (!StringUtils.isBlank(url) && !StringUtils.isBlank(param)) {
+	    int quotationMarkIndex = url.indexOf("?");
+	    String queryPart = quotationMarkIndex > -1 ? url.substring(quotationMarkIndex + 1) : url;
+	    String[] paramEntries = queryPart.split("&");
+	    for (String paramEntry : paramEntries) {
+		String[] paramEntrySplitted = paramEntry.split("=");
+		if (param.equalsIgnoreCase(paramEntrySplitted[0])) {
+		    return paramEntrySplitted[1];
+		}
+	    }
 
+	}
+	return null;
+    }
 }

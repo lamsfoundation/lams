@@ -69,6 +69,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		var messageAreaFrame = document.getElementById("messageArea");
 		messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
 	}
+        
+    function importQTI(){
+    	window.open('<lams:LAMSURL/>questionFile.jsp?chooseAnswers=true',
+    			    'QuestionFile','width=500,height=200,scrollbars=yes');
+    }
+    
+    function saveQTI(queryString) {
+    	window.location.href = '<html:rewrite page="/authoring.do?dispatch=saveQTI&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}"/>&'
+    				           + queryString;
+    }
 
 </script>
 
@@ -113,6 +123,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newQuestionBox&requestType=direct&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}"/>');"
 			class="button-add-item"> <fmt:message
 				key="label.save.question" /> </a>
+		<a href="#" onClick="javascript:importQTI()" style="margin-left: 40px"><fmt:message
+				key="label.authoring.import.qti" /></a>
 	</c:if>
 	<c:if
 		test="${mcGeneralAuthoringDTO.activeModule != 'authoring' && mcGeneralAuthoringDTO.activeModule != 'defineLater'}">
