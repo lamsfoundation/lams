@@ -94,8 +94,8 @@ public class WebUtil {
     }
 
     /**
-     * @exception IllegalArgumentException -
-     *                    if not set
+     * @exception IllegalArgumentException
+     *                - if not set
      */
     public static void checkObject(String paramName, Object paramValue) throws IllegalArgumentException {
 	boolean isNull = paramValue == null;
@@ -110,8 +110,8 @@ public class WebUtil {
 
     /**
      * @return integer value of paramValue
-     * @exception IllegalArgumentException -
-     *                    if (a) not set and is not optional or (b) not integer
+     * @exception IllegalArgumentException
+     *                - if (a) not set and is not optional or (b) not integer
      */
     public static Integer checkInteger(String paramName, String paramValue, boolean isOptional)
 	    throws IllegalArgumentException {
@@ -129,8 +129,8 @@ public class WebUtil {
 
     /**
      * @return long value of paramValue
-     * @exception IllegalArgumentException -
-     *                    if (a) not set and is not optional or (b) not long
+     * @exception IllegalArgumentException
+     *                - if (a) not set and is not optional or (b) not long
      */
     public static Long checkLong(String paramName, String paramValue, boolean isOptional)
 	    throws IllegalArgumentException {
@@ -151,8 +151,8 @@ public class WebUtil {
      * null
      * 
      * @return long value of paramValue
-     * @exception IllegalArgumentException -
-     *                    if not set or not long
+     * @exception IllegalArgumentException
+     *                - if not set or not long
      */
     public static long checkLong(String paramName, Long paramValue, boolean isOptional) throws IllegalArgumentException {
 	if (!isOptional) {
@@ -163,8 +163,8 @@ public class WebUtil {
 
     /**
      * @return boolean value of paramValue
-     * @exception IllegalArgumentException -
-     *                    if not set or not boolean
+     * @exception IllegalArgumentException
+     *                - if not set or not boolean
      */
     public static boolean checkBoolean(String paramName, String paramValue) throws IllegalArgumentException {
 
@@ -175,8 +175,10 @@ public class WebUtil {
     /**
      * Read an int parameter, throwing exception if null or not a integer
      * 
-     * @param req -
-     * @param paramName -
+     * @param req
+     *            -
+     * @param paramName
+     *            -
      * @return parameter value
      */
     public static int readIntParam(HttpServletRequest req, String paramName) {
@@ -186,8 +188,10 @@ public class WebUtil {
     /**
      * Read an int parameter, throwing exception if ( not optional and null ) or not a integer
      * 
-     * @param req -
-     * @param paramName -
+     * @param req
+     *            -
+     * @param paramName
+     *            -
      * @param isOptional
      * @return parameter value
      */
@@ -198,8 +202,10 @@ public class WebUtil {
     /**
      * Read an long parameter, throwing exception if null or not a long
      * 
-     * @param req -
-     * @param paramName -
+     * @param req
+     *            -
+     * @param paramName
+     *            -
      * @return parameter value
      */
     public static long readLongParam(HttpServletRequest req, String paramName) {
@@ -209,8 +215,10 @@ public class WebUtil {
     /**
      * Read an long parameter, throwing exception if ( not optional and null ) or not a long
      * 
-     * @param req -
-     * @param paramName -
+     * @param req
+     *            -
+     * @param paramName
+     *            -
      * @param isOptional
      * @return parameter value
      */
@@ -219,8 +227,10 @@ public class WebUtil {
     }
 
     /**
-     * @param req -
-     * @param paramName -
+     * @param req
+     *            -
+     * @param paramName
+     *            -
      * @return parameter value
      */
     public static String readStrParam(HttpServletRequest req, String paramName) {
@@ -228,8 +238,10 @@ public class WebUtil {
     }
 
     /**
-     * @param req -
-     * @param paramName -
+     * @param req
+     *            -
+     * @param paramName
+     *            -
      * @param isOptional
      * @return parameter value
      */
@@ -241,21 +253,25 @@ public class WebUtil {
     }
 
     /**
-     * @param req -
-     * @param paramName -
+     * @param req
+     *            -
+     * @param paramName
+     *            -
      * @return parameter value
-     * @exception IllegalArgumentException -
-     *                    if valid boolean parameter value is not found
+     * @exception IllegalArgumentException
+     *                - if valid boolean parameter value is not found
      */
     public static boolean readBooleanParam(HttpServletRequest req, String paramName) throws IllegalArgumentException {
 	return checkBoolean(paramName, req.getParameter(paramName));
     }
 
     /**
-     * @param req -
-     * @param paramName -
-     * @param defaultValue -
-     *                if valid boolean parameter value is not found, return this value
+     * @param req
+     *            -
+     * @param paramName
+     *            -
+     * @param defaultValue
+     *            - if valid boolean parameter value is not found, return this value
      * @return parameter value
      */
     public static boolean readBooleanParam(HttpServletRequest req, String paramName, boolean defaultValue) {
@@ -274,7 +290,8 @@ public class WebUtil {
      * TODO default proper exception at lams level to replace RuntimeException TODO isTesting should be removed when
      * login is done properly.
      * 
-     * @param req -
+     * @param req
+     *            -
      * @return username from principal object
      */
     public static String getUsername(HttpServletRequest req, boolean isTesting) throws RuntimeException {
@@ -372,11 +389,11 @@ public class WebUtil {
      * Append a parameter to a requested url.
      * 
      * @param parameterName
-     *                the name of the parameter
+     *            the name of the parameter
      * @param parameterValue
-     *                the value of the parameter
+     *            the value of the parameter
      * @param learnerUrl
-     *                the target url
+     *            the target url
      * @return the url with parameter appended.
      */
     public static String appendParameterToURL(String url, String parameterName, String parameterValue) {
@@ -390,7 +407,7 @@ public class WebUtil {
      * It is using a null safe String util method to checkup the url String and append proper deliminator if necessary.
      * 
      * @param url
-     *                the url needs to append deliminator.
+     *            the url needs to append deliminator.
      * @return target url with the deliminator;
      */
     public static String appendParameterDeliminator(String url) {
@@ -409,7 +426,7 @@ public class WebUtil {
      * appended to the server url from the LAMS Configuration.
      * 
      * @param url
-     *                e.g. tool/lanb11/starter/learner.do
+     *            e.g. tool/lanb11/starter/learner.do
      * @return complete url
      */
     public static String convertToFullURL(String url) {
@@ -428,7 +445,8 @@ public class WebUtil {
     }
 
     /**
-     * Convert any newslines in a string to <BR/>. If input = null, returns null.
+     * Convert any newslines in a string to <BR/>
+     * . If input = null, returns null.
      */
     public static String convertNewlines(String input) {
 	if (input != null) {
@@ -442,7 +460,7 @@ public class WebUtil {
      * Strips HTML tags and leave "pure" text. Useful for CKeditor created text.
      * 
      * @param text
-     *                string to process
+     *            string to process
      * @return string after stripping
      */
     public static String removeHTMLtags(String text) {
@@ -602,7 +620,7 @@ public class WebUtil {
 
 	return conn.getInputStream();
     }
-    
+
     public static String extractParameterValue(String url, String param) {
 	if (!StringUtils.isBlank(url) && !StringUtils.isBlank(param)) {
 	    int quotationMarkIndex = url.indexOf("?");
@@ -610,11 +628,10 @@ public class WebUtil {
 	    String[] paramEntries = queryPart.split("&");
 	    for (String paramEntry : paramEntries) {
 		String[] paramEntrySplitted = paramEntry.split("=");
-		if (param.equalsIgnoreCase(paramEntrySplitted[0])) {
+		if (paramEntrySplitted.length > 1 && param.equalsIgnoreCase(paramEntrySplitted[0])) {
 		    return paramEntrySplitted[1];
 		}
 	    }
-
 	}
 	return null;
     }
