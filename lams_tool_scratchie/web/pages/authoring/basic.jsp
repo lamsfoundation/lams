@@ -82,6 +82,21 @@
 	function refreshThickbox(){
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
 	};
+	
+    function importQTI(){
+    	window.open('<lams:LAMSURL/>questionFile.jsp?chooseAnswers=true',
+    			    'QuestionFile','width=500,height=200,scrollbars=yes');
+    }
+	
+    function saveQTI(queryString) {
+		var url = '<c:url value="/authoring/saveQTI.do" />?' + queryString;
+		$(itemTargetDiv).load(
+			url,
+			{
+				sessionMapID: "${sessionMapID}"
+			}
+		);
+    }
 
 </script>
 <!-- Basic Tab Content -->
@@ -118,6 +133,9 @@
 		</c:set>
 		<a href="${addItemUrl}" class="button-add-item right-buttons thickbox">
 			<fmt:message key="label.authoring.basic.add.another.scratchie" /> 
+		</a>
+		<a href="#" onClick="javascript:importQTI()">
+			<fmt:message key="label.authoring.import.qti" /> 
 		</a>
 	</div>
 </div>

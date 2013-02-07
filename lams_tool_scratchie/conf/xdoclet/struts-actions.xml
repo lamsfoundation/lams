@@ -97,6 +97,14 @@
 			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
 		</action>
 		
+		<action path="/authoring/saveQTI"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
+			scope="request" 
+			parameter="saveQTI" 
+			validate="false">
+			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
+		</action>
+		
 		<action path="/authoring/removeItem"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.AuthoringAction"
 			scope="request" 
