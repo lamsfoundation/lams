@@ -696,8 +696,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request.getQueryString());
 
 	for (Question question : questions) {
-	    // quietly do same verification as in other question-adding methods 
-	    String questionText = WebUtil.removeHTMLtags(question.getText());
+	    // quietly do same verification as in other question-adding methods
+	    String questionText = question.getText();
 	    if (StringUtils.isBlank(questionText)) {
 		LamsDispatchAction.log.warn("Skipping a blank question.");
 		continue;
@@ -715,7 +715,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    if (question.getAnswers() != null) {
 		for (Answer answer : question.getAnswers()) {
 		    McCandidateAnswersDTO mcCandidateAnswersDTO = new McCandidateAnswersDTO();
-		    String answerText = WebUtil.removeHTMLtags(answer.getText());
+		    String answerText = answer.getText();
 		    if (correctAnswer != null && correctAnswer.equals(answerText)) {
 			LamsDispatchAction.log.warn("Skipping an answer with same text as the correct answer: "
 				+ answerText);

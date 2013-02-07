@@ -137,7 +137,7 @@ public class QuestionParser {
 			// do not support algorithmic question type
 			continue questionLoop;
 		    }
-		    question.setText(questionText);
+		    question.setText(WebUtil.removeHTMLtags(questionText));
 		} else if ("response_lid".equals(presentationChild.getNodeName())) {
 		    // parse answers
 		    NodeList answerList = ((Element) presentationChild).getElementsByTagName("response_label");
@@ -146,7 +146,7 @@ public class QuestionParser {
 			Element textElement = (Element) answerElement.getElementsByTagName("mattext").item(0);
 			String answerText = ((CDATASection) textElement.getChildNodes().item(0)).getData();
 			Answer answer = new Answer();
-			answer.setText(answerText);
+			answer.setText(WebUtil.removeHTMLtags(answerText));
 			if (question.getAnswers() == null) {
 			    question.setAnswers(new ArrayList<Answer>());
 			}
@@ -203,14 +203,14 @@ public class QuestionParser {
 		    String feedbackType = feedbackElement.getAttribute("view");
 		    // it is a question feedback
 		    if ("All".equalsIgnoreCase(feedbackType)) {
-			question.setFeedback(feedbackText);
+			question.setFeedback(WebUtil.removeHTMLtags(feedbackText));
 		    } else {
 			// it is an answer feedback
 			String feedbackId = feedbackElement.getAttribute("ident");
 			String answerId = feedbackMap.get(feedbackId);
 			if (answerId != null) {
 			    Answer answer = answerMap.get(answerId);
-			    answer.setFeedback(feedbackText);
+			    answer.setFeedback(WebUtil.removeHTMLtags(feedbackText));
 			}
 		    }
 		}
@@ -240,7 +240,9 @@ public class QuestionParser {
 		String questionFeedback = WebUtil.extractParameterValue(queryString, "question" + questionIndex
 			+ "feedback");
 		// can be blank
-		question.setFeedback(URLDecoder.decode(questionFeedback, "UTF8"));
+		if (!StringUtils.isBlank(questionFeedback)) {
+		    question.setFeedback(URLDecoder.decode(questionFeedback, "UTF8"));
+		}
 		if (chooseAnswers) {
 		    String answerCountParam = WebUtil.extractParameterValue(queryString, "answerCount" + questionIndex);
 		    int answerCount = answerCountParam == null ? 0 : Integer.parseInt(answerCountParam);
@@ -256,12 +258,13 @@ public class QuestionParser {
 				if (!StringUtils.isBlank(answerScore)) {
 				    answer.setScore(Float.parseFloat(answerScore));
 				}
-				
+
 				String answerFeedback = WebUtil.extractParameterValue(queryString, answerId
 					+ "feedback");
 				// can be blank
-				answer.setFeedback(URLDecoder.decode(answerFeedback, "UTF8"));
-				
+				if (!StringUtils.isBlank(answerFeedback)) {
+				    answer.setFeedback(URLDecoder.decode(answerFeedback, "UTF8"));
+				}
 				question.getAnswers().add(answer);
 			    }
 			}
