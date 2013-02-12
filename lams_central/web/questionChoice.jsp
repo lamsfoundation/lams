@@ -12,13 +12,17 @@
 	<lams:css/>	
 	<style type="text/css">
 		div.answerDiv {
-			padding-left: 20px;
+			padding-left: 25px;
 			display: none;
 		}
 		
 		input[type="checkbox"] {
 			border: none;
 			margin: 10px 10px 0px 15px;
+		}
+		
+		.questionText {
+			margin-left: 43px;
 		}
 		
 		div.answerDiv input {
@@ -44,7 +48,6 @@
 		window.resizeTo(800, 600);
 	
 		var returnURL = '${returnURL}';
-		var chooseAnswers = '${chooseAnswers}';
 		
 		function submitForm() {
 			var anyQuestionsSelected = false;
@@ -72,44 +75,45 @@
 		}
 		
 		$(document).ready(function(){
-			if (chooseAnswers == 'true') {
-				$('.question').change(function(){
-					var checked = $(this).is(':checked');
-					var selector = '#' + $(this).attr('id');
-					
-					// enable/disable answers and feedback fields
-					// so they do not get posted when not needed
-					$(selector + 'answerDiv').toggle('slow')
-					    .find('input')
-					    .add(selector + 'feedback')
-					    .attr('disabled', checked ? null : 'disabled');
-					
-					if (checked) {
-						$('#errorArea').hide('slow');
-					} else {
-						// one unchecked question makes "Select all" checkbox uncheck as well
-						$('#selectAll').attr('checked', false);
-					}
-				});
-			}
+			$('.question').change(function(){
+				var checked = $(this).is(':checked');
+				var selector = '#' + $(this).attr('id');
+				var answerDiv = $(selector + 'answerDiv');
+				var answersVisible = answerDiv.find('input[type="checkbox"]').length > 0;
+				// enable/disable answers and feedback fields
+				// so they do not get posted when not needed
+				if (answersVisible) {
+					// if this was not tested, there would be a tiny,
+					// but annoying movement when question checkbox is clicked 
+					answerDiv.toggle('slow');
+				}
+				$('input', answerDiv).add(selector + 'feedback').add(selector + 'type').add(selector + 'text')
+				                     .attr('disabled', checked ? null : 'disabled');
+				
+				if (checked) {
+					$('#errorArea').hide('slow');
+				} else {
+					// one unchecked question makes "Select all" checkbox uncheck as well
+					$('#selectAll').attr('checked', false);
+				}
+			});
+			
 			
 			$('#selectAll').click(function(){
 				var checked = $(this).is(':checked');
 				
 				$('.question').attr('checked', checked);
-				$('.questionFeedback').attr('disabled', checked ? null : 'disabled');
+				$('.questionAttribute').attr('disabled', checked ? null : 'disabled');
 				if (checked) {
 					$('#errorArea').hide('slow');
 				}
 				
-				if (chooseAnswers == 'true') {
-					if (checked) {
-						$('.answerDiv').show('slow')
-						  .find('input').attr('disabled', null);
-					} else {
-						$('.answerDiv').hide('slow')
-						   .find('input').attr('disabled', 'disabled');
-					}
+				if (checked) {
+					$('.answerDiv').show('slow')
+					  .find('input').attr('disabled', null);
+				} else {
+					$('.answerDiv').hide('slow')
+					   .find('input').attr('disabled', 'disabled');
 				}
 			});
 		});
@@ -127,33 +131,88 @@
 	<input id="selectAll" type="checkbox" /><fmt:message key="label.questions.choice.select.all" /><br /><br />
 			       
 	<form id="questionForm" action="${returnURL}">
-		<input type="hidden" name="chooseAnswers" value="${chooseAnswers}" />
 		<input type="hidden" name="questionCount" value="${fn:length(questions)}" />
 		
 		<c:forEach var="question" items="${questions}" varStatus="questionStatus">
-			<!-- Question itself -->
+			<%-- Question itself --%>
 			<input id="question${questionStatus.index}" name="question${questionStatus.index}"
+			       value="<c:out value='${question.title}' />"
+			       class="question" type="checkbox" />${questionStatus.index + 1}.
+     		<c:choose>
+				<c:when test="${question.type eq 'mc'}">
+					(<fmt:message key="label.questions.choice.type.mc" />)
+				</c:when>
+				<c:when test="${question.type eq 'mr'}">
+					(<fmt:message key="label.questions.choice.type.mr" />)
+				</c:when>
+				<c:when test="${question.type eq 'mt'}">
+					(<fmt:message key="label.questions.choice.type.mt" />)
+				</c:when>
+				<c:when test="${question.type eq 'fb'}">
+					(<fmt:message key="label.questions.choice.type.fb" />)
+				</c:when>
+				<c:when test="${question.type eq 'es'}">
+					(<fmt:message key="label.questions.choice.type.es" />)
+				</c:when>
+				<c:when test="${question.type eq 'tf'}">
+					(<fmt:message key="label.questions.choice.type.tf" />)
+				</c:when>
+				<c:otherwise>
+					(<fmt:message key="label.questions.choice.type.unknown" />)
+				</c:otherwise>
+			</c:choose>
+			<c:out value='${question.title}' /><br />
+			<input id="question${questionStatus.index}text" name="question${questionStatus.index}text"
 			       value="<c:out value='${question.text}' />"
-			       class="question" type="checkbox" />${questionStatus.index + 1}. <c:out value='${question.text}' /><br />
-			<!-- Question feedback -->
+			       class="questionAttribute" type="hidden" disabled="disabled" />
+			       <span class="questionText"><c:out value='${question.text}' /></span><br />
+			<input type="hidden" id="question${questionStatus.index}type" name="question${questionStatus.index}type"
+		           value="${question.type}"
+		           class="questionAttribute" disabled="disabled" />
+			<%-- Question feedback --%>
 		    <input type="hidden" id="question${questionStatus.index}feedback" name="question${questionStatus.index}feedback"
 		           value="${question.feedback}"
-		           class="questionFeedback" disabled="disabled" />
-		    <!-- Answers, if required and exist -->
-			<c:if test="${chooseAnswers and fn:length(question.answers) > 0}">
+		           class="questionAttribute" disabled="disabled" />
+		    <%-- Answers, if required and exist --%>
+			<c:if test="${fn:length(question.answers) > 0}">
 				<div id="question${questionStatus.index}answerDiv" class="answerDiv">
-					<input type="hidden" name="answerCount${questionStatus.index}" value="${fn:length(question.answers)}" />
+					<input type="hidden" name="answerCount${questionStatus.index}" 
+					       value="${fn:length(question.answers)}" />
 					<c:forEach var="answer" items="${question.answers}" varStatus="answerStatus">
-						<!-- Answers itself -->
-						<input name="question${questionStatus.index}answer${answerStatus.index}"
-			       			   value="<c:out value='${answer.text}' />"
-			       			   type="checkbox" checked="checked" disabled="disabled" /><c:out value='${answer.text}' /><br />
-			       		<!-- Answers score and feedback -->
+						<%-- Answer itself --%>
+						<c:choose>
+							<c:when test="${question.type eq 'mc' or question.type eq 'mr' or question.type eq 'fb'}">
+								<input name="question${questionStatus.index}answer${answerStatus.index}"
+					       			   value="<c:out value='${answer.text}' />"
+					       			   type="checkbox" checked="checked" disabled="disabled" /><c:out value='${answer.text}' /><br />
+			       			</c:when>
+			       			<c:otherwise>
+			       				<%-- Do not display answers if management is too difficult or pointless --%>
+								<input name="question${questionStatus.index}answer${answerStatus.index}"
+					       			   value="<c:out value='${answer.text}' />"
+					       			   type="hidden" disabled="disabled" />
+							</c:otherwise>
+						</c:choose>
+			       		<%-- Answers score and feedback --%>
 			       		<input type="hidden" name="question${questionStatus.index}answer${answerStatus.index}score"
 						       value="${answer.score}" disabled="disabled" />
 						<input type="hidden" name="question${questionStatus.index}answer${answerStatus.index}feedback"
 		           			   value="${answer.feedback}" disabled="disabled" />
 					</c:forEach>
+					<c:if test="${question.type eq 'mt'}">
+						<input type="hidden" name="matchAnswerCount${questionStatus.index}" 
+						       value="${fn:length(question.matchAnswers)}" />
+						<c:forEach var="matchAnswer" items="${question.matchAnswers}" varStatus="matchAnswerStatus">
+							<input name="question${questionStatus.index}matchAnswer${matchAnswerStatus.index}"
+					       		   value="<c:out value='${matchAnswer.text}' />"
+					       		   type="hidden" disabled="disabled" />
+						</c:forEach>
+						<c:forEach var="entry" items="${question.matchMap}">
+				       		<input name="question${questionStatus.index}match${entry.key}"
+				       		   	   value="${entry.value}"
+				       		   	   type="hidden" disabled="disabled" />
+					    </c:forEach>
+					</c:if>
 				</div>
 			</c:if>
 		</c:forEach>

@@ -23,6 +23,8 @@
 /* $Id$ */
 package org.lamsfoundation.lams.questions;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 
 public class Answer {
     private String text;
@@ -51,5 +53,32 @@ public class Answer {
 
     public void setScore(Float score) {
 	this.score = score;
+    }
+
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(text).toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj) {
+	    return true;
+	}
+	if (obj == null) {
+	    return false;
+	}
+	if (!(obj instanceof Answer)) {
+	    return false;
+	}
+	Answer other = (Answer) obj;
+	if (text == null) {
+	    if (other.text != null) {
+		return false;
+	    }
+	} else if (!text.equals(other.text)) {
+	    return false;
+	}
+	return true;
     }
 }

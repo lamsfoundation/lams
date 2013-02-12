@@ -71,7 +71,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	}
         
     function importQTI(){
-    	window.open('<lams:LAMSURL/>questionFile.jsp?chooseAnswers=true',
+    	window.open('<lams:LAMSURL/>questionFile.jsp?limitType=mc',
     			    'QuestionFile','width=500,height=200,scrollbars=yes');
     }
     

@@ -23,12 +23,49 @@
 /* $Id$ */
 package org.lamsfoundation.lams.questions;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class Question {
+    public static final String QUESTION_TYPE_MULTIPLE_CHOICE = "mc";
+    public static final String QUESTION_TYPE_MULTIPLE_RESPONSE = "mr";
+    public static final String QUESTION_TYPE_TRUE_FALSE = "tf";
+    public static final String QUESTION_TYPE_ESSAY = "es";
+    public static final String QUESTION_TYPE_MATCHING = "mt";
+    public static final String QUESTION_TYPE_FILL_IN_BLANK = "fb";
+    public static final Set<String> QUESTION_TYPES = new TreeSet<String>(Arrays.asList(new String[] {
+	    Question.QUESTION_TYPE_MULTIPLE_CHOICE, Question.QUESTION_TYPE_MULTIPLE_RESPONSE,
+	    Question.QUESTION_TYPE_TRUE_FALSE, Question.QUESTION_TYPE_ESSAY, Question.QUESTION_TYPE_MATCHING,
+	    Question.QUESTION_TYPE_FILL_IN_BLANK }));
+
+    private String type;
+    private String title;
     private String text;
     private String feedback;
     private List<Answer> answers;
+    private List<Answer> matchAnswers;
+    private Map<Integer, Integer> matchMap;
+
+    public String getType() {
+	return type;
+    }
+
+    public void setType(String type) {
+	this.type = type;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getText() {
 	return text;
@@ -52,5 +89,48 @@ public class Question {
 
     public void setAnswers(List<Answer> answers) {
 	this.answers = answers;
+    }
+
+    public List<Answer> getMatchAnswers() {
+	return matchAnswers;
+    }
+
+    public void setMatchAnswers(List<Answer> matchAnswers) {
+	this.matchAnswers = matchAnswers;
+    }
+
+    public Map<Integer, Integer> getMatchMap() {
+	return matchMap;
+    }
+
+    public void setMatchMap(Map<Integer, Integer> matchMap) {
+	this.matchMap = matchMap;
+    }
+
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(text).toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj) {
+	    return true;
+	}
+	if (obj == null) {
+	    return false;
+	}
+	if (!(obj instanceof Question)) {
+	    return false;
+	}
+	Question other = (Question) obj;
+	if (text == null) {
+	    if (other.text != null) {
+		return false;
+	    }
+	} else if (!text.equals(other.text)) {
+	    return false;
+	}
+	return true;
     }
 }

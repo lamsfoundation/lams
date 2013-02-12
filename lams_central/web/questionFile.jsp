@@ -48,9 +48,9 @@
  
 	<form id="questionForm" action="<lams:LAMSURL/>questions.do" enctype="multipart/form-data" method="post">
 		<input type="hidden" name="returnURL" value="${empty param.returnURL ? returnURL : param.returnURL}" />
-		<input type="hidden" name="chooseAnswers" value="${empty param.chooseAnswers ? chooseAnswers : param.chooseAnswers}" />
+		<input type="hidden" name="limitType" value="${empty param.limitType ? limitType : param.limitType}" />
 		
-		<input type="file" name="file" size="55"/>
+		<input type="file" name="file" size="53"/>
 		<div id="buttonsDiv">
 			<input class="button" value='<fmt:message key="button.cancel"/>' type="button" onClick="javascript:window.close()" />	
 			<input class="button" value='<fmt:message key="label.ok"/>' type="submit" />

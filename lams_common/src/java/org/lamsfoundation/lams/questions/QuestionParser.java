@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -72,8 +73,8 @@ public class QuestionParser {
     /**
      * Extracts questions from IMS QTI zip file.
      */
-    public static Question[] parseQTIPackage(InputStream packageFileStream) throws SAXParseException, IOException,
-	    SAXException, ParserConfigurationException, ZipFileUtilException {
+    public static Question[] parseQTIPackage(InputStream packageFileStream, Set<String> limitType)
+	    throws SAXParseException, IOException, SAXException, ParserConfigurationException, ZipFileUtilException {
 	List<Question> result = new ArrayList<Question>();
 
 	// unique folder name
@@ -86,7 +87,7 @@ public class QuestionParser {
 	    } else {
 		// extract from every XML file; usually there is just one
 		for (File resourceFile : resourceFiles) {
-		    Question[] fileQuestions = QuestionParser.parseQTIFile(resourceFile);
+		    Question[] fileQuestions = QuestionParser.parseQTIFile(resourceFile, limitType);
 		    if (fileQuestions != null) {
 			Collections.addAll(result, fileQuestions);
 		    }
@@ -103,7 +104,8 @@ public class QuestionParser {
     /**
      * Extracts questions from IMS QTI xml file.
      */
-    public static Question[] parseQTIFile(File xmlFile) throws ParserConfigurationException, SAXException, IOException {
+    public static Question[] parseQTIFile(File xmlFile, Set<String> limitType) throws ParserConfigurationException,
+	    SAXException, IOException {
 	List<Question> result = new ArrayList<Question>();
 	DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 	Document doc = docBuilder.parse(xmlFile);
@@ -115,13 +117,18 @@ public class QuestionParser {
 	    NodeList questionItemTypes = questionItem.getElementsByTagName("qmd_itemtype");
 	    String questionItemType = questionItemTypes.getLength() > 0 ? ((Text) questionItemTypes.item(0)
 		    .getChildNodes().item(0)).getData() : null;
-	    if ("Matching".equalsIgnoreCase(questionItemType)) {
-		// do not support matching question type
+	    Question question = new Question();
+	    // check if it is "matching" question type
+	    if ("Matching".equalsIgnoreCase(questionItemType)
+		    && !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_MATCHING, limitType, question)) {
 		continue;
 	    }
+	    String questionTitle = questionItem.getAttribute("title");
+	    question.setTitle(questionTitle);
 
-	    Question question = new Question();
 	    Map<String, Answer> answerMap = new TreeMap<String, Answer>();
+	    Map<String, Answer> matchAnswerMap = null;
+	    boolean textBasedQuestion = false;
 
 	    Element presentation = (Element) questionItem.getElementsByTagName("presentation").item(0);
 	    NodeList presentationChildrenList = presentation.getChildNodes();
@@ -134,34 +141,93 @@ public class QuestionParser {
 			    .item(0);
 		    String questionText = ((CDATASection) questionElement.getChildNodes().item(0)).getData();
 		    if (questionText.trim().startsWith("<!--")) {
-			// do not support algorithmic question type
+			// do not support Algorithmic question type
 			continue questionLoop;
 		    }
 		    question.setText(WebUtil.removeHTMLtags(questionText));
 		} else if ("response_lid".equals(presentationChild.getNodeName())) {
-		    // parse answers
-		    NodeList answerList = ((Element) presentationChild).getElementsByTagName("response_label");
-		    for (int answerIndex = 0; answerIndex < answerList.getLength(); answerIndex++) {
-			Element answerElement = (Element) answerList.item(answerIndex);
-			Element textElement = (Element) answerElement.getElementsByTagName("mattext").item(0);
-			String answerText = ((CDATASection) textElement.getChildNodes().item(0)).getData();
-			Answer answer = new Answer();
-			answer.setText(WebUtil.removeHTMLtags(answerText));
-			if (question.getAnswers() == null) {
-			    question.setAnswers(new ArrayList<Answer>());
-			}
-			question.getAnswers().add(answer);
+		    if (question.getAnswers() == null) {
+			boolean multipleAnswersAllowed = "multiple".equalsIgnoreCase(((Element) presentationChild)
+				.getAttribute("rcardinality"));
+			NodeList answerList = ((Element) presentationChild).getElementsByTagName("response_label");
+			// parse answers
+			for (int answerIndex = 0; answerIndex < answerList.getLength(); answerIndex++) {
+			    Element answerElement = (Element) answerList.item(answerIndex);
+			    Element textElement = (Element) answerElement.getElementsByTagName("mattext").item(0);
+			    String answerText = ((CDATASection) textElement.getChildNodes().item(0)).getData();
 
-			// for other metadata parts to find Answer object
-			String answerId = answerElement.getAttribute("ident");
-			answerMap.put(answerId, answer);
+			    // if there are answers different thatn true/false,
+			    // it is Multiple Choice or Multiple Answers
+			    if ((question.getType() == null)
+				    && !"true".equalsIgnoreCase(answerText)
+				    && !"false".equalsIgnoreCase(answerText)
+				    && !QuestionParser.isQuestionTypeAcceptable(
+					    multipleAnswersAllowed ? Question.QUESTION_TYPE_MULTIPLE_RESPONSE
+						    : Question.QUESTION_TYPE_MULTIPLE_CHOICE, limitType, question)) {
+				continue questionLoop;
+			    }
+
+			    Answer answer = new Answer();
+			    answer.setText(WebUtil.removeHTMLtags(answerText));
+			    if (question.getAnswers() == null) {
+				question.setAnswers(new ArrayList<Answer>());
+			    }
+			    question.getAnswers().add(answer);
+
+			    // for other metadata parts to find Answer object
+			    String answerId = answerElement.getAttribute("ident");
+			    answerMap.put(answerId, answer);
+			}
+
+			// if there are only true/false answers, set the question type
+			if ((question.getType() == null)
+				&& (question.getAnswers() != null)
+				&& (question.getAnswers().size() == 2)
+				&& !multipleAnswersAllowed
+				&& !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_TRUE_FALSE,
+					limitType, question)) {
+			    continue questionLoop;
+			}
 		    }
+
+		    if (Question.QUESTION_TYPE_MATCHING.equals(question.getType())) {
+			if (question.getMatchAnswers() == null) {
+			    // the parsed answers are actually the second part of matching
+			    // move collections accordingly
+			    question.setMatchAnswers(question.getAnswers());
+			    question.setAnswers(new ArrayList<Answer>());
+
+			    matchAnswerMap = answerMap;
+			    answerMap = new TreeMap<String, Answer>();
+			}
+
+			NodeList responseLidChildrenList = presentationChild.getChildNodes();
+			for (int responseLidChildIndex = 0; responseLidChildIndex < responseLidChildrenList.getLength(); responseLidChildIndex++) {
+			    // parse answers for first part of matching
+			    Node responseLidChild = responseLidChildrenList.item(responseLidChildIndex);
+			    if ("material".equals(responseLidChild.getNodeName())) {
+				Element answerElement = (Element) ((Element) presentationChild).getElementsByTagName(
+					"mattext").item(0);
+				String answerText = ((CDATASection) answerElement.getChildNodes().item(0)).getData();
+
+				Answer answer = new Answer();
+				answer.setText(WebUtil.removeHTMLtags(answerText));
+				question.getAnswers().add(answer);
+
+				String answerId = ((Element) presentationChild).getAttribute("ident");
+				answerMap.put(answerId, answer);
+			    }
+			}
+		    }
+		} else if ("response_str".equals(presentationChild.getNodeName())) {
+		    // Essay or Fill-in-Blank question types
+		    textBasedQuestion = true;
 		}
 	    }
 
 	    // extract score and feedback
 	    Map<String, String> feedbackMap = new TreeMap<String, String>();
-	    if (!answerMap.isEmpty()) {
+	    if (textBasedQuestion || !answerMap.isEmpty()) {
 		NodeList answerMetadatas = questionItem.getElementsByTagName("respcondition");
 		for (int answerMetadataIndex = 0; answerMetadataIndex < answerMetadatas.getLength(); answerMetadataIndex++) {
 		    Element answerMetadata = (Element) answerMetadatas.item(answerMetadataIndex);
@@ -169,14 +235,58 @@ public class QuestionParser {
 		    // find where given metadata part references to
 		    String answerId = scoreReference.getLength() > 0 ? ((Text) scoreReference.item(0).getChildNodes()
 			    .item(0)).getData() : null;
+		    if (answerId == null) {
+			// no answers at all, so it is Essay type
+			if ((question.getType() == null)
+				&& textBasedQuestion
+				&& !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_ESSAY, limitType,
+					question)) {
+			    continue questionLoop;
+			}
+		    } else {
+			if ((question.getType() == null)
+				&& textBasedQuestion
+				&& !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_FILL_IN_BLANK,
+					limitType, question)) {
+			    continue questionLoop;
+			}
 
-		    if (answerId != null) {
+			Answer answer = null;
+			if (textBasedQuestion) {
+			    // for Fill-in-Blank answer parsing can be done only here
+			    answer = new Answer();
+			    answer.setText(WebUtil.removeHTMLtags(answerId));
+			    if (question.getAnswers() == null) {
+				question.setAnswers(new ArrayList<Answer>());
+			    }
+			    question.getAnswers().add(answer);
+			}
 			// extract score
-			String score = ((Text) answerMetadata.getElementsByTagName("setvar").item(0).getChildNodes()
-				.item(0)).getData();
+			Element setVarElement = (Element) answerMetadata.getElementsByTagName("setvar").item(0);
+			String score = ((Text) setVarElement.getChildNodes().item(0)).getData();
 			if (!StringUtils.isBlank(score)) {
-			    Answer answer = answerMap.get(answerId);
-			    answer.setScore(Float.parseFloat(score));
+			    if (Question.QUESTION_TYPE_MATCHING.equals(question.getType())) {
+				// map matching answers to each other, plus set the score
+				if (setVarElement.getAttribute("varname").endsWith("_Correct")) {
+				    Answer matchAnswer = matchAnswerMap.get(answerId);
+				    answerId = ((Element) scoreReference.item(0)).getAttribute("respident");
+				    answer = answerMap.get(answerId);
+				    answer.setScore(Float.parseFloat(score));
+
+				    if (question.getMatchMap() == null) {
+					question.setMatchMap(new TreeMap<Integer, Integer>());
+				    }
+				    Integer answerIndex = question.getAnswers().indexOf(answer);
+				    Integer matchAnswerIndex = question.getMatchAnswers().indexOf(matchAnswer);
+				    question.getMatchMap().put(answerIndex, matchAnswerIndex);
+				}
+			    } else {
+				if (answer == null) {
+				    // for all types except Matching and Fill-in-Blank
+				    answer = answerMap.get(answerId);
+				}
+				answer.setScore(Float.parseFloat(score));
+			    }
 			}
 
 			// extract question and answer feedback references
@@ -210,7 +320,9 @@ public class QuestionParser {
 			String answerId = feedbackMap.get(feedbackId);
 			if (answerId != null) {
 			    Answer answer = answerMap.get(answerId);
-			    answer.setFeedback(WebUtil.removeHTMLtags(feedbackText));
+			    if (answer != null) {
+				answer.setFeedback(WebUtil.removeHTMLtags(feedbackText));
+			    }
 			}
 		    }
 		}
@@ -228,44 +340,84 @@ public class QuestionParser {
     public static Question[] parseQuestionChoiceForm(String queryString) throws UnsupportedEncodingException {
 	List<Question> result = new ArrayList<Question>();
 
-	// are answers needed at all?
-	boolean chooseAnswers = Boolean.parseBoolean(WebUtil.extractParameterValue(queryString, "chooseAnswers"));
 	// to know where to stop searching for question entries (disabled/unchecked form fields are not sent)
 	int questionCount = Integer.parseInt(WebUtil.extractParameterValue(queryString, "questionCount"));
 	for (int questionIndex = 0; questionIndex < questionCount; questionIndex++) {
-	    String questionText = WebUtil.extractParameterValue(queryString, "question" + questionIndex);
-	    if (!StringUtils.isBlank(questionText)) {
-		Question question = new Question();
-		question.setText(URLDecoder.decode(questionText, "UTF8"));
+	    String questionType = WebUtil.extractParameterValue(queryString, "question" + questionIndex + "type");
+	    Question question = new Question();
+	    // if question was not checked on the form, type is NULL and it is not accepted
+	    if (QuestionParser.isQuestionTypeAcceptable(questionType, null, question)) {
+		String questionTitle = WebUtil.extractParameterValue(queryString, "question" + questionIndex);
+		if (!StringUtils.isBlank(questionTitle)) {
+		    question.setTitle(URLDecoder.decode(questionTitle, "UTF8"));
+		}
+		String questionText = WebUtil.extractParameterValue(queryString, "question" + questionIndex + "text");
+		if (!StringUtils.isBlank(questionText)) {
+		    question.setText(URLDecoder.decode(questionText, "UTF8"));
+		}
 		String questionFeedback = WebUtil.extractParameterValue(queryString, "question" + questionIndex
 			+ "feedback");
 		// can be blank
 		if (!StringUtils.isBlank(questionFeedback)) {
 		    question.setFeedback(URLDecoder.decode(questionFeedback, "UTF8"));
 		}
-		if (chooseAnswers) {
-		    String answerCountParam = WebUtil.extractParameterValue(queryString, "answerCount" + questionIndex);
-		    int answerCount = answerCountParam == null ? 0 : Integer.parseInt(answerCountParam);
-		    if (answerCount > 0) {
-			question.setAnswers(new ArrayList<Answer>());
-			for (int answerIndex = 0; answerIndex < answerCount; answerIndex++) {
-			    String answerId = "question" + questionIndex + "answer" + answerIndex;
-			    String answerText = WebUtil.extractParameterValue(queryString, answerId);
-			    String answerScore = WebUtil.extractParameterValue(queryString, answerId + "score");
-			    if (!StringUtils.isBlank(answerText)) {
-				Answer answer = new Answer();
-				answer.setText(URLDecoder.decode(answerText, "UTF8"));
-				if (!StringUtils.isBlank(answerScore)) {
-				    answer.setScore(Float.parseFloat(answerScore));
-				}
 
-				String answerFeedback = WebUtil.extractParameterValue(queryString, answerId
-					+ "feedback");
-				// can be blank
-				if (!StringUtils.isBlank(answerFeedback)) {
-				    answer.setFeedback(URLDecoder.decode(answerFeedback, "UTF8"));
+		boolean isMatching = Question.QUESTION_TYPE_MATCHING.equals(question.getType());
+
+		// extract answers
+		String answerCountParam = WebUtil.extractParameterValue(queryString, "answerCount" + questionIndex);
+		int answerCount = answerCountParam == null ? 0 : Integer.parseInt(answerCountParam);
+		if (answerCount > 0) {
+		    question.setAnswers(new ArrayList<Answer>());
+		    for (int answerIndex = 0; answerIndex < answerCount; answerIndex++) {
+			String answerId = "question" + questionIndex + "answer" + answerIndex;
+			String answerText = WebUtil.extractParameterValue(queryString, answerId);
+			String answerScore = WebUtil.extractParameterValue(queryString, answerId + "score");
+			if (!StringUtils.isBlank(answerText)) {
+			    Answer answer = new Answer();
+			    answer.setText(URLDecoder.decode(answerText, "UTF8"));
+			    if (!StringUtils.isBlank(answerScore)) {
+				answer.setScore(Float.parseFloat(answerScore));
+			    }
+
+			    String answerFeedback = WebUtil.extractParameterValue(queryString, answerId + "feedback");
+			    // can be blank
+			    if (!StringUtils.isBlank(answerFeedback)) {
+				answer.setFeedback(URLDecoder.decode(answerFeedback, "UTF8"));
+			    }
+			    question.getAnswers().add(answer);
+
+			    if (isMatching) {
+				// map indexes of answers
+				String matchAnswerIndex = WebUtil.extractParameterValue(queryString, "question"
+					+ questionIndex + "match" + answerIndex);
+				if (!StringUtils.isBlank(matchAnswerIndex)) {
+				    if (question.getMatchMap() == null) {
+					question.setMatchMap(new TreeMap<Integer, Integer>());
+				    }
+				    question.getMatchMap().put(answerIndex, Integer.valueOf(matchAnswerIndex));
 				}
-				question.getAnswers().add(answer);
+			    }
+			}
+		    }
+		}
+
+		// extract match answers
+		if (isMatching) {
+		    String matchAnswerCountParam = WebUtil.extractParameterValue(queryString, "matchAnswerCount"
+			    + questionIndex);
+		    int matchAnswerCount = matchAnswerCountParam == null ? 0 : Integer.parseInt(matchAnswerCountParam);
+		    if (matchAnswerCount > 0) {
+			question.setMatchAnswers(new ArrayList<Answer>());
+			for (int matchAnswerIndex = 0; matchAnswerIndex < matchAnswerCount; matchAnswerIndex++) {
+			    String matchAnswerId = "question" + questionIndex + "matchAnswer" + matchAnswerIndex;
+			    String matchAnswerText = WebUtil.extractParameterValue(queryString, matchAnswerId);
+
+			    if (!StringUtils.isBlank(matchAnswerText)) {
+				Answer matchAnswer = new Answer();
+				matchAnswer.setText(URLDecoder.decode(matchAnswerText, "UTF8"));
+
+				question.getMatchAnswers().add(matchAnswer);
 			    }
 			}
 		    }
@@ -307,5 +459,16 @@ public class QuestionParser {
 	    }
 	}
 	return resourceFiles;
+    }
+
+    /**
+     * Checks if given type has a correct value and should be processed. Also sets question property for convenience.
+     */
+    private static boolean isQuestionTypeAcceptable(String type, Set<String> limitType, Question question) {
+	if (type == null || !Question.QUESTION_TYPES.contains(type)) {
+	    return false;
+	}
+	question.setType(type);
+	return (limitType == null) || limitType.isEmpty() || limitType.contains(type);
     }
 }

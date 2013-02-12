@@ -84,7 +84,7 @@
 	};
 	
     function importQTI(){
-    	window.open('<lams:LAMSURL/>questionFile.jsp?chooseAnswers=true',
+    	window.open('<lams:LAMSURL/>questionFile.jsp?limitType=mc',
     			    'QuestionFile','width=500,height=200,scrollbars=yes');
     }
 	
@@ -94,6 +94,9 @@
 			url,
 			{
 				sessionMapID: "${sessionMapID}"
+			},
+			function(){
+				refreshThickbox();
 			}
 		);
     }

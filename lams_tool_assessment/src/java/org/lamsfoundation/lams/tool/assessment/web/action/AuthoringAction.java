@@ -63,6 +63,9 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
+import org.lamsfoundation.lams.questions.Answer;
+import org.lamsfoundation.lams.questions.Question;
+import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
@@ -98,6 +101,7 @@ public class AuthoringAction extends Action {
 
     private static Logger log = Logger.getLogger(AuthoringAction.class);
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -106,10 +110,11 @@ public class AuthoringAction extends Action {
 	if (param.equals("start")) {
 	    ToolAccessMode mode = getAccessMode(request);
 	    // teacher mode "check for new" button enter.
-	    if (mode != null)
+	    if (mode != null) {
 		request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	    else
+	    } else {
 		request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.AUTHOR.toString());
+	    }
 	    return start(mapping, form, request, response);
 	}
 	if (param.equals("definelater")) {
@@ -152,6 +157,9 @@ public class AuthoringAction extends Action {
 	if (param.equals("saveOrUpdateQuestion")) {
 	    return saveOrUpdateQuestion(mapping, form, request, response);
 	}
+	if (param.equals("saveQTI")) {
+	    return saveQTI(mapping, form, request, response);
+	}
 	if (param.equals("removeQuestion")) {
 	    return removeQuestion(mapping, form, request, response);
 	}
@@ -167,7 +175,7 @@ public class AuthoringAction extends Action {
 	}
 	if (param.equals("downQuestionReference")) {
 	    return downQuestionReference(mapping, form, request, response);
-	}	
+	}
 	// ----------------------- Import/Export Questions functions ---------------------------
 	if (param.equals("importInit")) {
 	    return importInit(mapping, form, request, response);
@@ -177,7 +185,7 @@ public class AuthoringAction extends Action {
 	}
 	if (param.equals("exportQuestions")) {
 	    return exportQuestions(mapping, form, request, response);
-	}	
+	}
 	// -----------------------Assessment Answer Option functions ---------------------------
 	if (param.equals("addOption")) {
 	    return addOption(mapping, form, request, response);
@@ -191,21 +199,21 @@ public class AuthoringAction extends Action {
 	if (param.equals("downOption")) {
 	    return downOption(mapping, form, request, response);
 	}
-	// -----------------------Assessment Unit functions ---------------------------	
+	// -----------------------Assessment Unit functions ---------------------------
 	if (param.equals("newUnit")) {
 	    return newUnit(mapping, form, request, response);
 	}
 	// -----------------------Assessment Overall Feedback functions ---------------------------
 	if (param.equals("initOverallFeedback")) {
 	    return initOverallFeedback(mapping, form, request, response);
-	}	
+	}
 	if (param.equals("newOverallFeedback")) {
 	    return newOverallFeedback(mapping, form, request, response);
 	}
-	
+
 	return mapping.findForward(AssessmentConstants.ERROR);
     }
-    
+
     /**
      * Read assessment data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
@@ -232,7 +240,7 @@ public class AuthoringAction extends Action {
 	SessionMap sessionMap = new SessionMap();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	assessmentForm.setSessionMapID(sessionMap.getSessionID());
-	
+
 	// Get contentFolderID and save to form.
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
@@ -245,10 +253,12 @@ public class AuthoringAction extends Action {
 		assessment = service.getDefaultContent(contentId);
 		if (assessment.getQuestions() != null) {
 		    questions = new ArrayList<AssessmentQuestion>(assessment.getQuestions());
-		} else
+		} else {
 		    questions = null;
-	    } else
+		}
+	    } else {
 		questions = service.getAuthoredQuestions(assessment.getUid());
+	    }
 
 	    assessmentForm.setAssessment(assessment);
 
@@ -257,14 +267,14 @@ public class AuthoringAction extends Action {
 	    attachmentList.clear();
 	    attachmentList.addAll(assessment.getAttachments());
 	} catch (Exception e) {
-	    log.error(e);
+	    AuthoringAction.log.error(e);
 	    throw new ServletException(e);
 	}
 
 	// init it to avoid null exception in following handling
-	if (questions == null)
+	if (questions == null) {
 	    questions = new ArrayList<AssessmentQuestion>();
-	else {
+	} else {
 	    AssessmentUser assessmentUser = null;
 	    // handle system default question: createBy is null, now set it to current user
 	    for (AssessmentQuestion question : questions) {
@@ -283,21 +293,21 @@ public class AuthoringAction extends Action {
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
 	questionList.clear();
 	questionList.addAll(questions);
-	
+
 	// init question references
 	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
 	references.clear();
 	if (assessment.getQuestionReferences() != null) {
 	    references.addAll(assessment.getQuestionReferences());
 	}
-	
+
 	// init available questions
 	reinitializeAvailableQuestions(sessionMap);
-	
+
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT_FORM, assessmentForm);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-    
+
     /**
      * Display same entire authoring page content from HttpSession variable.
      * 
@@ -313,7 +323,7 @@ public class AuthoringAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	AssessmentForm existForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
-	
+
 	AssessmentForm assessmentForm = (AssessmentForm) form;
 	try {
 	    PropertyUtils.copyProperties(assessmentForm, existForm);
@@ -322,14 +332,16 @@ public class AuthoringAction extends Action {
 	}
 
 	ToolAccessMode mode = getAccessMode(request);
-	if (mode.isAuthor())
+	if (mode.isAuthor()) {
 	    return mapping.findForward(AssessmentConstants.SUCCESS);
-	else
+	} else {
 	    return mapping.findForward(AssessmentConstants.DEFINE_LATER);
+	}
     }
 
     /**
-     * This method will persist all inforamtion in this authoring page, include all assessment question, information etc.
+     * This method will persist all inforamtion in this authoring page, include all assessment question, information
+     * etc.
      * 
      * @param mapping
      * @param form
@@ -389,8 +401,9 @@ public class AuthoringAction extends Action {
 	// merge attachment info
 	// so far, attPOSet will be empty if content is existed. because PropertyUtils.copyProperties() is executed
 	Set attPOSet = assessmentPO.getAttachments();
-	if (attPOSet == null)
+	if (attPOSet == null) {
 	    attPOSet = new HashSet();
+	}
 	List attachmentList = getAttachmentList(sessionMap);
 	List deleteAttachmentList = getDeletedAttachmentList(sessionMap);
 
@@ -434,31 +447,33 @@ public class AuthoringAction extends Action {
 	    }
 	}
 	assessmentPO.setQuestions(questions);
-	
+
 	// delete References from database.
 	List<QuestionReference> deletedReferences = getDeletedQuestionReferences(sessionMap);
 	iter = deletedReferences.iterator();
 	while (iter.hasNext()) {
 	    QuestionReference reference = (QuestionReference) iter.next();
 	    iter.remove();
-	    if (reference.getUid() != null)
+	    if (reference.getUid() != null) {
 		service.deleteQuestionReference(reference.getUid());
+	    }
 	}
-	
+
 	// delete Questions from database.
 	List deletedQuestionList = getDeletedQuestionList(sessionMap);
 	iter = deletedQuestionList.iterator();
 	while (iter.hasNext()) {
 	    AssessmentQuestion question = (AssessmentQuestion) iter.next();
 	    iter.remove();
-	    if (question.getUid() != null)
+	    if (question.getUid() != null) {
 		service.deleteAssessmentQuestion(question.getUid());
+	    }
 	}
-	
+
 	// Handle question references
 	Set<QuestionReference> questionReferences = updateQuestionReferencesGrades(request, sessionMap, true);
 	assessmentPO.setQuestionReferences(questionReferences);
-	
+
 	// handle assessment question attachment file:
 	List delQuestionAttList = getDeletedQuestionAttachmentList(sessionMap);
 	iter = delQuestionAttList.iterator();
@@ -466,12 +481,12 @@ public class AuthoringAction extends Action {
 	    AssessmentQuestion delAtt = (AssessmentQuestion) iter.next();
 	    iter.remove();
 	}
-	
+
 	// ************************* Handle assessment overall feedbacks *******************
-	 if (mode.isAuthor()) {
-	     TreeSet<AssessmentOverallFeedback> overallFeedbackList = getOverallFeedbacksFromForm(request, true);
-	     assessmentPO.setOverallFeedbacks(overallFeedbackList);
-	 }
+	if (mode.isAuthor()) {
+	    TreeSet<AssessmentOverallFeedback> overallFeedbackList = getOverallFeedbacksFromForm(request, true);
+	    assessmentPO.setOverallFeedbacks(overallFeedbackList);
+	}
 
 	// **********************************************
 	// finally persist assessmentPO again
@@ -485,8 +500,7 @@ public class AuthoringAction extends Action {
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	if (mode.isAuthor()) {
 	    return mapping.findForward("author");
-	}
-	else {
+	} else {
 	    return mapping.findForward("monitor");
 	}
     }
@@ -540,13 +554,15 @@ public class AuthoringAction extends Action {
 	updateQuestionReferencesGrades(request, sessionMap, true);
 
 	FormFile file;
-	if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type))
-	    file = (FormFile) assessmentForm.getOfflineFile();
-	else
-	    file = (FormFile) assessmentForm.getOnlineFile();
+	if (StringUtils.equals(IToolContentHandler.TYPE_OFFLINE, type)) {
+	    file = assessmentForm.getOfflineFile();
+	} else {
+	    file = assessmentForm.getOnlineFile();
+	}
 
-	if (file == null || StringUtils.isBlank(file.getFileName()))
+	if ((file == null) || StringUtils.isBlank(file.getFileName())) {
 	    return mapping.findForward(AssessmentConstants.SUCCESS);
+	}
 
 	// validate file size
 	ActionMessages errors = new ActionMessages();
@@ -648,7 +664,7 @@ public class AuthoringAction extends Action {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-    
+
     /**
      * Display empty page for new assessment question.
      * 
@@ -664,40 +680,40 @@ public class AuthoringAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form; 
+	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
 	questionForm.setSessionMapID(sessionMapID);
 	questionForm.setContentFolderID(contentFolderID);
 	questionForm.setDefaultGrade("1");
 	questionForm.setPenaltyFactor("0");
-	
+
 	List<AssessmentQuestionOption> optionList = new ArrayList<AssessmentQuestionOption>();
 	for (int i = 0; i < AssessmentConstants.INITIAL_OPTIONS_NUMBER; i++) {
 	    AssessmentQuestionOption option = new AssessmentQuestionOption();
-	    option.setSequenceId(i+1);
+	    option.setSequenceId(i + 1);
 	    option.setGrade(0);
 	    optionList.add(option);
 	}
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
-	
+
 	List<AssessmentUnit> unitList = new ArrayList<AssessmentUnit>();
 	AssessmentUnit unit = new AssessmentUnit();
 	unit.setSequenceId(1);
 	unit.setMultiplier(1);
-	unitList.add(unit);	
+	unitList.add(unit);
 	for (int i = 1; i < AssessmentConstants.INITIAL_UNITS_NUMBER; i++) {
 	    unit = new AssessmentUnit();
-	    unit.setSequenceId(i+1);
+	    unit.setSequenceId(i + 1);
 	    unit.setMultiplier(0);
 	    unitList.add(unit);
 	}
-	request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);	
+	request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);
 
 	short type = (short) NumberUtils.stringToInt(request.getParameter(AssessmentConstants.ATTR_QUESTION_TYPE));
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_TYPE, type);
-	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);	
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return findForward(type, mapping);
     }
-    
+
     /**
      * Display edit page for existed assessment question.
      * 
@@ -715,7 +731,7 @@ public class AuthoringAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	
+
 	int questionIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
 	AssessmentQuestion question = null;
 	if (questionIdx != -1) {
@@ -723,7 +739,7 @@ public class AuthoringAction extends Action {
 	    List<AssessmentQuestion> rList = new ArrayList<AssessmentQuestion>(assessmentList);
 	    question = rList.get(questionIdx);
 	    if (question != null) {
-		AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form; 
+		AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
 		populateQuestionToForm(questionIdx, question, questionForm, request);
 		questionForm.setContentFolderID(contentFolderID);
 	    }
@@ -741,17 +757,17 @@ public class AuthoringAction extends Action {
      * 
      * @param mapping
      * @param form
-     * @param request	
+     * @param request
      * @param response
      * @return
      * @throws ServletException
      */
     private ActionForward saveOrUpdateQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	
+
 	AssessmentQuestionForm questionForm = (AssessmentQuestionForm) form;
 	extractFormToAssessmentQuestion(request, questionForm);
-	
+
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(questionForm.getSessionMapID());
 	reinitializeAvailableQuestions(sessionMap);
 
@@ -761,8 +777,216 @@ public class AuthoringAction extends Action {
     }
 
     /**
-     * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only happen
-     * when user submit whole page. So this remove is just impact HttpSession values.
+     * Parses questions extracted from IMS QTI file and adds them as new items.
+     * 
+     * @throws UnsupportedEncodingException
+     */
+    @SuppressWarnings("rawtypes")
+    private ActionForward saveQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws UnsupportedEncodingException {
+	String sessionMapId = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapId);
+	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
+
+	Question[] questions = QuestionParser.parseQuestionChoiceForm(request.getQueryString());
+	for (Question question : questions) {
+	    AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
+	    assessmentQuestion.setCreateDate(new Timestamp(new Date().getTime()));
+	    int maxSeq = 1;
+	    if ((questionList != null) && (questionList.size() > 0)) {
+		AssessmentQuestion last = questionList.last();
+		maxSeq = last.getSequenceId() + 1;
+	    }
+	    assessmentQuestion.setSequenceId(maxSeq);
+	    assessmentQuestion.setTitle(question.getTitle());
+	    assessmentQuestion.setQuestion(question.getText());
+	    assessmentQuestion.setGeneralFeedback(question.getFeedback());
+	    assessmentQuestion.setPenaltyFactor(0);
+
+	    int questionGrade = 1;
+
+	    // options are different depending on the type
+	    if (Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType())
+		    || Question.QUESTION_TYPE_FILL_IN_BLANK.equals(question.getType())) {
+		// setting answers is very similar in both types, so they were put together here
+		if (Question.QUESTION_TYPE_MULTIPLE_CHOICE.equals(question.getType())) {
+		    assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
+		    assessmentQuestion.setMultipleAnswersAllowed(false);
+		    assessmentQuestion.setShuffle(false);
+		} else {
+		    assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER);
+		    assessmentQuestion.setCaseSensitive(false);
+		}
+
+		String correctAnswer = null;
+		if (question.getAnswers() != null) {
+		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<AssessmentQuestionOption>(
+			    new SequencableComparator());
+		    int orderId = 1;
+		    for (Answer answer : question.getAnswers()) {
+			String answerText = answer.getText();
+			if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
+			    AuthoringAction.log.warn("Skipping an answer with same text as the correct answer: "
+				    + answerText);
+			    continue;
+			}
+			AssessmentQuestionOption assessmentAnswer = new AssessmentQuestionOption();
+			assessmentAnswer.setOptionString(answerText);
+			assessmentAnswer.setSequenceId(orderId++);
+			assessmentAnswer.setFeedback(answer.getFeedback());
+
+			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+			    if (correctAnswer == null) {
+				// whatever the correct answer holds, it becomes the question score
+				questionGrade = new Double(Math.ceil(answer.getScore())).intValue();
+				// 100% goes to single correct answer
+				assessmentAnswer.setGrade(1);
+				correctAnswer = answerText;
+			    } else {
+				AuthoringAction.log
+					.warn("Choosing only first correct answer, despite another one was found: "
+						+ answerText);
+				assessmentAnswer.setGrade(0);
+			    }
+			} else {
+			    assessmentAnswer.setGrade(0);
+			}
+
+			optionList.add(assessmentAnswer);
+		    }
+
+		    assessmentQuestion.setQuestionOptions(optionList);
+		}
+
+		if (correctAnswer == null) {
+		    AuthoringAction.log.warn("No correct answer found for question: " + question.getText());
+		    continue;
+		}
+
+	    } else if (Question.QUESTION_TYPE_MULTIPLE_RESPONSE.equals(question.getType())) {
+		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE);
+		assessmentQuestion.setMultipleAnswersAllowed(true);
+		assessmentQuestion.setShuffle(false);
+
+		if (question.getAnswers() != null) {
+		    float totalScore = 0;
+		    for (Answer answer : question.getAnswers()) {
+			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+			    // the question score information is stored as sum of answer scores
+			    totalScore += answer.getScore();
+			}
+		    }
+		    questionGrade = new Double(Math.round(totalScore)).intValue();
+
+		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<AssessmentQuestionOption>(
+			    new SequencableComparator());
+		    int orderId = 1;
+		    for (Answer answer : question.getAnswers()) {
+			String answerText = answer.getText();
+			AssessmentQuestionOption assessmentAnswer = new AssessmentQuestionOption();
+			assessmentAnswer.setOptionString(answerText);
+			assessmentAnswer.setSequenceId(orderId++);
+			assessmentAnswer.setFeedback(answer.getFeedback());
+
+			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+			    // set the factor of score for correct answers
+			    assessmentAnswer.setGrade(answer.getScore() / totalScore);
+			} else {
+			    assessmentAnswer.setGrade(0);
+			}
+
+			optionList.add(assessmentAnswer);
+		    }
+
+		    assessmentQuestion.setQuestionOptions(optionList);
+		}
+
+	    } else if (Question.QUESTION_TYPE_TRUE_FALSE.equals(question.getType())) {
+		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_TRUE_FALSE);
+
+		if (question.getAnswers() == null) {
+		    AuthoringAction.log.warn("Answers missing from true-false question: " + question.getText());
+		    continue;
+		} else {
+		    for (Answer answer : question.getAnswers()) {
+			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+			    assessmentQuestion.setCorrectAnswer(Boolean.parseBoolean(answer.getText()));
+			    questionGrade = new Double(Math.ceil(answer.getScore())).intValue();
+			}
+			if (!StringUtils.isBlank(answer.getFeedback())) {
+			    // set feedback for true/false answers
+			    if (Boolean.parseBoolean(answer.getText())) {
+				assessmentQuestion.setFeedbackOnCorrect(answer.getFeedback());
+			    } else {
+				assessmentQuestion.setFeedbackOnIncorrect(answer.getFeedback());
+			    }
+			}
+		    }
+		}
+	    } else if (Question.QUESTION_TYPE_MATCHING.equals(question.getType())) {
+		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS);
+		assessmentQuestion.setShuffle(true);
+
+		if (question.getAnswers() != null) {
+		    // the question score information is stored as sum of answer scores
+		    float totalScore = 0;
+		    for (Answer answer : question.getAnswers()) {
+			if ((answer.getScore() != null) && (answer.getScore() > 0)) {
+			    totalScore += answer.getScore();
+			}
+		    }
+		    questionGrade = new Double(Math.round(totalScore)).intValue();
+
+		    TreeSet<AssessmentQuestionOption> optionList = new TreeSet<AssessmentQuestionOption>(
+			    new SequencableComparator());
+		    int orderId = 1;
+		    for (int answerIndex = 0; answerIndex < question.getAnswers().size(); answerIndex++) {
+			// QTI allows answers without a match, but LAMS assessment tool does not
+			Integer matchAnswerIndex = question.getMatchMap() == null ? null : question.getMatchMap().get(
+				answerIndex);
+			Answer matchAnswer = (matchAnswerIndex == null) || (question.getMatchAnswers() == null) ? null
+				: question.getMatchAnswers().get(matchAnswerIndex);
+			if (matchAnswer != null) {
+			    Answer answer = question.getAnswers().get(answerIndex);
+			    String answerText = answer.getText();
+			    AssessmentQuestionOption assessmentAnswer = new AssessmentQuestionOption();
+			    assessmentAnswer.setQuestion(answerText);
+			    assessmentAnswer.setOptionString(matchAnswer.getText());
+			    assessmentAnswer.setSequenceId(orderId++);
+			    assessmentAnswer.setFeedback(answer.getFeedback());
+
+			    optionList.add(assessmentAnswer);
+			}
+		    }
+
+		    assessmentQuestion.setQuestionOptions(optionList);
+		}
+	    } else if (Question.QUESTION_TYPE_ESSAY.equals(question.getType())) {
+		assessmentQuestion.setType(AssessmentConstants.QUESTION_TYPE_ESSAY);
+		assessmentQuestion.setAllowRichEditor(false);
+	    } else {
+		AuthoringAction.log.warn("Unknow QTI question type: " + question.getType());
+		continue;
+	    }
+
+	    assessmentQuestion.setDefaultGrade(questionGrade);
+
+	    questionList.add(assessmentQuestion);
+	    if (AuthoringAction.log.isDebugEnabled()) {
+		AuthoringAction.log.debug("Added question: " + assessmentQuestion.getTitle());
+	    }
+	}
+
+	reinitializeAvailableQuestions(sessionMap);
+
+	// set session map ID so that questionlist.jsp can get sessionMAP
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapId);
+	return mapping.findForward(AssessmentConstants.SUCCESS);
+    }
+
+    /**
+     * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only
+     * happen when user submit whole page. So this remove is just impact HttpSession values.
      * 
      * @param mapping
      * @param form
@@ -788,11 +1012,11 @@ public class AuthoringAction extends Action {
 	    // add to delList
 	    List delList = getDeletedQuestionList(sessionMap);
 	    delList.add(question);
-	    
-	    //remove according questionReference, if exists
+
+	    // remove according questionReference, if exists
 	    SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
 	    QuestionReference questionReferenceToDelete = null;
-	    for (QuestionReference questionReference: questionReferences) {
+	    for (QuestionReference questionReference : questionReferences) {
 		if ((questionReference.getQuestion() != null)
 			&& (questionReference.getQuestion().getSequenceId() == question.getSequenceId())) {
 		    questionReferenceToDelete = questionReference;
@@ -809,47 +1033,47 @@ public class AuthoringAction extends Action {
 	    }
 
 	}
-	
+
 	reinitializeAvailableQuestions(sessionMap);
 
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-    
+
     /**
-    * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only happen
-    * when user submit whole page. So this remove is just impact HttpSession values.
-    * 
-    * @param mapping
-    * @param form
-    * @param request
-    * @param response
-    * @return
-    */
-   private ActionForward addQuestionReference(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+     * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only
+     * happen when user submit whole page. So this remove is just impact HttpSession values.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward addQuestionReference(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	updateQuestionReferencesGrades(request, sessionMap, false);
-	
+
 	SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
 	int questionIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
-	
-	//set SequenceId
+
+	// set SequenceId
 	QuestionReference reference = new QuestionReference();
 	int maxSeq = 1;
-	if (references != null && references.size() > 0) {
+	if ((references != null) && (references.size() > 0)) {
 	    QuestionReference last = references.last();
 	    maxSeq = last.getSequenceId() + 1;
 	}
 	reference.setSequenceId(maxSeq);
-	
-	//set isRandomQuestion
+
+	// set isRandomQuestion
 	boolean isRandomQuestion = (questionIdx == -1);
 	reference.setRandomQuestion(isRandomQuestion);
-	    
-	if (isRandomQuestion) { 
+
+	if (isRandomQuestion) {
 	    reference.setDefaultGrade(1);
 	} else {
 	    SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
@@ -861,28 +1085,28 @@ public class AuthoringAction extends Action {
 		}
 	    }
 	    reference.setQuestion(question);
-	    
+
 	    reference.setDefaultGrade(question.getDefaultGrade());
 	}
 	references.add(reference);
-	
+
 	reinitializeAvailableQuestions(sessionMap);
 
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
-   }
-   
-   /**
-    * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only happen
-    * when user submit whole page. So this remove is just impact HttpSession values.
-    * 
-    * @param mapping
-    * @param form
-    * @param request
-    * @param response
-    * @return
-    */
-   private ActionForward removeQuestionReference(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    }
+
+    /**
+     * Remove assessment question from HttpSession list and update page display. As authoring rule, all persist only
+     * happen when user submit whole page. So this remove is just impact HttpSession values.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward removeQuestionReference(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	// get back sessionMAP
@@ -890,7 +1114,8 @@ public class AuthoringAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 
-	int questionReferenceIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
+	int questionReferenceIdx = NumberUtils.stringToInt(
+		request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
 	if (questionReferenceIdx != -1) {
 	    SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
 	    List<QuestionReference> rList = new ArrayList<QuestionReference>(questionReferences);
@@ -901,26 +1126,26 @@ public class AuthoringAction extends Action {
 	    List delList = getDeletedQuestionReferences(sessionMap);
 	    delList.add(questionReference);
 	}
-	
+
 	reinitializeAvailableQuestions(sessionMap);
 
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
-   }
-   
-   /**
-    * Move up current question reference.
-    * 
-    * @param mapping
-    * @param form
-    * @param request
-    * @param response
-    * @return
-    */
-   private ActionForward upQuestionReference(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    }
+
+    /**
+     * Move up current question reference.
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward upQuestionReference(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	return switchQuestionReferences(mapping, request, true);
-   }
+    }
 
     /**
      * Move down current question reference.
@@ -942,17 +1167,19 @@ public class AuthoringAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	updateQuestionReferencesGrades(request, sessionMap, false);
 
-	int questionReferenceIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
+	int questionReferenceIdx = NumberUtils.stringToInt(
+		request.getParameter(AssessmentConstants.PARAM_QUESTION_REFERENCE_INDEX), -1);
 	if (questionReferenceIdx != -1) {
 	    SortedSet<QuestionReference> references = getQuestionReferences(sessionMap);
 	    List<QuestionReference> rList = new ArrayList<QuestionReference>(references);
 	    // get current and the target item, and switch their sequnece
 	    QuestionReference reference = rList.get(questionReferenceIdx);
 	    QuestionReference repReference;
-	    if (up)
+	    if (up) {
 		repReference = rList.get(--questionReferenceIdx);
-	    else
+	    } else {
 		repReference = rList.get(++questionReferenceIdx);
+	    }
 	    int upSeqId = repReference.getSequenceId();
 	    repReference.setSequenceId(reference.getSequenceId());
 	    reference.setSequenceId(upSeqId);
@@ -965,7 +1192,7 @@ public class AuthoringAction extends Action {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-    
+
     /**
      * Initializes import questions page.
      */
@@ -973,10 +1200,10 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	
+
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-    
+
     /**
      * Imports questions into question bank from uploaded xml file.
      */
@@ -986,8 +1213,8 @@ public class AuthoringAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
-	SortedSet<AssessmentQuestion> oldQuestions = getQuestionList(sessionMap);	
-	
+	SortedSet<AssessmentQuestion> oldQuestions = getQuestionList(sessionMap);
+
 	List<String> ldErrorMsgs = new ArrayList<String>();
 	List<String> toolsErrorMsgs = new ArrayList<String>();
 	try {
@@ -1008,9 +1235,9 @@ public class AuthoringAction extends Action {
 	    while (iter.hasNext()) {
 		FileItem fi = (FileItem) iter.next();
 		// UPLOAD_FILE is input field from HTML page
-		if (!fi.getFieldName().equalsIgnoreCase("UPLOAD_FILE"))
+		if (!fi.getFieldName().equalsIgnoreCase("UPLOAD_FILE")) {
 		    params.put(fi.getFieldName(), fi.getString());
-		else {
+		} else {
 		    // filename on the client
 		    filename = FileUtil.getFileName(fi.getName());
 		    designFile = new File(uploadPath + filename);
@@ -1019,21 +1246,23 @@ public class AuthoringAction extends Action {
 	    }
 
 	    String filename2 = designFile.getName();
-	    String fileExtension = filename2 != null && filename2.length() >= 4 ? filename2
-		    .substring(filename2.length() - 4) : "";
-	    if (! fileExtension.equalsIgnoreCase(".xml")) {
+	    String fileExtension = (filename2 != null) && (filename2.length() >= 4) ? filename2.substring(filename2
+		    .length() - 4) : "";
+	    if (!fileExtension.equalsIgnoreCase(".xml")) {
 		throw new RuntimeException("Wrong file extension. Xml is expected");
 	    }
-	    //String learningDesignPath = ZipFileUtil.expandZip(new FileInputStream(designFile), filename2);
+	    // String learningDesignPath = ZipFileUtil.expandZip(new FileInputStream(designFile), filename2);
 
 	    // import learning design
-	    String fullFilePath = designFile.getAbsolutePath();//FileUtil.getFullPath(learningDesignPath,   ExportToolContentService.LEARNING_DESIGN_FILE_NAME);
-	    List<AssessmentQuestion> questions = (List<AssessmentQuestion>) FileUtil.getObjectFromXML(null, fullFilePath);
+	    String fullFilePath = designFile.getAbsolutePath();// FileUtil.getFullPath(learningDesignPath,
+							       // ExportToolContentService.LEARNING_DESIGN_FILE_NAME);
+	    List<AssessmentQuestion> questions = (List<AssessmentQuestion>) FileUtil.getObjectFromXML(null,
+		    fullFilePath);
 	    if (questions != null) {
 		for (AssessmentQuestion question : questions) {
 		    question.setCreateDate(new Timestamp(new Date().getTime()));
 		    int maxSeq = 1;
-		    if (oldQuestions != null && oldQuestions.size() > 0) {
+		    if ((oldQuestions != null) && (oldQuestions.size() > 0)) {
 			AssessmentQuestion last = oldQuestions.last();
 			maxSeq = last.getSequenceId() + 1;
 		    }
@@ -1041,20 +1270,20 @@ public class AuthoringAction extends Action {
 		    oldQuestions.add(question);
 		}
 	    }
-	    
+
 	} catch (Exception e) {
-	    log.error("Error occured during import", e);
+	    AuthoringAction.log.error("Error occured during import", e);
 	    toolsErrorMsgs.add(e.getClass().getName() + " " + e.getMessage());
 	}
 
 	if (toolsErrorMsgs.size() > 0) {
 	    request.setAttribute("toolsErrorMessages", toolsErrorMsgs);
 	}
-	
+
 	reinitializeAvailableQuestions(sessionMap);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-    
+
     /**
      * Exports xml format questions from question bank.
      */
@@ -1062,7 +1291,7 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	
+
 	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
 	Assessment assessment = assessmentForm.getAssessment();
 
@@ -1070,7 +1299,7 @@ public class AuthoringAction extends Action {
 	if (assessment != null) {
 	    try {
 		ArrayList<AssessmentQuestion> questionsToExport = new ArrayList<AssessmentQuestion>();
-		
+
 		for (AssessmentQuestion question : getQuestionList(sessionMap)) {
 		    AssessmentQuestion clonedQuestion = (AssessmentQuestion) question.clone();
 		    clonedQuestion.setCreateBy(null);
@@ -1079,21 +1308,22 @@ public class AuthoringAction extends Action {
 		// exporting XML
 		XStream designXml = new XStream();
 		String resultedXml = designXml.toXML(questionsToExport);
-		
+
 		response.setContentType("application/x-download");
-		response.setHeader("Content-Disposition", "attachment;filename=" + AssessmentConstants.EXPORT_QUESTIONS_FILENAME);
-		log.debug("Exporting assessment questions to an xml: " + assessment.getContentId());
+		response.setHeader("Content-Disposition", "attachment;filename="
+			+ AssessmentConstants.EXPORT_QUESTIONS_FILENAME);
+		AuthoringAction.log.debug("Exporting assessment questions to an xml: " + assessment.getContentId());
 
 		OutputStream out = null;
 		try {
 		    out = response.getOutputStream();
 		    out.write(resultedXml.getBytes());
 		    int count = resultedXml.getBytes().length;
-		    log.debug("Wrote out " + count + " bytes");
+		    AuthoringAction.log.debug("Wrote out " + count + " bytes");
 		    response.setContentLength(count);
 		    out.flush();
 		} catch (Exception e) {
-		    log.error("Exception occured writing out file:" + e.getMessage());
+		    AuthoringAction.log.error("Exception occured writing out file:" + e.getMessage());
 		    throw new ExportToolContentException(e);
 		} finally {
 		    try {
@@ -1101,13 +1331,14 @@ public class AuthoringAction extends Action {
 			    out.close();
 			}
 		    } catch (Exception e) {
-			log.error("Error Closing file. File already written out - no exception being thrown.", e);
+			AuthoringAction.log.error(
+				"Error Closing file. File already written out - no exception being thrown.", e);
 		    }
 		}
 
 	    } catch (Exception e) {
 		errors = "Unable to export tool content: " + e.toString();
-		log.error(errors);
+		AuthoringAction.log.error(errors);
 	    }
 
 	}
@@ -1122,7 +1353,6 @@ public class AuthoringAction extends Action {
 	return null;
     }
 
-    
     /**
      * Ajax call, will add one more input line for new resource item instruction.
      * 
@@ -1137,22 +1367,22 @@ public class AuthoringAction extends Action {
 	TreeSet<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
 	AssessmentQuestionOption option = new AssessmentQuestionOption();
 	int maxSeq = 1;
-	if (optionList != null && optionList.size() > 0) {
+	if ((optionList != null) && (optionList.size() > 0)) {
 	    AssessmentQuestionOption last = optionList.last();
 	    maxSeq = last.getSequenceId() + 1;
 	}
 	option.setSequenceId(maxSeq);
 	option.setGrade(0);
 	optionList.add(option);
-	
-	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
-		AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE, WebUtil.readIntParam(request,
-		AssessmentConstants.ATTR_QUESTION_TYPE));
+
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
+		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
+	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE,
+		WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE));
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
- 
+
     /**
      * Ajax call, remove the given line of instruction of resource item.
      * 
@@ -1173,14 +1403,14 @@ public class AuthoringAction extends Action {
 	    optionList.addAll(rList);
 	}
 
-	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
-		AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE, WebUtil.readIntParam(request,
-		AssessmentConstants.ATTR_QUESTION_TYPE));
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
+		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
+	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE,
+		WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE));
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-    
+
     /**
      * Move up current option.
      * 
@@ -1211,11 +1441,11 @@ public class AuthoringAction extends Action {
 
     private ActionForward switchOption(ActionMapping mapping, HttpServletRequest request, boolean up) {
 	Set<AssessmentQuestionOption> optionList = getOptionsFromRequest(request, false);
-	
+
 	int optionIndex = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
 	if (optionIndex != -1) {
 	    List<AssessmentQuestionOption> rList = new ArrayList<AssessmentQuestionOption>(optionList);
-	    
+
 	    // get current and the target item, and switch their sequnece
 	    AssessmentQuestionOption option = rList.get(optionIndex);
 	    AssessmentQuestionOption repOption;
@@ -1224,7 +1454,7 @@ public class AuthoringAction extends Action {
 	    } else {
 		repOption = rList.get(++optionIndex);
 	    }
-		
+
 	    int upSeqId = repOption.getSequenceId();
 	    repOption.setSequenceId(option.getSequenceId());
 	    option.setSequenceId(upSeqId);
@@ -1234,14 +1464,14 @@ public class AuthoringAction extends Action {
 	    optionList.addAll(rList);
 	}
 
-	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
-		AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE, WebUtil.readIntParam(request,
-		AssessmentConstants.ATTR_QUESTION_TYPE));
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
+		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
+	request.setAttribute(AssessmentConstants.ATTR_QUESTION_TYPE,
+		WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE));
 	request.setAttribute(AssessmentConstants.ATTR_OPTION_LIST, optionList);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-    
+
     /**
      * Ajax call, will add one more input line for new Unit.
      * 
@@ -1256,17 +1486,17 @@ public class AuthoringAction extends Action {
 	TreeSet<AssessmentUnit> unitList = getUnitsFromRequest(request, false);
 	AssessmentUnit unit = new AssessmentUnit();
 	int maxSeq = 1;
-	if (unitList != null && unitList.size() > 0) {
+	if ((unitList != null) && (unitList.size() > 0)) {
 	    AssessmentUnit last = unitList.last();
 	    maxSeq = last.getSequenceId() + 1;
 	}
 	unit.setSequenceId(maxSeq);
 	unitList.add(unit);
-	
+
 	request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-    
+
     /**
      * Ajax call, will add one more input line for new resource item instruction.
      * 
@@ -1279,7 +1509,7 @@ public class AuthoringAction extends Action {
     private ActionForward initOverallFeedback(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);	
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
 	Assessment assessment = assessmentForm.getAssessment();
 
@@ -1299,10 +1529,10 @@ public class AuthoringAction extends Action {
 	    }
 	}
 
-	request.setAttribute(AssessmentConstants.ATTR_OVERALL_FEEDBACK_LIST, overallFeedbackList);	
+	request.setAttribute(AssessmentConstants.ATTR_OVERALL_FEEDBACK_LIST, overallFeedbackList);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-    
+
     /**
      * Ajax call, will add one more input line for new OverallFeedback.
      * 
@@ -1317,13 +1547,13 @@ public class AuthoringAction extends Action {
 	TreeSet<AssessmentOverallFeedback> overallFeedbackList = getOverallFeedbacksFromRequest(request, false);
 	AssessmentOverallFeedback overallFeedback = new AssessmentOverallFeedback();
 	int maxSeq = 1;
-	if (overallFeedbackList != null && overallFeedbackList.size() > 0) {
+	if ((overallFeedbackList != null) && (overallFeedbackList.size() > 0)) {
 	    AssessmentOverallFeedback last = overallFeedbackList.last();
 	    maxSeq = last.getSequenceId() + 1;
 	}
 	overallFeedback.setSequenceId(maxSeq);
 	overallFeedbackList.add(overallFeedback);
-	
+
 	request.setAttribute(AssessmentConstants.ATTR_OVERALL_FEEDBACK_LIST, overallFeedbackList);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
@@ -1332,7 +1562,7 @@ public class AuthoringAction extends Action {
     // Private method
     // *************************************************************************************
     /**
-     * refreshes set of all available questions for adding to question list 
+     * refreshes set of all available questions for adding to question list
      * 
      * @param sessionMap
      */
@@ -1343,14 +1573,13 @@ public class AuthoringAction extends Action {
 	for (QuestionReference reference : references) {
 	    questionsFromList.add(reference.getQuestion());
 	}
-	
+
 	Set<AssessmentQuestion> availableQuestions = new TreeSet<AssessmentQuestion>(new SequencableComparator());
 	availableQuestions.addAll(CollectionUtils.subtract(bankQuestions, questionsFromList));
-	
+
 	sessionMap.put(AssessmentConstants.ATTR_AVAILABLE_QUESTIONS, availableQuestions);
     }
 
-    
     /**
      * Return AssessmentService bean.
      */
@@ -1391,7 +1620,7 @@ public class AuthoringAction extends Action {
 	}
 	return list;
     }
-    
+
     /**
      * List save current question references.
      * 
@@ -1417,7 +1646,7 @@ public class AuthoringAction extends Action {
     private List getDeletedQuestionList(SessionMap sessionMap) {
 	return getListFromSession(sessionMap, AssessmentConstants.ATTR_DELETED_QUESTION_LIST);
     }
-    
+
     /**
      * List save deleted assessment questions, which could be persisted or non-persisted questions.
      * 
@@ -1429,9 +1658,9 @@ public class AuthoringAction extends Action {
     }
 
     /**
-     * If a assessment question has attahment file, and the user edit this question and change the attachment to new file, then
-     * the old file need be deleted when submitting the whole authoring page. Save the file uuid and version id into
-     * Assessmentquestion object for temporarily use.
+     * If a assessment question has attahment file, and the user edit this question and change the attachment to new
+     * file, then the old file need be deleted when submitting the whole authoring page. Save the file uuid and version
+     * id into Assessmentquestion object for temporarily use.
      * 
      * @param request
      * @return
@@ -1486,7 +1715,7 @@ public class AuthoringAction extends Action {
 	    break;
 	case AssessmentConstants.QUESTION_TYPE_ORDERING:
 	    forward = mapping.findForward("ordering");
-	    break;	    
+	    break;
 	default:
 	    forward = null;
 	    break;
@@ -1504,7 +1733,7 @@ public class AuthoringAction extends Action {
      */
     private void populateQuestionToForm(int questionIdx, AssessmentQuestion question, AssessmentQuestionForm form,
 	    HttpServletRequest request) {
-	form.setTitle(question.getTitle());	
+	form.setTitle(question.getTitle());
 	form.setQuestion(question.getQuestion());
 	form.setDefaultGrade(String.valueOf(question.getDefaultGrade()));
 	form.setPenaltyFactor(String.valueOf(question.getPenaltyFactor()));
@@ -1521,7 +1750,7 @@ public class AuthoringAction extends Action {
 	if (questionIdx >= 0) {
 	    form.setQuestionIndex(new Integer(questionIdx).toString());
 	}
-	
+
 	short questionType = question.getType();
 	if ((questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
 		|| (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING)
@@ -1533,7 +1762,7 @@ public class AuthoringAction extends Action {
 	}
 	if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
 	    Set<AssessmentUnit> unitList = question.getUnits();
-	    request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);	    
+	    request.setAttribute(AssessmentConstants.ATTR_UNIT_LIST, unitList);
 	}
     }
 
@@ -1561,7 +1790,7 @@ public class AuthoringAction extends Action {
 	    question = new AssessmentQuestion();
 	    question.setCreateDate(new Timestamp(new Date().getTime()));
 	    int maxSeq = 1;
-	    if (questionList != null && questionList.size() > 0) {
+	    if ((questionList != null) && (questionList.size() > 0)) {
 		AssessmentQuestion last = questionList.last();
 		maxSeq = last.getSequenceId() + 1;
 	    }
@@ -1576,10 +1805,10 @@ public class AuthoringAction extends Action {
 
 	question.setTitle(questionForm.getTitle());
 	question.setQuestion(questionForm.getQuestion());
-	
+
 	question.setDefaultGrade(Integer.parseInt(questionForm.getDefaultGrade()));
 	question.setGeneralFeedback(questionForm.getGeneralFeedback());
-	
+
 	if (type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 	    question.setMultipleAnswersAllowed(questionForm.isMultipleAnswersAllowed());
 	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
@@ -1599,7 +1828,7 @@ public class AuthoringAction extends Action {
 	    question.setPenaltyFactor(Float.parseFloat(questionForm.getPenaltyFactor()));
 	    question.setCorrectAnswer(questionForm.isCorrectAnswer());
 	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
-	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());	    
+	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
 	} else if ((type == AssessmentConstants.QUESTION_TYPE_ESSAY)) {
 	    question.setAllowRichEditor(questionForm.isAllowRichEditor());
 	} else if (type == AssessmentConstants.QUESTION_TYPE_ORDERING) {
@@ -1607,7 +1836,7 @@ public class AuthoringAction extends Action {
 	    question.setFeedbackOnCorrect(questionForm.getFeedbackOnCorrect());
 	    question.setFeedbackOnIncorrect(questionForm.getFeedbackOnIncorrect());
 	}
-	
+
 	// set options
 	if ((type == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE)
 		|| (type == AssessmentConstants.QUESTION_TYPE_ORDERING)
@@ -1634,7 +1863,7 @@ public class AuthoringAction extends Action {
 	    }
 	    question.setUnits(units);
 	}
-	
+
     }
 
     /**
@@ -1646,48 +1875,53 @@ public class AuthoringAction extends Action {
     private ToolAccessMode getAccessMode(HttpServletRequest request) {
 	ToolAccessMode mode;
 	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString()))
+	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
 	    mode = ToolAccessMode.TEACHER;
-	else
+	} else {
 	    mode = ToolAccessMode.AUTHOR;
+	}
 	return mode;
     }
-    
-    private Set<QuestionReference> updateQuestionReferencesGrades(HttpServletRequest request, SessionMap sessionMap, boolean isFormSubmit) {
-	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_QUESTION_REFERENCES_GRADES);
-	
+
+    private Set<QuestionReference> updateQuestionReferencesGrades(HttpServletRequest request, SessionMap sessionMap,
+	    boolean isFormSubmit) {
+	Map<String, String> paramMap = splitRequestParameter(request,
+		AssessmentConstants.ATTR_QUESTION_REFERENCES_GRADES);
+
 	SortedSet<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
 	for (QuestionReference questionReference : questionReferences) {
 	    try {
 		int grade;
 		if (isFormSubmit) {
-		    grade = WebUtil.readIntParam(request, AssessmentConstants.PARAM_GRADE + questionReference.getSequenceId());
+		    grade = WebUtil.readIntParam(request,
+			    AssessmentConstants.PARAM_GRADE + questionReference.getSequenceId());
 		} else {
 		    String gradeStr = paramMap.get(AssessmentConstants.PARAM_GRADE + questionReference.getSequenceId());
 		    grade = new Integer(gradeStr);
 		}
-		
+
 		questionReference.setDefaultGrade(grade);
 	    } catch (Exception e) {
-		log.debug(e.getMessage());
+		AuthoringAction.log.debug(e.getMessage());
 	    }
 	}
-	
+
 	return questionReferences;
     }
-    
+
     /**
      * Get answer options from <code>HttpRequest</code>
      * 
      * @param request
-     * @param isForSaving whether the blank options will be preserved or not 
+     * @param isForSaving
+     *            whether the blank options will be preserved or not
      * 
      */
     private TreeSet<AssessmentQuestionOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving) {
 	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_OPTION_LIST);
 
 	int count = NumberUtils.stringToInt(paramMap.get(AssessmentConstants.ATTR_OPTION_COUNT));
-	int questionType = WebUtil.readIntParam(request,AssessmentConstants.ATTR_QUESTION_TYPE);
+	int questionType = WebUtil.readIntParam(request, AssessmentConstants.ATTR_QUESTION_TYPE);
 	TreeSet<AssessmentQuestionOption> optionList = new TreeSet<AssessmentQuestionOption>(
 		new SequencableComparator());
 	for (int i = 0; i < count; i++) {
@@ -1704,46 +1938,47 @@ public class AuthoringAction extends Action {
 		option.setOptionString(optionString);
 		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
 		option.setGrade(grade);
-		option.setFeedback((String) paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
+		option.setFeedback(paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
 		optionList.add(option);
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
 		String question = paramMap.get(AssessmentConstants.ATTR_OPTION_QUESTION_PREFIX + i);
 		if ((question == null) && isForSaving) {
 		    continue;
 		}
-		
+
 		AssessmentQuestionOption option = new AssessmentQuestionOption();
-		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);		
+		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
 		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
-		option.setOptionString((String) paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i));
+		option.setOptionString(paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i));
 		option.setQuestion(question);
 		optionList.add(option);
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
 		String optionFloatStr = paramMap.get(AssessmentConstants.ATTR_OPTION_FLOAT_PREFIX + i);
 		String acceptedErrorStr = paramMap.get(AssessmentConstants.ATTR_OPTION_ACCEPTED_ERROR_PREFIX + i);
 		String gradeStr = paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i);
-		if (optionFloatStr.equals("0.0") && optionFloatStr.equals("0.0") && gradeStr.equals("0.0") && isForSaving) {
+		if (optionFloatStr.equals("0.0") && optionFloatStr.equals("0.0") && gradeStr.equals("0.0")
+			&& isForSaving) {
 		    continue;
 		}
-		
+
 		AssessmentQuestionOption option = new AssessmentQuestionOption();
 		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
 		option.setSequenceId(NumberUtils.stringToInt(sequenceId));
 		try {
 		    float optionFloat = Float.valueOf(optionFloatStr);
-		    option.setOptionFloat(optionFloat);		    
+		    option.setOptionFloat(optionFloat);
 		} catch (Exception e) {
 		    option.setOptionFloat(0);
 		}
 		try {
 		    float acceptedError = Float.valueOf(acceptedErrorStr);
-		    option.setAcceptedError(acceptedError);	    
+		    option.setAcceptedError(acceptedError);
 		} catch (Exception e) {
 		    option.setAcceptedError(0);
-		}		
+		}
 		float grade = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_OPTION_GRADE_PREFIX + i));
-		option.setGrade(grade);    
-		option.setFeedback((String) paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
+		option.setGrade(grade);
+		option.setFeedback(paramMap.get(AssessmentConstants.ATTR_OPTION_FEEDBACK_PREFIX + i));
 		optionList.add(option);
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 		String optionString = paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i);
@@ -1761,7 +1996,7 @@ public class AuthoringAction extends Action {
 	}
 	return optionList;
     }
-    
+
     /**
      * Get units from <code>HttpRequest</code>
      * 
@@ -1777,25 +2012,26 @@ public class AuthoringAction extends Action {
 	    if (StringUtils.isBlank(unitStr) && isForSaving) {
 		continue;
 	    }
-	    
+
 	    AssessmentUnit unit = new AssessmentUnit();
-	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_UNIT_SEQUENCE_ID_PREFIX + i);	    
+	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_UNIT_SEQUENCE_ID_PREFIX + i);
 	    unit.setSequenceId(NumberUtils.stringToInt(sequenceId));
 	    unit.setUnit(unitStr);
 	    float multiplier = Float.valueOf(paramMap.get(AssessmentConstants.ATTR_UNIT_MULTIPLIER_PREFIX + i));
 	    unit.setMultiplier(multiplier);
 	    unitList.add(unit);
 	}
-	
+
 	return unitList;
     }
-    
+
     /**
      * Get overall feedbacks from <code>HttpRequest</code>
      * 
      * @param request
      */
-    private TreeSet<AssessmentOverallFeedback> getOverallFeedbacksFromRequest(HttpServletRequest request, boolean skipBlankOverallFeedbacks) {
+    private TreeSet<AssessmentOverallFeedback> getOverallFeedbacksFromRequest(HttpServletRequest request,
+	    boolean skipBlankOverallFeedbacks) {
 	int count = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.ATTR_OVERALL_FEEDBACK_COUNT));
 	TreeSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<AssessmentOverallFeedback>(
 		new SequencableComparator());
@@ -1820,21 +2056,21 @@ public class AuthoringAction extends Action {
 	}
 	return overallFeedbackList;
     }
-    
+
     /**
      * Get overall feedbacks from <code>HttpRequest</code>
      * 
      * @param request
      */
-    private TreeSet<AssessmentOverallFeedback> getOverallFeedbacksFromForm(HttpServletRequest request, boolean skipBlankOverallFeedbacks) {
+    private TreeSet<AssessmentOverallFeedback> getOverallFeedbacksFromForm(HttpServletRequest request,
+	    boolean skipBlankOverallFeedbacks) {
 	Map<String, String> paramMap = splitRequestParameter(request, AssessmentConstants.ATTR_OVERALL_FEEDBACK_LIST);
-	
+
 	int count = NumberUtils.stringToInt(paramMap.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_COUNT));
 	TreeSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<AssessmentOverallFeedback>(
 		new SequencableComparator());
 	for (int i = 0; i < count; i++) {
-	    String gradeBoundaryStr = paramMap
-		    .get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_GRADE_BOUNDARY_PREFIX + i);
+	    String gradeBoundaryStr = paramMap.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_GRADE_BOUNDARY_PREFIX + i);
 	    String feedback = paramMap.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_FEEDBACK_PREFIX + i);
 	    String sequenceId = paramMap.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_SEQUENCE_ID_PREFIX + i);
 
@@ -1853,30 +2089,32 @@ public class AuthoringAction extends Action {
 	}
 	return overallFeedbackList;
     }
-    
+
     /**
      * Split Request Parameter from <code>HttpRequest</code>
      * 
      * @param request
-     * @param parameterName parameterName
+     * @param parameterName
+     *            parameterName
      */
     private Map<String, String> splitRequestParameter(HttpServletRequest request, String parameterName) {
 	String list = request.getParameter(parameterName);
 	if (list == null) {
 	    return null;
 	}
-	
+
 	String[] params = list.split("&");
 	Map<String, String> paramMap = new HashMap<String, String>();
 	String[] pair;
 	for (String item : params) {
 	    pair = item.split("=");
-	    if (pair == null || pair.length != 2)
+	    if ((pair == null) || (pair.length != 2)) {
 		continue;
+	    }
 	    try {
 		paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
 	    } catch (UnsupportedEncodingException e) {
-		log.error("Error occurs when decode instruction string:" + e.toString());
+		AuthoringAction.log.error("Error occurs when decode instruction string:" + e.toString());
 	    }
 	}
 	return paramMap;
@@ -1902,7 +2140,7 @@ public class AuthoringAction extends Action {
 		    option.setQuestion(questionStr.replaceAll("[\n\r\f]", ""));
 		}
 	    }
-	    
+
 	}
     }
 }

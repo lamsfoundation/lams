@@ -148,6 +148,24 @@
 		    $('#passingMark').append( new Option(i, i, isSelected, isSelected) );
 		}
 	};	
+	
+    function importQTI(){
+    	window.open('<lams:LAMSURL/>questionFile.jsp',
+    			    'QuestionFile','width=500,height=200,scrollbars=yes');
+    }
+	
+    function saveQTI(queryString) {
+		var url = '<c:url value="/authoring/saveQTI.do" />?' + queryString;
+		$(questionListTargetDiv).load(
+			url,
+			{
+				sessionMapID: "${sessionMapID}"
+			},
+			function(){
+				refreshThickbox();
+			}
+		);
+    }
 
 
 </script>
@@ -205,6 +223,10 @@
 	
 	<a onclick="javascript:exportQuestions();" class="button space-right" id="exportButton" style="float: right;">  
 		<fmt:message key="label.authoring.basic.export.questions" />
+	</a>
+	
+	<a href="#" onClick="javascript:importQTI()" style="float: right; margin-right: 50px">
+			<fmt:message key="label.authoring.basic.import.qti" /> 
 	</a>
 </p>
 <br>

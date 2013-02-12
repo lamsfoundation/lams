@@ -703,7 +703,8 @@ public class AuthoringAction extends Action {
 		maxSeq = last.getOrderId() + 1;
 	    }
 	    item.setOrderId(maxSeq);
-	    item.setTitle(question.getText());
+	    item.setTitle(question.getTitle());
+	    item.setDescription(question.getText());
 
 	    TreeSet<ScratchieAnswer> answerList = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
 	    String correctAnswer = null;

@@ -1,7 +1,10 @@
 package org.lamsfoundation.lams.web;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,22 +42,22 @@ public class QuestionsAction extends Action {
 	List<FileItem> formFields = formParser.parseRequest(request);
 
 	String returnURL = null;
-	Boolean chooseAnswers = null;
+	String limitTypeParam = null;
 	InputStream packageFileStream = null;
 	for (FileItem formField : formFields) {
 	    String fieldName = formField.getFieldName();
 	    if ("returnURL".equals(fieldName)) {
 		// this can be empty; if so, another method of delivering results is used
 		returnURL = formField.getString();
-	    } else if ("chooseAnswers".equals(fieldName)) {
-		chooseAnswers = Boolean.parseBoolean(formField.getString());
+	    } else if ("limitType".equals(fieldName)) {
+		limitTypeParam = formField.getString();
 	    } else if ("file".equals(fieldName) && !StringUtils.isBlank(formField.getName())) {
 		packageFileStream = formField.getInputStream();
 	    }
 	}
 
 	request.setAttribute("returnURL", returnURL);
-	request.setAttribute("chooseAnswers", chooseAnswers);
+	request.setAttribute("limitType", limitTypeParam);
 
 	// user did not choose a file
 	if (packageFileStream == null) {
@@ -64,7 +67,14 @@ public class QuestionsAction extends Action {
 	    return mapping.findForward("questionFile");
 	}
 
-	Question[] questions = QuestionParser.parseQTIPackage(packageFileStream);
+	Set<String> limitType = null;
+	if (!StringUtils.isBlank(limitTypeParam)) {
+	    limitType = new TreeSet<String>();
+	    // comma delimited acceptable question types, for example "mc,fb"
+	    Collections.addAll(limitType, limitTypeParam.split(","));
+	}
+
+	Question[] questions = QuestionParser.parseQTIPackage(packageFileStream, limitType);
 	request.setAttribute("questions", questions);
 
 	return mapping.findForward("questionChoice");
