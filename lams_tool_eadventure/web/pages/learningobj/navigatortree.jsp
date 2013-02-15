@@ -75,8 +75,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   			</x:transform>
   			-->
   	  </script>
-	<script language="JavaScript" src="${ctxPath}/includes/javascript/tree.js"></script>
-	<script language="JavaScript" src="${ctxPath}/includes/javascript/tree_tpl.js"></script>
+	<script language="JavaScript" src="<lams:LAMSURL/>includes/javascript/tree.js"></script>
+	<script language="JavaScript" src="<lams:LAMSURL/>includes/javascript/tree_tpl.js"></script>
 
 </lams:head>
 
