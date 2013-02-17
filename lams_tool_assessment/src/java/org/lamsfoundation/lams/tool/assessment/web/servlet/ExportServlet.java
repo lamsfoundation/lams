@@ -28,7 +28,9 @@ package org.lamsfoundation.lams.tool.assessment.web.servlet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -37,9 +39,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
+import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
@@ -51,6 +56,7 @@ import org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceProxy;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentBundler;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
+import org.lamsfoundation.lams.tool.assessment.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -100,7 +106,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
 		+ request.getContextPath();
-	
+
 	// Attempting to export required js and image files
 	try {
 	    AssessmentBundler imageBundler = new AssessmentBundler();
@@ -109,7 +115,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error(
 		    "Could not export spreadsheet javascript files, some files may be missing in export portfolio", e);
 	}
-	
+
 	writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID=" + sessionMap.getSessionID(),
 		directoryName, FILENAME, cookies);
 
@@ -161,7 +167,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error(error);
 	    throw new AssessmentApplicationException(error);
 	}
-	
+
 	AssessmentSession session = service.getAssessmentSessionBySessionId(toolSessionID);
 	if (session == null) {
 	    String error = "Failed get AssessmentSession by ID [" + toolSessionID + "]";
@@ -173,6 +179,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, content);
 	sessionMap.put(AssessmentConstants.ATTR_USER_SUMMARY, userSummary);
+
+	// Create reflectList if reflection is enabled.
+	if (content.isReflectOnActivity()) {
+
+	    // Add reflectList to sessionMap
+	    sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ENTRY, getReflectionEntry(learner));
+	}
+
     }
 
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName,
@@ -192,9 +206,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error(error);
 	    throw new AssessmentApplicationException(error);
 	}
-	
+
 	List<Summary> summaryList = service.getSummaryList(toolContentID);
-	
+
 	ArrayList<QuestionSummary> questionSummaryList = new ArrayList<QuestionSummary>();
 	Set<AssessmentQuestion> questions = content.getQuestions();
 	for (AssessmentQuestion question : questions) {
@@ -203,17 +217,29 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 
 	// cache into sessionMap
-	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, content);	
+	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, content);
 	sessionMap.put(AssessmentConstants.ATTR_SUMMARY_LIST, summaryList);
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_SUMMARY_LIST, questionSummaryList);
+
+	// Create reflectList if reflection is enabled.
+	if (content.isReflectOnActivity()) {
+	    Map<Long, Set<ReflectDTO>> reflectList = service.getReflectList(content.getContentId());
+	    // Add reflectList to sessionMap
+	    sessionMap.put(AssessmentConstants.ATTR_REFLECT_LIST, reflectList);
+	}
+
     }
 
-    private AssessmentToolContentHandler getToolContentHandler() {
-	if (handler == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this
-		    .getServletContext());
-	    handler = (AssessmentToolContentHandler) wac.getBean(AssessmentConstants.TOOL_CONTENT_HANDLER_NAME);
+    private ReflectDTO getReflectionEntry(AssessmentUser user) {
+	ReflectDTO reflectDTO = new ReflectDTO(user);
+	NotebookEntry notebookEntry = service.getEntry(user.getSession().getSessionId(), user.getUserId().intValue());
+
+	// check notebookEntry is not null
+	if (notebookEntry != null) {
+	    reflectDTO.setReflect(notebookEntry.getEntry());
+	    logger.debug("Could not find notebookEntry for ResourceUser: " + user.getUid());
 	}
-	return handler;
+	return reflectDTO;
     }
+
 }

@@ -144,7 +144,18 @@
 					
 					<table id="user${userSummaryItem.question.uid}" class="scroll" cellpadding="0" cellspacing="0" ></table>
 				</div>	
-			</c:forEach>	
+			</c:forEach>
+			
+			<%-- Display reflection entries --%>
+		<c:if test="${assessment.reflectOnActivity}">
+			<h3>
+				<fmt:message key="label.export.reflection" />
+			</h3>
+			
+			<p>
+				<lams:out value="${sessionMap.reflectEntry.reflect}" escapeHtml="true" />
+			</p>
+		</c:if>	
 
 		</div>
 		<!--closes content-->

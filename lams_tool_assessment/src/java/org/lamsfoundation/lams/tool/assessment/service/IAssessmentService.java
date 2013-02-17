@@ -26,10 +26,14 @@ package org.lamsfoundation.lams.tool.assessment.service;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
+import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
@@ -184,6 +188,14 @@ public interface IAssessmentService {
     int getAssessmentResultCount(Long assessmentUid, Long userId);
     
     List<AssessmentQuestionResult> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid);
+    
+    Long createNotebookEntry(Long sessionId, Integer userId, String entryText);
+    
+    NotebookEntry getEntry(Long sessionId, Integer userId);
+    
+    void updateEntry(NotebookEntry notebookEntry);
+    
+    Map<Long, Set<ReflectDTO>> getReflectList(Long contentId);
 
     /**
      * If success return next activity's url, otherwise return null.

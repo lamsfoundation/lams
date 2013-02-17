@@ -220,6 +220,29 @@
 				<br><br><br><br><br>
 			</c:forEach>
 			</div>
+		
+		<%-- Display reflection entries --%>
+		<c:if test="${assessment.reflectOnActivity}">
+			<h3>
+				<fmt:message key="label.export.reflection" />
+			</h3>
+			
+			<c:forEach var="summary" items="${summaryList}">
+				<div style="padding-bottom: 5px; font-size: small;">
+					<B><fmt:message key="monitoring.label.group" /></B> ${summary.sessionName}
+				</div>			
+			
+				<c:set var="reflectDTOSet" value="${sessionMap.reflectList[summary.sessionId]}" />
+				<c:forEach var="reflectDTO" items="${reflectDTOSet}">
+					<h4>
+						${reflectDTO.fullName}
+					</h4>
+					<p>
+						<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
+					</p>
+				</c:forEach>
+			</c:forEach>
+		</c:if>
 	
 		</div>
 		<!--closes content-->

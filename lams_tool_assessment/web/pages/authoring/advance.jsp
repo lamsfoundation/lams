@@ -151,6 +151,17 @@
 	</label>
 </p>
 
+<p>
+	<html:checkbox property="assessment.reflectOnActivity" styleClass="noBorder" styleId="reflectOnActivity"/>
+	<label for="reflectOnActivity">
+		<fmt:message key="advanced.reflectOnActivity" />
+	</label>
+</p>
+
+<p>
+	<html:textarea property="assessment.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
+</p>
+
 <!-- Overall feedback -->
 <input type="hidden" name="overallFeedbackList" id="overallFeedbackList" />
 <p>
@@ -159,3 +170,23 @@
 		style="width:650px;height:100px;border:0px;display:block;" frameborder="no" scrolling="no" src="<c:url value='/authoring/initOverallFeedback.do'/>?sessionMapID=${formBean.sessionMapID}">
 	</iframe>
 </p>
+
+<script type="text/javascript">
+	<!--
+	//automatically turn on refect option if there are text input in refect instruction area
+		var ra = document.getElementById("reflectInstructions");
+		var rao = document.getElementById("reflectOnActivity");
+		function turnOnRefect(){
+			if(isEmpty(ra.value)){
+			//turn off	
+				rao.checked = false;
+			}else{
+			//turn on
+				rao.checked = true;		
+			}
+		}
+	
+		ra.onkeyup=turnOnRefect;
+	//-->
+</script>
+

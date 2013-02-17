@@ -202,6 +202,8 @@ public class AssessmentConstants {
     
     public static final String ATTR_FINISHED_LOCK = "finishedLock";
     
+    public static final String ATTR_USER_FINISHED = "userFinished";
+    
     public static final String ATTR_USER = "user";
     
     public static final String ATTR_QUESTION_NUMBERING_OFFSET = "questionNumberingOffset";
@@ -211,6 +213,14 @@ public class AssessmentConstants {
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
     
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
+    
+    public static final String ATTR_REFLECTION_ON = "reflectOn";
+
+    public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
+
+    public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
+
+    public static final String ATTR_REFLECT_LIST = "reflectList";
 
     // error message keys
     public static final String ERROR_MSG_QUESTION_NAME_BLANK = "error.question.name.blank";

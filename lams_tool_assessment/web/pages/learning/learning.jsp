@@ -98,6 +98,9 @@
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
 		}
+		function continueReflect(){
+			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
+		}
 		function nextPage(pageNumber){
 			var secondsLeft = 0;
 			if (${not finishedLock && assessment.timeLimit > 0}) {
@@ -194,6 +197,34 @@
 		<c:if test="${finishedLock && assessment.displaySummary}">
 			<%@ include file="parts/allquestions.jsp"%>
 		</c:if>
+		
+		<%-- Reflection entry --%>
+		<c:if test="${sessionMap.reflectOn && sessionMap.userFinished && finishedLock}">
+			<div class="small-space-top">
+				<h2>
+					${sessionMap.reflectInstructions}
+				</h2>
+
+				<c:choose>
+					<c:when test="${empty sessionMap.reflectEntry}">
+						<p>
+							<em> <fmt:message key="message.no.reflection.available" />	</em>
+						</p>
+					</c:when>
+					<c:otherwise>
+						<p>
+							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
+						</p>
+					</c:otherwise>
+				</c:choose>
+
+				<c:if test="${mode != 'teacher'}">
+					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
+						<fmt:message key="label.edit" />
+					</html:button>
+				</c:if>
+			</div>
+		</c:if>
 
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-right">
@@ -209,10 +240,22 @@
 								<fmt:message key="label.learning.resubmit" />
 							</html:link>						
 						</c:if>	
-						<c:if test="${! isUserFailed}">				
-							<html:link href="#nogo" property="FinishButton" onclick="return finishSession()" styleClass="button">
-								<span class="nextActivity"><fmt:message key="label.learning.next.activity" /></span>
-							</html:link>
+						
+						<c:if test="${! isUserFailed}">
+						
+							<c:choose>
+								<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
+									<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
+										<fmt:message key="label.continue" />
+									</html:button>
+								</c:when>
+								<c:otherwise>
+									<html:link href="#nogo" property="FinishButton" onclick="return finishSession()" styleClass="button">
+										<span class="nextActivity"><fmt:message key="label.learning.next.activity" /></span>
+									</html:link>
+								</c:otherwise>
+							</c:choose>
+
 						</c:if>
 					</c:otherwise>
 				</c:choose>

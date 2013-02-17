@@ -92,6 +92,10 @@ public class Assessment implements Cloneable {
     private boolean contentInUse;
 
     private boolean notifyTeachersOnAttemptCompletion;
+    
+    private boolean reflectOnActivity;
+
+    private String reflectInstructions;
 
     // instructions
     private String onlineInstructions;
@@ -749,5 +753,29 @@ public class Assessment implements Cloneable {
 
     public void setNotifyTeachersOnAttemptCompletion(boolean notifyTeachersOnAttemptCompletion) {
 	this.notifyTeachersOnAttemptCompletion = notifyTeachersOnAttemptCompletion;
+    }
+    
+    /**
+     * @hibernate.property column="reflect_instructions"
+     * @return
+     */
+    public String getReflectInstructions() {
+	return reflectInstructions;
+    }
+
+    public void setReflectInstructions(String reflectInstructions) {
+	this.reflectInstructions = reflectInstructions;
+    }
+
+    /**
+     * @hibernate.property column="reflect_on_activity"
+     * @return
+     */
+    public boolean isReflectOnActivity() {
+	return reflectOnActivity;
+    }
+
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity;
     }
 }

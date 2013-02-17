@@ -28,10 +28,12 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -58,6 +60,8 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -74,6 +78,7 @@ import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
+import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.Summary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
@@ -91,6 +96,7 @@ import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentQuestionResultComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
+import org.lamsfoundation.lams.tool.assessment.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
@@ -210,6 +216,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
     }
 
+    @Override
     public Assessment getAssessmentByContentId(Long contentId) {
 	Assessment rs = assessmentDao.getByContentId(contentId);
 	if (rs == null) {
@@ -218,6 +225,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return rs;
     }
 
+    @Override
     public Assessment getDefaultContent(Long contentId) throws AssessmentApplicationException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
@@ -232,10 +240,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return content;
     }
 
+    @Override
     public List getAuthoredQuestions(Long assessmentUid) {
 	return assessmentQuestionDao.getAuthoringQuestions(assessmentUid);
     }
 
+    @Override
     public AssessmentAttachment uploadInstructionFile(FormFile uploadFile, String fileType)
 	    throws UploadAssessmentFileException {
 	if (uploadFile == null || StringUtils.isEmpty(uploadFile.getFileName())) {
@@ -256,18 +266,22 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return file;
     }
 
+    @Override
     public void createUser(AssessmentUser assessmentUser) {
 	assessmentUserDao.saveObject(assessmentUser);
     }
 
+    @Override
     public AssessmentUser getUserByIDAndContent(Long userId, Long contentId) {
 	return assessmentUserDao.getUserByUserIDAndContentID(userId, contentId);
     }
 
+    @Override
     public AssessmentUser getUserByIDAndSession(Long userId, Long sessionId) {
 	return assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
     }
 
+    @Override
     public void deleteFromRepository(Long fileUuid, Long fileVersionId) throws AssessmentApplicationException {
 	ITicket ticket = getRepositoryLoginTicket();
 	try {
@@ -278,27 +292,27 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
     }
 
+    @Override
     public void saveOrUpdateAssessment(Assessment assessment) {
 	assessmentDao.saveObject(assessment);
     }
 
+    @Override
     public void deleteAssessmentAttachment(Long attachmentUid) {
 	assessmentAttachmentDao.removeObject(AssessmentAttachment.class, attachmentUid);
-
     }
 
-    public void saveOrUpdateAssessmentQuestion(AssessmentQuestion question) {
-	assessmentQuestionDao.saveObject(question);
-    }
-
+    @Override
     public void deleteAssessmentQuestion(Long uid) {
 	assessmentQuestionDao.removeObject(AssessmentQuestion.class, uid);
     }
     
+    @Override
     public void deleteQuestionReference(Long uid) {
 	assessmentQuestionDao.removeObject(QuestionReference.class, uid);
     }
 
+    @Override
     public List<AssessmentQuestion> getAssessmentQuestionsBySessionId(Long sessionId) {
 	AssessmentSession session = assessmentSessionDao.getSessionBySessionId(sessionId);
 	if (session == null) {
@@ -316,6 +330,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return questions;
     }
 
+    @Override
     public Assessment getAssessmentBySessionId(Long sessionId) {
 	AssessmentSession session = assessmentSessionDao.getSessionBySessionId(sessionId);
 	// to skip CGLib problem
@@ -324,14 +339,17 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return res;
     }
 
+    @Override
     public AssessmentSession getAssessmentSessionBySessionId(Long sessionId) {
 	return assessmentSessionDao.getSessionBySessionId(sessionId);
     }
 
+    @Override
     public void saveOrUpdateAssessmentSession(AssessmentSession resSession) {
 	assessmentSessionDao.saveObject(resSession);
     }
 
+    @Override
     public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) {
 	AssessmentResult result = new AssessmentResult();
 	result.setAssessment(assessment);
@@ -341,6 +359,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	assessmentResultDao.saveObject(result);
     }
 
+    @Override
     public void processUserAnswers(Long assessmentUid, Long userId,
 	    ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions) {
 	SortedSet<AssessmentQuestionResult> questionResultList = new TreeSet<AssessmentQuestionResult>(
@@ -499,23 +518,79 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return questionResult;
     }
 
+    @Override
     public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastAssessmentResult(assessmentUid, userId);
     }
 
+    @Override
     public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastFinishedAssessmentResult(assessmentUid, userId);
     }
 
+    @Override
     public int getAssessmentResultCount(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getAssessmentResultCount(assessmentUid, userId);
     }
 
+    @Override
     public List<AssessmentQuestionResult> getAssessmentQuestionResultList(Long assessmentUid, Long userId,
 	    Long questionUid) {
 	return assessmentQuestionResultDao.getAssessmentQuestionResultList(assessmentUid, userId, questionUid);
     }
+    
+    @Override
+    public Long createNotebookEntry(Long sessionId, Integer userId, String entryText) {
+	return coreNotebookService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		AssessmentConstants.TOOL_SIGNATURE, userId, "", entryText);
+    }
 
+    @Override
+    public NotebookEntry getEntry(Long sessionId, Integer userId) {
+	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		AssessmentConstants.TOOL_SIGNATURE, userId);
+	if (list == null || list.isEmpty()) {
+	    return null;
+	} else {
+	    return list.get(0);
+	}
+    }
+
+    @Override
+    public void updateEntry(NotebookEntry notebookEntry) {
+	coreNotebookService.updateEntry(notebookEntry);
+    }
+    
+    @Override
+    public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId) {
+	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
+
+	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
+	for (AssessmentSession session : sessionList) {
+	    Long sessionId = session.getSessionId();
+	    boolean hasRefection = session.getAssessment().isReflectOnActivity();
+	    Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
+	    // get all users in this session
+	    List<AssessmentUser> users = assessmentUserDao.getBySessionID(sessionId);
+	    for (AssessmentUser user : users) {
+		ReflectDTO ref = new ReflectDTO(user);
+
+		NotebookEntry entry = getEntry(sessionId, user.getUserId().intValue());
+		if (entry != null) {
+		    ref.setReflect(entry.getEntry());
+		}
+
+		ref.setHasRefection(hasRefection);
+		list.add(ref);
+	    }
+	    map.put(sessionId, list);
+	}
+
+	return map;
+    }
+
+
+    @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws AssessmentApplicationException {
 	AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(true);
@@ -532,10 +607,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return nextUrl;
     }
 
+    @Override
     public AssessmentQuestion getAssessmentQuestionByUid(Long questionUid) {
 	return assessmentQuestionDao.getByUid(questionUid);
     }
 
+    @Override
     public List<Summary> getSummaryList(Long contentId) {
 	List<Summary> summaryList = new ArrayList<Summary>();
 
@@ -570,6 +647,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return summaryList;
     }
 
+    @Override
     public AssessmentResult getUserMasterDetail(Long sessionId, Long userId) {
 	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId,
 		userId);
@@ -583,6 +661,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return lastFinishedResult;
     }
 
+    @Override
     public UserSummary getUserSummary(Long contentId, Long userId, Long sessionId) {
 	UserSummary userSummary = new UserSummary();
 	AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, sessionId);
@@ -631,6 +710,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return userSummary;
     }
 
+    @Override
     public QuestionSummary getQuestionSummary(Long contentId, Long questionUid) {
 	QuestionSummary questionSummary = new QuestionSummary();
 	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
@@ -688,6 +768,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	return questionSummary;
     }
 
+    @Override
     public void changeQuestionResultMark(Long questionResultUid, float newMark) {
 	AssessmentQuestionResult questionResult = assessmentQuestionResultDao
 		.getAssessmentQuestionResultByUid(questionResultUid);
@@ -700,6 +781,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	assessmentResultDao.saveObject(result);
     }
 
+    @Override
     public AssessmentUser getUser(Long uid) {
 	return (AssessmentUser) assessmentUserDao.getObject(AssessmentUser.class, uid);
     }
