@@ -97,6 +97,20 @@
 				    		jQuery("#"+subgrid_table_id).clearGridData();
 				    		info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
 				    	 },
+				    	 formatCell: function(rowid, cellname,value, iRow, iCol) {
+					    	 if (cellname == "mark") {
+					    	 		
+					    	 	var rowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
+					    	 	var string = removeHTMLTags(rowData["mark"]);
+					    	 		
+					    	 	if (string.indexOf("-") != -1){
+					    	 		string = " ";
+					    	 	}
+					    	 		
+					    	 	return string;
+					    	 		
+					    	 }
+					     },
 					     afterSaveCell: function(rowid, cellname,value, iRow, iCol) {
 					     	
 					     	// update the lesson average mark
@@ -231,7 +245,7 @@
 								{name:'averageTimeTaken',index:'averageTimeTaken', sortable:true, hidden:true, editable:false, search:false, width:80, align:"center"},
 								{name:'timeTaken',index:'timeTaken', sortable:true, editable:false, hidden:true, search:false, width:80, align:"center"},
 								{name:'averageMark',index:'averageMark', sortable:true, editable:false, hidden:true, search:false, width:50, align:"center"},
-								{name:'mark',index:'mark', sortable:true, editable:true, search:false, width:60, align:"center"}
+								{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:60, align:"center"}
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
