@@ -31,7 +31,7 @@
 		</script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/assessmentoption.js'/>"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.validate.js'/>"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.pack.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
   	    <script><!--
 			$(document).ready(function(){
