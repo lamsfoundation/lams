@@ -386,7 +386,18 @@ public class GradebookAction extends LamsDispatchAction {
     	    HttpServletResponse response) throws Exception {
 	initServices();
 
-    	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	String rowID = WebUtil.readStrParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	
+	Long activityID = null;
+	
+	// Splitting the rowID param to get the activity/group id pair
+	String[] split = rowID.split("_");
+	if (split.length == 2) {
+	    activityID = Long.parseLong(split[0]);
+	} else {
+	    activityID = Long.parseLong(rowID);
+	}
+	
     	Activity activity = gradebookService.getActivityById(activityID);
     	
     	if (activity != null) {
