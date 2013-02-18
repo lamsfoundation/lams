@@ -389,11 +389,13 @@ public class GradebookAction extends LamsDispatchAction {
 	String rowID = WebUtil.readStrParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	
 	Long activityID = null;
+	Long groupID = null;
 	
 	// Splitting the rowID param to get the activity/group id pair
 	String[] split = rowID.split("_");
 	if (split.length == 2) {
 	    activityID = Long.parseLong(split[0]);
+	    groupID = Long.parseLong(split[1]);
 	} else {
 	    activityID = Long.parseLong(rowID);
 	}
@@ -401,8 +403,7 @@ public class GradebookAction extends LamsDispatchAction {
     	Activity activity = gradebookService.getActivityById(activityID);
     	
     	if (activity != null) {
-    	    Double averageMark = gradebookService.getAverageMarkForActivity(activityID);
-
+    	    Double averageMark = gradebookService.getAverageMarkForActivity(activityID, groupID);
     	    
     	    if (averageMark != null) {
     		writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, averageMark.toString());

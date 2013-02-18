@@ -157,12 +157,14 @@ public interface IGradebookService {
     GradebookUserActivity getGradebookUserActivity(Long activityID, Integer userID);
     
     /**
-     * Returns the average mark for a given activity
+     * Returns the average mark for a given activity. Activity can be grouped - then supply according groupId to receive
+     * AverageMarkForGroupedActivity.
      * 
      * @param activityID
+     * @param groupID return AverageMarkForActivity if groupId is null and AverageMarkForGroupedActivity if groupId is specified
      * @return
      */
-    Double getAverageMarkForActivity(Long activityID);
+    Double getAverageMarkForActivity(Long activityID, Long groupID);
     
     /**
      * Returns the average mark for a lesson

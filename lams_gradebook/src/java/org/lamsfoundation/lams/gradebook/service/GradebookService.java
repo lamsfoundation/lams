@@ -335,8 +335,15 @@ public class GradebookService implements IGradebookService {
 	return gradebookDAO.getGradebookUserDataForActivity(activityID, userID);
     }
 
-    public Double getAverageMarkForActivity(Long activityID) {
-	return gradebookDAO.getAverageMarkForActivity(activityID);
+    public Double getAverageMarkForActivity(Long activityID, Long groupID) {
+	//return AverageMarkForActivity if groupId is null and AverageMarkForGroupedActivity if groupId is specified
+	Double averageMark;
+	if (groupID == null) {
+	    averageMark = gradebookDAO.getAverageMarkForActivity(activityID);
+	} else {
+	    averageMark = gradebookDAO.getAverageMarkForGroupedActivity(activityID, groupID);
+	}
+	return averageMark;
     }
 
     public Double getAverageMarkForLesson(Long lessonID) {
