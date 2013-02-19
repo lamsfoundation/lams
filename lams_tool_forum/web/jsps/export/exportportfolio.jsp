@@ -14,17 +14,16 @@
 
 <lams:head>
 	<lams:css localLinkPath="../"/>
-	<link rel="stylesheet" href="./css/jRating.jquery.css"  type="text/css" />
-	<link rel="stylesheet" href="./css/ratingStars.css"  type="text/css" />
+	<link rel="stylesheet" href="./css/jquery.jRating.css"  type="text/css" />
 
 	<script type="text/javascript"> 
-		var pathToImageFolder = "./images/"; 
+		var pathToImageFolder = "./images/css/";
 	</script>
 	<script type="text/javascript" src="./javascript/jquery.js"></script>
-	<script type="text/javascript" src="./javascript/jRating.jquery.js"></script>
+	<script type="text/javascript" src="./javascript/jquery.jRating.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
 	  	$(document).ready(function(){
-		    $(".ratingStarsDisabled").jRating({
+		    $(".rating-stars-disabled").jRating({
 		    	rateMax : 5,
 		    	isDisabled : true
 			});		    

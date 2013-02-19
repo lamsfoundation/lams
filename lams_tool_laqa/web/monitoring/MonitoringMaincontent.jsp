@@ -59,10 +59,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
-	<link rel="stylesheet" href="<html:rewrite page='/includes/css/jRating.jquery.css'/>"  type="text/css" />
-	<link rel="stylesheet" href="<html:rewrite page='/includes/css/ratingStars.css'/>"  type="text/css" />
+	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 	<style media="screen,projection" type="text/css">
-		.ratingStarsDiv {padding-right: 15px;}
+		.rating-stars-div {padding-right: 15px;}
 	</style>
 	
 	<!-- ********************  javascript ********************** -->
@@ -78,7 +77,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
 		};	
 	
-		var pathToImageFolder = "<html:rewrite page='/images/'/>"; 
+		//var for jquery.jRating.js
+		var pathToImageFolder = "${lams}images/css/";
 	</script>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
@@ -87,13 +87,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jRating.jquery.js'/>"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script language="JavaScript" type="text/JavaScript">
 	
 	  	$(document).ready(function(){
-		    $(".ratingStarsDisabled").jRating({
+		    $(".rating-stars-disabled").jRating({
 		    	rateMax : 5,
 		    	isDisabled : true
 			});

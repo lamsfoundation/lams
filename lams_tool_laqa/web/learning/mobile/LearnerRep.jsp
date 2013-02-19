@@ -18,18 +18,18 @@
 
 	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
-	<link rel="stylesheet" href="<html:rewrite page='/includes/css/jRating.jquery.css'/>"  type="text/css" />
-	<link rel="stylesheet" href="<html:rewrite page='/includes/css/ratingStars.css'/>"  type="text/css" />
+	<link rel="stylesheet" href="${lams}css/jquery.jRating.css" />
 
 	<script type="text/javascript"> 
-		var pathToImageFolder = "<html:rewrite page='/images/'/>"; 
+		//var for jquery.jRating.js
+		var pathToImageFolder = "${lams}images/css/";
 	</script>
-	<script src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jRating.jquery.js'/>"></script>
-	<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
-	<script language="JavaScript" type="text/JavaScript">
+	<script src="${lams}includes/javascript/jquery.js" type="text/javascript" ></script>
+	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript" ></script>
+	<script src="${lams}includes/javascript/jquery.mobile.js" type="text/javascript" ></script>	
+	<script type="text/javascript">
 	  	$(document).bind('pageinit', function(){
-		    $(".ratingStars").jRating({
+		    $(".rating-stars").jRating({
 		    	phpPath : "<c:url value='/learning.do'/>?method=rateResponse&toolSessionID=" + $("#toolSessionID").val(),
 		    	rateMax : 5,
 		    	decimalLength : 1,
@@ -41,7 +41,7 @@
 			    	jError('Error : please retry');
 			  	}
 			});
-		    $(".ratingStarsDisabled").jRating({
+		    $(".rating-stars-disabled").jRating({
 		    	rateMax : 5,
 		    	isDisabled : true
 		    });

@@ -1,10 +1,19 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="messageId" value="${msgDto.message.uid}"/>
+<c:choose>
+	<c:when test='${(sessionMap.mode == "teacher") || msgDto.isAuthor || sessionMap.finishedLock}'>
+		<c:set var="ratingStarsClass" value="rating-stars-disabled"/>
+	</c:when>
+	<c:otherwise>
+		<c:set var="ratingStarsClass" value="rating-stars"/>
+	</c:otherwise>
+</c:choose>
 
 <c:if test="${sessionMap.allowRateMessages}">
-	<div class="ratingStarsDiv">
-		<div class="ratingStarsDisabled" data="${msgDto.averageRating}_${messageId}"></div>
-		<div class="ratingStarsCaption">
+	<div class="rating-stars-div" style="float: left;">
+		<div class="${ratingStarsClass}" data-average="${msgDto.averageRating}" data-id="${messageId}"></div>
+		
+		<div class="rating-stars-caption">
 		
 			<fmt:message key="label.learning.number.of.votes" >
 				<fmt:param>
@@ -16,6 +25,7 @@
 					<span id="numberOfVotes${messageId}">${msgDto.numberOfVotes}</span>
 				</fmt:param>
 			</fmt:message>
+			
 		</div>
 	</div>
 </c:if>

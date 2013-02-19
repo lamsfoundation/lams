@@ -80,38 +80,27 @@ public class QaBundler extends Bundler {
 	}
 	this.createDirectories(directories);
 
-	String[] imageNames = new String[] { "bg_jRatingInfos.png", "small.png", "stars.png" };
+	String[] imageNames = new String[] { "jquery.jRating-background.png", "jquery.jRating-stars.png", "jquery.jRating-small.png" };
 	for (String imageName : imageNames) {
-	    String urlToConnectTo = getToolFolder() + "images" + URL_SEPARATOR + imageName;
+	    String urlToConnectTo = getServerUrl() + "images" + URL_SEPARATOR + "css" + URL_SEPARATOR + imageName;
 	    String directoryToStoreFile = outputDirectory + File. separator + "images";
 	    HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, imageName, cookies);// cookies aren't really needed here.
 	}
-	
-	final String includesFolder = getToolFolder() + "includes" + URL_SEPARATOR;
 	
 	// JS files
 	String urlToConnectTo = getServerUrl() + "includes" + URL_SEPARATOR + "javascript" + URL_SEPARATOR + "jquery.js";
 	String directoryToStoreFile = outputDirectory + File.separator + "javascript";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.js", cookies); 
 	
-	urlToConnectTo = includesFolder + "javascript" + URL_SEPARATOR + "jRating.jquery.js";
+	urlToConnectTo = getServerUrl() + "includes" + URL_SEPARATOR + "javascript" + URL_SEPARATOR + "jquery.jRating.js";
 	directoryToStoreFile = outputDirectory + File.separator + "javascript";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jRating.jquery.js", cookies); 
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.jRating.js", cookies); 
 
 	//CSS files
-	urlToConnectTo = includesFolder + "css" + URL_SEPARATOR + "jRating.jquery.css";
+	urlToConnectTo = getServerUrl() + "css" + URL_SEPARATOR + "jquery.jRating.css";
 	directoryToStoreFile = outputDirectory + File.separator + "css";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jRating.jquery.css", cookies); 
-	
-	urlToConnectTo = includesFolder + "css" + URL_SEPARATOR + "ratingStars.css";
-	directoryToStoreFile = outputDirectory + File.separator + "css";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "ratingStars.css", cookies); 
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.jRating.css", cookies); 
 
-    }
-    
-    private String getToolFolder() {
-	String toolFolder = getServerUrl() + "tool" + URL_SEPARATOR + QaAppConstants.MY_SIGNATURE + URL_SEPARATOR;
-	return toolFolder;
     }
 
     private String getServerUrl() {

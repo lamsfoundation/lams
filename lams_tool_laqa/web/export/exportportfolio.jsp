@@ -28,20 +28,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><fmt:message key="label.exportPortfolio" />
 	</title>
 	<lams:css localLinkPath="../" />
-	<link rel="stylesheet" href="./css/jRating.jquery.css"  type="text/css" />
-	<link rel="stylesheet" href="./css/ratingStars.css"  type="text/css" />
+	<link rel="stylesheet" href="./css/jquery.jRating.css"  type="text/css" />
 	<style media="screen,projection" type="text/css">
-		.ratingStarsDiv {padding-top: 24px; padding-bottom: 2px;}
+		.rating-stars-div {padding-top: 24px; padding-bottom: 2px;}
 	</style>
 
 	<script type="text/javascript"> 
-		var pathToImageFolder = "./images/"; 
+		var pathToImageFolder = "./images/css/";
 	</script>
 	<script type="text/javascript" src="./javascript/jquery.js"></script>
-	<script type="text/javascript" src="./javascript/jRating.jquery.js"></script>
-	<script language="JavaScript" type="text/JavaScript">
+	<script type="text/javascript" src="./javascript/jquery.jRating.js"></script>
+	<script type="text/javascript">
 	  	$(document).ready(function(){
-		    $(".ratingStarsDisabled").jRating({
+		    $(".rating-stars-disabled").jRating({
 		    	rateMax : 5,
 		    	isDisabled : true
 			});		    

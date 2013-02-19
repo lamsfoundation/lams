@@ -24,23 +24,23 @@
 				<lams:css />
 			</c:otherwise>
 		</c:choose>
-		<link rel="stylesheet" href="<html:rewrite page='/includes/css/jRating.jquery.css'/>"  type="text/css" />
-		<link rel="stylesheet" href="<html:rewrite page='/includes/css/ratingStars.css'/>"  type="text/css" />
+		<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 		
 		<!-- ********************  javascript ********************** -->
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 		
 		<script type="text/javascript">
-			var pathToImageFolder = "<html:rewrite page='/images/'/>"; 
 			var removeItemAttachmentUrl = "<html:rewrite page="/learning/deleteAttachment.do" />";
+			//var for jquery.jRating.js
+			var pathToImageFolder = "${lams}images/css/";
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jRating.jquery.js'/>"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
-				$(".ratingStars").jRating({
+				$(".rating-stars").jRating({
 				    phpPath : "<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}",
 				    rateMax : 5,
 				    decimalLength : 1,
@@ -52,7 +52,7 @@
 					    jError('Error : please retry');
 					}
 				});
-			    $(".ratingStarsDisabled").jRating({
+			    $(".rating-stars-disabled").jRating({
 			    	rateMax : 5,
 			    	isDisabled : true
 				});

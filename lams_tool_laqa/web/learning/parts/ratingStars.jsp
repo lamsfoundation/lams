@@ -1,9 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:if test="${generalLearnerFlowDTO.allowRateAnswers == 'true'}">
-	<div class="ratingStarsDiv">
-		<div class="ratingStars" data="${userData.averageRating}_${responseUid}"></div>
-		<div class="ratingStarsCaption">
+	<div class="rating-stars-div">
+		<div class="rating-stars" data-average="${userData.averageRating}" data-id="${responseUid}"></div>
+		<div class="rating-stars-caption">
 		
 			<fmt:message key="label.learning.number.of.votes" >
 				<fmt:param>
@@ -18,5 +18,5 @@
 		</div>
 	</div>
 	
-	<div class="afterRatingStarsDiv"></div>
+	<div style="clear: both;"></div>
 </c:if>

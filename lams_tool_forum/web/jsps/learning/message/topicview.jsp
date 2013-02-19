@@ -99,14 +99,7 @@
 				<td>
 					<div class="right-buttons">
 						<!--  Rating stars -->
-						<c:choose>
-							<c:when test='${(sessionMap.mode == "teacher") || msgDto.isAuthor || sessionMap.finishedLock}'>
-								<%@ include file="/jsps/learning/rating/ratingStarsDisabled.jsp"%>
-							</c:when>
-							<c:otherwise>
-								<%@ include file="/jsps/learning/rating/ratingStars.jsp"%>
-							</c:otherwise>
-						</c:choose>
+						<%@ include file="/jsps/learning/ratingStars.jsp"%>
 					
 						<!--  Hide/Unhide Button -->
 						<c:if test='${sessionMap.mode == "teacher"}'>

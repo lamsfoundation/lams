@@ -18,8 +18,7 @@
 	<lams:head>
 		<title><fmt:message key="activity.title" /></title>
 		
-		<link rel="stylesheet" href="<html:rewrite page='/includes/css/jRating.jquery.css'/>"  type="text/css" />
-		<link rel="stylesheet" href="<html:rewrite page='/includes/css/ratingStars.css'/>"  type="text/css" />
+		<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 		<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 
 		<!-- ********************  javascript from header.jsp ********************** -->
@@ -35,16 +34,17 @@
 		
 		<script type="text/javascript">
 			var removeItemAttachmentUrl = "<html:rewrite page="/learning/deleteAttachment.do" />";
-			var pathToImageFolder = "<html:rewrite page='/images/'/>"; 
+			//var for jquery.jRating.js
+			var pathToImageFolder = "${lams}images/css/"; 
 		</script>		
 		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>	
 		<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
 		<script src="${lams}includes/javascript/jquery.js"></script>
 		<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jRating.jquery.js'/>"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
-				$(".ratingStars").jRating({
+				$(".rating-stars").jRating({
 				    phpPath : "<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}",
 				    rateMax : 5,
 				    decimalLength : 1,
@@ -56,7 +56,7 @@
 					    jError('Error : please retry');
 					}
 				});
-			    $(".ratingStarsDisabled").jRating({
+			    $(".rating-stars-disabled").jRating({
 			    	rateMax : 5,
 			    	isDisabled : true
 				});

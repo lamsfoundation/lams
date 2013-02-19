@@ -1,8 +1,8 @@
 /************************************************************************
 *************************************************************************
 @Name :       	jRating - jQuery Plugin
-@Revison :    	2.3
-@Date : 		07/09/2012
+@Revison :    	3.0
+@Date : 		28/01/2013 
 @Author:     	 ALPIXEL - (www.myjqueryplugins.com - www.alpixel.fr) 
 @License :		 Open Source - MIT License : http://www.opensource.org/licenses/mit-license.php
  
@@ -26,6 +26,7 @@
 			step:false, // if true,  mouseover binded star by star,
 			isDisabled:false,
 			showRateInfo: true,
+			canRateAgain : false,
 
 			/** Integer vars **/
 			length:5, // number of star to display
@@ -33,6 +34,7 @@
 			rateMax : 20, // maximal rate - integer from 0 to 9999 (or more)
 			rateInfosX : -45, // relative position in X axis of the info box when mouseover
 			rateInfosY : 5, // relative position in Y axis of the info box when mouseover
+			nbRates : 1,
 
 			/** Functions **/
 			onSuccess : null,
@@ -41,11 +43,15 @@
 
 		if(this.length>0)
 		return this.each(function() {
+			/*vars*/
 			var opts = $.extend(defaults, op),    
 			newWidth = 0,
 			starWidth = 0,
 			starHeight = 0,
-			bgPath = '';
+			bgPath = '',
+			hasRated = false,
+			globalWidth = 0,
+			nbOfRates = opts.nbRates;
 
 			if($(this).hasClass('jDisabled') || opts.isDisabled)
 				var jDisabled = true;
@@ -55,8 +61,8 @@
 			getStarWidth();
 			$(this).height(starHeight);
 
-			var average = parseFloat($(this).attr('id').split('_')[0]),
-			idBox = parseInt($(this).attr('id').split('_')[1]), // get the id of the box
+			var average = parseFloat($(this).attr('data-average')), // get the average of all rates
+			idBox = parseInt($(this).attr('data-id')), // get the id of the box
 			widthRatingContainer = starWidth*opts.length, // Width of the Container
 			widthColor = average/opts.rateMax*widthRatingContainer, // Width of the color Container
 
@@ -115,7 +121,8 @@
 				},
 				mouseout : function(){
 					$(this).css('cursor','default');
-					average.width(0);
+					if(hasRated) average.width(globalWidth);
+					else average.width(0);
 				},
 				mousemove : function(e){
 					var realOffsetLeft = findRealLeft(this);
@@ -135,7 +142,14 @@
 				},
 				click : function(e){
                     var element = this;
-					$(this).unbind().css('cursor','default').addClass('jDisabled');
+					
+					/*set vars*/
+					hasRated = true;
+					globalWidth = newWidth;
+					nbOfRates--;
+					
+					if(!opts.canRateAgain || parseInt(nbOfRates) <= 0) $(this).unbind().css('cursor','default').addClass('jDisabled');
+					
 					if (opts.showRateInfo) $("p.jRatingInfos").fadeOut('fast',function(){$(this).remove();});
 					e.preventDefault();
 					var rate = getNote(newWidth);
