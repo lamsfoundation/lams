@@ -87,7 +87,13 @@ public class QuestionParser {
 	    } else {
 		// extract from every XML file; usually there is just one
 		for (File resourceFile : resourceFiles) {
-		    Question[] fileQuestions = QuestionParser.parseQTIFile(resourceFile, limitType);
+		    FileInputStream xmlFileStream = new FileInputStream(resourceFile);
+		    Question[] fileQuestions = null;
+		    try {
+			fileQuestions = QuestionParser.parseQTIFile(xmlFileStream, limitType);
+		    } finally {
+			xmlFileStream.close();
+		    }
 		    if (fileQuestions != null) {
 			Collections.addAll(result, fileQuestions);
 		    }
@@ -95,6 +101,7 @@ public class QuestionParser {
 	    }
 	} finally {
 	    // clean up
+	    packageFileStream.close();
 	    ZipFileUtil.deleteDirectory(tempPackageDirPath);
 	}
 
@@ -104,11 +111,11 @@ public class QuestionParser {
     /**
      * Extracts questions from IMS QTI xml file.
      */
-    public static Question[] parseQTIFile(File xmlFile, Set<String> limitType) throws ParserConfigurationException,
-	    SAXException, IOException {
+    public static Question[] parseQTIFile(InputStream xmlFileStream, Set<String> limitType)
+	    throws ParserConfigurationException, SAXException, IOException {
 	List<Question> result = new ArrayList<Question>();
 	DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-	Document doc = docBuilder.parse(xmlFile);
+	Document doc = docBuilder.parse(xmlFileStream);
 
 	NodeList questionItems = doc.getElementsByTagName("item");
 	// yes, a label here for convenience

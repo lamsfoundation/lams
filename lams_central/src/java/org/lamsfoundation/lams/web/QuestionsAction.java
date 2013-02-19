@@ -43,7 +43,8 @@ public class QuestionsAction extends Action {
 
 	String returnURL = null;
 	String limitTypeParam = null;
-	InputStream packageFileStream = null;
+	InputStream uploadedFileStream = null;
+	String packageName = null;
 	for (FileItem formField : formFields) {
 	    String fieldName = formField.getFieldName();
 	    if ("returnURL".equals(fieldName)) {
@@ -52,7 +53,8 @@ public class QuestionsAction extends Action {
 	    } else if ("limitType".equals(fieldName)) {
 		limitTypeParam = formField.getString();
 	    } else if ("file".equals(fieldName) && !StringUtils.isBlank(formField.getName())) {
-		packageFileStream = formField.getInputStream();
+		packageName = formField.getName().toLowerCase();
+		uploadedFileStream = formField.getInputStream();
 	    }
 	}
 
@@ -60,7 +62,7 @@ public class QuestionsAction extends Action {
 	request.setAttribute("limitType", limitTypeParam);
 
 	// user did not choose a file
-	if (packageFileStream == null) {
+	if ((uploadedFileStream == null) || !(packageName.endsWith(".zip") || packageName.endsWith(".xml"))) {
 	    ActionMessages errors = new ActionMessages();
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("label.questions.file.missing"));
 	    request.setAttribute(Globals.ERROR_KEY, errors);
@@ -74,7 +76,9 @@ public class QuestionsAction extends Action {
 	    Collections.addAll(limitType, limitTypeParam.split(","));
 	}
 
-	Question[] questions = QuestionParser.parseQTIPackage(packageFileStream, limitType);
+	Question[] questions = packageName.endsWith(".xml") ? QuestionParser
+		.parseQTIFile(uploadedFileStream, limitType) : QuestionParser.parseQTIPackage(uploadedFileStream,
+		limitType);
 	request.setAttribute("questions", questions);
 
 	return mapping.findForward("questionChoice");
