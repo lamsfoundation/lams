@@ -23,7 +23,7 @@
 	<script type="text/javascript" src="./javascript/jquery.jRating.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
 	  	$(document).ready(function(){
-		    $(".rating-stars-disabled").jRating({
+		    $(".rating-stars").jRating({
 		    	rateMax : 5,
 		    	isDisabled : true
 			});		    
@@ -136,7 +136,7 @@
 							<tr>
 								<td>
 									<div class="right-buttons">
-										<%@ include file="/jsps/learning/rating/ratingStarsDisabled.jsp"%>
+										<%@ include file="/jsps/learning/ratingStars.jsp"%>
 									</div>
 								</td>
 							</tr>
