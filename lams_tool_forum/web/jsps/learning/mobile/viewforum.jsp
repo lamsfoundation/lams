@@ -9,14 +9,10 @@
 	function finishForum() {
 		document.getElementById("finishForum").disabled = true;
 		location.href = '${finish}';
-	};
-		
-		//$("#refresh").click( function() {
-			//location.href = '${refresh}';
-		//});			
+	};			
 </script>
 
-<div data-role="page" data-cache="false">
+<div data-role="page" data-dom-cache="false">
 
 	<div data-role="header" data-theme="b">
 		<h1>
@@ -136,8 +132,8 @@
 
 	</div><!-- /content -->
 
-	<div data-role="footer" data-theme="b">
-		<div align="right" style="margin: 5px 13px;">
+	<div data-role="footer" data-theme="b" class="ui-bar">
+		<span class="ui-finishbtn-right">
 				<c:if test='${sessionMap.mode != "teacher"}'>
 					<c:choose>
 						<c:when
@@ -154,7 +150,7 @@
 						</c:otherwise>
 					</c:choose>
 				</c:if>
-		</div>
+		</span>
 	</div><!-- /footer -->
 </div><!-- /page -->
 

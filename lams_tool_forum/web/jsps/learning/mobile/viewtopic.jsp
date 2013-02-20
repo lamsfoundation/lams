@@ -20,30 +20,23 @@
 		
 		<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 		<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
+		<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
 
 		<!-- ********************  javascript from header.jsp ********************** -->
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 		<script type="text/javascript">
-			function closeAndRefreshParentMonitoringWindow() {
-				refreshParentMonitoringWindow();
-				window.close();
-			}  				
-		</script>
-		<!-- End of javascript from header.jsp -->
-		
-		<script type="text/javascript">
 			var removeItemAttachmentUrl = "<html:rewrite page="/learning/deleteAttachment.do" />";
 			//var for jquery.jRating.js
 			var pathToImageFolder = "${lams}images/css/"; 
+			window.close();
 		</script>		
-		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>	
-		<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
-		<script src="${lams}includes/javascript/jquery.js"></script>
-		<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+		<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
+		<script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
+		<script src="${lams}includes/javascript/jquery.mobile.js" type="text/javascript"></script>	
+		<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 		<script type="text/javascript">
-			$(document).ready(function(){
+			$(document).bind('pageinit', function(){
 				$(".rating-stars").jRating({
 				    phpPath : "<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}",
 				    rateMax : 5,
@@ -61,11 +54,6 @@
 			    	isDisabled : true
 				});
 			});
-		
-			function removeAtt(mapID){
-				removeItemAttachmentUrl =  removeItemAttachmentUrl + "?sessionMapID="+ mapID;
-				removeItemAttachment();
-			}
 			
 			function removeAtt(mapID){
 				removeItemAttachmentUrl =  removeItemAttachmentUrl + "?sessionMapID="+ mapID;
@@ -80,7 +68,7 @@
 		
 	</lams:head>
 	<body class="large-font">
-<div data-role="page" data-cache="false">
+<div data-role="page" data-dom-cache="false">
 
 	<div data-role="header" data-theme="b">
 		<a id="backToForum"	href="${backToForum}" data-role="button" data-icon="arrow-l">
@@ -145,7 +133,7 @@
 		</div>
 	</div>
 	
-	<div data-role="footer" data-theme="b" style="padding: 0px;">
+	<div data-role="footer" data-theme="b" class="ui-bar">
 		<a id="backToForumFooter"	href="${backToForum}" data-role="button" data-icon="arrow-l">
 			Back
 		</a>

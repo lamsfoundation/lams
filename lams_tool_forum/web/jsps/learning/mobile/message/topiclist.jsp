@@ -35,7 +35,7 @@
 					<c:set var="viewtopic">
 						<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}" />
 					</c:set>
-					<a href="${viewtopic}" >
+					<a href="${viewtopic}" data-ajax="false">
 						<c:choose>
 							<c:when test="${fn:length(topic.message.subject) > 14}">
 								${fn:substring(topic.message.subject, 0, 13)}...
