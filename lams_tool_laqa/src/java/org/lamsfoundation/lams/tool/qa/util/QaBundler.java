@@ -73,7 +73,7 @@ public class QaBundler extends Bundler {
      */
     private void bundleViaHTTP(HttpServletRequest request, Cookie[] cookies, String outputDirectory)
 	    throws MalformedURLException, FileNotFoundException, IOException {
-	String[] directoryNames = { "javascript", "images", "css" };
+	String[] directoryNames = { "javascript", "images" + File.separator + "css", "css" };
 	List<String> directories = new ArrayList<String>();
 	for (String directoryName : directoryNames) {
 	    directories.add(outputDirectory + File.separator + directoryName);
@@ -83,7 +83,7 @@ public class QaBundler extends Bundler {
 	String[] imageNames = new String[] { "jquery.jRating-background.png", "jquery.jRating-stars.png", "jquery.jRating-small.png" };
 	for (String imageName : imageNames) {
 	    String urlToConnectTo = getServerUrl() + "images" + URL_SEPARATOR + "css" + URL_SEPARATOR + imageName;
-	    String directoryToStoreFile = outputDirectory + File. separator + "images";
+	    String directoryToStoreFile = outputDirectory + File. separator + "images" + File.separator + "css";
 	    HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, imageName, cookies);// cookies aren't really needed here.
 	}
 	

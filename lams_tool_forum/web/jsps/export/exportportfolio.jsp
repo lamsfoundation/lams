@@ -23,7 +23,7 @@
 	<script type="text/javascript" src="./javascript/jquery.jRating.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
 	  	$(document).ready(function(){
-		    $(".rating-stars").jRating({
+		    $(".rating-stars-disabled, .rating-stars").jRating({
 		    	rateMax : 5,
 		    	isDisabled : true
 			});		    
