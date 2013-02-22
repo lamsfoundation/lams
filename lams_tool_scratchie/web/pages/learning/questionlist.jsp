@@ -14,7 +14,7 @@
 
 		<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 			<h3>${item.title}</h3>
-			<i>${item.description}</i>
+			<div>${item.description}</div>
 	
 			<table id="scratches" class="alternative-color">
 				<c:forEach var="answer" items="${item.answers}" varStatus="status">
