@@ -9,7 +9,7 @@
 </c:choose>
 
 <div class="rating-stars-div">
-	<div class="${ratingStarsClass}" id="${item.averageRatingDto.rating}_${item.uid}"></div>
+	<div class="${ratingStarsClass}" data-average="${item.averageRatingDto.rating}" data-id="${item.uid}"></div>
 	
 	<div class="rating-stars-caption">
 		

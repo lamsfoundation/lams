@@ -26,7 +26,7 @@
 	#player-wrap {clear: both; margin-bottom: 20px; background: black; position: absolute; top: 0; bottom: 0; left: 0; right: 0;}
 	#dummy {padding-top: 75%;} /* 4:3 aspect ratio. I.e. padding-top:75% gives the box of the dummy element a height that is 75% of the aforementioned width*/
 	#player-bottombar {width: 85%;}
-	.rating-stars-div {float: right; margin-bottom: 10px; min-height: 50px; padding-right: 10px;}
+	.rating-stars-div {margin-bottom: 10px; min-height: 50px; padding-right: 10px;}
 	.rating-stars-caption { text-align: left; padding-left: 20px; }
 	.rating-stars-disabled-small {padding: 5px 5px;}
 	#accordion { padding: 65px 0 20px;}
@@ -261,7 +261,7 @@
 								    <c:if test="${kaltura.allowRatings}">
 									    <span class="thumb-stat">
 									    	<span style="float: left;"><fmt:message key="label.rating" /></span>
-									        <div class="rating-stars-disabled-small" id="${previewItem.averageRatingDto.rating}_00${previewItem.uid}"></div>
+									        <div class="rating-stars-disabled-small" data-average="${previewItem.averageRatingDto.rating}" data-id="${previewItem.uid}"></div>
 										</span>
 									</c:if>
 								    

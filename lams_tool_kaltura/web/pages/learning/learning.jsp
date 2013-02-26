@@ -29,16 +29,16 @@
 	#player-block {  clear: both; position: absolute; top: 0; bottom: 0; left: 0; right: 0;}
 	#dummy {padding-top: 52%; /* aspect ratio */}
 	#player-wrap {width: 60%; height: 100%; clear: both; margin-bottom: 20px; background: black;}
-	#player-bottombar {width: 60%; margin-top: 15px;}
+	#player-bottombar {height:50px; width: 60%; margin-top: 15px; margin-bottom: 10px;}
 	
-	#comments-area { padding: 75px 0 20px; min-width: 431px; width: 60%;}
+	#comments-area { padding: 5px 0 20px; min-width: 431px; width: 60%;}
 	#comments-table {border-spacing: 3px; margin-top: 0; padding-right: 3px;}
 	#comment-textarea textarea {width: 99%;}
 	#comment-textarea input {margin-top: 2px;}
-	.rating-stars-div {float: right; margin-bottom: 10px; min-height: 50px; padding-right: 0;}
+	.rating-stars-div {min-height: 50px; padding-right: 0;}
 	.rating-stars-caption { text-align: left; padding-left: 30px; }
 	.rating-stars-disabled-small {padding: 2px 5px;}
-	#add-new-item {float: left; margin-top: 2px;}
+	#add-new-item {float: left; margin-top: 2px; margin-bottom: 20px;}
 	.comment-by {font-size: .9166em; color: #8E8E8E; margin-top: 3px;}
 	.comment-by-text {color: #8E8E8E;}
 	.item-hidden {background: #FFB3B3!important;}
@@ -67,12 +67,10 @@
 </script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jRating.js"></script>
-
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
 <script type="text/javascript" src="http://cdnbakmi.kaltura.com/html5/html5lib/v1.6.10.4/mwEmbedLoader.php"></script>
 
 <script type="text/javascript">
-	<!--
 	//Kaltura settings
 	//kaltura server 
 	var KALTURA_SERVER = "${KALTURA_SERVER}";
@@ -87,16 +85,6 @@
 	//ui_conf_id of Kaltura Dynamic Player(KDP)
 	var KDP_UI_CONF_ID = "${KDP_UI_CONF_ID}";
 
-	//enable HTML5 support
-	mw.setConfig("Kaltura.ServiceUrl" , KALTURA_SERVER );
-	mw.setConfig("Kaltura.CdnUrl" , KALTURA_SERVER );
-	mw.setConfig("Kaltura.ServiceBase", "/api_v3/index.php?service=");
-	mw.setConfig("EmbedPlayer.EnableIframeApi", true );
-	mw.setConfig("EmbedPlayer.UseFlashOnAndroid", false );
-	mw.setConfig("Kaltura.UseAppleAdaptive", false );
-	mw.setConfig("EmbedPlayer.AttributionButton", false );
-	mw.setConfig("EmbedPlayer.OverlayControls", false ); 
-	
 	var params = {
 		allowscriptaccess: "always",
 		allownetworking: "all",
@@ -221,7 +209,6 @@
 
 	});
 
-	-->
 </script>
 
 <div id="content">
@@ -305,7 +292,7 @@
 							    <c:if test="${kaltura.allowRatings}">
 								    <span class="thumb-stat">
 								    	<span class="float-left"><fmt:message key="label.rating" /></span>
-								        <div class="rating-stars-disabled-small" id="${previewItem.averageRatingDto.rating}_00${previewItem.uid}"></div>
+								        <div class="rating-stars-disabled-small" data-average="${previewItem.averageRatingDto.rating}" data-id="${previewItem.uid}"></div>
 									</span>
 								</c:if>
 							    
