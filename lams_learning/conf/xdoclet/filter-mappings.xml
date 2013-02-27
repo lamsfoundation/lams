@@ -1,3 +1,8 @@
+<filter-mapping>
+	<filter-name>UrlRewriteFilter</filter-name>
+	<url-pattern>/layout/supportMobileVersionLayout.jsp</url-pattern>
+	<dispatcher>FORWARD</dispatcher>
+</filter-mapping>
 
 <filter-mapping>
 	<filter-name>HibernateFilter</filter-name>
