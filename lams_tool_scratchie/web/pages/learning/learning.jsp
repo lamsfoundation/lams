@@ -78,7 +78,7 @@
 		}
 		
 		if (${!isUserLeader && mode != "teacher"}) {
-			setInterval("refreshQuestionList();",10000);// Auto-Refresh every 30 seconds
+			setInterval("refreshQuestionList();",3000);// Auto-Refresh every 3 seconds
 		}
 		
 		function refreshQuestionList() {
