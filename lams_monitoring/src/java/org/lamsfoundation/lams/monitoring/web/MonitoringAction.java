@@ -204,7 +204,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	String introDescription = introEnable ? request.getParameter("introDescription") : null;
 	boolean introImage = introEnable && WebUtil.readBooleanParam(request, "introImage", false);
 	boolean startMonitor = WebUtil.readBooleanParam(request, "startMonitor", false);
-	boolean enableLiveEdit = WebUtil.readBooleanParam(request, "enableLiveEdit", false);
+	boolean enableLiveEdit = WebUtil.readBooleanParam(request, "liveEditEnable", false);
 	boolean notificationsEnable = WebUtil.readBooleanParam(request, "notificationsEnable", false);
 	boolean portfolioEnable = WebUtil.readBooleanParam(request, "portfolioEnable", false);
 	boolean presenceEnable = WebUtil.readBooleanParam(request, "presenceEnable", false);
