@@ -691,6 +691,7 @@ public class AuthoringAction extends Action {
 	// big part of code was taken from saveItem() method
 	String sessionMapId = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapId);
+	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request.getQueryString());
@@ -704,14 +705,16 @@ public class AuthoringAction extends Action {
 	    }
 	    item.setOrderId(maxSeq);
 	    item.setTitle(question.getTitle());
-	    item.setDescription(question.getText());
+	    item.setDescription(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
+			question.getResourcesFolderPath()));
 
 	    TreeSet<ScratchieAnswer> answerList = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
 	    String correctAnswer = null;
 	    int orderId = 1;
 	    if (question.getAnswers() != null) {
 		for (Answer answer : question.getAnswers()) {
-		    String answerText = answer.getText();
+		    String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
+				question.getResourcesFolderPath());
 		    if (correctAnswer != null && correctAnswer.equals(answerText)) {
 			log.warn("Skipping an answer with same text as the correct answer: " + answerText);
 			continue;

@@ -703,6 +703,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		continue;
 	    }
 
+	    questionText = QuestionParser.processHTMLField(questionText, false, contentFolderID,
+		    question.getResourcesFolderPath());
+
 	    if (AuthoringUtil.checkDuplicateQuestions(listQuestionContentDTO, questionText)) {
 		LamsDispatchAction.log.warn("Skipping duplicate question: " + questionText);
 		continue;
@@ -715,7 +718,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    if (question.getAnswers() != null) {
 		for (Answer answer : question.getAnswers()) {
 		    McCandidateAnswersDTO mcCandidateAnswersDTO = new McCandidateAnswersDTO();
-		    String answerText = answer.getText();
+		    String answerText = QuestionParser.processHTMLField(answer.getText(), true, null, null);
+		    if (answerText == null) {
+			LamsDispatchAction.log.warn("Skipping a blank answer");
+			continue;
+		    }
 		    if (correctAnswer != null && correctAnswer.equals(answerText)) {
 			LamsDispatchAction.log.warn("Skipping an answer with same text as the correct answer: "
 				+ answerText);
@@ -754,7 +761,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    McQuestionContentDTO mcQuestionContentDTO = new McQuestionContentDTO();
 	    mcQuestionContentDTO.setDisplayOrder(String.valueOf(listQuestionContentDTO.size() + 1));
 	    mcQuestionContentDTO.setQuestion(questionText);
-	    mcQuestionContentDTO.setFeedback(question.getFeedback());
+	    mcQuestionContentDTO.setFeedback(QuestionParser.processHTMLField(question.getFeedback(), true, null, null));
 	    mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
 	    mcQuestionContentDTO.setMark(correctAnswerScore.toString());
 	    mcQuestionContentDTO.setCaCount(String.valueOf(caList.size()));

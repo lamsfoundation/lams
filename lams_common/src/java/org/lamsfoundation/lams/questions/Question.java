@@ -50,6 +50,7 @@ public class Question {
     private List<Answer> answers;
     private List<Answer> matchAnswers;
     private Map<Integer, Integer> matchMap;
+    private String resourcesFolderPath;
 
     public String getType() {
 	return type;
@@ -60,11 +61,11 @@ public class Question {
     }
 
     public String getTitle() {
-        return title;
+	return title;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+	this.title = title;
     }
 
     public String getText() {
@@ -105,6 +106,14 @@ public class Question {
 
     public void setMatchMap(Map<Integer, Integer> matchMap) {
 	this.matchMap = matchMap;
+    }
+
+    public String getResourcesFolderPath() {
+	return resourcesFolderPath;
+    }
+
+    public void setResourcesFolderPath(String resourcesFolderPath) {
+	this.resourcesFolderPath = resourcesFolderPath;
     }
 
     @Override

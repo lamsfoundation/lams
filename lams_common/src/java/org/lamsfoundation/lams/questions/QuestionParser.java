@@ -36,13 +36,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.util.UploadFileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
@@ -69,6 +73,7 @@ public class QuestionParser {
     private static final Question[] QUESTION_ARRAY_TYPE = new Question[] {};
     // can be anything
     private static final String TEMP_PACKAGE_NAME_PREFIX = "QTI_PACKAGE_";
+    private static final Pattern IMAGE_PATTERN = Pattern.compile("\\[IMAGE: (.*)\\]");
 
     /**
      * Extracts questions from IMS QTI zip file.
@@ -90,7 +95,7 @@ public class QuestionParser {
 		    FileInputStream xmlFileStream = new FileInputStream(resourceFile);
 		    Question[] fileQuestions = null;
 		    try {
-			fileQuestions = QuestionParser.parseQTIFile(xmlFileStream, limitType);
+			fileQuestions = QuestionParser.parseQTIFile(xmlFileStream, tempPackageDirPath, limitType);
 		    } finally {
 			xmlFileStream.close();
 		    }
@@ -102,7 +107,21 @@ public class QuestionParser {
 	} finally {
 	    // clean up
 	    packageFileStream.close();
-	    ZipFileUtil.deleteDirectory(tempPackageDirPath);
+
+	    // if there are any images attached, do not delete the exploded ZIP
+	    // unfortunately, in this case it stays there until OS does temp dir clean up
+	    boolean tempFolderStillNeeded = false;
+	    if (result != null) {
+		for (Question question : result) {
+		    if (!StringUtils.isBlank(question.getResourcesFolderPath())) {
+			tempFolderStillNeeded = true;
+			break;
+		    }
+		}
+	    }
+	    if (!tempFolderStillNeeded) {
+		ZipFileUtil.deleteDirectory(tempPackageDirPath);
+	    }
 	}
 
 	return result.toArray(QuestionParser.QUESTION_ARRAY_TYPE);
@@ -111,7 +130,7 @@ public class QuestionParser {
     /**
      * Extracts questions from IMS QTI xml file.
      */
-    public static Question[] parseQTIFile(InputStream xmlFileStream, Set<String> limitType)
+    public static Question[] parseQTIFile(InputStream xmlFileStream, String resourcesFolderPath, Set<String> limitType)
 	    throws ParserConfigurationException, SAXException, IOException {
 	List<Question> result = new ArrayList<Question>();
 	DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -144,14 +163,13 @@ public class QuestionParser {
 		Node presentationChild = presentationChildrenList.item(presentationChildIndex);
 		// here is where question data is stored
 		if ("material".equals(presentationChild.getNodeName())) {
-		    Element questionElement = (Element) ((Element) presentationChild).getElementsByTagName("mattext")
-			    .item(0);
-		    String questionText = ((CDATASection) questionElement.getChildNodes().item(0)).getData();
+		    String questionText = QuestionParser.parseMaterialElement(presentationChild, question,
+			    resourcesFolderPath);
 		    if (questionText.trim().startsWith("<!--")) {
 			// do not support Algorithmic question type
 			continue questionLoop;
 		    }
-		    question.setText(WebUtil.removeHTMLtags(questionText));
+		    question.setText(questionText);
 		} else if ("response_lid".equals(presentationChild.getNodeName())) {
 		    if (question.getAnswers() == null) {
 			boolean multipleAnswersAllowed = "multiple".equalsIgnoreCase(((Element) presentationChild)
@@ -160,8 +178,9 @@ public class QuestionParser {
 			// parse answers
 			for (int answerIndex = 0; answerIndex < answerList.getLength(); answerIndex++) {
 			    Element answerElement = (Element) answerList.item(answerIndex);
-			    Element textElement = (Element) answerElement.getElementsByTagName("mattext").item(0);
-			    String answerText = ((CDATASection) textElement.getChildNodes().item(0)).getData();
+			    Element materialElement = (Element) answerElement.getElementsByTagName("material").item(0);
+			    String answerText = QuestionParser.parseMaterialElement(materialElement, question,
+				    resourcesFolderPath);
 
 			    // if there are answers different thatn true/false,
 			    // it is Multiple Choice or Multiple Answers
@@ -175,7 +194,7 @@ public class QuestionParser {
 			    }
 
 			    Answer answer = new Answer();
-			    answer.setText(WebUtil.removeHTMLtags(answerText));
+			    answer.setText(answerText);
 			    if (question.getAnswers() == null) {
 				question.setAnswers(new ArrayList<Answer>());
 			    }
@@ -213,12 +232,11 @@ public class QuestionParser {
 			    // parse answers for first part of matching
 			    Node responseLidChild = responseLidChildrenList.item(responseLidChildIndex);
 			    if ("material".equals(responseLidChild.getNodeName())) {
-				Element answerElement = (Element) ((Element) presentationChild).getElementsByTagName(
-					"mattext").item(0);
-				String answerText = ((CDATASection) answerElement.getChildNodes().item(0)).getData();
+				String answerText = QuestionParser.parseMaterialElement(responseLidChild, question,
+					resourcesFolderPath);
 
 				Answer answer = new Answer();
-				answer.setText(WebUtil.removeHTMLtags(answerText));
+				answer.setText(answerText);
 				question.getAnswers().add(answer);
 
 				String answerId = ((Element) presentationChild).getAttribute("ident");
@@ -262,7 +280,7 @@ public class QuestionParser {
 			if (textBasedQuestion) {
 			    // for Fill-in-Blank answer parsing can be done only here
 			    answer = new Answer();
-			    answer.setText(WebUtil.removeHTMLtags(answerId));
+			    answer.setText(answerId);
 			    if (question.getAnswers() == null) {
 				question.setAnswers(new ArrayList<Answer>());
 			    }
@@ -314,13 +332,14 @@ public class QuestionParser {
 	    NodeList feedbacks = questionItem.getElementsByTagName("itemfeedback");
 	    for (int feedbackIndex = 0; feedbackIndex < feedbacks.getLength(); feedbackIndex++) {
 		Element feedbackElement = (Element) feedbacks.item(feedbackIndex);
-		String feedbackText = ((CDATASection) feedbackElement.getElementsByTagName("mattext").item(0)
-			.getChildNodes().item(0)).getData();
+		Node materialElement = feedbackElement.getElementsByTagName("material").item(0);
+		String feedbackText = QuestionParser.parseMaterialElement(materialElement, question,
+			resourcesFolderPath);
 		if (!StringUtils.isBlank(feedbackText)) {
 		    String feedbackType = feedbackElement.getAttribute("view");
 		    // it is a question feedback
 		    if ("All".equalsIgnoreCase(feedbackType)) {
-			question.setFeedback(WebUtil.removeHTMLtags(feedbackText));
+			question.setFeedback(feedbackText);
 		    } else {
 			// it is an answer feedback
 			String feedbackId = feedbackElement.getAttribute("ident");
@@ -328,7 +347,7 @@ public class QuestionParser {
 			if (answerId != null) {
 			    Answer answer = answerMap.get(answerId);
 			    if (answer != null) {
-				answer.setFeedback(WebUtil.removeHTMLtags(feedbackText));
+				answer.setFeedback(feedbackText);
 			    }
 			}
 		    }
@@ -367,6 +386,12 @@ public class QuestionParser {
 		// can be blank
 		if (!StringUtils.isBlank(questionFeedback)) {
 		    question.setFeedback(URLDecoder.decode(questionFeedback, "UTF8"));
+		}
+
+		String questionResourcesFolderPath = WebUtil.extractParameterValue(queryString, "question"
+			+ questionIndex + "resourcesFolder");
+		if (!StringUtils.isBlank(questionResourcesFolderPath)) {
+		    question.setResourcesFolderPath(URLDecoder.decode(questionResourcesFolderPath, "UTF8"));
 		}
 
 		boolean isMatching = Question.QUESTION_TYPE_MATCHING.equals(question.getType());
@@ -438,6 +463,56 @@ public class QuestionParser {
     }
 
     /**
+     * Adapts QTI form field for Tools to use. Some Tools do not accept HTML, so it gets converted to plain text. Also
+     * image placeholders get resolved here.
+     */
+    public static String processHTMLField(String fieldText, boolean forcePlainText, String contentFolderID,
+	    String resourcesFolderPath) {
+	String result = forcePlainText ? WebUtil.removeHTMLtags(fieldText) : fieldText;
+
+	if (!StringUtils.isBlank(result)) {
+	    Matcher imageMatcher = QuestionParser.IMAGE_PATTERN.matcher(result);
+	    StringBuffer resultBuilder = new StringBuffer();
+
+	    // find image placeholders
+	    while (imageMatcher.find()) {
+		String fileName = imageMatcher.group(1);
+		// if it is plain text or something goes wrong, the placeholder simply gets removed
+		String replacement = "";
+		if (!forcePlainText) {
+		    if (resourcesFolderPath == null) {
+			QuestionParser.log
+				.warn("Image " + fileName + " declaration found but its location is unknown.");
+		    } else {
+			File sourceFile = new File(resourcesFolderPath, fileName);
+			if (sourceFile.canRead()) {
+			    // copy the image from exploded IMS zip to secure dir in lams-www
+			    File uploadDir = UploadFileUtil.getUploadDir(contentFolderID, "Image");
+			    String destinationFileName = UploadFileUtil.getUploadFileName(uploadDir, fileName);
+			    File destinationFile = new File(uploadDir, destinationFileName);
+			    String uploadWebPath = UploadFileUtil.getUploadWebPath(contentFolderID, "Image") + '/'
+				    + fileName;
+			    try {
+				FileUtils.copyFile(sourceFile, destinationFile);
+				replacement = "<img src=\"" + uploadWebPath + "\" />";
+			    } catch (IOException e) {
+				QuestionParser.log.error("Could not store image " + fileName);
+			    }
+			} else {
+			    QuestionParser.log.warn("Image " + fileName + " declaration found but it can not be read.");
+			}
+		    }
+		}
+		imageMatcher.appendReplacement(resultBuilder, replacement);
+	    }
+	    imageMatcher.appendTail(resultBuilder);
+	    result = resultBuilder.toString();
+	}
+
+	return StringUtils.isBlank(result) ? null : result;
+    }
+
+    /**
      * Find XML file list in IMS QTI package.
      */
     private static List<File> getQTIResourceFiles(String packageDirPath) throws IOException,
@@ -472,10 +547,40 @@ public class QuestionParser {
      * Checks if given type has a correct value and should be processed. Also sets question property for convenience.
      */
     private static boolean isQuestionTypeAcceptable(String type, Set<String> limitType, Question question) {
-	if (type == null || !Question.QUESTION_TYPES.contains(type)) {
+	if ((type == null) || !Question.QUESTION_TYPES.contains(type)) {
 	    return false;
 	}
 	question.setType(type);
 	return (limitType == null) || limitType.isEmpty() || limitType.contains(type);
+    }
+
+    /**
+     * Constructs HTML text out of "material" IMS QTI tags. Images get replaced by placeholders for further processing.
+     */
+    private static String parseMaterialElement(Node materialElement, Question question, String resourcesFolderPath) {
+	StringBuilder result = new StringBuilder();
+
+	NodeList questionElements = materialElement.getChildNodes();
+	for (int questionElementIndex = 0; questionElementIndex < questionElements.getLength(); questionElementIndex++) {
+	    Node questionElement = questionElements.item(questionElementIndex);
+	    String elementName = questionElement.getNodeName();
+	    if ("mattext".equalsIgnoreCase(elementName)) {
+		// it is a HTML part
+		String questionTextPart = ((CDATASection) questionElement.getChildNodes().item(0)).getData();
+		result.append(questionTextPart);
+	    } else if ("matimage".equalsIgnoreCase(elementName)) {
+		String fileName = ((Element) questionElement).getAttribute("uri");
+		if (resourcesFolderPath == null) {
+		    QuestionParser.log.warn("Image " + fileName + " declaration found but its location is unknown");
+		} else {
+		    if (question.getResourcesFolderPath() == null) {
+			question.setResourcesFolderPath(resourcesFolderPath);
+		    }
+		    result.append("[IMAGE: ").append(fileName).append("]");
+		}
+	    }
+	}
+
+	return result.toString();
     }
 }

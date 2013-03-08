@@ -786,6 +786,7 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) throws UnsupportedEncodingException {
 	String sessionMapId = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapId);
+	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
 
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request.getQueryString());
@@ -799,8 +800,10 @@ public class AuthoringAction extends Action {
 	    }
 	    assessmentQuestion.setSequenceId(maxSeq);
 	    assessmentQuestion.setTitle(question.getTitle());
-	    assessmentQuestion.setQuestion(question.getText());
-	    assessmentQuestion.setGeneralFeedback(question.getFeedback());
+	    assessmentQuestion.setQuestion(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
+		    question.getResourcesFolderPath()));
+	    assessmentQuestion.setGeneralFeedback(QuestionParser.processHTMLField(question.getFeedback(), false, contentFolderID,
+		    question.getResourcesFolderPath()));
 	    assessmentQuestion.setPenaltyFactor(0);
 
 	    int questionGrade = 1;
@@ -824,7 +827,8 @@ public class AuthoringAction extends Action {
 			    new SequencableComparator());
 		    int orderId = 1;
 		    for (Answer answer : question.getAnswers()) {
-			String answerText = answer.getText();
+			String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
+				question.getResourcesFolderPath());
 			if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
 			    AuthoringAction.log.warn("Skipping an answer with same text as the correct answer: "
 				    + answerText);

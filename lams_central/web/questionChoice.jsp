@@ -23,6 +23,7 @@
 		
 		.questionText {
 			margin-left: 43px;
+			overflow: auto;
 		}
 		
 		div.answerDiv input {
@@ -88,6 +89,7 @@
 					answerDiv.toggle('slow');
 				}
 				$('input', answerDiv).add(selector + 'feedback').add(selector + 'type').add(selector + 'text')
+				                     .add(selector + 'resourcesFolder')
 				                     .attr('disabled', checked ? null : 'disabled');
 				
 				if (checked) {
@@ -161,17 +163,22 @@
 					(<fmt:message key="label.questions.choice.type.unknown" />)
 				</c:otherwise>
 			</c:choose>
-			<c:out value='${question.title}' /><br />
+			<c:out value='${question.title}' />
 			<input id="question${questionStatus.index}text" name="question${questionStatus.index}text"
 			       value="<c:out value='${question.text}' />"
 			       class="questionAttribute" type="hidden" disabled="disabled" />
-			       <span class="questionText"><c:out value='${question.text}' /></span><br />
+			       <div class="questionText">${question.text}</div><br />
 			<input type="hidden" id="question${questionStatus.index}type" name="question${questionStatus.index}type"
 		           value="${question.type}"
 		           class="questionAttribute" disabled="disabled" />
 			<%-- Question feedback --%>
 		    <input type="hidden" id="question${questionStatus.index}feedback" name="question${questionStatus.index}feedback"
-		           value="${question.feedback}"
+		           value="<c:out value='${question.feedback}' />"
+		           class="questionAttribute" disabled="disabled" />
+		    <%-- If question contains images, where to take them from --%>
+		    <input type="hidden" id="question${questionStatus.index}resourcesFolder"
+		           name="question${questionStatus.index}resourcesFolder"
+		           value="<c:out value='${question.resourcesFolderPath}' />"
 		           class="questionAttribute" disabled="disabled" />
 		    <%-- Answers, if required and exist --%>
 			<c:if test="${fn:length(question.answers) > 0}">
@@ -184,7 +191,7 @@
 							<c:when test="${question.type eq 'mc' or question.type eq 'mr' or question.type eq 'fb'}">
 								<input name="question${questionStatus.index}answer${answerStatus.index}"
 					       			   value="<c:out value='${answer.text}' />"
-					       			   type="checkbox" checked="checked" disabled="disabled" /><c:out value='${answer.text}' /><br />
+					       			   type="checkbox" checked="checked" disabled="disabled" />${answer.text}<br />
 			       			</c:when>
 			       			<c:otherwise>
 			       				<%-- Do not display answers if management is too difficult or pointless --%>
@@ -197,7 +204,7 @@
 			       		<input type="hidden" name="question${questionStatus.index}answer${answerStatus.index}score"
 						       value="${answer.score}" disabled="disabled" />
 						<input type="hidden" name="question${questionStatus.index}answer${answerStatus.index}feedback"
-		           			   value="${answer.feedback}" disabled="disabled" />
+		           			   value="<c:out value='${answer.feedback}' />" disabled="disabled" />
 					</c:forEach>
 					<c:if test="${question.type eq 'mt'}">
 						<input type="hidden" name="matchAnswerCount${questionStatus.index}" 

@@ -76,9 +76,8 @@ public class QuestionsAction extends Action {
 	    Collections.addAll(limitType, limitTypeParam.split(","));
 	}
 
-	Question[] questions = packageName.endsWith(".xml") ? QuestionParser
-		.parseQTIFile(uploadedFileStream, limitType) : QuestionParser.parseQTIPackage(uploadedFileStream,
-		limitType);
+	Question[] questions = packageName.endsWith(".xml") ? QuestionParser.parseQTIFile(uploadedFileStream, null,
+		limitType) : QuestionParser.parseQTIPackage(uploadedFileStream, limitType);
 	request.setAttribute("questions", questions);
 
 	return mapping.findForward("questionChoice");
