@@ -196,14 +196,11 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 			Lesson lesson = null;
 
 			for (ToolActivity activity : activities) {
-			    ToolSession toolSession = getLamsCoreToolService().getToolSessionByLearner(user, activity);
-			    if (toolSession != null) {
-				lesson = toolSession.getLesson();
-				if ((lesson != null) && (lesson.getLessonClass() != null)
-					&& lesson.getLessonClass().isStaffMember(user)) {
-				    isStaffMember = true;
-				    break;
-				}
+			    // there should be just one lesson
+			    lesson = (Lesson) activity.getLearningDesign().getLessons().iterator().next();
+			    if ((lesson.getLessonClass() != null) && lesson.getLessonClass().isStaffMember(user)) {
+				isStaffMember = true;
+				break;
 			    }
 			}
 
