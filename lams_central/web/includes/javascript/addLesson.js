@@ -275,7 +275,7 @@ function addLesson(){
 		$('#tabs').tabs('option', 'selected', 1);
 		return;
 	}
-	$('#monitorsField').val(learners);
+	$('#monitorsField').val(monitors);
 	
 	if ($('#splitLearnersField').is(':checked')) {
 		var maxLearnerCount = $('#selected-learners div.draggableUser').length;
