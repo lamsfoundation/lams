@@ -207,7 +207,7 @@
 	<div id="tabConditions" class="tabContent">
 		<div class="fieldSectionTitle"><fmt:message key="label.tab.conditions.dependencies" /></div>
 		<div class="fieldSectionDescription"><fmt:message key="label.tab.conditions.dependencies.desc" /></div>
-		<input id="precedingLessonEnableField" name="precedingLessonEnable"
+		<input id="precedingLessonEnableField" name="precedingLessonEnable" value="true"
 		       type="checkbox"><fmt:message key="label.tab.conditions.enable" /></input>
 		<select id="precedingLessonIdField" name="precedingLessonId">
 			<c:forEach var="availableLesson" items="${availablePrecedingLessons}">
