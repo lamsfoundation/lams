@@ -1,55 +1,18 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang.builder;
 
@@ -57,6 +20,7 @@ import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.ObjectUtils;
@@ -82,43 +46,181 @@ import org.apache.commons.lang.SystemUtils;
  * output the whole array, whereas the summary method will just output
  * the array length.</p>
  *
- * @author Stephen Colebourne
+ * <p>If you want to format the output of certain objects, such as dates, you
+ * must create a subclass and override a method.
+ * <pre>
+ * public class MyStyle extends ToStringStyle {
+ *   protected void appendDetail(StringBuffer buffer, String fieldName, Object value) {
+ *     if (value instanceof Date) {
+ *       value = new SimpleDateFormat("yyyy-MM-dd").format(value);
+ *     }
+ *     buffer.append(value);
+ *   }
+ * }
+ * </pre>
+ * </p>
+ *
+ * @author Apache Software Foundation
  * @author Gary Gregory
  * @author Pete Gieser
+ * @author Masato Tezuka
  * @since 1.0
  * @version $Id$
  */
 public abstract class ToStringStyle implements Serializable {
 
     /**
-     * The default toString style.
+     * The default toString style. Using the Using the <code>Person</code>
+     * example from {@link ToStringBuilder}, the output would look like this:
+     *
+     * <pre>
+     * Person@182f0db[name=John Doe,age=33,smoker=false]
+     * </pre>
      */
     public static final ToStringStyle DEFAULT_STYLE = new DefaultToStringStyle();
+
     /**
-     * The multi line toString style.
+     * The multi line toString style. Using the Using the <code>Person</code>
+     * example from {@link ToStringBuilder}, the output would look like this:
+     *
+     * <pre>
+     * Person@182f0db[
+     *   name=John Doe
+     *   age=33
+     *   smoker=false
+     * ]
+     * </pre>
      */
     public static final ToStringStyle MULTI_LINE_STYLE = new MultiLineToStringStyle();
+
     /**
-     * The no field names toString style.
+     * The no field names toString style. Using the Using the
+     * <code>Person</code> example from {@link ToStringBuilder}, the output
+     * would look like this:
+     *
+     * <pre>
+     * Person@182f0db[John Doe,33,false]
+     * </pre>
      */
     public static final ToStringStyle NO_FIELD_NAMES_STYLE = new NoFieldNameToStringStyle();
+
     /**
-     * The simple toString style.
+     * The short prefix toString style. Using the <code>Person</code> example
+     * from {@link ToStringBuilder}, the output would look like this:
+     *
+     * <pre>
+     * Person[name=John Doe,age=33,smoker=false]
+     * </pre>
+     *
+     * @since 2.1
+     */
+    public static final ToStringStyle SHORT_PREFIX_STYLE = new ShortPrefixToStringStyle();
+
+    /**
+     * The simple toString style. Using the Using the <code>Person</code>
+     * example from {@link ToStringBuilder}, the output would look like this:
+     *
+     * <pre>
+     * John Doe,33,false
+     * </pre>
      */
     public static final ToStringStyle SIMPLE_STYLE = new SimpleToStringStyle();
+
+    /**
+     * <p>
+     * A registry of objects used by <code>reflectionToString</code> methods
+     * to detect cyclical object references and avoid infinite loops.
+     * </p>
+     */
+    private static final ThreadLocal REGISTRY = new ThreadLocal();
+
+    /**
+     * <p>
+     * Returns the registry of objects being traversed by the <code>reflectionToString</code>
+     * methods in the current thread.
+     * </p>
+     *
+     * @return Set the registry of objects being traversed
+     */
+    static Map getRegistry() {
+        return (Map) REGISTRY.get();
+    }
+
+    /**
+     * <p>
+     * Returns <code>true</code> if the registry contains the given object.
+     * Used by the reflection methods to avoid infinite loops.
+     * </p>
+     *
+     * @param value
+     *                  The object to lookup in the registry.
+     * @return boolean <code>true</code> if the registry contains the given
+     *             object.
+     */
+    static boolean isRegistered(Object value) {
+        Map m = getRegistry();
+        return m != null && m.containsKey(value);
+    }
+
+    /**
+     * <p>
+     * Registers the given object. Used by the reflection methods to avoid
+     * infinite loops.
+     * </p>
+     *
+     * @param value
+     *                  The object to register.
+     */
+    static void register(Object value) {
+        if (value != null) {
+            Map m = getRegistry();
+            if (m == null) {
+                m = new WeakHashMap();
+                REGISTRY.set(m);
+            }
+            m.put(value, null);
+        }
+    }
+
+    /**
+     * <p>
+     * Unregisters the given object.
+     * </p>
+     *
+     * <p>
+     * Used by the reflection methods to avoid infinite loops.
+     * </p>
+     *
+     * @param value
+     *                  The object to unregister.
+     */
+    static void unregister(Object value) {
+        if (value != null) {
+            Map m = getRegistry();
+            if (m != null) {
+                m.remove(value);
+                if (m.isEmpty()) {
+                    REGISTRY.set(null);
+                }
+            }
+        }
+    }
 
     /**
      * Whether to use the field names, the default is <code>true</code>.
      */
     private boolean useFieldNames = true;
+
     /**
      * Whether to use the class name, the default is <code>true</code>.
      */
     private boolean useClassName = true;
+
     /**
      * Whether to use short class names, the default is <code>false</code>.
      */
     private boolean useShortClassName = false;
+
     /**
      * Whether to use the identity hash code, the default is <code>true</code>.
      */
@@ -128,63 +230,78 @@ public abstract class ToStringStyle implements Serializable {
      * The content start <code>'['</code>.
      */
     private String contentStart = "[";
+
     /**
      * The content end <code>']'</code>.
      */
     private String contentEnd = "]";
+
     /**
      * The field name value separator <code>'='</code>.
      */
     private String fieldNameValueSeparator = "=";
+
     /**
      * Whether the field separator should be added before any other fields.
      */
     private boolean fieldSeparatorAtStart = false;
+
     /**
      * Whether the field separator should be added after any other fields.
      */
     private boolean fieldSeparatorAtEnd = false;
+
     /**
      * The field separator <code>','</code>.
      */
     private String fieldSeparator = ",";
+
     /**
      * The array start <code>'{'</code>.
      */
     private String arrayStart = "{";
+
     /**
      * The array separator <code>','</code>.
      */
     private String arraySeparator = ",";
+
     /**
      * The detail for array content.
      */
     private boolean arrayContentDetail = true;
+
     /**
      * The array end <code>'}'</code>.
      */
     private String arrayEnd = "}";
+
     /**
      * The value to use when fullDetail is <code>null</code>,
      * the default value is <code>true</code>.
      */
     private boolean defaultFullDetail = true;
+
     /**
      * The <code>null</code> text <code>'&lt;null&gt;'</code>.
      */
     private String nullText = "<null>";
+
     /**
      * The summary size text start <code>'<size'</code>.
      */
     private String sizeStartText = "<size=";
+
     /**
      * The summary size text start <code>'&gt;'</code>.
      */
     private String sizeEndText = ">";
+
     /**
      * The summary object text start <code>'&lt;'</code>.
      */
     private String summaryObjectStartText = "<";
+
     /**
      * The summary object text start <code>'&gt;'</code>.
      */
@@ -203,9 +320,10 @@ public abstract class ToStringStyle implements Serializable {
 
     /**
      * <p>Append to the <code>toString</code> the superclass toString.</p>
-     * 
+     * <p>NOTE: It assumes that the toString has been created from the same ToStringStyle. </p>
+     *
      * <p>A <code>null</code> <code>superToString</code> is ignored.</p>
-     * 
+     *
      * @param buffer  the <code>StringBuffer</code> to populate
      * @param superToString  the <code>super.toString()</code>
      * @since 2.0
@@ -216,9 +334,10 @@ public abstract class ToStringStyle implements Serializable {
 
     /**
      * <p>Append to the <code>toString</code> another toString.</p>
-     * 
+     * <p>NOTE: It assumes that the toString has been created from the same ToStringStyle. </p>
+     *
      * <p>A <code>null</code> <code>toString</code> is ignored.</p>
-     * 
+     *
      * @param buffer  the <code>StringBuffer</code> to populate
      * @param toString  the additional <code>toString</code>
      * @since 2.0
@@ -240,37 +359,39 @@ public abstract class ToStringStyle implements Serializable {
 
     /**
      * <p>Append to the <code>toString</code> the start of data indicator.</p>
-     * 
+     *
      * @param buffer  the <code>StringBuffer</code> to populate
-     * @param object  the <code>Object</code> to build a
-     *  <code>toString</code> for, must not be <code>null</code>
+     * @param object  the <code>Object</code> to build a <code>toString</code> for
      */
     public void appendStart(StringBuffer buffer, Object object) {
-        appendClassName(buffer, object);
-        appendIdentityHashCode(buffer, object);
-        appendContentStart(buffer);
-        if (fieldSeparatorAtStart) {
-            appendFieldSeparator(buffer);
+        if (object != null) {
+            appendClassName(buffer, object);
+            appendIdentityHashCode(buffer, object);
+            appendContentStart(buffer);
+            if (fieldSeparatorAtStart) {
+                appendFieldSeparator(buffer);
+            }
         }
     }
 
     /**
      * <p>Append to the <code>toString</code> the end of data indicator.</p>
-     * 
+     *
      * @param buffer  the <code>StringBuffer</code> to populate
      * @param object  the <code>Object</code> to build a
-     *  <code>toString</code> for, must not be <code>null</code>
+     *  <code>toString</code> for.
      */
     public void appendEnd(StringBuffer buffer, Object object) {
-        if (fieldSeparatorAtEnd == false) {
+        if (this.fieldSeparatorAtEnd == false) {
             removeLastFieldSeparator(buffer);
         }
         appendContentEnd(buffer);
+        unregister(object);
     }
 
     /**
      * <p>Remove the last field separator from the buffer.</p>
-     * 
+     *
      * @param buffer  the <code>StringBuffer</code> to populate
      * @since 2.0
      */
@@ -337,94 +458,118 @@ public abstract class ToStringStyle implements Serializable {
      * @param detail  output detail or not
      */
     protected void appendInternal(StringBuffer buffer, String fieldName, Object value, boolean detail) {
-        if (ReflectionToStringBuilder.isRegistered(value)
+        if (isRegistered(value)
             && !(value instanceof Number || value instanceof Boolean || value instanceof Character)) {
-            ObjectUtils.appendIdentityToString(buffer, value);
-
-        } else if (value instanceof Collection) {
-            if (detail) {
-                appendDetail(buffer, fieldName, (Collection) value);
-            } else {
-                appendSummarySize(buffer, fieldName, ((Collection) value).size());
-            }
-
-        } else if (value instanceof Map) {
-            if (detail) {
-                appendDetail(buffer, fieldName, (Map) value);
-            } else {
-                appendSummarySize(buffer, fieldName, ((Map) value).size());
-            }
-
-        } else if (value instanceof long[]) {
-            if (detail) {
-                appendDetail(buffer, fieldName, (long[]) value);
-            } else {
-                appendSummary(buffer, fieldName, (long[]) value);
-            }
-
-        } else if (value instanceof int[]) {
-            if (detail) {
-                appendDetail(buffer, fieldName, (int[]) value);
-            } else {
-                appendSummary(buffer, fieldName, (int[]) value);
-            }
-
-        } else if (value instanceof short[]) {
-            if (detail) {
-                appendDetail(buffer, fieldName, (short[]) value);
-            } else {
-                appendSummary(buffer, fieldName, (short[]) value);
-            }
-
-        } else if (value instanceof byte[]) {
-            if (detail) {
-                appendDetail(buffer, fieldName, (byte[]) value);
-            } else {
-                appendSummary(buffer, fieldName, (byte[]) value);
-            }
-
-        } else if (value instanceof char[]) {
-            if (detail) {
-                appendDetail(buffer, fieldName, (char[]) value);
-            } else {
-                appendSummary(buffer, fieldName, (char[]) value);
-            }
-
-        } else if (value instanceof double[]) {
-            if (detail) {
-                appendDetail(buffer, fieldName, (double[]) value);
-            } else {
-                appendSummary(buffer, fieldName, (double[]) value);
-            }
-
-        } else if (value instanceof float[]) {
-            if (detail) {
-                appendDetail(buffer, fieldName, (float[]) value);
-            } else {
-                appendSummary(buffer, fieldName, (float[]) value);
-            }
-
-        } else if (value instanceof boolean[]) {
-            if (detail) {
-                appendDetail(buffer, fieldName, (boolean[]) value);
-            } else {
-                appendSummary(buffer, fieldName, (boolean[]) value);
-            }
-
-        } else if (value.getClass().isArray()) {
-            if (detail) {
-                appendDetail(buffer, fieldName, (Object[]) value);
-            } else {
-                appendSummary(buffer, fieldName, (Object[]) value);
-            }
-
-        } else {
-            if (detail) {
-                appendDetail(buffer, fieldName, value);
-            } else {
-                appendSummary(buffer, fieldName, value);
-            }
+           appendCyclicObject(buffer, fieldName, value);
+           return;
         }
+
+        register(value);
+
+        try {
+            if (value instanceof Collection) {
+                if (detail) {
+                    appendDetail(buffer, fieldName, (Collection) value);
+                } else {
+                    appendSummarySize(buffer, fieldName, ((Collection) value).size());
+                }
+
+            } else if (value instanceof Map) {
+                if (detail) {
+                    appendDetail(buffer, fieldName, (Map) value);
+                } else {
+                    appendSummarySize(buffer, fieldName, ((Map) value).size());
+                }
+
+            } else if (value instanceof long[]) {
+                if (detail) {
+                    appendDetail(buffer, fieldName, (long[]) value);
+                } else {
+                    appendSummary(buffer, fieldName, (long[]) value);
+                }
+
+            } else if (value instanceof int[]) {
+                if (detail) {
+                    appendDetail(buffer, fieldName, (int[]) value);
+                } else {
+                    appendSummary(buffer, fieldName, (int[]) value);
+                }
+
+            } else if (value instanceof short[]) {
+                if (detail) {
+                    appendDetail(buffer, fieldName, (short[]) value);
+                } else {
+                    appendSummary(buffer, fieldName, (short[]) value);
+                }
+
+            } else if (value instanceof byte[]) {
+                if (detail) {
+                    appendDetail(buffer, fieldName, (byte[]) value);
+                } else {
+                    appendSummary(buffer, fieldName, (byte[]) value);
+                }
+
+            } else if (value instanceof char[]) {
+                if (detail) {
+                    appendDetail(buffer, fieldName, (char[]) value);
+                } else {
+                    appendSummary(buffer, fieldName, (char[]) value);
+                }
+
+            } else if (value instanceof double[]) {
+                if (detail) {
+                    appendDetail(buffer, fieldName, (double[]) value);
+                } else {
+                    appendSummary(buffer, fieldName, (double[]) value);
+                }
+
+            } else if (value instanceof float[]) {
+                if (detail) {
+                    appendDetail(buffer, fieldName, (float[]) value);
+                } else {
+                    appendSummary(buffer, fieldName, (float[]) value);
+                }
+
+            } else if (value instanceof boolean[]) {
+                if (detail) {
+                    appendDetail(buffer, fieldName, (boolean[]) value);
+                } else {
+                    appendSummary(buffer, fieldName, (boolean[]) value);
+                }
+
+            } else if (value.getClass().isArray()) {
+                if (detail) {
+                    appendDetail(buffer, fieldName, (Object[]) value);
+                } else {
+                    appendSummary(buffer, fieldName, (Object[]) value);
+                }
+
+            } else {
+                    if (detail) {
+                        appendDetail(buffer, fieldName, value);
+                    } else {
+                        appendSummary(buffer, fieldName, value);
+                    }
+            }
+        } finally {
+            unregister(value);
+        }
+    }
+
+    /**
+     * <p>Append to the <code>toString</code> an <code>Object</code>
+     * value that has been detected to participate in a cycle. This
+     * implementation will print the standard string value of the value.</p>
+     *
+     * @param buffer  the <code>StringBuffer</code> to populate
+     * @param fieldName  the field name, typically not used as already appended
+     * @param value  the value to add to the <code>toString</code>,
+     *  not <code>null</code>
+     *
+     * @since 2.2
+     */
+    protected void appendCyclicObject(StringBuffer buffer, String fieldName, Object value) {
+       ObjectUtils.identityToString(buffer, value);
     }
 
     /**
@@ -1289,12 +1434,13 @@ public abstract class ToStringStyle implements Serializable {
 
     /**
      * <p>Append to the <code>toString</code> the class name.</p>
-     * 
+     *
      * @param buffer  the <code>StringBuffer</code> to populate
      * @param object  the <code>Object</code> whose name to output
      */
     protected void appendClassName(StringBuffer buffer, Object object) {
-        if (useClassName) {
+        if (useClassName && object != null) {
+            register(object);
             if (useShortClassName) {
                 buffer.append(getShortClassName(object.getClass()));
             } else {
@@ -1305,12 +1451,13 @@ public abstract class ToStringStyle implements Serializable {
 
     /**
      * <p>Append the {@link System#identityHashCode(java.lang.Object)}.</p>
-     * 
+     *
      * @param buffer  the <code>StringBuffer</code> to populate
      * @param object  the <code>Object</code> whose id to output
      */
     protected void appendIdentityHashCode(StringBuffer buffer, Object object) {
-        if (useIdentityHashCode) {
+        if (this.isUseIdentityHashCode() && object!=null) {
+            register(object);
             buffer.append('@');
             buffer.append(Integer.toHexString(System.identityHashCode(object)));
         }
@@ -1318,7 +1465,7 @@ public abstract class ToStringStyle implements Serializable {
 
     /**
      * <p>Append to the <code>toString</code> the content start.</p>
-     * 
+     *
      * @param buffer  the <code>StringBuffer</code> to populate
      */
     protected void appendContentStart(StringBuffer buffer) {
@@ -1327,7 +1474,7 @@ public abstract class ToStringStyle implements Serializable {
 
     /**
      * <p>Append to the <code>toString</code> the content end.</p>
-     * 
+     *
      * @param buffer  the <code>StringBuffer</code> to populate
      */
     protected void appendContentEnd(StringBuffer buffer) {
@@ -1338,7 +1485,7 @@ public abstract class ToStringStyle implements Serializable {
      * <p>Append to the <code>toString</code> an indicator for <code>null</code>.</p>
      *
      * <p>The default indicator is <code>'&lt;null&gt;'</code>.</p>
-     * 
+     *
      * @param buffer  the <code>StringBuffer</code> to populate
      * @param fieldName  the field name, typically not used as already appended
      */
@@ -1348,7 +1495,7 @@ public abstract class ToStringStyle implements Serializable {
 
     /**
      * <p>Append to the <code>toString</code> the field separator.</p>
-     * 
+     *
      * @param buffer  the <code>StringBuffer</code> to populate
      */
     protected void appendFieldSeparator(StringBuffer buffer) {
@@ -1357,7 +1504,7 @@ public abstract class ToStringStyle implements Serializable {
 
     /**
      * <p>Append to the <code>toString</code> the field start.</p>
-     * 
+     *
      * @param buffer  the <code>StringBuffer</code> to populate
      * @param fieldName  the field name
      */
@@ -1370,7 +1517,7 @@ public abstract class ToStringStyle implements Serializable {
 
     /**
      * <p>Append to the <code>toString<code> the field end.</p>
-     * 
+     *
      * @param buffer  the <code>StringBuffer</code> to populate
      * @param fieldName  the field name, typically not used as already appended
      */
@@ -1409,7 +1556,7 @@ public abstract class ToStringStyle implements Serializable {
      * <code>null</code> indicating that it doesn't care about
      * the detail level. In this case the default detail level is
      * used.</p>
-     * 
+     *
      * @param fullDetailRequest  the detail level requested
      * @return whether full detail is to be shown
      */
@@ -1628,8 +1775,8 @@ public abstract class ToStringStyle implements Serializable {
      * @param arrayEnd  the new array end text
      */
     protected void setArrayEnd(String arrayEnd) {
-        if (arrayStart == null) {
-            arrayStart = "";
+        if (arrayEnd == null) {
+            arrayEnd = "";
         }
         this.arrayEnd = arrayEnd;
     }
@@ -1767,9 +1914,9 @@ public abstract class ToStringStyle implements Serializable {
     //---------------------------------------------------------------------
 
     /**
-     * <p>Gets whether the field separator should be added at the start 
+     * <p>Gets whether the field separator should be added at the start
      * of each buffer.</p>
-     * 
+     *
      * @return the fieldSeparatorAtStart flag
      * @since 2.0
      */
@@ -1778,9 +1925,9 @@ public abstract class ToStringStyle implements Serializable {
     }
 
     /**
-     * <p>Sets whether the field separator should be added at the start 
+     * <p>Sets whether the field separator should be added at the start
      * of each buffer.</p>
-     * 
+     *
      * @param fieldSeparatorAtStart  the fieldSeparatorAtStart flag
      * @since 2.0
      */
@@ -1791,9 +1938,9 @@ public abstract class ToStringStyle implements Serializable {
     //---------------------------------------------------------------------
 
     /**
-     * <p>Gets whether the field separator should be added at the end 
+     * <p>Gets whether the field separator should be added at the end
      * of each buffer.</p>
-     * 
+     *
      * @return fieldSeparatorAtEnd flag
      * @since 2.0
      */
@@ -1802,9 +1949,9 @@ public abstract class ToStringStyle implements Serializable {
     }
 
     /**
-     * <p>Sets whether the field separator should be added at the end 
+     * <p>Sets whether the field separator should be added at the end
      * of each buffer.</p>
-     * 
+     *
      * @param fieldSeparatorAtEnd  the fieldSeparatorAtEnd flag
      * @since 2.0
      */
@@ -1977,11 +2124,18 @@ public abstract class ToStringStyle implements Serializable {
     private static final class DefaultToStringStyle extends ToStringStyle {
 
         /**
+         * Required for serialization support.
+         *
+         * @see java.io.Serializable
+         */
+        private static final long serialVersionUID = 1L;
+
+        /**
          * <p>Constructor.</p>
          *
          * <p>Use the static constant rather than instantiating.</p>
          */
-        private DefaultToStringStyle() {
+        DefaultToStringStyle() {
             super();
         }
 
@@ -2007,12 +2161,14 @@ public abstract class ToStringStyle implements Serializable {
      */
     private static final class NoFieldNameToStringStyle extends ToStringStyle {
 
+        private static final long serialVersionUID = 1L;
+
         /**
          * <p>Constructor.</p>
          *
          * <p>Use the static constant rather than instantiating.</p>
          */
-        private NoFieldNameToStringStyle() {
+        NoFieldNameToStringStyle() {
             super();
             this.setUseFieldNames(false);
         }
@@ -2031,6 +2187,38 @@ public abstract class ToStringStyle implements Serializable {
     //----------------------------------------------------------------------------
 
     /**
+     * <p><code>ToStringStyle</code> that prints out the short
+     * class name and no identity hashcode.</p>
+     *
+     * <p>This is an inner class rather than using
+     * <code>StandardToStringStyle</code> to ensure its immutability.</p>
+     */
+    private static final class ShortPrefixToStringStyle extends ToStringStyle {
+
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * <p>Constructor.</p>
+         *
+         * <p>Use the static constant rather than instantiating.</p>
+         */
+        ShortPrefixToStringStyle() {
+            super();
+            this.setUseShortClassName(true);
+            this.setUseIdentityHashCode(false);
+        }
+
+        /**
+         * <p>Ensure <code>Singleton</ode> after serialization.</p>
+         * @return the singleton
+         */
+        private Object readResolve() {
+            return ToStringStyle.SHORT_PREFIX_STYLE;
+        }
+
+    }
+
+    /**
      * <p><code>ToStringStyle</code> that does not print out the
      * classname, identity hashcode, content start or field name.</p>
      *
@@ -2039,12 +2227,14 @@ public abstract class ToStringStyle implements Serializable {
      */
     private static final class SimpleToStringStyle extends ToStringStyle {
 
+        private static final long serialVersionUID = 1L;
+
         /**
          * <p>Constructor.</p>
          *
          * <p>Use the static constant rather than instantiating.</p>
          */
-        private SimpleToStringStyle() {
+        SimpleToStringStyle() {
             super();
             this.setUseClassName(false);
             this.setUseIdentityHashCode(false);
@@ -2073,12 +2263,14 @@ public abstract class ToStringStyle implements Serializable {
      */
     private static final class MultiLineToStringStyle extends ToStringStyle {
 
+        private static final long serialVersionUID = 1L;
+
         /**
          * <p>Constructor.</p>
          *
          * <p>Use the static constant rather than instantiating.</p>
          */
-        private MultiLineToStringStyle() {
+        MultiLineToStringStyle() {
             super();
             this.setContentStart("[");
             this.setFieldSeparator(SystemUtils.LINE_SEPARATOR + "  ");
@@ -2096,74 +2288,5 @@ public abstract class ToStringStyle implements Serializable {
         }
 
     }
-
-    //----------------------------------------------------------------------------
-
-// Removed, as the XML style needs more work for escaping characters, arrays,
-// collections, maps and embedded beans.
-//    /**
-//     * ToStringStyle that outputs in XML style
-//     */
-//    private static class XMLToStringStyle extends ToStringStyle {
-//        
-//        /**
-//         * Constructor - use the static constant rather than instantiating.
-//         */
-//        private XMLToStringStyle() {
-//            super();
-//            nullText = "null";
-//            sizeStartText = "size=";
-//            sizeEndText = "";
-//        }
-//        
-//        /**
-//         * @see ToStringStyle#appendStart(StringBuffer, Object)
-//         */
-//        public void appendStart(StringBuffer buffer, Object object) {
-//            buffer.append('<');
-//            buffer.append(getShortClassName(object.getClass()));
-//            buffer.append(" class=\"");
-//            appendClassName(buffer, object);
-//            buffer.append("\" hashCode=\"");
-//            appendIdentityHashCode(buffer, object);
-//            buffer.append("\">");
-//            buffer.append(SystemUtils.LINE_SEPARATOR);
-//            buffer.append("  ");
-//        }
-//
-//        /**
-//         * @see ToStringStyle#appendFieldStart(StringBuffer, String)
-//         */
-//        protected void appendFieldStart(StringBuffer buffer, String fieldName) {
-//            buffer.append('<');
-//            buffer.append(fieldName);
-//            buffer.append('>');
-//        }
-//
-//        /**
-//         * @see ToStringStyle#appendFieldEnd(StringBuffer, String)
-//         */
-//        protected void appendFieldEnd(StringBuffer buffer, String fieldName) {
-//            buffer.append("</");
-//            buffer.append(fieldName);
-//            buffer.append('>');
-//            buffer.append(SystemUtils.LINE_SEPARATOR);
-//            buffer.append("  ");
-//        }
-//
-//        /**
-//         * @see ToStringStyle#appendEnd(StringBuffer, Object)
-//         */
-//        public void appendEnd(StringBuffer buffer, Object object) {
-//            int len = buffer.length();
-//            if (len > 2 && buffer.charAt(len - 1) == ' ' && buffer.charAt(len - 2) == ' ') {
-//                buffer.setLength(len - 2);
-//            }
-//            buffer.append("</");
-//            buffer.append(getShortClassName(object.getClass()));
-//            buffer.append("\">");
-//        }
-//
-//    }
 
 }

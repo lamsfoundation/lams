@@ -1,55 +1,18 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang.enum;
 
@@ -62,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
@@ -172,7 +136,7 @@ import org.apache.commons.lang.StringUtils;
  *       super("Plus");
  *     }
  *     public int eval(int a, int b) {
- *       return (a + b);
+ *       return a + b;
  *     }
  *   }
  *   public static final OperationEnum MINUS = new MinusOperation();
@@ -181,7 +145,7 @@ import org.apache.commons.lang.StringUtils;
  *       super("Minus");
  *     }
  *     public int eval(int a, int b) {
- *       return (a - b);
+ *       return a - b;
  *     }
  *   }
  *
@@ -214,9 +178,60 @@ import org.apache.commons.lang.StringUtils;
  * </pre>
  * <p>The code above will work on JDK 1.2. If JDK1.3 and later is used,
  * the subclasses may be defined as anonymous.</p>
+ * 
+ * <h4>Nested class Enums</h4>
  *
+ * <p>Care must be taken with class loading when defining a static nested class
+ * for enums. The static nested class can be loaded without the surrounding outer
+ * class being loaded. This can result in an empty list/map/iterator being returned.
+ * One solution is to define a static block that references the outer class where
+ * the constants are defined. For example:</p>
+ *
+ * <pre>
+ * public final class Outer {
+ *   public static final BWEnum BLACK = new BWEnum("Black");
+ *   public static final BWEnum WHITE = new BWEnum("White");
+ *
+ *   // static nested enum class
+ *   public static final class BWEnum extends Enum {
+ * 
+ *     static {
+ *       // explicitly reference BWEnum class to force constants to load
+ *       Object obj = Outer.BLACK;
+ *     }
+ * 
+ *     // ... other methods omitted
+ *   }
+ * }
+ * </pre>
+ * 
+ * <p>Although the above solves the problem, it is not recommended. The best solution
+ * is to define the constants in the enum class, and hold references in the outer class:
+ *
+ * <pre>
+ * public final class Outer {
+ *   public static final BWEnum BLACK = BWEnum.BLACK;
+ *   public static final BWEnum WHITE = BWEnum.WHITE;
+ *
+ *   // static nested enum class
+ *   public static final class BWEnum extends Enum {
+ *     // only define constants in enum classes - private if desired
+ *     private static final BWEnum BLACK = new BWEnum("Black");
+ *     private static final BWEnum WHITE = new BWEnum("White");
+ * 
+ *     // ... other methods omitted
+ *   }
+ * }
+ * </pre>
+ * 
+ * <p>For more details, see the 'Nested' test cases.
+ * 
+ * @deprecated Replaced by {@link org.apache.commons.lang.enums.Enum org.apache.commons.lang.enums.Enum} 
+ *          and will be removed in version 3.0. All classes in this package are deprecated and repackaged to 
+ *          {@link org.apache.commons.lang.enums} since <code>enum</code> is a Java 1.5 keyword. 
+ * @see org.apache.commons.lang.enums.Enum
  * @author Apache Avalon project
- * @author Stephen Colebourne
+ * @author Apache Software Foundation
  * @author Chris Webb
  * @author Mike Bowler
  * @since 1.0
@@ -224,7 +239,11 @@ import org.apache.commons.lang.StringUtils;
  */
 public abstract class Enum implements Comparable, Serializable {
 
-    /** Lang version 1.0.1 serial compatability */
+    /**
+     * Required for serialization support. Lang version 1.0.1 serial compatibility.
+     * 
+     * @see java.io.Serializable
+     */
     private static final long serialVersionUID = -487045951170455942L;
     
     // After discussion, the default size for HashMaps is used, as the
@@ -237,7 +256,11 @@ public abstract class Enum implements Comparable, Serializable {
     /**
      * <code>Map</code>, key of class name, value of <code>Entry</code>.
      */
-    private static final Map cEnumClasses = new HashMap();
+    private static Map cEnumClasses
+        // LANG-334: To avoid exposing a mutating map,
+        // we copy it each time we add to it. This is cheaper than
+        // using a synchronized map since we are almost entirely reads
+        = new WeakHashMap();
     
     /**
      * The string representation of the Enum.
@@ -279,7 +302,8 @@ public abstract class Enum implements Comparable, Serializable {
         /**
          * <p>Restrictive constructor.</p>
          */
-        private Entry() {
+        protected Entry() {
+            super();
         }
     }
 
@@ -329,12 +353,18 @@ public abstract class Enum implements Comparable, Serializable {
         if (ok == false) {
             throw new IllegalArgumentException("getEnumClass() must return a superclass of this class");
         }
-        
-        // create entry
-        Entry entry = (Entry) cEnumClasses.get(enumClass);
-        if (entry == null) {
-            entry = createEntry(enumClass);
-            cEnumClasses.put(enumClass, entry);
+
+        Entry entry;
+        synchronized( Enum.class ) { // LANG-334
+            // create entry
+            entry = (Entry) cEnumClasses.get(enumClass);
+            if (entry == null) {
+                entry = createEntry(enumClass);
+                Map myMap = new WeakHashMap( ); // we avoid the (Map) constructor to achieve JDK 1.2 support
+                myMap.putAll( cEnumClasses );
+                myMap.put(enumClass, entry);
+                cEnumClasses = myMap;
+            }
         }
         if (entry.map.containsKey(name)) {
             throw new IllegalArgumentException("The Enum name must be unique, '" + name + "' has already been added");
@@ -354,7 +384,7 @@ public abstract class Enum implements Comparable, Serializable {
         if (entry == null) {
             return null;
         }
-        return (Enum) entry.map.get(getName());
+        return entry.map.get(getName());
     }
     
     //--------------------------------------------------------------------------------
@@ -366,7 +396,7 @@ public abstract class Enum implements Comparable, Serializable {
      *  be <code>null</code>
      * @param name  the name of the <code>Enum</code> to get,
      *  may be <code>null</code>
-     * @return the enum object, or null if the enum does not exist
+     * @return the enum object, or <code>null</code> if the enum does not exist
      * @throws IllegalArgumentException if the enum class
      *  is <code>null</code>
      */
@@ -454,6 +484,17 @@ public abstract class Enum implements Comparable, Serializable {
             throw new IllegalArgumentException("The Class must be a subclass of Enum");
         }
         Entry entry = (Entry) cEnumClasses.get(enumClass);
+
+        if (entry == null) {
+            try {
+                // LANG-76 - try to force class initialization for JDK 1.5+
+                Class.forName(enumClass.getName(), true, enumClass.getClassLoader());
+                entry = (Entry) cEnumClasses.get(enumClass);
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+
         return entry;
     }
     
@@ -510,6 +551,9 @@ public abstract class Enum implements Comparable, Serializable {
      * <p>Two Enum objects are considered equal
      * if they have the same class names and the same names.
      * Identity is tested for first, so this method usually runs fast.</p>
+     * 
+     * <p>If the parameter is in a different class loader than this instance,
+     * reflection is used to compare the names.</p>
      *
      * @param other  the other object to compare for equality
      * @return <code>true</code> if the Enums are equal
@@ -520,34 +564,19 @@ public abstract class Enum implements Comparable, Serializable {
         } else if (other == null) {
             return false;
         } else if (other.getClass() == this.getClass()) {
-            // shouldn't happen, but...
+            // Ok to do a class cast to Enum here since the test above
+            // guarantee both
+            // classes are in the same class loader.
             return iName.equals(((Enum) other).iName);
-        } else if (((Enum) other).getEnumClass().getName().equals(getEnumClass().getName())) {
-            // different classloaders
-            try {
-                // try to avoid reflection
-                return iName.equals(((Enum) other).iName);
-
-            } catch (ClassCastException ex) {
-                // use reflection
-                try {
-                    Method mth = other.getClass().getMethod("getName", null);
-                    String name = (String) mth.invoke(other, null);
-                    return iName.equals(name);
-                } catch (NoSuchMethodException ex2) {
-                    // ignore - should never happen
-                } catch (IllegalAccessException ex2) {
-                    // ignore - should never happen
-                } catch (InvocationTargetException ex2) {
-                    // ignore - should never happen
-                }
+        } else {
+            // This and other are in different class loaders, we must check indirectly
+            if (other.getClass().getName().equals(this.getClass().getName()) == false) {
                 return false;
             }
-        } else {
-            return false;
+            return iName.equals( getNameInOtherClassLoader(other) );
         }
     }
-
+    
     /**
      * <p>Returns a suitable hashCode for the enumeration.</p>
      *
@@ -563,6 +592,9 @@ public abstract class Enum implements Comparable, Serializable {
      * <p>The default ordering is alphabetic by name, but this
      * can be overridden by subclasses.</p>
      * 
+     * <p>If the parameter is in a different class loader than this instance,
+     * reflection is used to compare the names.</p>
+     *
      * @see java.lang.Comparable#compareTo(Object)
      * @param other  the other object to compare to
      * @return -ve if this is less than the other object, +ve if greater
@@ -574,7 +606,35 @@ public abstract class Enum implements Comparable, Serializable {
         if (other == this) {
             return 0;
         }
+        if (other.getClass() != this.getClass()) {
+            if (other.getClass().getName().equals(this.getClass().getName())) {
+                return iName.compareTo( getNameInOtherClassLoader(other) );
+            }
+            throw new ClassCastException(
+                    "Different enum class '" + ClassUtils.getShortClassName(other.getClass()) + "'");
+        }
         return iName.compareTo(((Enum) other).iName);
+    }
+
+    /**
+     * <p>Use reflection to return an objects class name.</p>
+     *
+     * @param other The object to determine the class name for
+     * @return The class name
+     */
+    private String getNameInOtherClassLoader(Object other) {
+        try {
+            Method mth = other.getClass().getMethod("getName", null);
+            String name = (String) mth.invoke(other, null);
+            return name;
+        } catch (NoSuchMethodException e) {
+            // ignore - should never happen
+        } catch (IllegalAccessException e) {
+            // ignore - should never happen
+        } catch (InvocationTargetException e) {
+            // ignore - should never happen
+        }
+        throw new IllegalStateException("This should not happen");
     }
 
     /**

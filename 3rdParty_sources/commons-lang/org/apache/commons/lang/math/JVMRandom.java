@@ -1,55 +1,20 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
- * reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.commons.lang.math;
 
@@ -59,24 +24,47 @@ import java.util.Random;
  * <p><code>JVMRandom</code> is a wrapper that supports all possible 
  * Random methods via the {@link java.lang.Math#random()} method
  * and its system-wide {@link Random} object.</p>
+ * <p>
+ * It does this to allow for a Random class in which the seed is
+ * shared between all members of the class - a better name would
+ * have been SharedSeedRandom.
+ * <p>
+ * <b>N.B.</b> the current implementation overrides the methods
+ * {@link Random#nextInt(int)} and {@link Random#nextLong()}
+ * to produce positive numbers ranging from 0 (inclusive)
+ * to MAX_VALUE (exclusive).
  * 
- * @author Henri Yandell
  * @since 2.0
  * @version $Id$
  */
 public final class JVMRandom extends Random {
 
     /**
-     * Ensures that only the constructor can call reseed.
+     * Required for serialization support.
+     * 
+     * @see java.io.Serializable
+     */
+    private static final long serialVersionUID = 1L;
+
+    private static final Random SHARED_RANDOM = new Random();
+
+    /**
+     * Ensures that only the parent constructor can call reseed.
      */
     private boolean constructed = false;
 
+    /**
+     * Constructs a new instance.
+     */
     public JVMRandom() {
         this.constructed = true;
     }
     
     /**
      * Unsupported in 2.0.
+     * 
+     * @param seed ignored
+     * @throws UnsupportedOperationException
      */
     public synchronized void setSeed(long seed) {
         if (this.constructed) {
@@ -86,6 +74,9 @@ public final class JVMRandom extends Random {
 
     /**
      * Unsupported in 2.0.
+     * 
+     * @return Nothing, this method always throws an UnsupportedOperationException.
+     * @throws UnsupportedOperationException
      */
     public synchronized double nextGaussian() {
         throw new UnsupportedOperationException();
@@ -93,6 +84,9 @@ public final class JVMRandom extends Random {
 
     /**
      * Unsupported in 2.0.
+     * 
+     * @param byteArray ignored
+     * @throws UnsupportedOperationException
      */
     public void nextBytes(byte[] byteArray) {
         throw new UnsupportedOperationException();
@@ -101,12 +95,16 @@ public final class JVMRandom extends Random {
     /**
      * <p>Returns the next pseudorandom, uniformly distributed int value
      * from the Math.random() sequence.</p>
-     *
+     * Identical to <code>nextInt(Integer.MAX_VALUE)</code>
+     * <p>
+     * <b>N.B. All values are >= 0.<b>
+     * </p>
      * @return the random int
      */
     public int nextInt() {
         return nextInt(Integer.MAX_VALUE);
     }
+
     /**
      * <p>Returns a pseudorandom, uniformly distributed int value between
      * <code>0</code> (inclusive) and the specified value (exclusive), from
@@ -117,21 +115,19 @@ public final class JVMRandom extends Random {
      * @throws IllegalArgumentException when <code>n &lt;= 0</code>
      */
     public int nextInt(int n) {
-        if (n <= 0) {
-            throw new IllegalArgumentException(
-                "Upper bound for nextInt must be positive"
-            );
-        }
-        // TODO: check this cannot return 'n'
-        return (int)(Math.random() * n);
+        return SHARED_RANDOM.nextInt(n);
     }
+
     /**
      * <p>Returns the next pseudorandom, uniformly distributed long value
      * from the Math.random() sequence.</p>
+     * Identical to <code>nextLong(Long.MAX_VALUE)</code>
+     * <p>
+     * <b>N.B. All values are >= 0.<b>
+     * </p>
      * @return the random long
      */
     public long nextLong() {
-        // possible loss of precision?
         return nextLong(Long.MAX_VALUE);
     }
 
@@ -151,8 +147,20 @@ public final class JVMRandom extends Random {
                 "Upper bound for nextInt must be positive"
             );
         }
-        // TODO: check this cannot return 'n'
-        return (long)(Math.random() * n);
+        // Code adapted from Harmony Random#nextInt(int)
+        if ((n & -n) == n) { // n is power of 2
+            // dropping lower order bits improves behaviour for low values of n
+            return next63bits() >> 63 // drop all the bits 
+                 - bitsRequired(n-1); // except the ones we need
+        }
+        // Not a power of two
+        long val;
+        long bits;
+        do { // reject some values to improve distribution
+            bits = next63bits();
+            val = bits % n;
+        } while (bits - val + (n - 1) < 0);
+        return val;
      }
 
     /**
@@ -162,8 +170,9 @@ public final class JVMRandom extends Random {
      * @return the random boolean
      */
     public boolean nextBoolean() {
-        return (Math.random() > 0.5);
+        return SHARED_RANDOM.nextBoolean();
     }
+
     /**
      * <p>Returns the next pseudorandom, uniformly distributed float value
      * between <code>0.0</code> and <code>1.0</code> from the Math.random()
@@ -172,15 +181,48 @@ public final class JVMRandom extends Random {
      * @return the random float
      */
     public float nextFloat() {
-        return (float)Math.random();
+        return SHARED_RANDOM.nextFloat();
     }
+
     /**
      * <p>Synonymous to the Math.random() call.</p>
      *
      * @return the random double
      */
     public double nextDouble() {
-        return Math.random();
+        return SHARED_RANDOM.nextDouble();
     }
     
+    /**
+     * Get the next unsigned random long
+     * @return unsigned random long
+     */
+    private static long next63bits(){
+        // drop the sign bit to leave 63 random bits
+        return SHARED_RANDOM.nextLong() & 0x7fffffffffffffffL;
+    }
+
+    /**
+     * Count the number of bits required to represent a long number.
+     * 
+     * @param num long number
+     * @return number of bits required
+     */
+    private static int bitsRequired(long num){
+        // Derived from Hacker's Delight, Figure 5-9
+        long y=num; // for checking right bits
+        int n=0; // number of leading zeros found
+        while(true){
+            // 64 = number of bits in a long
+            if (num < 0) {
+                return 64-n; // no leading zeroes left
+            }
+            if (y == 0) {
+                return n; // no bits left to check
+            }
+            n++;
+            num=num << 1; // check leading bits
+            y=y >> 1; // check trailing bits
+        }
+    }
 }

@@ -1,72 +1,36 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang.time;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
 /**
- * <p>Date and time formatting utilites and constants.</p>
+ * <p>Date and time formatting utilities and constants.</p>
  *
  * <p>Formatting is performed using the
  * {@link org.apache.commons.lang.time.FastDateFormat} class.</p>
  *
+ * @author Apache Software Foundation
  * @author Apache Ant - DateUtils
  * @author <a href="mailto:sbailliez@apache.org">Stephane Bailliez</a>
  * @author <a href="mailto:stefan.bodewig@epost.de">Stefan Bodewig</a>
- * @author Stephen Colebourne
  * @author <a href="mailto:ggregory@seagullsw.com">Gary Gregory</a>
  * @since 2.0
  * @version $Id$
@@ -74,7 +38,7 @@ import java.util.TimeZone;
 public class DateFormatUtils {
 
     /**
-     * ISO8601 formatter for date-time witout time zone.
+     * ISO8601 formatter for date-time without time zone.
      * The format used is <tt>yyyy-MM-dd'T'HH:mm:ss</tt>.
      */
     public static final FastDateFormat ISO_DATETIME_FORMAT
@@ -150,10 +114,11 @@ public class DateFormatUtils {
      * to operate.</p>
      */
     public DateFormatUtils() {
+        super();
     }
 
     /**
-     * <p>Format a date/time into a specific pattern using the UTC time zone.</p>
+     * <p>Formats a date/time into a specific pattern using the UTC time zone.</p>
      * 
      * @param millis  the date to format expressed in milliseconds
      * @param pattern  the pattern to use to format the date
@@ -164,7 +129,7 @@ public class DateFormatUtils {
     }
 
     /**
-     * <p>Format a date/time into a specific pattern using the UTC time zone.</p>
+     * <p>Formats a date/time into a specific pattern using the UTC time zone.</p>
      * 
      * @param date  the date to format
      * @param pattern  the pattern to use to format the date
@@ -175,7 +140,7 @@ public class DateFormatUtils {
     }
     
     /**
-     * <p>Format a date/time into a specific pattern using the UTC time zone.</p>
+     * <p>Formats a date/time into a specific pattern using the UTC time zone.</p>
      * 
      * @param millis  the date to format expressed in milliseconds
      * @param pattern  the pattern to use to format the date
@@ -187,7 +152,7 @@ public class DateFormatUtils {
     }
 
     /**
-     * <p>Format a date/time into a specific pattern using the UTC time zone.</p>
+     * <p>Formats a date/time into a specific pattern using the UTC time zone.</p>
      * 
      * @param date  the date to format
      * @param pattern  the pattern to use to format the date
@@ -199,7 +164,7 @@ public class DateFormatUtils {
     }
     
     /**
-     * <p>Format a date/time into a specific pattern.</p>
+     * <p>Formats a date/time into a specific pattern.</p>
      * 
      * @param millis  the date to format expressed in milliseconds
      * @param pattern  the pattern to use to format the date
@@ -210,7 +175,7 @@ public class DateFormatUtils {
     }
 
     /**
-     * <p>Format a date/time into a specific pattern.</p>
+     * <p>Formats a date/time into a specific pattern.</p>
      * 
      * @param date  the date to format
      * @param pattern  the pattern to use to format the date
@@ -219,9 +184,22 @@ public class DateFormatUtils {
     public static String format(Date date, String pattern) {
         return format(date, pattern, null, null);
     }
+
+    /**
+     * <p>Formats a calendar into a specific pattern.</p>
+     * 
+     * @param calendar  the calendar to format
+     * @param pattern  the pattern to use to format the calendar
+     * @return the formatted calendar
+     * @see FastDateFormat#format(Calendar)
+     * @since 2.4
+     */
+    public static String format(Calendar calendar, String pattern) {
+        return format(calendar, pattern, null, null);
+    }
     
     /**
-     * <p>Format a date/time into a specific pattern in a time zone.</p>
+     * <p>Formats a date/time into a specific pattern in a time zone.</p>
      * 
      * @param millis  the time expressed in milliseconds
      * @param pattern  the pattern to use to format the date
@@ -233,7 +211,7 @@ public class DateFormatUtils {
     }
 
     /**
-     * <p>Format a date/time into a specific pattern in a time zone.</p>
+     * <p>Formats a date/time into a specific pattern in a time zone.</p>
      * 
      * @param date  the date to format
      * @param pattern  the pattern to use to format the date
@@ -245,7 +223,21 @@ public class DateFormatUtils {
     }
 
     /**
-     * <p>Format a date/time into a specific pattern in a locale.</p>
+     * <p>Formats a calendar into a specific pattern in a time zone.</p>
+     * 
+     * @param calendar  the calendar to format
+     * @param pattern  the pattern to use to format the calendar
+     * @param timeZone  the time zone  to use, may be <code>null</code>
+     * @return the formatted calendar
+     * @see FastDateFormat#format(Calendar)
+     * @since 2.4
+     */
+    public static String format(Calendar calendar, String pattern, TimeZone timeZone) {
+        return format(calendar, pattern, timeZone, null);
+    }
+
+    /**
+     * <p>Formats a date/time into a specific pattern in a locale.</p>
      * 
      * @param millis  the date to format expressed in milliseconds
      * @param pattern  the pattern to use to format the date
@@ -257,7 +249,7 @@ public class DateFormatUtils {
     }
 
     /**
-     * <p>Format a date/time into a specific pattern in a locale.</p>
+     * <p>Formats a date/time into a specific pattern in a locale.</p>
      * 
      * @param date  the date to format
      * @param pattern  the pattern to use to format the date
@@ -269,7 +261,21 @@ public class DateFormatUtils {
     }
 
     /**
-     * <p>Format a date/time into a specific pattern in a time zone  and locale.</p>
+     * <p>Formats a calendar into a specific pattern in a locale.</p>
+     * 
+     * @param calendar  the calendar to format
+     * @param pattern  the pattern to use to format the calendar
+     * @param locale  the locale to use, may be <code>null</code>
+     * @return the formatted calendar
+     * @see FastDateFormat#format(Calendar)
+     * @since 2.4
+     */
+    public static String format(Calendar calendar, String pattern, Locale locale) {
+        return format(calendar, pattern, null, locale);
+    }
+
+    /**
+     * <p>Formats a date/time into a specific pattern in a time zone  and locale.</p>
      * 
      * @param millis  the date to format expressed in milliseconds
      * @param pattern  the pattern to use to format the date
@@ -282,7 +288,7 @@ public class DateFormatUtils {
     }
 
     /**
-     * <p>Format a date/time into a specific pattern in a time zone  and locale.</p>
+     * <p>Formats a date/time into a specific pattern in a time zone  and locale.</p>
      * 
      * @param date  the date to format
      * @param pattern  the pattern to use to format the date
@@ -293,6 +299,22 @@ public class DateFormatUtils {
     public static String format(Date date, String pattern, TimeZone timeZone, Locale locale) {
         FastDateFormat df = FastDateFormat.getInstance(pattern, timeZone, locale);
         return df.format(date);
+    }
+
+    /**
+     * <p>Formats a calendar into a specific pattern in a time zone  and locale.</p>
+     * 
+     * @param calendar  the calendar to format
+     * @param pattern  the pattern to use to format the calendar
+     * @param timeZone  the time zone  to use, may be <code>null</code>
+     * @param locale  the locale to use, may be <code>null</code>
+     * @return the formatted calendar
+     * @see FastDateFormat#format(Calendar)
+     * @since 2.4
+     */
+    public static String format(Calendar calendar, String pattern, TimeZone timeZone, Locale locale) {
+        FastDateFormat df = FastDateFormat.getInstance(pattern, timeZone, locale);
+        return df.format(calendar);
     }
 
 }

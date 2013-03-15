@@ -1,201 +1,342 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package org.apache.commons.lang.time;
 
 /**
- * <p><code>StopWatch</code> provides a convenient API for timings.</p>
+ * <p>
+ * <code>StopWatch</code> provides a convenient API for timings.
+ * </p>
  * 
- * <p>The methods do <b>not</b> protect against inappropriate calls. Thus you
- * can call stop before start, resume before suspend or unsplit before split.
- * The results are indeterminate in these cases.</p>
- * 
- * <p>To start the watch, call {@link #start()}. At this point you can:</p>
+ * <p>
+ * To start the watch, call {@link #start()}. At this point you can:
+ * </p>
  * <ul>
- *  <li>{@link #split()} the watch to get the time whilst the watch continues in the
- *   background. {@link #unsplit()} will remove the effect of the split. At this point,
- *   these three options are available again.</li>
- *  <li>{@link #suspend()} the watch to pause it. {@link #resume()} allows the watch
- *   to continue. Any time between the suspend and resume will not be counted in
- *   the total. At this point, these three options are available again.</li>
- *  <li>{@link #stop()} the watch to complete the timing session.</li>
+ * <li>{@link #split()} the watch to get the time whilst the watch continues in the background. {@link #unsplit()} will
+ * remove the effect of the split. At this point, these three options are available again.</li>
+ * <li>{@link #suspend()} the watch to pause it. {@link #resume()} allows the watch to continue. Any time between the
+ * suspend and resume will not be counted in the total. At this point, these three options are available again.</li>
+ * <li>{@link #stop()} the watch to complete the timing session.</li>
  * </ul>
- *
- * <p>It is intended that the output methods {@link #toString()} and {@link #getTime()}
- * should only be called after stop, split or suspend, however a suitable result will
- * be returned at other points.</p>
- *
- * @author Henri Yandell
- * @author Stephen Colebourne
+ * 
+ * <p>
+ * It is intended that the output methods {@link #toString()} and {@link #getTime()} should only be called after stop,
+ * split or suspend, however a suitable result will be returned at other points.
+ * </p>
+ * 
+ * <p>
+ * NOTE: As from v2.1, the methods protect against inappropriate calls. Thus you cannot now call stop before start,
+ * resume before suspend or unsplit before split.
+ * </p>
+ * 
+ * <p>
+ * 1. split(), suspend(), or stop() cannot be invoked twice<br />
+ * 2. unsplit() may only be called if the watch has been split()<br />
+ * 3. resume() may only be called if the watch has been suspend()<br />
+ * 4. start() cannot be called twice without calling reset()
+ * </p>
+ * 
+ * <p>This class is not thread-safe</p>
+ * 
+ * @author Apache Software Foundation
  * @since 2.0
  * @version $Id$
  */
 public class StopWatch {
-    
+
+    // running states
+    private static final int STATE_UNSTARTED = 0;
+
+    private static final int STATE_RUNNING = 1;
+
+    private static final int STATE_STOPPED = 2;
+
+    private static final int STATE_SUSPENDED = 3;
+
+    // split state
+    private static final int STATE_UNSPLIT = 10;
+
+    private static final int STATE_SPLIT = 11;
+
+    /**
+     * The current running state of the StopWatch.
+     */
+    private int runningState = STATE_UNSTARTED;
+
+    /**
+     * Whether the stopwatch has a split time recorded.
+     */
+    private int splitState = STATE_UNSPLIT;
+
     /**
      * The start time.
      */
     private long startTime = -1;
+
     /**
      * The stop time.
      */
     private long stopTime = -1;
 
     /**
-     * <p>Constructor.</p>
+     * <p>
+     * Constructor.
+     * </p>
      */
     public StopWatch() {
+        super();
     }
 
     /**
-     * <p>Start the stopwatch.</p>
+     * <p>
+     * Start the stopwatch.
+     * </p>
      * 
-     * <p>This method starts a new timing session, clearing any previous values.</p>
+     * <p>
+     * This method starts a new timing session, clearing any previous values.
+     * </p>
+     * 
+     * @throws IllegalStateException
+     *             if the StopWatch is already running.
      */
     public void start() {
-        stopTime = -1;
-        startTime = System.currentTimeMillis();
+        if (this.runningState == STATE_STOPPED) {
+            throw new IllegalStateException("Stopwatch must be reset before being restarted. ");
+        }
+        if (this.runningState != STATE_UNSTARTED) {
+            throw new IllegalStateException("Stopwatch already started. ");
+        }
+        this.stopTime = -1;
+        this.startTime = System.currentTimeMillis();
+        this.runningState = STATE_RUNNING;
     }
 
     /**
-     * <p>Stop the stopwatch.</p>
+     * <p>
+     * Stop the stopwatch.
+     * </p>
      * 
-     * <p>This method ends a new timing session, allowing the time to be retrieved.</p>
+     * <p>
+     * This method ends a new timing session, allowing the time to be retrieved.
+     * </p>
+     * 
+     * @throws IllegalStateException
+     *             if the StopWatch is not running.
      */
     public void stop() {
-        stopTime = System.currentTimeMillis();
+        if (this.runningState != STATE_RUNNING && this.runningState != STATE_SUSPENDED) {
+            throw new IllegalStateException("Stopwatch is not running. ");
+        }
+        if (this.runningState == STATE_RUNNING) {
+            this.stopTime = System.currentTimeMillis();
+        }
+        this.runningState = STATE_STOPPED;
     }
 
     /**
-     * <p>Reset the stopwatch.</p>
+     * <p>
+     * Resets the stopwatch. Stops it if need be.
+     * </p>
      * 
-     * <p>This method clears the internal values to allow the object to be reused.</p>
+     * <p>
+     * This method clears the internal values to allow the object to be reused.
+     * </p>
      */
     public void reset() {
-        startTime = -1;
-        stopTime = -1;
+        this.runningState = STATE_UNSTARTED;
+        this.splitState = STATE_UNSPLIT;
+        this.startTime = -1;
+        this.stopTime = -1;
     }
 
     /**
-     * <p>Split the time.</p>
+     * <p>
+     * Split the time.
+     * </p>
      * 
-     * <p>This method sets the stop time of the watch to allow a time to be extracted.
-     * The start time is unaffected, enabling {@link #unsplit()} to contine the 
-     * timing from the original start point.</p>
+     * <p>
+     * This method sets the stop time of the watch to allow a time to be extracted. The start time is unaffected,
+     * enabling {@link #unsplit()} to continue the timing from the original start point.
+     * </p>
+     * 
+     * @throws IllegalStateException
+     *             if the StopWatch is not running.
      */
     public void split() {
-        stopTime = System.currentTimeMillis();
+        if (this.runningState != STATE_RUNNING) {
+            throw new IllegalStateException("Stopwatch is not running. ");
+        }
+        this.stopTime = System.currentTimeMillis();
+        this.splitState = STATE_SPLIT;
     }
 
     /**
-     * <p>Remove a split.</p>
+     * <p>
+     * Remove a split.
+     * </p>
      * 
-     * <p>This method clears the stop time. The start time is unaffected, enabling 
-     * timing from the original start point to continue.</p>
+     * <p>
+     * This method clears the stop time. The start time is unaffected, enabling timing from the original start point to
+     * continue.
+     * </p>
+     * 
+     * @throws IllegalStateException
+     *             if the StopWatch has not been split.
      */
     public void unsplit() {
-        stopTime = -1;
+        if (this.splitState != STATE_SPLIT) {
+            throw new IllegalStateException("Stopwatch has not been split. ");
+        }
+        this.stopTime = -1;
+        this.splitState = STATE_UNSPLIT;
     }
 
     /**
-     * <p>Suspend the stopwatch for later resumption.</p>
+     * <p>
+     * Suspend the stopwatch for later resumption.
+     * </p>
      * 
-     * <p>This method suspends the watch until it is resumed. The watch will not include
-     * time between the suspend and resume calls in the total time.</p>
+     * <p>
+     * This method suspends the watch until it is resumed. The watch will not include time between the suspend and
+     * resume calls in the total time.
+     * </p>
+     * 
+     * @throws IllegalStateException
+     *             if the StopWatch is not currently running.
      */
     public void suspend() {
-        stopTime = System.currentTimeMillis();
+        if (this.runningState != STATE_RUNNING) {
+            throw new IllegalStateException("Stopwatch must be running to suspend. ");
+        }
+        this.stopTime = System.currentTimeMillis();
+        this.runningState = STATE_SUSPENDED;
     }
 
     /**
-     * <p>Resume the stopwatch after a suspend.</p>
+     * <p>
+     * Resume the stopwatch after a suspend.
+     * </p>
      * 
-     * <p>This method resumes the watch after it was suspended. The watch will not include
-     * time between the suspend and resume calls in the total time.</p>
+     * <p>
+     * This method resumes the watch after it was suspended. The watch will not include time between the suspend and
+     * resume calls in the total time.
+     * </p>
+     * 
+     * @throws IllegalStateException
+     *             if the StopWatch has not been suspended.
      */
     public void resume() {
-        startTime += (System.currentTimeMillis() - stopTime);
-        stopTime = -1;
+        if (this.runningState != STATE_SUSPENDED) {
+            throw new IllegalStateException("Stopwatch must be suspended to resume. ");
+        }
+        this.startTime += (System.currentTimeMillis() - this.stopTime);
+        this.stopTime = -1;
+        this.runningState = STATE_RUNNING;
     }
 
     /**
-     * <p>Get the time on the stopwatch.</p>
+     * <p>
+     * Get the time on the stopwatch.
+     * </p>
      * 
-     * <p>This is either the time between start and latest split, between start
-     * and stop, or the time between the start and the moment this method is called.</p>
+     * <p>
+     * This is either the time between the start and the moment this method is called, or the amount of time between
+     * start and stop.
+     * </p>
      * 
      * @return the time in milliseconds
      */
     public long getTime() {
-        if (stopTime == -1) {
-            if (startTime == -1) {
-                return 0;
-            }
-            return (System.currentTimeMillis() - this.startTime);
+        if (this.runningState == STATE_STOPPED || this.runningState == STATE_SUSPENDED) {
+            return this.stopTime - this.startTime;
+        } else if (this.runningState == STATE_UNSTARTED) {
+            return 0;
+        } else if (this.runningState == STATE_RUNNING) {
+            return System.currentTimeMillis() - this.startTime;
         }
-        return (this.stopTime - this.startTime);
+        throw new RuntimeException("Illegal running state has occured. ");
     }
 
     /**
-     * <p>Gets a summary of the time that the stopwatch recorded as a string.</p>
+     * <p>
+     * Get the split time on the stopwatch.
+     * </p>
      * 
-     * <p>The format used is ISO8601-like,
-     * <i>hours</i>:<i>minutes</i>:<i>seconds</i>.<i>milliseconds</i>.</p>
+     * <p>
+     * This is the time between start and latest split.
+     * </p>
+     * 
+     * @return the split time in milliseconds
+     * 
+     * @throws IllegalStateException
+     *             if the StopWatch has not yet been split.
+     * @since 2.1
+     */
+    public long getSplitTime() {
+        if (this.splitState != STATE_SPLIT) {
+            throw new IllegalStateException("Stopwatch must be split to get the split time. ");
+        }
+        return this.stopTime - this.startTime;
+    }
+
+    /**
+     * Returns the time this stopwatch was started.
+     * 
+     * @return the time this stopwatch was started
+     * @throws IllegalStateException
+     *             if this StopWatch has not been started
+     * @since 2.4
+     */
+    public long getStartTime() {
+        if (this.runningState == STATE_UNSTARTED) {
+            throw new IllegalStateException("Stopwatch has not been started");
+        }
+        return this.startTime;
+    }
+
+    /**
+     * <p>
+     * Gets a summary of the time that the stopwatch recorded as a string.
+     * </p>
+     * 
+     * <p>
+     * The format used is ISO8601-like, <i>hours</i>:<i>minutes</i>:<i>seconds</i>.<i>milliseconds</i>.
+     * </p>
      * 
      * @return the time as a String
      */
     public String toString() {
-        return DurationFormatUtils.formatISO(getTime());
+        return DurationFormatUtils.formatDurationHMS(getTime());
+    }
+
+    /**
+     * <p>
+     * Gets a summary of the split time that the stopwatch recorded as a string.
+     * </p>
+     * 
+     * <p>
+     * The format used is ISO8601-like, <i>hours</i>:<i>minutes</i>:<i>seconds</i>.<i>milliseconds</i>.
+     * </p>
+     * 
+     * @return the split time as a String
+     * @since 2.1
+     */
+    public String toSplitString() {
+        return DurationFormatUtils.formatDurationHMS(getSplitTime());
     }
 
 }

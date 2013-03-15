@@ -1,59 +1,27 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+
+import org.apache.commons.lang.exception.CloneFailedException;
+import org.apache.commons.lang.reflect.MethodUtils;
 
 /**
  * <p>Operations on <code>Object</code>.</p>
@@ -62,16 +30,20 @@ import java.io.Serializable;
  * An exception will generally not be thrown for a <code>null</code> input.
  * Each method documents its behaviour in more detail.</p>
  *
+ * <p>#ThreadSafe#</p>
+ * @author Apache Software Foundation
  * @author <a href="mailto:nissim@nksystems.com">Nissim Karpenstein</a>
  * @author <a href="mailto:janekdb@yahoo.co.uk">Janek Bogucki</a>
- * @author <a href="mailto:dlr@finemaltcoding.com">Daniel Rall</a>
- * @author Stephen Colebourne
+ * @author Daniel L. Rall
  * @author Gary Gregory
+ * @author Mario Winterer
+ * @author <a href="mailto:david@davidkarlsen.com">David J. M. Karlsen</a>
  * @since 1.0
  * @version $Id$
  */
+//@Immutable
 public class ObjectUtils {
-    
+
     /**
      * <p>Singleton used as a <code>null</code> placeholder where
      * <code>null</code> has another meaning.</p>
@@ -99,6 +71,7 @@ public class ObjectUtils {
      * to operate.</p>
      */
     public ObjectUtils() {
+        super();
     }
 
     // Defaulting
@@ -120,7 +93,7 @@ public class ObjectUtils {
      * @return <code>object</code> if it is not <code>null</code>, defaultValue otherwise
      */
     public static Object defaultIfNull(Object object, Object defaultValue) {
-        return (object != null ? object : defaultValue);
+        return object != null ? object : defaultValue;
     }
 
     /**
@@ -151,7 +124,48 @@ public class ObjectUtils {
         }
         return object1.equals(object2);
     }
-    
+
+    /**
+     * <p>Compares two objects for inequality, where either one or both
+     * objects may be <code>null</code>.</p>
+     *
+     * <pre>
+     * ObjectUtils.notEqual(null, null)                  = false
+     * ObjectUtils.notEqual(null, "")                    = true
+     * ObjectUtils.notEqual("", null)                    = true
+     * ObjectUtils.notEqual("", "")                      = false
+     * ObjectUtils.notEqual(Boolean.TRUE, null)          = true
+     * ObjectUtils.notEqual(Boolean.TRUE, "true")        = true
+     * ObjectUtils.notEqual(Boolean.TRUE, Boolean.TRUE)  = false
+     * ObjectUtils.notEqual(Boolean.TRUE, Boolean.FALSE) = true
+     * </pre>
+     *
+     * @param object1  the first object, may be <code>null</code>
+     * @param object2  the second object, may be <code>null</code>
+     * @return <code>false</code> if the values of both objects are the same
+     * @since 2.6
+     */
+    public static boolean notEqual(Object object1, Object object2) {
+        return ObjectUtils.equals(object1, object2) == false;
+    }
+
+    /**
+     * <p>Gets the hash code of an object returning zero when the
+     * object is <code>null</code>.</p>
+     *
+     * <pre>
+     * ObjectUtils.hashCode(null)   = 0
+     * ObjectUtils.hashCode(obj)    = obj.hashCode()
+     * </pre>
+     *
+     * @param obj  the object to obtain the hash code of, may be <code>null</code>
+     * @return the hash code of the object, or zero if null
+     * @since 2.1
+     */
+    public static int hashCode(Object obj) {
+        return (obj == null) ? 0 : obj.hashCode();
+    }
+
     // Identity ToString
     //-----------------------------------------------------------------------
     /**
@@ -174,7 +188,33 @@ public class ObjectUtils {
         if (object == null) {
             return null;
         }
-        return appendIdentityToString(null, object).toString();
+        StringBuffer buffer = new StringBuffer();
+        identityToString(buffer, object);
+        return buffer.toString();
+    }
+
+    /**
+     * <p>Appends the toString that would be produced by <code>Object</code>
+     * if a class did not override toString itself. <code>null</code>
+     * will throw a NullPointerException for either of the two parameters. </p>
+     *
+     * <pre>
+     * ObjectUtils.identityToString(buf, "")            = buf.append("java.lang.String@1e23"
+     * ObjectUtils.identityToString(buf, Boolean.TRUE)  = buf.append("java.lang.Boolean@7fa"
+     * ObjectUtils.identityToString(buf, Boolean.TRUE)  = buf.append("java.lang.Boolean@7fa")
+     * </pre>
+     *
+     * @param buffer  the buffer to append to
+     * @param object  the object to create a toString for
+     * @since 2.4
+     */
+    public static void identityToString(StringBuffer buffer, Object object) {
+        if (object == null) {
+            throw new NullPointerException("Cannot get the toString of a null identity");
+        }
+        buffer.append(object.getClass().getName())
+              .append('@')
+              .append(Integer.toHexString(System.identityHashCode(object)));
     }
 
     /**
@@ -194,6 +234,7 @@ public class ObjectUtils {
      * @return the default toString text, or <code>null</code> if
      *  <code>null</code> passed in
      * @since 2.0
+     * @deprecated The design of this method is bad - see LANG-360. Instead, use identityToString(StringBuffer, Object).
      */
     public static StringBuffer appendIdentityToString(StringBuffer buffer, Object object) {
         if (object == null) {
@@ -228,7 +269,7 @@ public class ObjectUtils {
      * @since 2.0
      */
     public static String toString(Object obj) {
-        return (obj == null ? "" : obj.toString());
+        return obj == null ? "" : obj.toString();
     }
 
     /**
@@ -251,7 +292,142 @@ public class ObjectUtils {
      * @since 2.0
      */
     public static String toString(Object obj, String nullStr) {
-        return (obj == null ? nullStr : obj.toString());
+        return obj == null ? nullStr : obj.toString();
+    }
+
+    // Min/Max
+    //-----------------------------------------------------------------------
+    /**
+     * Null safe comparison of Comparables.
+     * 
+     * @param c1  the first comparable, may be null
+     * @param c2  the second comparable, may be null
+     * @return
+     *  <ul>
+     *   <li>If both objects are non-null and unequal, the lesser object.
+     *   <li>If both objects are non-null and equal, c1.
+     *   <li>If one of the comparables is null, the non-null object.
+     *   <li>If both the comparables are null, null is returned.
+     *  </ul>
+     */
+    public static Object min(Comparable c1, Comparable c2) {
+        return (compare(c1, c2, true) <= 0 ? c1 : c2);
+    }
+
+    /**
+     * Null safe comparison of Comparables.
+     * 
+     * @param c1  the first comparable, may be null
+     * @param c2  the second comparable, may be null
+     * @return
+     *  <ul>
+     *   <li>If both objects are non-null and unequal, the greater object.
+     *   <li>If both objects are non-null and equal, c1.
+     *   <li>If one of the comparables is null, the non-null object.
+     *   <li>If both the comparables are null, null is returned.
+     *  </ul>
+     */
+    public static Object max(Comparable c1, Comparable c2) {
+        return (compare(c1, c2, false) >= 0 ? c1 : c2);
+    }
+
+    /**
+     * Null safe comparison of Comparables.
+     * {@code null} is assumed to be less than a non-{@code null} value.
+     * 
+     * @param c1  the first comparable, may be null
+     * @param c2  the second comparable, may be null
+     * @return a negative value if c1 < c2, zero if c1 = c2
+     * and a positive value if c1 > c2
+     * @since 2.6
+     */
+    public static int compare(Comparable c1, Comparable c2) {
+        return compare(c1, c2, false);
+    }
+
+    /**
+     * Null safe comparison of Comparables.
+     * 
+     * @param c1  the first comparable, may be null
+     * @param c2  the second comparable, may be null
+     * @param nullGreater if true <code>null</code> is considered greater
+     * than a Non-<code>null</code> value or if false <code>null</code> is
+     * considered less than a Non-<code>null</code> value
+     * @return a negative value if c1 < c2, zero if c1 = c2
+     * and a positive value if c1 > c2
+     * @see java.util.Comparator#compare(Object, Object)
+     * @since 2.6
+     */
+    public static int compare(Comparable c1, Comparable c2, boolean nullGreater) {
+        if (c1 == c2) {
+            return 0;
+        } else if (c1 == null) {
+            return (nullGreater ? 1 : -1);
+        } else if (c2 == null) {
+            return (nullGreater ? -1 : 1);
+        }
+        return c1.compareTo(c2);
+    }
+    
+    /**
+     * Clone an object.
+     * 
+     * @param o the object to clone
+     * @return the clone if the object implements {@link Cloneable} otherwise <code>null</code>
+     * @throws CloneFailedException if the object is cloneable and the clone operation fails
+     * @since 2.6
+     */
+    public static Object clone(final Object o) {
+        if (o instanceof Cloneable) {
+            final Object result;
+            if (o.getClass().isArray()) {
+                final Class componentType = o.getClass().getComponentType();
+                if (!componentType.isPrimitive()) {
+                    result = ((Object[])o).clone();
+                } else {
+                    int length = Array.getLength(o);
+                    result = Array.newInstance(componentType, length);
+                    while (length-- > 0) {
+                        Array.set(result, length, Array.get(o, length));
+                    }
+                }
+            } else {
+                try {
+                    result = MethodUtils.invokeMethod(o, "clone", null);
+                } catch (final NoSuchMethodException e) {
+                    throw new CloneFailedException("Cloneable type "
+                        + o.getClass().getName()
+                        + " has no clone method", e);
+                } catch (final IllegalAccessException e) {
+                    throw new CloneFailedException("Cannot clone Cloneable type "
+                        + o.getClass().getName(), e);
+                } catch (final InvocationTargetException e) {
+                    throw new CloneFailedException("Exception cloning Cloneable type "
+                        + o.getClass().getName(), e.getTargetException());
+                }
+            }
+            return result;
+        }
+
+        return null;
+    }
+
+    /**
+     * Clone an object if possible. This method is similar to {@link #clone(Object)}, but will
+     * return the provided instance as the return value instead of <code>null</code> if the instance
+     * is not cloneable. This is more convenient if the caller uses different
+     * implementations (e.g. of a service) and some of the implementations do not allow concurrent
+     * processing or have state. In such cases the implementation can simply provide a proper
+     * clone implementation and the caller's code does not have to change.
+     * 
+     * @param o the object to clone
+     * @return the clone if the object implements {@link Cloneable} otherwise the object itself
+     * @throws CloneFailedException if the object is cloneable and the clone operation fails
+     * @since 2.6
+     */
+    public static Object cloneIfPossible(final Object o) {
+        final Object clone = clone(o);
+        return clone == null ? o : clone;
     }
 
     // Null
@@ -271,13 +447,18 @@ public class ObjectUtils {
      * cannot be stored.</p>
      */
     public static class Null implements Serializable {
-        // declare serialization compatability with Commons Lang 1.0
+        /**
+         * Required for serialization support. Declare serialization compatibility with Commons Lang 1.0
+         * 
+         * @see java.io.Serializable
+         */
         private static final long serialVersionUID = 7092611880189329093L;
         
         /**
          * Restricted constructor - singleton.
          */
         Null() {
+            super();
         }
         
         /**
@@ -289,5 +470,5 @@ public class ObjectUtils {
             return ObjectUtils.NULL;
         }
     }
-    
+
 }

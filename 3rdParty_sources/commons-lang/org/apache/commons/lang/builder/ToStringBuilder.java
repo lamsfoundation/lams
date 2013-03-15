@@ -1,55 +1,18 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang.builder;
 
@@ -76,7 +39,7 @@ import org.apache.commons.lang.ObjectUtils;
  * public class Person {
  *   String name;
  *   int age;
- *   boolean isSmoker;
+ *   boolean smoker;
  * 
  *   ...
  * 
@@ -121,7 +84,7 @@ import org.apache.commons.lang.ObjectUtils;
  * <p>The exact format of the <code>toString</code> is determined by
  * the {@link ToStringStyle} passed into the constructor.</p>
  *
- * @author Stephen Colebourne
+ * @author Apache Software Foundation
  * @author Gary Gregory
  * @author Pete Gieser
  * @since 1.0
@@ -130,71 +93,45 @@ import org.apache.commons.lang.ObjectUtils;
 public class ToStringBuilder {
 
     /**
-     * The default style of output to use.
+     * The default style of output to use, not null.
      */
-    private static ToStringStyle defaultStyle = ToStringStyle.DEFAULT_STYLE;
+    private static volatile ToStringStyle defaultStyle = ToStringStyle.DEFAULT_STYLE;
 
     //----------------------------------------------------------------------------
 
     /**
      * <p>Gets the default <code>ToStringStyle</code> to use.</p>
-     *
-     * <p>This could allow the <code>ToStringStyle</code> to be
-     * controlled for an entire application with one call.</p>
-     *
-     * <p>This might be used to have a verbose
-     * <code>ToStringStyle</code> during development and a compact
-     * <code>ToStringStyle</code> in production.</p>
      * 
-     * @return the default <code>ToStringStyle</code>
+     * <p>This method gets a singleton default value, typically for the whole JVM.
+     * Changing this default should generally only be done during application startup.
+     * It is recommended to pass a <code>ToStringStyle</code> to the constructor instead
+     * of using this global default.</p>
+     * 
+     * <p>This method can be used from multiple threads.
+     * Internally, a <code>volatile</code> variable is used to provide the guarantee
+     * that the latest value set using {@link #setDefaultStyle} is the value returned.
+     * It is strongly recommended that the default style is only changed during application startup.</p>
+     * 
+     * <p>One reason for changing the default could be to have a verbose style during
+     * development and a compact style in production.</p>
+     * 
+     * @return the default <code>ToStringStyle</code>, never null
      */
     public static ToStringStyle getDefaultStyle() {
         return defaultStyle;
     }
 
     /**
-     * <p>Forwards to <code>ReflectionToStringBuilder</code>.</p>
-     * 
-     * @see ReflectionToStringBuilder#toString(Object)
-     */
-    public static String reflectionToString(Object object) {
-        return ReflectionToStringBuilder.toString(object);
-    }
-
-    /**
-     * <p>Forwards to <code>ReflectionToStringBuilder</code>.</p>
-     * 
-     * @see ReflectionToStringBuilder#toString(Object,ToStringStyle)
-     */
-    public static String reflectionToString(Object object, ToStringStyle style) {
-        return ReflectionToStringBuilder.toString(object, style);
-    }
-
-    /**
-     * <p>Forwards to <code>ReflectionToStringBuilder</code>.</p>
-     * 
-     * @see ReflectionToStringBuilder#toString(Object,ToStringStyle,boolean)
-     */
-    public static String reflectionToString(Object object, ToStringStyle style, boolean outputTransients) {
-        return ReflectionToStringBuilder.toString(object, style, outputTransients, null);
-    }
-
-    /**
-     * <p>Forwards to <code>ReflectionToStringBuilder</code>.</p>
-     * 
-     * @see ReflectionToStringBuilder#toString(Object,ToStringStyle,boolean,Class)
-     * @since 2.0
-     */
-    public static String reflectionToString(
-        Object object,
-        ToStringStyle style,
-        boolean outputTransients,
-        Class reflectUpToClass) {
-        return ReflectionToStringBuilder.toString(object, style, outputTransients, reflectUpToClass);
-    }
-
-    /**
      * <p>Sets the default <code>ToStringStyle</code> to use.</p>
+     * 
+     * <p>This method sets a singleton default value, typically for the whole JVM.
+     * Changing this default should generally only be done during application startup.
+     * It is recommended to pass a <code>ToStringStyle</code> to the constructor instead
+     * of changing this global default.</p>
+     * 
+     * <p>This method is not intended for use from multiple threads.
+     * Internally, a <code>volatile</code> variable is used to provide the guarantee
+     * that the latest value set is the value returned from {@link #getDefaultStyle}.</p>
      * 
      * @param style  the default <code>ToStringStyle</code>
      * @throws IllegalArgumentException if the style is <code>null</code>
@@ -206,74 +143,116 @@ public class ToStringBuilder {
         defaultStyle = style;
     }
 
+    //----------------------------------------------------------------------------
     /**
-     * Current toString buffer.
+     * <p>Uses <code>ReflectionToStringBuilder</code> to generate a
+     * <code>toString</code> for the specified object.</p>
+     * 
+     * @param object  the Object to be output
+     * @return the String result
+     * @see ReflectionToStringBuilder#toString(Object)
+     */
+    public static String reflectionToString(Object object) {
+        return ReflectionToStringBuilder.toString(object);
+    }
+
+    /**
+     * <p>Uses <code>ReflectionToStringBuilder</code> to generate a
+     * <code>toString</code> for the specified object.</p>
+     * 
+     * @param object  the Object to be output
+     * @param style  the style of the <code>toString</code> to create, may be <code>null</code>
+     * @return the String result
+     * @see ReflectionToStringBuilder#toString(Object,ToStringStyle)
+     */
+    public static String reflectionToString(Object object, ToStringStyle style) {
+        return ReflectionToStringBuilder.toString(object, style);
+    }
+
+    /**
+     * <p>Uses <code>ReflectionToStringBuilder</code> to generate a
+     * <code>toString</code> for the specified object.</p>
+     * 
+     * @param object  the Object to be output
+     * @param style  the style of the <code>toString</code> to create, may be <code>null</code>
+     * @param outputTransients  whether to include transient fields
+     * @return the String result
+     * @see ReflectionToStringBuilder#toString(Object,ToStringStyle,boolean)
+     */
+    public static String reflectionToString(Object object, ToStringStyle style, boolean outputTransients) {
+        return ReflectionToStringBuilder.toString(object, style, outputTransients, false, null);
+    }
+
+    /**
+     * <p>Uses <code>ReflectionToStringBuilder</code> to generate a
+     * <code>toString</code> for the specified object.</p>
+     * 
+     * @param object  the Object to be output
+     * @param style  the style of the <code>toString</code> to create, may be <code>null</code>
+     * @param outputTransients  whether to include transient fields
+     * @param reflectUpToClass  the superclass to reflect up to (inclusive), may be <code>null</code>
+     * @return the String result
+     * @see ReflectionToStringBuilder#toString(Object,ToStringStyle,boolean,boolean,Class)
+     * @since 2.0
+     */
+    public static String reflectionToString(
+        Object object,
+        ToStringStyle style,
+        boolean outputTransients,
+        Class reflectUpToClass) {
+        return ReflectionToStringBuilder.toString(object, style, outputTransients, false, reflectUpToClass);
+    }
+
+    //----------------------------------------------------------------------------
+
+    /**
+     * Current toString buffer, not null.
      */
     private final StringBuffer buffer;
-
     /**
-     * The object being output.
+     * The object being output, may be null.
      */
     private final Object object;
-
     /**
-     * The style of output to use.
+     * The style of output to use, not null.
      */
     private final ToStringStyle style;
 
     /**
-     * <p>Constructor for <code>ToStringBuilder</code>.</p>
+     * <p>Constructs a builder for the specified object using the default output style.</p>
      *
-     * <p>This constructor outputs using the default style set with
-     * <code>setDefaultStyle</code>.</p>
+     * <p>This default style is obtained from {@link #getDefaultStyle()}.</p>
      * 
-     * @param object  the Object to build a <code>toString</code> for,
-     *  must not be <code>null</code>
-     * @throws IllegalArgumentException  if the Object passed in is
-     *  <code>null</code>
+     * @param object  the Object to build a <code>toString</code> for, not recommended to be null
      */
     public ToStringBuilder(Object object) {
-        this(object, getDefaultStyle(), null);
+        this(object, null, null);
     }
 
     /**
-     * <p>Constructor for <code>ToStringBuilder</code> specifying the
-     * output style.</p>
+     * <p>Constructs a builder for the specified object using the a defined output style.</p>
      *
      * <p>If the style is <code>null</code>, the default style is used.</p>
      * 
-     * @param object  the Object to build a <code>toString</code> for,
-     *  must not be <code>null</code>
-     * @param style  the style of the <code>toString</code> to create,
-     *  may be <code>null</code>
-     * @throws IllegalArgumentException  if the Object passed in is
-     *  <code>null</code>
+     * @param object  the Object to build a <code>toString</code> for, not recommended to be null
+     * @param style  the style of the <code>toString</code> to create, null uses the default style
      */
     public ToStringBuilder(Object object, ToStringStyle style) {
         this(object, style, null);
     }
 
     /**
-     * <p>Constructor for <code>ToStringBuilder</code>.</p>
+     * <p>Constructs a builder for the specified object.</p>
      *
      * <p>If the style is <code>null</code>, the default style is used.</p>
      *
      * <p>If the buffer is <code>null</code>, a new one is created.</p>
      * 
-     * @param object  the Object to build a <code>toString</code> for,
-     *  must not be <code>null</code>
-     * @param style  the style of the <code>toString</code> to create,
-     *  may be <code>null</code>
-     * @param buffer  the <code>StringBuffer</code> to populate, may be
-     *  <code>null</code>
-     * @throws IllegalArgumentException  if the Object passed in is
-     *  <code>null</code>
+     * @param object  the Object to build a <code>toString</code> for, not recommended to be null
+     * @param style  the style of the <code>toString</code> to create, null uses the default style
+     * @param buffer  the <code>StringBuffer</code> to populate, may be null
      */
     public ToStringBuilder(Object object, ToStringStyle style, StringBuffer buffer) {
-        super();
-        if (object == null) {
-            throw new IllegalArgumentException("The object to create a toString for must not be null");
-        }
         if (style == null) {
             style = getDefaultStyle();
         }
@@ -489,11 +468,11 @@ public class ToStringBuilder {
      * <p>Append to the <code>toString</code> an <code>Object</code>
      * value.</p>
      *
-     * @param object  the value to add to the <code>toString</code>
+     * @param obj  the value to add to the <code>toString</code>
      * @return this
      */
-    public ToStringBuilder append(Object object) {
-        style.append(buffer, null, object, null);
+    public ToStringBuilder append(Object obj) {
+        style.append(buffer, null, obj, null);
         return this;
     }
 
@@ -865,11 +844,11 @@ public class ToStringBuilder {
      * value.</p>
      *
      * @param fieldName  the field name
-     * @param object  the value to add to the <code>toString</code>
+     * @param obj  the value to add to the <code>toString</code>
      * @return this
      */
-    public ToStringBuilder append(String fieldName, Object object) {
-        style.append(buffer, fieldName, object, null);
+    public ToStringBuilder append(String fieldName, Object obj) {
+        style.append(buffer, fieldName, obj, null);
         return this;
     }
 
@@ -878,13 +857,13 @@ public class ToStringBuilder {
      * value.</p>
      *
      * @param fieldName  the field name
-     * @param object  the value to add to the <code>toString</code>
+     * @param obj  the value to add to the <code>toString</code>
      * @param fullDetail  <code>true</code> for detail,
      *  <code>false</code> for summary info
      * @return this
      */
-    public ToStringBuilder append(String fieldName, Object object, boolean fullDetail) {
-        style.append(buffer, fieldName, object, BooleanUtils.toBooleanObject(fullDetail));
+    public ToStringBuilder append(String fieldName, Object obj, boolean fullDetail) {
+        style.append(buffer, fieldName, obj, BooleanUtils.toBooleanObject(fullDetail));
         return this;
     }
 
@@ -973,10 +952,11 @@ public class ToStringBuilder {
      * {@link System#identityHashCode(java.lang.Object)}.</p>
      * 
      * @param object  the <code>Object</code> whose class name and id to output
+     * @return this
      * @since 2.0
      */
     public ToStringBuilder appendAsObjectToString(Object object) {
-        ObjectUtils.appendIdentityToString(this.getStringBuffer(), object);
+        ObjectUtils.identityToString(this.getStringBuffer(), object);
         return this;
     }
 
@@ -1036,6 +1016,16 @@ public class ToStringBuilder {
     }
 
     /**
+     * <p>Returns the <code>Object</code> being output.</p>
+     * 
+     * @return The object being output.
+     * @since 2.0
+     */
+    public Object getObject() {
+        return object;
+    }
+
+    /**
      * <p>Gets the <code>StringBuffer</code> being populated.</p>
      * 
      * @return the <code>StringBuffer</code> being populated
@@ -1062,21 +1052,17 @@ public class ToStringBuilder {
      * <p>This method appends the end of data indicator, and can only be called once.
      * Use {@link #getStringBuffer} to get the current string state.</p>
      * 
+     * <p>If the object is <code>null</code>, return the style's <code>nullText</code></p>
+     * 
      * @return the String <code>toString</code>
      */
     public String toString() {
-        style.appendEnd(buffer, object);
-        return buffer.toString();
-    }
-
-    /**
-     * <p>Returns the <code>Object</code> being output.</p>
-     * 
-     * @return The object being output.
-     * @since 2.0
-     */
-    public Object getObject() {
-        return object;
+        if (this.getObject() == null) {
+            this.getStringBuffer().append(this.getStyle().getNullText());
+        } else {
+            style.appendEnd(this.getStringBuffer(), this.getObject());
+        }
+        return this.getStringBuffer().toString();
     }
 
 }

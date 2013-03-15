@@ -1,66 +1,29 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang;
 
 /**
  * <p>Operations on bit-mapped fields.</p>
  *
+ * @author Apache Software Foundation
  * @author Apache Jakarta POI
  * @author Scott Sanders (sanders at apache dot org)
  * @author Marc Johnson (mjohnson at apache dot org)
  * @author Andrew C. Oliver (acoliver at apache dot org)
- * @author Stephen Colebourne
  * @author Pete Gieser
  * @author Gary Gregory
  * @since 2.0
@@ -78,7 +41,7 @@ public class BitField {
      *  BitField. Bits that are set in this mask are the bits
      *  that this BitField operates on
      */
-    public BitField(final int mask) {
+    public BitField(int mask) {
         _mask = mask;
         int count = 0;
         int bit_pattern = mask;
@@ -101,12 +64,12 @@ public class BitField {
      * value is stored as a BitField (and so shifted left so many
      * bits).</p>
      *
-     * @see #setValue
+     * @see #setValue(int,int)
      * @param holder the int data containing the bits we're interested
      *  in
      * @return the selected bits, shifted right appropriately
      */
-    public int getValue(final int holder) {
+    public int getValue(int holder) {
         return getRawValue(holder) >> _shift_count;
     }
 
@@ -119,12 +82,12 @@ public class BitField {
      * value is stored as a BitField (and so shifted left so many
      * bits).</p>
      *
-     * @see #setShortValue
+     * @see #setShortValue(short,short)
      * @param holder the short data containing the bits we're
      *  interested in
      * @return the selected bits, shifted right appropriately
      */
-    public short getShortValue(final short holder) {
+    public short getShortValue(short holder) {
         return (short) getValue(holder);
     }
 
@@ -135,8 +98,8 @@ public class BitField {
      *  interested in
      * @return the selected bits
      */
-    public int getRawValue(final int holder) {
-        return (holder & _mask);
+    public int getRawValue(int holder) {
+        return holder & _mask;
     }
 
     /**
@@ -146,7 +109,7 @@ public class BitField {
      *  interested in
      * @return the selected bits
      */
-    public short getShortRawValue(final short holder) {
+    public short getShortRawValue(short holder) {
         return (short) getRawValue(holder);
     }
 
@@ -163,7 +126,7 @@ public class BitField {
      * @return <code>true</code> if any of the bits are set,
      *  else <code>false</code>
      */
-    public boolean isSet(final int holder) {
+    public boolean isSet(int holder) {
         return (holder & _mask) != 0;
     }
 
@@ -179,35 +142,35 @@ public class BitField {
      * @return <code>true</code> if all of the bits are set,
      *  else <code>false</code>
      */
-    public boolean isAllSet(final int holder) {
+    public boolean isAllSet(int holder) {
         return (holder & _mask) == _mask;
     }
 
     /**
      * <p>Replaces the bits with new values.</p>
      *
-     * @see #getValue
-     * @param holder the int data containint the bits we're
+     * @see #getValue(int)
+     * @param holder the int data containing the bits we're
      *  interested in
      * @param value the new value for the specified bits
      * @return the value of holder with the bits from the value
      *  parameter replacing the old bits
      */
-    public int setValue(final int holder, final int value) {
+    public int setValue(int holder, int value) {
         return (holder & ~_mask) | ((value << _shift_count) & _mask);
     }
 
     /**
      * <p>Replaces the bits with new values.</p>
      *
-     * @see #getShortValue
+     * @see #getShortValue(short)
      * @param holder the short data containing the bits we're
      *  interested in
      * @param value the new value for the specified bits
      * @return the value of holder with the bits from the value
      *  parameter replacing the old bits
      */
-    public short setShortValue(final short holder, final short value) {
+    public short setShortValue(short holder, short value) {
         return (short) setValue(holder, value);
     }
 
@@ -219,7 +182,7 @@ public class BitField {
      * @return the value of holder with the specified bits cleared
      *  (set to <code>0</code>)
      */
-    public int clear(final int holder) {
+    public int clear(int holder) {
         return holder & ~_mask;
     }
 
@@ -231,7 +194,7 @@ public class BitField {
      * @return the value of holder with the specified bits cleared
      *  (set to <code>0</code>)
      */
-    public short clearShort(final short holder) {
+    public short clearShort(short holder) {
         return (short) clear(holder);
     }
 
@@ -244,7 +207,7 @@ public class BitField {
      * @return the value of holder with the specified bits cleared
      *  (set to <code>0</code>)
      */
-    public byte clearByte(final byte holder) {
+    public byte clearByte(byte holder) {
         return (byte) clear(holder);
     }
 
@@ -256,7 +219,7 @@ public class BitField {
      * @return the value of holder with the specified bits set
      *  to <code>1</code>
      */
-    public int set(final int holder) {
+    public int set(int holder) {
         return holder | _mask;
     }
 
@@ -268,7 +231,7 @@ public class BitField {
      * @return the value of holder with the specified bits set
      *  to <code>1</code>
      */
-    public short setShort(final short holder) {
+    public short setShort(short holder) {
         return (short) set(holder);
     }
 
@@ -281,7 +244,7 @@ public class BitField {
      * @return the value of holder with the specified bits set
      *  to <code>1</code>
      */
-    public byte setByte(final byte holder) {
+    public byte setByte(byte holder) {
         return (byte) set(holder);
     }
 
@@ -294,7 +257,7 @@ public class BitField {
      * @return the value of holder with the specified bits set or
      *         cleared
      */
-    public int setBoolean(final int holder, final boolean flag) {
+    public int setBoolean(int holder, boolean flag) {
         return flag ? set(holder) : clear(holder);
     }
 
@@ -307,7 +270,7 @@ public class BitField {
      * @return the value of holder with the specified bits set or
      *  cleared
      */
-    public short setShortBoolean(final short holder, final boolean flag) {
+    public short setShortBoolean(short holder, boolean flag) {
         return flag ? setShort(holder) : clearShort(holder);
     }
 
@@ -320,7 +283,7 @@ public class BitField {
      * @return the value of holder with the specified bits set or
      *  cleared
      */
-    public byte setByteBoolean(final byte holder, final boolean flag) {
+    public byte setByteBoolean(byte holder, boolean flag) {
         return flag ? setByte(holder) : clearByte(holder);
     }
 

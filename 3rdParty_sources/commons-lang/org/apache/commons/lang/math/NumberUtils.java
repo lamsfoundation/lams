@@ -1,55 +1,18 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang.math;
 
@@ -61,14 +24,14 @@ import org.apache.commons.lang.StringUtils;
 /**
  * <p>Provides extra functionality for Java Number classes.</p>
  *
- * @author <a href="mailto:bayard@generationjava.com">Henri Yandell</a>
+ * @author Apache Software Foundation
  * @author <a href="mailto:rand_mcneely@yahoo.com">Rand McNeely</a>
- * @author Stephen Colebourne
  * @author <a href="mailto:steve.downey@netfolio.com">Steve Downey</a>
  * @author Eric Pugh
  * @author Phil Steitz
  * @author Matthew Hawthorne
  * @author <a href="mailto:ggregory@seagullsw.com">Gary Gregory</a>
+ * @author <a href="mailto:fredrik@westermarck.com">Fredrik Westermarck</a>
  * @since 2.0
  * @version $Id$
  */
@@ -113,12 +76,13 @@ public class NumberUtils {
 
     /**
      * <p><code>NumberUtils</code> instances should NOT be constructed in standard programming.
-     * Instead, the class should be used as <code>NumberUtils.stringToInt("6");</code>.</p>
+     * Instead, the class should be used as <code>NumberUtils.toInt("6");</code>.</p>
      *
      * <p>This constructor is public to permit tools that require a JavaBean instance
      * to operate.</p>
      */
     public NumberUtils() {
+        super();
     }
 
     //-----------------------------------------------------------------------
@@ -128,12 +92,41 @@ public class NumberUtils {
      *
      * <p>If the string is <code>null</code>, <code>zero</code> is returned.</p>
      * 
+     * <pre>
+     *   NumberUtils.stringToInt(null) = 0
+     *   NumberUtils.stringToInt("")   = 0
+     *   NumberUtils.stringToInt("1")  = 1
+     * </pre>
+     *
      * @param str  the string to convert, may be null
      * @return the int represented by the string, or <code>zero</code> if
      *  conversion fails
+     * @deprecated Use {@link #toInt(String)}
+     *  This method will be removed in Commons Lang 3.0
      */
     public static int stringToInt(String str) {
-        return stringToInt(str, 0);
+        return toInt(str);
+    }
+
+    /**
+     * <p>Convert a <code>String</code> to an <code>int</code>, returning
+     * <code>zero</code> if the conversion fails.</p>
+     *
+     * <p>If the string is <code>null</code>, <code>zero</code> is returned.</p>
+     *
+     * <pre>
+     *   NumberUtils.toInt(null) = 0
+     *   NumberUtils.toInt("")   = 0
+     *   NumberUtils.toInt("1")  = 1
+     * </pre>
+     *
+     * @param str  the string to convert, may be null
+     * @return the int represented by the string, or <code>zero</code> if
+     *  conversion fails
+     * @since 2.1
+     */
+    public static int toInt(String str) {
+        return toInt(str, 0);
     }
 
     /**
@@ -142,13 +135,297 @@ public class NumberUtils {
      *
      * <p>If the string is <code>null</code>, the default value is returned.</p>
      * 
+     * <pre>
+     *   NumberUtils.stringToInt(null, 1) = 1
+     *   NumberUtils.stringToInt("", 1)   = 1
+     *   NumberUtils.stringToInt("1", 0)  = 1
+     * </pre>
+     *
      * @param str  the string to convert, may be null
      * @param defaultValue  the default value
      * @return the int represented by the string, or the default if conversion fails
+     * @deprecated Use {@link #toInt(String, int)}
+     *  This method will be removed in Commons Lang 3.0
      */
     public static int stringToInt(String str, int defaultValue) {
+        return toInt(str, defaultValue);
+    }
+
+    /**
+     * <p>Convert a <code>String</code> to an <code>int</code>, returning a
+     * default value if the conversion fails.</p>
+     *
+     * <p>If the string is <code>null</code>, the default value is returned.</p>
+     *
+     * <pre>
+     *   NumberUtils.toInt(null, 1) = 1
+     *   NumberUtils.toInt("", 1)   = 1
+     *   NumberUtils.toInt("1", 0)  = 1
+     * </pre>
+     *
+     * @param str  the string to convert, may be null
+     * @param defaultValue  the default value
+     * @return the int represented by the string, or the default if conversion fails
+     * @since 2.1
+     */
+    public static int toInt(String str, int defaultValue) {
+        if(str == null) {
+            return defaultValue;
+        }
         try {
             return Integer.parseInt(str);
+        } catch (NumberFormatException nfe) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * <p>Convert a <code>String</code> to a <code>long</code>, returning
+     * <code>zero</code> if the conversion fails.</p>
+     *
+     * <p>If the string is <code>null</code>, <code>zero</code> is returned.</p>
+     *
+     * <pre>
+     *   NumberUtils.toLong(null) = 0L
+     *   NumberUtils.toLong("")   = 0L
+     *   NumberUtils.toLong("1")  = 1L
+     * </pre>
+     *
+     * @param str  the string to convert, may be null
+     * @return the long represented by the string, or <code>0</code> if
+     *  conversion fails
+     * @since 2.1
+     */
+    public static long toLong(String str) {
+        return toLong(str, 0L);
+    }
+
+    /**
+     * <p>Convert a <code>String</code> to a <code>long</code>, returning a
+     * default value if the conversion fails.</p>
+     *
+     * <p>If the string is <code>null</code>, the default value is returned.</p>
+     *
+     * <pre>
+     *   NumberUtils.toLong(null, 1L) = 1L
+     *   NumberUtils.toLong("", 1L)   = 1L
+     *   NumberUtils.toLong("1", 0L)  = 1L
+     * </pre>
+     *
+     * @param str  the string to convert, may be null
+     * @param defaultValue  the default value
+     * @return the long represented by the string, or the default if conversion fails
+     * @since 2.1
+     */
+    public static long toLong(String str, long defaultValue) {
+        if (str == null) {
+            return defaultValue;
+        }
+        try {
+            return Long.parseLong(str);
+        } catch (NumberFormatException nfe) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * <p>Convert a <code>String</code> to a <code>float</code>, returning
+     * <code>0.0f</code> if the conversion fails.</p>
+     *
+     * <p>If the string <code>str</code> is <code>null</code>,
+     * <code>0.0f</code> is returned.</p>
+     *
+     * <pre>
+     *   NumberUtils.toFloat(null)   = 0.0f
+     *   NumberUtils.toFloat("")     = 0.0f
+     *   NumberUtils.toFloat("1.5")  = 1.5f
+     * </pre>
+     *
+     * @param str the string to convert, may be <code>null</code>
+     * @return the float represented by the string, or <code>0.0f</code>
+     *  if conversion fails
+     * @since 2.1
+     */
+    public static float toFloat(String str) {
+        return toFloat(str, 0.0f);
+    }
+
+    /**
+     * <p>Convert a <code>String</code> to a <code>float</code>, returning a
+     * default value if the conversion fails.</p>
+     *
+     * <p>If the string <code>str</code> is <code>null</code>, the default
+     * value is returned.</p>
+     *
+     * <pre>
+     *   NumberUtils.toFloat(null, 1.1f)   = 1.0f
+     *   NumberUtils.toFloat("", 1.1f)     = 1.1f
+     *   NumberUtils.toFloat("1.5", 0.0f)  = 1.5f
+     * </pre>
+     *
+     * @param str the string to convert, may be <code>null</code>
+     * @param defaultValue the default value
+     * @return the float represented by the string, or defaultValue
+     *  if conversion fails
+     * @since 2.1
+     */
+    public static float toFloat(String str, float defaultValue) {
+      if (str == null) {
+          return defaultValue;
+      }     
+      try {
+          return Float.parseFloat(str);
+      } catch (NumberFormatException nfe) {
+          return defaultValue;
+      }
+    }
+
+    /**
+     * <p>Convert a <code>String</code> to a <code>double</code>, returning
+     * <code>0.0d</code> if the conversion fails.</p>
+     *
+     * <p>If the string <code>str</code> is <code>null</code>,
+     * <code>0.0d</code> is returned.</p>
+     *
+     * <pre>
+     *   NumberUtils.toDouble(null)   = 0.0d
+     *   NumberUtils.toDouble("")     = 0.0d
+     *   NumberUtils.toDouble("1.5")  = 1.5d
+     * </pre>
+     *
+     * @param str the string to convert, may be <code>null</code>
+     * @return the double represented by the string, or <code>0.0d</code>
+     *  if conversion fails
+     * @since 2.1
+     */
+    public static double toDouble(String str) {
+        return toDouble(str, 0.0d);
+    }
+
+    /**
+     * <p>Convert a <code>String</code> to a <code>double</code>, returning a
+     * default value if the conversion fails.</p>
+     *
+     * <p>If the string <code>str</code> is <code>null</code>, the default
+     * value is returned.</p>
+     *
+     * <pre>
+     *   NumberUtils.toDouble(null, 1.1d)   = 1.1d
+     *   NumberUtils.toDouble("", 1.1d)     = 1.1d
+     *   NumberUtils.toDouble("1.5", 0.0d)  = 1.5d
+     * </pre>
+     *
+     * @param str the string to convert, may be <code>null</code>
+     * @param defaultValue the default value
+     * @return the double represented by the string, or defaultValue
+     *  if conversion fails
+     * @since 2.1
+     */
+    public static double toDouble(String str, double defaultValue) {
+      if (str == null) {
+          return defaultValue;
+      }
+      try {
+          return Double.parseDouble(str);
+      } catch (NumberFormatException nfe) {
+          return defaultValue;
+      }
+    }
+
+     //-----------------------------------------------------------------------
+     /**
+     * <p>Convert a <code>String</code> to a <code>byte</code>, returning
+     * <code>zero</code> if the conversion fails.</p>
+     *
+     * <p>If the string is <code>null</code>, <code>zero</code> is returned.</p>
+     *
+     * <pre>
+     *   NumberUtils.toByte(null) = 0
+     *   NumberUtils.toByte("")   = 0
+     *   NumberUtils.toByte("1")  = 1
+     * </pre>
+     *
+     * @param str  the string to convert, may be null
+     * @return the byte represented by the string, or <code>zero</code> if
+     *  conversion fails
+     * @since 2.5
+     */
+    public static byte toByte(String str) {
+        return toByte(str, (byte) 0);
+    }
+
+    /**
+     * <p>Convert a <code>String</code> to a <code>byte</code>, returning a
+     * default value if the conversion fails.</p>
+     *
+     * <p>If the string is <code>null</code>, the default value is returned.</p>
+     *
+     * <pre>
+     *   NumberUtils.toByte(null, 1) = 1
+     *   NumberUtils.toByte("", 1)   = 1
+     *   NumberUtils.toByte("1", 0)  = 1
+     * </pre>
+     *
+     * @param str  the string to convert, may be null
+     * @param defaultValue  the default value
+     * @return the byte represented by the string, or the default if conversion fails
+     * @since 2.5
+     */
+    public static byte toByte(String str, byte defaultValue) {
+        if(str == null) {
+            return defaultValue;
+        }
+        try {
+            return Byte.parseByte(str);
+        } catch (NumberFormatException nfe) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * <p>Convert a <code>String</code> to a <code>short</code>, returning
+     * <code>zero</code> if the conversion fails.</p>
+     *
+     * <p>If the string is <code>null</code>, <code>zero</code> is returned.</p>
+     *
+     * <pre>
+     *   NumberUtils.toShort(null) = 0
+     *   NumberUtils.toShort("")   = 0
+     *   NumberUtils.toShort("1")  = 1
+     * </pre>
+     *
+     * @param str  the string to convert, may be null
+     * @return the short represented by the string, or <code>zero</code> if
+     *  conversion fails
+     * @since 2.5
+     */
+    public static short toShort(String str) {
+        return toShort(str, (short) 0);
+    }
+
+    /**
+     * <p>Convert a <code>String</code> to an <code>short</code>, returning a
+     * default value if the conversion fails.</p>
+     *
+     * <p>If the string is <code>null</code>, the default value is returned.</p>
+     *
+     * <pre>
+     *   NumberUtils.toShort(null, 1) = 1
+     *   NumberUtils.toShort("", 1)   = 1
+     *   NumberUtils.toShort("1", 0)  = 1
+     * </pre>
+     *
+     * @param str  the string to convert, may be null
+     * @param defaultValue  the default value
+     * @return the short represented by the string, or the default if conversion fails
+     * @since 2.5
+     */
+    public static short toShort(String str, short defaultValue) {
+        if(str == null) {
+            return defaultValue;
+        }
+        try {
+            return Short.parseShort(str);
         } catch (NumberFormatException nfe) {
             return defaultValue;
         }
@@ -243,7 +520,7 @@ public class NumberUtils {
         if (decPos > -1) {
 
             if (expPos > -1) {
-                if (expPos < decPos) {
+                if (expPos < decPos || expPos > str.length()) {
                     throw new NumberFormatException(str + " is not a valid number.");
                 }
                 dec = str.substring(decPos + 1, expPos);
@@ -253,13 +530,16 @@ public class NumberUtils {
             mant = str.substring(0, decPos);
         } else {
             if (expPos > -1) {
+                if (expPos > str.length()) {
+                    throw new NumberFormatException(str + " is not a valid number.");
+                }
                 mant = str.substring(0, expPos);
             } else {
                 mant = str;
             }
             dec = null;
         }
-        if (!Character.isDigit(lastChar)) {
+        if (!Character.isDigit(lastChar) && lastChar != '.') {
             if (expPos > -1 && expPos < str.length() - 1) {
                 exp = str.substring(expPos + 1, str.length() - 1);
             } else {
@@ -273,8 +553,7 @@ public class NumberUtils {
                 case 'L' :
                     if (dec == null
                         && exp == null
-                        && isDigits(numeric.substring(1))
-                        && (numeric.charAt(0) == '-' || Character.isDigit(numeric.charAt(0)))) {
+                        && (numeric.charAt(0) == '-' && isDigits(numeric.substring(1)) || isDigits(numeric))) {
                         try {
                             return createLong(numeric);
                         } catch (NumberFormatException nfe) {
@@ -290,13 +569,14 @@ public class NumberUtils {
                         Float f = NumberUtils.createFloat(numeric);
                         if (!(f.isInfinite() || (f.floatValue() == 0.0F && !allZeros))) {
                             //If it's too big for a float or the float value = 0 and the string
-                            //has non-zeros in it, then float doens't have the presision we want
+                            //has non-zeros in it, then float does not have the precision we want
                             return f;
                         }
 
                     } catch (NumberFormatException nfe) {
+                        // ignore the bad number
                     }
-                    //Fall through
+                    //$FALL-THROUGH$
                 case 'd' :
                 case 'D' :
                     try {
@@ -305,12 +585,14 @@ public class NumberUtils {
                             return d;
                         }
                     } catch (NumberFormatException nfe) {
+                        // ignore the bad number
                     }
                     try {
                         return createBigDecimal(numeric);
                     } catch (NumberFormatException e) {
+                        // ignore the bad number
                     }
-                    //Fall through
+                    //$FALL-THROUGH$
                 default :
                     throw new NumberFormatException(str + " is not a valid number.");
 
@@ -328,10 +610,12 @@ public class NumberUtils {
                 try {
                     return createInteger(str);
                 } catch (NumberFormatException nfe) {
+                    // ignore the bad number
                 }
                 try {
                     return createLong(str);
                 } catch (NumberFormatException nfe) {
+                    // ignore the bad number
                 }
                 return createBigInteger(str);
 
@@ -344,6 +628,7 @@ public class NumberUtils {
                         return f;
                     }
                 } catch (NumberFormatException nfe) {
+                    // ignore the bad number
                 }
                 try {
                     Double d = createDouble(str);
@@ -351,6 +636,7 @@ public class NumberUtils {
                         return d;
                     }
                 } catch (NumberFormatException nfe) {
+                    // ignore the bad number
                 }
 
                 return createBigDecimal(str);
@@ -565,6 +851,33 @@ public class NumberUtils {
         return min;
     }
 
+    /**
+     * <p>Returns the minimum value in an array.</p>
+     * 
+     * @param array  an array, must not be null or empty
+     * @return the minimum value in the array
+     * @throws IllegalArgumentException if <code>array</code> is <code>null</code>
+     * @throws IllegalArgumentException if <code>array</code> is empty
+     */
+    public static byte min(byte[] array) {
+        // Validates input
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+    
+        // Finds and returns min
+        byte min = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] < min) {
+                min = array[i];
+            }
+        }
+    
+        return min;
+    }
+
      /**
      * <p>Returns the minimum value in an array.</p>
      * 
@@ -572,6 +885,7 @@ public class NumberUtils {
      * @return the minimum value in the array
      * @throws IllegalArgumentException if <code>array</code> is <code>null</code>
      * @throws IllegalArgumentException if <code>array</code> is empty
+     * @see IEEE754rUtils#min(double[]) IEEE754rUtils for a version of this method that handles NaN differently
      */
     public static double min(double[] array) {
         // Validates input
@@ -584,6 +898,9 @@ public class NumberUtils {
         // Finds and returns min
         double min = array[0];
         for (int i = 1; i < array.length; i++) {
+            if (Double.isNaN(array[i])) {
+                return Double.NaN;
+            }
             if (array[i] < min) {
                 min = array[i];
             }
@@ -599,6 +916,7 @@ public class NumberUtils {
      * @return the minimum value in the array
      * @throws IllegalArgumentException if <code>array</code> is <code>null</code>
      * @throws IllegalArgumentException if <code>array</code> is empty
+     * @see IEEE754rUtils#min(float[]) IEEE754rUtils for a version of this method that handles NaN differently
      */
     public static float min(float[] array) {
         // Validates input
@@ -611,6 +929,9 @@ public class NumberUtils {
         // Finds and returns min
         float min = array[0];
         for (int i = 1; i < array.length; i++) {
+            if (Float.isNaN(array[i])) {
+                return Float.NaN;
+            }
             if (array[i] < min) {
                 min = array[i];
             }
@@ -710,6 +1031,34 @@ public class NumberUtils {
      * @throws IllegalArgumentException if <code>array</code> is <code>null</code>
      * @throws IllegalArgumentException if <code>array</code> is empty
      */
+    public static byte max(byte[] array) {
+        // Validates input
+        if (array == null) {
+            throw new IllegalArgumentException("The Array must not be null");
+        } else if (array.length == 0) {
+            throw new IllegalArgumentException("Array cannot be empty.");
+        }
+    
+        // Finds and returns max
+        byte max = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] > max) {
+                max = array[i];
+            }
+        }
+    
+        return max;
+    }
+
+    /**
+     * <p>Returns the maximum value in an array.</p>
+     * 
+     * @param array  an array, must not be null or empty
+     * @return the minimum value in the array
+     * @throws IllegalArgumentException if <code>array</code> is <code>null</code>
+     * @throws IllegalArgumentException if <code>array</code> is empty
+     * @see IEEE754rUtils#max(double[]) IEEE754rUtils for a version of this method that handles NaN differently
+     */
     public static double max(double[] array) {
         // Validates input
         if (array== null) {
@@ -721,6 +1070,9 @@ public class NumberUtils {
         // Finds and returns max
         double max = array[0];
         for (int j = 1; j < array.length; j++) {
+            if (Double.isNaN(array[j])) {
+                return Double.NaN;
+            }
             if (array[j] > max) {
                 max = array[j];
             }
@@ -736,6 +1088,7 @@ public class NumberUtils {
      * @return the minimum value in the array
      * @throws IllegalArgumentException if <code>array</code> is <code>null</code>
      * @throws IllegalArgumentException if <code>array</code> is empty
+     * @see IEEE754rUtils#max(float[]) IEEE754rUtils for a version of this method that handles NaN differently
      */
     public static float max(float[] array) {
         // Validates input
@@ -748,6 +1101,9 @@ public class NumberUtils {
         // Finds and returns max
         float max = array[0];
         for (int j = 1; j < array.length; j++) {
+            if (Float.isNaN(array[j])) {
+                return Float.NaN;
+            }
             if (array[j] > max) {
                 max = array[j];
             }
@@ -840,6 +1196,7 @@ public class NumberUtils {
      * @param b  value 2
      * @param c  value 3
      * @return  the smallest of the values
+     * @see IEEE754rUtils#min(double, double, double) for a version of this method that handles NaN differently
      */
     public static double min(double a, double b, double c) {
         return Math.min(Math.min(a, b), c);
@@ -855,6 +1212,7 @@ public class NumberUtils {
      * @param b  value 2
      * @param c  value 3
      * @return  the smallest of the values
+     * @see IEEE754rUtils#min(float, float, float) for a version of this method that handles NaN differently
      */
     public static float min(float a, float b, float c) {
         return Math.min(Math.min(a, b), c);
@@ -944,6 +1302,7 @@ public class NumberUtils {
      * @param b  value 2
      * @param c  value 3
      * @return  the largest of the values
+     * @see IEEE754rUtils#max(double, double, double) for a version of this method that handles NaN differently
      */
     public static double max(double a, double b, double c) {
         return Math.max(Math.max(a, b), c);
@@ -959,6 +1318,7 @@ public class NumberUtils {
      * @param b  value 2
      * @param c  value 3
      * @return  the largest of the values
+     * @see IEEE754rUtils#max(float, float, float) for a version of this method that handles NaN differently
      */
     public static float max(float a, float b, float c) {
         return Math.max(Math.max(a, b), c);
@@ -982,7 +1342,7 @@ public class NumberUtils {
      *  <li>NaN
      *  <li>Positive infinity
      *  <li>Maximum double
-     *  <li>Normal positve numbers
+     *  <li>Normal positive numbers
      *  <li>+0.0
      *  <li>-0.0
      *  <li>Normal negative numbers
@@ -1031,7 +1391,7 @@ public class NumberUtils {
     /**
      * <p>Compares two floats for order.</p>
      *
-     * <p>This method is more comprhensive than the standard Java greater than,
+     * <p>This method is more comprehensive than the standard Java greater than,
      * less than and equals operators.</p>
      * <ul>
      *  <li>It returns <code>-1</code> if the first value is less than the second.
@@ -1044,7 +1404,7 @@ public class NumberUtils {
      * <li>NaN
      * <li>Positive infinity
      * <li>Maximum float
-     * <li>Normal positve numbers
+     * <li>Normal positive numbers
      * <li>+0.0
      * <li>-0.0
      * <li>Normal negative numbers
@@ -1101,7 +1461,7 @@ public class NumberUtils {
      * @return <code>true</code> if str contains only unicode numeric
      */
     public static boolean isDigits(String str) {
-        if ((str == null) || (str.length() == 0)) {
+        if (StringUtils.isEmpty(str)) {
             return false;
         }
         for (int i = 0; i < str.length(); i++) {
@@ -1126,7 +1486,7 @@ public class NumberUtils {
      * @return <code>true</code> if the string is a correctly formatted number
      */
     public static boolean isNumber(String str) {
-        if ((str == null) || (str.length() == 0)) {
+        if (StringUtils.isEmpty(str)) {
             return false;
         }
         char[] chars = str.toCharArray();
@@ -1201,6 +1561,14 @@ public class NumberUtils {
                 // can't have an E at the last byte
                 return false;
             }
+            if (chars[i] == '.') {
+                if (hasDecPoint || hasExp) {
+                    // two decimal points or dec in exponent
+                    return false;
+                }
+                // single trailing decimal point after non-exponent is ok
+                return foundDigit;
+            }
             if (!allowSigns
                 && (chars[i] == 'd'
                     || chars[i] == 'D'
@@ -1210,7 +1578,7 @@ public class NumberUtils {
             }
             if (chars[i] == 'l'
                 || chars[i] == 'L') {
-                // not allowing L with an exponoent
+                // not allowing L with an exponent
                 return foundDigit && !hasExp;
             }
             // last character is illegal

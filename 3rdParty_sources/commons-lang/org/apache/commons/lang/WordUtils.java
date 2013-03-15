@@ -1,55 +1,18 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang;
 
@@ -61,8 +24,7 @@ package org.apache.commons.lang;
  * Each method documents its behaviour in more detail.</p>
  * 
  * @author Apache Jakarta Velocity
- * @author Henri Yandell
- * @author Stephen Colebourne
+ * @author Apache Software Foundation
  * @author <a href="mailto:hps@intermeta.de">Henning P. Schmiedehausen</a>
  * @author Gary Gregory
  * @since 2.0
@@ -71,14 +33,15 @@ package org.apache.commons.lang;
 public class WordUtils {
 
     /**
-     * <p><code>WordWrapUtils</code> instances should NOT be constructed in
+     * <p><code>WordUtils</code> instances should NOT be constructed in
      * standard programming. Instead, the class should be used as
-     * <code>WordWrapUtils.wrap("foo bar", 20);</code>.</p>
+     * <code>WordUtils.wrap("foo bar", 20);</code>.</p>
      *
      * <p>This constructor is public to permit tools that require a JavaBean
      * instance to operate.</p>
      */
     public WordUtils() {
+      super();
     }
 
     // Wrapping
@@ -152,7 +115,7 @@ public class WordUtils {
 //            }
 //        }
 //
-//        return (stringBuffer.toString());
+//        return stringBuffer.toString();
 //    }
 
     // Wrapping
@@ -256,8 +219,9 @@ public class WordUtils {
     //-----------------------------------------------------------------------
     /**
      * <p>Capitalizes all the whitespace separated words in a String.
-     * Only the first letter of each word is changed. To change all letters to
-     * the capitalized case, use {@link #capitalizeFully(String)}.</p>
+     * Only the first letter of each word is changed. To convert the 
+     * rest of each word to lowercase at the same time, 
+     * use {@link #capitalizeFully(String)}.</p>
      *
      * <p>Whitespace is defined by {@link Character#isWhitespace(char)}.
      * A <code>null</code> input String returns <code>null</code>.
@@ -276,20 +240,55 @@ public class WordUtils {
      * @see #capitalizeFully(String)
      */
     public static String capitalize(String str) {
-        int strLen;
-        if (str == null || (strLen = str.length()) == 0) {
+        return capitalize(str, null);
+    }
+
+    /**
+     * <p>Capitalizes all the delimiter separated words in a String.
+     * Only the first letter of each word is changed. To convert the 
+     * rest of each word to lowercase at the same time, 
+     * use {@link #capitalizeFully(String, char[])}.</p>
+     *
+     * <p>The delimiters represent a set of characters understood to separate words.
+     * The first string character and the first non-delimiter character after a
+     * delimiter will be capitalized. </p>
+     *
+     * <p>A <code>null</code> input String returns <code>null</code>.
+     * Capitalization uses the unicode title case, normally equivalent to
+     * upper case.</p>
+     *
+     * <pre>
+     * WordUtils.capitalize(null, *)            = null
+     * WordUtils.capitalize("", *)              = ""
+     * WordUtils.capitalize(*, new char[0])     = *
+     * WordUtils.capitalize("i am fine", null)  = "I Am Fine"
+     * WordUtils.capitalize("i aM.fine", {'.'}) = "I aM.Fine"
+     * </pre>
+     * 
+     * @param str  the String to capitalize, may be null
+     * @param delimiters  set of characters to determine capitalization, null means whitespace
+     * @return capitalized String, <code>null</code> if null String input
+     * @see #uncapitalize(String)
+     * @see #capitalizeFully(String)
+     * @since 2.1
+     */
+    public static String capitalize(String str, char[] delimiters) {
+        int delimLen = (delimiters == null ? -1 : delimiters.length);
+        if (str == null || str.length() == 0 || delimLen == 0) {
             return str;
         }
+        int strLen = str.length();
         StringBuffer buffer = new StringBuffer(strLen);
-        boolean whitespace = true;
+        boolean capitalizeNext = true;
         for (int i = 0; i < strLen; i++) {
             char ch = str.charAt(i);
-            if (Character.isWhitespace(ch)) {
+
+            if (isDelimiter(ch, delimiters)) {
                 buffer.append(ch);
-                whitespace = true;
-            } else if (whitespace) {
+                capitalizeNext = true;
+            } else if (capitalizeNext) {
                 buffer.append(Character.toTitleCase(ch));
-                whitespace = false;
+                capitalizeNext = false;
             } else {
                 buffer.append(ch);
             }
@@ -297,9 +296,11 @@ public class WordUtils {
         return buffer.toString();
     }
 
+    //-----------------------------------------------------------------------
     /**
-     * <p>Capitalizes all the whitespace separated words in a String.
-     * All letters are changed, so the resulting string will be fully changed.</p>
+     * <p>Converts all the whitespace separated words in a String into capitalized words, 
+     * that is each word is made up of a titlecase character and then a series of 
+     * lowercase characters.  </p>
      *
      * <p>Whitespace is defined by {@link Character#isWhitespace(char)}.
      * A <code>null</code> input String returns <code>null</code>.
@@ -307,36 +308,54 @@ public class WordUtils {
      * upper case.</p>
      *
      * <pre>
-     * WordUtils.capitalize(null)        = null
-     * WordUtils.capitalize("")          = ""
-     * WordUtils.capitalize("i am FINE") = "I Am Fine"
+     * WordUtils.capitalizeFully(null)        = null
+     * WordUtils.capitalizeFully("")          = ""
+     * WordUtils.capitalizeFully("i am FINE") = "I Am Fine"
      * </pre>
      * 
      * @param str  the String to capitalize, may be null
      * @return capitalized String, <code>null</code> if null String input
      */
     public static String capitalizeFully(String str) {
-        int strLen;
-        if (str == null || (strLen = str.length()) == 0) {
-            return str;
-        }
-        StringBuffer buffer = new StringBuffer(strLen);
-        boolean whitespace = true;
-        for (int i = 0; i < strLen; i++) {
-            char ch = str.charAt(i);
-            if (Character.isWhitespace(ch)) {
-                buffer.append(ch);
-                whitespace = true;
-            } else if (whitespace) {
-                buffer.append(Character.toTitleCase(ch));
-                whitespace = false;
-            } else {
-                buffer.append(Character.toLowerCase(ch));
-            }
-        }
-        return buffer.toString();
+        return capitalizeFully(str, null);
     }
 
+    /**
+     * <p>Converts all the delimiter separated words in a String into capitalized words, 
+     * that is each word is made up of a titlecase character and then a series of 
+     * lowercase characters. </p>
+     *
+     * <p>The delimiters represent a set of characters understood to separate words.
+     * The first string character and the first non-delimiter character after a
+     * delimiter will be capitalized. </p>
+     *
+     * <p>A <code>null</code> input String returns <code>null</code>.
+     * Capitalization uses the unicode title case, normally equivalent to
+     * upper case.</p>
+     *
+     * <pre>
+     * WordUtils.capitalizeFully(null, *)            = null
+     * WordUtils.capitalizeFully("", *)              = ""
+     * WordUtils.capitalizeFully(*, null)            = *
+     * WordUtils.capitalizeFully(*, new char[0])     = *
+     * WordUtils.capitalizeFully("i aM.fine", {'.'}) = "I am.Fine"
+     * </pre>
+     * 
+     * @param str  the String to capitalize, may be null
+     * @param delimiters  set of characters to determine capitalization, null means whitespace
+     * @return capitalized String, <code>null</code> if null String input
+     * @since 2.1
+     */
+    public static String capitalizeFully(String str, char[] delimiters) {
+        int delimLen = (delimiters == null ? -1 : delimiters.length);
+        if (str == null || str.length() == 0 || delimLen == 0) {
+            return str;
+        }
+        str = str.toLowerCase();
+        return capitalize(str, delimiters);
+    }
+
+    //-----------------------------------------------------------------------
     /**
      * <p>Uncapitalizes all the whitespace separated words in a String.
      * Only the first letter of each word is changed.</p>
@@ -355,20 +374,51 @@ public class WordUtils {
      * @see #capitalize(String)
      */
     public static String uncapitalize(String str) {
-        int strLen;
-        if (str == null || (strLen = str.length()) == 0) {
+        return uncapitalize(str, null);
+    }
+
+    /**
+     * <p>Uncapitalizes all the whitespace separated words in a String.
+     * Only the first letter of each word is changed.</p>
+     *
+     * <p>The delimiters represent a set of characters understood to separate words.
+     * The first string character and the first non-delimiter character after a
+     * delimiter will be uncapitalized. </p>
+     *
+     * <p>Whitespace is defined by {@link Character#isWhitespace(char)}.
+     * A <code>null</code> input String returns <code>null</code>.</p>
+     *
+     * <pre>
+     * WordUtils.uncapitalize(null, *)            = null
+     * WordUtils.uncapitalize("", *)              = ""
+     * WordUtils.uncapitalize(*, null)            = *
+     * WordUtils.uncapitalize(*, new char[0])     = *
+     * WordUtils.uncapitalize("I AM.FINE", {'.'}) = "i AM.fINE"
+     * </pre>
+     * 
+     * @param str  the String to uncapitalize, may be null
+     * @param delimiters  set of characters to determine uncapitalization, null means whitespace
+     * @return uncapitalized String, <code>null</code> if null String input
+     * @see #capitalize(String)
+     * @since 2.1
+     */
+    public static String uncapitalize(String str, char[] delimiters) {
+        int delimLen = (delimiters == null ? -1 : delimiters.length);
+        if (str == null || str.length() == 0 || delimLen == 0) {
             return str;
         }
+        int strLen = str.length();
         StringBuffer buffer = new StringBuffer(strLen);
-        boolean whitespace = true;
+        boolean uncapitalizeNext = true;
         for (int i = 0; i < strLen; i++) {
             char ch = str.charAt(i);
-            if (Character.isWhitespace(ch)) {
+
+            if (isDelimiter(ch, delimiters)) {
                 buffer.append(ch);
-                whitespace = true;
-            } else if (whitespace) {
+                uncapitalizeNext = true;
+            } else if (uncapitalizeNext) {
                 buffer.append(Character.toLowerCase(ch));
-                whitespace = false;
+                uncapitalizeNext = false;
             } else {
                 buffer.append(ch);
             }
@@ -376,6 +426,7 @@ public class WordUtils {
         return buffer.toString();
     }
 
+    //-----------------------------------------------------------------------
     /**
      * <p>Swaps the case of a String using a word based algorithm.</p>
      * 
@@ -429,5 +480,168 @@ public class WordUtils {
         }
         return buffer.toString();
     }
-    
+
+    //-----------------------------------------------------------------------
+    /**
+     * <p>Extracts the initial letters from each word in the String.</p>
+     * 
+     * <p>The first letter of the string and all first letters after
+     * whitespace are returned as a new string.
+     * Their case is not changed.</p>
+     *
+     * <p>Whitespace is defined by {@link Character#isWhitespace(char)}.
+     * A <code>null</code> input String returns <code>null</code>.</p>
+     *
+     * <pre>
+     * WordUtils.initials(null)             = null
+     * WordUtils.initials("")               = ""
+     * WordUtils.initials("Ben John Lee")   = "BJL"
+     * WordUtils.initials("Ben J.Lee")      = "BJ"
+     * </pre>
+     *
+     * @param str  the String to get initials from, may be null
+     * @return String of initial letters, <code>null</code> if null String input
+     * @see #initials(String,char[])
+     * @since 2.2
+     */
+    public static String initials(String str) {
+        return initials(str, null);
+    }
+
+    /**
+     * <p>Extracts the initial letters from each word in the String.</p>
+     * 
+     * <p>The first letter of the string and all first letters after the
+     * defined delimiters are returned as a new string.
+     * Their case is not changed.</p>
+     *
+     * <p>If the delimiters array is null, then Whitespace is used.
+     * Whitespace is defined by {@link Character#isWhitespace(char)}.
+     * A <code>null</code> input String returns <code>null</code>.
+     * An empty delimiter array returns an empty String.</p>
+     *
+     * <pre>
+     * WordUtils.initials(null, *)                = null
+     * WordUtils.initials("", *)                  = ""
+     * WordUtils.initials("Ben John Lee", null)   = "BJL"
+     * WordUtils.initials("Ben J.Lee", null)      = "BJ"
+     * WordUtils.initials("Ben J.Lee", [' ','.']) = "BJL"
+     * WordUtils.initials(*, new char[0])         = ""
+     * </pre>
+     * 
+     * @param str  the String to get initials from, may be null
+     * @param delimiters  set of characters to determine words, null means whitespace
+     * @return String of initial letters, <code>null</code> if null String input
+     * @see #initials(String)
+     * @since 2.2
+     */
+    public static String initials(String str, char[] delimiters) {
+        if (str == null || str.length() == 0) {
+            return str;
+        }
+        if (delimiters != null && delimiters.length == 0) {
+            return "";
+        }
+        int strLen = str.length();
+        char[] buf = new char[strLen / 2 + 1];
+        int count = 0;
+        boolean lastWasGap = true;
+        for (int i = 0; i < strLen; i++) {
+            char ch = str.charAt(i);
+
+            if (isDelimiter(ch, delimiters)) {
+                lastWasGap = true;
+            } else if (lastWasGap) {
+                buf[count++] = ch;
+                lastWasGap = false;
+            } else {
+                // ignore ch
+            }
+        }
+        return new String(buf, 0, count);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Is the character a delimiter.
+     *
+     * @param ch  the character to check
+     * @param delimiters  the delimiters
+     * @return true if it is a delimiter
+     */
+    private static boolean isDelimiter(char ch, char[] delimiters) {
+        if (delimiters == null) {
+            return Character.isWhitespace(ch);
+        }
+        for (int i = 0, isize = delimiters.length; i < isize; i++) {
+            if (ch == delimiters[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Abbreviates a string nicely.
+     * 
+     * This method searches for the first space after the lower limit and abbreviates
+     * the String there. It will also append any String passed as a parameter
+     * to the end of the String. The upper limit can be specified to forcibly
+     * abbreviate a String.
+     * 
+     * @param str         the string to be abbreviated. If null is passed, null is returned.
+     *                    If the empty String is passed, the empty string is returned.
+     * @param lower       the lower limit.
+     * @param upper       the upper limit; specify -1 if no limit is desired.
+     *                    If the upper limit is lower than the lower limit, it will be
+     *                    adjusted to be the same as the lower limit.
+     * @param appendToEnd String to be appended to the end of the abbreviated string.
+     *                    This is appended ONLY if the string was indeed abbreviated.
+     *                    The append does not count towards the lower or upper limits.
+     * @return the abbreviated String.
+     * @since 2.4
+     */
+    public static String abbreviate(String str, int lower, int upper, String appendToEnd) {
+        // initial parameter checks
+        if (str == null) {
+            return null;
+        }
+        if (str.length() == 0) {
+            return StringUtils.EMPTY;
+        }
+
+        // if the lower value is greater than the length of the string,
+        // set to the length of the string
+        if (lower > str.length()) {
+            lower = str.length();    
+        }
+        // if the upper value is -1 (i.e. no limit) or is greater
+        // than the length of the string, set to the length of the string
+        if (upper == -1 || upper > str.length()) {
+            upper = str.length();
+        }
+        // if upper is less than lower, raise it to lower
+        if (upper < lower) {
+            upper = lower;
+        }
+
+        StringBuffer result = new StringBuffer();
+        int index = StringUtils.indexOf(str, " ", lower);
+        if (index == -1) {
+            result.append(str.substring(0, upper));
+            // only if abbreviation has occured do we append the appendToEnd value
+            if (upper != str.length()) {
+                result.append(StringUtils.defaultString(appendToEnd));
+            }
+        } else if (index > upper) {
+            result.append(str.substring(0, upper));
+            result.append(StringUtils.defaultString(appendToEnd));
+        } else {
+            result.append(str.substring(0, index));
+            result.append(StringUtils.defaultString(appendToEnd));
+        }
+        return result.toString();
+    }
+
 }

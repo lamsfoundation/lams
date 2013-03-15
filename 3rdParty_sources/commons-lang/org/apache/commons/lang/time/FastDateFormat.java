@@ -1,58 +1,23 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang.time;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.FieldPosition;
@@ -68,6 +33,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+
+import org.apache.commons.lang.Validate;
+import org.apache.commons.lang.text.StrBuilder;
 
 /**
  * <p>FastDateFormat is a fast and thread-safe version of
@@ -89,14 +57,15 @@ import java.util.TimeZone;
  *
  * <p>In addition, the pattern <code>'ZZ'</code> has been made to represent
  * ISO8601 full format time zones (eg. <code>+08:00</code> or <code>-11:00</code>).
- * This introduces a minor incompatability with Java 1.4, but at a gain of
+ * This introduces a minor incompatibility with Java 1.4, but at a gain of
  * useful functionality.</p>
  *
+ * @author Apache Software Foundation
  * @author TeaTrove project
  * @author Brian S O'Neill
  * @author Sean Schofield
  * @author Gary Gregory
- * @author Stephen Colebourne
+ * @author Nikolay Metchev
  * @since 2.0
  * @version $Id$
  */
@@ -114,6 +83,13 @@ public class FastDateFormat extends Format {
     // So, don't change this code! It works and is very fast.
     
     /**
+     * Required for serialization support.
+     * 
+     * @see java.io.Serializable
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * FULL locale dependent date or time style.
      */
     public static final int FULL = DateFormat.FULL;
@@ -130,16 +106,13 @@ public class FastDateFormat extends Format {
      */
     public static final int SHORT = DateFormat.SHORT;
     
-    // package scoped as used by inner class
-    static final double LOG_10 = Math.log(10);
+    private static String cDefaultPattern; // lazily initialised by getInstance()
 
-    private static String cDefaultPattern;
-
-    private static Map cInstanceCache = new HashMap(7);
-    private static Map cDateInstanceCache = new HashMap(7);
-    private static Map cTimeInstanceCache = new HashMap(7);
-    private static Map cDateTimeInstanceCache = new HashMap(7);
-    private static Map cTimeZoneDisplayCache = new HashMap(7);
+    private static final Map cInstanceCache = new HashMap(7);
+    private static final Map cDateInstanceCache = new HashMap(7);
+    private static final Map cTimeInstanceCache = new HashMap(7);
+    private static final Map cDateTimeInstanceCache = new HashMap(7);
+    private static final Map cTimeZoneDisplayCache = new HashMap(7);
 
     /**
      * The pattern.
@@ -164,11 +137,11 @@ public class FastDateFormat extends Format {
     /**
      * The parsed rules.
      */
-    private Rule[] mRules;
+    private transient Rule[] mRules;
     /**
      * The estimated maximum length.
      */
-    private int mMaxLengthEstimate;
+    private transient int mMaxLengthEstimate;
 
     //-----------------------------------------------------------------------
     /**
@@ -247,6 +220,51 @@ public class FastDateFormat extends Format {
         return format;
     }
 
+    //-----------------------------------------------------------------------
+    /**
+     * <p>Gets a date formatter instance using the specified style in the
+     * default time zone and locale.</p>
+     * 
+     * @param style  date style: FULL, LONG, MEDIUM, or SHORT
+     * @return a localized standard date formatter
+     * @throws IllegalArgumentException if the Locale has no date
+     *  pattern defined
+     * @since 2.1
+     */
+    public static FastDateFormat getDateInstance(int style) {
+        return getDateInstance(style, null, null);
+    }
+
+    /**
+     * <p>Gets a date formatter instance using the specified style and
+     * locale in the default time zone.</p>
+     * 
+     * @param style  date style: FULL, LONG, MEDIUM, or SHORT
+     * @param locale  optional locale, overrides system locale
+     * @return a localized standard date formatter
+     * @throws IllegalArgumentException if the Locale has no date
+     *  pattern defined
+     * @since 2.1
+     */
+    public static FastDateFormat getDateInstance(int style, Locale locale) {
+        return getDateInstance(style, null, locale);
+    }
+
+    /**
+     * <p>Gets a date formatter instance using the specified style and
+     * time zone in the default locale.</p>
+     * 
+     * @param style  date style: FULL, LONG, MEDIUM, or SHORT
+     * @param timeZone  optional time zone, overrides time zone of
+     *  formatted date
+     * @return a localized standard date formatter
+     * @throws IllegalArgumentException if the Locale has no date
+     *  pattern defined
+     * @since 2.1
+     */
+    public static FastDateFormat getDateInstance(int style, TimeZone timeZone) {
+        return getDateInstance(style, timeZone, null);
+    }
     /**
      * <p>Gets a date formatter instance using the specified style, time
      * zone and locale.</p>
@@ -264,16 +282,15 @@ public class FastDateFormat extends Format {
         if (timeZone != null) {
             key = new Pair(key, timeZone);
         }
+
         if (locale == null) {
-            key = new Pair(key, locale);
+            locale = Locale.getDefault();
         }
+
+        key = new Pair(key, locale);
 
         FastDateFormat format = (FastDateFormat) cDateInstanceCache.get(key);
         if (format == null) {
-            if (locale == null) {
-                locale = Locale.getDefault();
-            }
-
             try {
                 SimpleDateFormat formatter = (SimpleDateFormat) DateFormat.getDateInstance(style, locale);
                 String pattern = formatter.toPattern();
@@ -287,6 +304,52 @@ public class FastDateFormat extends Format {
         return format;
     }
 
+    //-----------------------------------------------------------------------
+    /**
+     * <p>Gets a time formatter instance using the specified style in the
+     * default time zone and locale.</p>
+     * 
+     * @param style  time style: FULL, LONG, MEDIUM, or SHORT
+     * @return a localized standard time formatter
+     * @throws IllegalArgumentException if the Locale has no time
+     *  pattern defined
+     * @since 2.1
+     */
+    public static FastDateFormat getTimeInstance(int style) {
+        return getTimeInstance(style, null, null);
+    }
+
+    /**
+     * <p>Gets a time formatter instance using the specified style and
+     * locale in the default time zone.</p>
+     * 
+     * @param style  time style: FULL, LONG, MEDIUM, or SHORT
+     * @param locale  optional locale, overrides system locale
+     * @return a localized standard time formatter
+     * @throws IllegalArgumentException if the Locale has no time
+     *  pattern defined
+     * @since 2.1
+     */
+    public static FastDateFormat getTimeInstance(int style, Locale locale) {
+        return getTimeInstance(style, null, locale);
+    }
+    
+    /**
+     * <p>Gets a time formatter instance using the specified style and
+     * time zone in the default locale.</p>
+     * 
+     * @param style  time style: FULL, LONG, MEDIUM, or SHORT
+     * @param timeZone  optional time zone, overrides time zone of
+     *  formatted time
+     * @return a localized standard time formatter
+     * @throws IllegalArgumentException if the Locale has no time
+     *  pattern defined
+     * @since 2.1
+     */
+    public static FastDateFormat getTimeInstance(int style, TimeZone timeZone) {
+        return getTimeInstance(style, timeZone, null);
+    }
+    
     /**
      * <p>Gets a time formatter instance using the specified style, time
      * zone and locale.</p>
@@ -327,6 +390,57 @@ public class FastDateFormat extends Format {
         return format;
     }
 
+    //-----------------------------------------------------------------------
+    /**
+     * <p>Gets a date/time formatter instance using the specified style
+     * in the default time zone and locale.</p>
+     * 
+     * @param dateStyle  date style: FULL, LONG, MEDIUM, or SHORT
+     * @param timeStyle  time style: FULL, LONG, MEDIUM, or SHORT
+     * @return a localized standard date/time formatter
+     * @throws IllegalArgumentException if the Locale has no date/time
+     *  pattern defined
+     * @since 2.1
+     */
+    public static FastDateFormat getDateTimeInstance(
+            int dateStyle, int timeStyle) {
+        return getDateTimeInstance(dateStyle, timeStyle, null, null);
+    }
+    
+    /**
+     * <p>Gets a date/time formatter instance using the specified style and
+     * locale in the default time zone.</p>
+     * 
+     * @param dateStyle  date style: FULL, LONG, MEDIUM, or SHORT
+     * @param timeStyle  time style: FULL, LONG, MEDIUM, or SHORT
+     * @param locale  optional locale, overrides system locale
+     * @return a localized standard date/time formatter
+     * @throws IllegalArgumentException if the Locale has no date/time
+     *  pattern defined
+     * @since 2.1
+     */
+    public static FastDateFormat getDateTimeInstance(
+            int dateStyle, int timeStyle, Locale locale) {
+        return getDateTimeInstance(dateStyle, timeStyle, null, locale);
+    }
+    
+    /**
+     * <p>Gets a date/time formatter instance using the specified style and
+     * time zone in the default locale.</p>
+     * 
+     * @param dateStyle  date style: FULL, LONG, MEDIUM, or SHORT
+     * @param timeStyle  time style: FULL, LONG, MEDIUM, or SHORT
+     * @param timeZone  optional time zone, overrides time zone of
+     *  formatted date
+     * @return a localized standard date/time formatter
+     * @throws IllegalArgumentException if the Locale has no date/time
+     *  pattern defined
+     * @since 2.1
+     */
+    public static FastDateFormat getDateTimeInstance(
+            int dateStyle, int timeStyle, TimeZone timeZone) {
+        return getDateTimeInstance(dateStyle, timeStyle, timeZone, null);
+    }    
     /**
      * <p>Gets a date/time formatter instance using the specified style,
      * time zone and locale.</p>
@@ -340,29 +454,27 @@ public class FastDateFormat extends Format {
      * @throws IllegalArgumentException if the Locale has no date/time
      *  pattern defined
      */
-    public static synchronized FastDateFormat getDateTimeInstance(
-            int dateStyle, int timeStyle, TimeZone timeZone, Locale locale) {
+    public static synchronized FastDateFormat getDateTimeInstance(int dateStyle, int timeStyle, TimeZone timeZone,
+            Locale locale) {
 
         Object key = new Pair(new Integer(dateStyle), new Integer(timeStyle));
         if (timeZone != null) {
             key = new Pair(key, timeZone);
         }
-        if (locale != null) {
-            key = new Pair(key, locale);
+        if (locale == null) {
+            locale = Locale.getDefault();
         }
+        key = new Pair(key, locale);
 
         FastDateFormat format = (FastDateFormat) cDateTimeInstanceCache.get(key);
         if (format == null) {
-            if (locale == null) {
-                locale = Locale.getDefault();
-            }
-
             try {
-                SimpleDateFormat formatter = (SimpleDateFormat) DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
+                SimpleDateFormat formatter = (SimpleDateFormat) DateFormat.getDateTimeInstance(dateStyle, timeStyle,
+                        locale);
                 String pattern = formatter.toPattern();
                 format = getInstance(pattern, timeZone, locale);
                 cDateTimeInstanceCache.put(key, format);
-                
+
             } catch (ClassCastException ex) {
                 throw new IllegalArgumentException("No date time pattern for locale: " + locale);
             }
@@ -440,7 +552,7 @@ public class FastDateFormat extends Format {
     }
 
     /**
-     * <p>Initialise the instance for first use.</p>
+     * <p>Initializes the instance for first use.</p>
      */
     protected void init() {
         List rulesList = parsePattern();
@@ -495,7 +607,7 @@ public class FastDateFormat extends Format {
                 break;
             case 'y': // year (number)
                 if (tokenLen >= 4) {
-                    rule = UnpaddedNumberField.INSTANCE_YEAR;
+                    rule = selectNumberRule(Calendar.YEAR, tokenLen);
                 } else {
                     rule = TwoDigitYearField.INSTANCE;
                 }
@@ -593,7 +705,7 @@ public class FastDateFormat extends Format {
      * @return parsed token
      */
     protected String parseToken(String pattern, int[] indexRef) {
-        StringBuffer buf = new StringBuffer();
+        StrBuilder buf = new StrBuilder();
 
         int i = indexRef[0];
         int length = pattern.length();
@@ -665,8 +777,8 @@ public class FastDateFormat extends Format {
     // Format methods
     //-----------------------------------------------------------------------
     /**
-     * <p>Format either a <code>Date</code> or a
-     * <code>Calendar</code> object.</p>
+     * <p>Formats a <code>Date</code>, <code>Calendar</code> or
+     * <code>Long</code> (milliseconds) object.</p>
      * 
      * @param obj  the object to format
      * @param toAppendTo  the buffer to append to
@@ -678,10 +790,23 @@ public class FastDateFormat extends Format {
             return format((Date) obj, toAppendTo);
         } else if (obj instanceof Calendar) {
             return format((Calendar) obj, toAppendTo);
+        } else if (obj instanceof Long) {
+            return format(((Long) obj).longValue(), toAppendTo);
         } else {
             throw new IllegalArgumentException("Unknown class: " +
                 (obj == null ? "<null>" : obj.getClass().getName()));
         }
+    }
+
+    /**
+     * <p>Formats a millisecond <code>long</code> value.</p>
+     * 
+     * @param millis  the millisecond value to format
+     * @return the formatted string
+     * @since 2.1
+     */
+    public String format(long millis) {
+        return format(new Date(millis));
     }
 
     /**
@@ -691,7 +816,7 @@ public class FastDateFormat extends Format {
      * @return the formatted string
      */
     public String format(Date date) {
-        Calendar c = new GregorianCalendar(mTimeZone);
+        Calendar c = new GregorianCalendar(mTimeZone, mLocale);
         c.setTime(date);
         return applyRules(c, new StringBuffer(mMaxLengthEstimate)).toString();
     }
@@ -704,6 +829,19 @@ public class FastDateFormat extends Format {
      */
     public String format(Calendar calendar) {
         return format(calendar, new StringBuffer(mMaxLengthEstimate)).toString();
+    }
+
+    /**
+     * <p>Formats a milliseond <code>long</code> value into the
+     * supplied <code>StringBuffer</code>.</p>
+     * 
+     * @param millis  the millisecond value to format
+     * @param buf  the buffer to format into
+     * @return the specified string buffer
+     * @since 2.1
+     */
+    public StringBuffer format(long millis, StringBuffer buf) {
+        return format(new Date(millis), buf);
     }
 
     /**
@@ -730,6 +868,7 @@ public class FastDateFormat extends Format {
      */
     public StringBuffer format(Calendar calendar, StringBuffer buf) {
         if (mTimeZoneForced) {
+            calendar.getTime(); /// LANG-538
             calendar = (Calendar) calendar.clone();
             calendar.setTimeZone(mTimeZone);
         }
@@ -756,7 +895,7 @@ public class FastDateFormat extends Format {
     // Parsing
     //-----------------------------------------------------------------------
     /**
-     * <p>Parsing not supported.</p>
+     * <p>Parsing is not supported.</p>
      * 
      * @param source  the string to parse
      * @param pos  the parsing position
@@ -814,7 +953,7 @@ public class FastDateFormat extends Format {
     }
 
     /**
-     * <p>Gets  an estimate for the maximum string length that the
+     * <p>Gets an estimate for the maximum string length that the
      * formatter will produce.</p>
      *
      * <p>The actual formatted length will almost always be less than or
@@ -829,7 +968,7 @@ public class FastDateFormat extends Format {
     // Basics
     //-----------------------------------------------------------------------
     /**
-     * <p>Compare two objects for equality.</p>
+     * <p>Compares two objects for equality.</p>
      * 
      * @param obj  the object to compare to
      * @return <code>true</code> if equal
@@ -852,9 +991,9 @@ public class FastDateFormat extends Format {
     }
 
     /**
-     * <p>A suitable hashcode.</p>
+     * <p>Returns a hashcode compatible with equals.</p>
      * 
-     * @return a hashcode compatable with equals
+     * @return a hashcode compatible with equals
      */
     public int hashCode() {
         int total = 0;
@@ -874,6 +1013,21 @@ public class FastDateFormat extends Format {
     public String toString() {
         return "FastDateFormat[" + mPattern + "]";
     }
+
+    // Serializing
+    //-----------------------------------------------------------------------
+    /**
+     * Create the object after serialization. This implementation reinitializes the 
+     * transient properties.
+     *
+     * @param in ObjectInputStream from which the object is being deserialized.
+     * @throws IOException if there is an IO issue.
+     * @throws ClassNotFoundException if a class cannot be found.
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        init();
+    }
     
     // Rules
     //-----------------------------------------------------------------------
@@ -881,7 +1035,19 @@ public class FastDateFormat extends Format {
      * <p>Inner class defining a rule.</p>
      */
     private interface Rule {
+        /**
+         * Returns the estimated lentgh of the result.
+         * 
+         * @return the estimated length
+         */
         int estimateLength();
+        
+        /**
+         * Appends the value of the specified calendar to the output buffer based on the rule implementation.
+         * 
+         * @param buffer the output buffer
+         * @param calendar calendar to be appended
+         */
         void appendTo(StringBuffer buffer, Calendar calendar);
     }
 
@@ -889,6 +1055,12 @@ public class FastDateFormat extends Format {
      * <p>Inner class defining a numeric rule.</p>
      */
     private interface NumberRule extends Rule {
+        /**
+         * Appends the specified value to the output buffer based on the rule implementation.
+         * 
+         * @param buffer the output buffer
+         * @param value the value to be appended
+         */
         void appendTo(StringBuffer buffer, int value);
     }
 
@@ -898,14 +1070,26 @@ public class FastDateFormat extends Format {
     private static class CharacterLiteral implements Rule {
         private final char mValue;
 
+        /**
+         * Constructs a new instance of <code>CharacterLiteral</code>
+         * to hold the specified value.
+         * 
+         * @param value the character literal
+         */
         CharacterLiteral(char value) {
             mValue = value;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int estimateLength() {
             return 1;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, Calendar calendar) {
             buffer.append(mValue);
         }
@@ -917,14 +1101,26 @@ public class FastDateFormat extends Format {
     private static class StringLiteral implements Rule {
         private final String mValue;
 
+        /**
+         * Constructs a new instance of <code>StringLiteral</code>
+         * to hold the specified value.
+         * 
+         * @param value the string literal
+         */
         StringLiteral(String value) {
             mValue = value;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int estimateLength() {
             return mValue.length();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, Calendar calendar) {
             buffer.append(mValue);
         }
@@ -937,11 +1133,21 @@ public class FastDateFormat extends Format {
         private final int mField;
         private final String[] mValues;
 
+        /**
+         * Constructs an instance of <code>TextField</code>
+         * with the specified field and values.
+         * 
+         * @param field the field
+         * @param values the field values
+         */
         TextField(int field, String[] values) {
             mField = field;
             mValues = values;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int estimateLength() {
             int max = 0;
             for (int i=mValues.length; --i >= 0; ) {
@@ -953,6 +1159,9 @@ public class FastDateFormat extends Format {
             return max;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, Calendar calendar) {
             buffer.append(mValues[calendar.get(mField)]);
         }
@@ -962,22 +1171,34 @@ public class FastDateFormat extends Format {
      * <p>Inner class to output an unpadded number.</p>
      */
     private static class UnpaddedNumberField implements NumberRule {
-        static final UnpaddedNumberField INSTANCE_YEAR = new UnpaddedNumberField(Calendar.YEAR);
-        
         private final int mField;
 
+        /**
+         * Constructs an instance of <code>UnpadedNumberField</code> with the specified field.
+         * 
+         * @param field the field
+         */
         UnpaddedNumberField(int field) {
             mField = field;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int estimateLength() {
             return 4;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, Calendar calendar) {
             appendTo(buffer, calendar.get(mField));
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public final void appendTo(StringBuffer buffer, int value) {
             if (value < 10) {
                 buffer.append((char)(value + '0'));
@@ -995,18 +1216,32 @@ public class FastDateFormat extends Format {
      */
     private static class UnpaddedMonthField implements NumberRule {
         static final UnpaddedMonthField INSTANCE = new UnpaddedMonthField();
-        
+
+        /**
+         * Constructs an instance of <code>UnpaddedMonthField</code>.
+         *
+         */
         UnpaddedMonthField() {
+            super();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int estimateLength() {
             return 2;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, Calendar calendar) {
             appendTo(buffer, calendar.get(Calendar.MONTH) + 1);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public final void appendTo(StringBuffer buffer, int value) {
             if (value < 10) {
                 buffer.append((char)(value + '0'));
@@ -1024,6 +1259,12 @@ public class FastDateFormat extends Format {
         private final int mField;
         private final int mSize;
 
+        /**
+         * Constructs an instance of <code>PaddedNumberField</code>.
+         * 
+         * @param field the field
+         * @param size size of the output field
+         */
         PaddedNumberField(int field, int size) {
             if (size < 3) {
                 // Should use UnpaddedNumberField or TwoDigitNumberField.
@@ -1033,14 +1274,23 @@ public class FastDateFormat extends Format {
             mSize = size;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int estimateLength() {
             return 4;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, Calendar calendar) {
             appendTo(buffer, calendar.get(mField));
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public final void appendTo(StringBuffer buffer, int value) {
             if (value < 100) {
                 for (int i = mSize; --i >= 2; ) {
@@ -1053,7 +1303,8 @@ public class FastDateFormat extends Format {
                 if (value < 1000) {
                     digits = 3;
                 } else {
-                    digits = (int)(Math.log(value) / LOG_10) + 1;
+                    Validate.isTrue(value > -1, "Negative values should not be possible", value);
+                    digits = Integer.toString(value).length();
                 }
                 for (int i = mSize; --i >= digits; ) {
                     buffer.append('0');
@@ -1069,18 +1320,32 @@ public class FastDateFormat extends Format {
     private static class TwoDigitNumberField implements NumberRule {
         private final int mField;
 
+        /**
+         * Constructs an instance of <code>TwoDigitNumberField</code> with the specified field.
+         * 
+         * @param field the field
+         */
         TwoDigitNumberField(int field) {
             mField = field;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int estimateLength() {
             return 2;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, Calendar calendar) {
             appendTo(buffer, calendar.get(mField));
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public final void appendTo(StringBuffer buffer, int value) {
             if (value < 100) {
                 buffer.append((char)(value / 10 + '0'));
@@ -1096,18 +1361,31 @@ public class FastDateFormat extends Format {
      */
     private static class TwoDigitYearField implements NumberRule {
         static final TwoDigitYearField INSTANCE = new TwoDigitYearField();
-        
+
+        /**
+         * Constructs an instance of <code>TwoDigitYearField</code>.
+         */
         TwoDigitYearField() {
+            super();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int estimateLength() {
             return 2;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, Calendar calendar) {
             appendTo(buffer, calendar.get(Calendar.YEAR) % 100);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public final void appendTo(StringBuffer buffer, int value) {
             buffer.append((char)(value / 10 + '0'));
             buffer.append((char)(value % 10 + '0'));
@@ -1119,18 +1397,31 @@ public class FastDateFormat extends Format {
      */
     private static class TwoDigitMonthField implements NumberRule {
         static final TwoDigitMonthField INSTANCE = new TwoDigitMonthField();
-        
+
+        /**
+         * Constructs an instance of <code>TwoDigitMonthField</code>.
+         */
         TwoDigitMonthField() {
+            super();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int estimateLength() {
             return 2;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, Calendar calendar) {
             appendTo(buffer, calendar.get(Calendar.MONTH) + 1);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public final void appendTo(StringBuffer buffer, int value) {
             buffer.append((char)(value / 10 + '0'));
             buffer.append((char)(value % 10 + '0'));
@@ -1143,14 +1434,26 @@ public class FastDateFormat extends Format {
     private static class TwelveHourField implements NumberRule {
         private final NumberRule mRule;
 
+        /**
+         * Constructs an instance of <code>TwelveHourField</code> with the specified
+         * <code>NumberRule</code>.
+         * 
+         * @param rule the rule
+         */
         TwelveHourField(NumberRule rule) {
             mRule = rule;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int estimateLength() {
             return mRule.estimateLength();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, Calendar calendar) {
             int value = calendar.get(Calendar.HOUR);
             if (value == 0) {
@@ -1159,6 +1462,9 @@ public class FastDateFormat extends Format {
             mRule.appendTo(buffer, value);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, int value) {
             mRule.appendTo(buffer, value);
         }
@@ -1170,14 +1476,26 @@ public class FastDateFormat extends Format {
     private static class TwentyFourHourField implements NumberRule {
         private final NumberRule mRule;
 
+        /**
+         * Constructs an instance of <code>TwentyFourHourField</code> with the specified
+         * <code>NumberRule</code>.
+         * 
+         * @param rule the rule
+         */
         TwentyFourHourField(NumberRule rule) {
             mRule = rule;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int estimateLength() {
             return mRule.estimateLength();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, Calendar calendar) {
             int value = calendar.get(Calendar.HOUR_OF_DAY);
             if (value == 0) {
@@ -1186,6 +1504,9 @@ public class FastDateFormat extends Format {
             mRule.appendTo(buffer, value);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, int value) {
             mRule.appendTo(buffer, value);
         }
@@ -1202,6 +1523,14 @@ public class FastDateFormat extends Format {
         private final String mStandard;
         private final String mDaylight;
 
+        /**
+         * Constructs an instance of <code>TimeZoneNameRule</code> with the specified properties.
+         * 
+         * @param timeZone the time zone
+         * @param timeZoneForced if <code>true</code> the time zone is forced into standard and daylight
+         * @param locale the locale
+         * @param style the style
+         */
         TimeZoneNameRule(TimeZone timeZone, boolean timeZoneForced, Locale locale, int style) {
             mTimeZone = timeZone;
             mTimeZoneForced = timeZoneForced;
@@ -1217,6 +1546,9 @@ public class FastDateFormat extends Format {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int estimateLength() {
             if (mTimeZoneForced) {
                 return Math.max(mStandard.length(), mDaylight.length());
@@ -1227,6 +1559,9 @@ public class FastDateFormat extends Format {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, Calendar calendar) {
             if (mTimeZoneForced) {
                 if (mTimeZone.useDaylightTime() && calendar.get(Calendar.DST_OFFSET) != 0) {
@@ -1255,14 +1590,25 @@ public class FastDateFormat extends Format {
         
         final boolean mColon;
         
+        /**
+         * Constructs an instance of <code>TimeZoneNumberRule</code> with the specified properties.
+         * 
+         * @param colon add colon between HH and MM in the output if <code>true</code>
+         */
         TimeZoneNumberRule(boolean colon) {
             mColon = colon;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int estimateLength() {
             return 5;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public void appendTo(StringBuffer buffer, Calendar calendar) {
             int offset = calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET);
             
@@ -1296,6 +1642,14 @@ public class FastDateFormat extends Format {
         private final int mStyle;
         private final Locale mLocale;
 
+        /**
+         * Constructs an instance of <code>TimeZoneDisplayKey</code> with the specified properties.
+         *  
+         * @param timeZone the time zone
+         * @param daylight adjust the style for daylight saving time if <code>true</code>
+         * @param style the timezone style
+         * @param locale the timezone locale
+         */
         TimeZoneDisplayKey(TimeZone timeZone,
                            boolean daylight, int style, Locale locale) {
             mTimeZone = timeZone;
@@ -1306,10 +1660,16 @@ public class FastDateFormat extends Format {
             mLocale = locale;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int hashCode() {
             return mStyle * 31 + mLocale.hashCode();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean equals(Object obj) {
             if (this == obj) {
                 return true;
@@ -1336,11 +1696,19 @@ public class FastDateFormat extends Format {
         private final Object mObj1;
         private final Object mObj2;
 
+        /**
+         * Constructs an instance of <code>Pair</code> to hold the specified objects.
+         * @param obj1 one object in the pair
+         * @param obj2 second object in the pair
+         */
         public Pair(Object obj1, Object obj2) {
             mObj1 = obj1;
             mObj2 = obj2;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean equals(Object obj) {
             if (this == obj) {
                 return true;
@@ -1359,12 +1727,18 @@ public class FastDateFormat extends Format {
                  key.mObj2 == null : mObj2.equals(key.mObj2));
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public int hashCode() {
             return
                 (mObj1 == null ? 0 : mObj1.hashCode()) +
                 (mObj2 == null ? 0 : mObj2.hashCode());
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public String toString() {
             return "[" + mObj1 + ':' + mObj2 + ']';
         }

@@ -1,67 +1,34 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang;
 
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+import org.apache.commons.lang.text.StrBuilder;
 
 /**
  * <p>A contiguous range of characters, optionally negated.</p>
  * 
  * <p>Instances are immutable.</p>
  *
- * @author Henri Yandell
- * @author Stephen Colebourne
+ * <p>#ThreadSafe#</p>
+ * @author Apache Software Foundation
  * @author Chris Feldhacker
  * @author Gary Gregory
  * @since 1.0
@@ -69,7 +36,11 @@ import java.io.Serializable;
  */
 public final class CharRange implements Serializable {
 
-    /** Serialization lock, Lang version 2.0. */
+    /**
+     * Required for serialization support. Lang version 2.0. 
+     * 
+     * @see java.io.Serializable
+     */
     private static final long serialVersionUID = 8270183163158333422L;
     
     /** The first character, inclusive, in the range. */
@@ -81,6 +52,58 @@ public final class CharRange implements Serializable {
     
     /** Cached toString. */
     private transient String iToString;
+
+    // Static
+    //-----------------------------------------------------------------------
+    /**
+     * <p>Constructs a <code>CharRange</code> over a single character.</p>
+     *
+     * @param ch  only character in this range
+     * @return the new CharRange object
+     * @see CharRange#CharRange(char, char, boolean)
+     * @since 2.5
+     */
+    public static CharRange is(char ch) {
+        return new CharRange(ch, ch, false);
+    }
+
+    /**
+     * <p>Constructs a negated <code>CharRange</code> over a single character.</p>
+     *
+     * @param ch  only character in this range
+     * @return the new CharRange object
+     * @see CharRange#CharRange(char, char, boolean)
+     * @since 2.5
+     */
+    public static CharRange isNot(char ch) {
+        return new CharRange(ch, ch, true);
+    }
+
+    /**
+     * <p>Constructs a <code>CharRange</code> over a set of characters.</p>
+     *
+     * @param start  first character, inclusive, in this range
+     * @param end  last character, inclusive, in this range
+     * @return the new CharRange object
+     * @see CharRange#CharRange(char, char, boolean)
+     * @since 2.5
+     */
+    public static CharRange isIn(char start, char end) {
+        return new CharRange(start, end, false);
+    }
+
+    /**
+     * <p>Constructs a negated <code>CharRange</code> over a set of characters.</p>
+     *
+     * @param start  first character, inclusive, in this range
+     * @param end  last character, inclusive, in this range
+     * @return the new CharRange object
+     * @see CharRange#CharRange(char, char, boolean)
+     * @since 2.5
+     */
+    public static CharRange isNotIn(char start, char end) {
+        return new CharRange(start, end, true);
+    }
 
     //-----------------------------------------------------------------------
     /**
@@ -183,7 +206,7 @@ public final class CharRange implements Serializable {
      * @return <code>true</code> if this range contains the input character
      */
     public boolean contains(char ch) {
-        return ((ch >= start && ch <= end) != negated);
+        return (ch >= start && ch <= end) != negated;
     }
 
     /**
@@ -200,17 +223,14 @@ public final class CharRange implements Serializable {
         }
         if (negated) {
             if (range.negated) {
-                return (start >= range.start && end <= range.end);
-            } else {
-                return (range.end < start || range.start > end);
+                return start >= range.start && end <= range.end;
             }
-        } else {
-            if (range.negated) {
-                return (start == 0 && end == Character.MAX_VALUE);
-            } else {
-                return (start <= range.start && end >= range.end);
-            }
+            return range.end < start || range.start > end;
         }
+        if (range.negated) {
+            return start == 0 && end == Character.MAX_VALUE;
+        }
+        return start <= range.start && end >= range.end;
     }
 
     // Basics
@@ -230,11 +250,11 @@ public final class CharRange implements Serializable {
             return false;
         }
         CharRange other = (CharRange) obj;
-        return (start == other.start && end == other.end && negated == other.negated);
+        return start == other.start && end == other.end && negated == other.negated;
     }
 
     /**
-     * <p>Gets a hashCode compatable with the equals method.</p>
+     * <p>Gets a hashCode compatible with the equals method.</p>
      * 
      * @return a suitable hashCode
      */
@@ -249,7 +269,7 @@ public final class CharRange implements Serializable {
      */
     public String toString() {
         if (iToString == null) {
-            StringBuffer buf = new StringBuffer(4);
+            StrBuilder buf = new StrBuilder(4);
             if (isNegated()) {
                 buf.append('^');
             }
@@ -262,5 +282,110 @@ public final class CharRange implements Serializable {
         }
         return iToString;
     }
-    
+
+    // Expansions
+    //-----------------------------------------------------------------------
+    /**
+     * <p>Returns an iterator which can be used to walk through the characters described by this range.</p>
+     *
+     * <p>#NotThreadSafe# the iterator is not threadsafe</p>
+     * @return an iterator to the chars represented by this range
+     * @since 2.5
+     */
+    public Iterator iterator() {
+        return new CharacterIterator(this);
+    }
+
+    /**
+     * Character {@link Iterator}.
+     * <p>#NotThreadSafe#</p>
+     */
+    private static class CharacterIterator implements Iterator {
+        /** The current character */
+        private char current;
+
+        private final CharRange range;
+        private boolean hasNext;
+
+        /**
+         * Construct a new iterator for the character range.
+         *
+         * @param r The character range
+         */
+        private CharacterIterator(CharRange r) {
+            range = r;
+            hasNext = true;
+
+            if (range.negated) {
+                if (range.start == 0) {
+                    if (range.end == Character.MAX_VALUE) {
+                        // This range is an empty set
+                        hasNext = false;
+                    } else {
+                        current = (char) (range.end + 1);
+                    }
+                } else {
+                    current = 0;
+                }
+            } else {
+                current = range.start;
+            }
+        }
+
+        /**
+         * Prepare the next character in the range.
+         */
+        private void prepareNext() {
+            if (range.negated) {
+                if (current == Character.MAX_VALUE) {
+                    hasNext = false;
+                } else if (current + 1 == range.start) {
+                    if (range.end == Character.MAX_VALUE) {
+                        hasNext = false;
+                    } else {
+                        current = (char) (range.end + 1);
+                    }
+                } else {
+                    current = (char) (current + 1);
+                }
+            } else if (current < range.end) {
+                current = (char) (current + 1);
+            } else {
+                hasNext = false;
+            }
+        }
+
+        /**
+         * Has the iterator not reached the end character yet?
+         *
+         * @return <code>true</code> if the iterator has yet to reach the character date
+         */
+        public boolean hasNext() {
+            return hasNext;
+        }
+
+        /**
+         * Return the next character in the iteration
+         *
+         * @return <code>Character</code> for the next character
+         */
+        public Object next() {
+            if (hasNext == false) {
+                throw new NoSuchElementException();
+            }
+            char cur = current;
+            prepareNext();
+            return new Character(cur);
+        }
+
+        /**
+         * Always throws UnsupportedOperationException.
+         *
+         * @throws UnsupportedOperationException
+         * @see java.util.Iterator#remove()
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
 }

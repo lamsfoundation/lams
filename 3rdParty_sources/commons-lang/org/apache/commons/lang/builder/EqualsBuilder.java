@@ -1,61 +1,27 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang.builder;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
+
+import org.apache.commons.lang.ArrayUtils;
 
 /**
  * <p>Assists in implementing {@link Object#equals(Object)} methods.</p>
@@ -78,13 +44,15 @@ import java.lang.reflect.Modifier;
  *
  * <p>Typical use for the code is as follows:</p>
  * <pre>
- * public boolean equals(Object o) {
- *   if ( !(o instanceof MyClass) ) {
- *    return false;
+ * public boolean equals(Object obj) {
+ *   if (obj == null) { return false; }
+ *   if (obj == this) { return true; }
+ *   if (obj.getClass() != getClass()) {
+ *     return false;
  *   }
- *  MyClass rhs = (MyClass) o;
- *  return new EqualsBuilder()
- *                 .appendSuper(super.equals(o))
+ *   MyClass rhs = (MyClass) obj;
+ *   return new EqualsBuilder()
+ *                 .appendSuper(super.equals(obj))
  *                 .append(field1, rhs.field1)
  *                 .append(field2, rhs.field2)
  *                 .append(field3, rhs.field3)
@@ -101,33 +69,35 @@ import java.lang.reflect.Modifier;
  *
  * <p> A typical invocation for this method would look like:</p>
  * <pre>
- * public boolean equals(Object o) {
- *   return EqualsBuilder.reflectionEquals(this, o);
+ * public boolean equals(Object obj) {
+ *   return EqualsBuilder.reflectionEquals(this, obj);
  * }
  * </pre>
  *
+ * @author Apache Software Foundation
  * @author <a href="mailto:steve.downey@netfolio.com">Steve Downey</a>
- * @author Stephen Colebourne
  * @author Gary Gregory
  * @author Pete Gieser
+ * @author Arun Mammen Thomas
  * @since 1.0
  * @version $Id$
  */
 public class EqualsBuilder {
+    
     /**
      * If the fields tested are equals.
+     * The default value is <code>true</code>.
      */
-    private boolean isEquals;
+    private boolean isEquals = true;
 
     /**
      * <p>Constructor for EqualsBuilder.</p>
      *
      * <p>Starts off assuming that equals is <code>true</code>.</p>
-     * @see java.lang.Object#equals
+     * @see Object#equals(Object)
      */
     public EqualsBuilder() {
-        super();
-        isEquals = true;
+        // do nothing for now.
     }
 
     //-------------------------------------------------------------------------
@@ -151,7 +121,53 @@ public class EqualsBuilder {
      * @return <code>true</code> if the two Objects have tested equals.
      */
     public static boolean reflectionEquals(Object lhs, Object rhs) {
-        return reflectionEquals(lhs, rhs, false, null);
+        return reflectionEquals(lhs, rhs, false, null, null);
+    }
+
+    /**
+     * <p>This method uses reflection to determine if the two <code>Object</code>s
+     * are equal.</p>
+     *
+     * <p>It uses <code>AccessibleObject.setAccessible</code> to gain access to private
+     * fields. This means that it will throw a security exception if run under
+     * a security manager, if the permissions are not set up correctly. It is also
+     * not as efficient as testing explicitly.</p>
+     *
+     * <p>Transient members will be not be tested, as they are likely derived
+     * fields, and not part of the value of the Object.</p>
+     *
+     * <p>Static fields will not be tested. Superclass fields will be included.</p>
+     *
+     * @param lhs  <code>this</code> object
+     * @param rhs  the other object
+     * @param excludeFields  Collection of String field names to exclude from testing
+     * @return <code>true</code> if the two Objects have tested equals.
+     */
+    public static boolean reflectionEquals(Object lhs, Object rhs, Collection /*String*/ excludeFields) {
+        return reflectionEquals(lhs, rhs, ReflectionToStringBuilder.toNoNullStringArray(excludeFields));
+    }
+
+    /**
+     * <p>This method uses reflection to determine if the two <code>Object</code>s
+     * are equal.</p>
+     *
+     * <p>It uses <code>AccessibleObject.setAccessible</code> to gain access to private
+     * fields. This means that it will throw a security exception if run under
+     * a security manager, if the permissions are not set up correctly. It is also
+     * not as efficient as testing explicitly.</p>
+     *
+     * <p>Transient members will be not be tested, as they are likely derived
+     * fields, and not part of the value of the Object.</p>
+     *
+     * <p>Static fields will not be tested. Superclass fields will be included.</p>
+     *
+     * @param lhs  <code>this</code> object
+     * @param rhs  the other object
+     * @param excludeFields  array of field names to exclude from testing
+     * @return <code>true</code> if the two Objects have tested equals.
+     */
+    public static boolean reflectionEquals(Object lhs, Object rhs, String[] excludeFields) {
+        return reflectionEquals(lhs, rhs, false, null, excludeFields);
     }
 
     /**
@@ -175,7 +191,7 @@ public class EqualsBuilder {
      * @return <code>true</code> if the two Objects have tested equals.
      */
     public static boolean reflectionEquals(Object lhs, Object rhs, boolean testTransients) {
-        return reflectionEquals(lhs, rhs, testTransients, null);
+        return reflectionEquals(lhs, rhs, testTransients, null, null);
     }
 
     /**
@@ -204,6 +220,37 @@ public class EqualsBuilder {
      * @since 2.0
      */
     public static boolean reflectionEquals(Object lhs, Object rhs, boolean testTransients, Class reflectUpToClass) {
+        return reflectionEquals(lhs, rhs, testTransients, reflectUpToClass, null);
+    }
+
+    /**
+     * <p>This method uses reflection to determine if the two <code>Object</code>s
+     * are equal.</p>
+     *
+     * <p>It uses <code>AccessibleObject.setAccessible</code> to gain access to private
+     * fields. This means that it will throw a security exception if run under
+     * a security manager, if the permissions are not set up correctly. It is also
+     * not as efficient as testing explicitly.</p>
+     *
+     * <p>If the testTransients parameter is set to <code>true</code>, transient
+     * members will be tested, otherwise they are ignored, as they are likely
+     * derived fields, and not part of the value of the <code>Object</code>.</p>
+     *
+     * <p>Static fields will not be included. Superclass fields will be appended
+     * up to and including the specified superclass. A null superclass is treated
+     * as java.lang.Object.</p>
+     *
+     * @param lhs  <code>this</code> object
+     * @param rhs  the other object
+     * @param testTransients  whether to include transient fields
+     * @param reflectUpToClass  the superclass to reflect up to (inclusive),
+     *  may be <code>null</code>
+     * @param excludeFields  array of field names to exclude from testing
+     * @return <code>true</code> if the two Objects have tested equals.
+     * @since 2.0
+     */
+    public static boolean reflectionEquals(Object lhs, Object rhs, boolean testTransients, Class reflectUpToClass,
+            String[] excludeFields) {
         if (lhs == rhs) {
             return true;
         }
@@ -235,10 +282,10 @@ public class EqualsBuilder {
         }
         EqualsBuilder equalsBuilder = new EqualsBuilder();
         try {
-            reflectionAppend(lhs, rhs, testClass, equalsBuilder, testTransients);
+            reflectionAppend(lhs, rhs, testClass, equalsBuilder, testTransients, excludeFields);
             while (testClass.getSuperclass() != null && testClass != reflectUpToClass) {
                 testClass = testClass.getSuperclass();
-                reflectionAppend(lhs, rhs, testClass, equalsBuilder, testTransients);
+                reflectionAppend(lhs, rhs, testClass, equalsBuilder, testTransients, excludeFields);
             }
         } catch (IllegalArgumentException e) {
             // In this case, we tried to test a subclass vs. a superclass and
@@ -260,18 +307,21 @@ public class EqualsBuilder {
      * @param clazz  the class to append details of
      * @param builder  the builder to append to
      * @param useTransients  whether to test transient fields
+     * @param excludeFields  array of field names to exclude from testing
      */
     private static void reflectionAppend(
         Object lhs,
         Object rhs,
         Class clazz,
         EqualsBuilder builder,
-        boolean useTransients) {
+        boolean useTransients,
+        String[] excludeFields) {
         Field[] fields = clazz.getDeclaredFields();
         AccessibleObject.setAccessible(fields, true);
         for (int i = 0; i < fields.length && builder.isEquals; i++) {
             Field f = fields[i];
-            if ((f.getName().indexOf('$') == -1)
+            if (!ArrayUtils.contains(excludeFields, f.getName())
+                && (f.getName().indexOf('$') == -1)
                 && (useTransients || !Modifier.isTransient(f.getModifiers()))
                 && (!Modifier.isStatic(f.getModifiers()))) {
                 try {
@@ -320,45 +370,51 @@ public class EqualsBuilder {
             return this;
         }
         if (lhs == null || rhs == null) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         Class lhsClass = lhs.getClass();
         if (!lhsClass.isArray()) {
-            //the simple case, not an array, just test the element
+            // The simple case, not an array, just test the element
             isEquals = lhs.equals(rhs);
+        } else if (lhs.getClass() != rhs.getClass()) {
+            // Here when we compare different dimensions, for example: a boolean[][] to a boolean[] 
+            this.setEquals(false);
+        }
+        // 'Switch' on type of array, to dispatch to the correct handler
+        // This handles multi dimensional arrays of the same depth
+        else if (lhs instanceof long[]) {
+            append((long[]) lhs, (long[]) rhs);
+        } else if (lhs instanceof int[]) {
+            append((int[]) lhs, (int[]) rhs);
+        } else if (lhs instanceof short[]) {
+            append((short[]) lhs, (short[]) rhs);
+        } else if (lhs instanceof char[]) {
+            append((char[]) lhs, (char[]) rhs);
+        } else if (lhs instanceof byte[]) {
+            append((byte[]) lhs, (byte[]) rhs);
+        } else if (lhs instanceof double[]) {
+            append((double[]) lhs, (double[]) rhs);
+        } else if (lhs instanceof float[]) {
+            append((float[]) lhs, (float[]) rhs);
+        } else if (lhs instanceof boolean[]) {
+            append((boolean[]) lhs, (boolean[]) rhs);
         } else {
-            //'Switch' on type of array, to dispatch to the correct handler
-            // This handles multi dimensional arrays
-            if (lhs instanceof long[]) {
-                append((long[]) lhs, (long[]) rhs);
-            } else if (lhs instanceof int[]) {
-                append((int[]) lhs, (int[]) rhs);
-            } else if (lhs instanceof short[]) {
-                append((short[]) lhs, (short[]) rhs);
-            } else if (lhs instanceof char[]) {
-                append((char[]) lhs, (char[]) rhs);
-            } else if (lhs instanceof byte[]) {
-                append((byte[]) lhs, (byte[]) rhs);
-            } else if (lhs instanceof double[]) {
-                append((double[]) lhs, (double[]) rhs);
-            } else if (lhs instanceof float[]) {
-                append((float[]) lhs, (float[]) rhs);
-            } else if (lhs instanceof boolean[]) {
-                append((boolean[]) lhs, (boolean[]) rhs);
-            } else {
-                // Not an array of primitives
-                append((Object[]) lhs, (Object[]) rhs);
-            }
+            // Not an array of primitives
+            append((Object[]) lhs, (Object[]) rhs);
         }
         return this;
     }
 
     /**
-     * <p>Test if two <code>long</code>s are equal.</p>
-     *
-     * @param lhs  the left hand <code>long</code>
-     * @param rhs  the right hand <code>long</code>
+     * <p>
+     * Test if two <code>long</code> s are equal.
+     * </p>
+     * 
+     * @param lhs
+     *                  the left hand <code>long</code>
+     * @param rhs
+     *                  the right hand <code>long</code>
      * @return EqualsBuilder - used to chain calls.
      */
     public EqualsBuilder append(long lhs, long rhs) {
@@ -433,7 +489,7 @@ public class EqualsBuilder {
      * <p>Test if two <code>double</code>s are equal by testing that the
      * pattern of bits returned by <code>doubleToLong</code> are equal.</p>
      *
-     * <p>This handles NaNs, Infinties, and <code>-0.0</code>.</p>
+     * <p>This handles NaNs, Infinities, and <code>-0.0</code>.</p>
      *
      * <p>It is compatible with the hash code generated by
      * <code>HashCodeBuilder</code>.</p>
@@ -453,7 +509,7 @@ public class EqualsBuilder {
      * <p>Test if two <code>float</code>s are equal byt testing that the
      * pattern of bits returned by doubleToLong are equal.</p>
      *
-     * <p>This handles NaNs, Infinties, and <code>-0.0</code>.</p>
+     * <p>This handles NaNs, Infinities, and <code>-0.0</code>.</p>
      *
      * <p>It is compatible with the hash code generated by
      * <code>HashCodeBuilder</code>.</p>
@@ -502,19 +558,14 @@ public class EqualsBuilder {
             return this;
         }
         if (lhs == null || rhs == null) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         if (lhs.length != rhs.length) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         for (int i = 0; i < lhs.length && isEquals; ++i) {
-            Class lhsClass = lhs[i].getClass();
-            if (!lhsClass.isInstance(rhs[i])) {
-                isEquals = false; //If the types don't match, not equal
-                break;
-            }
             append(lhs[i], rhs[i]);
         }
         return this;
@@ -538,11 +589,11 @@ public class EqualsBuilder {
             return this;
         }
         if (lhs == null || rhs == null) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         if (lhs.length != rhs.length) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         for (int i = 0; i < lhs.length && isEquals; ++i) {
@@ -569,11 +620,11 @@ public class EqualsBuilder {
             return this;
         }
         if (lhs == null || rhs == null) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         if (lhs.length != rhs.length) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         for (int i = 0; i < lhs.length && isEquals; ++i) {
@@ -600,11 +651,11 @@ public class EqualsBuilder {
             return this;
         }
         if (lhs == null || rhs == null) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         if (lhs.length != rhs.length) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         for (int i = 0; i < lhs.length && isEquals; ++i) {
@@ -631,11 +682,11 @@ public class EqualsBuilder {
             return this;
         }
         if (lhs == null || rhs == null) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         if (lhs.length != rhs.length) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         for (int i = 0; i < lhs.length && isEquals; ++i) {
@@ -662,11 +713,11 @@ public class EqualsBuilder {
             return this;
         }
         if (lhs == null || rhs == null) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         if (lhs.length != rhs.length) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         for (int i = 0; i < lhs.length && isEquals; ++i) {
@@ -693,11 +744,11 @@ public class EqualsBuilder {
             return this;
         }
         if (lhs == null || rhs == null) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         if (lhs.length != rhs.length) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         for (int i = 0; i < lhs.length && isEquals; ++i) {
@@ -724,11 +775,11 @@ public class EqualsBuilder {
             return this;
         }
         if (lhs == null || rhs == null) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         if (lhs.length != rhs.length) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         for (int i = 0; i < lhs.length && isEquals; ++i) {
@@ -755,11 +806,11 @@ public class EqualsBuilder {
             return this;
         }
         if (lhs == null || rhs == null) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         if (lhs.length != rhs.length) {
-            isEquals = false;
+            this.setEquals(false);
             return this;
         }
         for (int i = 0; i < lhs.length && isEquals; ++i) {
@@ -769,13 +820,30 @@ public class EqualsBuilder {
     }
 
     /**
-     * <p>Return <code>true</code> if the fields that have been checked
+     * <p>Returns <code>true</code> if the fields that have been checked
      * are all equal.</p>
      *
      * @return boolean
      */
     public boolean isEquals() {
-        return isEquals;
+        return this.isEquals;
     }
 
+    /**
+     * Sets the <code>isEquals</code> value.
+     * 
+     * @param isEquals The value to set.
+     * @since 2.1
+     */
+    protected void setEquals(boolean isEquals) {
+        this.isEquals = isEquals;
+    }
+
+    /**
+     * Reset the EqualsBuilder so you can use the same object again
+     * @since 2.5
+     */
+    public void reset() {
+        this.isEquals = true;
+    }
 }

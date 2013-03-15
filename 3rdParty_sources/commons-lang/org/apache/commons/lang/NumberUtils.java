@@ -1,55 +1,18 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang;
 
@@ -59,9 +22,8 @@ import java.math.BigInteger;
 /**
  * <p>Provides extra functionality for Java Number classes.</p>
  *
- * @author <a href="mailto:bayard@generationjava.com">Henri Yandell</a>
+ * @author Apache Software Foundation
  * @author <a href="mailto:rand_mcneely@yahoo.com">Rand McNeely</a>
- * @author Stephen Colebourne
  * @author <a href="mailto:steve.downey@netfolio.com">Steve Downey</a>
  * @author Eric Pugh
  * @author Phil Steitz
@@ -82,6 +44,7 @@ public final class NumberUtils {
      * to operate.</p>
      */
     public NumberUtils() {
+      super();
     }
 
     //--------------------------------------------------------------------
@@ -156,7 +119,7 @@ public final class NumberUtils {
      *
      * <p>First, the value is examined for a type qualifier on the end
      * (<code>'f','F','d','D','l','L'</code>).  If it is found, it starts 
-     * trying to create succissively larger types from the type specified
+     * trying to create successively larger types from the type specified
      * until one is found that can hold the value.</p>
      *
      * <p>If a type specifier is not found, it will check for a decimal point
@@ -178,6 +141,9 @@ public final class NumberUtils {
         }
         if (val.length() == 0) {
             throw new NumberFormatException("\"\" is not a valid number.");
+        }
+        if (val.length() == 1 && !Character.isDigit(val.charAt(0))) {
+            throw new NumberFormatException(val + " is not a valid number.");
         }
         if (val.startsWith("--")) {
             // this is protection for poorness in java.lang.BigDecimal.
@@ -229,8 +195,7 @@ public final class NumberUtils {
                 case 'L' :
                     if (dec == null
                         && exp == null
-                        && isDigits(numeric.substring(1))
-                        && (numeric.charAt(0) == '-' || Character.isDigit(numeric.charAt(0)))) {
+                        && (numeric.charAt(0) == '-' && isDigits(numeric.substring(1)) || isDigits(numeric))) {
                         try {
                             return createLong(numeric);
                         } catch (NumberFormatException nfe) {
@@ -246,13 +211,14 @@ public final class NumberUtils {
                         Float f = NumberUtils.createFloat(numeric);
                         if (!(f.isInfinite() || (f.floatValue() == 0.0F && !allZeros))) {
                             //If it's too big for a float or the float value = 0 and the string
-                            //has non-zeros in it, then float doens't have the presision we want
+                            //has non-zeros in it, then float does not have the precision we want
                             return f;
                         }
 
-                    } catch (NumberFormatException nfe) {
+                    } catch (NumberFormatException e) {
+                        // ignore the bad number
                     }
-                    //Fall through
+                    //$FALL-THROUGH$
                 case 'd' :
                 case 'D' :
                     try {
@@ -261,12 +227,14 @@ public final class NumberUtils {
                             return d;
                         }
                     } catch (NumberFormatException nfe) {
+                        // empty catch
                     }
                     try {
                         return createBigDecimal(numeric);
                     } catch (NumberFormatException e) {
+                        // empty catch
                     }
-                    //Fall through
+                    //$FALL-THROUGH$
                 default :
                     throw new NumberFormatException(val + " is not a valid number.");
 
@@ -284,10 +252,12 @@ public final class NumberUtils {
                 try {
                     return createInteger(val);
                 } catch (NumberFormatException nfe) {
+                    // empty catch
                 }
                 try {
                     return createLong(val);
                 } catch (NumberFormatException nfe) {
+                    // empty catch
                 }
                 return createBigInteger(val);
 
@@ -300,6 +270,7 @@ public final class NumberUtils {
                         return f;
                     }
                 } catch (NumberFormatException nfe) {
+                    // empty catch
                 }
                 try {
                     Double d = createDouble(val);
@@ -307,6 +278,7 @@ public final class NumberUtils {
                         return d;
                     }
                 } catch (NumberFormatException nfe) {
+                    // empty catch
                 }
 
                 return createBigDecimal(val);
@@ -501,7 +473,7 @@ public final class NumberUtils {
      *  <li>NaN
      *  <li>Positive infinity
      *  <li>Maximum double
-     *  <li>Normal positve numbers
+     *  <li>Normal positive numbers
      *  <li>+0.0
      *  <li>-0.0
      *  <li>Normal negative numbers
@@ -550,7 +522,7 @@ public final class NumberUtils {
     /**
      * <p>Compares two floats for order.</p>
      *
-     * <p>This method is more comprhensive than the standard Java greater than,
+     * <p>This method is more comprehensive than the standard Java greater than,
      * less than and equals operators.</p>
      * <ul>
      *  <li>It returns <code>-1</code> if the first value is less than the second.
@@ -563,7 +535,7 @@ public final class NumberUtils {
      * <li>NaN
      * <li>Positive infinity
      * <li>Maximum float
-     * <li>Normal positve numbers
+     * <li>Normal positive numbers
      * <li>+0.0
      * <li>-0.0
      * <li>Normal negative numbers
@@ -646,7 +618,7 @@ public final class NumberUtils {
      * @return <code>true</code> if the string is a correctly formatted number
      */
     public static boolean isNumber(String str) {
-        if ((str == null) || (str.length() == 0)) {
+        if (StringUtils.isEmpty(str)) {
             return false;
         }
         char[] chars = str.toCharArray();
@@ -730,7 +702,7 @@ public final class NumberUtils {
             }
             if (chars[i] == 'l'
                 || chars[i] == 'L') {
-                // not allowing L with an exponoent
+                // not allowing L with an exponent
                 return foundDigit && !hasExp;
             }
             // last character is illegal

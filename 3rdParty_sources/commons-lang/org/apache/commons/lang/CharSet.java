@@ -1,59 +1,23 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -65,8 +29,8 @@ import java.util.Set;
  *
  * <p>Instances are immutable, but instances of subclasses may not be.</p>
  *
- * @author Henri Yandell
- * @author Stephen Colebourne
+ * <p>#ThreadSafe#</p>
+ * @author Apache Software Foundation
  * @author Phil Steitz
  * @author Pete Gieser
  * @author Gary Gregory
@@ -75,7 +39,11 @@ import java.util.Set;
  */
 public class CharSet implements Serializable {
 
-    /** Serialization lock, Lang version 2.0. */
+    /**
+     * Required for serialization support. Lang version 2.0. 
+     * 
+     * @see java.io.Serializable
+     */
     private static final long serialVersionUID = 5947847346149275958L;
 
     /** 
@@ -110,10 +78,10 @@ public class CharSet implements Serializable {
 
     /**
      * A Map of the common cases used in the factory.
-     * Subclasses can add more common patterns if desired.
+     * Subclasses can add more common patterns if desired
      * @since 2.0
      */
-    protected static final Map COMMON = new HashMap();
+    protected static final Map COMMON = Collections.synchronizedMap(new HashMap());
     
     static {
         COMMON.put(null, EMPTY);
@@ -126,7 +94,7 @@ public class CharSet implements Serializable {
     }
 
     /** The set of CharRange objects. */
-    private Set set = new HashSet();
+    private final Set set = Collections.synchronizedSet(new HashSet());
 
     //-----------------------------------------------------------------------
     /**
@@ -180,6 +148,21 @@ public class CharSet implements Serializable {
         return new CharSet(setStr);
     }
 
+    /**
+     * <p>Constructs a new CharSet using the set syntax.
+     * Each string is merged in with the set.</p>
+     *
+     * @param setStrs  Strings to merge into the initial set, may be null
+     * @return a CharSet instance
+     * @since 2.4
+     */
+    public static CharSet getInstance(String[] setStrs) {
+        if (setStrs == null) {
+            return null;
+        }
+        return new CharSet(setStrs); 
+    }
+
     //-----------------------------------------------------------------------
     /**
      * <p>Constructs a new CharSet using the set syntax.</p>
@@ -224,19 +207,19 @@ public class CharSet implements Serializable {
             int remainder = (len - pos);
             if (remainder >= 4 && str.charAt(pos) == '^' && str.charAt(pos + 2) == '-') {
                 // negated range
-                set.add(new CharRange(str.charAt(pos + 1), str.charAt(pos + 3), true));
+                set.add(CharRange.isNotIn(str.charAt(pos + 1), str.charAt(pos + 3)));
                 pos += 4;
             } else if (remainder >= 3 && str.charAt(pos + 1) == '-') {
                 // range
-                set.add(new CharRange(str.charAt(pos), str.charAt(pos + 2)));
+                set.add(CharRange.isIn(str.charAt(pos), str.charAt(pos + 2)));
                 pos += 3;
             } else if (remainder >= 2 && str.charAt(pos) == '^') {
                 // negated char
-                set.add(new CharRange(str.charAt(pos + 1), true));
+                set.add(CharRange.isNot(str.charAt(pos + 1)));
                 pos += 2;
             } else {
                 // char
-                set.add(new CharRange(str.charAt(pos)));
+                set.add(CharRange.is(str.charAt(pos)));
                 pos += 1;
             }
         }
@@ -292,11 +275,11 @@ public class CharSet implements Serializable {
             return false;
         }
         CharSet other = (CharSet) obj;
-        return (set.equals(other.set));
+        return set.equals(other.set);
     }
 
     /**
-     * <p>Gets a hashCode compatable with the equals method.</p>
+     * <p>Gets a hashCode compatible with the equals method.</p>
      *
      * @return a suitable hashCode
      * @since 2.0

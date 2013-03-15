@@ -11,7 +11,7 @@ CKEditor 3.6.2
 
 Commons HttpClient 3.0
 
-Commons Lang 2.0
+Commons Lang 2.6
 
 Commons IO 2.1
 

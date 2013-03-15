@@ -1,55 +1,18 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang.exception;
 
@@ -63,9 +26,9 @@ import java.io.PrintWriter;
  * about the exception which was caught and provoked throwing the
  * current exception. Catching and rethrowing may occur multiple
  * times, and provided that all exceptions except the first one
- * are descendands of <code>NestedException</code>, when the
+ * are descendants of <code>NestedException</code>, when the
  * exception is finally printed out using any of the <code>
- * printStackTrace()</code> methods, the stacktrace will contain
+ * printStackTrace()</code> methods, the stack trace will contain
  * the information about all exceptions thrown and caught on
  * the way.
  * <p> Running the following program
@@ -102,7 +65,7 @@ import java.io.PrintWriter;
  * 30      }
  * 31 }
  * </pre></blockquote>
- * <p>Yields the following stacktrace:
+ * <p>Yields the following stack trace:
  * <p><blockquote><pre>
  * org.apache.commons.lang.exception.NestableException: foo
  *         at Test.a(Test.java:16)
@@ -118,7 +81,7 @@ import java.io.PrintWriter;
  * </pre></blockquote><br>
  *
  * @author <a href="mailto:Rafal.Krzewski@e-point.pl">Rafal Krzewski</a>
- * @author <a href="mailto:dlr@collab.net">Daniel Rall</a>
+ * @author Daniel L. Rall
  * @author <a href="mailto:knielsen@apache.org">Kasper Nielsen</a>
  * @author <a href="mailto:steven@caswell.name">Steven Caswell</a>
  * @since 1.0
@@ -126,6 +89,13 @@ import java.io.PrintWriter;
  */
 public class NestableException extends Exception implements Nestable {
     
+    /**
+     * Required for serialization support.
+     * 
+     * @see java.io.Serializable
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * The helper instance which contains much of the code which we
      * delegate to.
@@ -181,6 +151,9 @@ public class NestableException extends Exception implements Nestable {
         this.cause = cause;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Throwable getCause() {
         return cause;
     }
@@ -189,6 +162,8 @@ public class NestableException extends Exception implements Nestable {
      * Returns the detail message string of this throwable. If it was
      * created with a null message, returns the following:
      * (cause==null ? null : cause.toString()).
+     *
+     * @return String message string of the throwable
      */
     public String getMessage() {
         if (super.getMessage() != null) {
@@ -200,50 +175,82 @@ public class NestableException extends Exception implements Nestable {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getMessage(int index) {
         if (index == 0) {
             return super.getMessage();
-        } else {
-            return delegate.getMessage(index);
         }
+        return delegate.getMessage(index);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String[] getMessages() {
         return delegate.getMessages();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Throwable getThrowable(int index) {
         return delegate.getThrowable(index);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int getThrowableCount() {
         return delegate.getThrowableCount();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Throwable[] getThrowables() {
         return delegate.getThrowables();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int indexOfThrowable(Class type) {
         return delegate.indexOfThrowable(type, 0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int indexOfThrowable(Class type, int fromIndex) {
         return delegate.indexOfThrowable(type, fromIndex);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void printStackTrace() {
         delegate.printStackTrace();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void printStackTrace(PrintStream out) {
         delegate.printStackTrace(out);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void printStackTrace(PrintWriter out) {
         delegate.printStackTrace(out);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public final void printPartialStackTrace(PrintWriter out) {
         super.printStackTrace(out);
     }

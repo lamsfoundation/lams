@@ -1,55 +1,20 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
- * reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.commons.lang.math;
 
@@ -60,12 +25,15 @@ import java.util.Random;
  * {@link java.util.Random} methods via the {@link java.lang.Math#random()}
  * method and its system-wide <code>Random</code> object.
  * 
- * @author Henri Yandell
+ * @author Gary D. Gregory
  * @since 2.0
  * @version $Id$
  */
 public class RandomUtils {
 
+    /**
+     * An instance of {@link JVMRandom}.
+     */
     public static final Random JVM_RANDOM = new JVMRandom();
 
 // should be possible for JVM_RANDOM?
@@ -76,43 +44,71 @@ public class RandomUtils {
     /**
      * <p>Returns the next pseudorandom, uniformly distributed int value
      * from the Math.random() sequence.</p>
-     *
+     * <b>N.B. All values are >= 0.<b>
      * @return the random int
      */
     public static int nextInt() {
         return nextInt(JVM_RANDOM);
     }
-    public static int nextInt(Random rnd) {
-        return rnd.nextInt();
+    
+    /**
+     * <p>Returns the next pseudorandom, uniformly distributed int value
+     * from the given <code>random</code> sequence.</p>
+     *
+     * @param random the Random sequence generator.
+     * @return the random int
+     */
+    public static int nextInt(Random random) {
+        return random.nextInt();
     }
+    
     /**
      * <p>Returns a pseudorandom, uniformly distributed int value
      * between <code>0</code> (inclusive) and the specified value
      * (exclusive), from the Math.random() sequence.</p>
      *
      * @param n  the specified exclusive max-value
-     *
      * @return the random int
      */
     public static int nextInt(int n) {
         return nextInt(JVM_RANDOM, n);
     }
-    public static int nextInt(Random rnd, int n) {
+    
+    /**
+     * <p>Returns a pseudorandom, uniformly distributed int value
+     * between <code>0</code> (inclusive) and the specified value
+     * (exclusive), from the given Random sequence.</p>
+     *
+     * @param random the Random sequence generator.
+     * @param n  the specified exclusive max-value
+     * @return the random int
+     */
+    public static int nextInt(Random random, int n) {
         // check this cannot return 'n'
-        return rnd.nextInt(n);
+        return random.nextInt(n);
     }
+    
     /**
      * <p>Returns the next pseudorandom, uniformly distributed long value
      * from the Math.random() sequence.</p>
-     *
+     * <b>N.B. All values are >= 0.<b>
      * @return the random long
      */
     public static long nextLong() {
         return nextLong(JVM_RANDOM);
     }
-    public static long nextLong(Random rnd) {
-        return rnd.nextLong();
+
+    /**
+     * <p>Returns the next pseudorandom, uniformly distributed long value
+     * from the given Random sequence.</p>
+     *
+     * @param random the Random sequence generator.
+     * @return the random long
+     */
+    public static long nextLong(Random random) {
+        return random.nextLong();
     }
+    
     /**
      * <p>Returns the next pseudorandom, uniformly distributed boolean value
      * from the Math.random() sequence.</p>
@@ -122,9 +118,18 @@ public class RandomUtils {
     public static boolean nextBoolean() {
         return nextBoolean(JVM_RANDOM);
     }
-    public static boolean nextBoolean(Random rnd) {
-        return rnd.nextBoolean();
+
+    /**
+     * <p>Returns the next pseudorandom, uniformly distributed boolean value
+     * from the given random sequence.</p>
+     *
+     * @param random the Random sequence generator.
+     * @return the random boolean
+     */
+    public static boolean nextBoolean(Random random) {
+        return random.nextBoolean();
     }
+    
     /**
      * <p>Returns the next pseudorandom, uniformly distributed float value
      * between <code>0.0</code> and <code>1.0</code> from the Math.random()
@@ -135,19 +140,40 @@ public class RandomUtils {
     public static float nextFloat() {
         return nextFloat(JVM_RANDOM);
     }
-    public static float nextFloat(Random rnd) {
-        return rnd.nextFloat();
-    }
+
     /**
-     * <p>Synonymous to the Math.random() call.</p>
+     * <p>Returns the next pseudorandom, uniformly distributed float value
+     * between <code>0.0</code> and <code>1.0</code> from the given Random
+     * sequence.</p>
+     *
+     * @param random the Random sequence generator.
+     * @return the random float
+     */
+    public static float nextFloat(Random random) {
+        return random.nextFloat();
+    }
+    
+    /**
+     * <p>Returns the next pseudorandom, uniformly distributed float value
+     * between <code>0.0</code> and <code>1.0</code> from the Math.random()
+     * sequence.</p>
      *
      * @return the random double
      */
     public static double nextDouble() {
         return nextDouble(JVM_RANDOM);
     }
-    public static double nextDouble(Random rnd) {
-        return rnd.nextDouble();
+
+    /**
+     * <p>Returns the next pseudorandom, uniformly distributed float value
+     * between <code>0.0</code> and <code>1.0</code> from the given Random
+     * sequence.</p>
+     *
+     * @param random the Random sequence generator.
+     * @return the random double
+     */
+    public static double nextDouble(Random random) {
+        return random.nextDouble();
     }
     
 }

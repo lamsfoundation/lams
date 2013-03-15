@@ -1,57 +1,22 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowledgement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowledgement may appear in the software itself,
- *    if and wherever such third-party acknowledgements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang;
+
+import org.apache.commons.lang.text.StrBuilder;
 
 /**
  * <p>Operations on <code>CharSet</code>s.</p>
@@ -60,9 +25,9 @@ package org.apache.commons.lang;
  * An exception will not be thrown for a <code>null</code> input.
  * Each method documents its behaviour in more detail.</p>
  * 
+ * <p>#ThreadSafe#</p>
  * @see CharSet
- * @author <a href="bayard@generationjava.com">Henri Yandell</a>
- * @author Stephen Colebourne
+ * @author Apache Software Foundation
  * @author Phil Steitz
  * @author Gary Gregory
  * @since 1.0
@@ -78,6 +43,7 @@ public class CharSetUtils {
      * to operate.</p>
      */
     public CharSetUtils() {
+      super();
     }
 
     // Factory
@@ -89,7 +55,7 @@ public class CharSetUtils {
      * <ul>
      *  <li>&quot;aeio&quot; which implies 'a','e',..</li>
      *  <li>&quot;^e&quot; implies not e.</li>
-     *  <li>&quot;ej-m&quot; implies e,j->m. e,j,k,l,m.</li>
+     *  <li>&quot;ej-m&quot; implies e,j-&gt;m. e,j,k,l,m.</li>
      * </ul>
      * 
      * <pre>
@@ -100,7 +66,7 @@ public class CharSetUtils {
      *
      * @param set  the set, may be null
      * @return a CharSet instance, <code>null</code> if null input
-     * @deprecated Use {@link CharSet#getInstance(String)}.
+     * @deprecated Use {@link CharSet#getInstance(String[])}.
      *             Method will be removed in Commons Lang 3.0.
      */
     public static CharSet evaluateSet(String[] set) {
@@ -113,7 +79,7 @@ public class CharSetUtils {
     // Squeeze
     //-----------------------------------------------------------------------
     /**
-     * <p>Squeezes any repititions of a character that is mentioned in the
+     * <p>Squeezes any repetitions of a character that is mentioned in the
      * supplied set.</p>
      *
      * <pre>
@@ -125,13 +91,13 @@ public class CharSetUtils {
      * CharSetUtils.squeeze("hello", "a-e") = "hello"
      * </pre>
      *
-     * @see #evaluateSet(java.lang.String[]) for set-syntax.
+     * @see CharSet#getInstance(java.lang.String) for set-syntax.
      * @param str  the string to squeeze, may be null
      * @param set  the character set to use for manipulation, may be null
      * @return modified String, <code>null</code> if null string input
      */
     public static String squeeze(String str, String set) {
-        if (str == null || str.length() == 0 || set == null || set.length() == 0) {
+        if (StringUtils.isEmpty(str) || StringUtils.isEmpty(set)) {
             return str;
         }
         String[] strs = new String[1];
@@ -140,7 +106,7 @@ public class CharSetUtils {
     }
 
     /**
-     * <p>Squeezes any repititions of a character that is mentioned in the
+     * <p>Squeezes any repetitions of a character that is mentioned in the
      * supplied set.</p>
      *
      * <p>An example is:</p>
@@ -148,17 +114,17 @@ public class CharSetUtils {
      *   <li>squeeze(&quot;hello&quot;, {&quot;el&quot;}) => &quot;helo&quot;</li>
      * </ul>
      * 
-     * @see #evaluateSet(java.lang.String[]) for set-syntax.
+     * @see CharSet#getInstance(java.lang.String) for set-syntax.
      * @param str  the string to squeeze, may be null
      * @param set  the character set to use for manipulation, may be null
      * @return modified String, <code>null</code> if null string input
      */
     public static String squeeze(String str, String[] set) {
-        if (str == null || str.length() == 0 || set == null || set.length == 0) {
+        if (StringUtils.isEmpty(str) || ArrayUtils.isEmpty(set)) {
             return str;
         }
-        CharSet chars = evaluateSet(set);
-        StringBuffer buffer = new StringBuffer(str.length());
+        CharSet chars = CharSet.getInstance(set);
+        StrBuilder buffer = new StrBuilder(str.length());
         char[] chrs = str.toCharArray();
         int sz = chrs.length;
         char lastChar = ' ';
@@ -191,13 +157,13 @@ public class CharSetUtils {
      * CharSetUtils.count("hello", "a-e") = 1
      * </pre>
      *
-     * @see #evaluateSet(java.lang.String[]) for set-syntax.
+     * @see CharSet#getInstance(java.lang.String) for set-syntax.
      * @param str  String to count characters in, may be null
      * @param set  String set of characters to count, may be null
      * @return character count, zero if null string input
      */
     public static int count(String str, String set) {
-        if (str == null || str.length() == 0 || set == null || set.length() == 0) {
+        if (StringUtils.isEmpty(str) || StringUtils.isEmpty(set)) {
             return 0;
         }
         String[] strs = new String[1];
@@ -214,16 +180,16 @@ public class CharSetUtils {
      *  <li>count(&quot;hello&quot;, {&quot;c-f&quot;, &quot;o&quot;}) returns 2.</li>
      * </ul>
      *
-     * @see #evaluateSet(java.lang.String[]) for set-syntax.
+     * @see CharSet#getInstance(java.lang.String) for set-syntax.
      * @param str  String to count characters in, may be null
      * @param set  String[] set of characters to count, may be null
      * @return character count, zero if null string input
      */
     public static int count(String str, String[] set) {
-        if (str == null || str.length() == 0 || set == null || set.length == 0) {
+        if (StringUtils.isEmpty(str) || ArrayUtils.isEmpty(set)) {
             return 0;
         }
-        CharSet chars = evaluateSet(set);
+        CharSet chars = CharSet.getInstance(set);
         int count = 0;
         char[] chrs = str.toCharArray();
         int sz = chrs.length;
@@ -246,11 +212,11 @@ public class CharSetUtils {
      * CharSetUtils.keep("", *)          = ""
      * CharSetUtils.keep(*, null)        = ""
      * CharSetUtils.keep(*, "")          = ""
-     * CharSetUtils.keep("hello", "hl") = "hll"
-     * CharSetUtils.keep("hello", "le") = "ell"
+     * CharSetUtils.keep("hello", "hl")  = "hll"
+     * CharSetUtils.keep("hello", "le")  = "ell"
      * </pre>
      *
-     * @see #evaluateSet(java.lang.String[]) for set-syntax.
+     * @see CharSet#getInstance(java.lang.String) for set-syntax.
      * @param str  String to keep characters from, may be null
      * @param set  String set of characters to keep, may be null
      * @return modified String, <code>null</code> if null string input
@@ -260,7 +226,7 @@ public class CharSetUtils {
         if (str == null) {
             return null;
         }
-        if (str.length() == 0 || set == null || set.length() == 0) {
+        if (str.length() == 0 || StringUtils.isEmpty(set)) {
             return "";
         }
         String[] strs = new String[1];
@@ -275,10 +241,10 @@ public class CharSetUtils {
      * <p>An example would be:</p>
      * <ul>
      *  <li>keep(&quot;hello&quot;, {&quot;c-f&quot;, &quot;o&quot;})
-     *   returns &quot;hll&quot;</li>
+     *   returns &quot;eo&quot;</li>
      * </ul>
      *
-     * @see #evaluateSet(java.lang.String[]) for set-syntax.
+     * @see CharSet#getInstance(java.lang.String) for set-syntax.
      * @param str  String to keep characters from, may be null
      * @param set  String[] set of characters to keep, may be null
      * @return modified String, <code>null</code> if null string input
@@ -288,7 +254,7 @@ public class CharSetUtils {
         if (str == null) {
             return null;
         }
-        if (str.length() == 0 || set == null || set.length == 0) {
+        if (str.length() == 0 || ArrayUtils.isEmpty(set)) {
             return "";
         }
         return modify(str, set, true);
@@ -305,17 +271,17 @@ public class CharSetUtils {
      * CharSetUtils.delete("", *)          = ""
      * CharSetUtils.delete(*, null)        = *
      * CharSetUtils.delete(*, "")          = *
-     * CharSetUtils.delete("hello", "hl") = "hll"
-     * CharSetUtils.delete("hello", "le") = "ell"
+     * CharSetUtils.delete("hello", "hl")  = "eo"
+     * CharSetUtils.delete("hello", "le")  = "ho"
      * </pre>
      *
-     * @see #evaluateSet(java.lang.String[]) for set-syntax.
+     * @see CharSet#getInstance(java.lang.String) for set-syntax.
      * @param str  String to delete characters from, may be null
      * @param set  String set of characters to delete, may be null
      * @return modified String, <code>null</code> if null string input
      */
     public static String delete(String str, String set) {
-        if (str == null || str.length() == 0 || set == null || set.length() == 0) {
+        if (StringUtils.isEmpty(str) || StringUtils.isEmpty(set)) {
             return str;
         }
         String[] strs = new String[1];
@@ -333,23 +299,30 @@ public class CharSetUtils {
      *   &quot;hll&quot;</li>
      * </ul>
      *
-     * @see #evaluateSet(java.lang.String[]) for set-syntax.
+     * @see CharSet#getInstance(java.lang.String) for set-syntax.
      * @param str  String to delete characters from, may be null
      * @param set  String[] set of characters to delete, may be null
      * @return modified String, <code>null</code> if null string input
      */
     public static String delete(String str, String[] set) {
-        if (str == null || str.length() == 0 || set == null || set.length == 0) {
+        if (StringUtils.isEmpty(str) || ArrayUtils.isEmpty(set)) {
             return str;
         }
         return modify(str, set, false);
     }
 
     //-----------------------------------------------------------------------
-    // Implementation of delete and keep
+    /**
+     * Implementation of delete and keep
+     *
+     * @param str String to modify characters within
+     * @param set String[] set of characters to modify
+     * @param expect whether to evaluate on match, or non-match
+     * @return modified String
+     */
     private static String modify(String str, String[] set, boolean expect) {
-        CharSet chars = evaluateSet(set);
-        StringBuffer buffer = new StringBuffer(str.length());
+        CharSet chars = CharSet.getInstance(set);
+        StrBuilder buffer = new StrBuilder(str.length());
         char[] chrs = str.toCharArray();
         int sz = chrs.length;
         for(int i=0; i<sz; i++) {
@@ -369,7 +342,7 @@ public class CharSetUtils {
      * <p>An example is:</p>
      * <ul>
      *   <li>translate(&quot;hello&quot;, &quot;ho&quot;, &quot;jy&quot;)
-     *    => jelly</li>
+     *    =&gt; jelly</li>
      * </ul>
      *
      * <p>If the length of characters to search for is greater than the
@@ -378,24 +351,27 @@ public class CharSetUtils {
      * 
      * <pre>
      * CharSetUtils.translate(null, *, *) = null
-     * CharSetUtils.translate("", *, *) = ""
+     * CharSetUtils.translate("", *, *)   = ""
      * </pre>
      *
      * @param str  String to replace characters in, may be null
      * @param searchChars   a set of characters to search for, must not be null
-     * @param replaceChars  a set of characters to replace, must not be null or empty ("")
+     * @param replaceChars  a set of characters to replace, must not be null or empty (&quot;&quot;)
      * @return translated String, <code>null</code> if null string input
-     * @throws NullPointerException if <code>with</code> or <code>repl</code> 
+     * @throws NullPointerException if <code>searchChars</code> or <code>replaceChars</code> 
      *  is <code>null</code>
-     * @throws ArrayIndexOutOfBoundsException if <code>with</code> is empty ("")
+     * @throws ArrayIndexOutOfBoundsException if <code>replaceChars</code> is empty (&quot;&quot;)
      * @deprecated Use {@link StringUtils#replaceChars(String, String, String)}.
      *             Method will be removed in Commons Lang 3.0.
+     *  NOTE: StringUtils#replaceChars behaves differently when 'searchChars' is longer
+     *  than 'replaceChars'. CharSetUtils#translate will use the last char of the replacement
+     *  string whereas StringUtils#replaceChars will delete
      */
     public static String translate(String str, String searchChars, String replaceChars) {
-        if (str == null || str.length() == 0) {
+        if (StringUtils.isEmpty(str)) {
             return str;
         }
-        StringBuffer buffer = new StringBuffer(str.length());
+        StrBuilder buffer = new StrBuilder(str.length());
         char[] chrs = str.toCharArray();
         char[] withChrs = replaceChars.toCharArray();
         int sz = chrs.length;
