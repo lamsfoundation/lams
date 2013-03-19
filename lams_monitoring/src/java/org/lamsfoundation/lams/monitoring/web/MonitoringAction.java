@@ -32,7 +32,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
@@ -44,7 +46,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.util.LessonComparator;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
@@ -56,6 +64,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -66,8 +75,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 
 /**
  * <p>
@@ -85,6 +92,7 @@ import org.apache.tomcat.util.json.JSONObject;
  * @struts.action-forward name = "previewdeleted" path = "/previewdeleted.jsp"
  * @struts.action-forward name = "notsupported" path = ".notsupported"
  * @struts.action-forward name = "timeChart" path = "/timeChart.jsp"
+ * @struts.action-forward name = "monitorLesson" path = "/monitor.jsp"
  * 
  *                        ----------------XDoclet Tags--------------------
  */
@@ -109,6 +117,8 @@ public class MonitoringAction extends LamsDispatchAction {
     private static IAuditService auditService;
 
     private static ITimezoneService timezoneService;
+
+    private static ILessonService lessonService;
 
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
@@ -215,7 +225,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		.getParameter("schedulingDatetime")) : null;
 
 	boolean precedingLessonEnable = WebUtil.readBooleanParam(request, "precedingLessonEnable", false);
-	Long precedingLessonId = precedingLessonEnable ? WebUtil.readLongParam(request, "precedingLessonId", true) : null;
+	Long precedingLessonId = precedingLessonEnable ? WebUtil.readLongParam(request, "precedingLessonId", true)
+		: null;
 	boolean timeLimitEnableField = WebUtil.readBooleanParam(request, "timeLimitEnableField", false);
 	Integer timeLimitDaysField = WebUtil.readIntParam(request, "timeLimitDaysField", true);
 	boolean timeLimitIndividualField = WebUtil.readBooleanParam(request, "timeLimitIndividualField", false);
@@ -1001,6 +1012,72 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
+    public ActionForward monitorLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Lesson lesson = getLessonService().getLesson(lessonId);
+	request.setAttribute(CentralConstants.PARAM_LEARNING_DESIGN_ID, lesson.getLearningDesign()
+		.getLearningDesignId());
+
+	return mapping.findForward("monitorLesson");
+    }
+
+    @SuppressWarnings("unchecked")
+    public ActionForward getLessonProgressJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Lesson lesson = getLessonService().getLesson(lessonId);
+	String contentFolderId = lesson.getLessonDetails().getContentFolderID();
+	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
+		.getServletContext());
+	Integer monitorUserId = getUserId();
+	JSONObject responseJSON = new JSONObject();
+
+	// few details for each activity
+	Map<Long, JSONObject> activitiesMap = new TreeMap<Long, JSONObject>();
+	for (Activity activity : (Set<Activity>) lesson.getLearningDesign().getActivities()) {
+	    JSONObject activityJSON = new JSONObject();
+	    Long activityId = activity.getActivityId();
+	    activityJSON.put("id", activityId);
+	    String monitorUrl = monitoringService.getActivityMonitorURL(lessonId, activityId, contentFolderId,
+		    monitorUserId);
+	    if (monitorUrl != null) { 
+		activityJSON.put("url", monitorUrl);
+	    }
+	    activitiesMap.put(activityId, activityJSON);
+	}
+
+	for (LearnerProgress learnerProgress : (Set<LearnerProgress>) lesson.getLearnerProgresses()) {
+	    JSONObject learnerJSON = new JSONObject();
+	    User learner = learnerProgress.getUser();
+	    learnerJSON.put("id", learner.getUserId());
+	    learnerJSON.put("firstName", learner.getFirstName());
+	    learnerJSON.put("lastName", learner.getLastName());
+	    learnerJSON.put("login", learner.getLogin());
+	    if (learnerProgress.isComplete()) {
+		// no more details are needed for learners who completed the lesson
+		responseJSON.append("completedLearners", learnerJSON);
+	    } else {
+		Activity currentActivity = learnerProgress.getCurrentActivity();
+		if (currentActivity != null) {
+		    Long activityId = currentActivity.getActivityId();
+		    // monitoring URL for the given learner
+		    String learnerUrl = monitoringService.getLearnerActivityURL(lessonId, activityId,
+			    learner.getUserId(), monitorUserId);
+		    learnerJSON.put("url", learnerUrl);
+
+		    JSONObject currentActivityJSON = activitiesMap.get(currentActivity.getActivityId());
+		    currentActivityJSON.append("learners", learnerJSON);
+		}
+	    }
+	}
+
+	responseJSON.put("activities", new JSONArray(activitiesMap.values()));
+	response.getWriter().write(responseJSON.toString());
+
+	return null;
+    }
+
     public ActionForward renameLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
@@ -1133,6 +1210,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	    MonitoringAction.timezoneService = (ITimezoneService) ctx.getBean("timezoneService");
 	}
 	return MonitoringAction.timezoneService;
+    }
+
+    private ILessonService getLessonService() {
+	if (MonitoringAction.lessonService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    MonitoringAction.lessonService = (ILessonService) ctx.getBean("lessonService");
+	}
+	return MonitoringAction.lessonService;
     }
 
     /**

@@ -692,9 +692,8 @@ public class SVGGenerator extends SVGConstants{
 	}
 	
 	Element rectangle = doc.createElementNS(SVG_NAMESPACE, "rect");
-	if (activity.getActivityTypeID().equals(Activity.TOOL_ACTIVITY_TYPE)) {	
-	    rectangle.setAttributeNS(null, "id", "act" + activity.getActivityID());
-	}
+	
+	rectangle.setAttributeNS(null, "id", "act" + activity.getActivityID());
 	rectangle.setAttributeNS(null, "x", Double.toString(x));
 	rectangle.setAttributeNS(null, "y", Double.toString(y));
 	rectangle.setAttributeNS(null, "width", Double.toString(dimension.width));

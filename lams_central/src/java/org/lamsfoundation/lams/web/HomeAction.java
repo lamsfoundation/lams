@@ -392,10 +392,12 @@ public class HomeAction extends DispatchAction {
     public ActionForward createLearningDesignThumbnail(ActionMapping mapping, ActionForm form, HttpServletRequest req,
 	    HttpServletResponse res) throws JDOMException, IOException, TranscoderException {
 	Long learningDesignId = WebUtil.readLongParam(req, CentralConstants.PARAM_LEARNING_DESIGN_ID);
-	String imagePath = getLearningDesignService().createLearningDesignSVG(learningDesignId,
-		SVGGenerator.OUTPUT_FORMAT_PNG);
+	Integer format = WebUtil.readIntParam(req, CentralConstants.PARAM_SVG_FORMAT, true);
+	format = format == null ? SVGGenerator.OUTPUT_FORMAT_PNG : format;
 
-	res.setContentType("image/png");
+	String imagePath = getLearningDesignService().createLearningDesignSVG(learningDesignId, format);
+
+	res.setContentType(format == SVGGenerator.OUTPUT_FORMAT_PNG ? "image/png" : "image/svg+xml");
 	OutputStream output = res.getOutputStream();
 	FileInputStream input = new FileInputStream(imagePath);
 	IOUtils.copy(input, output);

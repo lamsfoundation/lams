@@ -4,7 +4,7 @@
 	<classpathentry kind="src" path="conf/hibernate/mappings"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/3rdParty"/>
-	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-central.jar"/>
+	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-central.jar" sourcepath="/lams_central"/>
 	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-contentrepository.jar"/>
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/jbossweb">
 		<attributes>

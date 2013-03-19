@@ -1,0 +1,114 @@
+div#tabs {
+	width: 768px;
+	height: 574px;
+}
+
+.ui-tabs .ui-tabs-panel {
+	padding: 0px;
+}
+
+div#tabs ul li a, a#closeButton {
+	border-bottom: none;
+}
+
+a#closeButton {
+	position: absolute;
+	right: 10px;
+	top: 11px;
+	width: 19px;
+	height: 18px;
+}
+
+a#closeButton span {
+	background-color: #D0E5F5;
+}
+
+div.tabTitle {
+	padding: 5px 0px 5px 0px;
+	font-size: small;
+	font-weight: bold;
+	text-align: center;
+}
+
+.errorMessage {
+	font-weight: bold;
+	color: red;
+}
+
+.errorField {
+	border: thick solid red;
+}
+
+input[type="checkbox"] {
+	margin: 10px 5px 0px 0px;
+	border: none;
+}
+
+div.dialogContainer {
+	display: none;
+}
+
+div.topButtonsContainer {
+	height: 30px;
+}
+
+div.topButtonsContainer a {
+	float: right;
+	margin: 5px 5px 0 0;
+}
+
+div#sequenceCanvas {
+	text-align: center;
+	height: 483px;
+	width: 768px;
+	overflow: auto;
+}
+
+div#sequenceCanvas svg {
+	display: block;
+	overflow: hidden;
+}
+
+div#completedLearnersContainer {
+	padding: 4px 0px 3px 5px;
+	border-top: thin dotted #2E6E9E;
+}
+
+div#completedLearnersContainer span {
+	font-family: Verdana;
+	font-size: 10px;
+	cursor: default;
+	vertical-align: top;
+	margin-right: 5px;
+}
+
+div#learnerGroupList {
+	overflow: auto;
+	border: thin solid black;
+	padding : 5px;
+}
+
+div.learnerGroupListItem {
+	padding: 3px 0px 3px 0px;
+	cursor: pointer;
+}
+
+div.learnerGroupListItemSelected {
+	background-color: #5c9ccc !important;
+	color: white !important;
+}
+
+#learnerGroupListTitle {
+	padding: 0px 0px 5px 0px;
+	height: 15px;
+	font-size: small;
+	font-weight: bold;
+	text-align: center;
+}
+
+#sortLearnerGroupListButton {
+	text-align: right;
+	padding-right: 3px;
+	float: right;
+	cursor: pointer;
+}

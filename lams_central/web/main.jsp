@@ -31,11 +31,11 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>/css/thickbox.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen">
 	<style type="text/css">
-		div#addLessonDialog {
+		.dialogContainer {
 			display: none;
 		}
 		
-		#addLessonFrame {
+		.dialogContainer iframe {
 			width: 100%;
 			height: 100%;
 			border: none;
@@ -51,6 +51,11 @@
 		<script language="JavaScript" type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
 	</c:if>
 	<script language="javascript" type="text/javascript">
+		function showMonitorLessonDialog(lessonID){
+			$("#monitorDialog").dialog('option', 'lessonID', lessonID)
+								 .dialog('open');
+		}
+		
 		function showAddLessonDialog(orgID){
 			$("#addLessonDialog").dialog('option', 'orgID', orgID)
 								 .dialog('open');
@@ -63,6 +68,13 @@
 								 .dialog('close');
 		}
 	
+		function closeMonitorLessonDialog(refresh) {
+			$('#monitorFrame').attr('src', null);
+			// was the dialog just closed or a new lesson really added? if latter, refresh the list
+			$("#monitorDialog").dialog('option', 'refresh', refresh ? true : false)
+								 .dialog('close');
+		}
+		
 		<!--
 			jQuery(document).ready(function(){
 				<c:if test="${not empty collapsedOrgDTOs}">
@@ -100,7 +112,7 @@
 				
 		       
 		        // initialise lesson dialog
-				var dialog = $('#addLessonDialog').dialog({
+				$('#addLessonDialog').dialog({
  					'autoOpen'  : false,
  					'height'    : 600,
  					'width'     : 800,
@@ -120,6 +132,28 @@
  						}
  					}
  				// tabs are the title bar, so remove dialog's one
+ 				}).closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
+		        
+				// initialise monitor dialog
+				$('#monitorDialog').dialog({
+ 					'autoOpen'  : false,
+ 					'height'    : 600,
+ 					'width'     : 800,
+ 					'modal'     : true,
+ 					'resizable' : false,
+ 					'show'      : 'fold',
+ 					'hide'      : 'fold',
+ 					'open'      : function(){
+ 						// load contents after opening the dialog
+ 						$('#monitorFrame').attr('src', '<lams:LAMSURL/>monitoring/monitoring.do?method=monitorLesson&lessonID='
+ 								                         + $(this).dialog('option', 'lessonID'));
+ 					},
+ 					'close' : function() {
+ 						// refresh if lesson was added
+ 						if($(this).dialog('option', 'refresh')){
+ 							refresh();
+ 						}
+ 					}
  				}).closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
 			});
 		
@@ -303,8 +337,11 @@
 	</div>
 </div>
 
-<div id="addLessonDialog">
+<div id="addLessonDialog" class="dialogContainer">
 	<iframe id="addLessonFrame"></iframe>
+</div>
+<div id="monitorDialog" class="dialogContainer">
+	<iframe id="monitorFrame"></iframe>
 </div>
 
 </body>
