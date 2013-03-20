@@ -25,29 +25,26 @@ package org.lamsfoundation.lams.learningdesign;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.apache.commons.collections.comparators.NullComparator;
+import org.lamsfoundation.lams.util.AlphanumComparator;
 
 /**
  * The grouping comparator used for any ordered collection. Order is done on the alphabetic order of the group name.
  * Input objects must be of type Group.
  */
-public class GroupComparator implements Comparator, Serializable {
+public class GroupComparator implements Comparator<Group>, Serializable {
 
-	private static final long serialVersionUID = 4127022514966256114L;
+    private static final long serialVersionUID = 4127022514966256114L;
 
-	/**
+    /**
      * Compare the group names
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare(Object o1, Object o2) {
-        Group grp1 = (Group)o1;
-        String grp1Name = grp1 != null ? grp1.getGroupName() : null;
-        
-        Group grp2 = (Group)o2;
-        String grp2Name = grp2!= null ? grp2.getGroupName() : null;
+    public int compare(Group grp1, Group grp2) {
+	String grp1Name = grp1 != null ? grp1.getGroupName() : "";
 
-        NullComparator comparator = new NullComparator(false);
-        return comparator.compare(grp1Name,grp2Name);
+	String grp2Name = grp2 != null ? grp2.getGroupName() : "";
+
+	AlphanumComparator comparator = new AlphanumComparator();
+	return comparator.compare(grp1Name, grp2Name);
     }
-    
+
 }
