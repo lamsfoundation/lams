@@ -75,9 +75,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     			    'QuestionFile','width=500,height=200,scrollbars=yes');
     }
     
-    function saveQTI(queryString) {
-    	window.location.href = '<html:rewrite page="/authoring.do?dispatch=saveQTI&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}"/>&'
-    				           + queryString;
+	
+    function saveQTI(formHTML, formName) {
+    	var form = $($.parseHTML(formHTML));
+		$.ajax({
+			type: "POST",
+			url: '<c:url value="/authoring/saveQTI.do?sessionMapID=${sessionMapID}" />',
+			data: form.serializeArray(),
+			success: function(response) {
+				$(questionListTargetDiv).html(response);
+				refreshThickbox();
+			}
+		});
+    }
+    
+    function saveQTI(formHTML, formName) {
+    	document.body.innerHTML += formHTML;
+    	var form = document.getElementById(formName);
+    	form.action = '<html:rewrite page="/authoring.do?dispatch=saveQTI&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}"/>';
+    	form.submit();
     }
 
 </script>

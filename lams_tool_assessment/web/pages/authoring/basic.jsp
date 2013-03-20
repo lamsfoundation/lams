@@ -154,17 +154,17 @@
     			    'QuestionFile','width=500,height=200,scrollbars=yes');
     }
 	
-    function saveQTI(queryString) {
-		var url = '<c:url value="/authoring/saveQTI.do" />?' + queryString;
-		$(questionListTargetDiv).load(
-			url,
-			{
-				sessionMapID: "${sessionMapID}"
-			},
-			function(){
+    function saveQTI(formHTML, formName) {
+    	var form = $($.parseHTML(formHTML));
+		$.ajax({
+			type: "POST",
+			url: '<c:url value="/authoring/saveQTI.do?sessionMapID=${sessionMapID}" />',
+			data: form.serializeArray(),
+			success: function(response) {
+				$(questionListTargetDiv).html(response);
 				refreshThickbox();
 			}
-		);
+		});
     }
 
 

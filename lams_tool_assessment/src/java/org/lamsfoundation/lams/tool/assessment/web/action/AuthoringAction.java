@@ -789,7 +789,7 @@ public class AuthoringAction extends Action {
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
 
-	Question[] questions = QuestionParser.parseQuestionChoiceForm(request.getQueryString());
+	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 	for (Question question : questions) {
 	    AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
 	    assessmentQuestion.setCreateDate(new Timestamp(new Date().getTime()));

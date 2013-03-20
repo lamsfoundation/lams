@@ -693,7 +693,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	List<McQuestionContentDTO> listQuestionContentDTO = (List<McQuestionContentDTO>) sessionMap
 		.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
 	// proper parsing
-	Question[] questions = QuestionParser.parseQuestionChoiceForm(request.getQueryString());
+	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 
 	for (Question question : questions) {
 	    // quietly do same verification as in other question-adding methods
@@ -780,7 +780,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		defaultContentIdStr, mcService, httpSessionID, listQuestionContentDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-	return (mapping.findForward(McAppConstants.LOAD_QUESTIONS));
+	return (mapping.findForward(McAppConstants.LOAD));
     }
 
     /**

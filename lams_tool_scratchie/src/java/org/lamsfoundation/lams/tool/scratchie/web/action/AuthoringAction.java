@@ -694,7 +694,7 @@ public class AuthoringAction extends Action {
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 
-	Question[] questions = QuestionParser.parseQuestionChoiceForm(request.getQueryString());
+	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 	for (Question question : questions) {
 	    ScratchieItem item = new ScratchieItem();
 	    item.setCreateDate(new Timestamp(new Date().getTime()));

@@ -39,6 +39,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -254,6 +255,11 @@ public class QuestionParser {
 	    Map<String, String> feedbackMap = new TreeMap<String, String>();
 	    if (textBasedQuestion || !answerMap.isEmpty()) {
 		NodeList answerMetadatas = questionItem.getElementsByTagName("respcondition");
+		// if no answers at all, it is Essay type
+		if ((answerMetadatas.getLength() == 0) && (question.getType() == null) && textBasedQuestion
+			&& !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_ESSAY, limitType, question)) {
+		    continue questionLoop;
+		}
 		for (int answerMetadataIndex = 0; answerMetadataIndex < answerMetadatas.getLength(); answerMetadataIndex++) {
 		    Element answerMetadata = (Element) answerMetadatas.item(answerMetadataIndex);
 		    NodeList scoreReference = answerMetadata.getElementsByTagName("varequal");
@@ -363,33 +369,33 @@ public class QuestionParser {
     /**
      * Parses query string (send by form submit or extracted otherwise) from questionChoice.jsp form.
      */
-    public static Question[] parseQuestionChoiceForm(String queryString) throws UnsupportedEncodingException {
+    public static Question[] parseQuestionChoiceForm(HttpServletRequest request) throws UnsupportedEncodingException {
 	List<Question> result = new ArrayList<Question>();
 
 	// to know where to stop searching for question entries (disabled/unchecked form fields are not sent)
-	int questionCount = Integer.parseInt(WebUtil.extractParameterValue(queryString, "questionCount"));
+
+	int questionCount = WebUtil.readIntParam(request, "questionCount");
 	for (int questionIndex = 0; questionIndex < questionCount; questionIndex++) {
-	    String questionType = WebUtil.extractParameterValue(queryString, "question" + questionIndex + "type");
+	    String questionType = request.getParameter("question" + questionIndex + "type");
 	    Question question = new Question();
 	    // if question was not checked on the form, type is NULL and it is not accepted
 	    if (QuestionParser.isQuestionTypeAcceptable(questionType, null, question)) {
-		String questionTitle = WebUtil.extractParameterValue(queryString, "question" + questionIndex);
+		String questionTitle = request.getParameter("question" + questionIndex);
 		if (!StringUtils.isBlank(questionTitle)) {
 		    question.setTitle(URLDecoder.decode(questionTitle, "UTF8"));
 		}
-		String questionText = WebUtil.extractParameterValue(queryString, "question" + questionIndex + "text");
+		String questionText = request.getParameter("question" + questionIndex + "text");
 		if (!StringUtils.isBlank(questionText)) {
 		    question.setText(URLDecoder.decode(questionText, "UTF8"));
 		}
-		String questionFeedback = WebUtil.extractParameterValue(queryString, "question" + questionIndex
-			+ "feedback");
+		String questionFeedback = request.getParameter("question" + questionIndex + "feedback");
 		// can be blank
 		if (!StringUtils.isBlank(questionFeedback)) {
 		    question.setFeedback(URLDecoder.decode(questionFeedback, "UTF8"));
 		}
 
-		String questionResourcesFolderPath = WebUtil.extractParameterValue(queryString, "question"
-			+ questionIndex + "resourcesFolder");
+		String questionResourcesFolderPath = request.getParameter("question" + questionIndex
+			+ "resourcesFolder");
 		if (!StringUtils.isBlank(questionResourcesFolderPath)) {
 		    question.setResourcesFolderPath(URLDecoder.decode(questionResourcesFolderPath, "UTF8"));
 		}
@@ -397,14 +403,14 @@ public class QuestionParser {
 		boolean isMatching = Question.QUESTION_TYPE_MATCHING.equals(question.getType());
 
 		// extract answers
-		String answerCountParam = WebUtil.extractParameterValue(queryString, "answerCount" + questionIndex);
+		String answerCountParam = request.getParameter("answerCount" + questionIndex);
 		int answerCount = answerCountParam == null ? 0 : Integer.parseInt(answerCountParam);
 		if (answerCount > 0) {
 		    question.setAnswers(new ArrayList<Answer>());
 		    for (int answerIndex = 0; answerIndex < answerCount; answerIndex++) {
 			String answerId = "question" + questionIndex + "answer" + answerIndex;
-			String answerText = WebUtil.extractParameterValue(queryString, answerId);
-			String answerScore = WebUtil.extractParameterValue(queryString, answerId + "score");
+			String answerText = request.getParameter(answerId);
+			String answerScore = request.getParameter(answerId + "score");
 			if (!StringUtils.isBlank(answerText)) {
 			    Answer answer = new Answer();
 			    answer.setText(URLDecoder.decode(answerText, "UTF8"));
@@ -412,7 +418,7 @@ public class QuestionParser {
 				answer.setScore(Float.parseFloat(answerScore));
 			    }
 
-			    String answerFeedback = WebUtil.extractParameterValue(queryString, answerId + "feedback");
+			    String answerFeedback = request.getParameter(answerId + "feedback");
 			    // can be blank
 			    if (!StringUtils.isBlank(answerFeedback)) {
 				answer.setFeedback(URLDecoder.decode(answerFeedback, "UTF8"));
@@ -421,8 +427,8 @@ public class QuestionParser {
 
 			    if (isMatching) {
 				// map indexes of answers
-				String matchAnswerIndex = WebUtil.extractParameterValue(queryString, "question"
-					+ questionIndex + "match" + answerIndex);
+				String matchAnswerIndex = request.getParameter("question" + questionIndex + "match"
+					+ answerIndex);
 				if (!StringUtils.isBlank(matchAnswerIndex)) {
 				    if (question.getMatchMap() == null) {
 					question.setMatchMap(new TreeMap<Integer, Integer>());
@@ -436,14 +442,13 @@ public class QuestionParser {
 
 		// extract match answers
 		if (isMatching) {
-		    String matchAnswerCountParam = WebUtil.extractParameterValue(queryString, "matchAnswerCount"
-			    + questionIndex);
+		    String matchAnswerCountParam = request.getParameter("matchAnswerCount" + questionIndex);
 		    int matchAnswerCount = matchAnswerCountParam == null ? 0 : Integer.parseInt(matchAnswerCountParam);
 		    if (matchAnswerCount > 0) {
 			question.setMatchAnswers(new ArrayList<Answer>());
 			for (int matchAnswerIndex = 0; matchAnswerIndex < matchAnswerCount; matchAnswerIndex++) {
 			    String matchAnswerId = "question" + questionIndex + "matchAnswer" + matchAnswerIndex;
-			    String matchAnswerText = WebUtil.extractParameterValue(queryString, matchAnswerId);
+			    String matchAnswerText = request.getParameter(matchAnswerId);
 
 			    if (!StringUtils.isBlank(matchAnswerText)) {
 				Answer matchAnswer = new Answer();

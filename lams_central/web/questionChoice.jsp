@@ -44,7 +44,6 @@
 		}
 	</style>
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript">
 		window.resizeTo(800, 600);
 	
@@ -60,16 +59,23 @@
 			});
 			
 			if (anyQuestionsSelected) {
+				var form = $("#questionForm");
 				if (returnURL == '') {
-					var queryString = $('#questionForm').formSerialize();
-					window.opener.saveQTI(queryString);
+					form.css('visibility', 'hidden');
+					window.opener.saveQTI(form[0].outerHTML, 'questionForm');
+					window.close();
 				} else {
-					$('#questionForm').ajaxSubmit({
-						'success' : function(){
-							window.opener.location.reload();	
-					}});
+					// this code is not really used at the moment, but it's available
+					$.ajax({
+						type: "POST",
+						url: returnURL,
+						data: form.serializeArray(),
+						success: function(response) {
+							window.opener.location.reload();
+							window.close();
+						}
+					});
 				}
-				window.close();
 			} else {
 				$('#errorArea').show();
 			}
@@ -132,7 +138,7 @@
 	
 	<input id="selectAll" type="checkbox" /><fmt:message key="label.questions.choice.select.all" /><br /><br />
 			       
-	<form id="questionForm" action="${returnURL}">
+	<form id="questionForm" method="POST">
 		<input type="hidden" name="questionCount" value="${fn:length(questions)}" />
 		
 		<c:forEach var="question" items="${questions}" varStatus="questionStatus">
