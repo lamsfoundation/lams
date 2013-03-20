@@ -28,7 +28,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -382,22 +381,22 @@ public class QuestionParser {
 	    if (QuestionParser.isQuestionTypeAcceptable(questionType, null, question)) {
 		String questionTitle = request.getParameter("question" + questionIndex);
 		if (!StringUtils.isBlank(questionTitle)) {
-		    question.setTitle(URLDecoder.decode(questionTitle, "UTF8"));
+		    question.setTitle(questionTitle);
 		}
 		String questionText = request.getParameter("question" + questionIndex + "text");
 		if (!StringUtils.isBlank(questionText)) {
-		    question.setText(URLDecoder.decode(questionText, "UTF8"));
+		    question.setText(questionText);
 		}
 		String questionFeedback = request.getParameter("question" + questionIndex + "feedback");
 		// can be blank
 		if (!StringUtils.isBlank(questionFeedback)) {
-		    question.setFeedback(URLDecoder.decode(questionFeedback, "UTF8"));
+		    question.setFeedback(questionFeedback);
 		}
 
 		String questionResourcesFolderPath = request.getParameter("question" + questionIndex
 			+ "resourcesFolder");
 		if (!StringUtils.isBlank(questionResourcesFolderPath)) {
-		    question.setResourcesFolderPath(URLDecoder.decode(questionResourcesFolderPath, "UTF8"));
+		    question.setResourcesFolderPath(questionResourcesFolderPath);
 		}
 
 		boolean isMatching = Question.QUESTION_TYPE_MATCHING.equals(question.getType());
@@ -413,7 +412,7 @@ public class QuestionParser {
 			String answerScore = request.getParameter(answerId + "score");
 			if (!StringUtils.isBlank(answerText)) {
 			    Answer answer = new Answer();
-			    answer.setText(URLDecoder.decode(answerText, "UTF8"));
+			    answer.setText(answerText);
 			    if (!StringUtils.isBlank(answerScore)) {
 				answer.setScore(Float.parseFloat(answerScore));
 			    }
@@ -421,7 +420,7 @@ public class QuestionParser {
 			    String answerFeedback = request.getParameter(answerId + "feedback");
 			    // can be blank
 			    if (!StringUtils.isBlank(answerFeedback)) {
-				answer.setFeedback(URLDecoder.decode(answerFeedback, "UTF8"));
+				answer.setFeedback(answerFeedback);
 			    }
 			    question.getAnswers().add(answer);
 
@@ -452,7 +451,7 @@ public class QuestionParser {
 
 			    if (!StringUtils.isBlank(matchAnswerText)) {
 				Answer matchAnswer = new Answer();
-				matchAnswer.setText(URLDecoder.decode(matchAnswerText, "UTF8"));
+				matchAnswer.setText(matchAnswerText);
 
 				question.getMatchAnswers().add(matchAnswer);
 			    }
