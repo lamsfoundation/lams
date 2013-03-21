@@ -39,6 +39,7 @@
 		var SPLIT_LEARNERS_DESCRIPTION = '<fmt:message key="label.tab.advanced.split.desc" />';
 		var LABEL_MISSING_LEARNERS = '<fmt:message key="error.tab.class.learners" />';
 		var LABEL_MISSING_MONITORS = '<fmt:message key="error.tab.class.monitors" />';
+		var LABEL_RUN_SEQUENCES_FOLDER = '<fmt:message key="label.tab.lesson.sequence.folder" />';
 		
 		$(document).ready(function(){
 			$('#tabs').tabs();

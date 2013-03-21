@@ -29,6 +29,8 @@ import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
@@ -98,6 +100,16 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  */
 public class HomeAction extends DispatchAction {
+
+    private static final Comparator<FolderContentDTO> LD_NAME_COMPARATOR = new Comparator<FolderContentDTO>() {
+	// folders go first, then sort by name
+	@Override
+	public int compare(FolderContentDTO o1, FolderContentDTO o2) {
+	    return o1.getResourceType().equals(o2.getResourceType()) ? o1.getName().compareTo(o2.getName())
+		    : FolderContentDTO.FOLDER.equals(o1.getResourceType()) ? -1 : 1;
+	}
+
+    };
 
     private static Logger log = Logger.getLogger(HomeAction.class);
 
@@ -413,7 +425,7 @@ public class HomeAction extends DispatchAction {
 	JSONObject result = new JSONObject();
 	Vector<FolderContentDTO> folderContents = null;
 
-	// get use accessible folders in the start
+	// get user accessible folders in the start
 	if (folderID == null) {
 	    folderContents = new Vector<FolderContentDTO>(3);
 	    MessageService msgService = getWorkspaceManagementService().getMessageService();
@@ -436,6 +448,7 @@ public class HomeAction extends DispatchAction {
 	    // special behaviour for organisation folders
 	} else if (folderID.equals(WorkspaceAction.ORG_FOLDER_ID)) {
 	    folderContents = getWorkspaceManagementService().getAccessibleOrganisationWorkspaceFolders(userID);
+	    Collections.sort(folderContents, HomeAction.LD_NAME_COMPARATOR);
 
 	    if (folderContents.size() == 1) {
 		FolderContentDTO folder = folderContents.firstElement();
@@ -447,6 +460,7 @@ public class HomeAction extends DispatchAction {
 	    WorkspaceFolder folder = getWorkspaceManagementService().getWorkspaceFolder(folderID);
 	    folderContents = getWorkspaceManagementService().getFolderContents(userID, folder,
 		    WorkspaceManagementService.AUTHORING);
+	    Collections.sort(folderContents, HomeAction.LD_NAME_COMPARATOR);
 	}
 
 	// recursively check folders, building a tree
@@ -455,6 +469,8 @@ public class HomeAction extends DispatchAction {
 	    if (FolderContentDTO.FOLDER.equals(contentType)) {
 		JSONObject subfolder = getDeepFolderContents(userID, folderContent.getResourceID().intValue());
 		subfolder.put("name", folderContent.getName());
+		subfolder.put("isRunSequencesFolder",
+			WorkspaceFolder.RUN_SEQUENCES.equals(folderContent.getResourceTypeID().intValue()));
 		result.append("folders", subfolder);
 	    } else if (FolderContentDTO.DESIGN.equals(contentType)) {
 		JSONObject learningDesign = new JSONObject();

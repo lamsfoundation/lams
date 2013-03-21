@@ -351,7 +351,8 @@ function parseFolderTreeNode(nodeJSON) {
 		if (nodeJSON.folders) {
 			$.each(nodeJSON.folders, function(){
 				result.push({'type'            : 'text',
-						  	 'label'           : this.name,
+						  	 'label'           : this.isRunSequencesFolder ?
+						  			 				LABEL_RUN_SEQUENCES_FOLDER : this.name,
 						     'children'        : parseFolderTreeNode(this)
 							 });
 			});
