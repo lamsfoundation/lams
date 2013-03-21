@@ -11,6 +11,6 @@
 	<classpathentry kind="lib" path="/lams_build/deploy-tool/lib/commons-configuration-1.1.jar"/>
 	<classpathentry kind="lib" path="/lams_build/deploy-tool/lib/commons-dbutils-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/ant/ant.jar"/>
-	<classpathentry kind="lib" path="/lams_build/lib/jakarta-commons/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="/lams_build/lib/jakarta-commons/commons-lang.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
