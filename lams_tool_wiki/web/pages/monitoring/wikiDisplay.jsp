@@ -369,7 +369,7 @@
 	CKEDITOR.on('instanceCreated',function (editorInstance) 
 	{ 	
 		editorInstance.wikiLinkArray = wikiLinkArray;
-	}
+	});
 	
 	function refreshPage()
 	{
