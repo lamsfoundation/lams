@@ -376,8 +376,7 @@ function fillUserContainer(users, containerId) {
 		// create user DIVs
 		$.each(users, function(index, userJSON) {
 			$('#' + containerId).append($('<div />').attr({
-											'userId'  : userJSON.userID,
-											'sortKey' : userJSON.lastName+userJSON.firstName
+											'userId'  : userJSON.userID
 											})
 					                      .addClass('draggableUser')
             						      .text(userJSON.firstName + ' ' + userJSON.lastName 
@@ -423,8 +422,8 @@ function sortUsers(buttonId) {
 		users.each(function(){
 			$(this).detach();
 		}).sort(function(a, b){
-			var keyA = $(a).attr('sortKey');
-			var keyB = $(b).attr('sortKey');
+			var keyA = $(a).text().toLowerCase();
+			var keyB = $(b).text().toLowerCase();
 			var result = keyA > keyB ? 1 : keyA < keyB ? -1 : 0;
 			return sortOrderAsc ? -result : result;
 		}).each(function(){

@@ -412,7 +412,6 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners) {
 	$.each(learners, function(learnerIndex, learner) {
 		$(learnerGroupList).append($('<div />').attr({
 										'learnerId'  : learner.id,
-										'sortKey'    : learner.lastName + learner.firstName,
 										'viewUrl'    : learner.url
 										})
 				                      .addClass('learnerGroupListItem')
@@ -463,8 +462,8 @@ function sortLearnerGroupList() {
 		learners.each(function(){
 			$(this).detach();
 		}).sort(function(a, b){
-			var keyA = $(a).attr('sortKey');
-			var keyB = $(b).attr('sortKey');
+			var keyA = $(a).text().toLowerCase();
+			var keyB = $(b).text().toLowerCase();
 			var result = keyA > keyB ? 1 : keyA < keyB ? -1 : 0;
 			return learnerGroupListAscending ? -result : result;
 		}).each(function(){
