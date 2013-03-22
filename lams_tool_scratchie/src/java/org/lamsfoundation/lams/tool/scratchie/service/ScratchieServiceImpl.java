@@ -1407,7 +1407,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	try {
 	    exportContentService.registerFileClassForExport(ScratchieAttachment.class.getName(), "fileUuid",
 		    "fileVersionId");
-	    exportContentService.registerFileClassForExport(ScratchieItem.class.getName(), "fileUuid", "fileVersionId");
 	    exportContentService
 		    .exportToolContent(toolContentId, toolContentObj, scratchieToolContentHandler, rootPath);
 	} catch (ExportToolContentException e) {
@@ -1421,8 +1420,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	try {
 	    exportContentService.registerFileClassForImport(ScratchieAttachment.class.getName(), "fileUuid",
 		    "fileVersionId", "fileName", "fileType", null, null);
-	    exportContentService.registerFileClassForImport(ScratchieItem.class.getName(), "fileUuid", "fileVersionId",
-		    "fileName", "fileType", null, "initialItem");
 
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, scratchieToolContentHandler,
 		    fromVersion, toVersion);
