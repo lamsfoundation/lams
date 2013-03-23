@@ -182,9 +182,13 @@
 				<table class="tablesorter">
 					<thead>
 						<tr>
-							<th><fmt:message key="label.learning.answer" /></th>
+							<th title="<fmt:message key='label.sort.by.answer'/>" >
+								<fmt:message key="label.learning.answer" />
+							</th>
 							<c:if test="${generalLearnerFlowDTO.allowRateAnswers == 'true'}">
-								<th><fmt:message key="label.learning.rating" /></th>
+								<th title="<fmt:message key='label.sort.by.rating'/>">
+									<fmt:message key="label.learning.rating" />
+								</th>
 							</c:if>
 						</tr>
 					</thead>
