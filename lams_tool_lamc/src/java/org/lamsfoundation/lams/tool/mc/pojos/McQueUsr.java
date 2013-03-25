@@ -52,8 +52,6 @@ public class McQueUsr implements Serializable {
     private String fullname;
     
     private boolean responseFinalised;
-    
-    private boolean viewSummaryRequested;
 
     private Long mcSessionId;
     
@@ -157,7 +155,6 @@ public class McQueUsr implements Serializable {
             .append("username", getUsername())
             .append("fullname", getFullname())
             .append("responseFinalised", isResponseFinalised())
-            .append("viewSummaryRequested", isViewSummaryRequested())
             .append("mcSessionId", getMcSessionId())
             .append("lastAttemptOrder", getLastAttemptOrder())
             .append("lastAttemptTotalMark", getLastAttemptTotalMark())
@@ -176,18 +173,6 @@ public class McQueUsr implements Serializable {
 	public void setMcSessionId(Long mcSessionId) {
 		this.mcSessionId = mcSessionId;
 	}
-    /**
-     * @return Returns the viewSummaryRequested.
-     */
-    public boolean isViewSummaryRequested() {
-        return viewSummaryRequested;
-    }
-    /**
-     * @param viewSummaryRequested The viewSummaryRequested to set.
-     */
-    public void setViewSummaryRequested(boolean viewSummaryRequested) {
-        this.viewSummaryRequested = viewSummaryRequested;
-    }
 
 	public Integer getLastAttemptOrder() {
 		return lastAttemptOrder;

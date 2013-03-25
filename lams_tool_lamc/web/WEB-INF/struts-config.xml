@@ -274,12 +274,6 @@
 	  	/>
 
 	  	<forward
-		    name="resultsSummary"
-		    path="/learning/ResultsSummary.jsp"
-		    redirect="false"
-	  	/>
-
-	  	<forward
 		    name="errorList"
 		    path="/McErrorBox.jsp"
 		    redirect="false"

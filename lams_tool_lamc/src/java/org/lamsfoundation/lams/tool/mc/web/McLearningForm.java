@@ -39,7 +39,6 @@ public class McLearningForm extends ActionForm implements McAppConstants {
     protected String nextOptions;
     protected String continueOptionsCombined;
     protected String redoQuestions;
-    protected String viewSummary;
     protected String viewAnswers;
     protected String learnerFinished;
     protected String redoQuestionsOk;
@@ -87,7 +86,6 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	this.setNextOptions(null);
 	this.setContinueOptionsCombined(null);
 	this.setRedoQuestions(null);
-	this.setViewSummary(null);
 	this.setViewAnswers(null);
 	this.setRedoQuestionsOk(null);
 	this.setLearnerFinished(null);
@@ -112,21 +110,6 @@ public class McLearningForm extends ActionForm implements McAppConstants {
      */
     public void setContinueOptions(String continueOptions) {
 	this.continueOptions = continueOptions;
-    }
-
-    /**
-     * @return Returns the viewSummary.
-     */
-    public String getViewSummary() {
-	return viewSummary;
-    }
-
-    /**
-     * @param viewSummary
-     *            The viewSummary to set.
-     */
-    public void setViewSummary(String viewSummary) {
-	this.viewSummary = viewSummary;
     }
 
     /**

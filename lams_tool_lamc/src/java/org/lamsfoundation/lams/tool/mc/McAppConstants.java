@@ -48,10 +48,8 @@ public interface McAppConstants {
     public static final String LIST_ALL_GROUPS_DTO = "listAllGroupsDTO";
     public static final String EXPORT_PORTFOLIO = "exportPortfolio";
     public static final String INDIVIDUAL_REPORT = "individualReport";
-    public static final String VIEW_SUMMARY = "viewSummary";
     public static final String REDO_QUESTIONS = "redoQuestions";
     public static final String SINGLE_QUESTION_ANSWERS = "singleQuestionAnswers";
-    public static final String RESULTS_SUMMARY = "resultsSummary";
     public static final String ERROR_LIST = "errorList";
     public static final String PREVIEW = "preview";
     public static final String LEARNER_PROGRESS = "learnerProgress";

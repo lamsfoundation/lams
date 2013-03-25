@@ -123,12 +123,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  />
 
  <forward
- name="resultsSummary"
- path="/learning/ResultsSummary.jsp"
- redirect="false"
- />
-
- <forward
  name="errorList"
  path="/McErrorBox.jsp"
  redirect="false"
@@ -268,11 +262,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    setContentInUse(request, toolContentId, mcService);
 	    mcLearningForm.setLearnerProgress(new Boolean(false).toString());
 	    return viewAnswers(mapping, mcLearningForm, request, response);
-	} else if (mcLearningForm.getViewSummary() != null) {
-	    McLearningAction.logger.debug("processing getViewSummary...");
-	    LearningUtil.saveFormRequestData(request, mcLearningForm, false);
-	    setContentInUse(request, toolContentId, mcService);
-	    return viewSummary(mapping, form, request, response);
 	} else if (mcLearningForm.getSubmitReflection() != null) {
 	    McLearningAction.logger.debug("processing getSubmitReflection...");
 	    LearningUtil.saveFormRequestData(request, mcLearningForm, false);
@@ -400,7 +389,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	mcService.updateMcQueUsr(mcQueUsr);
 	McLearningAction.logger.debug("response finalised for user:" + mcQueUsr);
 
-	mcQueUsr.setViewSummaryRequested(true);
 	mcService.updateMcQueUsr(mcQueUsr);
 	McLearningAction.logger.debug("view summary requested by mcQueUsr: " + mcQueUsr);
 
@@ -1204,110 +1192,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	prepareViewAnswersData(mapping, mcLearningForm, request, response);
 	return mapping.findForward(McAppConstants.VIEW_ANSWERS);
-    }
-
-    /**
-     * 
-     * viewSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-     * 
-     * allows the learner to view all the other learners' activity summary
-     * 
-     * @param request
-     * @param form
-     * @param mapping
-     * @return ActionForward
-     */
-    public ActionForward viewSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	McLearningAction.logger.debug("dispatching viewSummary...");
-	McLearningForm mcLearningForm = (McLearningForm) form;
-	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McLearningAction.logger.debug("mcService: " + mcService);
-
-	String userID = request.getParameter(AttributeNames.PARAM_USER_ID);
-	McLearningAction.logger.debug("userID: " + userID);
-
-	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	McLearningAction.logger.debug("toolSessionID: " + toolSessionID);
-
-	McSession mcSession = mcService.retrieveMcSession(new Long(toolSessionID));
-	McLearningAction.logger.debug("retrieving mcSession: " + mcSession);
-
-	McQueUsr mcQueUsr = mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
-	McLearningAction.logger.debug("mcQueUsr: " + mcQueUsr);
-
-	mcQueUsr.setViewSummaryRequested(true);
-	mcService.updateMcQueUsr(mcQueUsr);
-	McLearningAction.logger.debug("view summary requested by mcQueUsr: " + mcQueUsr);
-
-	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
-	McLearningAction.logger.debug("toolContentId: " + toolContentId);
-
-	McContent mcContent = mcService.retrieveMc(new Long(toolContentId));
-	McLearningAction.logger.debug("mcContent: " + mcContent);
-
-	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
-
-	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
-	mcGeneralLearnerFlowDTO.setNotebookEntriesVisible(new Boolean(false).toString());
-
-	int countSessionComplete = 0;
-	Iterator sessionsIterator = mcContent.getMcSessions().iterator();
-	while (sessionsIterator.hasNext()) {
-	    McSession mcSessionLocal = (McSession) sessionsIterator.next();
-	    if (mcSession != null) {
-		McLearningAction.logger.debug("mcSessionLocal: " + mcSessionLocal);
-		if (mcSessionLocal.getSessionStatus().equals(McAppConstants.COMPLETED)) {
-		    McLearningAction.logger.debug("COMPLETED session found: " + mcSessionLocal);
-		    ++countSessionComplete;
-		}
-	    }
-	}
-	McLearningAction.logger.debug("countSessionComplete: " + countSessionComplete);
-
-	Integer[] markStatistics = mcService.getMarkStatistics(mcSession);
-
-	McLearningAction.logger.debug("countSessionComplete: " + countSessionComplete);
-	McLearningAction.logger.debug("topMark: " + markStatistics[0]);
-	McLearningAction.logger.debug("lowestMark: " + markStatistics[1]);
-	McLearningAction.logger.debug("averageMark: " + markStatistics[2]);
-
-	mcGeneralLearnerFlowDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
-	mcGeneralLearnerFlowDTO.setTopMark(markStatistics[0]);
-	mcGeneralLearnerFlowDTO.setLowestMark(markStatistics[1]);
-	mcGeneralLearnerFlowDTO.setAverageMark(markStatistics[2]);
-
-	McLearningAction.logger.debug("is tool reflective: " + mcContent.isReflect());
-	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
-	McLearningAction.logger.debug("reflection subject: " + mcContent.getReflectionSubject());
-
-	String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
-	mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
-
-	McLearningAction.logger.debug("mcContent.isRetries(): " + mcContent.isRetries());
-	mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
-
-	String passMarkApplicable = new Boolean(mcContent.isPassMarkApplicable()).toString();
-	mcGeneralLearnerFlowDTO.setPassMarkApplicable(passMarkApplicable);
-	mcLearningForm.setPassMarkApplicable(passMarkApplicable);
-
-	String userOverPassMark = new Boolean(mcQueUsr.isLastAttemptMarkPassed()).toString();
-	mcGeneralLearnerFlowDTO.setUserOverPassMark(userOverPassMark);
-	mcLearningForm.setUserOverPassMark(userOverPassMark);
-
-	String httpSessionID = mcLearningForm.getHttpSessionID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-
-	mcGeneralLearnerFlowDTO.setTotalMarksPossible(mcContent.getTotalMarksPossible());
-
-	McLearningAction.logger.debug("mcGeneralLearnerFlowDTO for jsp: " + mcGeneralLearnerFlowDTO);
-
-	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
-	McLearningAction.logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: "
-		+ request.getAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO));
-
-	return mapping.findForward(McAppConstants.RESULTS_SUMMARY);
     }
 
     /**
