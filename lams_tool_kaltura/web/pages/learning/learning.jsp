@@ -58,7 +58,7 @@
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
-<script type="text/javascript" src="includes/javascript/instantedit.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/instantedit.js"></script>
 <script type="text/javascript">
 	//var for jquery.jRating.js
 	var pathToImageFolder = "<lams:LAMSURL/>images/css/";
