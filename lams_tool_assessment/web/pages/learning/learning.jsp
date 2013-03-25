@@ -33,10 +33,10 @@
 		</c:otherwise>
 	</c:choose>	
 	
-	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/jquery.countdown.css'/>" />
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script> 
-	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/jquery.countdown.js'/>"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript">
 	<!--	
