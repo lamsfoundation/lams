@@ -24,7 +24,7 @@
 		body { margin: 10px; overflow:hidden }
 	</style>
 		
-	<script type="text/javascript" src="kaltura.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/kaltura.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
 	<script language="JavaScript" type="text/javascript">
 	<!--

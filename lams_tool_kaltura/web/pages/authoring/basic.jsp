@@ -14,7 +14,7 @@
 <c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
 <c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 
-<script type="text/javascript" src="includes/javascript/kaltura.min.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/kaltura.min.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
 <script type="text/javascript">
 
