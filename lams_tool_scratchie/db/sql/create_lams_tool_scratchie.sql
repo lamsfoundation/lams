@@ -112,8 +112,6 @@ INSERT INTO `tl_lascrt11_scratchie_answer` (`uid`, `description`, `correct`, `sc
 INSERT INTO `tl_lascrt11_scratchie_answer` (`uid`, `description`, `correct`, `scratchie_item_uid`, `order_id`) VALUES 
   (3, 'Question Answer C',0,1,2);
 INSERT INTO `tl_lascrt11_scratchie_answer` (`uid`, `description`, `correct`, `scratchie_item_uid`, `order_id`) VALUES 
-  (4, 'Question Answer D',0,1,3);  
-INSERT INTO `tl_lascrt11_scratchie_answer` (`uid`, `description`, `correct`, `scratchie_item_uid`, `order_id`) VALUES 
-  (5, 'Question Answer E',0,1,4);  
+  (4, 'Question Answer D',0,1,3);
   
 SET FOREIGN_KEY_CHECKS=1;
