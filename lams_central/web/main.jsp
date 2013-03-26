@@ -122,7 +122,7 @@
  					'hide'      : 'fold',
  					'open'      : function(){
  						// load contents after opening the dialog
- 						$('#addLessonFrame').attr('src', '<lams:LAMSURL/>home.do?method=addLesson&organisationID='
+ 						$('#addLessonFrame').prop('src', '<lams:LAMSURL/>home.do?method=addLesson&organisationID='
  								                         + $(this).dialog('option', 'orgID'));
  					},
  					'close' : function() {
@@ -145,7 +145,7 @@
  					'hide'      : 'fold',
  					'open'      : function(){
  						// load contents after opening the dialog
- 						$('#monitorFrame').attr('src', '<lams:LAMSURL/>monitoring/monitoring.do?method=monitorLesson&lessonID='
+ 						$('#monitorFrame').prop('src', '<lams:LAMSURL/>monitoring/monitoring.do?method=monitorLesson&lessonID='
  								                         + $(this).dialog('option', 'lessonID'));
  					},
  					'close' : function() {

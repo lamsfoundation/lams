@@ -53,7 +53,6 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.jdom.JDOMException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.learningdesign.GroupUser;
-import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -460,7 +459,7 @@ public class HomeAction extends DispatchAction {
 	} else {
 	    WorkspaceFolder folder = getWorkspaceManagementService().getWorkspaceFolder(folderID);
 	    folderContents = getWorkspaceManagementService().getFolderContents(userID, folder,
-		    WorkspaceManagementService.AUTHORING);
+		    WorkspaceManagementService.MONITORING);
 	    Collections.sort(folderContents, HomeAction.LD_NAME_COMPARATOR);
 	}
 
@@ -474,16 +473,10 @@ public class HomeAction extends DispatchAction {
 			WorkspaceFolder.RUN_SEQUENCES.equals(folderContent.getResourceTypeID().intValue()));
 		result.append("folders", subfolder);
 	    } else if (FolderContentDTO.DESIGN.equals(contentType)) {
-		Long learningDesignID = folderContent.getResourceID();
-		LearningDesign learningDesign = (LearningDesign) getService().findById(LearningDesign.class,
-			learningDesignID);
-		// use only valid designs
-		if (learningDesign != null && learningDesign.getValidDesign()) {
-		    JSONObject learningDesignJSON = new JSONObject();
-		    learningDesignJSON.put("learningDesignId", learningDesignID);
-		    learningDesignJSON.put("name", folderContent.getName());
-		    result.append("learningDesigns", learningDesignJSON);
-		}
+		JSONObject learningDesignJSON = new JSONObject();
+		learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
+		learningDesignJSON.put("name", folderContent.getName());
+		result.append("learningDesigns", learningDesignJSON);
 	    } else {
 		if (HomeAction.log.isDebugEnabled()) {
 		    HomeAction.log.debug("Unsupported folder content found, named \"" + folderContent.getName() + "\"");
