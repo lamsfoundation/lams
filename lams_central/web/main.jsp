@@ -33,7 +33,12 @@
 	<style type="text/css">
 		.dialogContainer {
 			display: none;
-			overflow: hidden !important;
+		}
+		
+		.dialogContainer iframe {
+			width: 100%;
+			height: 100%;
+			border: none;
 		}
 	</style>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
@@ -46,28 +51,27 @@
 		<script language="JavaScript" type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
 	</c:if>
 	<script language="javascript" type="text/javascript">
-		var monitorDialog = null;
-		var addLessonDialog = null;
-		
 		function showMonitorLessonDialog(lessonID){
-			monitorDialog.dialog('option', 'lessonID', lessonID)
+			$("#monitorDialog").dialog('option', 'lessonID', lessonID)
 								 .dialog('open');
 		}
 		
 		function showAddLessonDialog(orgID){
-			addLessonDialog.dialog('option', 'orgID', orgID)
+			$("#addLessonDialog").dialog('option', 'orgID', orgID)
 								 .dialog('open');
 		}
 		
 		function closeAddLessonDialog(refresh) {
+			$('#addLessonFrame').attr('src', null);
 			// was the dialog just closed or a new lesson really added? if latter, refresh the list
-			addLessonDialog.dialog('option', 'refresh', refresh ? true : false)
-					       .dialog('close');
+			$("#addLessonDialog").dialog('option', 'refresh', refresh ? true : false)
+								 .dialog('close');
 		}
 	
 		function closeMonitorLessonDialog(refresh) {
+			$('#monitorFrame').attr('src', null);
 			// was the dialog just closed or a new lesson really added? if latter, refresh the list
-			monitorDialog.dialog('option', 'refresh', refresh ? true : false)
+			$("#monitorDialog").dialog('option', 'refresh', refresh ? true : false)
 								 .dialog('close');
 		}
 		
@@ -108,71 +112,47 @@
 				
 		       
 		        // initialise lesson dialog
-				addLessonDialog = $('#addLessonDialog').dialog({
+				$('#addLessonDialog').dialog({
  					'autoOpen'  : false,
  					'height'    : 600,
  					'width'     : 800,
  					'modal'     : true,
  					'resizable' : false,
- 					'show'      : 'fold',
  					'hide'      : 'fold',
  					'open'      : function(){
- 						addLessonDialog.html(null);
-						$.ajax({
-							url : '<lams:LAMSURL/>home.do',
-							cache : false,
-							data : {
-	 							'method'         : 'addLesson',
-	 							'organisationID' : addLessonDialog.dialog('option', 'orgID')
-							},
-							success : function(response) {
-								addLessonDialog.html(response);
-							}
-						});
+ 						// load contents after opening the dialog
+ 						$('#addLessonFrame').attr('src', '<lams:LAMSURL/>home.do?method=addLesson&organisationID='
+ 								                         + $(this).dialog('option', 'orgID'));
  					},
  					'close' : function() {
  						// refresh if lesson was added
- 						if(addLessonDialog.dialog('option', 'refresh')){
+ 						if($(this).dialog('option', 'refresh')){
  							refresh();
  						}
  					}
- 				});
-				// tabs are the title bar, so remove dialog's one
-		        addLessonDialog.closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
+ 				// tabs are the title bar, so remove dialog's one
+ 				}).closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
 		        
-				
 				// initialise monitor dialog
-				monitorDialog = $('#monitorDialog').dialog({
+				$('#monitorDialog').dialog({
  					'autoOpen'  : false,
  					'height'    : 600,
  					'width'     : 800,
  					'modal'     : true,
  					'resizable' : false,
- 					'show'      : 'fold',
  					'hide'      : 'fold',
  					'open'      : function(){
- 					    // load contents after opening the dialog
- 						monitorDialog.html(null);
-						$.ajax({
-							url : '<lams:LAMSURL/>monitoring/monitoring.do',
-							cache : false,
-							data : {
-	 							'method'   : 'monitorLesson',
-	 							'lessonID' : monitorDialog.dialog('option', 'lessonID')
-							},
-							success : function(response) {
-								monitorDialog.html(response);
-							}
-						});
+ 						// load contents after opening the dialog
+ 						$('#monitorFrame').attr('src', '<lams:LAMSURL/>monitoring/monitoring.do?method=monitorLesson&lessonID='
+ 								                         + $(this).dialog('option', 'lessonID'));
  					},
  					'close' : function() {
  						// refresh if lesson was added
- 						if(monitorDialog.dialog('option', 'refresh')){
+ 						if($(this).dialog('option', 'refresh')){
  							refresh();
  						}
  					}
- 				});
-				monitorDialog.closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
+ 				}).closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
 			});
 		
 			function removeLesson(lessonID) {
@@ -354,8 +334,12 @@
 	</div>
 </div>
 
-<div id="addLessonDialog" class="dialogContainer"></div>
-<div id="monitorDialog" class="dialogContainer"></div>
+<div id="addLessonDialog" class="dialogContainer">
+	<iframe id="addLessonFrame"></iframe>
+</div>
+<div id="monitorDialog" class="dialogContainer">
+	<iframe id="monitorFrame"></iframe>
+</div>
 
 </body>
 </lams:html>
