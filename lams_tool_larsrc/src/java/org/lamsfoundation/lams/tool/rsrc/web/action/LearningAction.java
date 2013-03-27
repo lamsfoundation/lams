@@ -390,6 +390,8 @@ public class LearningAction extends Action {
 
 	Resource resource = resSession.getResource();
 	if (resource.isNotifyTeachersOnAssigmentSumbit()) {
+	    final boolean isHtmlFormat = false;
+	    
 	    List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
 	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
 		Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
@@ -399,7 +401,8 @@ public class LearningAction extends Action {
 		String fullName = resourceUser.getLastName() + " " + resourceUser.getFirstName();
 		service.getEventNotificationService().sendMessage(monitoringUsersIds, DeliveryMethodMail.getInstance(),
 			service.getLocalisedMessage("event.assigment.submit.subject", null),
-			service.getLocalisedMessage("event.assigment.submit.body", new Object[] { fullName }));
+			service.getLocalisedMessage("event.assigment.submit.body", new Object[] { fullName }),
+			isHtmlFormat);
 	    }
 	}
 	return mapping.findForward(ResourceConstants.SUCCESS);

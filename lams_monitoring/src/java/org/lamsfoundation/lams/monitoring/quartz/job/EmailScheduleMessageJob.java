@@ -68,11 +68,12 @@ public class EmailScheduleMessageJob extends MonitoringJob {
 		lessonId, lessonIds, activityId, xDaystoFinish, orgId);
 
 	for (User user : users) {
+	    boolean isHtmlFormat = false;
 	    long userId = user.getUserId();
 	    log.debug("Sending scheduled email to user [" + userId + "].");
 	    eventNotificationService.sendMessage(userId, DeliveryMethodMail.getInstance(), monitoringService
 		    .getMessageService().getMessage("event.emailnotifications.email.subject", new Object[] {}),
-		    emailBody);
+		    emailBody, isHtmlFormat);
 	}
     }
 

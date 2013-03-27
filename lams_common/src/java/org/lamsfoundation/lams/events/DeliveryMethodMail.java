@@ -25,11 +25,8 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 	super((short) 1, "MAIL", "Messages will be send by Mail");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public String send(Long userId, String subject, String message) throws InvalidParameterException {
+    public String send(Long userId, String subject, String message, boolean isHtmlFormat) throws InvalidParameterException {
 	if (userId == null) {
 	    return "User ID should not be null.";
 	}
@@ -43,7 +40,7 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 	    if (StringUtils.isBlank(email)) {
 		return "User's e-mail address is blank.";
 	    }
-	    sendFromSupportEmail(subject, email, message);
+	    sendFromSupportEmail(subject, email, message, isHtmlFormat);
 	    return null;
 	} catch (Exception e) {
 	    return e.toString();
@@ -61,37 +58,43 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
      * Sends an email sourced from admin. Copied from Emailer class.
      * 
      * @param subject
-     *                subject of the message
+     *            subject of the message
      * @param to
-     *                address to send
+     *            address to send
      * @param body
-     *                text of the message
+     *            text of the message
+     * @param isHtmlFormat
+     *            whether the message is of HTML content-type or plain text
      * @throws AddressException
-     *                 if address was incorrect
+     *             if address was incorrect
      * @throws MessagingException
-     *                 if the operation failed
+     *             if the operation failed
      */
-    public void sendFromSupportEmail(String subject, String to, String body) throws AddressException,
+    public void sendFromSupportEmail(String subject, String to, String body, boolean isHtmlFormat) throws AddressException,
 	    MessagingException, UnsupportedEncodingException {
-	Emailer.sendFromSupportEmail(subject, to, body);
+	Emailer.sendFromSupportEmail(subject, to, body, isHtmlFormat);
     }
 
     /**
      * Sends an email to the address provided by the admin.
      * 
      * @param subject
-     *                subject of the message
+     *            subject of the message
      * @param body
-     *                text of the message
+     *            text of the message
+     * 
+     * @param isHtmlFormat
+     *            whether the message is of HTML content-type or plain text
      * @throws AddressException
-     *                 if address was incorrect
+     *             if address was incorrect
      * @throws MessagingException
-     *                 if the operation failed
+     *             if the operation failed
      */
-    void notifyAdmin(String subject, String body) throws AddressException, MessagingException, UnsupportedEncodingException {
+    void notifyAdmin(String subject, String body, boolean isHtmlFormat) throws AddressException,
+	    MessagingException, UnsupportedEncodingException {
 	String adminEmail = Configuration.get("LamsSupportEmail");
 	if (!StringUtils.isEmpty(adminEmail)) {
-	    sendFromSupportEmail(subject, adminEmail, body);
+	    sendFromSupportEmail(subject, adminEmail, body, isHtmlFormat);
 	}
     }
 }

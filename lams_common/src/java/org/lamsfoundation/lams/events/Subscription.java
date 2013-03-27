@@ -159,10 +159,12 @@ class Subscription {
 	 * Properties storing information of the last notification attempt are updated.
 	 * @param subject subject of the message; <code>null</code> if not applicable
 	 * @param message message to send
+	 * @param isHtmlFormat
+     *            whether the message is of HTML content-type or plain text
 	 */
-	protected void notifyUser(String subject, String message) {
+	protected void notifyUser(String subject, String message, boolean isHtmlFormat) {
 		lastOperationTime = new Date();
-		lastOperationMessage = deliveryMethod.send(userId, subject, message);
+		lastOperationMessage = deliveryMethod.send(userId, subject, message, isHtmlFormat);
 	}
 
 	protected void setPeriodicity(Long periodicity) {

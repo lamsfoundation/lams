@@ -47,8 +47,9 @@ public class ResendMessagesJob extends QuartzJobBean {
 									User.class, subscription.getUserId().intValue());
 							body.append(user.getLogin()).append('\n');
 						}
-						((DeliveryMethodMail) IEventNotificationService.DELIVERY_METHOD_MAIL).notifyAdmin(
-								ResendMessagesJob.messageService.getMessage("mail.resend.abandon.subject"), body.toString());
+                        			((DeliveryMethodMail) IEventNotificationService.DELIVERY_METHOD_MAIL).notifyAdmin(
+                        				ResendMessagesJob.messageService.getMessage("mail.resend.abandon.subject"),
+                        				body.toString(), event.isHtmlFormat());
 					}
 				}
 				else {
@@ -58,7 +59,8 @@ public class ResendMessagesJob extends QuartzJobBean {
 										.getPeriodicity()) {
 							String subject = event.getSubject() == null ? event.getDefaultSubject() : event.getSubject();
 							String message = event.getMessage() == null ? event.getDefaultMessage() : event.getMessage();
-							subscription.notifyUser(subject, message);
+							boolean isHtmlFormat = event.isHtmlFormat();
+							subscription.notifyUser(subject, message, isHtmlFormat);
 						}
 					}
 				}

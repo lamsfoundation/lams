@@ -397,6 +397,8 @@ public class LearningAction extends Action {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO surveyUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	if (survey.isNotifyTeachersOnAnswerSumbit()) {
+	    final boolean isHtmlFormat = false;
+	    
 	    List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
 	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
 		Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
@@ -406,7 +408,8 @@ public class LearningAction extends Action {
 		String fullName = surveyUser.getLastName() + " " + surveyUser.getFirstName();
 		service.getEventNotificationService().sendMessage(monitoringUsersIds, DeliveryMethodMail.getInstance(),
 			service.getLocalisedMessage("event.answer.submit.subject", null),
-			service.getLocalisedMessage("event.answer.submit.body", new Object[] { fullName }));
+			service.getLocalisedMessage("event.answer.submit.body", new Object[] { fullName }),
+			isHtmlFormat);
 	    }
 	}
 	return mapping.findForward(SurveyConstants.SUCCESS);

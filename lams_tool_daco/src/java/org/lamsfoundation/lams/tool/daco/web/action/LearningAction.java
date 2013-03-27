@@ -238,6 +238,8 @@ public class LearningAction extends Action {
 	sessionMap.put(DacoConstants.ATTR_DACO, daco);
 
 	if (daco.isNotifyTeachersOnLearnerEntry()) {
+	    final boolean isHtmlFormat = false;
+	    
 	    List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
 	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
 		Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
@@ -247,7 +249,8 @@ public class LearningAction extends Action {
 		String fullName = dacoUser.getLastName() + " " + dacoUser.getFirstName();
 		service.getEventNotificationService().sendMessage(monitoringUsersIds, DeliveryMethodMail.getInstance(),
 			service.getLocalisedMessage("event.learnerentry.subject", null),
-			service.getLocalisedMessage("event.learnerentry.body", new Object[] { fullName }));
+			service.getLocalisedMessage("event.learnerentry.body", new Object[] { fullName }),
+			isHtmlFormat);
 	    }
 	}
 	return mapping.findForward(DacoConstants.SUCCESS);
@@ -495,6 +498,8 @@ public class LearningAction extends Action {
 	    // notify teachers
 
 	    if (daco.isNotifyTeachersOnRecordSumbit()) {
+		final boolean isHtmlFormat = false;
+		
 		List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
 		if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
 		    Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
@@ -505,7 +510,8 @@ public class LearningAction extends Action {
 		    service.getEventNotificationService().sendMessage(monitoringUsersIds,
 			    DeliveryMethodMail.getInstance(),
 			    service.getLocalisedMessage("event.recordsubmit.subject", null),
-			    service.getLocalisedMessage("event.recordsubmit.body", new Object[] { fullName }));
+			    service.getLocalisedMessage("event.recordsubmit.body", new Object[] { fullName }),
+			    isHtmlFormat);
 		}
 	    }
 	}

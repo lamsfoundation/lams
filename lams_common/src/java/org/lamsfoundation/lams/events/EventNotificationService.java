@@ -120,25 +120,21 @@ class EventNotificationService implements IEventNotificationService {
 		return EventNotificationService.availableDeliveryMethods.add(deliveryMethod);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#createEvent(java.lang.String, java.lang.String, java.lang.Long, java.lang.String, java.lang.String)
-	 */
-	public boolean createEvent(String scope, String name, Long eventSessionId, String defaultSubject, String defaultMessage)
-			throws InvalidParameterException {
+	@Override
+	public boolean createEvent(String scope, String name, Long eventSessionId, String defaultSubject,
+	    String defaultMessage, boolean isHtmlFormat) throws InvalidParameterException {
 		Event event = getEvent(scope, name, eventSessionId);
 		if (event != null) {
 			saveEvent(event);
 			return false;
 		}
-		event = new Event(scope, name, eventSessionId, defaultSubject, defaultMessage);
+		event = new Event(scope, name, eventSessionId, defaultSubject, defaultMessage, isHtmlFormat);
 		event.referenceCounter++;
 		saveEvent(event);
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#deleteEvent(java.lang.String, java.lang.String, java.lang.Long, java.lang.String)
-	 */
+	@Override
 	public boolean deleteEvent(String scope, String name, Long eventSessionId) throws InvalidParameterException {
 		if (scope == null) {
 			throw new InvalidParameterException("Scope should not be null.");
@@ -157,9 +153,7 @@ class EventNotificationService implements IEventNotificationService {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#eventExists(java.lang.String, java.lang.String, java.lang.Long)
-	 */
+	@Override
 	public boolean eventExists(String scope, String name, Long eventSessionId) throws InvalidParameterException {
 		if (scope == null) {
 			throw new InvalidParameterException("Scope should not be null.");
@@ -177,9 +171,7 @@ class EventNotificationService implements IEventNotificationService {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#getAvailableDeliveryMethods()
-	 */
+	@Override
 	public Set<AbstractDeliveryMethod> getAvailableDeliveryMethods() {
 		return EventNotificationService.availableDeliveryMethods;
 	}
@@ -188,9 +180,7 @@ class EventNotificationService implements IEventNotificationService {
 		return eventDAO;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#isSubscribed(java.lang.String, java.lang.String, java.lang.Long, java.lang.Long)
-	 */
+	@Override
 	public boolean isSubscribed(String scope, String name, Long eventSessionId, Long userId) throws InvalidParameterException {
 		if (scope == null) {
 			throw new InvalidParameterException("Scope should not be null.");
@@ -215,14 +205,12 @@ class EventNotificationService implements IEventNotificationService {
 		return isSubscribed;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#sendMessage(java.lang.Long, org.lamsfoundation.lams.events.AbstractDeliveryMethod, java.lang.String, java.lang.String)
-	 */
-	public boolean sendMessage(Long userId, AbstractDeliveryMethod deliveryMethod, String subject, String message)
+	@Override
+	public boolean sendMessage(Long userId, AbstractDeliveryMethod deliveryMethod, String subject, String message, boolean isHtmlFormat)
 			throws InvalidParameterException {
 		Event eventFailCopy = new Event(EventNotificationService.SINGLE_MESSAGE_SCOPE,
-				String.valueOf(System.currentTimeMillis()), null, subject, message);
-		String result = deliveryMethod.send(userId, subject, message);
+				String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat);
+		String result = deliveryMethod.send(userId, subject, message, isHtmlFormat);
 		if (result != null) {
 		    	EventNotificationService.log.warn(messageService.getMessage("mail.error.occurred.while.sending.message",
 		    		new Object[] { result }));		    
@@ -238,11 +226,9 @@ class EventNotificationService implements IEventNotificationService {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#sendMessage(java.lang.Long[], org.lamsfoundation.lams.events.AbstractDeliveryMethod, java.lang.String, java.lang.String)
-	 */
+	@Override
 	public boolean sendMessage(final Long[] userId, final AbstractDeliveryMethod deliveryMethod, final String subject,
-			final String message) throws InvalidParameterException {
+			final String message, final boolean isHtmlFormat) throws InvalidParameterException {
 		if (userId == null) {
 			throw new InvalidParameterException("User IDs array should not be null.");
 		}
@@ -251,16 +237,16 @@ class EventNotificationService implements IEventNotificationService {
 		}
 		if (userId.length > 0) {
 			if (userId.length == 1) {
-				return sendMessage(userId[0], deliveryMethod, subject, message);
+				return sendMessage(userId[0], deliveryMethod, subject, message, isHtmlFormat);
 			}
 			else {
 				final Event event = new Event(EventNotificationService.SINGLE_MESSAGE_SCOPE, String.valueOf(System
-						.currentTimeMillis()), null, subject, message);
+						.currentTimeMillis()), null, subject, message, isHtmlFormat);
 				event.referenceCounter++;
 				event.notificationThread = new Thread(new Runnable() {
 					public void run() {
 						for (Long id : userId) {
-							String result = deliveryMethod.send(id, subject, message);
+							String result = deliveryMethod.send(id, subject, message, isHtmlFormat);
 							if (result != null) {
 							    	EventNotificationService.log.warn(messageService.getMessage(
 							    		"mail.error.occurred.while.sending.message",
@@ -290,9 +276,7 @@ class EventNotificationService implements IEventNotificationService {
 		this.userManagementService = userManagementService;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#subscribe(java.lang.String, java.lang.String, java.lang.Long, java.lang.Long, org.lamsfoundation.lams.events.AbstractDeliveryMethod, java.lang.Long)
-	 */
+	@Override
 	public boolean subscribe(String scope, String name, Long eventSessionId, Long userId, AbstractDeliveryMethod deliveryMethod,
 			Long periodicity) throws InvalidParameterException {
 		if (scope == null) {
@@ -323,9 +307,7 @@ class EventNotificationService implements IEventNotificationService {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#trigger(java.lang.String, java.lang.String, java.lang.Long)
-	 */
+	@Override
 	public boolean trigger(String scope, String name, Long eventSessionId) throws InvalidParameterException {
 		if (scope == null) {
 			throw new InvalidParameterException("Scope should not be null.");
@@ -346,9 +328,7 @@ class EventNotificationService implements IEventNotificationService {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#trigger(java.lang.String, java.lang.String, java.lang.Long, java.lang.Object[] parameterValues)
-	 */
+	@Override
 	public boolean trigger(String scope, String name, Long eventSessionId, Object[] parameterValues)
 			throws InvalidParameterException {
 		if (scope == null) {
@@ -378,9 +358,7 @@ class EventNotificationService implements IEventNotificationService {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#trigger(java.lang.String, java.lang.String, java.lang.Long, java.lang.String, java.lang.String)
-	 */
+	@Override
 	public boolean trigger(String scope, String name, Long eventSessionId, String title, String message)
 			throws InvalidParameterException {
 		if (scope == null) {
@@ -402,9 +380,7 @@ class EventNotificationService implements IEventNotificationService {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#triggerForSingleUser(java.lang.String, java.lang.String, java.lang.Long, java.lang.Long)
-	 */
+	@Override
 	public boolean triggerForSingleUser(String scope, String name, Long eventSessionId, Long userId)
 			throws InvalidParameterException {
 		if (scope == null) {
@@ -431,9 +407,7 @@ class EventNotificationService implements IEventNotificationService {
 		return notificationSuccessful;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#triggerForSingleUser(java.lang.String, java.lang.String, java.lang.Long, java.lang.Long)
-	 */
+	@Override
 	public boolean triggerForSingleUser(String scope, String name, Long eventSessionId, Long userId, Object[] parameterValues)
 			throws InvalidParameterException {
 		if (scope == null) {
@@ -468,9 +442,7 @@ class EventNotificationService implements IEventNotificationService {
 		return notificationSuccessful;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#triggerForSingleUser(java.lang.String, java.lang.String, java.lang.Long, java.lang.Long, java.lang.String, java.lang.String)
-	 */
+	@Override
 	public boolean triggerForSingleUser(String scope, String name, Long eventSessionId, Long userId, String subject,
 			String message) throws InvalidParameterException {
 		if (scope == null) {
@@ -500,9 +472,7 @@ class EventNotificationService implements IEventNotificationService {
 		return notificationSuccessful;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#unsubscribe(java.lang.String, java.lang.String, java.lang.Long, java.lang.Long)
-	 */
+	@Override
 	public boolean unsubscribe(String scope, String name, Long eventSessionId, Long userId) throws InvalidParameterException {
 		if (scope == null) {
 			throw new InvalidParameterException("Scope should not be null.");
@@ -531,9 +501,7 @@ class EventNotificationService implements IEventNotificationService {
 		return subscriptionFound;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.events.IEventNotificationService#unsubscribe(java.lang.String, java.lang.String, java.lang.Long, java.lang.Long, org.lamsfoundation.lams.events.AbstractDeliveryMethod)
-	 */
+	@Override
 	public boolean unsubscribe(String scope, String name, Long eventSessionId, Long userId, AbstractDeliveryMethod deliveryMethod)
 			throws InvalidParameterException {
 		if (scope == null) {

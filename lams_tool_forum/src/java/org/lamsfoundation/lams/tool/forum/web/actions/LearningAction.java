@@ -285,10 +285,13 @@ public class LearningAction extends Action {
 	}
 
 	if (forum.isNotifyLearnersOnMarkRelease()) {
+	    boolean isHtmlFormat = false;
+	    
 	    forumService.getEventNotificationService().createEvent(ForumConstants.TOOL_SIGNATURE,
 		    ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(),
 		    forumService.getLocalisedMessage("event.mark.release.subject", null),
-		    forumService.getLocalisedMessage("event.mark.release.body", null));
+		    forumService.getLocalisedMessage("event.mark.release.body", null),
+		    isHtmlFormat);
 
 	    forumService.getEventNotificationService().subscribe(ForumConstants.TOOL_SIGNATURE,
 		    ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(),

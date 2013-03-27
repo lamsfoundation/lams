@@ -232,11 +232,12 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    String[] userIdStrs = request.getParameterValues("userId");
 	    for (String userIdStr : userIdStrs) {
 		long userId = Long.parseLong(userIdStr);
+		boolean isHtmlFormat = false;
 		isSuccessfullySent &= eventNotificationService.sendMessage(
 			userId,
 			DeliveryMethodMail.getInstance(),
 			monitoringService.getMessageService().getMessage("event.emailnotifications.email.subject",
-				new Object[] {}), emailBody);
+				new Object[] {}), emailBody, isHtmlFormat);
 	    }
 
 	    JSONObject.put("isSuccessfullySent", isSuccessfullySent);

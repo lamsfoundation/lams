@@ -103,8 +103,9 @@ public class SignupAction extends Action {
 		    body += "\n\n";
 		    body += "Regards,\n";
 		    body += "LAMS Signup System";
+		    boolean isHtmlFormat = false;
 
-		    Emailer.sendFromSupportEmail(subject, user.getEmail(), body);
+		    Emailer.sendFromSupportEmail(subject, user.getEmail(), body, isHtmlFormat);
 		} catch (Exception e) {
 		    log.error(e.getMessage(), e);
 		    request.setAttribute("error", e.getMessage());

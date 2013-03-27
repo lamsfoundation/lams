@@ -51,10 +51,11 @@ public abstract class AbstractDeliveryMethod {
 	 * @param userId ID of the user
 	 * @param subject subject of the message
 	 * @param message text of the message
+	 * @param isHtmlFormat whether the message is of HTML content-type or plain text
 	 * @return <code>null</code> if the operation was successful; error message if it failed
 	 * @throws InvalidParameterException
 	 */
-	protected abstract String send(Long userId, String subject, String message) throws InvalidParameterException;
+	protected abstract String send(Long userId, String subject, String message, boolean isHtmlFormat) throws InvalidParameterException;
 
 	public String getSignature() {
 		return signature;

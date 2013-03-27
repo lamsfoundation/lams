@@ -48,11 +48,12 @@ public interface IEventNotificationService {
 	 * @param eventSessionId session ID of the event
 	 * @param defaultSubject subject of the message send to users; it can be altered when triggering the event
 	 * @param defaultMessage body of the message send to users; it can be altered when triggering the event
+	 * @param isHtmlFormat whether the message is of HTML content-type or plain text
 	 * @return <code>true</code> if the event did not exist and was correctly created
 	 * @throws InvalidParameterException if scope was <code>null</code> or name was blank
 	 */
 	public abstract boolean createEvent(String scope, String name, Long eventSessionId, String defaultSubject,
-			String defaultMessage) throws InvalidParameterException;
+			String defaultMessage, boolean isHtmlFormat) throws InvalidParameterException;
 
 	/**
 	 * Deletes an event.
@@ -98,10 +99,11 @@ public interface IEventNotificationService {
 	 * @param deliveryMethod method of messaged delivery to use
 	 * @param subject subject of the message to send
 	 * @param message body of the message to send
+	 * @param isHtmlFormat whether the message is of HTML content-type or plain text
 	 * @return <code>true</code> if the message was succefully send to the user
 	 * @throws InvalidParameterException if userId or delivery method are <code>null</code>
 	 */
-	public abstract boolean sendMessage(Long userId, AbstractDeliveryMethod deliveryMethod, String subject, String message)
+	public abstract boolean sendMessage(Long userId, AbstractDeliveryMethod deliveryMethod, String subject, String message, boolean isHtmlFormat)
 			throws InvalidParameterException;
 
 	/**
@@ -111,10 +113,11 @@ public interface IEventNotificationService {
 	 * @param deliveryMethod method of messaged delivery to use
 	 * @param subject subject of the message to send
 	 * @param message body of the message to send
+	 * @param isHtmlFormat whether the message is of HTML content-type or plain text
 	 * @return <code>true</code> if the message was succefully send to all the users; as in the current implementation a separate thread is used for sending messages, this method always returns <code>true</code> 
 	 * @throws InvalidParameterException if userId array or delivery method are <code>null</code>
 	 */
-	public abstract boolean sendMessage(Long[] userId, AbstractDeliveryMethod deliveryMethod, String subject, String message)
+	public abstract boolean sendMessage(Long[] userId, AbstractDeliveryMethod deliveryMethod, String subject, String message, boolean isHtmlFormat)
 			throws InvalidParameterException;
 
 	/**

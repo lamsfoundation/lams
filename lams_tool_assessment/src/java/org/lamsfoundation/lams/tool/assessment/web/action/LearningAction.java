@@ -770,6 +770,8 @@ public class LearningAction extends Action {
 	if ((mode != null) && !mode.isTeacher()) {
 	    Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	    Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	    final boolean isHtmlFormat = false;
+	    
 	    if (assessment.isNotifyTeachersOnAttemptCompletion()) {
 		List<User> monitoringUsers = service.getMonitorsByToolSessionId(toolSessionId);
 		if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
@@ -782,7 +784,8 @@ public class LearningAction extends Action {
 		    service.getEventNotificationService().sendMessage(monitoringUsersIds,
 			    DeliveryMethodMail.getInstance(),
 			    service.getLocalisedMessage("event.learner.completes.attempt.subject", null),
-			    service.getLocalisedMessage("event.learner.completes.attempt.body", new Object[] { fullName }));
+			    service.getLocalisedMessage("event.learner.completes.attempt.body", new Object[] { fullName }),
+			    isHtmlFormat);
 		}
 	    }
 	}

@@ -176,6 +176,7 @@ public class ForgotPasswordServlet extends HttpServlet
 
 			if (!err)
 			{
+			    	boolean isHtmlFormat = false;
 				// generate a key for the request
 				String key = generateUniqueKey();
 				
@@ -198,7 +199,8 @@ public class ForgotPasswordServlet extends HttpServlet
 					  Emailer.sendFromSupportEmail(
 						messageService.getMessage("forgot.password.email.subject"),
 						user.getEmail(),
-						body
+						body,
+						isHtmlFormat
 						);
 					  languageKey = this.SUCCESS_REQUEST_EMAIL;
 					  success = 1;

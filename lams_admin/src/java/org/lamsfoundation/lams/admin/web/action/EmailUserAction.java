@@ -111,6 +111,7 @@ public class EmailUserAction extends LamsDispatchAction {
     
     public ActionForward send(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 	initServices();
+	boolean isHtmlFormat = false;
 	
 	if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
 	    request.setAttribute("errorName", "UserAction");
@@ -140,8 +141,8 @@ public class EmailUserAction extends LamsDispatchAction {
 	EmailUserAction.log.debug("Administrator " + fromPerson + " (" + from + ") " 
 			+ " sent email to user " + toPerson + "( " + to + ") " + ": \n[subject] " + subject + "\n[message] " + body);
 	Properties properties = new Properties();
-
-	Emailer.send(subject, to, toPerson, from, fromPerson, body, properties);
+	
+	Emailer.send(subject, to, toPerson, from, fromPerson, body, isHtmlFormat, properties);
 	
 	return mapping.findForward("usersearch");
     }

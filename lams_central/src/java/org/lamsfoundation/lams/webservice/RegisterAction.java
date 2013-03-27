@@ -273,13 +273,18 @@ public class RegisterAction extends HttpServlet {
 	    
 	    //send email to participant
 	    if ("1".equals(isEmailParticipant)) {
+		boolean isHtmlFormat = false;
+		
 		eventNotificationService.sendMessage(user.getUserId().longValue(), DeliveryMethodMail.getInstance(),
 			messageService.getMessage("register.user.email.subject"),
-			messageService.getMessage("register.user.email.body", new Object[] { username, password }));
+			messageService.getMessage("register.user.email.body", new Object[] { username, password }),
+			isHtmlFormat);
 	    }
 	    
 	    //send email to coordinator
 	    if (StringUtils.isNotBlank(isEmailCoordinator)) {
+		boolean isHtmlFormat = false;
+		
 		List<User> coordinators = userManagementService.getAllUsersWithEmail(isEmailCoordinator);
 		if ((coordinators == null) || (coordinators.size() == 0)) {
 		    throw new RuntimeException("There are no coordinators with email: " + isEmailCoordinator);
@@ -289,7 +294,8 @@ public class RegisterAction extends HttpServlet {
 		String registeredUserName = firstName + " " + lastName + " (" + username + ")";
 		eventNotificationService.sendMessage(coordinator.getUserId().longValue(), DeliveryMethodMail.getInstance(),
 			messageService.getMessage("notify.coordinator.register.user.email.subject"),
-			messageService.getMessage("notify.coordinator.register.user.email.body", new Object[] { registeredUserName }));
+			messageService.getMessage("notify.coordinator.register.user.email.body", new Object[] { registeredUserName }),
+			isHtmlFormat);
 	    }
 	    
 	    writeAJAXOKResponse(response);

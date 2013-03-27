@@ -501,8 +501,9 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// first check whether the event exists and create it if it doesnt
 	if (!notificationService.eventExists(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
 		toolSessionID)) {
+	    boolean isHtmlFormat = false;
 	    notificationService.createEvent(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
-		    toolSessionID, null, null);
+		    toolSessionID, null, null, isHtmlFormat);
 	}
 
 	// Get whether the user is subscribed
@@ -543,6 +544,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	
 	// Notify all the monitors
 	if (wikiSession.getWiki().isNotifyUpdates()) {
+	    boolean isHtmlFormat = false;
 
 	    List<User> users = wikiService.getMonitorsByToolSessionId(toolSessionID);
 	    Long[] monitoringUsersIds = new Long[users.size()];
@@ -564,7 +566,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 		    wikiSession.getSessionName(), link });
 
 	    notificationService.sendMessage(monitoringUsersIds, IEventNotificationService.DELIVERY_METHOD_MAIL,
-		    subject, body);
+		    subject, body, isHtmlFormat);
 	}
 
 	// trigger the event if exists for all the learners who are subscribed

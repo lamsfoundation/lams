@@ -73,6 +73,11 @@ public class Event {
 	 * Subject of the message that will be send when the event is triggered.
 	 */
 	protected String subject;
+	
+	/**
+	 * Boolean indicates whether the message should be sent as text/html content or regular text/plain one
+	 */
+	protected boolean htmlFormat;
 
 	/**
 	 * If sending notifications fails, this property holds the time of this failure.
@@ -115,7 +120,8 @@ public class Event {
 	 * @param defaultMessage body of the message to send
 	 * @throws InvalidParameterException if scope is <code>null</code> or name is blank
 	 */
-	public Event(String scope, String name, Long sessionId, String defaultSubject, String defaultMessage)
+        public Event(String scope, String name, Long sessionId, String defaultSubject, String defaultMessage,
+    	    boolean isHtmlContentType)
 			throws InvalidParameterException {
 		if (scope == null) {
 			throw new InvalidParameterException("Event scope can not be null.");
@@ -128,6 +134,7 @@ public class Event {
 		eventSessionId = sessionId;
 		this.defaultSubject = defaultSubject;
 		this.defaultMessage = defaultMessage;
+		this.htmlFormat = isHtmlContentType;
 		fullSignature = createFullSignature(scope, name, sessionId);
 	}
 
@@ -151,7 +158,7 @@ public class Event {
 
 	@Override
 	public Object clone() {
-		Event clone = new Event(scope, name, eventSessionId, defaultSubject, defaultMessage);
+		Event clone = new Event(scope, name, eventSessionId, defaultSubject, defaultMessage, htmlFormat);
 		for (Subscription subscription : getSubscriptions()) {
 			clone.getSubscriptions().add((Subscription) subscription.clone());
 		}
@@ -258,7 +265,7 @@ public class Event {
 		for (int index = 0; index < subscriptionList.size(); index++) {
 			Subscription subscription = subscriptionList.get(index);
 			if (subscription.getUserId().equals(userId) && subscription.isEligibleForNotification()) {
-				subscription.notifyUser(subject, message);
+				subscription.notifyUser(subject, message, this.isHtmlFormat());
 				return subscription.getLastOperationSuccessful();
 			}
 		}
@@ -352,6 +359,7 @@ public class Event {
 
 			final String subjectToSend = getSubject() == null ? getDefaultSubject() : getSubject();
 			final String messageToSend = getMessage() == null ? getDefaultMessage() : getMessage();
+			final boolean isHtmlContentType = isHtmlFormat();
 			final Event finalRef = this;
 			notificationThread = new Thread(new Runnable() {
 				public void run() {
@@ -360,7 +368,7 @@ public class Event {
 					for (int index = 0; index < subscriptionList.size(); index++) {
 						Subscription subscription = subscriptionList.get(index);
 						if (getFailTime() != null || subscription.isEligibleForNotification()) {
-							subscription.notifyUser(subjectToSend, messageToSend);
+							subscription.notifyUser(subjectToSend, messageToSend, isHtmlContentType);
 							if (subscription.getLastOperationSuccessful()) {
 								if (getFailTime() != null) {
 									getSubscriptions().remove(subscription);
@@ -470,5 +478,17 @@ public class Event {
 
 	protected void setSubject(String subject) {
 		this.subject = subject;
+	}
+	
+	/**
+	 * @hibernate.property column="html_format" length="1"
+	 * @return
+	 */
+	protected boolean isHtmlFormat() {
+		return htmlFormat;
+	}
+
+	protected void setHtmlFormat(boolean isHtmlContentType) {
+		this.htmlFormat = isHtmlContentType;
 	}
 }

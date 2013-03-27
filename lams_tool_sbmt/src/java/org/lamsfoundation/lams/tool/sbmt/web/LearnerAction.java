@@ -193,10 +193,11 @@ public class LearnerAction extends DispatchAction {
 	}
 
 	if (content.isNotifyLearnersOnMarkRelease()) {
+	    boolean isHtmlFormat = false;
 	    submitFilesService.getEventNotificationService().createEvent(SbmtConstants.TOOL_SIGNATURE,
 		    SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(),
 		    submitFilesService.getLocalisedMessage("event.mark.release.subject", null),
-		    submitFilesService.getLocalisedMessage("event.mark.release.body", null));
+		    submitFilesService.getLocalisedMessage("event.mark.release.body", null), isHtmlFormat);
 
 	    submitFilesService.getEventNotificationService().subscribe(SbmtConstants.TOOL_SIGNATURE,
 		    SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(),
@@ -266,6 +267,7 @@ public class LearnerAction extends DispatchAction {
 
 	SubmitFilesContent content = submitFilesService.getSessionById(sessionID).getContent();
 	if (content.isNotifyTeachersOnFileSubmit()) {
+	    boolean isHtmlFormat = false;
 	    List<User> monitoringUsers = submitFilesService.getMonitorsByToolSessionId(sessionID);
 	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
 		Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
@@ -276,7 +278,8 @@ public class LearnerAction extends DispatchAction {
 		submitFilesService.getEventNotificationService().sendMessage(monitoringUsersIds,
 			DeliveryMethodMail.getInstance(),
 			submitFilesService.getLocalisedMessage("event.file.submit.subject", null),
-			submitFilesService.getLocalisedMessage("event.file.submit.body", new Object[] { fullName }));
+			submitFilesService.getLocalisedMessage("event.file.submit.body", new Object[] { fullName }),
+			isHtmlFormat);
 	    }
 	}
 	return mapping.getInputForward();

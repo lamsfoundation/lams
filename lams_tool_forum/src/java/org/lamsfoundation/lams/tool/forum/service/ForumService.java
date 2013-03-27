@@ -1420,6 +1420,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	ToolSession toolSession = toolService.getToolSession(sessionId);
 	Long activityId = toolSession.getToolActivity().getActivityId();
 	ToolActivity activity = (ToolActivity) activityDAO.getActivityByActivityId(activityId, ToolActivity.class);
+	boolean isHtmlFormat = forum.isAllowRichEditor();
 
 	if (forum.isNotifyLearnersOnForumPosting()) {
 	    List<User> learners = lessonService.getLearnersHaveAttemptedActivity(activity);
@@ -1432,7 +1433,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		getEventNotificationService().sendMessage(learnerIds.toArray(new Long[0]),
 			DeliveryMethodMail.getInstance(),
 			getLocalisedMessage("event.newposting.subject", new Object[] { forum.getTitle() }),
-			getLocalisedMessage("event.newposting.body", new Object[] { fullName, message.getBody() }));
+			getLocalisedMessage("event.newposting.body", new Object[] { fullName, message.getBody() }),
+			isHtmlFormat);
 	    }
 	}
 
@@ -1447,7 +1449,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		getEventNotificationService().sendMessage(monitoringUsersIds.toArray(new Long[0]),
 			DeliveryMethodMail.getInstance(),
 			getLocalisedMessage("event.newposting.subject", new Object[] { forum.getTitle() }),
-			getLocalisedMessage("event.newposting.body", new Object[] { fullName, message.getBody() }));
+			getLocalisedMessage("event.newposting.body", new Object[] { fullName, message.getBody() }),
+			isHtmlFormat);
 	    }
 	}
     }
