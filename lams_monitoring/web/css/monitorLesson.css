@@ -1,13 +1,16 @@
+/********** GENERAL/DIALOG STYLES **********/
+
 div#tabs {
 	width: 768px;
 	height: 574px;
+	overflow: hidden;
 }
 
 .ui-tabs .ui-tabs-panel {
 	padding: 0px;
 }
 
-div#tabs ul li a, a#closeButton {
+div#tabs ul li a,a#closeButton {
 	border-bottom: none;
 }
 
@@ -21,13 +24,6 @@ a#closeButton {
 
 a#closeButton span {
 	background-color: #D0E5F5;
-}
-
-div.tabTitle {
-	padding: 5px 0px 5px 0px;
-	font-size: small;
-	font-weight: bold;
-	text-align: center;
 }
 
 .errorMessage {
@@ -48,18 +44,122 @@ div.dialogContainer {
 	display: none;
 }
 
-div.topButtonsContainer {
-	height: 30px;
+.dialogList {
+	overflow: auto;
+	border: thin solid black;
+	padding: 5px;
 }
 
-div.topButtonsContainer a {
-	float: right;
-	margin: 5px 5px 0 0;
+div.dialogListItem {
+	padding: 3px 0px 3px 0px;
+	cursor: pointer;
 }
+
+div.dialogListItemSelected {
+	background-color: #5c9ccc !important;
+	color: white !important;
+}
+
+div.dialogListItemDisabled {
+	color: grey !important;
+}
+
+.dialogTitle {
+	padding: 0px 0px 5px 0px;
+	height: 15px;
+	font-size: small;
+	font-weight: bold;
+	text-align: center;
+}
+
+.dialogListSortButton {
+	text-align: right;
+	padding-right: 3px;
+	float: right;
+	cursor: pointer;
+}
+
+
+/********** LESSON TAB STYLES **********/
+
+div#tabLesson {
+	height: 540px;
+	overflow: auto;
+}
+
+table#tabLessonTable {
+	table-layout: fixed;
+}
+
+table#tabLessonTable td {
+	padding: 7px;
+}
+
+td.fieldLabel {
+	font-weight: bold;
+	width: 150px;
+}
+
+td.sectionHeader {
+	font-weight: bold;
+	background-color: #D0E5F5;
+}
+
+.topButtonsContainer {
+	height: 30px;
+	padding: 0px !important;
+}
+
+.topButtonsContainer a {
+	float: right;
+	margin: 5px 5px 5px 0;
+}
+
+.lessonManageField {
+	margin-right: 5px;
+}
+
+#lessonStateField {
+	width: 114px;
+}
+
+#lessonStartDateCell * {
+	display: none;
+}
+
+table#tabLessonTable td.contributeActivityCell {
+	padding: 0 0 0 5px;
+	font-weight: bold;
+}
+
+table#tabLessonTable td.contributeEntryCell {
+	padding: 0 5px 0 15px;
+}
+
+td.contributeEntryCell a {
+	float: right;
+}
+
+#classDialogTable {
+	border-spacing: 5px 0;
+}
+
+#classDialogTable td {
+	width: 50%;
+	vertical-align: top;
+}
+
+#classDialogTable input[type="checkbox"] {
+	margin: 0 5px 0px 0px;
+	border: none;
+}
+
+
+/********** SEQUENCE TAB STYLES **********/
 
 div#sequenceCanvas {
 	text-align: center;
-	height: 483px;
+	height: 478px;
 	width: 768px;
 	overflow: auto;
 }
@@ -80,35 +180,4 @@ div#completedLearnersContainer span {
 	cursor: default;
 	vertical-align: top;
 	margin-right: 5px;
-}
-
-div#learnerGroupList {
-	overflow: auto;
-	border: thin solid black;
-	padding : 5px;
-}
-
-div.learnerGroupListItem {
-	padding: 3px 0px 3px 0px;
-	cursor: pointer;
-}
-
-div.learnerGroupListItemSelected {
-	background-color: #5c9ccc !important;
-	color: white !important;
-}
-
-#learnerGroupListTitle {
-	padding: 0px 0px 5px 0px;
-	height: 15px;
-	font-size: small;
-	font-weight: bold;
-	text-align: center;
-}
-
-#sortLearnerGroupListButton {
-	text-align: right;
-	padding-right: 3px;
-	float: right;
-	cursor: pointer;
 }

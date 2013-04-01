@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -50,26 +51,30 @@ import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.util.LessonComparator;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
+import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
+import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -241,31 +246,15 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
 	Integer userId = getUserId();
-	User user = (User) userManagementService.findById(User.class, userId);
+	User creator = (User) userManagementService.findById(User.class, userId);
 
-	// parse comma delimited learner list and get the real users objects
-	String learnersParam = request.getParameter("learners");
-	List<User> learners = new ArrayList<User>();
-	for (String learnerID : learnersParam.split(",")) {
-	    // last one will be blank
-	    if (!StringUtils.isBlank(learnerID)) {
-		User learner = (User) userManagementService.findById(User.class, Integer.valueOf(learnerID));
-		learners.add(learner);
-	    }
-	}
+	List<User> learners = parseUserList(request, "learners");
 	String learnerGroupName = organisation.getName() + " learners";
 
-	String staffParam = request.getParameter("monitors");
-	List<User> staff = new ArrayList<User>();
-	for (String staffMemberID : staffParam.split(",")) {
-	    if (!StringUtils.isBlank(staffMemberID)) {
-		User staffMemeber = (User) userManagementService.findById(User.class, Integer.valueOf(staffMemberID));
-		staff.add(staffMemeber);
-	    }
-	}
+	List<User> staff = parseUserList(request, "monitors");
 	// add the creator as staff, if not already done
-	if (!staff.contains(user)) {
-	    staff.add(user);
+	if (!staff.contains(creator)) {
+	    staff.add(creator);
 	}
 	String staffGroupName = organisation.getName() + " staff";
 
@@ -359,6 +348,17 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	PrintWriter writer = response.getWriter();
 	writer.println(message);
+	return null;
+    }
+
+    public ActionForward startOnScheduleLessonJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ParseException {
+	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
+		.getServletContext());
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
+	Date startDate = MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateStr);
+	monitoringService.startLessonOnSchedule(lessonId, startDate, getUserId());
 	return null;
     }
 
@@ -680,6 +680,78 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
+    /**
+     * Gets learners or monitors of either the lesson only or the lesson and organisation containing it.
+     */
+    @SuppressWarnings("unchecked")
+    public ActionForward getClassMembers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, JSONException {
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	String role = WebUtil.readStrParam(request, AttributeNames.PARAM_ROLE);
+	boolean getMonitors = Role.MONITOR.equalsIgnoreCase(role);
+	boolean classOnly = WebUtil.readBooleanParam(request, "classOnly", true);
+	Lesson lesson = getLessonService().getLesson(lessonId);
+	Set<User> classUsers = (Set<User>) (getMonitors ? lesson.getLessonClass().getStaffGroup().getUsers() : lesson
+		.getLessonClass().getLearners());
+	JSONArray responseJSON = new JSONArray();
+
+	// get class members
+	for (User user : classUsers) {
+	    JSONObject userJSON = MonitoringAction.userToJSON(user);
+	    if (!classOnly) {
+		// mark that this user is a class member
+		userJSON.put("classMember", true);
+		if (lesson.getUser().equals(user)) {
+		    // mark this user is lesson author
+		    userJSON.put("lessonCreator", true);
+		}
+	    }
+	    responseJSON.put(userJSON);
+	}
+
+	// add non-class, organisation members, if requested
+	if (!classOnly) {
+	    IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
+		    .getServletContext());
+	    List<User> orgUsers = userManagementService.getUsersFromOrganisationByRole(lesson.getOrganisation()
+		    .getOrganisationId(), getMonitors ? Role.MONITOR : Role.LEARNER, false, true);
+	    for (User user : orgUsers) {
+		if (!classUsers.contains(user)) {
+		    JSONObject userJSON = MonitoringAction.userToJSON(user);
+		    userJSON.put("classMember", false);
+		    responseJSON.put(userJSON);
+		}
+	    }
+	}
+
+	response.getWriter().write(responseJSON.toString());
+	return null;
+    }
+
+    /**
+     * Adds/removes learners and monitors to/from lesson class.
+     */
+    public ActionForward updateLessonClass(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, JSONException {
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Lesson lesson = getLessonService().getLesson(lessonId);
+	Organisation organisation = lesson.getOrganisation();
+
+	List<User> learners = parseUserList(request, "learners");
+	String learnerGroupName = organisation.getName() + " learners";
+
+	List<User> staff = parseUserList(request, "monitors");
+	// add the creator as staff, if not already done
+	String staffGroupName = organisation.getName() + " staff";
+
+	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
+		.getServletContext());
+	monitoringService.createLessonClassForLesson(lessonId, organisation, learnerGroupName, learners,
+		staffGroupName, staff, getUserId());
+
+	return null;
+    }
+
     public ActionForward getLessonStaff(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	String wddxPacket;
@@ -730,6 +802,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
+    @SuppressWarnings("unchecked")
     public ActionForward getDictionaryXML(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
@@ -1015,23 +1088,72 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward monitorLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	Lesson lesson = getLessonService().getLesson(lessonId);
-	request.setAttribute(CentralConstants.PARAM_LEARNING_DESIGN_ID, lesson.getLearningDesign()
-		.getLearningDesignId());
+	LessonDetailsDTO lessonDTO = getLessonService().getLessonDetails(lessonId);
 
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Locale userLocale = new Locale(user.getLocaleLanguage(), user.getLocaleCountry());
+	if ((lessonDTO.getCreateDateTime() != null) && (lessonDTO.getCreateDateTime() != WDDXTAGS.DATE_NULL_VALUE)) {
+	    DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
+	    lessonDTO.setCreateDateTimeStr(sfm.format(lessonDTO.getCreateDateTime()));
+	}
+
+	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
+		.getServletContext());
+	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonId);
+
+	if (contributeActivities != null) {
+	    List<ContributeActivityDTO> requiredContributeActivities = new ArrayList<ContributeActivityDTO>();
+	    for (ContributeActivityDTO contributeActivity : contributeActivities) {
+		if (contributeActivity.getContributeEntries() != null) {
+		    for (ContributeActivityDTO.ContributeEntry contributeEntry : contributeActivity
+			    .getContributeEntries()) {
+			if (contributeEntry.getIsRequired()) {
+			    requiredContributeActivities.add(contributeActivity);
+			    if (ContributionTypes.DEFINE_LATER.equals(contributeEntry.getContributionType())) {
+				String url = WebUtil.appendParameterToURL(contributeEntry.getURL(),
+					AttributeNames.PARAM_CONTENT_FOLDER_ID, lessonDTO.getContentFolderID());
+				contributeEntry.setURL(url);
+			    }
+			}
+		    }
+		}
+	    }
+	    if (!requiredContributeActivities.isEmpty()) {
+		request.setAttribute("contributeActivities", requiredContributeActivities);
+	    }
+	}
+
+	request.setAttribute("lesson", lessonDTO);
 	return mapping.findForward("monitorLesson");
     }
 
     @SuppressWarnings("unchecked")
     public ActionForward getLessonProgressJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
-	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Lesson lesson = getLessonService().getLesson(lessonId);
-	String contentFolderId = lesson.getLessonDetails().getContentFolderID();
+	LessonDetailsDTO lessonDetails = lesson.getLessonDetails();
+	String contentFolderId = lessonDetails.getContentFolderID();
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
 	Integer monitorUserId = getUserId();
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Locale userLocale = new Locale(user.getLocaleLanguage(), user.getLocaleCountry());
+
 	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("numberPossibleLearners", lessonDetails.getNumberPossibleLearners());
+	responseJSON.put("lessonStateID", lessonDetails.getLessonStateID());
+
+	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate() : lesson
+		.getStartDateTime();
+	if (startOrScheduleDate != null) {
+	    DateFormat indfm = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", userLocale);
+	    Date tzStartDate = DateUtil.convertToTimeZoneFromDefault(user.getTimeZone(), startOrScheduleDate);
+	    responseJSON.put("startDate",
+		    indfm.format(tzStartDate) + " " + user.getTimeZone().getDisplayName(userLocale));
+	}
 
 	// few details for each activity
 	Map<Long, JSONObject> activitiesMap = new TreeMap<Long, JSONObject>();
@@ -1041,19 +1163,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	    activityJSON.put("id", activityId);
 	    String monitorUrl = monitoringService.getActivityMonitorURL(lessonId, activityId, contentFolderId,
 		    monitorUserId);
-	    if (monitorUrl != null) { 
+	    if (monitorUrl != null) {
 		activityJSON.put("url", monitorUrl);
 	    }
 	    activitiesMap.put(activityId, activityJSON);
 	}
 
 	for (LearnerProgress learnerProgress : (Set<LearnerProgress>) lesson.getLearnerProgresses()) {
-	    JSONObject learnerJSON = new JSONObject();
 	    User learner = learnerProgress.getUser();
-	    learnerJSON.put("id", learner.getUserId());
-	    learnerJSON.put("firstName", learner.getFirstName());
-	    learnerJSON.put("lastName", learner.getLastName());
-	    learnerJSON.put("login", learner.getLogin());
+	    JSONObject learnerJSON = MonitoringAction.userToJSON(learner);
 	    if (learnerProgress.isComplete()) {
 		// no more details are needed for learners who completed the lesson
 		responseJSON.append("completedLearners", learnerJSON);
@@ -1356,5 +1474,35 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	return mapping.findForward(MonitoringAction.TIME_CHART_SCREEN);
+    }
+
+    /**
+     * Produces JSON object with basic user details.
+     */
+    private static JSONObject userToJSON(User user) throws JSONException {
+	JSONObject userJSON = new JSONObject();
+	userJSON.put("id", user.getUserId());
+	userJSON.put("firstName", user.getFirstName());
+	userJSON.put("lastName", user.getLastName());
+	userJSON.put("login", user.getLogin());
+	return userJSON;
+    }
+
+    /**
+     * Creates a list of users out of string with comma-delimited user IDs.
+     */
+    private List<User> parseUserList(HttpServletRequest request, String paramName) {
+	IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
+		.getServletContext());
+	String userIdList = request.getParameter(paramName);
+	String[] userIdArray = userIdList.split(",");
+	List<User> result = new ArrayList<User>(userIdArray.length);
+	for (String userId : userIdArray) {
+	    if (!StringUtils.isBlank(userId)) {
+		User user = (User) userManagementService.findById(User.class, Integer.valueOf(userId));
+		result.add(user);
+	    }
+	}
+	return result;
     }
 }

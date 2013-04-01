@@ -116,7 +116,7 @@ public class ContributeActivityDTO {
 	contributeEntries.add(entry);
     }
 
-    class ContributeEntry {
+    public class ContributeEntry {
 	private Boolean isRequired;
 	private Integer contributionType;
 	private String url;

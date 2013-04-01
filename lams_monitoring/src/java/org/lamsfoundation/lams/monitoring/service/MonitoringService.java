@@ -86,6 +86,7 @@ import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
+import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.dto.LearnerProgressBatchDTO;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -1956,6 +1957,18 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		    new Object[] { lessonID }), FlashMessage.ERROR);
 	}
 	return flashMessage.serializeMessage();
+    }
+
+    public List<ContributeActivityDTO> getAllContributeActivityDTO(Long lessonID) {
+	List<ContributeActivityDTO> result = null;
+	Lesson lesson = lessonDAO.getLesson(lessonID);
+	if (lesson != null) {
+	    ContributeActivitiesProcessor processor = new ContributeActivitiesProcessor(lesson.getLearningDesign(),
+		    lessonID, activityDAO, lamsCoreToolService);
+	    processor.parseLearningDesign();
+	    result = processor.getMainActivityList();
+	}
+	return result;
     }
 
     /**

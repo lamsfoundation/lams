@@ -13,11 +13,14 @@
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
 	<script type="text/javascript" src="includes/javascript/monitorLesson.js"></script>
 	<script type="text/javascript">
 		var userId = '<lams:user property="userID"/>';
-		var lessonId = ${param.lessonID};
-		var ldId = ${ldId};
+		var lessonId = ${lesson.lessonID};
+		var ldId = ${lesson.learningDesignID};
+		var lessonStateId = ${lesson.lessonStateID};
+		var createDateTimeStr = '${lesson.createDateTimeStr}';
 		
 		var LAMS_URL = '<lams:LAMSURL/>';
 		
@@ -33,6 +36,30 @@
 		var CLOSE_BUTTON_LABEL = '<fmt:message key="button.close"/>';
 		var LEARNER_FINISHED_COUNT_LABEL = '<fmt:message key="learner.finished.count"/>';
 		var LEARNER_FINISHED_DIALOG_TITLE_LABEL = '<fmt:message key="learner.finished.dialog.title"/>';
+		var LESSON_PRESENCE_ENABLE_ALERT_LABEL = '<fmt:message key="lesson.enable.presence.alert"/>';
+		var LESSON_PRESENCE_DISABLE_ALERT_LABEL = '<fmt:message key="lesson.disable.presence.alert"/>';
+		var LESSON_IM_ENABLE_ALERT_LABEL = '<fmt:message key="lesson.enable.im.alert"/>';
+		var LESSON_IM_DISABLE_ALERT_LABEL = '<fmt:message key="lesson.disable.im.alert"/>';
+		var LESSON_REMOVE_ALERT_LABEL = '<fmt:message key="lesson.remove.alert"/>';
+		var LESSON_REMOVE_DOUBLECHECK_ALERT_LABEL = '<fmt:message key="lesson.remove.doublecheck.alert"/>';
+		var LESSON_STATE_CREATED_LABEL = '<fmt:message key="lesson.state.created"/>';
+		var LESSON_STATE_SCHEDULED_LABEL = '<fmt:message key="lesson.state.scheduled"/>';
+		var LESSON_STATE_STARTED_LABEL = '<fmt:message key="lesson.state.started"/>';
+		var LESSON_STATE_SUSPENDED_LABEL = '<fmt:message key="lesson.state.suspended"/>';
+		var LESSON_STATE_FINISHED_LABEL = '<fmt:message key="lesson.state.finished"/>';
+		var LESSON_STATE_ARCHIVED_LABEL = '<fmt:message key="lesson.state.archived"/>';
+		var LESSON_STATE_REMOVED_LABEL = '<fmt:message key="lesson.state.removed"/>';
+		var LESSON_STATE_ACTION_DISABLE_LABEL = '<fmt:message key="lesson.state.action.disable"/>';
+		var LESSON_STATE_ACTION_ACTIVATE_LABEL = '<fmt:message key="lesson.state.action.activate"/>';
+		var LESSON_STATE_ACTION_REMOVE_LABEL = '<fmt:message key="lesson.state.action.remove"/>';
+		var LESSON_STATE_ACTION_ARCHIVE_LABEL = '<fmt:message key="lesson.state.action.archive"/>';
+		var LESSON_ERROR_SCHEDULE_DATE_LABEL = '<fmt:message key="error.lesson.schedule.date"/>';
+		var LESSON_EDIT_CLASS_LABEL = '<fmt:message key="button.edit.class"/>';
+		var LESSON_GROUP_DIALOG_CLASS_LABEL = '<fmt:message key="lesson.group.dialog.class"/>';
+		var LESSON__LABEL = '<fmt:message key=""/>';
+		var LESSON__LABEL = '<fmt:message key=""/>';
+		var LESSON__LABEL = '<fmt:message key=""/>';
+		var LESSON__LABEL = '<fmt:message key=""/>';
 		
 		$(document).ready(function(){
 			$('#tabs').tabs();
@@ -40,6 +67,7 @@
 			initLessonTab();
 			initSequenceTab();
 			initLearnersTab();
+			refreshMonitor();
 		});
 	</script>
 </lams:head>
@@ -58,11 +86,188 @@
 	
 	<!-- Tab contents -->
 	
-	<div id="tabLesson" class="tabContent">
-
+	<div id="tabLesson">
+		<table id="tabLessonTable">
+			<tr>
+				<td class="fieldLabel">
+				</td>
+				<td class="topButtonsContainer">
+					<a target="_blank" class="button" title="<fmt:message key='button.help.tooltip'/>"
+					   href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringlesson">
+					<fmt:message key="button.help"/></a>
+					<a class="button" title="<fmt:message key='button.refresh.tooltip'/>"
+					   href="#" onClick="javascript:refreshMonitor()">
+					<fmt:message key="button.refresh"/></a>
+				</td>
+			</tr>
+			<tr>
+				<td class="fieldLabel">
+					<fmt:message key="lesson.name"/>
+				</td>
+				<td>
+					<c:out value="${lesson.lessonName}" />
+				</td>
+			</tr>
+			<tr>
+				<td class="fieldLabel">
+					<fmt:message key="lesson.description"/>
+				</td>
+				<td>
+					<c:out value="${lesson.lessonDescription}" />
+				</td>
+			</tr>
+			<tr>
+				<td class="fieldLabel">
+					<fmt:message key="lesson.state"/>
+				</td>
+				<td id="lessonStateLabel"></td>
+			<tr>
+				<td class="fieldLabel">
+					<fmt:message key="lesson.learners"/>
+				</td>
+				<td id="learnersStartedPossibleCell"></td>
+			</tr>
+			<tr>
+				<td class="fieldLabel">
+					<fmt:message key="lesson.class"/>
+				</td>
+				<td>
+					${lesson.organisationName}
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="sectionHeader">
+					<fmt:message key="lesson.manage"/>
+				</td>
+			</tr>
+			<tr>
+				<td class="fieldLabel">
+					<fmt:message key="lesson.class"/>
+				</td>
+				<td>
+					<a class="button lessonManageField" href="#"
+					   onClick="javascript:showLessonLearnersDialog()"
+					   title='<fmt:message key="button.view.learners.tooltip"/>'>
+					   <fmt:message key="button.view.learners"/>
+					</a>
+					<a class="button lessonManageField" href="#"
+					   onClick="javascript:showClassDialog()"
+					   title='<fmt:message key="button.edit.class.tooltip"/>'>
+					   <fmt:message key="button.edit.class"/>
+					</a>
+					<a id="openImButton" class="button" href="#"
+					   onClick="javascript:openChatWindow()"
+						<c:if test="${not lesson.learnerImAvailable}">
+							style="display: none"
+						</c:if>
+						>
+					   <fmt:message key="button.open.im"/>
+				    </a>
+				</td>
+			</tr>
+			<tr>
+				<td class="fieldLabel">
+					<fmt:message key="lesson.change.state"/>
+				</td>
+				<td>
+					<select id="lessonStateField" class="lessonManageField">
+						<option value="-1"><fmt:message key="lesson.select.state"/></option>
+					</select>
+					<a class="button" href="#"
+					   onClick="javascript:changeLessonState()"
+					   title='<fmt:message key="lesson.change.state.tooltip"/>'>
+					   <fmt:message key="button.apply"/>
+				    </a>
+				</td>
+			</tr>
+			<tr>
+				<td class="fieldLabel">
+					<fmt:message key="lesson.start"/>
+				</td>
+				<td id="lessonStartDateCell">
+					<span id="lessonStartDateSpan" class="lessonManageField"></span>
+					<input id="scheduleDatetimeField" class="lessonManageField"/>
+					<a id="scheduleLessonButton" class="button lessonManageField" href="#"
+					   onClick="javascript:scheduleLesson()"
+					   title='<fmt:message key="button.schedule.tooltip"/>'>
+					   <fmt:message key="button.schedule"/>
+					</a>
+					<a id="startLessonButton" class="button" href="#"
+					   onClick="javascript:startLesson()"
+					   title='<fmt:message key="button.start.now.tooltip"/>'>
+					   <fmt:message key="button.start.now"/>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				</td>
+				<td>
+					<input type="checkbox" id="exportAvailableField"
+						<c:if test="${lesson.learnerExportAvailable}">
+							checked="checked"
+						</c:if> 
+					/><fmt:message key="lesson.enable.portfolio"/><br />
+					<input type="checkbox" id="presenceAvailableField"
+						<c:if test="${lesson.learnerPresenceAvailable}">
+							checked="checked"
+						</c:if> 
+					/><fmt:message key="lesson.enable.presence"/><br />
+					<input type="checkbox" id="imAvailableField"
+						<c:if test="${not lesson.learnerPresenceAvailable}">
+							disabled="disabled"
+						</c:if>
+						<c:if test="${lesson.learnerImAvailable}">
+							checked="checked"
+						</c:if> 
+					/><fmt:message key="lesson.enable.im"/>
+				</td>
+			</tr>
+			<c:if test="${not empty contributeActivities}">
+				<tr>
+					<td colspan="2" class="sectionHeader">
+						<fmt:message key="lesson.required.tasks"/>
+					</td>
+				</tr>
+				<c:forEach var="activity" items="${contributeActivities}">
+					<tr>
+						<td colspan="2" class="contributeActivityCell">
+							<c:out value="${activity.title}" />
+						</td>
+					</tr>
+					<c:forEach var="entry" items="${activity.contributeEntries}">
+						<c:if test="${entry.isRequired}">
+							<tr>
+								<td colspan="2" class="contributeEntryCell">
+									<c:choose>
+										<c:when test="${entry.contributionType eq 2}">
+											<fmt:message key="lesson.task.define.later"/>
+										</c:when>
+										<c:when test="${entry.contributionType eq 3}">
+											<fmt:message key="lesson.task.gate"/>
+										</c:when>
+										<c:when test="${entry.contributionType eq 6}">
+											<fmt:message key="lesson.task.grouping"/>
+										</c:when>
+										<c:when test="${entry.contributionType eq 9}">
+											<fmt:message key="lesson.task.branching"/>
+										</c:when>
+									</c:choose>
+									<a href="#" class="button"
+									   onClick="javascript:openWindow('${entry.URL}','ContributeActivity', 800, 600)"
+									   title='<fmt:message key="button.task.go.tooltip"/>'>
+									   <fmt:message key="button.task.go"/>
+									</a>
+								</td>
+							</tr>
+						</c:if>
+					</c:forEach>
+				</c:forEach>
+			</c:if>
+		</table>
 	</div>
 	
-	<div id="tabSequence" class="tabContent">
+	<div id="tabSequence">
 		<div class="topButtonsContainer">
 			<a target="_blank" class="button" title="<fmt:message key='button.help.tooltip'/>"
 			 href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringsequence">
@@ -72,25 +277,52 @@
 			 <fmt:message key="button.refresh"/></a>
 			 <a class="button" title="<fmt:message key='button.export.tooltip'/>"
 			 href="#"
-			 onClick="javascript:openWindow('<lams:LAMSURL/>learning/exportWaitingPage.jsp?mode=teacher&lessonID=${param.lessonID}', '<fmt:message key="button.export"/>', 640, 240)">
+			 onClick="javascript:openWindow('<lams:LAMSURL/>learning/exportWaitingPage.jsp?mode=teacher&lessonID=${lesson.lessonID}', '<fmt:message key="button.export"/>', 640, 240)">
 			 <fmt:message key="button.export"/></a>
 		</div>
 		<div id="sequenceCanvas"></div>
 		<div id="completedLearnersContainer" title="<fmt:message key='force.complete.end.lesson.tooltip' />">
 			<img id="completedLearnersDoorIcon" src="<lams:LAMSURL/>images/icons/door_open.png" />
 		</div>
-		<div id="learnerGroupDialog" class="dialogContainer">
-			<div id="learnerGroupListTitle">
-				<fmt:message key="learner.group.list.title"/>
-				<span id="sortLearnerGroupListButton"
-					  title="<fmt:message key='learner.group.sort.button'/>">▲</span>
-			</div>
-			<div id="learnerGroupList"></div>
-		</div>
+
 	</div>
 	
-	<div id="tabLearners" class="tabContent">
+	<div id="tabLearners">
 			
+	</div>
+	
+	<!-- Inner dialog placeholders -->
+	
+	<div id="learnerGroupDialog" class="dialogContainer">
+		<div class="dialogTitle">
+			<fmt:message key="learner.group.list.title"/>
+			<span id="learnerGroupSortButton" class="dialogListSortButton"
+				  title="<fmt:message key='learner.group.sort.button'/>">▲</span>
+		</div>
+		<div id="learnerGroupList" class="dialogList"></div>
+	</div>
+		
+	<div id="classDialog" class="dialogContainer">
+		<table id="classDialogTable">
+			<tr>
+				<td class="dialogTitle">
+					<fmt:message key="lesson.learners"/>
+					<span id="classLearnerSortButton" class="dialogListSortButton"
+				  		  title="<fmt:message key='learner.group.sort.button'/>">▲</span>
+				</td>
+				<td class="dialogTitle">
+					<fmt:message key="lesson.monitors"/>
+					<span id="classMonitorSortButton" class="dialogListSortButton"
+				  		  title="<fmt:message key='learner.group.sort.button'/>">▲</span>
+				</td>
+			</tr>
+			<tr>
+				<td id="classLearnerList" class="dialogList">
+				</td>
+				<td id="classMonitorList" class="dialogList">
+				</td>
+			</tr>
+		</table>
 	</div>
 </div>
 </body>

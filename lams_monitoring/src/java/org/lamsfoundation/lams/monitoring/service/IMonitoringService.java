@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorE
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
+import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -555,7 +556,9 @@ public interface IMonitoringService {
      * @throws IOException
      */
     public String getAllContributeActivities(Long lessonID) throws IOException, LearningDesignProcessorException;
-
+    
+    public List<ContributeActivityDTO> getAllContributeActivityDTO(Long lessonID);
+    
     /**
      * This method returns the url associated with the activity in the
      * monitoring enviornment. This is the URL that opens up when the
