@@ -154,12 +154,6 @@
 			</filterset>
 		</copy>
 		
-		<copy todir="${build.deploy.sql}/updatescripts" overwrite="true">
-			<fileset dir="${db.scripts}/updatescripts" erroronmissingdir="false">
-				<include name="*.sql" />
-			</fileset>
-		</copy>
-		
 		<echo>${ant.project.name}: Copying Tool language files</echo>
 		<copy todir="${build.deploy.language}" overwrite="true">
 			<fileset dir="${conf.language.dir}">
@@ -195,7 +189,6 @@
 			toolVersion="${tool.version}"
 			hideTool="${tool.hide}"
 			minServerVersionNumber="${min.server.version.number}"
-			toolUpdateScriptPath="${build.deploy.sql}/updatescripts/updateTo${tool.version}.sql"
 			toolTablesScriptPath="${build.deploy.sql}/${tool.build.sql.create}" 
 			toolTablesDeleteScriptPath="${build.deploy.sql}/${tool.build.sql.drop}" 
 			toolActivityInsertScriptPath="${build.deploy.sql}/activity_insert.sql" 
