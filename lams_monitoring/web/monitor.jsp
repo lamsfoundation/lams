@@ -273,7 +273,7 @@
 			 href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringsequence">
 			 <fmt:message key="button.help"/></a>
 			 <a class="button" title="<fmt:message key='button.refresh.tooltip'/>"
-			 href="#" onClick="javascript:refreshSequenceCanvas()">
+			 href="#" onClick="javascript:refreshMonitor()">
 			 <fmt:message key="button.refresh"/></a>
 			 <a class="button" title="<fmt:message key='button.export.tooltip'/>"
 			 href="#"
