@@ -474,14 +474,4 @@
   <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
  <message-resources parameter="org.lamsfoundation.lams.tool.qa.ApplicationResources"/>
 
-<!-- StrutsTestCase doesn't support tile well at the moment, Have to be 
-commented out for testing-->
-<plug-in className="org.apache.struts.tiles.TilesPlugin">
-	<set-property property="definitions-config"
-		value="/WEB-INF/tiles-defs.xml" />
-	<set-property property="definitions-debug" value="0" />
-	<set-property property="definitions-parser-details" value="0" />
-	<set-property property="definitions-parser-validate" value="true" />
-</plug-in>
-
 </struts-config>
