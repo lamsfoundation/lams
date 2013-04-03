@@ -288,7 +288,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 	item.setSequenceId(maxSeq);
 
-	String title = WebUtil.readStrParam(request, KalturaConstants.PARAM_ITEM_TITLE);
+	String title = WebUtil.readStrParam(request, KalturaConstants.PARAM_ITEM_TITLE, true);
 	if (StringUtils.isBlank(title)) {
 	    String itemLocalized = service.getLocalisedMessage("label.authoring.item", null);
 	    title = itemLocalized + " " + maxSeq;

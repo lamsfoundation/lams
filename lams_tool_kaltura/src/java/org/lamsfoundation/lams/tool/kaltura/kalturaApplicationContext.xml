@@ -42,6 +42,7 @@
 		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		   		<property name="kalturaOutputFactory"><ref bean="kalturaOutputFactory"/></property>
 		   		<property name="repositoryService"><ref bean="repositoryService"/></property>
+		   		<property name="messageService"><ref bean="kalturaMessageService"/></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">

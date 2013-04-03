@@ -66,6 +66,8 @@
 			alert('<fmt:message key="error.there.was.error"/>: ' + kSession.message);
 			return;
 		}
+		
+		kClient.setKs(kSession);
 			
 		//Prepare variables to be passed to embedded flash object.
 		var flashVars = {
@@ -121,8 +123,7 @@
 						
 					addItem(entryId, title, duration);
 				}, 
-				entryId,
-				100
+				entryId
 			);
 		}
 	}
@@ -223,7 +224,6 @@
 	window.onresize = resizeIframe;
 
 </script>
-
 
 <!-- ========== Basic Tab ========== -->
 <table cellpadding="0">
