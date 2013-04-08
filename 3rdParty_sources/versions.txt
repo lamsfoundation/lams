@@ -7,6 +7,8 @@ This project contains following versions:
 
 aspirin 0.8.03.201003071132
 
+batik 1.7.0
+
 CKEditor 3.6.2
 
 Commons HttpClient 3.0
