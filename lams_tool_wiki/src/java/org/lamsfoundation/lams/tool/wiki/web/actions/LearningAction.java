@@ -37,6 +37,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -137,7 +138,10 @@ public class LearningAction extends WikiPageAction {
 	    wiki.setContentInUse(new Boolean(true));
 	    wikiService.saveOrUpdateWiki(wiki);
 	}
-
+	
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
+		.getServletContext());
+	
 	// check runOffline
 	if (wiki.isRunOffline()) {
 	    return mapping.findForward("runOffline");
@@ -326,7 +330,10 @@ public class LearningAction extends WikiPageAction {
 	if (notebookEntry != null) {
 	    lrnForm.setEntryText(notebookEntry.getEntry());
 	}
-
+	
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(lrnForm.getToolSessionID(), request, getServlet()
+		.getServletContext());
+	
 	return mapping.findForward("notebook");
     }
 

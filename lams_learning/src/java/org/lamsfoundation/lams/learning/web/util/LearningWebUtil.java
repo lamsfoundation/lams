@@ -35,8 +35,10 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
 import org.lamsfoundation.lams.learning.web.action.ActivityAction;
+import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -136,7 +138,7 @@ public class LearningWebUtil {
 
 	    if (learnerProgressId != null) {
 		learnerProgress = learnerService.getProgressById(new Long(learnerProgressId));
-		if (learnerProgress != null && LearningWebUtil.log.isDebugEnabled()) {
+		if ((learnerProgress != null) && LearningWebUtil.log.isDebugEnabled()) {
 		    LearningWebUtil.log.debug("getLearnerProgress: found progress via progress id");
 		}
 	    }
@@ -144,16 +146,16 @@ public class LearningWebUtil {
 	}
 
 	if (learnerProgress == null) {
-	    Integer learnerId = getUserId();
-	    Activity act = getActivityFromRequest(request, learnerService);
+	    Integer learnerId = LearningWebUtil.getUserId();
+	    Activity act = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	    Lesson lesson = learnerService.getLessonByActivity(act);
 	    learnerProgress = learnerService.getProgress(learnerId, lesson.getLessonId());
-	    if (learnerProgress != null && LearningWebUtil.log.isDebugEnabled()) {
+	    if ((learnerProgress != null) && LearningWebUtil.log.isDebugEnabled()) {
 		LearningWebUtil.log.debug("getLearnerProgress: found progress via learner id and activity");
 	    }
 	}
 
-	putLearnerProgressInRequest(request, learnerProgress);
+	LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
 	return learnerProgress;
     }
 
@@ -202,10 +204,10 @@ public class LearningWebUtil {
      * Grouping actions. Calls the learningService to actually complete the activity and progress.
      * 
      * @param redirect
-     *                Should this call redirect to the next screen (true) or use a forward (false)
+     *            Should this call redirect to the next screen (true) or use a forward (false)
      * @param windowName
-     *                Name of the window that triggered this code. Normally LearnerActivity (the popup window) or
-     *                lWindow (normal learner window)
+     *            Name of the window that triggered this code. Normally LearnerActivity (the popup window) or lWindow
+     *            (normal learner window)
      * @throws UnsupportedEncodingException
      * @throws InterruptedException
      * 
@@ -238,7 +240,7 @@ public class LearningWebUtil {
 	    }
 	}
 
-	if (currentActivity != null && currentActivity.isFloating()) {
+	if ((currentActivity != null) && currentActivity.isFloating()) {
 	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
 	}
 
@@ -259,13 +261,13 @@ public class LearningWebUtil {
     public static void setupProgressInRequest(ActivityForm activityForm, HttpServletRequest request,
 	    LearnerProgress learnerProgress) {
 
-	putLearnerProgressInRequest(request, learnerProgress);
+	LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
 
 	// Calculate the progress summary. On join this method gets called twice, and we
 	// only want to calculate once
 	String progressSummary = activityForm.getProgressSummary();
 	if (progressSummary == null) {
-	    progressSummary = getProgressSummary(learnerProgress);
+	    progressSummary = LearningWebUtil.getProgressSummary(learnerProgress);
 	    activityForm.setProgressSummary(progressSummary);
 	}
 
@@ -292,13 +294,13 @@ public class LearningWebUtil {
     public static void setupProgressInRequest(DynaActionForm actionForm, HttpServletRequest request,
 	    LearnerProgress learnerProgress) {
 
-	putLearnerProgressInRequest(request, learnerProgress);
+	LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
 
 	// Calculate the progress summary. On join this method gets called twice, and we
 	// only want to calculate once
 	String progressSummary = (String) actionForm.get("progressSummary");
 	if (progressSummary == null) {
-	    progressSummary = getProgressSummary(learnerProgress);
+	    progressSummary = LearningWebUtil.getProgressSummary(learnerProgress);
 	    actionForm.set("progressSummary", progressSummary);
 	}
 
@@ -323,10 +325,6 @@ public class LearningWebUtil {
 	if (learnerProgress == null) {
 	    progressSummary.append("attempted=&completed=&current=");
 	    progressSummary.append("&lessonID=");
-	    Lesson currentLesson = learnerProgress.getLesson();
-	    if (currentLesson != null) {
-		progressSummary.append(currentLesson.getLessonId());
-	    }
 	} else {
 	    progressSummary.append("attempted=");
 	    boolean first = true;
@@ -366,7 +364,7 @@ public class LearningWebUtil {
 	    Activity activity, boolean defaultURL, boolean isFloating) {
 	ActivityURL activityURL = new ActivityURL();
 	activityURL.setType(activity.getClass().getSimpleName());
-	
+
 	String url = activityMapping.getActivityURL(activity);
 	activityURL.setUrl(url);
 	activityURL.setActivityId(activity.getActivityId());
@@ -381,5 +379,41 @@ public class LearningWebUtil {
 	activityURL.setFloating(isFloating);
 	activityURL.setDefaultURL(defaultURL);
 	return activityURL;
+    }
+
+    /**
+     * Finds activity position within Learning Design and stores it as request attribute.
+     */
+    public static ActivityPositionDTO putActivityPositionInRequest(Long activityId, HttpServletRequest request,
+	    ServletContext context) {
+	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
+	ILearnerService learnerService = (ILearnerService) wac.getBean("learnerService");
+	if (learnerService == null) {
+	    LearningWebUtil.log.warn("Can not set activity position, no Learner service in servlet context.");
+	    return null;
+	}
+	ActivityPositionDTO positionDTO = learnerService.getActivityPosition(activityId);
+	if (positionDTO != null) {
+	    request.setAttribute(AttributeNames.ATTR_ACTIVITY_POSITION, positionDTO);
+	}
+	return positionDTO;
+    }
+
+    /**
+     * Finds activity position within Learning Design and stores it as request attribute.
+     */
+    public static ActivityPositionDTO putActivityPositionInRequestByToolSessionId(Long toolSessionId,
+	    HttpServletRequest request, ServletContext context) {
+	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(context);
+	ILearnerService learnerService = (ILearnerService) wac.getBean("learnerService");
+	if (learnerService == null) {
+	    LearningWebUtil.log.warn("Can not set activity position, no Learner service in servlet context.");
+	    return null;
+	}
+	ActivityPositionDTO positionDTO = learnerService.getActivityPositionByToolSessionId(toolSessionId);
+	if (positionDTO != null) {
+	    request.setAttribute(AttributeNames.ATTR_ACTIVITY_POSITION, positionDTO);
+	}
+	return positionDTO;
     }
 }

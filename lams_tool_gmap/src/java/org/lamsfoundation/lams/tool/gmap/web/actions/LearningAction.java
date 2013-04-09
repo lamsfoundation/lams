@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -124,6 +125,9 @@ public class LearningAction extends LamsDispatchAction {
 			gmapService.saveOrUpdateGmap(gmap);
 		}
 
+		LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
+			.getServletContext());
+		
 		// check runOffline
 		if (gmap.isRunOffline()) {
 			return mapping.findForward("runOffline");
@@ -307,6 +311,9 @@ public class LearningAction extends LamsDispatchAction {
 		if (notebookEntry != null) {
 			lrnForm.setEntryText(notebookEntry.getEntry());
 		}
+
+        	LearningWebUtil.putActivityPositionInRequestByToolSessionId(lrnForm.getToolSessionID(), request, getServlet()
+        		.getServletContext());
 
 		return mapping.findForward("notebook");
 	}

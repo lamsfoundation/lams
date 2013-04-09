@@ -49,6 +49,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.events.DeliveryMethodMail;
+import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -209,6 +211,10 @@ public class LearningAction extends Action {
 	} else {
 	    sessionMap.put(SurveyConstants.PARAM_RUN_OFFLINE, false);
 	}
+
+	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
+		request, getServlet().getServletContext());
+	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	// check if there is submission deadline
 	Date submissionDeadline = survey.getSubmissionDeadline();

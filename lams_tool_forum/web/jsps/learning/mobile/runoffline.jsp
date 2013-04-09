@@ -55,7 +55,16 @@
 			<c:otherwise>
 				<a href="#nogo"  name="finish" id="finish"
 					onclick="submitFinish();" data-role="button" data-icon="arrow-r" data-theme="b">
-					<span class="nextActivity"><fmt:message key="label.finish" /></span>
+					<span class="nextActivity">
+						<c:choose>
+		 					<c:when test="${sessionMap.activityPosition.last}">
+		 						<fmt:message key="label.submit" />
+		 					</c:when>
+		 					<c:otherwise>
+		 		 				<fmt:message key="label.finish" />
+		 					</c:otherwise>
+		 				</c:choose>
+			 		</span>
 				</a>
 			</c:otherwise>
 		</c:choose>

@@ -85,7 +85,16 @@
 			</c:when>
 			<c:otherwise>
 				<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="javascript:finishSession()" styleClass="button">
-					<span class="nextActivity"><fmt:message key="label.learning.finished" /></span>
+					<span class="nextActivity">
+						<c:choose>
+		 					<c:when test="${sessionMap.activityPosition.last}">
+		 						<fmt:message key="label.learning.submit" />
+		 					</c:when>
+		 					<c:otherwise>
+		 		 				<fmt:message key="label.learning.finished" />
+		 					</c:otherwise>
+		 				</c:choose>
+		 			</span>
 				</html:link>
 			</c:otherwise>
 		</c:choose>

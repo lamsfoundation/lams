@@ -44,6 +44,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -189,6 +191,10 @@ public class LearningAction extends Action {
 	commonCartridge.setContentInUse(true);
 	commonCartridge.setDefineLater(false);
 	service.saveOrUpdateCommonCartridge(commonCartridge);
+
+	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
+		request, getServlet().getServletContext());
+	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	// add run offline support
 	if (commonCartridge.getRunOffline()) {

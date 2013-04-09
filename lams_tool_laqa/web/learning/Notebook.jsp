@@ -60,7 +60,16 @@
 			<div class="space-bottom-top align-right">
 				<html:link href="#nogo" property="submitReflection" styleId="finishButton"
 					onclick="javascript:submitMethod('submitReflection');return false" styleClass="button">
-					<span class="nextActivity"><fmt:message key="button.endLearning" /></span>
+					<span class="nextActivity">					
+						<c:choose>
+		 					<c:when test="${sessionMap.activityPosition.last}">
+		 						<fmt:message key="button.submit" />
+		 					</c:when>
+		 					<c:otherwise>
+		 		 				<fmt:message key="button.endLearning" />
+		 					</c:otherwise>
+		 				</c:choose>
+		 			</span>
 				</html:link>
 			</div>
 		</div>

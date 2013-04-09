@@ -184,7 +184,10 @@ public class GroupingAction extends LamsDispatchAction {
 	request.setAttribute(GroupingAction.LOCAL_FILES, Boolean.FALSE);
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 	request.setAttribute(GroupingAction.FINISHED_BUTTON, new Boolean(mode == null || !mode.isTeacher()));
-
+	
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	LearningWebUtil.putActivityPositionInRequest(activityId, request, getServlet().getServletContext());
+	
 	return mapping.findForward(GroupingAction.SHOW_GROUP);
     }
 

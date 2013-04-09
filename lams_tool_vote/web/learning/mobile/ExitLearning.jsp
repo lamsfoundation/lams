@@ -130,7 +130,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<span class="ui-finishbtn-right">
 				<a href="#" name="learnerFinished" id="finishButton"
 					onclick="javascript:submitMethod('learnerFinished');return false" data-role="button" data-icon="arrow-r" data-theme="b">
-					<span class="nextActivity"><fmt:message key="label.finished" /></span>
+					<span class="nextActivity">
+						<c:choose>
+							<c:when test="${activityPosition.last}">
+								<fmt:message key="button.submitActivity" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.endLearning" />
+							</c:otherwise>
+						</c:choose>
+					</span>
 				</a>
 			</span>
 		</c:if>

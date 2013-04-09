@@ -43,7 +43,16 @@
 				<html:hidden property="toolSessionID" />
 	
 				<a href="#nogo" id="finishButton" onclick="submitForm('finish')" data-role="button" data-icon="arrow-r" data-theme="b">
-					<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
+					<span class="nextActivity">
+						<c:choose>
+							<c:when test="${activityPosition.last}">
+								<fmt:message key="button.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.finish" />
+							</c:otherwise>
+						</c:choose>
+					</span>
 				</a>
 			</html:form>
 		</c:if>

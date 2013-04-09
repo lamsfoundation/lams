@@ -63,7 +63,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
-
 /**
  * 
  * @author Ozgur Demirtas
@@ -101,207 +100,197 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * If the tool has a LockOnFinish flag, then the tool should lock learner's entries once they have completed the activity. 
  * If they return to the activity (e.g. via the progress bar) then the entries should be read only.
  * 
-   <!--Learning Starter Action: initializes the Learning module -->
-   <action 	path="/learningStarter" 
-   			type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
-   			name="McLearningForm" 
-	      	scope="request"
-	      	validate="false"
-	      	unknown="false"
-   			input="/learningIndex.jsp"> 
+ <!--Learning Starter Action: initializes the Learning module -->
+ <action 	path="/learningStarter" 
+ type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
+ name="McLearningForm" 
+ scope="request"
+ validate="false"
+ unknown="false"
+ input="/learningIndex.jsp"> 
 
-	  	<forward
-		    name="loadLearner"
-		    path="/learning/AnswersContent.jsp"
-		    redirect="false"
-	  	/>
+ <forward
+ name="loadLearner"
+ path="/learning/AnswersContent.jsp"
+ redirect="false"
+ />
 
-	  	<forward
-		    name="viewAnswers"
-		    path="/learning/ViewAnswers.jsp"
-		    redirect="false"
-	  	/>
+ <forward
+ name="viewAnswers"
+ path="/learning/ViewAnswers.jsp"
+ redirect="false"
+ />
 
-	  	<forward
-		    name="redoQuestions"
-		    path="/learning/RedoQuestions.jsp"
-		    redirect="false"
-	  	/>
-	  	
-	     <forward
-	        name="preview"
-	        path="/learning/Preview.jsp"
-		    redirect="false"
-	     />
+ <forward
+ name="redoQuestions"
+ path="/learning/RedoQuestions.jsp"
+ redirect="false"
+ />
 
-	  	<forward
-		    name="learningStarter"
-		    path="/learningIndex.jsp"
-		    redirect="false"
-	  	/>
-	  	
-	  	<forward
-		    name="defineLater"
-	        path="/learning/defineLater.jsp"
-		    redirect="false"
-	  	/>
+ <forward
+ name="preview"
+ path="/learning/Preview.jsp"
+ redirect="false"
+ />
 
-	  	<forward
-		    name="runOffline"
-	        path="/learning/RunOffline.jsp"
-		    redirect="false"
-	  	/>
+ <forward
+ name="learningStarter"
+ path="/learningIndex.jsp"
+ redirect="false"
+ />
 
-	  	<forward
-		    name="errorList"
-		    path="/McErrorBox.jsp"
-		    redirect="false"
-	  	/>
-	</action>  
+ <forward
+ name="defineLater"
+ path="/learning/defineLater.jsp"
+ redirect="false"
+ />
+
+ <forward
+ name="runOffline"
+ path="/learning/RunOffline.jsp"
+ redirect="false"
+ />
+
+ <forward
+ name="errorList"
+ path="/McErrorBox.jsp"
+ redirect="false"
+ />
+ </action>  
  *
  */
 
 /**
- *
- * Note:  Because of MCQ's learning reporting structure, Show Learner Report is always ON even if in authoring it is set to false.
+ * 
+ * Note: Because of MCQ's learning reporting structure, Show Learner Report is always ON even if in authoring it is set
+ * to false.
  */
 
 public class McLearningStarterAction extends Action implements McAppConstants {
-	static Logger logger = Logger.getLogger(McLearningStarterAction.class.getName());
+    static Logger logger = Logger.getLogger(McLearningStarterAction.class.getName());
 
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-  								throws IOException, ServletException, McApplicationException {
-		
-	    /*
-	     * By now, the passed tool session id MUST exist in the db through the calling of:
-	     * public void createToolSession(Long toolSessionId, Long toolContentId) by the container.
-	     * 
-	     * make sure this session exists in tool's session table by now.
-	     */
-		
-		McUtils.cleanUpSessionAbsolute(request);
-		
-		Map mapQuestionsContent= new TreeMap(new McComparator());
-		Map mapAnswers= new TreeMap(new McComparator());
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, McApplicationException {
 
-		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	/*
+	 * By now, the passed tool session id MUST exist in the db through the calling of:
+	 * public void createToolSession(Long toolSessionId, Long toolContentId) by the container.
+	 * 
+	 * make sure this session exists in tool's session table by now.
+	 */
 
-		McLearningForm mcLearningForm = (McLearningForm) form;
-		mcLearningForm.setMcService(mcService);
-    	mcLearningForm.setPassMarkApplicable(new Boolean(false).toString());
-		mcLearningForm.setUserOverPassMark(new Boolean(false).toString());
-		
+	McUtils.cleanUpSessionAbsolute(request);
 
-		ActionForward validateParameters=validateParameters(request, mcLearningForm, mapping);
-	    if (validateParameters != null)
-	    {
-	    	return validateParameters;
+	Map mapQuestionsContent = new TreeMap(new McComparator());
+	Map mapAnswers = new TreeMap(new McComparator());
+
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+
+	McLearningForm mcLearningForm = (McLearningForm) form;
+	mcLearningForm.setMcService(mcService);
+	mcLearningForm.setPassMarkApplicable(new Boolean(false).toString());
+	mcLearningForm.setUserOverPassMark(new Boolean(false).toString());
+
+	ActionForward validateParameters = validateParameters(request, mcLearningForm, mapping);
+	if (validateParameters != null) {
+	    return validateParameters;
+	}
+
+	SessionMap sessionMap = new SessionMap();
+	List sequentialCheckedCa = new LinkedList();
+	sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, sequentialCheckedCa);
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	mcLearningForm.setHttpSessionID(sessionMap.getSessionID());
+
+	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	mcLearningForm.setToolSessionID(new Long(toolSessionID).toString());
+
+	/*
+	 * by now, we made sure that the passed tool session id exists in the db as a new record
+	 * Make sure we can retrieve it and the relavent content
+	 */
+
+	McSession mcSession = mcService.retrieveMcSession(new Long(toolSessionID));
+
+	if (mcSession == null) {
+	    McUtils.cleanUpSessionAbsolute(request);
+	    return (mapping.findForward(McAppConstants.ERROR_LIST));
+	}
+
+	/*
+	 * find out what content this tool session is referring to
+	 * get the content for this tool session 
+	 * Each passed tool session id points to a particular content. Many to one mapping.
+	 */
+	McContent mcContent = mcSession.getMcContent();
+
+	if (mcContent == null) {
+	    McUtils.cleanUpSessionAbsolute(request);
+	    persistError(request, "error.content.doesNotExist");
+	    return (mapping.findForward(McAppConstants.ERROR_LIST));
+	}
+
+	/*
+	 * The content we retrieved above must have been created before in Authoring time. 
+	 * And the passed tool session id already refers to it.
+	 */
+
+	McLearnerStarterDTO mcLearnerStarterDTO = new McLearnerStarterDTO();
+	if (mcContent.isQuestionsSequenced()) {
+	    mcLearnerStarterDTO.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_SEQUENTIAL);
+	    mcLearningForm.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_SEQUENTIAL);
+	} else {
+	    mcLearnerStarterDTO.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_COMBINED);
+	    mcLearningForm.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_COMBINED);
+	}
+
+	/*  
+	 * Is there a deadline set?
+	 */
+
+	Date submissionDeadline = mcContent.getSubmissionDeadline();
+
+	if (submissionDeadline != null) {
+
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+	    mcLearnerStarterDTO.setSubmissionDeadline(submissionDeadline);
+
+	    // calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
+		request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
+		return mapping.findForward(McAppConstants.RUN_OFFLINE);
 	    }
-	    
-	    SessionMap sessionMap = new SessionMap();
-	    List sequentialCheckedCa= new LinkedList();
-	    sessionMap.put(QUESTION_AND_CANDIDATE_ANSWERS_KEY, sequentialCheckedCa);
-	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	    mcLearningForm.setHttpSessionID(sessionMap.getSessionID());
-	        
-	    String toolSessionID=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	    mcLearningForm.setToolSessionID(new Long(toolSessionID).toString());
-	    
-	    
-		/*
-		 * by now, we made sure that the passed tool session id exists in the db as a new record
-		 * Make sure we can retrieve it and the relavent content
-		 */
-		
-		McSession mcSession=mcService.retrieveMcSession(new Long(toolSessionID));
-	    
-	    if (mcSession == null)
-	    {
-	    	McUtils.cleanUpSessionAbsolute(request);
-			return (mapping.findForward(ERROR_LIST));
-	    }
+	}
 
-	    /*
-	     * find out what content this tool session is referring to
-	     * get the content for this tool session 
-	     * Each passed tool session id points to a particular content. Many to one mapping.
-	     */
-		McContent mcContent=mcSession.getMcContent();
-	    
-	    if (mcContent == null)
-	    {
-	    	McUtils.cleanUpSessionAbsolute(request);
-	    	persistError(request,"error.content.doesNotExist");
-	    	return (mapping.findForward(ERROR_LIST));
-	    }
+	/*
+	 * Is the tool activity been checked as Run Offline in the property inspector?
+	 */
+	mcLearnerStarterDTO.setToolActivityOffline(new Boolean(mcContent.isRunOffline()).toString());
+	mcLearnerStarterDTO.setActivityTitle(mcContent.getTitle());
+	request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 
-	    
-	    /*
-	     * The content we retrieved above must have been created before in Authoring time. 
-	     * And the passed tool session id already refers to it.
-	     */
-	    
-	    McLearnerStarterDTO mcLearnerStarterDTO= new McLearnerStarterDTO();
-	    if (mcContent.isQuestionsSequenced())
-		{
-			mcLearnerStarterDTO.setQuestionListingMode(QUESTION_LISTING_MODE_SEQUENTIAL);
-			mcLearningForm.setQuestionListingMode(QUESTION_LISTING_MODE_SEQUENTIAL);
-		}
-	    else
-	    {
-	    	mcLearnerStarterDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
-	    	mcLearningForm.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
-	    }
-	    
-	    /*  
-	     * Is there a deadline set?
-	     */
-	    
-	    Date submissionDeadline = mcContent.getSubmissionDeadline();
-		
-		if (submissionDeadline != null) {
-			
-			HttpSession ss = SessionManager.getSession();			
-			UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			TimeZone learnerTimeZone = learnerDto.getTimeZone();
-			Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
-			Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
-			mcLearnerStarterDTO.setSubmissionDeadline(submissionDeadline);
-		
-			//calculate whether submission deadline has passed, and if so forward to "runOffline"
-			if (currentLearnerDate.after(tzSubmissionDeadline)) {
-				request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
-				return mapping.findForward(RUN_OFFLINE);
-			}
-		}
-		
-	    /*
-	     * Is the tool activity been checked as Run Offline in the property inspector?
-	     */
-	    mcLearnerStarterDTO.setToolActivityOffline(new Boolean(mcContent.isRunOffline()).toString());
-	    mcLearnerStarterDTO.setActivityTitle(mcContent.getTitle());
-	    request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
-	    
-	    mcLearningForm.setToolContentID(mcContent.getMcContentId().toString());
-	    commonContentSetup(request, mcContent, mcService,mcLearningForm, toolSessionID);
-	    
- 	    /* find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that. */
-	    boolean isRunOffline=McUtils.isRunOffline(mcContent);
-	    if (isRunOffline == true)
-	    {
-			return (mapping.findForward(RUN_OFFLINE));
-	    }
+	mcLearningForm.setToolContentID(mcContent.getMcContentId().toString());
+	commonContentSetup(request, mcContent, mcService, mcLearningForm, toolSessionID);
 
-	    /* find out if the content is being modified at the moment. */
-	    boolean isDefineLater=McUtils.isDefineLater(mcContent);
-	    if (isDefineLater == true)
-	    {
-	    	return (mapping.findForward(DEFINE_LATER));
-	    }
+	/* find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that. */
+	boolean isRunOffline = McUtils.isRunOffline(mcContent);
+	if (isRunOffline == true) {
+	    return (mapping.findForward(McAppConstants.RUN_OFFLINE));
+	}
 
-	    
-    	/* Is the request for a preview by the author?
-    	Preview The tool must be able to show the specified content as if it was running in a lesson. 
+	/* find out if the content is being modified at the moment. */
+	boolean isDefineLater = McUtils.isDefineLater(mcContent);
+	if (isDefineLater == true) {
+	    return (mapping.findForward(McAppConstants.DEFINE_LATER));
+	}
+
+	/* Is the request for a preview by the author?
+	Preview The tool must be able to show the specified content as if it was running in a lesson. 
 		It will be the learner url with tool access mode set to ToolAccessMode.AUTHOR 
 		3 modes are:
 			author
@@ -309,55 +298,51 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 			learner
 		*/
 
-	    /*handle PREVIEW mode*/
-	    //String mode=mcLearningForm.getLearningMode();
-	    String mode=request.getParameter(MODE);
-	    
-	   	/* by now, we know that the mode is either teacher or learner
-    	 * check if the mode is teacher and request is for Learner Progress
-    	 */
-		String userId=request.getParameter(USER_ID);
-	    
-		if ((userId != null) && (mode.equals("teacher")))
-		{
-	    	
-			/* LEARNER_PROGRESS for jsp*/
-			mcLearningForm.setLearnerProgress(new Boolean(true).toString());
-			mcLearningForm.setLearnerProgressUserId(userId);
-			
-			McLearningAction mcLearningAction= new McLearningAction();
-			/* pay attention that this userId is the learner's userId passed by the request parameter.
-			 * It is differerent than USER_ID kept in the session of the current system user*/
-		    
-		    McQueUsr mcQueUsr=mcService.getMcUserBySession(new Long(userId), mcSession.getUid());
-		    if (mcQueUsr == null)
-		    {
-				logger.error("error.learner.required");
-				persistError(request,"error.learner.required");
-				logger.error("forwarding to: " + SIMPLE_LEARNING_ERROR);
-				return (mapping.findForward(SIMPLE_LEARNING_ERROR));
-		    }
-		    
-		    /* check whether the user's session really referrs to the session id passed to the url*/
-		    Long sessionUid=mcQueUsr.getMcSessionId();
-		    McSession mcSessionLocal=mcService.getMcSessionByUID(sessionUid);
+	/*handle PREVIEW mode*/
+	// String mode=mcLearningForm.getLearningMode();
+	String mode = request.getParameter(McAppConstants.MODE);
 
-		    toolSessionID=(String)mcLearningForm.getToolSessionID();
-		    
-		    if  ((mcSessionLocal ==  null) ||
-				 (mcSessionLocal.getMcSessionId().longValue() != new Long(toolSessionID).longValue()))
-		    {
-		        logger.error("error.learner.sessionId.inconsistent");
-		    }
-		    LearningUtil.saveFormRequestData(request, mcLearningForm, true);
-		    
-		    
-		    request.setAttribute(REQUEST_BY_STARTER, new Boolean (true).toString());
-		    return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
-		}
-    	
-		/* by now, we know that the mode is learner*/
-    	/*
+	/* by now, we know that the mode is either teacher or learner
+	* check if the mode is teacher and request is for Learner Progress
+	*/
+	String userId = request.getParameter(McAppConstants.USER_ID);
+
+	if ((userId != null) && (mode.equals("teacher"))) {
+
+	    /* LEARNER_PROGRESS for jsp*/
+	    mcLearningForm.setLearnerProgress(new Boolean(true).toString());
+	    mcLearningForm.setLearnerProgressUserId(userId);
+
+	    McLearningAction mcLearningAction = new McLearningAction();
+	    /* pay attention that this userId is the learner's userId passed by the request parameter.
+	     * It is differerent than USER_ID kept in the session of the current system user*/
+
+	    McQueUsr mcQueUsr = mcService.getMcUserBySession(new Long(userId), mcSession.getUid());
+	    if (mcQueUsr == null) {
+		McLearningStarterAction.logger.error("error.learner.required");
+		persistError(request, "error.learner.required");
+		McLearningStarterAction.logger.error("forwarding to: " + McAppConstants.SIMPLE_LEARNING_ERROR);
+		return (mapping.findForward(McAppConstants.SIMPLE_LEARNING_ERROR));
+	    }
+
+	    /* check whether the user's session really referrs to the session id passed to the url*/
+	    Long sessionUid = mcQueUsr.getMcSessionId();
+	    McSession mcSessionLocal = mcService.getMcSessionByUID(sessionUid);
+
+	    toolSessionID = mcLearningForm.getToolSessionID();
+
+	    if ((mcSessionLocal == null)
+		    || (mcSessionLocal.getMcSessionId().longValue() != new Long(toolSessionID).longValue())) {
+		McLearningStarterAction.logger.error("error.learner.sessionId.inconsistent");
+	    }
+	    LearningUtil.saveFormRequestData(request, mcLearningForm, true);
+
+	    request.setAttribute(McAppConstants.REQUEST_BY_STARTER, new Boolean(true).toString());
+	    return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
+	}
+
+	/* by now, we know that the mode is learner*/
+	/*
 	     * verify that userId does not already exist in the db.
 	     * If it does exist, that means, that user already responded to the content and 
 	     * his answers must be displayed  read-only
@@ -375,7 +360,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 
 	McQueUsr mcQueUsr = mcService.getMcUserBySession(new Long(userID.longValue()), mcSession.getUid());
 
-	request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
+	request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 
 	/* if the user's session id AND user id exists in the tool tables go to redo questions. */
 	if (mcQueUsr != null) {
@@ -385,8 +370,9 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 
 	    if (toolSessionID.equals(userSessionId)) {
 		McLearningAction mcLearningAction = new McLearningAction();
-		request.setAttribute(REQUEST_BY_STARTER, (Boolean.TRUE).toString());
-		return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
+		request.setAttribute(McAppConstants.REQUEST_BY_STARTER, (Boolean.TRUE).toString());
+		mcLearningAction.prepareViewAnswersData(mapping, mcLearningForm, request, getServlet().getServletContext());
+		return mapping.findForward(McAppConstants.VIEW_ANSWERS);
 	    }
 	} else if (mode.equals("teacher")) {
 	    McLearningAction mcLearningAction = new McLearningAction();
@@ -394,151 +380,134 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    mcLearningForm.setLearnerProgressUserId(userId);
 	    return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
 	}
-	request.setAttribute(MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
-	return (mapping.findForward(LOAD_LEARNER));
+	request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
+	return (mapping.findForward(McAppConstants.LOAD_LEARNER));
     }
-	
-	
-	/**
-	 * sets up question and candidate answers maps
-	 * commonContentSetup(HttpServletRequest request, McContent mcContent)
-	 * 
-	 * @param request
-	 * @param mcContent
+
+    /**
+     * sets up question and candidate answers maps commonContentSetup(HttpServletRequest request, McContent mcContent)
+     * 
+     * @param request
+     * @param mcContent
+     */
+    protected void commonContentSetup(HttpServletRequest request, McContent mcContent, IMcService mcService,
+	    McLearningForm mcLearningForm, String toolSessionID) {
+	McLearningStarterAction.logger.debug("dettingcommon content: ");
+	Map mapQuestionsContent = new TreeMap(new McComparator());
+
+	boolean randomize = mcContent.isRandomize();
+	McLearningStarterAction.logger.debug("randomize: " + randomize);
+
+	List<McLearnerAnswersDTO> listQuestionAndCandidateAnswersDTO = LearningUtil
+		.buildQuestionAndCandidateAnswersDTO(request, mcContent, randomize, mcService);
+
+	McLearningStarterAction.logger.debug("listQuestionAndCandidateAnswersDTO: "
+		+ listQuestionAndCandidateAnswersDTO);
+	request.setAttribute(McAppConstants.LIST_QUESTION_CANDIDATEANSWERS_DTO, listQuestionAndCandidateAnswersDTO);
+	McLearningStarterAction.logger.debug("LIST_QUESTION_CANDIDATEANSWERS_DTO: "
+		+ request.getAttribute(McAppConstants.LIST_QUESTION_CANDIDATEANSWERS_DTO));
+
+	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
+	mcGeneralLearnerFlowDTO.setTotalCountReached(new Boolean(false).toString());
+	mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(1));
+
+	// should we show the marks for each question - we show the marks if any of the questions
+	// have a mark > 1.
+	Boolean showMarks = LearningUtil.isShowMarksOnQuestion(listQuestionAndCandidateAnswersDTO);
+	mcGeneralLearnerFlowDTO.setShowMarks(showMarks.toString());
+
+	Boolean displayAnswers = mcContent.isDisplayAnswers();
+	mcGeneralLearnerFlowDTO.setDisplayAnswers(displayAnswers.toString());
+	McLearningStarterAction.logger.debug("MCQ displayAnswers: " + mcGeneralLearnerFlowDTO.getDisplayAnswers());
+
+	McLearningStarterAction.logger.debug("is tool reflective: " + mcContent.isReflect());
+	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
+	McLearningStarterAction.logger.debug("reflection subject: " + mcContent.getReflectionSubject());
+
+	String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
+	mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+
+	String userID = mcLearningForm.getUserID();
+	McLearningStarterAction.logger.debug("userID: " + userID);
+
+	McLearningStarterAction.logger.debug("attempt getting notebookEntry: ");
+	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
+		McAppConstants.MY_SIGNATURE, new Integer(userID));
+
+	McLearningStarterAction.logger.debug("notebookEntry: " + notebookEntry);
+
+	if (notebookEntry != null) {
+	    String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+	}
+
+	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
+	McLearningStarterAction.logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: "
+		+ request.getAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO));
+    }
+
+    protected ActionForward validateParameters(HttpServletRequest request, McLearningForm mcLearningForm,
+	    ActionMapping mapping) {
+	/*
+	* obtain and setup the current user's data 
+	*/
+
+	String userID = "";
+	HttpSession ss = SessionManager.getSession();
+	McLearningStarterAction.logger.debug("ss: " + ss);
+
+	if (ss != null) {
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    if ((user != null) && (user.getUserID() != null)) {
+		userID = user.getUserID().toString();
+		McLearningStarterAction.logger.debug("retrieved userId: " + userID);
+	    }
+	}
+
+	mcLearningForm.setUserID(userID);
+
+	/*
+	 * process incoming tool session id and later derive toolContentId from it. 
 	 */
-	protected void commonContentSetup(HttpServletRequest request, McContent mcContent, IMcService mcService, 
-	        McLearningForm mcLearningForm, String toolSessionID)
-	{
-	    logger.debug("dettingcommon content: ");
-		Map mapQuestionsContent= new TreeMap(new McComparator());
-		
-		boolean randomize=mcContent.isRandomize();
-		logger.debug("randomize: " + randomize);
-		
-		List<McLearnerAnswersDTO> listQuestionAndCandidateAnswersDTO=LearningUtil.buildQuestionAndCandidateAnswersDTO(request, mcContent, randomize, mcService);
-		
-		logger.debug("listQuestionAndCandidateAnswersDTO: " + listQuestionAndCandidateAnswersDTO);
-		request.setAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO, listQuestionAndCandidateAnswersDTO);
-		logger.debug("LIST_QUESTION_CANDIDATEANSWERS_DTO: " +  request.getAttribute(LIST_QUESTION_CANDIDATEANSWERS_DTO));
-		
-		McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO=LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
-		mcGeneralLearnerFlowDTO.setTotalCountReached(new Boolean(false).toString());
-		mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(1));
-		
-	    // should we show the marks for each question - we show the marks if any of the questions
-	    // have a mark > 1.
-	    Boolean showMarks = LearningUtil.isShowMarksOnQuestion(listQuestionAndCandidateAnswersDTO);
-	    mcGeneralLearnerFlowDTO.setShowMarks(showMarks.toString());
-
-		Boolean displayAnswers = mcContent.isDisplayAnswers();
-		mcGeneralLearnerFlowDTO.setDisplayAnswers(displayAnswers.toString());
-		logger.debug("MCQ displayAnswers: " + mcGeneralLearnerFlowDTO.getDisplayAnswers());
-	    
-	    logger.debug("is tool reflective: " + mcContent.isReflect());
-	    mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
-		logger.debug("reflection subject: " + mcContent.getReflectionSubject());
-		
-		String reflectionSubject=McUtils.replaceNewLines(mcContent.getReflectionSubject());
-		mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
-		
-		
-		String userID=mcLearningForm.getUserID();
-		logger.debug("userID: " +  userID);
-		
-		
-		logger.debug("attempt getting notebookEntry: ");
-		NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID),
-				CoreNotebookConstants.NOTEBOOK_TOOL,
-				MY_SIGNATURE, new Integer(userID));
-		
-        logger.debug("notebookEntry: " + notebookEntry);
-		
-		if (notebookEntry != null) {
-		    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
-		    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
-		}
-
-
-		
-		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
-		logger.debug("MC_GENERAL_LEARNER_FLOW_DTO: " +  request.getAttribute(MC_GENERAL_LEARNER_FLOW_DTO));
-	}
-	
-	
-	
-	protected ActionForward validateParameters(HttpServletRequest request, McLearningForm mcLearningForm, ActionMapping mapping)
-	{
-		/*
-	     * obtain and setup the current user's data 
-	     */
-		
-	    String userID = "";
-	    HttpSession ss = SessionManager.getSession();
-	    logger.debug("ss: " + ss);
-	    
-	    if (ss != null)
-	    {
-		    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		    if ((user != null) && (user.getUserID() != null))
-		    {
-		    	userID = user.getUserID().toString();
-			    logger.debug("retrieved userId: " + userID);
-		    }
+	String strToolSessionId = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	long toolSessionId = 0;
+	if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) {
+	    McLearningStarterAction.logger.error("error.toolSessionId.required");
+	} else {
+	    try {
+		toolSessionId = new Long(strToolSessionId).longValue();
+		McLearningStarterAction.logger.debug("passed TOOL_SESSION_ID : " + new Long(toolSessionId));
+	    } catch (NumberFormatException e) {
+		McLearningStarterAction.logger.error("error.sessionId.numberFormatException");
 	    }
-		
-	    mcLearningForm.setUserID(userID);
-	    
-	    /*
-	     * process incoming tool session id and later derive toolContentId from it. 
-	     */
-    	String strToolSessionId=request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	    long toolSessionId=0;
-	    if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) 
-	    {
-			logger.error("error.toolSessionId.required");
-	    }
-	    else
-	    {
-	    	try
-			{
-	    		toolSessionId=new Long(strToolSessionId).longValue();
-		    	logger.debug("passed TOOL_SESSION_ID : " + new Long(toolSessionId));
-			}
-	    	catch(NumberFormatException e)
-			{
-				logger.error("error.sessionId.numberFormatException");
-			}
-	    }
-	    
-	    /*mode can be learner, teacher or author */
-	    String mode=request.getParameter(MODE);
-	    logger.debug("mode: " + mode);
-	    
-	    if ((mode == null) || (mode.length() == 0)) 
-	    {
-			logger.error("error.mode.required");
-	    }
-	    
-	    if ((!mode.equals("learner")) && (!mode.equals("teacher")) && (!mode.equals("author")))
-	    {
-			logger.error("error.mode.invalid");
-	    }
-		logger.debug("session LEARNING_MODE set to:" + mode);
-	    
-	    return null;
 	}
 
-	
-	/**
+	/*mode can be learner, teacher or author */
+	String mode = request.getParameter(McAppConstants.MODE);
+	McLearningStarterAction.logger.debug("mode: " + mode);
+
+	if ((mode == null) || (mode.length() == 0)) {
+	    McLearningStarterAction.logger.error("error.mode.required");
+	}
+
+	if ((!mode.equals("learner")) && (!mode.equals("teacher")) && (!mode.equals("author"))) {
+	    McLearningStarterAction.logger.error("error.mode.invalid");
+	}
+	McLearningStarterAction.logger.debug("session LEARNING_MODE set to:" + mode);
+
+	return null;
+    }
+
+    /**
      * persists error messages to request scope
+     * 
      * @param request
      * @param message
      */
-	public void persistError(HttpServletRequest request, String message)
-	{
-		ActionMessages errors= new ActionMessages();
-		errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-		logger.debug("add " + message +"  to ActionMessages:");
-		saveErrors(request,errors);	    	    
-	}
-}  
+    public void persistError(HttpServletRequest request, String message) {
+	ActionMessages errors = new ActionMessages();
+	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
+	McLearningStarterAction.logger.debug("add " + message + "  to ActionMessages:");
+	saveErrors(request, errors);
+    }
+}

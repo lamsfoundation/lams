@@ -175,6 +175,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
@@ -381,6 +382,9 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	/* by now, we know that the mode is learner */
 	putNotebookEntryIntoVoteGeneralLearnerFlowDTO(voteService, voteGeneralLearnerFlowDTO, toolSessionID, userID);
 
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
+		.getServletContext());
+	
 	/*
 	 * find out if the content is set to run offline or online. If it is set to run offline , the learners are
 	 * informed about that.

@@ -27,7 +27,16 @@
 			<html:hidden property="mode" />
 			<html:hidden property="method" value="finish"/>
 			<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-				<span class="nextActivity"><fmt:message key="button.finish" /></span>
+				<span class="nextActivity">								
+					<c:choose>
+						<c:when test="${activityPosition.last}">
+							<fmt:message key="button.submit" />
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="button.finish" />
+						</c:otherwise>
+					</c:choose>
+				</span>
 			</html:link>
 		</div>
 			 

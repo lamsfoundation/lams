@@ -57,7 +57,14 @@
 			<c:otherwise>
 				<html:hidden property="dispatch" value="finishActivity" />
 				<html:submit styleClass="button" styleId="finishButton">
-					<fmt:message key="button.finish" />
+					<c:choose>
+	 					<c:when test="${activityPosition.last}">
+	 						<fmt:message key="button.submit" />
+	 					</c:when>
+	 					<c:otherwise>
+	 		 				<fmt:message key="button.finish" />
+	 					</c:otherwise>
+		 			</c:choose>
 				</html:submit>
 			</c:otherwise>
 		</c:choose>

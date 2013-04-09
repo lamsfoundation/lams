@@ -47,6 +47,8 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.ActionRedirect;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -142,6 +144,10 @@ public class LearningAction extends LamsDispatchAction {
 	    service.saveOrUpdateKaltura(kaltura);
 	}
 
+	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId, request, getServlet()
+		.getServletContext());
+	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	
 	// check runOffline
 	if (kaltura.isRunOffline()) {
 	    return mapping.findForward("runOffline");

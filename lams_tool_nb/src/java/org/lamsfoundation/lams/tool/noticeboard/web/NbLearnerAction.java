@@ -40,6 +40,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.MessageResources;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -209,7 +210,10 @@ public class NbLearnerAction extends LamsDispatchAction {
         if (entry != null) {
         	request.setAttribute("reflectEntry", entry.getEntry());
         }
-	  
+        
+        LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
+		.getServletContext());
+        
     	return mapping.findForward(NoticeboardConstants.REFLECT_ON_ACTIVITY);
     }
 }

@@ -5,21 +5,47 @@
 <script lang="javascript">
 	$(document).ready(function(){
 		$("#allowContributeVideos").click(function() {
-			if ($('#allowContributeVideos').is(':checked')) {
+			if ($(this).is(':checked')) {
 				$("#allowSeeingOtherUsersRecordings").prop("disabled", false);
 				$("#learnerContributionLimit").prop("disabled", false);
+				$("#allow-teacher-cue-points").prop("disabled", false);
 			} else {
 				$("#allowSeeingOtherUsersRecordings").prop("disabled", true);
 				$("#allowSeeingOtherUsersRecordings").prop("checked", false);
 				$("#learnerContributionLimit").prop("disabled", true);
 				$("#learnerContributionLimit").prop("value", -1);
+				$("#allow-teacher-cue-points").prop("checked", false);
+				$("#allow-teacher-cue-points").prop("disabled", true);
 			}
 		});
 		
 		<c:if test="${!formBean.allowContributeVideos}">
 			$("#allowSeeingOtherUsersRecordings").prop("disabled", true);
 			$("#learnerContributionLimit").prop("disabled", true);
+			$("#allow-teacher-cue-points").prop("disabled", true);
 		</c:if>
+		
+		//time stamped comments
+		<c:choose>
+			<c:when test="${formBean.allowTeacherCuePoints || formBean.allowLernerCuePoints}">
+				$("#allow-time-stamped-comments").prop("checked", true);
+			</c:when>
+			<c:otherwise>
+				$('#allow-time-stamped-comments-area').css("display", "none");
+			</c:otherwise>
+		</c:choose>
+		$("#allow-time-stamped-comments").click(function(){
+			$('#allow-time-stamped-comments-area').toggle('slow');
+			$('#allow-lerner-cue-points').prop("checked", false);
+			$('#allow-teacher-cue-points').prop("checked", false);
+		});
+		$("#allow-teacher-cue-points").click(function(){
+			$('#allow-lerner-cue-points').prop("checked", false);
+		});
+		$("#allow-lerner-cue-points").click(function(){
+			$('#allow-teacher-cue-points').prop("checked", false);
+		});
+		
 	});
 
 </script>
@@ -65,6 +91,27 @@
 		<html:option value="9">9</html:option>
 		<html:option value="10">10</html:option>
 	</html:select>
+</p>
+
+<p class="small-space-top">
+
+	<input type="checkbox" value="" id="allow-time-stamped-comments" class="noBorder">
+	<label for="allow-time-stamped-comments">
+		<fmt:message key="label.time.stamped.comments" />
+	</label>
+
+	<div id="allow-time-stamped-comments-area" style="padding-left: 50px;">
+		<html:radio property="allowTeacherCuePoints" value="true" styleClass="noBorder" styleId="allow-teacher-cue-points" />
+		<label for="allow-teacher-cue-points">
+			<fmt:message key="label.teacher.can.leave.personal.comments" />
+		</label>
+		<br><br>
+	
+		<html:radio property="allowLernerCuePoints" value="true" styleClass="noBorder" styleId="allow-lerner-cue-points" />
+		<label for="allow-lerner-cue-points">
+			<fmt:message key="label.allow.lerners.create.cue.points" />
+		</label>
+	</div>
 </p>
 
 <p>

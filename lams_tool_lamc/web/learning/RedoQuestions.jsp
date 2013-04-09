@@ -116,7 +116,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<html:hidden property="learnerFinished" value="Finished" />
 																  			  		
 											<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish'); return false;">
-												<span class="nextActivity"><fmt:message key="label.finished"/></span>
+												<span class="nextActivity">									
+													<c:choose>
+									 					<c:when test="${activityPosition.last}">
+									 						<fmt:message key="label.submit" />
+									 					</c:when>
+									 					<c:otherwise>
+									 		 				<fmt:message key="label.finished" />
+									 					</c:otherwise>
+										 			</c:choose>
+										 		</span>
 											</html:link>
 									  	</c:if> 				    					
 						
@@ -137,7 +146,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<html:hidden property="learnerFinished" value="Finished" />
 																  			  		
 											<html:submit styleClass="button" styleId="finishButton">
-												<fmt:message key="label.finished"/>
+												<c:choose>
+								 					<c:when test="${activityPosition.last}">
+								 						<fmt:message key="label.submit" />
+								 					</c:when>
+								 					<c:otherwise>
+								 		 				<fmt:message key="label.finished" />
+								 					</c:otherwise>
+									 			</c:choose>
 											</html:submit> 				
 								  	</c:if> 				    					
 					

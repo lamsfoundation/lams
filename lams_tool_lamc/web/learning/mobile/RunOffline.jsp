@@ -96,7 +96,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<html:hidden property="learnerFinished" value="Finished" />
 						
 						<a href="#nogo" id="finishButton" onclick="javascript:submitForm('finish');return false"  data-role="button" data-icon="arrow-r">
-							<span class="nextActivity"><fmt:message key="label.finished" /></span>
+							<span class="nextActivity">
+								<c:choose>
+				 					<c:when test="${activityPosition.last}">
+				 						<fmt:message key="label.submit" />
+				 					</c:when>
+				 					<c:otherwise>
+				 		 				<fmt:message key="label.finished" />
+				 					</c:otherwise>
+					 			</c:choose>
+					 		</span>
 						</a>
 					</c:if>
 	

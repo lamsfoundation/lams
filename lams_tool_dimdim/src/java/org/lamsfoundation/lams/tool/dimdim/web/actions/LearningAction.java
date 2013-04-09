@@ -35,6 +35,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -185,8 +186,10 @@ public class LearningAction extends DispatchAction {
 	    lrnForm.setEntryText(notebookEntry.getEntry());
 	}
 
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(lrnForm.getToolSessionID(), request, getServlet()
+		.getServletContext());
+	
 	return mapping.findForward("notebook");
-
     }
 
     public ActionForward openPreviewMeeting(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -284,6 +287,9 @@ public class LearningAction extends DispatchAction {
 	contentDTO.setReflectInstructions(dimdim.getReflectInstructions());
 
 	request.setAttribute(Constants.ATTR_CONTENT_DTO, contentDTO);
+
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
+		.getServletContext());
 
 	// Set the content in use flag.
 	if (!dimdim.isContentInUse()) {

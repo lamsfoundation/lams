@@ -49,6 +49,8 @@ import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.config.ForwardConfig;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.DeliveryMethodMail;
+import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -215,7 +217,7 @@ public class LearningAction extends Action {
 		.getConfigValue()));
 	sessionMap.put(ImageGalleryConstants.ATTR_THUMBNAIL_IMAGE_DIMENSIONS, Integer
 		.parseInt(thumbnailImageDimensionsKey.getConfigValue()));
-
+	
 	// add define later support
 	if (imageGallery.isDefineLater()) {
 	    return mapping.findForward("defineLater");
@@ -226,6 +228,10 @@ public class LearningAction extends Action {
 	imageGallery.setDefineLater(false);
 	service.saveOrUpdateImageGallery(imageGallery);
 
+	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
+		request, getServlet().getServletContext());
+	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	
 	// add run offline support
 	if (imageGallery.getRunOffline()) {
 	    sessionMap.put(ImageGalleryConstants.PARAM_RUN_OFFLINE, true);

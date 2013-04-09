@@ -57,10 +57,20 @@
 			<c:otherwise>
 
 			<div align="right" class="space-bottom-top">
-				<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="javascript:continueOrFinish('finishActivity'); return false">
-					<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
-				</html:link>
-			</div>
+					<html:link href="#nogo" styleClass="button" styleId="finishButton"
+						onclick="javascript:continueOrFinish('finishActivity'); return false">
+						<span class="nextActivity">
+							<c:choose>
+								<c:when test="${activityPosition.last}">
+									<fmt:message key="button.submit" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="button.finish" />
+								</c:otherwise>
+							</c:choose>
+						</span>
+					</html:link>
+				</div>
 			</c:otherwise>
 		</c:choose>
 	</div>

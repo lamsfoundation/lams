@@ -36,6 +36,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.dao.IBaseDAO;
+import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -164,6 +166,9 @@ public class LearningAction extends LamsDispatchAction {
 			videoRecorder.setContentInUse(new Boolean(true));
 			videoRecorderService.saveOrUpdateVideoRecorder(videoRecorder);
 		}
+		
+        	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
+        		.getServletContext());
 
 		// check runOffline
 		if (videoRecorder.isRunOffline()) {

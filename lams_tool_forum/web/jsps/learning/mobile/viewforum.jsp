@@ -145,7 +145,14 @@
 		
 						<c:otherwise>
 							<button name="finish" id="finishForum" data-icon="arrow-r" onclick="finishForum();">
-								<fmt:message key="label.finish" />
+								<c:choose>
+				 					<c:when test="${sessionMap.activityPosition.last}">
+				 						<fmt:message key="label.submit" />
+				 					</c:when>
+				 					<c:otherwise>
+				 		 				<fmt:message key="label.finish" />
+				 					</c:otherwise>
+				 				</c:choose>
 							</button>
 						</c:otherwise>
 					</c:choose>

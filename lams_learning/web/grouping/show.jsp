@@ -65,7 +65,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<table><tr><td><div id="right" class="right-buttons">
 					<html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-					  <span class="nextActivity"><fmt:message key="label.finish.button"/></span>
+					  <span class="nextActivity">
+	                    <c:choose>
+		 					<c:when test="${activityPosition.last}">
+		 						<fmt:message key="label.submit.button" />
+		 					</c:when>
+		 					<c:otherwise>
+		 		 				<fmt:message key="label.finish.button" />
+		 					</c:otherwise>
+		 				</c:choose>
+		 			 </span>
 					 </html:link>
 			</div></td></tr></table>
 	</c:if>

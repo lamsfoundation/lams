@@ -9,6 +9,7 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
+<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
 
 <lams:html>
 <lams:head>
@@ -64,7 +65,16 @@
 		<div class="finishButtonDiv">
 			<button name="submitReflection" id="finishButton" onclick="javascript:submitMethod('submitReflection');return false"
 					data-theme="b" data-icon="arrow-r">
-				<span class="nextActivity"><fmt:message key="button.endLearning" /></span>
+				<span class="nextActivity">								
+					<c:choose>
+	 					<c:when test="${sessionMap.activityPosition.last}">
+	 						<fmt:message key="button.submit" />
+	 					</c:when>
+	 					<c:otherwise>
+	 		 				<fmt:message key="button.endLearning" />
+	 					</c:otherwise>
+	 				</c:choose>
+	 			</span>
 			</button>
 		</div>
 	</div><!-- /footer -->

@@ -24,6 +24,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.learning.service;
 
+import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.tool.ToolOutput;
 
 /**
@@ -37,15 +38,19 @@ public interface ILearnerService {
      * 
      * Do not change learnerId to Integer (to match the other calls) as all the tools expect this to be a Long.
      * 
-     * @param toolSessionId,
-     *                session ID for completed tool
+     * @param toolSessionId
+     *            , session ID for completed tool
      * @param learnerId
-     *                the learner who is completing the tool session.
+     *            the learner who is completing the tool session.
      * @return the URL for the next activity
      * @throws LearnerServiceException
-     *                 in case of problems.
+     *             in case of problems.
      */
     public String completeToolSession(Long toolSessionId, Long learnerId);
 
     ToolOutput getToolInput(Long requestingToolContentId, Integer assigmentId, Integer learnerId);
+
+    ActivityPositionDTO getActivityPosition(Long activityId);
+
+    ActivityPositionDTO getActivityPositionByToolSessionId(Long toolSessionId);
 }

@@ -82,6 +82,7 @@ public class AttributeNames {
     public static final String ATTR_USERNAME = "username";
     public static final String ATTR_UPDATE_PROGRESS_BAR = "updateProgressBar";
     public static final String ATTR_SESSION_STATUS = "sessionStatus";
+    public static final String ATTR_ACTIVITY_POSITION = "activityPosition";
 
     // for Pedagogical Planner
     public static final String PARAM_COMMAND = "command";

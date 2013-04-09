@@ -51,6 +51,8 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -232,6 +234,10 @@ public class LearningAction extends Action {
 	sessionMap.put(ForumConstants.ATTR_MINIMUM_REPLY, forum.getMinimumReply());
 	sessionMap.put(ForumConstants.ATTR_MAXIMUM_REPLY, forum.getMaximumReply());
 
+	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
+		request, getServlet().getServletContext());
+	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	
 	// Should we show the reflection or not? We shouldn't show it when the screen is accessed
 	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
 	// Need to constantly past this value on, rather than hiding just the once, as the View Forum

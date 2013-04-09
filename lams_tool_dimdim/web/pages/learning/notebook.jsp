@@ -25,7 +25,14 @@
 			<html:hidden property="dispatch" value="submitReflection" />
 			<html:hidden property="toolSessionID" />
 			<html:submit styleClass="button" styleId="finishButton">
-				<fmt:message>button.finish</fmt:message>
+				<c:choose>
+ 					<c:when test="${activityPosition.last}">
+ 						<fmt:message key="button.submit" />
+ 					</c:when>
+ 					<c:otherwise>
+ 		 				<fmt:message key="button.finish" />
+ 					</c:otherwise>
+	 			</c:choose>
 			</html:submit>
 		</div>
 	</html:form>

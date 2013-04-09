@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -134,6 +135,9 @@ public class LearningAction extends LamsDispatchAction {
 			scribeService.saveOrUpdateScribe(scribe);
 		}
 
+		LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
+			.getServletContext());
+		
 		// Retrieve the current user
 		ScribeUser scribeUser = getCurrentUser(toolSessionID);
 
@@ -295,6 +299,10 @@ public class LearningAction extends LamsDispatchAction {
 				.getScribe());
 
 		request.setAttribute("scribeDTO", scribeDTO);
+		
+		LearningWebUtil.putActivityPositionInRequestByToolSessionId(scribeUser.getScribeSession().getSessionId(),
+			request, getServlet().getServletContext());
+
 		return mapping.findForward("notebook");
 	}
 
@@ -456,6 +464,9 @@ public class LearningAction extends LamsDispatchAction {
 
 		if ( session.getScribe().isShowAggregatedReports() )
 			setupOtherGroupReportDTO(request, session, scribeUser);
+        
+        	LearningWebUtil.putActivityPositionInRequestByToolSessionId(session.getSessionId(), request, getServlet()
+        		.getServletContext());
 
 		return mapping.findForward("report");
 	}

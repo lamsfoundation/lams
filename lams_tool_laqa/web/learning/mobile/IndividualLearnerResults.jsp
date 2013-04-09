@@ -136,7 +136,16 @@
 				    <div class="space-bottom-top align-right">
 						<a href="#nogo" name="endLearning" id="finishButton"
 							onclick="javascript:submitMethod('storeAllResults');return false" data-icon="arrow-r" data-theme="b">
-							<span class="nextActivity"><fmt:message key="button.endLearning" /></span>
+							<span class="nextActivity">
+								<c:choose>
+				 					<c:when test="${sessionMap.activityPosition.last}">
+				 						<fmt:message key="button.submit" />
+				 					</c:when>
+				 					<c:otherwise>
+				 		 				<fmt:message key="button.endLearning" />
+				 					</c:otherwise>
+				 				</c:choose>
+				 			</span>
 						</a>
 				    </div>
 				</c:if>

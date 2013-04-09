@@ -300,7 +300,14 @@
 		<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
 			<span class="ui-finishbtn-right">
 				<button name="endLearning" id="finishButton" onclick="javascript:submitMethod('endLearning');" data-icon="arrow-r" data-theme="b">
-					<fmt:message key="button.endLearning" />
+					<c:choose>
+	 					<c:when test="${sessionMap.activityPosition.last}">
+	 						<fmt:message key="button.submit" />
+	 					</c:when>
+	 					<c:otherwise>
+	 		 				<fmt:message key="button.endLearning" />
+	 					</c:otherwise>
+	 				</c:choose>
 				</button>
 			</span>
 		</c:if>

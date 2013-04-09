@@ -29,7 +29,16 @@
 
 		<div class="space-bottom-top align-right">
 			<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-				<span class="nextActivity"><fmt:message>button.finish</fmt:message></span>
+				<span class="nextActivity">
+					<c:choose>
+	 					<c:when test="${activityPosition.last}">
+	 						<fmt:message key="button.submitActivity" />
+	 					</c:when>
+	 					<c:otherwise>
+	 		 				<fmt:message key="button.finish" />
+	 					</c:otherwise>
+	 				</c:choose>
+	 			</span>
 			</html:link>
 		</div>
 

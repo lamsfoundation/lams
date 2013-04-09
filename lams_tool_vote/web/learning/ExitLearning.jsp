@@ -119,7 +119,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<div class="space-bottom-top align-right">
 						<html:link href="#nogo" property="learnerFinished" styleClass="button" styleId="finishButton"
 							onclick="submitMethod('learnerFinished');return false">
-							<span class="nextActivity"><fmt:message key="label.finished" /></span>
+							<span class="nextActivity">
+								<c:choose>
+									<c:when test="${activityPosition.last}">
+										<fmt:message key="button.submitActivity" />
+									</c:when>
+									<c:otherwise>
+										<fmt:message key="button.endLearning" />
+									</c:otherwise>
+								</c:choose>
+						</span>
 						</html:link>
 					</div>
 				</c:if>

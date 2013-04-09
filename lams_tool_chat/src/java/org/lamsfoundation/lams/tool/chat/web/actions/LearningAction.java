@@ -46,6 +46,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -175,6 +176,9 @@ public class LearningAction extends LamsDispatchAction {
 	    chatService.saveOrUpdateChat(chat);
 	}
 
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
+		.getServletContext());
+	
 	// check runOffline
 	if (chat.isRunOffline()) {
 	    return mapping.findForward("runOffline");
@@ -258,6 +262,9 @@ public class LearningAction extends LamsDispatchAction {
 	if (notebookEntry != null) {
 	    lrnForm.setEntryText(notebookEntry.getEntry());
 	}
+
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(chatUser.getChatSession().getSessionId(), request,
+		getServlet().getServletContext());
 
 	return mapping.findForward("notebook");
     }

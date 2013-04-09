@@ -35,6 +35,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.util.MessageResources;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -194,6 +195,9 @@ public class NbLearnerStarterAction extends LamsDispatchAction {
 	    Boolean userFinished = (nbUser!=null && NoticeboardUser.COMPLETED.equals(nbUser.getUserStatus()));
         request.setAttribute("userFinished", userFinished);
 	    
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
+		.getServletContext());
+
 	    /*
          * Checks to see if the runOffline flag is set.
          * If the particular flag is set, control is forwarded to jsp page

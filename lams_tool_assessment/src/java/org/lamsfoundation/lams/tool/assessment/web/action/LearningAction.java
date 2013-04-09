@@ -52,6 +52,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.events.DeliveryMethodMail;
+import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
@@ -132,6 +134,7 @@ public class LearningAction extends Action {
      * @throws ServletException 
      * 
      */
+    @SuppressWarnings("unchecked")
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 
@@ -222,6 +225,10 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_INSTRUCTION, assessment.getReflectInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ENTRY, entryText);
 
+	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId, request, getServlet()
+		.getServletContext());
+	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+	
 	// add define later support
 	if (assessment.isDefineLater()) {
 	    return mapping.findForward("defineLater");
@@ -355,7 +362,8 @@ public class LearningAction extends Action {
 	}
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_NUMBERING_OFFSET, ++questionNumberingOffset);
 	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, pageNumber);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);	
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
     
@@ -396,6 +404,7 @@ public class LearningAction extends Action {
 	
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, true);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     } 
     

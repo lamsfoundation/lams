@@ -37,6 +37,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.util.MessageResources;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -185,6 +186,9 @@ public class LearningAction extends DispatchAction {
 	    lrnForm.setEntryText(notebookEntry.getEntry());
 	}
 
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(lrnForm.getToolSessionID(), request, getServlet()
+		.getServletContext());
+
 	return mapping.findForward("notebook");
 
     }
@@ -304,6 +308,9 @@ public class LearningAction extends DispatchAction {
 	    bbbService.saveOrUpdateBbb(bbb);
 	}
 
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
+		.getServletContext());
+	
 	// check runOffline
 	if (bbb.isRunOffline()) {
 	    return mapping.findForward("runOffline");

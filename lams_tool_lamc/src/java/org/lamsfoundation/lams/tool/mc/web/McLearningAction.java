@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,6 +45,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -975,6 +977,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(questionIndex));
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
+		.getServletContext());
+	
 	return mapping.findForward(McAppConstants.LOAD_LEARNER);
     }
 
@@ -1072,6 +1077,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    McLearningAction.logger.debug("mcGeneralLearnerFlowDTO for jsp: " + mcGeneralLearnerFlowDTO);
 	}
 
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
+		.getServletContext());
+	
 	return mapping.findForward(McAppConstants.REDO_QUESTIONS);
     }
 
@@ -1085,7 +1093,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
      * @param response
      */
     public void prepareViewAnswersData(ActionMapping mapping, McLearningForm mcLearningForm,
-	    HttpServletRequest request, HttpServletResponse response) {
+	    HttpServletRequest request, ServletContext servletContext) {
 
 	// may have to get service from the form - if class has been created by starter action, rather than by struts
 	IMcService mcService = null;
@@ -1174,6 +1182,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	}
 
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
+
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, servletContext);
     }
 
     /**
@@ -1190,7 +1200,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     public ActionForward viewAnswers(ActionMapping mapping, McLearningForm mcLearningForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
-	prepareViewAnswersData(mapping, mcLearningForm, request, response);
+	prepareViewAnswersData(mapping, mcLearningForm, request, getServlet().getServletContext());
 	return mapping.findForward(McAppConstants.VIEW_ANSWERS);
     }
 

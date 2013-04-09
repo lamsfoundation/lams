@@ -113,7 +113,16 @@
 					</c:when>
 					<c:otherwise>
 						<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finished');return false">
-							<span class="nextActivity"><fmt:message key="button.finish" /></span>
+							<span class="nextActivity">
+								<c:choose>
+									<c:when test="${activityPosition.last}">
+										<fmt:message key="button.submit" />
+									</c:when>
+									<c:otherwise>
+										<fmt:message key="button.finish" />
+									</c:otherwise>
+								</c:choose>
+							</span>
 						</html:link>
 					</c:otherwise>
 				</c:choose>

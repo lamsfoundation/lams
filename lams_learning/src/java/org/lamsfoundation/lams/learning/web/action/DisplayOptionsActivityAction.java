@@ -115,9 +115,10 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 		form.setProgressID(learnerProgress.getLearnerProgressId());
 		
 		this.saveToken(request);
+        
+        	LearningWebUtil.setupProgressInRequest(form, request, learnerProgress);
+        	LearningWebUtil.putActivityPositionInRequest(form.getActivityID(), request, getServlet().getServletContext());
 		
-		LearningWebUtil.setupProgressInRequest(form, request, learnerProgress);
-
 		String forward = "displayOptions";
 		return mapping.findForward(forward);
 	}

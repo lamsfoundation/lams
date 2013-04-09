@@ -43,6 +43,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -298,6 +299,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	logger.debug("view-only voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
+
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
+		.getServletContext());
+	
 	logger.debug("fwding to ALL_NOMINATIONS: " + ALL_NOMINATIONS);
 	return (mapping.findForward(ALL_NOMINATIONS));
     }
@@ -382,6 +387,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	logger.debug("final voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
+
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
+		.getServletContext());
+	
 	logger.debug("fwd'ing to : " + VIEW_ANSWERS);
 	return (mapping.findForward(VIEW_ANSWERS));
     }
@@ -957,6 +966,9 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	logger.debug("final voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
 	voteLearningForm.resetCommands();
 
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
+		.getServletContext());
+	
 	logger.debug("fwd'ing to: " + NOTEBOOK);
 	return (mapping.findForward(NOTEBOOK));
     }
