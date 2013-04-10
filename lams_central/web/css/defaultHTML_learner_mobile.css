@@ -6,9 +6,9 @@ body {
 body.large-font {font-size: 16px;}
 
 h2 {/*color:#47bc23;  */
-	font-size:14px; 
+	font-size:17px; 
 	padding-top:10px;
-	margin-bottom:5px; } 
+	margin-bottom:15px; } 
 
 span.h2font {color:#47bc23;  
 	font-size:14px; } 
@@ -32,6 +32,11 @@ h5 {/*color:#47bc23; */
 	margin-bottom:8px;
 	}
 	
+p {
+	margin-right: 30px;
+	margin-top:10px;
+}	
+	
 .regular-li { font-size: 14px; font-weight: normal; }
 
 /**********************layout of the table with the alternate color for the table heading cell *********************/
@@ -50,9 +55,8 @@ table.alternative-color th {
 }
 
 table.alternative-color td {
-	padding:5px;
-	padding-left: 2px;
-	font-size: 11px;
+	padding:8px 5px;
+	font-size: 12px;
 	border-bottom: 1px solid #efefef;
 	vertical-align: middle; 
 	background:url('../images/css/greyfade_bg.jpg') repeat-x 3px 0px
