@@ -157,24 +157,4 @@ VALUES(
 	0
 );
 
-INSERT INTO tl_lakalt11_kaltura_item (
-   entry_id,
-   title,
-   duration,
-   create_date,
-   create_by_author,
-   sequence_id,
-   is_hidden,
-   kaltura_uid)
-VALUES(
-	"1_aepj00r4",
-	"Kaltura Video Tutorial",
-	60,
-	NOW(),
-	1,
-	1,
-	0,
-	1
-);
-
 SET FOREIGN_KEY_CHECKS=1;
