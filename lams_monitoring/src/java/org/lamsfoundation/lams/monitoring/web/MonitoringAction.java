@@ -232,11 +232,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean precedingLessonEnable = WebUtil.readBooleanParam(request, "precedingLessonEnable", false);
 	Long precedingLessonId = precedingLessonEnable ? WebUtil.readLongParam(request, "precedingLessonId", true)
 		: null;
-	boolean timeLimitEnableField = WebUtil.readBooleanParam(request, "timeLimitEnableField", false);
-	Integer timeLimitDaysField = WebUtil.readIntParam(request, "timeLimitDaysField", true);
-	boolean timeLimitIndividualField = WebUtil.readBooleanParam(request, "timeLimitIndividualField", false);
-	Integer timeLimitIndividual = timeLimitEnableField && timeLimitIndividualField ? timeLimitDaysField : null;
-	Integer timeLimitLesson = timeLimitEnableField && !timeLimitIndividualField ? timeLimitDaysField : null;
+	boolean timeLimitEnable = WebUtil.readBooleanParam(request, "timeLimitEnable", false);
+	Integer timeLimitDays = WebUtil.readIntParam(request, "timeLimitDays", true);
+	boolean timeLimitIndividualField = WebUtil.readBooleanParam(request, "timeLimitIndividual", false);
+	Integer timeLimitIndividual = timeLimitEnable && timeLimitIndividualField ? timeLimitDays : null;
+	Integer timeLimitLesson = timeLimitEnable && !timeLimitIndividualField ? timeLimitDays : null;
 
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
