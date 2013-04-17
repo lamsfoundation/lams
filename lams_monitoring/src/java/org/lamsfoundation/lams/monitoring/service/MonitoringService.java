@@ -1532,9 +1532,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     /**
-     * Moves user to the given activity which he already completed.
-     * Removes and resets entries in LearnerProgress to achieve it.
+     * Moves user to the given activity which he already completed. Removes and resets entries in LearnerProgress to
+     * achieve it.
      */
+    @SuppressWarnings("unchecked")
     private String forceUncompleteActivity(LearnerProgress learnerProgress, Activity previousActivity) {
 	Activity currentActivity = learnerProgress.getCurrentActivity();
 
@@ -1547,10 +1548,29 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
 	CompletedActivityProgress completedActivityProgress = learnerProgress.getCompletedActivities().get(
 		targetActivity);
-	learnerProgress.getAttemptedActivities().remove(currentActivity);
+	learnerProgress.getCompletedActivities().remove(targetActivity);
 	learnerProgress.getAttemptedActivities().put(targetActivity, completedActivityProgress.getStartDate());
 
 	do {
+	    if (currentActivity.isComplexActivity()) {
+		// remove all records within complex activity
+		for (Activity childActivity : (Set<Activity>) ((ComplexActivity) currentActivity).getActivities()) {
+		    learnerProgress.getAttemptedActivities().remove(childActivity);
+		    learnerProgress.getCompletedActivities().remove(childActivity);
+
+		    if (childActivity.isComplexActivity()) {
+			for (Activity innerChildActivity : (Set<Activity>) ((ComplexActivity) childActivity)
+				.getActivities()) {
+			    learnerProgress.getAttemptedActivities().remove(innerChildActivity);
+			    learnerProgress.getCompletedActivities().remove(innerChildActivity);
+			}
+		    }
+		}
+	    }
+
+	    learnerProgress.getAttemptedActivities().remove(currentActivity);
+	    learnerProgress.getCompletedActivities().remove(currentActivity);
+
 	    Transition transitionTo = currentActivity.getTransitionTo();
 	    if (transitionTo == null) {
 		// reached beginning of either sequence or complex activity
@@ -1560,21 +1580,18 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 			    + targetActivity.getActivityId());
 		} else {
 		    currentActivity = currentActivity.getParentActivity();
-		    learnerProgress.getAttemptedActivities().remove(currentActivity);
-		    
 		    if (currentActivity.getParentActivity() != null) {
 			// for optional sequences, the real complex activity is 2 tiers up, not just one
 			currentActivity = currentActivity.getParentActivity();
-			learnerProgress.getAttemptedActivities().remove(currentActivity);
 		    }
 
-		    // now outside the complex activity, carry on with the main sequence
-		    transitionTo = currentActivity.getTransitionTo();
+		    // now the current activity is the complex one in main sequence
 		}
+	    } else {
+		// move backwards
+		currentActivity = transitionTo.getFromActivity();
 	    }
-	    currentActivity = transitionTo.getFromActivity();
-	    // remove completed activities
-	    learnerProgress.getCompletedActivities().remove(currentActivity);
+
 	} while (!currentActivity.equals(targetActivity));
 
 	learnerProgressDAO.saveLearnerProgress(learnerProgress);
