@@ -1540,6 +1540,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	Activity currentActivity = learnerProgress.getCurrentActivity();
 
 	learnerProgress.setLessonComplete(LearnerProgress.LESSON_NOT_COMPLETE);
+	learnerProgress.setFinishDate(null);
+	
 	learnerProgress.setPreviousActivity(previousActivity);
 	Activity targetActivity = previousActivity == null ? learnerProgress.getLesson().getLearningDesign()
 		.getFirstActivity() : previousActivity.getTransitionFrom().getToActivity();
