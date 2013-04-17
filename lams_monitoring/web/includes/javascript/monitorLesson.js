@@ -494,35 +494,16 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 				executeForceComplete = confirm(FORCE_COMPLETE_END_LESSON_CONFIRM_LABEL
 						.replace('[0]',learnerName));
 			} else {
-				var targetActivityId = act.parent().attr('id');
+				var transitionLine = $('line[id$="to_' 
+						+ act.parent().attr('id') + '"]:not([id^="arrow"])'
+						, sequenceCanvas);
+				// if move to start of sequence, the value is -1
+				previousActivityId = transitionLine.length == 1 ?
+						transitionLine.attr('id').split('_')[0] : -1;
+						
 				var targetActivityName = act.siblings('text[id^="TextElement"]').text();
-				
-				// find if it is not already completed/current activity - it is forbidden
-				var precedingActivityId = targetActivityId;
-				// move step by step to the sequence beginning
-				// if current activity is found, it is a activity still in front, so it's OK
-				do {
-					// find transition line and extract activity IDs from them
-					var transitionLine = $('line[id$="to_' 
-							+ precedingActivityId + '"]:not([id^="arrow"])'
-							, sequenceCanvas);
-					precedingActivityId = transitionLine.length == 1 ? 
-							transitionLine.attr('id').split('_')[0] : null;
-					if (previousActivityId == null) {
-						previousActivityId = precedingActivityId;
-					}
-					if (precedingActivityId == currentActivityId) {
-						break;
-					}
-				} while (precedingActivityId);
-				
-				if (precedingActivityId) {
-					executeForceComplete = confirm(FORCE_COMPLETE_ACTIVITY_CONFIRM_LABEL
+				executeForceComplete = confirm(FORCE_COMPLETE_ACTIVITY_CONFIRM_LABEL
 							.replace('[0]', learnerName).replace('[1]', targetActivityName));
-				} else {
-					alert(FORCE_COMPLETE_DROP_FAIL_LABEL
-							.replace('[0]', learnerName).replace('[1]', targetActivityName));
-				}
 			}
 			
 			if (executeForceComplete) {
