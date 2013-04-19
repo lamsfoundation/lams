@@ -172,9 +172,9 @@ public class LearningAction extends Action {
 	
 	// get notebook entry
 	String entryText = new String();
-	if (user != null) {
+	if (groupLeader != null) {
 	    NotebookEntry notebookEntry = service.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ScratchieConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+		    ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId().intValue());
 	    if (notebookEntry != null) {
 		entryText = notebookEntry.getEntry();
 	    }

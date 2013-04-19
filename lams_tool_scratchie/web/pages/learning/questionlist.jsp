@@ -75,7 +75,7 @@
 					</c:otherwise>
 				</c:choose>
 
-				<c:if test="${(mode != 'teacher') && (isUserLeader || isScratchingFinished)}">
+				<c:if test="${(mode != 'teacher') && isUserLeader}">
 					<html:button property="finishButton" onclick="return continueReflect()" styleClass="button">
 						<fmt:message key="label.edit" />
 					</html:button>
@@ -86,7 +86,7 @@
 		<c:if test="${(mode != 'teacher') &&  (isUserLeader || isScratchingFinished)}">
 			<div class="space-bottom-top align-right">
 				<c:choose>
-					<c:when test="${sessionMap.reflectOn && !sessionMap.userFinished and !sessionMap.isShowResultsPage}">
+					<c:when test="${sessionMap.reflectOn && !sessionMap.userFinished && !sessionMap.isShowResultsPage && isUserLeader}">
 						<html:button property="finishButton" styleId="finishButton" onclick="return continueReflect()" styleClass="button">
 							<fmt:message key="label.continue" />
 						</html:button>

@@ -10,6 +10,7 @@
 	<c:set var="mode" value="${sessionMap.mode}" />
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="scratchie" value="${sessionMap.scratchie}" />
+	<c:set var="isUserLeader" value="${sessionMap.user.leader}" />
 
 <lams:html>
 <lams:head>
@@ -73,7 +74,7 @@
 		</c:forEach>
 
 
-		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
+		<c:if test="${sessionMap.userFinished && sessionMap.reflectOn}">
 			<div class="small-space-top">
 				<h2>
 					${sessionMap.reflectInstructions}
@@ -93,7 +94,7 @@
 					</c:otherwise>
 				</c:choose>
 
-				<c:if test="${mode != 'teacher'}">
+				<c:if test="${(mode != 'teacher') && isUserLeader}">
 					<html:button property="finishButton" onclick="return continueReflect()" styleClass="button">
 						<fmt:message key="label.edit" />
 					</html:button>
@@ -104,7 +105,7 @@
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-right">
 				<c:choose>
-					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
+					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished) && isUserLeader}">
 						<html:button property="finishButton" styleId="finishButton" onclick="return continueReflect()" styleClass="button">
 							<fmt:message key="label.continue" />
 						</html:button>
