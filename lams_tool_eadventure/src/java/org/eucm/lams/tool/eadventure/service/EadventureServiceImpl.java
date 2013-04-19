@@ -257,7 +257,7 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
     public Eadventure getEadventureByContentId(Long contentId) {
 	Eadventure rs = eadventureDao.getByContentId(contentId);
 	if (rs == null) {
-	    EadventureServiceImpl.log.error("Could not find the content by given ID:" + contentId);
+	    EadventureServiceImpl.log.debug("Could not find the content by given ID:" + contentId);
 	}
 	return rs;
     }
@@ -785,7 +785,7 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	    // need unzip upload, and parse learning object information from XML file.
 	   
 		String packageDirectory = ZipFileUtil.expandZip(is, fileName);
-		log.error("Dirección del zip: "+packageDirectory);
+		log.error("Direcciï¿½n del zip: "+packageDirectory);
 		IContentPackageConverter cpConverter = new SimpleContentPackageConverter(packageDirectory);
 		String initFile = cpConverter.getDefaultItem();
 		ead.setImsSchema(cpConverter.getSchema());
@@ -1260,7 +1260,7 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	    // Eadventure Items. They are ordered on the screen by create date so they need to be saved in the right
 	    // order.
 	    // So read them all in first, then go through and assign the dates in the correct order and then save.
-	  //TODO nos cargamos la parte de los items.... comprobar que se pase todo bien y no de ningún problema
+	  //TODO nos cargamos la parte de los items.... comprobar que se pase todo bien y no de ningï¿½n problema
 	    /* Vector urls = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_URL_URLS);
 	    SortedMap<Integer, EadventureItem> items = new TreeMap<Integer, EadventureItem>();
 	    if (urls != null) {
@@ -1427,7 +1427,7 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	return getLessonService().getMonitorsByToolSessionId(sessionId);
     }
 
-    //TODO Resultado de la actualización a la brach de release 2.3.5, ver si afecta!!!
+    //TODO Resultado de la actualizaciï¿½n a la brach de release 2.3.5, ver si afecta!!!
     
     /*public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getEadventureOutputFactory().getSupportedDefinitionClasses(definitionType);
@@ -1578,7 +1578,7 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
     
 
     
-    //TODO IMPORRRRRRRRRRRRRRRTANTE!!!!!!!!!!!!!!! el parámetro toolContentID que estamos pasando es realmente toolSessionID!!!!
+    //TODO IMPORRRRRRRRRRRRRRRTANTE!!!!!!!!!!!!!!! el parï¿½metro toolContentID que estamos pasando es realmente toolSessionID!!!!
     //@Override
     public boolean setAppletInput(String name, String value, String userId, String toolContentID) {
 	//TODO restart when  
@@ -1589,8 +1589,8 @@ public class EadventureServiceImpl implements IEadventureService, ToolContentMan
 	EadventureServiceImpl.log.error("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOEEEEEEEEEEEEEEEE");
 	
 	
-	//TODO Ahora recuperamos la session para sacar el EAD!!! pero añadir el toolContentId para que sea mas sencillo!!!
-	//TODO user va a sobrar!! con el userID que ya se nos pasa por parámetro vamos sobraos!!					
+	//TODO Ahora recuperamos la session para sacar el EAD!!! pero aï¿½adir el toolContentId para que sea mas sencillo!!!
+	//TODO user va a sobrar!! con el userID que ya se nos pasa por parï¿½metro vamos sobraos!!					
 	//EadventureUser user = eadventureUserDao.getUserByUserIDAndContentID(Long.parseLong(userId), Long.parseLong(toolContentID));
 	//EadventureUser user = eadventureUserDao.getUserByUserIDAndSessionID(Long.parseLong(userId), Long.parseLong(toolContentID));
 	    //eadventureUserDao.getUserByUserIDAndSessionID(Long.parseLong(userId), Long.parseLong(toolSessionID));

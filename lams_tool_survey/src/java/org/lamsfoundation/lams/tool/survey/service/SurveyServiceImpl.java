@@ -164,7 +164,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public Survey getSurveyByContentId(Long contentId) {
 	Survey rs = surveyDao.getByContentId(contentId);
 	if (rs == null) {
-	    SurveyServiceImpl.log.error("Could not find the content by given ID:" + contentId);
+	    SurveyServiceImpl.log.debug("Could not find the content by given ID:" + contentId);
 	}
 	return rs;
     }

@@ -191,7 +191,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     public Spreadsheet getSpreadsheetByContentId(Long contentId) {
 	Spreadsheet rs = spreadsheetDao.getByContentId(contentId);
 	if (rs == null) {
-	    SpreadsheetServiceImpl.log.error("Could not find the content by given ID:" + contentId);
+	    SpreadsheetServiceImpl.log.debug("Could not find the content by given ID:" + contentId);
 	}
 	return rs;
     }

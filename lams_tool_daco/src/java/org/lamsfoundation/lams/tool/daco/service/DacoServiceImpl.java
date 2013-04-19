@@ -287,7 +287,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     public Daco getDacoByContentId(Long contentId) {
 	Daco daco = dacoDao.getByContentId(contentId);
 	if (daco == null) {
-	    DacoServiceImpl.log.error("Could not find the content by given ID:" + contentId);
+	    DacoServiceImpl.log.debug("Could not find the content by given ID:" + contentId);
 	}
 	return daco;
     }

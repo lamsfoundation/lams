@@ -141,7 +141,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     public TaskList getTaskListByContentId(Long contentId) {
 	TaskList rs = taskListDao.getByContentId(contentId);
 	if (rs == null) {
-	    TaskListServiceImpl.log.error("Could not find the content by given ID:" + contentId);
+	    TaskListServiceImpl.log.debug("Could not find the content by given ID:" + contentId);
 	}
 	return rs;
     }
