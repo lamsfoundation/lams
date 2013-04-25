@@ -1538,21 +1538,31 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     @SuppressWarnings("unchecked")
     private String forceUncompleteActivity(LearnerProgress learnerProgress, Activity previousActivity) {
 	Activity currentActivity = learnerProgress.getCurrentActivity();
+	if (currentActivity == null) {
+	    // Learner has finished the whole lesson. Find the last activity by traversing the transition.
+	    currentActivity = learnerProgress.getLesson().getLearningDesign().getFirstActivity();
+	    while (currentActivity.getTransitionFrom() != null) {
+		currentActivity = currentActivity.getTransitionFrom().getToActivity();
+	    }
+	}
 
 	learnerProgress.setLessonComplete(LearnerProgress.LESSON_NOT_COMPLETE);
 	learnerProgress.setFinishDate(null);
-	
+
+	// set previous/current/next activity fields
 	learnerProgress.setPreviousActivity(previousActivity);
 	Activity targetActivity = previousActivity == null ? learnerProgress.getLesson().getLearningDesign()
 		.getFirstActivity() : previousActivity.getTransitionFrom().getToActivity();
 	learnerProgress.setCurrentActivity(targetActivity);
 	learnerProgress.setNextActivity(targetActivity);
 
+	// set target activity as attempted
 	CompletedActivityProgress completedActivityProgress = learnerProgress.getCompletedActivities().get(
 		targetActivity);
 	learnerProgress.getCompletedActivities().remove(targetActivity);
 	learnerProgress.getAttemptedActivities().put(targetActivity, completedActivityProgress.getStartDate());
 
+	// remove completed activities step by step, all the way from current to target activity
 	do {
 	    if (currentActivity.isComplexActivity()) {
 		// remove all records within complex activity
@@ -1573,6 +1583,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    learnerProgress.getAttemptedActivities().remove(currentActivity);
 	    learnerProgress.getCompletedActivities().remove(currentActivity);
 
+	    Long id = currentActivity.getActivityId();
 	    Transition transitionTo = currentActivity.getTransitionTo();
 	    if (transitionTo == null) {
 		// reached beginning of either sequence or complex activity
@@ -1596,7 +1607,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
 	} while (!currentActivity.equals(targetActivity));
 
-	learnerProgressDAO.saveLearnerProgress(learnerProgress);
+	learnerProgressDAO.updateLearnerProgress(learnerProgress);
 	return messageService.getMessage(MonitoringService.FORCE_COMPLETE_STOP_MESSAGE_COMPLETED_TO_ACTIVITY,
 		new Object[] { targetActivity.getTitle() });
     }
