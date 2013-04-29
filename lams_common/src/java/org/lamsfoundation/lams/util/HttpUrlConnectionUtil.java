@@ -63,7 +63,13 @@ public class HttpUrlConnectionUtil {
     public static final int STATUS_OK = 1;
     public static final int STATUS_ERROR = -1;
 
+    // environment variables
+    public static final String JBOSS_BIND_ADDRESS_KEY = "jboss.bind.address";
+    // if JBoss bind port is different than 8080, this must be set using -Dlams.port=XXXX as a command line parameter
+    public static final String LAMS_PORT_KEY = "lams.port";
+
     private static boolean defaultTrustManagerSet = false;
+    private static String lamsLocalAddress;
 
     /**
      * Write URL connection repsonse to <code>OutputStream</code>.
@@ -315,5 +321,21 @@ public class HttpUrlConnectionUtil {
 	}
 
 	return con;
+    }
+
+    public static String getLamsLocalAddress() {
+	if (HttpUrlConnectionUtil.lamsLocalAddress == null) {
+	    // get address where JBoss is running for localhost calls, otherwise there is a problem with load balancing
+	    String port = System.getProperty(HttpUrlConnectionUtil.LAMS_PORT_KEY);
+	    // if there is no port given explicitly as parameter, fall back to SERVER_URL
+	    if (port == null) {
+		HttpUrlConnectionUtil.lamsLocalAddress = Configuration.get(ConfigurationKeys.SERVER_URL);
+	    } else {
+		HttpUrlConnectionUtil.lamsLocalAddress = "http://"
+			+ System.getProperty(HttpUrlConnectionUtil.JBOSS_BIND_ADDRESS_KEY) + ":" + port + "/"
+			+ Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH);
+	    }
+	}
+	return HttpUrlConnectionUtil.lamsLocalAddress;
     }
 }

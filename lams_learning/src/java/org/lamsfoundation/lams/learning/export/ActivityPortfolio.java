@@ -40,7 +40,7 @@ public class ActivityPortfolio {
     private String activityDescription;
     private String activityName;
     private String exportUrl;
-    private List childPortfolios;
+    private List<ActivityPortfolio> childPortfolios;
     /* The link to the tool page from the main export page */
     private String toolLink;
     private boolean headingNoPage;
@@ -56,7 +56,7 @@ public class ActivityPortfolio {
 
     /**
      * @param toolLink
-     *                The toolLink to set.
+     *            The toolLink to set.
      */
     public void setToolLink(String toolLink) {
 	this.toolLink = toolLink;
@@ -82,7 +82,7 @@ public class ActivityPortfolio {
 
     /**
      * @param activityName
-     *                The activityName to set.
+     *            The activityName to set.
      */
     public void setActivityName(String activityName) {
 	this.activityName = activityName;
@@ -97,7 +97,7 @@ public class ActivityPortfolio {
 
     /**
      * @param exportUrl
-     *                The exportUrl to set.
+     *            The exportUrl to set.
      */
     public void setExportUrl(String exportUrl) {
 	this.exportUrl = exportUrl;
@@ -112,7 +112,7 @@ public class ActivityPortfolio {
 
     /**
      * @param activityId
-     *                The activityId to set.
+     *            The activityId to set.
      */
     public void setActivityId(Long activityId) {
 	this.activityId = activityId;
@@ -127,18 +127,18 @@ public class ActivityPortfolio {
 
     /**
      * @param activityDescription
-     *                The activityDescription to set.
+     *            The activityDescription to set.
      */
     public void setActivityDescription(String activityDescription) {
 	this.activityDescription = activityDescription;
     }
 
     /** Get the portfolios for any sub activities. Will return null for tool portfolios */
-    public List getChildPortfolios() {
+    public List<ActivityPortfolio> getChildPortfolios() {
 	return childPortfolios;
     }
 
-    public void setChildPortfolios(List childPortfolios) {
+    public void setChildPortfolios(List<ActivityPortfolio> childPortfolios) {
 	this.childPortfolios = childPortfolios;
     }
 
@@ -155,9 +155,10 @@ public class ActivityPortfolio {
     public void setHeadingNoPage(boolean headingNoPage) {
 	this.headingNoPage = headingNoPage;
     }
-    
+
     /**
      * Identifies this portfolio as of a Floating Activity
+     * 
      * @return
      */
     public boolean isFloating() {

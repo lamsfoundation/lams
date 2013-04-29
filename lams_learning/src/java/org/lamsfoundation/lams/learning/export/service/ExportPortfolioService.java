@@ -96,7 +96,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 
     /**
      * @param learnerService
-     *                The learnerService to set.
+     *            The learnerService to set.
      */
     public void setLearnerService(ICoreLearnerService learnerService) {
 	this.learnerService = learnerService;
@@ -104,7 +104,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 
     /**
      * @param learnerService
-     *                The learnerService to set.
+     *            The learnerService to set.
      */
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
@@ -112,7 +112,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 
     /**
      * @param activityDAO
-     *                The activityDAO to set.
+     *            The activityDAO to set.
      */
     public void setActivityDAO(IActivityDAO activityDAO) {
 	this.activityDAO = activityDAO;
@@ -120,7 +120,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 
     /**
      * @param lessonDAO
-     *                The lessonDAO to set.
+     *            The lessonDAO to set.
      */
     public void setLessonDAO(ILessonDAO lessonDAO) {
 	this.lessonDAO = lessonDAO;
@@ -132,7 +132,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
 
     /**
      * @param lamsCoreToolService
-     *                The lamsCoreToolService to set.
+     *            The lamsCoreToolService to set.
      */
     public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
 	this.lamsCoreToolService = lamsCoreToolService;
@@ -147,6 +147,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
     }
 
     /** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#exportPortfolioForTeacher(org.lamsfoundation.lams.lesson.Lesson) */
+    @Override
     public Portfolio exportPortfolioForTeacher(Long lessonId, Cookie[] cookies) {
 	Lesson lesson = lessonDAO.getLesson(lessonId);
 
@@ -187,6 +188,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
      * @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#exportPortfolioForStudent(java.lang.Long,
      *      org.lamsfoundation.lams.usermanagement.User,boolean)
      */
+    @Override
     public Portfolio exportPortfolioForStudent(Integer userId, Long lessonID, boolean anonymity,
 	    ToolAccessMode accessMode, Cookie[] cookies) {
 	ArrayList<ActivityPortfolio> portfolios = null;
@@ -255,6 +257,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
     }
 
     /** @see org.lamsfoundation.lams.learning.export.service.IExportPortfolioService#zipPortfolio(String, String) */
+    @Override
     public String zipPortfolio(String filename, String directoryToZip) {
 	String zipfileName, dirToPutZip;
 	// create tmp dir to put zip file
@@ -307,12 +310,12 @@ public class ExportPortfolioService implements IExportPortfolioService {
 
     }
 
-    private void processPortfolios(List portfolios, Cookie[] cookies, String tempDirectoryName) {
+    private void processPortfolios(List<ActivityPortfolio> portfolios, Cookie[] cookies, String tempDirectoryName) {
 
-	Iterator i = portfolios.iterator();
+	Iterator<ActivityPortfolio> i = portfolios.iterator();
 	// iterate through the list of portfolios, create subdirectory,
 	while (i.hasNext()) {
-	    ActivityPortfolio activityPortfolio = (ActivityPortfolio) i.next();
+	    ActivityPortfolio activityPortfolio = i.next();
 
 	    // create a subdirectory with the name ActivityXX where XX is the activityId
 	    String subDirectoryName = ExportPortfolioConstants.SUBDIRECTORY_BASENAME
@@ -326,32 +329,33 @@ public class ExportPortfolioService implements IExportPortfolioService {
 
 	    // for security reasons, append the relative directory name to the end of the export url instead of the
 	    // whole path
-	    String relativePath = activitySubDirectory.substring(FileUtil.getTempDir().length() + 1, activitySubDirectory
-		    .length());
+	    String relativePath = activitySubDirectory.substring(FileUtil.getTempDir().length() + 1,
+		    activitySubDirectory.length());
 
 	    // Some activities (parallel, optional, sequence) don't have export urls.
 	    if (!activityPortfolio.isHeadingNoPage()) {
-		activityPortfolio.setExportUrl(ExportPortfolioConstants.HOST + activityPortfolio.getExportUrl());
+		activityPortfolio.setExportUrl(HttpUrlConnectionUtil.getLamsLocalAddress()
+			+ activityPortfolio.getExportUrl());
 		activityPortfolio.setExportUrl(WebUtil.appendParameterToURL(activityPortfolio.getExportUrl(),
 			AttributeNames.PARAM_DIRECTORY_NAME, relativePath));
 
 		// get tool to export its files, mainFileName is the name of the main HTML page that the tool exported.
-		String mainFileName = connectToToolViaExportURL(activityPortfolio.getActivityName(), activityPortfolio
-			.getExportUrl(), cookies, activitySubDirectory);
+		String mainFileName = connectToToolViaExportURL(activityPortfolio.getActivityName(),
+			activityPortfolio.getExportUrl(), cookies, activitySubDirectory);
 
 		// toolLink is used in main page, so that it can link with the tools export pages.
 		String toolLink = subDirectoryName + "/" + mainFileName;
 		activityPortfolio.setToolLink(toolLink);
 	    }
 
-	    if (activityPortfolio.getChildPortfolios() != null && activityPortfolio.getChildPortfolios().size() > 0) {
+	    if ((activityPortfolio.getChildPortfolios() != null) && (activityPortfolio.getChildPortfolios().size() > 0)) {
 		processPortfolios(activityPortfolio.getChildPortfolios(), cookies, tempDirectoryName);
 	    }
 	}
 
     }
 
-    private void processNotes(List notes, String tempDirectoryName, Portfolio portfolio) {
+    private void processNotes(List<NotebookPortfolio> notes, String tempDirectoryName, Portfolio portfolio) {
 
 	if (notes.size() > 0) {
 
@@ -379,9 +383,9 @@ public class ExportPortfolioService implements IExportPortfolioService {
      * calling the FileUtil directly.
      * 
      * @param parentDir
-     *                The name of the parent directory
+     *            The name of the parent directory
      * @param subDir
-     *                The name of the child directory to create.
+     *            The name of the child directory to create.
      * @return true is the subdirectory was created, false otherwise
      */
     private boolean createSubDirectory(String parentDir, String subDir) {
@@ -403,9 +407,9 @@ public class ExportPortfolioService implements IExportPortfolioService {
      * files anyway, after the export is done)
      * 
      * @param parentDir
-     *                The name of the parent directory
+     *            The name of the parent directory
      * @param subDir
-     *                The name of the child directory to create.
+     *            The name of the child directory to create.
      * @return true is the subdirectory was created, false otherwise
      */
     private String createDirectory(String name) {
@@ -450,11 +454,9 @@ public class ExportPortfolioService implements IExportPortfolioService {
     }
 
     /** Generate the main page, given this portfolio */
+    @Override
     public void generateMainPage(HttpServletRequest request, Portfolio portfolio, Cookie[] cookies) {
-
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-		+ request.getContextPath();
-	String url = basePath + "/exportPortfolio/main.jsp";
+	String url = HttpUrlConnectionUtil.getLamsLocalAddress() + "learning/exportPortfolio/main.jsp";
 
 	String filename = ExportPortfolioConstants.MAIN_EXPORT_FILENAME;
 	try {
@@ -472,11 +474,9 @@ public class ExportPortfolioService implements IExportPortfolioService {
     }
 
     /** Generate the main page, given this portfolio */
+    @Override
     public void generateNotebookPage(HttpServletRequest request, Portfolio portfolio, Cookie[] cookies) {
-
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-		+ request.getContextPath();
-	String url = basePath + "/exportPortfolio/notebook.jsp";
+	String url = HttpUrlConnectionUtil.getLamsLocalAddress() + "learning/exportPortfolio/notebook.jsp";
 
 	String filename = ExportPortfolioConstants.MAIN_NOTEBOOK_FILENAME;
 	try {
@@ -510,6 +510,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
      * Gets the themes for the current user. This is used to determine the stylesheets included in the export file. We
      * need the full theme, not just the name, so we can get the directory names for the images.
      */
+    @Override
     public Collection<Theme> getUserThemes() {
 	List<String> themeNames = CSSThemeUtil.getAllUserThemes();
 	Set<Theme> userThemes = new HashSet<Theme>();
