@@ -491,19 +491,21 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 			var executeForceComplete = false;
 			
 			if (act.attr('id') == 'completedLearnersContainer') {
-				executeForceComplete = confirm(FORCE_COMPLETE_END_LESSON_CONFIRM_LABEL
+				executeForceComplete =  currentActivityId && confirm(FORCE_COMPLETE_END_LESSON_CONFIRM_LABEL
 						.replace('[0]',learnerName));
 			} else {
-				var transitionLine = $('line[id$="to_' 
-						+ act.parent().attr('id') + '"]:not([id^="arrow"])'
-						, sequenceCanvas);
-				// if move to start of sequence, the value is -1
-				previousActivityId = transitionLine.length == 1 ?
-						transitionLine.attr('id').split('_')[0] : -1;
-						
-				var targetActivityName = act.siblings('text[id^="TextElement"]').text();
-				executeForceComplete = confirm(FORCE_COMPLETE_ACTIVITY_CONFIRM_LABEL
-							.replace('[0]', learnerName).replace('[1]', targetActivityName));
+				var targetActivityId = act.parent().attr('id');
+				if (currentActivityId != targetActivityId) {
+					var transitionLine = $('line[id$="to_' + targetActivityId + '"]:not([id^="arrow"])'
+							,sequenceCanvas);
+					// if move to start of sequence, the value is -1
+					previousActivityId = transitionLine.length == 1 ?
+							transitionLine.attr('id').split('_')[0] : -1;
+							
+					var targetActivityName = act.siblings('text[id^="TextElement"]').text();
+					executeForceComplete = confirm(FORCE_COMPLETE_ACTIVITY_CONFIRM_LABEL
+								.replace('[0]', learnerName).replace('[1]', targetActivityName));
+				}
 			}
 			
 			if (executeForceComplete) {
@@ -608,9 +610,9 @@ function addLearnerIconsHandlers(activity) {
 				 // double click on learner icon to see activity from his perspective
 				event.stopPropagation();
 				openWindow(LAMS_URL + learner.url, "LearnActivity", 800, 600);
-			})
+			}).css('cursor', 'pointer')
 			// drag learners to force complete activities
-			.draggable({
+			  .draggable({
 				'appendTo'    : '#tabSequence',
 				'containment' : '#tabSequence',
 			    'distance'    : 20,
@@ -677,7 +679,25 @@ function addCompletedLearnerIcons(learners, learnerTotalCount) {
 				$('<img />').attr({
 					'src' : LAMS_URL + 'images/icons/user.png',
 					'title'      : getLearnerDisplayName(learner)
-				}).appendTo(iconsContainer);
+				}).css('cursor', 'pointer')
+				// drag learners to force complete activities
+				  .draggable({
+					'appendTo'    : '#tabSequence',
+					'containment' : '#tabSequence',
+				    'distance'    : 20,
+				    'scroll'      : false,
+				    'cursorAt'	  : {'left' : 10, 'top' : 15},
+					'helper'      : function(event){
+						// copy of the icon for dragging
+						return $('<img />').attr('src', LAMS_URL + 'images/icons/user.png');
+					},
+					'stop' : function(event, ui) {
+						// jQuery droppable does not work for SVG, so this is a workaround
+						forceComplete(null, learner.id, getLearnerDisplayName(learner),
+								      ui.offset.left, ui.offset.top);
+					}
+				})
+				.appendTo(iconsContainer);
 			}
 		});
 	}
