@@ -33,8 +33,8 @@
 <%@ page import="blackboard.data.gradebook.Lineitem" %>
 <%@ page import="blackboard.persist.gradebook.LineitemDbPersister" %>
 <%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsPluginUtil"%>    
-<%@ page import="org.lamsfoundation.ld.integration.Constants" %> 
+<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsPluginUtil"%>
+<%@ page import="org.lamsfoundation.ld.integration.Constants" %>
 <%@ page import="blackboard.portal.data.*" %>
 <%@ page import="blackboard.portal.servlet.PortalUtil" %>
 <%@ page import="blackboard.persist.PersistenceException" %>
@@ -44,11 +44,18 @@
 <bbNG:genericPage title="LAMS Learning Activity Management System" ctxId="ctx">
 
        <%-- Set the new LAMS Lesson Content Object --%>
+<%
+// Note: Following is the original class used for the content creation. However, it appears to cause a security problem and users need to click thrice instead of twice to get to the item.
+// Change Part 1
+// Comment out the jsp tags.
+/* **
     <jsp:useBean id="newLesson" scope="page" class="blackboard.data.content.CourseDocument"/>
     <jsp:setProperty name="newLesson" property="title"/>
     <jsp:setProperty name="newLesson" property="isAvailable"/>
     <jsp:setProperty name="newLesson" property="isTracked"/>
-	
+** */
+	blackboard.data.content.ExternalLink newLesson = new blackboard.data.content.ExternalLink();
+%>
     <%
         // SECURITY!
         // Authorise current user for Course Control Panel (automatic redirect)
@@ -58,40 +65,40 @@
         } catch(PlugInException e) {
             throw new RuntimeException(e);
         }
-    
-                
+
+
 		// Retrieve the Db persistence manager from the persistence service
         BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
         ContentDbPersister contentPersister = (ContentDbPersister) bbPm.getPersister( ContentDbPersister.TYPE );
-	    
+
         // Internal Blackboard IDs for the course and parent content item
         Id courseId = bbPm.generateId(Course.DATA_TYPE,request.getParameter("course_id"));
         Id folderId = bbPm.generateId(CourseDocument.DATA_TYPE,request.getParameter("content_id"));
-	    
+
 		// Load parent content item
         ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
 		ContentFolder courseDocParent = (ContentFolder)courseDocumentLoader.loadById( folderId );
-	
+
         // Get the session object to obtain the user and course object
         BbSessionManagerService sessionService = BbServiceManager.getSessionManagerService();
         BbSession bbSession = sessionService.getSession( request );
-        
+
         // Get the form parameters and convert into correct data types
         // TODO: Use bb text area instead
         String strTitle = request.getParameter("title").trim();
         String strDescription = request.getParameter("description").trim();
         FormattedText description = new FormattedText(strDescription, FormattedText.Type.HTML);
-        
+
         String strSequenceID = request.getParameter("sequence_id").trim();
-        long ldId = Long.parseLong(strSequenceID);               
-        
+        long ldId = Long.parseLong(strSequenceID);
+
         String strIsAvailable = request.getParameter("isAvailable");
         String strIsTracked = request.getParameter("isTracked");
         boolean isAvailable = strIsAvailable.equals("true")?true:false;
         boolean isTracked = strIsTracked.equals("true")?true:false;
-        
+
         String isDisplayDesignImage = request.getParameter("isDisplayDesignImage");
-        
+
         String strStartDate = request.getParameter("lessonAvailability_start_datetime");
         String strEndDate = request.getParameter("lessonAvailability_end_datetime");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -99,39 +106,41 @@
 		Calendar endDate = Calendar.getInstance();
         startDate.setTime(formatter.parse(strStartDate));
         endDate.setTime(formatter.parse(strEndDate));
-        
+
         String strStartDateCheckbox = request.getParameter("lessonAvailability_start_checkbox");
         String strEndDateCheckbox = request.getParameter("lessonAvailability_end_checkbox");
-	    
+
         // Set the New LAMS Lesson content data (in Blackboard)
         newLesson.setTitle(strTitle);
 		newLesson.setIsAvailable(isAvailable);
         newLesson.setIsTracked(isTracked);
         newLesson.setAllowGuests(false);
-		
-        newLesson.setContentHandler(LamsPluginUtil.CONTENT_HANDLE);
+// Change Part 2
+//        newLesson.setContentHandler(LamsPluginUtil.CONTENT_HANDLE);
+        newLesson.setLaunchInNewWindow(true);
+
         newLesson.setCourseId(courseId);
         newLesson.setParentId(folderId);
-	    
+
         newLesson.setRenderType(Content.RenderType.URL);
         newLesson.setBody(description);
-        
+
         // Start the Lesson in LAMS (via Webservices)
         // Capture the lesson ID
         String lessonIdStr = null;
-        try{  	
+        try{
             long lessonId = LamsSecurityUtil.startLesson(ctx, ldId, strTitle, strDescription, false);
             //error checking
             if (lessonId == -1) {
                 response.sendRedirect("lamsServerDown.jsp");
                 System.exit(1);
             }
-	    	
+
             lessonIdStr = Long.toString(lessonId);
         } catch (Exception e){
             throw new ServletException(e.getMessage(), e);
         }
-        
+
         //Create new Gradebook column for current lesson
         Lineitem lineitem = new Lineitem();
 	    lineitem.setCourseId(courseId);
@@ -145,16 +154,16 @@
 		lineitem.validate();
 	    LineitemDbPersister linePersister= (LineitemDbPersister) bbPm.getPersister( LineitemDbPersister.TYPE );
 	    linePersister.persist(lineitem);
-	    
+
 	    OutcomeDefinitionDbPersister ocdPersister = (OutcomeDefinitionDbPersister)bbPm.getPersister(OutcomeDefinitionDbPersister.TYPE);
 	    OutcomeDefinition ocd = lineitem.getOutcomeDefinition();
 	    ocd.setCourseId(courseId);
 	    ocd.setPosition(1);
 
-		
+
 	    OutcomeDefinitionScaleDbLoader ods2Loader = (OutcomeDefinitionScaleDbLoader)bbPm.getLoader(OutcomeDefinitionScaleDbLoader.TYPE);
 	    OutcomeDefinitionScaleDbPersister uutcomeDefinitionScaleDbPersister = (OutcomeDefinitionScaleDbPersister)bbPm.getPersister(OutcomeDefinitionScaleDbPersister.TYPE);
-	    
+
 	    boolean hasLessonScoreOutputs = LamsSecurityUtil.hasLessonScoreOutputs(ctx);
 	    OutcomeDefinitionScale ods;
 	    if (hasLessonScoreOutputs) {
@@ -171,28 +180,30 @@
 	    uutcomeDefinitionScaleDbPersister.persist(ods);
 	    ocd.setScale(ods);
 	    ocdPersister.persist(ocd);
-	    
-	    
-	    
-	    
+
+
+
+
 	    // Add port to the url if the port is in the blackboard url.
 	    int bbport = request.getServerPort();
 	    String bbportstr = bbport != 0 ? ":" + bbport : "";
-		
+
+// Change Part 3
 	    //Build and set the content URL
 	    String contentUrl = request.getScheme()
 	        + "://" +
-	        request.getServerName() + 
+	        request.getServerName() +
 	        bbportstr +
-	        request.getContextPath() + 
-	        "/modules/learnermonitor.jsp?lsid=" + lessonIdStr + 
-	        "&course_id=" + request.getParameter("course_id") + "&lineitemid=" + lineitem.getId() + 
-	        "&ldid=" + ldId + "&isDisplayDesignImage=" + isDisplayDesignImage + "&title=" + URLEncoder.encode(strTitle) + "&description=" + URLEncoder.encode(strDescription);
-		
+	        request.getContextPath() +
+	        "/modules/learnermonitor.jsp?lsid=" + lessonIdStr +
+	        "&course_id=" + request.getParameter("course_id") + "&lineitemid=" + lineitem.getId() +
+	        "&ldid=" + ldId + "&isDisplayDesignImage=" + isDisplayDesignImage + "&title=" + URLEncoder.encode(strTitle);
+	        //+ "&description=" + URLEncoder.encode(strDescription);
+
 	    newLesson.setUrl(contentUrl);
 	    newLesson.setLinkRef(lessonIdStr);
 
-	    // Set Availability Dates	    
+	    // Set Availability Dates
 	    // Start Date
 	    if (strStartDateCheckbox != null){
 	        if (strStartDateCheckbox.equals("1")){
@@ -209,7 +220,7 @@
 	    //Persist the New Lesson Object in Blackboard
 	    ContentDbPersister persister= (ContentDbPersister) bbPm.getPersister( ContentDbPersister.TYPE );
 	    persister.persist( newLesson );
-	    
+
 	    //store internalContentId -> externalContentId. This is required for lesson and according lineitem removal (see delete.jsp)
 		PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
 		ExtraInfo ei = pei.getExtraInfo();
@@ -217,7 +228,7 @@
 	    String newLessonKeyId = "_" + newLessonPkId.getPk1() + "_" + newLessonPkId.getPk2();
 		ei.setValue(newLessonKeyId, lessonIdStr);
 		PortalUtil.savePortalExtraInfo(pei);
-	    
+
         String strReturnUrl = PlugInUtil.getEditableContentReturnURL(newLesson.getParentId(), courseId);
 	%>
 
@@ -225,18 +236,18 @@
     <bbNG:breadcrumbBar environment="COURSE" isContent="true">
         <bbNG:breadcrumb title="Start A LAMS Lesson" />
     </bbNG:breadcrumbBar>
-	
+
     <%-- Page Header --%>
-    <bbNG:pageHeader>    	
+    <bbNG:pageHeader>
         <bbNG:pageTitleBar title="Start A LAMS Lesson"/>
     </bbNG:pageHeader>
 
     <%-- Receipt --%>
-    <bbNG:receipt type="SUCCESS" 
-        iconUrl="/images/ci/icons/receiptsuccess_u.gif" 
-        title="Start A LAMS Lesson" 
+    <bbNG:receipt type="SUCCESS"
+        iconUrl="/images/ci/icons/receiptsuccess_u.gif"
+        title="Start A LAMS Lesson"
         recallUrl="<%=strReturnUrl%>">
             Content successfully added.
     </bbNG:receipt>
-        
+
 </bbNG:genericPage>
