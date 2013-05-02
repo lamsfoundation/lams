@@ -5,7 +5,7 @@
     <name value= "LAMS2 Module"/>
     <handle value= "lamscontent"/>
     <description value= "LAMS2 and Blackboard integration allows LAMS2 leaning designs to be managed and views in a Blackboard Environment."/>
-    <version value= "1.2.0"/>
+    <version value= "1.2.1"/>
     <requires>
       <bbversion value="9.1.0"/>
     </requires>
