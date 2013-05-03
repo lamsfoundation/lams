@@ -98,10 +98,13 @@
 		<property name="eventNotificationService">
 			<ref bean="eventNotificationService"/>
 		</property>   
-		<property name="lessonService">
-   			<ref bean="lessonService"/>
+		<property name="lamsCoreToolService">
+   			<ref bean="lamsCoreToolService"/>
    		</property>
-				<property name="scratchieOutputFactory"><ref bean="scratchieOutputFactory"/></property>
+   		<property name="activityDAO">
+   			<ref bean="activityDAO"/>
+   		</property>
+		<property name="scratchieOutputFactory"><ref bean="scratchieOutputFactory"/></property>
     </bean>
 
     <bean id="scratchieService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -119,7 +122,7 @@
                 <prop key="remove*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="save*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setGroupLeader">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copyScratchesFromLeader">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setScratchingFinished">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setAsDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

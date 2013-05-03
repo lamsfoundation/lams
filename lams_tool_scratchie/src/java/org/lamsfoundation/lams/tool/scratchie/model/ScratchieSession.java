@@ -50,6 +50,7 @@ public class ScratchieSession {
     private int status;
     // scratchie Items
     private Set scratchieItems;
+    private ScratchieUser groupLeader;
 
     // **********************************************************
     // Get/Set methods
@@ -159,6 +160,18 @@ public class ScratchieSession {
 
     public void setScratchieItems(Set scratchieItems) {
 	this.scratchieItems = scratchieItems;
+    }
+    
+    /**
+     * @hibernate.many-to-one not-null="true"
+     * @hibernate.column name="group_leader_uid"
+     */
+    public ScratchieUser getGroupLeader() {
+	return this.groupLeader;
+    }
+
+    public void setGroupLeader(ScratchieUser groupLeader) {
+	this.groupLeader = groupLeader;
     }
 
 }

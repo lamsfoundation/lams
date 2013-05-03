@@ -197,9 +197,6 @@
 			<html:link href="javascript:exportExcel();" styleClass="button float-right space-left">
 				<fmt:message key="label.export.excel" />
 			</html:link>
-			<a href="<c:url value='/monitoring/manageLeaders.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=400&width=650" class="float-right button thickbox" <fmt:message key="label.manage.leaders" />>
-				<fmt:message key="label.manage.leaders" />
-			</a>
 		</div>
 	
 	</c:otherwise>

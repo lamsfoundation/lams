@@ -87,9 +87,6 @@ public class LearningAction extends Action {
 	if (param.equals("refreshQuestionList")) {
 	    return refreshQuestionList(mapping, form, request, response);
 	}
-	if (param.equals("becomeLeader")) {
-	    return becomeLeader(mapping, form, request, response);
-	}
 	if (param.equals("scratchItem")) {
 	    return scratchItem(mapping, form, request, response);
 	}
@@ -128,7 +125,7 @@ public class LearningAction extends Action {
 	// get back the scratchie and item list and display them on page
 	IScratchieService service = getScratchieService();
 	Scratchie scratchie = service.getScratchieBySessionId(toolSessionId);
-	
+
 	ScratchieUser user = null;
 	if (mode != null && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
@@ -138,38 +135,38 @@ public class LearningAction extends Action {
 	} else {
 	    user = getCurrentUser(service, toolSessionId);
 	}
-	
-	ScratchieUser groupLeader = service.getGroupLeader(toolSessionId);
-	//forwards to the leaderSelection page
-	if ((groupLeader == null) && !mode.isTeacher()) {
+
+	ScratchieUser groupLeader = service.checkLeaderSelectToolForSessionLeader(user, toolSessionId);
+
+	// forwards to the leaderSelection page
+	if (groupLeader == null && !mode.isTeacher()) {
+
 	    List<ScratchieUser> groupUsers = service.getUsersBySession(toolSessionId);
 	    request.setAttribute(ScratchieConstants.ATTR_GROUP_USERS, groupUsers);
 	    request.setAttribute(ScratchieConstants.PARAM_TOOL_SESSION_ID, toolSessionId);
 	    request.setAttribute(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
-	    
-	    //checks whether to display dialog prompting to become a leader
-	    boolean nodialog = WebUtil.readBooleanParam(request, "nodialog", false);
-	    request.setAttribute("nodialog", nodialog);
-	    return mapping.findForward("leaderSelection");
+
+	    return mapping.findForward("waitforleader");
 	}
-	
-	//in case user joins the lesson after leader has scratched some answers already - we need to make sure he has the same scratches as leader 
-	if (!mode.isTeacher()) {
+
+	if (groupLeader != null && !mode.isTeacher()) {
+	    // in case user joins the lesson after leader has scratched some answers already - we need to make sure
+	    // he has the same scratches as leader
 	    service.copyScratchesFromLeader(user, groupLeader);
-	    
-	    //if user joins a lesson after leader has already finished an activity set his scratchingFinished parameter to true
+
+	    // if user joins a lesson after leader has already finished an activity set his scratchingFinished
+	    // parameter to true
 	    if (groupLeader.isScratchingFinished()) {
 		user.setScratchingFinished(true);
 		service.saveUser(user);
 	    }
 	}
-	
+
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
-	
 	// get notebook entry
 	String entryText = new String();
 	if (groupLeader != null) {
@@ -186,6 +183,8 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_USER_ID, user.getUserId());
 	sessionMap.put(ScratchieConstants.ATTR_USER, user);
 	sessionMap.put(ScratchieConstants.ATTR_GROUP_LEADER, groupLeader);
+	boolean isUserLeader = service.isUserGroupLeader(user, toolSessionId);
+	sessionMap.put(ScratchieConstants.ATTR_IS_USER_LEADER, isUserLeader);
 	boolean isUserFinished = user != null && user.isSessionFinished();
 	sessionMap.put(ScratchieConstants.ATTR_USER_FINISHED, isUserFinished);
 	sessionMap.put(ScratchieConstants.ATTR_IS_SHOW_RESULTS_PAGE, scratchie.isShowResultsPage());
@@ -206,10 +205,10 @@ public class LearningAction extends Action {
 	scratchie.setDefineLater(false);
 	service.saveOrUpdateScratchie(scratchie);
 
-	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId, request, getServlet()
-		.getServletContext());
+	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(
+		toolSessionId, request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
-	
+
 	// add run offline support
 	if (scratchie.getRunOffline()) {
 	    sessionMap.put(ScratchieConstants.PARAM_RUN_OFFLINE, true);
@@ -219,13 +218,14 @@ public class LearningAction extends Action {
 	}
 
 	Set<ScratchieItem> initialItems = scratchie.getScratchieItems();
-	// becuase in webpage will use this login name. Here is just initialize it to avoid session close error in proxy object.
+	// becuase in webpage will use this login name. Here is just initialize it to avoid session close error in proxy
+	// object.
 	for (ScratchieItem item : initialItems) {
 	    if (item.getCreateBy() != null) {
 		item.getCreateBy().getLoginName();
 	    }
 	}
-	
+
 	// for teacher in monitoring display the number of attempt.
 	if (mode.isTeacher()) {
 	    service.retrieveScratchesOrder(initialItems, user);
@@ -235,15 +235,15 @@ public class LearningAction extends Action {
 	if (user != null) {
 	    service.retrieveScratched(initialItems, user);
 	}
-	
+
 	Collection<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
 	items.addAll(initialItems);
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 	boolean isScratchingFinished = user != null && user.isScratchingFinished();
 	sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, isScratchingFinished);
-	
-	//decide whether to show results page or learning one
+
+	// decide whether to show results page or learning one
 	if (scratchie.isShowResultsPage() && isScratchingFinished && !mode.isTeacher()) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
 	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
@@ -252,16 +252,15 @@ public class LearningAction extends Action {
 	} else {
 	    return mapping.findForward(ScratchieConstants.SUCCESS);
 	}
-	
+
     }
-    
+
     /**
      * Refresh
-     * 
      */
     private ActionForward refreshQuestionList(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	
+
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -269,55 +268,29 @@ public class LearningAction extends Action {
 
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	ScratchieUser user = getCurrentUser(service, toolSessionId);
-	
+
 	// get back the scratchie and item list and display them on page
 	Scratchie scratchie = service.getScratchieBySessionId(toolSessionId);
 
 	Collection<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
-	
+
 	// set scratched flag for display purpose
 	if (user != null) {
 	    service.retrieveScratched(items, user);
 	}
-	
+
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
-	//refresh leadership status
+	// refresh leadership status
 	sessionMap.put(ScratchieConstants.ATTR_USER, user);
-	//refresh ScratchingFinished status
+	// refresh ScratchingFinished status
 	boolean isScratchingFinished = user != null && user.isScratchingFinished();
 	sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, isScratchingFinished);
-	
+
 	return mapping.findForward(ScratchieConstants.SUCCESS);
-	
+
     }
-    
-    /**
-     * Sets current user as a leader of a group.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws JSONException 
-     * @throws IOException 
-     */
-    private ActionForward becomeLeader(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
-	IScratchieService service = getScratchieService();
-	Long toolSessionId = new Long(request.getParameter(ScratchieConstants.PARAM_TOOL_SESSION_ID));
-	
-	ScratchieUser groupLeader = service.getGroupLeader(toolSessionId);
-	//check there is no leader yet. Just in case somebody has pressed "Yes" button faster
-	if (groupLeader == null) {
-	    ScratchieUser user = getCurrentUser(service, toolSessionId);
-	    service.setGroupLeader(user.getUserId(), toolSessionId);
-	}
-	
-	return null;
-    }
-    
+
     /**
      * Scratch specified answer.
      * 
@@ -326,21 +299,21 @@ public class LearningAction extends Action {
      * @param request
      * @param response
      * @return
-     * @throws JSONException 
-     * @throws IOException 
+     * @throws JSONException
+     * @throws IOException
      */
     private ActionForward scratchItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
-	
+
 	IScratchieService service = getScratchieService();
 
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	
+
 	ScratchieUser user = getCurrentUser(service, toolSessionId);
-	//only leaders are allowed to scratch answers
-	if (!user.isLeader()) {
+	// only leaders are allowed to scratch answers
+	if (!service.isUserGroupLeader(user, toolSessionId)) {
 	    return null;
 	}
 
@@ -352,14 +325,14 @@ public class LearningAction extends Action {
 
 	service.setAnswerAccess(answer.getUid(), toolSessionId);
 
-	JSONObject JSONObject = new JSONObject();  
+	JSONObject JSONObject = new JSONObject();
 	JSONObject.put(ScratchieConstants.ATTR_ANSWER_CORRECT, answer.isCorrect());
 	response.setContentType("application/x-json;charset=utf-8");
 	response.getWriter().print(JSONObject);
 	return null;
 
     }
-    
+
     /**
      * Leader presses button show results. All the users set scratchingFinished to true.
      * 
@@ -380,8 +353,8 @@ public class LearningAction extends Action {
 
 	IScratchieService service = getScratchieService();
 	Long userId = (Long) sessionMap.get(ScratchieConstants.ATTR_USER_ID);
-	
-	//only leaders should get to here to finalize scratching
+
+	// only leaders should get to here to finalize scratching
 	service.setScratchingFinished(toolSessionId);
 
 	Set<ScratchieItem> items = service.populateItemsResults(toolSessionId, userId);
@@ -408,12 +381,12 @@ public class LearningAction extends Action {
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	ScratchieUser user = (ScratchieUser) sessionMap.get(AttributeNames.USER);
 	IScratchieService service = getScratchieService();
-	
-	//in case of the leader we should let all other learners see Next Activity button
-	if (user.isLeader()) {
+
+	// in case of the leader we should let all other learners see Next Activity button
+	if (service.isUserGroupLeader(user, toolSessionId)) {
 	    service.setScratchingFinished(toolSessionId);
 	}
-	
+
 	String nextActivityUrl = null;
 	try {
 	    nextActivityUrl = service.finishToolSession(toolSessionId, user.getUserId());
@@ -503,7 +476,7 @@ public class LearningAction extends Action {
     // *************************************************************************************
     // Private method
     // *************************************************************************************
-    
+
     private IScratchieService getScratchieService() {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());

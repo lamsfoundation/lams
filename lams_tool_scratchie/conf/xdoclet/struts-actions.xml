@@ -189,7 +189,7 @@
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
 			parameter="start" >
 			<forward name="success" path="/pages/learning/start.jsp" />
-			<forward name="leaderSelection" path="/pages/learning/leaderselection.jsp" />
+			<forward name="waitforleader" path="/pages/learning/waitforleader.jsp" />
 			<forward name="showResults" path="/learning/showResults.do" />
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
 			<forward name="runOffline" path="/pages/learning/runoffline.jsp" />			
@@ -198,10 +198,6 @@
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
 			parameter="refreshQuestionList" >
 			<forward name="success" path="/pages/learning/questionlist.jsp" />		
-		</action>
-		<action path="/learning/becomeLeader"
-			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
-			parameter="becomeLeader" >
 		</action>
 		<action path="/learning/scratchItem"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
@@ -251,15 +247,6 @@
 			parameter="itemSummary" >
 			<forward name="success" path="/pages/monitoring/parts/itemSummary.jsp" />
 		</action>		
-		<action path="/monitoring/manageLeaders"
-			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
-			parameter="manageLeaders" >
-			<forward name="success" path="/pages/monitoring/manageLeaders.jsp" />
-		</action>
-		<action path="/monitoring/saveLeaders"
-			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
-			parameter="saveLeaders" >
-		</action>
 		<action path="/monitoring/exportExcel"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
 			parameter="exportExcel" >

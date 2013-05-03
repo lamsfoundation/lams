@@ -59,10 +59,11 @@ public interface IScratchieService {
     Scratchie getScratchieByContentId(Long contentId);
     
     /**
+     * @param user
      * @param toolSessionId
-     * @return group leader if available, null otherwise
+     * @return
      */
-    ScratchieUser getGroupLeader(Long toolSessionId);
+    boolean isUserGroupLeader(ScratchieUser user, Long toolSessionId);
     
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
@@ -70,7 +71,7 @@ public interface IScratchieService {
      * @param userId
      * @param toolSessionId
      */
-    void setGroupLeader(Long userId, Long toolSessionId);
+    ScratchieUser checkLeaderSelectToolForSessionLeader(ScratchieUser user, Long toolSessionId);
     
     ScratchieAnswer getScratchieAnswerById (Long answerUid);
     
@@ -320,15 +321,6 @@ public interface IScratchieService {
      * @return message content
      */
     String getMessage(String key);
-
-    /**
-     * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     * 
-     * @param sessionId
-     *                tool session ID
-     * @return list of teachers that monitor the lesson which contains the tool with given session ID
-     */
-    List<User> getMonitorsByToolSessionId(Long sessionId);
     
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.

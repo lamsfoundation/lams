@@ -150,6 +150,12 @@ public class ScratchieConstants {
     public static final String ATTR_USER = "user";
     
     public static final String ATTR_GROUP_LEADER = "groupLeader";
+    
+    public static final String ATTR_IS_USER_LEADER = "isUserLeader";
 
     public static final String LEARNER_MARK = "learner.mark";
+    
+    //Leader selection tool Constants
+    public static final String LEADER_SELECTION_TOOL_SIGNATURE = "lalead11";
+    public static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
 }
