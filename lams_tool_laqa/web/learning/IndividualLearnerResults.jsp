@@ -87,7 +87,7 @@
 
 
 
-							<p>
+							<p class="user-answer">
 								<strong> <fmt:message key="label.learning.yourAnswer" />
 								</strong>
 

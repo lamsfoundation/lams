@@ -90,7 +90,7 @@
 
 					<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswersPresentable}">
 						<c:if test="${answerEntry.key == questionEntry.key}">
-							<p class="small-space-top">
+							<p class="small-space-top user-answer">
 								<strong> <fmt:message key="label.learning.yourAnswer" />
 								</strong>
 								<br>

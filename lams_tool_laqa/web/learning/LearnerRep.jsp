@@ -146,7 +146,7 @@
 									-
 									<lams:Date value="${userData.attemptTime}" />
 								</p>
-								<p>
+								<p class="user-answer">
 									<c:out value="${userData.responsePresentable}" escapeXml="false" />
 								</p>
 								<jsp:include page="parts/ratingStarsDisabled.jsp" />

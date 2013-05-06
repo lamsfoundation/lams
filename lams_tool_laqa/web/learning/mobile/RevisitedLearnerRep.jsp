@@ -149,7 +149,7 @@
 											<span class="field-name"> <c:out value="${userData.userName}" /> </span> -
 											<lams:Date value="${userData.attemptTime}" style="short"/>
 										</p>
-										<p class="space-bottom">
+										<p class="space-bottom user-answer">
 											<c:out value="${userData.responsePresentable}" escapeXml="false" />
 										</p>
 										<jsp:include page="parts/ratingStarsDisabled.jsp" />
