@@ -74,25 +74,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * setAsForceComplete(Long userId) throws QaApplicationException ?
- */
-
-/**
- * <p>
- * Action class that controls the logic of tool behavior.
- * </p>
- * 
- * <p>
- * Note that Struts action class only has the responsibility to navigate page
- * flow. All database operation should go to service layer and data
- * transformation from domain model to struts form bean should go to form bean
- * class. This ensure clean and maintainable code.
- * </p>
- * 
- * <code>SystemException</code> is thrown whenever an known error condition is
- * identified. No system exception error handling code should appear in the
- * Struts action class as all of them are handled in
- * <code>CustomStrutsExceptionHandler<code>.
  * 
  * @author Ozgur Demirtas
  * 
@@ -150,8 +131,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  redirect="false"
  />
  </action>
-
- *
  */
 public class QaAction extends LamsDispatchAction implements QaAppConstants {
     static Logger logger = Logger.getLogger(QaAction.class.getName());
@@ -196,9 +175,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
     /**
      * submits content into the tool database ActionForward
-     * submitAllContent(ActionMapping mapping, ActionForm form,
-     * HttpServletRequest request, HttpServletResponse response) throws
-     * IOException, ServletException
      * 
      * @param mapping
      * @param form
@@ -302,15 +278,12 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	     */
 	    authoringUtil.removeRedundantQuestions(listQuestionContentDTO, qaService, qaAuthoringForm, request,
 		    strToolContentID);
-	    QaAction.logger.debug("end of removing unused entries... ");
 
 	    qaContent = authoringUtil.saveOrUpdateQaContent(listQuestionContentDTO, qaService,
 		    qaAuthoringForm, request, qaContentTest, strToolContentID, conditionSet);
 
 	    long defaultContentID = 0;
-	    QaAction.logger.debug("attempt retrieving tool with signatute : " + QaAppConstants.MY_SIGNATURE);
 	    defaultContentID = qaService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
-	    QaAction.logger.debug("retrieved tool default contentId: " + defaultContentID);
 
 	    if (qaContent != null) {
 		qaGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
@@ -382,7 +355,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
 	qaAuthoringForm.setCurrentTab("1");
 
-	QaAction.logger.debug("forwarding to :" + QaAppConstants.LOAD_QUESTIONS);
 	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
     }
 
@@ -400,7 +372,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     public ActionForward saveSingleQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
-	QaAction.logger.debug("dispathcing saveSingleQuestion");
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
@@ -446,9 +417,8 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	
 	if (newQuestion != null && newQuestion.length() > 0) {
 	    if (editQuestionBoxRequest != null && editQuestionBoxRequest.equals("false")) {
-		QaAction.logger.debug("request for add and save");
+		//request for add and save
 		boolean duplicates = AuthoringUtil.checkDuplicateQuestions(listQuestionContentDTO, newQuestion);
-		QaAction.logger.debug("duplicates: " + duplicates);
 
 		if (!duplicates) {
 		    QaQuestionDTO qaQuestionDTO = null;
@@ -476,10 +446,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		    listQuestionContentDTO = AuthoringUtil.reorderUpdateListQuestionContentDTO(listQuestionContentDTO,
 			    qaQuestionDTO, editableQuestionIndex);
 		} else {
-		    QaAction.logger.debug("duplicate question entry, not adding");
+		    //duplicate question entry, not adding
 		}
 	    } else {
-		QaAction.logger.debug("request for edit and save.");
+		//request for edit and save
 		QaQuestionDTO qaQuestionDTO = null;
 		Iterator listIterator = listQuestionContentDTO.iterator();
 		while (listIterator.hasNext()) {
@@ -505,7 +475,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 			qaQuestionDTO, editableQuestionIndex);
 	    }
 	} else {
-	    QaAction.logger.debug("entry blank, not adding");
+	    //entry blank, not adding
 	}
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
@@ -630,11 +600,10 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 			feedback, requiredBoolean);
 		listQuestionContentDTO.add(qaQuestionDTO);
 	    } else {
-		QaAction.logger.debug("entry duplicate, not adding");
-
+		//entry duplicate, not adding
 	    }
 	} else {
-	    QaAction.logger.debug("entry blank, not adding");
+	    //entry blank, not adding
 	}
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
@@ -709,7 +678,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
      */
     public ActionForward newQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	QaAction.logger.debug("dispathcing newQuestionBox");
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
@@ -782,7 +750,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
      */
     public ActionForward newEditableQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	QaAction.logger.debug("dispathcing newEditableQuestionBox");
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
@@ -928,8 +895,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 
 	listQuestionContentDTO = AuthoringUtil.reorderListQuestionContentDTO(listQuestionContentDTO, questionIndex);
-	QaAction.logger.debug("listQuestionContentDTO reordered:" + listQuestionContentDTO);
-
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
@@ -951,7 +916,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	QaContent qaContent = qaService.getQa(new Long(strToolContentID).longValue());
 
 	if (qaContent == null) {
-	    QaAction.logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
 	    qaContent = qaService.getQa(new Long(defaultContentIdStr).longValue());
 	}
 
@@ -963,7 +927,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	QaAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(QaAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
 	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
@@ -1025,7 +988,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
      */
     public ActionForward moveQuestionDown(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	QaAction.logger.debug("dispatching moveQuestionDown");
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
@@ -1073,7 +1035,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	QaAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(QaAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
 	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
@@ -1231,10 +1192,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * adds a new file to content repository ActionForward
-     * addNewFile(ActionMapping mapping, ActionForm form, HttpServletRequest
-     * request, HttpServletResponse response) throws IOException,
-     * ServletException
+     * adds a new file to content repository 
      * 
      * @param mapping
      * @param form
@@ -1246,7 +1204,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
      */
     public ActionForward addNewFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	QaAction.logger.debug("dispathching addNewFile");
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
@@ -1338,10 +1295,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * deletes a file from the content repository ActionForward
-     * deleteFile(ActionMapping mapping, ActionForm form, HttpServletRequest
-     * request, HttpServletResponse response) throws IOException,
-     * ServletException
+     * deletes a file from the content repository 
      * 
      * @param mapping
      * @param form
@@ -1353,7 +1307,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
      */
     public ActionForward deleteFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	QaAction.logger.debug("dispatching deleteFile");
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
@@ -1452,7 +1405,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     /**
      * persists error messages to request scope
      * 
-     * persistError(HttpServletRequest request, String message)
      * 
      * @param request
      * @param message
@@ -1464,8 +1416,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * addFileToContentRepository(HttpServletRequest request, QaAuthoringForm
-     * qaAuthoringForm)
      * 
      * @param request
      * @param qaAuthoringForm
@@ -1473,7 +1423,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     public void addFileToContentRepository(HttpServletRequest request, QaAuthoringForm qaAuthoringForm,
 	    List attachmentList, List deletedAttachmentList, SessionMap sessionMap,
 	    QaGeneralAuthoringDTO qaGeneralAuthoringDTO) {
-	QaAction.logger.debug("attempt addFileToContentRepository");
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 
 	if (attachmentList == null) {
@@ -1488,11 +1437,11 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	boolean isOnlineFile = false;
 	String fileType = null;
 	if (qaAuthoringForm.getTheOfflineFile() != null && qaAuthoringForm.getTheOfflineFile().getFileSize() > 0) {
-	    QaAction.logger.debug("theOfflineFile is available: ");
+	    //theOfflineFile is available
 	    uploadedFile = qaAuthoringForm.getTheOfflineFile();
 	    fileType = IToolContentHandler.TYPE_OFFLINE;
 	} else if (qaAuthoringForm.getTheOnlineFile() != null && qaAuthoringForm.getTheOnlineFile().getFileSize() > 0) {
-	    QaAction.logger.debug("theOnlineFile is available: ");
+	    //theOnlineFile is available
 	    uploadedFile = qaAuthoringForm.getTheOnlineFile();
 	    isOnlineFile = true;
 	    fileType = IToolContentHandler.TYPE_ONLINE;
@@ -1509,8 +1458,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    return;
 	}
 
-	QaAction.logger.debug("uploadedFile.getFileName(): " + uploadedFile.getFileName());
-
 	/*
 	 * if a file with the same name already exists then move the old one to deleted
 	 */
@@ -1526,12 +1473,9 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		    uploadedFile.getFileName(), uploadedFile.getContentType(), fileType);
 	    QaUploadedFile file = new QaUploadedFile();
 	    String fileName = uploadedFile.getFileName();
-	    QaAction.logger.debug("fileName: " + fileName);
-	    QaAction.logger.debug("fileName length: " + fileName.length());
 
 	    if (fileName != null && fileName.length() > 30) {
 		fileName = fileName.substring(0, 31);
-		QaAction.logger.debug("shortened fileName: " + fileName);
 	    }
 
 	    file.setFileName(fileName);
@@ -1590,8 +1534,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     private List saveAttachments(QaContent qaContent, List attachmentList, List deletedAttachmentList,
 	    ActionMapping mapping, HttpServletRequest request) {
 
-	QaAction.logger.debug("start saveAttachments");
-
 	if (attachmentList == null || deletedAttachmentList == null) {
 	    return null;
 	}
@@ -1599,7 +1541,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 
 	if (deletedAttachmentList != null) {
-	    QaAction.logger.debug("deletedAttachmentList is iterated...");
 	    Iterator iter = deletedAttachmentList.iterator();
 	    while (iter.hasNext()) {
 		QaUploadedFile attachment = (QaUploadedFile) iter.next();
@@ -1611,15 +1552,12 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		}
 	    }
 	    deletedAttachmentList.clear();
-	    QaAction.logger.error("cleared attachment list.");
 	}
 
 	if (attachmentList != null) {
-	    QaAction.logger.debug("attachmentList is iterated...");
 	    Iterator iter = attachmentList.iterator();
 	    while (iter.hasNext()) {
 		QaUploadedFile attachment = (QaUploadedFile) iter.next();
-		QaAction.logger.debug("attachment submission id: " + attachment.getSubmissionId());
 
 		if (attachment.getSubmissionId() == null) {
 		    /*
@@ -1635,7 +1573,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
     public ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	QaAction.logger.debug("dispatching proxy editActivity...");
 	return null;
     }
 
@@ -1703,10 +1640,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
     }
 
     /**
-     * generates Edit Activity screen ActionForward
-     * editActivityQuestions(ActionMapping mapping, ActionForm form,
-     * HttpServletRequest request, HttpServletResponse response) throws
-     * IOException, ServletException, ToolException
+     * generates Edit Activity screen 
      * 
      * @param mapping
      * @param form
@@ -1719,7 +1653,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
      */
     public ActionForward editActivityQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, ToolException {
-	QaAction.logger.debug("dispatching editActivityQuestions...");
 
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 
@@ -1762,13 +1695,12 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	qaGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(false).toString());
 	if (isContentInUse == true) {
-	    QaAction.logger.debug("monitoring url does not allow editActivity since the content is in use.");
+	    //monitoring url does not allow editActivity since the content is in use
 	    persistError(request, "error.content.inUse");
 	    qaGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(true).toString());
 	}
 
 	EditActivityDTO editActivityDTO = new EditActivityDTO();
-	QaAction.logger.debug("isContentInUse:" + isContentInUse);
 	if (isContentInUse == true) {
 	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
 	}
@@ -1807,7 +1739,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
-	QaAction.logger.debug("forwarding to : " + QaAppConstants.LOAD_QUESTIONS);
 	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
     }
 

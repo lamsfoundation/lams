@@ -60,6 +60,7 @@ public class QaGeneralAuthoringDTO implements Comparable {
     protected String editActivityEditMode;
     protected String reflectionSubject;
     protected Boolean allowRichEditor;
+    protected Boolean useSelectLeaderToolOuput;
 
     protected String monitoredContentInUse;
 
@@ -609,6 +610,14 @@ public class QaGeneralAuthoringDTO implements Comparable {
 
     public void setAllowRichEditor(Boolean allowRichEditor) {
         this.allowRichEditor = allowRichEditor;
+    }
+    
+    public Boolean getUseSelectLeaderToolOuput() {
+        return useSelectLeaderToolOuput;
+    }
+
+    public void setUseSelectLeaderToolOuput(Boolean useSelectLeaderToolOuput) {
+        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
     
     

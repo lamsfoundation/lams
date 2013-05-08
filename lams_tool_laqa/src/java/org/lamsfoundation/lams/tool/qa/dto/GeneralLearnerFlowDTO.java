@@ -111,6 +111,8 @@ public class GeneralLearnerFlowDTO implements Comparable {
     
     protected String allowRichEditor;
     
+    protected String useSelectLeaderToolOuput;
+    
     protected String allowRateAnswers;
 
     /**
@@ -703,6 +705,14 @@ public class GeneralLearnerFlowDTO implements Comparable {
     public void setAllowRichEditor(String allowRichEditor) {
         this.allowRichEditor = allowRichEditor;
     } 
+    
+    public String getUseSelectLeaderToolOuput() {
+        return useSelectLeaderToolOuput;
+    }
+
+    public void setUseSelectLeaderToolOuput(String useSelectLeaderToolOuput) {
+        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+    }
     
     public String getAllowRateAnswers() {
         return allowRateAnswers;

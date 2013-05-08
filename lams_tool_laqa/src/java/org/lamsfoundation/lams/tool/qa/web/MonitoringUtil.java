@@ -66,7 +66,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  */
 public class MonitoringUtil implements QaAppConstants {
-    static Logger logger = Logger.getLogger(MonitoringUtil.class.getName());
 
     /**
      * populates all the tool sessions in a map

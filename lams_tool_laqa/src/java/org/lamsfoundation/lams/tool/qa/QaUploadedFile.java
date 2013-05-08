@@ -51,7 +51,6 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
  */
 
 public class QaUploadedFile implements Serializable, Comparable {
-    static Logger logger = Logger.getLogger(QaUploadedFile.class.getName());
     /** identifier field */
     private Long submissionId;
 
@@ -92,7 +91,6 @@ public class QaUploadedFile implements Serializable, Comparable {
     }
 
     public QaUploadedFile(String uuid, boolean fileOnline, String fileName, QaContent qaContent) {
-	logger.debug("constructor gets called.");
 	this.uuid = uuid;
 	this.fileOnline = fileOnline;
 	this.fileName = fileName;

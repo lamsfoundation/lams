@@ -84,7 +84,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, QaApplicationException {
-	logger.debug("init QaMonitoringStarterAction...");
 	QaUtils.cleanUpSessionAbsolute(request);
 
 	QaMonitoringForm qaMonitoringForm = (QaMonitoringForm) form;
@@ -95,7 +94,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	qaMonitoringForm.setQaService(qaService);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	logger.debug("contentFolderID: " + contentFolderID);
 	qaMonitoringForm.setContentFolderID(contentFolderID);
 
 	ActionForward validateParameters = validateParameters(request, mapping, qaMonitoringForm);
@@ -107,12 +105,10 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	GeneralMonitoringDTO generalMonitoringDTO = new GeneralMonitoringDTO();
 	boolean initData = initialiseMonitoringData(mapping, qaMonitoringForm, request, response, qaService,
 		generalMonitoringDTO);
-	logger.debug("initData: " + initData);
 	if (initData == false)
 	    return (mapping.findForward(ERROR_LIST));
 
 	qaMonitoringForm.setCurrentTab("1");
-	logger.debug("setting current tab to 1: ");
 
 	generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	generalMonitoringDTO.setContentFolderID(contentFolderID);
@@ -127,10 +123,8 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
 	/*true means there is at least 1 response*/
 	if (qaService.isStudentActivityOccurredGlobal(qaContent)) {
-	    logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
 	    generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
 	} else {
-	    logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 	    generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
@@ -194,16 +188,14 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
 	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(qaService, qaContent);
-	logger.debug("notebookEntriesExist : " + notebookEntriesExist);
 
 	if (notebookEntriesExist) {
 	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
 
 	    String userExceptionNoToolSessions = (String) generalMonitoringDTO.getUserExceptionNoToolSessions();
-	    logger.debug("userExceptionNoToolSessions : " + userExceptionNoToolSessions);
 
 	    if (userExceptionNoToolSessions.equals("true")) {
-		logger.debug("there are no online student activity but there are reflections : ");
+		//there are no online student activity but there are reflections 
 		request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
 	    }
 
@@ -260,10 +252,8 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
      */
     protected ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping,
 	    QaMonitoringForm qaMonitoringForm) {
-	logger.debug("start validating monitoring parameters...");
 
 	String strToolContentId = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	logger.debug("strToolContentId: " + strToolContentId);
 
 	if ((strToolContentId == null) || (strToolContentId.length() == 0)) {
 	    QaUtils.cleanUpSessionAbsolute(request);
@@ -271,7 +261,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	} else {
 	    try {
 		long toolContentId = new Long(strToolContentId).longValue();
-		logger.debug("passed TOOL_CONTENT_ID : " + new Long(toolContentId));
 
 		qaMonitoringForm.setToolContentID(new Long(toolContentId).toString());
 	    } catch (NumberFormatException e) {
@@ -292,7 +281,6 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
     public void persistError(HttpServletRequest request, String message) {
 	ActionMessages errors = new ActionMessages();
 	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-	logger.debug("add " + message + "  to ActionMessages:");
 	saveErrors(request, errors);
     }
 }

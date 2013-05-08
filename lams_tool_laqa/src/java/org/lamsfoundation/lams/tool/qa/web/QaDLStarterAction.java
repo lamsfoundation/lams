@@ -75,12 +75,10 @@ import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 
 public class QaDLStarterAction extends Action implements QaAppConstants {
-    static Logger logger = Logger.getLogger(QaDLStarterAction.class.getName());
 
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, QaApplicationException {
 	QaUtils.cleanUpSessionAbsolute(request);
-	logger.debug("init defineLater mode. removed attributes...");
 
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 

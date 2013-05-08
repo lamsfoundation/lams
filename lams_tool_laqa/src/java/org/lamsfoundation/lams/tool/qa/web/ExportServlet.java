@@ -58,10 +58,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 
     public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
-	logger.debug("dispathcing doExport");
 	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
 		+ request.getContextPath();
-	logger.debug("basePath:" + basePath);
 
 	if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
 	    learner(request, response, directoryName, cookies);
@@ -127,9 +125,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	    throw new QaApplicationException(error);
 	}
 
-	logger.debug("calling learning mode toolSessionID:" + toolSessionID + " userID: " + userID);
 	QaMonitoringAction qaMonitoringAction = new QaMonitoringAction();
-	logger.debug("start refreshSummaryData for learner mode.");
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(content);
 	generalLearnerFlowDTO.setUserUid(learner != null ? learner.getQueUsrId().toString() : null);
@@ -139,18 +135,16 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	    qaMonitoringAction
 		    .refreshSummaryData(request, content, qaService, content.isUsernameVisible(), true, toolSessionID
 			    .toString(), userID.toString(), generalLearnerFlowDTO, false, toolSessionID.toString());
-	    logger.debug("end refreshSummaryData for learner mode.");
 	    qaMonitoringAction.prepareReflectionData(request, content, qaService, userID.toString(), true,
 		    toolSessionID.toString());
 	}
 
 	generalLearnerFlowDTO = (GeneralLearnerFlowDTO) request.getAttribute(GENERAL_LEARNER_FLOW_DTO);
 
-	logger.debug("for the special case of export portfolio we place generalLearnerFlowDTO into session scope");
+	//for the special case of export portfolio we place generalLearnerFlowDTO into session scope
 	request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
 	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
-	logger.debug("ending learner mode: ");
     }
 
     public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {

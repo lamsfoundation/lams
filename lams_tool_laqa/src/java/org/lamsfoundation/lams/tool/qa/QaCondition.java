@@ -54,7 +54,6 @@ public class QaCondition extends TextSearchCondition {
      * the words that make the condition's parameters.
      */
     private Set<QaQueContent> questions = new TreeSet<QaQueContent>(new QaQueContentComparator());
-    private static Logger log = Logger.getLogger(QaCondition.class);
 
     public SortedSet<QaQuestionDTO> temporaryQuestionDTOSet = new TreeSet<QaQuestionDTO>(
 	    new QaQuestionContentDTOComparator());
