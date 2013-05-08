@@ -44,7 +44,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 
 public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
-    static Logger logger = Logger.getLogger(QaContentDAO.class.getName());
 
     private static final String LOAD_QA_BY_SESSION = "select qa from QaContent qa left join fetch "
 	    + "qa.qaSessions session where session.qaSessionId=:sessionId";
