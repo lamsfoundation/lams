@@ -59,8 +59,7 @@ public class MCOutputFactory extends OutputFactory {
 		    .getTotalMarksPossible().longValue()), true);
 	    definitionMap.put(OUTPUT_NAME_LEARNER_MARK, definition);
 	} else {
-	    log
-		    .error("Unable to build content based output definitions for Multiple Choice as no tool content object supplied. Only including the definitions that do not need any content.");
+	    log.error("Unable to build content based output definitions for Multiple Choice as no tool content object supplied. Only including the definitions that do not need any content.");
 	}
 
 	return definitionMap;

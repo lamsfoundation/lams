@@ -53,16 +53,12 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  */
 public abstract class McUtils implements McAppConstants {
 
-	static Logger logger = Logger.getLogger(McUtils.class.getName());
-
     public static String replaceNewLines(String text)
     {
-        logger.debug("using text: " + text);
         String newText = "";
         if (text != null)
         {
             newText = text.replaceAll("\n","<br>");
-            logger.debug("newText: " + newText);
         }
         
         return newText;
@@ -72,8 +68,6 @@ public abstract class McUtils implements McAppConstants {
 
 	/**
 	 * 
-	 * getGMTDateTime(HttpServletRequest request)
-	 * 
 	 * @param request
 	 * @return
 	 */
@@ -81,7 +75,6 @@ public abstract class McUtils implements McAppConstants {
     public static Date getGMTDateTime()
     {
     	Date date=new Date(System.currentTimeMillis());
-    	logger.debug("date: " + date);
     	return date;
     }
 
@@ -92,7 +85,6 @@ public abstract class McUtils implements McAppConstants {
 	    HttpSession ss = SessionManager.getSession();
 	    /* get back login user DTO */
 	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		logger.debug("retrieving toolUser: " + toolUser);
 		return 	toolUser;
 	}
 	
@@ -101,7 +93,6 @@ public abstract class McUtils implements McAppConstants {
 	{
 		UserDTO toolUser=getToolUser();
 		long userId=toolUser.getUserID().longValue();
-		logger.debug("userId: " + userId);
 		return new Long(userId);
 	}
 	
@@ -110,7 +101,6 @@ public abstract class McUtils implements McAppConstants {
 		/* double check if username and login is the same */
 		UserDTO toolUser=getToolUser();
 		String userName=toolUser.getLogin();
-		logger.debug("userName: " + userName);
 		return userName;
 	}
 	
@@ -118,14 +108,11 @@ public abstract class McUtils implements McAppConstants {
 	{
 		UserDTO toolUser=getToolUser();
 		String fullName=toolUser.getFirstName() + " " + toolUser.getLastName();  
-		logger.debug("fullName: " + fullName);
 		return fullName;
 	}
 	
 	public static String getFormattedDateString(Date date)
 	{
-		logger.debug("getFormattedDateString: " +  
-				DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
 		return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
 	}
 	
@@ -142,7 +129,6 @@ public abstract class McUtils implements McAppConstants {
 	 */
 	public static Map generateOptionsMap(List listMcOptions)
 	{
-		logger.debug("incoming listMcOptions" + listMcOptions);
 		Map mapOptionsContent= new TreeMap(new McStringComparator());
 		
 		Iterator listIterator=listMcOptions.iterator();
@@ -150,19 +136,15 @@ public abstract class McUtils implements McAppConstants {
     	while (listIterator.hasNext())
     	{
     		McOptsContent mcOptionsContent = (McOptsContent)listIterator.next();
-    		logger.debug("mcOptionsContent:" + mcOptionsContent);
     		mapOptionsContent.put(mapIndex.toString(),mcOptionsContent.getMcQueOptionText());
     		mapIndex=new Long(mapIndex.longValue()+1);
     	}
-    	logger.debug("generated mcOptionsContent: " + mapOptionsContent);
     	return mapOptionsContent;
 	}
 
 	public static void configureContentRepository(HttpServletRequest request, IMcService mcService)
 	{
-		logger.debug("attempt configureContentRepository");
     	mcService.configureContentRepository();
-	    logger.debug("configureContentRepository ran successfully");
 	}
 	
     /**
@@ -198,7 +180,6 @@ public abstract class McUtils implements McAppConstants {
     {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		logger.debug(logger + " " + "McUtils" +  " Current user is: " + user + " with id: " + user.getUserID());
 		return user.getUserID().intValue();
     }
 	
@@ -213,28 +194,17 @@ public abstract class McUtils implements McAppConstants {
 		user.setUserId(userId);
 		return user;
 	}
-
-    /**
-     * temporary function
-     * @return
-     */
-	public static boolean getDefineLaterStatus()
-	{
-		return false;
-	}
 	
 	/**
 	 * find out if the content is in use or not. If it is in use, the author can not modify it.
 	 * The idea of content being in use is, once any one learner starts using a particular content
 	 * that content should become unmodifiable. 
 	 * 
-	 * isContentInUse(McContent mcContent)
 	 * @param mcContent
 	 * @return boolean
 	 */
 	public static boolean isContentInUse(McContent mcContent)
 	{
-		logger.debug("is content inuse: " + mcContent.isContentInUse());
 		return  mcContent.isContentInUse();
 	}
 	
@@ -242,51 +212,24 @@ public abstract class McUtils implements McAppConstants {
 	/**
 	 * find out if the content is being edited in monitoring interface or not. If it is, the author can not modify it.
 	 * 
-	 * isDefineLater(McContent mcContent)
 	 * @param mcContent
 	 * @return boolean
 	 */
 	public static boolean isDefineLater(McContent mcContent)
 	{
-		logger.debug("is define later: " + mcContent.isDefineLater());
 		return  mcContent.isDefineLater();
 	}
 	
 	
 	/**
 	 * find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that..
-	 * isRubnOffline(McContent mcContent)
 	 * 
 	 * @param mcContent
 	 * @return boolean
 	 */
 	public static boolean isRunOffline(McContent mcContent)
 	{
-		logger.debug("is run offline: " + mcContent.isRunOffline());
 		return mcContent.isRunOffline();
-	}
-
-	
-    
-	public static String getDestination(String sourceMcStarter)
-	{
-		logger.debug("sourceMcStarter: " + sourceMcStarter);
-		
-		if ((sourceMcStarter != null) && !sourceMcStarter.equals("monitoring"))
-		{
-			logger.debug("request is from authoring or define Later url. return to: " + LOAD_QUESTIONS);
-			return LOAD_QUESTIONS;	
-		}
-		else if (sourceMcStarter == null)
-		{
-			logger.debug("request is from authoring url. return to: " + LOAD_QUESTIONS);
-			return LOAD_QUESTIONS;	
-		}
-		else
-		{
-			logger.debug("request is from monitoring url. return to: " + LOAD_MONITORING_CONTENT_EDITACTIVITY);
-			return LOAD_MONITORING_CONTENT_EDITACTIVITY;	
-		}
 	}
 	
 	
@@ -455,12 +398,10 @@ public abstract class McUtils implements McAppConstants {
     	request.getSession().removeAttribute(ACTIVITY_TITLE);
     	request.getSession().removeAttribute(ACTIVITY_INSTRUCTIONS);
     	request.getSession().removeAttribute(SUMMARY_TOOL_SESSIONS_ID);
-    	logger.debug("completely cleaned the session.");
     }
   
     
 	/**
-	 * String getDestination(String sourceMcStarter, String requestedModule)
 	 * 
 	 * determines the struts level location to return
 	 *   
@@ -470,29 +411,26 @@ public abstract class McUtils implements McAppConstants {
 	 */
 	public static String getDestination(String sourceMcStarter, String requestedModule)
 	{
-		logger.debug("sourceMcStarter: " + sourceMcStarter + " and requestedModule:" + requestedModule);
 		
 		if (requestedModule.equals(DEFINE_LATER))
 		{
-			logger.debug("request is from define Later url. return to: " + LOAD_VIEW_ONLY);
+			//request is from define Later url. return to LOAD_VIEW_ONLY
 			return LOAD_VIEW_ONLY;	
 		}
 		else if (requestedModule.equals(AUTHORING))
 		{
-			logger.debug("request is from authoring url. return to: " + LOAD_QUESTIONS);
+			//request is from authoring url. return to LOAD_QUESTIONS
 			return LOAD_QUESTIONS;	
 		}
 		else
 		{
-			logger.debug("request is from an unknown source. return null");
+			//request is from an unknown source. return null
 			return null;
 		}
 	}
 
 	
 	/**
-	 * populateAuthoringDTO(HttpServletRequest request, McContent defaultMcContent, 
-            McGeneralAuthoringDTO mcGeneralAuthoringDTO)
 	 * 
 	 * @param request
 	 * @param defaultMcContent
@@ -510,32 +448,23 @@ public abstract class McUtils implements McAppConstants {
 
     
 	/**
-	 * setDefineLater(HttpServletRequest request, boolean value, String toolContentID)
 	 * @param request
 	 * @param value
 	 * @param toolContentID
 	 */
 	public static void setDefineLater(HttpServletRequest request, boolean value, String strToolContentID, IMcService mcService)
     {
-		logger.debug("mcService: " + mcService);
-    	logger.debug("value:" + value);
-    	logger.debug("strToolContentID:" + strToolContentID);
     	
 		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-    	logger.debug("mcContent:" + mcContent);
     	if (mcContent != null)
     	{
     		mcContent.setDefineLater(value);
-        	logger.debug("defineLater has been set to:" + value);
         	mcService.updateMc(mcContent);	
     	}
     }
 
     
 	/**
-	 * setFormProperties(HttpServletRequest request, IMcService mcService,  
-            McAuthoringForm  mcAuthoringForm, McGeneralAuthoringDTO mcGeneralAuthoringDTO, String strToolContentID, String defaultContentIdStr, 
-            String activeModule, SessionMap sessionMap, String httpSessionID)
 	 * 
 	 * @param request
 	 * @param mcService
@@ -551,11 +480,6 @@ public abstract class McUtils implements McAppConstants {
             McAuthoringForm  mcAuthoringForm, McGeneralAuthoringDTO mcGeneralAuthoringDTO, String strToolContentID, String defaultContentIdStr, 
             String activeModule, SessionMap sessionMap, String httpSessionID)
     {
-    	logger.debug("setFormProperties: ");
-    	logger.debug("using strToolContentID: " + strToolContentID);
-    	logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
-    	logger.debug("using activeModule: " + activeModule);
-    	logger.debug("using httpSessionID: " + httpSessionID);
 
     	mcAuthoringForm.setHttpSessionID(httpSessionID);
     	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
@@ -573,63 +497,49 @@ public abstract class McUtils implements McAppConstants {
     	mcGeneralAuthoringDTO.setActiveModule(activeModule);
     	
     	String sln=request.getParameter("sln");
-    	logger.debug("sln: " + sln);
 		mcAuthoringForm.setSln(sln);
 		mcGeneralAuthoringDTO.setSln(sln);
 		
 		String questionsSequenced=request.getParameter("questionsSequenced");
-		logger.debug("questionsSequenced: " + questionsSequenced);
 		mcAuthoringForm.setQuestionsSequenced(questionsSequenced);
 		mcGeneralAuthoringDTO.setQuestionsSequenced(questionsSequenced);
 
 		String randomize=request.getParameter("randomize");
-		logger.debug("randomize: " + randomize);
 		mcAuthoringForm.setRandomize(randomize);
 		mcGeneralAuthoringDTO.setRandomize(randomize);
 
 		
 		String showMarks=request.getParameter("showMarks");
-		logger.debug("showMarks: " + questionsSequenced);
 		mcAuthoringForm.setShowMarks(showMarks);
 		mcGeneralAuthoringDTO.setShowMarks(showMarks);
 		
 		
 		String retries=request.getParameter("retries");
-		logger.debug("retries: " + retries);
 		mcAuthoringForm.setRetries(retries);
 		mcGeneralAuthoringDTO.setRetries(retries);
 		
 		
 		String offlineInstructions=request.getParameter(OFFLINE_INSTRUCTIONS);
-		logger.debug("offlineInstructions: " + offlineInstructions);
 		mcAuthoringForm.setOfflineInstructions(offlineInstructions);
 		mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 		String onlineInstructions=request.getParameter(ONLINE_INSTRUCTIONS);
-		logger.debug("onlineInstructions: " + onlineInstructions);
 		mcAuthoringForm.setOnlineInstructions(onlineInstructions);
 		mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 
 		String reflect=request.getParameter(REFLECT);
-		logger.debug("reflect: " + reflect);
 		mcAuthoringForm.setReflect(reflect);
 		mcGeneralAuthoringDTO.setReflect(reflect);
 		
 
 		String reflectionSubject=request.getParameter(REFLECTION_SUBJECT);
-		logger.debug("reflectionSubject: " + reflectionSubject);
 		mcAuthoringForm.setReflectionSubject(reflectionSubject);
 		mcGeneralAuthoringDTO.setReflectionSubject(reflectionSubject);
 		
 		
      	String passmark= request.getParameter("passmark");
-     	logger.debug("passmark: " + passmark);
 		mcGeneralAuthoringDTO.setPassMarkValue(passmark);
-
-		
-		logger.debug("ending setFormProperties with mcAuthoringForm: " + mcAuthoringForm);
-		logger.debug("ending setFormProperties with mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
     }
 
     

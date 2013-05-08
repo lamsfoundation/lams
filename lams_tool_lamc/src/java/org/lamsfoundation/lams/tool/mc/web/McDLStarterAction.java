@@ -75,7 +75,6 @@ import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 
 
 public class McDLStarterAction extends Action implements McAppConstants {
-	static Logger logger = Logger.getLogger(McDLStarterAction.class.getName());
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, McApplicationException {

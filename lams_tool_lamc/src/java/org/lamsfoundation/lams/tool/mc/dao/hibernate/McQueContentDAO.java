@@ -39,7 +39,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * <p>Hibernate implementation for database access to McQueContent for the mc tool.</p>
  */
 public class McQueContentDAO extends HibernateDaoSupport implements IMcQueContentDAO {
-	 	static Logger logger = Logger.getLogger(McQueContentDAO.class.getName());
 	 	
 	 	private static final String LOAD_QUESTION_CONTENT_BY_CONTENT_ID = "from mcQueContent in class McQueContent where mcQueContent.mcContentId=:mcContentId order by mcQueContent.displayOrder";
 	 	
@@ -205,7 +204,6 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 		    	{
 		    		McQueContent mcQueContent=(McQueContent)listIterator.next();
 	    			this.getSession().setFlushMode(FlushMode.AUTO);
-	    			logger.debug("deleting mcQueContent: " + mcQueContent);
 		    		templ.delete(mcQueContent);	
 		    	}
 			}
@@ -225,7 +223,6 @@ public class McQueContentDAO extends HibernateDaoSupport implements IMcQueConten
 		    	{
 		    		McQueContent mcQueContent=(McQueContent)listIterator.next();
 	    			this.getSession().setFlushMode(FlushMode.AUTO);
-	    			logger.debug("deleting mcQueContent: " + mcQueContent);
 		    		templ.delete(mcQueContent);	
 		    	}
 			}

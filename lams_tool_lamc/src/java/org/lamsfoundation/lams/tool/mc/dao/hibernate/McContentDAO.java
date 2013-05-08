@@ -39,9 +39,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * @author Ozgur Demirtas
  * <p>Hibernate implementation for database access to McContent for the mc tool.</p>
  */
-
 public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
-	static Logger logger = Logger.getLogger(McContentDAO.class.getName());
 	
 	private static final String FIND_MC_CONTENT = "from " + McContent.class.getName() + " as mc where content_id=?";
 	
@@ -55,16 +53,12 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	
 	public McContent findMcContentById(Long mcContentId)
 	{
-	    logger.debug("doing findMcContentById" + mcContentId);
 		String query = "from McContent as mc where mc.mcContentId = ?";
-		logger.debug("query: " + query);
 	    HibernateTemplate templ = this.getHibernateTemplate();
 
 		List list = getSession().createQuery(FIND_MC_CONTENT)
 		.setLong(0,mcContentId.longValue())
 		.list();
-		
-		logger.debug("list: " + list);
 		
 		if(list != null && list.size() > 0){
 			McContent mc = (McContent) list.get(0);
@@ -93,9 +87,7 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	public void saveMcContent(McContent mcContent)
     {
 		this.getSession().setFlushMode(FlushMode.AUTO);
-		logger.debug("before saveOrUpdate");
     	this.getHibernateTemplate().saveOrUpdate(mcContent);
-    	logger.debug("after saveOrUpdate");
     }
     
 	public void updateMcContent(McContent mcContent)
@@ -107,7 +99,6 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
  	public void saveOrUpdateMc(McContent mc)
     {
  		this.getSession().setFlushMode(FlushMode.AUTO);
-		logger.debug("before saveOrUpdateMc: " + mc);
 		this.getHibernateTemplate().saveOrUpdate(mc);
     }
 

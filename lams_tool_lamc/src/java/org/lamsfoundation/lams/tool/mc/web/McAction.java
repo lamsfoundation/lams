@@ -80,16 +80,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * Action class that controls the logic of tool behavior.
  * </p>
  * 
- * <p>
- * Note that Struts action class only has the responsibility to navigate page flow. All database operation should go to
- * service layer and data transformation from domain model to struts form bean should go to form bean class. This ensure
- * clean and maintainable code.
- * </p>
- * 
- * <code>SystemException</code> is thrown whenever an known error condition is identified. No system exception error
- * handling code should appear in the Struts action class as all of them are handled in
- * <code>CustomStrutsExceptionHandler<code>.
- * 
  * @author Ozgur Demirtas
  * 
  *         <action path="/authoring" type="org.lamsfoundation.lams.tool.mc.web.McAction" name="McAuthoringForm"
@@ -116,43 +106,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
     private McToolContentHandler toolContentHandler;
 
-    /**
-     * <p>
-     * Struts dispatch method.
-     * </p>
-     * 
-     * <p>
-     * It is assuming that progress engine should pass in the tool access mode and the tool session id as http
-     * parameters.
-     * </p>
-     * 
-     * @param mapping
-     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
-     *            the end-user.
-     * 
-     * @param form
-     *            The ActionForm class that will contain any data submitted by the end-user via a form.
-     * @param request
-     *            A standard Servlet HttpServletRequest class.
-     * @param response
-     *            A standard Servlet HttpServletResponse class.
-     * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
-     *         next.
-     * @throws IOException
-     * @throws ServletException
-     * @throws McApplicationException
-     *             the known runtime exception
-     * 
-     */
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	return (mapping.findForward(McAppConstants.LOAD_QUESTIONS));
     }
 
     /**
-     * 
-     * ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-     * HttpServletResponse response) throws IOException, ServletException
      * 
      * submits content into the tool database
      * 
@@ -167,83 +126,62 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
     public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
-	McAction.logger.debug("dispathcing submitAllContent :" + form);
-
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	Map mapQuestionContent = AuthoringUtil.extractMapQuestionContent(listQuestionContentDTO);
-	McAction.logger.debug("extracted mapQuestionContent: " + mapQuestionContent);
 
 	Map mapFeedback = AuthoringUtil.extractMapFeedback(listQuestionContentDTO);
-	McAction.logger.debug("extracted mapFeedback: " + mapFeedback);
 
 	Map mapWeights = new TreeMap(new McComparator());
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	Map mapMarks = AuthoringUtil.extractMapMarks(listQuestionContentDTO);
-	McAction.logger.debug("extracted mapMarks: " + mapMarks);
 
 	Map mapCandidatesList = AuthoringUtil.extractMapCandidatesList(listQuestionContentDTO);
-	McAction.logger.debug("extracted mapCandidatesList: " + mapCandidatesList);
 
 	ActionMessages errors = new ActionMessages();
-	McAction.logger.debug("mapQuestionContent size: " + mapQuestionContent.size());
 
 	if (mapQuestionContent.size() == 0) {
 	    ActionMessage error = new ActionMessage("questions.none.submitted");
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 	}
-	McAction.logger.debug("errors: " + errors);
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    List attachmentListBackup = new ArrayList();
 	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("attachmentList: " + attachmentList);
 	    attachmentListBackup = attachmentList;
 
 	    List deletedAttachmentListBackup = new ArrayList();
 	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 	    deletedAttachmentListBackup = deletedAttachmentList;
 
 	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
@@ -251,8 +189,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOfflineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 
@@ -263,9 +199,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
 
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
-
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	mcAuthoringForm.setTitle(richTextTitle);
 
@@ -275,17 +208,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	mcGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 
-	McAction.logger.debug("mcGeneralAuthoringDTO now: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
-	McAction.logger.debug("there are no issues with input, continue and submit data");
+	//there are no issues with input, continue and submit data
 
 	McContent mcContentTest = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContentTest: " + mcContentTest);
 
-	McAction.logger.debug("errors: " + errors);
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
 	    McAction.logger.debug("errors saved: " + errors);
@@ -293,64 +222,53 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	McContent mcContent = mcContentTest;
 	if (errors.isEmpty()) {
-	    McAction.logger.debug("errors is empty: " + errors);
 	    authoringUtil.removeRedundantQuestions(mapQuestionContent, mcService, mcAuthoringForm, request,
 		    strToolContentID);
-	    McAction.logger.debug("end of removing unused entries... ");
+	    //end of removing unused entries
 
 	    mcContent = authoringUtil.saveOrUpdateMcContent(mapQuestionContent, mapFeedback, mapWeights, mapMarks,
 		    mapCandidatesList, mcService, mcAuthoringForm, request, mcContentTest, strToolContentID);
-	    McAction.logger.debug("mcContent: " + mcContent);
 
 	    long defaultContentID = 0;
-	    McAction.logger.debug("attempt retrieving tool with signatute : " + McAppConstants.MY_SIGNATURE);
+	    //attempt retrieving tool with signatute McAppConstants.MY_SIGNATURE
 	    defaultContentID = mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE);
-	    McAction.logger.debug("retrieved tool default contentId: " + defaultContentID);
 
 	    if (mcContent != null) {
 		mcGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
 	    }
-	    McAction.logger.debug("updated mcGeneralAuthoringDTO to: " + mcGeneralAuthoringDTO);
 
 	    authoringUtil.reOrganizeDisplayOrder(mapQuestionContent, mcService, mcAuthoringForm, mcContent);
-	    McAction.logger.debug("post reOrganizeDisplayOrder: " + mcContent);
 
-	    McAction.logger.debug("activeModule: " + activeModule);
 	    if (activeModule.equals(McAppConstants.AUTHORING)) {
 
 		List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-		McAction.logger.debug("attachmentList: " + attachmentList);
 
 		List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
 
 		List attachments = saveAttachments(mcContent, attachmentList, deletedAttachmentList, mapping, request);
-		McAction.logger.debug("attachments: " + attachments);
 	    }
 
-	    McAction.logger.debug("strToolContentID: " + strToolContentID);
 	    McUtils.setDefineLater(request, false, strToolContentID, mcService);
-	    McAction.logger.debug("define later set to false");
+	    //define later set to false
 
 	    McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
 		    defaultContentIdStr, activeModule, sessionMap, httpSessionID);
 
 	    if (activeModule.equals(McAppConstants.AUTHORING)) {
-		McAction.logger.debug("standard authoring close");
+		//standard authoring close
 		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 		mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 	    } else {
-		McAction.logger.debug("go back to view only screen");
+		//go back to view only screen
 		mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
 	    }
 
 	} else {
-	    McAction.logger.debug("errors is not empty: " + errors);
+	    //errors is not empty
 
 	    if (mcContent != null) {
 		long defaultContentID = 0;
-		McAction.logger.debug("attempt retrieving tool with signatute : " + McAppConstants.MY_SIGNATURE);
 		defaultContentID = mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE);
-		McAction.logger.debug("retrieved tool default contentId: " + defaultContentID);
 
 		if (mcContent != null) {
 		    mcGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
@@ -368,11 +286,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
 
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
@@ -381,17 +297,14 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
+	//generating dyn pass map using listQuestionContentDTO
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
@@ -405,81 +318,49 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
 	mcAuthoringForm.setCurrentTab("1");
 
-	McAction.logger.debug("forwarding to :" + McAppConstants.LOAD_QUESTIONS);
 	return mapping.findForward(McAppConstants.LOAD_QUESTIONS);
     }
 
-    /**
-     * 
-     * saveSingleQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
-     * response)
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
     public ActionForward saveSingleQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
-	McAction.logger.debug("dispathcing saveSingleQuestion");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
-	McAction.logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	String mark = request.getParameter("mark");
-	McAction.logger.debug("mark: " + mark);
 
 	String passmark = request.getParameter("passmark");
-	McAction.logger.debug("passmark: " + passmark);
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	boolean validateCandidateAnswersNotBlank = authoringUtil.validateCandidateAnswersNotBlank(request);
-	McAction.logger.debug("validateCandidateAnswersNotBlank: " + validateCandidateAnswersNotBlank);
 
 	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
-	McAction.logger.debug("repopulated caList: " + caList);
 
 	caList = AuthoringUtil.removeBlankEntries(caList);
-	McAction.logger.debug("caList after removing blank entries: " + caList);
 
 	boolean validateSingleCorrectCandidate = authoringUtil.validateSingleCorrectCandidate(caList);
-	McAction.logger.debug("validateSingleCorrectCandidate: " + validateSingleCorrectCandidate);
 
 	boolean validateOnlyOneCorrectCandidate = authoringUtil.validateOnlyOneCorrectCandidate(caList);
-	McAction.logger.debug("validateOnlyOneCorrectCandidate: " + validateOnlyOneCorrectCandidate);
 
 	ActionMessages errors = new ActionMessages();
 
@@ -498,60 +379,44 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 	}
 
-	McAction.logger.debug("errors: " + errors);
-
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
 	    McAction.logger.debug("errors saved: " + errors);
 	}
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-
-	McAction.logger.debug("entry using mark: " + mark);
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 	mcGeneralAuthoringDTO.setPassMarkValue(passmark);
 
 	if (errors.isEmpty()) {
-	    McAction.logger.debug("errors is empty: " + errors);
 	    McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	    McAction.logger.debug("mcContent: " + mcContent);
 
-	    McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	    mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	    mcGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
 
 	    String newQuestion = request.getParameter("newQuestion");
-	    McAction.logger.debug("newQuestion: " + newQuestion);
 
 	    String feedback = request.getParameter("feedback");
-	    McAction.logger.debug("feedback: " + feedback);
 
 	    String editableQuestionIndex = request.getParameter("editableQuestionIndex");
-	    McAction.logger.debug("editableQuestionIndex: " + editableQuestionIndex);
 	    mcAuthoringForm.setQuestionIndex(editableQuestionIndex);
 
 	    if ((newQuestion != null) && (newQuestion.length() > 0)) {
 		if ((editQuestionBoxRequest != null) && (editQuestionBoxRequest.equals("false"))) {
-		    McAction.logger.debug("request for add and save");
+		    //request for add and save
 		    boolean duplicates = AuthoringUtil.checkDuplicateQuestions(listQuestionContentDTO, newQuestion);
-		    McAction.logger.debug("duplicates: " + duplicates);
 
 		    if (!duplicates) {
 			McQuestionContentDTO mcQuestionContentDTO = null;
 			Iterator listIterator = listQuestionContentDTO.iterator();
 			while (listIterator.hasNext()) {
 			    mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
-			    McAction.logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
-			    McAction.logger
-				    .debug("mcQuestionContentDTO question:" + mcQuestionContentDTO.getQuestion());
 
 			    String question = mcQuestionContentDTO.getQuestion();
 			    String displayOrder = mcQuestionContentDTO.getDisplayOrder();
-			    McAction.logger.debug("displayOrder:" + displayOrder);
 
 			    if ((displayOrder != null) && (!displayOrder.equals(""))) {
 				if (displayOrder.equals(editableQuestionIndex)) {
@@ -560,7 +425,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 			    }
 			}
-			McAction.logger.debug("mcQuestionContentDTO found:" + mcQuestionContentDTO);
 
 			mcQuestionContentDTO.setQuestion(newQuestion);
 			mcQuestionContentDTO.setFeedback(feedback);
@@ -568,30 +432,24 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 			mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
 			mcQuestionContentDTO.setMark(mark);
 
-			McAction.logger
-				.debug("caList size:" + mcQuestionContentDTO.getListCandidateAnswersDTO().size());
 			mcQuestionContentDTO.setCaCount(new Integer(mcQuestionContentDTO.getListCandidateAnswersDTO()
 				.size()).toString());
 
 			listQuestionContentDTO = AuthoringUtil.reorderUpdateListQuestionContentDTO(
 				listQuestionContentDTO, mcQuestionContentDTO, editableQuestionIndex);
-			McAction.logger.debug("post reorderUpdateListQuestionContentDTO listQuestionContentDTO: "
-				+ listQuestionContentDTO);
+			//post reorderUpdateListQuestionContentDTO listQuestionContentDTO
 		    } else {
-			McAction.logger.debug("duplicate question entry, not adding");
+			//duplicate question entry, not adding
 		    }
 		} else {
-		    McAction.logger.debug("request for edit and save.");
+		    //request for edit and save
 		    McQuestionContentDTO mcQuestionContentDTO = null;
 		    Iterator listIterator = listQuestionContentDTO.iterator();
 		    while (listIterator.hasNext()) {
 			mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
-			McAction.logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
-			McAction.logger.debug("mcQuestionContentDTO question:" + mcQuestionContentDTO.getQuestion());
 
 			String question = mcQuestionContentDTO.getQuestion();
 			String displayOrder = mcQuestionContentDTO.getDisplayOrder();
-			McAction.logger.debug("displayOrder:" + displayOrder);
 
 			if ((displayOrder != null) && (!displayOrder.equals(""))) {
 			    if (displayOrder.equals(editableQuestionIndex)) {
@@ -600,7 +458,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 			}
 		    }
-		    McAction.logger.debug("mcQuestionContentDTO found:" + mcQuestionContentDTO);
 
 		    mcQuestionContentDTO.setQuestion(newQuestion);
 		    mcQuestionContentDTO.setFeedback(feedback);
@@ -608,59 +465,48 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		    mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
 		    mcQuestionContentDTO.setMark(mark);
 
-		    McAction.logger.debug("caList size:" + mcQuestionContentDTO.getListCandidateAnswersDTO().size());
 		    mcQuestionContentDTO.setCaCount(new Integer(mcQuestionContentDTO.getListCandidateAnswersDTO()
 			    .size()).toString());
 
 		    listQuestionContentDTO = AuthoringUtil.reorderUpdateListQuestionContentDTO(listQuestionContentDTO,
 			    mcQuestionContentDTO, editableQuestionIndex);
-		    McAction.logger.debug("post reorderUpdateListQuestionContentDTO listQuestionContentDTO: "
-			    + listQuestionContentDTO);
 		}
 	    } else {
-		McAction.logger.debug("entry blank, not adding");
+		//entry blank, not adding
 	    }
 
-	    McAction.logger.debug("entryusing mark: " + mark);
 	    mcGeneralAuthoringDTO.setMarkValue(mark);
 
 	    request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	    sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	    commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, activeModule, strToolContentID,
 		    defaultContentIdStr, mcService, httpSessionID, listQuestionContentDTO);
 
 	    request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
-	    McAction.logger.debug("fwd ing to LOAD_QUESTIONS: " + McAppConstants.LOAD_QUESTIONS);
 	    return (mapping.findForward(McAppConstants.LOAD_QUESTIONS));
 	} else {
-	    McAction.logger.debug("errors is not empty: " + errors);
+	    //errors is not empty
 
 	    commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, activeModule, strToolContentID,
 		    defaultContentIdStr, mcService, httpSessionID, listQuestionContentDTO);
 
-	    McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
+	    //generating dyn pass map using listQuestionContentDTO
 	    Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    McAction.logger.debug("passMarksMap: " + passMarksMap);
 	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	    String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	    McAction.logger.debug("totalMark: " + totalMark);
 	    mcAuthoringForm.setTotalMarks(totalMark);
 	    mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
-	    McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	    request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	    request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	    sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	    request.setAttribute("requestNewEditableQuestionBox", new Boolean(true).toString());
 
-	    McAction.logger.debug("forwarding using newEditableQuestionBox");
 	    return newEditableQuestionBox(mapping, form, request, response);
 	}
 
@@ -783,30 +629,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	return (mapping.findForward(McAppConstants.LOAD));
     }
 
-    /**
-     * commonSaveCode(HttpServletRequest request, McGeneralAuthoringDTO mcGeneralAuthoringDTO, McAuthoringForm
-     * mcAuthoringForm, SessionMap sessionMap, String activeModule, String strToolContentID, String defaultContentIdStr,
-     * IMcService mcService, String httpSessionID, List listQuestionContentDTO)
-     * 
-     * @param request
-     * @param mcGeneralAuthoringDTO
-     * @param mcAuthoringForm
-     * @param sessionMap
-     * @param activeModule
-     * @param strToolContentID
-     * @param defaultContentIdStr
-     * @param mcService
-     * @param httpSessionID
-     * @param listQuestionContentDTO
-     */
     protected void commonSaveCode(HttpServletRequest request, McGeneralAuthoringDTO mcGeneralAuthoringDTO,
 	    McAuthoringForm mcAuthoringForm, SessionMap sessionMap, String activeModule, String strToolContentID,
 	    String defaultContentIdStr, IMcService mcService, String httpSessionID, List listQuestionContentDTO) {
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
 
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	mcAuthoringForm.setTitle(richTextTitle);
 
@@ -815,29 +643,22 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("attachmentList: " + attachmentList);
 
 	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOfflineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 
@@ -866,84 +687,48 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
-	McAction.logger.debug("mcGeneralAuthoringDTO now: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
-
 	request.getSession().setAttribute(httpSessionID, sessionMap);
-	McAction.logger.debug("mcGeneralAuthoringDTO.getMapQuestionContent(); "
-		+ mcGeneralAuthoringDTO.getMapQuestionContent());
     }
 
-    /**
-     * addSingleQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
-     * response)
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
     public ActionForward addSingleQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
-	McAction.logger.debug("dispathcing addSingleQuestion");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
@@ -951,47 +736,34 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	List listAddableQuestionContentDTO = (List) sessionMap.get(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_KEY);
-	McAction.logger.debug("listAddableQuestionContentDTO: " + listAddableQuestionContentDTO);
 
 	McQuestionContentDTO mcQuestionContentDTONew = null;
 
 	int listSize = listQuestionContentDTO.size();
-	McAction.logger.debug("listSize: " + listSize);
 
-	McAction.logger.debug("listAddableQuestionContentDTO now: " + listAddableQuestionContentDTO);
 	request.setAttribute(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
 
 	String newQuestion = request.getParameter("newQuestion");
-	McAction.logger.debug("newQuestion: " + newQuestion);
 
 	String feedback = request.getParameter("feedback");
-	McAction.logger.debug("feedback: " + feedback);
 
 	String mark = request.getParameter("mark");
-	McAction.logger.debug("mark: " + mark);
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
 	String passmark = request.getParameter("passmark");
-	McAction.logger.debug("passmark: " + passmark);
 	mcGeneralAuthoringDTO.setPassMarkValue(passmark);
 
 	boolean validateCandidateAnswersNotBlank = authoringUtil.validateCandidateAnswersNotBlank(request);
-	McAction.logger.debug("validateCandidateAnswersNotBlank: " + validateCandidateAnswersNotBlank);
 
 	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
-	McAction.logger.debug("repopulated caList: " + caList);
 
 	caList = AuthoringUtil.removeBlankEntries(caList);
-	McAction.logger.debug("caList after removing blank entries: " + caList);
 
 	boolean validateSingleCorrectCandidate = authoringUtil.validateSingleCorrectCandidate(caList);
-	McAction.logger.debug("validateSingleCorrectCandidate: " + validateSingleCorrectCandidate);
 
 	boolean validateOnlyOneCorrectCandidate = authoringUtil.validateOnlyOneCorrectCandidate(caList);
-	McAction.logger.debug("validateOnlyOneCorrectCandidate: " + validateOnlyOneCorrectCandidate);
 
 	ActionMessages errors = new ActionMessages();
 
@@ -1010,19 +782,14 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 	}
 
-	McAction.logger.debug("errors: " + errors);
-
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
 	    McAction.logger.debug("errors saved: " + errors);
 	}
 
-	McAction.logger.debug("errors saved: " + errors);
-
 	if (errors.isEmpty()) {
 	    if ((newQuestion != null) && (newQuestion.length() > 0)) {
 		boolean duplicates = AuthoringUtil.checkDuplicateQuestions(listQuestionContentDTO, newQuestion);
-		McAction.logger.debug("duplicates: " + duplicates);
 
 		if (!duplicates) {
 		    McQuestionContentDTO mcQuestionContentDTO = new McQuestionContentDTO();
@@ -1032,90 +799,64 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		    mcQuestionContentDTO.setMark(mark);
 
 		    mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
-		    McAction.logger.debug("caList size:" + mcQuestionContentDTO.getListCandidateAnswersDTO().size());
 		    mcQuestionContentDTO.setCaCount(new Integer(mcQuestionContentDTO.getListCandidateAnswersDTO()
 			    .size()).toString());
 
 		    listQuestionContentDTO.add(mcQuestionContentDTO);
-		    McAction.logger.debug("updated listQuestionContentDTO: " + listQuestionContentDTO);
 		} else {
-		    McAction.logger.debug("entry duplicate, not adding");
+		    //entry duplicate, not adding
 		}
 	    } else {
-		McAction.logger.debug("entry blank, not adding");
+		//entry blank, not adding
 	    }
 	} else {
-	    McAction.logger.debug("errors, not adding");
-
-	    McAction.logger.debug("errors is not empty: " + errors);
+	    //errors, not adding
 
 	    commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, activeModule, strToolContentID,
 		    defaultContentIdStr, mcService, httpSessionID, listQuestionContentDTO);
 
-	    McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	    Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    McAction.logger.debug("passMarksMap: " + passMarksMap);
 	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	    String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	    McAction.logger.debug("totalMark: " + totalMark);
 	    mcAuthoringForm.setTotalMarks(totalMark);
 	    mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
-	    McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	    request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	    request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	    sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
-	    McAction.logger.debug("forwarding using newQuestionBox");
 	    return newQuestionBox(mapping, form, request, response);
 	}
 
-	McAction.logger.debug("entry using mark: " + mark);
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
-	McAction.logger.debug("newQuestion: " + newQuestion);
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
-
-	McAction.logger.debug("feedback: " + feedback);
 	mcAuthoringForm.setFeedback(feedback);
 
-	McAction.logger.debug("mark: " + mark);
 	mcGeneralAuthoringDTO.setMarkValue(mark);
-
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, activeModule, strToolContentID,
 		defaultContentIdStr, mcService, httpSessionID, listQuestionContentDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
-	McAction.logger.debug("before forwarding mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
-
-	McAction.logger.debug("fwd LOAD_QUESTIONS");
 	return (mapping.findForward(McAppConstants.LOAD_QUESTIONS));
     }
 
     /**
-     * newQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-     * 
      * opens up an new screen within the current page for adding a new question
      * 
      * newQuestionBox
@@ -1130,49 +871,32 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
      */
     public ActionForward newQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispathcing newQuestionBox");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
-
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
-
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	/* create default mcContent object*/
 	McContent mcContent = mcService.retrieveMc(new Long(defaultContentIdStr));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	mcAuthoringForm.setTitle(richTextTitle);
 
@@ -1181,12 +905,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
 		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -1195,64 +916,47 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
-	McAction.logger.debug("mcGeneralAuthoringDTO now: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	String requestType = request.getParameter("requestType");
-	McAction.logger.debug("requestType: " + requestType);
 
 	List listAddableQuestionContentDTO = (List) sessionMap.get(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_KEY);
-	McAction.logger.debug("listAddableQuestionContentDTO: " + listAddableQuestionContentDTO);
 
 	if ((requestType != null) && (requestType.equals("direct"))) {
-	    McAction.logger.debug("requestType is direct");
+	    //requestType is direct
 	    listAddableQuestionContentDTO = authoringUtil.buildDefaultQuestionContent(mcContent, mcService);
-	    McAction.logger.debug("listAddableQuestionContentDTO from db: " + listAddableQuestionContentDTO);
 	}
 
 	request.setAttribute(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
 	sessionMap.put(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
 
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
-
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String newQuestion = request.getParameter("newQuestion");
-	McAction.logger.debug("newQuestion: " + newQuestion);
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
 
 	String feedback = request.getParameter("feedback");
-	McAction.logger.debug("feedback: " + feedback);
 	mcAuthoringForm.setFeedback(feedback);
 
 	String mark = request.getParameter("mark");
-	McAction.logger.debug("mark: " + mark);
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
-	McAction.logger.debug("final listQuestionContentDTO: " + listQuestionContentDTO);
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 
 	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
@@ -1265,14 +969,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setActiveModule(activeModule);
 	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
 
-	McAction.logger.debug("fwd ing to newQuestionBox: ");
 	return (mapping.findForward("newQuestionBox"));
     }
 
     /**
-     * newEditableQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
-     * response)
-     * 
      * opens up an new screen within the current page for editing a question
      * 
      * @param mapping
@@ -1285,23 +985,17 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
      */
     public ActionForward newEditableQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispathcing newEditableQuestionBox");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String questionIndex = request.getParameter("questionIndex");
-	McAction.logger.debug("questionIndex: " + questionIndex);
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	request.setAttribute(McAppConstants.CURRENT_EDITABLE_QUESTION_INDEX, questionIndex);
@@ -1309,7 +1003,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setEditableQuestionIndex(questionIndex);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	String editableQuestion = "";
 	String editableFeedback = "";
@@ -1317,8 +1010,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	Iterator listIterator = listQuestionContentDTO.iterator();
 	while (listIterator.hasNext()) {
 	    McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
-	    McAction.logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
-	    McAction.logger.debug("mcQuestionContentDTO question:" + mcQuestionContentDTO.getQuestion());
 	    String question = mcQuestionContentDTO.getQuestion();
 	    String displayOrder = mcQuestionContentDTO.getDisplayOrder();
 
@@ -1327,56 +1018,37 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		    editableFeedback = mcQuestionContentDTO.getFeedback();
 		    editableQuestion = mcQuestionContentDTO.getQuestion();
 		    editableMark = mcQuestionContentDTO.getMark();
-		    McAction.logger.debug("editableFeedback found :" + editableFeedback);
 
 		    List candidates = mcQuestionContentDTO.getListCandidateAnswersDTO();
-		    McAction.logger.debug("candidates found :" + candidates);
 
 		    break;
 		}
 
 	    }
 	}
-	McAction.logger.debug("editableFeedback found :" + editableFeedback);
-	McAction.logger.debug("editableQuestion found :" + editableQuestion);
-	McAction.logger.debug("editableMark found :" + editableMark);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
-
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
-
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = (McGeneralAuthoringDTO) request
 		.getAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO);
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 
 	if (mcGeneralAuthoringDTO == null) {
 	    mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
 	}
 
 	mcGeneralAuthoringDTO.setMarkValue(editableMark);
-
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	mcAuthoringForm.setTitle(richTextTitle);
 
@@ -1393,46 +1065,33 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-
-	McAction.logger.debug("mcGeneralAuthoringDTO now: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	String requestNewEditableQuestionBox = (String) request.getAttribute("requestNewEditableQuestionBox");
-	McAction.logger.debug("requestNewEditableQuestionBox: " + requestNewEditableQuestionBox);
 
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
-	McAction.logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
 	String newQuestion = request.getParameter("newQuestion");
-	McAction.logger.debug("newQuestion: " + newQuestion);
 
 	// if ((editQuestionBoxRequest != null) && (editQuestionBoxRequest.equals("false")))
 	if ((requestNewEditableQuestionBox != null) && requestNewEditableQuestionBox.equals("true")) {
@@ -1441,14 +1100,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
 
 	    String feedback = request.getParameter("feedback");
-	    McAction.logger.debug("feedback: " + feedback);
 	    mcAuthoringForm.setFeedback(feedback);
 	}
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
-	McAction.logger.debug("final listQuestionContentDTO: " + listQuestionContentDTO);
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 
 	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
@@ -1460,15 +1115,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setHttpSessionID(httpSessionID);
 	mcAuthoringForm.setActiveModule(activeModule);
 	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-	McAction.logger.debug("fwd ing to editQuestionBox: ");
 	return (mapping.findForward("editQuestionBox"));
     }
 
     /**
-     * 
-     * ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-     * HttpServletResponse response) throws IOException, ServletException
-     * 
      * removes a question from the questions map
      * 
      * @param mapping
@@ -1481,38 +1131,28 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
      */
     public ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching removeQuestion");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String questionIndex = request.getParameter("questionIndex");
-	McAction.logger.debug("questionIndex: " + questionIndex);
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	McQuestionContentDTO mcQuestionContentDTO = null;
 	Iterator listIterator = listQuestionContentDTO.iterator();
 	while (listIterator.hasNext()) {
 	    mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
-	    McAction.logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
-	    McAction.logger.debug("mcQuestionContentDTO question:" + mcQuestionContentDTO.getQuestion());
 
 	    String question = mcQuestionContentDTO.getQuestion();
 	    String displayOrder = mcQuestionContentDTO.getDisplayOrder();
-	    McAction.logger.debug("displayOrder:" + displayOrder);
 
 	    if ((displayOrder != null) && (!displayOrder.equals(""))) {
 		if (displayOrder.equals(questionIndex)) {
@@ -1522,50 +1162,32 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    }
 	}
 
-	McAction.logger.debug("mcQuestionContentDTO found:" + mcQuestionContentDTO);
 	mcQuestionContentDTO.setQuestion("");
-	McAction.logger.debug("listQuestionContentDTO after remove:" + listQuestionContentDTO);
 
 	listQuestionContentDTO = AuthoringUtil.reorderListQuestionContentDTO(listQuestionContentDTO, questionIndex);
-	McAction.logger.debug("listQuestionContentDTO reordered:" + listQuestionContentDTO);
 
 	sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
-
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
-
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
-
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
-
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	if (mcContent == null) {
-	    McAction.logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
 	    mcContent = mcService.retrieveMc(new Long(defaultContentIdStr));
 	}
-	McAction.logger.debug("final mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -1573,28 +1195,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -1619,42 +1234,29 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	McAction.logger.debug("mcQuestionContentDTO now: " + mcQuestionContentDTO);
-	McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
-	McAction.logger.debug("fwd ing to LOAD_QUESTIONS: " + McAppConstants.LOAD_QUESTIONS);
 	return (mapping.findForward(McAppConstants.LOAD_QUESTIONS));
     }
 
     /**
-     * moveQuestionDown(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
-     * response)
-     * 
      * moves a question down in the list
      * 
      * moveQuestionDown
@@ -1669,65 +1271,47 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
      */
     public ActionForward moveQuestionDown(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching moveQuestionDown");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String questionIndex = request.getParameter("questionIndex");
-	McAction.logger.debug("questionIndex: " + questionIndex);
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	listQuestionContentDTO = AuthoringUtil.swapNodes(listQuestionContentDTO, questionIndex, "down");
-	McAction.logger.debug("listQuestionContentDTO after swap: " + listQuestionContentDTO);
 
 	listQuestionContentDTO = AuthoringUtil.reorderSimpleListQuestionContentDTO(listQuestionContentDTO);
-	McAction.logger.debug("listQuestionContentDTO after reordersimple: " + listQuestionContentDTO);
 
 	sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
 
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -1735,28 +1319,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -1781,112 +1358,66 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
-
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
-
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-
-	McAction.logger.debug("fwd ing to LOAD_QUESTIONS: " + McAppConstants.LOAD_QUESTIONS);
 	return (mapping.findForward(McAppConstants.LOAD_QUESTIONS));
     }
 
-    /**
-     * moveQuestionUp(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-     * 
-     * moveQuestionUp(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-     * *
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward moveQuestionUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+   public ActionForward moveQuestionUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching moveQuestionUp");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String questionIndex = request.getParameter("questionIndex");
-	McAction.logger.debug("questionIndex: " + questionIndex);
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	listQuestionContentDTO = AuthoringUtil.swapNodes(listQuestionContentDTO, questionIndex, "up");
-	McAction.logger.debug("listQuestionContentDTO after swap: " + listQuestionContentDTO);
 
 	listQuestionContentDTO = AuthoringUtil.reorderSimpleListQuestionContentDTO(listQuestionContentDTO);
-	McAction.logger.debug("listQuestionContentDTO after reordersimple: " + listQuestionContentDTO);
 
 	sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
-
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -1894,28 +1425,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -1940,41 +1464,30 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
-	McAction.logger.debug("fwd ing to LOAD_QUESTIONS: " + McAppConstants.LOAD_QUESTIONS);
 	return (mapping.findForward(McAppConstants.LOAD_QUESTIONS));
     }
 
     /**
-     * 
-     * ActionForward addNewFile(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
-     * response) throws IOException, ServletException
      * 
      * adds a new file to content repository
      * 
@@ -1988,55 +1501,40 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
      */
     public ActionForward addNewFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispathching addNewFile");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String onlineInstructions = request.getParameter(McAppConstants.ONLINE_INSTRUCTIONS);
-	McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 
 	String offlineInstructions = request.getParameter(McAppConstants.OFFLINE_INSTRUCTIONS);
-	McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 
 	sessionMap.put(McAppConstants.ONLINE_INSTRUCTIONS_KEY, onlineInstructions);
 	sessionMap.put(McAppConstants.OFFLINE_INSTRUCTIONS, offlineInstructions);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
@@ -2047,8 +1545,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
 
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	mcAuthoringForm.setTitle(richTextTitle);
 
@@ -2058,14 +1554,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	McAction.logger.debug("attachmentList: " + attachmentList);
 	List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	addFileToContentRepository(request, mcAuthoringForm, attachmentList, deletedAttachmentList, sessionMap,
 		mcGeneralAuthoringDTO);
-	McAction.logger.debug("post addFileToContentRepository, attachmentList: " + attachmentList);
-	McAction.logger.debug("post addFileToContentRepository, deletedAttachmentList: " + deletedAttachmentList);
 
 	sessionMap.put(McAppConstants.ATTACHMENT_LIST_KEY, attachmentList);
 	sessionMap.put(McAppConstants.DELETED_ATTACHMENT_LIST_KEY, deletedAttachmentList);
@@ -2089,45 +1581,33 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	mcAuthoringForm.resetUserAction();
 
 	String strOnlineInstructions = request.getParameter("onlineInstructions");
 	String strOfflineInstructions = request.getParameter("offlineInstructions");
-	McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
-	McAction.logger.debug("fwd ing to LOAD_QUESTIONS: " + McAppConstants.LOAD_QUESTIONS);
 	return (mapping.findForward(McAppConstants.LOAD_QUESTIONS));
     }
 
     /**
-     * 
-     * ActionForward deleteFile(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
-     * response) throws IOException, ServletException
      * 
      * deletes a file from the content repository
      * 
@@ -2141,46 +1621,33 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
      */
     public ActionForward deleteFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching deleteFile");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
@@ -2189,10 +1656,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
 
 	String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 
 	String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 
 	mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 	mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
@@ -2201,9 +1666,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String richTextTitle = (String) sessionMap.get(McAppConstants.ACTIVITY_TITLE_KEY);
 	String richTextInstructions = (String) sessionMap.get(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY);
-
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	mcAuthoringForm.setTitle(richTextTitle);
 
@@ -2212,14 +1674,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	long uuid = WebUtil.readLongParam(request, McAppConstants.UUID);
 
 	List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	McAction.logger.debug("attachmentList: " + attachmentList);
 
 	if (attachmentList == null) {
 	    attachmentList = new ArrayList();
 	}
 
 	List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	if (deletedAttachmentList == null) {
 	    deletedAttachmentList = new ArrayList();
@@ -2249,35 +1709,27 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
 	mcAuthoringForm.resetUserAction();
-	McAction.logger.debug("fwd ing to LOAD_QUESTIONS: " + McAppConstants.LOAD_QUESTIONS);
 	return (mapping.findForward(McAppConstants.LOAD_QUESTIONS));
     }
 
     /**
-     * persistError(HttpServletRequest request, String message)
      * 
      * persists error messages to request scope
      * 
@@ -2287,7 +1739,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
     public void persistError(HttpServletRequest request, String message) {
 	ActionMessages errors = new ActionMessages();
 	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-	McAction.logger.debug("add " + message + "  to ActionMessages:");
 	saveErrors(request, errors);
     }
 
@@ -2301,11 +1752,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
     public void addFileToContentRepository(HttpServletRequest request, McAuthoringForm mcAuthoringForm,
 	    List attachmentList, List deletedAttachmentList, SessionMap sessionMap,
 	    McGeneralAuthoringDTO mcGeneralAuthoringDTO) {
-	McAction.logger.debug("attempt addFileToContentRepository");
-	McAction.logger.debug("attachmentList: " + attachmentList);
-	McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	if (attachmentList == null) {
 	    attachmentList = new ArrayList();
@@ -2319,15 +1766,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	boolean isOnlineFile = false;
 	String fileType = null;
 	if ((mcAuthoringForm.getTheOfflineFile() != null) && (mcAuthoringForm.getTheOfflineFile().getFileSize() > 0)) {
-	    McAction.logger.debug("theOfflineFile is available: ");
+	    //theOfflineFile is available
 	    uploadedFile = mcAuthoringForm.getTheOfflineFile();
-	    McAction.logger.debug("uploadedFile: " + uploadedFile);
 	    fileType = IToolContentHandler.TYPE_OFFLINE;
 	} else if ((mcAuthoringForm.getTheOnlineFile() != null)
 		&& (mcAuthoringForm.getTheOnlineFile().getFileSize() > 0)) {
-	    McAction.logger.debug("theOnlineFile is available: ");
+	    //theOnlineFile is available
 	    uploadedFile = mcAuthoringForm.getTheOnlineFile();
-	    McAction.logger.debug("uploadedFile: " + uploadedFile);
 	    isOnlineFile = true;
 	    fileType = IToolContentHandler.TYPE_ONLINE;
 	} else {
@@ -2343,12 +1788,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    return;
 	}
 
-	McAction.logger.debug("uploadedFile.getFileName(): " + uploadedFile.getFileName());
-
 	/* if a file with the same name already exists then move the old one to deleted */
 	deletedAttachmentList = McUtils.moveToDelete(uploadedFile.getFileName(), isOnlineFile, attachmentList,
 		deletedAttachmentList);
-	McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	try {
 	    /* This is a new file and so is saved to the content repository. Add it to the 
@@ -2358,12 +1800,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		    uploadedFile.getFileName(), uploadedFile.getContentType(), fileType);
 	    McUploadedFile file = new McUploadedFile();
 	    String fileName = uploadedFile.getFileName();
-	    McAction.logger.debug("fileName: " + fileName);
-	    McAction.logger.debug("fileName length: " + fileName.length());
 
 	    if ((fileName != null) && (fileName.length() > 30)) {
 		fileName = fileName.substring(0, 31);
-		McAction.logger.debug("shortened fileName: " + fileName);
 	    }
 
 	    file.setFileName(fileName);
@@ -2389,11 +1828,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	}
     }
 
-    /**
-     * McToolContentHandler getToolContentHandler()
-     * 
-     * @return
-     */
     private McToolContentHandler getToolContentHandler() {
 	if (toolContentHandler == null) {
 	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
@@ -2419,43 +1853,31 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
     private List saveAttachments(McContent mcContent, List attachmentList, List deletedAttachmentList,
 	    ActionMapping mapping, HttpServletRequest request) {
 
-	McAction.logger.debug("start saveAttachments, mcContent " + mcContent);
-	McAction.logger.debug("start saveAttachments, attachmentList " + attachmentList);
-	McAction.logger.debug("start deletedAttachmentList, deletedAttachmentList " + deletedAttachmentList);
-
 	if ((attachmentList == null) || (deletedAttachmentList == null)) {
 	    return null;
 	}
 
 	IMcService voteService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("voteService: " + voteService);
 
 	if (deletedAttachmentList != null) {
-	    McAction.logger.debug("deletedAttachmentList is iterated...");
 	    Iterator iter = deletedAttachmentList.iterator();
 	    while (iter.hasNext()) {
 		McUploadedFile attachment = (McUploadedFile) iter.next();
-		McAction.logger.debug("attachment: " + attachment);
 
 		if (attachment.getSubmissionId() != null) {
 		    voteService.removeFile(attachment.getSubmissionId());
 		}
 	    }
 	    deletedAttachmentList.clear();
-	    McAction.logger.error("cleared attachment list.");
 	}
 
 	if (attachmentList != null) {
-	    McAction.logger.debug("attachmentList is iterated...");
 	    Iterator iter = attachmentList.iterator();
 	    while (iter.hasNext()) {
 		McUploadedFile attachment = (McUploadedFile) iter.next();
-		McAction.logger.debug("attachment: " + attachment);
-		McAction.logger.debug("attachment submission id: " + attachment.getSubmissionId());
 
 		if (attachment.getSubmissionId() == null) {
 		    /* add entry to tool table - file already in content repository */
-		    McAction.logger.debug("calling persistFile with  attachment: " + attachment);
 		    voteService.persistFile(mcContent, attachment);
 		}
 	    }
@@ -2466,14 +1888,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
     public ActionForward editActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching proxy editActivity...");
 	return null;
     }
 
     /**
-     * 
-     * ActionForward editActivityQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-     * HttpServletResponse response) throws IOException, ServletException, ToolException
      * 
      * generates Edit Activity screen
      * 
@@ -2488,47 +1906,31 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
      */
     public ActionForward editActivityQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, ToolException {
-	McAction.logger.debug("dispatching editActivityQuestions...");
 
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-	McAction.logger.debug("mcAuthoringForm: " + mcAuthoringForm);
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-
-	McAction.logger.debug("title: " + mcContent.getTitle());
-	McAction.logger.debug("instructions: " + mcContent.getInstructions());
 
 	mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
 	mcAuthoringForm.setTitle(mcContent.getTitle());
@@ -2540,23 +1942,20 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	/* determine whether the request is from Monitoring url Edit Activity*/
 	String sourceMcStarter = (String) request.getAttribute(McAppConstants.SOURCE_MC_STARTER);
-	McAction.logger.debug("sourceMcStarter: " + sourceMcStarter);
 
 	mcAuthoringForm.setDefineLaterInEditMode(new Boolean(true).toString());
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	boolean isContentInUse = McUtils.isContentInUse(mcContent);
-	McAction.logger.debug("isContentInUse:" + isContentInUse);
 
 	mcGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(false).toString());
 	if (isContentInUse == true) {
-	    McAction.logger.debug("monitoring url does not allow editActivity since the content is in use.");
+	    //monitoring url does not allow editActivity since the content is in use
 	    persistError(request, "error.content.inUse");
 	    mcGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(true).toString());
 	}
 
 	EditActivityDTO editActivityDTO = new EditActivityDTO();
-	McAction.logger.debug("isContentInUse:" + isContentInUse);
 	if (isContentInUse == true) {
 	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
 	}
@@ -2577,10 +1976,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 	List listQuestionContentDTO = authoringUtil.buildDefaultQuestionContent(mcContent, mcService);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
@@ -2588,54 +1985,23 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-
-	McAction.logger.debug("before fwding to jsp, mcAuthoringForm: " + mcAuthoringForm);
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
-	McAction.logger.debug("forwarding to : " + McAppConstants.LOAD_QUESTIONS);
 	return mapping.findForward(McAppConstants.LOAD_QUESTIONS);
     }
 
     /**
-     * 
-     * newEditableCaBox(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
-     * response)
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward newEditableCaBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching newEditableCaBox");
-	return null;
-    }
-
-    /**
-     * moveCandidateDown(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
-     * response)
-     * 
      * moves a candidate dwn in the list
      * 
      * @param mapping
@@ -2648,33 +2014,25 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
      */
     public ActionForward moveCandidateDown(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching moveCandidateDown");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String questionIndex = request.getParameter("questionIndex");
-	McAction.logger.debug("questionIndex: " + questionIndex);
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	String candidateIndex = request.getParameter("candidateIndex");
-	McAction.logger.debug("candidateIndex: " + candidateIndex);
 	mcAuthoringForm.setCandidateIndex(candidateIndex);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	boolean validateCandidateAnswersNotBlank = authoringUtil.validateCandidateAnswersNotBlank(request);
-	McAction.logger.debug("validateCandidateAnswersNotBlank: " + validateCandidateAnswersNotBlank);
 
 	ActionMessages errors = new ActionMessages();
 
@@ -2685,14 +2043,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
-	    McAction.logger.debug("errors saved: " + errors);
 	}
 
 	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
-	McAction.logger.debug("repopulated caList: " + caList);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	if (errors.isEmpty()) {
 	    List candidates = new LinkedList();
@@ -2701,23 +2056,19 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    Iterator listIterator = listQuestionContentDTO.iterator();
 	    while (listIterator.hasNext()) {
 		McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
-		McAction.logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
 
-		McAction.logger.debug("mcQuestionContentDTO question:" + mcQuestionContentDTO.getQuestion());
 		String question = mcQuestionContentDTO.getQuestion();
 		String displayOrder = mcQuestionContentDTO.getDisplayOrder();
 
 		if ((displayOrder != null) && (!displayOrder.equals(""))) {
 		    if (displayOrder.equals(questionIndex)) {
-			McAction.logger.debug("displayOrder equals questionIndex :" + questionIndex);
 			editableQuestion = mcQuestionContentDTO.getQuestion();
 
 			candidates = mcQuestionContentDTO.getListCandidateAnswersDTO();
-			McAction.logger.debug("candidates found :" + candidates);
-			McAction.logger.debug("but we are using the repopulated caList here: " + caList);
+			//candidates found
+			//but we are using the repopulated caList here
 
 			listCandidates = AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "down");
-			McAction.logger.debug("swapped candidates :" + listCandidates);
 
 			mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
 
@@ -2726,43 +2077,30 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 		}
 	    }
-	    McAction.logger.debug("candidates found :" + candidates);
-	    McAction.logger.debug("swapped candidates is :" + listCandidates);
 	}
-
-	McAction.logger.debug("listQuestionContentDTO after swapped candidates :" + listQuestionContentDTO);
 
 	sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
 
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -2770,28 +2108,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -2814,55 +2145,42 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
 	String newQuestion = request.getParameter("newQuestion");
-	McAction.logger.debug("newQuestion: " + newQuestion);
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
 
 	String feedback = request.getParameter("feedback");
-	McAction.logger.debug("feedback: " + feedback);
 	mcAuthoringForm.setFeedback(feedback);
 
 	String mark = request.getParameter("mark");
-	McAction.logger.debug("mark: " + mark);
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
-	McAction.logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
 	request.setAttribute("requestNewEditableQuestionBox", new Boolean(true).toString());
 	return newEditableQuestionBox(mapping, form, request, response);
     }
 
     /**
-     * moveCandidateUp(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-     * 
      * moves a candidate up in the list
      * 
      * @param mapping
@@ -2875,33 +2193,25 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
      */
     public ActionForward moveCandidateUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching moveCandidateUp");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String questionIndex = request.getParameter("questionIndex");
-	McAction.logger.debug("questionIndex: " + questionIndex);
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	String candidateIndex = request.getParameter("candidateIndex");
-	McAction.logger.debug("candidateIndex: " + candidateIndex);
 	mcAuthoringForm.setCandidateIndex(candidateIndex);
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	boolean validateCandidateAnswersNotBlank = authoringUtil.validateCandidateAnswersNotBlank(request);
-	McAction.logger.debug("validateCandidateAnswersNotBlank: " + validateCandidateAnswersNotBlank);
 
 	ActionMessages errors = new ActionMessages();
 
@@ -2912,14 +2222,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
-	    McAction.logger.debug("errors saved: " + errors);
 	}
 
 	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
-	McAction.logger.debug("repopulated caList: " + caList);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	if (errors.isEmpty()) {
 	    List candidates = new LinkedList();
@@ -2928,24 +2235,17 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    Iterator listIterator = listQuestionContentDTO.iterator();
 	    while (listIterator.hasNext()) {
 		McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
-		McAction.logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
 
-		McAction.logger.debug("mcQuestionContentDTO question:" + mcQuestionContentDTO.getQuestion());
 		String question = mcQuestionContentDTO.getQuestion();
 		String displayOrder = mcQuestionContentDTO.getDisplayOrder();
 
 		if ((displayOrder != null) && (!displayOrder.equals(""))) {
 		    if (displayOrder.equals(questionIndex)) {
-			McAction.logger.debug("displayOrder equals questionIndex :" + questionIndex);
 			editableQuestion = mcQuestionContentDTO.getQuestion();
 
 			candidates = mcQuestionContentDTO.getListCandidateAnswersDTO();
-			McAction.logger.debug("candidates found :" + candidates);
-
-			McAction.logger.debug("using repopulated caList:" + caList);
 
 			listCandidates = AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "up");
-			McAction.logger.debug("swapped candidates :" + listCandidates);
 
 			mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
 			mcQuestionContentDTO.setCaCount(new Integer(listCandidates.size()).toString());
@@ -2955,44 +2255,29 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 		}
 	    }
-
-	    McAction.logger.debug("candidates found :" + candidates);
-	    McAction.logger.debug("swapped candidates is :" + listCandidates);
 	}
-
-	McAction.logger.debug("listQuestionContentDTO after swapped candidates :" + listQuestionContentDTO);
 
 	sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
 
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
-
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -3000,28 +2285,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -3044,55 +2322,42 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	String newQuestion = request.getParameter("newQuestion");
-	McAction.logger.debug("newQuestion: " + newQuestion);
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
 
 	String feedback = request.getParameter("feedback");
-	McAction.logger.debug("feedback: " + feedback);
 	mcAuthoringForm.setFeedback(feedback);
 
 	String mark = request.getParameter("mark");
-	McAction.logger.debug("mark: " + mark);
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
-	McAction.logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
 	request.setAttribute("requestNewEditableQuestionBox", new Boolean(true).toString());
 	return newEditableQuestionBox(mapping, form, request, response);
     }
 
     /**
-     * removeCandidate(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-     * 
      * removes a candidate from the list
      * 
      * @param mapping
@@ -3105,46 +2370,34 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
      */
     public ActionForward removeCandidate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching removeCandidate");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String questionIndex = request.getParameter("questionIndex");
-	McAction.logger.debug("questionIndex: " + questionIndex);
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	String candidateIndex = request.getParameter("candidateIndex");
-	McAction.logger.debug("candidateIndex: " + candidateIndex);
 	mcAuthoringForm.setCandidateIndex(candidateIndex);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
-	McAction.logger.debug("repopulated caList: " + caList);
 
 	McQuestionContentDTO mcQuestionContentDTO = null;
 	Iterator listIterator = listQuestionContentDTO.iterator();
 	while (listIterator.hasNext()) {
 	    mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
-	    McAction.logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
-	    McAction.logger.debug("mcQuestionContentDTO question:" + mcQuestionContentDTO.getQuestion());
 
 	    String question = mcQuestionContentDTO.getQuestion();
 	    String displayOrder = mcQuestionContentDTO.getDisplayOrder();
-	    McAction.logger.debug("displayOrder:" + displayOrder);
 
 	    if ((displayOrder != null) && (!displayOrder.equals(""))) {
 		if (displayOrder.equals(questionIndex)) {
@@ -3154,77 +2407,55 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    }
 	}
 
-	McAction.logger.debug("mcQuestionContentDTO found:" + mcQuestionContentDTO);
-	McAction.logger.debug("setting caList for the content:");
 	mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
 
 	List candidateAnswers = mcQuestionContentDTO.getListCandidateAnswersDTO();
-	McAction.logger.debug("candidateAnswers:" + candidateAnswers);
 
 	McCandidateAnswersDTO mcCandidateAnswersDTO = null;
 	Iterator listCaIterator = candidateAnswers.iterator();
 	int caIndex = 0;
 	while (listCaIterator.hasNext()) {
 	    caIndex++;
-	    McAction.logger.debug("caIndex:" + caIndex);
 	    mcCandidateAnswersDTO = (McCandidateAnswersDTO) listCaIterator.next();
-	    McAction.logger.debug("mcCandidateAnswersDTO:" + mcCandidateAnswersDTO);
-	    McAction.logger.debug("mcCandidateAnswersDTO question:" + mcCandidateAnswersDTO.getCandidateAnswer());
 
 	    if (caIndex == new Integer(candidateIndex).intValue()) {
-		McAction.logger.debug("candidateIndex found");
 		mcCandidateAnswersDTO.setCandidateAnswer("");
 
 		break;
 	    }
 	}
-	McAction.logger.debug("candidateAnswers after resetting answer" + candidateAnswers);
 
 	candidateAnswers = AuthoringUtil.reorderListCandidatesDTO(candidateAnswers);
-	McAction.logger.debug("candidateAnswers after reordering candidate nodes" + candidateAnswers);
 
 	mcQuestionContentDTO.setListCandidateAnswersDTO(candidateAnswers);
 	mcQuestionContentDTO.setCaCount(new Integer(candidateAnswers.size()).toString());
 
-	McAction.logger.debug("listQuestionContentDTO after remove: " + listQuestionContentDTO);
-
 	sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
 
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	if (mcContent == null) {
-	    McAction.logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
 	    mcContent = mcService.retrieveMc(new Long(defaultContentIdStr));
 	}
-	McAction.logger.debug("final mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -3232,28 +2463,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -3276,56 +2500,42 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	McAction.logger.debug("mcQuestionContentDTO now: " + mcQuestionContentDTO);
-	McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
 	String newQuestion = request.getParameter("newQuestion");
-	McAction.logger.debug("newQuestion: " + newQuestion);
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
 
 	String feedback = request.getParameter("feedback");
-	McAction.logger.debug("feedback: " + feedback);
 	mcAuthoringForm.setFeedback(feedback);
 
 	String mark = request.getParameter("mark");
-	McAction.logger.debug("mark: " + mark);
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
-	McAction.logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
 	request.setAttribute("requestNewEditableQuestionBox", new Boolean(true).toString());
 	return newEditableQuestionBox(mapping, form, request, response);
     }
 
     /**
-     * newCandidateBox(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-     * 
      * enables adding a new candidate answer
      * 
      * @param mapping
@@ -3338,67 +2548,48 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
      */
     public ActionForward newCandidateBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching newCandidateBox");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String questionIndex = request.getParameter("questionIndex");
-	McAction.logger.debug("questionIndex: " + questionIndex);
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	String candidateIndex = request.getParameter("candidateIndex");
-	McAction.logger.debug("candidateIndex: " + candidateIndex);
 	mcAuthoringForm.setCandidateIndex(candidateIndex);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 	List caList = authoringUtil.repopulateCandidateAnswersBox(request, true);
-	McAction.logger.debug("repopulated caList: " + caList);
 
 	int caCount = caList.size();
-	McAction.logger.debug("caCount: " + caCount);
 
 	String newQuestion = request.getParameter("newQuestion");
-	McAction.logger.debug("newQuestion: " + newQuestion);
 
 	String mark = request.getParameter("mark");
-	McAction.logger.debug("mark: " + mark);
 
 	String passmark = request.getParameter("passmark");
-	McAction.logger.debug("passmark: " + passmark);
 
 	String feedback = request.getParameter("feedback");
-	McAction.logger.debug("feedback: " + feedback);
 
 	int currentQuestionCount = listQuestionContentDTO.size();
-	McAction.logger.debug("currentQuestionCount: " + currentQuestionCount);
 
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
-	McAction.logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
 	McQuestionContentDTO mcQuestionContentDTOLocal = null;
 	Iterator listIterator = listQuestionContentDTO.iterator();
 	while (listIterator.hasNext()) {
 	    mcQuestionContentDTOLocal = (McQuestionContentDTO) listIterator.next();
-	    McAction.logger.debug("mcQuestionContentDTOLocal:" + mcQuestionContentDTOLocal);
-	    McAction.logger.debug("mcQuestionContentDTOLocal question:" + mcQuestionContentDTOLocal.getQuestion());
 
 	    String question = mcQuestionContentDTOLocal.getQuestion();
 	    String displayOrder = mcQuestionContentDTOLocal.getDisplayOrder();
-	    McAction.logger.debug("displayOrder:" + displayOrder);
 
 	    if ((displayOrder != null) && (!displayOrder.equals(""))) {
 		if (displayOrder.equals(questionIndex)) {
@@ -3408,42 +2599,30 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    }
 	}
 
-	McAction.logger.debug("mcQuestionContentDTOLocal found:" + mcQuestionContentDTOLocal);
-
 	if (mcQuestionContentDTOLocal != null) {
 	    mcQuestionContentDTOLocal.setListCandidateAnswersDTO(caList);
 	    mcQuestionContentDTOLocal.setCaCount(new Integer(caList.size()).toString());
 	}
 
-	McAction.logger.debug("listQuestionContentDTO after repopulating data: " + listQuestionContentDTO);
 	sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
 
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
-
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -3451,28 +2630,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -3495,44 +2667,31 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	McAction.logger.debug("mcQuestionContentDTOLocal now: " + mcQuestionContentDTOLocal);
-	McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
-	McAction.logger.debug("newQuestion: " + newQuestion);
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
 
-	McAction.logger.debug("feedback: " + feedback);
 	mcAuthoringForm.setFeedback(feedback);
 
-	McAction.logger.debug("mark: " + mark);
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-
-	McAction.logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
 	request.setAttribute("requestNewEditableQuestionBox", new Boolean(true).toString());
 	return newEditableQuestionBox(mapping, form, request, response);
@@ -3540,59 +2699,43 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
     public ActionForward updateMarksList(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching updateMarksList");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String questionIndex = request.getParameter("questionIndex");
-	McAction.logger.debug("questionIndex: " + questionIndex);
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
 
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -3600,28 +2743,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -3646,62 +2782,47 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("2");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
-	McAction.logger.debug("fwd ing to LOAD_QUESTIONS: " + McAppConstants.LOAD_QUESTIONS);
 	return (mapping.findForward(McAppConstants.LOAD_QUESTIONS));
     }
 
     public ActionForward moveAddedCandidateUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching moveAddedCandidateUp");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	String candidateIndex = request.getParameter("candidateIndex");
-	McAction.logger.debug("candidateIndex: " + candidateIndex);
 	mcAuthoringForm.setCandidateIndex(candidateIndex);
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	boolean validateCandidateAnswersNotBlank = authoringUtil.validateCandidateAnswersNotBlank(request);
-	McAction.logger.debug("validateCandidateAnswersNotBlank: " + validateCandidateAnswersNotBlank);
 
 	ActionMessages errors = new ActionMessages();
 
@@ -3712,19 +2833,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
-	    McAction.logger.debug("errors saved: " + errors);
 	}
 
 	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
-	McAction.logger.debug("repopulated caList: " + caList);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	List listAddableQuestionContentDTO = (List) sessionMap.get(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_KEY);
-	McAction.logger.debug("listAddableQuestionContentDTO: " + listAddableQuestionContentDTO);
 
 	if (errors.isEmpty()) {
 	    List candidates = new LinkedList();
@@ -3734,53 +2851,38 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    /*there is only 1 question dto*/
 	    while (listIterator.hasNext()) {
 		McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
-		McAction.logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
 
 		candidates = mcQuestionContentDTO.getListCandidateAnswersDTO();
-		McAction.logger.debug("candidates found :" + candidates);
-		McAction.logger.debug("but we are using the repopulated caList here: " + caList);
 
 		listCandidates = AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "up");
-		McAction.logger.debug("swapped candidates :" + listCandidates);
 
 		mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
 	    }
 	}
 
-	McAction.logger.debug("listAddableQuestionContentDTO after swapping (up) candidates: "
-		+ listAddableQuestionContentDTO);
 	request.setAttribute(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
 	sessionMap.put(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
 
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -3788,28 +2890,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -3832,47 +2927,36 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	String newQuestion = request.getParameter("newQuestion");
-	McAction.logger.debug("newQuestion: " + newQuestion);
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
 
 	String feedback = request.getParameter("feedback");
-	McAction.logger.debug("feedback: " + feedback);
 	mcAuthoringForm.setFeedback(feedback);
 
 	String mark = request.getParameter("mark");
-	McAction.logger.debug("mark: " + mark);
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
-	McAction.logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
 	return newQuestionBox(mapping, form, request, response);
 
@@ -3880,29 +2964,22 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
     public ActionForward moveAddedCandidateDown(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching moveAddedCandidateDown");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String candidateIndex = request.getParameter("candidateIndex");
-	McAction.logger.debug("candidateIndex: " + candidateIndex);
 	mcAuthoringForm.setCandidateIndex(candidateIndex);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	boolean validateCandidateAnswersNotBlank = authoringUtil.validateCandidateAnswersNotBlank(request);
-	McAction.logger.debug("validateCandidateAnswersNotBlank: " + validateCandidateAnswersNotBlank);
 
 	ActionMessages errors = new ActionMessages();
 
@@ -3913,18 +2990,14 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
-	    McAction.logger.debug("errors saved: " + errors);
 	}
 
 	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
-	McAction.logger.debug("repopulated caList: " + caList);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 	sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	List listAddableQuestionContentDTO = (List) sessionMap.get(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_KEY);
-	McAction.logger.debug("listAddableQuestionContentDTO: " + listAddableQuestionContentDTO);
 
 	if (errors.isEmpty()) {
 	    List candidates = new LinkedList();
@@ -3934,52 +3007,38 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    /*there is only 1 question dto*/
 	    while (listIterator.hasNext()) {
 		McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
-		McAction.logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
 
 		candidates = mcQuestionContentDTO.getListCandidateAnswersDTO();
-		McAction.logger.debug("candidates found :" + candidates);
-		McAction.logger.debug("but we are using the repopulated caList here: " + caList);
 
 		listCandidates = AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "down");
-		McAction.logger.debug("swapped candidates :" + listCandidates);
 
 		mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
 	    }
 	}
 
-	McAction.logger.debug("listAddableQuestionContentDTO after moving down candidates: ");
 	request.setAttribute(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
 	sessionMap.put(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
 
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -3987,28 +3046,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -4031,82 +3083,62 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
 	String newQuestion = request.getParameter("newQuestion");
-	McAction.logger.debug("newQuestion: " + newQuestion);
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
 
 	String feedback = request.getParameter("feedback");
-	McAction.logger.debug("feedback: " + feedback);
 	mcAuthoringForm.setFeedback(feedback);
 
 	String mark = request.getParameter("mark");
-	McAction.logger.debug("mark: " + mark);
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
-	McAction.logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
 	return newQuestionBox(mapping, form, request, response);
     }
 
     public ActionForward removeAddedCandidate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching removeAddedCandidate");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String candidateIndex = request.getParameter("candidateIndex");
-	McAction.logger.debug("candidateIndex: " + candidateIndex);
 	mcAuthoringForm.setCandidateIndex(candidateIndex);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
-	McAction.logger.debug("repopulated caList: " + caList);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 	sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	List listAddableQuestionContentDTO = (List) sessionMap.get(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_KEY);
-	McAction.logger.debug("listAddableQuestionContentDTO: " + listAddableQuestionContentDTO);
 
 	List candidates = new LinkedList();
 	List listCandidates = new LinkedList();
@@ -4115,85 +3147,59 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	/*there is only 1 question dto*/
 	while (listIterator.hasNext()) {
 	    McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
-	    McAction.logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
 
 	    candidates = mcQuestionContentDTO.getListCandidateAnswersDTO();
-	    McAction.logger.debug("candidates found :" + candidates);
-
-	    McAction.logger.debug("mcQuestionContentDTO found:" + mcQuestionContentDTO);
-	    McAction.logger.debug("setting caList for the content:");
 	    mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
 
 	    List candidateAnswers = mcQuestionContentDTO.getListCandidateAnswersDTO();
-	    McAction.logger.debug("candidateAnswers:" + candidateAnswers);
 
 	    McCandidateAnswersDTO mcCandidateAnswersDTO = null;
 	    Iterator listCaIterator = candidateAnswers.iterator();
 	    int caIndex = 0;
 	    while (listCaIterator.hasNext()) {
 		caIndex++;
-		McAction.logger.debug("caIndex:" + caIndex);
 		mcCandidateAnswersDTO = (McCandidateAnswersDTO) listCaIterator.next();
-		McAction.logger.debug("mcCandidateAnswersDTO:" + mcCandidateAnswersDTO);
-		McAction.logger.debug("mcCandidateAnswersDTO question:" + mcCandidateAnswersDTO.getCandidateAnswer());
 
 		if (caIndex == new Integer(candidateIndex).intValue()) {
-		    McAction.logger.debug("candidateIndex found");
 		    mcCandidateAnswersDTO.setCandidateAnswer("");
 
 		    break;
 		}
 	    }
-	    McAction.logger.debug("candidateAnswers after resetting answer" + candidateAnswers);
 
 	    candidateAnswers = AuthoringUtil.reorderListCandidatesDTO(candidateAnswers);
-	    McAction.logger.debug("candidateAnswers after reordering candidate nodes" + candidateAnswers);
 
 	    mcQuestionContentDTO.setListCandidateAnswersDTO(candidateAnswers);
 	    mcQuestionContentDTO.setCaCount(new Integer(candidateAnswers.size()).toString());
-
-	    McAction.logger.debug("listQuestionContentDTO after remove: " + listQuestionContentDTO);
 	}
 
-	McAction.logger.debug("listAddableQuestionContentDTO : " + listAddableQuestionContentDTO);
 	request.setAttribute(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
 	sessionMap.put(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
 
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
-	McAction.logger.debug("mcContent: " + mcContent);
 
 	if (mcContent == null) {
-	    McAction.logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
 	    mcContent = mcService.retrieveMc(new Long(defaultContentIdStr));
 	}
-	McAction.logger.debug("final mcContent: " + mcContent);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -4201,28 +3207,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -4245,47 +3244,36 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
 	String newQuestion = request.getParameter("newQuestion");
-	McAction.logger.debug("newQuestion: " + newQuestion);
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
 
 	String feedback = request.getParameter("feedback");
-	McAction.logger.debug("feedback: " + feedback);
 	mcAuthoringForm.setFeedback(feedback);
 
 	String mark = request.getParameter("mark");
-	McAction.logger.debug("mark: " + mark);
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
-	McAction.logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
 	return newQuestionBox(mapping, form, request, response);
 
@@ -4293,55 +3281,39 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
     public ActionForward newAddedCandidateBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	McAction.logger.debug("dispatching newAddedCandidateBox");
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	McAction.logger.debug("mcService: " + mcService);
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	McAction.logger.debug("httpSessionID: " + httpSessionID);
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
-	McAction.logger.debug("sessionMap: " + sessionMap);
 
 	String candidateIndex = request.getParameter("candidateIndex");
-	McAction.logger.debug("candidateIndex: " + candidateIndex);
 	mcAuthoringForm.setCandidateIndex(candidateIndex);
 
 	String totalMarks = request.getParameter("totalMarks");
-	McAction.logger.debug("totalMarks: " + totalMarks);
 
 	List listQuestionContentDTO = (List) sessionMap.get(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
-	McAction.logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 	List caList = authoringUtil.repopulateCandidateAnswersBox(request, true);
-	McAction.logger.debug("repopulated caList: " + caList);
 
 	int caCount = caList.size();
-	McAction.logger.debug("caCount: " + caCount);
 
 	String newQuestion = request.getParameter("newQuestion");
-	McAction.logger.debug("newQuestion: " + newQuestion);
 
 	String mark = request.getParameter("mark");
-	McAction.logger.debug("mark: " + mark);
 
 	String passmark = request.getParameter("passmark");
-	McAction.logger.debug("passmark: " + passmark);
 
 	String feedback = request.getParameter("feedback");
-	McAction.logger.debug("feedback: " + feedback);
 
 	int currentQuestionCount = listQuestionContentDTO.size();
-	McAction.logger.debug("currentQuestionCount: " + currentQuestionCount);
 
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
-	McAction.logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
 	List listAddableQuestionContentDTO = (List) sessionMap.get(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_KEY);
-	McAction.logger.debug("listAddableQuestionContentDTO: " + listAddableQuestionContentDTO);
 
 	List candidates = new LinkedList();
 	List listCandidates = new LinkedList();
@@ -4350,47 +3322,34 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	/*there is only 1 question dto*/
 	while (listIterator.hasNext()) {
 	    McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
-	    McAction.logger.debug("mcQuestionContentDTO:" + mcQuestionContentDTO);
 
-	    McAction.logger.debug("caList:" + caList);
-	    McAction.logger.debug("caList size:" + caList.size());
 	    mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
 	    mcQuestionContentDTO.setCaCount(new Integer(caList.size()).toString());
 	}
 
-	McAction.logger.debug("listAddableQuestionContentDTO after swapping (up) candidates: ");
 	request.setAttribute(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
 	sessionMap.put(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
 
-	McAction.logger.debug("listQuestionContentDTO after repopulating data: " + listQuestionContentDTO);
 	sessionMap.put(McAppConstants.LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	McAction.logger.debug("contentFolderID: " + contentFolderID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
 	String activeModule = request.getParameter(McAppConstants.ACTIVE_MODULE);
-	McAction.logger.debug("activeModule: " + activeModule);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
-	McAction.logger.debug("richTextTitle: " + richTextTitle);
 
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-	McAction.logger.debug("richTextInstructions: " + richTextInstructions);
 
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McAction.logger.debug("strToolContentID: " + strToolContentID);
 
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
-	;
-	McAction.logger.debug("defaultContentIdStr: " + defaultContentIdStr);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
-	McAction.logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
@@ -4398,28 +3357,21 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	McAction.logger.debug("activeModule: " + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
 	    String onlineInstructions = (String) sessionMap.get(McAppConstants.ONLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("onlineInstructions: " + onlineInstructions);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
 
 	    String offlineInstructions = (String) sessionMap.get(McAppConstants.OFFLINE_INSTRUCTIONS_KEY);
-	    McAction.logger.debug("offlineInstructions: " + offlineInstructions);
 	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 	    List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("attachmentList: " + attachmentList);
 	    List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    McAction.logger.debug("deletedAttachmentList: " + deletedAttachmentList);
 
 	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
 	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
 
 	    String strOnlineInstructions = request.getParameter("onlineInstructions");
 	    String strOfflineInstructions = request.getParameter("offlineInstructions");
-	    McAction.logger.debug("onlineInstructions: " + strOnlineInstructions);
-	    McAction.logger.debug("offlineInstructions: " + strOnlineInstructions);
 	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
 	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
 	}
@@ -4442,26 +3394,20 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(McAppConstants.LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
-	McAction.logger.debug("listQuestionContentDTO now: " + listQuestionContentDTO);
 
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
 	Map marksMap = authoringUtil.buildMarksMap();
-	McAction.logger.debug("marksMap: " + marksMap);
 	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-	McAction.logger.debug("generating dyn pass map using listQuestionContentDTO: " + listQuestionContentDTO);
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	McAction.logger.debug("passMarksMap: " + passMarksMap);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
 	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	McAction.logger.debug("totalMark: " + totalMark);
 	mcAuthoringForm.setTotalMarks(totalMark);
 	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
 	Map correctMap = authoringUtil.buildCorrectMap();
-	McAction.logger.debug("correctMap: " + correctMap);
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
 	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
@@ -4470,24 +3416,14 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setMarkValue(mark);
 
-	McAction.logger.debug("before saving final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-
-	McAction.logger.debug("editQuestionBoxRequest: " + editQuestionBoxRequest);
 
 	return newQuestionBox(mapping, form, request, response);
 
     }
 
-    /**
-     * boolean existsContent(long toolContentID, IMcService mcService)
-     * 
-     * @param toolContentID
-     * @param mcService
-     * @return
-     */
     protected boolean existsContent(long toolContentID, IMcService mcService) {
 	McContent mcContent = mcService.retrieveMc(new Long(toolContentID));
 	if (mcContent == null) {

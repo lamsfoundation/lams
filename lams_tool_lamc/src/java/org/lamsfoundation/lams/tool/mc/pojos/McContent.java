@@ -46,7 +46,6 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
  * @author Ozgur Demirtas
  */
 public class McContent implements Serializable {
-	static Logger logger = Logger.getLogger(McContent.class.getName());
 
     /** identifier field */
     private Long uid;
@@ -126,7 +125,6 @@ public class McContent implements Serializable {
 			Integer passMark, boolean showReport, boolean randomize, boolean displayAnswers, boolean showMarks, boolean retries, boolean reflect, String reflectionSubject, Set mcQueContents, Set mcSessions, 
 			Set mcAttachments) {
         
-        logger.debug("copying properties");
         this.mcContentId = mcContentId;
         this.content=content;
         this.title = title;
@@ -475,18 +473,6 @@ public class McContent implements Serializable {
      */
     public void setReflectionSubject(String reflectionSubject) {
         this.reflectionSubject = reflectionSubject;
-    }    
-    /**
-     * @return Returns the logger.
-     */
-    public static Logger getLogger() {
-        return logger;
-    }
-    /**
-     * @param logger The logger to set.
-     */
-    public static void setLogger(Logger logger) {
-        McContent.logger = logger;
     }
     /**
      * @return Returns the showMarks.
@@ -551,7 +537,6 @@ public class McContent implements Serializable {
 	        Integer mark=mcQueContent.getMark();
 	        totalMarksPossible += (mark!=null ? mark.intValue() : 0);
 	    }
-	    logger.debug("totalMarksPossible: " + totalMarksPossible);
 	    
 	    return new Integer(totalMarksPossible);
     }

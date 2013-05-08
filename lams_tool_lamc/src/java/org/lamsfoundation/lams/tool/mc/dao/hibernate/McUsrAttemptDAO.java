@@ -41,7 +41,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * must also be checked.
  */
 public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemptDAO {
-	 	static Logger logger = Logger.getLogger(McUsrAttemptDAO.class.getName());
 	 	
 	 	private static final String LOAD_ATTEMPT_BY_USER_SESSION = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrUid";
 	 		 	

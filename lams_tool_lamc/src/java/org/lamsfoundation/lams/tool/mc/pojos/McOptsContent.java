@@ -40,7 +40,6 @@ import org.apache.log4j.Logger;
  * @author Ozgur Demirtas
  */ 
 public class McOptsContent implements Serializable, Comparable {
-	static Logger logger = Logger.getLogger(McOptsContent.class.getName());
 	
     /** identifier field */
     private Long uid;
@@ -195,18 +194,6 @@ public class McOptsContent implements Serializable, Comparable {
         	return 1;
 		else
 			return (int) (mcQueOptionId.longValue() - optContent.mcQueOptionId.longValue());
-    }
-    /**
-     * @return Returns the logger.
-     */
-    public static Logger getLogger() {
-        return logger;
-    }
-    /**
-     * @param logger The logger to set.
-     */
-    public static void setLogger(Logger logger) {
-        McOptsContent.logger = logger;
     }
     /**
      * @return Returns the displayOrder.

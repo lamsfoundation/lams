@@ -41,7 +41,6 @@ import org.apache.log4j.Logger;
  * @author Ozgur Demirtas
  */
 public class McQueContent implements Serializable, Comparable {
-	static Logger logger = Logger.getLogger(McQueContent.class.getName());
 
     /** identifier field */
     private Long uid;
@@ -174,7 +173,6 @@ public class McQueContent implements Serializable, Comparable {
     										McContent newMcContent)
     										
     {
-    	logger.debug("deep copying queContent: " + queContent);
     	McQueContent newQueContent = new McQueContent(queContent.getQuestion(),
 													  queContent.getDisplayOrder(),
 													  queContent.getMark(),
@@ -297,19 +295,6 @@ public class McQueContent implements Serializable, Comparable {
 	public void setMcContentId(Long mcContentId) {
 		this.mcContentId = mcContentId;
 	}
-
-    /**
-     * @return Returns the logger.
-     */
-    public static Logger getLogger() {
-        return logger;
-    }
-    /**
-     * @param logger The logger to set.
-     */
-    public static void setLogger(Logger logger) {
-        McQueContent.logger = logger;
-    }
     /**
      * @return Returns the feedback.
      */

@@ -63,11 +63,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  *
  */
 public class MonitoringUtil implements McAppConstants{
-	static Logger logger = Logger.getLogger(MonitoringUtil.class.getName());
 	
 	/**
-	 * 
-	 * buildGroupsQuestionData(HttpServletRequest request, McContent mcContent)
 	 * 
 	 * ends up populating the attempt history for all the users of all the tool sessions for a content
 	 * 
@@ -77,11 +74,9 @@ public class MonitoringUtil implements McAppConstants{
 	 */
 	public static List buildGroupsQuestionData(HttpServletRequest request, McContent mcContent, IMcService mcService)
 	{
-		logger.debug("will be building groups question data  for content:..." + mcContent);
-		logger.debug("mcService: " + mcService);
+		//will be building groups question data  for content
 		
     	List listQuestions=mcService.getAllQuestionEntries(mcContent.getUid());
-    	logger.debug("listQuestions:..." + listQuestions);
     	
     	List listMonitoredAnswersContainerDTO= new LinkedList();
     	
@@ -89,7 +84,6 @@ public class MonitoringUtil implements McAppConstants{
 	    while (itListQuestions.hasNext())
 	    {
 	    	McQueContent mcQueContent =(McQueContent)itListQuestions.next();
-	    	logger.debug("mcQueContent:..." + mcQueContent);
 	    	
 	    	if (mcQueContent != null)
 	    	{
@@ -99,24 +93,19 @@ public class MonitoringUtil implements McAppConstants{
 	    		mcMonitoredAnswersDTO.setMark(mcQueContent.getMark().toString());
     		
 	    		List listCandidateAnswersDTO=mcService.populateCandidateAnswersDTO(mcQueContent.getUid());
-				logger.debug("listCandidateAnswersDTO:..." + listCandidateAnswersDTO);
 				mcMonitoredAnswersDTO.setCandidateAnswersCorrect(listCandidateAnswersDTO);
 				
 				Map questionAttemptData= buildGroupsAttemptData(request, mcContent, mcQueContent, mcQueContent.getUid(), mcService, null);
-				logger.debug("questionAttemptData:..." + questionAttemptData);
 				mcMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 				listMonitoredAnswersContainerDTO.add(mcMonitoredAnswersDTO);
 				
 	    	}
 		}
-		logger.debug("final listMonitoredAnswersContainerDTO:..." + listMonitoredAnswersContainerDTO);
 		return listMonitoredAnswersContainerDTO;
 	}
 
 	
 	/**
-	 * buildGroupsQuestionDataForExportLearner(HttpServletRequest request, McContent mcContent, 
-	        IMcService mcService, McSession mcSession, McQueUsr mcQueUsr)
 	 * 
 	 * @param request
 	 * @param mcContent
@@ -128,13 +117,8 @@ public class MonitoringUtil implements McAppConstants{
 	public static List 	buildGroupsQuestionDataForExportLearner(HttpServletRequest request, McContent mcContent, 
 	        IMcService mcService, McSession mcSession, McQueUsr mcQueUsr)
 	{
-		logger.debug("will be building groups question data  for content:..." + mcContent);
-		logger.debug("using mcSession:..." + mcSession);
-		logger.debug("using mcQueUsr:..." + mcQueUsr);
-		logger.debug("mcService: " + mcService);
 		
     	List listQuestions=mcService.getAllQuestionEntries(mcContent.getUid());
-    	logger.debug("listQuestions:..." + listQuestions);
     	
     	List listMonitoredAnswersContainerDTO= new LinkedList();
     	
@@ -142,7 +126,6 @@ public class MonitoringUtil implements McAppConstants{
 	    while (itListQuestions.hasNext())
 	    {
 	    	McQueContent mcQueContent =(McQueContent)itListQuestions.next();
-	    	logger.debug("mcQueContent:..." + mcQueContent);
 	    	
 	    	if (mcQueContent != null)
 	    	{
@@ -152,7 +135,6 @@ public class MonitoringUtil implements McAppConstants{
 	    		mcMonitoredAnswersDTO.setMark(mcQueContent.getMark().toString());
 	    		
 	    		List listCandidateAnswersDTO=mcService.populateCandidateAnswersDTO(mcQueContent.getUid());
-				logger.debug("listCandidateAnswersDTO:..." + listCandidateAnswersDTO);
 				mcMonitoredAnswersDTO.setCandidateAnswersCorrect(listCandidateAnswersDTO);
 				
 				// Get the attempts for this user. The maps must match the maps in buildGroupsAttemptData or the jsp won't work.
@@ -160,20 +142,15 @@ public class MonitoringUtil implements McAppConstants{
 				Map questionAttemptData = new TreeMap(new McStringComparator());
 				questionAttemptData.put(mcSession.getSession_name(), listMonitoredUserContainerDTO);
 
-				if ( logger.isDebugEnabled() ) {
-					logger.debug("questionAttemptData:..." + questionAttemptData);
-				}
 				mcMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 				listMonitoredAnswersContainerDTO.add(mcMonitoredAnswersDTO);
 	    	}
 		}
-		logger.debug("final listMonitoredAnswersContainerDTO:..." + listMonitoredAnswersContainerDTO);
 		return listMonitoredAnswersContainerDTO;
 	}
 	
 
 	/**
-	 * List buildGroupsMarkData(HttpServletRequest request, McContent mcContent, IMcService mcService)
 	 * 
 	 * @param request
 	 * @param mcContent
@@ -182,7 +159,6 @@ public class MonitoringUtil implements McAppConstants{
 	 */
 	public static List buildGroupsMarkData(HttpServletRequest request, McContent mcContent, IMcService mcService)
 	{
-		logger.debug("will be building groups mark data  for content:..." + mcContent);
     	List listMonitoredMarksContainerDTO= new LinkedList();
     	Set sessions=mcContent.getMcSessions();
     	Iterator sessionsIterator=sessions.iterator();
@@ -190,8 +166,7 @@ public class MonitoringUtil implements McAppConstants{
 	    
 	    while (sessionsIterator.hasNext())
     	{
-    	    McSession mcSession=(McSession) sessionsIterator.next(); 
-    	    logger.debug("iterating mcSession:..." + mcSession);
+    	    McSession mcSession=(McSession) sessionsIterator.next();
     	    
     	    McSessionMarkDTO mcSessionMarkDTO= new McSessionMarkDTO();
     	    mcSessionMarkDTO.setSessionId(mcSession.getMcSessionId().toString());
@@ -206,7 +181,6 @@ public class MonitoringUtil implements McAppConstants{
         	while (usersIterator.hasNext())
         	{
         	    McQueUsr mcQueUsr=(McQueUsr) usersIterator.next();
-        	    logger.debug("iterating mcQueUsr:..." + mcQueUsr);
         	    
         	    McUserMarkDTO mcUserMarkDTO= new McUserMarkDTO();
         	    mcUserMarkDTO.setSessionId(mcSession.getMcSessionId().toString());
@@ -259,15 +233,11 @@ public class MonitoringUtil implements McAppConstants{
         	listMonitoredMarksContainerDTO.add(mcSessionMarkDTO);
     	}
     	
-    	if ( logger.isDebugEnabled() )
-    		logger.debug("final listMonitoredMarksContainerDTO:..." + listMonitoredMarksContainerDTO);
     	
 		return listMonitoredMarksContainerDTO;
 	}
 
 	/**
-	 *  
-	 * buildGroupsAttemptData(HttpServletRequest request, McContent mcContent, McQueContent mcQueContent)
 	 * 
 	 * helps populating user's attempt history
 	 * 
@@ -279,7 +249,6 @@ public class MonitoringUtil implements McAppConstants{
 	public static Map buildGroupsAttemptData(HttpServletRequest request, McContent mcContent, McQueContent mcQueContent, 
 	        Long questionUid, IMcService mcService, McQueUsr mcQueUsr)
 	{
-		logger.debug("will be building groups attempt data  for mcQueContent:..." + mcQueContent + " questionUid:" + questionUid);
     	Map<String,List>  mapMonitoredAttemptsContainerDTO= new TreeMap(new McStringComparator());
     	
     	Iterator sessionIterator = mcContent.getMcSessions().iterator();
@@ -291,15 +260,10 @@ public class MonitoringUtil implements McAppConstants{
     		mapMonitoredAttemptsContainerDTO.put(mcSession.getSession_name(), sessionUsersAttempts);
 		}
 
-    	if ( logger.isDebugEnabled() )
-    		logger.debug("final mapMonitoredAttemptsContainerDTO:..." + mapMonitoredAttemptsContainerDTO);
-
     	return mapMonitoredAttemptsContainerDTO;
 	}
 
 	/**
-	 *   
-	 * populateSessionUsersAttempts(HttpServletRequest request,List listMcUsers)
 	 * 
 	 * ends up populating all the user's attempt data of a  particular tool session
 	 * 
@@ -311,10 +275,6 @@ public class MonitoringUtil implements McAppConstants{
 	 */
 	public static List  populateSessionUsersAttempts(HttpServletRequest request,Long sessionId, Set listMcUsers, Long questionUid, IMcService mcService)
 	{
-		if ( logger.isDebugEnabled() ) {
-			logger.debug("starting populateSessionUsersAttempts");
-			logger.debug("will be populating users marks for session id: " + sessionId);
-		}
 		
 		McSession mcSession=mcService.retrieveMcSession(sessionId);
 
@@ -330,8 +290,6 @@ public class MonitoringUtil implements McAppConstants{
 	}
 	
 	/**
-	 * Map getAttemptEntries(HttpServletRequest request, IMcService mcService, McQueUsr mcQueUsr, McSession mcSession, 
-	        String questionUid, List listMonitoredUserContainerDTO, Map mapMonitoredUserContainerDTO)
 	 * 
 	 * @param request
 	 * @param mcService
@@ -345,13 +303,9 @@ public class MonitoringUtil implements McAppConstants{
 	public static List getAttemptEntries(HttpServletRequest request, IMcService mcService, McQueUsr mcQueUsr, McSession mcSession, 
 			Long questionUid, List listMonitoredUserContainerDTO, boolean latestOnly)
 	{
-	    logger.debug("starting getAttemptEntries.");
-		logger.debug("mcQueUsr: " + mcQueUsr);
-		logger.debug("mcSession: " + mcSession);
 		
 		if (mcQueUsr != null)
 		{
-			logger.debug("getting listUserAttempts for user id: " + mcQueUsr.getUid() + " and que content id: " + questionUid);
 			
 		    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
 			mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
@@ -388,9 +342,6 @@ public class MonitoringUtil implements McAppConstants{
 				mcMonitoredUserDTO.setUsersAttempts(attemptMap);
 	    	}
 			
-		    if ( logger.isDebugEnabled() ) 
-		    	logger.debug("final constructed mcMonitoredUserDTO: " + mcMonitoredUserDTO);
-
 		    listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
 
 		}
@@ -411,11 +362,9 @@ public class MonitoringUtil implements McAppConstants{
 		while (iteratorSession.hasNext())
 		{
 		    McSession mcSession=(McSession) iteratorSession.next();
-		    logger.debug("mcSession: " + mcSession);
 		    
 		    if (mcSession != null)
 		    {
-			    logger.debug("mcSession id: " + mcSession.getMcSessionId());
 			    
 			    if (mcSession.getSessionStatus().equals(COMPLETED))
 			    {
@@ -434,7 +383,6 @@ public class MonitoringUtil implements McAppConstants{
 
 	
 	/**
-	 *  boolean notebookEntriesExist(IMcService mcService, McContent mcContent)
 	 * 
 	 * @param mcService
 	 * @param mcContent
@@ -442,37 +390,26 @@ public class MonitoringUtil implements McAppConstants{
 	 */
 	public static boolean notebookEntriesExist(IMcService mcService, McContent mcContent)
 	{
-		logger.debug("finding out about content level notebook entries: " + mcContent);
 		Iterator iteratorSession= mcContent.getMcSessions().iterator();
 		while (iteratorSession.hasNext())
 		{
 		    McSession mcSession=(McSession) iteratorSession.next();
-		    logger.debug("mcSession: " + mcSession);
 		    
 		    if (mcSession != null)
 		    {
-			    logger.debug("mcSession id: " + mcSession.getMcSessionId());
 			    
 			    Iterator iteratorUser=mcSession.getMcQueUsers().iterator();
 			    while (iteratorUser.hasNext())
 				{
 			        McQueUsr mcQueUsr=(McQueUsr) iteratorUser.next();
-			        logger.debug("mcQueUsr: " + mcQueUsr);
 			        
 			        if (mcQueUsr != null)
 			        {
-				        logger.debug("mcQueUsr id: " + mcQueUsr.getQueUsrId());
-				        
-						logger.debug("attempt getting notebookEntry: ");
 						NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
 								CoreNotebookConstants.NOTEBOOK_TOOL,
 								MY_SIGNATURE, new Integer(mcQueUsr.getQueUsrId().intValue()));
-						
-				        logger.debug("notebookEntry: " + notebookEntry);
-				        
 						if (notebookEntry != null)
 						{
-						    logger.debug("found at least one notebookEntry: " + notebookEntry.getEntry());
 						    return true;
 						}
 						    
@@ -485,26 +422,18 @@ public class MonitoringUtil implements McAppConstants{
 	
 
 	/**
-	 * generateGroupsSessionData(HttpServletRequest request, IMcService mcService, McContent mcContent)
-	 * 
 	 * @param request
 	 * @param mcService
 	 * @param mcContent
 	 */
 	public static void generateGroupsSessionData(HttpServletRequest request, IMcService mcService, McContent mcContent)
 	{
-	    logger.debug("generateGroupsSessionData: " + mcContent);
-	    
 	    List listAllGroupsDTO=buildGroupBasedSessionData(request, mcContent, mcService);
-		logger.debug("listAllGroupsDTO: " + listAllGroupsDTO);
-		
 	    request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
 	}
 
 
 	/**
-	 * List buildGroupBasedSessionData(HttpServletRequest request, McContent mcContent, IMcService mcService)
-	 * 
 	 * @param request
 	 * @param mcContent
 	 * @param mcService
@@ -512,10 +441,7 @@ public class MonitoringUtil implements McAppConstants{
 	 */
 	public static List buildGroupBasedSessionData(HttpServletRequest request, McContent mcContent, IMcService mcService)
 	{
-		logger.debug("buildGroupBasedSessionData" + mcContent);
-		logger.debug("will be building groups question data  for content:..." + mcContent);
     	List listQuestions=mcService.getAllQuestionEntries(mcContent.getUid());
-    	logger.debug("listQuestions:..." + listQuestions);
     	
     	List listAllGroupsContainerDTO= new LinkedList();
     	
@@ -524,12 +450,9 @@ public class MonitoringUtil implements McAppConstants{
 		while (iteratorSession.hasNext())
 		{
 		    McSession mcSession=(McSession) iteratorSession.next();
-		    logger.debug("iteration for group based session data: " + mcSession);
 		    String currentSessionId=mcSession.getMcSessionId().toString();
-		    logger.debug("currentSessionId: " + currentSessionId);
 		    
 		    String currentSessionName=mcSession.getSession_name();
-		    logger.debug("currentSessionName: " + currentSessionName);
 		    
 		    McAllGroupsDTO mcAllGroupsDTO= new McAllGroupsDTO();
 		    List listMonitoredAnswersContainerDTO= new LinkedList();
@@ -540,11 +463,9 @@ public class MonitoringUtil implements McAppConstants{
 			    while (itListQuestions.hasNext())
 			    {
 			    	McQueContent mcQueContent =(McQueContent)itListQuestions.next();
-			    	logger.debug("mcQueContent:..." + mcQueContent);
 			    	
 			    	if (mcQueContent != null)
 			    	{
-					    logger.debug("populating McMonitoredAnswersDTO for : " + mcQueContent);
 			    		McMonitoredAnswersDTO mcMonitoredAnswersDTO= new McMonitoredAnswersDTO();
 			    		mcMonitoredAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
 			    		mcMonitoredAnswersDTO.setQuestion(mcQueContent.getQuestion());
@@ -553,28 +474,19 @@ public class MonitoringUtil implements McAppConstants{
 			    		
 			    		Map questionAttemptData = new TreeMap();
 			    		
-			    		logger.debug("generated  questionAttemptData: " + questionAttemptData);
 						mcMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 						
-						logger.debug("adding mcMonitoredAnswersDTO to the listMonitoredAnswersContainerDTO: " + mcMonitoredAnswersDTO);
 						listMonitoredAnswersContainerDTO.add(mcMonitoredAnswersDTO);
 			    	}
 			    }
 		    }
-		    logger.debug("listMonitoredAnswersContainerDTO:" + listMonitoredAnswersContainerDTO);
-		    
-		    logger.debug("adding listMonitoredAnswersContainerDTO to the mcAllGroupsDTO:" + listMonitoredAnswersContainerDTO);
 		    mcAllGroupsDTO.setGroupData(listMonitoredAnswersContainerDTO);
 		    mcAllGroupsDTO.setSessionName(currentSessionName);
 		    mcAllGroupsDTO.setSessionId(currentSessionId);
 		    
-		    logger.debug("built mcAllGroupsDTO:" + mcAllGroupsDTO);
 		    listAllGroupsContainerDTO.add(mcAllGroupsDTO);
 		    
 		}
-    	
-    	
-		logger.debug("final listAllGroupsContainerDTO:..." + listAllGroupsContainerDTO);
 		return listAllGroupsContainerDTO;
 	}	
 

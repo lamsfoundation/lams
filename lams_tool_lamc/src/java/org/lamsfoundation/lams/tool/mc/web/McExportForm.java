@@ -32,8 +32,6 @@ import org.lamsfoundation.lams.tool.mc.pojos.McContent;
  */
 public class McExportForm extends ActionForm {
     
-    static Logger logger = Logger.getLogger(McExportForm.class.getName());
-    
     private String title;
 	private String content;
 	
@@ -41,19 +39,6 @@ public class McExportForm extends ActionForm {
 	private String toolSessionID;
 	private String userID;
 	private String mode;
-	
-    /**
-     * @return Returns the logger.
-     */
-    public static Logger getLogger() {
-        return logger;
-    }
-    /**
-     * @param logger The logger to set.
-     */
-    public static void setLogger(Logger logger) {
-    	McExportForm.logger = logger;
-    }
     /**
      * @return Returns the content.
      */

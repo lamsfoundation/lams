@@ -53,7 +53,6 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
 public class McUploadedFile implements Serializable, Comparable
 {
-	static Logger logger = Logger.getLogger(McUploadedFile.class.getName());
 	/** identifier field */
     private Long submissionId;
     
@@ -108,7 +107,6 @@ public class McUploadedFile implements Serializable, Comparable
     					String fileName,
 						McContent mcContent)  
     {
-    	logger.debug("constructor gets called.");
         this.uuid = uuid;
         this.fileOnline = fileOnline;
         this.fileName = fileName;

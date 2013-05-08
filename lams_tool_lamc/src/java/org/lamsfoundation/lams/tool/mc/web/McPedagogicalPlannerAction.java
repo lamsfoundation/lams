@@ -56,8 +56,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class McPedagogicalPlannerAction extends LamsDispatchAction {
 
-    private static Logger logger = Logger.getLogger(McPedagogicalPlannerAction.class);
-
     @Override
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {

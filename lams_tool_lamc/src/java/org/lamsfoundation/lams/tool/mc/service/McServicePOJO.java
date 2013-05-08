@@ -136,14 +136,10 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     }
 
     public void configureContentRepository() throws McApplicationException {
-	McServicePOJO.logger.debug("retrieved repService: " + repositoryService);
 	cred = new SimpleCredentials(repositoryUser, repositoryId);
-	McServicePOJO.logger.debug("retrieved cred: " + cred);
 	try {
 	    repositoryService.createCredentials(cred);
-	    McServicePOJO.logger.debug("created credentails.");
 	    repositoryService.addWorkspace(cred, repositoryWorkspace);
-	    McServicePOJO.logger.debug("created workspace.");
 	} catch (ItemExistsException ie) {
 	    McServicePOJO.logger.warn("Tried to configure repository but it "
 		    + " appears to be already configured. Exception thrown by repository being ignored. ", ie);
@@ -157,7 +153,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     public void createMc(McContent mcContent) throws McApplicationException {
 	try {
-	    McServicePOJO.logger.debug("using mcContent defineLater:" + mcContent.isDefineLater());
 	    mcContentDAO.saveMcContent(mcContent);
 	} catch (DataAccessException e) {
 	    throw new McApplicationException("Exception occured when lams is creating mc content: " + e.getMessage(), e);
@@ -579,7 +574,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * @return top mark, lowest mark, average mark in that order
      */
     public Integer[] getMarkStatistics(McSession mcSession) {
-	McServicePOJO.logger.debug("getting mark statistics on mcSession: " + mcSession.getUid());
 	return mcUserDAO.getMarkStatisticsForSession(mcSession.getUid());
     }
 
@@ -722,7 +716,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     public User getCurrentUserData(String username) throws McApplicationException {
 	try {
-	    McServicePOJO.logger.debug("getCurrentUserData: " + username);
 	    /**
 	     * this will return null if the username not found
 	     */
@@ -773,14 +766,12 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    McQueContent mcQueContent = (McQueContent) questionIterator.next();
 	    Iterator attemptsIterator = mcQueContent.getMcUsrAttempts().iterator();
 	    while (attemptsIterator.hasNext()) {
-		McServicePOJO.logger.debug("there is at least one attempt");
 		/**
 		 * proved the fact that there is at least one attempt for this content.
 		 */
 		return true;
 	    }
 	}
-	McServicePOJO.logger.debug("there is no response for this content");
 	return false;
     }
 
@@ -821,12 +812,9 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * 
      */
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
-	McServicePOJO.logger.debug("start of copyToolContent with ids: " + fromContentId + " and " + toContentId);
 
 	if (fromContentId == null) {
-	    McServicePOJO.logger.error("fromContentId is null.");
-	    McServicePOJO.logger.debug("attempt retrieving tool's default content id with signatute : "
-		    + McAppConstants.MY_SIGNATURE);
+	    McServicePOJO.logger.warn("fromContentId is null.");
 	    long defaultContentId = 0;
 	    try {
 		defaultContentId = getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE);
@@ -843,15 +831,12 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    McServicePOJO.logger.error("throwing ToolException: toContentId is null");
 	    throw new ToolException("toContentId is missing");
 	}
-	McServicePOJO.logger.debug("final - copyToolContent using ids: " + fromContentId + " and " + toContentId);
 
 	try {
 	    McContent fromContent = mcContentDAO.findMcContentById(fromContentId);
 
 	    if (fromContent == null) {
-		McServicePOJO.logger.error("fromContent is null.");
-		McServicePOJO.logger.error("attempt retrieving tool's default content id with signatute : "
-			+ McAppConstants.MY_SIGNATURE);
+		McServicePOJO.logger.warn("fromContent is null.");
 		long defaultContentId = 0;
 		try {
 		    defaultContentId = getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE);
@@ -864,25 +849,16 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		}
 
 		fromContent = mcContentDAO.findMcContentById(fromContentId);
-		McServicePOJO.logger.debug("using fromContent: " + fromContent);
 	    }
-
-	    McServicePOJO.logger.debug("final - retrieved fromContent: " + fromContent);
-	    McServicePOJO.logger.debug("final - before new instance using " + fromContent + " and " + toContentId);
-	    McServicePOJO.logger.debug("final - before new instance using mcToolContentHandler: "
-		    + mcToolContentHandler);
-
+	    
 	    try {
 		McContent toContent = McContent.newInstance(mcToolContentHandler, fromContent, toContentId);
 		if (toContent == null) {
-		    McServicePOJO.logger.debug("throwing ToolException: WARNING!, retrieved toContent is null.");
+		    McServicePOJO.logger.error("throwing ToolException: WARNING!, retrieved toContent is null.");
 		    throw new ToolException("WARNING! Fail to create toContent. Can't continue!");
 		} else {
-		    McServicePOJO.logger.debug("retrieved toContent: " + toContent);
 		    mcContentDAO.saveMcContent(toContent);
-		    McServicePOJO.logger.debug("toContent has been saved successfully: " + toContent);
 		}
-		McServicePOJO.logger.debug("end of copyToolContent with ids: " + fromContentId + " and " + toContentId);
 
 	    } catch (ItemNotFoundException e) {
 		McServicePOJO.logger.error("exception occurred: " + e);
@@ -907,8 +883,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      */
     public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException {
-	McServicePOJO.logger.debug("start of removeToolContent with toolContentId: " + toolContentId
-		+ "removeSessionData: " + removeSessionData);
 
 	if (toolContentId == null) {
 	    McServicePOJO.logger.error("toolContentId is null");
@@ -916,14 +890,11 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
 
 	McContent mcContent = mcContentDAO.findMcContentById(toolContentId);
-	McServicePOJO.logger.debug("retrieving mcContent: " + mcContent);
 
 	if (mcContent != null) {
-	    McServicePOJO.logger.error("start deleting any uploaded file for this content from the content repository");
 	    Iterator filesIterator = mcContent.getMcAttachments().iterator();
 	    while (filesIterator.hasNext()) {
 		McUploadedFile mcUploadedFile = (McUploadedFile) filesIterator.next();
-		McServicePOJO.logger.debug("iterated mcUploadedFile : " + mcUploadedFile);
 		String filesUuid = mcUploadedFile.getUuid();
 		if (filesUuid != null && filesUuid.length() > 0) {
 		    try {
@@ -934,36 +905,27 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		    }
 		}
 	    }
-	    McServicePOJO.logger.debug("end deleting any uploaded files for this content.");
 
 	    Iterator sessionIterator = mcContent.getMcSessions().iterator();
 	    while (sessionIterator.hasNext()) {
 		if (removeSessionData == false) {
-		    McServicePOJO.logger.debug("removeSessionData is false, throwing SessionDataExistsException.");
 		    throw new SessionDataExistsException();
 		}
 
 		McSession mcSession = (McSession) sessionIterator.next();
-		McServicePOJO.logger.debug("iterated mcSession : " + mcSession);
 
 		Iterator sessionUsersIterator = mcSession.getMcQueUsers().iterator();
 		while (sessionUsersIterator.hasNext()) {
 		    McQueUsr mcQueUsr = (McQueUsr) sessionUsersIterator.next();
-		    McServicePOJO.logger.debug("iterated mcQueUsr : " + mcQueUsr);
 
 		    Iterator sessionUsersAttemptsIterator = mcQueUsr.getMcUsrAttempts().iterator();
 		    while (sessionUsersAttemptsIterator.hasNext()) {
 			McUsrAttempt mcUsrAttempt = (McUsrAttempt) sessionUsersAttemptsIterator.next();
-			McServicePOJO.logger.debug("iterated mcUsrAttempt : " + mcUsrAttempt);
 			removeAttempt(mcUsrAttempt);
-			McServicePOJO.logger.debug("removed mcUsrAttempt : " + mcUsrAttempt);
 		    }
 		}
 	    }
-	    McServicePOJO.logger.debug("removed all existing responses of toolContent with toolContentId:"
-		    + toolContentId);
 	    mcContentDAO.removeMcById(toolContentId);
-	    McServicePOJO.logger.debug("removed mcContent:" + mcContent);
 	} else {
 	    McServicePOJO.logger.error("Warning!!!, We should have not come here. mcContent is null.");
 	    throw new ToolException("toolContentId is missing");
@@ -996,35 +958,25 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	McQueUsr mcQueUsr = retrieveMcQueUsr(userId);
 
 	if (mcQueUsr != null) {
-	    McServicePOJO.logger.error("retrieved mcQueUsr : " + mcQueUsr);
-	    McServicePOJO.logger.error("retrieved mcQueUsr  has the tool session : " + mcQueUsr.getMcSession());
 	    McSession mcSession = mcQueUsr.getMcSession();
 	    if (mcSession != null) {
 		Long usersToolSessionId = mcSession.getMcSessionId();
-		McServicePOJO.logger.debug("retrieved  tool session has tool session id : " + usersToolSessionId);
 
 		mcSession = retrieveMcSession(usersToolSessionId);
-		McServicePOJO.logger.debug("retrieved  mcSession is : " + mcSession);
 		mcSession.setSessionStatus(McSession.COMPLETED);
-		McServicePOJO.logger.debug("updated  mcSession to COMPLETED : ");
 		updateMcSession(mcSession);
-		McServicePOJO.logger.debug("updated  mcSession to COMPLETED in the db : ");
 
 		McContent mcContent = mcSession.getMcContent();
-		McServicePOJO.logger.debug("mcSession uses mcContent : " + mcContent);
-		McServicePOJO.logger.debug("mcSession uses mcContentId : " + mcContent.getMcContentId());
 
 		/**
 		 * if all the sessions of this content is COMPLETED, unlock the content
 		 * 
 		 */
 		int countIncompleteSession = countIncompleteSession(mcContent);
-		McServicePOJO.logger.debug("mcSession countIncompleteSession : " + countIncompleteSession);
 
 		if (countIncompleteSession == 0) {
 		    mcContent.setContentInUse(false);
 		    updateMc(mcContent);
-		    McServicePOJO.logger.debug("mcContent has been updated for contentInUse" + mcContent);
 		}
 	    } else {
 		McServicePOJO.logger.error("WARNING!: retrieved mcSession is null.");
@@ -1184,14 +1136,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      */
     public boolean existsSession(Long toolSessionId) {
 	McSession mcSession = retrieveMcSession(toolSessionId);
-
-	if (mcSession == null) {
-	    McServicePOJO.logger.error("mcSession does not exist yet: " + toolSessionId);
-	    return false;
-	} else {
-	    McServicePOJO.logger.debug("retrieving an existing mcSession: " + mcSession + " " + toolSessionId);
-	}
-	return true;
+	return mcSession != null;
     }
 
     /**
@@ -1209,8 +1154,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * 
      */
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
-	McServicePOJO.logger.debug("start of createToolSession with ids: " + toolSessionId + " and " + toolContentId);
-	McServicePOJO.logger.debug("toolSessionName: " + toolSessionName);
 
 	if (toolSessionId == null) {
 	    McServicePOJO.logger.error("toolSessionId is null");
@@ -1219,14 +1162,10 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	long defaultContentId = 0;
 	if (toolContentId == null) {
-	    McServicePOJO.logger.error("toolContentId is null.");
-	    McServicePOJO.logger.error("attempt retrieving tool's default content id with signatute : "
-		    + McAppConstants.MY_SIGNATURE);
 
 	    try {
 		defaultContentId = getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE);
 		toolContentId = new Long(defaultContentId);
-		McServicePOJO.logger.debug("updated toolContentId to: " + toolContentId);
 	    } catch (Exception e) {
 		McServicePOJO.logger.error("default content id has not been setup for signature: "
 			+ McAppConstants.MY_SIGNATURE);
@@ -1234,20 +1173,14 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 			+ McAppConstants.MY_SIGNATURE + " Can't continue!");
 	    }
 	}
-	McServicePOJO.logger.debug("final toolSessionId and toolContentId: " + toolSessionId + " " + toolContentId);
 
 	McContent mcContent = mcContentDAO.findMcContentById(toolContentId);
-	McServicePOJO.logger.debug("retrieved mcContent: " + mcContent);
 
 	if (mcContent == null) {
-	    McServicePOJO.logger.error("mcContent is null.");
-	    McServicePOJO.logger.error("attempt retrieving tool's default content id with signatute : "
-		    + McAppConstants.MY_SIGNATURE);
 
 	    try {
 		defaultContentId = getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE);
 		toolContentId = new Long(defaultContentId);
-		McServicePOJO.logger.debug("updated toolContentId to: " + toolContentId);
 	    } catch (Exception e) {
 		McServicePOJO.logger.error("default content id has not been setup for signature: "
 			+ McAppConstants.MY_SIGNATURE);
@@ -1257,7 +1190,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	    mcContent = mcContentDAO.findMcContentById(toolContentId);
 	}
-	McServicePOJO.logger.debug("final - retrieved mcContent: " + mcContent);
 
 	/*
 	 * create a new a new tool session if it does not already exist in the tool session table
@@ -1267,9 +1199,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		McSession mcSession = new McSession(toolSessionId, new Date(System.currentTimeMillis()),
 			McSession.INCOMPLETE, toolSessionName, mcContent, new TreeSet());
 
-		McServicePOJO.logger.debug("created mcSession: " + mcSession);
 		mcSessionDAO.saveMcSession(mcSession);
-		McServicePOJO.logger.debug("created mcSession in the db: " + mcSession);
 
 	    } catch (Exception e) {
 		McServicePOJO.logger.error("Error creating new toolsession in the db");
@@ -1288,7 +1218,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * @throws ToolException
      */
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
-	McServicePOJO.logger.debug("start of removeToolSession with id: " + toolSessionId);
 	if (toolSessionId == null) {
 	    McServicePOJO.logger.error("toolSessionId is null");
 	    throw new DataMissingException("toolSessionId is missing");
@@ -1297,7 +1226,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	McSession mcSession = null;
 	try {
 	    mcSession = retrieveMcSession(toolSessionId);
-	    McServicePOJO.logger.debug("retrieved mcSession: " + mcSession);
 	} catch (McApplicationException e) {
 	    throw new DataMissingException("error retrieving mcSession: " + e);
 	} catch (Exception e) {
@@ -1328,9 +1256,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * 
      */
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-	McServicePOJO.logger.debug("start of leaveToolSession with toolSessionId:" + toolSessionId + " and learnerId:"
-		+ learnerId);
-	McServicePOJO.logger.debug("make sure learnerService is available. Is it?" + learnerService);
 
 	if (learnerService == null) {
 	    return "dummyNextUrl";
@@ -1349,7 +1274,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	McSession mcSession = null;
 	try {
 	    mcSession = retrieveMcSession(toolSessionId);
-	    McServicePOJO.logger.debug("retrieved mcSession: " + mcSession);
 	} catch (McApplicationException e) {
 	    throw new DataMissingException("error retrieving mcSession: " + e);
 	} catch (Exception e) {
@@ -1357,10 +1281,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
 	mcSession.setSessionStatus(McAppConstants.COMPLETED);
 	mcSessionDAO.updateMcSession(mcSession);
-	McServicePOJO.logger.debug("updated mcSession to COMPLETED" + mcSession);
 
 	String nextUrl = learnerService.completeToolSession(toolSessionId, learnerId);
-	McServicePOJO.logger.debug("nextUrl: " + nextUrl);
 	if (nextUrl == null) {
 	    McServicePOJO.logger.error("nextUrl is null");
 	    throw new ToolException("nextUrl is null");
@@ -1414,22 +1336,18 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     }
 
     public IToolVO getToolBySignature(String toolSignature) throws McApplicationException {
-	McServicePOJO.logger.debug("attempt retrieving tool with signature : " + toolSignature);
 	IToolVO tool = toolService.getToolBySignature(toolSignature);
-	McServicePOJO.logger.debug("retrieved tool: " + tool);
 	return tool;
     }
 
     public long getToolDefaultContentIdBySignature(String toolSignature) throws McApplicationException {
 	long contentId = 0;
 	contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
-	McServicePOJO.logger.debug("tool default contentId : " + contentId);
 	return contentId;
     }
 
     public McQueContent getToolDefaultQuestionContent(long contentId) throws McApplicationException {
 	McQueContent mcQueContent = mcQueContentDAO.getToolDefaultQuestionContent(contentId);
-	McServicePOJO.logger.debug("retrieved mcQueContent : " + mcQueContent);
 	return mcQueContent;
     }
 
@@ -1468,7 +1386,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	ICredentials credentials = new SimpleCredentials(repositoryUser, repositoryId);
 	try {
 	    ITicket ticket = repositoryService.login(credentials, repositoryWorkspace);
-	    McServicePOJO.logger.debug("retrieved ticket: " + ticket);
 	    return ticket;
 	} catch (AccessDeniedException e) {
 	    throw new McApplicationException("Access Denied to repository." + e.getMessage());
@@ -1491,10 +1408,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      */
     public void deleteFromRepository(Long uuid, Long versionID) throws McApplicationException {
 	ITicket ticket = getRepositoryLoginTicket();
-	McServicePOJO.logger.debug("retrieved ticket: " + ticket);
 	try {
 	    String files[] = repositoryService.deleteVersion(ticket, uuid, versionID);
-	    McServicePOJO.logger.debug("retrieved files: " + files);
 	} catch (Exception e) {
 	    throw new McApplicationException("Exception occured while deleting files from" + " the repository "
 		    + e.getMessage());
@@ -1516,13 +1431,10 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * @throws SubmitFilesException
      */
     public NodeKey uploadFileToRepository(InputStream stream, String fileName) throws McApplicationException {
-	McServicePOJO.logger.debug("attempt getting the ticket");
 	ITicket ticket = getRepositoryLoginTicket();
-	McServicePOJO.logger.debug("retrieved ticket: " + ticket);
 
 	try {
 	    NodeKey nodeKey = repositoryService.addFileItem(ticket, stream, fileName, null, null);
-	    McServicePOJO.logger.debug("retrieved nodeKey from repository service: " + nodeKey);
 	    return nodeKey;
 	} catch (Exception e) {
 	    throw new McApplicationException("Exception occured while trying to" + " upload file into the repository"
@@ -1534,7 +1446,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	ITicket ticket = getRepositoryLoginTicket();
 	try {
 	    IVersionedNode node = repositoryService.getFileItem(ticket, uuid, null);
-	    McServicePOJO.logger.debug("retrieved node: " + node);
 	    return node.getFile();
 	} catch (AccessDeniedException e) {
 	    throw new McApplicationException("AccessDeniedException occured while trying to download file "
@@ -1553,31 +1464,12 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent)
 	    throws McApplicationException {
 
-	McServicePOJO.logger.debug("attempt persisting file to the db: " + uuid + " " + isOnlineFile + " " + fileName
-		+ " " + mcContent);
 	McUploadedFile mcUploadedFile = new McUploadedFile(uuid, isOnlineFile, fileName, mcContent);
-	McServicePOJO.logger.debug("created mcUploadedFile: " + mcUploadedFile);
 	mcUploadedFileDAO.saveUploadFile(mcUploadedFile);
-	McServicePOJO.logger.debug("persisted mcUploadedFile: " + mcUploadedFile);
     }
     
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
-    }
-
-    /**
-     * @return Returns the logger.
-     */
-    public static Logger getLogger() {
-	return McServicePOJO.logger;
-    }
-
-    /**
-     * @param logger
-     *                The logger to set.
-     */
-    public static void setLogger(Logger logger) {
-	McServicePOJO.logger = logger;
     }
 
     /**
@@ -1952,13 +1844,10 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * adds a new entry to the uploaded files table
      */
     public void persistFile(McContent content, McUploadedFile file) throws McApplicationException {
-	McServicePOJO.logger.debug("in persistFile: " + file);
-	McServicePOJO.logger.debug("in persistFile, content: " + content);
 
 	content.getMcAttachments().add(file);
 	file.setMcContent(content);
 	mcContentDAO.saveOrUpdateMc(content);
-	McServicePOJO.logger.debug("persisted mcUploadedFile: " + file);
     }
 
     /**
@@ -1966,11 +1855,9 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      */
     public void removeFile(Long submissionId) throws McApplicationException {
 	mcUploadedFileDAO.removeUploadFile(submissionId);
-	McServicePOJO.logger.debug("removed mcUploadedFile: " + submissionId);
     }
 
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
-	McServicePOJO.logger.debug("coreNotebookService: " + coreNotebookService);
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
 

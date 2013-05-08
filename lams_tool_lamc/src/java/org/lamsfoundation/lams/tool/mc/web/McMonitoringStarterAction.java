@@ -99,7 +99,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 		    redirect="false"
 	  	/>
 	</action>  
-  
  * 
  */
 
@@ -109,15 +108,10 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, McApplicationException 
 	{
-		logger.debug("init McMonitoringStarterAction...");
 		McUtils.cleanUpSessionAbsolute(request);
 
 		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-		logger.debug("mcService: " + mcService);
-		
 		McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
-		logger.debug("mcMonitoringForm: " + mcMonitoringForm);
-		
 		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
 		McGeneralMonitoringDTO mcGeneralMonitoringDTO=new McGeneralMonitoringDTO();
 		
@@ -138,7 +132,6 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		
 		mcMonitoringForm.setCurrentTab("1");
 		mcGeneralMonitoringDTO.setCurrentTab("1");
-		logger.debug("setting current tab to 1: ");
 		
 		mcMonitoringForm.setActiveModule(MONITORING);
 		mcGeneralMonitoringDTO.setActiveModule(MONITORING);
@@ -153,24 +146,15 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		mcGeneralAuthoringDTO.setActivityTitle(mcGeneralMonitoringDTO.getActivityTitle());
 		mcGeneralAuthoringDTO.setActivityInstructions(mcGeneralMonitoringDTO.getActivityInstructions());
 		mcGeneralAuthoringDTO.setActiveModule(MONITORING);
-		
-	    if ( logger.isDebugEnabled() ) {
-	    	logger.debug("mcGeneralMonitoringDTO: " + mcGeneralMonitoringDTO);
-	    	logger.debug("mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
-	    }
 	    
 		request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
 	    request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 		
-		logger.debug("calling submitSession with selectedToolSessionId" + mcMonitoringForm.getSelectedToolSessionId());
 		return new McMonitoringAction().commonSubmitSessionCode(mcMonitoringForm, request, mapping, mcService, mcGeneralMonitoringDTO);
 	}
 
 
 	/**
-	 * initialiseMonitoringData(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response,
-	        IMcService mcService, McGeneralMonitoringDTO mcGeneralMonitoringDTO)
-	        
 	   initialises monitoring data
 	 * 
 	 * @param mapping
@@ -204,11 +188,9 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 		List listQuestionContentDTO= new  LinkedList();
 		
 		Map mapOptionsContent= new TreeMap(new McComparator());
-		logger.debug("setting existing content data from the db");
 		mapOptionsContent.clear();
 		Iterator queIterator=mcContent.getMcQueContents().iterator();
 		Long mapIndex=new Long(1);
-		logger.debug("mapOptionsContent: " + mapOptionsContent);
 		while (queIterator.hasNext())
 		{
 		    McQuestionContentDTO mcContentDTO=new McQuestionContentDTO();
@@ -216,7 +198,6 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 			McQueContent mcQueContent=(McQueContent) queIterator.next();
 			if (mcQueContent != null)
 			{
-				logger.debug("question: " + mcQueContent.getQuestion());
 				mapOptionsContent.put(mapIndex.toString(),mcQueContent.getQuestion());
 
 				mcContentDTO.setQuestion(mcQueContent.getQuestion());
@@ -226,21 +207,16 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    		mapIndex=new Long(mapIndex.longValue()+1);
 			}
 		}
-		logger.debug("Map initialized with existing contentid to: " + mapOptionsContent);
 		mcGeneralMonitoringDTO.setMapOptionsContent(mapOptionsContent);
 		/* ends here*/
 		
-		logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 		request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
 		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 		
-		logger.debug("end initializing  monitoring data...");
 	    mcGeneralMonitoringDTO.setExistsOpenMcs(new Boolean(false).toString());
-	    logger.debug("post refreshes, mcGeneralMonitoringDTO: " + mcGeneralMonitoringDTO);
 
 	    /* SELECTION_CASE == 2 indicates start up */
 	    request.setAttribute(SELECTION_CASE, new Long(2));
-	    logger.debug("SELECTION_CASE: " + request.getAttribute(SELECTION_CASE));
 	    	
 	    /* Default to All for tool Sessions so that all tool sessions' summary information gets displayed when the module starts up */
 	    request.setAttribute(CURRENT_MONITORED_TOOL_SESSION, "All");
@@ -267,7 +243,6 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	{
 		ActionMessages errors= new ActionMessages();
 		errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-		logger.debug("add " + message +"  to ActionMessages:");
 		saveErrors(request,errors);	    	    
 	}
 }  

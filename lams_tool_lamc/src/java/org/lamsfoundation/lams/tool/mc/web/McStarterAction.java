@@ -155,9 +155,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * 
  * @author Ozgur Demirtas
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  * 
  * A Map data structure is used to present the UI.
  */
@@ -168,46 +165,37 @@ public class McStarterAction extends Action implements McAppConstants {
   								throws IOException, ServletException, McApplicationException {
 	
 		McUtils.cleanUpSessionAbsolute(request);
-	    logger.debug("init authoring mode.");
 		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-		logger.debug("mcAuthoringForm: " + mcAuthoringForm);
 		
 		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		logger.debug("contentFolderID: " + contentFolderID);
 		mcAuthoringForm.setContentFolderID(contentFolderID);
 	
 		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
 		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 		
 		Map mapQuestionContent= new TreeMap(new McComparator());
-		logger.debug("mapQuestionContent: " + mapQuestionContent);
 		
 		mcAuthoringForm.resetRadioBoxes();
 		
 		IMcService mcService =null;
 		if ((getServlet() == null) || (getServlet().getServletContext() == null))
 		{
-		    logger.debug("obtaining mcService from the form");
 		    mcService=mcAuthoringForm.getMcService();
 		}
 		else
 		{
-		    logger.debug("obtaining mcService via proxy");
 		    mcService =McServiceProxy.getMcService(getServlet().getServletContext());
 		}
-		logger.debug("mcService: " + mcService);
 		
 		mcGeneralAuthoringDTO.setCurrentTab("1");
-		logger.debug("setting currrent tab to 1:");
 		
 		
 		mcGeneralAuthoringDTO.setMonitoringOriginatedDefineLater(new Boolean(false).toString());
 		String servletPath=request.getServletPath();
-		logger.debug("getServletPath: "+ servletPath);
 		String requestedModule=null;
 		if (servletPath.indexOf("authoringStarter") > 0)
 		{
-			logger.debug("request is for authoring module");
+			//request is for authoring module
 			mcGeneralAuthoringDTO.setActiveModule(AUTHORING);
 			mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 			mcGeneralAuthoringDTO.setShowAuthoringTabs(new Boolean(true).toString());
@@ -216,7 +204,7 @@ public class McStarterAction extends Action implements McAppConstants {
 		}
 		else
 		{
-			logger.debug("request is for define later module either direcly from define later url or monitoring url");
+			//request is for define later module either direcly from define later url or monitoring url
 			mcGeneralAuthoringDTO.setActiveModule(DEFINE_LATER);
 			mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 			mcGeneralAuthoringDTO.setShowAuthoringTabs(new Boolean(false).toString());
@@ -225,19 +213,16 @@ public class McStarterAction extends Action implements McAppConstants {
 			
 			if (servletPath.indexOf("monitoring") > 0)
 			{
-				logger.debug("request is from monitoring  url.");
+				//request is from monitoring  url
 				mcGeneralAuthoringDTO.setMonitoringOriginatedDefineLater(new Boolean(true).toString());
 			}
 		}
-		logger.debug("requestedModule: " + requestedModule);
 		mcGeneralAuthoringDTO.setRequestedModule(requestedModule);
 
 	
 		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
-		logger.debug("sourceMcStarter: " + sourceMcStarter);
 		
 	    boolean validateSignature=readSignature(request,mapping, mcService, mcGeneralAuthoringDTO, mcAuthoringForm);
-		logger.debug("validateSignature:  " + validateSignature);
 		if (validateSignature == false)
 		{
 			logger.debug("error during validation");
@@ -249,11 +234,9 @@ public class McStarterAction extends Action implements McAppConstants {
 	    /*
 	     * find out whether the request is coming from monitoring module for EditActivity tab or from authoring environment url
 	     */
-	    logger.debug("no problems getting the default content, will render authoring screen");
 	    String strToolContentID="";
 	    /*the authoring url must be passed a tool content id*/
 	    strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	    logger.debug("strToolContentID: " + strToolContentID);
 	    mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
 	    
 	    SessionMap sessionMap = new SessionMap();
@@ -270,30 +253,25 @@ public class McStarterAction extends Action implements McAppConstants {
 	    {
 	    	/*it is possible that the original request for authoring module is coming from monitoring url which keeps the
 	    	 TOOL_CONTENT_ID in the session*/
-		    logger.debug("strToolContentID is null, handle this");
 	        
 	    	Long toolContentID =(Long) request.getSession().getAttribute(TOOL_CONTENT_ID);
-		    logger.debug("toolContentID: " + toolContentID);
 		    if (toolContentID != null)
 		    {
 		        strToolContentID= toolContentID.toString();
-			    logger.debug("cached strToolContentID from the session: " + strToolContentID);	
+			    //cached strToolContentID from the session	
 		    }
 		    else
 		    {
-		    	logger.debug("we should IDEALLY not arrive here. The TOOL_CONTENT_ID is NOT available from the url or the session.");
+		    	//we should IDEALLY not arrive here. The TOOL_CONTENT_ID is NOT available from the url or the session.
 		    	/*use default content instead of giving a warning*/
 		    	defaultContentId=mcAuthoringForm.getDefaultContentIdStr();
-		    	logger.debug("using MCQ defaultContentId: " + defaultContentId);
 		    	strToolContentID=defaultContentId;
 		    }
 	    }
-    	logger.debug("final strToolContentID: " + strToolContentID);
 	    
 	    if ((strToolContentID == null) || (strToolContentID.equals(""))) 
 	    {
 	    	McUtils.cleanUpSessionAbsolute(request);
-	    	logger.debug("forwarding to: " + ERROR_LIST);
 			//return (mapping.findForward(ERROR_LIST));
 	    }
 
@@ -312,35 +290,24 @@ public class McStarterAction extends Action implements McAppConstants {
 	    McContent mcContent=null;
 		if (!existsContent(new Long(strToolContentID).longValue(), mcService)) 
 		{
-			logger.debug("getting default content");
 			/*fetch default content*/
 			defaultContentIdStr=mcAuthoringForm.getDefaultContentIdStr();
-			logger.debug("defaultContentIdStr:" + defaultContentIdStr);
             mcContent=retrieveContent(request, mapping, mcAuthoringForm, mapQuestionContent, 
                     new Long(defaultContentIdStr).longValue(), true, mcService, mcGeneralAuthoringDTO, sessionMap);
             
-            logger.debug("post retrive content :" + sessionMap); 
 		}
         else
         {
-        	logger.debug("getting existing content");
         	/* it is possible that the content is in use by learners.*/
         	mcContent=mcService.retrieveMc(new Long(strToolContentID));
         	
-        	logger.debug("mcContent: " + mcContent);
         	if (mcService.studentActivityOccurredGlobal(mcContent))
     		{
         		McUtils.cleanUpSessionAbsolute(request);
-    			logger.debug("student activity occurred on this content:" + mcContent);
     		}
         	mcContent=retrieveContent(request, mapping, mcAuthoringForm, mapQuestionContent, 
                     new Long(strToolContentID).longValue(),false, mcService, mcGeneralAuthoringDTO, sessionMap);
-        	
-        	logger.debug("post retrive content :" + sessionMap);        	
         }
-		
-		logger.debug("mcGeneralAuthoringDTO.getOnlineInstructions() :" + mcGeneralAuthoringDTO.getOnlineInstructions());
-		logger.debug("mcGeneralAuthoringDTO.getOfflineInstructions():" + mcGeneralAuthoringDTO.getOfflineInstructions());
 		
 	    if ((mcGeneralAuthoringDTO.getOnlineInstructions() == null) || (mcGeneralAuthoringDTO.getOnlineInstructions().length() == 0))
 	    {
@@ -357,43 +324,26 @@ public class McStarterAction extends Action implements McAppConstants {
 	    }
 
 		
-	    logger.debug("final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
-		logger.debug("will return to jsp with: " + sourceMcStarter);
 		String destination=McUtils.getDestination(sourceMcStarter, requestedModule);
-		logger.debug("destination: " + destination);
-		
 		Map mapQuestionContentLocal=mcGeneralAuthoringDTO.getMapQuestionContent(); 
-		logger.debug("mapQuestionContentLocal: " + mapQuestionContentLocal);
-		
-		logger.debug("mapQuestionContent: " + mapQuestionContent);
 		sessionMap.put(MAP_QUESTION_CONTENT_KEY, mapQuestionContent);
-		
-		
 		
 		AuthoringUtil authoringUtil =new AuthoringUtil();
 		List listAddableQuestionContentDTO=authoringUtil.buildDefaultQuestionContent(mcContent, mcService);
-		logger.debug("listAddableQuestionContentDTO: " + listAddableQuestionContentDTO);
 		sessionMap.put(NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
 		
-		logger.debug("persisting sessionMap into session: " + sessionMap);
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 		
 		
 	    Map marksMap=authoringUtil.buildMarksMap();
-	    logger.debug("marksMap: " + marksMap);
 	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
 	    mcGeneralAuthoringDTO.setMarkValue("1");
 	    
-
 	    List listQuestionContentDTOLocal=authoringUtil.buildDefaultQuestionContent(mcContent, mcService);
-	    logger.debug("listQuestionContentDTOLocal: " + listQuestionContentDTOLocal);
-
 	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTOLocal, true);
-	    logger.debug("passMarksMap: " + passMarksMap);
 	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 	    
         String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTOLocal);
-        logger.debug("totalMark: " + totalMark);
         mcAuthoringForm.setTotalMarks(totalMark);
         mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
@@ -407,22 +357,15 @@ public class McStarterAction extends Action implements McAppConstants {
 	    mcGeneralAuthoringDTO.setPassMarkValue (passMark);
 	    
 	    Map correctMap=authoringUtil.buildCorrectMap();
-	    logger.debug("correctMap: " + correctMap);
 	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 		
-		
-		logger.debug("before fwding to jsp, mcAuthoringForm : " + mcAuthoringForm);
-		logger.debug("final mcGeneralAuthoringDTO: " + mcGeneralAuthoringDTO);
 		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 		
 		return (mapping.findForward(destination));
 	} 
 	
-	
-	
 	/**
 	 * retrives the existing content information from the db and prepares the data for presentation purposes.
-	 * ActionForward retrieveExistingContent(HttpServletRequest request, ActionMapping mapping, McAuthoringForm mcAuthoringForm, Map mapQuestionContent, long toolContentID)
 	 *  
 	 * @param request
 	 * @param mapping
@@ -435,13 +378,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	        Map mapQuestionContent, long toolContentID, boolean isDefaultContent, IMcService mcService,
 	        McGeneralAuthoringDTO mcGeneralAuthoringDTO, SessionMap sessionMap)
 	{
-	    logger.debug("starting retrieveContent: " + mcService);
-	    logger.debug("toolContentID: " + toolContentID);
-		logger.debug("isDefaultContent: " + isDefaultContent);
-
-	    logger.debug("getting content with id:" + toolContentID);
 	    McContent mcContent = mcService.retrieveMc(new Long(toolContentID));
-		logger.debug("McContent: " + mcContent);
 		
 		McUtils.populateAuthoringDTO(request, mcContent, mcGeneralAuthoringDTO);
 		
@@ -486,27 +423,20 @@ public class McStarterAction extends Action implements McAppConstants {
 	    
 	    AuthoringUtil authoringUtil= new AuthoringUtil();
 	    List listQuestionContentDTO=authoringUtil.buildDefaultQuestionContent(mcContent, mcService);
-	    logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 
 	    request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-		logger.debug("listQuestionContentDTO: " + listQuestionContentDTO);
 		request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
 		sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 		
 		
 		if (isDefaultContent)
 		{
-		    logger.debug("overwriting default question.");
+		    //overwriting default question
 		    mcGeneralAuthoringDTO.setDefaultQuestionContent("Sample Question 1?");
 		    
 		}
 		
-		logger.debug("mapQuestionContent is:" + mapQuestionContent);
 		mcGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
-
-		
-		logger.debug("mcContent.getOnlineInstructions():" + mcContent.getOnlineInstructions());
-		logger.debug("mcContent.getOfflineInstructions():" + mcContent.getOfflineInstructions());
 		mcGeneralAuthoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
 		mcGeneralAuthoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
 		
@@ -514,11 +444,8 @@ public class McStarterAction extends Action implements McAppConstants {
 		mcAuthoringForm.setOfflineInstructions(mcContent.getOfflineInstructions());
 		sessionMap.put(ONLINE_INSTRUCTIONS_KEY, mcContent.getOnlineInstructions());
 		sessionMap.put(OFFLINE_INSTRUCTIONS_KEY, mcContent.getOfflineInstructions());
-	    
-		logger.debug("ACTIVITY_TITLE_KEY set to:" +  sessionMap.get(ACTIVITY_TITLE_KEY ));
 		
 		mcAuthoringForm.resetUserAction();
-		logger.debug("returning mcContent:" + mcContent);
 		return mcContent;
 	}
 
@@ -527,8 +454,6 @@ public class McStarterAction extends Action implements McAppConstants {
 	 * each tool has a signature. MC tool's signature is stored in MY_SIGNATURE. The default tool content id and 
 	 * other depending content ids are obtained in this method.
 	 * if all the default content has been setup properly the method persists DEFAULT_CONTENT_ID in the session.
-	 * 
-	 * readSignature(HttpServletRequest request, ActionMapping mapping)
 	 * @param request
 	 * @param mapping
 	 * @return ActionForward
@@ -536,19 +461,16 @@ public class McStarterAction extends Action implements McAppConstants {
 	public boolean readSignature(HttpServletRequest request, ActionMapping mapping, IMcService mcService, 
 	        McGeneralAuthoringDTO mcGeneralAuthoringDTO, McAuthoringForm mcAuthoringForm)
 	{
-		logger.debug("mcService: " + mcService);
 		/*
 		 * retrieve the default content id based on tool signature
 		 */
 		long defaultContentID=0;
 		try
 		{
-			logger.debug("attempt retrieving tool with signatute : " + MY_SIGNATURE);
             defaultContentID=mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
-			logger.debug("retrieved tool default contentId: " + defaultContentID);
 			if (defaultContentID == 0)
 			{
-				logger.debug("default content id has not been setup");
+				//default content id has not been setup
 				return false;	
 			}
 		}
@@ -564,7 +486,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		long contentUID=0;
 		try
 		{
-			logger.debug("retrieve uid of the content based on default content id determined above: " + defaultContentID);
 			McContent mcContent=mcService.retrieveMc(new Long(defaultContentID));
 			if (mcContent == null)
 			{
@@ -572,10 +493,7 @@ public class McStarterAction extends Action implements McAppConstants {
 	    		persistError(request,"error.defaultContent.notSetup");
 	    		return false;
 			}
-			logger.debug("using mcContent: " + mcContent);
-			logger.debug("using mcContent uid: " + mcContent.getUid());
 			contentUID=mcContent.getUid().longValue();
-			logger.debug("contentUID: " + contentUID);
 		}
 		catch(Exception e)
 		{
@@ -585,7 +503,6 @@ public class McStarterAction extends Action implements McAppConstants {
 		}
 
 		
-		logger.debug("MC tool has the default content id: " + defaultContentID);
 		mcGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
 		mcAuthoringForm.setDefaultContentIdStr(new Long(defaultContentID).toString());
 		
@@ -595,7 +512,6 @@ public class McStarterAction extends Action implements McAppConstants {
 	
 	
 	/**
-	 * existsContent(long toolContentID)
 	 * @param long toolContentID
 	 * @return boolean
 	 * determine whether a specific toolContentID exists in the db
@@ -613,9 +529,6 @@ public class McStarterAction extends Action implements McAppConstants {
 	/**
 	 * bridges define later url request to authoring functionality
 	 * 
-	 * executeDefineLater(ActionMapping mapping, ActionForm form, 
-			HttpServletRequest request, HttpServletResponse response, IMcService mcService) 
-		throws IOException, ServletException, McApplicationException
 	 * 
 	 * @param mapping
 	 * @param form
@@ -630,7 +543,6 @@ public class McStarterAction extends Action implements McAppConstants {
 	public ActionForward executeDefineLater(ActionMapping mapping, McAuthoringForm mcAuthoringForm, 
 			HttpServletRequest request, HttpServletResponse response, IMcService mcService) 
 		throws IOException, ServletException, McApplicationException {
-		logger.debug("calling execute..., mcService will be needed next.");
 		return execute(mapping, mcAuthoringForm, request, response);
 	}
 
@@ -644,7 +556,6 @@ public class McStarterAction extends Action implements McAppConstants {
 	{
 		ActionMessages errors= new ActionMessages();
 		errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-		logger.debug("add " + message +"  to ActionMessages:");
 		saveErrors(request,errors);	    	    
 	}
 }  
