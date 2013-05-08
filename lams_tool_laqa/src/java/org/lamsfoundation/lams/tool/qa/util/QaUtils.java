@@ -53,7 +53,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * Common utility functions live here.
  */
 public abstract class QaUtils implements QaAppConstants {
-    static Logger logger = Logger.getLogger(QaUtils.class.getName());
 
     /**
      * 
@@ -152,7 +151,6 @@ public abstract class QaUtils implements QaAppConstants {
     }
 
     /**
-     * existsContent(long toolContentID)
      * 
      * @param long
      *                toolContentID
@@ -175,7 +173,6 @@ public abstract class QaUtils implements QaAppConstants {
      * @return boolean
      */
     public static boolean existsSession(long toolContentID, IQaService qaService) {
-	logger.debug("existsSession");
 	QaSession qaSession = qaService.getSessionById(toolContentID);
 	
 
@@ -421,8 +418,6 @@ public abstract class QaUtils implements QaAppConstants {
     }
 
     /**
-     * setDefineLater(HttpServletRequest request, boolean value, String
-     * toolContentID)
      * 
      * @param request
      * @param value
@@ -430,15 +425,11 @@ public abstract class QaUtils implements QaAppConstants {
      */
     public static void setDefineLater(HttpServletRequest request, boolean value, String strToolContentID,
 	    IQaService qaService) {
-	
-	logger.debug("value:" + value);
-	logger.debug("strToolContentID:" + strToolContentID);
 
 	QaContent qaContent = qaService.getQa(new Long(strToolContentID).longValue());
 	
 	if (qaContent != null) {
 	    qaContent.setDefineLater(value);
-	    logger.debug("defineLater has been set to:" + value);
 	    qaService.updateQa(qaContent);
 	}
     }
@@ -451,30 +442,25 @@ public abstract class QaUtils implements QaAppConstants {
      * @return
      */
     public static String getDestination(String sourceMcStarter, String requestedModule) {
-	logger.debug("sourceMcStarter: " + sourceMcStarter + " and requestedModule:" + requestedModule);
-
 	if (requestedModule.equals(DEFINE_LATER)) {
-	    logger.debug("request is from define Later url. return to: " + LOAD_VIEW_ONLY);
+	    //request is from define Later url. return to  LOAD_VIEW_ONLY
 	    return LOAD_VIEW_ONLY;
 	} else if (requestedModule.equals(AUTHORING)) {
-	    logger.debug("request is from authoring url. return to: " + LOAD_QUESTIONS);
+	    //request is from authoring url. return to  LOAD_QUESTIONS
 	    return LOAD_QUESTIONS;
 	} else {
-	    logger.debug("request is from an unknown source. return null");
+	    //request is from an unknown source. return null
 	    return null;
 	}
     }
 
     public static void setDefineLater(HttpServletRequest request, boolean value, IQaService qaService,
 	    String toolContentID) {
-	
-	logger.debug("toolContentID:" + toolContentID);
 
 	QaContent qaContent = qaService.getQa(new Long(toolContentID).longValue());
 	
 	if (qaContent != null) {
 	    qaContent.setDefineLater(value);
-	    logger.debug("defineLater has been set to true");
 	    qaService.updateQa(qaContent);
 	}
     }
@@ -488,7 +474,6 @@ public abstract class QaUtils implements QaAppConstants {
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    if ((user != null) && (user.getUserID() != null)) {
 		userID = user.getUserID().toString();
-		logger.debug("retrieved userId: " + userID);
 	    }
 	}
 	return userID;
