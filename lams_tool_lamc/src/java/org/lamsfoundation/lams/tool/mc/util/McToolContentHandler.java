@@ -32,35 +32,40 @@ import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
 public class McToolContentHandler extends ToolContentHandler {
 
     private static String repositoryWorkspaceName = "lamc11";
-    private final String repositoryUser 			= "lamc11";
-    private final char[] repositoryId 				= {'l','a','m','c','_','1', '1'};
-	
+    private final String repositoryUser = "lamc11";
+    private final char[] repositoryId = { 'l', 'a', 'm', 'c', '_', '1', '1' };
 
     /**
      * 
      */
     public McToolContentHandler() {
-        super();
+	super();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryWorkspaceName()
      */
     public String getRepositoryWorkspaceName() {
-        return repositoryWorkspaceName;
+	return repositoryWorkspaceName;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryUser()
      */
     public String getRepositoryUser() {
-        return repositoryUser;
+	return repositoryUser;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryId()
      */
     public char[] getRepositoryId() {
-        return repositoryId;
+	return repositoryId;
     }
 }

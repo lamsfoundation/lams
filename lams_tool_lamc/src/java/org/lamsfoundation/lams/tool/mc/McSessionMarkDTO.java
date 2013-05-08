@@ -26,75 +26,74 @@ import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p> DTO that hols session user marks
+ * <p>
+ * DTO that hols session user marks
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McSessionMarkDTO implements Comparable
-{
+public class McSessionMarkDTO implements Comparable {
     private String sessionId;
     private String sessionName;
-    private Map userMarks; 
-    
+    private Map userMarks;
+
     public String toString() {
-        return new ToStringBuilder(this)
-        	.append("Listing SessionMarkDTO: ")
-            .append("sessionId: ", sessionId)
-            .append("sessionName: ", sessionName)
-            .append("userMarks: ", userMarks)            
-            .toString();
+	return new ToStringBuilder(this).append("Listing SessionMarkDTO: ").append("sessionId: ", sessionId)
+		.append("sessionName: ", sessionName).append("userMarks: ", userMarks).toString();
     }
-	
-    
-	public int compareTo(Object o)
-    {
-	    McSessionMarkDTO mcSessionMarkDTO = (McSessionMarkDTO) o;
-     
-        if (mcSessionMarkDTO == null)
-        	return 1;
-		else
-			return (int) (new Long(sessionId).longValue() - new Long(mcSessionMarkDTO.sessionId).longValue());
+
+    public int compareTo(Object o) {
+	McSessionMarkDTO mcSessionMarkDTO = (McSessionMarkDTO) o;
+
+	if (mcSessionMarkDTO == null)
+	    return 1;
+	else
+	    return (int) (new Long(sessionId).longValue() - new Long(mcSessionMarkDTO.sessionId).longValue());
     }
-	
+
     /**
      * @return Returns the sessionId.
      */
     public String getSessionId() {
-        return sessionId;
+	return sessionId;
     }
+
     /**
-     * @param sessionId The sessionId to set.
+     * @param sessionId
+     *            The sessionId to set.
      */
     public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+	this.sessionId = sessionId;
     }
-    
 
     /**
      * @return Returns the sessionName.
      */
     public String getSessionName() {
-        return sessionName;
+	return sessionName;
     }
+
     /**
-     * @param sessionName The sessionName to set.
+     * @param sessionName
+     *            The sessionName to set.
      */
     public void setSessionName(String sessionName) {
-        this.sessionName = sessionName;
+	this.sessionName = sessionName;
     }
+
     /**
      * @return Returns the userMarks.
      */
     public Map getUserMarks() {
-        return userMarks;
+	return userMarks;
     }
+
     /**
-     * @param userMarks The userMarks to set.
+     * @param userMarks
+     *            The userMarks to set.
      */
     public void setUserMarks(Map userMarks) {
-        this.userMarks = userMarks;
+	this.userMarks = userMarks;
     }
 }

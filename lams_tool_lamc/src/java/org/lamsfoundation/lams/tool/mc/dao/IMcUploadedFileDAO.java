@@ -32,25 +32,24 @@ import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 /**
  * 
  * @author Ozgur Demirtas
- *
+ * 
  */
-public interface IMcUploadedFileDAO
-{
-	 	public McUploadedFile loadUploadedFileById(long submissionId);
+public interface IMcUploadedFileDAO {
+    public McUploadedFile loadUploadedFileById(long submissionId);
 
-	 	public void updateUploadFile(McUploadedFile mcUploadedFile);
-	 	
-	    public void saveUploadFile(McUploadedFile mcUploadedFile);
-	    
-	    public void createUploadFile(McUploadedFile mcUploadedFile); 
-	    
-	    public void UpdateUploadFile(McUploadedFile mcUploadedFile);
+    public void updateUploadFile(McUploadedFile mcUploadedFile);
 
-	    public void removeUploadFile(Long submissionId);
-	    
-	    public void deleteUploadFile(McUploadedFile mcUploadedFile);
-        
-        public List<McUploadedFile> retrieveMcUploadedFiles(McContent mc);
-	    
-	    public void flush();
+    public void saveUploadFile(McUploadedFile mcUploadedFile);
+
+    public void createUploadFile(McUploadedFile mcUploadedFile);
+
+    public void UpdateUploadFile(McUploadedFile mcUploadedFile);
+
+    public void removeUploadFile(Long submissionId);
+
+    public void deleteUploadFile(McUploadedFile mcUploadedFile);
+
+    public List<McUploadedFile> retrieveMcUploadedFiles(McContent mc);
+
+    public void flush();
 }

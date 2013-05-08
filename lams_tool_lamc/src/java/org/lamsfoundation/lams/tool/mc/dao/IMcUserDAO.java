@@ -22,55 +22,64 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.dao;
 
-import java.util.List;
-
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
-import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 
 /**
  * @author Ozgur Demirtas
- * <p>Interface for the McUser DAO, defines methods needed to access/modify user data</p>
+ *         <p>
+ *         Interface for the McUser DAO, defines methods needed to access/modify user data
+ *         </p>
  */
 public interface IMcUserDAO {
-    
+
     /**
-	 * <p>Return the persistent instance of a McQueUsr 
-	 * with the given identifier <code>uid</code>, returns null if not found. </p>
-	 * 
-	 * @param uid an identifier for the McQueUsr.
-	 * @return the persistent instance of a McQueUsr or null if not found
-	 */
-    public McQueUsr getMcUserByUID(Long uid);
-   
-    /**
-	 * <p> Return the persistent instance of a McQueUsr
-	 * with the given user id <code>userId</code>,
-	 * returns null if not found.</p>
-	 * 
-	 * @param userId The id of a McQueUsr
-	 * @return the persistent instance of a McQueUsr or null if not found.
-	 */
-    public McQueUsr findMcUserById(Long userId);
-    
-    public McQueUsr getMcUserBySession(Long userId, Long sessionId);
-    
-    public void saveMcUser(McQueUsr mcUser);
-    
-    /**
-     * <p>Update the given persistent instance of McQueUsr.</p>
+     * <p>
+     * Return the persistent instance of a McQueUsr with the given identifier <code>uid</code>, returns null if not
+     * found.
+     * </p>
      * 
-     * @param nbUser The instance of McQueUsr to persist.
+     * @param uid
+     *            an identifier for the McQueUsr.
+     * @return the persistent instance of a McQueUsr or null if not found
+     */
+    public McQueUsr getMcUserByUID(Long uid);
+
+    /**
+     * <p>
+     * Return the persistent instance of a McQueUsr with the given user id <code>userId</code>, returns null if not
+     * found.
+     * </p>
+     * 
+     * @param userId
+     *            The id of a McQueUsr
+     * @return the persistent instance of a McQueUsr or null if not found.
+     */
+    public McQueUsr findMcUserById(Long userId);
+
+    public McQueUsr getMcUserBySession(Long userId, Long sessionId);
+
+    public void saveMcUser(McQueUsr mcUser);
+
+    /**
+     * <p>
+     * Update the given persistent instance of McQueUsr.
+     * </p>
+     * 
+     * @param nbUser
+     *            The instance of McQueUsr to persist.
      */
     public void updateMcUser(McQueUsr mcUser);
-    
+
     /**
-     * <p>Delete the given instance of McQueUsr</p>
+     * <p>
+     * Delete the given instance of McQueUsr
+     * </p>
      * 
-     * @param nbUser The instance of McQueUsr to delete. 
+     * @param nbUser
+     *            The instance of McQueUsr to delete.
      */
     public void removeMcUser(McQueUsr mcUser);
-    
-     /** Get the max, min and average mark (in that order) for a session */
+
+    /** Get the max, min and average mark (in that order) for a session */
     public Integer[] getMarkStatisticsForSession(Long sessionUid);
 }

@@ -51,7 +51,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
@@ -78,64 +77,25 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * @author Ozgur Demirtas
  * 
  * 
- <!--Learning Main Action: interacts with the Learning module user -->
- <action	path="/learning"
- type="org.lamsfoundation.lams.tool.mc.web.McLearningAction"
- name="McLearningForm"
- scope="request"
- input="/learning/AnswersContent.jsp"
- parameter="method"
- u7nknown="false"
- validate="false">
- <forward
- name="loadLearner"
- path="/learning/AnswersContent.jsp"
- redirect="false"
- />
-
- <forward
- name="individualReport"
- path="/learning/IndividualLearnerResults.jsp"
- redirect="false"
- />
-
- <forward
- name="redoQuestions"
- path="/learning/RedoQuestions.jsp"
- redirect="false"
- />
-
- <forward
- name="viewAnswers"
- path="/learning/ViewAnswers.jsp"
- redirect="false"
- />
-
- <forward
- name="errorList"
- path="/McErrorBox.jsp"
- redirect="false"
- />
-
- <forward
- name="starter"
- path="/index.jsp"
- redirect="false"
- />
-
- <forward
- name="learningStarter"
- path="/learningIndex.jsp"
- redirect="false"
- />
-
- <forward
- name="preview"
- path="/learning/Preview.jsp"
- redirect="false"
- />
- </action>
- *
+ *         <!--Learning Main Action: interacts with the Learning module user --> <action path="/learning"
+ *         type="org.lamsfoundation.lams.tool.mc.web.McLearningAction" name="McLearningForm" scope="request"
+ *         input="/learning/AnswersContent.jsp" parameter="method" u7nknown="false" validate="false"> <forward
+ *         name="loadLearner" path="/learning/AnswersContent.jsp" redirect="false" />
+ * 
+ *         <forward name="individualReport" path="/learning/IndividualLearnerResults.jsp" redirect="false" />
+ * 
+ *         <forward name="redoQuestions" path="/learning/RedoQuestions.jsp" redirect="false" />
+ * 
+ *         <forward name="viewAnswers" path="/learning/ViewAnswers.jsp" redirect="false" />
+ * 
+ *         <forward name="errorList" path="/McErrorBox.jsp" redirect="false" />
+ * 
+ *         <forward name="starter" path="/index.jsp" redirect="false" />
+ * 
+ *         <forward name="learningStarter" path="/learningIndex.jsp" redirect="false" />
+ * 
+ *         <forward name="preview" path="/learning/Preview.jsp" redirect="false" /> </action>
+ * 
  */
 public class McLearningAction extends LamsDispatchAction implements McAppConstants {
     static Logger logger = Logger.getLogger(McLearningAction.class.getName());
@@ -250,7 +210,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	mcLearningForm.setToolContentID(toolContentId);
 
 	LearningUtil.saveFormRequestData(request, mcLearningForm, false);
-	//requested learner finished, the learner should be directed to next activity
+	// requested learner finished, the learner should be directed to next activity
 
 	String userID = "";
 	HttpSession ss = SessionManager.getSession();
@@ -262,7 +222,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    }
 	}
 
-	//attempting to leave/complete session with toolSessionId:
+	// attempting to leave/complete session with toolSessionId:
 
 	McUtils.cleanUpSessionAbsolute(request);
 
@@ -318,7 +278,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     }
 
     /**
-     *
+     * 
      * 
      * @param learnerInput
      * @param mcContent
@@ -516,7 +476,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	boolean allQuestionsChecked = allQuestionsChecked(mcService, learnerInput, mcContent, mcTempDataHolderDTO);
 
 	if (!allQuestionsChecked) {
-	    //there are no selected answers for any questions
+	    // there are no selected answers for any questions
 	    ActionMessages errors = new ActionMessages();
 
 	    ActionMessage error = new ActionMessage("answers.submitted.none");
@@ -567,7 +527,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	if (existingMcQueUsr != null) {
 	    isUserDefined = true;
 	}
-
 
 	McQueUsr mcQueUsr = null;
 	if (isUserDefined == false) {
@@ -739,7 +698,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
 		.getServletContext());
-	
+
 	return mapping.findForward(McAppConstants.LOAD_LEARNER);
     }
 
@@ -821,7 +780,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
 		.getServletContext());
-	
+
 	return mapping.findForward(McAppConstants.REDO_QUESTIONS);
     }
 
@@ -1059,7 +1018,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	/* it is possible that mcQueUsr can be null if the content is set as runoffline and reflection is on */
 	if (mcQueUsr == null) {
-	    //attempt creating  user record since it must exist for the runOffline + reflection screens
+	    // attempt creating user record since it must exist for the runOffline + reflection screens
 	    HttpSession ss = SessionManager.getSession();
 
 	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -1127,7 +1086,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    }
 	}
 
-	//attempt getting notebookEntry
+	// attempt getting notebookEntry
 	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
 		McAppConstants.MY_SIGNATURE, new Integer(userID));
 

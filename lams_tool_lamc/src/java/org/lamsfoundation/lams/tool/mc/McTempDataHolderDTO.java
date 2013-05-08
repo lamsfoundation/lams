@@ -24,73 +24,74 @@ package org.lamsfoundation.lams.tool.mc;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-
 /**
- * <p> DTO that holds temporary data
+ * <p>
+ * DTO that holds temporary data
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McTempDataHolderDTO implements Comparable
-{
+public class McTempDataHolderDTO implements Comparable {
     protected Integer learnerMark;
     protected Integer totalMarksPossible;
     protected Integer displayOrder;
 
-    
-	public int compareTo(Object o)
-    {
-	    McTempDataHolderDTO mcTempDataHolderDTO = (McTempDataHolderDTO) o;
-     
-        if (mcTempDataHolderDTO == null)
-        	return 1;
-		else
-			return 0;
+    public int compareTo(Object o) {
+	McTempDataHolderDTO mcTempDataHolderDTO = (McTempDataHolderDTO) o;
+
+	if (mcTempDataHolderDTO == null)
+	    return 1;
+	else
+	    return 0;
     }
 
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("learnerMark: ", learnerMark)
-            .append("totalMarksPossible : ", totalMarksPossible)
-            .append("displayOrder : ", displayOrder)
-            .toString();
+    public String toString() {
+	return new ToStringBuilder(this).append("learnerMark: ", learnerMark)
+		.append("totalMarksPossible : ", totalMarksPossible).append("displayOrder : ", displayOrder).toString();
     }
-    
+
     /**
      * @return Returns the learnerMark.
      */
     public Integer getLearnerMark() {
-        return learnerMark;
+	return learnerMark;
     }
+
     /**
-     * @param learnerMark The learnerMark to set.
+     * @param learnerMark
+     *            The learnerMark to set.
      */
     public void setLearnerMark(Integer learnerMark) {
-        this.learnerMark = learnerMark;
+	this.learnerMark = learnerMark;
     }
+
     /**
      * @return Returns the totalMarksPossible.
      */
     public Integer getTotalMarksPossible() {
-        return totalMarksPossible;
+	return totalMarksPossible;
     }
+
     /**
-     * @param totalMarksPossible The totalMarksPossible to set.
+     * @param totalMarksPossible
+     *            The totalMarksPossible to set.
      */
     public void setTotalMarksPossible(Integer totalMarksPossible) {
-        this.totalMarksPossible = totalMarksPossible;
+	this.totalMarksPossible = totalMarksPossible;
     }
+
     /**
      * @return Returns the displayOrder.
      */
     public Integer getDisplayOrder() {
-        return displayOrder;
+	return displayOrder;
     }
+
     /**
-     * @param displayOrder The displayOrder to set.
+     * @param displayOrder
+     *            The displayOrder to set.
      */
     public void setDisplayOrder(Integer displayOrder) {
-        this.displayOrder = displayOrder;
+	this.displayOrder = displayOrder;
     }
 }

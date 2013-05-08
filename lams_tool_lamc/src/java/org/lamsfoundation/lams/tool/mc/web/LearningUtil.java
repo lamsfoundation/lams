@@ -170,8 +170,8 @@ public class LearningUtil implements McAppConstants {
 	    McQueContent mcQueContent = mcService.findMcQuestionContentByUid(mcLearnerAnswersDTO.getQuestionUid());
 
 	    createIndividualOptions(request, mcLearnerAnswersDTO.getCandidateAnswers(), mcQueContent, mcQueUsr,
-		    attemptTime, mcLearnerAnswersDTO.getMark(), passed, highestAttemptOrder, mcLearnerAnswersDTO
-			    .getAttemptCorrect(), mcService);
+		    attemptTime, mcLearnerAnswersDTO.getMark(), passed, highestAttemptOrder,
+		    mcLearnerAnswersDTO.getAttemptCorrect(), mcService);
 	}
 
     }
@@ -207,10 +207,10 @@ public class LearningUtil implements McAppConstants {
 			    .toString(), mcQueContent.getUid());
 		    if (mcOptsContent != null) {
 			McUsrAttempt mcUsrAttempt = new McUsrAttempt(attemptTime, mcQueContent, mcQueUsr,
-				mcOptsContent, IntegerMark, passed, highestAttemptOrder, new Boolean(isAttemptCorrect)
-					.booleanValue());
+				mcOptsContent, IntegerMark, passed, highestAttemptOrder,
+				new Boolean(isAttemptCorrect).booleanValue());
 			mcService.createMcUsrAttempt(mcUsrAttempt);
-			//created mcUsrAttempt in the db
+			// created mcUsrAttempt in the db
 		    }
 		}
 	    }
@@ -287,13 +287,13 @@ public class LearningUtil implements McAppConstants {
 	    String caUid = (String) listCandidateAnswerUids.get(randomInt);
 
 	    if (!isEntryStored(ca, randomList)) {
-		//adding ca, since it is a new candidate
+		// adding ca, since it is a new candidate
 		randomList.add(ca);
 		randomUidList.add(caUid);
 
 		LearningUtil.logger.debug("randomList size: " + randomList.size());
 		if (randomList.size() == listCandidateAnswers.size()) {
-		    //the list is populated completely
+		    // the list is populated completely
 		    listNotComplete = false;
 		}
 	    }
@@ -315,7 +315,7 @@ public class LearningUtil implements McAppConstants {
 	    String caStored = (String) randomListIterator.next();
 
 	    if (caStored.equals(ca)) {
-		//this ca already is stored
+		// this ca already is stored
 		return true;
 	    }
 	}
@@ -438,8 +438,8 @@ public class LearningUtil implements McAppConstants {
 
 	    Integer mark = null;
 	    if (mcUsrAttemptFinal != null) {
-		mapFinalAnswersIsContent.put(questionDisplayOrderString, new Boolean(mcUsrAttemptFinal
-			.isAttemptCorrect()).toString());
+		mapFinalAnswersIsContent.put(questionDisplayOrderString,
+			new Boolean(mcUsrAttemptFinal.isAttemptCorrect()).toString());
 		mapFinalAnswersContent.put(questionDisplayOrderString, mcUsrAttemptFinal.getMcOptionsContent()
 			.getMcQueOptionText().toString());
 	    }

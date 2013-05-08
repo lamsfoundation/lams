@@ -28,22 +28,21 @@ import java.util.Comparator;
 import org.apache.log4j.Logger;
 
 /**
- * @author Ozgur Demirtas
- *  *  A comparator implementation that can be used as a constructor to collections. 
- *  The TreeMap in the web layer makes use of it.
+ * @author Ozgur Demirtas * A comparator implementation that can be used as a constructor to collections. The TreeMap in
+ *         the web layer makes use of it.
  * 
  */
 public class McStringComparator implements Comparator, Serializable {
-	static Logger logger = Logger.getLogger(McStringComparator.class.getName());
-	
-	 public int compare(Object o1, Object o2) {
-	   String s1 = (String)o1;
-	   String s2 = (String)o2;
+    static Logger logger = Logger.getLogger(McStringComparator.class.getName());
 
-	   return s1.compareTo(s2);
-	  }                                    
+    public int compare(Object o1, Object o2) {
+	String s1 = (String) o1;
+	String s2 = (String) o2;
 
-	 public boolean equals(Object o) {
-	  	return compare(this, o)==0;
-	  }
+	return s1.compareTo(s2);
+    }
+
+    public boolean equals(Object o) {
+	return compare(this, o) == 0;
+    }
 }

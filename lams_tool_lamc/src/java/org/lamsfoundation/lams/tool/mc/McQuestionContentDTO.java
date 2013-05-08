@@ -23,133 +23,144 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import java.util.List; 
+import java.util.List;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * <p> DTO that holds users attempt history data for jsp purposes
+ * <p>
+ * DTO that holds users attempt history data for jsp purposes
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McQuestionContentDTO implements Comparable
-{
+public class McQuestionContentDTO implements Comparable {
     private String question;
     private String displayOrder;
     private String feedback;
     private String weight;
     private String mark;
-    
+
     private String caCount;
     private List listCandidateAnswersDTO;
-    
-	public String toString() {
-       return new ToStringBuilder(this)
-            .append("question:", question)
-            .append("feedback:", feedback)
-            .append("weight:", weight)
-            .append("caCount:", caCount)
-            .append("displayOrder:", displayOrder)
-            .append("mark:", mark)
-            .append("listCandidateAnswersDTO:", listCandidateAnswersDTO)
-            .toString();
+
+    public String toString() {
+	return new ToStringBuilder(this).append("question:", question).append("feedback:", feedback)
+		.append("weight:", weight).append("caCount:", caCount).append("displayOrder:", displayOrder)
+		.append("mark:", mark).append("listCandidateAnswersDTO:", listCandidateAnswersDTO).toString();
     }
-	
-	public int compareTo(Object o)
-    {
-		McMonitoredUserDTO mcMonitoredUserDTO = (McMonitoredUserDTO) o;
-     
-        if (mcMonitoredUserDTO == null)
-        	return 1;
-		else
-			return 0;
+
+    public int compareTo(Object o) {
+	McMonitoredUserDTO mcMonitoredUserDTO = (McMonitoredUserDTO) o;
+
+	if (mcMonitoredUserDTO == null)
+	    return 1;
+	else
+	    return 0;
     }
+
     /**
      * @return Returns the displayOrder.
      */
     public String getDisplayOrder() {
-        return displayOrder;
+	return displayOrder;
     }
+
     /**
-     * @param displayOrder The displayOrder to set.
+     * @param displayOrder
+     *            The displayOrder to set.
      */
     public void setDisplayOrder(String displayOrder) {
-        this.displayOrder = displayOrder;
+	this.displayOrder = displayOrder;
     }
+
     /**
      * @return Returns the feedback.
      */
     public String getFeedback() {
-        return feedback;
+	return feedback;
     }
+
     /**
-     * @param feedback The feedback to set.
+     * @param feedback
+     *            The feedback to set.
      */
     public void setFeedback(String feedback) {
-        this.feedback = feedback;
+	this.feedback = feedback;
     }
+
     /**
      * @return Returns the question.
      */
     public String getQuestion() {
-        return question;
+	return question;
     }
+
     /**
-     * @param question The question to set.
+     * @param question
+     *            The question to set.
      */
     public void setQuestion(String question) {
-        this.question = question;
+	this.question = question;
     }
-    
+
     /**
      * @return Returns the weight.
      */
     public String getWeight() {
-        return weight;
+	return weight;
     }
+
     /**
-     * @param weight The weight to set.
+     * @param weight
+     *            The weight to set.
      */
     public void setWeight(String weight) {
-        this.weight = weight;
+	this.weight = weight;
     }
-    
+
     /**
      * @return Returns the mark.
      */
     public String getMark() {
-        return mark;
+	return mark;
     }
+
     /**
-     * @param mark The mark to set.
+     * @param mark
+     *            The mark to set.
      */
     public void setMark(String mark) {
-        this.mark = mark;
+	this.mark = mark;
     }
+
     /**
      * @return Returns the listCandidateAnswersDTO.
      */
     public List getListCandidateAnswersDTO() {
-        return listCandidateAnswersDTO;
+	return listCandidateAnswersDTO;
     }
+
     /**
-     * @param listCandidateAnswersDTO The listCandidateAnswersDTO to set.
+     * @param listCandidateAnswersDTO
+     *            The listCandidateAnswersDTO to set.
      */
     public void setListCandidateAnswersDTO(List listCandidateAnswersDTO) {
-        this.listCandidateAnswersDTO = listCandidateAnswersDTO;
+	this.listCandidateAnswersDTO = listCandidateAnswersDTO;
     }
-    
+
     /**
      * @return Returns the caCount.
      */
     public String getCaCount() {
-        return caCount;
+	return caCount;
     }
+
     /**
-     * @param caCount The caCount to set.
+     * @param caCount
+     *            The caCount to set.
      */
     public void setCaCount(String caCount) {
-        this.caCount = caCount;
+	this.caCount = caCount;
     }
-  }
+}

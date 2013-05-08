@@ -22,53 +22,59 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.dao;
 
-import java.util.List;
-
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
-
 
 /**
  * @author Ozgur Demirtas
- * <p>Interface for the McSession DAO, defines methods needed to access/modify mc session</p>
+ *         <p>
+ *         Interface for the McSession DAO, defines methods needed to access/modify mc session
+ *         </p>
  * 
  */
 public interface IMcSessionDAO {
-	
-	/**
-	 * <p>Return the persistent instance of a McSession  
-	 * with the given identifier <code>uid</code>, returns null if not found. </p>
-	 * 
-	 * @param uid an identifier for the McSession object.
-	 * @return the persistent instance of a McSession or null if not found
-	 */
-	
-    public McSession getMcSessionByUID(Long uid);
-    
+
     /**
-	 * <p> Return the persistent instance of a McSession
-	 * with the given tool session id <code>mcSessionId</code>,
-	 * returns null if not found.</p>
-	 * 
-	 * @param mcSessionId The tool session id
-	 * @return the persistent instance of a McSession or null if not found.
-	 */
-    public McSession findMcSessionById(Long mcSessionId);
-	
-	
-	
-    /**
-	 * <p>Persist the given persistent instance of McSession.</p>
-	 * 
-	 * @param mcSession The instance of McSession to persist.
-	 */
-    public void saveMcSession(McSession mcSession);
-    
-    /**
-     * <p>Update the given persistent instance of McSession.</p>
+     * <p>
+     * Return the persistent instance of a McSession with the given identifier <code>uid</code>, returns null if not
+     * found.
+     * </p>
      * 
-     * @param mcContent The instance of McSession to persist.
+     * @param uid
+     *            an identifier for the McSession object.
+     * @return the persistent instance of a McSession or null if not found
+     */
+
+    public McSession getMcSessionByUID(Long uid);
+
+    /**
+     * <p>
+     * Return the persistent instance of a McSession with the given tool session id <code>mcSessionId</code>, returns
+     * null if not found.
+     * </p>
+     * 
+     * @param mcSessionId
+     *            The tool session id
+     * @return the persistent instance of a McSession or null if not found.
+     */
+    public McSession findMcSessionById(Long mcSessionId);
+
+    /**
+     * <p>
+     * Persist the given persistent instance of McSession.
+     * </p>
+     * 
+     * @param mcSession
+     *            The instance of McSession to persist.
+     */
+    public void saveMcSession(McSession mcSession);
+
+    /**
+     * <p>
+     * Update the given persistent instance of McSession.
+     * </p>
+     * 
+     * @param mcContent
+     *            The instance of McSession to persist.
      */
     public void updateMcSession(McSession mcSession);
 
@@ -76,17 +82,16 @@ public interface IMcSessionDAO {
      * Delete the given instance of McSession
      */
     public void removeMcSession(McSession mcSession);
-    
-    
+
     /**
-     * <p> Returns the persistent instance of McSession
-     * associated with the given mc user, with user id <code>userId</code>, 
+     * <p>
+     * Returns the persistent instance of McSession associated with the given mc user, with user id <code>userId</code>,
      * returns null if not found.
      * 
-     * @param userId The mc user id
+     * @param userId
+     *            The mc user id
      * @return a persistent instance of McSessions or null if not found.
-     */	
+     */
     public McSession getMcSessionByUser(Long userId);
-    
 
 }

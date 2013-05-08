@@ -140,8 +140,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    HttpServletResponse response) throws IOException, ServletException, McApplicationException {
 
 	/*
-	 * By now, the passed tool session id MUST exist in the db through the calling of:
-	 * public void createToolSession(Long toolSessionId, Long toolContentId) by the container.
+	 * By now, the passed tool session id MUST exist in the db through the calling of: public void
+	 * createToolSession(Long toolSessionId, Long toolContentId) by the container.
 	 * 
 	 * make sure this session exists in tool's session table by now.
 	 */
@@ -173,8 +173,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	mcLearningForm.setToolSessionID(new Long(toolSessionID).toString());
 
 	/*
-	 * by now, we made sure that the passed tool session id exists in the db as a new record
-	 * Make sure we can retrieve it and the relavent content
+	 * by now, we made sure that the passed tool session id exists in the db as a new record Make sure we can
+	 * retrieve it and the relavent content
 	 */
 
 	McSession mcSession = mcService.retrieveMcSession(new Long(toolSessionID));
@@ -185,9 +185,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	}
 
 	/*
-	 * find out what content this tool session is referring to
-	 * get the content for this tool session 
-	 * Each passed tool session id points to a particular content. Many to one mapping.
+	 * find out what content this tool session is referring to get the content for this tool session Each passed
+	 * tool session id points to a particular content. Many to one mapping.
 	 */
 	McContent mcContent = mcSession.getMcContent();
 
@@ -198,8 +197,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	}
 
 	/*
-	 * The content we retrieved above must have been created before in Authoring time. 
-	 * And the passed tool session id already refers to it.
+	 * The content we retrieved above must have been created before in Authoring time. And the passed tool session
+	 * id already refers to it.
 	 */
 
 	McLearnerStarterDTO mcLearnerStarterDTO = new McLearnerStarterDTO();
@@ -211,7 +210,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    mcLearningForm.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_COMBINED);
 	}
 
-	/*  
+	/*
 	 * Is there a deadline set?
 	 */
 
@@ -243,7 +242,10 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	mcLearningForm.setToolContentID(mcContent.getMcContentId().toString());
 	commonContentSetup(request, mcContent, mcService, mcLearningForm, toolSessionID);
 
-	/* find out if the content is set to run offline or online. If it is set to run offline , the learners are informed about that. */
+	/*
+	 * find out if the content is set to run offline or online. If it is set to run offline , the learners are
+	 * informed about that.
+	 */
 	boolean isRunOffline = McUtils.isRunOffline(mcContent);
 	if (isRunOffline == true) {
 	    return (mapping.findForward(McAppConstants.RUN_OFFLINE));
@@ -255,33 +257,33 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    return (mapping.findForward(McAppConstants.DEFINE_LATER));
 	}
 
-	/* Is the request for a preview by the author?
-	Preview The tool must be able to show the specified content as if it was running in a lesson. 
-		It will be the learner url with tool access mode set to ToolAccessMode.AUTHOR 
-		3 modes are:
-			author
-			teacher
-			learner
-		*/
+	/*
+	 * Is the request for a preview by the author? Preview The tool must be able to show the specified content as if
+	 * it was running in a lesson. It will be the learner url with tool access mode set to ToolAccessMode.AUTHOR 3
+	 * modes are: author teacher learner
+	 */
 
-	/*handle PREVIEW mode*/
+	/* handle PREVIEW mode */
 	// String mode=mcLearningForm.getLearningMode();
 	String mode = request.getParameter(McAppConstants.MODE);
 
-	/* by now, we know that the mode is either teacher or learner
-	* check if the mode is teacher and request is for Learner Progress
-	*/
+	/*
+	 * by now, we know that the mode is either teacher or learner check if the mode is teacher and request is for
+	 * Learner Progress
+	 */
 	String userId = request.getParameter(McAppConstants.USER_ID);
 
 	if ((userId != null) && (mode.equals("teacher"))) {
 
-	    /* LEARNER_PROGRESS for jsp*/
+	    /* LEARNER_PROGRESS for jsp */
 	    mcLearningForm.setLearnerProgress(new Boolean(true).toString());
 	    mcLearningForm.setLearnerProgressUserId(userId);
 
 	    McLearningAction mcLearningAction = new McLearningAction();
-	    /* pay attention that this userId is the learner's userId passed by the request parameter.
-	     * It is differerent than USER_ID kept in the session of the current system user*/
+	    /*
+	     * pay attention that this userId is the learner's userId passed by the request parameter. It is differerent
+	     * than USER_ID kept in the session of the current system user
+	     */
 
 	    McQueUsr mcQueUsr = mcService.getMcUserBySession(new Long(userId), mcSession.getUid());
 	    if (mcQueUsr == null) {
@@ -291,7 +293,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		return (mapping.findForward(McAppConstants.SIMPLE_LEARNING_ERROR));
 	    }
 
-	    /* check whether the user's session really referrs to the session id passed to the url*/
+	    /* check whether the user's session really referrs to the session id passed to the url */
 	    Long sessionUid = mcQueUsr.getMcSessionId();
 	    McSession mcSessionLocal = mcService.getMcSessionByUID(sessionUid);
 
@@ -307,13 +309,11 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
 	}
 
-	/* by now, we know that the mode is learner*/
+	/* by now, we know that the mode is learner */
 	/*
-	     * verify that userId does not already exist in the db.
-	     * If it does exist, that means, that user already responded to the content and 
-	     * his answers must be displayed  read-only
-	     * 
-	     */
+	 * verify that userId does not already exist in the db. If it does exist, that means, that user already
+	 * responded to the content and his answers must be displayed read-only
+	 */
 
 	Integer userID = null;
 	HttpSession ss = SessionManager.getSession();
@@ -337,7 +337,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    if (toolSessionID.equals(userSessionId)) {
 		McLearningAction mcLearningAction = new McLearningAction();
 		request.setAttribute(McAppConstants.REQUEST_BY_STARTER, (Boolean.TRUE).toString());
-		mcLearningAction.prepareViewAnswersData(mapping, mcLearningForm, request, getServlet().getServletContext());
+		mcLearningAction.prepareViewAnswersData(mapping, mcLearningForm, request, getServlet()
+			.getServletContext());
 		return mapping.findForward(McAppConstants.VIEW_ANSWERS);
 	    }
 	} else if (mode.equals("teacher")) {
@@ -396,8 +397,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
     protected ActionForward validateParameters(HttpServletRequest request, McLearningForm mcLearningForm,
 	    ActionMapping mapping) {
 	/*
-	* obtain and setup the current user's data 
-	*/
+	 * obtain and setup the current user's data
+	 */
 
 	String userID = "";
 	HttpSession ss = SessionManager.getSession();
@@ -412,7 +413,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	mcLearningForm.setUserID(userID);
 
 	/*
-	 * process incoming tool session id and later derive toolContentId from it. 
+	 * process incoming tool session id and later derive toolContentId from it.
 	 */
 	String strToolSessionId = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	long toolSessionId = 0;
@@ -426,7 +427,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    }
 	}
 
-	/*mode can be learner, teacher or author */
+	/* mode can be learner, teacher or author */
 	String mode = request.getParameter(McAppConstants.MODE);
 
 	if ((mode == null) || (mode.length() == 0)) {

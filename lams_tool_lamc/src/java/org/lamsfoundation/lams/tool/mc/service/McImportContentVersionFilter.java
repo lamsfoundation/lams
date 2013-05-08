@@ -8,33 +8,34 @@ import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 
 /**
  * Import filter class for different version of MC content.
+ * 
  * @author steven
- *
+ * 
  */
-public class McImportContentVersionFilter extends ToolContentVersionFilter{
+public class McImportContentVersionFilter extends ToolContentVersionFilter {
 
-	/**
-	 * Import 1.0 version content to 1.1 version tool server.
-	 *
-	 */
-	public void up10To20061015(){
-		this.removeField(McQueContent.class, "weight");
-		this.removeField(McUsrAttempt.class, "timeZone");
-		
-	}
-	
-	public void up20061015To20061113(){
-		// Change name to suit the version you give the tool.
+    /**
+     * Import 1.0 version content to 1.1 version tool server.
+     * 
+     */
+    public void up10To20061015() {
+	this.removeField(McQueContent.class, "weight");
+	this.removeField(McUsrAttempt.class, "timeZone");
 
-	    this.addField(McContent.class, "showMarks",new Boolean(false));
-	    this.addField(McContent.class, "randomize",new Boolean(false));
-	    this.addField(McOptsContent.class, "displayOrder",new Integer(0));
-	}
-	
-	public void up20061113To20070820() {
-		// Adds displayAnswers LDEV-1156
-		
-		this.addField(McContent.class, "displayAnswers", new Boolean(true));
-		
-	}
+    }
+
+    public void up20061015To20061113() {
+	// Change name to suit the version you give the tool.
+
+	this.addField(McContent.class, "showMarks", new Boolean(false));
+	this.addField(McContent.class, "randomize", new Boolean(false));
+	this.addField(McOptsContent.class, "displayOrder", new Integer(0));
+    }
+
+    public void up20061113To20070820() {
+	// Adds displayAnswers LDEV-1156
+
+	this.addField(McContent.class, "displayAnswers", new Boolean(true));
+
+    }
 }

@@ -222,7 +222,7 @@ public interface McAppConstants {
     public static final String TOP_MARK = "topMark";
     public static final String LOWEST_MARK = "lowestMark";
     public static final String AVERAGE_MARK = "averageMark";
-    
+
     /* Date time restriction LDEV-2657 */
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";

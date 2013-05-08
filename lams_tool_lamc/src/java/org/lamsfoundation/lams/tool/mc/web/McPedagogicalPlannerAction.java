@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -134,8 +133,8 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 			for (int candidateAnswerDTOIndex = 0; candidateAnswerDTOIndex < candidateAnswerDTOList.size(); candidateAnswerDTOIndex++) {
 			    McCandidateAnswersDTO answerDTO = candidateAnswerDTOList.get(candidateAnswerDTOIndex);
 			    McOptsContent candidateAnswer = new McOptsContent(candidateAnswerDTOIndex + 1,
-				    McAppConstants.CORRECT.equals(answerDTO.getCorrect()), answerDTO
-					    .getCandidateAnswer(), mcQueContent, null);
+				    McAppConstants.CORRECT.equals(answerDTO.getCorrect()),
+				    answerDTO.getCandidateAnswer(), mcQueContent, null);
 			    candidateAnswer.setMcQueContentId(mcQueContent.getMcContentId());
 			    candidateAnswers.add(candidateAnswer);
 			}

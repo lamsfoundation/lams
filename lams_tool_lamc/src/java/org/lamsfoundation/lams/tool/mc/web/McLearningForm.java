@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.tool.mc.service.IMcService;
 /**
  * @author Ozgur Demirtas
  * 
- *  ActionForm for the Learning environment
+ *         ActionForm for the Learning environment
  */
 public class McLearningForm extends ActionForm implements McAppConstants {
     protected String continueOptions;

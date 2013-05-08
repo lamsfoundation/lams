@@ -22,27 +22,24 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc;
 
-
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p> DTO that holds monitoring flow properties 
+ * <p>
+ * DTO that holds monitoring flow properties
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McGeneralMonitoringDTO implements Comparable
-{
+public class McGeneralMonitoringDTO implements Comparable {
     protected String editResponse;
-    
+
     protected Map mapQuestionContent;
     protected String defaultQuestionContent;
-    
+
     protected String currentMonitoringTab;
     protected String sbmtSuccess;
     protected String defineLaterInEditMode;
@@ -56,770 +53,901 @@ public class McGeneralMonitoringDTO implements Comparable
 
     protected String activeModule;
     protected String currentTab;
-	protected String activityTitle;
-	protected String activityInstructions;
-	protected String defaultOptionContent;
-	protected Integer countAllUsers;
-	protected Integer countSessionComplete;
-	protected String isPortfolioExport;
-	protected String groupName;
-	protected String currentMonitoredToolSession;
-	protected Long selectionCase;
-	protected String existsOpenMcs;
-	protected String isToolSessionChanged;
-	protected String responseId;
-	protected String currentUid;
-	protected String displayAnswers;
-	
-	protected String toolContentID;
-	protected Map mapOptionsContent;
-	protected Map summaryToolSessions;
-	protected List listMonitoredAnswersContainerDto;
-	protected List listUserEntries;
-	protected String selectedToolSessionId;
-	
-	protected String richTextOnlineInstructions;
-	protected String richTextOfflineInstructions;
-	protected List listOfflineFilesMetadata;
-	protected List listUploadedOfflineFileNames;
-	protected List listOnlineFilesMetadata;
-	protected List listUploadedOnlineFileNames;
-	protected String showOpenMcsSection;
-	
-	protected List listMcAllSessionsDTO;
+    protected String activityTitle;
+    protected String activityInstructions;
+    protected String defaultOptionContent;
+    protected Integer countAllUsers;
+    protected Integer countSessionComplete;
+    protected String isPortfolioExport;
+    protected String groupName;
+    protected String currentMonitoredToolSession;
+    protected Long selectionCase;
+    protected String existsOpenMcs;
+    protected String isToolSessionChanged;
+    protected String responseId;
+    protected String currentUid;
+    protected String displayAnswers;
+
+    protected String toolContentID;
+    protected Map mapOptionsContent;
+    protected Map summaryToolSessions;
+    protected List listMonitoredAnswersContainerDto;
+    protected List listUserEntries;
+    protected String selectedToolSessionId;
+
+    protected String richTextOnlineInstructions;
+    protected String richTextOfflineInstructions;
+    protected List listOfflineFilesMetadata;
+    protected List listUploadedOfflineFileNames;
+    protected List listOnlineFilesMetadata;
+    protected List listUploadedOnlineFileNames;
+    protected String showOpenMcsSection;
+
+    protected List listMcAllSessionsDTO;
     protected Map mapStandardQuestionUid;
     protected Map mapStandardToolSessionUid;
-    
+
     protected String sessionUserCount;
     protected String completedSessionUserCount;
     protected String completedSessionUserPercent;
     protected List mapStudentsMcd;
-    
+
     protected String onlineInstructions;
     protected String offlineInstructions;
     protected List attachmentList;
     protected List deletedAttachmentList;
     protected String contentFolderID;
-    
+
     /**
      * @return Returns the listOfflineFilesMetadata.
      */
     public List getListOfflineFilesMetadata() {
-        return listOfflineFilesMetadata;
+	return listOfflineFilesMetadata;
     }
+
     /**
-     * @param listOfflineFilesMetadata The listOfflineFilesMetadata to set.
+     * @param listOfflineFilesMetadata
+     *            The listOfflineFilesMetadata to set.
      */
     public void setListOfflineFilesMetadata(List listOfflineFilesMetadata) {
-        this.listOfflineFilesMetadata = listOfflineFilesMetadata;
+	this.listOfflineFilesMetadata = listOfflineFilesMetadata;
     }
+
     /**
      * @return Returns the listOnlineFilesMetadata.
      */
     public List getListOnlineFilesMetadata() {
-        return listOnlineFilesMetadata;
+	return listOnlineFilesMetadata;
     }
+
     /**
-     * @param listOnlineFilesMetadata The listOnlineFilesMetadata to set.
+     * @param listOnlineFilesMetadata
+     *            The listOnlineFilesMetadata to set.
      */
     public void setListOnlineFilesMetadata(List listOnlineFilesMetadata) {
-        this.listOnlineFilesMetadata = listOnlineFilesMetadata;
+	this.listOnlineFilesMetadata = listOnlineFilesMetadata;
     }
+
     /**
      * @return Returns the listUploadedOfflineFileNames.
      */
     public List getListUploadedOfflineFileNames() {
-        return listUploadedOfflineFileNames;
+	return listUploadedOfflineFileNames;
     }
+
     /**
-     * @param listUploadedOfflineFileNames The listUploadedOfflineFileNames to set.
+     * @param listUploadedOfflineFileNames
+     *            The listUploadedOfflineFileNames to set.
      */
-    public void setListUploadedOfflineFileNames(
-            List listUploadedOfflineFileNames) {
-        this.listUploadedOfflineFileNames = listUploadedOfflineFileNames;
+    public void setListUploadedOfflineFileNames(List listUploadedOfflineFileNames) {
+	this.listUploadedOfflineFileNames = listUploadedOfflineFileNames;
     }
+
     /**
      * @return Returns the listUploadedOnlineFileNames.
      */
     public List getListUploadedOnlineFileNames() {
-        return listUploadedOnlineFileNames;
+	return listUploadedOnlineFileNames;
     }
+
     /**
-     * @param listUploadedOnlineFileNames The listUploadedOnlineFileNames to set.
+     * @param listUploadedOnlineFileNames
+     *            The listUploadedOnlineFileNames to set.
      */
     public void setListUploadedOnlineFileNames(List listUploadedOnlineFileNames) {
-        this.listUploadedOnlineFileNames = listUploadedOnlineFileNames;
+	this.listUploadedOnlineFileNames = listUploadedOnlineFileNames;
     }
+
     /**
      * @return Returns the richTextOfflineInstructions.
      */
     public String getRichTextOfflineInstructions() {
-        return richTextOfflineInstructions;
+	return richTextOfflineInstructions;
     }
+
     /**
-     * @param richTextOfflineInstructions The richTextOfflineInstructions to set.
+     * @param richTextOfflineInstructions
+     *            The richTextOfflineInstructions to set.
      */
-    public void setRichTextOfflineInstructions(
-            String richTextOfflineInstructions) {
-        this.richTextOfflineInstructions = richTextOfflineInstructions;
+    public void setRichTextOfflineInstructions(String richTextOfflineInstructions) {
+	this.richTextOfflineInstructions = richTextOfflineInstructions;
     }
+
     /**
      * @return Returns the richTextOnlineInstructions.
      */
     public String getRichTextOnlineInstructions() {
-        return richTextOnlineInstructions;
+	return richTextOnlineInstructions;
     }
+
     /**
-     * @param richTextOnlineInstructions The richTextOnlineInstructions to set.
+     * @param richTextOnlineInstructions
+     *            The richTextOnlineInstructions to set.
      */
     public void setRichTextOnlineInstructions(String richTextOnlineInstructions) {
-        this.richTextOnlineInstructions = richTextOnlineInstructions;
+	this.richTextOnlineInstructions = richTextOnlineInstructions;
     }
+
     /**
      * @return Returns the userExceptionContentDoesNotExist.
      */
     public String getUserExceptionContentDoesNotExist() {
-        return userExceptionContentDoesNotExist;
+	return userExceptionContentDoesNotExist;
     }
+
     /**
-     * @param userExceptionContentDoesNotExist The userExceptionContentDoesNotExist to set.
+     * @param userExceptionContentDoesNotExist
+     *            The userExceptionContentDoesNotExist to set.
      */
-    public void setUserExceptionContentDoesNotExist(
-            String userExceptionContentDoesNotExist) {
-        this.userExceptionContentDoesNotExist = userExceptionContentDoesNotExist;
+    public void setUserExceptionContentDoesNotExist(String userExceptionContentDoesNotExist) {
+	this.userExceptionContentDoesNotExist = userExceptionContentDoesNotExist;
     }
+
     /**
      * @return Returns the userExceptionNoStudentActivity.
      */
     public String getUserExceptionNoStudentActivity() {
-        return userExceptionNoStudentActivity;
+	return userExceptionNoStudentActivity;
     }
+
     /**
-     * @param userExceptionNoStudentActivity The userExceptionNoStudentActivity to set.
+     * @param userExceptionNoStudentActivity
+     *            The userExceptionNoStudentActivity to set.
      */
-    public void setUserExceptionNoStudentActivity(
-            String userExceptionNoStudentActivity) {
-        this.userExceptionNoStudentActivity = userExceptionNoStudentActivity;
+    public void setUserExceptionNoStudentActivity(String userExceptionNoStudentActivity) {
+	this.userExceptionNoStudentActivity = userExceptionNoStudentActivity;
     }
+
     /**
      * @return Returns the activeModule.
      */
     public String getActiveModule() {
-        return activeModule;
+	return activeModule;
     }
+
     /**
-     * @param activeModule The activeModule to set.
+     * @param activeModule
+     *            The activeModule to set.
      */
     public void setActiveModule(String activeModule) {
-        this.activeModule = activeModule;
+	this.activeModule = activeModule;
     }
+
     /**
      * @return Returns the currentTab.
      */
     public String getCurrentTab() {
-        return currentTab;
+	return currentTab;
     }
+
     /**
-     * @param currentTab The currentTab to set.
+     * @param currentTab
+     *            The currentTab to set.
      */
     public void setCurrentTab(String currentTab) {
-        this.currentTab = currentTab;
+	this.currentTab = currentTab;
     }
+
     /**
      * @return Returns the defaultOptionContent.
      */
     public String getDefaultOptionContent() {
-        return defaultOptionContent;
+	return defaultOptionContent;
     }
+
     /**
-     * @param defaultOptionContent The defaultOptionContent to set.
+     * @param defaultOptionContent
+     *            The defaultOptionContent to set.
      */
     public void setDefaultOptionContent(String defaultOptionContent) {
-        this.defaultOptionContent = defaultOptionContent;
+	this.defaultOptionContent = defaultOptionContent;
     }
+
     /**
      * @return Returns the userExceptionContentInUse.
      */
     public String getUserExceptionContentInUse() {
-        return userExceptionContentInUse;
+	return userExceptionContentInUse;
     }
+
     /**
-     * @param userExceptionContentInUse The userExceptionContentInUse to set.
+     * @param userExceptionContentInUse
+     *            The userExceptionContentInUse to set.
      */
     public void setUserExceptionContentInUse(String userExceptionContentInUse) {
-        this.userExceptionContentInUse = userExceptionContentInUse;
+	this.userExceptionContentInUse = userExceptionContentInUse;
     }
+
     /**
      * @return Returns the activityInstructions.
      */
     public String getActivityInstructions() {
-        return activityInstructions;
+	return activityInstructions;
     }
+
     /**
-     * @param activityInstructions The activityInstructions to set.
+     * @param activityInstructions
+     *            The activityInstructions to set.
      */
     public void setActivityInstructions(String activityInstructions) {
-        this.activityInstructions = activityInstructions;
+	this.activityInstructions = activityInstructions;
     }
+
     /**
      * @return Returns the activityTitle.
      */
     public String getActivityTitle() {
-        return activityTitle;
+	return activityTitle;
     }
+
     /**
-     * @param activityTitle The activityTitle to set.
+     * @param activityTitle
+     *            The activityTitle to set.
      */
     public void setActivityTitle(String activityTitle) {
-        this.activityTitle = activityTitle;
+	this.activityTitle = activityTitle;
     }
+
     /**
      * @return Returns the currentMonitoringTab.
      */
     public String getCurrentMonitoringTab() {
-        return currentMonitoringTab;
+	return currentMonitoringTab;
     }
+
     /**
-     * @param currentMonitoringTab The currentMonitoringTab to set.
+     * @param currentMonitoringTab
+     *            The currentMonitoringTab to set.
      */
     public void setCurrentMonitoringTab(String currentMonitoringTab) {
-        this.currentMonitoringTab = currentMonitoringTab;
+	this.currentMonitoringTab = currentMonitoringTab;
     }
+
     /**
      * @return Returns the defineLaterInEditMode.
      */
     public String getDefineLaterInEditMode() {
-        return defineLaterInEditMode;
+	return defineLaterInEditMode;
     }
+
     /**
-     * @param defineLaterInEditMode The defineLaterInEditMode to set.
+     * @param defineLaterInEditMode
+     *            The defineLaterInEditMode to set.
      */
     public void setDefineLaterInEditMode(String defineLaterInEditMode) {
-        this.defineLaterInEditMode = defineLaterInEditMode;
+	this.defineLaterInEditMode = defineLaterInEditMode;
     }
+
     /**
      * @return Returns the requestLearningReport.
      */
     public String getRequestLearningReport() {
-        return requestLearningReport;
+	return requestLearningReport;
     }
+
     /**
-     * @param requestLearningReport The requestLearningReport to set.
+     * @param requestLearningReport
+     *            The requestLearningReport to set.
      */
     public void setRequestLearningReport(String requestLearningReport) {
-        this.requestLearningReport = requestLearningReport;
+	this.requestLearningReport = requestLearningReport;
     }
+
     /**
      * @return Returns the sbmtSuccess.
      */
     public String getSbmtSuccess() {
-        return sbmtSuccess;
+	return sbmtSuccess;
     }
+
     /**
-     * @param sbmtSuccess The sbmtSuccess to set.
+     * @param sbmtSuccess
+     *            The sbmtSuccess to set.
      */
     public void setSbmtSuccess(String sbmtSuccess) {
-        this.sbmtSuccess = sbmtSuccess;
+	this.sbmtSuccess = sbmtSuccess;
     }
+
     /**
      * @return Returns the userExceptionNoToolSessions.
      */
     public String getUserExceptionNoToolSessions() {
-        return userExceptionNoToolSessions;
+	return userExceptionNoToolSessions;
     }
+
     /**
-     * @param userExceptionNoToolSessions The userExceptionNoToolSessions to set.
+     * @param userExceptionNoToolSessions
+     *            The userExceptionNoToolSessions to set.
      */
-    public void setUserExceptionNoToolSessions(
-            String userExceptionNoToolSessions) {
-        this.userExceptionNoToolSessions = userExceptionNoToolSessions;
+    public void setUserExceptionNoToolSessions(String userExceptionNoToolSessions) {
+	this.userExceptionNoToolSessions = userExceptionNoToolSessions;
     }
+
     /**
      * @return Returns the isMonitoredContentInUse.
      */
     public String getIsMonitoredContentInUse() {
-        return isMonitoredContentInUse;
-    }
-    /**
-     * @param isMonitoredContentInUse The isMonitoredContentInUse to set.
-     */
-    public void setIsMonitoredContentInUse(String isMonitoredContentInUse) {
-        this.isMonitoredContentInUse = isMonitoredContentInUse;
+	return isMonitoredContentInUse;
     }
 
-    
+    /**
+     * @param isMonitoredContentInUse
+     *            The isMonitoredContentInUse to set.
+     */
+    public void setIsMonitoredContentInUse(String isMonitoredContentInUse) {
+	this.isMonitoredContentInUse = isMonitoredContentInUse;
+    }
+
     /**
      * @return Returns the mapOptionsContent.
      */
     public Map getMapOptionsContent() {
-        return mapOptionsContent;
+	return mapOptionsContent;
     }
+
     /**
-     * @param mapOptionsContent The mapOptionsContent to set.
+     * @param mapOptionsContent
+     *            The mapOptionsContent to set.
      */
     public void setMapOptionsContent(Map mapOptionsContent) {
-        this.mapOptionsContent = mapOptionsContent;
+	this.mapOptionsContent = mapOptionsContent;
     }
-    
+
     /**
      * @return Returns the countAllUsers.
      */
     public Integer getCountAllUsers() {
-        return countAllUsers;
+	return countAllUsers;
     }
+
     /**
-     * @param countAllUsers The countAllUsers to set.
+     * @param countAllUsers
+     *            The countAllUsers to set.
      */
     public void setCountAllUsers(Integer countAllUsers) {
-        this.countAllUsers = countAllUsers;
+	this.countAllUsers = countAllUsers;
     }
+
     /**
      * @return Returns the countSessionComplete.
      */
     public Integer getCountSessionComplete() {
-        return countSessionComplete;
+	return countSessionComplete;
     }
+
     /**
-     * @param countSessionComplete The countSessionComplete to set.
+     * @param countSessionComplete
+     *            The countSessionComplete to set.
      */
     public void setCountSessionComplete(Integer countSessionComplete) {
-        this.countSessionComplete = countSessionComplete;
+	this.countSessionComplete = countSessionComplete;
     }
+
     /**
      * @return Returns the isPortfolioExport.
      */
     public String getIsPortfolioExport() {
-        return isPortfolioExport;
+	return isPortfolioExport;
     }
+
     /**
-     * @param isPortfolioExport The isPortfolioExport to set.
+     * @param isPortfolioExport
+     *            The isPortfolioExport to set.
      */
     public void setIsPortfolioExport(String isPortfolioExport) {
-        this.isPortfolioExport = isPortfolioExport;
+	this.isPortfolioExport = isPortfolioExport;
     }
+
     /**
      * @return Returns the summaryToolSessions.
      */
     public Map getSummaryToolSessions() {
-        return summaryToolSessions;
+	return summaryToolSessions;
     }
+
     /**
-     * @param summaryToolSessions The summaryToolSessions to set.
+     * @param summaryToolSessions
+     *            The summaryToolSessions to set.
      */
     public void setSummaryToolSessions(Map summaryToolSessions) {
-        this.summaryToolSessions = summaryToolSessions;
+	this.summaryToolSessions = summaryToolSessions;
     }
+
     /**
      * @return Returns the selectionCase.
      */
     public Long getSelectionCase() {
-        return selectionCase;
+	return selectionCase;
     }
+
     /**
-     * @param selectionCase The selectionCase to set.
+     * @param selectionCase
+     *            The selectionCase to set.
      */
     public void setSelectionCase(Long selectionCase) {
-        this.selectionCase = selectionCase;
+	this.selectionCase = selectionCase;
     }
+
     /**
      * @return Returns the currentMonitoredToolSession.
      */
     public String getCurrentMonitoredToolSession() {
-        return currentMonitoredToolSession;
+	return currentMonitoredToolSession;
     }
+
     /**
-     * @param currentMonitoredToolSession The currentMonitoredToolSession to set.
+     * @param currentMonitoredToolSession
+     *            The currentMonitoredToolSession to set.
      */
-    public void setCurrentMonitoredToolSession(
-            String currentMonitoredToolSession) {
-        this.currentMonitoredToolSession = currentMonitoredToolSession;
+    public void setCurrentMonitoredToolSession(String currentMonitoredToolSession) {
+	this.currentMonitoredToolSession = currentMonitoredToolSession;
     }
+
     /**
      * @return Returns the groupName.
      */
     public String getGroupName() {
-        return groupName;
+	return groupName;
     }
+
     /**
-     * @param groupName The groupName to set.
+     * @param groupName
+     *            The groupName to set.
      */
     public void setGroupName(String groupName) {
-        this.groupName = groupName;
+	this.groupName = groupName;
     }
+
     /**
      * @return Returns the listMonitoredAnswersContainerDto.
      */
     public List getListMonitoredAnswersContainerDto() {
-        return listMonitoredAnswersContainerDto;
+	return listMonitoredAnswersContainerDto;
     }
+
     /**
-     * @param listMonitoredAnswersContainerDto The listMonitoredAnswersContainerDto to set.
+     * @param listMonitoredAnswersContainerDto
+     *            The listMonitoredAnswersContainerDto to set.
      */
-    public void setListMonitoredAnswersContainerDto(
-            List listMonitoredAnswersContainerDto) {
-        this.listMonitoredAnswersContainerDto = listMonitoredAnswersContainerDto;
+    public void setListMonitoredAnswersContainerDto(List listMonitoredAnswersContainerDto) {
+	this.listMonitoredAnswersContainerDto = listMonitoredAnswersContainerDto;
     }
+
     /**
      * @return Returns the listUserEntries.
      */
     public List getListUserEntries() {
-        return listUserEntries;
+	return listUserEntries;
     }
+
     /**
-     * @param listUserEntries The listUserEntries to set.
+     * @param listUserEntries
+     *            The listUserEntries to set.
      */
     public void setListUserEntries(List listUserEntries) {
-        this.listUserEntries = listUserEntries;
+	this.listUserEntries = listUserEntries;
     }
+
     /**
      * @return Returns the existsOpenMcs.
      */
     public String getExistsOpenMcs() {
-        return existsOpenMcs;
+	return existsOpenMcs;
     }
+
     /**
-     * @param existsOpenMcs The existsOpenMcs to set.
+     * @param existsOpenMcs
+     *            The existsOpenMcs to set.
      */
     public void setExistsOpenMcs(String existsOpenMcs) {
-        this.existsOpenMcs = existsOpenMcs;
+	this.existsOpenMcs = existsOpenMcs;
     }
+
     /**
      * @return Returns the selectedToolSessionId.
      */
     public String getSelectedToolSessionId() {
-        return selectedToolSessionId;
+	return selectedToolSessionId;
     }
+
     /**
-     * @param selectedToolSessionId The selectedToolSessionId to set.
+     * @param selectedToolSessionId
+     *            The selectedToolSessionId to set.
      */
     public void setSelectedToolSessionId(String selectedToolSessionId) {
-        this.selectedToolSessionId = selectedToolSessionId;
+	this.selectedToolSessionId = selectedToolSessionId;
     }
+
     /**
      * @return Returns the listMcAllSessionsDTO.
      */
     public List getListMcAllSessionsDTO() {
-        return listMcAllSessionsDTO;
+	return listMcAllSessionsDTO;
     }
+
     /**
-     * @param listMcAllSessionsDTO The listMcAllSessionsDTO to set.
+     * @param listMcAllSessionsDTO
+     *            The listMcAllSessionsDTO to set.
      */
     public void setListMcAllSessionsDTO(List listMcAllSessionsDTO) {
-        this.listMcAllSessionsDTO = listMcAllSessionsDTO;
+	this.listMcAllSessionsDTO = listMcAllSessionsDTO;
     }
+
     /**
      * @return Returns the mapStandardQuestionUid.
      */
     public Map getMapStandardQuestionUid() {
-        return mapStandardQuestionUid;
+	return mapStandardQuestionUid;
     }
+
     /**
-     * @param mapStandardQuestionUid The mapStandardQuestionUid to set.
+     * @param mapStandardQuestionUid
+     *            The mapStandardQuestionUid to set.
      */
     public void setMapStandardQuestionUid(Map mapStandardQuestionUid) {
-        this.mapStandardQuestionUid = mapStandardQuestionUid;
+	this.mapStandardQuestionUid = mapStandardQuestionUid;
     }
+
     /**
      * @return Returns the mapStandardToolSessionUid.
      */
     public Map getMapStandardToolSessionUid() {
-        return mapStandardToolSessionUid;
+	return mapStandardToolSessionUid;
     }
+
     /**
-     * @param mapStandardToolSessionUid The mapStandardToolSessionUid to set.
+     * @param mapStandardToolSessionUid
+     *            The mapStandardToolSessionUid to set.
      */
     public void setMapStandardToolSessionUid(Map mapStandardToolSessionUid) {
-        this.mapStandardToolSessionUid = mapStandardToolSessionUid;
+	this.mapStandardToolSessionUid = mapStandardToolSessionUid;
     }
+
     /**
      * @return Returns the showOpenMcsSection.
      */
     public String getShowOpenMcsSection() {
-        return showOpenMcsSection;
+	return showOpenMcsSection;
     }
+
     /**
-     * @param showOpenMcsSection The showOpenMcsSection to set.
+     * @param showOpenMcsSection
+     *            The showOpenMcsSection to set.
      */
     public void setShowOpenMcsSection(String showOpenMcsSection) {
-        this.showOpenMcsSection = showOpenMcsSection;
+	this.showOpenMcsSection = showOpenMcsSection;
     }
+
     /**
-     * @param mapStudentsMcd The mapStudentsMcd to set.
+     * @param mapStudentsMcd
+     *            The mapStudentsMcd to set.
      */
     public void setMapStudentsMcd(List mapStudentsMcd) {
-        this.mapStudentsMcd = mapStudentsMcd;
+	this.mapStudentsMcd = mapStudentsMcd;
     }
+
     /**
      * @return Returns the mapStudentsMcd.
      */
     public List getMapStudentsMcd() {
-        return mapStudentsMcd;
+	return mapStudentsMcd;
     }
+
     /**
      * @return Returns the currentUid.
      */
     public String getCurrentUid() {
-        return currentUid;
+	return currentUid;
     }
+
     /**
-     * @param currentUid The currentUid to set.
+     * @param currentUid
+     *            The currentUid to set.
      */
     public void setCurrentUid(String currentUid) {
-        this.currentUid = currentUid;
+	this.currentUid = currentUid;
     }
+
     /**
      * @return Returns the displayAnswers.
      */
     public String getDisplayAnswers() {
-        return displayAnswers;
+	return displayAnswers;
     }
+
     /**
-     * @param displayAnswers The displayAnswers to set.
+     * @param displayAnswers
+     *            The displayAnswers to set.
      */
     public void setDisplayAnswers(String displayAnswers) {
-        this.displayAnswers = displayAnswers;
+	this.displayAnswers = displayAnswers;
     }
+
     /**
      * @return Returns the isToolSessionChanged.
      */
     public String getIsToolSessionChanged() {
-        return isToolSessionChanged;
+	return isToolSessionChanged;
     }
+
     /**
-     * @param isToolSessionChanged The isToolSessionChanged to set.
+     * @param isToolSessionChanged
+     *            The isToolSessionChanged to set.
      */
     public void setIsToolSessionChanged(String isToolSessionChanged) {
-        this.isToolSessionChanged = isToolSessionChanged;
+	this.isToolSessionChanged = isToolSessionChanged;
     }
+
     /**
      * @return Returns the responseId.
      */
     public String getResponseId() {
-        return responseId;
+	return responseId;
     }
+
     /**
-     * @param responseId The responseId to set.
+     * @param responseId
+     *            The responseId to set.
      */
     public void setResponseId(String responseId) {
-        this.responseId = responseId;
+	this.responseId = responseId;
     }
+
     /**
      * @return Returns the toolContentID.
      */
     public String getToolContentID() {
-        return toolContentID;
+	return toolContentID;
     }
+
     /**
-     * @param toolContentID The toolContentID to set.
+     * @param toolContentID
+     *            The toolContentID to set.
      */
     public void setToolContentID(String toolContentID) {
-        this.toolContentID = toolContentID;
+	this.toolContentID = toolContentID;
     }
+
     /**
      * @return Returns the completedSessionUserCount.
      */
     public String getCompletedSessionUserCount() {
-        return completedSessionUserCount;
+	return completedSessionUserCount;
     }
+
     /**
-     * @param completedSessionUserCount The completedSessionUserCount to set.
+     * @param completedSessionUserCount
+     *            The completedSessionUserCount to set.
      */
     public void setCompletedSessionUserCount(String completedSessionUserCount) {
-        this.completedSessionUserCount = completedSessionUserCount;
+	this.completedSessionUserCount = completedSessionUserCount;
     }
+
     /**
      * @return Returns the completedSessionUserPercent.
      */
     public String getCompletedSessionUserPercent() {
-        return completedSessionUserPercent;
+	return completedSessionUserPercent;
     }
+
     /**
-     * @param completedSessionUserPercent The completedSessionUserPercent to set.
+     * @param completedSessionUserPercent
+     *            The completedSessionUserPercent to set.
      */
-    public void setCompletedSessionUserPercent(
-            String completedSessionUserPercent) {
-        this.completedSessionUserPercent = completedSessionUserPercent;
+    public void setCompletedSessionUserPercent(String completedSessionUserPercent) {
+	this.completedSessionUserPercent = completedSessionUserPercent;
     }
+
     /**
      * @return Returns the sessionUserCount.
      */
     public String getSessionUserCount() {
-        return sessionUserCount;
+	return sessionUserCount;
     }
+
     /**
-     * @param sessionUserCount The sessionUserCount to set.
+     * @param sessionUserCount
+     *            The sessionUserCount to set.
      */
     public void setSessionUserCount(String sessionUserCount) {
-        this.sessionUserCount = sessionUserCount;
-    }
-    
- 	public String toString() {
-        return new ToStringBuilder(this)
-        	.append("toolContentID: ", toolContentID)
-        	.append("activeModule: ", activeModule)
-        	.append("monitoredContentInUse: ", monitoredContentInUse)
-            .append("currentMonitoringTab: ", currentMonitoringTab)
-            .append("selectionCase: ", selectionCase)
-            .append("isToolSessionChanged: ", isToolSessionChanged)
-            .append("currentTab: ", currentTab)
-            .append("sbmtSuccess: ", sbmtSuccess)
-            .append("defineLaterInEditMode: ", defineLaterInEditMode)
-            .append("requestLearningReport: ", requestLearningReport)
-            .append("userExceptionNoToolSessions: ", userExceptionNoToolSessions)
-            .append("userExceptionContentDoesNotExist: ", userExceptionContentDoesNotExist)
-            .append("userExceptionNoStudentActivity: ", userExceptionNoStudentActivity)
-            .append("isMonitoredContentInUse: ", isMonitoredContentInUse)
-            .append("activityTitle: ", activityTitle)
-            .append("activityInstructions: ", activityInstructions)
-            .append("userExceptionContentInUse: ", userExceptionContentInUse)
-            .append("defaultOptionContent: ", defaultOptionContent)
-            .append("countAllUsers: ", countAllUsers)
-            .append("countSessionComplete: ", countSessionComplete)
-            .append("isPortfolioExport: ", isPortfolioExport)
-            .append("summaryToolSessions: ", summaryToolSessions)
-            .append("currentMonitoredToolSession: ", currentMonitoredToolSession)            
-            .append("groupName: ", groupName)
-            .append("listMonitoredAnswersContainerDto: ", listMonitoredAnswersContainerDto)
-            .append("listUserEntries: ", listUserEntries)
-            .append("existsOpenMcs: ", existsOpenMcs)
-            .append("selectedToolSessionId: ", selectedToolSessionId)
-            .append("listMcAllSessionsDTO: ", listMcAllSessionsDTO)
-			.append("richTextOnlineInstructions: ", richTextOnlineInstructions)
-			.append("richTextOfflineInstructions: ", richTextOfflineInstructions)
-			.append("listOfflineFilesMetadata: ", listOfflineFilesMetadata)
-			.append("listUploadedOfflineFileNames: ", listUploadedOfflineFileNames)
-			.append("listOnlineFilesMetadata: ", listOnlineFilesMetadata)
-			.append("listUploadedOnlineFileNames: ", listUploadedOnlineFileNames)
-			.append("showOpenMcsSection: ", showOpenMcsSection)
-			.append("mapStudentsMcd: ", mapStudentsMcd)
-			.append("responseId: ", responseId)
-			.append("currentUid: ", currentUid)
-			.append("displayAnswers: ", displayAnswers)
-			.append("sessionUserCount: ", sessionUserCount)
-			.append("completedSessionUserCount: ", completedSessionUserCount)
-			.append("completedSessionUserPercent: ", completedSessionUserPercent)
-            .toString();
+	this.sessionUserCount = sessionUserCount;
     }
 
-	public int compareTo(Object o)
-    {
-	    McGeneralMonitoringDTO mcGeneralMonitoringDTO = (McGeneralMonitoringDTO) o;
-     
-        if (mcGeneralMonitoringDTO == null)
-        	return 1;
-		else
-			return 0;
+    public String toString() {
+	return new ToStringBuilder(this).append("toolContentID: ", toolContentID)
+		.append("activeModule: ", activeModule).append("monitoredContentInUse: ", monitoredContentInUse)
+		.append("currentMonitoringTab: ", currentMonitoringTab).append("selectionCase: ", selectionCase)
+		.append("isToolSessionChanged: ", isToolSessionChanged).append("currentTab: ", currentTab)
+		.append("sbmtSuccess: ", sbmtSuccess).append("defineLaterInEditMode: ", defineLaterInEditMode)
+		.append("requestLearningReport: ", requestLearningReport)
+		.append("userExceptionNoToolSessions: ", userExceptionNoToolSessions)
+		.append("userExceptionContentDoesNotExist: ", userExceptionContentDoesNotExist)
+		.append("userExceptionNoStudentActivity: ", userExceptionNoStudentActivity)
+		.append("isMonitoredContentInUse: ", isMonitoredContentInUse).append("activityTitle: ", activityTitle)
+		.append("activityInstructions: ", activityInstructions)
+		.append("userExceptionContentInUse: ", userExceptionContentInUse)
+		.append("defaultOptionContent: ", defaultOptionContent).append("countAllUsers: ", countAllUsers)
+		.append("countSessionComplete: ", countSessionComplete)
+		.append("isPortfolioExport: ", isPortfolioExport).append("summaryToolSessions: ", summaryToolSessions)
+		.append("currentMonitoredToolSession: ", currentMonitoredToolSession).append("groupName: ", groupName)
+		.append("listMonitoredAnswersContainerDto: ", listMonitoredAnswersContainerDto)
+		.append("listUserEntries: ", listUserEntries).append("existsOpenMcs: ", existsOpenMcs)
+		.append("selectedToolSessionId: ", selectedToolSessionId)
+		.append("listMcAllSessionsDTO: ", listMcAllSessionsDTO)
+		.append("richTextOnlineInstructions: ", richTextOnlineInstructions)
+		.append("richTextOfflineInstructions: ", richTextOfflineInstructions)
+		.append("listOfflineFilesMetadata: ", listOfflineFilesMetadata)
+		.append("listUploadedOfflineFileNames: ", listUploadedOfflineFileNames)
+		.append("listOnlineFilesMetadata: ", listOnlineFilesMetadata)
+		.append("listUploadedOnlineFileNames: ", listUploadedOnlineFileNames)
+		.append("showOpenMcsSection: ", showOpenMcsSection).append("mapStudentsMcd: ", mapStudentsMcd)
+		.append("responseId: ", responseId).append("currentUid: ", currentUid)
+		.append("displayAnswers: ", displayAnswers).append("sessionUserCount: ", sessionUserCount)
+		.append("completedSessionUserCount: ", completedSessionUserCount)
+		.append("completedSessionUserPercent: ", completedSessionUserPercent).toString();
     }
 
-        /**
+    public int compareTo(Object o) {
+	McGeneralMonitoringDTO mcGeneralMonitoringDTO = (McGeneralMonitoringDTO) o;
+
+	if (mcGeneralMonitoringDTO == null)
+	    return 1;
+	else
+	    return 0;
+    }
+
+    /**
      * @return Returns the monitoredContentInUse.
      */
     public String getMonitoredContentInUse() {
-        return monitoredContentInUse;
+	return monitoredContentInUse;
     }
+
     /**
-     * @param monitoredContentInUse The monitoredContentInUse to set.
+     * @param monitoredContentInUse
+     *            The monitoredContentInUse to set.
      */
     public void setMonitoredContentInUse(String monitoredContentInUse) {
-        this.monitoredContentInUse = monitoredContentInUse;
+	this.monitoredContentInUse = monitoredContentInUse;
     }
-    
+
     /**
      * @return Returns the offlineInstructions.
      */
     public String getOfflineInstructions() {
-        return offlineInstructions;
+	return offlineInstructions;
     }
+
     /**
-     * @param offlineInstructions The offlineInstructions to set.
+     * @param offlineInstructions
+     *            The offlineInstructions to set.
      */
     public void setOfflineInstructions(String offlineInstructions) {
-        this.offlineInstructions = offlineInstructions;
+	this.offlineInstructions = offlineInstructions;
     }
+
     /**
      * @return Returns the onlineInstructions.
      */
     public String getOnlineInstructions() {
-        return onlineInstructions;
+	return onlineInstructions;
     }
+
     /**
-     * @param onlineInstructions The onlineInstructions to set.
+     * @param onlineInstructions
+     *            The onlineInstructions to set.
      */
     public void setOnlineInstructions(String onlineInstructions) {
-        this.onlineInstructions = onlineInstructions;
+	this.onlineInstructions = onlineInstructions;
     }
-    
+
     /**
      * @return Returns the attachmentList.
      */
     public List getAttachmentList() {
-        return attachmentList;
+	return attachmentList;
     }
+
     /**
-     * @param attachmentList The attachmentList to set.
+     * @param attachmentList
+     *            The attachmentList to set.
      */
     public void setAttachmentList(List attachmentList) {
-        this.attachmentList = attachmentList;
+	this.attachmentList = attachmentList;
     }
+
     /**
      * @return Returns the contentFolderID.
      */
     public String getContentFolderID() {
-        return contentFolderID;
+	return contentFolderID;
     }
+
     /**
-     * @param contentFolderID The contentFolderID to set.
+     * @param contentFolderID
+     *            The contentFolderID to set.
      */
     public void setContentFolderID(String contentFolderID) {
-        this.contentFolderID = contentFolderID;
+	this.contentFolderID = contentFolderID;
     }
+
     /**
      * @return Returns the deletedAttachmentList.
      */
     public List getDeletedAttachmentList() {
-        return deletedAttachmentList;
+	return deletedAttachmentList;
     }
+
     /**
-     * @param deletedAttachmentList The deletedAttachmentList to set.
+     * @param deletedAttachmentList
+     *            The deletedAttachmentList to set.
      */
     public void setDeletedAttachmentList(List deletedAttachmentList) {
-        this.deletedAttachmentList = deletedAttachmentList;
+	this.deletedAttachmentList = deletedAttachmentList;
     }
-    
+
     /**
      * @return Returns the defaultQuestionContent.
      */
     public String getDefaultQuestionContent() {
-        return defaultQuestionContent;
+	return defaultQuestionContent;
     }
+
     /**
-     * @param defaultQuestionContent The defaultQuestionContent to set.
+     * @param defaultQuestionContent
+     *            The defaultQuestionContent to set.
      */
     public void setDefaultQuestionContent(String defaultQuestionContent) {
-        this.defaultQuestionContent = defaultQuestionContent;
+	this.defaultQuestionContent = defaultQuestionContent;
     }
+
     /**
      * @return Returns the editResponse.
      */
     public String getEditResponse() {
-        return editResponse;
+	return editResponse;
     }
+
     /**
-     * @param editResponse The editResponse to set.
+     * @param editResponse
+     *            The editResponse to set.
      */
     public void setEditResponse(String editResponse) {
-        this.editResponse = editResponse;
+	this.editResponse = editResponse;
     }
+
     /**
      * @return Returns the mapQuestionContent.
      */
     public Map getMapQuestionContent() {
-        return mapQuestionContent;
+	return mapQuestionContent;
     }
+
     /**
-     * @param mapQuestionContent The mapQuestionContent to set.
+     * @param mapQuestionContent
+     *            The mapQuestionContent to set.
      */
     public void setMapQuestionContent(Map mapQuestionContent) {
-        this.mapQuestionContent = mapQuestionContent;
+	this.mapQuestionContent = mapQuestionContent;
     }
 }

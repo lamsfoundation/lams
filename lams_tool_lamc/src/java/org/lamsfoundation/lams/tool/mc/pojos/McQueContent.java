@@ -29,13 +29,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.log4j.Logger;
-
 
 /**
- * <p>Persistent  object/bean that defines the question content for the MCQ tool.
- * Provides accessors and mutators to get/set attributes
- * It maps to database table: tl_lamc11_que_content
+ * <p>
+ * Persistent object/bean that defines the question content for the MCQ tool. Provides accessors and mutators to get/set
+ * attributes It maps to database table: tl_lamc11_que_content
  * </p>
  * 
  * @author Ozgur Demirtas
@@ -53,18 +51,17 @@ public class McQueContent implements Serializable, Comparable {
 
     /** nullable persistent field */
     private Integer displayOrder;
-    
+
     private Integer mark;
-    
+
     private String feedback;
-    
-    
+
     /** non persistent field */
     private Long mcContentId;
-    
+
     /** persistent field */
     private org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent;
-    
+
     /** persistent field */
     private Set mcUsrAttempts;
 
@@ -72,261 +69,255 @@ public class McQueContent implements Serializable, Comparable {
     private Set mcOptionsContents;
 
     /** full constructor */
-    public McQueContent(Long mcQueContentId, String question, Integer displayOrder,  McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
-        this.mcQueContentId = mcQueContentId;
-        this.question = question;
-        this.displayOrder = displayOrder;
-        this.mcContent=mcContent;
-        this.mcUsrAttempts = mcUsrAttempts;
-        this.mcOptionsContents = mcOptionsContents;
-    }
-    
-    public McQueContent(String question, Integer displayOrder,  McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
-        this.question = question;
-        this.displayOrder = displayOrder;
-        this.mcContent=mcContent;
-        this.mcUsrAttempts = mcUsrAttempts;
-        this.mcOptionsContents = mcOptionsContents;
-    }
-    
-    public McQueContent(String question, Integer displayOrder, Integer mark, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
-        this.question = question;
-        this.displayOrder = displayOrder;
-        this.mark = mark;
-        this.mcContent=mcContent;
-        this.mcUsrAttempts = mcUsrAttempts;
-        this.mcOptionsContents = mcOptionsContents;
+    public McQueContent(Long mcQueContentId, String question, Integer displayOrder, McContent mcContent,
+	    Set mcUsrAttempts, Set mcOptionsContents) {
+	this.mcQueContentId = mcQueContentId;
+	this.question = question;
+	this.displayOrder = displayOrder;
+	this.mcContent = mcContent;
+	this.mcUsrAttempts = mcUsrAttempts;
+	this.mcOptionsContents = mcOptionsContents;
     }
 
-    
-    public McQueContent(String question, Integer displayOrder, String feedback, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
-        this.question = question;
-        this.displayOrder = displayOrder;
-        this.feedback = feedback;
-        this.mcContent=mcContent;
-        this.mcUsrAttempts = mcUsrAttempts;
-        this.mcOptionsContents = mcOptionsContents;
+    public McQueContent(String question, Integer displayOrder, McContent mcContent, Set mcUsrAttempts,
+	    Set mcOptionsContents) {
+	this.question = question;
+	this.displayOrder = displayOrder;
+	this.mcContent = mcContent;
+	this.mcUsrAttempts = mcUsrAttempts;
+	this.mcOptionsContents = mcOptionsContents;
     }
 
-    
-    public McQueContent(String question, Integer displayOrder, Integer mark, String feedback, McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
-        this.question = question;
-        this.displayOrder = displayOrder;
-        this.mark = mark;
-        this.feedback = feedback;
-        this.mcContent=mcContent;
-        this.mcUsrAttempts = mcUsrAttempts;
-        this.mcOptionsContents = mcOptionsContents;
+    public McQueContent(String question, Integer displayOrder, Integer mark, McContent mcContent, Set mcUsrAttempts,
+	    Set mcOptionsContents) {
+	this.question = question;
+	this.displayOrder = displayOrder;
+	this.mark = mark;
+	this.mcContent = mcContent;
+	this.mcUsrAttempts = mcUsrAttempts;
+	this.mcOptionsContents = mcOptionsContents;
     }
 
-    
-    
-    public McQueContent(Long mcQueContentId, String question, Integer displayOrder,  Set mcUsrAttempts, Set mcOptionsContents) {
-        this.mcQueContentId = mcQueContentId;
-        this.question = question;
-        this.displayOrder = displayOrder;
-        this.mcUsrAttempts = mcUsrAttempts;
-        this.mcOptionsContents = mcOptionsContents;
-    }
-    
-    public McQueContent(Long mcQueContentId, String question, Integer displayOrder, Integer mark, Set mcUsrAttempts, Set mcOptionsContents) {
-        this.mcQueContentId = mcQueContentId;
-        this.question = question;
-        this.displayOrder = displayOrder;
-        this.mark=mark;
-        this.mcUsrAttempts = mcUsrAttempts;
-        this.mcOptionsContents = mcOptionsContents;
+    public McQueContent(String question, Integer displayOrder, String feedback, McContent mcContent, Set mcUsrAttempts,
+	    Set mcOptionsContents) {
+	this.question = question;
+	this.displayOrder = displayOrder;
+	this.feedback = feedback;
+	this.mcContent = mcContent;
+	this.mcUsrAttempts = mcUsrAttempts;
+	this.mcOptionsContents = mcOptionsContents;
     }
 
-
-    
-    public McQueContent(String question, Integer displayOrder,  Set mcUsrAttempts, Set mcOptionsContents) {
-        this.question = question;
-        this.displayOrder = displayOrder;
-        this.mcUsrAttempts = mcUsrAttempts;
-        this.mcOptionsContents = mcOptionsContents;
+    public McQueContent(String question, Integer displayOrder, Integer mark, String feedback, McContent mcContent,
+	    Set mcUsrAttempts, Set mcOptionsContents) {
+	this.question = question;
+	this.displayOrder = displayOrder;
+	this.mark = mark;
+	this.feedback = feedback;
+	this.mcContent = mcContent;
+	this.mcUsrAttempts = mcUsrAttempts;
+	this.mcOptionsContents = mcOptionsContents;
     }
-    
-    
+
+    public McQueContent(Long mcQueContentId, String question, Integer displayOrder, Set mcUsrAttempts,
+	    Set mcOptionsContents) {
+	this.mcQueContentId = mcQueContentId;
+	this.question = question;
+	this.displayOrder = displayOrder;
+	this.mcUsrAttempts = mcUsrAttempts;
+	this.mcOptionsContents = mcOptionsContents;
+    }
+
+    public McQueContent(Long mcQueContentId, String question, Integer displayOrder, Integer mark, Set mcUsrAttempts,
+	    Set mcOptionsContents) {
+	this.mcQueContentId = mcQueContentId;
+	this.question = question;
+	this.displayOrder = displayOrder;
+	this.mark = mark;
+	this.mcUsrAttempts = mcUsrAttempts;
+	this.mcOptionsContents = mcOptionsContents;
+    }
+
+    public McQueContent(String question, Integer displayOrder, Set mcUsrAttempts, Set mcOptionsContents) {
+	this.question = question;
+	this.displayOrder = displayOrder;
+	this.mcUsrAttempts = mcUsrAttempts;
+	this.mcOptionsContents = mcOptionsContents;
+    }
 
     /** default constructor */
     public McQueContent() {
     }
 
     /** minimal constructor */
-    public McQueContent(Long mcQueContentId, org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent, Set mcUsrAttempts, Set mcOptionsContents) {
-        this.mcQueContentId = mcQueContentId;
-        this.mcContent = mcContent;
-        this.mcUsrAttempts = mcUsrAttempts;
-        this.mcOptionsContents = mcOptionsContents;
+    public McQueContent(Long mcQueContentId, org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent,
+	    Set mcUsrAttempts, Set mcOptionsContents) {
+	this.mcQueContentId = mcQueContentId;
+	this.mcContent = mcContent;
+	this.mcUsrAttempts = mcUsrAttempts;
+	this.mcOptionsContents = mcOptionsContents;
     }
-    
-    
+
     /**
-     *  gets called by copyToolContent
+     * gets called by copyToolContent
      * 
      * Copy constructor
-     * @param queContent the original qa question content
+     * 
+     * @param queContent
+     *            the original qa question content
      * @return the new qa question content object
      */
-    public static McQueContent newInstance(McQueContent queContent,
-    										McContent newMcContent)
-    										
+    public static McQueContent newInstance(McQueContent queContent, McContent newMcContent)
+
     {
-    	McQueContent newQueContent = new McQueContent(queContent.getQuestion(),
-													  queContent.getDisplayOrder(),
-													  queContent.getMark(),
-													  queContent.getFeedback(),
-													  newMcContent,
-                                                      new TreeSet(),
-                                                      new TreeSet());
-    	
-    	newQueContent.setMcOptionsContents(queContent.deepCopyMcOptionsContent(newQueContent));
-    	return newQueContent;
+	McQueContent newQueContent = new McQueContent(queContent.getQuestion(), queContent.getDisplayOrder(),
+		queContent.getMark(), queContent.getFeedback(), newMcContent, new TreeSet(), new TreeSet());
+
+	newQueContent.setMcOptionsContents(queContent.deepCopyMcOptionsContent(newQueContent));
+	return newQueContent;
     }
-    
-    
-    public Set deepCopyMcOptionsContent(McQueContent newQueContent)
-    {
-    	Set newMcOptionsContent = new TreeSet();
-        for (Iterator i = this.getMcOptionsContents().iterator(); i.hasNext();)
-        {
-            McOptsContent mcOptsContent = (McOptsContent) i.next();
-            McOptsContent mcNewOptsContent= McOptsContent.newInstance(mcOptsContent,newQueContent);
-            
-            if (mcNewOptsContent.getMcQueContent() != null)
-            {
-            	newMcOptionsContent.add(mcNewOptsContent);
-            }
-        }
-        return newMcOptionsContent;
+
+    public Set deepCopyMcOptionsContent(McQueContent newQueContent) {
+	Set newMcOptionsContent = new TreeSet();
+	for (Iterator i = this.getMcOptionsContents().iterator(); i.hasNext();) {
+	    McOptsContent mcOptsContent = (McOptsContent) i.next();
+	    McOptsContent mcNewOptsContent = McOptsContent.newInstance(mcOptsContent, newQueContent);
+
+	    if (mcNewOptsContent.getMcQueContent() != null) {
+		newMcOptionsContent.add(mcNewOptsContent);
+	    }
+	}
+	return newMcOptionsContent;
     }
-    
 
     public Long getUid() {
-        return this.uid;
+	return this.uid;
     }
 
     public void setUid(Long uid) {
-        this.uid = uid;
+	this.uid = uid;
     }
 
     public Long getMcQueContentId() {
-        return this.mcQueContentId;
+	return this.mcQueContentId;
     }
 
     public void setMcQueContentId(Long mcQueContentId) {
-        this.mcQueContentId = mcQueContentId;
+	this.mcQueContentId = mcQueContentId;
     }
 
     public String getQuestion() {
-        return this.question;
+	return this.question;
     }
 
     public void setQuestion(String question) {
-        this.question = question;
+	this.question = question;
     }
 
     public Integer getDisplayOrder() {
-        return this.displayOrder;
+	return this.displayOrder;
     }
 
     public void setDisplayOrder(Integer displayOrder) {
-        this.displayOrder = displayOrder;
+	this.displayOrder = displayOrder;
     }
 
     public org.lamsfoundation.lams.tool.mc.pojos.McContent getMcContent() {
-        return this.mcContent;
+	return this.mcContent;
     }
 
     public void setMcContent(org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent) {
-        this.mcContent = mcContent;
+	this.mcContent = mcContent;
     }
 
     public Set getMcUsrAttempts() {
-    	if (this.mcUsrAttempts == null)
-        	setMcUsrAttempts(new HashSet());
-        return this.mcUsrAttempts;
+	if (this.mcUsrAttempts == null)
+	    setMcUsrAttempts(new HashSet());
+	return this.mcUsrAttempts;
     }
 
-    
     public void setMcUsrAttempts(Set mcUsrAttempts) {
-        this.mcUsrAttempts = mcUsrAttempts;
+	this.mcUsrAttempts = mcUsrAttempts;
     }
 
-    
     public Set getMcOptionsContents() {
-    	if (this.mcOptionsContents == null)
-        	setMcOptionsContents(new HashSet());
-        return this.mcOptionsContents;
+	if (this.mcOptionsContents == null)
+	    setMcOptionsContents(new HashSet());
+	return this.mcOptionsContents;
     }
 
     public void setMcOptionsContents(Set mcOptionsContents) {
-        this.mcOptionsContents = mcOptionsContents;
+	this.mcOptionsContents = mcOptionsContents;
     }
 
-    /** Get an options content record by its uid. Iterates
-     * over the set from  getMcOptionsContents(). */
+    /**
+     * Get an options content record by its uid. Iterates over the set from getMcOptionsContents().
+     */
     public McOptsContent getOptionsContentByUID(Long uid) {
-    	Iterator iter = getMcOptionsContents().iterator();
-    	while (iter.hasNext()) {
-			McOptsContent elem = (McOptsContent) iter.next();
-			if ( elem.getUid().equals(uid))
-				return elem;
-		}
-    	return null;
+	Iterator iter = getMcOptionsContents().iterator();
+	while (iter.hasNext()) {
+	    McOptsContent elem = (McOptsContent) iter.next();
+	    if (elem.getUid().equals(uid))
+		return elem;
+	}
+	return null;
     }
-    
+
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("uid", getUid())
-            .toString();
+	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
-	
-	/**
-	 * @return Returns the mcContentId.
-	 */
-	public Long getMcContentId() {
-		return mcContentId;
-	}
-	/**
-	 * @param mcContentId The mcContentId to set.
-	 */
-	public void setMcContentId(Long mcContentId) {
-		this.mcContentId = mcContentId;
-	}
+
+    /**
+     * @return Returns the mcContentId.
+     */
+    public Long getMcContentId() {
+	return mcContentId;
+    }
+
+    /**
+     * @param mcContentId
+     *            The mcContentId to set.
+     */
+    public void setMcContentId(Long mcContentId) {
+	this.mcContentId = mcContentId;
+    }
+
     /**
      * @return Returns the feedback.
      */
     public String getFeedback() {
-        return feedback;
+	return feedback;
     }
+
     /**
-     * @param feedback The feedback to set.
+     * @param feedback
+     *            The feedback to set.
      */
     public void setFeedback(String feedback) {
-        this.feedback = feedback;
+	this.feedback = feedback;
     }
-	public int compareTo(Object o)
-    {
-        McQueContent queContent = (McQueContent) o;
-        //if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
-        if (mcQueContentId == null)
-        	return 1;
-		else
-			return (int) (mcQueContentId.longValue() - queContent.mcQueContentId.longValue());
+
+    public int compareTo(Object o) {
+	McQueContent queContent = (McQueContent) o;
+	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
+	if (mcQueContentId == null)
+	    return 1;
+	else
+	    return (int) (mcQueContentId.longValue() - queContent.mcQueContentId.longValue());
     }
-	
+
     /**
      * @return Returns the mark.
      */
     public Integer getMark() {
-        return mark;
+	return mark;
     }
+
     /**
-     * @param mark The mark to set.
+     * @param mark
+     *            The mark to set.
      */
     public void setMark(Integer mark) {
-        this.mark = mark;
+	this.mark = mark;
     }
 }

@@ -55,7 +55,6 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.EditActivityDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralAuthoringDTO;
@@ -85,74 +84,37 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * * @author Ozgur Demirtas
  * 
-   <!--Monitoring Main Action: interacts with the Monitoring module user -->
-   <action 	path="/monitoring" 
-   			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringAction" 
-   			name="McMonitoringForm" 
-	      	scope="request"
-   			input="/monitoring/MonitoringMaincontent.jsp"
-      		parameter="dispatch"
-      		unknown="false"
-      		validate="false"> 
-	      
-	  	<forward
-			name="loadMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="false"
-	  	/>
-
-	  	<forward
-		    name="loadMonitoringEditActivity"
-		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="false"
-	  	/>
-	
-	  	<forward
-			name="refreshMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="false"
-	  	/>
-
-
-        <forward
-          name="learnerNotebook"
-          path="/monitoring/LearnerNotebook.jsp"
-          redirect="false"
-        />
-
-
-	    <forward
-			name="newQuestionBox"
-			path="/monitoring/newQuestionBox.jsp"
-			redirect="false"
-	    />
-
-	    <forward
-			name="editQuestionBox"
-			path="/monitoring/editQuestionBox.jsp"
-			redirect="false"
-	    />
-	</action>  
+ * <!--Monitoring Main Action: interacts with the Monitoring module user --> <action path="/monitoring"
+ * type="org.lamsfoundation.lams.tool.mc.web.McMonitoringAction" name="McMonitoringForm" scope="request"
+ * input="/monitoring/MonitoringMaincontent.jsp" parameter="dispatch" unknown="false" validate="false">
  * 
-*/
-public class McMonitoringAction extends LamsDispatchAction implements McAppConstants
-{
-	static Logger logger= Logger.getLogger(McMonitoringAction.class.getName());
-	
-	 /** 
-	 * main content/question content management and workflow logic
-	 * 
-	*/
-    public ActionForward unspecified(ActionMapping mapping,
-                               ActionForm form,
-                               HttpServletRequest request,
-                               HttpServletResponse response) throws IOException,
-                                                            ServletException
-    {
-	 	return null;
+ * <forward name="loadMonitoring" path="/monitoring/MonitoringMaincontent.jsp" redirect="false" />
+ * 
+ * <forward name="loadMonitoringEditActivity" path="/monitoring/MonitoringMaincontent.jsp" redirect="false" />
+ * 
+ * <forward name="refreshMonitoring" path="/monitoring/MonitoringMaincontent.jsp" redirect="false" />
+ * 
+ * 
+ * <forward name="learnerNotebook" path="/monitoring/LearnerNotebook.jsp" redirect="false" />
+ * 
+ * 
+ * <forward name="newQuestionBox" path="/monitoring/newQuestionBox.jsp" redirect="false" />
+ * 
+ * <forward name="editQuestionBox" path="/monitoring/editQuestionBox.jsp" redirect="false" /> </action>
+ * 
+ */
+public class McMonitoringAction extends LamsDispatchAction implements McAppConstants {
+    static Logger logger = Logger.getLogger(McMonitoringAction.class.getName());
+
+    /**
+     * main content/question content management and workflow logic
+     * 
+     */
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	return null;
     }
 
-   
     /**
      * @param form
      * @param request
@@ -161,228 +123,197 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @throws IOException
      * @throws ServletException
      */
-    protected ActionForward commonSubmitSessionCode(McMonitoringForm mcMonitoringForm, HttpServletRequest request, ActionMapping mapping,
-    		IMcService mcService, McGeneralMonitoringDTO mcGeneralMonitoringDTO) throws IOException, ServletException
-    {
-    	
-		repopulateRequestParameters(request, mcMonitoringForm, mcGeneralMonitoringDTO);
+    protected ActionForward commonSubmitSessionCode(McMonitoringForm mcMonitoringForm, HttpServletRequest request,
+	    ActionMapping mapping, IMcService mcService, McGeneralMonitoringDTO mcGeneralMonitoringDTO)
+	    throws IOException, ServletException {
 
-	    String currentMonitoredToolSession=request.getParameter("monitoredToolSessionId");
-	    
-	    if (currentMonitoredToolSession == null)
-	    {
-	        //default to All
-	        currentMonitoredToolSession="All";
+	repopulateRequestParameters(request, mcMonitoringForm, mcGeneralMonitoringDTO);
+
+	String currentMonitoredToolSession = request.getParameter("monitoredToolSessionId");
+
+	if (currentMonitoredToolSession == null) {
+	    // default to All
+	    currentMonitoredToolSession = "All";
+	}
+
+	String toolContentID = mcMonitoringForm.getToolContentID();
+
+	McContent mcContent = mcService.retrieveMc(new Long(toolContentID));
+
+	if (currentMonitoredToolSession.equals("All")) {
+	    List listMcAllSessionsDTO = new LinkedList();
+	    // generate DTO for All sessions
+	    MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+
+	    mcGeneralMonitoringDTO.setSelectionCase(new Long(2));
+	    request.setAttribute(SELECTION_CASE, new Long(2));
+	} else {
+	    McSession mcSession = mcService.retrieveMcSession(new Long(currentMonitoredToolSession));
+
+	    MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+
+	    mcGeneralMonitoringDTO.setGroupName(mcSession.getSession_name());
+	    mcGeneralMonitoringDTO.setSelectionCase(new Long(1));
+	    request.setAttribute(SELECTION_CASE, new Long(1));
+	}
+
+	request.setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
+
+	mcGeneralMonitoringDTO.setCurrentMonitoredToolSession(currentMonitoredToolSession);
+	mcGeneralMonitoringDTO.setSbmtSuccess(new Boolean(false).toString());
+	mcGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
+
+	mcGeneralMonitoringDTO.setSummaryToolSessions(populateToolSessions(mcContent));
+	mcGeneralMonitoringDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
+
+	boolean isGroupedActivity = mcService.isGroupedActivity(new Long(toolContentID));
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
+
+	/* setting editable screen properties */
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
+	mcGeneralAuthoringDTO.setActivityInstructions(mcContent.getInstructions());
+
+	Map mapOptionsContent = new TreeMap(new McComparator());
+	Iterator queIterator = mcContent.getMcQueContents().iterator();
+	Long mapIndex = new Long(1);
+	while (queIterator.hasNext()) {
+	    McQueContent mcQueContent = (McQueContent) queIterator.next();
+	    if (mcQueContent != null) {
+		mapOptionsContent.put(mapIndex.toString(), mcQueContent.getQuestion());
+
+		mapIndex = new Long(mapIndex.longValue() + 1);
 	    }
-	    
-	    
-	    String toolContentID =mcMonitoringForm.getToolContentID();
-	    
-	    McContent mcContent=mcService.retrieveMc(new Long(toolContentID));
-		
-		if (currentMonitoredToolSession.equals("All"))
-	    {
-		    List listMcAllSessionsDTO = new LinkedList();
-		    //generate DTO for All sessions
-		    MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+	}
 
-		    mcGeneralMonitoringDTO.setSelectionCase(new Long(2));
-		    request.setAttribute(SELECTION_CASE, new Long(2));
+	int maxIndex = mapOptionsContent.size();
+
+	boolean isContentInUse = McUtils.isContentInUse(mcContent);
+	mcGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(false).toString());
+	if (isContentInUse == true) {
+	    // monitoring url does not allow editActivity since the content is in use
+	    mcGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(true).toString());
+	}
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	prepareReflectionData(request, mcContent, mcService, null, false, "All");
+
+	if (mcService.studentActivityOccurredGlobal(mcContent)) {
+	    // USER_EXCEPTION_NO_TOOL_SESSIONS is set to false
+	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
+	} else {
+	    // USER_EXCEPTION_NO_TOOL_SESSIONS is set to true
+	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
+	}
+
+	/** getting instructions screen content from here... */
+	mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
+	mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
+
+	List<McUploadedFile> attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
+	mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
+	mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
+	/** ...till here **/
+
+	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
+
+	EditActivityDTO editActivityDTO = new EditActivityDTO();
+	if (isContentInUse == true) {
+	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+	}
+	request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+
+	/* find out if there are any reflection entries, from here */
+	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(mcService, mcContent);
+
+	if (notebookEntriesExist) {
+	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+
+	    String userExceptionNoToolSessions = (String) mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+
+	    if (userExceptionNoToolSessions.equals("true")) {
+		// there are no online student activity but there are reflections
+		request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
 	    }
-	    else
-	    {
-		    McSession mcSession=mcService.retrieveMcSession(new Long(currentMonitoredToolSession));
-		    
-		    MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-		    
-		    mcGeneralMonitoringDTO.setGroupName(mcSession.getSession_name());
-		    mcGeneralMonitoringDTO.setSelectionCase(new Long(1));
-		    request.setAttribute(SELECTION_CASE, new Long(1));
-	    }
-		
-	    request.setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
+	} else {
+	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
+	}
+	/* ... till here */
 
-	    
-		mcGeneralMonitoringDTO.setCurrentMonitoredToolSession(currentMonitoredToolSession);
-	    mcGeneralMonitoringDTO.setSbmtSuccess(new Boolean(false).toString());
-	    mcGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
-	    
-		mcGeneralMonitoringDTO.setSummaryToolSessions(populateToolSessions(mcContent));
-		mcGeneralMonitoringDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
-		
-		boolean isGroupedActivity = mcService.isGroupedActivity(new Long(toolContentID));
-		request.setAttribute("isGroupedActivity", isGroupedActivity);
+	MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
 
-		/*setting editable screen properties*/
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
-		mcGeneralAuthoringDTO.setActivityInstructions(mcContent.getInstructions());
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
 
-		Map mapOptionsContent= new TreeMap(new McComparator());
-		Iterator queIterator=mcContent.getMcQueContents().iterator();
-		Long mapIndex=new Long(1);
-		while (queIterator.hasNext())
-		{
-			McQueContent mcQueContent=(McQueContent) queIterator.next();
-			if (mcQueContent != null)
-			{
-				mapOptionsContent.put(mapIndex.toString(),mcQueContent.getQuestion());
-	    		
-	    		mapIndex=new Long(mapIndex.longValue()+1);
-			}
-		}
-		
-	    int maxIndex=mapOptionsContent.size();
-		
-		boolean isContentInUse=McUtils.isContentInUse(mcContent);
-		mcGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(false).toString());
-		if (isContentInUse == true)
-		{
-			//monitoring url does not allow editActivity since the content is in use
-			mcGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(true).toString());
-		}
-
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-		
-		prepareReflectionData(request, mcContent, mcService, null, false, "All");
-
-		if (mcService.studentActivityOccurredGlobal(mcContent))
-		{
-			//USER_EXCEPTION_NO_TOOL_SESSIONS is set to false
-			mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
-		}
-		else
-		{
-			//USER_EXCEPTION_NO_TOOL_SESSIONS is set to true
-			mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
-		}
-		
-		/**getting instructions screen content from here... */
-		mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
-		mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
-		
-		List<McUploadedFile> attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
-        mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
-        mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-        /** ...till here **/
-
-
-		request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
-		
-    	EditActivityDTO editActivityDTO = new EditActivityDTO();
-		if (isContentInUse == true)
-		{
-		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
-		}
-		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
-	
-		
-		/*find out if there are any reflection entries, from here*/
-		boolean notebookEntriesExist=MonitoringUtil.notebookEntriesExist(mcService, mcContent);
-		
-		if (notebookEntriesExist)
-		{
-		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-		    
-		    String userExceptionNoToolSessions=(String)mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-		    
-		    if (userExceptionNoToolSessions.equals("true"))
-		    {
-		        //there are no online student activity but there are reflections
-		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-		    }
-		}
-		else
-		{
-		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
-		}
-		/* ... till here*/
-		
-		MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-        
-        return (mapping.findForward(LOAD_MONITORING_CONTENT));	
+	return (mapping.findForward(LOAD_MONITORING_CONTENT));
 
     }
-    
-	/**
-	 * Populates a sorted map of the tool session where the key is the mcSessionId and the value is name of the session.
-	 * If no sessions exists, there will be a single entry "None", otherwise on the end of the list will be the entry "All"
-	 */
-	public static Map<String,String> populateToolSessions(McContent mcContent)
-	{
-		Map<String, String> sessionsMap = new TreeMap<String, String>();
-		Iterator iter = mcContent.getMcSessions().iterator();
-		while (iter.hasNext()) {
-			McSession elem = (McSession) iter.next();
-			sessionsMap.put(elem.getMcSessionId().toString(), elem.getSession_name() );
-		}
 
-		if (sessionsMap.isEmpty())
-		{
-        	sessionsMap.put("None", "None");
-		}
-    	else
-    	{
-    		sessionsMap.put("All" , "All");	
-    	}
- 
-
-		return sessionsMap;
-
+    /**
+     * Populates a sorted map of the tool session where the key is the mcSessionId and the value is name of the session.
+     * If no sessions exists, there will be a single entry "None", otherwise on the end of the list will be the entry
+     * "All"
+     */
+    public static Map<String, String> populateToolSessions(McContent mcContent) {
+	Map<String, String> sessionsMap = new TreeMap<String, String>();
+	Iterator iter = mcContent.getMcSessions().iterator();
+	while (iter.hasNext()) {
+	    McSession elem = (McSession) iter.next();
+	    sessionsMap.put(elem.getMcSessionId().toString(), elem.getSession_name());
 	}
 
-	/**
-	 * 
-	 * submitSession
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws IOException
-	 * @throws ServletException
-	 */
-    public ActionForward submitSession(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) 
-    		throws IOException,ServletException
-	{
-        IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-        String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-        McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-        mcContent.setDisplayAnswers(new Boolean(true));
-        return commonSubmitSessionCode((McMonitoringForm) form, request, mapping, mcService, new McGeneralMonitoringDTO() );
+	if (sessionsMap.isEmpty()) {
+	    sessionsMap.put("None", "None");
+	} else {
+	    sessionsMap.put("All", "All");
 	}
 
-	/**
-	 * displayAnswers
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws IOException
-	 * @throws ServletException
-	 */
-    public ActionForward displayAnswers(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) 
-    		throws IOException,ServletException
-	{
-        IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-        String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-        McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-        mcContent.setDisplayAnswers(new Boolean(true));
-        return commonSubmitSessionCode((McMonitoringForm) form, request, mapping, mcService, new McGeneralMonitoringDTO() );
-	}
-    
-    
+	return sessionsMap;
+
+    }
+
+    /**
+     * 
+     * submitSession
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward submitSession(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+	mcContent.setDisplayAnswers(new Boolean(true));
+	return commonSubmitSessionCode((McMonitoringForm) form, request, mapping, mcService,
+		new McGeneralMonitoringDTO());
+    }
+
+    /**
+     * displayAnswers
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward displayAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+	mcContent.setDisplayAnswers(new Boolean(true));
+	return commonSubmitSessionCode((McMonitoringForm) form, request, mapping, mcService,
+		new McGeneralMonitoringDTO());
+    }
 
     /**
      * editActivityQuestions
@@ -398,426 +329,370 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @throws ServletException
      * @throws ToolException
      */
-    public ActionForward editActivityQuestions(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws IOException,
-                                         ServletException,
-                                         ToolException
-    {
-    	
-    	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-		
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
+    public ActionForward editActivityQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, ToolException {
 
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
 
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-		
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
-		//String defaultContentIdStr=request.getParameter(DEFAULT_CONTENT_ID_STR);
-		
-		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-		
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
-        mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
-        mcAuthoringForm.setTitle(mcContent.getTitle());
-        
-        mcGeneralAuthoringDTO.setActivityInstructions(mcContent.getInstructions());
-        		
-		/* determine whether the request is from Monitoring url Edit Activity*/
-		String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-		mcAuthoringForm.setDefineLaterInEditMode(new Boolean(true).toString());
-     	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-     	
-		boolean isContentInUse=McUtils.isContentInUse(mcContent);
-		
-		mcGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(false).toString());
-		if (isContentInUse == true)
-		{
-			//monitoring url does not allow editActivity since the content is in use
-	    	persistError(request,"error.content.inUse");
-	    	mcGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(true).toString());
-		}
-		
-	    EditActivityDTO editActivityDTO = new EditActivityDTO();
-		if (isContentInUse == true)
-		{
-		    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
-		}
-		request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
 
-		McUtils.setDefineLater(request, true, strToolContentID, mcService);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
 
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+	String activeModule = request.getParameter(ACTIVE_MODULE);
 
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	// String defaultContentIdStr=request.getParameter(DEFAULT_CONTENT_ID_STR);
 
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setCurrentTab("3");
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
 
-		
-	    AuthoringUtil authoringUtil= new AuthoringUtil();
-	    List listQuestionContentDTO=authoringUtil.buildDefaultQuestionContent(mcContent, mcService);
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
-	    request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-		request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-		sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
+	mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
+	mcAuthoringForm.setTitle(mcContent.getTitle());
 
-		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-		request.getSession().setAttribute(httpSessionID, sessionMap);
+	mcGeneralAuthoringDTO.setActivityInstructions(mcContent.getInstructions());
 
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
+	/* determine whether the request is from Monitoring url Edit Activity */
+	String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
 
-	    
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-	    
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-		
-		
-		
-		/*setting up USER_EXCEPTION_NO_TOOL_SESSIONS, from here */
-		McGeneralMonitoringDTO mcGeneralMonitoringDTO= new McGeneralMonitoringDTO();
-		mcGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-		
-		if (mcService.studentActivityOccurredGlobal(mcContent))
-		{
-			mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
-		}
-		else
-		{
-			mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
-		}
-		
-		
-		mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
-		mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
-		
-		List<McUploadedFile> attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
-        mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
-        mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-        
+	mcAuthoringForm.setDefineLaterInEditMode(new Boolean(true).toString());
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
-		request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
-		/*.. till here*/
-		
-		
-		/*find out if there are any reflection entries, from here*/
-		boolean notebookEntriesExist=MonitoringUtil.notebookEntriesExist(mcService, mcContent);
-		
-		if (notebookEntriesExist)
-		{
-		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-		    
-		    String userExceptionNoToolSessions=(String)mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-		    
-		    if (userExceptionNoToolSessions.equals("true"))
-		    {
-		        //there are no online student activity but there are reflections
-		        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-		    }
-		}
-		else
-		{
-		    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
-		}
-		/* ... till here*/
-		MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
-		MonitoringUtil.generateGroupsSessionData(request, mcService, mcContent);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-		
+	boolean isContentInUse = McUtils.isContentInUse(mcContent);
 
-		return mapping.findForward(LOAD_MONITORING_CONTENT); 
-    } 
-    
-    
+	mcGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(false).toString());
+	if (isContentInUse == true) {
+	    // monitoring url does not allow editActivity since the content is in use
+	    persistError(request, "error.content.inUse");
+	    mcGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(true).toString());
+	}
+
+	EditActivityDTO editActivityDTO = new EditActivityDTO();
+	if (isContentInUse == true) {
+	    editActivityDTO.setMonitoredContentInUse(new Boolean(true).toString());
+	}
+	request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
+
+	McUtils.setDefineLater(request, true, strToolContentID, mcService);
+
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setCurrentTab("3");
+
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+	List listQuestionContentDTO = authoringUtil.buildDefaultQuestionContent(mcContent, mcService);
+
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
+
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	/* setting up USER_EXCEPTION_NO_TOOL_SESSIONS, from here */
+	McGeneralMonitoringDTO mcGeneralMonitoringDTO = new McGeneralMonitoringDTO();
+	mcGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+	if (mcService.studentActivityOccurredGlobal(mcContent)) {
+	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
+	} else {
+	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
+	}
+
+	mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
+	mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
+
+	List<McUploadedFile> attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
+	mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
+	mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
+
+	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
+	/* .. till here */
+
+	/* find out if there are any reflection entries, from here */
+	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(mcService, mcContent);
+
+	if (notebookEntriesExist) {
+	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+
+	    String userExceptionNoToolSessions = (String) mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+
+	    if (userExceptionNoToolSessions.equals("true")) {
+		// there are no online student activity but there are reflections
+		request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+	    }
+	} else {
+	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
+	}
+	/* ... till here */
+	MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
+	MonitoringUtil.generateGroupsSessionData(request, mcService, mcContent);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+
+	return mapping.findForward(LOAD_MONITORING_CONTENT);
+    }
 
     /**
      * persists error messages to request scope
+     * 
      * @param request
      * @param message
      */
-    public void persistError(HttpServletRequest request, String message)
-	{
-		ActionMessages errors= new ActionMessages();
-		errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-		saveErrors(request,errors);	    	    
-	}
-    
-    
-
-    
-    
-    /**
-     * 
-        submits content into the tool database
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-        throws IOException, ServletException {
-    	
-    	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-		
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
-
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
-		
-        List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
-        
-        Map mapQuestionContent=AuthoringUtil.extractMapQuestionContent(listQuestionContentDTO);
-         
-        Map mapFeedback=AuthoringUtil.extractMapFeedback(listQuestionContentDTO);
-        
-        Map mapWeights=new TreeMap(new McComparator());
-
-	    String totalMarks=request.getParameter("totalMarks");
-
-        Map mapMarks=AuthoringUtil.extractMapMarks(listQuestionContentDTO);
-
-        Map mapCandidatesList=AuthoringUtil.extractMapCandidatesList(listQuestionContentDTO);
-        
-        ActionMessages errors = new ActionMessages();
-        
-        if (mapQuestionContent.size() == 0)
-        {
-            ActionMessage error = new ActionMessage("questions.none.submitted");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-        }
-	    
-	    AuthoringUtil authoringUtil= new AuthoringUtil();
-	 	
-	 	McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-	 	
-        if (activeModule.equals(AUTHORING))
-        {
-    		List attachmentListBackup= new  ArrayList();
-            List attachmentList=(List)sessionMap.get(ATTACHMENT_LIST_KEY);
-    	    attachmentListBackup=attachmentList;
-    	    
-    	    List deletedAttachmentListBackup= new  ArrayList();
-    	    List deletedAttachmentList=(List)sessionMap.get(DELETED_ATTACHMENT_LIST_KEY);
-    	    deletedAttachmentListBackup=deletedAttachmentList;
-    	    
-            String onlineInstructions=(String)sessionMap.get(ONLINE_INSTRUCTIONS_KEY);
-    	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-
-            String offlineInstructions=(String)sessionMap.get(OFFLINE_INSTRUCTIONS_KEY);
-    	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
-
-    	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
-    		mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
-    		
-    		String strOnlineInstructions= request.getParameter("onlineInstructions");
-    		String strOfflineInstructions= request.getParameter("offlineInstructions");
-    		mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
-    		mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
-
-        }
-	 	
-	 	
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-		
-	 	String richTextTitle = request.getParameter(TITLE);
-        String richTextInstructions = request.getParameter(INSTRUCTIONS);
-        
-        mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-        mcAuthoringForm.setTitle(richTextTitle);
-        
-        mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-        
-        sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
-        sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-        
-	    mcGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
-        McContent mcContentTest=mcService.retrieveMc(new Long(strToolContentID));
-	 	if(!errors.isEmpty()){
-			saveErrors(request, errors);
-	        logger.debug("errors saved: " + errors);
-		}
-	 	
-	 	McGeneralMonitoringDTO mcGeneralMonitoringDTO= new McGeneralMonitoringDTO();
-
-	 	McContent mcContent=mcContentTest;
-	 	if(errors.isEmpty()){
-	        authoringUtil.removeRedundantQuestions(mapQuestionContent, mcService, mcAuthoringForm, request, strToolContentID);
-
-	        mcContent=authoringUtil.saveOrUpdateMcContent(mapQuestionContent, mapFeedback, mapWeights, 
-	                mapMarks, mapCandidatesList, mcService, mcAuthoringForm, request, mcContentTest, strToolContentID);
-	        
-	        
-	        long defaultContentID=0;
-	        defaultContentID=mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
-			
-	        if (mcContent != null)
-	        {
-	            mcGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
-	        }
-			
-		    authoringUtil.reOrganizeDisplayOrder(mapQuestionContent, mcService, mcAuthoringForm, mcContent);
-
-	        McUtils.setDefineLater(request, false, strToolContentID, mcService);
-	        //define later set to false
-	        
-			McUtils.setFormProperties(request, mcService,  
-		             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-
-		    //go back to view only screen
-		    mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
-		    mcGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
-	 	}
-	 	else
-	 	{
-	 	   //errors is not empty
-	 	   
-	 	   if (mcContent != null)
-	 	   {
-		        long defaultContentID=0;
-		        defaultContentID=mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
-				
-		        if (mcContent != null)
-		        {
-		            mcGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
-		        }
-
-				McUtils.setFormProperties(request, mcService, 
-			             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-
-				mcGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());				
-	 	   }
-	 	}
-    	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
-	 	
-
-        mcGeneralAuthoringDTO.setSbmtSuccess(new Integer(1).toString());
-        
-        mcAuthoringForm.resetUserAction();
-        mcGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
-        
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
-	    
-	    
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-
-	    
-
-		request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-		sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    request.getSession().setAttribute(httpSessionID, sessionMap);
-	    
-	    request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-	    
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-	    
-	    
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
-
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
-		
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setCurrentTab("3");
-		
-		
-		/*common screen data*/
-    	if (mcService.studentActivityOccurredGlobal(mcContent))
-    	{
-    		mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
-    	}
-    	else
-    	{
-    		mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
-    	}
-    	
-    	
-    	mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
-    	mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
-    	
-        List<McUploadedFile> attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
-        mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
-        mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-        
-
-    	/*find out if there are any reflection entries, from here*/
-    	boolean notebookEntriesExist=MonitoringUtil.notebookEntriesExist(mcService, mcContent);
-    	
-    	if (notebookEntriesExist)
-    	{
-    	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-    	    
-    	    String userExceptionNoToolSessions=(String)mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-    	    
-    	    if (userExceptionNoToolSessions.equals("true"))
-    	    {
-    	        //there are no online student activity but there are reflections
-    	        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-    	    }
-    	}
-    	else
-    	{
-    	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
-    	}
-    	/* ... till here*/
-		MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
-    	MonitoringUtil.generateGroupsSessionData(request, mcService, mcContent);
- 
-    	MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-
-		
-        return mapping.findForward(LOAD_MONITORING);
+    public void persistError(HttpServletRequest request, String message) {
+	ActionMessages errors = new ActionMessages();
+	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
+	saveErrors(request, errors);
     }
 
-    
+    /**
+     * 
+     submits content into the tool database
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
+
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
+
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
+
+	String activeModule = request.getParameter(ACTIVE_MODULE);
+
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+
+	Map mapQuestionContent = AuthoringUtil.extractMapQuestionContent(listQuestionContentDTO);
+
+	Map mapFeedback = AuthoringUtil.extractMapFeedback(listQuestionContentDTO);
+
+	Map mapWeights = new TreeMap(new McComparator());
+
+	String totalMarks = request.getParameter("totalMarks");
+
+	Map mapMarks = AuthoringUtil.extractMapMarks(listQuestionContentDTO);
+
+	Map mapCandidatesList = AuthoringUtil.extractMapCandidatesList(listQuestionContentDTO);
+
+	ActionMessages errors = new ActionMessages();
+
+	if (mapQuestionContent.size() == 0) {
+	    ActionMessage error = new ActionMessage("questions.none.submitted");
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	}
+
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+
+	if (activeModule.equals(AUTHORING)) {
+	    List attachmentListBackup = new ArrayList();
+	    List attachmentList = (List) sessionMap.get(ATTACHMENT_LIST_KEY);
+	    attachmentListBackup = attachmentList;
+
+	    List deletedAttachmentListBackup = new ArrayList();
+	    List deletedAttachmentList = (List) sessionMap.get(DELETED_ATTACHMENT_LIST_KEY);
+	    deletedAttachmentListBackup = deletedAttachmentList;
+
+	    String onlineInstructions = (String) sessionMap.get(ONLINE_INSTRUCTIONS_KEY);
+	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
+
+	    String offlineInstructions = (String) sessionMap.get(OFFLINE_INSTRUCTIONS_KEY);
+	    mcGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
+
+	    mcGeneralAuthoringDTO.setAttachmentList(attachmentList);
+	    mcGeneralAuthoringDTO.setDeletedAttachmentList(deletedAttachmentList);
+
+	    String strOnlineInstructions = request.getParameter("onlineInstructions");
+	    String strOfflineInstructions = request.getParameter("offlineInstructions");
+	    mcAuthoringForm.setOfflineInstructions(strOfflineInstructions);
+	    mcAuthoringForm.setOnlineInstructions(strOnlineInstructions);
+
+	}
+
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+
+	String richTextTitle = request.getParameter(TITLE);
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
+
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
+
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+
+	sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
+	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
+
+	mcGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	McContent mcContentTest = mcService.retrieveMc(new Long(strToolContentID));
+	if (!errors.isEmpty()) {
+	    saveErrors(request, errors);
+	    logger.debug("errors saved: " + errors);
+	}
+
+	McGeneralMonitoringDTO mcGeneralMonitoringDTO = new McGeneralMonitoringDTO();
+
+	McContent mcContent = mcContentTest;
+	if (errors.isEmpty()) {
+	    authoringUtil.removeRedundantQuestions(mapQuestionContent, mcService, mcAuthoringForm, request,
+		    strToolContentID);
+
+	    mcContent = authoringUtil.saveOrUpdateMcContent(mapQuestionContent, mapFeedback, mapWeights, mapMarks,
+		    mapCandidatesList, mcService, mcAuthoringForm, request, mcContentTest, strToolContentID);
+
+	    long defaultContentID = 0;
+	    defaultContentID = mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+
+	    if (mcContent != null) {
+		mcGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
+	    }
+
+	    authoringUtil.reOrganizeDisplayOrder(mapQuestionContent, mcService, mcAuthoringForm, mcContent);
+
+	    McUtils.setDefineLater(request, false, strToolContentID, mcService);
+	    // define later set to false
+
+	    McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		    defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+	    // go back to view only screen
+	    mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
+	    mcGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
+	} else {
+	    // errors is not empty
+
+	    if (mcContent != null) {
+		long defaultContentID = 0;
+		defaultContentID = mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
+
+		if (mcContent != null) {
+		    mcGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
+		}
+
+		McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+			defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+		mcGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+	    }
+	}
+	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
+
+	mcGeneralAuthoringDTO.setSbmtSuccess(new Integer(1).toString());
+
+	mcAuthoringForm.resetUserAction();
+	mcGeneralAuthoringDTO.setMapQuestionContent(mapQuestionContent);
+
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setCurrentTab("3");
+
+	/* common screen data */
+	if (mcService.studentActivityOccurredGlobal(mcContent)) {
+	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
+	} else {
+	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
+	}
+
+	mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
+	mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
+
+	List<McUploadedFile> attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
+	mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
+	mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
+
+	/* find out if there are any reflection entries, from here */
+	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(mcService, mcContent);
+
+	if (notebookEntriesExist) {
+	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+
+	    String userExceptionNoToolSessions = (String) mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+
+	    if (userExceptionNoToolSessions.equals("true")) {
+		// there are no online student activity but there are reflections
+		request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+	    }
+	} else {
+	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
+	}
+	/* ... till here */
+	MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
+	MonitoringUtil.generateGroupsSessionData(request, mcService, mcContent);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+
+	return mapping.findForward(LOAD_MONITORING);
+    }
+
     /**
      * 
      * @param mapping
@@ -828,458 +703,400 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @throws IOException
      * @throws ServletException
      */
-	public ActionForward saveSingleQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException {
-		
-		McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-	
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
-	
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();;
-		String editQuestionBoxRequest=request.getParameter("editQuestionBoxRequest");
-	    String totalMarks=request.getParameter("totalMarks");
-		String mark=request.getParameter("mark");
-		String passmark=request.getParameter("passmark");
-		
-		AuthoringUtil authoringUtil = new AuthoringUtil();
-	    List caList=authoringUtil.repopulateCandidateAnswersBox(request, false);
-	    
-	    caList=AuthoringUtil.removeBlankEntries(caList);
-	    
+    public ActionForward saveSingleQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
 
-		boolean validateSingleCorrectCandidate=authoringUtil.validateSingleCorrectCandidate(caList);
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
 
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
 
-		boolean validateOnlyOneCorrectCandidate=authoringUtil.validateOnlyOneCorrectCandidate(caList);
+	String activeModule = request.getParameter(ACTIVE_MODULE);
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	;
+	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
+	String totalMarks = request.getParameter("totalMarks");
+	String mark = request.getParameter("mark");
+	String passmark = request.getParameter("passmark");
 
-	    
-	    
-        ActionMessages errors = new ActionMessages();
-        
-        
-        if (!validateSingleCorrectCandidate)
-        {
-            ActionMessage error = new ActionMessage("candidates.none.correct");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-        }
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
 
-        if (!validateOnlyOneCorrectCandidate)
-        {
-            ActionMessage error = new ActionMessage("candidates.duplicate.correct");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-        }
-        
+	caList = AuthoringUtil.removeBlankEntries(caList);
 
-	 	if(!errors.isEmpty()){
-			saveErrors(request, errors);
-	        logger.debug("errors saved: " + errors);
-		}
+	boolean validateSingleCorrectCandidate = authoringUtil.validateSingleCorrectCandidate(caList);
 
-        List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
-		
-        McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
+	boolean validateOnlyOneCorrectCandidate = authoringUtil.validateOnlyOneCorrectCandidate(caList);
 
-	    mcGeneralAuthoringDTO.setMarkValue(mark);
-	    mcGeneralAuthoringDTO.setPassMarkValue(passmark);
+	ActionMessages errors = new ActionMessages();
 
-	    McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-
-	    
-	 	if(errors.isEmpty())
-	 	{
-	       //errors is empty
-			mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-			
-			mcGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
-			
-		    String newQuestion=request.getParameter("newQuestion");
-		    String feedback=request.getParameter("feedback");
-		    
-		    String editableQuestionIndex=request.getParameter("editableQuestionIndex");
-		    mcAuthoringForm.setQuestionIndex(editableQuestionIndex);
-		    
-
-		    if ((newQuestion != null) && (newQuestion.length() > 0))
-		    {
-			        if ((editQuestionBoxRequest != null) && (editQuestionBoxRequest.equals("false")))
-			        {
-				        boolean duplicates=AuthoringUtil.checkDuplicateQuestions(listQuestionContentDTO, newQuestion);
-				        if (!duplicates)
-				        {
-						    McQuestionContentDTO mcQuestionContentDTO= null;
-						    Iterator listIterator=listQuestionContentDTO.iterator();
-						    while (listIterator.hasNext())
-						    {
-						        mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-						        
-						        String question=mcQuestionContentDTO.getQuestion();
-						        String displayOrder=mcQuestionContentDTO.getDisplayOrder();
-						        
-						        if ((displayOrder != null) && (!displayOrder.equals("")))
-					    		{
-						            if (displayOrder.equals(editableQuestionIndex))
-						            {
-						                break;
-						            }
-						            
-					    		}
-						    }
-						    
-						    mcQuestionContentDTO.setQuestion(newQuestion);
-						    mcQuestionContentDTO.setFeedback(feedback);
-						    mcQuestionContentDTO.setDisplayOrder(editableQuestionIndex);
-						    mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
-						    mcQuestionContentDTO.setMark(mark);
-						    
-						    mcQuestionContentDTO.setCaCount(new Integer(mcQuestionContentDTO.getListCandidateAnswersDTO().size()).toString());
-						    
-						    
-						    listQuestionContentDTO=AuthoringUtil.reorderUpdateListQuestionContentDTO(listQuestionContentDTO, mcQuestionContentDTO, editableQuestionIndex);
-				        }
-				        else
-				        {
-				            //duplicate question entry, not adding
-				        }
-			        }
-				    else
-				    {
-				        	//request for edit and save
-						    McQuestionContentDTO mcQuestionContentDTO= null;
-						    Iterator listIterator=listQuestionContentDTO.iterator();
-						    while (listIterator.hasNext())
-						    {
-						        mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-						        
-						        String question=mcQuestionContentDTO.getQuestion();
-						        String displayOrder=mcQuestionContentDTO.getDisplayOrder();
-						        
-						        if ((displayOrder != null) && (!displayOrder.equals("")))
-					    		{
-						            if (displayOrder.equals(editableQuestionIndex))
-						            {
-						                break;
-						            }
-						            
-					    		}
-						    }
-						    
-						    mcQuestionContentDTO.setQuestion(newQuestion);
-						    mcQuestionContentDTO.setFeedback(feedback);
-						    mcQuestionContentDTO.setDisplayOrder(editableQuestionIndex);
-						    mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
-						    mcQuestionContentDTO.setMark(mark);
-						    
-						    mcQuestionContentDTO.setCaCount(new Integer(mcQuestionContentDTO.getListCandidateAnswersDTO().size()).toString());
-						    
-						    listQuestionContentDTO=AuthoringUtil.reorderUpdateListQuestionContentDTO(listQuestionContentDTO, mcQuestionContentDTO, editableQuestionIndex);
-				  }
-		    }
-	        else
-	        {
-	            //entry blank, not adding
-	        }
-		    
-		    mcGeneralAuthoringDTO.setMarkValue(mark);
-		    
-		    
-		    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-			sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-
-		    commonSaveCode(request, mcGeneralAuthoringDTO, 
-	        mcAuthoringForm, sessionMap, activeModule, strToolContentID, 
-	        defaultContentIdStr,  mcService, httpSessionID,listQuestionContentDTO);
-
-		    request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-		    
-		    setupCommonScreenData(mcContent, mcService,request);
-		    MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-
-		    
-		    return (mapping.findForward(LOAD_MONITORING));
-	 	}
-	 	else
-	 	{
-	        //errors is not empty
-		    commonSaveCode(request, mcGeneralAuthoringDTO, 
-			        mcAuthoringForm, sessionMap, activeModule, strToolContentID, 
-			        defaultContentIdStr,  mcService, httpSessionID,listQuestionContentDTO);
-
-		    
-		    
-		    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-		    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-		    
-	        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	        mcAuthoringForm.setTotalMarks(totalMark);
-	        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
-		    		    
-	    	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
-	        
-		    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-			sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-		    
-		    setupCommonScreenData(mcContent, mcService,request);
-		    MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-
-		    request.setAttribute("requestNewEditableQuestionBox",new Boolean(true).toString());
-		    
-			return newEditableQuestionBox(mapping, form,  request, response);
-	 	}
-
+	if (!validateSingleCorrectCandidate) {
+	    ActionMessage error = new ActionMessage("candidates.none.correct");
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 	}
 
-	
-	/**
-	 * 
-	 * @param request
-	 * @param mcGeneralAuthoringDTO
-	 * @param mcAuthoringForm
-	 * @param sessionMap
-	 * @param activeModule
-	 * @param strToolContentID
-	 * @param defaultContentIdStr
-	 * @param mcService
-	 * @param httpSessionID
-	 * @param listQuestionContentDTO
-	 */
-	protected void commonSaveCode(HttpServletRequest request, McGeneralAuthoringDTO mcGeneralAuthoringDTO, 
-	        McAuthoringForm mcAuthoringForm, SessionMap sessionMap, String activeModule, String strToolContentID, 
-	        String defaultContentIdStr, IMcService mcService, String httpSessionID, List listQuestionContentDTO)
-	{
-		String richTextTitle = request.getParameter(TITLE);
-	    String richTextInstructions = request.getParameter(INSTRUCTIONS);
+	if (!validateOnlyOneCorrectCandidate) {
+	    ActionMessage error = new ActionMessage("candidates.duplicate.correct");
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	}
 
-	    mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	    mcAuthoringForm.setTitle(richTextTitle);
-	    
-		mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-			
-	    sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
-	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
+	if (!errors.isEmpty()) {
+	    saveErrors(request, errors);
+	    logger.debug("errors saved: " + errors);
+	}
 
-	    mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-	    
-	    request.getSession().setAttribute(httpSessionID, sessionMap);
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+
+	mcGeneralAuthoringDTO.setMarkValue(mark);
+	mcGeneralAuthoringDTO.setPassMarkValue(passmark);
+
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+
+	if (errors.isEmpty()) {
+	    // errors is empty
+	    mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+
+	    mcGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
+
+	    String newQuestion = request.getParameter("newQuestion");
+	    String feedback = request.getParameter("feedback");
+
+	    String editableQuestionIndex = request.getParameter("editableQuestionIndex");
+	    mcAuthoringForm.setQuestionIndex(editableQuestionIndex);
+
+	    if ((newQuestion != null) && (newQuestion.length() > 0)) {
+		if ((editQuestionBoxRequest != null) && (editQuestionBoxRequest.equals("false"))) {
+		    boolean duplicates = AuthoringUtil.checkDuplicateQuestions(listQuestionContentDTO, newQuestion);
+		    if (!duplicates) {
+			McQuestionContentDTO mcQuestionContentDTO = null;
+			Iterator listIterator = listQuestionContentDTO.iterator();
+			while (listIterator.hasNext()) {
+			    mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
+
+			    String question = mcQuestionContentDTO.getQuestion();
+			    String displayOrder = mcQuestionContentDTO.getDisplayOrder();
+
+			    if ((displayOrder != null) && (!displayOrder.equals(""))) {
+				if (displayOrder.equals(editableQuestionIndex)) {
+				    break;
+				}
+
+			    }
+			}
+
+			mcQuestionContentDTO.setQuestion(newQuestion);
+			mcQuestionContentDTO.setFeedback(feedback);
+			mcQuestionContentDTO.setDisplayOrder(editableQuestionIndex);
+			mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
+			mcQuestionContentDTO.setMark(mark);
+
+			mcQuestionContentDTO.setCaCount(new Integer(mcQuestionContentDTO.getListCandidateAnswersDTO()
+				.size()).toString());
+
+			listQuestionContentDTO = AuthoringUtil.reorderUpdateListQuestionContentDTO(
+				listQuestionContentDTO, mcQuestionContentDTO, editableQuestionIndex);
+		    } else {
+			// duplicate question entry, not adding
+		    }
+		} else {
+		    // request for edit and save
+		    McQuestionContentDTO mcQuestionContentDTO = null;
+		    Iterator listIterator = listQuestionContentDTO.iterator();
+		    while (listIterator.hasNext()) {
+			mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
+
+			String question = mcQuestionContentDTO.getQuestion();
+			String displayOrder = mcQuestionContentDTO.getDisplayOrder();
+
+			if ((displayOrder != null) && (!displayOrder.equals(""))) {
+			    if (displayOrder.equals(editableQuestionIndex)) {
+				break;
+			    }
+
+			}
+		    }
+
+		    mcQuestionContentDTO.setQuestion(newQuestion);
+		    mcQuestionContentDTO.setFeedback(feedback);
+		    mcQuestionContentDTO.setDisplayOrder(editableQuestionIndex);
+		    mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
+		    mcQuestionContentDTO.setMark(mark);
+
+		    mcQuestionContentDTO.setCaCount(new Integer(mcQuestionContentDTO.getListCandidateAnswersDTO()
+			    .size()).toString());
+
+		    listQuestionContentDTO = AuthoringUtil.reorderUpdateListQuestionContentDTO(listQuestionContentDTO,
+			    mcQuestionContentDTO, editableQuestionIndex);
+		}
+	    } else {
+		// entry blank, not adding
+	    }
+
+	    mcGeneralAuthoringDTO.setMarkValue(mark);
+
+	    request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
 	    sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
 
-		
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setCurrentTab("3");
-	 	
-		mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-
-		
-		AuthoringUtil authoringUtil = new AuthoringUtil();
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
-	    
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-
-	    
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
-	    
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-	    
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-	    
-	    request.getSession().setAttribute(httpSessionID, sessionMap);
-	}
-
-	
-    
-    /**
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-	public ActionForward addSingleQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-	    throws IOException, ServletException {
-		
-		McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-	
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
-	
-	    String totalMarks=request.getParameter("totalMarks");
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();;
-		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-		
-		mcGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
-		
-	    AuthoringUtil authoringUtil= new AuthoringUtil();
-	    
-        List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
-        List listAddableQuestionContentDTO = (List)sessionMap.get(NEW_ADDABLE_QUESTION_CONTENT_KEY);
-
-	    McQuestionContentDTO mcQuestionContentDTONew = null; 
-	    
-
-	    int listSize=listQuestionContentDTO.size();
-		request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
-
-	    String newQuestion=request.getParameter("newQuestion");
-	    String feedback=request.getParameter("feedback");
-		String mark=request.getParameter("mark");
-	    mcGeneralAuthoringDTO.setMarkValue(mark);
-
-	    String passmark=request.getParameter("passmark");
-	    mcGeneralAuthoringDTO.setPassMarkValue(passmark);
-	    
-	    List caList=authoringUtil.repopulateCandidateAnswersBox(request, false);
-	    caList=AuthoringUtil.removeBlankEntries(caList);
-
-		boolean validateSingleCorrectCandidate=authoringUtil.validateSingleCorrectCandidate(caList);
-		boolean validateOnlyOneCorrectCandidate=authoringUtil.validateOnlyOneCorrectCandidate(caList);
-	    
-        ActionMessages errors = new ActionMessages();
-        
-        
-        if (!validateSingleCorrectCandidate)
-        {
-            ActionMessage error = new ActionMessage("candidates.none.correct");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-        }
-
-        if (!validateOnlyOneCorrectCandidate)
-        {
-            ActionMessage error = new ActionMessage("candidates.duplicate.correct");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-        }
-
-
-	 	if(!errors.isEmpty()){
-			saveErrors(request, errors);
-	        logger.debug("errors saved: " + errors);
-		}
-	    
-	 	if(errors.isEmpty())
-	 	{
-		    if ((newQuestion != null) && (newQuestion.length() > 0))
-		    {
-		        boolean duplicates=AuthoringUtil.checkDuplicateQuestions(listQuestionContentDTO, newQuestion);
-		        
-		        if (!duplicates)
-		        {
-				    McQuestionContentDTO mcQuestionContentDTO=new McQuestionContentDTO();
-				    mcQuestionContentDTO.setDisplayOrder(new Long(listSize+1).toString());
-				    mcQuestionContentDTO.setFeedback(feedback);
-				    mcQuestionContentDTO.setQuestion(newQuestion);
-				    mcQuestionContentDTO.setMark(mark);
-				    
-				    mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
-				    mcQuestionContentDTO.setCaCount(new Integer(mcQuestionContentDTO.getListCandidateAnswersDTO().size()).toString());
-				    
-				    listQuestionContentDTO.add(mcQuestionContentDTO);
-		        }
-		        else
-		        {
-		            //entry duplicate, not adding
-		        }
-		    }
-	        else
-	        {
-	            //entry blank, not adding
-	        }
-	 	}
-	 	else
-	 	{
-	        //errors, not adding
-	        
-		    commonSaveCode(request, mcGeneralAuthoringDTO, 
-			        mcAuthoringForm, sessionMap, activeModule, strToolContentID, 
-			        defaultContentIdStr,  mcService, httpSessionID,listQuestionContentDTO);
-
-		    
-		    
-		    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-		    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-		    
-	        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-	        mcAuthoringForm.setTotalMarks(totalMark);
-	        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-
-	    	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
-	        
-		    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-			sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-			return newQuestionBox(mapping, form,  request, response);
-	 	}
-	    mcGeneralAuthoringDTO.setMarkValue(mark);
-	    
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-	    
-	    
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
-	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
-	    mcAuthoringForm.setFeedback(feedback);
-	    
-	    mcGeneralAuthoringDTO.setMarkValue(mark);
-
-    	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
-	    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-		sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-
-	    commonSaveCode(request, mcGeneralAuthoringDTO, 
-        mcAuthoringForm, sessionMap, activeModule, strToolContentID, 
-        defaultContentIdStr,  mcService, httpSessionID,listQuestionContentDTO);
+	    commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, activeModule, strToolContentID,
+		    defaultContentIdStr, mcService, httpSessionID, listQuestionContentDTO);
 
 	    request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-        
-	    setupCommonScreenData(mcContent, mcService,request);
-	    
-	    MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
+
+	    setupCommonScreenData(mcContent, mcService, request);
+	    MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
 
 	    return (mapping.findForward(LOAD_MONITORING));
- 	}
-	
-    
+	} else {
+	    // errors is not empty
+	    commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, activeModule, strToolContentID,
+		    defaultContentIdStr, mcService, httpSessionID, listQuestionContentDTO);
+
+	    Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	    String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	    mcAuthoringForm.setTotalMarks(totalMark);
+	    mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	    request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	    request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	    sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
+
+	    setupCommonScreenData(mcContent, mcService, request);
+	    MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+
+	    request.setAttribute("requestNewEditableQuestionBox", new Boolean(true).toString());
+
+	    return newEditableQuestionBox(mapping, form, request, response);
+	}
+
+    }
+
+    /**
+     * 
+     * @param request
+     * @param mcGeneralAuthoringDTO
+     * @param mcAuthoringForm
+     * @param sessionMap
+     * @param activeModule
+     * @param strToolContentID
+     * @param defaultContentIdStr
+     * @param mcService
+     * @param httpSessionID
+     * @param listQuestionContentDTO
+     */
+    protected void commonSaveCode(HttpServletRequest request, McGeneralAuthoringDTO mcGeneralAuthoringDTO,
+	    McAuthoringForm mcAuthoringForm, SessionMap sessionMap, String activeModule, String strToolContentID,
+	    String defaultContentIdStr, IMcService mcService, String httpSessionID, List listQuestionContentDTO) {
+	String richTextTitle = request.getParameter(TITLE);
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
+
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
+
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+
+	sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
+	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
+
+	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
+
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
+
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setCurrentTab("3");
+
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+    }
+
+    /**
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward addSingleQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
+
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
+
+	String totalMarks = request.getParameter("totalMarks");
+	String activeModule = request.getParameter(ACTIVE_MODULE);
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	;
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+
+	mcGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
+
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+	List listAddableQuestionContentDTO = (List) sessionMap.get(NEW_ADDABLE_QUESTION_CONTENT_KEY);
+
+	McQuestionContentDTO mcQuestionContentDTONew = null;
+
+	int listSize = listQuestionContentDTO.size();
+	request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
+
+	String newQuestion = request.getParameter("newQuestion");
+	String feedback = request.getParameter("feedback");
+	String mark = request.getParameter("mark");
+	mcGeneralAuthoringDTO.setMarkValue(mark);
+
+	String passmark = request.getParameter("passmark");
+	mcGeneralAuthoringDTO.setPassMarkValue(passmark);
+
+	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
+	caList = AuthoringUtil.removeBlankEntries(caList);
+
+	boolean validateSingleCorrectCandidate = authoringUtil.validateSingleCorrectCandidate(caList);
+	boolean validateOnlyOneCorrectCandidate = authoringUtil.validateOnlyOneCorrectCandidate(caList);
+
+	ActionMessages errors = new ActionMessages();
+
+	if (!validateSingleCorrectCandidate) {
+	    ActionMessage error = new ActionMessage("candidates.none.correct");
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	}
+
+	if (!validateOnlyOneCorrectCandidate) {
+	    ActionMessage error = new ActionMessage("candidates.duplicate.correct");
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	}
+
+	if (!errors.isEmpty()) {
+	    saveErrors(request, errors);
+	    logger.debug("errors saved: " + errors);
+	}
+
+	if (errors.isEmpty()) {
+	    if ((newQuestion != null) && (newQuestion.length() > 0)) {
+		boolean duplicates = AuthoringUtil.checkDuplicateQuestions(listQuestionContentDTO, newQuestion);
+
+		if (!duplicates) {
+		    McQuestionContentDTO mcQuestionContentDTO = new McQuestionContentDTO();
+		    mcQuestionContentDTO.setDisplayOrder(new Long(listSize + 1).toString());
+		    mcQuestionContentDTO.setFeedback(feedback);
+		    mcQuestionContentDTO.setQuestion(newQuestion);
+		    mcQuestionContentDTO.setMark(mark);
+
+		    mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
+		    mcQuestionContentDTO.setCaCount(new Integer(mcQuestionContentDTO.getListCandidateAnswersDTO()
+			    .size()).toString());
+
+		    listQuestionContentDTO.add(mcQuestionContentDTO);
+		} else {
+		    // entry duplicate, not adding
+		}
+	    } else {
+		// entry blank, not adding
+	    }
+	} else {
+	    // errors, not adding
+
+	    commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, activeModule, strToolContentID,
+		    defaultContentIdStr, mcService, httpSessionID, listQuestionContentDTO);
+
+	    Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	    String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	    mcAuthoringForm.setTotalMarks(totalMark);
+	    mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	    request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	    request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	    sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
+	    return newQuestionBox(mapping, form, request, response);
+	}
+	mcGeneralAuthoringDTO.setMarkValue(mark);
+
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
+	mcAuthoringForm.setFeedback(feedback);
+
+	mcGeneralAuthoringDTO.setMarkValue(mark);
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
+
+	commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, activeModule, strToolContentID,
+		defaultContentIdStr, mcService, httpSessionID, listQuestionContentDTO);
+
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+
+	setupCommonScreenData(mcContent, mcService, request);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+
+	return (mapping.findForward(LOAD_MONITORING));
+    }
+
     /**
      * newQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
      * 
      * opens up an new screen within the current page for adding a new question
      * 
      * newQuestionBox
+     * 
      * @param mapping
      * @param form
      * @param request
@@ -1288,113 +1105,103 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward newQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException 
-    {
-		McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-		
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-		
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
+    public ActionForward newQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
 
-	    String totalMarks=request.getParameter("totalMarks");
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
-		
-		String activeModule=request.getParameter(ACTIVE_MODULE);
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
-		
-		
-		/* create default mcContent object*/
-		McContent mcContent=mcService.retrieveMc(new Long(defaultContentIdStr));
-		
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
 
-		String richTextTitle = request.getParameter(TITLE);
-	    String richTextInstructions = request.getParameter(INSTRUCTIONS);
-	
-	    mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	    mcAuthoringForm.setTitle(richTextTitle);
-	    
-		mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-			
-		
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
 
-		
-	    mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+	String totalMarks = request.getParameter("totalMarks");
 
-	    AuthoringUtil authoringUtil = new AuthoringUtil();
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
+	String activeModule = request.getParameter(ACTIVE_MODULE);
 
-	    
-        List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
 
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+	/* create default mcContent object */
+	McContent mcContent = mcService.retrieveMc(new Long(defaultContentIdStr));
 
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
-		String requestType=request.getParameter("requestType");
-		
-		List listAddableQuestionContentDTO = (List)sessionMap.get(NEW_ADDABLE_QUESTION_CONTENT_KEY);
-		if ((requestType != null) && (requestType.equals("direct")))
-		{
-			//requestType is direct
-			listAddableQuestionContentDTO=authoringUtil.buildDefaultQuestionContent(mcContent, mcService);
-		}
-		    
-		request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
-		sessionMap.put(NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
+	String richTextTitle = request.getParameter(TITLE);
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
 
-	    request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-	    String newQuestion=request.getParameter("newQuestion");
-	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
-	    
-	    String feedback=request.getParameter("feedback");
-	    mcAuthoringForm.setFeedback(feedback);
-	    
-		String mark=request.getParameter("mark");
-	    mcGeneralAuthoringDTO.setMarkValue(mark);
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
 
-    	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-	    
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
 
-		request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-		
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		
-		setupCommonScreenData(mcContent, mcService,request);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-        return (mapping.findForward("newQuestionBox"));
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	String requestType = request.getParameter("requestType");
+
+	List listAddableQuestionContentDTO = (List) sessionMap.get(NEW_ADDABLE_QUESTION_CONTENT_KEY);
+	if ((requestType != null) && (requestType.equals("direct"))) {
+	    // requestType is direct
+	    listAddableQuestionContentDTO = authoringUtil.buildDefaultQuestionContent(mcContent, mcService);
+	}
+
+	request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
+	sessionMap.put(NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
+
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+	String newQuestion = request.getParameter("newQuestion");
+	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
+
+	String feedback = request.getParameter("feedback");
+	mcAuthoringForm.setFeedback(feedback);
+
+	String mark = request.getParameter("mark");
+	mcGeneralAuthoringDTO.setMarkValue(mark);
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+
+	setupCommonScreenData(mcContent, mcService, request);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+	return (mapping.findForward("newQuestionBox"));
     }
-
 
     /**
      * opens up an new screen within the current page for editing a question
@@ -1407,154 +1214,141 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward newEditableQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException 
-    {
-		McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-		
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-		
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
+    public ActionForward newEditableQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
 
-	    String totalMarks=request.getParameter("totalMarks");
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
-		
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-		
-		String questionIndex=request.getParameter("questionIndex");
-		mcAuthoringForm.setQuestionIndex(questionIndex);
-		
-		request.setAttribute(CURRENT_EDITABLE_QUESTION_INDEX,questionIndex); 
-		
-		mcAuthoringForm.setEditableQuestionIndex(questionIndex);
-		
-        List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+	String totalMarks = request.getParameter("totalMarks");
 
-        String editableQuestion="";
-        String editableFeedback="";
-        String editableMark="";
-	    Iterator listIterator=listQuestionContentDTO.iterator();
-	    while (listIterator.hasNext())
-	    {
-	        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-	        String question=mcQuestionContentDTO.getQuestion();
-	        String displayOrder=mcQuestionContentDTO.getDisplayOrder();
-	        
-	        if ((displayOrder != null) && (!displayOrder.equals("")))
-    		{
-	            if (displayOrder.equals(questionIndex))
-	            {
-	                editableFeedback=mcQuestionContentDTO.getFeedback();
-	                editableQuestion=mcQuestionContentDTO.getQuestion();
-	                editableMark=mcQuestionContentDTO.getMark();
-	                
-	                List candidates=mcQuestionContentDTO.getListCandidateAnswersDTO();
-	                
-	                break;
-	            }
-	            
-    		}
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+
+	String questionIndex = request.getParameter("questionIndex");
+	mcAuthoringForm.setQuestionIndex(questionIndex);
+
+	request.setAttribute(CURRENT_EDITABLE_QUESTION_INDEX, questionIndex);
+
+	mcAuthoringForm.setEditableQuestionIndex(questionIndex);
+
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+
+	String editableQuestion = "";
+	String editableFeedback = "";
+	String editableMark = "";
+	Iterator listIterator = listQuestionContentDTO.iterator();
+	while (listIterator.hasNext()) {
+	    McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
+	    String question = mcQuestionContentDTO.getQuestion();
+	    String displayOrder = mcQuestionContentDTO.getDisplayOrder();
+
+	    if ((displayOrder != null) && (!displayOrder.equals(""))) {
+		if (displayOrder.equals(questionIndex)) {
+		    editableFeedback = mcQuestionContentDTO.getFeedback();
+		    editableQuestion = mcQuestionContentDTO.getQuestion();
+		    editableMark = mcQuestionContentDTO.getMark();
+
+		    List candidates = mcQuestionContentDTO.getListCandidateAnswersDTO();
+
+		    break;
+		}
+
 	    }
+	}
 
-	    String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
 
+	String activeModule = request.getParameter(ACTIVE_MODULE);
 
-		String activeModule=request.getParameter(ACTIVE_MODULE);
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();;
-		
-		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-		
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	;
 
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO = (McGeneralAuthoringDTO)  request.getAttribute(MC_GENERAL_AUTHORING_DTO);
-		
-		if (mcGeneralAuthoringDTO == null)
-		    mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		
-		
-		mcGeneralAuthoringDTO.setMarkValue(editableMark);
-		
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
 
-		
-		String richTextTitle = request.getParameter(TITLE);
-	    String richTextInstructions = request.getParameter(INSTRUCTIONS);
-	
-	    mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	    mcAuthoringForm.setTitle(richTextTitle);
-	    
-		mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-			
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-		
-		mcGeneralAuthoringDTO.setEditableQuestionText(editableQuestion);
-		mcGeneralAuthoringDTO.setEditableQuestionFeedback (editableFeedback);
-		mcAuthoringForm.setFeedback(editableFeedback);
-		
-	    mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = (McGeneralAuthoringDTO) request
+		.getAttribute(MC_GENERAL_AUTHORING_DTO);
 
-	    AuthoringUtil authoringUtil = new AuthoringUtil();
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
+	if (mcGeneralAuthoringDTO == null)
+	    mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
 
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+	mcGeneralAuthoringDTO.setMarkValue(editableMark);
 
-	    
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-		
-		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-		
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-	    
-	    
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
-        String requestNewEditableQuestionBox=(String )request.getAttribute("requestNewEditableQuestionBox");
-        
-        String editQuestionBoxRequest=request.getParameter("editQuestionBoxRequest");
+	String richTextTitle = request.getParameter(TITLE);
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
 
-	    String newQuestion=request.getParameter("newQuestion");
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
 
-        if ( (requestNewEditableQuestionBox != null) && requestNewEditableQuestionBox.equals("true"))
-        {
-    	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
-    	    
-    	    String feedback=request.getParameter("feedback");
-    	    mcAuthoringForm.setFeedback(feedback);
-        }
-        
-    	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-	    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-		
-	    mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		
-		setupCommonScreenData(mcContent, mcService,request);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-        return (mapping.findForward("editQuestionBox"));
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+	mcGeneralAuthoringDTO.setEditableQuestionText(editableQuestion);
+	mcGeneralAuthoringDTO.setEditableQuestionFeedback(editableFeedback);
+	mcAuthoringForm.setFeedback(editableFeedback);
+
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	String requestNewEditableQuestionBox = (String) request.getAttribute("requestNewEditableQuestionBox");
+
+	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
+
+	String newQuestion = request.getParameter("newQuestion");
+
+	if ((requestNewEditableQuestionBox != null) && requestNewEditableQuestionBox.equals("true")) {
+	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
+
+	    String feedback = request.getParameter("feedback");
+	    mcAuthoringForm.setFeedback(feedback);
+	}
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+
+	setupCommonScreenData(mcContent, mcService, request);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+	return (mapping.findForward("editQuestionBox"));
     }
 
-    
-    
     /**
-        removes a question from the questions map
+     * removes a question from the questions map
      * 
      * @param mapping
      * @param form
@@ -1564,132 +1358,122 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-        throws IOException, ServletException {
-    	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-    	
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
+    public ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
 
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		String questionIndex=request.getParameter("questionIndex");
-		mcAuthoringForm.setQuestionIndex(questionIndex);
-		
-	    String totalMarks=request.getParameter("totalMarks");
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
-		List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	String questionIndex = request.getParameter("questionIndex");
+	mcAuthoringForm.setQuestionIndex(questionIndex);
 
-	    McQuestionContentDTO mcQuestionContentDTO= null;
-	    Iterator listIterator=listQuestionContentDTO.iterator();
-	    while (listIterator.hasNext())
-	    {
-	        mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-	        
-	        String question=mcQuestionContentDTO.getQuestion();
-	        String displayOrder=mcQuestionContentDTO.getDisplayOrder();
-	        
-	        if ((displayOrder != null) && (!displayOrder.equals("")))
-    		{
-	            if (displayOrder.equals(questionIndex))
-	            {
-	                break;
-	            }
-	            
-    		}
-	    }
-	    
-	    mcQuestionContentDTO.setQuestion("");
-	  
-	    
-	    listQuestionContentDTO=AuthoringUtil.reorderListQuestionContentDTO(listQuestionContentDTO, questionIndex );
+	String totalMarks = request.getParameter("totalMarks");
 
-	    sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
-		String activeModule=request.getParameter(ACTIVE_MODULE);
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
 
-		
-		String richTextTitle = request.getParameter(TITLE);
-        
-		String richTextInstructions = request.getParameter(INSTRUCTIONS);
-		
-        sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
-        sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
+	McQuestionContentDTO mcQuestionContentDTO = null;
+	Iterator listIterator = listQuestionContentDTO.iterator();
+	while (listIterator.hasNext()) {
+	    mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
 
+	    String question = mcQuestionContentDTO.getQuestion();
+	    String displayOrder = mcQuestionContentDTO.getDisplayOrder();
 
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();;
-		
-		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-		
-		if (mcContent == null)
-		{
-			mcContent=mcService.retrieveMc(new Long(defaultContentIdStr));
+	    if ((displayOrder != null) && (!displayOrder.equals(""))) {
+		if (displayOrder.equals(questionIndex)) {
+		    break;
 		}
 
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-		
-        mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-        mcAuthoringForm.setTitle(richTextTitle);
-        
-  		mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+	    }
+	}
 
-		AuthoringUtil authoringUtil= new AuthoringUtil();
-        
-        mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-        
-        request.getSession().setAttribute(httpSessionID, sessionMap);
+	mcQuestionContentDTO.setQuestion("");
 
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+	listQuestionContentDTO = AuthoringUtil.reorderListQuestionContentDTO(listQuestionContentDTO, questionIndex);
 
-		
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setCurrentTab("3");
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
-	    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-	    mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
+	String activeModule = request.getParameter(ACTIVE_MODULE);
 
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
+	String richTextTitle = request.getParameter(TITLE);
 
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
 
-	    
-	    
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+	sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
+	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
-		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-		
-	
-		setupCommonScreenData(mcContent, mcService,request);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);		
-        return (mapping.findForward(LOAD_MONITORING));
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	;
+
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+
+	if (mcContent == null) {
+	    mcContent = mcService.retrieveMc(new Long(defaultContentIdStr));
+	}
+
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
+
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+
+	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
+
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setCurrentTab("3");
+
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+
+	setupCommonScreenData(mcContent, mcService, request);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+	return (mapping.findForward(LOAD_MONITORING));
     }
-    
-    
+
     /**
      * moves a question down in the list
      * 
      * moveQuestionDown
+     * 
      * @param mapping
      * @param form
      * @param request
@@ -1698,95 +1482,91 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward moveQuestionDown(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException {
-		McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-		
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		String questionIndex=request.getParameter("questionIndex");
-		mcAuthoringForm.setQuestionIndex(questionIndex);
-		
-	    String totalMarks=request.getParameter("totalMarks");
-	    
-	    List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
-	    
-	    listQuestionContentDTO=AuthoringUtil.swapNodes(listQuestionContentDTO, questionIndex, "down");
-	    
-	    listQuestionContentDTO=AuthoringUtil.reorderSimpleListQuestionContentDTO(listQuestionContentDTO);
-	    sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    
-	    
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
-	
-		
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-		String richTextTitle = request.getParameter(TITLE);
-		String richTextInstructions = request.getParameter(INSTRUCTIONS);
-	    sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
-	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-	
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();;
-		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-		
-	    mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	    mcAuthoringForm.setTitle(richTextTitle);
-	    
-		mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-	
-		AuthoringUtil authoringUtil= new AuthoringUtil();
-	    
-	    mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-	    
-	    request.getSession().setAttribute(httpSessionID, sessionMap);
-	
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-	
-		
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setCurrentTab("3");
-	
-	    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-		mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+    public ActionForward moveQuestionDown(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
 
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	String questionIndex = request.getParameter("questionIndex");
+	mcAuthoringForm.setQuestionIndex(questionIndex);
 
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+	String totalMarks = request.getParameter("totalMarks");
 
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
 
-	    
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-	    
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-	
-		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-		
-		setupCommonScreenData(mcContent, mcService,request);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-	    return (mapping.findForward(LOAD_MONITORING));
+	listQuestionContentDTO = AuthoringUtil.swapNodes(listQuestionContentDTO, questionIndex, "down");
+
+	listQuestionContentDTO = AuthoringUtil.reorderSimpleListQuestionContentDTO(listQuestionContentDTO);
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
+
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
+
+	String activeModule = request.getParameter(ACTIVE_MODULE);
+	String richTextTitle = request.getParameter(TITLE);
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
+	sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
+	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
+
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	;
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
+
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+
+	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
+
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setCurrentTab("3");
+
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+
+	setupCommonScreenData(mcContent, mcService, request);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+	return (mapping.findForward(LOAD_MONITORING));
     }
 
-    
     /**
      * 
      * @param mapping
@@ -1797,96 +1577,89 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward moveQuestionUp(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException {
-		McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-		
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-	
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		String questionIndex=request.getParameter("questionIndex");
-		mcAuthoringForm.setQuestionIndex(questionIndex);
-		
-	    
-	    List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
-	    listQuestionContentDTO=AuthoringUtil.swapNodes(listQuestionContentDTO, questionIndex, "up");
-	    listQuestionContentDTO=AuthoringUtil.reorderSimpleListQuestionContentDTO(listQuestionContentDTO);
-	    sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
-	
-		
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-		String richTextTitle = request.getParameter(TITLE);
-	    String totalMarks=request.getParameter("totalMarks");
-		String richTextInstructions = request.getParameter(INSTRUCTIONS);
-	    sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
-	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-	
-	
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();;
-		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-		
-	    mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	    mcAuthoringForm.setTitle(richTextTitle);
-	    
-		mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-	    
-		AuthoringUtil authoringUtil= new AuthoringUtil();
-	    
-	    mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-	    
-	    request.getSession().setAttribute(httpSessionID, sessionMap);
-	
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-	
-		
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setCurrentTab("3");
-	
-	    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-		mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+    public ActionForward moveQuestionUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
 
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	String questionIndex = request.getParameter("questionIndex");
+	mcAuthoringForm.setQuestionIndex(questionIndex);
 
-	    
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+	listQuestionContentDTO = AuthoringUtil.swapNodes(listQuestionContentDTO, questionIndex, "up");
+	listQuestionContentDTO = AuthoringUtil.reorderSimpleListQuestionContentDTO(listQuestionContentDTO);
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
-	    
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-	
-		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-		
-		setupCommonScreenData(mcContent, mcService,request);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-		
-	    return (mapping.findForward(LOAD_MONITORING));
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
+
+	String activeModule = request.getParameter(ACTIVE_MODULE);
+	String richTextTitle = request.getParameter(TITLE);
+	String totalMarks = request.getParameter("totalMarks");
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
+	sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
+	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
+
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	;
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
+
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+
+	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
+
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setCurrentTab("3");
+
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+
+	setupCommonScreenData(mcContent, mcService, request);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+
+	return (mapping.findForward(LOAD_MONITORING));
     }
 
-
-    
     /**
      * moves a candidate dwn in the list
      * 
@@ -1898,169 +1671,150 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward moveCandidateDown(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException {
-		McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-		
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-	
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		String questionIndex=request.getParameter("questionIndex");
-		mcAuthoringForm.setQuestionIndex(questionIndex);
-		
-		String candidateIndex=request.getParameter("candidateIndex");
-		mcAuthoringForm.setCandidateIndex(candidateIndex);
-		
-	    String totalMarks=request.getParameter("totalMarks");
-		AuthoringUtil authoringUtil = new AuthoringUtil();
-		boolean validateCandidateAnswersNotBlank =authoringUtil.validateCandidateAnswersNotBlank(request);
-		ActionMessages errors = new ActionMessages();
-		
-        if (!validateCandidateAnswersNotBlank)
-        {
-            ActionMessage error = new ActionMessage("candidates.blank");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-        }
-        
+    public ActionForward moveCandidateDown(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
 
-	 	if(!errors.isEmpty()){
-			saveErrors(request, errors);
-	        logger.debug("errors saved: " + errors);
-		}
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
-		
-	    List caList=authoringUtil.repopulateCandidateAnswersBox(request, false);
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-		
-	    List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
-	  
-	    if (errors.isEmpty())
-	    {
-		    List candidates =new LinkedList();
-		    List listCandidates =new LinkedList();
-	        String editableQuestion="";
-		    Iterator listIterator=listQuestionContentDTO.iterator();
-		    while (listIterator.hasNext())
-		    {
-		        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-		        
-		        String question=mcQuestionContentDTO.getQuestion();
-		        String displayOrder=mcQuestionContentDTO.getDisplayOrder();
-		        
-		        if ((displayOrder != null) && (!displayOrder.equals("")))
-	    		{
-		            if (displayOrder.equals(questionIndex))
-		            {
-		                editableQuestion=mcQuestionContentDTO.getQuestion();
-		                
-		                candidates=mcQuestionContentDTO.getListCandidateAnswersDTO();
-		                
-		                listCandidates=AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "down");
-		                
-		                mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
-		                
-		                break;
-		            }
-		            
-	    		}
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	String questionIndex = request.getParameter("questionIndex");
+	mcAuthoringForm.setQuestionIndex(questionIndex);
+
+	String candidateIndex = request.getParameter("candidateIndex");
+	mcAuthoringForm.setCandidateIndex(candidateIndex);
+
+	String totalMarks = request.getParameter("totalMarks");
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+	boolean validateCandidateAnswersNotBlank = authoringUtil.validateCandidateAnswersNotBlank(request);
+	ActionMessages errors = new ActionMessages();
+
+	if (!validateCandidateAnswersNotBlank) {
+	    ActionMessage error = new ActionMessage("candidates.blank");
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	}
+
+	if (!errors.isEmpty()) {
+	    saveErrors(request, errors);
+	    logger.debug("errors saved: " + errors);
+	}
+
+	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
+
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+
+	if (errors.isEmpty()) {
+	    List candidates = new LinkedList();
+	    List listCandidates = new LinkedList();
+	    String editableQuestion = "";
+	    Iterator listIterator = listQuestionContentDTO.iterator();
+	    while (listIterator.hasNext()) {
+		McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
+
+		String question = mcQuestionContentDTO.getQuestion();
+		String displayOrder = mcQuestionContentDTO.getDisplayOrder();
+
+		if ((displayOrder != null) && (!displayOrder.equals(""))) {
+		    if (displayOrder.equals(questionIndex)) {
+			editableQuestion = mcQuestionContentDTO.getQuestion();
+
+			candidates = mcQuestionContentDTO.getListCandidateAnswersDTO();
+
+			listCandidates = AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "down");
+
+			mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
+
+			break;
 		    }
+
+		}
 	    }
+	}
 
-	    
-	    sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    
-	    
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
-	
-		
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-	
-		String richTextTitle = request.getParameter(TITLE);
-	    
-		String richTextInstructions = request.getParameter(INSTRUCTIONS);
-	    
-		
-	    sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
-	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-	
-	
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();;
-		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-		
-	    mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	    mcAuthoringForm.setTitle(richTextTitle);
-	    
-		mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-	
-	    mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-	    
-	    request.getSession().setAttribute(httpSessionID, sessionMap);
-	
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-	
-		
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setCurrentTab("3");
-	
-	    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-	
-		mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
 
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-	    
-	    
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+	String activeModule = request.getParameter(ACTIVE_MODULE);
 
-	    
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-	    
-	    
-	    String newQuestion=request.getParameter("newQuestion");
-	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
-	    
-	    String feedback=request.getParameter("feedback");
-	    mcAuthoringForm.setFeedback(feedback);
-	    
-		String mark=request.getParameter("mark");
-	    mcGeneralAuthoringDTO.setMarkValue(mark);
+	String richTextTitle = request.getParameter(TITLE);
 
-	    
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-	
-		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-	
-		
-		String editQuestionBoxRequest=request.getParameter("editQuestionBoxRequest");
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
 
-		setupCommonScreenData(mcContent, mcService,request);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-		request.setAttribute("requestNewEditableQuestionBox",new Boolean(true).toString());
+	sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
+	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
-		return newEditableQuestionBox(mapping, form,  request, response);
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	;
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
+
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+
+	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
+
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setCurrentTab("3");
+
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+
+	String newQuestion = request.getParameter("newQuestion");
+	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
+
+	String feedback = request.getParameter("feedback");
+	mcAuthoringForm.setFeedback(feedback);
+
+	String mark = request.getParameter("mark");
+	mcGeneralAuthoringDTO.setMarkValue(mark);
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+
+	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
+
+	setupCommonScreenData(mcContent, mcService, request);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+	request.setAttribute("requestNewEditableQuestionBox", new Boolean(true).toString());
+
+	return newEditableQuestionBox(mapping, form, request, response);
     }
-
 
     /**
      * 
@@ -2074,157 +1828,143 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward moveCandidateUp(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException {
-		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-		
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		String questionIndex=request.getParameter("questionIndex");
-		mcAuthoringForm.setQuestionIndex(questionIndex);
-		
-	    String totalMarks=request.getParameter("totalMarks");
-		String candidateIndex=request.getParameter("candidateIndex");
-		mcAuthoringForm.setCandidateIndex(candidateIndex);
+    public ActionForward moveCandidateUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
-		AuthoringUtil authoringUtil = new AuthoringUtil();
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	String questionIndex = request.getParameter("questionIndex");
+	mcAuthoringForm.setQuestionIndex(questionIndex);
 
-		boolean validateCandidateAnswersNotBlank =authoringUtil.validateCandidateAnswersNotBlank(request);
+	String totalMarks = request.getParameter("totalMarks");
+	String candidateIndex = request.getParameter("candidateIndex");
+	mcAuthoringForm.setCandidateIndex(candidateIndex);
 
-		ActionMessages errors = new ActionMessages();
-		
-        if (!validateCandidateAnswersNotBlank)
-        {
-            ActionMessage error = new ActionMessage("candidates.blank");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-        }
-        
+	AuthoringUtil authoringUtil = new AuthoringUtil();
 
-	 	if(!errors.isEmpty()){
-			saveErrors(request, errors);
-	        logger.debug("errors saved: " + errors);
-		}
+	boolean validateCandidateAnswersNotBlank = authoringUtil.validateCandidateAnswersNotBlank(request);
 
-		
-	    List caList=authoringUtil.repopulateCandidateAnswersBox(request, false);
-	    List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+	ActionMessages errors = new ActionMessages();
 
-	    
-	    if (errors.isEmpty())
-	    {
-		    List candidates =new LinkedList();
-		    List listCandidates =new LinkedList();
-	        String editableQuestion="";
-		    Iterator listIterator=listQuestionContentDTO.iterator();
-		    while (listIterator.hasNext())
-		    {
-		        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-		        String question=mcQuestionContentDTO.getQuestion();
-		        String displayOrder=mcQuestionContentDTO.getDisplayOrder();
-		        
-		        if ((displayOrder != null) && (!displayOrder.equals("")))
-	    		{
-		            if (displayOrder.equals(questionIndex))
-		            {
-		                editableQuestion=mcQuestionContentDTO.getQuestion();
-		                
-		                candidates=mcQuestionContentDTO.getListCandidateAnswersDTO();
-		                listCandidates=AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "up");
-		                mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
-		                mcQuestionContentDTO.setCaCount(new Integer(listCandidates.size()).toString());
-		                
-		                break;
-		            }
-		            
-	    		}
+	if (!validateCandidateAnswersNotBlank) {
+	    ActionMessage error = new ActionMessage("candidates.blank");
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	}
+
+	if (!errors.isEmpty()) {
+	    saveErrors(request, errors);
+	    logger.debug("errors saved: " + errors);
+	}
+
+	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+
+	if (errors.isEmpty()) {
+	    List candidates = new LinkedList();
+	    List listCandidates = new LinkedList();
+	    String editableQuestion = "";
+	    Iterator listIterator = listQuestionContentDTO.iterator();
+	    while (listIterator.hasNext()) {
+		McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
+		String question = mcQuestionContentDTO.getQuestion();
+		String displayOrder = mcQuestionContentDTO.getDisplayOrder();
+
+		if ((displayOrder != null) && (!displayOrder.equals(""))) {
+		    if (displayOrder.equals(questionIndex)) {
+			editableQuestion = mcQuestionContentDTO.getQuestion();
+
+			candidates = mcQuestionContentDTO.getListCandidateAnswersDTO();
+			listCandidates = AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "up");
+			mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
+			mcQuestionContentDTO.setCaCount(new Integer(listCandidates.size()).toString());
+
+			break;
 		    }
+
+		}
 	    }
-	    
-	    sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    
-	    
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
-	
-		
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-		String richTextTitle = request.getParameter(TITLE);
-		String richTextInstructions = request.getParameter(INSTRUCTIONS);
-	    sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
-	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-	
-	
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();;
-		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-		
-	    mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	    mcAuthoringForm.setTitle(richTextTitle);
-	    
-		mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-	
-		mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-	    
-	    request.getSession().setAttribute(httpSessionID, sessionMap);
-	
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-	
-		
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setCurrentTab("3");
-	
-	    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-		mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+	}
 
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
 
+	String activeModule = request.getParameter(ACTIVE_MODULE);
+	String richTextTitle = request.getParameter(TITLE);
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
+	sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
+	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-	    
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	;
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
-	    String newQuestion=request.getParameter("newQuestion");
-	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
-	    
-	    String feedback=request.getParameter("feedback");
-	    mcAuthoringForm.setFeedback(feedback);
-	    
-		String mark=request.getParameter("mark");
-	    mcGeneralAuthoringDTO.setMarkValue(mark);
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
 
-	    
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-	
-		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-		
-		String editQuestionBoxRequest=request.getParameter("editQuestionBoxRequest");
-		
-		setupCommonScreenData(mcContent, mcService,request);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-		request.setAttribute("requestNewEditableQuestionBox",new Boolean(true).toString());
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-		return newEditableQuestionBox(mapping, form,  request, response);
+	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
+
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setCurrentTab("3");
+
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	String newQuestion = request.getParameter("newQuestion");
+	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
+
+	String feedback = request.getParameter("feedback");
+	mcAuthoringForm.setFeedback(feedback);
+
+	String mark = request.getParameter("mark");
+	mcGeneralAuthoringDTO.setMarkValue(mark);
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+
+	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
+
+	setupCommonScreenData(mcContent, mcService, request);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+	request.setAttribute("requestNewEditableQuestionBox", new Boolean(true).toString());
+
+	return newEditableQuestionBox(mapping, form, request, response);
     }
-
 
     /**
      * removes a candidate from the list
@@ -2237,153 +1977,140 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward removeCandidate(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException {
-		McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-		
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		String questionIndex=request.getParameter("questionIndex");
-		mcAuthoringForm.setQuestionIndex(questionIndex);
+    public ActionForward removeCandidate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
 
-		String candidateIndex=request.getParameter("candidateIndex");
-		mcAuthoringForm.setCandidateIndex(candidateIndex);
-		
-	    String totalMarks=request.getParameter("totalMarks");
-		List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
-	    AuthoringUtil authoringUtil = new AuthoringUtil();
-	    List caList=authoringUtil.repopulateCandidateAnswersBox(request, false);
-	    
-	    McQuestionContentDTO mcQuestionContentDTO= null;
-	    Iterator listIterator=listQuestionContentDTO.iterator();
-	    while (listIterator.hasNext())
-	    {
-	        mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-	        
-	        String question=mcQuestionContentDTO.getQuestion();
-	        String displayOrder=mcQuestionContentDTO.getDisplayOrder();
-	        
-	        if ((displayOrder != null) && (!displayOrder.equals("")))
-			{
-	            if (displayOrder.equals(questionIndex))
-	            {
-	                break;
-	            }
-	            
-			}
-	    }
-	    
-	    mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
-	    
-	    List candidateAnswers=mcQuestionContentDTO.getListCandidateAnswersDTO();
-	    
-	    McCandidateAnswersDTO mcCandidateAnswersDTO= null;
-	    Iterator listCaIterator=candidateAnswers.iterator();
-	    int caIndex=0;
-	    while (listCaIterator.hasNext())
-	    {
-	        caIndex ++;
-	        mcCandidateAnswersDTO= (McCandidateAnswersDTO)listCaIterator.next();
-	        
-	        if (caIndex == new Integer(candidateIndex).intValue())
-	        {
-	            mcCandidateAnswersDTO.setCandidateAnswer("");
-	            
-	            break;
-	        }
-	    }
-	    
-		candidateAnswers=AuthoringUtil.reorderListCandidatesDTO(candidateAnswers);
-		mcQuestionContentDTO.setListCandidateAnswersDTO(candidateAnswers);
-		mcQuestionContentDTO.setCaCount(new Integer(candidateAnswers.size()).toString());
-	    sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
-	
-		
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-		String richTextTitle = request.getParameter(TITLE);
-		String richTextInstructions = request.getParameter(INSTRUCTIONS);
-	    sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
-	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-	
-	
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();;
-		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-		if (mcContent == null)
-		{
-			mcContent=mcService.retrieveMc(new Long(defaultContentIdStr));
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	String questionIndex = request.getParameter("questionIndex");
+	mcAuthoringForm.setQuestionIndex(questionIndex);
+
+	String candidateIndex = request.getParameter("candidateIndex");
+	mcAuthoringForm.setCandidateIndex(candidateIndex);
+
+	String totalMarks = request.getParameter("totalMarks");
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
+
+	McQuestionContentDTO mcQuestionContentDTO = null;
+	Iterator listIterator = listQuestionContentDTO.iterator();
+	while (listIterator.hasNext()) {
+	    mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
+
+	    String question = mcQuestionContentDTO.getQuestion();
+	    String displayOrder = mcQuestionContentDTO.getDisplayOrder();
+
+	    if ((displayOrder != null) && (!displayOrder.equals(""))) {
+		if (displayOrder.equals(questionIndex)) {
+		    break;
 		}
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-		
-	    mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	    mcAuthoringForm.setTitle(richTextTitle);
-	    
-		mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-	    
-		mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-	    
-	    request.getSession().setAttribute(httpSessionID, sessionMap);
-	
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-	
-		
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setCurrentTab("3");
-	
-	    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-	    mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-	
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
-	    
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+	    }
+	}
 
-        
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-	    
+	mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
 
-	    String newQuestion=request.getParameter("newQuestion");
-	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
-	    
-	    String feedback=request.getParameter("feedback");
-	    mcAuthoringForm.setFeedback(feedback);
-	    
-		String mark=request.getParameter("mark");
-	    mcGeneralAuthoringDTO.setMarkValue(mark);
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-		
-		
-		String editQuestionBoxRequest=request.getParameter("editQuestionBoxRequest");
-		
-		setupCommonScreenData(mcContent, mcService,request);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-		request.setAttribute("requestNewEditableQuestionBox",new Boolean(true).toString());
+	List candidateAnswers = mcQuestionContentDTO.getListCandidateAnswersDTO();
 
-		return newEditableQuestionBox(mapping, form,  request, response);
+	McCandidateAnswersDTO mcCandidateAnswersDTO = null;
+	Iterator listCaIterator = candidateAnswers.iterator();
+	int caIndex = 0;
+	while (listCaIterator.hasNext()) {
+	    caIndex++;
+	    mcCandidateAnswersDTO = (McCandidateAnswersDTO) listCaIterator.next();
+
+	    if (caIndex == new Integer(candidateIndex).intValue()) {
+		mcCandidateAnswersDTO.setCandidateAnswer("");
+
+		break;
+	    }
+	}
+
+	candidateAnswers = AuthoringUtil.reorderListCandidatesDTO(candidateAnswers);
+	mcQuestionContentDTO.setListCandidateAnswersDTO(candidateAnswers);
+	mcQuestionContentDTO.setCaCount(new Integer(candidateAnswers.size()).toString());
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
+
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
+
+	String activeModule = request.getParameter(ACTIVE_MODULE);
+	String richTextTitle = request.getParameter(TITLE);
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
+	sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
+	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
+
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	;
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+	if (mcContent == null) {
+	    mcContent = mcService.retrieveMc(new Long(defaultContentIdStr));
+	}
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
+
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+
+	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
+
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setCurrentTab("3");
+
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+
+	String newQuestion = request.getParameter("newQuestion");
+	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
+
+	String feedback = request.getParameter("feedback");
+	mcAuthoringForm.setFeedback(feedback);
+
+	String mark = request.getParameter("mark");
+	mcGeneralAuthoringDTO.setMarkValue(mark);
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+
+	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
+
+	setupCommonScreenData(mcContent, mcService, request);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+	request.setAttribute("requestNewEditableQuestionBox", new Boolean(true).toString());
+
+	return newEditableQuestionBox(mapping, form, request, response);
 
     }
-
 
     /**
      * 
@@ -2397,699 +2124,630 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward newCandidateBox(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException {
-		McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-	    
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-	
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		
-		String questionIndex=request.getParameter("questionIndex");
-		mcAuthoringForm.setQuestionIndex(questionIndex);
+    public ActionForward newCandidateBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
 
-		String candidateIndex=request.getParameter("candidateIndex");
-		mcAuthoringForm.setCandidateIndex(candidateIndex);
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
-	    String totalMarks=request.getParameter("totalMarks");
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	    
-	    List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
-	
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
 
-		AuthoringUtil authoringUtil = new AuthoringUtil();
-	    List caList=authoringUtil.repopulateCandidateAnswersBox(request, true);
-	    
-	    int caCount=caList.size();
-	    String newQuestion=request.getParameter("newQuestion");
-	    String mark=request.getParameter("mark");
-	    String passmark=request.getParameter("passmark");
-	    String feedback=request.getParameter("feedback");
-	    int currentQuestionCount= listQuestionContentDTO.size();
-	    String editQuestionBoxRequest=request.getParameter("editQuestionBoxRequest");
-	    McQuestionContentDTO mcQuestionContentDTOLocal= null;
-	    Iterator listIterator=listQuestionContentDTO.iterator();
-	    while (listIterator.hasNext())
-	    {
-	        mcQuestionContentDTOLocal= (McQuestionContentDTO)listIterator.next();
-	        
-	        String question=mcQuestionContentDTOLocal.getQuestion();
-	        String displayOrder=mcQuestionContentDTOLocal.getDisplayOrder();
-	        if ((displayOrder != null) && (!displayOrder.equals("")))
-			{
-	            if (displayOrder.equals(questionIndex))
-	            {
-	                break;
-	            }
-	            
-			}
+	String questionIndex = request.getParameter("questionIndex");
+	mcAuthoringForm.setQuestionIndex(questionIndex);
+
+	String candidateIndex = request.getParameter("candidateIndex");
+	mcAuthoringForm.setCandidateIndex(candidateIndex);
+
+	String totalMarks = request.getParameter("totalMarks");
+
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+	List caList = authoringUtil.repopulateCandidateAnswersBox(request, true);
+
+	int caCount = caList.size();
+	String newQuestion = request.getParameter("newQuestion");
+	String mark = request.getParameter("mark");
+	String passmark = request.getParameter("passmark");
+	String feedback = request.getParameter("feedback");
+	int currentQuestionCount = listQuestionContentDTO.size();
+	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
+	McQuestionContentDTO mcQuestionContentDTOLocal = null;
+	Iterator listIterator = listQuestionContentDTO.iterator();
+	while (listIterator.hasNext()) {
+	    mcQuestionContentDTOLocal = (McQuestionContentDTO) listIterator.next();
+
+	    String question = mcQuestionContentDTOLocal.getQuestion();
+	    String displayOrder = mcQuestionContentDTOLocal.getDisplayOrder();
+	    if ((displayOrder != null) && (!displayOrder.equals(""))) {
+		if (displayOrder.equals(questionIndex)) {
+		    break;
+		}
+
 	    }
-	    
-	    if (mcQuestionContentDTOLocal != null)
-	    {
-		    mcQuestionContentDTOLocal.setListCandidateAnswersDTO(caList);
-		    mcQuestionContentDTOLocal.setCaCount(new Integer(caList.size()).toString());
+	}
+
+	if (mcQuestionContentDTOLocal != null) {
+	    mcQuestionContentDTOLocal.setListCandidateAnswersDTO(caList);
+	    mcQuestionContentDTOLocal.setCaCount(new Integer(caList.size()).toString());
+	}
+
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
+
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
+
+	String activeModule = request.getParameter(ACTIVE_MODULE);
+	String richTextTitle = request.getParameter(TITLE);
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
+	sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
+	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
+
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	;
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
+
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+
+	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
+
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setCurrentTab("3");
+
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+
+	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
+
+	mcAuthoringForm.setFeedback(feedback);
+
+	mcGeneralAuthoringDTO.setMarkValue(mark);
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+
+	setupCommonScreenData(mcContent, mcService, request);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+	request.setAttribute("requestNewEditableQuestionBox", new Boolean(true).toString());
+
+	return newEditableQuestionBox(mapping, form, request, response);
+    }
+
+    public ActionForward moveAddedCandidateUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
+
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
+
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+
+	String totalMarks = request.getParameter("totalMarks");
+
+	String candidateIndex = request.getParameter("candidateIndex");
+	mcAuthoringForm.setCandidateIndex(candidateIndex);
+
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+
+	boolean validateCandidateAnswersNotBlank = authoringUtil.validateCandidateAnswersNotBlank(request);
+	ActionMessages errors = new ActionMessages();
+
+	if (!validateCandidateAnswersNotBlank) {
+	    ActionMessage error = new ActionMessage("candidates.blank");
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	}
+
+	if (!errors.isEmpty()) {
+	    saveErrors(request, errors);
+	    logger.debug("errors saved: " + errors);
+	}
+
+	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
+
+	List listAddableQuestionContentDTO = (List) sessionMap.get(NEW_ADDABLE_QUESTION_CONTENT_KEY);
+	if (errors.isEmpty()) {
+	    List candidates = new LinkedList();
+	    List listCandidates = new LinkedList();
+
+	    Iterator listIterator = listAddableQuestionContentDTO.iterator();
+	    /* there is only 1 question dto */
+	    while (listIterator.hasNext()) {
+		McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
+
+		candidates = mcQuestionContentDTO.getListCandidateAnswersDTO();
+		listCandidates = AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "up");
+
+		mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
 	    }
-			
-	    sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
-	
-		
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-		String richTextTitle = request.getParameter(TITLE);
-		String richTextInstructions = request.getParameter(INSTRUCTIONS);
-	    sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
-	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-	
-	
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();;
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-		
-	    mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	    mcAuthoringForm.setTitle(richTextTitle);
-	    
-		mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-		
-	    mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-	    
-	    request.getSession().setAttribute(httpSessionID, sessionMap);
-	
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-	
-		
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setCurrentTab("3");
-	
-	    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-	    mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-	
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
+	}
 
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+	request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
+	sessionMap.put(NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
 
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
 
-	    
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+	String activeModule = request.getParameter(ACTIVE_MODULE);
 
-	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
-	    
-	    mcAuthoringForm.setFeedback(feedback);
-	    
-	    mcGeneralAuthoringDTO.setMarkValue(mark);
+	String richTextTitle = request.getParameter(TITLE);
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
+	sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
+	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-	
-		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	;
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
-		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
 
-		setupCommonScreenData(mcContent, mcService,request);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-		request.setAttribute("requestNewEditableQuestionBox",new Boolean(true).toString());
-		
-		return newEditableQuestionBox(mapping, form,  request, response);
-    }
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 
-    
-    public ActionForward moveAddedCandidateUp(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException {
-		McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-		
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-	
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		
-		
-	    String totalMarks=request.getParameter("totalMarks");
+	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 
-		
-		String candidateIndex=request.getParameter("candidateIndex");
-		mcAuthoringForm.setCandidateIndex(candidateIndex);
+	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-		AuthoringUtil authoringUtil = new AuthoringUtil();
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
 
-		boolean validateCandidateAnswersNotBlank =authoringUtil.validateCandidateAnswersNotBlank(request);
-		ActionMessages errors = new ActionMessages();
-		
-        if (!validateCandidateAnswersNotBlank)
-        {
-            ActionMessage error = new ActionMessage("candidates.blank");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-        }
-        
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setCurrentTab("3");
 
-	 	if(!errors.isEmpty()){
-			saveErrors(request, errors);
-	        logger.debug("errors saved: " + errors);
-		}
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
-	    List caList=authoringUtil.repopulateCandidateAnswersBox(request, false);
-	    List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
-	    sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    
-	    
-		List listAddableQuestionContentDTO = (List)sessionMap.get(NEW_ADDABLE_QUESTION_CONTENT_KEY);
-		if (errors.isEmpty())
-		{
-		    List candidates =new LinkedList();
-		    List listCandidates =new LinkedList();
-		    
-		    Iterator listIterator=listAddableQuestionContentDTO.iterator();
-		    /*there is only 1 question dto*/
-		    while (listIterator.hasNext())
-		    {
-		        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-		        
-	            candidates=mcQuestionContentDTO.getListCandidateAnswersDTO();
-	            listCandidates=AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "up");
-	            
-	            mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
-		    }
-		}
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
 
-		request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
-		sessionMap.put(NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
-	    
-	    
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
-	
-		
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-	
-		String richTextTitle = request.getParameter(TITLE);
-		String richTextInstructions = request.getParameter(INSTRUCTIONS);
-	    sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
-	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-	
-	
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();;
-		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-		
-	    mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	    mcAuthoringForm.setTitle(richTextTitle);
-	    
-		mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-	
-		mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-	    
-	    request.getSession().setAttribute(httpSessionID, sessionMap);
-	
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-	
-		
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setCurrentTab("3");
-	
-	    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-		mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
 
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-	    
+	String newQuestion = request.getParameter("newQuestion");
+	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
 
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-	    
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+	String feedback = request.getParameter("feedback");
+	mcAuthoringForm.setFeedback(feedback);
 
-        
-	    String newQuestion=request.getParameter("newQuestion");
-	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
-	    
-	    String feedback=request.getParameter("feedback");
-	    mcAuthoringForm.setFeedback(feedback);
-	    
-		String mark=request.getParameter("mark");
-	    mcGeneralAuthoringDTO.setMarkValue(mark);
+	String mark = request.getParameter("mark");
+	mcGeneralAuthoringDTO.setMarkValue(mark);
 
-	    
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-	
-		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-		
-		String editQuestionBoxRequest=request.getParameter("editQuestionBoxRequest");
-		
-		setupCommonScreenData(mcContent, mcService,request);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
-		return newQuestionBox(mapping, form,  request, response);
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+
+	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
+
+	setupCommonScreenData(mcContent, mcService, request);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+
+	return newQuestionBox(mapping, form, request, response);
 
     }
-    
-    
 
-    public ActionForward moveAddedCandidateDown(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException {
-		McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-		
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-	
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		String candidateIndex=request.getParameter("candidateIndex");
-		mcAuthoringForm.setCandidateIndex(candidateIndex);
-		
-	    String totalMarks=request.getParameter("totalMarks");
-		AuthoringUtil authoringUtil = new AuthoringUtil();
-		boolean validateCandidateAnswersNotBlank =authoringUtil.validateCandidateAnswersNotBlank(request);
-		ActionMessages errors = new ActionMessages();
-		
-        if (!validateCandidateAnswersNotBlank)
-        {
-            ActionMessage error = new ActionMessage("candidates.blank");
-			errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-        }
-        
+    public ActionForward moveAddedCandidateDown(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
 
-	 	if(!errors.isEmpty()){
-			saveErrors(request, errors);
-	        logger.debug("errors saved: " + errors);
-		}
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
-	    List caList=authoringUtil.repopulateCandidateAnswersBox(request, false);
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	String candidateIndex = request.getParameter("candidateIndex");
+	mcAuthoringForm.setCandidateIndex(candidateIndex);
 
-		
-	    List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
-	    sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    
+	String totalMarks = request.getParameter("totalMarks");
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+	boolean validateCandidateAnswersNotBlank = authoringUtil.validateCandidateAnswersNotBlank(request);
+	ActionMessages errors = new ActionMessages();
 
-		List listAddableQuestionContentDTO = (List)sessionMap.get(NEW_ADDABLE_QUESTION_CONTENT_KEY);
+	if (!validateCandidateAnswersNotBlank) {
+	    ActionMessage error = new ActionMessage("candidates.blank");
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	}
 
-	    
-		if (errors.isEmpty())
-		{
-		    List candidates =new LinkedList();
-		    List listCandidates =new LinkedList();
-		    
-		    Iterator listIterator=listAddableQuestionContentDTO.iterator();
-		    /*there is only 1 question dto*/
-		    while (listIterator.hasNext())
-		    {
-		        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-		        
-	            candidates=mcQuestionContentDTO.getListCandidateAnswersDTO();
-	            listCandidates=AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "down");
-	            mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
-		    }
-		}
-		
+	if (!errors.isEmpty()) {
+	    saveErrors(request, errors);
+	    logger.debug("errors saved: " + errors);
+	}
 
-		request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
-		sessionMap.put(NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
-	    
-	    
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
-	
-		
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-		String richTextTitle = request.getParameter(TITLE);
-		String richTextInstructions = request.getParameter(INSTRUCTIONS);
-	    sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
-	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-	
-	
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();;
-		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-		
-	    mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	    mcAuthoringForm.setTitle(richTextTitle);
-	    
-		mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-	
-	    mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-	    
-	    request.getSession().setAttribute(httpSessionID, sessionMap);
-	
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-	
-		
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setCurrentTab("3");
-	
-	    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-		mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
 
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-	    
-	    
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+	List listAddableQuestionContentDTO = (List) sessionMap.get(NEW_ADDABLE_QUESTION_CONTENT_KEY);
 
-	    
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
-	    
-	    String newQuestion=request.getParameter("newQuestion");
-	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
-	    
-	    String feedback=request.getParameter("feedback");
-	    mcAuthoringForm.setFeedback(feedback);
-	    
-		String mark=request.getParameter("mark");
-	    mcGeneralAuthoringDTO.setMarkValue(mark);
-	    
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-	
-		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-	
-		
-		String editQuestionBoxRequest=request.getParameter("editQuestionBoxRequest");
-		setupCommonScreenData(mcContent, mcService,request);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
+	if (errors.isEmpty()) {
+	    List candidates = new LinkedList();
+	    List listCandidates = new LinkedList();
 
-		return newQuestionBox(mapping, form,  request, response);
+	    Iterator listIterator = listAddableQuestionContentDTO.iterator();
+	    /* there is only 1 question dto */
+	    while (listIterator.hasNext()) {
+		McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
+
+		candidates = mcQuestionContentDTO.getListCandidateAnswersDTO();
+		listCandidates = AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "down");
+		mcQuestionContentDTO.setListCandidateAnswersDTO(listCandidates);
+	    }
+	}
+
+	request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
+	sessionMap.put(NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
+
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
+
+	String activeModule = request.getParameter(ACTIVE_MODULE);
+	String richTextTitle = request.getParameter(TITLE);
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
+	sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
+	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
+
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	;
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
+
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+
+	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
+
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setCurrentTab("3");
+
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+
+	String newQuestion = request.getParameter("newQuestion");
+	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
+
+	String feedback = request.getParameter("feedback");
+	mcAuthoringForm.setFeedback(feedback);
+
+	String mark = request.getParameter("mark");
+	mcGeneralAuthoringDTO.setMarkValue(mark);
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+
+	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
+	setupCommonScreenData(mcContent, mcService, request);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+
+	return newQuestionBox(mapping, form, request, response);
     }
 
-    
-    
-    public ActionForward removeAddedCandidate(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException {
-		McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-		
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-	
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		
+    public ActionForward removeAddedCandidate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
 
-		String candidateIndex=request.getParameter("candidateIndex");
-		mcAuthoringForm.setCandidateIndex(candidateIndex);
-		
-	    String totalMarks=request.getParameter("totalMarks");
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	    AuthoringUtil authoringUtil = new AuthoringUtil();
-	    List caList=authoringUtil.repopulateCandidateAnswersBox(request, false);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
 
-	    
-	    List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
-	    sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
+	String candidateIndex = request.getParameter("candidateIndex");
+	mcAuthoringForm.setCandidateIndex(candidateIndex);
 
-	    
-		List listAddableQuestionContentDTO = (List)sessionMap.get(NEW_ADDABLE_QUESTION_CONTENT_KEY);
+	String totalMarks = request.getParameter("totalMarks");
 
-	    
-	    List candidates =new LinkedList();
-	    List listCandidates =new LinkedList();
-	    
-	    Iterator listIterator=listAddableQuestionContentDTO.iterator();
-	    /*there is only 1 question dto*/
-	    while (listIterator.hasNext())
-	    {
-	        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-	        
-            candidates=mcQuestionContentDTO.getListCandidateAnswersDTO();
-    	    mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
-    	    
-    	    List candidateAnswers=mcQuestionContentDTO.getListCandidateAnswersDTO();
-    	    McCandidateAnswersDTO mcCandidateAnswersDTO= null;
-    	    Iterator listCaIterator=candidateAnswers.iterator();
-    	    int caIndex=0;
-    	    while (listCaIterator.hasNext())
-    	    {
-    	        caIndex ++;
-    	        mcCandidateAnswersDTO= (McCandidateAnswersDTO)listCaIterator.next();
-    	        if (caIndex == new Integer(candidateIndex).intValue())
-    	        {
-    	            mcCandidateAnswersDTO.setCandidateAnswer("");
-    	            break;
-    	        }
-    	    }
-    	    
-    		candidateAnswers=AuthoringUtil.reorderListCandidatesDTO(candidateAnswers);
-    		mcQuestionContentDTO.setListCandidateAnswersDTO(candidateAnswers);
-    		mcQuestionContentDTO.setCaCount(new Integer(candidateAnswers.size()).toString());
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+	List caList = authoringUtil.repopulateCandidateAnswersBox(request, false);
+
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
+
+	List listAddableQuestionContentDTO = (List) sessionMap.get(NEW_ADDABLE_QUESTION_CONTENT_KEY);
+
+	List candidates = new LinkedList();
+	List listCandidates = new LinkedList();
+
+	Iterator listIterator = listAddableQuestionContentDTO.iterator();
+	/* there is only 1 question dto */
+	while (listIterator.hasNext()) {
+	    McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
+
+	    candidates = mcQuestionContentDTO.getListCandidateAnswersDTO();
+	    mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
+
+	    List candidateAnswers = mcQuestionContentDTO.getListCandidateAnswersDTO();
+	    McCandidateAnswersDTO mcCandidateAnswersDTO = null;
+	    Iterator listCaIterator = candidateAnswers.iterator();
+	    int caIndex = 0;
+	    while (listCaIterator.hasNext()) {
+		caIndex++;
+		mcCandidateAnswersDTO = (McCandidateAnswersDTO) listCaIterator.next();
+		if (caIndex == new Integer(candidateIndex).intValue()) {
+		    mcCandidateAnswersDTO.setCandidateAnswer("");
+		    break;
+		}
 	    }
 
-		request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
-		sessionMap.put(NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
+	    candidateAnswers = AuthoringUtil.reorderListCandidatesDTO(candidateAnswers);
+	    mcQuestionContentDTO.setListCandidateAnswersDTO(candidateAnswers);
+	    mcQuestionContentDTO.setCaCount(new Integer(candidateAnswers.size()).toString());
+	}
 
-	    
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
-	
-		
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-		String richTextTitle = request.getParameter(TITLE);
-		String richTextInstructions = request.getParameter(INSTRUCTIONS);
-	    sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
-	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-	
-	
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();;
-		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-		if (mcContent == null)
-		{
-			mcContent=mcService.retrieveMc(new Long(defaultContentIdStr));
-		}
-	
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-		
-	    mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	    mcAuthoringForm.setTitle(richTextTitle);
-	    
-		mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-	
-	    
-		mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-	    
-	    request.getSession().setAttribute(httpSessionID, sessionMap);
-	
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-	
-		
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setCurrentTab("3");
-	
-	    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-	
-	    mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-	
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
+	request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
+	sessionMap.put(NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
 
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-	    
-	    
-	    
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
 
-        
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+	String activeModule = request.getParameter(ACTIVE_MODULE);
+	String richTextTitle = request.getParameter(TITLE);
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
+	sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
+	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
-	    
-	    String newQuestion=request.getParameter("newQuestion");
-	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
-	    
-	    String feedback=request.getParameter("feedback");
-	    mcAuthoringForm.setFeedback(feedback);
-	    
-		String mark=request.getParameter("mark");
-	    mcGeneralAuthoringDTO.setMarkValue(mark);
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	;
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+	if (mcContent == null) {
+	    mcContent = mcService.retrieveMc(new Long(defaultContentIdStr));
+	}
 
-	    
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-	
-		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-		
-		
-		String editQuestionBoxRequest=request.getParameter("editQuestionBoxRequest");
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
-		setupCommonScreenData(mcContent, mcService,request);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-		return newQuestionBox(mapping, form,  request, response);
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
+
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+
+	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
+
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setCurrentTab("3");
+
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+
+	String newQuestion = request.getParameter("newQuestion");
+	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
+
+	String feedback = request.getParameter("feedback");
+	mcAuthoringForm.setFeedback(feedback);
+
+	String mark = request.getParameter("mark");
+	mcGeneralAuthoringDTO.setMarkValue(mark);
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+
+	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
+
+	setupCommonScreenData(mcContent, mcService, request);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+	return newQuestionBox(mapping, form, request, response);
 
     }
 
+    public ActionForward newAddedCandidateBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
 
-    public ActionForward newAddedCandidateBox(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-    throws IOException, ServletException {
-		McAuthoringForm mcAuthoringForm = (McMonitoringForm) form;
-	    
-		IMcService mcService =McServiceProxy.getMcService(getServlet().getServletContext());
-		String httpSessionID=mcAuthoringForm.getHttpSessionID();
-		SessionMap sessionMap=(SessionMap)request.getSession().getAttribute(httpSessionID);
-		String candidateIndex=request.getParameter("candidateIndex");
-		mcAuthoringForm.setCandidateIndex(candidateIndex);
-	    String totalMarks=request.getParameter("totalMarks");
-	    List listQuestionContentDTO=(List)sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
-		AuthoringUtil authoringUtil = new AuthoringUtil();
-	    List caList=authoringUtil.repopulateCandidateAnswersBox(request, true);
-	    int caCount=caList.size();
-	    String newQuestion=request.getParameter("newQuestion");
-	    String mark=request.getParameter("mark");
-	    String passmark=request.getParameter("passmark");
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	String httpSessionID = mcAuthoringForm.getHttpSessionID();
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	String candidateIndex = request.getParameter("candidateIndex");
+	mcAuthoringForm.setCandidateIndex(candidateIndex);
+	String totalMarks = request.getParameter("totalMarks");
+	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
+	AuthoringUtil authoringUtil = new AuthoringUtil();
+	List caList = authoringUtil.repopulateCandidateAnswersBox(request, true);
+	int caCount = caList.size();
+	String newQuestion = request.getParameter("newQuestion");
+	String mark = request.getParameter("mark");
+	String passmark = request.getParameter("passmark");
 
-	    
-	    String feedback=request.getParameter("feedback");
-	    int currentQuestionCount= listQuestionContentDTO.size();
-	    String editQuestionBoxRequest=request.getParameter("editQuestionBoxRequest");
-		List listAddableQuestionContentDTO = (List)sessionMap.get(NEW_ADDABLE_QUESTION_CONTENT_KEY);
-	    List candidates =new LinkedList();
-	    List listCandidates =new LinkedList();
-	    
-	    Iterator listIterator=listAddableQuestionContentDTO.iterator();
-	    /*there is only 1 question dto*/
-	    while (listIterator.hasNext())
-	    {
-	        McQuestionContentDTO mcQuestionContentDTO= (McQuestionContentDTO)listIterator.next();
-	        mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
-	        mcQuestionContentDTO.setCaCount(new Integer(caList.size()).toString());
-	    }
-	    
+	String feedback = request.getParameter("feedback");
+	int currentQuestionCount = listQuestionContentDTO.size();
+	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
+	List listAddableQuestionContentDTO = (List) sessionMap.get(NEW_ADDABLE_QUESTION_CONTENT_KEY);
+	List candidates = new LinkedList();
+	List listCandidates = new LinkedList();
 
-		request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
-		sessionMap.put(NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
-		
-	    sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
-	    
-		String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-		mcAuthoringForm.setContentFolderID(contentFolderID);
-	
-		
-		String activeModule=request.getParameter(ACTIVE_MODULE);
-		String richTextTitle = request.getParameter(TITLE);
-		String richTextInstructions = request.getParameter(INSTRUCTIONS);
-	    sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
-	    sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
-	
-	
-		String strToolContentID=request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-		String defaultContentIdStr=new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();;
-		McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-		
-	    mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	    mcAuthoringForm.setTitle(richTextTitle);
-	    
-		mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-		
-	    mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-	    
-	    request.getSession().setAttribute(httpSessionID, sessionMap);
-	
-		McUtils.setFormProperties(request, mcService,  
-	             mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, defaultContentIdStr, activeModule, sessionMap, httpSessionID);
-	
-		
-		mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
-		mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-		mcGeneralAuthoringDTO.setActiveModule(activeModule);
-		mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setToolContentID(strToolContentID);
-		mcAuthoringForm.setHttpSessionID(httpSessionID);
-		mcAuthoringForm.setActiveModule(activeModule);
-		mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
-		mcAuthoringForm.setCurrentTab("3");
-	
-	    request.setAttribute(LIST_QUESTION_CONTENT_DTO,listQuestionContentDTO);
-	
-	    mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-	
-	    Map marksMap=authoringUtil.buildMarksMap();
-	    mcGeneralAuthoringDTO.setMarksMap(marksMap);
+	Iterator listIterator = listAddableQuestionContentDTO.iterator();
+	/* there is only 1 question dto */
+	while (listIterator.hasNext()) {
+	    McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
+	    mcQuestionContentDTO.setListCandidateAnswersDTO(caList);
+	    mcQuestionContentDTO.setCaCount(new Integer(caList.size()).toString());
+	}
 
-	    Map passMarksMap=authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
-	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
-	    
-        String totalMark=AuthoringUtil.getTotalMark(listQuestionContentDTO);
-        mcAuthoringForm.setTotalMarks(totalMark);
-        mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+	request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
+	sessionMap.put(NEW_ADDABLE_QUESTION_CONTENT_KEY, listAddableQuestionContentDTO);
 
-	    
-	    Map correctMap=authoringUtil.buildCorrectMap();
-	    mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+	sessionMap.put(LIST_QUESTION_CONTENT_DTO_KEY, listQuestionContentDTO);
 
-	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
-	    mcAuthoringForm.setFeedback(feedback);
-	    mcGeneralAuthoringDTO.setMarkValue(mark);
+	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	mcAuthoringForm.setContentFolderID(contentFolderID);
 
-	    
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-		request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
-		McContent mcContent=mcService.retrieveMc(new Long(strToolContentID));
-		setupCommonScreenData(mcContent, mcService,request);
-		
-		MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
-		return newQuestionBox(mapping, form,  request, response);
+	String activeModule = request.getParameter(ACTIVE_MODULE);
+	String richTextTitle = request.getParameter(TITLE);
+	String richTextInstructions = request.getParameter(INSTRUCTIONS);
+	sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
+	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
+
+	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
+	;
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
+	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
+
+	mcGeneralAuthoringDTO.setActivityTitle(richTextTitle);
+	mcAuthoringForm.setTitle(richTextTitle);
+
+	mcGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+
+	mcGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
+
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+
+	McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+		defaultContentIdStr, activeModule, sessionMap, httpSessionID);
+
+	mcGeneralAuthoringDTO.setToolContentID(strToolContentID);
+	mcGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	mcGeneralAuthoringDTO.setActiveModule(activeModule);
+	mcGeneralAuthoringDTO.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setToolContentID(strToolContentID);
+	mcAuthoringForm.setHttpSessionID(httpSessionID);
+	mcAuthoringForm.setActiveModule(activeModule);
+	mcAuthoringForm.setDefaultContentIdStr(defaultContentIdStr);
+	mcAuthoringForm.setCurrentTab("3");
+
+	request.setAttribute(LIST_QUESTION_CONTENT_DTO, listQuestionContentDTO);
+
+	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
+
+	Map marksMap = authoringUtil.buildMarksMap();
+	mcGeneralAuthoringDTO.setMarksMap(marksMap);
+
+	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
+	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
+
+	String totalMark = AuthoringUtil.getTotalMark(listQuestionContentDTO);
+	mcAuthoringForm.setTotalMarks(totalMark);
+	mcGeneralAuthoringDTO.setTotalMarks(totalMark);
+
+	Map correctMap = authoringUtil.buildCorrectMap();
+	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
+
+	mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
+	mcAuthoringForm.setFeedback(feedback);
+	mcGeneralAuthoringDTO.setMarkValue(mark);
+
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
+	setupCommonScreenData(mcContent, mcService, request);
+
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+	return newQuestionBox(mapping, form, request, response);
     }
-    
+
     /**
      * prepares reflection data
      * 
@@ -3099,144 +2757,124 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @param userID
      * @param exportMode
      */
-	public void prepareReflectionData(HttpServletRequest request, McContent mcContent, 
-	        IMcService mcService, String userID, boolean exportMode)
-	{
-	    List reflectionsContainerDTO= new LinkedList();
-	    
-	    if (userID == null)
-	    {
-		    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) 
-		    {
-		        McSession mcSession = (McSession) sessionIter.next();
-		       for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) 
-		       {
-					McQueUsr user = (McQueUsr) userIter.next();
+    public void prepareReflectionData(HttpServletRequest request, McContent mcContent, IMcService mcService,
+	    String userID, boolean exportMode) {
+	List reflectionsContainerDTO = new LinkedList();
 
-					NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
-							CoreNotebookConstants.NOTEBOOK_TOOL,
-							MY_SIGNATURE, new Integer(user.getQueUsrId().toString()));
-					
-					if (notebookEntry != null) {
-					    ReflectionDTO reflectionDTO = new ReflectionDTO();
-					    reflectionDTO.setUserId(user.getQueUsrId().toString());
-					    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
-					    reflectionDTO.setUserName(user.getUsername());
-					    reflectionDTO.setReflectionUid (notebookEntry.getUid().toString());
-					    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
-					    reflectionDTO.setEntry(notebookEntryPresentable);
-					    reflectionsContainerDTO.add(reflectionDTO);
-					} 
-					
-		       }
-		   }
-	    }
-	    else
-	    {
-			//single user mode
-		    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) 
-		    {
-		        McSession mcSession = (McSession) sessionIter.next();
-		       for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) 
-		       {
-					McQueUsr user = (McQueUsr) userIter.next();
-					if (user.getQueUsrId().toString().equals(userID))
-					{
-						NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
-								CoreNotebookConstants.NOTEBOOK_TOOL,
-								MY_SIGNATURE, new Integer(user.getQueUsrId().toString()));
-						
-						if (notebookEntry != null) {
-						    ReflectionDTO reflectionDTO = new ReflectionDTO();
-						    reflectionDTO.setUserId(user.getQueUsrId().toString());
-						    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
-						    reflectionDTO.setUserName(user.getUsername());
-						    reflectionDTO.setReflectionUid (notebookEntry.getUid().toString());
-						    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
-						    reflectionDTO.setEntry(notebookEntryPresentable);
-						    reflectionsContainerDTO.add(reflectionDTO);
-						} 
-					    
-					}
-		       }
-		   }	        
-	        
-	    }
-	    
-	   request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
-	   
-	   if (exportMode)
-	   {
-	       request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
-	   }
-	}
+	if (userID == null) {
+	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) {
+		McSession mcSession = (McSession) sessionIter.next();
+		for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) {
+		    McQueUsr user = (McQueUsr) userIter.next();
 
+		    NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
+			    CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
+				    .toString()));
 
-	/**
-	 * allows viewing users reflection data
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws IOException
-	 * @throws ServletException
-	 * @throws ToolException
-	 */
-	public ActionForward openNotebook(ActionMapping mapping,
-			ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) throws IOException,
-            ServletException, ToolException
-    {
-    	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-		String uid=request.getParameter("uid");
-		String userId=request.getParameter("userId");
-		String userName=request.getParameter("userName");
-		String sessionId=request.getParameter("sessionId");
-		NotebookEntry notebookEntry = mcService.getEntry(new Long(sessionId),
-				CoreNotebookConstants.NOTEBOOK_TOOL,
-				MY_SIGNATURE, new Integer(userId));
-		
-        McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO= new McGeneralLearnerFlowDTO();
-		if (notebookEntry != null) {
-		    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
-		    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
-		    mcGeneralLearnerFlowDTO.setUserName(userName);
+		    if (notebookEntry != null) {
+			ReflectionDTO reflectionDTO = new ReflectionDTO();
+			reflectionDTO.setUserId(user.getQueUsrId().toString());
+			reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
+			reflectionDTO.setUserName(user.getUsername());
+			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
+			String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+			reflectionDTO.setEntry(notebookEntryPresentable);
+			reflectionsContainerDTO.add(reflectionDTO);
+		    }
+
 		}
+	    }
+	} else {
+	    // single user mode
+	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) {
+		McSession mcSession = (McSession) sessionIter.next();
+		for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) {
+		    McQueUsr user = (McQueUsr) userIter.next();
+		    if (user.getQueUsrId().toString().equals(userID)) {
+			NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
+				CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
+					.toString()));
 
-		request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
-		
-		return mapping.findForward(LEARNER_NOTEBOOK);
+			if (notebookEntry != null) {
+			    ReflectionDTO reflectionDTO = new ReflectionDTO();
+			    reflectionDTO.setUserId(user.getQueUsrId().toString());
+			    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
+			    reflectionDTO.setUserName(user.getUsername());
+			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
+			    String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+			    reflectionDTO.setEntry(notebookEntryPresentable);
+			    reflectionsContainerDTO.add(reflectionDTO);
+			}
+
+		    }
+		}
+	    }
+
 	}
-	
-	
-	/**
-	 * 
-	 * @param request
-	 * @param mcContent
-	 * @param mcService
-	 * @param userID
-	 * @param exportMode
-	 * @param currentSessionId
-	 */
-    public void prepareReflectionData(HttpServletRequest request, McContent mcContent, 
-	        IMcService mcService, String userID, boolean exportMode, String currentSessionId)
-	{
 
+	request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
 
-	    List reflectionsContainerDTO= new LinkedList();
-	    
-	    reflectionsContainerDTO=getReflectionList(mcContent, userID, mcService);	    
-	    
-	   request.setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
-	   
-	   if (exportMode)
-	   {
-	       request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
-	   }
+	if (exportMode) {
+	    request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
 	}
-    
+    }
+
+    /**
+     * allows viewing users reflection data
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     * @throws ToolException
+     */
+    public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, ToolException {
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	String uid = request.getParameter("uid");
+	String userId = request.getParameter("userId");
+	String userName = request.getParameter("userName");
+	String sessionId = request.getParameter("sessionId");
+	NotebookEntry notebookEntry = mcService.getEntry(new Long(sessionId), CoreNotebookConstants.NOTEBOOK_TOOL,
+		MY_SIGNATURE, new Integer(userId));
+
+	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = new McGeneralLearnerFlowDTO();
+	if (notebookEntry != null) {
+	    String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+	    mcGeneralLearnerFlowDTO.setUserName(userName);
+	}
+
+	request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
+
+	return mapping.findForward(LEARNER_NOTEBOOK);
+    }
+
+    /**
+     * 
+     * @param request
+     * @param mcContent
+     * @param mcService
+     * @param userID
+     * @param exportMode
+     * @param currentSessionId
+     */
+    public void prepareReflectionData(HttpServletRequest request, McContent mcContent, IMcService mcService,
+	    String userID, boolean exportMode, String currentSessionId) {
+
+	List reflectionsContainerDTO = new LinkedList();
+
+	reflectionsContainerDTO = getReflectionList(mcContent, userID, mcService);
+
+	request.setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
+
+	if (exportMode) {
+	    request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
+	}
+    }
 
     /**
      * 
@@ -3247,70 +2885,61 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @param mcService
      * @return
      */
-    public List getReflectionList(McContent mcContent, String userID, IMcService mcService)
-    {
-        List reflectionsContainerDTO= new LinkedList();
-        if (userID == null)
-        {
-            //all users mode
-    	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) 
-    	    {
-    	       McSession mcSession = (McSession) sessionIter.next();
-    	       
-    	       for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) 
-    	       {
-    				McQueUsr user = (McQueUsr) userIter.next();
+    public List getReflectionList(McContent mcContent, String userID, IMcService mcService) {
+	List reflectionsContainerDTO = new LinkedList();
+	if (userID == null) {
+	    // all users mode
+	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) {
+		McSession mcSession = (McSession) sessionIter.next();
 
-    				NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
-    						CoreNotebookConstants.NOTEBOOK_TOOL,
-    						MY_SIGNATURE, new Integer(user.getQueUsrId().toString()));
-    				
-    				if (notebookEntry != null) {
-    				    ReflectionDTO reflectionDTO = new ReflectionDTO();
-    				    reflectionDTO.setUserId(user.getQueUsrId().toString());
-    				    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
-    				    reflectionDTO.setUserName(user.getFullname());
-    				    reflectionDTO.setReflectionUid (notebookEntry.getUid().toString());
-    				    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
-    				    reflectionDTO.setEntry(notebookEntryPresentable);
-    				    reflectionsContainerDTO.add(reflectionDTO);
-    				} 
-    	       }
-    	   }
-       }
-       else
-       {
-           //single user mode
-    	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) 
-    	    {
-    	       McSession mcSession = (McSession) sessionIter.next();
-    	       for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) 
-    	       {
-    				McQueUsr user = (McQueUsr) userIter.next();
-    				if (user.getQueUsrId().toString().equals(userID))
-    				{
-    					NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
-    							CoreNotebookConstants.NOTEBOOK_TOOL,
-    							MY_SIGNATURE, new Integer(user.getQueUsrId().toString()));
-    					
-    					if (notebookEntry != null) {
-    					    ReflectionDTO reflectionDTO = new ReflectionDTO();
-    					    reflectionDTO.setUserId(user.getQueUsrId().toString());
-    					    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
-    					    reflectionDTO.setUserName(user.getFullname());
-    					    reflectionDTO.setReflectionUid (notebookEntry.getUid().toString());
-    					    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
-    					    reflectionDTO.setEntry(notebookEntryPresentable);
-    					    reflectionsContainerDTO.add(reflectionDTO);
-    					} 
-    				}
-    	       }		       
-    	    }
-       }
-        
-        return reflectionsContainerDTO;
+		for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) {
+		    McQueUsr user = (McQueUsr) userIter.next();
+
+		    NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
+			    CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
+				    .toString()));
+
+		    if (notebookEntry != null) {
+			ReflectionDTO reflectionDTO = new ReflectionDTO();
+			reflectionDTO.setUserId(user.getQueUsrId().toString());
+			reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
+			reflectionDTO.setUserName(user.getFullname());
+			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
+			String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+			reflectionDTO.setEntry(notebookEntryPresentable);
+			reflectionsContainerDTO.add(reflectionDTO);
+		    }
+		}
+	    }
+	} else {
+	    // single user mode
+	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) {
+		McSession mcSession = (McSession) sessionIter.next();
+		for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) {
+		    McQueUsr user = (McQueUsr) userIter.next();
+		    if (user.getQueUsrId().toString().equals(userID)) {
+			NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
+				CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
+					.toString()));
+
+			if (notebookEntry != null) {
+			    ReflectionDTO reflectionDTO = new ReflectionDTO();
+			    reflectionDTO.setUserId(user.getQueUsrId().toString());
+			    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
+			    reflectionDTO.setUserName(user.getFullname());
+			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
+			    String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+			    reflectionDTO.setEntry(notebookEntryPresentable);
+			    reflectionsContainerDTO.add(reflectionDTO);
+			}
+		    }
+		}
+	    }
+	}
+
+	return reflectionsContainerDTO;
     }
-    
+
     /**
      * returns reflection data for a specific session
      * 
@@ -3320,78 +2949,67 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @param currentSessionId
      * @return
      */
-    public List getReflectionListForSession(McContent mcContent, String userID, IMcService mcService, String currentSessionId)
-    {
-        List reflectionsContainerDTO= new LinkedList();
-        if (userID == null)
-        {
-            //all users mode
-    	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) 
-    	    {
-    	       McSession mcSession = (McSession) sessionIter.next();
-    	       
-    	       if (currentSessionId.equals(mcSession.getMcSessionId()))
-    	       {
-    	           
-        	       for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) 
-        	       {
-        				McQueUsr user = (McQueUsr) userIter.next();
+    public List getReflectionListForSession(McContent mcContent, String userID, IMcService mcService,
+	    String currentSessionId) {
+	List reflectionsContainerDTO = new LinkedList();
+	if (userID == null) {
+	    // all users mode
+	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) {
+		McSession mcSession = (McSession) sessionIter.next();
 
-        				NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
-        						CoreNotebookConstants.NOTEBOOK_TOOL,
-        						MY_SIGNATURE, new Integer(user.getQueUsrId().toString()));
-        				
-        				if (notebookEntry != null) {
-        				    ReflectionDTO reflectionDTO = new ReflectionDTO();
-        				    reflectionDTO.setUserId(user.getQueUsrId().toString());
-        				    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
-        				    reflectionDTO.setUserName(user.getFullname());
-        				    reflectionDTO.setReflectionUid (notebookEntry.getUid().toString());
-        				    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
-        				    reflectionDTO.setEntry(notebookEntryPresentable);
-        				    reflectionsContainerDTO.add(reflectionDTO);
-        				} 
-        	       }
-    	       }
-    	   }
-       }
-       else
-       {
-           //single user mode
-    	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) 
-    	    {
-    	       McSession mcSession = (McSession) sessionIter.next();
-    	       
-    	       if (currentSessionId.equals(mcSession.getMcSessionId()))
-    	       {
-        	       for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) 
-        	       {
-        				McQueUsr user = (McQueUsr) userIter.next();
-        				if (user.getQueUsrId().toString().equals(userID))
-        				{
-        					NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
-        							CoreNotebookConstants.NOTEBOOK_TOOL,
-        							MY_SIGNATURE, new Integer(user.getQueUsrId().toString()));
-        					if (notebookEntry != null) {
-        					    ReflectionDTO reflectionDTO = new ReflectionDTO();
-        					    reflectionDTO.setUserId(user.getQueUsrId().toString());
-        					    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
-        					    reflectionDTO.setUserName(user.getFullname());
-        					    reflectionDTO.setReflectionUid (notebookEntry.getUid().toString());
-        					    String notebookEntryPresentable=McUtils.replaceNewLines(notebookEntry.getEntry());
-        					    reflectionDTO.setEntry(notebookEntryPresentable);
-        					    reflectionsContainerDTO.add(reflectionDTO);
-        					} 
-        				}
-        	       }	
-    	           
-    	       }
-    	    }
-       }
-        
-        return reflectionsContainerDTO;
+		if (currentSessionId.equals(mcSession.getMcSessionId())) {
+
+		    for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) {
+			McQueUsr user = (McQueUsr) userIter.next();
+
+			NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
+				CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
+					.toString()));
+
+			if (notebookEntry != null) {
+			    ReflectionDTO reflectionDTO = new ReflectionDTO();
+			    reflectionDTO.setUserId(user.getQueUsrId().toString());
+			    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
+			    reflectionDTO.setUserName(user.getFullname());
+			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
+			    String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+			    reflectionDTO.setEntry(notebookEntryPresentable);
+			    reflectionsContainerDTO.add(reflectionDTO);
+			}
+		    }
+		}
+	    }
+	} else {
+	    // single user mode
+	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) {
+		McSession mcSession = (McSession) sessionIter.next();
+
+		if (currentSessionId.equals(mcSession.getMcSessionId())) {
+		    for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) {
+			McQueUsr user = (McQueUsr) userIter.next();
+			if (user.getQueUsrId().toString().equals(userID)) {
+			    NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
+				    CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
+					    .toString()));
+			    if (notebookEntry != null) {
+				ReflectionDTO reflectionDTO = new ReflectionDTO();
+				reflectionDTO.setUserId(user.getQueUsrId().toString());
+				reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
+				reflectionDTO.setUserName(user.getFullname());
+				reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
+				String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+				reflectionDTO.setEntry(notebookEntryPresentable);
+				reflectionsContainerDTO.add(reflectionDTO);
+			    }
+			}
+		    }
+
+		}
+	    }
+	}
+
+	return reflectionsContainerDTO;
     }
-
 
     /**
      * prepareEditActivityScreenData
@@ -3399,285 +3017,269 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @param request
      * @param mcContent
      */
-	public void prepareEditActivityScreenData(HttpServletRequest request, McContent mcContent)
-	{
-	    McGeneralAuthoringDTO mcGeneralAuthoringDTO= new McGeneralAuthoringDTO();
-		
-		mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
-		mcGeneralAuthoringDTO.setActivityInstructions(mcContent.getInstructions());
-		request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-	}
+    public void prepareEditActivityScreenData(HttpServletRequest request, McContent mcContent) {
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
 
- 	/**
-	 * 
-	 * @param request
-	 * @param mcMonitoringForm
-	 * @param mcGeneralMonitoringDTO
-	 */
-    protected void repopulateRequestParameters(HttpServletRequest request, McMonitoringForm mcMonitoringForm, 
-            McGeneralMonitoringDTO mcGeneralMonitoringDTO)
-    {
-	
-        String toolContentID=request.getParameter(TOOL_CONTENT_ID);
-        mcMonitoringForm.setToolContentID(toolContentID);
-        mcGeneralMonitoringDTO.setToolContentID(toolContentID);
-        
-        String activeModule=request.getParameter(ACTIVE_MODULE);
-        mcMonitoringForm.setActiveModule(activeModule);
-        mcGeneralMonitoringDTO.setActiveModule(activeModule);
-        
-        String defineLaterInEditMode=request.getParameter(DEFINE_LATER_IN_EDIT_MODE);
-        mcMonitoringForm.setDefineLaterInEditMode(defineLaterInEditMode);
-        mcGeneralMonitoringDTO.setDefineLaterInEditMode(defineLaterInEditMode);
-
-        
-        String isToolSessionChanged=request.getParameter(IS_TOOL_SESSION_CHANGED);
-        mcMonitoringForm.setIsToolSessionChanged(isToolSessionChanged);
-        mcGeneralMonitoringDTO.setIsToolSessionChanged(isToolSessionChanged);
-
-        String responseId=request.getParameter(RESPONSE_ID);
-        mcMonitoringForm.setResponseId(responseId);
-        mcGeneralMonitoringDTO.setResponseId(responseId);
-
-        String currentUid=request.getParameter(CURRENT_UID);
-        mcMonitoringForm.setCurrentUid(currentUid);
-        mcGeneralMonitoringDTO.setCurrentUid(currentUid);
+	mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
+	mcGeneralAuthoringDTO.setActivityInstructions(mcContent.getInstructions());
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
     }
 
-    
+    /**
+     * 
+     * @param request
+     * @param mcMonitoringForm
+     * @param mcGeneralMonitoringDTO
+     */
+    protected void repopulateRequestParameters(HttpServletRequest request, McMonitoringForm mcMonitoringForm,
+	    McGeneralMonitoringDTO mcGeneralMonitoringDTO) {
+
+	String toolContentID = request.getParameter(TOOL_CONTENT_ID);
+	mcMonitoringForm.setToolContentID(toolContentID);
+	mcGeneralMonitoringDTO.setToolContentID(toolContentID);
+
+	String activeModule = request.getParameter(ACTIVE_MODULE);
+	mcMonitoringForm.setActiveModule(activeModule);
+	mcGeneralMonitoringDTO.setActiveModule(activeModule);
+
+	String defineLaterInEditMode = request.getParameter(DEFINE_LATER_IN_EDIT_MODE);
+	mcMonitoringForm.setDefineLaterInEditMode(defineLaterInEditMode);
+	mcGeneralMonitoringDTO.setDefineLaterInEditMode(defineLaterInEditMode);
+
+	String isToolSessionChanged = request.getParameter(IS_TOOL_SESSION_CHANGED);
+	mcMonitoringForm.setIsToolSessionChanged(isToolSessionChanged);
+	mcGeneralMonitoringDTO.setIsToolSessionChanged(isToolSessionChanged);
+
+	String responseId = request.getParameter(RESPONSE_ID);
+	mcMonitoringForm.setResponseId(responseId);
+	mcGeneralMonitoringDTO.setResponseId(responseId);
+
+	String currentUid = request.getParameter(CURRENT_UID);
+	mcMonitoringForm.setCurrentUid(currentUid);
+	mcGeneralMonitoringDTO.setCurrentUid(currentUid);
+    }
+
     /**
      * 
      * @param mcContent
      * @param mcService
      * @param request
      */
-    protected void setupCommonScreenData(McContent mcContent, IMcService mcService, HttpServletRequest request)
-    {
-    	/*setting up USER_EXCEPTION_NO_TOOL_SESSIONS, from here */
-    	McGeneralMonitoringDTO mcGeneralMonitoringDTO= new McGeneralMonitoringDTO();
-    	mcGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
-    	
-    	if (mcService.studentActivityOccurredGlobal(mcContent))
-    	{
-    		mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
-    	}
-    	else
-    	{
-    		mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
-    	}
-    	
-    	
-    	mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
-    	mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
-    	
-        List attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
-        mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
-        mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
-        
+    protected void setupCommonScreenData(McContent mcContent, IMcService mcService, HttpServletRequest request) {
+	/* setting up USER_EXCEPTION_NO_TOOL_SESSIONS, from here */
+	McGeneralMonitoringDTO mcGeneralMonitoringDTO = new McGeneralMonitoringDTO();
+	mcGeneralMonitoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
-    	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
-    	/*.. till here*/
-    	
-    	
-    	/*find out if there are any reflection entries, from here*/
-    	boolean notebookEntriesExist=MonitoringUtil.notebookEntriesExist(mcService, mcContent);
-    	
-    	if (notebookEntriesExist)
-    	{
-    	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-    	    
-    	    String userExceptionNoToolSessions=(String)mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-    	    
-    	    if (userExceptionNoToolSessions.equals("true"))
-    	    {
-    	        //there are no online student activity but there are reflections
-    	        request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
-    	    }
-    	}
-    	else
-    	{
-    	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
-    	}
-    	/* ... till here*/
+	if (mcService.studentActivityOccurredGlobal(mcContent)) {
+	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
+	} else {
+	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
+	}
 
-    	MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
-    	MonitoringUtil.generateGroupsSessionData(request, mcService, mcContent);
-    	MonitoringUtil.setupAllSessionsData(request, mcContent,mcService);
+	mcGeneralMonitoringDTO.setOnlineInstructions(mcContent.getOnlineInstructions());
+	mcGeneralMonitoringDTO.setOfflineInstructions(mcContent.getOfflineInstructions());
+
+	List attachmentList = mcService.retrieveMcUploadedFiles(mcContent);
+	mcGeneralMonitoringDTO.setAttachmentList(attachmentList);
+	mcGeneralMonitoringDTO.setDeletedAttachmentList(new ArrayList());
+
+	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
+	/* .. till here */
+
+	/* find out if there are any reflection entries, from here */
+	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(mcService, mcContent);
+
+	if (notebookEntriesExist) {
+	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+
+	    String userExceptionNoToolSessions = (String) mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+
+	    if (userExceptionNoToolSessions.equals("true")) {
+		// there are no online student activity but there are reflections
+		request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+	    }
+	} else {
+	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
+	}
+	/* ... till here */
+
+	MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
+	MonitoringUtil.generateGroupsSessionData(request, mcService, mcContent);
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
     }
-    
-    
-    
+
     /**
-	 * downloadMarks
-	 * 
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws IOException
-	 * @throws ServletException
-	 */
-	public ActionForward downloadMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-	throws IOException, ServletException
-	{
-		MessageService messageService = getMessageService();
-		
-		String currentMonitoredToolSession=request.getParameter("monitoredToolSessionId");
-	    McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
-		
-		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-		String toolContentID = mcMonitoringForm.getToolContentID();
-		
-		McContent mcContent = mcService.retrieveMc(new Long(toolContentID));
-		
-		byte[] spreadsheet = null;
-		
-		try {
-			spreadsheet = prepareSessionDataSpreadsheet(request, response, mcContent, mcService, messageService, currentMonitoredToolSession);
-		} catch (Exception e) {
-			log.error("Error preparing spreadsheet: ", e);
-			request.setAttribute("errorName", messageService.getMessage("error.monitoring.spreadsheet.download"));
-			request.setAttribute("errorMessage", e);
-			return mapping.findForward("error");
-		}
-		
-		//	construct download file response header
-		OutputStream out = response.getOutputStream();
-		String fileName = "lams_mcq_" + currentMonitoredToolSession+".xls";
-		String mineType = "application/vnd.ms-excel";
-		String header = "attachment; filename=\"" + fileName + "\";";
-		response.setContentType(mineType);
-		response.setHeader("Content-Disposition",header);
-		
-		// write response
-		try {
-			out.write(spreadsheet);
-			out.flush();
-		} finally {
-			try {
-        		if (out != null) out.close();
-        	} catch (IOException e) {}
-		}
-		
-		return null;
-	}
-	
-	/**
-	 * prepareSessionDataSpreadsheet
-	 * 
-	 * @param request
-	 * @param response
-	 * @param mcContent
-	 * @param mcService
-	 * @param currentMonitoredToolSession
-	 * 
-	 * @return data to write out
-	 */
-    public byte[] prepareSessionDataSpreadsheet(HttpServletRequest request, HttpServletResponse response, McContent mcContent, 
-	        IMcService mcService, MessageService messageService, String currentMonitoredToolSession) 
-    		throws IOException, ServletException
-	{
-    	//create an empty excel file
-		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet("Marks");
-			
-		HSSFRow row;
-		HSSFCell cell;
-			
-		List listMonitoredAnswersContainerDTO=MonitoringUtil.buildGroupsQuestionData(request, mcContent, mcService);
-		List listMonitoredMarksContainerDTO=MonitoringUtil.buildGroupsMarkData(request, mcContent, mcService);
-		    
-		Map mapOptionsContent= new TreeMap(new McComparator());
-		mapOptionsContent.clear();
-			
-		Iterator queIterator= mcContent.getMcQueContents().iterator();
-		Long mapIndex=new Long(1);
-			
-		int idx = 0;
+     * downloadMarks
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public ActionForward downloadMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	MessageService messageService = getMessageService();
 
-		Iterator marksIterator = listMonitoredMarksContainerDTO.iterator();
-			
-			while(marksIterator.hasNext()) {
-						
-				McSessionMarkDTO mcSessionMarkDTO = (McSessionMarkDTO) marksIterator.next();
-				Map usersMarksMap = mcSessionMarkDTO.getUserMarks();
-				
-				String currentSessionId = mcSessionMarkDTO.getSessionId();
-				String currentSessionName = mcSessionMarkDTO.getSessionName();
-				
-				if(currentMonitoredToolSession.equals("All") || currentMonitoredToolSession.equals(currentSessionId)) {
-						
-					row = sheet.createRow(idx++);
-							
-					cell = row.createCell(0);
-					cell.setCellValue(messageService.getMessage("group.label"));
-							
-					cell = row.createCell(1);
-					cell.setCellValue(currentSessionName);
-							
-					idx++;
-					int count = 0;
-							
-					row = sheet.createRow(idx++);
-							
-					cell = row.createCell(count++);
-					cell.setCellValue(messageService.getMessage("label.learner"));
-							
-					cell = row.createCell(count++);
-					cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.username"));
-							
-					Iterator answersIterator = listMonitoredAnswersContainerDTO.iterator();
-					
-					while(answersIterator.hasNext()) {
-						McMonitoredAnswersDTO mcMonitoredAnswersDTO = (McMonitoredAnswersDTO) answersIterator.next();
-								
-						cell = row.createCell(count++);
-						cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.question.mark", new Object[] {count-1, mcMonitoredAnswersDTO.getMark()}));
-					}
-						
-					cell = row.createCell(count++);
-					cell.setCellValue(messageService.getMessage("label.total"));
-							
-					Iterator userMarkIterator = usersMarksMap.values().iterator();
-							
-					while(userMarkIterator.hasNext()) {
-						row = sheet.createRow(idx++);
-						count = 0;
-								
-						McUserMarkDTO userMark = (McUserMarkDTO) userMarkIterator.next();
-						String currentUserSessionId = userMark.getSessionId();
+	String currentMonitoredToolSession = request.getParameter("monitoredToolSessionId");
+	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 
-						cell = row.createCell(count++);
-						cell.setCellValue(userMark.getFullName());
-								
-						cell = row.createCell(count++);
-						cell.setCellValue(userMark.getUserName());
-								
-								
-						Integer[] marks = userMark.getMarks();
-						for(int i=0; i<marks.length; i++) {
-							cell = row.createCell(count++);
-							cell.setCellValue(marks[i]);
-						}
-										
-						cell = row.createCell(count++);
-						cell.setCellValue(userMark.getTotalMark());
-					}	
-					
-					idx++;
-				}
-						
-			}
-			
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		wb.write(bos);
-			
-		byte[] data = bos.toByteArray();
-    	
-		return data;
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	String toolContentID = mcMonitoringForm.getToolContentID();
+
+	McContent mcContent = mcService.retrieveMc(new Long(toolContentID));
+
+	byte[] spreadsheet = null;
+
+	try {
+	    spreadsheet = prepareSessionDataSpreadsheet(request, response, mcContent, mcService, messageService,
+		    currentMonitoredToolSession);
+	} catch (Exception e) {
+	    log.error("Error preparing spreadsheet: ", e);
+	    request.setAttribute("errorName", messageService.getMessage("error.monitoring.spreadsheet.download"));
+	    request.setAttribute("errorMessage", e);
+	    return mapping.findForward("error");
 	}
-    
+
+	// construct download file response header
+	OutputStream out = response.getOutputStream();
+	String fileName = "lams_mcq_" + currentMonitoredToolSession + ".xls";
+	String mineType = "application/vnd.ms-excel";
+	String header = "attachment; filename=\"" + fileName + "\";";
+	response.setContentType(mineType);
+	response.setHeader("Content-Disposition", header);
+
+	// write response
+	try {
+	    out.write(spreadsheet);
+	    out.flush();
+	} finally {
+	    try {
+		if (out != null)
+		    out.close();
+	    } catch (IOException e) {
+	    }
+	}
+
+	return null;
+    }
+
+    /**
+     * prepareSessionDataSpreadsheet
+     * 
+     * @param request
+     * @param response
+     * @param mcContent
+     * @param mcService
+     * @param currentMonitoredToolSession
+     * 
+     * @return data to write out
+     */
+    public byte[] prepareSessionDataSpreadsheet(HttpServletRequest request, HttpServletResponse response,
+	    McContent mcContent, IMcService mcService, MessageService messageService, String currentMonitoredToolSession)
+	    throws IOException, ServletException {
+	// create an empty excel file
+	HSSFWorkbook wb = new HSSFWorkbook();
+	HSSFSheet sheet = wb.createSheet("Marks");
+
+	HSSFRow row;
+	HSSFCell cell;
+
+	List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(request, mcContent, mcService);
+	List listMonitoredMarksContainerDTO = MonitoringUtil.buildGroupsMarkData(request, mcContent, mcService);
+
+	Map mapOptionsContent = new TreeMap(new McComparator());
+	mapOptionsContent.clear();
+
+	Iterator queIterator = mcContent.getMcQueContents().iterator();
+	Long mapIndex = new Long(1);
+
+	int idx = 0;
+
+	Iterator marksIterator = listMonitoredMarksContainerDTO.iterator();
+
+	while (marksIterator.hasNext()) {
+
+	    McSessionMarkDTO mcSessionMarkDTO = (McSessionMarkDTO) marksIterator.next();
+	    Map usersMarksMap = mcSessionMarkDTO.getUserMarks();
+
+	    String currentSessionId = mcSessionMarkDTO.getSessionId();
+	    String currentSessionName = mcSessionMarkDTO.getSessionName();
+
+	    if (currentMonitoredToolSession.equals("All") || currentMonitoredToolSession.equals(currentSessionId)) {
+
+		row = sheet.createRow(idx++);
+
+		cell = row.createCell(0);
+		cell.setCellValue(messageService.getMessage("group.label"));
+
+		cell = row.createCell(1);
+		cell.setCellValue(currentSessionName);
+
+		idx++;
+		int count = 0;
+
+		row = sheet.createRow(idx++);
+
+		cell = row.createCell(count++);
+		cell.setCellValue(messageService.getMessage("label.learner"));
+
+		cell = row.createCell(count++);
+		cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.username"));
+
+		Iterator answersIterator = listMonitoredAnswersContainerDTO.iterator();
+
+		while (answersIterator.hasNext()) {
+		    McMonitoredAnswersDTO mcMonitoredAnswersDTO = (McMonitoredAnswersDTO) answersIterator.next();
+
+		    cell = row.createCell(count++);
+		    cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.question.mark",
+			    new Object[] { count - 1, mcMonitoredAnswersDTO.getMark() }));
+		}
+
+		cell = row.createCell(count++);
+		cell.setCellValue(messageService.getMessage("label.total"));
+
+		Iterator userMarkIterator = usersMarksMap.values().iterator();
+
+		while (userMarkIterator.hasNext()) {
+		    row = sheet.createRow(idx++);
+		    count = 0;
+
+		    McUserMarkDTO userMark = (McUserMarkDTO) userMarkIterator.next();
+		    String currentUserSessionId = userMark.getSessionId();
+
+		    cell = row.createCell(count++);
+		    cell.setCellValue(userMark.getFullName());
+
+		    cell = row.createCell(count++);
+		    cell.setCellValue(userMark.getUserName());
+
+		    Integer[] marks = userMark.getMarks();
+		    for (int i = 0; i < marks.length; i++) {
+			cell = row.createCell(count++);
+			cell.setCellValue(marks[i]);
+		    }
+
+		    cell = row.createCell(count++);
+		    cell.setCellValue(userMark.getTotalMark());
+		}
+
+		idx++;
+	    }
+
+	}
+
+	ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	wb.write(bos);
+
+	byte[] data = bos.toByteArray();
+
+	return data;
+    }
+
     /**
      * Set Submission Deadline
      * 
@@ -3689,18 +3291,19 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-    	
-    	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-		
-    	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-    	McContent mcContent = mcService.retrieveMc(contentID);
-	
+
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	McContent mcContent = mcService.retrieveMc(contentID);
+
 	Long dateParameter = WebUtil.readLongParam(request, McAppConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
 	if (dateParameter != null) {
 	    Date submissionDeadline = new Date(dateParameter);
 	    HttpSession ss = SessionManager.getSession();
-	    org.lamsfoundation.lams.usermanagement.dto.UserDTO teacher = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss.getAttribute(AttributeNames.USER);
+	    org.lamsfoundation.lams.usermanagement.dto.UserDTO teacher = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss
+		    .getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
 	}
@@ -3711,10 +3314,9 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     }
 
     /**
-	 * Return ResourceService bean.
-	 */
-	private MessageService getMessageService() {
-	     return (MessageService) McServiceProxy.getMessageService(getServlet().getServletContext());
-	}
+     * Return ResourceService bean.
+     */
+    private MessageService getMessageService() {
+	return (MessageService) McServiceProxy.getMessageService(getServlet().getServletContext());
+    }
 }
-    

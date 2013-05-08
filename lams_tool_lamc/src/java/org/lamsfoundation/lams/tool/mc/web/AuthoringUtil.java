@@ -109,7 +109,7 @@ public class AuthoringUtil implements McAppConstants {
     public static void cleanupRedundantQuestions(HttpServletRequest request, List existingQuestions,
 	    Map mapQuestionsContent, McContent mcContent, IMcService mcService) {
 
-	/*remove ununsed question entries from the db */
+	/* remove ununsed question entries from the db */
 	boolean questionFound = false;
 	Iterator itExistingQuestions = existingQuestions.iterator();
 	while (itExistingQuestions.hasNext()) {
@@ -128,15 +128,15 @@ public class AuthoringUtil implements McAppConstants {
 
 	    if (questionFound == false) {
 		String deletableQuestion = mcQueContent.getQuestion();
-		//found is false, delete this question
+		// found is false, delete this question
 		mcQueContent = mcService.getQuestionContentByQuestionText(deletableQuestion, mcContent.getUid());
 
 		if (mcQueContent != null) {
-		    //first removing from collection
+		    // first removing from collection
 		    mcContent.getMcQueContents().remove(mcQueContent);
 
 		    mcService.removeMcQueContent(mcQueContent);
-		    //removed mcQueContent from the db
+		    // removed mcQueContent from the db
 		}
 	    }
 	}
@@ -392,7 +392,7 @@ public class AuthoringUtil implements McAppConstants {
 
 	    if ((!mcQuestionContentDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString()))
 		    && !mcQuestionContentDTO.getDisplayOrder().equals(new Integer(replacedNodeIndex).toString())) {
-		//normal cop
+		// normal cop
 		tempNode.setQuestion(mcQuestionContentDTO.getQuestion());
 		tempNode.setDisplayOrder(mcQuestionContentDTO.getDisplayOrder());
 		tempNode.setFeedback(mcQuestionContentDTO.getFeedback());
@@ -401,7 +401,7 @@ public class AuthoringUtil implements McAppConstants {
 		tempNode.setMark(mcQuestionContentDTO.getMark());
 
 	    } else if (mcQuestionContentDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())) {
-		//move type 1
+		// move type 1
 		tempNode.setQuestion(replacedNode.getQuestion());
 		tempNode.setDisplayOrder(replacedNode.getDisplayOrder());
 		tempNode.setFeedback(replacedNode.getFeedback());
@@ -409,7 +409,7 @@ public class AuthoringUtil implements McAppConstants {
 		tempNode.setCaCount(replacedNode.getCaCount());
 		tempNode.setMark(replacedNode.getMark());
 	    } else if (mcQuestionContentDTO.getDisplayOrder().equals(new Integer(replacedNodeIndex).toString())) {
-		//move type 2
+		// move type 2
 		tempNode.setQuestion(mainNode.getQuestion());
 		tempNode.setDisplayOrder(mainNode.getDisplayOrder());
 		tempNode.setFeedback(mainNode.getFeedback());
@@ -492,15 +492,15 @@ public class AuthoringUtil implements McAppConstants {
 
 	    if ((!new Integer(queIndex).toString().equals(new Integer(intOriginalCandidateIndex).toString()))
 		    && !new Integer(queIndex).toString().equals(new Integer(replacedNodeIndex).toString())) {
-		//normal copy
+		// normal copy
 		tempNode.setCandidateAnswer(mcCandidateAnswersDTO.getCandidateAnswer());
 		tempNode.setCorrect(mcCandidateAnswersDTO.getCorrect());
 	    } else if (new Integer(queIndex).toString().equals(new Integer(intOriginalCandidateIndex).toString())) {
-		//move type 1
+		// move type 1
 		tempNode.setCandidateAnswer(replacedNode.getCandidateAnswer());
 		tempNode.setCorrect(replacedNode.getCorrect());
 	    } else if (new Integer(queIndex).toString().equals(new Integer(replacedNodeIndex).toString())) {
-		//move type 2
+		// move type 2
 		tempNode.setCandidateAnswer(mainNode.getCandidateAnswer());
 		tempNode.setCorrect(mainNode.getCorrect());
 	    }
@@ -872,7 +872,7 @@ public class AuthoringUtil implements McAppConstants {
 		}
 
 		if (entryUsed == false) {
-		    //removing unused entry in db
+		    // removing unused entry in db
 
 		    McQueContent removeableMcQueContent = mcService.getQuestionContentByQuestionText(
 			    queContent.getQuestion(), mcContent.getUid());
@@ -1066,7 +1066,7 @@ public class AuthoringUtil implements McAppConstants {
 	    if (user != null) {
 		userId = user.getUserID().longValue();
 	    } else {
-		//should not reach here
+		// should not reach here
 		userId = 0;
 	    }
 	}
@@ -1099,7 +1099,7 @@ public class AuthoringUtil implements McAppConstants {
 
 	AuthoringUtil.logger.debug("activeModule:" + activeModule);
 	if (activeModule.equals(McAppConstants.AUTHORING)) {
-	    //setting other content values
+	    // setting other content values
 	    mcContent.setOnlineInstructions(richTextOnlineInstructions);
 	    mcContent.setOfflineInstructions(richTextOfflineInstructions);
 	    mcContent.setQuestionsSequenced(questionsSequencedBoolean);
@@ -1159,7 +1159,7 @@ public class AuthoringUtil implements McAppConstants {
 		String currentFeedback = (String) mapFeedback.get(new Integer(displayOrder).toString());
 
 		String currentMark = (String) mapMarks.get(new Integer(displayOrder).toString());
-		/*set the default mark in case it is not provided*/
+		/* set the default mark in case it is not provided */
 		if (currentMark == null) {
 		    currentMark = "1";
 		}
@@ -1169,22 +1169,21 @@ public class AuthoringUtil implements McAppConstants {
 		McQueContent queContent = new McQueContent(pairs.getValue().toString(), new Integer(displayOrder),
 			new Integer(currentMark), currentFeedback, mcContent, null, null);
 
-
-		/* checks if the question is already recorded*/
+		/* checks if the question is already recorded */
 		McQueContent existingMcQueContent = mcService.getQuestionContentByDisplayOrder(new Long(displayOrder),
 			mcContent.getUid());
 
 		if (existingMcQueContent == null) {
-		    /*make sure a question with the same question text is not already saved*/
+		    /* make sure a question with the same question text is not already saved */
 		    McQueContent duplicateMcQueContent = mcService.getQuestionContentByQuestionText(pairs.getValue()
 			    .toString(), mcContent.getUid());
-		    //adding a new question to content
+		    // adding a new question to content
 		    mcContent.getMcQueContents().add(queContent);
 		    queContent.setMcContent(mcContent);
 
 		    mcService.createMcQue(queContent);
 
-		    //start persisting candidate answers
+		    // start persisting candidate answers
 		    persistCandidates(caList, queContent, mcService);
 		} else {
 
@@ -1195,12 +1194,12 @@ public class AuthoringUtil implements McAppConstants {
 		    existingMcQueContent.setDisplayOrder(new Integer(displayOrder));
 		    existingMcQueContent.setMark(new Integer(currentMark));
 
-		    //updating the existing question content
+		    // updating the existing question content
 		    mcService.updateMcQueContent(existingMcQueContent);
 
-		    //will be removing redundant candidates
+		    // will be removing redundant candidates
 		    mcService.removeMcOptionsContentByQueId(existingMcQueContent.getUid());
-		    //start persisting candidates 
+		    // start persisting candidates
 
 		    persistCandidates(caList, existingMcQueContent, mcService);
 		}
@@ -1219,7 +1218,6 @@ public class AuthoringUtil implements McAppConstants {
 	if ((totalMark != null) && (totalMark.length() > 0)) {
 	    intTotalMark = new Integer(totalMark).intValue();
 	}
-
 
 	Map passMarksMap = buildPassMarkMap(intTotalMark, false);
 	return passMarksMap;
@@ -1275,12 +1273,11 @@ public class AuthoringUtil implements McAppConstants {
 
 	String correct = request.getParameter("correct");
 
-	/* check this logic again*/
+	/* check this logic again */
 	int intCorrect = 0;
 	if (correct != null) {
 	    intCorrect = new Integer(correct).intValue();
 	}
-
 
 	List listFinalCandidatesDTO = new LinkedList();
 
@@ -1317,7 +1314,7 @@ public class AuthoringUtil implements McAppConstants {
 	    String candidate = request.getParameter("ca" + i);
 
 	    if ((candidate != null) && (candidate.length() == 0)) {
-		//there is at least 1 blank candidate
+		// there is at least 1 blank candidate
 		return false;
 	    }
 	}
@@ -1341,7 +1338,7 @@ public class AuthoringUtil implements McAppConstants {
 	    String correct = mcCandidateAnswersDTO.getCorrect();
 
 	    if (correct.equals("Correct")) {
-		//there is at least one Correct candidate, it is good.
+		// there is at least one Correct candidate, it is good.
 		return true;
 	    }
 	}
@@ -1360,7 +1357,7 @@ public class AuthoringUtil implements McAppConstants {
 	    String correct = mcCandidateAnswersDTO.getCorrect();
 
 	    if (correct.equals("Correct")) {
-		//there is at leat one Correct candidate, it is good.
+		// there is at leat one Correct candidate, it is good.
 		++correctCandidatesCount;
 	    }
 	}
@@ -1400,7 +1397,6 @@ public class AuthoringUtil implements McAppConstants {
 		if (mcQueContent.getFeedback() != null) {
 		    feedback = mcQueContent.getFeedback();
 		}
-
 
 		String question = mcQueContent.getQuestion();
 

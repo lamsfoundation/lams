@@ -26,25 +26,24 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * @author Ozgur Demirtas
- *  A comparator implementation that can be used as a constructor to collections. 
- *  The TreeMap in the web layer makes use of it.
+ * @author Ozgur Demirtas A comparator implementation that can be used as a constructor to collections. The TreeMap in
+ *         the web layer makes use of it.
  * 
  */
 public class McComparator implements Comparator, Serializable {
-	
-	 public int compare(Object o1, Object o2) {
-	   String s1 = (String)o1;
-	   String s2 = (String)o2;
-	 	   
-	   int key1=new Long(s1).intValue();
-	   int key2=new Long(s2).intValue();
-	   //logger.debug(logger + " " + this.getClass().getName() +  "comparing key1 and key2:"  + key1 + " and " + key2);
-	   return key1 - key2;
-	  }                                    
 
-	 public boolean equals(Object o) {
-	    String s = (String)o;
-	  	return compare(this, o)==0;
-	  }
+    public int compare(Object o1, Object o2) {
+	String s1 = (String) o1;
+	String s2 = (String) o2;
+
+	int key1 = new Long(s1).intValue();
+	int key2 = new Long(s2).intValue();
+	// logger.debug(logger + " " + this.getClass().getName() + "comparing key1 and key2:" + key1 + " and " + key2);
+	return key1 - key2;
+    }
+
+    public boolean equals(Object o) {
+	String s = (String) o;
+	return compare(this, o) == 0;
+    }
 }

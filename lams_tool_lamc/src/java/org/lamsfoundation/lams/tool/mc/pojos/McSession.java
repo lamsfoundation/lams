@@ -29,21 +29,20 @@ import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p>Persistent  object/bean that defines the content for the MCQ tool.
- * Provides accessors and mutators to get/set attributes
- * It maps to database table: tl_lamc11_session
+ * <p>
+ * Persistent object/bean that defines the content for the MCQ tool. Provides accessors and mutators to get/set
+ * attributes It maps to database table: tl_lamc11_session
  * </p>
  * 
  * @author Ozgur Demirtas
  */
 public class McSession implements Serializable {
 
-	public final static String INCOMPLETE = "INCOMPLETE";
-    
+    public final static String INCOMPLETE = "INCOMPLETE";
+
     public static final String COMPLETED = "COMPLETED";
-    
+
     /** identifier field */
     private Long uid;
 
@@ -58,7 +57,7 @@ public class McSession implements Serializable {
 
     /** nullable persistent field */
     private String sessionStatus;
-    
+
     private String session_name;
 
     /** nullable persistent field */
@@ -71,142 +70,156 @@ public class McSession implements Serializable {
     private Set mcQueUsers;
 
     /** full constructor */
-    public McSession(Long mcSessionId, Date sessionStartDate, Date sessionEndDate, String sessionStatus, org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent, Set mcQueUsers) {
-        this.mcSessionId = mcSessionId;
-        this.sessionStartDate = sessionStartDate;
-        this.sessionEndDate = sessionEndDate;
-        this.sessionStatus = sessionStatus;
-        this.mcContent = mcContent;
-        this.mcQueUsers = mcQueUsers;
+    public McSession(Long mcSessionId, Date sessionStartDate, Date sessionEndDate, String sessionStatus,
+	    org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent, Set mcQueUsers) {
+	this.mcSessionId = mcSessionId;
+	this.sessionStartDate = sessionStartDate;
+	this.sessionEndDate = sessionEndDate;
+	this.sessionStatus = sessionStatus;
+	this.mcContent = mcContent;
+	this.mcQueUsers = mcQueUsers;
     }
-    
-    public McSession(Long mcSessionId, Date sessionStartDate, String sessionStatus, String session_name, org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent, Set mcQueUsers) {
-        this.mcSessionId = mcSessionId;
-        this.sessionStartDate = sessionStartDate;
-        this.sessionStatus = sessionStatus;
-        this.session_name = session_name;
-        this.mcContent = mcContent;
-        this.mcQueUsers = mcQueUsers;
+
+    public McSession(Long mcSessionId, Date sessionStartDate, String sessionStatus, String session_name,
+	    org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent, Set mcQueUsers) {
+	this.mcSessionId = mcSessionId;
+	this.sessionStartDate = sessionStartDate;
+	this.sessionStatus = sessionStatus;
+	this.session_name = session_name;
+	this.mcContent = mcContent;
+	this.mcQueUsers = mcQueUsers;
     }
-    
-    public McSession(Long mcSessionId, Date sessionStartDate, String sessionStatus, org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent, Set mcQueUsers) {
-        this.mcSessionId = mcSessionId;
-        this.sessionStartDate = sessionStartDate;
-        this.sessionStatus = sessionStatus;
-        this.mcContent = mcContent;
-        this.mcQueUsers = mcQueUsers;
+
+    public McSession(Long mcSessionId, Date sessionStartDate, String sessionStatus,
+	    org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent, Set mcQueUsers) {
+	this.mcSessionId = mcSessionId;
+	this.sessionStartDate = sessionStartDate;
+	this.sessionStatus = sessionStatus;
+	this.mcContent = mcContent;
+	this.mcQueUsers = mcQueUsers;
     }
-    
+
     /** default constructor */
     public McSession() {
     }
 
     /** minimal constructor */
     public McSession(Long mcSessionId, Set mcQueUsers) {
-        this.mcSessionId = mcSessionId;
-        this.mcQueUsers = mcQueUsers;
+	this.mcSessionId = mcSessionId;
+	this.mcQueUsers = mcQueUsers;
     }
 
     public Long getUid() {
-        return this.uid;
+	return this.uid;
     }
 
     public void setUid(Long uid) {
-        this.uid = uid;
+	this.uid = uid;
     }
 
     public Long getMcSessionId() {
-        return this.mcSessionId;
+	return this.mcSessionId;
     }
 
     public void setMcSessionId(Long mcSessionId) {
-        this.mcSessionId = mcSessionId;
+	this.mcSessionId = mcSessionId;
     }
 
-    
     public Long getMcContentId() {
-        return this.mcContentId;
+	return this.mcContentId;
     }
 
     public void setMcContentId(Long mcContentId) {
-        this.mcContentId = mcContentId;
+	this.mcContentId = mcContentId;
     }
 
     public org.lamsfoundation.lams.tool.mc.pojos.McContent getMcContent() {
-        return this.mcContent;
+	return this.mcContent;
     }
 
     public void setMcContent(org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent) {
-        this.mcContent = mcContent;
+	this.mcContent = mcContent;
     }
 
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("uid", getUid())
-            .toString();
+	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
 
-	/**
-	 * @return Returns the sessionEndDate.
-	 */
-	public Date getSessionEndDate() {
-		return sessionEndDate;
-	}
-	/**
-	 * @param sessionEndDate The sessionEndDate to set.
-	 */
-	public void setSessionEndDate(Date sessionEndDate) {
-		this.sessionEndDate = sessionEndDate;
-	}
-	/**
-	 * @return Returns the sessionStartDate.
-	 */
-	public Date getSessionStartDate() {
-		return sessionStartDate;
-	}
-	/**
-	 * @param sessionStartDate The sessionStartDate to set.
-	 */
-	public void setSessionStartDate(Date sessionStartDate) {
-		this.sessionStartDate = sessionStartDate;
-	}
-	/**
-	 * @return Returns the sessionStatus.
-	 */
-	public String getSessionStatus() {
-		return sessionStatus;
-	}
-	/**
-	 * @param sessionStatus The sessionStatus to set.
-	 */
-	public void setSessionStatus(String sessionStatus) {
-		this.sessionStatus = sessionStatus;
-	}
-	/**
-	 * @return Returns the mcQueUsers.
-	 */
-	
-	public Set getMcQueUsers() {
-		if (this.mcQueUsers == null)
-			setMcQueUsers(new HashSet());
-	    return this.mcQueUsers;
-	}
-	/**
-	 * @param mcQueUsers The mcQueUsers to set.
-	 */
-	public void setMcQueUsers(Set mcQueUsers) {
-		this.mcQueUsers = mcQueUsers;
-	}
-	/**
-	 * @return Returns the session_name.
-	 */
-	public String getSession_name() {
-		return session_name;
-	}
-	/**
-	 * @param session_name The session_name to set.
-	 */
-	public void setSession_name(String session_name) {
-		this.session_name = session_name;
-	}
+    /**
+     * @return Returns the sessionEndDate.
+     */
+    public Date getSessionEndDate() {
+	return sessionEndDate;
+    }
+
+    /**
+     * @param sessionEndDate
+     *            The sessionEndDate to set.
+     */
+    public void setSessionEndDate(Date sessionEndDate) {
+	this.sessionEndDate = sessionEndDate;
+    }
+
+    /**
+     * @return Returns the sessionStartDate.
+     */
+    public Date getSessionStartDate() {
+	return sessionStartDate;
+    }
+
+    /**
+     * @param sessionStartDate
+     *            The sessionStartDate to set.
+     */
+    public void setSessionStartDate(Date sessionStartDate) {
+	this.sessionStartDate = sessionStartDate;
+    }
+
+    /**
+     * @return Returns the sessionStatus.
+     */
+    public String getSessionStatus() {
+	return sessionStatus;
+    }
+
+    /**
+     * @param sessionStatus
+     *            The sessionStatus to set.
+     */
+    public void setSessionStatus(String sessionStatus) {
+	this.sessionStatus = sessionStatus;
+    }
+
+    /**
+     * @return Returns the mcQueUsers.
+     */
+
+    public Set getMcQueUsers() {
+	if (this.mcQueUsers == null)
+	    setMcQueUsers(new HashSet());
+	return this.mcQueUsers;
+    }
+
+    /**
+     * @param mcQueUsers
+     *            The mcQueUsers to set.
+     */
+    public void setMcQueUsers(Set mcQueUsers) {
+	this.mcQueUsers = mcQueUsers;
+    }
+
+    /**
+     * @return Returns the session_name.
+     */
+    public String getSession_name() {
+	return session_name;
+    }
+
+    /**
+     * @param session_name
+     *            The session_name to set.
+     */
+    public void setSession_name(String session_name) {
+	this.session_name = session_name;
+    }
 }

@@ -107,8 +107,8 @@ public class MCOutputFactory extends OutputFactory {
     }
 
     /**
-     * Get the mark for a specific user. This gets the mark associated with the
-     * last attempt. Will always return a ToolOutput object.
+     * Get the mark for a specific user. This gets the mark associated with the last attempt. Will always return a
+     * ToolOutput object.
      */
     private ToolOutput getLearnerMark(McQueUsr queUser) {
 	Long mark;
@@ -122,10 +122,8 @@ public class MCOutputFactory extends OutputFactory {
     }
 
     /**
-     * Did the user get the questions all correct. This checks the answers
-     * associated with the last attempt. Assumes all correct if the mark is
-     * equal to the maximum possible mark. Will always return a ToolOutput
-     * object.
+     * Did the user get the questions all correct. This checks the answers associated with the last attempt. Assumes all
+     * correct if the mark is equal to the maximum possible mark. Will always return a ToolOutput object.
      */
     private ToolOutput getLearnerAllCorrect(IMcService mcService, McQueUsr queUser) {
 	boolean allCorrect = allQuestionsCorrect(mcService, queUser);
@@ -137,7 +135,7 @@ public class MCOutputFactory extends OutputFactory {
     // one correct option for a question.
     private boolean allQuestionsCorrect(IMcService mcService, McQueUsr queUser) {
 
-	// Build a list of all the correct answers. If we hit any options that are not a correct option 
+	// Build a list of all the correct answers. If we hit any options that are not a correct option
 	// we can abort as we know there is a wrong answer.
 	// Otherwise count the number of correct options overall (for comparison later).
 	long correctlearnerOptions = 0;

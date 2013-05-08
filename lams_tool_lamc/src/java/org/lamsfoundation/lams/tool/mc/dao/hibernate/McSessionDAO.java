@@ -28,76 +28,60 @@ import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO;
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author ozgurd
- * <p>Hibernate implementation for database access to Mc sessions for the mc tool.</p>
+ *         <p>
+ *         Hibernate implementation for database access to Mc sessions for the mc tool.
+ *         </p>
  */
 
 public class McSessionDAO extends HibernateDaoSupport implements IMcSessionDAO {
-	
+
     private static final String LOAD_MCSESSION_BY_USER = "select ms from McSession ms left join fetch "
-        + "ms.mcQueUsers user where user.queUsrId=:userId";
-    
-	private static final String LOAD_MCSESSION_BY_MCSESSIONID = "from McSession mcs where mcs.mcSessionId=?";
-    
-    public McSession getMcSessionByUID(Long uid)
-	{
-		 return (McSession) this.getHibernateTemplate()
-         .get(McSession.class, uid);
-	}
-	
-    public McSession findMcSessionById(Long mcSessionId)
-    {
-		
-		List list = getSession().createQuery(LOAD_MCSESSION_BY_MCSESSIONID)
-		.setLong(0,mcSessionId.longValue())
-		.list();
-		
-		if(list != null && list.size() > 0){
-			McSession mcs = (McSession) list.get(0);
-			return mcs;
-		}
-		return null;
-	}
-    
-    public void saveMcSession(McSession mcSession)
-    {
-    	this.getHibernateTemplate().save(mcSession);
-    }
-    
-	
-    public void updateMcSession(McSession mcSession)
-    {
-    	this.getSession().setFlushMode(FlushMode.AUTO);
-    	this.getHibernateTemplate().update(mcSession);
+	    + "ms.mcQueUsers user where user.queUsrId=:userId";
+
+    private static final String LOAD_MCSESSION_BY_MCSESSIONID = "from McSession mcs where mcs.mcSessionId=?";
+
+    public McSession getMcSessionByUID(Long uid) {
+	return (McSession) this.getHibernateTemplate().get(McSession.class, uid);
     }
 
-    public void removeMcSession(McSession mcSession)
-    {
-		this.getSession().setFlushMode(FlushMode.AUTO);
-        this.getHibernateTemplate().delete(mcSession);
+    public McSession findMcSessionById(Long mcSessionId) {
+
+	List list = getSession().createQuery(LOAD_MCSESSION_BY_MCSESSIONID).setLong(0, mcSessionId.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    McSession mcs = (McSession) list.get(0);
+	    return mcs;
+	}
+	return null;
     }
 
-    public McSession getMcSessionByUser(final Long userId)
-	{
-		 return (McSession) getHibernateTemplate().execute(new HibernateCallback()
-                {
+    public void saveMcSession(McSession mcSession) {
+	this.getHibernateTemplate().save(mcSession);
+    }
 
-                    public Object doInHibernate(Session session) throws HibernateException
-                    {
-                        return session.createQuery(LOAD_MCSESSION_BY_USER)
-                                      .setLong("userId",
-                                      		userId.longValue())
-                                      .uniqueResult();
-                    }
-                });
-	}
-	
+    public void updateMcSession(McSession mcSession) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().update(mcSession);
+    }
+
+    public void removeMcSession(McSession mcSession) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(mcSession);
+    }
+
+    public McSession getMcSessionByUser(final Long userId) {
+	return (McSession) getHibernateTemplate().execute(new HibernateCallback() {
+
+	    public Object doInHibernate(Session session) throws HibernateException {
+		return session.createQuery(LOAD_MCSESSION_BY_USER).setLong("userId", userId.longValue()).uniqueResult();
+	    }
+	});
+    }
+
 }

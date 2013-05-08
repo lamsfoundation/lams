@@ -95,8 +95,8 @@ import org.springframework.dao.DataAccessException;
  * 
  * @author Ozgur Demirtas
  * 
- * The POJO implementation of Mc service. All business logics of MCQ tool are implemented in this class. It translate
- * the request from presentation layer and perform appropriate database operation.
+ *         The POJO implementation of Mc service. All business logics of MCQ tool are implemented in this class. It
+ *         translate the request from presentation layer and perform appropriate database operation.
  * 
  */
 public class McServicePOJO implements IMcService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager,
@@ -850,7 +850,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 		fromContent = mcContentDAO.findMcContentById(fromContentId);
 	    }
-	    
+
 	    try {
 		McContent toContent = McContent.newInstance(mcToolContentHandler, fromContent, toContentId);
 		if (toContent == null) {
@@ -938,7 +938,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * update the tool session status to COMPLETE for this tool session
      * 
      * @param Long
-     *                toolSessionId
+     *            toolSessionId
      */
     public void setAsForceCompleteSession(Long toolSessionId) throws McApplicationException {
 	McSession mcSession = retrieveMcSession(toolSessionId);
@@ -1016,7 +1016,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * toolContentId) throws DataMissingException, ToolException
      * 
      * @param toolContentId
-     *                return
+     *            return
      * @throws ToolException
      */
     public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException {
@@ -1037,9 +1037,9 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws DataMissingException
-     *                 if no tool content matches the toolSessionId
+     *             if no tool content matches the toolSessionId
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
 
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
@@ -1075,7 +1075,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
@@ -1144,13 +1144,13 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * group have the same toolSessionId.
      * 
      * @param toolSessionId
-     *                the generated tool session id.
+     *            the generated tool session id.
      * @param toolSessionName
-     *                the tool session name.
+     *            the tool session name.
      * @param toolContentId
-     *                the tool content id specified.
+     *            the tool content id specified.
      * @throws ToolException
-     *                 if an error occurs e.g. defaultContent is missing.
+     *             if an error occurs e.g. defaultContent is missing.
      * 
      */
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
@@ -1214,7 +1214,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * 
      * @param toolSessionId
      * @param toolContentId
-     *                return
+     *            return
      * @throws ToolException
      */
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
@@ -1251,7 +1251,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * 
      * @param toolSessionId
      * @param learnerId
-     *                return String
+     *            return String
      * @throws ToolException
      * 
      */
@@ -1294,7 +1294,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * exportToolSession(Long toolSessionId) throws DataMissingException, ToolException
      * 
      * @param toolSessionId
-     *                return ToolSessionExportOutputData
+     *            return ToolSessionExportOutputData
      * @throws ToolException
      */
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException {
@@ -1305,7 +1305,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * exportToolSession(Long toolSessionId) throws DataMissingException, ToolException
      * 
      * @param toolSessionIds
-     *                return ToolSessionExportOutputData
+     *            return ToolSessionExportOutputData
      * @throws ToolException
      */
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
@@ -1401,9 +1401,9 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * repository
      * 
      * @param uuid
-     *                The <code>uuid</code> of the node to be deleted
+     *            The <code>uuid</code> of the node to be deleted
      * @param versionID
-     *                The <code>version_id</code> of the node to be deleted.
+     *            The <code>version_id</code> of the node to be deleted.
      * @throws SubmitFilesException
      */
     public void deleteFromRepository(Long uuid, Long versionID) throws McApplicationException {
@@ -1422,11 +1422,11 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * corresponding file is added to the repository.
      * 
      * @param stream
-     *                The <code>InputStream</code> representing the data to be added
+     *            The <code>InputStream</code> representing the data to be added
      * @param fileName
-     *                The name of the file being added
+     *            The name of the file being added
      * @param mimeType
-     *                The MIME type of the file (eg. TXT, DOC, GIF etc)
+     *            The MIME type of the file (eg. TXT, DOC, GIF etc)
      * @return NodeKey Represents the two part key - UUID and Version.
      * @throws SubmitFilesException
      */
@@ -1467,7 +1467,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	McUploadedFile mcUploadedFile = new McUploadedFile(uuid, isOnlineFile, fileName, mcContent);
 	mcUploadedFileDAO.saveUploadFile(mcUploadedFile);
     }
-    
+
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -1481,7 +1481,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     /**
      * @param cred
-     *                The cred to set.
+     *            The cred to set.
      */
     public void setCred(ICredentials cred) {
 	this.cred = cred;
@@ -1492,7 +1492,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * 
      * public void setMcUploadedFileDAO(IMcUploadedFileDAO mcUploadedFileDAO) { this.mcUploadedFileDAO =
      * mcUploadedFileDAO; }
-     * 
      */
 
     /**
@@ -1539,7 +1538,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     /**
      * @param mcContentDAO
-     *                The mcContentDAO to set.
+     *            The mcContentDAO to set.
      */
     public void setMcContentDAO(IMcContentDAO mcContentDAO) {
 	this.mcContentDAO = mcContentDAO;
@@ -1554,7 +1553,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     /**
      * @param mcOptionsContentDAO
-     *                The mcOptionsContentDAO to set.
+     *            The mcOptionsContentDAO to set.
      */
     public void setMcOptionsContentDAO(IMcOptionsContentDAO mcOptionsContentDAO) {
 	this.mcOptionsContentDAO = mcOptionsContentDAO;
@@ -1569,7 +1568,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     /**
      * @param mcQueContentDAO
-     *                The mcQueContentDAO to set.
+     *            The mcQueContentDAO to set.
      */
     public void setMcQueContentDAO(IMcQueContentDAO mcQueContentDAO) {
 	this.mcQueContentDAO = mcQueContentDAO;
@@ -1584,7 +1583,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     /**
      * @param mcSessionDAO
-     *                The mcSessionDAO to set.
+     *            The mcSessionDAO to set.
      */
     public void setMcSessionDAO(IMcSessionDAO mcSessionDAO) {
 	this.mcSessionDAO = mcSessionDAO;
@@ -1599,7 +1598,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     /**
      * @param mcUserDAO
-     *                The mcUserDAO to set.
+     *            The mcUserDAO to set.
      */
     public void setMcUserDAO(IMcUserDAO mcUserDAO) {
 	this.mcUserDAO = mcUserDAO;
@@ -1614,7 +1613,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     /**
      * @param mcUsrAttemptDAO
-     *                The mcUsrAttemptDAO to set.
+     *            The mcUsrAttemptDAO to set.
      */
     public void setMcUsrAttemptDAO(IMcUsrAttemptDAO mcUsrAttemptDAO) {
 	this.mcUsrAttemptDAO = mcUsrAttemptDAO;
@@ -1629,7 +1628,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     /**
      * @param repositoryService
-     *                The repositoryService to set.
+     *            The repositoryService to set.
      */
     public void setRepositoryService(IRepositoryService repositoryService) {
 	this.repositoryService = repositoryService;
@@ -1652,7 +1651,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     /**
      * @param mcUploadedFileDAO
-     *                The mcUploadedFileDAO to set.
+     *            The mcUploadedFileDAO to set.
      */
     public void setMcUploadedFileDAO(IMcUploadedFileDAO mcUploadedFileDAO) {
 	this.mcUploadedFileDAO = mcUploadedFileDAO;
@@ -1667,7 +1666,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     /**
      * @param mcToolContentHandler
-     *                The mcToolContentHandler to set.
+     *            The mcToolContentHandler to set.
      */
     public void setMcToolContentHandler(IToolContentHandler mcToolContentHandler) {
 	this.mcToolContentHandler = mcToolContentHandler;
@@ -1682,7 +1681,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     /**
      * @param learnerService
-     *                The learnerService to set.
+     *            The learnerService to set.
      */
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
@@ -1884,7 +1883,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     /**
      * @param coreNotebookService
-     *                The coreNotebookService to set.
+     *            The coreNotebookService to set.
      */
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
@@ -1899,7 +1898,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     /**
      * @param auditService
-     *                The auditService to set.
+     *            The auditService to set.
      */
     public void setAuditService(IAuditService auditService) {
 	this.auditService = auditService;
@@ -1914,7 +1913,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     /**
      * @param messageService
-     *                The MessageService to set.
+     *            The MessageService to set.
      */
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;

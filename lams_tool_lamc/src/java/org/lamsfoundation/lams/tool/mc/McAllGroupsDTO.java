@@ -28,77 +28,77 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p> DTO that holds question and user attempts data for jsp purposes
+ * <p>
+ * DTO that holds question and user attempts data for jsp purposes
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McAllGroupsDTO implements Comparable
-{
+public class McAllGroupsDTO implements Comparable {
 
     private String sessionId;
-    
+
     private String sessionName;
-    
-    private List  groupData;
-    
-	
-	
-	public String toString() {
-        return new ToStringBuilder(this)
-        	.append("sessionId:", sessionId)
-            .append("sessionName:", sessionName)
-            .append("groupData: ", groupData)
-            .toString();
+
+    private List groupData;
+
+    public String toString() {
+	return new ToStringBuilder(this).append("sessionId:", sessionId).append("sessionName:", sessionName)
+		.append("groupData: ", groupData).toString();
     }
-	
-	public int compareTo(Object o)
-    {
-	    McAllGroupsDTO mcAllGroupsDTO = (McAllGroupsDTO) o;
-     
-        if (mcAllGroupsDTO == null)
-        	return 1;
-		else
-			return 0;
+
+    public int compareTo(Object o) {
+	McAllGroupsDTO mcAllGroupsDTO = (McAllGroupsDTO) o;
+
+	if (mcAllGroupsDTO == null)
+	    return 1;
+	else
+	    return 0;
     }
-	
 
     /**
      * @return Returns the groupData.
      */
     public List getGroupData() {
-        return groupData;
+	return groupData;
     }
+
     /**
-     * @param groupData The groupData to set.
+     * @param groupData
+     *            The groupData to set.
      */
     public void setGroupData(List groupData) {
-        this.groupData = groupData;
+	this.groupData = groupData;
     }
+
     /**
      * @return Returns the sessionName.
      */
     public String getSessionName() {
-        return sessionName;
+	return sessionName;
     }
+
     /**
-     * @param sessionName The sessionName to set.
+     * @param sessionName
+     *            The sessionName to set.
      */
     public void setSessionName(String sessionName) {
-        this.sessionName = sessionName;
+	this.sessionName = sessionName;
     }
+
     /**
      * @return Returns the sessionId.
      */
     public String getSessionId() {
-        return sessionId;
+	return sessionId;
     }
+
     /**
-     * @param sessionId The sessionId to set.
+     * @param sessionId
+     *            The sessionId to set.
      */
     public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+	this.sessionId = sessionId;
     }
 }

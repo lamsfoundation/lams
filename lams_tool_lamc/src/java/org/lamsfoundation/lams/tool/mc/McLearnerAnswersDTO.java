@@ -26,173 +26,196 @@ import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p> DTO that holds question and candidate answers for the learner environment
+ * <p>
+ * DTO that holds question and candidate answers for the learner environment
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McLearnerAnswersDTO implements Comparable
-{
+public class McLearnerAnswersDTO implements Comparable {
     protected String question;
-    
+
     protected String displayOrder;
-    
+
     protected Long questionUid;
-    
+
     protected Integer mark;
-    
+
     protected Map candidateAnswers;
-    
+
     protected Map candidateAnswerUids;
-    
+
     protected String attemptCorrect;
-    
+
     protected String feedbackIncorrect;
-    
+
     protected String feedbackCorrect;
-    
+
     protected String feedback;
-    
+
     /**
      * @return Returns the candidateAnswers.
      */
     public Map getCandidateAnswers() {
-        return candidateAnswers;
+	return candidateAnswers;
     }
+
     /**
-     * @param candidateAnswers The candidateAnswers to set.
+     * @param candidateAnswers
+     *            The candidateAnswers to set.
      */
     public void setCandidateAnswers(Map candidateAnswers) {
-        this.candidateAnswers = candidateAnswers;
+	this.candidateAnswers = candidateAnswers;
     }
+
     /**
      * @return Returns the question.
      */
     public String getQuestion() {
-        return question;
-    }
-    /**
-     * @param question The question to set.
-     */
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-    
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("question: ", getQuestion())
-            .append("displayOrder: ", getDisplayOrder())
-            .append("candidateAnswers: ", getCandidateAnswers())
-            .toString();
+	return question;
     }
 
-    
-	public int compareTo(Object o)
-    {
-	    McLearnerAnswersDTO mcLearnerAnswersDTO = (McLearnerAnswersDTO) o;
-     
-        if (mcLearnerAnswersDTO == null)
-        	return 1;
-		else
-			return 0;
+    /**
+     * @param question
+     *            The question to set.
+     */
+    public void setQuestion(String question) {
+	this.question = question;
     }
-	
+
+    public String toString() {
+	return new ToStringBuilder(this).append("question: ", getQuestion())
+		.append("displayOrder: ", getDisplayOrder()).append("candidateAnswers: ", getCandidateAnswers())
+		.toString();
+    }
+
+    public int compareTo(Object o) {
+	McLearnerAnswersDTO mcLearnerAnswersDTO = (McLearnerAnswersDTO) o;
+
+	if (mcLearnerAnswersDTO == null)
+	    return 1;
+	else
+	    return 0;
+    }
+
     /**
      * @return Returns the displayOrder.
      */
     public String getDisplayOrder() {
-        return displayOrder;
+	return displayOrder;
     }
+
     /**
-     * @param displayOrder The displayOrder to set.
+     * @param displayOrder
+     *            The displayOrder to set.
      */
     public void setDisplayOrder(String displayOrder) {
-        this.displayOrder = displayOrder;
+	this.displayOrder = displayOrder;
     }
+
     /**
      * @return Returns the questionUid.
      */
     public Long getQuestionUid() {
-        return questionUid;
+	return questionUid;
     }
+
     /**
-     * @param questionUid The questionUid to set.
+     * @param questionUid
+     *            The questionUid to set.
      */
     public void setQuestionUid(Long questionUid) {
-        this.questionUid = questionUid;
+	this.questionUid = questionUid;
     }
+
     /**
      * @return Returns the candidateAnswerUids.
      */
     public Map getCandidateAnswerUids() {
-        return candidateAnswerUids;
+	return candidateAnswerUids;
     }
+
     /**
-     * @param candidateAnswerUids The candidateAnswerUids to set.
+     * @param candidateAnswerUids
+     *            The candidateAnswerUids to set.
      */
     public void setCandidateAnswerUids(Map candidateAnswerUids) {
-        this.candidateAnswerUids = candidateAnswerUids;
+	this.candidateAnswerUids = candidateAnswerUids;
     }
+
     /**
      * @return Returns the feedbackCorrect.
      */
     public String getFeedbackCorrect() {
-        return feedbackCorrect;
+	return feedbackCorrect;
     }
+
     /**
-     * @param feedbackCorrect The feedbackCorrect to set.
+     * @param feedbackCorrect
+     *            The feedbackCorrect to set.
      */
     public void setFeedbackCorrect(String feedbackCorrect) {
-        this.feedbackCorrect = feedbackCorrect;
+	this.feedbackCorrect = feedbackCorrect;
     }
+
     /**
      * @return Returns the attemptCorrect.
      */
     public String getAttemptCorrect() {
-        return attemptCorrect;
+	return attemptCorrect;
     }
+
     /**
-     * @param attemptCorrect The attemptCorrect to set.
+     * @param attemptCorrect
+     *            The attemptCorrect to set.
      */
     public void setAttemptCorrect(String attemptCorrect) {
-        this.attemptCorrect = attemptCorrect;
+	this.attemptCorrect = attemptCorrect;
     }
+
     /**
      * @return Returns the feedbackIncorrect.
      */
     public String getFeedbackIncorrect() {
-        return feedbackIncorrect;
+	return feedbackIncorrect;
     }
+
     /**
-     * @param feedbackIncorrect The feedbackIncorrect to set.
+     * @param feedbackIncorrect
+     *            The feedbackIncorrect to set.
      */
     public void setFeedbackIncorrect(String feedbackIncorrect) {
-        this.feedbackIncorrect = feedbackIncorrect;
+	this.feedbackIncorrect = feedbackIncorrect;
     }
+
     /**
      * @return Returns the mark.
      */
     public Integer getMark() {
-        return mark;
+	return mark;
     }
+
     /**
-     * @param mark The mark to set.
+     * @param mark
+     *            The mark to set.
      */
     public void setMark(Integer mark) {
-        this.mark = mark;
+	this.mark = mark;
     }
+
     /**
      * @return Returns the feedback.
      */
     public String getFeedback() {
-        return feedback;
+	return feedback;
     }
+
     /**
-     * @param feedback The feedback to set.
+     * @param feedback
+     *            The feedback to set.
      */
     public void setFeedback(String feedback) {
-        this.feedback = feedback;
+	this.feedback = feedback;
     }
 }

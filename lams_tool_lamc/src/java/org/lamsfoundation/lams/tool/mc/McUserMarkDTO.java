@@ -26,148 +26,155 @@ import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p> DTO that hols user marks
+ * <p>
+ * DTO that hols user marks
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McUserMarkDTO implements Comparable
-{
+public class McUserMarkDTO implements Comparable {
     private String sessionId;
     private String sessionName;
     private String queUsrId;
     private String userName;
     private String fullName;
     private Date attemptTime;
-	private Integer[] marks; 
+    private Integer[] marks;
     private Long totalMark;
 
-	public String toString() {
-        return new ToStringBuilder(this)
-        	.append("Listing UserMarkDTO:")
-            .append("sessionId", sessionId)
-            .append("queUsrId", queUsrId)
-            .append("userName", userName)
-            .append("fullName", fullName)
-            .append("marks", marks)            
-            .append("totalMark", totalMark)
-            .append("attemptTime", attemptTime)
-            .toString();
+    public String toString() {
+	return new ToStringBuilder(this).append("Listing UserMarkDTO:").append("sessionId", sessionId)
+		.append("queUsrId", queUsrId).append("userName", userName).append("fullName", fullName)
+		.append("marks", marks).append("totalMark", totalMark).append("attemptTime", attemptTime).toString();
     }
 
-	
     /**
      * @return Returns the marks.
      */
     public Integer[] getMarks() {
-        return marks;
+	return marks;
     }
+
     /**
-     * @param marks The marks to set.
+     * @param marks
+     *            The marks to set.
      */
     public void setMarks(Integer[] marks) {
-        this.marks = marks;
+	this.marks = marks;
     }
+
     /**
      * @return Returns the queUsrId.
      */
     public String getQueUsrId() {
-        return queUsrId;
+	return queUsrId;
     }
-    
+
     /**
-     * @param queUsrId The queUsrId to set.
+     * @param queUsrId
+     *            The queUsrId to set.
      */
     public void setQueUsrId(String queUsrId) {
-        this.queUsrId = queUsrId;
+	this.queUsrId = queUsrId;
     }
-    
+
     /**
      * @return Returns the userName.
      */
     public String getUserName() {
-        return userName;
+	return userName;
     }
-    
+
     /**
-     * @param userName The userName to set.
+     * @param userName
+     *            The userName to set.
      */
     public void setUserName(String userName) {
-        this.userName = userName;
+	this.userName = userName;
     }
-    
+
     /**
      * @return Returns the userName.
      */
     public String getFullName() {
-        return fullName;
+	return fullName;
     }
-    
+
     /**
-     * @param userName The userName to set.
+     * @param userName
+     *            The userName to set.
      */
     public void setFullName(String fullName) {
-        this.fullName = fullName;
+	this.fullName = fullName;
     }
-    
-	public int compareTo(Object o)
-    {
-	    McUserMarkDTO mcUserMarkDTO = (McUserMarkDTO) o;
-     
-        if (mcUserMarkDTO == null)
-        	return 1;
-		else
-			return (int) (new Long(queUsrId).longValue() - new Long(mcUserMarkDTO.queUsrId).longValue());
+
+    public int compareTo(Object o) {
+	McUserMarkDTO mcUserMarkDTO = (McUserMarkDTO) o;
+
+	if (mcUserMarkDTO == null)
+	    return 1;
+	else
+	    return (int) (new Long(queUsrId).longValue() - new Long(mcUserMarkDTO.queUsrId).longValue());
     }
-  
+
     /**
      * @return Returns the sessionId.
      */
     public String getSessionId() {
-        return sessionId;
+	return sessionId;
     }
+
     /**
-     * @param sessionId The sessionId to set.
+     * @param sessionId
+     *            The sessionId to set.
      */
     public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+	this.sessionId = sessionId;
     }
+
     /**
      * @return Returns the totalMark.
      */
     public Long getTotalMark() {
-        return totalMark;
+	return totalMark;
     }
+
     /**
-     * @param totalMark The totalMark to set.
+     * @param totalMark
+     *            The totalMark to set.
      */
     public void setTotalMark(Long totalMark) {
-        this.totalMark = totalMark;
+	this.totalMark = totalMark;
     }
+
     /**
      * @return Returns the sessionName.
      */
     public String getSessionName() {
-        return sessionName;
+	return sessionName;
     }
+
     /**
-     * @param sessionName The sessionName to set.
+     * @param sessionName
+     *            The sessionName to set.
      */
     public void setSessionName(String sessionName) {
-        this.sessionName = sessionName;
+	this.sessionName = sessionName;
     }
+
     /**
      * @return Returns the attemptTime.
      */
     public Date getAttemptTime() {
-		return attemptTime;
-	}
+	return attemptTime;
+    }
+
     /**
-     * @param attemptTime The attemptTime to set.
+     * @param attemptTime
+     *            The attemptTime to set.
      */
-	public void setAttemptTime(Date attemptTime) {
-		this.attemptTime = attemptTime;
-	}
+    public void setAttemptTime(Date attemptTime) {
+	this.attemptTime = attemptTime;
+    }
 }

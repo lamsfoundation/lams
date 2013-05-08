@@ -24,54 +24,53 @@ package org.lamsfoundation.lams.tool.mc;
 
 import java.util.List;
 
-
-
-
 /**
- * <p> DTO that holds randomized lists
+ * <p>
+ * DTO that holds randomized lists
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McRandomizedListsDTO implements Comparable
-{
+public class McRandomizedListsDTO implements Comparable {
     List listCandidateAnswers;
     List listCandidateAnswerUids;
-    
-    
-	public int compareTo(Object o)
-    {
-	    McRandomizedListsDTO mcRandomizedListsDTO = (McRandomizedListsDTO) o;
-     
-        if (mcRandomizedListsDTO == null)
-        	return 1;
-		else
-			return 0;
+
+    public int compareTo(Object o) {
+	McRandomizedListsDTO mcRandomizedListsDTO = (McRandomizedListsDTO) o;
+
+	if (mcRandomizedListsDTO == null)
+	    return 1;
+	else
+	    return 0;
     }
-    
-    
+
     /**
      * @return Returns the listCandidateAnswers.
      */
     public List getListCandidateAnswers() {
-        return listCandidateAnswers;
+	return listCandidateAnswers;
     }
+
     /**
-     * @param listCandidateAnswers The listCandidateAnswers to set.
+     * @param listCandidateAnswers
+     *            The listCandidateAnswers to set.
      */
     public void setListCandidateAnswers(List listCandidateAnswers) {
-        this.listCandidateAnswers = listCandidateAnswers;
+	this.listCandidateAnswers = listCandidateAnswers;
     }
+
     /**
      * @return Returns the listCandidateAnswerUids.
      */
     public List getListCandidateAnswerUids() {
-        return listCandidateAnswerUids;
+	return listCandidateAnswerUids;
     }
+
     /**
-     * @param listCandidateAnswerUids The listCandidateAnswerUids to set.
+     * @param listCandidateAnswerUids
+     *            The listCandidateAnswerUids to set.
      */
     public void setListCandidateAnswerUids(List listCandidateAnswerUids) {
-        this.listCandidateAnswerUids = listCandidateAnswerUids;
+	this.listCandidateAnswerUids = listCandidateAnswerUids;
     }
 }

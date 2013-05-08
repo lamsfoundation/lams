@@ -22,103 +22,84 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
-import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
-import org.lamsfoundation.lams.tool.mc.pojos.McSession;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author Ozgur Demirtas
- * <p>Hibernate implementation for database access to Mc users (learners) for the mc tool.</p>
+ *         <p>
+ *         Hibernate implementation for database access to Mc users (learners) for the mc tool.
+ *         </p>
  */
 public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
-    
- 	private static final String CALC_MARK_STATS_FOR_SESSION = "select max(mu.lastAttemptTotalMark), min(mu.lastAttemptTotalMark), avg(mu.lastAttemptTotalMark)"
- 		+" from McQueUsr mu where mu.mcSessionId = :mcSessionUid";
 
- 	private static final String GET_USER_BY_USER_ID_SESSION = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSessionId=:mcSessionId";
+    private static final String CALC_MARK_STATS_FOR_SESSION = "select max(mu.lastAttemptTotalMark), min(mu.lastAttemptTotalMark), avg(mu.lastAttemptTotalMark)"
+	    + " from McQueUsr mu where mu.mcSessionId = :mcSessionUid";
 
- 	private static final String GET_USER_BY_USER_ID = "from McQueUsr user where user.queUsrId=?";
-	
+    private static final String GET_USER_BY_USER_ID_SESSION = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSessionId=:mcSessionId";
 
-   public McQueUsr getMcUserByUID(Long uid)
-	{
-		 return (McQueUsr) this.getHibernateTemplate()
-         .get(McQueUsr.class, uid);
-	}
-	
-	
-	public McQueUsr findMcUserById(Long userId)
-	{
-		List list = getSession().createQuery(GET_USER_BY_USER_ID)
-		.setLong(0,userId.longValue())
-		.list();
-		
-		if(list != null && list.size() > 0){
-			McQueUsr mcu = (McQueUsr) list.get(0);
-			return mcu;
-		}
-		return null;
-	}
-	
-	public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionId)
-	{
-		
-		List list = getSession().createQuery(GET_USER_BY_USER_ID_SESSION)
-			.setLong("queUsrId", queUsrId.longValue())
-			.setLong("mcSessionId", mcSessionId.longValue())				
-			.list();
-		
-		if(list != null && list.size() > 0){
-			McQueUsr usr = (McQueUsr) list.get(0);
-			return usr;
-		}
-		return null;
-	}
+    private static final String GET_USER_BY_USER_ID = "from McQueUsr user where user.queUsrId=?";
 
-	
-	public void saveMcUser(McQueUsr mcUser)
-    {
-    	this.getHibernateTemplate().save(mcUser);
+    public McQueUsr getMcUserByUID(Long uid) {
+	return (McQueUsr) this.getHibernateTemplate().get(McQueUsr.class, uid);
     }
-	
 
-    public void updateMcUser(McQueUsr mcUser)
-    {
-    	this.getHibernateTemplate().update(mcUser);
+    public McQueUsr findMcUserById(Long userId) {
+	List list = getSession().createQuery(GET_USER_BY_USER_ID).setLong(0, userId.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    McQueUsr mcu = (McQueUsr) list.get(0);
+	    return mcu;
+	}
+	return null;
     }
-    
-    public void removeMcUser(McQueUsr mcUser)
-    {
-		this.getSession().setFlushMode(FlushMode.AUTO);
-        this.getHibernateTemplate().delete(mcUser);
+
+    public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionId) {
+
+	List list = getSession().createQuery(GET_USER_BY_USER_ID_SESSION).setLong("queUsrId", queUsrId.longValue())
+		.setLong("mcSessionId", mcSessionId.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    McQueUsr usr = (McQueUsr) list.get(0);
+	    return usr;
+	}
+	return null;
     }
-    
+
+    public void saveMcUser(McQueUsr mcUser) {
+	this.getHibernateTemplate().save(mcUser);
+    }
+
+    public void updateMcUser(McQueUsr mcUser) {
+	this.getHibernateTemplate().update(mcUser);
+    }
+
+    public void removeMcUser(McQueUsr mcUser) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(mcUser);
+    }
+
     /** Get the max, min and average mark (in that order) for a session */
-	public Integer[] getMarkStatisticsForSession(Long sessionUid)
-	{
-		Object[] stats = (Object[]) getSession().createQuery(CALC_MARK_STATS_FOR_SESSION)
-			.setLong("mcSessionUid",sessionUid.longValue())
-			.uniqueResult();
-		
-		if (stats!= null) {
-		    if (stats[2] instanceof Float) {
-			return new Integer[]{(Integer)stats[0], (Integer)stats[1], new Integer(((Float)stats[2]).intValue())};
-		    } else if(stats[2] instanceof Double) {
-			return new Integer[]{(Integer)stats[0], (Integer)stats[1], new Integer(((Double)stats[2]).intValue())};
-		    }
-		} 
-		
-		return null;
+    public Integer[] getMarkStatisticsForSession(Long sessionUid) {
+	Object[] stats = (Object[]) getSession().createQuery(CALC_MARK_STATS_FOR_SESSION)
+		.setLong("mcSessionUid", sessionUid.longValue()).uniqueResult();
 
-	}	
+	if (stats != null) {
+	    if (stats[2] instanceof Float) {
+		return new Integer[] { (Integer) stats[0], (Integer) stats[1],
+			new Integer(((Float) stats[2]).intValue()) };
+	    } else if (stats[2] instanceof Double) {
+		return new Integer[] { (Integer) stats[0], (Integer) stats[1],
+			new Integer(((Double) stats[2]).intValue()) };
+	    }
+	}
 
+	return null;
 
-    
+    }
+
 }

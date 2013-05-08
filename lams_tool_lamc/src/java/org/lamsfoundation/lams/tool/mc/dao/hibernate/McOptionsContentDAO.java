@@ -34,225 +34,184 @@ import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-
 /**
  * @author Ozgur Demirtas
- * <p>Hibernate implementation for database access to McOptionsContent for the mc tool.</p>
+ *         <p>
+ *         Hibernate implementation for database access to McOptionsContent for the mc tool.
+ *         </p>
  */
 public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptionsContentDAO {
-	 	static Logger logger = Logger.getLogger(McOptionsContentDAO.class.getName());
-	 	
-	 	//private static final String FIND_MC_OPTIONS_CONTENT = "from " + McOptsContent.class.getName() + " as mco where mc_que_content_id=?";
-	 	private static final String FIND_MC_OPTIONS_CONTENT = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid order by mcOptsContent.displayOrder";
-	 	private static final String LOAD_OPTION_CONTENT_BY_OPTION_TEXT = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueOptionText=:option and mcOptsContent.mcQueContentId=:mcQueContentUid";
-	 	
-	 	private static final String LOAD_PERSISTED_SELECTED_OPTIONS = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid and  mcOptsContent.correctOption = 1";
-	 	
-	 	private static final String LOAD_CORRECT_OPTION = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid and  mcOptsContent.correctOption = 1";
-	 	
-	 	
-	 	private static final String LOAD_MAX_UID = "from mcOptsContent in class McOptsContent";
-	 	
-	 	public McOptsContent getMcOptionsContentByUID(Long uid)
-		{
-			 return (McOptsContent) this.getHibernateTemplate()
-	         .get(McOptsContent.class, uid);
+    static Logger logger = Logger.getLogger(McOptionsContentDAO.class.getName());
+
+    // private static final String FIND_MC_OPTIONS_CONTENT = "from " + McOptsContent.class.getName() +
+    // " as mco where mc_que_content_id=?";
+    private static final String FIND_MC_OPTIONS_CONTENT = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid order by mcOptsContent.displayOrder";
+    private static final String LOAD_OPTION_CONTENT_BY_OPTION_TEXT = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueOptionText=:option and mcOptsContent.mcQueContentId=:mcQueContentUid";
+
+    private static final String LOAD_PERSISTED_SELECTED_OPTIONS = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid and  mcOptsContent.correctOption = 1";
+
+    private static final String LOAD_CORRECT_OPTION = "from mcOptsContent in class McOptsContent where mcOptsContent.mcQueContentId=:mcQueContentUid and  mcOptsContent.correctOption = 1";
+
+    private static final String LOAD_MAX_UID = "from mcOptsContent in class McOptsContent";
+
+    public McOptsContent getMcOptionsContentByUID(Long uid) {
+	return (McOptsContent) this.getHibernateTemplate().get(McOptsContent.class, uid);
+    }
+
+    public List findMcOptionsContentByQueId(Long mcQueContentId) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	if (mcQueContentId != null) {
+	    List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
+		    .setLong("mcQueContentUid", mcQueContentId.longValue()).list();
+	    return list;
+	}
+	return null;
+    }
+
+    public List findMcOptionUidsByQueId(Long mcQueContentId) {
+
+	List listOptionUids = new LinkedList();
+
+	HibernateTemplate templ = this.getHibernateTemplate();
+	if (mcQueContentId != null) {
+	    List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
+		    .setLong("mcQueContentUid", mcQueContentId.longValue()).list();
+
+	    if (list != null && list.size() > 0) {
+		Iterator listIterator = list.iterator();
+		while (listIterator.hasNext()) {
+		    McOptsContent mcOptsContent = (McOptsContent) listIterator.next();
+		    listOptionUids.add(mcOptsContent.getUid().toString());
 		}
-	 	
-	 	
-	 	public List findMcOptionsContentByQueId(Long mcQueContentId)
-	    {
-			HibernateTemplate templ = this.getHibernateTemplate();
-			if ( mcQueContentId != null) {
-				List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
-					.setLong("mcQueContentUid",mcQueContentId.longValue())
-					.list();
-				return list;
-			}
-			return null;
 	    }
+	}
+	return listOptionUids;
+    }
 
-	 	
-	 	public List findMcOptionUidsByQueId(Long mcQueContentId)
-	    {
-	 		
-	 		List listOptionUids= new LinkedList();
-	 		
-			HibernateTemplate templ = this.getHibernateTemplate();
-			if ( mcQueContentId != null) {
-				List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
-					.setLong("mcQueContentUid",mcQueContentId.longValue())					
-					.list();
-				
-				if(list != null && list.size() > 0){
-					Iterator listIterator=list.iterator();
-			    	while (listIterator.hasNext())
-			    	{
-			    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
-			    		listOptionUids.add(mcOptsContent.getUid().toString());
-			    	}
-				}
-			}
-			return listOptionUids;
-	    }
-	 	
-	 	
-	 	public List findMcOptionNamesByQueId(Long mcQueContentId)
-	    {
-	 		
-	 		List listOptionNames= new LinkedList();
-	 		
-			HibernateTemplate templ = this.getHibernateTemplate();
-			if ( mcQueContentId != null) {
-				List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
-					.setLong("mcQueContentUid",mcQueContentId.longValue())					
-					.list();
-				
-				if(list != null && list.size() > 0){
-					Iterator listIterator=list.iterator();
-			    	while (listIterator.hasNext())
-			    	{
-			    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
-			    		listOptionNames.add(mcOptsContent.getMcQueOptionText());
-			    	}
-				}
-			}
-			return listOptionNames;
-	    }
-	 	
-	 	
-	 	public List populateCandidateAnswersDTO(Long mcQueContentId)
-	    {
-	 		List listCandidateAnswersData= new LinkedList();
-	 		
-			HibernateTemplate templ = this.getHibernateTemplate();
-			if ( mcQueContentId != null) {
-				List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
-					.setLong("mcQueContentUid",mcQueContentId.longValue())
-					.list();
-				
-				if(list != null && list.size() > 0){
-					Iterator listIterator=list.iterator();
-			    	while (listIterator.hasNext())
-			    	{
-			    	    McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
-			    	    McCandidateAnswersDTO mcCandidateAnswersDTO= new McCandidateAnswersDTO();
-			    	    mcCandidateAnswersDTO.setCandidateAnswer(mcOptsContent.getMcQueOptionText());
-			    	    mcCandidateAnswersDTO.setCorrect(new Boolean(mcOptsContent.isCorrectOption()).toString());
-			    		listCandidateAnswersData.add(mcCandidateAnswersDTO);
-			    	}
-				}
-			}
-			return listCandidateAnswersData;
-	    }
+    public List findMcOptionNamesByQueId(Long mcQueContentId) {
 
-	 	
-	 	public List findMcOptionCorrectByQueId(Long mcQueContentId)
-	    {
-	 		
-	 		List listOptionCorrect= new LinkedList();
-	 		
-			HibernateTemplate templ = this.getHibernateTemplate();
-			if ( mcQueContentId != null) {
-				List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
-					.setLong("mcQueContentUid",mcQueContentId.longValue())
-					.list();
-				
-				if(list != null && list.size() > 0){
-					Iterator listIterator=list.iterator();
-			    	while (listIterator.hasNext())
-			    	{
-			    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
-			    		listOptionCorrect.add(new Boolean(mcOptsContent.isCorrectOption()).toString());
-			    	}
-				}
-			}
-			return listOptionCorrect;
-	    }
+	List listOptionNames = new LinkedList();
 
-	 	
-	 	
-	 	public McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid)
-	    {
-	        HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_OPTION_CONTENT_BY_OPTION_TEXT)
-				.setString("option", option)
-				.setLong("mcQueContentUid", mcQueContentUid.longValue())				
-				.list();
-			
-			if(list != null && list.size() > 0){
-				McOptsContent mcq = (McOptsContent) list.get(0);
-				return mcq;
-			}
-			return null;
-	    }
-	 	
-	 	
-	 	public List getPersistedSelectedOptions(Long mcQueContentId) 
-	 	{
-	 		HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_PERSISTED_SELECTED_OPTIONS)
-				.setLong("mcQueContentUid", mcQueContentId.longValue())
-				.list();
-			
-			return list;
-	 	}
-	 	
-	 	public List getCorrectOption(Long mcQueContentId) 
-	 	{
-	 		HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(LOAD_CORRECT_OPTION)
-				.setLong("mcQueContentUid", mcQueContentId.longValue())
-				.list();
-			
-			return list;
-	 	}
-		
-		public void saveMcOptionsContent(McOptsContent mcOptsContent)
-	    {
-	    	this.getHibernateTemplate().save(mcOptsContent);
-	    }
-	    
-		public void updateMcOptionsContent(McOptsContent mcOptsContent)
-	    {
-	    	this.getHibernateTemplate().update(mcOptsContent);
-	    }
-		
-		
-		public void removeMcOptionsContentByUID(Long uid)
-	    {
-			McOptsContent mco = (McOptsContent)getHibernateTemplate().get(McOptsContent.class, uid);
-	    	this.getHibernateTemplate().delete(mco);
-	    }
-		
-		
-		public void removeMcOptionsContentByQueId(Long mcQueContentId)
-	    {
-			HibernateTemplate templ = this.getHibernateTemplate();
-			List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
-				.setLong("mcQueContentUid",mcQueContentId.longValue())
-				.list();
+	HibernateTemplate templ = this.getHibernateTemplate();
+	if (mcQueContentId != null) {
+	    List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
+		    .setLong("mcQueContentUid", mcQueContentId.longValue()).list();
 
-			if(list != null && list.size() > 0){
-				Iterator listIterator=list.iterator();
-		    	while (listIterator.hasNext())
-		    	{
-		    		McOptsContent mcOptsContent=(McOptsContent)listIterator.next();
-					this.getSession().setFlushMode(FlushMode.AUTO);
-		    		templ.delete(mcOptsContent);
-		    	}
-			}
+	    if (list != null && list.size() > 0) {
+		Iterator listIterator = list.iterator();
+		while (listIterator.hasNext()) {
+		    McOptsContent mcOptsContent = (McOptsContent) listIterator.next();
+		    listOptionNames.add(mcOptsContent.getMcQueOptionText());
+		}
 	    }
-				
-		
-		public void removeMcOptionsContent(McOptsContent mcOptsContent)
-	    {
-			this.getSession().setFlushMode(FlushMode.AUTO);
-	        this.getHibernateTemplate().delete(mcOptsContent);
+	}
+	return listOptionNames;
+    }
+
+    public List populateCandidateAnswersDTO(Long mcQueContentId) {
+	List listCandidateAnswersData = new LinkedList();
+
+	HibernateTemplate templ = this.getHibernateTemplate();
+	if (mcQueContentId != null) {
+	    List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
+		    .setLong("mcQueContentUid", mcQueContentId.longValue()).list();
+
+	    if (list != null && list.size() > 0) {
+		Iterator listIterator = list.iterator();
+		while (listIterator.hasNext()) {
+		    McOptsContent mcOptsContent = (McOptsContent) listIterator.next();
+		    McCandidateAnswersDTO mcCandidateAnswersDTO = new McCandidateAnswersDTO();
+		    mcCandidateAnswersDTO.setCandidateAnswer(mcOptsContent.getMcQueOptionText());
+		    mcCandidateAnswersDTO.setCorrect(new Boolean(mcOptsContent.isCorrectOption()).toString());
+		    listCandidateAnswersData.add(mcCandidateAnswersDTO);
+		}
 	    }
-		
-		 public void flush()
-	    {
-	        this.getHibernateTemplate().flush();
+	}
+	return listCandidateAnswersData;
+    }
+
+    public List findMcOptionCorrectByQueId(Long mcQueContentId) {
+
+	List listOptionCorrect = new LinkedList();
+
+	HibernateTemplate templ = this.getHibernateTemplate();
+	if (mcQueContentId != null) {
+	    List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
+		    .setLong("mcQueContentUid", mcQueContentId.longValue()).list();
+
+	    if (list != null && list.size() > 0) {
+		Iterator listIterator = list.iterator();
+		while (listIterator.hasNext()) {
+		    McOptsContent mcOptsContent = (McOptsContent) listIterator.next();
+		    listOptionCorrect.add(new Boolean(mcOptsContent.isCorrectOption()).toString());
+		}
 	    }
-	} 
+	}
+	return listOptionCorrect;
+    }
+
+    public McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(LOAD_OPTION_CONTENT_BY_OPTION_TEXT).setString("option", option)
+		.setLong("mcQueContentUid", mcQueContentUid.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    McOptsContent mcq = (McOptsContent) list.get(0);
+	    return mcq;
+	}
+	return null;
+    }
+
+    public List getPersistedSelectedOptions(Long mcQueContentId) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(LOAD_PERSISTED_SELECTED_OPTIONS)
+		.setLong("mcQueContentUid", mcQueContentId.longValue()).list();
+
+	return list;
+    }
+
+    public List getCorrectOption(Long mcQueContentId) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(LOAD_CORRECT_OPTION)
+		.setLong("mcQueContentUid", mcQueContentId.longValue()).list();
+
+	return list;
+    }
+
+    public void saveMcOptionsContent(McOptsContent mcOptsContent) {
+	this.getHibernateTemplate().save(mcOptsContent);
+    }
+
+    public void updateMcOptionsContent(McOptsContent mcOptsContent) {
+	this.getHibernateTemplate().update(mcOptsContent);
+    }
+
+    public void removeMcOptionsContentByUID(Long uid) {
+	McOptsContent mco = (McOptsContent) getHibernateTemplate().get(McOptsContent.class, uid);
+	this.getHibernateTemplate().delete(mco);
+    }
+
+    public void removeMcOptionsContentByQueId(Long mcQueContentId) {
+	HibernateTemplate templ = this.getHibernateTemplate();
+	List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
+		.setLong("mcQueContentUid", mcQueContentId.longValue()).list();
+
+	if (list != null && list.size() > 0) {
+	    Iterator listIterator = list.iterator();
+	    while (listIterator.hasNext()) {
+		McOptsContent mcOptsContent = (McOptsContent) listIterator.next();
+		this.getSession().setFlushMode(FlushMode.AUTO);
+		templ.delete(mcOptsContent);
+	    }
+	}
+    }
+
+    public void removeMcOptionsContent(McOptsContent mcOptsContent) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(mcOptsContent);
+    }
+
+    public void flush() {
+	this.getHibernateTemplate().flush();
+    }
+}

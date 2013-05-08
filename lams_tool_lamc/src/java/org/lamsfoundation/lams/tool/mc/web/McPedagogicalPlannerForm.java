@@ -144,8 +144,8 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 		    McCandidateAnswersDTO candidateAnswer = candidateAnswers.get(candidateAnswerIndex - 1);
 
 		    candidateAnswersBuilder.append(McAppConstants.CANDIDATE_ANSWER_PREFIX).append(questionDisplayOrder)
-			    .append('-').append(candidateAnswerIndex).append('=').append(
-				    candidateAnswer.getCandidateAnswer()).append('&');
+			    .append('-').append(candidateAnswerIndex).append('=')
+			    .append(candidateAnswer.getCandidateAnswer()).append('&');
 		    if (candidateAnswer.getCorrect().equals(McAppConstants.CORRECT)) {
 			setCorrect(questionDisplayOrder - 1, String.valueOf(candidateAnswerIndex));
 		    }

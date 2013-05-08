@@ -22,52 +22,49 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc;
 
-
 /**
- * <p>This exception wraps all basic exception occured in the mcq tool. It is 
- * not suppose to be try and catched in any level. The struts should be taking
- * care of handling this exception.</p>
+ * <p>
+ * This exception wraps all basic exception occured in the mcq tool. It is not suppose to be try and catched in any
+ * level. The struts should be taking care of handling this exception.
+ * </p>
  * 
-* @author Ozgur Demirtas
+ * @author Ozgur Demirtas
  * 
  */
-public class McApplicationException extends RuntimeException
-{
+public class McApplicationException extends RuntimeException {
     /**
      * Default Constructor
      */
-    public McApplicationException()
-    {
-        super();
+    public McApplicationException() {
+	super();
     }
 
     /**
      * Constructor for customized error message
+     * 
      * @param message
      */
-    public McApplicationException(String message)
-    {
-        super(message);
+    public McApplicationException(String message) {
+	super(message);
     }
 
     /**
      * Constructor for wrapping the throwable object
+     * 
      * @param cause
      */
-    public McApplicationException(Throwable cause)
-    {
-        super(cause);
+    public McApplicationException(Throwable cause) {
+	super(cause);
     }
 
     /**
-     * Constructor for wrapping both the customized error message and 
-     * throwable exception object.
+     * Constructor for wrapping both the customized error message and throwable exception object.
+     * 
      * @param message
      * @param cause
      */
-    public McApplicationException(String message, Throwable cause)
-    {
-        super(message, cause);
+    public McApplicationException(String message, Throwable cause) {
+	super(message, cause);
     }
 
 }

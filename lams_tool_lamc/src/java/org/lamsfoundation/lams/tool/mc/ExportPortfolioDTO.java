@@ -26,68 +26,66 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-
 /**
- * <p> DTO that holds export portfolio properties
+ * <p>
+ * DTO that holds export portfolio properties
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class ExportPortfolioDTO implements Comparable
-{
+public class ExportPortfolioDTO implements Comparable {
     protected String portfolioExportMode;
     protected String userExceptionNoToolSessions;
-    
+
     protected List listUserEntries;
     protected List listMonitoredAnswersContainerDto;
-    
 
-    
-    public int compareTo(Object o)
-    {
-	    McGeneralAuthoringDTO mcGeneralAuthoringDTO = (McGeneralAuthoringDTO) o;
-     
-        if (mcGeneralAuthoringDTO == null)
-        	return 1;
-		else
-			return 0;
+    public int compareTo(Object o) {
+	McGeneralAuthoringDTO mcGeneralAuthoringDTO = (McGeneralAuthoringDTO) o;
+
+	if (mcGeneralAuthoringDTO == null)
+	    return 1;
+	else
+	    return 0;
     }
 
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("portfolioExportMode: ", portfolioExportMode)
-            .append("userExceptionNoToolSessions: ", userExceptionNoToolSessions)
-            .append("listUserEntries: ", listUserEntries)
-            .append("listMonitoredAnswersContainerDto: ", listMonitoredAnswersContainerDto)
-            .toString();
+    public String toString() {
+	return new ToStringBuilder(this).append("portfolioExportMode: ", portfolioExportMode)
+		.append("userExceptionNoToolSessions: ", userExceptionNoToolSessions)
+		.append("listUserEntries: ", listUserEntries)
+		.append("listMonitoredAnswersContainerDto: ", listMonitoredAnswersContainerDto).toString();
     }
-	
+
     /**
      * @return Returns the listMonitoredAnswersContainerDto.
      */
     public List getListMonitoredAnswersContainerDto() {
-        return listMonitoredAnswersContainerDto;
+	return listMonitoredAnswersContainerDto;
     }
+
     /**
-     * @param listMonitoredAnswersContainerDto The listMonitoredAnswersContainerDto to set.
+     * @param listMonitoredAnswersContainerDto
+     *            The listMonitoredAnswersContainerDto to set.
      */
-    public void setListMonitoredAnswersContainerDto(
-            List listMonitoredAnswersContainerDto) {
-        this.listMonitoredAnswersContainerDto = listMonitoredAnswersContainerDto;
+    public void setListMonitoredAnswersContainerDto(List listMonitoredAnswersContainerDto) {
+	this.listMonitoredAnswersContainerDto = listMonitoredAnswersContainerDto;
     }
+
     /**
      * @return Returns the listUserEntries.
      */
     public List getListUserEntries() {
-        return listUserEntries;
+	return listUserEntries;
     }
+
     /**
-     * @param listUserEntries The listUserEntries to set.
+     * @param listUserEntries
+     *            The listUserEntries to set.
      */
     public void setListUserEntries(List listUserEntries) {
-        this.listUserEntries = listUserEntries;
+	this.listUserEntries = listUserEntries;
     }
+
     /**
      * @return Returns the mapStandardNominationsHTMLedContent.
      */
@@ -95,25 +93,29 @@ public class ExportPortfolioDTO implements Comparable
      * @return Returns the portfolioExportMode.
      */
     public String getPortfolioExportMode() {
-        return portfolioExportMode;
+	return portfolioExportMode;
     }
+
     /**
-     * @param portfolioExportMode The portfolioExportMode to set.
+     * @param portfolioExportMode
+     *            The portfolioExportMode to set.
      */
     public void setPortfolioExportMode(String portfolioExportMode) {
-        this.portfolioExportMode = portfolioExportMode;
+	this.portfolioExportMode = portfolioExportMode;
     }
+
     /**
      * @return Returns the userExceptionNoToolSessions.
      */
     public String getUserExceptionNoToolSessions() {
-        return userExceptionNoToolSessions;
+	return userExceptionNoToolSessions;
     }
+
     /**
-     * @param userExceptionNoToolSessions The userExceptionNoToolSessions to set.
+     * @param userExceptionNoToolSessions
+     *            The userExceptionNoToolSessions to set.
      */
-    public void setUserExceptionNoToolSessions(
-            String userExceptionNoToolSessions) {
-        this.userExceptionNoToolSessions = userExceptionNoToolSessions;
+    public void setUserExceptionNoToolSessions(String userExceptionNoToolSessions) {
+	this.userExceptionNoToolSessions = userExceptionNoToolSessions;
     }
 }

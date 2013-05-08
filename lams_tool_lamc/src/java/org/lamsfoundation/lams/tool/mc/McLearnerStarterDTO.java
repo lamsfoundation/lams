@@ -24,81 +24,90 @@ package org.lamsfoundation.lams.tool.mc;
 
 import java.util.Date;
 
-
 /**
- * <p> DTO that holds properties for initial screen presentation
+ * <p>
+ * DTO that holds properties for initial screen presentation
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McLearnerStarterDTO implements Comparable
-{
-    
+public class McLearnerStarterDTO implements Comparable {
+
     protected String questionListingMode;
-    
+
     protected String activityTitle;
-    
+
     protected String toolActivityOffline;
-    
+
     protected Date submissionDeadline;
-    
+
     /**
      * @return Returns the toolActivityOffline.
      */
     public String getToolActivityOffline() {
-        return toolActivityOffline;
+	return toolActivityOffline;
     }
+
     /**
-     * @param toolActivityOffline The toolActivityOffline to set.
+     * @param toolActivityOffline
+     *            The toolActivityOffline to set.
      */
     public void setToolActivityOffline(String toolActivityOffline) {
-        this.toolActivityOffline = toolActivityOffline;
+	this.toolActivityOffline = toolActivityOffline;
     }
+
     /**
      * @return Returns the activityTitle.
      */
     public String getActivityTitle() {
-        return activityTitle;
+	return activityTitle;
     }
+
     /**
-     * @param activityTitle The activityTitle to set.
+     * @param activityTitle
+     *            The activityTitle to set.
      */
     public void setActivityTitle(String activityTitle) {
-        this.activityTitle = activityTitle;
+	this.activityTitle = activityTitle;
     }
+
     /**
      * @return Returns the questionListingMode.
      */
     public String getQuestionListingMode() {
-        return questionListingMode;
+	return questionListingMode;
     }
+
     /**
-     * @param questionListingMode The questionListingMode to set.
+     * @param questionListingMode
+     *            The questionListingMode to set.
      */
     public void setQuestionListingMode(String questionListingMode) {
-        this.questionListingMode = questionListingMode;
+	this.questionListingMode = questionListingMode;
     }
-	/**
-	 * @return the submissionDeadline
-	 */
-	public Date getSubmissionDeadline() {
-		return submissionDeadline;
-	}
-	
-	/**
-	 * @param submissionDeadline the submissionDeadline to set
-	 */
-	public void setSubmissionDeadline(Date submissionDeadline) {
-		this.submissionDeadline = submissionDeadline;
-	}
-	public int compareTo(Object o)
-    {
-	    McLearnerStarterDTO mcLearnerStarterDTO = (McLearnerStarterDTO) o;
-     
-        if (mcLearnerStarterDTO == null)
-        	return 1;
-		else
-			return 0;
+
+    /**
+     * @return the submissionDeadline
+     */
+    public Date getSubmissionDeadline() {
+	return submissionDeadline;
     }
-	
+
+    /**
+     * @param submissionDeadline
+     *            the submissionDeadline to set
+     */
+    public void setSubmissionDeadline(Date submissionDeadline) {
+	this.submissionDeadline = submissionDeadline;
+    }
+
+    public int compareTo(Object o) {
+	McLearnerStarterDTO mcLearnerStarterDTO = (McLearnerStarterDTO) o;
+
+	if (mcLearnerStarterDTO == null)
+	    return 1;
+	else
+	    return 0;
+    }
+
 }

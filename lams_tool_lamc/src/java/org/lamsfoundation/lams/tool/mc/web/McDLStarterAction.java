@@ -26,44 +26,44 @@
  * McDLStarterAction activates the Define Later module. 
  * It reuses majority of the functionality from existing authoring module.
  * 
-   <!--Define Later Starter Action: initializes the DefineLater module -->
-   <action 
-   	path="/defineLaterStarter" 
-   	type="org.lamsfoundation.lams.tool.mc.web.McDLStarterAction" 
-   	name="McAuthoringForm" 
-	scope="request"
-   	input="/index.jsp"> 
+ <!--Define Later Starter Action: initializes the DefineLater module -->
+ <action 
+ path="/defineLaterStarter" 
+ type="org.lamsfoundation.lams.tool.mc.web.McDLStarterAction" 
+ name="McAuthoringForm" 
+ scope="request"
+ input="/index.jsp"> 
 
-	  	<forward
-		    name="load"
-          	path="/AuthoringMaincontent.jsp"
-		    redirect="false"
-	  	/>
-	  	
-	  	<forward
-	        name="starter"
-	        path="/index.jsp"
-	        redirect="false"
-	     />
-	  
-        <forward
-          name="loadViewOnly"
-          path="/authoring/AuthoringTabsHolder.jsp"
-          redirect="false"
-        />
-	  	
-	</action>  
-  
-*/
+ <forward
+ name="load"
+ path="/AuthoringMaincontent.jsp"
+ redirect="false"
+ />
+
+ <forward
+ name="starter"
+ path="/index.jsp"
+ redirect="false"
+ />
+
+ <forward
+ name="loadViewOnly"
+ path="/authoring/AuthoringTabsHolder.jsp"
+ redirect="false"
+ />
+
+ </action>  
+
+ */
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.web;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -73,17 +73,16 @@ import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 
-
 public class McDLStarterAction extends Action implements McAppConstants {
 
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-  								throws IOException, ServletException, McApplicationException {
-		McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
-		
-		IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-		mcAuthoringForm.setMcService(mcService);
-		
-	    McStarterAction mcStarterAction= new McStarterAction();
-	    return mcStarterAction.executeDefineLater(mapping, mcAuthoringForm, request, response, mcService);
-	}
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, McApplicationException {
+	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
+
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	mcAuthoringForm.setMcService(mcService);
+
+	McStarterAction mcStarterAction = new McStarterAction();
+	return mcStarterAction.executeDefineLater(mapping, mcAuthoringForm, request, response, mcService);
+    }
 }

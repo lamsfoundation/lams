@@ -24,114 +24,101 @@ package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author Ozgur Demirtas
- * <p>Hibernate implementation for database access to McUsrAttempt for the mc tool.</p>
- * <p>Be very careful about the queUserId and the McQueUser.uid fields. McQueUser.queUsrId is the core's user id for this user and McQueUser.uid 
- * is the primary key for McQueUser. McUsrAttempt.queUsrId = McQueUser.uid, not McUsrAttempt.queUsrId = McQueUser.queUsrId
- * as you would expect. A new McQueUser object is created for each new tool session, so if the McQueUser.uid is supplied, then this
- * denotes one user in a particular tool session, but if McQueUser.queUsrId is supplied, then this is just the user, not the session and the session
- * must also be checked.
+ *         <p>
+ *         Hibernate implementation for database access to McUsrAttempt for the mc tool.
+ *         </p>
+ *         <p>
+ *         Be very careful about the queUserId and the McQueUser.uid fields. McQueUser.queUsrId is the core's user id
+ *         for this user and McQueUser.uid is the primary key for McQueUser. McUsrAttempt.queUsrId = McQueUser.uid, not
+ *         McUsrAttempt.queUsrId = McQueUser.queUsrId as you would expect. A new McQueUser object is created for each
+ *         new tool session, so if the McQueUser.uid is supplied, then this denotes one user in a particular tool
+ *         session, but if McQueUser.queUsrId is supplied, then this is just the user, not the session and the session
+ *         must also be checked.
  */
 public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemptDAO {
-	 	
-	 	private static final String LOAD_ATTEMPT_BY_USER_SESSION = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrUid";
-	 		 	
-	 	private static final String LOAD_ATTEMPT_BY_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrUid"
-	 		+" and mcUsrAttempt.mcQueContentId=:mcQueContentId and mcUsrAttempt.attemptOrder=:attemptOrder"
-	 		+" order by mcUsrAttempt.attemptOrder, mcUsrAttempt.mcOptionsContent.uid";
-	 	
-	 	private static final String LOAD_LAST_ATTEMPT_BY_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueUsr.uid=:queUsrUid"
-	 		+" and mcUsrAttempt.mcQueContentId=:mcQueContentId and mcUsrAttempt.attemptOrder=mcUsrAttempt.mcQueUsr.lastAttemptOrder" 
-	 		+" order by mcUsrAttempt.mcOptionsContent.uid";
 
-	 	private static final String LOAD_ATTEMPT_FOR_QUESTION_CONTENT	 = "from mcUsrAttempt in class McUsrAttempt "
-	 		+" where mcUsrAttempt.mcQueContentId=:mcQueContentId and mcUsrAttempt.queUsrId=:queUsrUid"
-	 		+" order by mcUsrAttempt.attemptOrder";
+    private static final String LOAD_ATTEMPT_BY_USER_SESSION = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrUid";
 
-	 	private static final String LOAD_LAST_ATTEMPTS = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueUsr.uid=:queUsrUid"
-	 		+" and mcUsrAttempt.attemptOrder=mcUsrAttempt.mcQueUsr.lastAttemptOrder"
- 			+" order by mcUsrAttempt.mcQueContentId, mcUsrAttempt.mcOptionsContent.uid";
-	 	
-	 	public McUsrAttempt getMcUserAttemptByUID(Long uid)
-		{
-			 return (McUsrAttempt) this.getHibernateTemplate()
-	         .get(McUsrAttempt.class, uid);
-		}
-		
-		public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt)
-	    {
-	    	this.getHibernateTemplate().save(mcUsrAttempt);
-	    }
-	    
-		public List getUserAttemptsForSession(Long queUsrUid)
-	    {
-			List list = getSession().createQuery(LOAD_ATTEMPT_BY_USER_SESSION)
-				.setLong("queUsrUid", queUsrUid.longValue())
-				.list();
-			
-			return list;
-	    }
-		
-		public List getLatestAttemptsForAUser(final Long queUserUid) {
-			return (List) getSession().createQuery(LOAD_LAST_ATTEMPTS)
-				.setLong("queUsrUid", queUserUid.longValue())
-				.list();
-		}
+    private static final String LOAD_ATTEMPT_BY_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrUid"
+	    + " and mcUsrAttempt.mcQueContentId=:mcQueContentId and mcUsrAttempt.attemptOrder=:attemptOrder"
+	    + " order by mcUsrAttempt.attemptOrder, mcUsrAttempt.mcOptionsContent.uid";
 
-		// should be able to get rid of this one by rewriting export portfolio
-		@SuppressWarnings("unchecked")
-		public List<McUsrAttempt> getLatestAttemptsForAUserForOneQuestionContent(final Long queUsrUid, final Long mcQueContentId) {
-			return (List<McUsrAttempt>) getSession().createQuery(LOAD_LAST_ATTEMPT_BY_ATTEMPT_ORDER)
-				.setLong("queUsrUid", queUsrUid.longValue())
-				.setLong("mcQueContentId", mcQueContentId.longValue())
-				.list();
-		}
+    private static final String LOAD_LAST_ATTEMPT_BY_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueUsr.uid=:queUsrUid"
+	    + " and mcUsrAttempt.mcQueContentId=:mcQueContentId and mcUsrAttempt.attemptOrder=mcUsrAttempt.mcQueUsr.lastAttemptOrder"
+	    + " order by mcUsrAttempt.mcOptionsContent.uid";
 
-		@SuppressWarnings("unchecked")
-		public List<McUsrAttempt> getAllAttemptsForAUserForOneQuestionContentOrderByAttempt(final Long queUsrUid,  final Long mcQueContentId)
-	    {
-	        return (List<McUsrAttempt>)getSession().createQuery(LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
-			.setLong("mcQueContentId", mcQueContentId.longValue())
-			.setLong("queUsrUid", queUsrUid.longValue())
-			.list();
-	    }
+    private static final String LOAD_ATTEMPT_FOR_QUESTION_CONTENT = "from mcUsrAttempt in class McUsrAttempt "
+	    + " where mcUsrAttempt.mcQueContentId=:mcQueContentId and mcUsrAttempt.queUsrId=:queUsrUid"
+	    + " order by mcUsrAttempt.attemptOrder";
 
-		public List getAttemptByAttemptOrder(final Long queUsrUid, final Long mcQueContentId, final Integer attemptOrder)
-	    {
-	        List list = getSession().createQuery(LOAD_ATTEMPT_BY_ATTEMPT_ORDER)
-			.setLong("queUsrUid", queUsrUid.longValue())
-			.setLong("mcQueContentId", mcQueContentId.longValue())
-			.setInteger("attemptOrder", attemptOrder.intValue())
-			.list();
-			return list;
-	    }
-		
-		public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt)
-	    {
-		    this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().update(mcUsrAttempt);
-	    }
-		
-		public void removeMcUsrAttemptByUID(Long uid)
-	    {
-			McUsrAttempt mca = (McUsrAttempt)getHibernateTemplate().get(McUsrAttempt.class, uid);
-			this.getSession().setFlushMode(FlushMode.AUTO);
-	    	this.getHibernateTemplate().delete(mca);
-	    }
-		
-		
-		public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt)
-	    {
-			this.getSession().setFlushMode(FlushMode.AUTO);
-	        this.getHibernateTemplate().delete(mcUsrAttempt);
-	    }
-		
-} 
+    private static final String LOAD_LAST_ATTEMPTS = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueUsr.uid=:queUsrUid"
+	    + " and mcUsrAttempt.attemptOrder=mcUsrAttempt.mcQueUsr.lastAttemptOrder"
+	    + " order by mcUsrAttempt.mcQueContentId, mcUsrAttempt.mcOptionsContent.uid";
+
+    public McUsrAttempt getMcUserAttemptByUID(Long uid) {
+	return (McUsrAttempt) this.getHibernateTemplate().get(McUsrAttempt.class, uid);
+    }
+
+    public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
+	this.getHibernateTemplate().save(mcUsrAttempt);
+    }
+
+    public List getUserAttemptsForSession(Long queUsrUid) {
+	List list = getSession().createQuery(LOAD_ATTEMPT_BY_USER_SESSION).setLong("queUsrUid", queUsrUid.longValue())
+		.list();
+
+	return list;
+    }
+
+    public List getLatestAttemptsForAUser(final Long queUserUid) {
+	return (List) getSession().createQuery(LOAD_LAST_ATTEMPTS).setLong("queUsrUid", queUserUid.longValue()).list();
+    }
+
+    // should be able to get rid of this one by rewriting export portfolio
+    @SuppressWarnings("unchecked")
+    public List<McUsrAttempt> getLatestAttemptsForAUserForOneQuestionContent(final Long queUsrUid,
+	    final Long mcQueContentId) {
+	return (List<McUsrAttempt>) getSession().createQuery(LOAD_LAST_ATTEMPT_BY_ATTEMPT_ORDER)
+		.setLong("queUsrUid", queUsrUid.longValue()).setLong("mcQueContentId", mcQueContentId.longValue())
+		.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<McUsrAttempt> getAllAttemptsForAUserForOneQuestionContentOrderByAttempt(final Long queUsrUid,
+	    final Long mcQueContentId) {
+	return (List<McUsrAttempt>) getSession().createQuery(LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
+		.setLong("mcQueContentId", mcQueContentId.longValue()).setLong("queUsrUid", queUsrUid.longValue())
+		.list();
+    }
+
+    public List getAttemptByAttemptOrder(final Long queUsrUid, final Long mcQueContentId, final Integer attemptOrder) {
+	List list = getSession().createQuery(LOAD_ATTEMPT_BY_ATTEMPT_ORDER).setLong("queUsrUid", queUsrUid.longValue())
+		.setLong("mcQueContentId", mcQueContentId.longValue())
+		.setInteger("attemptOrder", attemptOrder.intValue()).list();
+	return list;
+    }
+
+    public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().update(mcUsrAttempt);
+    }
+
+    public void removeMcUsrAttemptByUID(Long uid) {
+	McUsrAttempt mca = (McUsrAttempt) getHibernateTemplate().get(McUsrAttempt.class, uid);
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(mca);
+    }
+
+    public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
+	this.getSession().setFlushMode(FlushMode.AUTO);
+	this.getHibernateTemplate().delete(mcUsrAttempt);
+    }
+
+}

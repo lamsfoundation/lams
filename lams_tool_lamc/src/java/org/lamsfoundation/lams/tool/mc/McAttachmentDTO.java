@@ -22,69 +22,79 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc;
 
-
 /**
- * <p> DTO that holds file attachment data for jsp purposes
+ * <p>
+ * DTO that holds file attachment data for jsp purposes
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McAttachmentDTO 
-{
-	private String uid;
-	
-	private String uuid;
+public class McAttachmentDTO {
+    private String uid;
+
+    private String uuid;
 
     private boolean isOfflineFile;
-    
+
     private String filename;
-	/**
-	 * @return Returns the filename.
-	 */
-	public String getFilename() {
-		return filename;
-	}
-	/**
-	 * @param filename The filename to set.
-	 */
-	public void setFilename(String filename) {
-		this.filename = filename;
-	}
-	
-	/**
-	 * @return Returns the uuid.
-	 */
-	public String getUuid() {
-		return uuid;
-	}
-	/**
-	 * @param uuid The uuid to set.
-	 */
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-	/**
-	 * @return Returns the isOfflineFile.
-	 */
-	public boolean isOfflineFile() {
-		return isOfflineFile;
-	}
-	/**
-	 * @param isOfflineFile The isOfflineFile to set.
-	 */
-	public void setOfflineFile(boolean isOfflineFile) {
-		this.isOfflineFile = isOfflineFile;
-	}
-	/**
-	 * @return Returns the uid.
-	 */
-	public String getUid() {
-		return uid;
-	}
-	/**
-	 * @param uid The uid to set.
-	 */
-	public void setUid(String uid) {
-		this.uid = uid;
-	}
+
+    /**
+     * @return Returns the filename.
+     */
+    public String getFilename() {
+	return filename;
+    }
+
+    /**
+     * @param filename
+     *            The filename to set.
+     */
+    public void setFilename(String filename) {
+	this.filename = filename;
+    }
+
+    /**
+     * @return Returns the uuid.
+     */
+    public String getUuid() {
+	return uuid;
+    }
+
+    /**
+     * @param uuid
+     *            The uuid to set.
+     */
+    public void setUuid(String uuid) {
+	this.uuid = uuid;
+    }
+
+    /**
+     * @return Returns the isOfflineFile.
+     */
+    public boolean isOfflineFile() {
+	return isOfflineFile;
+    }
+
+    /**
+     * @param isOfflineFile
+     *            The isOfflineFile to set.
+     */
+    public void setOfflineFile(boolean isOfflineFile) {
+	this.isOfflineFile = isOfflineFile;
+    }
+
+    /**
+     * @return Returns the uid.
+     */
+    public String getUid() {
+	return uid;
+    }
+
+    /**
+     * @param uid
+     *            The uid to set.
+     */
+    public void setUid(String uid) {
+	this.uid = uid;
+    }
 }

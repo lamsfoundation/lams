@@ -56,7 +56,6 @@ import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.EditActivityDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
-import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralAuthoringDTO;
@@ -211,7 +210,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
-	//there are no issues with input, continue and submit data
+	// there are no issues with input, continue and submit data
 
 	McContent mcContentTest = mcService.retrieveMc(new Long(strToolContentID));
 
@@ -224,13 +223,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	if (errors.isEmpty()) {
 	    authoringUtil.removeRedundantQuestions(mapQuestionContent, mcService, mcAuthoringForm, request,
 		    strToolContentID);
-	    //end of removing unused entries
+	    // end of removing unused entries
 
 	    mcContent = authoringUtil.saveOrUpdateMcContent(mapQuestionContent, mapFeedback, mapWeights, mapMarks,
 		    mapCandidatesList, mcService, mcAuthoringForm, request, mcContentTest, strToolContentID);
 
 	    long defaultContentID = 0;
-	    //attempt retrieving tool with signatute McAppConstants.MY_SIGNATURE
+	    // attempt retrieving tool with signatute McAppConstants.MY_SIGNATURE
 	    defaultContentID = mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE);
 
 	    if (mcContent != null) {
@@ -249,22 +248,22 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    }
 
 	    McUtils.setDefineLater(request, false, strToolContentID, mcService);
-	    //define later set to false
+	    // define later set to false
 
 	    McUtils.setFormProperties(request, mcService, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
 		    defaultContentIdStr, activeModule, sessionMap, httpSessionID);
 
 	    if (activeModule.equals(McAppConstants.AUTHORING)) {
-		//standard authoring close
+		// standard authoring close
 		request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 		mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 	    } else {
-		//go back to view only screen
+		// go back to view only screen
 		mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(false).toString());
 	    }
 
 	} else {
-	    //errors is not empty
+	    // errors is not empty
 
 	    if (mcContent != null) {
 		long defaultContentID = 0;
@@ -297,7 +296,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
 
-	//generating dyn pass map using listQuestionContentDTO
+	// generating dyn pass map using listQuestionContentDTO
 	Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
 	mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
@@ -406,7 +405,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	    if ((newQuestion != null) && (newQuestion.length() > 0)) {
 		if ((editQuestionBoxRequest != null) && (editQuestionBoxRequest.equals("false"))) {
-		    //request for add and save
+		    // request for add and save
 		    boolean duplicates = AuthoringUtil.checkDuplicateQuestions(listQuestionContentDTO, newQuestion);
 
 		    if (!duplicates) {
@@ -437,12 +436,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 			listQuestionContentDTO = AuthoringUtil.reorderUpdateListQuestionContentDTO(
 				listQuestionContentDTO, mcQuestionContentDTO, editableQuestionIndex);
-			//post reorderUpdateListQuestionContentDTO listQuestionContentDTO
+			// post reorderUpdateListQuestionContentDTO listQuestionContentDTO
 		    } else {
-			//duplicate question entry, not adding
+			// duplicate question entry, not adding
 		    }
 		} else {
-		    //request for edit and save
+		    // request for edit and save
 		    McQuestionContentDTO mcQuestionContentDTO = null;
 		    Iterator listIterator = listQuestionContentDTO.iterator();
 		    while (listIterator.hasNext()) {
@@ -472,7 +471,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 			    mcQuestionContentDTO, editableQuestionIndex);
 		}
 	    } else {
-		//entry blank, not adding
+		// entry blank, not adding
 	    }
 
 	    mcGeneralAuthoringDTO.setMarkValue(mark);
@@ -487,12 +486,12 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	    return (mapping.findForward(McAppConstants.LOAD_QUESTIONS));
 	} else {
-	    //errors is not empty
+	    // errors is not empty
 
 	    commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, activeModule, strToolContentID,
 		    defaultContentIdStr, mcService, httpSessionID, listQuestionContentDTO);
 
-	    //generating dyn pass map using listQuestionContentDTO
+	    // generating dyn pass map using listQuestionContentDTO
 	    Map passMarksMap = authoringUtil.buildDynamicPassMarkMap(listQuestionContentDTO, false);
 	    mcGeneralAuthoringDTO.setPassMarksMap(passMarksMap);
 
@@ -804,13 +803,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 		    listQuestionContentDTO.add(mcQuestionContentDTO);
 		} else {
-		    //entry duplicate, not adding
+		    // entry duplicate, not adding
 		}
 	    } else {
-		//entry blank, not adding
+		// entry blank, not adding
 	    }
 	} else {
-	    //errors, not adding
+	    // errors, not adding
 
 	    commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, activeModule, strToolContentID,
 		    defaultContentIdStr, mcService, httpSessionID, listQuestionContentDTO);
@@ -889,7 +888,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(McAppConstants.MY_SIGNATURE))
 		.toString();
 
-	/* create default mcContent object*/
+	/* create default mcContent object */
 	McContent mcContent = mcService.retrieveMc(new Long(defaultContentIdStr));
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
@@ -930,7 +929,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	List listAddableQuestionContentDTO = (List) sessionMap.get(McAppConstants.NEW_ADDABLE_QUESTION_CONTENT_KEY);
 
 	if ((requestType != null) && (requestType.equals("direct"))) {
-	    //requestType is direct
+	    // requestType is direct
 	    listAddableQuestionContentDTO = authoringUtil.buildDefaultQuestionContent(mcContent, mcService);
 	}
 
@@ -1376,7 +1375,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	return (mapping.findForward(McAppConstants.LOAD_QUESTIONS));
     }
 
-   public ActionForward moveQuestionUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward moveQuestionUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
@@ -1685,8 +1684,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    deletedAttachmentList = new ArrayList();
 	}
 
-	/* move the file's details from the attachment collection to the deleted attachments collection
-	 the attachment will be delete on saving. */
+	/*
+	 * move the file's details from the attachment collection to the deleted attachments collection the attachment
+	 * will be delete on saving.
+	 */
 
 	deletedAttachmentList = McUtils.moveToDelete(Long.toString(uuid), attachmentList, deletedAttachmentList);
 
@@ -1766,17 +1767,17 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	boolean isOnlineFile = false;
 	String fileType = null;
 	if ((mcAuthoringForm.getTheOfflineFile() != null) && (mcAuthoringForm.getTheOfflineFile().getFileSize() > 0)) {
-	    //theOfflineFile is available
+	    // theOfflineFile is available
 	    uploadedFile = mcAuthoringForm.getTheOfflineFile();
 	    fileType = IToolContentHandler.TYPE_OFFLINE;
 	} else if ((mcAuthoringForm.getTheOnlineFile() != null)
 		&& (mcAuthoringForm.getTheOnlineFile().getFileSize() > 0)) {
-	    //theOnlineFile is available
+	    // theOnlineFile is available
 	    uploadedFile = mcAuthoringForm.getTheOnlineFile();
 	    isOnlineFile = true;
 	    fileType = IToolContentHandler.TYPE_ONLINE;
 	} else {
-	    /*no file uploaded*/
+	    /* no file uploaded */
 	    return;
 	}
 
@@ -1793,8 +1794,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		deletedAttachmentList);
 
 	try {
-	    /* This is a new file and so is saved to the content repository. Add it to the 
-	     attachments collection, but don't add it to the tool's tables yet.
+	    /*
+	     * This is a new file and so is saved to the content repository. Add it to the attachments collection, but
+	     * don't add it to the tool's tables yet.
 	     */
 	    NodeKey node = getToolContentHandler().uploadFile(uploadedFile.getInputStream(),
 		    uploadedFile.getFileName(), uploadedFile.getContentType(), fileType);
@@ -1940,7 +1942,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	sessionMap.put(McAppConstants.ACTIVITY_TITLE_KEY, mcContent.getTitle());
 	sessionMap.put(McAppConstants.ACTIVITY_INSTRUCTIONS_KEY, mcContent.getInstructions());
 
-	/* determine whether the request is from Monitoring url Edit Activity*/
+	/* determine whether the request is from Monitoring url Edit Activity */
 	String sourceMcStarter = (String) request.getAttribute(McAppConstants.SOURCE_MC_STARTER);
 
 	mcAuthoringForm.setDefineLaterInEditMode(new Boolean(true).toString());
@@ -1950,7 +1952,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(false).toString());
 	if (isContentInUse == true) {
-	    //monitoring url does not allow editActivity since the content is in use
+	    // monitoring url does not allow editActivity since the content is in use
 	    persistError(request, "error.content.inUse");
 	    mcGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(true).toString());
 	}
@@ -2065,8 +2067,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 			editableQuestion = mcQuestionContentDTO.getQuestion();
 
 			candidates = mcQuestionContentDTO.getListCandidateAnswersDTO();
-			//candidates found
-			//but we are using the repopulated caList here
+			// candidates found
+			// but we are using the repopulated caList here
 
 			listCandidates = AuthoringUtil.swapCandidateNodes(caList, candidateIndex, "down");
 
@@ -2848,7 +2850,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    List listCandidates = new LinkedList();
 
 	    Iterator listIterator = listAddableQuestionContentDTO.iterator();
-	    /*there is only 1 question dto*/
+	    /* there is only 1 question dto */
 	    while (listIterator.hasNext()) {
 		McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
 
@@ -3004,7 +3006,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    List listCandidates = new LinkedList();
 
 	    Iterator listIterator = listAddableQuestionContentDTO.iterator();
-	    /*there is only 1 question dto*/
+	    /* there is only 1 question dto */
 	    while (listIterator.hasNext()) {
 		McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
 
@@ -3144,7 +3146,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	List listCandidates = new LinkedList();
 
 	Iterator listIterator = listAddableQuestionContentDTO.iterator();
-	/*there is only 1 question dto*/
+	/* there is only 1 question dto */
 	while (listIterator.hasNext()) {
 	    McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
 
@@ -3319,7 +3321,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	List listCandidates = new LinkedList();
 
 	Iterator listIterator = listAddableQuestionContentDTO.iterator();
-	/*there is only 1 question dto*/
+	/* there is only 1 question dto */
 	while (listIterator.hasNext()) {
 	    McQuestionContentDTO mcQuestionContentDTO = (McQuestionContentDTO) listIterator.next();
 

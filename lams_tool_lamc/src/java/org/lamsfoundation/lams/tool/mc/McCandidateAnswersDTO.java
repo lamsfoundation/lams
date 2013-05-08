@@ -24,61 +24,61 @@ package org.lamsfoundation.lams.tool.mc;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-
 /**
- * <p> DTO that holds candiate answers data for summary page
+ * <p>
+ * DTO that holds candiate answers data for summary page
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class McCandidateAnswersDTO implements Comparable
-{
-    
-	private String candidateAnswer;
-	
-	private String correct;
+public class McCandidateAnswersDTO implements Comparable {
+
+    private String candidateAnswer;
+
+    private String correct;
 
     /**
      * @return Returns the candidateAnswer.
      */
     public String getCandidateAnswer() {
-        return candidateAnswer;
+	return candidateAnswer;
     }
+
     /**
-     * @param candidateAnswer The candidateAnswer to set.
+     * @param candidateAnswer
+     *            The candidateAnswer to set.
      */
     public void setCandidateAnswer(String candidateAnswer) {
-        this.candidateAnswer = candidateAnswer;
+	this.candidateAnswer = candidateAnswer;
     }
+
     /**
      * @return Returns the correct.
      */
     public String getCorrect() {
-        return correct;
+	return correct;
     }
+
     /**
-     * @param correct The correct to set.
+     * @param correct
+     *            The correct to set.
      */
     public void setCorrect(String correct) {
-        this.correct = correct;
+	this.correct = correct;
     }
-	
-	public int compareTo(Object o)
-    {
-	    McCandidateAnswersDTO mcCandidateAnswersDTO = (McCandidateAnswersDTO) o;
-     
-        if (mcCandidateAnswersDTO == null)
-        	return 1;
-		else
-			return 0;
+
+    public int compareTo(Object o) {
+	McCandidateAnswersDTO mcCandidateAnswersDTO = (McCandidateAnswersDTO) o;
+
+	if (mcCandidateAnswersDTO == null)
+	    return 1;
+	else
+	    return 0;
     }
-	
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("candidateAnswer: ", candidateAnswer)
-            .append("correct: ", correct)
-            .toString();
+
+    public String toString() {
+	return new ToStringBuilder(this).append("candidateAnswer: ", candidateAnswer).append("correct: ", correct)
+		.toString();
     }
-	
+
 }

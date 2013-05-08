@@ -28,88 +28,110 @@ import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 
 /**
  * @author Ozgur Demirtas
- * <p>Interface for the McOptionsContent DAO, defines methods needed to access/modify mc options content</p>
+ *         <p>
+ *         Interface for the McOptionsContent DAO, defines methods needed to access/modify mc options content
+ *         </p>
  * 
  */
-public interface IMcOptionsContentDAO
-{
-	/**
-	 *  * <p>Return the persistent instance of a McOptsContent  
-	 * with the given identifier <code>uid</code>, returns null if not found. </p>
-	 * 
-	 * @param uid
-	 * @return McOptsContent
-	 */
-	public McOptsContent getMcOptionsContentByUID(Long uid);
+public interface IMcOptionsContentDAO {
+    /**
+     * *
+     * <p>
+     * Return the persistent instance of a McOptsContent with the given identifier <code>uid</code>, returns null if not
+     * found.
+     * </p>
+     * 
+     * @param uid
+     * @return McOptsContent
+     */
+    public McOptsContent getMcOptionsContentByUID(Long uid);
 
-	public List findMcOptionUidsByQueId(Long mcQueContentId);
-	
-	/**
-	 *  <p>Return a list of a McOptsContents  
-	 * with the given identifier <code>mcQueContentId</code>, returns null if not found. </p>
+    public List findMcOptionUidsByQueId(Long mcQueContentId);
 
-	 * @param mcQueContentId
-	 * @return List
-	 */
-	public List findMcOptionsContentByQueId(Long mcQueContentId);
-	
-	/**
-	 *  <p>Return the persistent instance of a McOptsContent  
-	 * with the given identifiers <code>option</code>, <code>mcQueContentUid  </code> returns null if not found. </p>
-	 * 
-	 * @param option
-	 * @param mcQueContentUid
-	 * @return McOptsContent
-	 */
-	public McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
-	
-	/**
-	 *  <p>Return a list of a persisted McOptsContents  
-	 * with the given identifier <code>mcQueContentId</code>, returns null if not found. </p>
-	 * 
-	 * @param mcQueContentId
-	 * @return List
-	 */
-	public List getPersistedSelectedOptions(Long mcQueContentId);
-	
-	public List findMcOptionCorrectByQueId(Long mcQueContentId);
-	
-	public List populateCandidateAnswersDTO(Long mcQueContentId);
-	
-	public List getCorrectOption(Long mcQueContentId);
-	
-	/**
-	 *  <p>saves McOptsContent </p>
-	 * @param mcOptionsContent
-	 */
-	public void saveMcOptionsContent(McOptsContent mcOptionsContent);
-    
-	/**
-	 *  <p>updates McOptsContent </p>
-	 * @param mcOptionsContent
-	 */
-	public void updateMcOptionsContent(McOptsContent mcOptionsContent);
+    /**
+     * <p>
+     * Return a list of a McOptsContents with the given identifier <code>mcQueContentId</code>, returns null if not
+     * found.
+     * </p>
+     * 
+     * @param mcQueContentId
+     * @return List
+     */
+    public List findMcOptionsContentByQueId(Long mcQueContentId);
 
-	/**
-	 *  <p>removes McOptsContent </p>
-	 * @param mcOptionsContent
-	 */
-	public void removeMcOptionsContentByUID(Long uid);
+    /**
+     * <p>
+     * Return the persistent instance of a McOptsContent with the given identifiers <code>option</code>,
+     * <code>mcQueContentUid  </code> returns null if not found.
+     * </p>
+     * 
+     * @param option
+     * @param mcQueContentUid
+     * @return McOptsContent
+     */
+    public McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
 
-	/**
-	 *  <p>removes McOptsContent </p>
-	 * @param mcOptionsContent
-	 */
-	public void removeMcOptionsContentByQueId(Long mcQueContentId);
+    /**
+     * <p>
+     * Return a list of a persisted McOptsContents with the given identifier <code>mcQueContentId</code>, returns null
+     * if not found.
+     * </p>
+     * 
+     * @param mcQueContentId
+     * @return List
+     */
+    public List getPersistedSelectedOptions(Long mcQueContentId);
 
-	/**
-	 *  <p>removes McOptsContent </p>
-	 * @param mcOptionsContent
-	 */
-	public void removeMcOptionsContent(McOptsContent mcOptsContent);
-	
-	public List findMcOptionNamesByQueId(Long mcQueContentId);
+    public List findMcOptionCorrectByQueId(Long mcQueContentId);
+
+    public List populateCandidateAnswersDTO(Long mcQueContentId);
+
+    public List getCorrectOption(Long mcQueContentId);
+
+    /**
+     * <p>
+     * saves McOptsContent
+     * </p>
+     * 
+     * @param mcOptionsContent
+     */
+    public void saveMcOptionsContent(McOptsContent mcOptionsContent);
+
+    /**
+     * <p>
+     * updates McOptsContent
+     * </p>
+     * 
+     * @param mcOptionsContent
+     */
+    public void updateMcOptionsContent(McOptsContent mcOptionsContent);
+
+    /**
+     * <p>
+     * removes McOptsContent
+     * </p>
+     * 
+     * @param mcOptionsContent
+     */
+    public void removeMcOptionsContentByUID(Long uid);
+
+    /**
+     * <p>
+     * removes McOptsContent
+     * </p>
+     * 
+     * @param mcOptionsContent
+     */
+    public void removeMcOptionsContentByQueId(Long mcQueContentId);
+
+    /**
+     * <p>
+     * removes McOptsContent
+     * </p>
+     * 
+     * @param mcOptionsContent
+     */
+    public void removeMcOptionsContent(McOptsContent mcOptsContent);
+
+    public List findMcOptionNamesByQueId(Long mcQueContentId);
 }
-
-
-
