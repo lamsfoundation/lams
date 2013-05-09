@@ -1354,7 +1354,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
 	    // check if activity is already complete
 	    if ((learnerProgress != null)
-		    && (activityId == -1L || learnerProgress.getCompletedActivities().containsKey(stopActivity))) {
+		    && ((activityId == -1L) || learnerProgress.getCompletedActivities().containsKey(stopActivity))) {
 		// if activityID == -1, then stopActivity == null and the method understands it
 		return forceUncompleteActivity(learnerProgress, stopActivity);
 	    }
@@ -1562,6 +1562,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	learnerProgress.getCompletedActivities().remove(targetActivity);
 	learnerProgress.getAttemptedActivities().put(targetActivity, completedActivityProgress.getStartDate());
 
+	// grouping activities which need to be reset
+	Set<Activity> groupings = new HashSet<Activity>();
+
 	// remove completed activities step by step, all the way from current to target activity
 	do {
 	    if (currentActivity.isComplexActivity()) {
@@ -1578,6 +1581,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 			}
 		    }
 		}
+	    } else if (currentActivity.isGroupingActivity()) {
+		groupings.add(currentActivity);
 	    }
 
 	    learnerProgress.getAttemptedActivities().remove(currentActivity);
@@ -1603,11 +1608,26 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    } else {
 		// move backwards
 		currentActivity = transitionTo.getFromActivity();
+		if (currentActivity.isGroupingActivity()) {
+		    groupings.add(currentActivity);
+		}
 	    }
 
 	} while (!currentActivity.equals(targetActivity));
 
 	learnerProgressDAO.updateLearnerProgress(learnerProgress);
+
+	User learner = learnerProgress.getUser();
+	for (Activity groupingActivity : groupings) {
+	    Grouping grouping = ((GroupingActivity) groupingActivity).getCreateGrouping();
+	    if (grouping.doesLearnerExist(learner)) {
+		// cancel existing grouping, so the learner has a chance to be grouped again
+		Group group = grouping.getGroupBy(learner);
+		group.getUsers().remove(learner);
+		groupDAO.saveGroup(group);
+	    }
+	}
+
 	return messageService.getMessage(MonitoringService.FORCE_COMPLETE_STOP_MESSAGE_COMPLETED_TO_ACTIVITY,
 		new Object[] { targetActivity.getTitle() });
     }
