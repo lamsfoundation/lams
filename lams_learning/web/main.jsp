@@ -42,7 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
 	<script type="text/javascript" src="includes/javascript/main.js"></script>
 	<script type="text/javascript">
-		var APP_URL = '<lams:WebAppURL />';
+		var APP_URL = '<lams:LAMSURL/>learning/';
 		var LABEL_CURRENT_ACTIVITY = '<fmt:message key="label.learner.progress.activity.current.tooltip"/>';
 		var LABEL_COMPLETED_ACTIVITY = '<fmt:message key="label.learner.progress.activity.completed.tooltip"/>';
 		var LABEL_ATTEMPTED_ACTIVITY = '<fmt:message key="label.learner.progress.activity.attempted.tooltip"/>';
