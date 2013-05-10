@@ -1619,8 +1619,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	learnerProgressDAO.updateLearnerProgress(learnerProgress);
 
 	User learner = learnerProgress.getUser();
-	for (Activity groupingActivity : groupings) {
-	    Grouping grouping = ((GroupingActivity) groupingActivity).getCreateGrouping();
+	for (Activity activity : groupings) {
+	    // fetch real object, otherwise there is a cast error
+	    GroupingActivity groupingActivity = (GroupingActivity) getActivityById(activity.getActivityId());
+	    Grouping grouping = groupingActivity.getCreateGrouping();
 	    if (grouping.doesLearnerExist(learner)) {
 		// cancel existing grouping, so the learner has a chance to be grouped again
 		Group group = grouping.getGroupBy(learner);
