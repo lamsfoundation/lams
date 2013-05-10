@@ -1555,12 +1555,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		.getFirstActivity() : previousActivity.getTransitionFrom().getToActivity();
 	learnerProgress.setCurrentActivity(targetActivity);
 	learnerProgress.setNextActivity(targetActivity);
-
-	// set target activity as attempted
 	CompletedActivityProgress completedActivityProgress = learnerProgress.getCompletedActivities().get(
 		targetActivity);
-	learnerProgress.getCompletedActivities().remove(targetActivity);
-	learnerProgress.getAttemptedActivities().put(targetActivity, completedActivityProgress.getStartDate());
 
 	// grouping activities which need to be reset
 	Set<Activity> groupings = new HashSet<Activity>();
@@ -1581,8 +1577,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 			}
 		    }
 		}
-	    } else if (currentActivity.isGroupingActivity()) {
-		groupings.add(currentActivity);
 	    }
 
 	    learnerProgress.getAttemptedActivities().remove(currentActivity);
@@ -1593,9 +1587,12 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    if (transitionTo == null) {
 		// reached beginning of either sequence or complex activity
 		if (currentActivity.getParentActivity() == null) {
-		    // reached beginning of sequence and target activity was not found, something is wrong
-		    throw new MonitoringServiceException("Target activity was not found sequence. Activity id: "
-			    + targetActivity.getActivityId());
+		    // special case when learning design has only on activity
+		    if (!((previousActivity == null) && currentActivity.equals(targetActivity))) {
+			// reached beginning of sequence and target activity was not found, something is wrong
+			throw new MonitoringServiceException("Target activity was not found sequence. Activity id: "
+				+ targetActivity.getActivityId());
+		    }
 		} else {
 		    currentActivity = currentActivity.getParentActivity();
 		    if (currentActivity.getParentActivity() != null) {
@@ -1614,6 +1611,10 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    }
 
 	} while (!currentActivity.equals(targetActivity));
+
+	// set target activity as attempted
+	learnerProgress.getCompletedActivities().remove(targetActivity);
+	learnerProgress.getAttemptedActivities().put(targetActivity, completedActivityProgress.getStartDate());
 
 	learnerProgressDAO.updateLearnerProgress(learnerProgress);
 
