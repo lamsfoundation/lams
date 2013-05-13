@@ -3080,16 +3080,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     public void prepareReflectionData(HttpServletRequest request, QaContent qaContent, IQaService qaService,
 	    String userID, boolean exportMode, String currentSessionId) {
 
-	List reflectionsContainerDTO = new LinkedList();
-	/*
-	 * if (currentSessionId.equals("All")) { reflectionsContainerDTO=getReflectionList(qaContent, userID,
-	 * qaService); } else { reflectionsContainerDTO=getReflectionListForSession(qaContent, userID, qaService,
-	 * currentSessionId); }
-	 */
-
-	reflectionsContainerDTO = getReflectionList(qaContent, userID, qaService);
-
-	
+	List reflectionsContainerDTO = getReflectionList(qaContent, userID, qaService);
 	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
 
 	if (exportMode) {
@@ -3161,91 +3152,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 			    reflectionsContainerDTO.add(reflectionDTO);
 			}
 		    }
-		}
-	    }
-	}
-
-	return reflectionsContainerDTO;
-    }
-
-    /**
-     * returns reflection data for a specific session
-     * 
-     * getReflectionListForSession(QaContent qaContent, String userID,
-     * IQaService qaService, String currentSessionId)
-     * 
-     * @param qaContent
-     * @param userID
-     * @param qaService
-     * @param currentSessionId
-     * @return
-     */
-    public List getReflectionListForSession(QaContent qaContent, String userID, IQaService qaService,
-	    String currentSessionId) {
-
-	List reflectionsContainerDTO = new LinkedList();
-	if (userID == null) {
-	    //all users mode
-	    for (Iterator sessionIter = qaContent.getQaSessions().iterator(); sessionIter.hasNext();) {
-		QaSession qaSession = (QaSession) sessionIter.next();
-		
-		QaMonitoringAction.logger.debug("qaSession sessionId: " + qaSession.getQaSessionId());
-
-		if (currentSessionId.equals(qaSession.getQaSessionId())) {
-
-		    for (Iterator userIter = qaSession.getQaQueUsers().iterator(); userIter.hasNext();) {
-			QaQueUsr user = (QaQueUsr) userIter.next();
-			QaMonitoringAction.logger.debug("user: " + user.getUsername());
-
-			NotebookEntry notebookEntry = qaService.getEntry(qaSession.getQaSessionId(),
-				CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(user
-					.getQueUsrId().toString()));
-
-			
-
-			if (notebookEntry != null) {
-			    ReflectionDTO reflectionDTO = new ReflectionDTO();
-			    reflectionDTO.setUserId(user.getQueUsrId().toString());
-			    reflectionDTO.setSessionId(qaSession.getQaSessionId().toString());
-			    reflectionDTO.setUserName(user.getFullname());
-			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			    String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
-			    reflectionDTO.setEntry(notebookEntryPresentable);
-			    reflectionsContainerDTO.add(reflectionDTO);
-			}
-		    }
-		}
-	    }
-	} else {
-	    //single user mode
-	    for (Iterator sessionIter = qaContent.getQaSessions().iterator(); sessionIter.hasNext();) {
-		QaSession qaSession = (QaSession) sessionIter.next();
-		
-
-		if (currentSessionId.equals(qaSession.getQaSessionId())) {
-		    for (Iterator userIter = qaSession.getQaQueUsers().iterator(); userIter.hasNext();) {
-			QaQueUsr user = (QaQueUsr) userIter.next();
-
-			if (user.getQueUsrId().toString().equals(userID)) {
-			    NotebookEntry notebookEntry = qaService.getEntry(qaSession.getQaSessionId(),
-				    CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(user
-					    .getQueUsrId().toString()));
-
-			    
-
-			    if (notebookEntry != null) {
-				ReflectionDTO reflectionDTO = new ReflectionDTO();
-				reflectionDTO.setUserId(user.getQueUsrId().toString());
-				reflectionDTO.setSessionId(qaSession.getQaSessionId().toString());
-				reflectionDTO.setUserName(user.getFullname());
-				reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-				String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
-				reflectionDTO.setEntry(notebookEntryPresentable);
-				reflectionsContainerDTO.add(reflectionDTO);
-			    }
-			}
-		    }
-
 		}
 	    }
 	}
