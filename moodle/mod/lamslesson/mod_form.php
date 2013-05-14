@@ -137,6 +137,7 @@ class mod_lamslesson_mod_form extends moodleform_mod {
         $mform->setType('customCSV', PARAM_TEXT);
 
         $mform->addElement('header', 'selectsequence', get_string('selectsequence', 'lamslesson'));
+	$mform->setExpanded('selectsequence', true);
 
         $mform->addElement('static', 'sequencemessage', '', $html);
     	$mform->addElement('checkbox', 'displaydesign', get_string('displaydesign', 'lamslesson'));
