@@ -29,7 +29,7 @@
 	#player-block {  clear: both; position: absolute; top: 0; bottom: 0; left: 0; right: 0;}
 	#dummy {padding-top: 52%; /* aspect ratio */}
 	#player-wrap {width: 60%; height: 100%; clear: both; margin-bottom: 20px; background: black;}
-	#player-bottombar {height:80px; width: 60%; margin-top: 15px; margin-bottom: 10px;}
+	#player-bottombar {height:50px; width: 60%; margin-top: 15px; margin-bottom: 10px;}
 	
 	#comments-area { padding: 5px 0 20px; min-width: 431px; width: 60%;}
 	#comments-table {border-spacing: 3px; margin-top: 0; padding-right: 3px;}
@@ -54,13 +54,9 @@
 	.thumb-title {width: auto; font-size: 12px; font-weight: bold; line-height: 15px; max-height: 30px; color: #333; display: block; margin-bottom: 4px; overflow: hidden; cursor: pointer;}
 	.thumb-stat {display: block; font-size: .9166em; color: #666; line-height: 1.4em; max-height: 1.4em; height: 1.4em; white-space: nowrap; overflow: hidden;}
 	.thumb-text {color: #666;}
-	#cuepoint-comments { height:80px; width: 160%; overflow: auto; font-size: 18px; line-height: 23px; margin-top:15px;  margin-bottom: 10px; display: none;}
-	#add-cue-points{clear: left;}
-	#add-cue-points-link{padding: 5px 15px 5px 25px; background-position-y: 0;}
 </style>	
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/instantedit.js"></script>
 <script type="text/javascript">
@@ -68,19 +64,14 @@
 	var pathToImageFolder = "<lams:LAMSURL/>images/css/";
 	//var for instantedit.js
 	var urlBase = '<c:url value="/monitoring.do"/>';
-	//vars for CodeCuePoints.create.js
-	var isCreationPhase = false;
-	var isDisplayCuePointComments = ${sessionMap.isDisplayCuePointComments};
 </script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jRating.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/kaltura.min.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
 <script type="text/javascript" src="http://cdnbakmi.kaltura.com/html5/html5lib/v1.6.10.4/mwEmbedLoader.php"></script>
-<script type="text/javascript" src="includes/javascript/CodeCuePoints.create.js"></script>
-<script>
 
-	//Specify Kaltura settings
+<script type="text/javascript">
+	//Kaltura settings
 	//kaltura server 
 	var KALTURA_SERVER = "${KALTURA_SERVER}";
 	//your actual parner id
@@ -92,111 +83,19 @@
 	//ui_conf_id of Kaltura Contribution Wizard(KCW)
 	var KCW_UI_CONF_ID = "${KCW_UI_CONF_ID}";
 	//ui_conf_id of Kaltura Dynamic Player(KDP)
-	var KDP_UI_CONF_ID = "5692401";
-	//constant used for tracking user info
-	var USER_ID  = ${sessionMap.toolSessionID};
-	
-	var kClient;
-	
-	$(document).ready(function(){
-    	initialize();
-    	
-		$(".rating-stars").jRating({
-		    phpPath : "<c:url value='/learning.do'/>?dispatch=rateItem&sessionMapID=${sessionMapID}",
-		    rateMax : 5,
-		    decimalLength : 1,
-			onSuccess : function(data, itemUid){
-			    $("#averageRating" + itemUid).html(data.averageRating);
-			    $("#numberOfVotes" + itemUid).html(data.numberOfVotes);
-			},
-			onError : function(){
-			    jError('Error submitting rating, please retry');
-			}
-		});
-	    $(".rating-stars-disabled").jRating({
-	    	rateMax : 5,
-	    	isDisabled : true
-		});
-	    $(".rating-stars-disabled-small").jRating({
-	    	rateMax : 5,
-	    	type: 'small',
-	    	isDisabled : true
-		});
-	    
-	    //edit mark 
-		setVarsForm("dispatch=markItem&itemUid=${item.uid}");
-		$('#editItemMark').click(function() {
-			editBox(document.getElementById( "itemMark" ));
-		});
-		
-		$("#add-cue-points-link").click(function() {
-			var href = "<c:url value='/learning.do'/>?dispatch=cuePoints&kalturaSession=" + KApps.CodeCuePoints.vars.ks + "&sessionMapID=${sessionMapID}&itemUid=${item.uid}&KeepThis=true&TB_iframe=true&height=440&width=820&modal=true";
-			$("#add-cue-points-link2").attr("href", href);
-			$("#add-cue-points-link2").click();
-		});
-	});
-	
-	function initialize() {
-	
-		//check if LAMS has a Kaltura server configured
-		if ((KALTURA_SERVER == "") || (PARTNER_ID == "") || (USER_SECRET == "") || (KCW_UI_CONF_ID == "")) {
-			alert('<fmt:message key="label.kaltura.server.not.configured"/>');
-			return false;
-		}
-			
-		//start Kaltura session
-		var kConfig = new KalturaConfiguration(parseInt(PARTNER_ID));
-		kConfig.serviceUrl = KALTURA_SERVER;
-		kClient = new KalturaClient(kConfig);
-		var expiry = null;
-		var privileges = null;//"edit:${item.entryId}";
-		kClient.session.start(onSessionCreated, USER_SECRET, USER_ID, KalturaSessionType.USER, PARTNER_ID, expiry, privileges);
-	}
-	
-	function onSessionCreated(isSuccess, kSession) {
-	
-    	if (! isSuccess) {
-    		alert('<fmt:message key="error.there.was.error"/>');
-    		return;
-    	} else if (kSession.code != null) {
-    		alert('<fmt:message key="error.there.was.error"/>: ' + kSession.message);
-    		return;
-    	}
-    	
-    	// kclip settings
-    	KApps.CodeCuePoints.vars.ks			= kSession;
-    	KApps.CodeCuePoints.vars.entry_id	= "${item.entryId}";
-    	
-    	//enable HTML5 support
-		mw.setConfig("Kaltura.ServiceUrl" , KALTURA_SERVER );
-		mw.setConfig("Kaltura.CdnUrl" , KALTURA_SERVER );
-		mw.setConfig("Kaltura.ServiceBase", "/api_v3/index.php?service=");
-		mw.setConfig("EmbedPlayer.EnableIframeApi", true );
-		mw.setConfig("EmbedPlayer.UseFlashOnAndroid", false );
-		mw.setConfig("Kaltura.UseAppleAdaptive", false );
-		mw.setConfig("EmbedPlayer.AttributionButton", false );
-		mw.setConfig("EmbedPlayer.OverlayControls", false ); 
-    	
-    	var params = {
-    		allowscriptaccess: "always",
-    		allownetworking: "all",
-    		allowfullscreen: "true",
-    		wmode: "opaque"
-    	};	
-    	var flashVars = {
-    		entryId:  "${item.entryId}",
-    		// enable kdp-js interaction:
-    		externalInterfaceDisabled : false,
-    		ks						: kSession,
-    		clientTag: (new Date()).getTime(),
-    		jsTraces : true,
-    		requiredMetadataFields : true,
-    		getCuePointsData : true
-    	};
-    	swfobject.embedSWF(KALTURA_SERVER + '/kwidget/wid/_' + PARTNER_ID + '/uiconf_id/' + KDP_UI_CONF_ID, "kplayer", "100%", "100%", "9.0.0", "includes/expressInstall.swf", flashVars, params);
+	var KDP_UI_CONF_ID = "${KDP_UI_CONF_ID}";
 
-	}
-
+	var params = {
+		allowscriptaccess: "always",
+		allownetworking: "all",
+		allowfullscreen: "true",
+		wmode: "opaque"
+	};	
+	var flashVars = {
+		entryId:  "${item.entryId}"
+	};	
+	swfobject.embedSWF(KALTURA_SERVER + '/kwidget/wid/_' + PARTNER_ID + '/uiconf_id/' + KDP_UI_CONF_ID, "kplayer", "100%", "100%", "9.0.0", "includes/expressInstall.swf", flashVars, params);
+	
 	function finishActivity(){
 		$('#finishButton').prop('disabled', true);
 		document.location.href ='<c:url value="/learning.do"/>?dispatch=finishActivity&sessionMapID=${sessionMapID}';
@@ -278,24 +177,37 @@
 		
 		return false;
 	}
-	
-	function resizeIframe() {
-		if (document.getElementById('TB_iframeContent') != null) {
-		    var height = top.window.innerHeight;
-		    if ( height == undefined || height == 0 ) {
-		    	// IE doesn't use window.innerHeight.
-		    	height = document.documentElement.clientHeight;
-		    	// alert("using clientHeight");
-		    }
-			// alert("doc height "+height);
-		    height -= document.getElementById('TB_iframeContent').offsetTop + 60;
-		    document.getElementById('TB_iframeContent').style.height = height +"px";
-	
-			TB_HEIGHT = height + 28;
-			tb_position();
-		}
-	};
-	window.onresize = resizeIframe;
+
+	$(document).ready(function(){
+		$(".rating-stars").jRating({
+		    phpPath : "<c:url value='/learning.do'/>?dispatch=rateItem&sessionMapID=${sessionMapID}",
+		    rateMax : 5,
+		    decimalLength : 1,
+			onSuccess : function(data, itemUid){
+			    $("#averageRating" + itemUid).html(data.averageRating);
+			    $("#numberOfVotes" + itemUid).html(data.numberOfVotes);
+			},
+			onError : function(){
+			    jError('Error submitting rating, please retry');
+			}
+		});
+	    $(".rating-stars-disabled").jRating({
+	    	rateMax : 5,
+	    	isDisabled : true
+		});
+	    $(".rating-stars-disabled-small").jRating({
+	    	rateMax : 5,
+	    	type: 'small',
+	    	isDisabled : true
+		});
+	    
+	    //edit mark 
+		setVarsForm("dispatch=markItem&itemUid=${item.uid}");
+		$('#editItemMark').click(function() {
+			editBox(document.getElementById( "itemMark" ));
+		});
+
+	});
 
 </script>
 
@@ -425,7 +337,7 @@
 	<div id="player-bottombar">
 		
 		<%--"Check for new" and "Add new image" buttons---------------%>
-		<div id="player-bottombar-internal">
+	
 		<div id="add-new-item">
 			<c:if test="${sessionMap.isAllowUpload && (not finishedLock)}">
 				<a href="<c:url value='/pages/learning/uploaditem.jsp'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=570&width=740&modal=true" class="button-add-item thickbox">  
@@ -449,33 +361,13 @@
 				<sup><a href="javascript:;" id="editItemMark"><fmt:message key="label.mark.edit" /></a></sup>
 			</c:if>
 		</div>
-		
+	
 		<!--  Rating stars -->
 	
 		<c:if test="${kaltura.allowRatings && (item.uid != -1)}">
 			<%@ include file="/pages/learning/ratingStars.jsp"%>
 		</c:if>
-		
-			<!--  Add-cue-points -->
-			<c:if test="${not finishedLock && kaltura.allowLearnerCuePoints || (kaltura.allowLearnerCuePoints || kaltura.allowTeacherCuePoints) && sessionMap.isGroupMonitoring }">
-				<div id="add-cue-points">
-					<a href="#nogo" class="button" id="add-cue-points-link">  
-						<fmt:message key="label.add.time.stamped.comments" />
-					</a>
-					<a href="#nogo" class="thickbox" id="add-cue-points-link2" style="display:none;">  
-						
-					</a>
-				</div>
-			</c:if>
-			
-		</div>
-		
-		<div id="cuepoint-comments">
-			
-		</div>
 	</div>
-	
-
 	    	
     <%--Comments area----------------------------------------------%>	
     	
