@@ -100,21 +100,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:hidden property="donePreview" />
 
 <div class="space-top button-inside">
-        <c:if 
-                test="${mcGeneralLearnerFlowDTO.totalCountReached != 'true'  &&  mcGeneralLearnerFlowDTO.totalQuestionCount != '1'}"> 
-                <button name="continueOptionsCombined" id="continueOptionsCombined" onclick="if (verifyCandidateSelected()){ submitNextQuestionSelected();}" data-theme="b"> 
-                        <fmt:message key="button.continue" /> 
-                </button> 
+        <c:if test="${mcGeneralLearnerFlowDTO.totalCountReached != 'true'  &&  mcGeneralLearnerFlowDTO.totalQuestionCount != '1'}"> 
+        	<button type="button" name="continueOptionsCombined" id="continueOptionsCombined" onclick="submitNextQuestionSelected();" data-theme="b"> 
+        		<fmt:message key="button.continue" /> 
+            </button> 
         </c:if>
 
 	<c:if test="${mcGeneralLearnerFlowDTO.totalQuestionCount == '1'}">
-		<button name="continueOptionsCombined" id="continueOptionsCombined" onclick="javascript:if (verifyCandidateSelected()){ submitAllAnswers();}" data-theme="b">
+		<button type="button" name="continueOptionsCombined" id="continueOptionsCombined" onclick="doSubmit();" data-theme="b">
 			<fmt:message key="button.continue" />
 		</button>
 	</c:if>
 
 	<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached == 'true'}">
-		<button name="continueOptionsCombined" id="continueOptionsCombined" onclick="javascript:if (verifyCandidateSelected()){ submitAllAnswers();}" data-theme="b">
+		<button type="button" name="continueOptionsCombined" id="continueOptionsCombined" onclick="submitAllAnswers();" data-theme="b">
 			<fmt:message key="button.submit" />
 		</button>
 	</c:if>

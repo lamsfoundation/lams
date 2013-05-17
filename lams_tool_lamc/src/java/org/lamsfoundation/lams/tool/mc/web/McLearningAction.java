@@ -473,26 +473,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	McTempDataHolderDTO mcTempDataHolderDTO = new McTempDataHolderDTO();
 
-	boolean allQuestionsChecked = allQuestionsChecked(mcService, learnerInput, mcContent, mcTempDataHolderDTO);
-
-	if (!allQuestionsChecked) {
-	    // there are no selected answers for any questions
-	    ActionMessages errors = new ActionMessages();
-
-	    ActionMessage error = new ActionMessage("answers.submitted.none");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	    saveErrors(request, errors);
-
-	    McLearningStarterAction mcLearningStarterAction = new McLearningStarterAction();
-	    mcLearningStarterAction.commonContentSetup(request, mcContent, mcService, mcLearningForm, toolSessionID);
-
-	    mcGeneralLearnerFlowDTO.setQuestionIndex(mcTempDataHolderDTO.getDisplayOrder());
-
-	    request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
-
-	    return mapping.findForward(McAppConstants.LOAD_LEARNER);
-	}
-
 	List selectedQuestionAndCandidateAnswersDTO = buildSelectedQuestionAndCandidateAnswersDTO(learnerInput,
 		mcTempDataHolderDTO, mcService, mcContent);
 	request.setAttribute(McAppConstants.LIST_SELECTED_QUESTION_CANDIDATEANSWERS_DTO,
@@ -579,44 +559,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	return mapping.findForward(McAppConstants.INDIVIDUAL_REPORT);
     }
 
-    public boolean allQuestionsChecked(IMcService mcService, List learnerInput, McContent mcContent,
-	    McTempDataHolderDTO mcTempDataHolderDTO) {
-
-	boolean questionSelected = false;
-	Iterator listIterator = mcContent.getMcQueContents().iterator();
-	while (listIterator.hasNext()) {
-	    McQueContent mcQueContent = (McQueContent) listIterator.next();
-	    String uid = mcQueContent.getUid().toString();
-
-	    questionSelected = false;
-	    Iterator learnerInputIterator = learnerInput.iterator();
-	    while (learnerInputIterator.hasNext() && !questionSelected) {
-		String learnerInputLine = (String) learnerInputIterator.next();
-
-		int sepIndex = learnerInputLine.indexOf("-");
-
-		String selectedUid = learnerInputLine.substring(0, sepIndex);
-
-		if (uid.equals(selectedUid)) {
-		    questionSelected = true;
-		}
-
-	    }
-
-	    if (questionSelected == false) {
-		mcTempDataHolderDTO.setDisplayOrder(mcQueContent.getDisplayOrder());
-		return false;
-	    }
-	}
-
-	return true;
-    }
-
     /**
-     * 
-     * continueOptionsCombined(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
-     * response)
-     * 
      * takes the learner to the next set of questions
      * 
      * @param request

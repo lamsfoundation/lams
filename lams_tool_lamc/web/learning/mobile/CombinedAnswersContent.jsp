@@ -56,8 +56,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 <ul data-role="listview" data-inset="true" data-theme="d" >
-<c:forEach var="dto" varStatus="status"
-	items="${requestScope.listQuestionCandidateAnswersDto}">
+<c:forEach var="dto" varStatus="status"	items="${requestScope.listQuestionCandidateAnswersDto}">
 
 	<li>
 	<fieldset data-role="controlgroup">
@@ -66,8 +65,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">			
 				[
-				<strong><fmt:message key="label.mark" />
-				</strong>
+				<strong><fmt:message key="label.mark" /></strong>
 				<c:out value="${dto.mark}" />
 				]
 			</c:if>							
@@ -94,7 +92,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <div class="space-top button-inside">
 	<html:hidden property="continueOptionsCombined" value="Continue" />
 
-	<button name="continueButton" id="continueButton" data-theme="b">
+	<button type="button" name="continueButton" id="continueButton" data-theme="b" onclick="doSubmit();">
 		<fmt:message key="button.continue" />
 	</button>
 </div>

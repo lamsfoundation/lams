@@ -57,8 +57,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 
 
-<c:forEach var="dto" varStatus="status"
-	items="${requestScope.listQuestionCandidateAnswersDto}">
+<c:forEach var="dto" varStatus="status" items="${requestScope.listQuestionCandidateAnswersDto}">
 
 	<div class="shading-bg">
 		<div style="overflow: auto;">
@@ -66,27 +65,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">			
 				[
-				<strong><fmt:message key="label.mark" />
-				</strong>
+				<strong><fmt:message key="label.mark" /></strong>
 				<c:out value="${dto.mark}" />
 				]
 			</c:if>							
 		</div>
 	</div>
 
-
-	<c:forEach var="ca" varStatus="status"
-		items="${dto.candidateAnswerUids}">
+	<c:forEach var="ca" varStatus="status" items="${dto.candidateAnswerUids}">
 
 		<div class="indent">
-			<input type="radio" name="checkedCa${dto.questionUid}" class="noBorder"
-				value="${dto.questionUid}-${ca.value}">
+			<input type="radio" name="checkedCa${dto.questionUid}" class="noBorder" value="${dto.questionUid}-${ca.value}">
 
-			<c:forEach var="caText" varStatus="status"
-				items="${dto.candidateAnswers}">
-
-
-
+			<c:forEach var="caText" varStatus="status" items="${dto.candidateAnswers}">
 				<c:if test="${ca.key == caText.key}">
 					<c:out value="${caText.value}" escapeXml="false" />
 		</div>
@@ -102,9 +93,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <div class="space-bottom-top align-right">
 	<html:hidden property="continueOptionsCombined" value="Continue" />
 
-	<html:submit styleClass="button" styleId="continueButton">
+	<html:button property="continueButton" styleClass="button" onclick="doSubmit();" styleId="continueButton">
 		<fmt:message key="button.continue" />
-	</html:submit>
+	</html:button>
 </div>
 
 <!--options content ends here-->

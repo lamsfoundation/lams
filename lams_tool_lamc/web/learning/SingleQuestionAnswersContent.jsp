@@ -95,21 +95,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:hidden property="donePreview" />
 
 <div class="space-bottom-top">
-        <c:if 
-                test="${mcGeneralLearnerFlowDTO.totalCountReached != 'true'  &&  mcGeneralLearnerFlowDTO.totalQuestionCount != '1'}"> 
-                <html:submit property="continueOptionsCombined" onclick="if (verifyCandidateSelected()){ submitNextQuestionSelected();}" styleClass="button"> 
-                        <fmt:message key="button.continue" /> 
-                </html:submit> 
-        </c:if>
+    <c:if test="${mcGeneralLearnerFlowDTO.totalCountReached != 'true'  &&  mcGeneralLearnerFlowDTO.totalQuestionCount != '1'}"> 
+    	<html:button property="continueOptionsCombined" onclick="submitNextQuestionSelected();" styleClass="button"> 
+        	<fmt:message key="button.continue" /> 
+        </html:button> 
+    </c:if>
 
 	<c:if test="${mcGeneralLearnerFlowDTO.totalQuestionCount == '1'}">
-		<html:submit property="continueOptionsCombined" onclick="javascript:verifyCandidateSelected()" styleClass="button">
+		<html:button property="continueOptionsCombined" onclick="doSubmit();" styleClass="button">
 			<fmt:message key="button.continue" />
-		</html:submit>
+		</html:button>
 	</c:if>
 
 	<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached == 'true'}">
-		<html:button property="continueOptionsCombined" onclick="javascript:if (verifyCandidateSelected()){ submitAllAnswers();}" styleClass="button">
+		<html:button property="continueOptionsCombined" onclick="submitAllAnswers();" styleClass="button">
 			<fmt:message key="button.submit" />
 		</html:button>
 	</c:if>

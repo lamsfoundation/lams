@@ -41,47 +41,52 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
-		<script language="JavaScript" type="text/JavaScript">
-			function submitNextQuestionSelected() 
-			{
+	<script language="JavaScript" type="text/JavaScript">
+		function submitNextQuestionSelected() {
+			if (verifyAllQuestionsAnswered()) {
 				++document.McLearningForm.questionIndex.value;
 				document.McLearningForm.nextQuestionSelected.value = 1;
+				disableContinueButton();
 				document.McLearningForm.submit();
 			}
+		}
 
-			function submitAllAnswers() 
-			{
-				document.McLearningForm.continueOptionsCombined.value = 1;			
+		function submitAllAnswers() {
+			document.McLearningForm.continueOptionsCombined.value = 1;			
+			doSubmit();
+		}
+		
+		function doSubmit() {
+			if (verifyAllQuestionsAnswered()) {
+				disableContinueButton();
 				document.McLearningForm.submit();
 			}
+		}
 
-			function verifyCandidateSelected()
-			{
-				var candidateSelected = false;
-				
-				for (counter = 0; counter < document.McLearningForm.checkedCa.length; counter++)
-				{
-					if (document.McLearningForm.checkedCa[counter].checked)
-						candidateSelected = true; 
-				}
-				
-				if (!candidateSelected)
-				{
-					var msg = "<fmt:message key="answers.submitted.none"/>";
-					alert(msg);
-					return (false);
-				}
-				return (true);
-			}
+		function verifyAllQuestionsAnswered() {
+			// in case oneQuestionPerPage option is ON user has to select 1 answer, and all answers otherwise
+			var isOneQuestionPerPage = ${mcGeneralLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'};
+			var answersRequiredNumber = (isOneQuestionPerPage) ? 1 : ${fn:length(requestScope.listQuestionCandidateAnswersDto)};
 			
-			function disableContinueButton() {
-				var elem = document.getElementById("continueButton");
-				if (elem != null) {
-					elem.disabled = true;
-				}				
+			//check each question is answered
+			if ($(':radio:checked').length == answersRequiredNumber) {
+				return true;
+				
+			} else {
+				var msg = "<fmt:message key="answers.submitted.none"/>";
+				alert(msg);
+				return false;
 			}
+		}
 			
-		</script>
+		function disableContinueButton() {
+			var elem = document.getElementById("continueButton");
+			if (elem != null) {
+				elem.disabled = true;
+			}				
+		}
+			
+	</script>
 </lams:head>
 
 <body class="large-font">
@@ -94,7 +99,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</div>
 
 	<div data-role="content">
-	<html:form  action="/learning?method=displayMc&validate=false" enctype="multipart/form-data" method="POST" target="_self" onsubmit="disableContinueButton();">
+	<html:form  action="/learning?method=displayMc&validate=false" enctype="multipart/form-data" method="POST" target="_self">
 		<html:hidden property="toolContentID"/>						
 		<html:hidden property="toolSessionID"/>						
 		<html:hidden property="httpSessionID"/>			
@@ -121,14 +126,3 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 </body>
 </lams:html>
-
-
-
-
-
-
-
-
-
-	
-	
