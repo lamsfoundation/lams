@@ -1,5 +1,4 @@
 /********** GENERAL/DIALOG STYLES **********/
-
 div#tabs {
 	width: 768px;
 	height: 574px;
@@ -79,9 +78,7 @@ div.dialogListItemDisabled {
 	cursor: pointer;
 }
 
-
 /********** LESSON TAB STYLES **********/
-
 div#tabLesson {
 	height: 540px;
 	overflow: auto;
@@ -154,9 +151,7 @@ td.contributeEntryCell a {
 	border: none;
 }
 
-
 /********** SEQUENCE TAB STYLES **********/
-
 div#sequenceCanvas {
 	text-align: center;
 	height: 478px;
@@ -180,4 +175,21 @@ div#completedLearnersContainer span {
 	cursor: default;
 	vertical-align: top;
 	margin-right: 5px;
+}
+
+/********** LEARNERS TAB STYLES **********/
+td.progressBarLabel {
+	padding: 0;
+	background-color: #D0E5F5;
+}
+
+td.progressBarLabel div {
+	float: left;
+	padding: 10px 0 4px 20px;
+	font-weight: bold;
+}
+
+td.progressBarLabel a {
+	float: right;
+	margin: 6px 5px 4px 0;
 }

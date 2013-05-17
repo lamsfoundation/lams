@@ -30,6 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:head>
 	<lams:css />
 	<link href="css/main.css" rel="stylesheet" type="text/css" />
+	<link href="<lams:LAMSURL/>css/progressBar.css" rel="stylesheet" type="text/css" />
 
 	<title><fmt:message key="learner.title" /></title>
 
@@ -40,16 +41,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.layout.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 	<script type="text/javascript" src="includes/javascript/main.js"></script>
 	<script type="text/javascript">
-		var APP_URL = '<lams:LAMSURL/>learning/';
-		var LABEL_CURRENT_ACTIVITY = '<fmt:message key="label.learner.progress.activity.current.tooltip"/>';
-		var LABEL_COMPLETED_ACTIVITY = '<fmt:message key="label.learner.progress.activity.completed.tooltip"/>';
-		var LABEL_ATTEMPTED_ACTIVITY = '<fmt:message key="label.learner.progress.activity.attempted.tooltip"/>';
-		var LABEL_TOSTART_ACTIVITY = '<fmt:message key="label.learner.progress.activity.tostart.tooltip"/>';
-		var LABEL_SUPPORT_ACTIVITY = '<fmt:message key="label.learner.progress.activity.support.tooltip"/>';
-
-		var tooltipDiv = null;
+		var LAMS_URL = '<lams:LAMSURL/>';
+		var APP_URL = LAMS_URL + 'learning/';
+		
+		var CURRENT_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.current.tooltip"/>';
+		var COMPLETED_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.completed.tooltip"/>';
+		var ATTEMPTED_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.attempted.tooltip"/>';
+		var TOSTART_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.tostart.tooltip"/>';
+		var SUPPORT_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.support.tooltip"/>';
+		
 		var supportSeparatorRow = null;
 		var supportPart = null;
 		
@@ -57,6 +60,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		var lessonId = '${param.lessonID}';
 		var progressPanelEnabled = '<lams:Configuration key="LearnerCollapsProgressPanel" />' != 'false';
 		var presenceEnabled = '${param.presenceEnabledPatch}' != 'false';
+		var isHorizontalBar = false;
+		var hasContentFrame = true;
+		var bars = {
+			'learnerMainBar' : {
+				'containerId' : 'progressBarDiv'
+			}
+		};
 		
 		$(document).ready(function() {
 			window.onresize = resizeElements;
@@ -64,7 +74,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			// show if panel is not disabled in LAMS Configuration
 			if (progressPanelEnabled) {
 				// these DOM elements are accessed often, so cache reference to them
-				tooltipDiv = $("#tooltip");
 				supportSeparatorRow = $('#supportSeparatorRow');
 				supportPart = $('#supportPart');
 				
@@ -116,7 +125,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		<div id="lessonTitleRow" class="separatorRow progressStaticHeight"><c:out value="${param.title}" /></div>
 		
-		<div id="progressBarDiv"></div>
+		<div id="progressBarDiv" class="progressBarContainer"></div>
 		
 		<div id="supportSeparatorRow" class="separatorRow progressStaticHeight"
 		     onClick="javascript:toggleBarPart('support')">
@@ -166,7 +175,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<%@ include file="presenceChat.jsp"%>
 	</c:if>
 	
-	<iframe id="contentFrame" name="contentFrame" onload="javascript:fillProgressBar()" class="ui-layout-center"
+	<iframe id="contentFrame" name="contentFrame" onload="javascript:fillProgressBar('learnerMainBar')" class="ui-layout-center"
 		src="content.do?lessonID=<c:out value="${param.lessonID}"/>"> </iframe>
 		
 	<div id="tooltip"></div>

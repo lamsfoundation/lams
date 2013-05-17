@@ -9,11 +9,14 @@
 	<lams:css style="main" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/progressBar.css" type="text/css" />
 	<link rel="stylesheet" href="css/monitorLesson.css" type="text/css" media="screen" />
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 	<script type="text/javascript" src="includes/javascript/monitorLesson.js"></script>
 	<script type="text/javascript">
 		var userId = '<lams:user property="userID"/>';
@@ -21,6 +24,9 @@
 		var ldId = ${lesson.learningDesignID};
 		var lessonStateId = ${lesson.lessonStateID};
 		var createDateTimeStr = '${lesson.createDateTimeStr}';
+		var isHorizontalBar = true;
+		var hasContentFrame = false;
+		var presenceEnabled =  false;
 		
 		var LAMS_URL = '<lams:LAMSURL/>';
 		
@@ -56,17 +62,21 @@
 		var LESSON_ERROR_SCHEDULE_DATE_LABEL = '<fmt:message key="error.lesson.schedule.date"/>';
 		var LESSON_EDIT_CLASS_LABEL = '<fmt:message key="button.edit.class"/>';
 		var LESSON_GROUP_DIALOG_CLASS_LABEL = '<fmt:message key="lesson.group.dialog.class"/>';
-		var LESSON__LABEL = '<fmt:message key=""/>';
-		var LESSON__LABEL = '<fmt:message key=""/>';
-		var LESSON__LABEL = '<fmt:message key=""/>';
-		var LESSON__LABEL = '<fmt:message key=""/>';
-		
+		var CURRENT_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.current.tooltip"/>';
+		var COMPLETED_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.completed.tooltip"/>';
+		var ATTEMPTED_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.attempted.tooltip"/>';
+		var TOSTART_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.tostart.tooltip"/>';
+		var SUPPORT_ACTIVITY_LABEL = '<fmt:message key="label.learner.progress.activity.support.tooltip"/>';
+		var EXPORT_PORTFOLIO_LABEL = '<fmt:message key="button.export"/>';
+		var EXPORT_PORTFOLIO_LEARNER_TOOLTIP_LABEL = '<fmt:message key="button.export.learner.tooltip"/>';
+	    var TIME_CHART_LABEL = '<fmt:message key="button.timechart"/>';
+	    var TIME_CHART_TOOLTIP_LABEL = '<fmt:message key="button.timechart.tooltip"/>';
+	    	
 		$(document).ready(function(){
 			$('#tabs').tabs();
 			
 			initLessonTab();
 			initSequenceTab();
-			initLearnersTab();
 			refreshMonitor();
 		});
 	</script>
@@ -254,7 +264,7 @@
 										</c:when>
 									</c:choose>
 									<a href="#" class="button"
-									   onClick="javascript:openWindow('${entry.URL}','ContributeActivity', 800, 600)"
+									   onClick="javascript:openPopUp('${entry.URL}','ContributeActivity', 600, 800, true)"
 									   title='<fmt:message key="button.task.go.tooltip"/>'>
 									   <fmt:message key="button.task.go"/>
 									</a>
@@ -288,7 +298,15 @@
 	</div>
 	
 	<div id="tabLearners">
-			
+		<table id="tabLearnersTable">
+			<tr>
+				<td class="topButtonsContainer">
+					<a class="button" title="<fmt:message key='button.refresh.tooltip'/>"
+					   href="#" onClick="javascript:refreshMonitor()">
+					<fmt:message key="button.refresh"/></a>
+				</td>
+			</tr>
+		</table>
 	</div>
 	
 	<!-- Inner dialog placeholders -->
@@ -324,6 +342,9 @@
 			</tr>
 		</table>
 	</div>
+	
+	<div id="tooltip"></div>
+	
 </div>
 </body>
 </lams:html>

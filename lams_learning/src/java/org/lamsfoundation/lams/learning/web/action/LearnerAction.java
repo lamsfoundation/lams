@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,11 +35,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -78,7 +74,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @since 3/03/2005
  * @version 1.1
  * 
- * ----------------XDoclet Tags--------------------
+ *          ----------------XDoclet Tags--------------------
  * 
  * @struts:action path="/learner" parameter="method" validate="false"
  * @struts:action-forward name="displayActivity" path="/DisplayActivity.do"
@@ -134,15 +130,15 @@ public class LearnerAction extends LamsDispatchAction {
      * </p>
      * 
      * @param mapping
-     *                An ActionMapping class that will be used by the Action class to tell the ActionServlet where to
-     *                send the end-user.
+     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
+     *            the end-user.
      * 
      * @param form
-     *                The ActionForm class that will contain any data submitted by the end-user via a form.
+     *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
-     *                A standard Servlet HttpServletRequest class.
+     *            A standard Servlet HttpServletRequest class.
      * @param response
-     *                A standard Servlet HttpServletResponse class.
+     *            A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
      * 
@@ -195,15 +191,15 @@ public class LearnerAction extends LamsDispatchAction {
      * </p>
      * 
      * @param mapping
-     *                An ActionMapping class that will be used by the Action class to tell the ActionServlet where to
-     *                send the end-user.
+     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
+     *            the end-user.
      * 
      * @param form
-     *                The ActionForm class that will contain any data submitted by the end-user via a form.
+     *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
-     *                A standard Servlet HttpServletRequest class.
+     *            A standard Servlet HttpServletRequest class.
      * @param response
-     *                A standard Servlet HttpServletResponse class.
+     *            A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
      * 
@@ -263,15 +259,15 @@ public class LearnerAction extends LamsDispatchAction {
      * component.
      * 
      * @param mapping
-     *                An ActionMapping class that will be used by the Action class to tell the ActionServlet where to
-     *                send the end-user.
+     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
+     *            the end-user.
      * 
      * @param form
-     *                The ActionForm class that will contain any data submitted by the end-user via a form.
+     *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
-     *                A standard Servlet HttpServletRequest class.
+     *            A standard Servlet HttpServletRequest class.
      * @param response
-     *                A standard Servlet HttpServletResponse class.
+     *            A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
      * 
@@ -365,15 +361,15 @@ public class LearnerAction extends LamsDispatchAction {
      * </p>
      * 
      * @param mapping
-     *                An ActionMapping class that will be used by the Action class to tell the ActionServlet where to
-     *                send the end-user.
+     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
+     *            the end-user.
      * 
      * @param form
-     *                The ActionForm class that will contain any data submitted by the end-user via a form.
+     *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
-     *                A standard Servlet HttpServletRequest class.
+     *            A standard Servlet HttpServletRequest class.
      * @param response
-     *                A standard Servlet HttpServletResponse class.
+     *            A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
      * @throws IOException
@@ -384,8 +380,6 @@ public class LearnerAction extends LamsDispatchAction {
 	if (LearnerAction.log.isDebugEnabled()) {
 	    LearnerAction.log.debug("Getting Flash progress data...");
 	}
-
-    
 
 	FlashMessage message = null;
 	try {
@@ -402,20 +396,20 @@ public class LearnerAction extends LamsDispatchAction {
 	    message = new FlashMessage("getFlashProgressData", learnerProgress);
 
 	} catch (Exception e) {
-	    message = handleException(e, "getFlashProgressData", LearnerServiceProxy.getLearnerService(getServlet()
-		    .getServletContext()));
+	    message = handleException(e, "getFlashProgressData",
+		    LearnerServiceProxy.getLearnerService(getServlet().getServletContext()));
 	}
 
 	String wddxPacket = WDDXProcessor.serialize(message);
 	if (LearnerAction.log.isDebugEnabled()) {
 	    LearnerAction.log.debug("Sending learner progress data to flash:" + wddxPacket);
 	}
-    // LDEV-2835
+	// LDEV-2835
 	response.addHeader("Pragma", "no-cache");
-    response.addHeader("Cache-Control", "no-cache");
-    response.addDateHeader("Expires", System.currentTimeMillis() - LamsDispatchAction.HEADER_EXPIRES_VALUE);
+	response.addHeader("Cache-Control", "no-cache");
+	response.addDateHeader("Expires", System.currentTimeMillis() - LamsDispatchAction.HEADER_EXPIRES_VALUE);
 
-    response.getWriter().print(wddxPacket);
+	response.getWriter().print(wddxPacket);
 
 	// don't need to return a action forward because it sent the wddx packet
 	// back already.
@@ -429,15 +423,15 @@ public class LearnerAction extends LamsDispatchAction {
      * </p>
      * 
      * @param mapping
-     *                An ActionMapping class that will be used by the Action class to tell the ActionServlet where to
-     *                send the end-user.
+     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
+     *            the end-user.
      * 
      * @param form
-     *                The ActionForm class that will contain any data submitted by the end-user via a form.
+     *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
-     *                A standard Servlet HttpServletRequest class.
+     *            A standard Servlet HttpServletRequest class.
      * @param response
-     *                A standard Servlet HttpServletResponse class.
+     *            A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
      * @throws IOException
@@ -461,8 +455,8 @@ public class LearnerAction extends LamsDispatchAction {
 	    message = new FlashMessage("getLearnerActivityURL", activityDTO);
 
 	} catch (Exception e) {
-	    message = handleException(e, "getLearnerActivityURL", LearnerServiceProxy.getLearnerService(getServlet()
-		    .getServletContext()));
+	    message = handleException(e, "getLearnerActivityURL",
+		    LearnerServiceProxy.getLearnerService(getServlet().getServletContext()));
 	}
 
 	String wddxPacket = WDDXProcessor.serialize(message);
@@ -500,14 +494,14 @@ public class LearnerAction extends LamsDispatchAction {
      * Flash packet.
      * 
      * @param mapping
-     *                An ActionMapping class that will be used by the Action class to tell the ActionServlet where to
-     *                send the end-user.
+     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
+     *            the end-user.
      * @param form
-     *                The ActionForm class that will contain any data submitted by the end-user via a form.
+     *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
-     *                A standard Servlet HttpServletRequest class.
+     *            A standard Servlet HttpServletRequest class.
      * @param response
-     *                A standard Servlet HttpServletResponse class.
+     *            A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
      * @throws IOException
@@ -526,79 +520,19 @@ public class LearnerAction extends LamsDispatchAction {
 
 	return mapping.findForward("displayProgress");
     }
-    
-    @SuppressWarnings("unchecked")
-    public ActionForward displayProgressJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException {
-	Integer learnerId = LearningWebUtil.getUserId();
-	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-	Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);
-
-	JSONObject responseJSON = new JSONObject();
-	responseJSON.put("currentActivityId", ret[1]);
-	responseJSON.put("isPreview", ret[2]);
-	for (ActivityURL activity : (List<ActivityURL>) ret[0]) {
-	    if (activity.getFloating()) {
-		// these are support activities
-		for (ActivityURL childActivity : activity.getChildActivities()) {
-		    responseJSON.append("support", activityToJSON(childActivity, null));
-		}
-	    } else {
-		responseJSON.append("activities", activityToJSON(activity, (Long) ret[1]));
-	    }
-	}
-
-	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(responseJSON.toString());
-
-	return null;
-    }
-
-    private JSONObject activityToJSON(ActivityURL activity, Long currentActivityId) throws JSONException {
-	JSONObject activityJSON = new JSONObject();
-	activityJSON.put("id", activity.getActivityId());
-	activityJSON.put("name", activity.getTitle());
-	activityJSON.put("status", activity.getActivityId().equals(currentActivityId) ? 0 : activity.getStatus());
-
-	if (activity.getUrl() != null) {
-	    activityJSON.put("url", activity.getUrl());
-	}
-
-	String actType = activity.getType().toLowerCase();
-	String type = "a";
-	if (actType.contains("gate")) {
-	    type = "g";
-	} else if (actType.contains("options")) {
-	    type = "o";
-	} else if (actType.contains("branching")) {
-	    type = "b";
-	}
-
-	activityJSON.put("type", type);
-	
-	if (activity.getChildActivities() != null) {
-	    for (ActivityURL childActivity : activity.getChildActivities()) {
-		activityJSON.append("childActivities", activityToJSON(childActivity, currentActivityId));
-	    }
-	}
-	
-	return activityJSON;
-    }
 
     /**
      * Forces a move to a destination Activity in the learning sequence, returning a WDDX packet
      * 
      * @param mapping
-     *                An ActionMapping class that will be used by the Action class to tell the ActionServlet where to
-     *                send the end-user.
+     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
+     *            the end-user.
      * @param form
-     *                The ActionForm class that will contain any data submitted by the end-user via a form.
+     *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
-     *                A standard Servlet HttpServletRequest class.
+     *            A standard Servlet HttpServletRequest class.
      * @param response
-     *                A standard Servlet HttpServletResponse class.
+     *            A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
      * @throws IOException
@@ -638,14 +572,14 @@ public class LearnerAction extends LamsDispatchAction {
      * returning a WDDX packet.
      * 
      * @param mapping
-     *                An ActionMapping class that will be used by the Action class to tell the ActionServlet where to
-     *                send the end-user.
+     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
+     *            the end-user.
      * @param form
-     *                The ActionForm class that will contain any data submitted by the end-user via a form.
+     *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
-     *                A standard Servlet HttpServletRequest class.
+     *            A standard Servlet HttpServletRequest class.
      * @param response
-     *                A standard Servlet HttpServletResponse class.
+     *            A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
      * @throws IOException
@@ -744,14 +678,14 @@ public class LearnerAction extends LamsDispatchAction {
      * Flash packet.
      * 
      * @param mapping
-     *                An ActionMapping class that will be used by the Action class to tell the ActionServlet where to
-     *                send the end-user.
+     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
+     *            the end-user.
      * @param form
-     *                The ActionForm class that will contain any data submitted by the end-user via a form.
+     *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
-     *                A standard Servlet HttpServletRequest class.
+     *            A standard Servlet HttpServletRequest class.
      * @param response
-     *                A standard Servlet HttpServletResponse class.
+     *            A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
      * @throws IOException

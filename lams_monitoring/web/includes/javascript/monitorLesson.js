@@ -9,6 +9,7 @@ var sortOrderAsc = {
 	classLearner : false,
 	classMonitor : false
 };
+var bars = {};
 
 //********** LESSON TAB FUNCTIONS **********
 
@@ -415,8 +416,8 @@ function initSequenceTab(){
 			            		var selectedLearner = $('#learnerGroupList div.dialogListItemSelected');
 			            		if (selectedLearner.length == 1) {
 			            			// open pop up with user progress in the given activity
-			            			openWindow(LAMS_URL 
-			            					+ selectedLearner.attr('viewUrl'), "LearnActivity", 800, 600);
+			            			openPopUp(LAMS_URL 
+			            					+ selectedLearner.attr('viewUrl'), "LearnActivity", 600, 800, true);
 			            		}
 							}
 			             },
@@ -467,7 +468,7 @@ function updateSequenceTab(response) {
 			var activityGroup = $('rect[id="act' + activity.id + '"]', sequenceCanvas).parent();
 			activityGroup.css('cursor', 'pointer').dblclick(function(){
 				// double click on activity shape to open Monitoring for this activity
-				openWindow(LAMS_URL + activity.url, "MonitorActivity", 900, 720);
+				openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true);
 			});
 		}
 	});
@@ -609,7 +610,7 @@ function addLearnerIconsHandlers(activity) {
 			 .dblclick(function(event){
 				 // double click on learner icon to see activity from his perspective
 				event.stopPropagation();
-				openWindow(LAMS_URL + learner.url, "LearnActivity", 800, 600);
+				openPopUp(LAMS_URL + learner.url, "LearnActivity", 600, 800, true);
 			}).css('cursor', 'pointer')
 			// drag learners to force complete activities
 			  .draggable({
@@ -774,7 +775,7 @@ function fillClassDialogList(listId, users, disableCreator) {
 		}
 		
 		var userDiv = $('<div />').attr({
-			'userId'  : user.id,
+			'userId'  : user.id
 			})
           .addClass('dialogListItem')
 	      .text(getLearnerDisplayName(user))
@@ -796,12 +797,49 @@ function fillClassDialogList(listId, users, disableCreator) {
 
 
 //********** LEARNERS TAB FUNCTIONS **********
+var learnerProgressCellsTemplate = null;
 
-function initLearnersTab(){
+
+function updateLearnersTab(response){
 	
+	if (!learnerProgressCellsTemplate) {
+		learnerProgressCellsTemplate =
+		  '<tr><td class="progressBarLabel" id="progressBarLabel;00;"><div>;11;</div>'
+		+ '<a class="button" title="' 
+		+ EXPORT_PORTFOLIO_LEARNER_TOOLTIP_LABEL + '" href="#" onClick="javascript:openPopUp(\''
+		+ LAMS_URL + 'learning/exportWaitingPage.jsp?mode=learner&role=teacher&lessonID='
+		+ lessonId + '&userID=;00;\',\''
+		+ EXPORT_PORTFOLIO_LABEL + '\',240,640,true)">'
+		+ EXPORT_PORTFOLIO_LABEL
+		+ '</a><a class="button" title="'
+		+ TIME_CHART_TOOLTIP_LABEL + '" href="#" onClick="javascript:openPopUp(\''
+		+ LAMS_URL + 'monitoring/monitoring.do?method=viewTimeChart&lessonID='
+		+ lessonId + '&learnerID=;00;\',\''
+		+ TIME_CHART_LABEL + '\',600,800,true)">'
+		+ TIME_CHART_LABEL 
+		+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
+	}
+	
+	if (response.learners) {
+		$.each(response.learners, function(){
+			var barId = 'bar' + this.id;
+			var bar = bars[barId];
+			if (!bar) {
+				bar = bars[barId] = {
+					'userId'      : this.id,
+					'containerId' : 'progressBar' + this.id
+				};
+				
+				var learnerProgressCellsInstance = learnerProgressCellsTemplate
+					.replace(/;00;/g, this.id)
+					.replace(/;11;/g, getLearnerDisplayName(this));
+				$(learnerProgressCellsInstance).appendTo('#tabLearnersTable');
+			}
+			
+			fillProgressBar(barId);
+		});
+	}
 }
-
-
 
 //********** COMMON FUNCTIONS **********
 
@@ -860,11 +898,14 @@ function refreshMonitor(){
 			'lessonID'  : lessonId
 		},
 		success : function(response) {
-			// update lesson tab widgets (state, number of learners etc.)
+			// update Lesson tab widgets (state, number of learners etc.)
 			updateLessonTab(response);
 			
-			// update learner progress in sequence tab
+			// update learner progress in Sequence tab
 			updateSequenceTab(response);
+			
+			// update learner progress in Learners tab
+			updateLearnersTab(response);
 		}
 	});
 }
@@ -897,7 +938,7 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners) {
 		      })
 		      .dblclick(function(){
 				// same as clicking View Learner button
-				openWindow(LAMS_URL + learner.url, "LearnActivity", 800, 600);
+				openPopUp(LAMS_URL + learner.url, "LearnActivity", 600, 800, true);
 		    });
 		}
 	});
@@ -909,8 +950,7 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners) {
 		.dialog('option', 
 			{
 			 'title' : dialogTitle,
-			 'activityId' : activityId,
-			  
+			 'activityId' : activityId
 			})
 		.dialog('open');	
 }
@@ -960,12 +1000,6 @@ function colorDialogList(listId) {
 		// every odd learner has different background
 		$(userDiv).css('background-color', userIndex % 2 ? '#dfeffc' : 'inherit');
 	});
-}
-
-
-function openWindow(url, title, width, height) {
-	window.open(url, title, "width=" + width + ",height=" + height
-			+ ",resizable=yes,scrollbars=yes,status=yes,menubar=no,toolbar=no");
 }
 
 

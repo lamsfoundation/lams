@@ -50,6 +50,8 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -1129,6 +1131,42 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     @SuppressWarnings("unchecked")
+    public ActionForward getLearnerProgressJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	Integer learnerId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, true);
+	Integer monitorId = null;
+	if (learnerId == null) {
+	    learnerId = getUserId();
+	} else {
+	    monitorId = getUserId();
+	}
+
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	ICoreLearnerService learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
+	Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);
+
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("currentActivityId", ret[1]);
+	responseJSON.put("isPreview", ret[2]);
+	for (ActivityURL activity : (List<ActivityURL>) ret[0]) {
+	    if (activity.getFloating()) {
+		// these are support activities
+		for (ActivityURL childActivity : activity.getChildActivities()) {
+		    responseJSON.append("support", activityToJSON(childActivity, null, lessonId, learnerId, monitorId));
+		}
+	    } else {
+		responseJSON.append("activities",
+			activityToJSON(activity, (Long) ret[1], lessonId, learnerId, monitorId));
+	    }
+	}
+
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(responseJSON.toString());
+
+	return null;
+    }
+
+    @SuppressWarnings("unchecked")
     public ActionForward getLessonProgressJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
@@ -1172,6 +1210,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	for (LearnerProgress learnerProgress : (Set<LearnerProgress>) lesson.getLearnerProgresses()) {
 	    User learner = learnerProgress.getUser();
 	    JSONObject learnerJSON = MonitoringAction.userToJSON(learner);
+	    responseJSON.append("learners", learnerJSON);
 	    if (learnerProgress.isComplete()) {
 		// no more details are needed for learners who completed the lesson
 		responseJSON.append("completedLearners", learnerJSON);
@@ -1486,6 +1525,45 @@ public class MonitoringAction extends LamsDispatchAction {
 	userJSON.put("lastName", user.getLastName());
 	userJSON.put("login", user.getLogin());
 	return userJSON;
+    }
+
+    private JSONObject activityToJSON(ActivityURL activity, Long currentActivityId, Long lessonId, Integer learnerId,
+	    Integer monitorId) throws JSONException, IOException {
+	JSONObject activityJSON = new JSONObject();
+	activityJSON.put("id", activity.getActivityId());
+	activityJSON.put("name", activity.getTitle());
+	activityJSON.put("status", activity.getActivityId().equals(currentActivityId) ? 0 : activity.getStatus());
+
+	String url = activity.getUrl();
+	if (url != null && monitorId != null) {
+	    IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
+		    .getServletContext());
+	    url = monitoringService.getLearnerActivityURL(lessonId, activity.getActivityId(), learnerId, monitorId);
+	}
+	if (url != null) {
+	    activityJSON.put("url", activity.getUrl());
+	}
+
+	String actType = activity.getType().toLowerCase();
+	String type = "a";
+	if (actType.contains("gate")) {
+	    type = "g";
+	} else if (actType.contains("options")) {
+	    type = "o";
+	} else if (actType.contains("branching")) {
+	    type = "b";
+	}
+
+	activityJSON.put("type", type);
+
+	if (activity.getChildActivities() != null) {
+	    for (ActivityURL childActivity : activity.getChildActivities()) {
+		activityJSON.append("childActivities",
+			activityToJSON(childActivity, currentActivityId, lessonId, learnerId, monitorId));
+	    }
+	}
+
+	return activityJSON;
     }
 
     /**
