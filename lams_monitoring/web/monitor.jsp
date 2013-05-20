@@ -278,7 +278,7 @@
 	</div>
 	
 	<div id="tabSequence">
-		<div class="topButtonsContainer">
+		<div id="sequenceTopButtonsContainer" class="topButtonsContainer">
 			<a target="_blank" class="button" title="<fmt:message key='button.help.tooltip'/>"
 			 href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringsequence">
 			 <fmt:message key="button.help"/></a>
@@ -294,7 +294,8 @@
 		<div id="completedLearnersContainer" title="<fmt:message key='force.complete.end.lesson.tooltip' />">
 			<img id="completedLearnersDoorIcon" src="<lams:LAMSURL/>images/icons/door_open.png" />
 		</div>
-
+		<img id="sequenceCanvasLoading"
+		     src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
 	</div>
 	
 	<div id="tabLearners">

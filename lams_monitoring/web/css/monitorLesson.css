@@ -164,6 +164,11 @@ div#sequenceCanvas svg {
 	overflow: hidden;
 }
 
+img#sequenceCanvasLoading {
+	padding: 5px 0 0 370px;
+	display: none;
+}
+
 div#completedLearnersContainer {
 	padding: 4px 0px 3px 5px;
 	border-top: thin dotted #2E6E9E;

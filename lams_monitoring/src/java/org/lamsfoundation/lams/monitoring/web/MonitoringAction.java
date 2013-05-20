@@ -1152,11 +1152,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	    if (activity.getFloating()) {
 		// these are support activities
 		for (ActivityURL childActivity : activity.getChildActivities()) {
-		    responseJSON.append("support", activityToJSON(childActivity, null, lessonId, learnerId, monitorId));
+		    responseJSON.append("support", activityProgressToJSON(childActivity, null, lessonId, learnerId, monitorId));
 		}
 	    } else {
 		responseJSON.append("activities",
-			activityToJSON(activity, (Long) ret[1], lessonId, learnerId, monitorId));
+			activityProgressToJSON(activity, (Long) ret[1], lessonId, learnerId, monitorId));
 	    }
 	}
 
@@ -1527,7 +1527,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	return userJSON;
     }
 
-    private JSONObject activityToJSON(ActivityURL activity, Long currentActivityId, Long lessonId, Integer learnerId,
+    private JSONObject activityProgressToJSON(ActivityURL activity, Long currentActivityId, Long lessonId, Integer learnerId,
 	    Integer monitorId) throws JSONException, IOException {
 	JSONObject activityJSON = new JSONObject();
 	activityJSON.put("id", activity.getActivityId());
@@ -1559,7 +1559,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	if (activity.getChildActivities() != null) {
 	    for (ActivityURL childActivity : activity.getChildActivities()) {
 		activityJSON.append("childActivities",
-			activityToJSON(childActivity, currentActivityId, lessonId, learnerId, monitorId));
+			activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId, monitorId));
 	    }
 	}
 

@@ -1,4 +1,5 @@
 ﻿// ********** GLOBAL VARIABLES **********
+var refreshInProgress = false;
 // copy of lesson SVG so it does no need to be fetched every time
 var originalSequenceCanvas = null;
 // DIV container for lesson SVG; it gets accessed so many times it's worth to cache it here
@@ -441,6 +442,9 @@ function initSequenceTab(){
  * Updates learner progress in sequence tab according to respose sent to refreshMonitor()
  */
 function updateSequenceTab(response) {
+	// remove the loading animation
+	$('#sequenceTopButtonsContainer img#sequenceCanvasLoading').remove();
+	
 	var learnerCount = 0;
 	$.each(response.activities, function(){
 		if (this.learners) {
@@ -465,7 +469,7 @@ function updateSequenceTab(response) {
 		addLearnerIconsHandlers(activity);
 		
 		if (activity.url) {
-			var activityGroup = $('rect[id="act' + activity.id + '"]', sequenceCanvas).parent();
+			var activityGroup = $('g#' + activity.id, sequenceCanvas);
 			activityGroup.css('cursor', 'pointer').dblclick(function(){
 				// double click on activity shape to open Monitoring for this activity
 				openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true);
@@ -650,8 +654,6 @@ function addLearnerIconsHandlers(activity) {
  */
 function addCompletedLearnerIcons(learners, learnerTotalCount) {
 	var iconsContainer = $('#completedLearnersContainer');
-	// clear all icons except the door
-	iconsContainer.children(':not(img#completedLearnersDoorIcon)').remove();
 	var completedLearnerCount = (learners ? learners.length : 0 );
 	// show (current/total) label
 	$('<span />').attr({
@@ -847,6 +849,11 @@ function updateLearnersTab(response){
  * Updates all changeable elements of monitoring screen.
  */
 function refreshMonitor(){
+	if (refreshInProgress) {
+		return;
+	}
+	refreshInProgress = true;
+	
 	if (originalSequenceCanvas) {
 		// put bottom layer, LD SVG
 		sequenceCanvas.html(originalSequenceCanvas);
@@ -888,6 +895,9 @@ function refreshMonitor(){
 		});
 	}
 	
+	// clear all completed learner icons except the door
+	$('#completedLearnersContainer :not(img#completedLearnersDoorIcon)').remove();
+	
 	// get update data
 	$.ajax({
 		dataType : 'json',
@@ -897,7 +907,18 @@ function refreshMonitor(){
 			'method'    : 'getLessonProgressJSON',
 			'lessonID'  : lessonId
 		},
+		beforeSend : function(){
+			var sequenceTopButtonsContainer = $('#sequenceTopButtonsContainer');
+			if ($('img#sequenceCanvasLoading', sequenceTopButtonsContainer).length == 0){
+				$('#sequenceCanvasLoading')
+						.clone().appendTo(sequenceTopButtonsContainer)
+						.css('display', 'block');
+			}
+		},
+		
 		success : function(response) {
+			refreshInProgress = false;
+			
 			// update Lesson tab widgets (state, number of learners etc.)
 			updateLessonTab(response);
 			
