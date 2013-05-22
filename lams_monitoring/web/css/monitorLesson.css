@@ -183,6 +183,37 @@ div#completedLearnersContainer span {
 }
 
 /********** LEARNERS TAB STYLES **********/
+#tabLearnerControlTable td {
+	padding: 0px;
+	text-align: center;
+}
+
+td.learnersHeaderCell {
+	border-right: thin solid #2E6E9E;
+}
+
+#tabLearnerControlTable td.topButtonsContainer {
+	width: 90px;
+}
+
+td.learnersHeaderPageCell,td.learnersPageShifter {
+	width: 30px;
+	cursor: pointer;
+}
+
+td.learnersHeaderPageCell:hover,td.learnersPageShifter:hover {
+	background-color: #D0E5F5;
+}
+
+td.selectedLearnersHeaderPageCell {
+	background-color: #5c9ccc;
+}
+
+div#tabLearnersContainer {
+	height: 500px;
+	overflow: auto;
+}
+
 td.progressBarLabel {
 	padding: 0;
 	background-color: #D0E5F5;

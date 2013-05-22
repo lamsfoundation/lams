@@ -1,6 +1,6 @@
 ﻿// ********** GLOBAL VARIABLES **********
-var refreshInProgress = false;
 // copy of lesson SVG so it does no need to be fetched every time
+// HTML with SVG of the lesson
 var originalSequenceCanvas = null;
 // DIV container for lesson SVG; it gets accessed so many times it's worth to cache it here
 var sequenceCanvas = null;
@@ -10,7 +10,18 @@ var sortOrderAsc = {
 	classLearner : false,
 	classMonitor : false
 };
-var bars = {};
+// container for learners' progress bars metadata
+var bars = null;
+// placeholder for single learner's progress bar and title
+var learnerProgressCellsTemplate = null;
+// for synchronisation purposes
+var learnersRefreshInProgress = false;
+var sequenceRefreshInProgress = false;
+
+// total number of learners with ongoing progress
+var numberActiveLearners = 0;
+// page in Learners tab
+var learnerProgressCurrentPageNumber = 1;
 
 //********** LESSON TAB FUNCTIONS **********
 
@@ -127,7 +138,7 @@ function initLessonTab(){
 		            			},
 		            			success : function() {
 		            				dialog.dialog('close');
-		            				refreshMonitor();
+		            				refreshMonitor('lesson');
 		            			}
 		            		});
 						}
@@ -218,7 +229,7 @@ function changeLessonState(){
 					// user chose to finish the lesson, close monitoring and refresh the lesson list
 					window.parent.closeMonitorLessonDialog(true);
 				} else {
-					refreshMonitor();
+					refreshMonitor('lesson');
 				}
 			}
 		});
@@ -229,75 +240,87 @@ function changeLessonState(){
 /**
  * Updates widgets in lesson tab according to respose sent to refreshMonitor()
  */
-function updateLessonTab(refreshResponse){
-	// update lesson state label
-	lessonStateId = +refreshResponse.lessonStateID;
-	var label = null;
-	switch (lessonStateId) {
-		case 1:
-			label = LESSON_STATE_CREATED_LABEL;
-			break;
-		case 2:
-			label = LESSON_STATE_SCHEDULED_LABEL;
-			break;
-		case 3:
-			label = LESSON_STATE_STARTED_LABEL;
-			break;
-		case 4:
-			label = LESSON_STATE_SUSPENDED_LABEL;
-			break;
-		case 5:
-			label = LESSON_STATE_FINISHED_LABEL;
-			break;
-		case 6:
-			label = LESSON_STATE_ARCHIVED_LABEL;
-			break;
-		case 7:
-			label = LESSON_STATE_REMOVED_LABEL;
-			break;
-	}
-	$('#lessonStateLabel').text(label);
-	
-	// update available options in change state dropdown menu
-	var selectField = $('#lessonStateField');
-	// remove all except "Select status" option
-	selectField.children('option:not([value="-1"])').remove();
-	switch (lessonStateId) {
-		case 3:
-			$('<option />').attr('value', 4).text(LESSON_STATE_ACTION_DISABLE_LABEL).appendTo(selectField);
-			$('<option />').attr('value', 6).text(LESSON_STATE_ACTION_ARCHIVE_LABEL).appendTo(selectField);
-			$('<option />').attr('value', 7).text(LESSON_STATE_ACTION_REMOVE_LABEL).appendTo(selectField);
-			break;
-		case 4:
-			$('<option />').attr('value', 3).text(LESSON_STATE_ACTION_ACTIVATE_LABEL).appendTo(selectField);
-			$('<option />').attr('value', 6).text(LESSON_STATE_ACTION_ARCHIVE_LABEL).appendTo(selectField);
-			$('<option />').attr('value', 7).text(LESSON_STATE_ACTION_REMOVE_LABEL).appendTo(selectField);
-			break;
-		case 5:
-			break;
-		case 6:
-			$('<option />').attr('value', 3).text(LESSON_STATE_ACTION_ACTIVATE_LABEL).appendTo(selectField);
-			$('<option />').attr('value', 7).text(LESSON_STATE_ACTION_REMOVE_LABEL).appendTo(selectField);
-			break;
-	}
-	
-	// show/remove widgets for lesson scheduling
-	var scheduleControls = $('#scheduleDatetimeField, #scheduleLessonButton, #startLessonButton');
-	var startDateField = $('#lessonStartDateSpan');
-	switch (lessonStateId) {
-		 case 1:
-			 scheduleControls.css('display','inline');
-			 startDateField.css('display','none');
-			 break;
-		 case 2:
-			 scheduleControls.css('display','none');
-			 startDateField.text(refreshResponse.startDate).add('#startLessonButton').css('display','inline');
-			 break;
-		default: 			
-			scheduleControls.css('display','none');
-		 	startDateField.text(refreshResponse.startDate).css('display','inline');
-		 	break;
-	}
+function updateLessonTab(){
+	$.ajax({
+		dataType : 'json',
+		url : LAMS_URL + 'monitoring/monitoring.do',
+		cache : false,
+		data : {
+			'method'    : 'getLessonDetailsJSON',
+			'lessonID'  : lessonId
+		},
+		
+		success : function(response) {
+			// update lesson state label
+			lessonStateId = +response.lessonStateID;
+			var label = null;
+			switch (lessonStateId) {
+				case 1:
+					label = LESSON_STATE_CREATED_LABEL;
+					break;
+				case 2:
+					label = LESSON_STATE_SCHEDULED_LABEL;
+					break;
+				case 3:
+					label = LESSON_STATE_STARTED_LABEL;
+					break;
+				case 4:
+					label = LESSON_STATE_SUSPENDED_LABEL;
+					break;
+				case 5:
+					label = LESSON_STATE_FINISHED_LABEL;
+					break;
+				case 6:
+					label = LESSON_STATE_ARCHIVED_LABEL;
+					break;
+				case 7:
+					label = LESSON_STATE_REMOVED_LABEL;
+					break;
+			}
+			$('#lessonStateLabel').text(label);
+			
+			// update available options in change state dropdown menu
+			var selectField = $('#lessonStateField');
+			// remove all except "Select status" option
+			selectField.children('option:not([value="-1"])').remove();
+			switch (lessonStateId) {
+				case 3:
+					$('<option />').attr('value', 4).text(LESSON_STATE_ACTION_DISABLE_LABEL).appendTo(selectField);
+					$('<option />').attr('value', 6).text(LESSON_STATE_ACTION_ARCHIVE_LABEL).appendTo(selectField);
+					$('<option />').attr('value', 7).text(LESSON_STATE_ACTION_REMOVE_LABEL).appendTo(selectField);
+					break;
+				case 4:
+					$('<option />').attr('value', 3).text(LESSON_STATE_ACTION_ACTIVATE_LABEL).appendTo(selectField);
+					$('<option />').attr('value', 6).text(LESSON_STATE_ACTION_ARCHIVE_LABEL).appendTo(selectField);
+					$('<option />').attr('value', 7).text(LESSON_STATE_ACTION_REMOVE_LABEL).appendTo(selectField);
+					break;
+				case 5:
+					break;
+				case 6:
+					$('<option />').attr('value', 3).text(LESSON_STATE_ACTION_ACTIVATE_LABEL).appendTo(selectField);
+					$('<option />').attr('value', 7).text(LESSON_STATE_ACTION_REMOVE_LABEL).appendTo(selectField);
+					break;
+			}
+			
+			// show/remove widgets for lesson scheduling
+			var scheduleControls = $('#scheduleDatetimeField, #scheduleLessonButton, #startLessonButton');
+			var startDateField = $('#lessonStartDateSpan');
+			switch (lessonStateId) {
+				 case 1:
+					 scheduleControls.css('display','inline');
+					 startDateField.css('display','none');
+					 break;
+				 case 2:
+					 scheduleControls.css('display','none');
+					 startDateField.text(response.startDate).add('#startLessonButton').css('display','inline');
+					 break;
+				default: 			
+					scheduleControls.css('display','none');
+				 	startDateField.text(response.startDate).css('display','inline');
+				 	break;
+			}
+		}
+	});
 }
 
 
@@ -313,7 +336,9 @@ function scheduleLesson(){
 				'lessonID'        : lessonId,
 				'lessonStartDate' : date
 			},
-			success : refreshMonitor
+			success : function() {
+				refreshMonitor('lesson');
+			}
 		});
 	} else {
 		alert(LESSON_ERROR_SCHEDULE_DATE_LABEL);
@@ -330,7 +355,9 @@ function startLesson(){
 			'method'          : 'startLesson',
 			'lessonID'        : lessonId
 		},
-		success : refreshMonitor
+		success : function() {
+			refreshMonitor('lesson');
+		}
 	});
 }
 
@@ -441,39 +468,108 @@ function initSequenceTab(){
 /**
  * Updates learner progress in sequence tab according to respose sent to refreshMonitor()
  */
-function updateSequenceTab(response) {
-	// remove the loading animation
-	$('#sequenceTopButtonsContainer img#sequenceCanvasLoading').remove();
+function updateSequenceTab() {
+	if (sequenceRefreshInProgress) {
+		return;
+	}
+	sequenceRefreshInProgress = true;
 	
-	var learnerCount = 0;
-	$.each(response.activities, function(){
-		if (this.learners) {
-			// are there any learners in this or any activity?
-			learnerCount += this.learners.length;
-			// put learner icons on each activity shape
-			addLearnerIcons(this);
-		}
-	});
-	
-	if (learnerCount > 0) {
-		// IMPORTANT! Reload SVG, otherwise added icons will not get displayed
-		sequenceCanvas.html(sequenceCanvas.html());
+	if (originalSequenceCanvas) {
+		// put bottom layer, LD SVG
+		sequenceCanvas.html(originalSequenceCanvas);
+	} else {
+		// fetch SVG just once, since it is immutable
+		$.ajax({
+			dataType : 'text',
+			url : LAMS_URL + 'home.do',
+			async : false,
+			cache : false,
+			data : {
+				'method'    : 'createLearningDesignThumbnail',
+				'svgFormat' : 1,
+				'ldId'      : ldId
+			},
+			success : function(response) {
+				originalSequenceCanvas = response;
+				sequenceCanvas = $('#sequenceCanvas').html(originalSequenceCanvas);
+				
+				var canvasHeight = sequenceCanvas.height();
+				var canvasWidth = sequenceCanvas.width();
+				var svg = $('svg', sequenceCanvas);
+				var canvasPaddingTop = canvasHeight/2 - svg.attr('height')/2;
+				var canvasPaddingLeft = canvasWidth/2 - svg.attr('width')/2;
+
+				if (canvasPaddingTop > 0) {
+					sequenceCanvas.css({
+						'padding-top' : canvasPaddingTop,
+						'height'      : canvasHeight - canvasPaddingTop		
+					});
+				}
+				if (canvasPaddingLeft > 0) {
+					sequenceCanvas.css({
+						'padding-left' : canvasPaddingLeft,
+						'width'        : canvasWidth - canvasPaddingLeft		
+					});
+				}
+			}
+		});
 	}
 	
-	var completedLearners = response.completedLearners;
-	var learnerTotalCount = learnerCount + (completedLearners ? completedLearners.length : 0 );
-	$('#learnersStartedPossibleCell').text(learnerTotalCount + ' / ' + response.numberPossibleLearners);
-	addCompletedLearnerIcons(completedLearners, learnerTotalCount);
+	// clear all completed learner icons except the door
+	$('#completedLearnersContainer :not(img#completedLearnersDoorIcon)').remove();
 	
-	$.each(response.activities, function(activityIndex, activity){
-		addLearnerIconsHandlers(activity);
-		
-		if (activity.url) {
-			var activityGroup = $('g#' + activity.id, sequenceCanvas);
-			activityGroup.css('cursor', 'pointer').dblclick(function(){
-				// double click on activity shape to open Monitoring for this activity
-				openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true);
+	var sequenceTopButtonsContainer = $('#sequenceTopButtonsContainer');
+	if ($('img#sequenceCanvasLoading', sequenceTopButtonsContainer).length == 0){
+		$('#sequenceCanvasLoading')
+				.clone().appendTo(sequenceTopButtonsContainer)
+				.css('display', 'block');
+	}
+	
+	$.ajax({
+		dataType : 'json',
+		url : LAMS_URL + 'monitoring/monitoring.do',
+		cache : false,
+		data : {
+			'method'    : 'getLessonProgressJSON',
+			'lessonID'  : lessonId
+		},		
+		success : function(response) {
+			// remove the loading animation
+			$('img#sequenceCanvasLoading', sequenceTopButtonsContainer).remove();
+			
+			var learnerCount = 0;
+			$.each(response.activities, function(){
+				if (this.learners) {
+					// are there any learners in this or any activity?
+					learnerCount += this.learners.length;
+					// put learner icons on each activity shape
+					addLearnerIcons(this);
+				}
 			});
+			
+			if (learnerCount > 0) {
+				// IMPORTANT! Reload SVG, otherwise added icons will not get displayed
+				sequenceCanvas.html(sequenceCanvas.html());
+			}
+			
+			var completedLearners = response.completedLearners;
+			var learnerTotalCount = learnerCount + (completedLearners ? completedLearners.length : 0 );
+			$('#learnersStartedPossibleCell').text(learnerTotalCount + ' / ' + response.numberPossibleLearners);
+			addCompletedLearnerIcons(completedLearners, learnerTotalCount);
+			
+			$.each(response.activities, function(activityIndex, activity){
+				addLearnerIconsHandlers(activity);
+				
+				if (activity.url) {
+					var activityGroup = $('g#' + activity.id, sequenceCanvas);
+					activityGroup.css('cursor', 'pointer').dblclick(function(){
+						// double click on activity shape to open Monitoring for this activity
+						openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true);
+					});
+				}
+			});	
+			
+			sequenceRefreshInProgress = false;
 		}
 	});
 }
@@ -533,7 +629,7 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 						}
 						
 						// progress changed, show it to monitor
-						refreshMonitor();
+						refreshMonitor('sequence');
 					}
 				});
 			}
@@ -799,12 +895,103 @@ function fillClassDialogList(listId, users, disableCreator) {
 
 
 //********** LEARNERS TAB FUNCTIONS **********
-var learnerProgressCellsTemplate = null;
+
+/**
+ * Handler for shift page numbers bar.
+ */
+function learnersPageShift(increment){
+	var pageNumberCell = $('#learnersPageLeft').next();
+	if (pageNumberCell.hasClass('learnersHeaderPageCell')) {
+		var startIndex = +pageNumberCell.text() + (increment ? 10 : -10);
+		var endIndex = startIndex + 9;
+		shiftLearnerProgressPageHeader(startIndex, endIndex);
+	}
+}
 
 
-function updateLearnersTab(response){
+/**
+ * Do the actual shifting of page numbers bar.
+ */
+function shiftLearnerProgressPageHeader(startIndex, endIndex) {
+	var pageLeftCell = $('#learnersPageLeft');
+	var pageCount = Math.ceil(numberActiveLearners / 10);
+	$('#tabLearnerControlTable td.learnersHeaderPageCell').remove();
+	
+	if (startIndex < 1) {
+		startIndex = 1;
+		endIndex = 10;
+	}
+	if (endIndex > pageCount) {
+		// put a bit more on the left, since right end of scale is too short
+		startIndex -= endIndex - pageCount;
+		if (startIndex < 1) {
+			startIndex = 1;
+		}
+		endIndex = pageCount;
+	}
+
+	for (var pageIndex = endIndex; pageIndex >= startIndex; pageIndex--) {
+		// produce the page number cells
+		var pageHeaderCell = 
+			$('<td class="learnersHeaderCell learnersHeaderPageCell"></td>')
+			.text(pageIndex)
+			.insertAfter(pageLeftCell)
+			.click(function(){
+				loadLearnerProgressPage(+$(this).text());
+			});
+		if (pageIndex == learnerProgressCurrentPageNumber){
+			// highlight the currently selected one
+			pageHeaderCell.addClass('selectedLearnersHeaderPageCell');
+		}
+	}
+}
+
+/**
+ * After page change, refresh values in the control bar.
+ */
+function updateLearnerProgressHeader(pageNumber) {
+	var controlRow = $('#tabLearnerControlTable tr');
+	if (numberActiveLearners < 10) {
+		// do not show the bar at all
+		$('.learnersHeaderCell', controlRow).hide();
+		return;
+	}
+	// show the bar
+	$('.learnersHeaderCell', controlRow).show();
+	
+	var pageCount = Math.ceil(numberActiveLearners / 10);
+	if (!pageNumber) {
+		pageNumber = 1;
+	} else if (pageNumber > pageCount) {
+		pageNumber = pageCount;
+	}
+	learnerProgressCurrentPageNumber = pageNumber;
+	// update "Page X / Y" field
+	$('#learnersPageCounter').text(pageNumber + ' / ' + pageCount);
+	
+	// remove arrows for shifting page numbers, if they are not needed
+	if (pageCount < 10) {
+		$('td.learnersPageShifter', controlRow).hide();
+	}
+	
+	// calculate currently visible page numbers
+	var pageStartIndex = pageNumber - 5;
+	var pageEndIndex = pageNumber + 5 - Math.min(pageStartIndex,0);
+	shiftLearnerProgressPageHeader(pageStartIndex, pageEndIndex, pageNumber);
+}
+
+/**
+ * Load the give page of learners' progress.
+ */
+function loadLearnerProgressPage(pageNumber){
+	// prevent double refresh at the same time
+	if (learnersRefreshInProgress) {
+		return;
+	}
+	learnersRefreshInProgress = true;
 	
 	if (!learnerProgressCellsTemplate) {
+		// fill the placeholder, after all required variables were initialised
 		learnerProgressCellsTemplate =
 		  '<tr><td class="progressBarLabel" id="progressBarLabel;00;"><div>;11;</div>'
 		+ '<a class="button" title="' 
@@ -822,25 +1009,70 @@ function updateLearnersTab(response){
 		+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
 	}
 	
-	if (response.learners) {
-		$.each(response.learners, function(){
-			var barId = 'bar' + this.id;
-			var bar = bars[barId];
-			if (!bar) {
-				bar = bars[barId] = {
-					'userId'      : this.id,
-					'containerId' : 'progressBar' + this.id
-				};
-				
-				var learnerProgressCellsInstance = learnerProgressCellsTemplate
-					.replace(/;00;/g, this.id)
-					.replace(/;11;/g, getLearnerDisplayName(this));
-				$(learnerProgressCellsInstance).appendTo('#tabLearnersTable');
+	// remove existing progress bars
+	$('#tabLearnersTable').html(null);
+	bars = {};
+	var isProgressSorted = $('#orderByCompletionCheckbox:checked').length > 0;
+	// either go to the given page or refresh the current one
+	pageNumber = pageNumber || learnerProgressCurrentPageNumber;
+	
+	$.ajax({
+		dataType : 'json',
+		url : LAMS_URL + 'monitoring/monitoring.do',
+		cache : false,
+		data : {
+			'method'           : 'getLearnerProgressPageJSON',
+			'lessonID'         : lessonId,
+			'searchPhrase'     : null,
+			'pageNumber'       : pageNumber,
+			'isProgressSorted' : isProgressSorted
+			
+		},
+		
+		success : function(response) {
+			numberActiveLearners = response.numberActiveLearners;
+			updateLearnerProgressHeader(pageNumber);
+			
+			if (response.learners) {
+				$.each(response.learners, function(){
+					var barId = 'bar' + this.id;
+					// create a new bar metadata entry
+					bars[barId] = {
+						'userId'      : this.id,
+						'containerId' : 'progressBar' + this.id
+					};
+					
+					// prepare HTML for progress bar
+					var learnerProgressCellsInstance = learnerProgressCellsTemplate
+						.replace(/;00;/g, this.id)
+						.replace(/;11;/g, getLearnerDisplayName(this));
+					$(learnerProgressCellsInstance).appendTo('#tabLearnersTable');
+					
+					// request data to build progress bar SVG
+					fillProgressBar(barId);
+				});
 			}
 			
-			fillProgressBar(barId);
-		});
+			learnersRefreshInProgress = false;
+		}
+	});
+
+}
+
+
+/**
+ * Refreshes the existing progress bars. 
+ */
+function updateLearnersTab(){
+	if (learnersRefreshInProgress) {
+		return;
 	}
+	learnersRefreshInProgress = true;
+	
+	for (var barId in bars) {
+		fillProgressBar(barId);
+	}
+	learnersRefreshInProgress = false;
 }
 
 //********** COMMON FUNCTIONS **********
@@ -848,87 +1080,23 @@ function updateLearnersTab(response){
 /**
  * Updates all changeable elements of monitoring screen.
  */
-function refreshMonitor(){
-	if (refreshInProgress) {
-		return;
+function refreshMonitor(tabName){
+	if (!tabName) {
+		// update Lesson tab widgets (state, number of learners etc.)
+		updateLessonTab();
+		// update learner progress in Sequence tab
+		updateSequenceTab();
+		// update learner progress in Learners tab
+		loadLearnerProgressPage();
+	} else if (tabName == 'lesson') {
+		updateLessonTab();
+	} else if (tabName == 'sequence'){
+		updateLessonTab();
+		updateSequenceTab();
+	} else if (tabName == 'learners'){
+		updateLessonTab();
+		updateLearnersTab();
 	}
-	refreshInProgress = true;
-	
-	if (originalSequenceCanvas) {
-		// put bottom layer, LD SVG
-		sequenceCanvas.html(originalSequenceCanvas);
-	} else {
-		// fetch SVG just once, since it is immutable
-		$.ajax({
-			dataType : 'text',
-			url : LAMS_URL + 'home.do',
-			async : false,
-			cache : false,
-			data : {
-				'method'    : 'createLearningDesignThumbnail',
-				'svgFormat' : 1,
-				'ldId'      : ldId
-			},
-			success : function(response) {
-				originalSequenceCanvas = response;
-				sequenceCanvas = $('#sequenceCanvas').html(originalSequenceCanvas);
-				
-				var canvasHeight = sequenceCanvas.height();
-				var canvasWidth = sequenceCanvas.width();
-				var svg = $('svg', sequenceCanvas);
-				var canvasPaddingTop = canvasHeight/2 - svg.attr('height')/2;
-				var canvasPaddingLeft = canvasWidth/2 - svg.attr('width')/2;
-
-				if (canvasPaddingTop > 0) {
-					sequenceCanvas.css({
-						'padding-top' : canvasPaddingTop,
-						'height'      : canvasHeight - canvasPaddingTop		
-					});
-				}
-				if (canvasPaddingLeft > 0) {
-					sequenceCanvas.css({
-						'padding-left' : canvasPaddingLeft,
-						'width'        : canvasWidth - canvasPaddingLeft		
-					});
-				}
-			}
-		});
-	}
-	
-	// clear all completed learner icons except the door
-	$('#completedLearnersContainer :not(img#completedLearnersDoorIcon)').remove();
-	
-	// get update data
-	$.ajax({
-		dataType : 'json',
-		url : LAMS_URL + 'monitoring/monitoring.do',
-		cache : false,
-		data : {
-			'method'    : 'getLessonProgressJSON',
-			'lessonID'  : lessonId
-		},
-		beforeSend : function(){
-			var sequenceTopButtonsContainer = $('#sequenceTopButtonsContainer');
-			if ($('img#sequenceCanvasLoading', sequenceTopButtonsContainer).length == 0){
-				$('#sequenceCanvasLoading')
-						.clone().appendTo(sequenceTopButtonsContainer)
-						.css('display', 'block');
-			}
-		},
-		
-		success : function(response) {
-			refreshInProgress = false;
-			
-			// update Lesson tab widgets (state, number of learners etc.)
-			updateLessonTab(response);
-			
-			// update learner progress in Sequence tab
-			updateSequenceTab(response);
-			
-			// update learner progress in Learners tab
-			updateLearnersTab(response);
-		}
-	});
 }
 
 

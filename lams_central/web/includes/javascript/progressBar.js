@@ -21,6 +21,9 @@ var COLOR_GATE_TEXT = "rgb(255,255,255)";
 var COLOR_COMPLEX_BACKGROUND = "rgb(153,153,153)";
 
 // SVG paths for activity shapes
+var PATH_START_LINE_HORIZONTAL = 'M 0 18 h 35';
+var PATH_START_LINE_VERTICAL = 'M 70 0 v 20';
+
 var PATH_SQUARE = " v16 h16 v-16 z";
 var PATH_BIG_SQUARE = " v26 h26 v-26 z";
 var PATH_CIRCLE = " m -8 0 a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0";
@@ -40,6 +43,7 @@ function openPopUp(url, title, h, w, status) {
 			+ ",menubar=no, toolbar=no");
 }
 
+// just a short cut to openPopUp function
 function openActivity(url) {
 	openPopUp(url, "LearnerActivity", 600, 800, "yes");
 }
@@ -55,7 +59,7 @@ function resizeElements() {
 	var height = $(window).height();
 
 	if (hasContentFrame) {
-		// resize main content frame
+		// resize main content frame, if it is present
 		$('#contentFrame').css({
 			'width' : width + "px",
 			'height' : height + "px",
@@ -63,6 +67,7 @@ function resizeElements() {
 		});
 	}
 
+	// do the real resizing; applicable only for Learner page
 	if (!isHorizontalBar && progressPanelEnabled) {
 		if (hasContentFrame && !controlFramePadding) {
 			// calculate only once in the beginning
@@ -199,7 +204,9 @@ var ActivityUtils = {
 			act.decoration = paper.set();
 
 			// should be internationalised?
+			// and for some reason, in horizontal bars the text must be slightly shifted, why?
 			var text = paper.text(act.middle, act.y + (isHorizontalBar ? 16 : 13), 'STOP');
+			
 			text.attr({
 				'opacity' : 0,
 				'font-size' : 9,
@@ -207,8 +214,11 @@ var ActivityUtils = {
 				'stroke' : COLOR_GATE_TEXT,
 				'cursor' : 'pointer'
 			});
+			// correct Raphael bug
+			$('tspan', text.node).attr('dy', 0);
 			act.decoration.push(text);
-
+			
+			
 			if (act.status == 0) {
 				// add dark red edge when current activity
 				act.statusTooltip = CURRENT_ACTIVITY_LABEL;
@@ -292,6 +302,8 @@ var ActivityUtils = {
 				43 + 60 * activity.index + (isLarger ? 10 : 0),
 				activity.name);
 		}
+		// correct Raphael bug
+		$('tspan', label.node).attr('dy', 0);
 		activity.elements.push(label);
 		
 		if (!isLast) {
@@ -346,8 +358,7 @@ var ActivityUtils = {
 					if (elem.decorationWraps) {
 						// glow the wrapping decoration element
 						// for example gray square in Optonal Activity container
-						// is bigger than inner activity shape, so it should
-						// glow
+						// is bigger than inner activity shape, so it should glow
 						activity.shape.glowRef = elem.glow({
 							color : elem.attr('fill')
 						});
@@ -770,18 +781,16 @@ function Activity(bar, index, id, type, name, status, url, childActivitiesData) 
 	this.isComplex = type == 'o' || (isPreview && type == 'b');
 
 	if (isHorizontalBar) {
+		// middle of the activity in X axis
 		this.middle = 48 + 60 * index;
 		this.y = 10;
 	} else {
 		// X positioning
 		this.middle = 70;
-		// 20 is the first line segment and following activities take 60 px each
-		// (together with following vertical line)
 		this.y = 20 + 60 * index;
 	}
 
-	// first draw the inner shape, then put back the realY for background gray
-	// square
+	// first draw the inner shape, then put back the realY for background gray square
 	var finalY = this.y;
 	if (!isHorizontalBar && this.isComplex) {
 		this.y += 5;
@@ -869,7 +878,7 @@ function OptionalActivity(bar, name, status, url, childActivitiesData, isNested)
 function fillProgressBar(barId) {
 	var bar = bars[barId];
 	if (!bar) {
-		// bar must be initialised first!
+		// bar should have been initialised first by another script
 		return false;
 	}
 
@@ -883,9 +892,13 @@ function fillProgressBar(barId) {
 		cache : false,
 		dataType : 'json',
 		success : function(result) {
+			// check if container still exists
+			// it may happen if user quickly changes pages in Monitor
+			var barContainer = $('#' + bar.containerId);
 			// if nothing changed, don't do any calculations
-			if (!bar.currentActivityId
-					|| result.currentActivityId != bar.currentActivityId) {
+			if (barContainer.length > 0
+					&& (!bar.currentActivityId
+							|| result.currentActivityId != bar.currentActivityId)) {
 				bar.currentActivityId = result.currentActivityId;
 				isPreview = result.isPreview;
 
@@ -896,8 +909,7 @@ function fillProgressBar(barId) {
 							isHorizontalBar ? 40 + 60 * result.activities.length : 140,
 							isHorizontalBar ? 60 : 60 * result.activities.length);
 					// first line on the top
-					paper.path(isHorizontalBar ? 'M 0 18 h 35'
-							: 'M 70 0 v 20');
+					paper.path(isHorizontalBar ? PATH_START_LINE_HORIZONTAL : PATH_START_LINE_VERTICAL);
 				}
 
 				// we need this to scroll to the current activity

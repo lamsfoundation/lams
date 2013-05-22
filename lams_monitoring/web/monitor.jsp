@@ -106,7 +106,7 @@
 					   href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringlesson">
 					<fmt:message key="button.help"/></a>
 					<a class="button" title="<fmt:message key='button.refresh.tooltip'/>"
-					   href="#" onClick="javascript:refreshMonitor()">
+					   href="#" onClick="javascript:refreshMonitor('lesson')">
 					<fmt:message key="button.refresh"/></a>
 				</td>
 			</tr>
@@ -283,7 +283,7 @@
 			 href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringsequence">
 			 <fmt:message key="button.help"/></a>
 			 <a class="button" title="<fmt:message key='button.refresh.tooltip'/>"
-			 href="#" onClick="javascript:refreshMonitor()">
+			 href="#" onClick="javascript:refreshMonitor('sequence')">
 			 <fmt:message key="button.refresh"/></a>
 			 <a class="button" title="<fmt:message key='button.export.tooltip'/>"
 			 href="#"
@@ -299,15 +299,34 @@
 	</div>
 	
 	<div id="tabLearners">
-		<table id="tabLearnersTable">
+		<table id="tabLearnerControlTable">
 			<tr>
+				<td class="learnersHeaderCell">
+					<fmt:message key='lesson.learners.page' />
+					<span id="learnersPageCounter" />
+				</td>
+				<td id="learnersPageLeft" class="learnersHeaderCell learnersPageShifter"
+				    onClick="javascript:learnersPageShift(false)"
+				>&lt;&lt;</td>
+				<td id="learnersPageRight" class="learnersHeaderCell learnersPageShifter"
+					onClick="javascript:learnersPageShift(true)"
+				>&gt;&gt;</td>
+				<td class="learnersHeaderCell">
+					<input id="orderByCompletionCheckbox" type="checkbox" 
+						   onChange="javascript:loadLearnerProgressPage()" />
+					<fmt:message key='lesson.learners.order' />
+				</td>
 				<td class="topButtonsContainer">
 					<a class="button" title="<fmt:message key='button.refresh.tooltip'/>"
-					   href="#" onClick="javascript:refreshMonitor()">
+					   href="#" onClick="javascript:refreshMonitor('learners')">
 					<fmt:message key="button.refresh"/></a>
 				</td>
 			</tr>
 		</table>
+		
+		<div id="tabLearnersContainer">
+			<table id="tabLearnersTable"></table>
+		</div>
 	</div>
 	
 	<!-- Inner dialog placeholders -->
