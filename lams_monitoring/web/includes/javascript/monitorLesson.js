@@ -22,6 +22,8 @@ var sequenceRefreshInProgress = false;
 var numberActiveLearners = 0;
 // page in Learners tab
 var learnerProgressCurrentPageNumber = 1;
+// search phrase in Learners tab
+var learnersSearchPhrase = null;
 
 //********** LESSON TAB FUNCTIONS **********
 
@@ -580,13 +582,26 @@ function updateSequenceTab() {
  */
 function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 	// check all activities and "users who finished lesson" bar
-	$('rect[id^="act"]', sequenceCanvas).add('#completedLearnersContainer').each(function(){
+	$('rect[id^="act"], g polygon', sequenceCanvas).add('#completedLearnersContainer').each(function(){
 		// find which activity learner was dropped on
 		var act = $(this);
 		var actX = act.offset().left;
 		var actY = act.offset().top;
-		var actEndX = actX + (act.width() ? act.width() : +act.attr('width'));
-		var actEndY = actY + (act.height() ? act.height() : +act.attr('height'));
+		var actWidth = act.width();
+		var actHeight = act.height();
+		if (!actWidth) {
+			actWidth = +act.attr('width');
+			actHeight = +act.attr('height');
+		}
+		if (!actWidth && act.is('polygon')){
+			// just for Gate activity
+			var polygonPoints = act.attr('points').split(' ');
+			actWidth = +polygonPoints[5].split(',')[0] - +polygonPoints[2].split(',')[0];
+			actHeight = +polygonPoints[0].split(',')[1] - +polygonPoints[3].split(',')[1];
+		}
+		var actEndX = actX + actWidth;
+		var actEndY = actY + actHeight;
+		
 		if (x >= actX && x<= actEndX && y>= actY && y<=actEndY) {
 			var previousActivityId = null;
 			var executeForceComplete = false;
@@ -602,8 +617,9 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 					// if move to start of sequence, the value is -1
 					previousActivityId = transitionLine.length == 1 ?
 							transitionLine.attr('id').split('_')[0] : -1;
-							
-					var targetActivityName = act.siblings('text[id^="TextElement"]').text();
+					
+					var targetActivityName = act.is('polygon') ? "Gate" 
+							: act.siblings('text[id^="TextElement"]').text();
 					executeForceComplete = confirm(FORCE_COMPLETE_ACTIVITY_CONFIRM_LABEL
 								.replace('[0]', learnerName).replace('[1]', targetActivityName));
 				}
@@ -644,16 +660,32 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
  * Draw user icons on top of activities.
  */
 function addLearnerIcons(activity) {
-	var activityRect = $('rect[id="act' + activity.id + '"]', sequenceCanvas);
-	var activityGroup = activityRect.parent();
-	var actX = +activityRect.attr('x') + 1;
-	var actY = +activityRect.attr('y') + 1;
+	var isGate = false;
+	var actX = null
+	var actY = null;
+	var activityGroup = $('g#' + activity.id, sequenceCanvas);
+	var activityShape = $('rect[id="act' + activity.id + '"]', activityGroup);
+	if (activityShape.length == 0){
+		// is it Gate activity?
+		activityShape = $('polygon', activityGroup);
+		if (activityShape.length > 0){
+			isGate = true;
+			var polygonPoints = activityShape.attr('points').split(' ');
+			var polygonStartPoints = polygonPoints[4].split(',');
+			actX = +polygonStartPoints[0];
+			actY = +polygonStartPoints[1] - 10;
+		}
+	} else {
+		actX = +activityShape.attr('x') + 1;
+		actY = +activityShape.attr('y') + 1;
+	}
+	
 	var actTooltip = LEARNER_GROUP_LIST_TITLE_LABEL;
 	
 	$.each(activity.learners, function(learnerIndex, learner){
-		if (activity.learners.length > 8 && learnerIndex == 7) {
+		if (isGate || (activity.learners.length > 8 && learnerIndex == 7)) {
 			// maximum 8 icons fit in an activity 
-			var actRightBorder = actX + +activityRect.attr('width');
+			var actRightBorder = actX + (isGate? 40 : +activityShape.attr('width'));
 			var groupTitle = activity.learners.length + ' ' + LEARNER_GROUP_COUNT_LABEL
 				+ ' ' + LEARNER_GROUP_SHOW_LABEL;
 			// if icons do not fit in shape anymore, show a group icon
@@ -703,16 +735,15 @@ function addLearnerIcons(activity) {
  */
 function addLearnerIconsHandlers(activity) {
 	if (activity.learners) {
-		var activityGroup = $('rect[id="act' + activity.id + '"]', sequenceCanvas).parent();
+		var activityGroup = $('g#' + activity.id, sequenceCanvas);
+		// gate activity does not allows users' view
+		var usersViewable = $('polygon', activityGroup).length == 0;
 		
-		$.each(activity.learners, function(learnerIndex, learner){	
-			$('image[id="act' + activity.id + 'learner' + learner.id + '"]', activityGroup)
-			 .dblclick(function(event){
-				 // double click on learner icon to see activity from his perspective
-				event.stopPropagation();
-				openPopUp(LAMS_URL + learner.url, "LearnActivity", 600, 800, true);
-			}).css('cursor', 'pointer')
-			// drag learners to force complete activities
+		$.each(activity.learners, function(learnerIndex, learner){
+			var learnerIcon = $('image[id="act' + activity.id + 'learner' + learner.id + '"]'
+					,activityGroup);
+			learnerIcon .css('cursor', 'pointer')
+			  // drag learners to force complete activities
 			  .draggable({
 				'appendTo'    : '#tabSequence',
 				'containment' : '#tabSequence',
@@ -729,8 +760,17 @@ function addLearnerIconsHandlers(activity) {
 							      ui.offset.left, ui.offset.top);
 				}
 			});
+			
+			if (usersViewable) {
+				learnerIcon.dblclick(function(event){
+					 // double click on learner icon to see activity from his perspective
+					event.stopPropagation();
+					openPopUp(LAMS_URL + learner.url, "LearnActivity", 600, 800, true);
+				});
+			}
 		});
-
+		
+		
 		var learnerGroupIcon = $('*[id^="act' + activity.id + 'learnerGroup"]', activityGroup);
 		// 0 is for no group icon, 2 is for icon + digits
 		if (learnerGroupIcon.length == 2) {
@@ -738,7 +778,7 @@ function addLearnerIconsHandlers(activity) {
 			learnerGroupIcon.dblclick(function(event){
 				 // double click on learner icon to see activity from his perspective
 				event.stopPropagation();
-				showLearnerGroupDialog(activity.id, activityName, activity.learners);
+				showLearnerGroupDialog(activity.id, activityName, activity.learners, true, usersViewable);
 			})
 		}
 	}
@@ -951,7 +991,8 @@ function shiftLearnerProgressPageHeader(startIndex, endIndex) {
  */
 function updateLearnerProgressHeader(pageNumber) {
 	var controlRow = $('#tabLearnerControlTable tr');
-	if (numberActiveLearners < 10) {
+	if (numberActiveLearners < 10 
+			&& (!learnersSearchPhrase || learnersSearchPhrase == '')) {
 		// do not show the bar at all
 		$('.learnersHeaderCell', controlRow).hide();
 		return;
@@ -967,7 +1008,7 @@ function updateLearnerProgressHeader(pageNumber) {
 	}
 	learnerProgressCurrentPageNumber = pageNumber;
 	// update "Page X / Y" field
-	$('#learnersPageCounter').text(pageNumber + ' / ' + pageCount);
+	$('#learnersPageCounter').html(pageNumber + '&nbsp;/&nbsp;' + pageCount + '&nbsp;');
 	
 	// remove arrows for shifting page numbers, if they are not needed
 	if (pageCount < 10) {
@@ -1023,7 +1064,7 @@ function loadLearnerProgressPage(pageNumber){
 		data : {
 			'method'           : 'getLearnerProgressPageJSON',
 			'lessonID'         : lessonId,
-			'searchPhrase'     : null,
+			'searchPhrase'     : learnersSearchPhrase,
 			'pageNumber'       : pageNumber,
 			'isProgressSorted' : isProgressSorted
 			
@@ -1064,6 +1105,7 @@ function loadLearnerProgressPage(pageNumber){
  * Refreshes the existing progress bars. 
  */
 function updateLearnersTab(){
+	// prevent double refresh
 	if (learnersRefreshInProgress) {
 		return;
 	}
@@ -1073,6 +1115,40 @@ function updateLearnersTab(){
 		fillProgressBar(barId);
 	}
 	learnersRefreshInProgress = false;
+}
+
+
+/**
+ * Run search for the phrase which user provided in text field.
+ */
+function learnersRunSearchPhrase(){
+	var searchPhraseField = $('#learnersSearchPhrase');
+	learnersSearchPhrase = searchPhraseField.val();
+	if (learnersSearchPhrase && learnersSearchPhrase.trim() != '') {
+		var pageNumber = parseInt(learnersSearchPhrase);
+		// must be a positive integer
+		if (isNaN(pageNumber) || !isFinite(pageNumber) || pageNumber < 0){
+			// if it was not a number, run a normal search
+			loadLearnerProgressPage(1);
+		} else {
+			// it was a number, reset the field and go to the given page
+			learnersSearchPhrase = null;
+			searchPhraseField.val(null);
+			loadLearnerProgressPage(pageNumber);
+		}
+	} else {
+		learnersSearchPhrase = null;
+	}
+}
+
+
+/**
+ * Clears previous run search for phrase.
+ */
+function learnersClearSearchPhrase(){
+	learnersSearchPhrase = null;
+	$('#learnersSearchPhrase').val(null);
+	loadLearnerProgressPage(1);
 }
 
 //********** COMMON FUNCTIONS **********
@@ -1103,7 +1179,7 @@ function refreshMonitor(tabName){
 /**
  * Show a dialog with user list and optional Force Complete and View Learner buttons.
  */
-function showLearnerGroupDialog(activityId, dialogTitle, learners) {
+function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceComplete, allowView) {
 	var learnerGroupList = $('#learnerGroupList').empty();
 	var learnerGroupDialog = $('#learnerGroupDialog');
 	$.each(learners, function(learnerIndex, learner) {
@@ -1115,26 +1191,31 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners) {
 						      .text(getLearnerDisplayName(learner))
 						      .appendTo(learnerGroupList);
 		
-		if (activityId) {
+		if (allowForceComplete || allowView) {
 			learnerDiv.click(function(){
 		    	  // select a learner
 		    	  $(this).addClass('dialogListItemSelected')
 		    	  	.siblings('div.dialogListItem')
 		    	  	.removeClass('dialogListItemSelected');
-		    	  // enable buttons
-		    	  $('button.learnerGroupDialogSelectableButton')
-		    	  	.attr('disabled', null);
-		      })
-		      .dblclick(function(){
-				// same as clicking View Learner button
-				openPopUp(LAMS_URL + learner.url, "LearnActivity", 600, 800, true);
+			    	// enable buttons
+			    	$('button.learnerGroupDialogSelectableButton')
+			    		.attr('disabled', null);
 		    });
+			if (allowView){
+				learnerDiv.dblclick(function(){
+					// same as clicking View Learner button
+					openPopUp(LAMS_URL + learner.url, "LearnActivity", 600, 800, true);
+				});
+			}
 		}
 	});
 	
-	// no activity ID, i.e. showing finshed learners, so no buttons
-	$('button.learnerGroupDialogSelectableButton').css('display', activityId ? 'inline' : 'none');
-	
+	// show buttons depending on parameters
+	$('button#learnerGroupDialogForceCompleteButton')
+		.css('display', allowForceComplete ? 'inline' : 'none');
+	$('button#learnerGroupDialogViewButton')
+		.css('display', allowView ? 'inline' : 'none');
+
 	learnerGroupDialog
 		.dialog('option', 
 			{

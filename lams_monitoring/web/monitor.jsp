@@ -302,8 +302,20 @@
 		<table id="tabLearnerControlTable">
 			<tr>
 				<td class="learnersHeaderCell">
-					<fmt:message key='lesson.learners.page' />
+					<fmt:message key='learners.page' /><br />
 					<span id="learnersPageCounter" />
+				</td>
+				<td id="learnersSearchPhraseCell" class="learnersHeaderCell">
+					<fmt:message key='learners.search.phrase' /><br />
+					<input id="learnersSearchPhrase" />
+					<img src="<lams:LAMSURL/>images/css/accept.png"
+					     onClick="javascript:learnersRunSearchPhrase()"
+					     title="<fmt:message key='learners.search.phrase.go.tooltip' />"
+					/>
+					<img src="<lams:LAMSURL/>images/css/delete.png"
+						 onClick="javascript:learnersClearSearchPhrase()"
+						 title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
+					/>
 				</td>
 				<td id="learnersPageLeft" class="learnersHeaderCell learnersPageShifter"
 				    onClick="javascript:learnersPageShift(false)"
@@ -312,9 +324,9 @@
 					onClick="javascript:learnersPageShift(true)"
 				>&gt;&gt;</td>
 				<td class="learnersHeaderCell">
+					<fmt:message key='learners.order' /><br />
 					<input id="orderByCompletionCheckbox" type="checkbox" 
 						   onChange="javascript:loadLearnerProgressPage()" />
-					<fmt:message key='lesson.learners.order' />
 				</td>
 				<td class="topButtonsContainer">
 					<a class="button" title="<fmt:message key='button.refresh.tooltip'/>"

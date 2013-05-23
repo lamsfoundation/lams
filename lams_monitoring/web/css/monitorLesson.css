@@ -189,7 +189,13 @@ div#completedLearnersContainer span {
 }
 
 td.learnersHeaderCell {
+	font-size: 10px;
 	border-right: thin solid #2E6E9E;
+}
+
+#learnersSearchPhraseCell img {
+	cursor: pointer;
+	vertical-align: middle;
 }
 
 #tabLearnerControlTable td.topButtonsContainer {
@@ -197,7 +203,7 @@ td.learnersHeaderCell {
 }
 
 td.learnersHeaderPageCell,td.learnersPageShifter {
-	width: 30px;
+	min-width: 25px;
 	cursor: pointer;
 }
 
