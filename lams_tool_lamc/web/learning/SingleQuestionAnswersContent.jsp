@@ -61,6 +61,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		test="${dto.displayOrder == mcGeneralLearnerFlowDTO.questionIndex}">
 		<div class="shading-bg">
 			<div style="overflow: auto;">
+				<span class="float-left space-right">
+					${dto.displayOrder})
+				</span>
 				<c:out value="${dto.question}" escapeXml="false" />
 				
 				<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">

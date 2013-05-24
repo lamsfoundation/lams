@@ -42,8 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</c:if>	
 
 
-<c:if
-	test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
+<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
 
 	<p>
 		<fmt:message key="label.learner.message" />
@@ -52,15 +51,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		)
 	</p>
 
-
 </c:if>
-
-
 
 <c:forEach var="dto" varStatus="status" items="${requestScope.listQuestionCandidateAnswersDto}">
 
 	<div class="shading-bg">
 		<div style="overflow: auto;">
+			<span class="float-left space-right">
+				${dto.displayOrder})
+			</span> 
 			<c:out value="${dto.question}" escapeXml="false" />
 
 			<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">			
@@ -72,12 +71,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</div>
 	</div>
 
-	<c:forEach var="ca" varStatus="status" items="${dto.candidateAnswerUids}">
+	<c:forEach var="ca" items="${dto.candidateAnswerUids}">
 
 		<div class="indent">
 			<input type="radio" name="checkedCa${dto.questionUid}" class="noBorder" value="${dto.questionUid}-${ca.value}">
 
-			<c:forEach var="caText" varStatus="status" items="${dto.candidateAnswers}">
+			<c:forEach var="caText" items="${dto.candidateAnswers}">
 				<c:if test="${ca.key == caText.key}">
 					<c:out value="${caText.value}" escapeXml="false" />
 		</div>

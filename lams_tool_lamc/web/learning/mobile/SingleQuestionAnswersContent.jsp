@@ -64,6 +64,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<li>
 		<fieldset data-role="controlgroup">
 			<legend>
+				<div style="overflow: auto;">
+				<span class="float-left space-right">
+					${dto.displayOrder})
+				</span>
 				<c:out value="${dto.question}" escapeXml="false" />
 				
 				<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">
@@ -71,7 +75,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<strong> <fmt:message key="label.mark" /> </strong>
 					<c:out value="${dto.mark}" />
 					]
-				</c:if>				
+				</c:if>
+				</div>
 			</legend>
 		
 			<c:forEach var="ca" varStatus="status"

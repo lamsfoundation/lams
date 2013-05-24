@@ -74,7 +74,11 @@ table.table-content-padding-left th {padding-left: 8px; }
 table.table-content-padding-left td {padding-left: 10px; }
 
 
-b.error {color:#cc0000;} 
+b.error {color:#cc0000;}
+
+.float-left {float:left;}
+
+.float-right {float:right;}
 
 /*******************************layout of the forum tables with the colored table heading cell ********************/
 table.forum { 

@@ -91,13 +91,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<!--  QUESTIONS  -->
 			<ul data-role="listview" data-inset="true" data-theme="d" >
 			<c:set var="mainQueIndex" scope="request" value="0" />
-			<c:forEach var="questionEntry"
+			<c:forEach var="questionEntry" varStatus="status"
 				items="${mcGeneralLearnerFlowDTO.mapQuestionsContent}">
 				<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}" />
 
 				<li>
 					<div class="regular-li">
-					<div style="overflow: auto;">									  	
+					<div style="overflow: auto;">
+						<span class="float-left space-right">
+							${status.count})
+						</span>
 						<c:out value="${questionEntry.value}" escapeXml="false" />
 					</div>																			  								
 

@@ -128,6 +128,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<div class="shading-bg">
 
+						<span class="float-left space-right">
+							${dto.displayOrder})
+						</span>
 						<strong> <fmt:message key="label.question.col" /> </strong>
 						
 						<div style="overflow: auto;">
