@@ -3,7 +3,10 @@ var tree;
 var lastSelectedUsers = {};
 var sortOrderAscending = {};
 var submitInProgress = false;
-		
+
+/**
+ * Sets up widgets in the main tab.
+ */
 function initLessonTab(){
 	$('#ldScreenshotAuthor').load(function(){
 		// hide "loading" animation
@@ -16,11 +19,35 @@ function initLessonTab(){
 				: CANVAS_RESIZE_OPTION_NONE);
 	});
 	
-	// generate LD tree; folderContents is declared in newLesson.jsp
-	var treeNodes = parseFolderTreeNode(folderContents);
+	// generate LD initial tree; folderContents is declared in newLesson.jsp
+	var treeNodes = parseFolderContents(folderContents);
 	// there should be no focus, just highlight
 	YAHOO.widget.TreeView.FOCUS_CLASS_NAME = null;
 	tree = new YAHOO.widget.TreeView('learningDesignTree', treeNodes);
+	tree.setDynamicLoad(function(node, callback){
+		// load subfolder contents
+		$.ajax({
+			url : LAMS_URL + 'home.do',
+			data : {
+				'method' : 'getFolderContents',
+				'folderID' : node.data.folderID
+			},
+			cache : false,
+			async: false,
+			dataType : 'json',
+			success : function(result) {
+				var childNodeData = parseFolderContents(result);
+				$.each(childNodeData, function(){
+						new YAHOO.widget.TextNode(this, node);
+					});
+				}
+			}
+		);
+		
+		// required by YUI
+		callback();
+	});
+	
 	tree.singleNodeHighlight = true;
 	tree.subscribe('clickEvent', function(event){
 		if (!event.node.data.learningDesignId){
@@ -43,23 +70,7 @@ function initLessonTab(){
 	tree.subscribe('clickEvent',tree.onEventToggleHighlight);
 	tree.render();
 	
-	// if empty folders were empty in the start, they would have been displayed as leafs
-	// instead, there is a dummy element in the start which is removed
-	// when user opens the folder
-	var emptyFolderNodes = tree.getNodesBy(function(node){
-		var firstNode = node.children[0];
-		return firstNode && firstNode.data.isDummy;
-	});
-	
-	if (emptyFolderNodes) {
-		$.each(emptyFolderNodes, function(){
-			this.setDynamicLoad(function(node, callback){
-				tree.removeChildren(node);
-				callback();
-			});
-		});
-	}
-	
+	// expand the first (user) folder
 	tree.getRoot().children[0].expand();
 }
 
@@ -71,6 +82,7 @@ function initClassTab(){
 	fillUserContainer(users.selectedMonitors, 'selected-monitors');
 	fillUserContainer(users.unselectedMonitors, 'unselected-monitors');
 	
+	// allow dragging of user divs
 	$('.draggableUser').each(function(){
 		$(this).draggable({ 'scope'       : getDraggableScope($(this).parents('.userContainer').attr('id')),
 							'appendTo'    : 'body',
@@ -126,6 +138,7 @@ function initClassTab(){
 		});
 	});
 	
+	// allow putting dragged users into container divs
 	$('.userContainer').each(function(){
 		var containerId = $(this).attr('id');
 		
@@ -232,6 +245,7 @@ function initConditionsTab(){
 
 
 function addLesson(){
+	// prevent double clicking of Add button
 	if (submitInProgress) {
 		return;
 	}
@@ -312,6 +326,9 @@ function resizeImage(id, width, height) {
 }
 
 
+/**
+ * Chooses whether LD thumbnail will be shrinked or full size.
+ */
 function toggleCanvasResize(mode) {
 	var toggleCanvasResizeLink = $('#toggleCanvasResizeLink');
 	switch (mode) {
@@ -338,33 +355,29 @@ function toggleCanvasResize(mode) {
 }
 
 
-function parseFolderTreeNode(nodeJSON) {
+/**
+ * Parses response in JSON format into readable for YUI.
+ */
+function parseFolderContents(nodeJSON) {
 	var result = [];
-	
-	if (!nodeJSON.folders && !nodeJSON.learningDesigns) {
-		// add dummy node, otherwise empty folder is displayed as a leaf
-		result.push({'type'    : 'text',
-			         'label'   : '(dummy)',
-				     'isDummy' : true
-				    });
-	} else {
-		if (nodeJSON.folders) {
-			$.each(nodeJSON.folders, function(){
-				result.push({'type'            : 'text',
-						  	 'label'           : this.isRunSequencesFolder ?
-						  			 				LABEL_RUN_SEQUENCES_FOLDER : this.name,
-						     'children'        : parseFolderTreeNode(this)
-							 });
-			});
-		}
-		if (nodeJSON.learningDesigns) {
-			$.each(nodeJSON.learningDesigns, function(){
-				result.push({'type'             : 'text',
-				  	         'label'            : this.name,
-				  	         'learningDesignId' : this.learningDesignId
-					        });
-			});
-		}
+
+	if (nodeJSON.folders) {
+		$.each(nodeJSON.folders, function(){
+			result.push({'type'            : 'text',
+					  	 'label'           : this.isRunSequencesFolder ?
+					  			 				LABEL_RUN_SEQUENCES_FOLDER : this.name,
+					  	 'folderID'		   : this.folderID
+						 });
+		});
+	}
+	if (nodeJSON.learningDesigns) {
+		$.each(nodeJSON.learningDesigns, function(){
+			result.push({'type'             : 'text',
+			  	         'label'            : this.name,
+			  	         'isLeaf'           : true,
+			  	         'learningDesignId' : this.learningDesignId
+				        });
+		});
 	}
 	
 	return result;
@@ -376,13 +389,15 @@ function fillUserContainer(users, containerId) {
 	if (users) {
 		// create user DIVs
 		$.each(users, function(index, userJSON) {
-			$('#' + containerId).append($('<div />').attr({
-											'userId'  : userJSON.userID
-											})
-					                      .addClass('draggableUser')
-            						      .text(userJSON.firstName + ' ' + userJSON.lastName 
-            						    		  + ' (' + userJSON.login + ')')
-            						   );
+			$('#' + containerId).append(
+					$('<div />').attr({
+									'userId'  : userJSON.userID
+									})
+			                    .addClass('draggableUser')
+    						    .text(userJSON.firstName + ' ' + userJSON.lastName 
+    						    		  + ' (' + userJSON.login + ')'
+    						    	 )
+    		);
 		});
 		
 		sortUsers('sort-' + containerId);

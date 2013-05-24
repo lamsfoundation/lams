@@ -348,7 +348,7 @@ public class HomeAction extends DispatchAction {
 	UserDTO userDTO = getUser();
 
 	// get all user accessible folders and LD descriptions as JSON
-	JSONObject learningDesigns = getDeepFolderContents(userDTO.getUserID(), null);
+	JSONObject learningDesigns = getFolderContents(null, userDTO.getUserID());
 	req.setAttribute("folderContents", learningDesigns.toString());
 
 	Integer organisationID = new Integer(WebUtil.readIntParam(req, "organisationID"));
@@ -401,6 +401,20 @@ public class HomeAction extends DispatchAction {
 	return mapping.findForward("addLesson");
     }
 
+    /**
+     * Gets subfolder contents in Add Lesson screen.
+     */
+    public ActionForward getFolderContents(ActionMapping mapping, ActionForm form, HttpServletRequest req,
+	    HttpServletResponse res) throws UserAccessDeniedException, JSONException, IOException,
+	    RepositoryCheckedException {
+	Integer folderID = new Integer(WebUtil.readIntParam(req, "folderID"));
+	JSONObject responseJSON = getFolderContents(folderID, getUser().getUserID());
+
+	res.setContentType("application/json;charset=utf-8");
+	res.getWriter().print(responseJSON.toString());
+	return null;
+    }
+
     public ActionForward createLearningDesignThumbnail(ActionMapping mapping, ActionForm form, HttpServletRequest req,
 	    HttpServletResponse res) throws JDOMException, IOException, TranscoderException {
 	Long learningDesignId = WebUtil.readLongParam(req, CentralConstants.PARAM_LEARNING_DESIGN_ID);
@@ -420,7 +434,7 @@ public class HomeAction extends DispatchAction {
     }
 
     @SuppressWarnings("unchecked")
-    private JSONObject getDeepFolderContents(Integer userID, Integer folderID) throws JSONException, IOException,
+    private JSONObject getFolderContents(Integer folderID, Integer userID) throws JSONException, IOException,
 	    UserAccessDeniedException, RepositoryCheckedException {
 	JSONObject result = new JSONObject();
 	Vector<FolderContentDTO> folderContents = null;
@@ -453,7 +467,7 @@ public class HomeAction extends DispatchAction {
 	    if (folderContents.size() == 1) {
 		FolderContentDTO folder = folderContents.firstElement();
 		if (folder.getResourceID().equals(WorkspaceAction.ROOT_ORG_FOLDER_ID)) {
-		    return getDeepFolderContents(userID, WorkspaceAction.ROOT_ORG_FOLDER_ID);
+		    return getFolderContents(WorkspaceAction.ROOT_ORG_FOLDER_ID, userID);
 		}
 	    }
 	} else {
@@ -463,19 +477,20 @@ public class HomeAction extends DispatchAction {
 	    Collections.sort(folderContents, HomeAction.LD_NAME_COMPARATOR);
 	}
 
-	// recursively check folders, building a tree
+	// fill JSON object with folders and LDs
 	for (FolderContentDTO folderContent : folderContents) {
 	    String contentType = folderContent.getResourceType();
 	    if (FolderContentDTO.FOLDER.equals(contentType)) {
-		JSONObject subfolder = getDeepFolderContents(userID, folderContent.getResourceID().intValue());
-		subfolder.put("name", folderContent.getName());
-		subfolder.put("isRunSequencesFolder",
+		JSONObject subfolderJSON = new JSONObject();
+		subfolderJSON.put("name", folderContent.getName());
+		subfolderJSON.put("isRunSequencesFolder",
 			WorkspaceFolder.RUN_SEQUENCES.equals(folderContent.getResourceTypeID().intValue()));
-		result.append("folders", subfolder);
+		subfolderJSON.put("folderID", folderContent.getResourceID().intValue());
+		result.append("folders", subfolderJSON);
 	    } else if (FolderContentDTO.DESIGN.equals(contentType)) {
 		JSONObject learningDesignJSON = new JSONObject();
-		learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
 		learningDesignJSON.put("name", folderContent.getName());
+		learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
 		result.append("learningDesigns", learningDesignJSON);
 	    } else {
 		if (HomeAction.log.isDebugEnabled()) {
