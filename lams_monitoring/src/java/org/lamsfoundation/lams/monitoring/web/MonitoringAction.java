@@ -1178,8 +1178,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	// batch size is 10
-	int fromIndex = (pageNumber - 1) * 10;
 	int toIndex = Math.min(pageNumber * 10, learnerProgresses.size());
+	int fromIndex = Math.min((pageNumber - 1) * 10, Math.max(toIndex - 10, 0));
 	// get just the requested chunk
 	for (LearnerProgress learnerProgress : learnerProgresses.subList(fromIndex, toIndex)) {
 	    responseJSON.append("learners", MonitoringAction.userToJSON(learnerProgress.getUser()));
