@@ -139,7 +139,7 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) throws ServletException {
 
 	// initialize Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	// save toolContentID into HTTPSession
@@ -334,18 +334,11 @@ public class LearningAction extends Action {
     
     /**
      * Display same entire authoring page content from HttpSession variable.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
     private ActionForward nextPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	boolean finishedLock = (Boolean) sessionMap.get(AssessmentConstants.ATTR_FINISHED_LOCK);
 	if (! finishedLock) {
 	    preserveUserAnswers(request);   
@@ -369,18 +362,11 @@ public class LearningAction extends Action {
     
     /**
      * Display same entire authoring page content from HttpSession variable.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
     private ActionForward submitAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	preserveUserAnswers(request);
 	processUserAnswers(sessionMap);
 	loadupResultMarks(sessionMap);
@@ -410,18 +396,11 @@ public class LearningAction extends Action {
     
     /**
      * Display same entire authoring page content from HttpSession variable.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
     private ActionForward resubmit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	Long toolSessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
 	AssessmentUser assessmentUser = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
@@ -437,31 +416,21 @@ public class LearningAction extends Action {
 
     /**
      * Finish learning session.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     private ActionForward finish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
-	// get mode and ToolSessionID from sessionMAP
-	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	IAssessmentService service = getAssessmentService();
-	// get sessionId from HttpServletRequest
+	
 	String nextActivityUrl = null;
 	try {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    Long userID = new Long(user.getUserID().longValue());
+	    Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	    nextActivityUrl = service.finishToolSession(sessionId, userID);
 	    request.setAttribute(AssessmentConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
@@ -474,12 +443,6 @@ public class LearningAction extends Action {
     
     /**
      * Move up current option.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     private ActionForward upOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -488,12 +451,6 @@ public class LearningAction extends Action {
 
     /**
      * Move down current option.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     private ActionForward downOption(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -502,7 +459,7 @@ public class LearningAction extends Action {
 
     private ActionForward switchOption(ActionMapping mapping, HttpServletRequest request, boolean up) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	LinkedHashSet<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageNumber-1);
@@ -542,12 +499,6 @@ public class LearningAction extends Action {
     
     /**
      * Display empty reflection form.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     private ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -565,7 +516,7 @@ public class LearningAction extends Action {
 	// get the existing reflection entry
 	IAssessmentService service = getAssessmentService();
 
-	SessionMap map = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	NotebookEntry entry = service.getEntry(toolSessionID, user.getUserID());
 
@@ -578,12 +529,6 @@ public class LearningAction extends Action {
 
     /**
      * Submit reflection form input database.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     private ActionForward submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -591,7 +536,7 @@ public class LearningAction extends Action {
 	Integer userId = refForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	IAssessmentService service = getAssessmentService();
@@ -618,7 +563,7 @@ public class LearningAction extends Action {
     
     private void preserveUserAnswers(HttpServletRequest request){
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	LinkedHashSet<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageNumber-1);
@@ -677,7 +622,7 @@ public class LearningAction extends Action {
 	}
     }
     
-    private void loadupResultMarks(SessionMap sessionMap){
+    private void loadupResultMarks(SessionMap<String, Object> sessionMap){
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
@@ -726,7 +671,7 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
     }    
     
-    private void loadupLastAttempt(SessionMap sessionMap){
+    private void loadupLastAttempt(SessionMap<String, Object> sessionMap){
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
@@ -747,26 +692,36 @@ public class LearningAction extends Action {
 			for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
 			    for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
 				if (questionOption.getUid().equals(optionAnswer.getQuestionOptionUid())) {
+				    
 				    questionOption.setAnswerBoolean(optionAnswer.getAnswerBoolean());
-				    questionOption.setAnswerInt(optionAnswer.getAnswerInt());
+				    if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+					questionOption.setSequenceId(optionAnswer.getAnswerInt());
+				    } else {
+					questionOption.setAnswerInt(optionAnswer.getAnswerInt());
+				    }
+				    
 				    break;
 				}
 			    }			    
 			}
 			break;
 		    }
-		}		
+		}
+		
+		//sort ordering type of question
+		if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+		    TreeSet<AssessmentQuestionOption> orderedSet = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
+		    orderedSet.addAll(question.getQuestionOptions());
+		    question.setQuestionOptions(orderedSet);
+		}
 	    }
 	}
     }
     
     /**
      * Get answer options from <code>HttpRequest</code>
-     * 
-     * @param request
-     * 
      */
-    private void processUserAnswers(SessionMap sessionMap) {
+    private void processUserAnswers(SessionMap<String, Object> sessionMap) {
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
