@@ -299,7 +299,7 @@ var ActivityUtils = {
 					activity.name);
 		} else {
 			label = paper.text(activity.middle,
-				43 + 60 * activity.index + (isLarger ? 10 : 0),
+				47 + 60 * activity.index + (isLarger ? 10 : 0),
 				activity.name);
 		}
 		// correct Raphael bug
@@ -700,30 +700,44 @@ var ActivityUtils = {
 
 		var activityShift = branchActivities.length - 1;
 		// how many pixels move subsequent activities down
-		var yShift = 60 * activityShift;
+		var pixelShift = 60 * activityShift;
 		// activity just after branching
 		var afterBranchActivity = null;
-		// move down existing activities that come after Branching; start with
-		// the last one
+		// move down/right existing activities that come after Branching
+		// start with the last one
 		var activities = bar.activities;
 		for ( var activityIndex = activities.length - 1; activityIndex > branchIndex; activityIndex--) {
 			afterBranchActivity = activities[activityIndex];
 			activities[activityIndex + activityShift] = afterBranchActivity;
-			afterBranchActivity.y += yShift;
+			var transform = null;
+			if (isHorizontalBar) {
+				afterBranchActivity.middle += pixelShift;
+				transform = 'T ' + pixelShift + ' 0';
+			} else {
+				afterBranchActivity.y += pixelShift;
+				transform = 'T 0 ' + pixelShift;
+			}
+			
 			afterBranchActivity.path = Raphael.transformPath(
-					afterBranchActivity.path, 'T0,' + yShift);
+					afterBranchActivity.path, transform);
 			afterBranchActivity.elements.forEach(function(elem) {
-				var y = elem.attr('y');
+				var x = elem.attr('x');
 				var targetProperties = null;
-				// text, rectangles etc. have 'y', paths have 'path'
-				if (y) {
-					targetProperties = {
-						'y' : elem.attr('y') + yShift
-					};
+				// text, rectangles etc. have 'x', paths have 'path'
+				if (x) {
+					// move either right or down, depending on bar orientation
+					targetProperties = isHorizontalBar ?
+							{
+						 	 'x' : x + pixelShift
+							}
+							:
+							{
+							 'y' : elem.attr('y') + pixelShift
+							};
 				} else {
 					var path = elem.attr('path');
 					targetProperties = {
-						'path' : Raphael.transformPath(path, 'T0,' + yShift)
+						'path' : Raphael.transformPath(path, transform)
 					};
 				}
 				elem.animate(targetProperties, 2000, "linear");
@@ -753,15 +767,13 @@ var ActivityUtils = {
 		}
 
 		// smoothly draw branch activities
-		setTimeout(
-				function() {
-					for ( var activityIndex = 0; activityIndex < branchActivities.length; activityIndex++) {
-						ActivityUtils
-								.drawActivity(
-										activities[activityIndex + branchIndex],
-										false,
-										!afterBranchActivity
-												&& activityIndex == branchActivities.length - 1);
+		setTimeout(function() {
+			for (var activityIndex = 0; activityIndex < branchActivities.length; activityIndex++) {
+						ActivityUtils.drawActivity(
+							activities[activityIndex + branchIndex],
+							false,
+							!afterBranchActivity && activityIndex == branchActivities.length - 1
+						);
 					}
 				}, 2000);
 	}
@@ -969,10 +981,15 @@ function fillProgressBar(barId) {
 								}
 							}
 
-							// resize main paper to accomodate new
-							// activities
-							paper.setSize(140, 60 * (activities.length
-									+ branchActivities.length - 1));
+							// resize main paper to accomodate new activities
+							if (isHorizontalBar) {
+								paper.setSize(40 + 60 * (activities.length
+										+ branchActivities.length - 1), 60);
+							} else {
+								paper.setSize(140, 60 * (activities.length
+										+ branchActivities.length - 1));
+							}
+
 							ActivityUtils.expandBranch(bar,
 									branchActivityId, branchActivities);
 						} else {
