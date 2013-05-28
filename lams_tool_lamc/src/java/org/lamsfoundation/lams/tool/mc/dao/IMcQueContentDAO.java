@@ -112,27 +112,6 @@ public interface IMcQueContentDAO {
     /**
      * *
      * <p>
-     * removes McQueContent with the given identifier <code>question</code> and <code>mcContentUid</code>, returns null
-     * if not found.
-     * </p>
-     * 
-     * @param mcContentUid
-     */
-    public void cleanAllQuestions(final Long mcContentUid);
-
-    /**
-     * *
-     * <p>
-     * removes McQueContent with the given identifier <code>mcContentUid</code>
-     * </p>
-     * 
-     * @param mcContentUid
-     */
-    public void cleanAllQuestionsSimple(final Long mcContentUid);
-
-    /**
-     * *
-     * <p>
      * resets McQueContent with the given identifier <code>mcContentUid</code>
      * </p>
      * 

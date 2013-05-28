@@ -61,9 +61,6 @@ public class McSession implements Serializable {
     private String session_name;
 
     /** nullable persistent field */
-    private Long mcContentId;
-
-    /** nullable persistent field */
     private org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent;
 
     /** persistent field */
@@ -123,14 +120,6 @@ public class McSession implements Serializable {
 
     public void setMcSessionId(Long mcSessionId) {
 	this.mcSessionId = mcSessionId;
-    }
-
-    public Long getMcContentId() {
-	return this.mcContentId;
-    }
-
-    public void setMcContentId(Long mcContentId) {
-	this.mcContentId = mcContentId;
     }
 
     public org.lamsfoundation.lams.tool.mc.pojos.McContent getMcContent() {

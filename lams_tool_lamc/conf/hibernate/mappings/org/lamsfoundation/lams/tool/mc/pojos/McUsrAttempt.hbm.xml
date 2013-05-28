@@ -33,15 +33,6 @@
         column="mark"
     />
     
-    
-       <property
-        name="finished"
-        type="boolean"
-        access="property"
-        column="finished"
-        length="1"        
-   />
-    
 
     <property
         name="passed"

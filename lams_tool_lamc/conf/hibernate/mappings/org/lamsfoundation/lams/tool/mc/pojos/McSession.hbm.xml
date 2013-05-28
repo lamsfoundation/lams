@@ -56,16 +56,6 @@
         column="session_name"
         length="100"
     />
-    
-    <property
-        name="mcContentId"
-        type="java.lang.Long"
-        update="false"
-        insert="false"
-        access="property"
-        column="mc_content_id"
-        length="20"
-    />
 
    <many-to-one
         name="mcContent"

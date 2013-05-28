@@ -68,46 +68,6 @@ public class McQueContent implements Serializable, Comparable {
     /** persistent field */
     private Set mcOptionsContents;
 
-    /** full constructor */
-    public McQueContent(Long mcQueContentId, String question, Integer displayOrder, McContent mcContent,
-	    Set mcUsrAttempts, Set mcOptionsContents) {
-	this.mcQueContentId = mcQueContentId;
-	this.question = question;
-	this.displayOrder = displayOrder;
-	this.mcContent = mcContent;
-	this.mcUsrAttempts = mcUsrAttempts;
-	this.mcOptionsContents = mcOptionsContents;
-    }
-
-    public McQueContent(String question, Integer displayOrder, McContent mcContent, Set mcUsrAttempts,
-	    Set mcOptionsContents) {
-	this.question = question;
-	this.displayOrder = displayOrder;
-	this.mcContent = mcContent;
-	this.mcUsrAttempts = mcUsrAttempts;
-	this.mcOptionsContents = mcOptionsContents;
-    }
-
-    public McQueContent(String question, Integer displayOrder, Integer mark, McContent mcContent, Set mcUsrAttempts,
-	    Set mcOptionsContents) {
-	this.question = question;
-	this.displayOrder = displayOrder;
-	this.mark = mark;
-	this.mcContent = mcContent;
-	this.mcUsrAttempts = mcUsrAttempts;
-	this.mcOptionsContents = mcOptionsContents;
-    }
-
-    public McQueContent(String question, Integer displayOrder, String feedback, McContent mcContent, Set mcUsrAttempts,
-	    Set mcOptionsContents) {
-	this.question = question;
-	this.displayOrder = displayOrder;
-	this.feedback = feedback;
-	this.mcContent = mcContent;
-	this.mcUsrAttempts = mcUsrAttempts;
-	this.mcOptionsContents = mcOptionsContents;
-    }
-
     public McQueContent(String question, Integer displayOrder, Integer mark, String feedback, McContent mcContent,
 	    Set mcUsrAttempts, Set mcOptionsContents) {
 	this.question = question;
@@ -119,43 +79,8 @@ public class McQueContent implements Serializable, Comparable {
 	this.mcOptionsContents = mcOptionsContents;
     }
 
-    public McQueContent(Long mcQueContentId, String question, Integer displayOrder, Set mcUsrAttempts,
-	    Set mcOptionsContents) {
-	this.mcQueContentId = mcQueContentId;
-	this.question = question;
-	this.displayOrder = displayOrder;
-	this.mcUsrAttempts = mcUsrAttempts;
-	this.mcOptionsContents = mcOptionsContents;
-    }
-
-    public McQueContent(Long mcQueContentId, String question, Integer displayOrder, Integer mark, Set mcUsrAttempts,
-	    Set mcOptionsContents) {
-	this.mcQueContentId = mcQueContentId;
-	this.question = question;
-	this.displayOrder = displayOrder;
-	this.mark = mark;
-	this.mcUsrAttempts = mcUsrAttempts;
-	this.mcOptionsContents = mcOptionsContents;
-    }
-
-    public McQueContent(String question, Integer displayOrder, Set mcUsrAttempts, Set mcOptionsContents) {
-	this.question = question;
-	this.displayOrder = displayOrder;
-	this.mcUsrAttempts = mcUsrAttempts;
-	this.mcOptionsContents = mcOptionsContents;
-    }
-
     /** default constructor */
     public McQueContent() {
-    }
-
-    /** minimal constructor */
-    public McQueContent(Long mcQueContentId, org.lamsfoundation.lams.tool.mc.pojos.McContent mcContent,
-	    Set mcUsrAttempts, Set mcOptionsContents) {
-	this.mcQueContentId = mcQueContentId;
-	this.mcContent = mcContent;
-	this.mcUsrAttempts = mcUsrAttempts;
-	this.mcOptionsContents = mcOptionsContents;
     }
 
     /**

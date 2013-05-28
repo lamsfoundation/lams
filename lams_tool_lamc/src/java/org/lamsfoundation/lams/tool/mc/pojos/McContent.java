@@ -152,13 +152,6 @@ public class McContent implements Serializable {
     public McContent() {
     }
 
-    /** minimal constructor */
-    public McContent(Long mcContentId, Set mcQueContents, Set mcSessions) {
-	this.mcContentId = mcContentId;
-	this.mcQueContents = mcQueContents;
-	this.mcSessions = mcSessions;
-    }
-
     /**
      * gets called as part of the copyToolContent
      * 

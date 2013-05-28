@@ -44,12 +44,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemptDAO {
 
-    private static final String LOAD_ATTEMPT_BY_USER_SESSION = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrUid";
-
-    private static final String LOAD_ATTEMPT_BY_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.queUsrId=:queUsrUid"
-	    + " and mcUsrAttempt.mcQueContentId=:mcQueContentId and mcUsrAttempt.attemptOrder=:attemptOrder"
-	    + " order by mcUsrAttempt.attemptOrder, mcUsrAttempt.mcOptionsContent.uid";
-
     private static final String LOAD_LAST_ATTEMPT_BY_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueUsr.uid=:queUsrUid"
 	    + " and mcUsrAttempt.mcQueContentId=:mcQueContentId and mcUsrAttempt.attemptOrder=mcUsrAttempt.mcQueUsr.lastAttemptOrder"
 	    + " order by mcUsrAttempt.mcOptionsContent.uid";
@@ -62,19 +56,8 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	    + " and mcUsrAttempt.attemptOrder=mcUsrAttempt.mcQueUsr.lastAttemptOrder"
 	    + " order by mcUsrAttempt.mcQueContentId, mcUsrAttempt.mcOptionsContent.uid";
 
-    public McUsrAttempt getMcUserAttemptByUID(Long uid) {
-	return (McUsrAttempt) this.getHibernateTemplate().get(McUsrAttempt.class, uid);
-    }
-
     public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
 	this.getHibernateTemplate().save(mcUsrAttempt);
-    }
-
-    public List getUserAttemptsForSession(Long queUsrUid) {
-	List list = getSession().createQuery(LOAD_ATTEMPT_BY_USER_SESSION).setLong("queUsrUid", queUsrUid.longValue())
-		.list();
-
-	return list;
     }
 
     public List getLatestAttemptsForAUser(final Long queUserUid) {
@@ -98,22 +81,9 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 		.list();
     }
 
-    public List getAttemptByAttemptOrder(final Long queUsrUid, final Long mcQueContentId, final Integer attemptOrder) {
-	List list = getSession().createQuery(LOAD_ATTEMPT_BY_ATTEMPT_ORDER).setLong("queUsrUid", queUsrUid.longValue())
-		.setLong("mcQueContentId", mcQueContentId.longValue())
-		.setInteger("attemptOrder", attemptOrder.intValue()).list();
-	return list;
-    }
-
     public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(mcUsrAttempt);
-    }
-
-    public void removeMcUsrAttemptByUID(Long uid) {
-	McUsrAttempt mca = (McUsrAttempt) getHibernateTemplate().get(McUsrAttempt.class, uid);
-	this.getSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(mca);
     }
 
     public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt) {

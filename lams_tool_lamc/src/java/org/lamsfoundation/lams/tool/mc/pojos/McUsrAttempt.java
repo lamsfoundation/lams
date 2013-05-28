@@ -48,8 +48,6 @@ public class McUsrAttempt implements Serializable {
 
     private Integer mark;
 
-    private boolean finished;
-
     private boolean attemptCorrect;
 
     private boolean passed;
@@ -282,21 +280,6 @@ public class McUsrAttempt implements Serializable {
      */
     public void setAttemptCorrect(boolean attemptCorrect) {
 	this.attemptCorrect = attemptCorrect;
-    }
-
-    /**
-     * @return Returns the finished.
-     */
-    public boolean isFinished() {
-	return finished;
-    }
-
-    /**
-     * @param finished
-     *            The finished to set.
-     */
-    public void setFinished(boolean finished) {
-	this.finished = finished;
     }
 
     /**

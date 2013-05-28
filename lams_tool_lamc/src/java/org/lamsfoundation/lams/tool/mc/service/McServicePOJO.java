@@ -257,15 +257,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    public void cleanAllQuestions(final Long mcContentUid) throws McApplicationException {
-	try {
-	    mcQueContentDAO.cleanAllQuestions(mcContentUid);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is cleaning all questions: " + e.getMessage(), e);
-	}
-    }
-
     public List getNextAvailableDisplayOrder(final long mcContentId) throws McApplicationException {
 	try {
 	    return mcQueContentDAO.getNextAvailableDisplayOrder(mcContentId);
@@ -352,17 +343,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    public List getAttemptByAttemptOrder(final Long queUsrId, final Long mcQueContentId, final Integer attemptOrder)
-	    throws McApplicationException {
-	try {
-	    return mcUsrAttemptDAO.getAttemptByAttemptOrder(queUsrId, mcQueContentId, attemptOrder);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is getting the learner's attempts by user id and que content id and attempt order: "
-			    + e.getMessage(), e);
-	}
-    }
-
     public List getLatestAttemptsForAUser(final Long queUserUid) throws McApplicationException {
 	try {
 	    return mcUsrAttemptDAO.getLatestAttemptsForAUser(queUserUid);
@@ -408,15 +388,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	} catch (DataAccessException e) {
 	    throw new McApplicationException("Exception occured when lams is retrieving by uid  mc question content: "
 		    + e.getMessage(), e);
-	}
-    }
-
-    public void cleanAllQuestionsSimple(final Long mcContentId) throws McApplicationException {
-	try {
-	    mcQueContentDAO.cleanAllQuestionsSimple(mcContentId);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is cleaning mc question content by mcContentId : " + e.getMessage(), e);
 	}
     }
 

@@ -58,40 +58,19 @@ public class McOptsContent implements Serializable, Comparable {
     /** persistent field */
     private org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent;
 
-    /** persistent field */
-    private Set mcUsrAttempts;
-
-    public McOptsContent(Long mcQueOptionId, boolean correctOption, String mcQueOptionText,
-	    org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent, Set mcUsrAttempts) {
-	this.mcQueOptionId = mcQueOptionId;
-	this.correctOption = correctOption;
-	this.mcQueOptionText = mcQueOptionText;
-	this.mcQueContent = mcQueContent;
-	this.mcUsrAttempts = mcUsrAttempts;
-    }
-
-    public McOptsContent(boolean correctOption, String mcQueOptionText,
-	    org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent, Set mcUsrAttempts) {
-	this.correctOption = correctOption;
-	this.mcQueOptionText = mcQueOptionText;
-	this.mcQueContent = mcQueContent;
-	this.mcUsrAttempts = mcUsrAttempts;
-    }
-
     public McOptsContent(Integer displayOrder, boolean correctOption, String mcQueOptionText,
-	    org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent, Set mcUsrAttempts) {
+	    org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent) {
 	this.displayOrder = displayOrder;
 	this.correctOption = correctOption;
 	this.mcQueOptionText = mcQueOptionText;
 	this.mcQueContent = mcQueContent;
-	this.mcUsrAttempts = mcUsrAttempts;
     }
 
     public static McOptsContent newInstance(McOptsContent mcOptsContent, McQueContent newMcQueContent)
 
     {
 	McOptsContent newMcOptsContent = new McOptsContent(mcOptsContent.getDisplayOrder(),
-		mcOptsContent.isCorrectOption(), mcOptsContent.getMcQueOptionText(), newMcQueContent, new TreeSet());
+		mcOptsContent.isCorrectOption(), mcOptsContent.getMcQueOptionText(), newMcQueContent);
 	return newMcOptsContent;
     }
 
@@ -148,24 +127,6 @@ public class McOptsContent implements Serializable, Comparable {
      */
     public void setMcQueOptionId(Long mcQueOptionId) {
 	this.mcQueOptionId = mcQueOptionId;
-    }
-
-    /**
-     * @return Returns the mcUsrAttempts.
-     */
-
-    public Set getMcUsrAttempts() {
-	if (this.mcUsrAttempts == null)
-	    setMcUsrAttempts(new HashSet());
-	return this.mcUsrAttempts;
-    }
-
-    /**
-     * @param mcUsrAttempts
-     *            The mcUsrAttempts to set.
-     */
-    public void setMcUsrAttempts(Set mcUsrAttempts) {
-	this.mcUsrAttempts = mcUsrAttempts;
     }
 
     /**

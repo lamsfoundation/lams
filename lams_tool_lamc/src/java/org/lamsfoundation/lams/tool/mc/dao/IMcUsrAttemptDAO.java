@@ -39,18 +39,6 @@ public interface IMcUsrAttemptDAO {
     /**
      * *
      * <p>
-     * Return the persistent instance of a McUsrAttempt with the given identifier <code>uid</code>, returns null if not
-     * found.
-     * </p>
-     * 
-     * @param uid
-     * @return McQueContent
-     */
-    public McUsrAttempt getMcUserAttemptByUID(Long uid);
-
-    /**
-     * *
-     * <p>
      * saves McUsrAttempt with the given identifier <code>mcUsrAttempt</code>
      * </p>
      * 
@@ -73,17 +61,6 @@ public interface IMcUsrAttemptDAO {
     /**
      * *
      * <p>
-     * removes McUsrAttempt with the given identifier <code>uid</code>
-     * </p>
-     * 
-     * @param uid
-     * @return
-     */
-    public void removeMcUsrAttemptByUID(Long uid);
-
-    /**
-     * *
-     * <p>
      * removes McUsrAttempt with the given identifier <code>mcUsrAttempt</code>
      * </p>
      * 
@@ -91,16 +68,6 @@ public interface IMcUsrAttemptDAO {
      * @return
      */
     public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt);
-
-    /**
-     * <p>
-     * gets all the attempts (for all questions) for one user in one tool session
-     * </p>
-     * 
-     * @param queUsrId
-     * @return
-     */
-    public List getUserAttemptsForSession(Long queUsrId);
 
     /**
      * Get the most recent attempts (for all questions) for one user in one tool session
@@ -126,19 +93,5 @@ public interface IMcUsrAttemptDAO {
      * Get the highest attempt order for a user for a particular question
      */
     public List<McUsrAttempt> getLatestAttemptsForAUserForOneQuestionContent(Long queUsrUid, Long mcQueContentId);
-
-    /**
-     * *
-     * <p>
-     * returns a list of attempts with the given identifiers <code>queUsrId</code> and <code>mcQueContentId</code> and
-     * <code>attemptOrder</code>
-     * </p>
-     * 
-     * @param queUsrId
-     * @param mcQueContentId
-     * @param attemptOrder
-     * @return
-     */
-    public List getAttemptByAttemptOrder(final Long queUsrUid, final Long mcQueContentId, final Integer attemptOrder);
 
 }

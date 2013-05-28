@@ -261,17 +261,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	mcQueUsr.setResponseFinalised(true);
 	mcService.updateMcQueUsr(mcQueUsr);
 
-	mcService.updateMcQueUsr(mcQueUsr);
-
-	List userAttempts = mcService.getLatestAttemptsForAUser(mcQueUsr.getUid());
-
-	Iterator itAttempts = userAttempts.iterator();
-	while (itAttempts.hasNext()) {
-	    McUsrAttempt mcUsrAttempt = (McUsrAttempt) itAttempts.next();
-	    mcUsrAttempt.setFinished(true);
-	    mcService.updateMcUsrAttempt(mcUsrAttempt);
-	}
-
 	response.sendRedirect(nextUrl);
 
 	return null;

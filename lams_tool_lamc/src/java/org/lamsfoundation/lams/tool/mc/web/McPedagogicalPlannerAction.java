@@ -134,7 +134,7 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 			    McCandidateAnswersDTO answerDTO = candidateAnswerDTOList.get(candidateAnswerDTOIndex);
 			    McOptsContent candidateAnswer = new McOptsContent(candidateAnswerDTOIndex + 1,
 				    McAppConstants.CORRECT.equals(answerDTO.getCorrect()),
-				    answerDTO.getCandidateAnswer(), mcQueContent, null);
+				    answerDTO.getCandidateAnswer(), mcQueContent);
 			    candidateAnswer.setMcQueContentId(mcQueContent.getMcContentId());
 			    candidateAnswers.add(candidateAnswer);
 			}

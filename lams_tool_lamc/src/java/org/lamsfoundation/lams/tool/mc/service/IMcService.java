@@ -90,11 +90,7 @@ public interface IMcService {
 
     public McOptsContent getMcOptionsContentByUID(Long uid) throws McApplicationException;
 
-    public void cleanAllQuestionsSimple(final Long mcContentUid) throws McApplicationException;
-
     public void resetAllQuestions(final Long mcContentUid) throws McApplicationException;
-
-    public void cleanAllQuestions(final Long mcContentUid) throws McApplicationException;
 
     public List refreshQuestionContent(final Long mcContentId) throws McApplicationException;
 
@@ -224,9 +220,6 @@ public interface IMcService {
     public InputStream downloadFile(Long uuid, Long versionID) throws McApplicationException;
 
     public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent)
-	    throws McApplicationException;
-
-    public List getAttemptByAttemptOrder(final Long queUsrId, final Long mcQueContentId, final Integer attemptOrder)
 	    throws McApplicationException;
 
     public McSession findMcSessionById(Long mcSessionId) throws McApplicationException;

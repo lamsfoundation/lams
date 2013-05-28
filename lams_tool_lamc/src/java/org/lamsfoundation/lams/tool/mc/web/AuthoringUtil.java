@@ -1468,7 +1468,7 @@ public class AuthoringUtil implements McAppConstants {
 	    // McOptsContent mcOptsContent = new McOptsContent(correctOption, candidateAnswer, mcQueContent, new
 	    // TreeSet());
 	    McOptsContent mcOptsContent = new McOptsContent(new Integer(displayOrder), correctOption, candidateAnswer,
-		    mcQueContent, new TreeSet());
+		    mcQueContent);
 
 	    mcService.saveMcOptionsContent(mcOptsContent);
 	}
