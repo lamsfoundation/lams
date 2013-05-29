@@ -5,7 +5,6 @@
 
 <lams:html>
 <lams:head>
-	<html:base />
 	<title><fmt:message key="label.learner.error" /></title>
 	
 	<%@ include file="/common/mobileheader.jsp"%>
