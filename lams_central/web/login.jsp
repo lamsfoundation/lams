@@ -39,7 +39,6 @@ j_security_login_page
 	<lams:css  style="core"/>
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	<script language="javascript" type="text/javascript" src="includes/javascript/AC_OETags.js"></script>
 	<script language="javascript" type="text/javascript" src="includes/javascript/browser_detect.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/sha1.js"></script>
 	<script>
@@ -76,21 +75,9 @@ j_security_login_page
 		   
 			  <div id="login-left-col">
 			    <h1><img src="<lams:LAMSURL/>/www/images/lams_login.gif" alt="LAMS - Learning Activity Management System" /></h1>
-			  	<!--Test if the browsers flash player meets requirements-->
+			  	<!--Test if the browsers meets requirements-->
 			  	<script language="JavaScript" type="text/javascript">
 			  		<!--			  		
-						var minFlashMajorVersion = 8; // Major version of Flash required
-						var minFlashMinorVersion = 0; // Minor version of Flash required
-						var minFlashRevision = 0; // Minor version of Flash required
-						
-						var hasRequiredFlashVersion = DetectFlashVer(minFlashMajorVersion, minFlashMinorVersion, minFlashRevision);
-						
-						if (!hasRequiredFlashVersion) {
-							// show error message
-							document.write('<div class=\"warning\"><fmt:message key="flash.min.error"/>');
-							document.write('<br><a href=\"http://get.adobe.com/flashplayer/\" target=\"_blank\"><fmt:message key="flash.download.player"/></a></div>');
-						}
-						
 						if(isBrowserNotCompatible()) {
 							// incompatible browser - show warning message
 							document.write('<div class=\"warning\"><fmt:message key="msg.browser.compat"/> <a href=\"http://getfirefox.com\" target=\"_blank\"><img src=\"images/firefox_logo.png\"></a>');
@@ -98,7 +85,7 @@ j_security_login_page
 						}
 						
 						function isBrowserNotCompatible() {
-							if(ie8 || ie7 || ie9) return false; // IE8 IE7 IE9
+							if(ie7 || ie8 || ie9 || ie10 ) return false; // IE8-IE10
 							else if(saf4) return false; //Safari4
 							else if(chrome) return false; //Chrome
 							else if(ie5xwin || ie5 || ie4 || ie5mac || ie5x || ie6) return true;
