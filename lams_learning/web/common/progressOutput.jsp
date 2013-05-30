@@ -60,7 +60,7 @@
 			<img src="<lams:LAMSURL/>/images/${image}" width="10"/>
 			<c:choose>
 				<c:when test="${includeActivity.status==1 || includeActivity.floating}">
-					<a href="#" onclick="javascript:openPopUp('${includeActivity.url}', 'LearnerActivity', 600, 800, true, true, true, false, false);">
+					<a href="#" onclick="javascript:openPopUp('${includeActivity.url}', 'LearnerActivity', 600, 800, 'yes', true, true, false, false);">
 				</c:when>
 				<c:otherwise>
 					<a href="#" onclick="javascript:loadFrame('${includeActivity.url}');">
