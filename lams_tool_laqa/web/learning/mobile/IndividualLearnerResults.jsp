@@ -135,7 +135,7 @@
 				<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
 				    <div class="space-bottom-top align-right">
 						<a href="#nogo" name="endLearning" id="finishButton"
-							onclick="javascript:submitMethod('storeAllResults');return false" data-icon="arrow-r" data-theme="b">
+							onclick="javascript:submitMethod('storeAllResults');return false" data-role="button" data-icon="arrow-r" data-theme="b">
 							<span class="nextActivity">
 								<c:choose>
 				 					<c:when test="${sessionMap.activityPosition.last}">
