@@ -104,7 +104,7 @@
 	
 	
 	<!-- Dropdown menu for choosing a question from question bank -->
-	<c:if test="${not empty availableQuestions}">
+	<c:if test="${fn:length(sessionMap.questionReferences) < fn:length(sessionMap.questionList)}">
 		<p>
 			<select id="questionSelect" style="float: left">
 				<c:if test="${fn:length(availableQuestions) > 1}">

@@ -1008,11 +1008,11 @@ public class AuthoringAction extends Action {
 
 	int questionIdx = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_QUESTION_INDEX), -1);
 	if (questionIdx != -1) {
-	    SortedSet<AssessmentQuestion> assessmentList = getQuestionList(sessionMap);
-	    List<AssessmentQuestion> rList = new ArrayList<AssessmentQuestion>(assessmentList);
+	    SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
+	    List<AssessmentQuestion> rList = new ArrayList<AssessmentQuestion>(questionList);
 	    AssessmentQuestion question = rList.remove(questionIdx);
-	    assessmentList.clear();
-	    assessmentList.addAll(rList);
+	    questionList.clear();
+	    questionList.addAll(rList);
 	    // add to delList
 	    List delList = getDeletedQuestionList(sessionMap);
 	    delList.add(question);
@@ -1026,11 +1026,18 @@ public class AuthoringAction extends Action {
 		    questionReferenceToDelete = questionReference;
 		}
 	    }
+	    //check if we need to delete random question reference
+	    if ((questionReferenceToDelete == null) && (questionReferences.size() > questionList.size())) {
+		//find the first random question
+		for (QuestionReference questionReference : questionReferences) {
+		    if (questionReference.isRandomQuestion()) {
+			questionReferenceToDelete = questionReference;
+			break;
+		    }
+		}
+	    }
 	    if (questionReferenceToDelete != null) {
-		List<QuestionReference> rRefList = new ArrayList<QuestionReference>(questionReferences);
-		rRefList.remove(questionReferenceToDelete.getSequenceId() - 1);
-		questionReferences.clear();
-		questionReferences.addAll(rRefList);
+		questionReferences.remove(questionReferenceToDelete);
 		// add to delList
 		List<QuestionReference> delReferencesList = getDeletedQuestionReferences(sessionMap);
 		delReferencesList.add(questionReferenceToDelete);
