@@ -362,7 +362,7 @@ public class GradebookAction extends LamsDispatchAction {
 
     	if (lesson != null && learner != null) {
     	    GradebookUserLesson lessonMark = gradebookService.getGradebookUserLesson(lessonID, userID);
-    	    writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, lessonMark.getMark().toString());
+    	    writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, GradebookUtil.niceFormatting(lessonMark.getMark()));
     	} else {
     	    // Grid will handle error, just log and return null
     	    logger.error("Error: request for course gradebook data with null user or lesson. lessonID: " + lessonID);
@@ -406,7 +406,7 @@ public class GradebookAction extends LamsDispatchAction {
     	    Double averageMark = gradebookService.getAverageMarkForActivity(activityID, groupID);
     	    
     	    if (averageMark != null) {
-    		writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, averageMark.toString());
+    		writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, GradebookUtil.niceFormatting(averageMark));
     	    } else {
     		writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, GradebookConstants.CELL_EMPTY);
     	    }
@@ -439,7 +439,7 @@ public class GradebookAction extends LamsDispatchAction {
     	    Double averageMark = gradebookService.getAverageMarkForLesson(lessonID);
     	    
     	    if (averageMark != null) {
-    		writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, averageMark.toString());
+    		writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, GradebookUtil.niceFormatting(averageMark));
     	    } else {
     		writeResponse(response, CONTENT_TYPE_TEXT_PLAIN, ENCODING_UTF8, GradebookConstants.CELL_EMPTY);
     	    }

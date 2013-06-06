@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.Set;
 
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
+import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
@@ -107,8 +108,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(startDate != null ? convertDateToString(startDate, DEFAULT_DATE_FORMAT) : CELL_EMPTY);
 	    ret.add(timeTaken != null ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(feedback);
-	    
-	    ret.add(markToString());
+	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 
 	} else if (view == GBGridView.MON_ACTIVITY) {
 	    
@@ -123,19 +123,17 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    
 	    ret.add((averageTimeTaken != null) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
 	    ret.add(competences);
+	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 	    
-	    
-	    ret.add(averageMarkToString());
 	} else if (view == GBGridView.LRN_ACTIVITY) {
 	    ret.add(rowName);
 	    ret.add(status);
 	    ret.add(feedback);
 	    ret.add((averageTimeTaken != null) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
-	    ret.add(averageMarkToString()); 
+	    ret.add(averageMark != null ? GradebookUtil.niceFormatting(averageMark) : CELL_EMPTY); 
+	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);  
 	    
-	    
-	    ret.add(markToString()); 
 	}
 	
 	return ret;

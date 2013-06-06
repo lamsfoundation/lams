@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -176,7 +177,15 @@ public class GradebookUtil {
 
 	return xml;
     }
-
+    
+    public static String niceFormatting(Double mark) {
+    	
+    	String markStr = new DecimalFormat("##0.00").format(mark);
+    	return markStr;
+    	
+    }
+    
+    
     private static Document getDocument() throws ParserConfigurationException {
 	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	DocumentBuilder builder = factory.newDocumentBuilder();

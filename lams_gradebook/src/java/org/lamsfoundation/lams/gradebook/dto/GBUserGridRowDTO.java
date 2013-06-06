@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
+import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.usermanagement.User;
 
 public class GBUserGridRowDTO extends GradebookGridRowDTO {
@@ -63,9 +64,8 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(status);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(feedback);
-	    //ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
-	    ret.add(markToString());
-	    
+	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
+	    	    
 	} else if (view == GBGridView.MON_ACTIVITY){
 	    
 	    ret.add(marksAvailable != null ? marksAvailable.toString() : "");
@@ -80,16 +80,14 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add((output != null) ? output.toString() : CELL_EMPTY);
 	    ret.add(feedback);
-	    //ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
-	    ret.add(markToString());
+	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 	    
 	} else if (view == GBGridView.MON_COURSE){
 	    ret.add(rowName);
 	    ret.add(status);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(feedback);
-	    //ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
-	    ret.add(markToString());
+	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 	}
 
 	return ret;

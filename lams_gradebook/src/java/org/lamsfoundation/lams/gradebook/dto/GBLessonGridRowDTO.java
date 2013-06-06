@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.gradebook.dto;
 import java.util.ArrayList;
 
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
+import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 
 public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 
@@ -61,7 +62,7 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(subGroup);
 	    ret.add(startDate);
 	    ret.add((averageTimeTaken != null && averageTimeTaken != 0) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
-	    ret.add((averageMark != null) ? averageMark.toString() : CELL_EMPTY);
+	    ret.add((averageMark != null) ? GradebookUtil.niceFormatting(averageMark) : CELL_EMPTY);
 	    
 	} else if ((view == GBGridView.LRN_COURSE) || (view == GBGridView.MON_USER)) {
 	    if (gradebookLearnerURL != null && gradebookLearnerURL.length() != 0) {
@@ -77,8 +78,8 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 	    ret.add((finishDate != null) ? finishDate : CELL_EMPTY);
 	    ret.add((averageTimeTaken != null && averageTimeTaken != 0) ? toItalic(convertTimeToString(averageTimeTaken)) : CELL_EMPTY);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
-	    ret.add((averageMark != null) ? toItalic(averageMark.toString()) : CELL_EMPTY);
-	    ret.add((mark != null) ? mark.toString() : CELL_EMPTY);
+	    ret.add((averageMark != null) ? toItalic(GradebookUtil.niceFormatting(averageMark)) : CELL_EMPTY);
+	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 	    
 	}
 	return ret;
@@ -131,6 +132,5 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
     public void setFinishDate(String finishDate) {
         this.finishDate = finishDate;
     }
-    
     
 }
