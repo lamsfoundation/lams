@@ -16,8 +16,8 @@
 		<title>
 			<fmt:message key="activity.title" />
 		</title>
-		<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 		<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
+		<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>

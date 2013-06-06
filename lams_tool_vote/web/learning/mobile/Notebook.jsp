@@ -37,8 +37,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<title><fmt:message key="activity.title" />
 	</title>
 	
-	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
+	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
 	<script language="JavaScript" type="text/JavaScript">

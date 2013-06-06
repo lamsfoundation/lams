@@ -17,11 +17,11 @@
 	<html:base />
 	<title><fmt:message key="activity.title" /></title>
 
-	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.jRating.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 	<style media="screen,projection" type="text/css">
 		.rating-stars-div {margin-top: 8px;}
 		.user-answer {padding: 7px 2px;}

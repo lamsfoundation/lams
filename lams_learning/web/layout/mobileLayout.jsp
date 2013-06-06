@@ -45,8 +45,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:set var="lams">
 				<lams:LAMSURL />
 			</c:set>
-			<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 			<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
+			<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 			
 			<script src="${lams}includes/javascript/AC_RunActiveContent.js"	type="text/javascript"></script>
 			<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>

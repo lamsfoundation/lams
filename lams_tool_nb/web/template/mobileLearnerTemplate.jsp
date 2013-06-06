@@ -13,8 +13,8 @@
 <lams:html>
 <lams:head>
 	<title><fmt:message key="activity.title"/></title>
-	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
+	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 	
 	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>	

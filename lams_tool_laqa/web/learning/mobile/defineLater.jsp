@@ -14,8 +14,8 @@
 <lams:head>
 	<html:base />
 	<title><fmt:message key="activity.title" /></title>
-	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />	
+	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 </lams:head>
 
 <body>

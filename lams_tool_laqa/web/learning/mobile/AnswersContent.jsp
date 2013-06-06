@@ -22,8 +22,8 @@
 			color: white; padding: 5px 5px 5px 0px; text-align: center;
 		}
 	</style>
-	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
+	<link rel="stylesheet" href="${lams}css/defaultHTML_learner_mobile.css" />
 	
 	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
