@@ -38,55 +38,66 @@ import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
  * @author Mitchell Seaton
  */
 
-public interface ILearningDesignService{
-	
-	/**
-	 * Get the learning design DTO, suitable to send to Flash via WDDX 
-	 * @param learningDesignId
-	 * @param languageCode Two letter language code needed to I18N the help url
-	 * @return LearningDesignDTO
-	 */
-	public LearningDesignDTO getLearningDesignDTO(Long learningDesignID, String languageCode);
+public interface ILearningDesignService {
 
-	/**
-	 * This method calls other validation methods which apply the validation 
-	 * rules to determine whether or not the learning design is valid.
-	 *
-	 * @param learningDesign
-	 * @return list of validation errors
-	 */
-	public Vector<ValidationErrorDTO> validateLearningDesign(LearningDesign learningDesign);
-	
-	/**
-	 * Get the DTO list of all valid learning libraries, which equals getAllLearningLibraryDetails(true) method.
-	 * @return list of LearningLibraryDTO
-	 * @throws IOException
-	 */
-	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(String languageCode) throws IOException;
-	/**
-	 * Get the DTO list of all learning libraries whatever it is valid or not.
-	 * @param valid
-	 * @return
-	 * @throws IOException
-	 */
-	public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(boolean valid, String languageCode) throws IOException;
-	
-	/**
-	 * Set valid flag to learning library.
-	 * @param learningLibraryId
-	 * @param valid
-	 */
-	public void setValid(Long learningLibraryId, boolean valid);
-	
-	/**
-	 * Creates learning design SVG/PNG file. Also stores it into the file system for caching.
-	 * 
-	 * @param learningDesignId source learning design for the outcome image
-	 * @param imageFormat it can be either SVGGenerator.OUTPUT_FORMAT_SVG or SVGGenerator.OUTPUT_FORMAT_PNG
-	 * @return
-	 * @throws JDOMException
-	 * @throws IOException
-	 * @throws TranscoderException
-	 */
-	String createLearningDesignSVG(Long learningDesignId, int imageFormat) throws JDOMException, IOException, TranscoderException;
+    /**
+     * Get the learning design DTO, suitable to send to Flash via WDDX
+     * 
+     * @param learningDesignId
+     * @param languageCode
+     *            Two letter language code needed to I18N the help url
+     * @return LearningDesignDTO
+     */
+    public LearningDesignDTO getLearningDesignDTO(Long learningDesignID, String languageCode);
+
+    /**
+     * This method calls other validation methods which apply the validation rules to determine whether or not the
+     * learning design is valid.
+     * 
+     * @param learningDesign
+     * @return list of validation errors
+     */
+    public Vector<ValidationErrorDTO> validateLearningDesign(LearningDesign learningDesign);
+
+    /**
+     * Get the DTO list of all valid learning libraries, which equals getAllLearningLibraryDetails(true) method.
+     * 
+     * @return list of LearningLibraryDTO
+     * @throws IOException
+     */
+    public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(String languageCode) throws IOException;
+
+    /**
+     * Get the DTO list of all learning libraries whatever it is valid or not.
+     * 
+     * @param valid
+     * @return
+     * @throws IOException
+     */
+    public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(boolean valid, String languageCode)
+	    throws IOException;
+
+    /**
+     * Set valid flag to learning library.
+     * 
+     * @param learningLibraryId
+     * @param valid
+     */
+    public void setValid(Long learningLibraryId, boolean valid);
+
+    /**
+     * Creates learning design SVG/PNG file. Also stores it into the file system for caching.
+     * 
+     * @param learningDesignId
+     *            source learning design for the outcome image
+     * @param imageFormat
+     *            it can be either SVGGenerator.OUTPUT_FORMAT_SVG or SVGGenerator.OUTPUT_FORMAT_PNG
+     * @return
+     * @throws JDOMException
+     * @throws IOException
+     * @throws TranscoderException
+     */
+    String createLearningDesignSVG(Long learningDesignId, int imageFormat) throws IOException;
+
+    String createBranchingSVG(Long branchingActivityId, int imageFormat) throws IOException;
 }

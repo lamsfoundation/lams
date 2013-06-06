@@ -325,7 +325,9 @@ public interface IMonitoringService {
      * @return success message.
      */
     public String forceCompleteLessonByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId);
-
+    
+    public String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId);
+	
     /**
      * Archive the specified lesson. When archived, the data is retained but the
      * learners cannot access the details.

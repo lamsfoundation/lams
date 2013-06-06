@@ -51,10 +51,12 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ContributionTypes;
+import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
@@ -73,7 +75,9 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -637,7 +641,16 @@ public class MonitoringAction extends LamsDispatchAction {
 	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	    Integer learnerId = new Integer(WebUtil.readIntParam(request, MonitoringConstants.PARAM_LEARNER_ID));
 	    Integer requesterId = getUserId();
-	    String message = monitoringService.forceCompleteLessonByUser(learnerId, requesterId, lessonId, activityId);
+
+	    // true if old, Flash Monitoring is used; to be removed after new Monitoring is adopted
+	    boolean isPreviousActivity = WebUtil.readBooleanParam(request, "isPreviousActivity", true);
+	    String message = null;
+	    if (isPreviousActivity) {
+		message = monitoringService.forceCompleteLessonByUser(learnerId, requesterId, lessonId, activityId);
+	    } else {
+		message = monitoringService.forceCompleteActivitiesByUser(learnerId, requesterId, lessonId, activityId);
+	    }
+
 	    if (LamsDispatchAction.log.isDebugEnabled()) {
 		LamsDispatchAction.log.debug("Force complete for learner " + learnerId + " lesson " + lessonId + ". "
 			+ message);
@@ -1272,6 +1285,8 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward getLessonProgressJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Long branchingActivityId = WebUtil.readLongParam(request, "branchingActivityID", true);
+
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
@@ -1282,36 +1297,52 @@ public class MonitoringAction extends LamsDispatchAction {
 	// few details for each activity
 	Map<Long, JSONObject> activitiesMap = new TreeMap<Long, JSONObject>();
 	for (Activity activity : (Set<Activity>) lesson.getLearningDesign().getActivities()) {
-	    JSONObject activityJSON = new JSONObject();
-	    Long activityId = activity.getActivityId();
-	    activityJSON.put("id", activityId);
-	    String monitorUrl = monitoringService.getActivityMonitorURL(lessonId, activityId, contentFolderId,
-		    monitorUserId);
-	    if (monitorUrl != null) {
-		// whole activity monitor URL
-		activityJSON.put("url", monitorUrl);
+	    if ((branchingActivityId == null) || MonitoringAction.isBranchingChild(branchingActivityId, activity)) {
+		Long activityId = activity.getActivityId();
+		JSONObject activityJSON = new JSONObject();
+		activityJSON.put("id", activityId);
+
+		if (activity.isBranchingActivity()) {
+		    activityJSON.put("isBranching", true);
+		} else {
+		    String monitorUrl = monitoringService.getActivityMonitorURL(lessonId, activityId, contentFolderId,
+			    monitorUserId);
+		    if (monitorUrl != null) {
+			// whole activity monitor URL
+			activityJSON.put("url", monitorUrl);
+		    }
+		}
+		activitiesMap.put(activityId, activityJSON);
 	    }
-	    activitiesMap.put(activityId, activityJSON);
 	}
 
 	JSONObject responseJSON = new JSONObject();
 	for (LearnerProgress learnerProgress : (Set<LearnerProgress>) lesson.getLearnerProgresses()) {
 	    User learner = learnerProgress.getUser();
-	    JSONObject learnerJSON = MonitoringAction.userToJSON(learner);
 	    if (learnerProgress.isComplete()) {
+		JSONObject learnerJSON = MonitoringAction.userToJSON(learner);
 		// no more details are needed for learners who completed the lesson
 		responseJSON.append("completedLearners", learnerJSON);
 	    } else {
 		Activity currentActivity = learnerProgress.getCurrentActivity();
-		if (currentActivity != null) {
-		    Long activityId = currentActivity.getActivityId();
+		if ((currentActivity != null)
+			&& ((branchingActivityId == null) || MonitoringAction.isBranchingChild(branchingActivityId,
+				currentActivity))) {
+		    JSONObject learnerJSON = MonitoringAction.userToJSON(learner);
+		    Long currentActivityId = currentActivity.getActivityId();
 		    // monitoring URL for the given learner
-		    String learnerUrl = monitoringService.getLearnerActivityURL(lessonId, activityId,
+		    String learnerUrl = monitoringService.getLearnerActivityURL(lessonId, currentActivityId,
 			    learner.getUserId(), monitorUserId);
 		    learnerJSON.put("url", learnerUrl);
 
-		    JSONObject currentActivityJSON = activitiesMap.get(currentActivity.getActivityId());
-		    currentActivityJSON.append("learners", learnerJSON);
+		    Activity parentActivity = currentActivity.getParentActivity();
+		    Long targetActivityId = (branchingActivityId != null) || (parentActivity == null)
+			    || (parentActivity.getParentActivity() == null)
+			    || !parentActivity.getParentActivity().isBranchingActivity() ? currentActivity
+			    .getActivityId() : parentActivity.getParentActivity().getActivityId();
+
+		    JSONObject targetActivityJSON = activitiesMap.get(targetActivityId);
+		    targetActivityJSON.append("learners", learnerJSON);
 		}
 	    }
 	}
@@ -1412,6 +1443,23 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	PrintWriter writer = response.getWriter();
 	writer.println(flashMessage.serializeMessage());
+	return null;
+    }
+
+    public ActionForward startLiveEdit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws LearningDesignException, UserException, IOException {
+	long learningDesignId = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
+	Integer userID = getUserId();
+
+	IAuthoringService authoringService = MonitoringServiceProxy.getAuthoringService(getServlet()
+		.getServletContext());
+
+	if (authoringService.setupEditOnFlyLock(learningDesignId, userID)) {
+	    authoringService.setupEditOnFlyGate(learningDesignId, userID);
+	} else {
+	    response.getWriter().write("Someone else is editing the design at the moment.");
+	}
+
 	return null;
     }
 
@@ -1680,5 +1728,14 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 	}
 	return result;
+    }
+
+    private static boolean isBranchingChild(Long branchingActivityId, Activity activity) {
+	if ((branchingActivityId == null) || (activity == null)) {
+	    return false;
+	}
+	Activity parentActivity = activity.getParentActivity();
+	return (parentActivity != null) && (parentActivity.getParentActivity() != null)
+		&& parentActivity.getParentActivity().getActivityId().equals(branchingActivityId);
     }
 }

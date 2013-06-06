@@ -164,8 +164,14 @@ div#sequenceCanvas svg {
 	overflow: hidden;
 }
 
+#closeBranchingButton {
+	font-weight: bold;
+	margin-right: 40px;
+	display: none;
+}
+
 img#sequenceCanvasLoading {
-	padding: 5px 0 0 370px;
+	padding: 5px 0 0 100px;
 	display: none;
 }
 

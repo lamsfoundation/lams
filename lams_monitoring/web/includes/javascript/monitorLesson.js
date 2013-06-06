@@ -1,9 +1,12 @@
 ﻿// ********** GLOBAL VARIABLES **********
-// copy of lesson SVG so it does no need to be fetched every time
+// copy of lesson/branching SVG so it does no need to be fetched every time
 // HTML with SVG of the lesson
 var originalSequenceCanvas = null;
-// DIV container for lesson SVG; it gets accessed so many times it's worth to cache it here
+// DIV container for lesson/branching SVG
+// it gets accessed so many times it's worth to cache it here
 var sequenceCanvas = null;
+// ID of currently shown branching activity; if NULL, the whole lesson is shown
+var sequenceBranchingId = null;
 // how learners in pop up lists are currently sorted
 var sortOrderAsc = {
 	learnerGroup : false,
@@ -489,11 +492,17 @@ function updateSequenceTab() {
 			data : {
 				'method'    : 'createLearningDesignThumbnail',
 				'svgFormat' : 1,
-				'ldId'      : ldId
+				'ldId'      : ldId,
+				'branchingActivityID' : sequenceBranchingId
 			},
 			success : function(response) {
 				originalSequenceCanvas = response;
-				sequenceCanvas = $('#sequenceCanvas').html(originalSequenceCanvas);
+				sequenceCanvas = $('#sequenceCanvas')
+					// remove previously set padding and dimensions, if any
+					.removeAttr('style')
+					.html(originalSequenceCanvas)
+					// if it was faded out by showBranchingSequence()
+					.fadeIn();
 				
 				var canvasHeight = sequenceCanvas.height();
 				var canvasWidth = sequenceCanvas.width();
@@ -533,12 +542,13 @@ function updateSequenceTab() {
 		cache : false,
 		data : {
 			'method'    : 'getLessonProgressJSON',
-			'lessonID'  : lessonId
+			'lessonID'  : lessonId,
+			'branchingActivityID' : sequenceBranchingId
 		},		
 		success : function(response) {
 			// remove the loading animation
 			$('img#sequenceCanvasLoading', sequenceTopButtonsContainer).remove();
-			
+
 			var learnerCount = 0;
 			$.each(response.activities, function(){
 				if (this.learners) {
@@ -562,12 +572,22 @@ function updateSequenceTab() {
 			$.each(response.activities, function(activityIndex, activity){
 				addLearnerIconsHandlers(activity);
 				
-				if (activity.url) {
-					var activityGroup = $('g#' + activity.id, sequenceCanvas);
-					activityGroup.css('cursor', 'pointer').dblclick(function(){
-						// double click on activity shape to open Monitoring for this activity
-						openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true);
-					});
+				if (activity.url || activity.isBranching) {
+					// find activity group, if it is not hidden
+					$('g#' + activity.id, sequenceCanvas)
+						.css('cursor', 'pointer')
+						.dblclick(
+							// different behaviour for regular/branching activities
+							activity.isBranching ? 
+							function(){
+								showBranchingSequence(activity.id);
+							}
+							:
+							function(){
+								// double click on activity shape to open Monitoring for this activity
+								openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true);
+							}
+					);
 				}
 			});	
 			
@@ -603,7 +623,7 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 		var actEndY = actY + actHeight;
 		
 		if (x >= actX && x<= actEndX && y>= actY && y<=actEndY) {
-			var previousActivityId = null;
+			var targetActivityId = null;
 			var executeForceComplete = false;
 			
 			if (act.attr('id') == 'completedLearnersContainer') {
@@ -612,12 +632,6 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 			} else {
 				var targetActivityId = act.parent().attr('id');
 				if (currentActivityId != targetActivityId) {
-					var transitionLine = $('line[id$="to_' + targetActivityId + '"]:not([id^="arrow"])'
-							,sequenceCanvas);
-					// if move to start of sequence, the value is -1
-					previousActivityId = transitionLine.length == 1 ?
-							transitionLine.attr('id').split('_')[0] : -1;
-					
 					var targetActivityName = act.is('polygon') ? "Gate" 
 							: act.siblings('text[id^="TextElement"]').text();
 					executeForceComplete = confirm(FORCE_COMPLETE_ACTIVITY_CONFIRM_LABEL
@@ -635,7 +649,7 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 						'method'     : 'forceComplete',
 						'lessonID'   : lessonId,
 						'learnerID'  : learnerId,
-						'activityID' : previousActivityId
+						'activityID' : targetActivityId
 					},
 					success : function(response) {
 						// inform user of result
@@ -674,6 +688,9 @@ function addLearnerIcons(activity) {
 			var polygonStartPoints = polygonPoints[4].split(',');
 			actX = +polygonStartPoints[0];
 			actY = +polygonStartPoints[1] - 10;
+		} else {
+			// unknown or invisible shape (System Gate?)
+			return;
 		}
 	} else {
 		actX = +activityShape.attr('x') + 1;
@@ -710,6 +727,7 @@ function addLearnerIcons(activity) {
 			appendXMLElement('title', null, groupTitle, element);
 			// stop processing learners
 			return false;
+			
 		} else {
 			/* make an icon for each learner */
 			var element = appendXMLElement('image', {
@@ -734,53 +752,59 @@ function addLearnerIcons(activity) {
  * After SVG refresh, add click/dblclick/drag handlers to user icons.
  */
 function addLearnerIconsHandlers(activity) {
-	if (activity.learners) {
-		var activityGroup = $('g#' + activity.id, sequenceCanvas);
-		// gate activity does not allows users' view
-		var usersViewable = $('polygon', activityGroup).length == 0;
-		
-		$.each(activity.learners, function(learnerIndex, learner){
-			var learnerIcon = $('image[id="act' + activity.id + 'learner' + learner.id + '"]'
-					,activityGroup);
-			learnerIcon .css('cursor', 'pointer')
-			  // drag learners to force complete activities
-			  .draggable({
-				'appendTo'    : '#tabSequence',
-				'containment' : '#tabSequence',
-			    'distance'    : 20,
-			    'scroll'      : false,
-			    'cursorAt'	  : {'left' : 10, 'top' : 15},
-				'helper'      : function(event){
-					// copy of the icon for dragging
-					return $('<img />').attr('src', LAMS_URL + 'images/icons/user.png');
-				},
-				'stop' : function(event, ui) {
-					// jQuery droppable does not work for SVG, so this is a workaround
-					forceComplete(activity.id, learner.id, getLearnerDisplayName(learner),
-							      ui.offset.left, ui.offset.top);
-				}
-			});
-			
-			if (usersViewable) {
-				learnerIcon.dblclick(function(event){
-					 // double click on learner icon to see activity from his perspective
-					event.stopPropagation();
-					openPopUp(LAMS_URL + learner.url, "LearnActivity", 600, 800, true);
-				});
+	if (!activity.learners) {
+		return;
+	}
+	
+	var activityGroup = $('g#' + activity.id, sequenceCanvas);
+	if (activityGroup.length == 0) {
+		// the activity is probably hidden (branching child, system gate)
+		return;
+	}
+	// gate activity does not allows users' view
+	var usersViewable = $('polygon', activityGroup).length == 0;
+	
+	$.each(activity.learners, function(learnerIndex, learner){
+		var learnerIcon = $('image[id="act' + activity.id + 'learner' + learner.id + '"]'
+				,activityGroup);
+		learnerIcon .css('cursor', 'pointer')
+		  // drag learners to force complete activities
+		  .draggable({
+			'appendTo'    : '#tabSequence',
+			'containment' : '#tabSequence',
+		    'distance'    : 20,
+		    'scroll'      : false,
+		    'cursorAt'	  : {'left' : 10, 'top' : 15},
+			'helper'      : function(event){
+				// copy of the icon for dragging
+				return $('<img />').attr('src', LAMS_URL + 'images/icons/user.png');
+			},
+			'stop' : function(event, ui) {
+				// jQuery droppable does not work for SVG, so this is a workaround
+				forceComplete(activity.id, learner.id, getLearnerDisplayName(learner),
+						      ui.offset.left, ui.offset.top);
 			}
 		});
 		
-		
-		var learnerGroupIcon = $('*[id^="act' + activity.id + 'learnerGroup"]', activityGroup);
-		// 0 is for no group icon, 2 is for icon + digits
-		if (learnerGroupIcon.length == 2) {
-			var activityName = $('text[id^="TextElement"]', activityGroup).text();
-			learnerGroupIcon.dblclick(function(event){
+		if (usersViewable) {
+			learnerIcon.dblclick(function(event){
 				 // double click on learner icon to see activity from his perspective
 				event.stopPropagation();
-				showLearnerGroupDialog(activity.id, activityName, activity.learners, true, usersViewable);
-			})
+				openPopUp(LAMS_URL + learner.url, "LearnActivity", 600, 800, true);
+			});
 		}
+	});
+	
+	
+	var learnerGroupIcon = $('*[id^="act' + activity.id + 'learnerGroup"]', activityGroup);
+	// 0 is for no group icon, 2 is for icon + digits
+	if (learnerGroupIcon.length == 2) {
+		var activityName = $('text[id^="TextElement"]', activityGroup).text();
+		learnerGroupIcon.dblclick(function(event){
+			 // double click on learner icon to see activity from his perspective
+			event.stopPropagation();
+			showLearnerGroupDialog(activity.id, activityName, activity.learners, true, usersViewable);
+		})
 	}
 }
 
@@ -933,6 +957,55 @@ function fillClassDialogList(listId, users, disableCreator) {
 }
 
 
+/**
+ * Opens Authoring for live edit.
+ */
+function openLiveEdit(){
+	if (confirm(LIVE_EDIT_CONFIRM_LABEL)) {
+		$.ajax({
+			dataType : 'text',
+			url : LAMS_URL + 'monitoring/monitoring.do',
+			cache : false,
+			async : false,
+			data : {
+				'method'    : 'startLiveEdit',
+				'ldId'      : ldId
+			},
+			success : function(response) {
+				if (response) {
+					alert(response);
+				} else {
+					openPopUp(LAMS_URL + 'home.do?method=author&layout=editonfly&learningDesignID=' + ldId,
+							'Live Edit', 600, 800, false);
+					window.parent.closeMonitorLessonDialog();
+				}
+			}
+		});	
+	}
+}
+
+
+/**
+ * Replaces canvas with the given branchin activity contents
+ */
+function showBranchingSequence(branchingActivityId){
+	sequenceBranchingId = branchingActivityId;
+	originalSequenceCanvas = null;
+	$('#closeBranchingButton').show();
+	sequenceCanvas.fadeOut(function(){
+		sequenceCanvas.html(null);
+		updateSequenceTab();
+	});
+}
+
+
+/**
+ * Shows Learning Design in canvas.
+ */
+function closeBranchingSequence(){
+	showBranchingSequence(null);
+	$('#closeBranchingButton').hide();
+}
 
 //********** LEARNERS TAB FUNCTIONS **********
 

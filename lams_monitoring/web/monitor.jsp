@@ -71,7 +71,9 @@
 		var EXPORT_PORTFOLIO_LEARNER_TOOLTIP_LABEL = '<fmt:message key="button.export.learner.tooltip"/>';
 	    var TIME_CHART_LABEL = '<fmt:message key="button.timechart"/>';
 	    var TIME_CHART_TOOLTIP_LABEL = '<fmt:message key="button.timechart.tooltip"/>';
-	    	
+		var LIVE_EDIT_CONFIRM_LABEL = '<fmt:message key="button.live.edit.confirm"/>';
+	    
+	    
 		$(document).ready(function(){
 			$('#tabs').tabs();
 			
@@ -280,15 +282,26 @@
 	<div id="tabSequence">
 		<div id="sequenceTopButtonsContainer" class="topButtonsContainer">
 			<a target="_blank" class="button" title="<fmt:message key='button.help.tooltip'/>"
-			 href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringsequence">
-			 <fmt:message key="button.help"/></a>
-			 <a class="button" title="<fmt:message key='button.refresh.tooltip'/>"
-			 href="#" onClick="javascript:refreshMonitor('sequence')">
-			 <fmt:message key="button.refresh"/></a>
-			 <a class="button" title="<fmt:message key='button.export.tooltip'/>"
-			 href="#"
-			 onClick="javascript:openWindow('<lams:LAMSURL/>learning/exportWaitingPage.jsp?mode=teacher&lessonID=${lesson.lessonID}', '<fmt:message key="button.export"/>', 640, 240)">
-			 <fmt:message key="button.export"/></a>
+			   href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringsequence">
+			   <fmt:message key="button.help"/></a>
+			<a class="button" title="<fmt:message key='button.refresh.tooltip'/>"
+			   href="#" onClick="javascript:refreshMonitor('sequence')">
+			   <fmt:message key="button.refresh"/></a>
+			<a class="button" title="<fmt:message key='button.export.tooltip'/>"
+			   href="#"
+			   onClick="javascript:openPopUp('<lams:LAMSURL/>learning/exportWaitingPage.jsp?mode=teacher&lessonID=${lesson.lessonID}', '<fmt:message key="button.export"/>', 240, 640, true)">
+			   <fmt:message key="button.export"/></a>
+			<c:if test="${lesson.liveEditEnabled}">
+				<a class="button" title="<fmt:message key='button.live.edit.tooltip'/>"
+			       href="#"
+			  	   onClick="javascript:openLiveEdit()">
+				 <fmt:message key='button.live.edit'/></a>
+			</c:if>
+			<a class="button" title="<fmt:message key='button.close.branching.tooltip'/>"
+			  id="closeBranchingButton"
+			  href="#"
+			  onClick="javascript:closeBranchingSequence()">
+			 <fmt:message key='button.close.branching'/></a>
 		</div>
 		<div id="sequenceCanvas"></div>
 		<div id="completedLearnersContainer" title="<fmt:message key='force.complete.end.lesson.tooltip' />">
@@ -329,9 +342,16 @@
 						   onChange="javascript:loadLearnerProgressPage()" />
 				</td>
 				<td class="topButtonsContainer">
+					<a target="_blank" class="button" title="<fmt:message key='button.help.tooltip'/>"
+			   		   href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringlearners">
+			   		   <fmt:message key="button.help"/></a>
 					<a class="button" title="<fmt:message key='button.refresh.tooltip'/>"
 					   href="#" onClick="javascript:refreshMonitor('learners')">
-					<fmt:message key="button.refresh"/></a>
+					   <fmt:message key="button.refresh"/></a>
+					<a class="button" title="<fmt:message key='button.journal.entries.tooltip'/>"
+			   		   href="#"
+			           onClick="javascript:openPopUp('<lams:LAMSURL/>learning/notebook.do?method=viewAllJournals&lessonID=${lesson.lessonID}', '<fmt:message key="button.journal.entries"/>', 570, 796, true)">
+			           <fmt:message key="button.journal.entries"/></a>
 				</td>
 			</tr>
 		</table>

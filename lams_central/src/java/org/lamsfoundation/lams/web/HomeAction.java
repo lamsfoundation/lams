@@ -420,8 +420,13 @@ public class HomeAction extends DispatchAction {
 	Long learningDesignId = WebUtil.readLongParam(req, CentralConstants.PARAM_LEARNING_DESIGN_ID);
 	Integer format = WebUtil.readIntParam(req, CentralConstants.PARAM_SVG_FORMAT, true);
 	format = format == null ? SVGGenerator.OUTPUT_FORMAT_PNG : format;
-
-	String imagePath = getLearningDesignService().createLearningDesignSVG(learningDesignId, format);
+	Long branchingActivityId = WebUtil.readLongParam(req, "branchingActivityID", true);
+	String imagePath = null;
+	if (branchingActivityId == null) {
+	    imagePath = getLearningDesignService().createLearningDesignSVG(learningDesignId, format);
+	} else {
+	    imagePath = getLearningDesignService().createBranchingSVG(branchingActivityId, format);
+	}
 
 	res.setContentType(format == SVGGenerator.OUTPUT_FORMAT_PNG ? "image/png" : "image/svg+xml");
 	OutputStream output = res.getOutputStream();

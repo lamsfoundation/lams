@@ -18,9 +18,9 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.webservice;
 
 import java.io.File;
@@ -51,7 +51,7 @@ public class LearningDesignSVGServlet extends HttpServlet {
     private static Logger log = Logger.getLogger(LearningDesignSVGServlet.class);
 
     private static IntegrationService integrationService = null;
-    
+
     private ILearningDesignService learningDesignService;
 
     /**
@@ -60,13 +60,13 @@ public class LearningDesignSVGServlet extends HttpServlet {
      * This method is called when a form has its tag value method equals to get.
      * 
      * @param request
-     *                the request send by the client to the server
+     *            the request send by the client to the server
      * @param response
-     *                the response send by the server to the client
+     *            the response send by the server to the client
      * @throws ServletException
-     *                 if an error occurred
+     *             if an error occurred
      * @throws IOException
-     *                 if an error occurred
+     *             if an error occurred
      */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -87,7 +87,8 @@ public class LearningDesignSVGServlet extends HttpServlet {
 	    }
 
 	    // check imageFormat parameter is correct
-	    if (!(imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG) && !(imageFormat == SVGGenerator.OUTPUT_FORMAT_PNG)) {
+	    if (!(imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG) && !(imageFormat == SVGGenerator.OUTPUT_FORMAT_PNG)
+		    && !(imageFormat == SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY)) {
 		String msg = "Image format parameter is incorrect";
 		log.error(msg);
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
@@ -111,39 +112,40 @@ public class LearningDesignSVGServlet extends HttpServlet {
 		contentType = "image/svg+xml";
 	    } else {
 		contentType = "image/png";
-	    }	    
+	    }
 	    response.setContentType(contentType);
-	   
+
 	    String imagePath = learningDesignService.createLearningDesignSVG(learningDesignId, imageFormat);
-	    
+
 	    OutputStream output = response.getOutputStream();
 	    FileInputStream input = new FileInputStream(imagePath);
 	    IOUtils.copy(input, output);
 	    IOUtils.closeQuietly(input);
 	    IOUtils.closeQuietly(output);
-	    
+
 	} catch (Exception e) {
 	    log.error("Problem with LearningDesignRepositoryServlet request", e);
-	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Problem with LearningDesignRepositoryServlet request");
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+		    "Problem with LearningDesignRepositoryServlet request");
 	}
 
     }
-    
+
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	doGet(request, response);
+	doGet(request, response);
     }
 
     /**
      * Initialization of the servlet. <br>
      * 
      * @throws ServletException
-     *                 if an error occure
+     *             if an error occure
      */
     public void init() throws ServletException {
 	integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("integrationService");	
-	
-	learningDesignService = (ILearningDesignService) WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext())
-		.getBean("learningDesignService");
+		getServletContext()).getBean("integrationService");
+
+	learningDesignService = (ILearningDesignService) WebApplicationContextUtils.getRequiredWebApplicationContext(
+		getServletContext()).getBean("learningDesignService");
     }
 }

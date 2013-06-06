@@ -1334,7 +1334,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @throws LamsToolServiceException
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#forceCompleteLessonByUser(Integer,long,long)
      */
-    public String forceCompleteLessonByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId) {
+    public String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId) {
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	checkOwnerOrStaffMember(requesterId, lesson, "force complete");
 
@@ -1344,31 +1344,83 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	Activity stopActivity = null;
 
 	if (activityId != null) {
-	    // -1 means back to start of the lesson
-	    if (activityId != -1L) {
-		stopActivity = activityDAO.getActivityByActivityId(activityId);
-		if (stopActivity == null) {
-		    throw new MonitoringServiceException("Activity missing. Activity id" + activityId);
-		}
+	    stopActivity = getActivityById(activityId);
+	    if (stopActivity == null) {
+		throw new MonitoringServiceException("Activity missing. Activity id" + activityId);
 	    }
 
 	    // check if activity is already complete
+	    Activity parentActivity = stopActivity.getParentActivity();
+
+	    // if user is moved into branch, see if he is allowed to do that
+	    if (parentActivity != null && parentActivity.isSequenceActivity()) {
+		SequenceActivity sequenceActivity = (SequenceActivity) parentActivity;
+		Group group = sequenceActivity.getSoleGroupForBranch();
+		if ((group == null) || !group.hasLearner(learner)) {
+		    return "User is not assigned to the chosen branch";
+		}
+	    }
+
+	    // check if the target activity or its parents were completed
+	    // if yes, we move user backward, otherwise forward
 	    if ((learnerProgress != null)
-		    && ((activityId == -1L) || learnerProgress.getCompletedActivities().containsKey(stopActivity))) {
-		// if activityID == -1, then stopActivity == null and the method understands it
+		    && (learnerProgress.getCompletedActivities().containsKey(stopActivity) || ((parentActivity != null) && (learnerProgress
+			    .getCompletedActivities().containsKey(parentActivity) || ((parentActivity
+			    .getParentActivity() != null) && learnerProgress.getCompletedActivities().containsKey(
+			    parentActivity.getParentActivity())))))) {
 		return forceUncompleteActivity(learnerProgress, stopActivity);
+	    }
+	}
+
+	Activity currentActivity = learnerProgress.getCurrentActivity();
+	Activity stopPreviousActivity = null;
+	if (stopActivity != null) {
+	    // force complete operates on previous activity, not target
+	    stopPreviousActivity = stopActivity.getTransitionTo().getFromActivity();
+	}
+	String stopReason = null;
+	if (currentActivity != null) {
+	    stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, currentActivity,
+		    stopPreviousActivity, new ArrayList<Long>());
+
+	    // without this, there are errors when target is in branching
+	    learnerService.createToolSessionsIfNecessary(stopActivity, learnerProgress);
+	}
+
+	return stopReason != null ? stopReason : messageService
+		.getMessage(MonitoringService.FORCE_COMPLETE_STOP_MESSAGE_STOPPED_UNEXPECTEDLY);
+    }
+    
+    /**
+     * @throws LamsToolServiceException
+     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#forceCompleteLessonByUser(Integer,long,long)
+     */
+    public String forceCompleteLessonByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId) {
+	//TODO: REMOVE THIS METHOD AFTER OLD, FLASH MONITORING IS REMOVED 
+	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
+	checkOwnerOrStaffMember(requesterId, lesson, "force complete");
+
+	User learner = (User) baseDAO.find(User.class, learnerId);
+
+	LearnerProgress learnerProgress = learnerService.getProgress(learnerId, lessonId);
+	Activity stopActivity = null;
+
+	if (activityId != null) {
+	    stopActivity = getActivityById(activityId);
+	    if (stopActivity == null) {
+		throw new MonitoringServiceException("Activity missing. Activity id" + activityId);
 	    }
 	}
 
 	Activity currentActivity = learnerProgress.getCurrentActivity();
 	String stopReason = null;
 	if (currentActivity != null) {
-	    stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, currentActivity, stopActivity,
-		    new ArrayList<Long>());
+	    stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, currentActivity,
+		    stopActivity, new ArrayList<Long>());
 	}
+
 	return stopReason != null ? stopReason : messageService
 		.getMessage(MonitoringService.FORCE_COMPLETE_STOP_MESSAGE_STOPPED_UNEXPECTEDLY);
-
     }
 
     /**
@@ -1536,7 +1588,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * achieve it.
      */
     @SuppressWarnings("unchecked")
-    private String forceUncompleteActivity(LearnerProgress learnerProgress, Activity previousActivity) {
+    private String forceUncompleteActivity(LearnerProgress learnerProgress, Activity targetActivity) {
+	User learner = learnerProgress.getUser();
 	Activity currentActivity = learnerProgress.getCurrentActivity();
 	if (currentActivity == null) {
 	    // Learner has finished the whole lesson. Find the last activity by traversing the transition.
@@ -1546,48 +1599,80 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    }
 	}
 
-	learnerProgress.setLessonComplete(LearnerProgress.LESSON_NOT_COMPLETE);
-	learnerProgress.setFinishDate(null);
+	// set of activities for which "attempted" and "completed" status will be removed
+	Set<Activity> uncompleteActivities = new HashSet<Activity>();
 
-	// set previous/current/next activity fields
-	learnerProgress.setPreviousActivity(previousActivity);
-	Activity targetActivity = previousActivity == null ? learnerProgress.getLesson().getLearningDesign()
-		.getFirstActivity() : previousActivity.getTransitionFrom().getToActivity();
-	learnerProgress.setCurrentActivity(targetActivity);
-	learnerProgress.setNextActivity(targetActivity);
+	// check if the target is a part of complex activity
 	CompletedActivityProgress completedActivityProgress = learnerProgress.getCompletedActivities().get(
 		targetActivity);
+	Activity previousActivity = null;
+	Activity targetParentActivity = targetActivity.getParentActivity();
+	if (targetParentActivity != null) {
+	    uncompleteActivities.add(targetParentActivity);
+	    if (targetParentActivity.getParentActivity() != null) {
+		targetParentActivity = targetParentActivity.getParentActivity();
+		uncompleteActivities.add(targetParentActivity);
+	    }
+	    if (completedActivityProgress == null) {
+		completedActivityProgress = learnerProgress.getCompletedActivities().get(targetParentActivity);
+	    }
+	}
 
-	// grouping activities which need to be reset
+	// find the activity just before the target activity
+	if (targetActivity.getTransitionTo() == null) {
+	    // if user is moved to first activity in branch
+	    // previous activity is the one before whole branching activity
+	    if ((targetParentActivity != null) && (targetParentActivity.getTransitionTo() != null)) {
+		previousActivity = targetParentActivity.getTransitionTo().getFromActivity();
+	    }
+	} else {
+	    previousActivity = targetActivity.getTransitionTo().getFromActivity();
+	}
+
+	learnerProgress.setLessonComplete(LearnerProgress.LESSON_NOT_COMPLETE);
+	learnerProgress.setFinishDate(null);
+	learnerProgress.setPreviousActivity(previousActivity);
+	learnerProgress.setCurrentActivity(targetActivity);
+	learnerProgress.setNextActivity(targetActivity);
+
+	// grouping and branch activities which need to be reset
 	Set<Activity> groupings = new HashSet<Activity>();
 
 	// remove completed activities step by step, all the way from current to target activity
 	do {
-	    if (currentActivity.isComplexActivity()) {
-		// remove all records within complex activity
-		for (Activity childActivity : (Set<Activity>) ((ComplexActivity) currentActivity).getActivities()) {
-		    learnerProgress.getAttemptedActivities().remove(childActivity);
-		    learnerProgress.getCompletedActivities().remove(childActivity);
+	    uncompleteActivities.add(currentActivity);
 
-		    if (childActivity.isComplexActivity()) {
-			for (Activity innerChildActivity : (Set<Activity>) ((ComplexActivity) childActivity)
-				.getActivities()) {
-			    learnerProgress.getAttemptedActivities().remove(innerChildActivity);
-			    learnerProgress.getCompletedActivities().remove(innerChildActivity);
+	    if (currentActivity.isComplexActivity()) {
+		if (currentActivity.equals(targetParentActivity)) {
+		    // we came to the complex activity which contains our target
+		    currentActivity = targetActivity;
+		    while (currentActivity.getTransitionFrom() != null) {
+			// find the last activity in the branch and carry on with backwards traversal
+			currentActivity = currentActivity.getTransitionFrom().getToActivity();
+		    }
+		    continue;
+		} else {
+		    // forget all records within complex activity
+		    for (Activity childActivity : (Set<Activity>) ((ComplexActivity) currentActivity).getActivities()) {
+			uncompleteActivities.add(childActivity);
+			if (childActivity.isComplexActivity()) {
+			    uncompleteActivities.addAll((Set<Activity>) ((ComplexActivity) childActivity)
+				    .getActivities());
+			}
+
+			// mark the activity to be "unbranched"
+			if (childActivity.isSequenceActivity()) {
+			    groupings.add(childActivity);
 			}
 		    }
 		}
 	    }
 
-	    learnerProgress.getAttemptedActivities().remove(currentActivity);
-	    learnerProgress.getCompletedActivities().remove(currentActivity);
-
-	    Long id = currentActivity.getActivityId();
 	    Transition transitionTo = currentActivity.getTransitionTo();
 	    if (transitionTo == null) {
 		// reached beginning of either sequence or complex activity
 		if (currentActivity.getParentActivity() == null) {
-		    // special case when learning design has only on activity
+		    // special case when learning design has only one activity
 		    if (!((previousActivity == null) && currentActivity.equals(targetActivity))) {
 			// reached beginning of sequence and target activity was not found, something is wrong
 			throw new MonitoringServiceException("Target activity was not found sequence. Activity id: "
@@ -1599,7 +1684,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 			// for optional sequences, the real complex activity is 2 tiers up, not just one
 			currentActivity = currentActivity.getParentActivity();
 		    }
-
 		    // now the current activity is the complex one in main sequence
 		}
 	    } else {
@@ -1612,22 +1696,73 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
 	} while (!currentActivity.equals(targetActivity));
 
+	// forget that user completed and attempted activiites
+	for (Activity activity : uncompleteActivities) {
+	    learnerProgress.getAttemptedActivities().remove(activity);
+	    learnerProgress.getCompletedActivities().remove(activity);
+	}
+
 	// set target activity as attempted
 	learnerProgress.getCompletedActivities().remove(targetActivity);
 	learnerProgress.getAttemptedActivities().put(targetActivity, completedActivityProgress.getStartDate());
+	if (targetParentActivity != null) {
+	    // set parent as attempted
+	    learnerProgress.getAttemptedActivities()
+		    .put(targetParentActivity, completedActivityProgress.getStartDate());
+	    targetParentActivity = targetActivity.getParentActivity();
+	    if (targetParentActivity != null) {
+		// if target was part of branch, then immediate parent was Sequence
+		// and parent's parent is Branching
+		learnerProgress.getAttemptedActivities().put(targetParentActivity,
+			completedActivityProgress.getStartDate());
+	    }
+	}
 
 	learnerProgressDAO.updateLearnerProgress(learnerProgress);
 
-	User learner = learnerProgress.getUser();
+	// do ungrouping and unbranching
 	for (Activity activity : groupings) {
-	    // fetch real object, otherwise there is a cast error
-	    GroupingActivity groupingActivity = (GroupingActivity) getActivityById(activity.getActivityId());
-	    Grouping grouping = groupingActivity.getCreateGrouping();
-	    if (grouping.doesLearnerExist(learner)) {
-		// cancel existing grouping, so the learner has a chance to be grouped again
-		Group group = grouping.getGroupBy(learner);
-		group.getUsers().remove(learner);
-		groupDAO.saveGroup(group);
+	    if (activity.isGroupingActivity()) {
+		// fetch real object, otherwise there is a cast error
+		GroupingActivity groupingActivity = (GroupingActivity) getActivityById(activity.getActivityId());
+		Grouping grouping = groupingActivity.getCreateGrouping();
+		if (grouping.doesLearnerExist(learner)) {
+		    // cancel existing grouping, so the learner has a chance to be grouped again
+		    Group group = grouping.getGroupBy(learner);
+		    group.getUsers().remove(learner);
+		    groupDAO.saveGroup(group);
+		}
+	    } else if (activity.isSequenceActivity()) {
+		SequenceActivity sequenceActivity = (SequenceActivity) getActivityById(activity.getActivityId());
+		Group group = sequenceActivity.getSoleGroupForBranch();
+		if ((group != null) && group.hasLearner(learner)) {
+		    // remove learner from the branch
+		    removeUsersFromBranch(sequenceActivity.getActivityId(), new String[] { learner.getUserId()
+			    .toString() });
+		}
+	    } else {
+		MonitoringService.log.warn("Unknow activity type marked for ungrouping: " + activity.getActivityId());
+	    }
+	}
+
+	if (targetParentActivity != null) {
+	    // needed by Monitor to display user's progress in the given activity
+	    learnerService.createToolSessionsIfNecessary(targetActivity, learnerProgress);
+
+	    // if user was moved to a branch, he needs to be force completed from beginning of the branch
+	    // all the way to target activity
+	    Activity precedingUncompleteActivity = null;
+	    Activity precedingActivity = targetActivity;
+	    while (precedingActivity.getTransitionTo() != null) {
+		precedingActivity = precedingActivity.getTransitionTo().getFromActivity();
+		if (!learnerProgress.getCompletedActivities().containsKey(precedingActivity)) {
+		    precedingUncompleteActivity = precedingActivity;
+		}
+	    }
+
+	    if (precedingUncompleteActivity != null) {
+		return forceCompleteActivity(learner, learnerProgress.getLesson().getLessonId(), learnerProgress,
+			precedingUncompleteActivity, previousActivity, new ArrayList<Long>());
 	    }
 	}
 

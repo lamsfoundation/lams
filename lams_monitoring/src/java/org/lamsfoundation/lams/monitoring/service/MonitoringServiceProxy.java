@@ -26,62 +26,69 @@ package org.lamsfoundation.lams.monitoring.service;
 
 import javax.servlet.ServletContext;
 
+import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-
 /**
- * <p>This class act as the proxy between web layer and service layer. It is
- * designed to decouple the presentation logic and business logic completely.
- * In this way, the presentation tier will no longer be aware of the changes in
- * service layer. Therefore we can feel free to switch the business logic
- * implementation.</p>
+ * <p>
+ * This class act as the proxy between web layer and service layer. It is designed to decouple the presentation logic
+ * and business logic completely. In this way, the presentation tier will no longer be aware of the changes in service
+ * layer. Therefore we can feel free to switch the business logic implementation.
+ * </p>
  * 
  * @author Jacky Fang
- * @since  2005-4-15
+ * @since 2005-4-15
  * @version 1.1
  * 
  */
-public class MonitoringServiceProxy
-{
+public class MonitoringServiceProxy {
 
     /**
-     * Return the monitor domain service object. It will delegate to the Spring
-     * helper method to retrieve the proper bean from Spring bean factory.
-     * @param servletContext the servletContext for current application
+     * Return the monitor domain service object. It will delegate to the Spring helper method to retrieve the proper
+     * bean from Spring bean factory.
+     * 
+     * @param servletContext
+     *            the servletContext for current application
      * @return monitoring service object.
      */
-    public static final IMonitoringService getMonitoringService(ServletContext servletContext)
-    {
-        return (IMonitoringService)getDomainService(servletContext,"monitoringService");
-    }
-    
-    /**
-     * Return the learner domain service object. It will delegate to the Spring
-     * helper method to retrieve the proper bean from Spring bean factory.
-     * @param servletContext the servletContext for current application
-     * @return learner service object.
-     */
-    public static final ICoreLearnerService getLearnerService(ServletContext servletContext)
-    {
-        return (ICoreLearnerService)getDomainService(servletContext,"learnerService");
-    }
-    
-    public static final IUserManagementService getUserManagementService(ServletContext servletContext) {
-	return (IUserManagementService) getDomainService(servletContext, "userManagementService");
+    public static final IMonitoringService getMonitoringService(ServletContext servletContext) {
+	return (IMonitoringService) MonitoringServiceProxy.getDomainService(servletContext, "monitoringService");
     }
 
     /**
-     * Retrieve the proper Spring bean from bean factory. 
-     * @param servletContext the servletContext for current application
+     * Return the learner domain service object. It will delegate to the Spring helper method to retrieve the proper
+     * bean from Spring bean factory.
+     * 
+     * @param servletContext
+     *            the servletContext for current application
+     * @return learner service object.
+     */
+    public static final ICoreLearnerService getLearnerService(ServletContext servletContext) {
+	return (ICoreLearnerService) MonitoringServiceProxy.getDomainService(servletContext, "learnerService");
+    }
+
+    public static final IUserManagementService getUserManagementService(ServletContext servletContext) {
+	return (IUserManagementService) MonitoringServiceProxy
+		.getDomainService(servletContext, "userManagementService");
+    }
+
+    public static final IAuthoringService getAuthoringService(ServletContext servletContext) {
+	return (IAuthoringService) MonitoringServiceProxy.getDomainService(servletContext, "authoringService");
+    }
+
+    /**
+     * Retrieve the proper Spring bean from bean factory.
+     * 
+     * @param servletContext
+     *            the servletContext for current application
      * @return the Spring service bean.
      */
-    private static Object getDomainService(ServletContext servletContext,String serviceName)
-    {
-        WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-        return wac.getBean(serviceName);
+    private static Object getDomainService(ServletContext servletContext, String serviceName) {
+	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+	return wac.getBean(serviceName);
     }
 
 }

@@ -669,7 +669,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    if (format != ExportToolContentService.PACKAGE_FORMAT_IMS) {
 		
 		String destinationPath = FileUtil.getFullPath(contentDir, ExportToolContentService.SVG_IMAGE_FILE_NAME);
-		String svgPath = service.createLearningDesignSVG(learningDesignId, SVGGenerator.OUTPUT_FORMAT_SVG);
+		String svgPath = service.createLearningDesignSVG(learningDesignId, SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY);
 		FileUtils.copyFile(new File(svgPath),  new File(destinationPath));
 		
 		destinationPath = FileUtil.getFullPath(contentDir, ExportToolContentService.PNG_IMAGE_FILE_NAME);
@@ -720,13 +720,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	} catch (IOException e) {
 	    log.error("IOException:", e);
 	    throw new ExportToolContentException(e);
-	} catch (JDOMException e) {
-	    log.error("JDOMException:", e);
-	    throw new ExportToolContentException(e);
-	} catch (TranscoderException e) {
-	    log.error("TranscoderException:", e);
-	    throw new ExportToolContentException(e);
-	} 
+	}
     }
 
     /**

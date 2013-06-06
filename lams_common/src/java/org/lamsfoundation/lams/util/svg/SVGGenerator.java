@@ -1,4 +1,5 @@
 package org.lamsfoundation.lams.util.svg;
+
 /**************************************************************** 
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
  * ============================================================= 
@@ -24,15 +25,20 @@ package org.lamsfoundation.lams.util.svg;
 /* $Id$ */
 
 import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.batik.dom.svg.SVGDOMImplementation;
@@ -41,10 +47,10 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.lang.StringUtils;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
+import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityDTOOrderComparator;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.TransitionDTO;
@@ -54,7 +60,10 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.bootstrap.DOMImplementationRegistry;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
 import org.w3c.dom.svg.SVGDocument;
 
 /**
@@ -62,129 +71,107 @@ import org.w3c.dom.svg.SVGDocument;
  * 
  * @author Andrey Balan
  */
-public class SVGGenerator extends SVGConstants{
-    
-    public final static int OUTPUT_FORMAT_SVG  = 1;
-    public final static int OUTPUT_FORMAT_PNG  = 2;
-    public final static int OUTPUT_FORMAT_SYSTEM_OUT  = 3;
-    
+public class SVGGenerator {
+    public final static int OUTPUT_FORMAT_SVG = 1;
+    public final static int OUTPUT_FORMAT_PNG = 2;
+    public final static int OUTPUT_FORMAT_SYSTEM_OUT = 3;
+    public final static int OUTPUT_FORMAT_SVG_LAMS_COMMUNITY = 4;
+
     private SVGDocument doc;
-    private Integer adjustedDocumentWidth = null;
-    
+    private Integer outputFormat;
+    private Integer adjustedDocumentWidth;
+    private final String localSvgIconsPath = Configuration.get(ConfigurationKeys.SERVER_URL) + "images/svg/";
+
+    // fille only for branching DOM
+    private Point branchingStartPoint;
+    private Point branchingEndPoint;
+
+    private static final Logger log = Logger.getLogger(SVGGenerator.class);
+    // tools used in all instances
+    private static final DOMImplementation svgDOMImplementation = SVGDOMImplementation.getDOMImplementation();
+    private static final PNGTranscoder pngTranscoder = new PNGTranscoder();
+    private static DOMImplementationLS lsDOMImplementation;
+    private static LSSerializer serializer;
+
+    static {
+	try {
+	    // initialize common tools
+	    DOMImplementationRegistry registry = DOMImplementationRegistry.newInstance();
+	    SVGGenerator.lsDOMImplementation = (DOMImplementationLS) registry.getDOMImplementation("XML 1.0 LS");
+
+	    SVGGenerator.serializer = SVGGenerator.lsDOMImplementation.createLSSerializer();
+	    SVGGenerator.serializer.getDomConfig().setParameter("format-pretty-print", Boolean.TRUE);
+	} catch (Exception e) {
+	    SVGGenerator.log.error(e);
+	}
+    }
+
     /**
      * Adjusts resulted SVG with user-specific width
      * 
-     * @param width user specific width
+     * @param width
+     *            user specific width
      */
     public void adjustDocumentWidth(Integer width) {
 	this.adjustedDocumentWidth = width;
     }
-    
+
     /**
      * @return actual width and height of resulted image
      */
     public Dimension getDocumentWidthHeight() {
-	
-        Element svg = doc.getDocumentElement();
-        String widthStr = svg.getAttributeNS(null, "width");
-        String heightStr = svg.getAttributeNS(null, "height");
-        
-        int width = Integer.parseInt(widthStr);
-        int height = Integer.parseInt(heightStr);
-        
-        return new Dimension(width, height);
+	Element svg = doc.getDocumentElement();
+	String widthStr = svg.getAttributeNS(null, "width");
+	String heightStr = svg.getAttributeNS(null, "height");
+
+	int width = Integer.parseInt(widthStr);
+	int height = Integer.parseInt(heightStr);
+
+	return new Dimension(width, height);
     }
-    
+
     /**
      * Stream out SVG document into specified outputStream.
      * 
-     * @param outputStream stream where we put resulted data. It can be null in case of RESULT_TYPE_DISPLAY
-     * @param resultType one of SVGGenerator's constants: either RESULT_TYPE_SVG or RESULT_TYPE_PNG or RESULT_TYPE_DISPLAY
+     * @param outputStream
+     *            stream where we put resulted data. It can be null in case of RESULT_TYPE_DISPLAY
+     * @param outputFormat
+     *            one of SVGGenerator's constants: either RESULT_TYPE_SVG or RESULT_TYPE_PNG or RESULT_TYPE_DISPLAY
      * 
      * @throws TranscoderException
      * @throws IOException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws ClassNotFoundException
+     * @throws ClassCastException
      */
-    public void streamOutDocument(OutputStream outputStream, int resultType) throws TranscoderException, IOException {
-	
-	switch (resultType) {
-	case OUTPUT_FORMAT_SVG:
-	    OutputFormat format = new OutputFormat(doc);
-	    format.setLineWidth(65);
-	    format.setIndenting(true);
-	    format.setIndent(2);
-
-	    XMLSerializer serializer = new XMLSerializer(outputStream, format);
-	    serializer.serialize(doc);
-	    outputStream.flush();
-	    outputStream.close();
-	    break;
-	    
-	case OUTPUT_FORMAT_PNG:
-	    NodeList imageNodes = null;
-	    String FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES = null;
-	    
-	    boolean isLocalImagesUsed = (Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) != null);
-	    // change image references to local ones
-	    if (isLocalImagesUsed) {
-		imageNodes = doc.getElementsByTagNameNS(SVG_NAMESPACE, "image");
-		FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES = "file://"
-			+ Configuration.get(ConfigurationKeys.LAMS_EAR_DIR).replaceAll("\\\\", "/")
-			+ "/lams-central.war/images/svg/";
-		for (int i = 0; i < imageNodes.getLength(); i++) {
-		    Element imageNode = (Element) imageNodes.item(i);
-		    String imageFileName = imageNode.getAttributeNS(SVG_NAMESPACE_XLINK, "href");
-		    imageFileName = imageFileName.replaceFirst(PATH_TO_LAMSCOMMUNITY_SVG_IMAGES,
-			    FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES);
-		    imageNode.setAttributeNS(SVG_NAMESPACE_XLINK, "xlink:href", imageFileName);
-		}
-	    }
-	    
-	    PNGTranscoder transcoder = new PNGTranscoder();
+    public void streamOutDocument(OutputStream outputStream) throws IOException {
+	if (SVGGenerator.OUTPUT_FORMAT_PNG == outputFormat) {
 	    // Set the transcoder input and output.
 	    TranscoderInput input = new TranscoderInput(doc);
 	    TranscoderOutput output = new TranscoderOutput(outputStream);
 
 	    // Perform the transcoding.
-	    transcoder.transcode(input, output);
-	    outputStream.flush();
-	    outputStream.close();
-	    
-	    //roll back all image references for later use
-	    if (isLocalImagesUsed) {
-		for (int i = 0; i < imageNodes.getLength(); i++) {
-		    Element imageNode = (Element) imageNodes.item(i);
-		    String imageFileName = imageNode.getAttributeNS(SVG_NAMESPACE_XLINK, "href");
-		    imageFileName = imageFileName.replaceFirst(FULL_PATH_TO_LAMS_CENTRAL_SVG_IMAGES,
-			    PATH_TO_LAMSCOMMUNITY_SVG_IMAGES);
-		    imageNode.setAttributeNS(SVG_NAMESPACE_XLINK, "xlink:href", imageFileName);
-		}
+
+	    try {
+		SVGGenerator.pngTranscoder.transcode(input, output);
+	    } catch (TranscoderException e) {
+		throw new IOException("Error while transcoding SVG into PNG", e);
 	    }
-	    break;
-	    
-//	// to see resulted SVG image in swing component     
-//	case OUTPUT_FORMAT_DISPLAY:	    
-//	    JSVGCanvas canvas = new JSVGCanvas();
-//	    JFrame f = new JFrame();
-//	    f.getContentPane().add(canvas);
-//	    canvas.setSVGDocument(doc);
-//	    f.pack();
-//	    f.setSize(CANVAS_DEFAULT_WIDTH, CANVAS_DEFAULT_HEIGHT);
-//	    f.setVisible(true);
-//	    break;	    
-	    
-	default:
-	    OutputFormat format2 = new OutputFormat(doc);
-	    format2.setLineWidth(65);
-	    format2.setIndenting(true);
-	    format2.setIndent(2);
-	    Writer out = new StringWriter();
-	    XMLSerializer serializer2 = new XMLSerializer(out, format2);
-	    serializer2.serialize(doc);
-	    System.out.println(out.toString());
+	} else {
+	    LSOutput output = SVGGenerator.lsDOMImplementation.createLSOutput();
+	    output.setEncoding("UTF-8");
+	    output.setByteStream((SVGGenerator.OUTPUT_FORMAT_SVG == outputFormat)
+		    || (SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY == outputFormat) ? outputStream : System.out);
+	    SVGGenerator.serializer.write(doc, output);
 	}
 
+	if (outputStream != null) {
+	    outputStream.flush();
+	    outputStream.close();
+	}
     }
-    
+
     /**
      * Generates SVG image based on learning design provided.
      * 
@@ -192,101 +179,74 @@ public class SVGGenerator extends SVGConstants{
      * @throws JDOMException
      * @throws IOException
      */
-    public void generateSvgDom(LearningDesignDTO learningDesign) throws JDOMException, IOException {
+    @SuppressWarnings("unchecked")
+    public void generateLearningDesignDOM(LearningDesignDTO learningDesign, int outputFormat) throws IOException {
+	this.outputFormat = outputFormat;
 	initializeSvgDocument();
 
-        //initialize all tree nodes
-        ArrayList<AuthoringActivityDTO> activities = learningDesign.getActivities();
-        HashMap<Long, ActivityTreeNode> allNodes = new HashMap<Long, ActivityTreeNode>();
-        for (AuthoringActivityDTO activity : activities) {
-            ActivityTreeNode node = new ActivityTreeNode(activity);
-            allNodes.put(activity.getActivityID(), node);
-        }
-        
-        //construct activities tree
-        ActivityTreeNode root = new ActivityTreeNode();        
-        for (ActivityTreeNode node : allNodes.values()) {
-            AuthoringActivityDTO activity = node.getActivity();
-            if (activity.getParentActivityID() == null) {
-        	root.add(node);
-            } else {
-        	Long parentId = activity.getParentActivityID();
-        	ActivityTreeNode parent = allNodes.get(parentId);
-        	parent.add(node);
-            }
-        }
-	
-        //**************** Draw transitions********************************************************
-        Element svgRoot = doc.getElementById(ROOT_ELEMENT_ID);
-        ArrayList<TransitionDTO> transitions = learningDesign.getTransitions();
-        for (TransitionDTO transition : transitions) {
-            
-            ActivityTreeNode fromActivity = allNodes.get(transition.getFromActivityID());
-            ActivityTreeNode toActivity = allNodes.get(transition.getToActivityID());
-	    Point2D fromIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(fromActivity, toActivity);
-	    Point2D toIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(toActivity, fromActivity);            
-            
-            //skip optional sequence's childs and lines between overlapped activities
-            if (fromActivity.isOptionalSequenceActivityChild() 
-        	    || (fromIntersection == null) || (toIntersection == null)) {
-        	continue;
-            }            
-	    
-	    // Create the line
-	    Element line = doc.createElementNS(SVG_NAMESPACE, "line");
-	    line.setAttributeNS(null, "id", transition.getFromActivityID() + "_to_" + transition.getToActivityID());
-	    line.setAttributeNS(null, "x1", Double.toString(fromIntersection.getX()));
-	    line.setAttributeNS(null, "y1", Double.toString(fromIntersection.getY()));
-	    line.setAttributeNS(null, "x2", Double.toString(toIntersection.getX()));
-	    line.setAttributeNS(null, "y2", Double.toString(toIntersection.getY()));
-	    line.setAttributeNS(null, "style", "stroke:#8C8FA6;stroke-width:2;opacity:1");
-	    line.setAttributeNS(null, "parentID", "0");
-	    
-	    double a = (toIntersection.getX() - fromIntersection.getX());
-	    double b = (toIntersection.getY() - fromIntersection.getY());
-	    double yArrowShift = (a*a + b*b == 0) ? 0 : 5* b/Math.sqrt(a*a + b*b);
-	    double xArrowShift = (a*a + b*b == 0) ? 0 : 5* a/Math.sqrt(a*a + b*b);
-	    // Create the arrowhead	    
-	    Element arrowhead = doc.createElementNS(SVG_NAMESPACE, "line");
-	    arrowhead.setAttributeNS(null, "id", "arrowhead_" + transition.getFromActivityID() + "_to_" + transition.getToActivityID());
-	    arrowhead.setAttributeNS(null, "x1", Double.toString(fromIntersection.getX()));
-	    arrowhead.setAttributeNS(null, "y1", Double.toString(fromIntersection.getY()));
-	    arrowhead.setAttributeNS(null, "x2", Double.toString((fromIntersection.getX() + toIntersection.getX())/2 - xArrowShift));
-	    arrowhead.setAttributeNS(null, "y2", Double.toString((fromIntersection.getY() + toIntersection.getY())/2 - yArrowShift));
-	    arrowhead.setAttributeNS(null, "style", "fill:#8C8FA6;stroke:#8C8FA6;stroke-width:2;opacity:1");
-	    arrowhead.setAttributeNS(null, "marker-end", "url(#Triangle)");
-	    arrowhead.setAttributeNS(null, "parentID", "0");
+	ActivityTreeNode root = new ActivityTreeNode();
+	Map<Long, ActivityTreeNode> allNodes = getActivityTree(learningDesign.getActivities(), root);
 
-	    // Attach the line to the root 'svg' element.
-	    svgRoot.appendChild(line);
-	    svgRoot.appendChild(arrowhead);
-        }
-        
-        //**************** Draw activities ********************************************************
-        //tree traverse
-        treeTraverse(root);
-        
-        setUpDocumentWidthHeight(allNodes.values());
+	// **************** Draw transitions********************************************************
+
+	ArrayList<TransitionDTO> transitions = (ArrayList<TransitionDTO>) learningDesign.getTransitions();
+	createActivityTransitionLines(allNodes, transitions);
+
+	// **************** Draw activities ********************************************************
+	treeTraverse(root);
+
+	setUpDocumentWidthHeight(allNodes.values());
     }
-    
+
     /**
-     * Sets up Svg root and defs. 
-     */    
+     * Generates SVG image based on branching activity provided.
+     */
+    @SuppressWarnings("unchecked")
+    public void generateBranchingDOM(LearningDesignDTO learningDesign, long branchingActivityId, int outputFormat)
+	    throws IOException {
+	this.outputFormat = outputFormat;
+	initializeSvgDocument();
+
+	ActivityTreeNode root = new ActivityTreeNode();
+	Set<LinkedList<ActivityTreeNode>> branches = new HashSet<LinkedList<ActivityTreeNode>>();
+	Map<Long, ActivityTreeNode> allNodes = getActivityTree(learningDesign.getActivities(), root,
+		branchingActivityId, branches);
+
+	// get only transitions between activities inside the given branching
+	Set<TransitionDTO> interActivityTransitions = new HashSet<TransitionDTO>();
+	Set<Long> allActivityIDs = allNodes.keySet();
+	for (TransitionDTO transition : (ArrayList<TransitionDTO>) learningDesign.getTransitions()) {
+	    if (allActivityIDs.contains(transition.getFromActivityID())
+		    || allActivityIDs.contains(transition.getToActivityID())) {
+		interActivityTransitions.add(transition);
+	    }
+	}
+
+	// **************** Draw transitions********************************************************
+	// draw initial lines
+	createBranchingTransitionLines(branches, root);
+
+	createActivityTransitionLines(allNodes, interActivityTransitions);
+
+	// **************** Draw activities ********************************************************
+	treeTraverse(root);
+
+	setUpDocumentWidthHeight(allNodes.values());
+    }
+
+    /**
+     * Sets up Svg root and defs.
+     */
     private void initializeSvgDocument() {
-	
-        // Create an SVG document.
-        DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
-        doc = (SVGDocument) impl.createDocument(SVG_NAMESPACE, "svg", null);
-        // Get the root element (the 'svg' element).
-        Element svgRoot = doc.getDocumentElement();
-        // Set the width and height attributes on the root 'svg' element.
-        svgRoot.setAttributeNS(null, "xmlns", SVG_NAMESPACE);
-        svgRoot.setAttributeNS(null, "xmlns:xlink", SVG_NAMESPACE_XLINK);
-        
-        //create arrow definition
-	Element defs = doc.createElementNS(SVG_NAMESPACE, "defs");
+	// Create an SVG document.
+	doc = (SVGDocument) SVGGenerator.svgDOMImplementation.createDocument(SVGConstants.SVG_NAMESPACE, "svg", null);
+	// Get the root element (the 'svg' element).
+	Element svgRoot = doc.getDocumentElement();
+
+	// create arrow definition
+	Element defs = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "defs");
 	svgRoot.appendChild(defs);
-	Element marker = doc.createElementNS(SVG_NAMESPACE, "marker");
+	Element marker = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "marker");
 	marker.setAttributeNS(null, "id", "Triangle");
 	marker.setAttributeNS(null, "viewBox", "0 0 10 10");
 	marker.setAttributeNS(null, "refX", "0");
@@ -296,18 +256,18 @@ public class SVGGenerator extends SVGConstants{
 	marker.setAttributeNS(null, "markerHeight", "5");
 	marker.setAttributeNS(null, "orient", "auto");
 	defs.appendChild(marker);
-	Element path = doc.createElementNS(SVG_NAMESPACE, "path");
+	Element path = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "path");
 	path.setAttributeNS(null, "d", "M 0 0 L 10 5 L 0 10 z");
 	marker.appendChild(path);
-	
+
 	// Create root g element
-	Element g = doc.createElementNS(SVG_NAMESPACE, "g");
-	g.setAttributeNS(null, "id", ROOT_ELEMENT_ID);
+	Element g = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "g");
+	g.setAttributeNS(null, "id", SVGConstants.ROOT_ELEMENT_ID);
 	svgRoot.appendChild(g);
     }
-    
+
     /**
-     * Recursive tree traverse. 
+     * Recursive tree traverse.
      * 
      * @param doc
      * @param svgRoot
@@ -316,28 +276,27 @@ public class SVGGenerator extends SVGConstants{
      */
     private void treeTraverse(ActivityTreeNode node) {
 	AuthoringActivityDTO activity = node.getActivity();
-	
-	//draw root's activity, unless it's the start root which doesn't contain activity
+
+	// draw root's activity, unless it's the start root which doesn't contain activity
 	if (activity != null) {
 	    createActivity(node);
-	    
-	    //in case of branching activity OR child of optional sequence activity OR optional actvity
-	    //don't traverse child activities
+
+	    // in case of branching activity OR child of optional sequence activity OR optional actvity
+	    // don't traverse child activities
 	    if (activity.getActivityTypeID().equals(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE)
 		    || activity.getActivityTypeID().equals(Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
 		    || activity.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE)
-		    || node.isOptionalSequenceActivityChild()
-		    || node.isOptionalActivityChild()) {
+		    || node.isOptionalSequenceActivityChild() || node.isOptionalActivityChild()) {
 		return;
 	    }
 	}
-	
-        //traverse child subtrees
-        for  (ActivityTreeNode child : node.getChildren()) {
-            treeTraverse(child);
-        }	
+
+	// traverse child subtrees
+	for (ActivityTreeNode child : node.getChildren()) {
+	    treeTraverse(child);
+	}
     }
-    
+
     /**
      * Adds activity to SVG DOM.
      * 
@@ -347,17 +306,16 @@ public class SVGGenerator extends SVGConstants{
      * @param activity
      */
     private void createActivity(ActivityTreeNode node) {
-	
 	AuthoringActivityDTO activity = node.getActivity();
-	
+
 	// Create current activity element
-	Element g = doc.createElementNS(SVG_NAMESPACE, "g");
+	Element g = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "g");
 	String activityId = activity.getActivityID().toString();
 	g.setAttributeNS(null, "id", activityId);
 	String parentID = (activity.getParentActivityID() == null) ? "0" : activity.getParentActivityID().toString();
 	g.setAttributeNS(null, "parentID", parentID);
 	// Attach the g element to the root 'svg' element.
-	Element svgRoot = doc.getElementById(ROOT_ELEMENT_ID);
+	Element svgRoot = doc.getElementById(SVGConstants.ROOT_ELEMENT_ID);
 	svgRoot.appendChild(g);
 
 	int x = node.getActivityCoordinates().x;
@@ -365,259 +323,314 @@ public class SVGGenerator extends SVGConstants{
 	// activities with parents (paralles, optionals, branching, etc)
 	if (activity.getParentActivityID() != null) {
 	    AuthoringActivityDTO parentActivity = node.getParentActivity();
-	    x += (parentActivity.getxCoord() == null) ?  0 : parentActivity.getxCoord();
-	    y += (parentActivity.getyCoord() == null) ?  0 : parentActivity.getyCoord();
+	    x += (parentActivity.getxCoord() == null) ? 0 : parentActivity.getxCoord();
+	    y += (parentActivity.getyCoord() == null) ? 0 : parentActivity.getyCoord();
 	}
-
-	Integer width = node.getActivityDimension().width;
-	Integer height = node.getActivityDimension().height;	
-	String text = activity.getActivityTitle();
 
 	// if this activity is a children of a sequence activity, if it is, then we need to change its size
 	if (node.isOptionalSequenceActivityChild()) {
-	    ActivityTreeNode parentNode = (ActivityTreeNode) node.getParent();
-	    AuthoringActivityDTO grandParentActivity = parentNode.getParentActivity();
-	    x += (grandParentActivity.getxCoord() == null) ? 0 : grandParentActivity.getxCoord();
-	    y += (grandParentActivity.getyCoord() == null) ? 0 : grandParentActivity.getyCoord();
-	    
-	    //create activity's rectangle
-	    createRectangle(node, x, y, g);
+	    createOptionalSequenceActivityChild(node, g, x, y);
 
-	    createImage(node, x, y, g);
-
-	// this activity is a children of an optional activity
+	    // this activity is a children of an optional activity
 	} else if (node.isOptionalActivityChild()) {
+	    createOptionalActivityChild(activity, node, g, x, y);
 
-	    //create activity's rectangle
-	    createRectangle(node, x, y, g);
-
-	    // Create text label
-	    if (text != null) {
-		int xText = x + (width / 2);
-		int yText = y + (height / 2) + 18;
-		createText("TextElement-" + activityId, xText, yText, null, "middle", "11.4", "Verdana", null, text, g);
-	    }
-	
-	    createImage(node, x, y, g);
-	    
 	} else if (activity.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.SCHEDULE_GATE_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.PERMISSION_GATE_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.CONDITION_GATE_ACTIVITY_TYPE)) {
-	    // if this is a stop gate we need to draw an octogon instead (and don't care about SYSTEM_GATE_ACTIVITY_TYPE)
-	    x += 8;
-	    y -= 2;
+	    createGateActivity(activity, node, g, x, y);
 
-	    String finalProportions = "";
-	    for (double[] proportion : GATE_PROPORTIONS) {
-		finalProportions += (x + proportion[0]) + "," + (y + proportion[1]) + " ";
-	    }
-
-	    Element polygon = doc.createElementNS(SVG_NAMESPACE, "polygon");
-	    polygon.setAttributeNS(null, "style", node.getActivityCss());
-	    polygon.setAttributeNS(null, "points", finalProportions);
-	    g.appendChild(polygon);
-
-	    // calculate midpoint for STOP text
-	    double x1 = x + GATE_PROPORTIONS[6][0];
-	    double x2 = x + GATE_PROPORTIONS[2][0];
-	    double midpointX = (x1 + x2) / 2;
-
-	    double y1 = y + GATE_PROPORTIONS[6][1];
-	    double y2 = y + GATE_PROPORTIONS[2][1];
-	    double midpointY = (y1 + y2) / 2 + 3;
-
-	    createText("Gate_" + activityId, midpointX, midpointY, "0", "middle", "10", "Verdana", "fill:#FFFFFF;stroke:#FFFFFF;stroke-width:.5;", "STOP", g);
-	    
 	} else if (activity.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE)) {
 	    // This is a parallel activity
+	    createParallelActivity(activity, node, g, x, y);
 
-	    // if the parallel is grouped, show it
-	    if (activity.getApplyGrouping()) {
-		createGroupingEffect(node, x, y, g);
-	    }
-	    
-	    //Create parallelContainer
-	    createRectangle(node, x, y, g);
-	    
-	    createActvityHeader(node, x, y, g);
-	    
-	    if (StringUtils.isNotEmpty(text)) {
-		createText("TextElement-" + activityId, x +9, y +19, null, "start", "12", "Arial", "fill:#828990", text, g);
-	    }
-	    
 	} else if (activity.getActivityTypeID().equals(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE)) {
 	    // This is a branching activity
+	    createBranchingActivity(activity, node, g, x, y);
 
-	    // if the parallel is grouped, show it
-	    if (activity.getApplyGrouping()) {
-		createGroupingEffect(node, x, y, g);
-	    }
-	    
-	    //Create branchingContainer
-	    createRectangle(node, x, y, g);
-	    
-	    int startingPointX = x + 26;
-	    int startingPointY = y + 40;
-	    if (node.getChildCount() == 4) {
-		startingPointY -= 12;
-	    } else if (node.getChildCount() > 4) {
-		startingPointY -= 2*12;
-	    }
-	    
-	    Element startingPoint = doc.createElementNS(SVG_NAMESPACE, "rect");
-	    startingPoint.setAttributeNS(null, "x", Integer.toString(startingPointX));
-	    startingPoint.setAttributeNS(null, "y", Integer.toString(startingPointY));
-	    startingPoint.setAttributeNS(null, "width", Double.toString(BRANCHING_ACTIVITY_POINT + 0.5));
-	    startingPoint.setAttributeNS(null, "height", Double.toString(BRANCHING_ACTIVITY_POINT + 0.5));
-	    startingPoint.setAttributeNS(null, "style", "fill:#000000");
-	    g.appendChild(startingPoint);
-	    
-	    TreeSet<ActivityTreeNode> sequenceNodes = new TreeSet<ActivityTreeNode>(new ActivityTreeNodeComparator());
-	    sequenceNodes.addAll(node.getChildren());
-	    Iterator<ActivityTreeNode> sequenceNodeIterator = sequenceNodes.iterator();
-	    for (int sequenceIndex = -1; sequenceNodeIterator.hasNext() && (sequenceIndex < 4); sequenceIndex++) {
-		ActivityTreeNode sequenceNode = sequenceNodeIterator.next();
-		double previousActivityPointX = startingPointX + BRANCHING_ACTIVITY_POINT/2;
-		double previousActivityPointY = startingPointY + BRANCHING_ACTIVITY_POINT/2;		
-
-		// Create the lines
-		Iterator<ActivityTreeNode> activityNodeIterator = sequenceNode.getChildren().iterator();
-		for (int activityIndex=1; activityNodeIterator.hasNext() && (activityIndex <= 6); activityIndex++, activityNodeIterator.next()) {
-		    double activityPointX = startingPointX + activityIndex*BRANCHING_STEP + BRANCHING_ACTIVITY_POINT/2;
-		    double activityPointY = startingPointY + sequenceIndex*BRANCHING_STEP + BRANCHING_ACTIVITY_POINT/2;
-		    
-		    Element line = doc.createElementNS(SVG_NAMESPACE, "line");
-		    line.setAttributeNS(null, "x1", Double.toString(previousActivityPointX));
-		    line.setAttributeNS(null, "y1", Double.toString(previousActivityPointY));
-		    line.setAttributeNS(null, "x2", Double.toString(activityPointX));
-		    line.setAttributeNS(null, "y2", Double.toString(activityPointY));
-		    line.setAttributeNS(null, "style", "stroke:black;stroke-width:1;");
-		    g.appendChild(line);
-
-		    previousActivityPointX = activityPointX;
-		    previousActivityPointY = activityPointY;		    
-		}
-
-		//check if we need to draw line connecting last activity with endingPoint
-		if (!sequenceNode.getActivity().getStopAfterActivity()) {
-		    Element line = doc.createElementNS(SVG_NAMESPACE, "line");
-		    line.setAttributeNS(null, "x1", Double.toString(previousActivityPointX));
-		    line.setAttributeNS(null, "y1", Double.toString(previousActivityPointY));
-		    line.setAttributeNS(null, "x2", Double.toString(x + 132 + BRANCHING_ACTIVITY_POINT / 2));
-		    line.setAttributeNS(null, "y2", Double.toString(startingPointY + BRANCHING_ACTIVITY_POINT / 2));
-		    line.setAttributeNS(null, "style", "stroke:black;stroke-width:1;");
-		    g.appendChild(line);
-
-		}
-		
-		 // Create activity points
-		activityNodeIterator = sequenceNode.getChildren().iterator();
-		for (int activityIndex=1; activityNodeIterator.hasNext() && (activityIndex <= 6); activityIndex++) {
-		    ActivityTreeNode activityNode = activityNodeIterator.next();
-		    String activityStyle = sequenceNode.getActivity().getStopAfterActivity()&&!activityNodeIterator.hasNext() ? "stroke:red" : "stroke:black";
-		    activityStyle += ";stroke-width:0.8;opacity:1" + activityNode.getActivityColor();
-		    double activityPointX = startingPointX + activityIndex*BRANCHING_STEP;
-		    double activityPointY = startingPointY + sequenceIndex*BRANCHING_STEP;
-		    
-		    Element activityPoint = doc.createElementNS(SVG_NAMESPACE, "rect");
-		    activityPoint.setAttributeNS(null, "x", Double.toString(activityPointX));
-		    activityPoint.setAttributeNS(null, "y", Double.toString(activityPointY));
-		    activityPoint.setAttributeNS(null, "width", "" + BRANCHING_ACTIVITY_POINT);
-		    activityPoint.setAttributeNS(null, "height", "" + BRANCHING_ACTIVITY_POINT);
-		    activityPoint.setAttributeNS(null, "style", activityStyle);
-		    g.appendChild(activityPoint);
-		}		
-	    }
-	    
-	    Element endingPoint = doc.createElementNS(SVG_NAMESPACE, "rect");
-	    endingPoint.setAttributeNS(null, "x", Integer.toString(x + 132));
-	    endingPoint.setAttributeNS(null, "y", Integer.toString(startingPointY));
-	    endingPoint.setAttributeNS(null, "width", Double.toString(BRANCHING_ACTIVITY_POINT + 0.5));
-	    endingPoint.setAttributeNS(null, "height", Double.toString(BRANCHING_ACTIVITY_POINT + 0.5));
-	    endingPoint.setAttributeNS(null, "style", "fill:#000000");
-	    g.appendChild(endingPoint);  	    
-
-	    if (StringUtils.isNotEmpty(text)) {
-		createText("TextElement-" + activityId, x + BRANCHING_ACTIVITY_WIDTH/2, y +90, null, "middle", "11.4", "Verdana", null, text, g);
-	    }
-	    
 	} else if (activity.getActivityTypeID().equals(Activity.OPTIONS_WITH_SEQUENCES_TYPE)) {
 	    // This is an optional sequence
-	    
-	    //Create optionalContainer
-	    createRectangle(node, x, y, g);
-	    
-	    createActvityHeader(node, x, y, g);
+	    createOptionalSequenceActivity(activity, node, g, x, y);
 
-	    if (StringUtils.isNotEmpty(text)) {
-		createText("TextElement-" + activityId, x +9, y +19, null, "start", "12", "Arial", "fill:#828990", text, g);
-	    }
-	    
-	    createText("Children-" + activityId, x +9, y +19*2+1, null, "start", "11", "Arial", "fill:#828990", node.getChildCount() + " - Sequences", g);
-
-	} else if (activity.getActivityTypeID().equals(Activity.SEQUENCE_ACTIVITY_TYPE)) {	
+	} else if (activity.getActivityTypeID().equals(Activity.SEQUENCE_ACTIVITY_TYPE)) {
 	    // This is a sequence within an optional
-	    
-	    //Create sequenceContainer
+
+	    // Create sequenceContainer
 	    createRectangle(node, x, y, g);
-	    
+
 	} else if (activity.getActivityTypeID().equals(Activity.OPTIONS_ACTIVITY_TYPE)) {
 	    // This is an optional activity
-		
-	    int childActivitiesSize = node.getChildCount();
-
-	    // Create optionalContainer
-	    createRectangle(node, x, y, g);
-	    
-	    createActvityHeader(node, x, y, g);
-
-	    if (StringUtils.isNotEmpty(text)) {
-		createText("TextElement-" + activityId, x +9, y +19, null, "start", "12", "Arial", "fill:#828990", text, g);
-	    }
-	    
-	    createText("Children-" + activityId, x +9, y +19*2+1, null, "start", "11", "Arial", "fill:#828990", childActivitiesSize + " - Activities", g);
+	    createOptionalActivity(activity, node, g, x, y);
 
 	} else if (activity.getActivityTypeID().equals(Activity.FLOATING_ACTIVITY_TYPE)) {
 	    // This is a support activity
-
-	    // Create supportContainer
-	    createRectangle(node, x, y, g);
-	    
-	    createActvityHeader(node, x, y, g);
-
-	    if (StringUtils.isNotEmpty(text)) {
-		createText("TextElement-" + activityId, x +9, y +19, null, "start", "12", "Arial", "fill:#828990", text, g);
-	    }
-	    
-	    int supportActivityChildrenSize = node.getChildCount();
-	    createText("Children-" + activityId, x +9, y +19*2+1, null, "start", "11", "Arial", "fill:#828990", supportActivityChildrenSize + " - Activities", g);
+	    createSupportActivity(activity, node, g, x, y);
 
 	} else {
 	    // This is a tool activity
-		
-	    // if activity uses a grouping we need to add a second rect layer to show that it's grouped
-	    if (activity.getApplyGrouping()) {
-		createGroupingEffect(node, x, y, g);
-	    }
+	    createToolActivity(activity, node, g, x, y);
+	}
+    }
 
-	    //create activity's rectangle
-	    createRectangle(node, x, y, g);
+    private void createOptionalActivityChild(AuthoringActivityDTO activity, ActivityTreeNode node, Element g, int x,
+	    int y) {
+	// create activity's rectangle
+	createRectangle(node, x, y, g);
 
-	    // Create text label
-	    if (text != null) {
-		int xText = x + (width / 2);
-		int yText = y + (height / 2) + 18;
-		createText("TextElement-" + activityId, xText, yText, null, "middle", "11.4", "Verdana", null, text, g);
-	    }
+	// Create text label
 
-	    createImage(node, x, y, g);
+	String text = activity.getActivityTitle();
+	if (text != null) {
+	    Integer width = node.getActivityDimension().width;
+	    Integer height = node.getActivityDimension().height;
+	    int xText = x + (width / 2);
+	    int yText = y + (height / 2) + 18;
+	    createText("TextElement-" + activity.getActivityID(), xText, yText, null, "middle", "11.4", "Verdana",
+		    null, text, g);
 	}
 
+	createImage(node, x, y, g);
     }
-    
+
+    private void createOptionalSequenceActivityChild(ActivityTreeNode node, Element g, int x, int y) {
+	ActivityTreeNode parentNode = (ActivityTreeNode) node.getParent();
+	AuthoringActivityDTO grandParentActivity = parentNode.getParentActivity();
+	x += (grandParentActivity.getxCoord() == null) ? 0 : grandParentActivity.getxCoord();
+	y += (grandParentActivity.getyCoord() == null) ? 0 : grandParentActivity.getyCoord();
+
+	// create activity's rectangle
+	createRectangle(node, x, y, g);
+
+	createImage(node, x, y, g);
+    }
+
+    private void createGateActivity(AuthoringActivityDTO activity, ActivityTreeNode node, Element g, int x, int y) {
+	// if this is a stop gate we need to draw an octogon instead (and don't care about
+	// SYSTEM_GATE_ACTIVITY_TYPE)
+	x += 8;
+	y -= 2;
+
+	String finalProportions = "";
+	for (double[] proportion : SVGConstants.GATE_PROPORTIONS) {
+	    finalProportions += (x + proportion[0]) + "," + (y + proportion[1]) + " ";
+	}
+
+	Element polygon = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "polygon");
+	polygon.setAttributeNS(null, "style", node.getActivityCss());
+	polygon.setAttributeNS(null, "points", finalProportions);
+	g.appendChild(polygon);
+
+	// calculate midpoint for STOP text
+	double x1 = x + SVGConstants.GATE_PROPORTIONS[6][0];
+	double x2 = x + SVGConstants.GATE_PROPORTIONS[2][0];
+	double midpointX = (x1 + x2) / 2;
+
+	double y1 = y + SVGConstants.GATE_PROPORTIONS[6][1];
+	double y2 = y + SVGConstants.GATE_PROPORTIONS[2][1];
+	double midpointY = (y1 + y2) / 2 + 3;
+
+	createText("Gate_" + activity.getActivityID(), midpointX, midpointY, "0", "middle", "10", "Verdana",
+		"fill:#FFFFFF;stroke:#FFFFFF;stroke-width:.5;", "STOP", g);
+    }
+
+    private void createParallelActivity(AuthoringActivityDTO activity, ActivityTreeNode node, Element g, int x, int y) {
+	// if the parallel is grouped, show it
+	if (activity.getApplyGrouping()) {
+	    createGroupingEffect(node, x, y, g);
+	}
+
+	// Create parallelContainer
+	createRectangle(node, x, y, g);
+
+	createActvityHeader(node, x, y, g);
+
+	String text = activity.getActivityTitle();
+	if (StringUtils.isNotEmpty(text)) {
+	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, null, "start", "12", "Arial",
+		    "fill:#828990", text, g);
+	}
+    }
+
+    private void createSupportActivity(AuthoringActivityDTO activity, ActivityTreeNode node, Element g, int x, int y) {
+	// Create supportContainer
+	createRectangle(node, x, y, g);
+
+	createActvityHeader(node, x, y, g);
+
+	String text = activity.getActivityTitle();
+	if (StringUtils.isNotEmpty(text)) {
+	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, null, "start", "12", "Arial",
+		    "fill:#828990", text, g);
+	}
+
+	int supportActivityChildrenSize = node.getChildCount();
+	createText("Children-" + activity.getActivityID(), x + 9, y + 19 * 2 + 1, null, "start", "11", "Arial",
+		"fill:#828990", supportActivityChildrenSize + " - Activities", g);
+    }
+
+    private void createToolActivity(AuthoringActivityDTO activity, ActivityTreeNode node, Element g, int x, int y) {
+	// if activity uses a grouping we need to add a second rect layer to show that it's grouped
+	if (activity.getApplyGrouping()) {
+	    createGroupingEffect(node, x, y, g);
+	}
+
+	// create activity's rectangle
+	createRectangle(node, x, y, g);
+
+	// Create text label
+	String text = activity.getActivityTitle();
+	if (StringUtils.isNotEmpty(text)) {
+	    Integer width = node.getActivityDimension().width;
+	    Integer height = node.getActivityDimension().height;
+	    int xText = x + (width / 2);
+	    int yText = y + (height / 2) + 18;
+	    createText("TextElement-" + activity.getActivityID(), xText, yText, null, "middle", "11.4", "Verdana",
+		    null, text, g);
+	}
+
+	createImage(node, x, y, g);
+    }
+
+    private void createOptionalActivity(AuthoringActivityDTO activity, ActivityTreeNode node, Element g, int x, int y) {
+	int childActivitiesSize = node.getChildCount();
+
+	// Create optionalContainer
+	createRectangle(node, x, y, g);
+
+	createActvityHeader(node, x, y, g);
+
+	String text = activity.getActivityTitle();
+	if (StringUtils.isNotEmpty(text)) {
+	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, null, "start", "12", "Arial",
+		    "fill:#828990", text, g);
+	}
+
+	createText("Children-" + activity.getActivityID(), x + 9, y + 19 * 2 + 1, null, "start", "11", "Arial",
+		"fill:#828990", childActivitiesSize + " - Activities", g);
+    }
+
+    private void createOptionalSequenceActivity(AuthoringActivityDTO activity, ActivityTreeNode node, Element g, int x,
+	    int y) {
+	// Create optionalContainer
+	createRectangle(node, x, y, g);
+
+	createActvityHeader(node, x, y, g);
+
+	String text = activity.getActivityTitle();
+	if (StringUtils.isNotEmpty(text)) {
+	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, null, "start", "12", "Arial",
+		    "fill:#828990", text, g);
+	}
+
+	createText("Children-" + activity.getActivityID(), x + 9, y + 19 * 2 + 1, null, "start", "11", "Arial",
+		"fill:#828990", node.getChildCount() + " - Sequences", g);
+    }
+
+    private void createBranchingActivity(AuthoringActivityDTO activity, ActivityTreeNode node, Element g, int x, int y) {
+	// if the parallel is grouped, show it
+	if (activity.getApplyGrouping()) {
+	    createGroupingEffect(node, x, y, g);
+	}
+
+	// Create branchingContainer
+	createRectangle(node, x, y, g);
+
+	int startingPointX = x + 26;
+	int startingPointY = y + 40;
+	if (node.getChildCount() == 4) {
+	    startingPointY -= 12;
+	} else if (node.getChildCount() > 4) {
+	    startingPointY -= 2 * 12;
+	}
+
+	Element startingPoint = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "rect");
+	startingPoint.setAttributeNS(null, "x", Integer.toString(startingPointX));
+	startingPoint.setAttributeNS(null, "y", Integer.toString(startingPointY));
+	startingPoint.setAttributeNS(null, "width", Double.toString(SVGConstants.BRANCHING_ACTIVITY_POINT + 0.5));
+	startingPoint.setAttributeNS(null, "height", Double.toString(SVGConstants.BRANCHING_ACTIVITY_POINT + 0.5));
+	startingPoint.setAttributeNS(null, "style", "fill:#000000");
+	g.appendChild(startingPoint);
+
+	TreeSet<ActivityTreeNode> sequenceNodes = new TreeSet<ActivityTreeNode>(new ActivityTreeNodeComparator());
+	sequenceNodes.addAll(node.getChildren());
+	Iterator<ActivityTreeNode> sequenceNodeIterator = sequenceNodes.iterator();
+	for (int sequenceIndex = -1; sequenceNodeIterator.hasNext() && (sequenceIndex < 4); sequenceIndex++) {
+	    ActivityTreeNode sequenceNode = sequenceNodeIterator.next();
+	    double previousActivityPointX = startingPointX + SVGConstants.BRANCHING_ACTIVITY_POINT / 2;
+	    double previousActivityPointY = startingPointY + SVGConstants.BRANCHING_ACTIVITY_POINT / 2;
+
+	    // Create the lines
+	    Iterator<ActivityTreeNode> activityNodeIterator = sequenceNode.getChildren().iterator();
+	    for (int activityIndex = 1; activityNodeIterator.hasNext() && (activityIndex <= 6); activityIndex++, activityNodeIterator
+		    .next()) {
+		double activityPointX = startingPointX + activityIndex * SVGConstants.BRANCHING_STEP
+			+ SVGConstants.BRANCHING_ACTIVITY_POINT / 2;
+		double activityPointY = startingPointY + sequenceIndex * SVGConstants.BRANCHING_STEP
+			+ SVGConstants.BRANCHING_ACTIVITY_POINT / 2;
+
+		Element line = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "line");
+		line.setAttributeNS(null, "x1", Double.toString(previousActivityPointX));
+		line.setAttributeNS(null, "y1", Double.toString(previousActivityPointY));
+		line.setAttributeNS(null, "x2", Double.toString(activityPointX));
+		line.setAttributeNS(null, "y2", Double.toString(activityPointY));
+		line.setAttributeNS(null, "style", "stroke:black;stroke-width:1;");
+		g.appendChild(line);
+
+		previousActivityPointX = activityPointX;
+		previousActivityPointY = activityPointY;
+	    }
+
+	    // check if we need to draw line connecting last activity with endingPoint
+	    if (!sequenceNode.getActivity().getStopAfterActivity()) {
+		Element line = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "line");
+		line.setAttributeNS(null, "x1", Double.toString(previousActivityPointX));
+		line.setAttributeNS(null, "y1", Double.toString(previousActivityPointY));
+		line.setAttributeNS(null, "x2", Double.toString(x + 132 + SVGConstants.BRANCHING_ACTIVITY_POINT / 2));
+		line.setAttributeNS(null, "y2",
+			Double.toString(startingPointY + SVGConstants.BRANCHING_ACTIVITY_POINT / 2));
+		line.setAttributeNS(null, "style", "stroke:black;stroke-width:1;");
+		g.appendChild(line);
+
+	    }
+
+	    // Create activity points
+	    activityNodeIterator = sequenceNode.getChildren().iterator();
+	    for (int activityIndex = 1; activityNodeIterator.hasNext() && (activityIndex <= 6); activityIndex++) {
+		ActivityTreeNode activityNode = activityNodeIterator.next();
+		String activityStyle = sequenceNode.getActivity().getStopAfterActivity()
+			&& !activityNodeIterator.hasNext() ? "stroke:red" : "stroke:black";
+		activityStyle += ";stroke-width:0.8;opacity:1" + activityNode.getActivityColor();
+		double activityPointX = startingPointX + activityIndex * SVGConstants.BRANCHING_STEP;
+		double activityPointY = startingPointY + sequenceIndex * SVGConstants.BRANCHING_STEP;
+
+		Element activityPoint = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "rect");
+		activityPoint.setAttributeNS(null, "x", Double.toString(activityPointX));
+		activityPoint.setAttributeNS(null, "y", Double.toString(activityPointY));
+		activityPoint.setAttributeNS(null, "width", "" + SVGConstants.BRANCHING_ACTIVITY_POINT);
+		activityPoint.setAttributeNS(null, "height", "" + SVGConstants.BRANCHING_ACTIVITY_POINT);
+		activityPoint.setAttributeNS(null, "style", activityStyle);
+		g.appendChild(activityPoint);
+	    }
+	}
+
+	Element endingPoint = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "rect");
+	endingPoint.setAttributeNS(null, "x", Integer.toString(x + 132));
+	endingPoint.setAttributeNS(null, "y", Integer.toString(startingPointY));
+	endingPoint.setAttributeNS(null, "width", Double.toString(SVGConstants.BRANCHING_ACTIVITY_POINT + 0.5));
+	endingPoint.setAttributeNS(null, "height", Double.toString(SVGConstants.BRANCHING_ACTIVITY_POINT + 0.5));
+	endingPoint.setAttributeNS(null, "style", "fill:#000000");
+	g.appendChild(endingPoint);
+
+	String text = activity.getActivityTitle();
+	if (StringUtils.isNotEmpty(text)) {
+	    createText("TextElement-" + activity.getActivityID(), x + SVGConstants.BRANCHING_ACTIVITY_WIDTH / 2,
+		    y + 90, null, "middle", "11.4", "Verdana", null, text, g);
+	}
+    }
+
     /**
      * Returns estimated width and height of the whole SVG document.
      * 
@@ -632,7 +645,7 @@ public class SVGGenerator extends SVGConstants{
 	int maxY = 0;
 	for (ActivityTreeNode node : nodes) {
 	    Dimension dimension = node.getActivityDimension();
-	    
+
 	    int rightestActivityPoint = node.getActivityCoordinates().x + dimension.width;
 	    if (rightestActivityPoint > maxX) {
 		maxX = rightestActivityPoint;
@@ -642,7 +655,7 @@ public class SVGGenerator extends SVGConstants{
 		maxY = bottomActivityPoint;
 	    }
 	}
-	
+
 	int minX = Integer.MAX_VALUE;
 	int minY = Integer.MAX_VALUE;
 	for (ActivityTreeNode node : nodes) {
@@ -658,41 +671,65 @@ public class SVGGenerator extends SVGConstants{
 		}
 	    }
 	}
-	
-        Element svg = doc.getDocumentElement();
-        
-	//Removes padding of the SVG image.
-        minX--;
-        minY--;
-        int width = maxX - minX +5;
-        int height = maxY - minY +5;
-        svg.setAttributeNS(null, "viewBox", minX + " " + minY + " " + Integer.toString(width) + " " + Integer.toString(height));
-        
-        // adjust width and height to adjustedDocumentWidth
-        if ((adjustedDocumentWidth != null) && adjustedDocumentWidth < width) {
-            double scale = (double) adjustedDocumentWidth / (double) width;
-            width = adjustedDocumentWidth;
-            height *= scale; 
-        }
-        
-        //Sets the width and height
-        svg.setAttributeNS(null, "width", Integer.toString(width));
-        svg.setAttributeNS(null, "height", Integer.toString(height));
+
+	for (Point branchingEdgePoint : new Point[] { branchingStartPoint, branchingEndPoint }) {
+	    if (branchingEdgePoint != null) {
+		int x = new Double(branchingEdgePoint.getX()).intValue();
+		if (x + 27 > maxX) {
+		    maxX = x + 27;
+		}
+
+		if (x < minX) {
+		    minX = x;
+		}
+
+		int y = new Double(branchingEdgePoint.getY()).intValue();
+		if (y + 27 > maxY) {
+		    maxY = y + 27;
+		}
+
+		if (y < minY) {
+		    minY = y;
+		}
+	    }
+	}
+
+	Element svg = doc.getDocumentElement();
+
+	// Removes padding of the SVG image.
+	minX--;
+	minY--;
+	int width = maxX - minX + 5;
+	int height = maxY - minY + 5;
+	svg.setAttributeNS(null, "viewBox",
+		minX + " " + minY + " " + Integer.toString(width) + " " + Integer.toString(height));
+
+	// adjust width and height to adjustedDocumentWidth
+	if ((adjustedDocumentWidth != null) && (adjustedDocumentWidth < width)) {
+	    double scale = (double) adjustedDocumentWidth / (double) width;
+	    width = adjustedDocumentWidth;
+	    height *= scale;
+	}
+
+	// Sets the width and height
+	svg.setAttributeNS(null, "width", Integer.toString(width));
+	svg.setAttributeNS(null, "height", Integer.toString(height));
     }
-    
-    //**************** Auxiliary methods for creating svg components ********************************************************
-    
+
+    // **************** Auxiliary methods for creating svg components
+    // ********************************************************
+
     private void createRectangle(ActivityTreeNode node, double x, double y, Element g) {
 	AuthoringActivityDTO activity = node.getActivity();
 	Dimension dimension = node.getActivityDimension();
 	String style = node.getActivityCss();
-	
+
 	if (style == null) {
 	    style = "";
 	}
-	
-	Element rectangle = doc.createElementNS(SVG_NAMESPACE, "rect");
-	
+
+	Element rectangle = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "rect");
+
 	rectangle.setAttributeNS(null, "id", "act" + activity.getActivityID());
 	rectangle.setAttributeNS(null, "x", Double.toString(x));
 	rectangle.setAttributeNS(null, "y", Double.toString(y));
@@ -701,34 +738,35 @@ public class SVGGenerator extends SVGConstants{
 	rectangle.setAttributeNS(null, "style", style);
 	g.appendChild(rectangle);
     }
-    
+
     private void createActvityHeader(ActivityTreeNode node, double x, double y, Element g) {
 	AuthoringActivityDTO activity = node.getActivity();
 	Dimension dimension = node.getActivityDimension();
-	double height = (activity.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE)) ? 23 : CONTAINER_HEADER_HEIGHT; 
-	
-	Element rectangle = doc.createElementNS(SVG_NAMESPACE, "rect");
-	rectangle.setAttributeNS(null, "x", Double.toString(x +4));
-	rectangle.setAttributeNS(null, "y", Double.toString(y +5));
-	rectangle.setAttributeNS(null, "width", Double.toString(dimension.width -8));
+	double height = (activity.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE)) ? 23
+		: SVGConstants.CONTAINER_HEADER_HEIGHT;
+
+	Element rectangle = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "rect");
+	rectangle.setAttributeNS(null, "x", Double.toString(x + 4));
+	rectangle.setAttributeNS(null, "y", Double.toString(y + 5));
+	rectangle.setAttributeNS(null, "width", Double.toString(dimension.width - 8));
 	rectangle.setAttributeNS(null, "height", Double.toString(height));
 	rectangle.setAttributeNS(null, "style", SVGConstants.CSS_CONTAINER);
 	g.appendChild(rectangle);
-    }    
-    
+    }
+
     private void createGroupingEffect(ActivityTreeNode node, double x, double y, Element g) {
 	AuthoringActivityDTO activity = node.getActivity();
 	Dimension dimension = node.getActivityDimension();
 	String style = node.getActivityCss();
-	
-	Element groupingRectangle = doc.createElementNS(SVG_NAMESPACE, "rect");
+
+	Element groupingRectangle = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "rect");
 	groupingRectangle.setAttributeNS(null, "id", "grouping-" + activity.getActivityID());
 	groupingRectangle.setAttributeNS(null, "x", Double.toString(x + 4));
 	groupingRectangle.setAttributeNS(null, "y", Double.toString(y + 4));
 	groupingRectangle.setAttributeNS(null, "width", Double.toString(dimension.width));
-	groupingRectangle.setAttributeNS(null, "height",Double.toString(dimension.height));
+	groupingRectangle.setAttributeNS(null, "height", Double.toString(dimension.height));
 	groupingRectangle.setAttributeNS(null, "style", style + ";stroke:#3b3b3b;stroke-width:3");
-	
+
 	g.appendChild(groupingRectangle);
     }
 
@@ -747,16 +785,16 @@ public class SVGGenerator extends SVGConstants{
 	if (fontFamily == null) {
 	    fontFamily = "Verdana";
 	}
-	
-	//trim text to fit into container
+
+	// trim text to fit into container
 	if (text.length() > 21) {
-	    text = text.substring(0, 20);    
+	    text = text.substring(0, 20);
 	}
-	
-	Element textNode = doc.createElementNS(SVG_NAMESPACE, "text");
+
+	Element textNode = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "text");
 	Node textContent = doc.createTextNode(text);
 	textNode.appendChild(textContent);
-	
+
 	textNode.setAttributeNS(null, "id", id);
 	textNode.setAttributeNS(null, "x", "" + x);
 	textNode.setAttributeNS(null, "y", "" + y);
@@ -767,10 +805,10 @@ public class SVGGenerator extends SVGConstants{
 	if (style != null) {
 	    textNode.setAttributeNS(null, "style", style);
 	}
-	
+
 	g.appendChild(textNode);
     }
-    
+
     /**
      * Creates image for a tool.
      * 
@@ -783,10 +821,9 @@ public class SVGGenerator extends SVGConstants{
      * @param g
      */
     private void createImage(ActivityTreeNode node, int x, int y, Element g) {
-
 	AuthoringActivityDTO activity = node.getActivity();
 	Dimension dimension = node.getActivityDimension();
-	
+
 	// Create image
 	int imageX = x + (dimension.width / 2) - 15;
 	int imageY = y + (dimension.height / 2) - 22;
@@ -797,33 +834,276 @@ public class SVGGenerator extends SVGConstants{
 	String imagePath = activity.getLibraryActivityUIImage();
 	// if png_filename is empty then this is a grouping act:
 	String imageFileName;
-	if (! StringUtils.isBlank(imagePath)) {
+	if (!StringUtils.isBlank(imagePath)) {
 	    imageFileName = FileUtil.getFileName(imagePath);
 	    imageFileName = imageFileName.replaceFirst(".swf$", ".png");
 	} else if (activity.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.SCHEDULE_GATE_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.PERMISSION_GATE_ACTIVITY_TYPE)
-		|| activity.getActivityTypeID().equals(Activity.CONDITION_GATE_ACTIVITY_TYPE)) { 
+		|| activity.getActivityTypeID().equals(Activity.CONDITION_GATE_ACTIVITY_TYPE)) {
 	    imageFileName = "icon_gate.png";
-    	} else if (activity.getActivityTypeID().equals(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE)
+	} else if (activity.getActivityTypeID().equals(Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE)
 		|| activity.getActivityTypeID().equals(Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
-		|| activity.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE)) { 
+		|| activity.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE)) {
 	    imageFileName = "icon_branching.png";
-    	} else if (activity.getActivityTypeID().equals(Activity.OPTIONS_WITH_SEQUENCES_TYPE)
-		|| activity.getActivityTypeID().equals(Activity.OPTIONS_ACTIVITY_TYPE)) { 
+	} else if (activity.getActivityTypeID().equals(Activity.OPTIONS_WITH_SEQUENCES_TYPE)
+		|| activity.getActivityTypeID().equals(Activity.OPTIONS_ACTIVITY_TYPE)) {
 	    imageFileName = "icon_urlcontentmessageboard.png";
-    	} else {
+	} else {
 	    imageFileName = "icon_grouping.png";
 	}
-	imageFileName = PATH_TO_LAMSCOMMUNITY_SVG_IMAGES + imageFileName;
-	Element imageNode = doc.createElementNS(SVG_NAMESPACE, "image");
-	imageNode.setAttributeNS(null, "id", "image-" + activity.getActivityID());
-	imageNode.setAttributeNS(null, "x", Integer.toString(imageX));
-	imageNode.setAttributeNS(null, "y", Integer.toString(imageY));
-	imageNode.setAttributeNS(SVG_NAMESPACE_XLINK, "xlink:href", imageFileName);
+
+	imageFileName = (SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY == outputFormat ? SVGConstants.PATH_TO_LAMSCOMMUNITY_SVG_IMAGES
+		: localSvgIconsPath)
+		+ imageFileName;
+	String imageId = "image-" + activity.getActivityID();
+	createImage(g, imageFileName, imageId, imageX, imageY);
+    }
+
+    private void createImage(Element g, String imageFileName, String id, int x, int y) {
+	Element imageNode = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "image");
+	imageNode.setAttributeNS(null, "id", id);
+	imageNode.setAttributeNS(null, "x", Integer.toString(x));
+	imageNode.setAttributeNS(null, "y", Integer.toString(y));
+	imageNode.setAttributeNS(SVGConstants.SVG_NAMESPACE_XLINK, "xlink:href", imageFileName);
 	imageNode.setAttributeNS(null, "width", Integer.toString(30));
 	imageNode.setAttributeNS(null, "height", Integer.toString(30));
-	g.appendChild(imageNode);
+	if (g == null) {
+	    Element svgRoot = doc.getDocumentElement();
+	    svgRoot.appendChild(imageNode);
+	} else {
+	    g.appendChild(imageNode);
+	}
     }
-    
+
+    private void createTransitionLine(String id, Point2D fromIntersection, Point2D toIntersection, String chosenColor) {
+	// Create the line
+	String color = chosenColor == null ? "#8C8FA6" : chosenColor;
+	Element line = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "line");
+	line.setAttributeNS(null, "id", id);
+	line.setAttributeNS(null, "x1", Double.toString(fromIntersection.getX()));
+	line.setAttributeNS(null, "y1", Double.toString(fromIntersection.getY()));
+	line.setAttributeNS(null, "x2", Double.toString(toIntersection.getX()));
+	line.setAttributeNS(null, "y2", Double.toString(toIntersection.getY()));
+	line.setAttributeNS(null, "style", "stroke:" + color + ";stroke-width:2;opacity:1");
+	line.setAttributeNS(null, "parentID", "0");
+
+	double a = (toIntersection.getX() - fromIntersection.getX());
+	double b = (toIntersection.getY() - fromIntersection.getY());
+	double yArrowShift = (a * a + b * b == 0) ? 0 : 5 * b / Math.sqrt(a * a + b * b);
+	double xArrowShift = (a * a + b * b == 0) ? 0 : 5 * a / Math.sqrt(a * a + b * b);
+	// Create the arrowhead
+	Element arrowhead = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "line");
+	arrowhead.setAttributeNS(null, "id", "arrowhead_" + id);
+	arrowhead.setAttributeNS(null, "x1", Double.toString(fromIntersection.getX()));
+	arrowhead.setAttributeNS(null, "y1", Double.toString(fromIntersection.getY()));
+	arrowhead.setAttributeNS(null, "x2",
+		Double.toString((fromIntersection.getX() + toIntersection.getX()) / 2 - xArrowShift));
+	arrowhead.setAttributeNS(null, "y2",
+		Double.toString((fromIntersection.getY() + toIntersection.getY()) / 2 - yArrowShift));
+	arrowhead.setAttributeNS(null, "style", "fill:" + color + ";stroke:" + color + ";stroke-width:2;opacity:1");
+	arrowhead.setAttributeNS(null, "marker-end", "url(#Triangle)");
+	arrowhead.setAttributeNS(null, "parentID", "0");
+
+	// Attach the line to the root 'svg' element.
+	Element svgRoot = doc.getDocumentElement();
+	svgRoot.appendChild(line);
+	svgRoot.appendChild(arrowhead);
+    }
+
+    /**
+     * Gets a map ID -> node for all activities in Learning Design.
+     */
+    private Map<Long, ActivityTreeNode> getActivityTree(List<AuthoringActivityDTO> activities, ActivityTreeNode root) {
+	// initialize all tree nodes
+	Map<Long, ActivityTreeNode> allNodes = new HashMap<Long, ActivityTreeNode>();
+	for (AuthoringActivityDTO activity : activities) {
+	    ActivityTreeNode node = new ActivityTreeNode(activity);
+	    allNodes.put(activity.getActivityID(), node);
+	}
+
+	// construct activities tree
+	for (ActivityTreeNode node : allNodes.values()) {
+	    AuthoringActivityDTO activity = node.getActivity();
+	    if (activity.getParentActivityID() == null) {
+		root.add(node);
+	    } else {
+		Long parentId = activity.getParentActivityID();
+		ActivityTreeNode parent = allNodes.get(parentId);
+		parent.add(node);
+	    }
+	}
+
+	return allNodes;
+    }
+
+    /**
+     * Gets map ID -> node for activities within branching. Also groups activities into sets the same way they are
+     * organised in branches.
+     */
+    private Map<Long, ActivityTreeNode> getActivityTree(List<AuthoringActivityDTO> activities, ActivityTreeNode root,
+	    long branchingActivityId, Set<LinkedList<ActivityTreeNode>> branchesContainter) {
+	// this set contains only activities with parents; other activities can not be part of branching
+	Set<AuthoringActivityDTO> allChildActivities = new HashSet<AuthoringActivityDTO>();
+	// maps Sequence Activity ID to activities it contains
+	Map<Long, Set<AuthoringActivityDTO>> branchMapping = new HashMap<Long, Set<AuthoringActivityDTO>>();
+	ActivityDTOOrderComparator orderComparator = new ActivityDTOOrderComparator();
+
+	for (AuthoringActivityDTO activity : activities) {
+	    Long activityId = activity.getActivityID();
+	    Long parentActivityId = activity.getParentActivityID();
+	    if (activityId.equals(branchingActivityId)) {
+		// fill coordinates for doors on canvas
+		branchingStartPoint = new Point(activity.getStartXCoord(), activity.getStartYCoord());
+		branchingEndPoint = new Point(activity.getEndXCoord(), activity.getEndYCoord());
+	    } else if (parentActivityId != null) {
+		// get only activities with parents
+		allChildActivities.add(activity);
+
+		if (parentActivityId.equals(branchingActivityId)) {
+		    // this is Sequence Activity, so a branch
+		    branchMapping.put(activityId, new TreeSet<AuthoringActivityDTO>(orderComparator));
+		}
+	    }
+	}
+
+	// now choose only the activities which belong to the given branching
+	Map<Long, ActivityTreeNode> branchingNodes = new HashMap<Long, ActivityTreeNode>();
+	for (AuthoringActivityDTO activity : allChildActivities) {
+	    Long parentActivityId = activity.getParentActivityID();
+	    // is the activity part of Sequence Activity, i.e. branch?
+	    if (branchMapping.keySet().contains(parentActivityId)) {
+		// branch parts become top-level activities
+		activity.setParentActivityID(null);
+
+		ActivityTreeNode node = new ActivityTreeNode(activity);
+		root.add(node);
+		branchingNodes.put(activity.getActivityID(), node);
+
+		// add the given activity to its branch
+		branchMapping.get(parentActivityId).add(activity);
+	    }
+	}
+
+	// activities in branchMapping are sorted with Comparator
+	// now convert them into a list of nodes
+	for (Set<AuthoringActivityDTO> branch : branchMapping.values()) {
+	    LinkedList<ActivityTreeNode> branchNodes = new LinkedList<ActivityTreeNode>();
+	    for (AuthoringActivityDTO activity : branch) {
+		branchNodes.add(branchingNodes.get(activity.getActivityID()));
+	    }
+	    branchesContainter.add(branchNodes);
+	}
+
+	// run the same code twice, for Optional Activities and Sequences
+	// first iteration sets parents for Optional Activities and sequences within Optional Sequences
+	for (AuthoringActivityDTO activity : allChildActivities) {
+	    Long parentActivityId = activity.getParentActivityID();
+	    Long activityId = activity.getActivityID();
+	    if (branchingNodes.keySet().contains(parentActivityId) && !branchingNodes.keySet().contains(activityId)) {
+		ActivityTreeNode node = new ActivityTreeNode(activity);
+		ActivityTreeNode parent = branchingNodes.get(parentActivityId);
+		parent.add(node);
+		branchingNodes.put(activityId, node);
+	    }
+	}
+	// second iteration sets parents for activities in sequences within Optional Sequences
+	for (AuthoringActivityDTO activity : allChildActivities) {
+	    Long parentActivityId = activity.getParentActivityID();
+	    Long activityId = activity.getActivityID();
+	    if (branchingNodes.keySet().contains(parentActivityId) && !branchingNodes.keySet().contains(activityId)) {
+		ActivityTreeNode node = new ActivityTreeNode(activity);
+		ActivityTreeNode parent = branchingNodes.get(parentActivityId);
+		parent.add(node);
+		branchingNodes.put(activityId, node);
+	    }
+	}
+
+	return branchingNodes;
+    }
+
+    /**
+     * Draws transitions between activities.
+     */
+    private void createActivityTransitionLines(Map<Long, ActivityTreeNode> nodes, Collection<TransitionDTO> transitions) {
+	for (TransitionDTO transition : transitions) {
+	    ActivityTreeNode fromActivity = nodes.get(transition.getFromActivityID());
+	    ActivityTreeNode toActivity = nodes.get(transition.getToActivityID());
+	    Point2D fromIntersection = SVGTrigonometryUtils.getActivityAndLineSegmentIntersection(fromActivity,
+		    toActivity);
+	    Point2D toIntersection = SVGTrigonometryUtils.getActivityAndLineSegmentIntersection(toActivity,
+		    fromActivity);
+
+	    // skip optional sequence's childs and lines between overlapped activities
+	    if (fromActivity.isOptionalSequenceActivityChild() || (fromIntersection == null)
+		    || (toIntersection == null)) {
+		continue;
+	    }
+
+	    String id = transition.getFromActivityID() + "_to_" + transition.getToActivityID();
+	    createTransitionLine(id, fromIntersection, toIntersection, null);
+	}
+    }
+
+    /**
+     * Draws initial (from door) and ending (to door) transition lines in branching.
+     */
+    private void createBranchingTransitionLines(Set<LinkedList<ActivityTreeNode>> branches, ActivityTreeNode root) {
+	String imageFolder = (SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY == outputFormat ? SVGConstants.PATH_TO_LAMSCOMMUNITY_SVG_IMAGES
+		: Configuration.get(ConfigurationKeys.SERVER_URL) + "images/icons/");
+
+	// first the lines from door
+	String imageFileName = imageFolder + "door_out.png";
+	String imageId = "image-start";
+	createImage(null, imageFileName, imageId, new Double(branchingStartPoint.getX()).intValue(), new Double(
+		branchingStartPoint.getY()).intValue());
+
+	imageFileName = imageFolder + "door_in.png";
+	imageId = "image-end";
+	createImage(null, imageFileName, imageId, new Double(branchingEndPoint.getX()).intValue(), new Double(
+		branchingEndPoint.getY()).intValue());
+
+	Dimension edgePointsDimensions = new Dimension(27, 27);
+	Rectangle startRectangle = new Rectangle(branchingStartPoint, edgePointsDimensions);
+	Rectangle endRectangle = new Rectangle(branchingEndPoint, edgePointsDimensions);
+
+	for (LinkedList<ActivityTreeNode> branch : branches) {
+	    ActivityTreeNode branchFirstActivity = branch.getFirst();
+	    Rectangle branchFirstActivityRectangle = new Rectangle(branchFirstActivity.getActivityCoordinates().x,
+		    branchFirstActivity.getActivityCoordinates().y, branchFirstActivity.getActivityDimension().width,
+		    branchFirstActivity.getActivityDimension().height);
+
+	    Point2D fromIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(startRectangle,
+		    branchFirstActivityRectangle);
+	    Point2D toIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(
+		    branchFirstActivityRectangle, startRectangle);
+
+	    // skip lines between overlapped activities
+	    if ((fromIntersection == null) || (toIntersection == null)) {
+		continue;
+	    }
+
+	    // now the last lines
+	    String id = "start_to_" + branchFirstActivity.getActivity().getActivityID();
+	    createTransitionLine(id, fromIntersection, toIntersection, "#AFCE63");
+
+	    ActivityTreeNode branchLastActivity = branch.getLast();
+	    Rectangle branchLastActivityRectangle = new Rectangle(branchLastActivity.getActivityCoordinates().x,
+		    branchLastActivity.getActivityCoordinates().y, branchLastActivity.getActivityDimension().width,
+		    branchLastActivity.getActivityDimension().height);
+
+	    fromIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(branchLastActivityRectangle,
+		    endRectangle);
+	    toIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(endRectangle,
+		    branchLastActivityRectangle);
+
+	    // skip lines between overlapped activities
+	    if ((fromIntersection == null) || (toIntersection == null)) {
+		continue;
+	    }
+
+	    id = branchLastActivity.getActivity().getActivityID() + "_to_end";
+	    createTransitionLine(id, fromIntersection, toIntersection, "#AFCE63");
+	}
+    }
 }

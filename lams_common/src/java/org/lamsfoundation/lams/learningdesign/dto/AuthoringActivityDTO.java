@@ -1111,7 +1111,7 @@ public class AuthoringActivityDTO extends BaseDTO {
      *                The parentActivityID to set.
      */
     public void setParentActivityID(Long parentActivityID) {
-	if (!parentActivityID.equals(WDDXTAGS.NUMERIC_NULL_VALUE_LONG)) {
+	if (!WDDXTAGS.NUMERIC_NULL_VALUE_LONG.equals(parentActivityID)) {
 	    this.parentActivityID = parentActivityID;
 	}
     }

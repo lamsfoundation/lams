@@ -294,9 +294,14 @@ var ActivityUtils = {
 		// label underneath the shape
 		var label = null;
 		if (isHorizontalBar) {
+			// cut lengthy activity names so they don't overlap
+			var content = activity.name;
+			if (content.length > 23) {
+				content = content.substring(0,20) + '...';
+			}
 			label = paper.text(activity.middle,
 					40 + (activity.index % 2 == 0 ? 0 : 15),
-					activity.name);
+					content);
 		} else {
 			label = paper.text(activity.middle,
 				47 + 60 * activity.index + (isLarger ? 10 : 0),
