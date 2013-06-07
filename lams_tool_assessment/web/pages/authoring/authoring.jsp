@@ -42,6 +42,12 @@
         	myForm.attr("action", "<c:url value='/authoring/uploadOfflineFile.do'/>");
         	myForm.submit();
         }
+        
+        function serializeOverallFeedbackForm() {
+        	$("#overallFeedbackList").val($('#advancedInputArea').contents().find('#overallFeedbackForm').serialize(true));
+        	return true;
+        }        
+        
     </script>
 </lams:head>
 <body class="stripes" onLoad="init()">
@@ -62,7 +68,7 @@
 		
 	<%@ include file="/common/messages.jsp"%>
 
-	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
+	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data" onsubmit="return serializeOverallFeedbackForm();">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<html:hidden property="assessment.contentId" />
 		<html:hidden property="sessionMapID" />

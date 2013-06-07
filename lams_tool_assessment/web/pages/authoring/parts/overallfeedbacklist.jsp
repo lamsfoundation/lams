@@ -51,7 +51,7 @@
 				<td style="padding-left:0px; border-bottom:0px; text-align:right; background:none;">
 					<fmt:message key="label.authoring.advance.grade.boundary"></fmt:message>
 				</td>
-				<td style="padding-left:0px; border-bottom:0px; background:none;">
+				<td style="padding-left:5px; border-bottom:0px; background:none;">
 					<input type="hidden" name="overallFeedbackGradeBoundary0" id="overallFeedbackGradeBoundary0" value="100">	
 					100%
 				</td>									
@@ -62,7 +62,7 @@
 						<td style="padding-left:0px; border-bottom:0px; vertical-align:middle; text-align:right; background:none;">
 							<fmt:message key="label.authoring.advance.grade.boundary"></fmt:message>
 						</td>
-						<td style="padding-left:0px; border-bottom:0px; background:none;">	
+						<td style="padding-left:5px; border-bottom:0px; background:none;">	
 							<input type="text" name="overallFeedbackGradeBoundary${status.index}"
 								id="overallFeedbackGradeBoundary${status.index}" size="5" value="${overallFeedback.gradeBoundary}">%
 						</td>									
@@ -73,7 +73,7 @@
 					<td style="padding-left:0px; border-bottom:0px; vertical-align:middle; text-align:right; background:none;">
 						<fmt:message key="label.authoring.advance.feedback"></fmt:message>
 					</td>
-					<td style="padding-left:0px; border-bottom:0px; background:none;">
+					<td style="padding-left:5px; border-bottom:0px; background:none;">
 						<input type="hidden" name="overallFeedbackSequenceId${status.index}" id="overallFeedbackSequenceId${status.index}" value="${overallFeedback.sequenceId}">									
 						<input type="text" name="overallFeedbackFeedback${status.index}"
 							id="overallFeedbackFeedback${status.index}" size="57" value="${overallFeedback.feedback}">
@@ -84,7 +84,7 @@
 				<td style="padding-left:0px; border-bottom:0px; vertical-align:middle; text-align:right; background:none;">
 					<fmt:message key="label.authoring.advance.grade.boundary"></fmt:message>
 				</td>
-				<td style="padding-left:0px; border-bottom:0px; background:none;">	
+				<td style="padding-left:5px; border-bottom:0px; background:none;">	
 					0%
 				</td>									
 			</tr>
@@ -100,7 +100,7 @@
 <%-- This script will adjust assessment item input area height according to the new instruction item amount. --%>
 <script type="text/javascript">
 	var obj = window.top.document.getElementById('advancedInputArea');
-	obj.style.height = eval(160 + ${overallFeedbackListSize}*60) + 'px';
+	obj.style.height = eval(155 + ${overallFeedbackListSize}*72) + 'px';
 </script>	
 	
 	</body>

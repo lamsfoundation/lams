@@ -167,7 +167,7 @@
 <p>
 	<iframe 
 		id="advancedInputArea" name="advancedInputArea"
-		style="width:650px;height:100px;border:0px;display:block;" frameborder="no" scrolling="no" src="<c:url value='/authoring/initOverallFeedback.do'/>?sessionMapID=${formBean.sessionMapID}">
+		style="width:650px;height:100%;border:0px;display:block;" frameborder="no" scrolling="no" src="<c:url value='/authoring/initOverallFeedback.do'/>?sessionMapID=${formBean.sessionMapID}">
 	</iframe>
 </p>
 
