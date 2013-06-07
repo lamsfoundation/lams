@@ -279,7 +279,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    mcLearningForm.setLearnerProgress(new Boolean(true).toString());
 	    mcLearningForm.setLearnerProgressUserId(userId);
 
-	    McLearningAction mcLearningAction = new McLearningAction();
 	    /*
 	     * pay attention that this userId is the learner's userId passed by the request parameter. It is differerent
 	     * than USER_ID kept in the session of the current system user
@@ -306,6 +305,9 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    LearningUtil.saveFormRequestData(request, mcLearningForm, true);
 
 	    request.setAttribute(McAppConstants.REQUEST_BY_STARTER, new Boolean(true).toString());
+	    
+	    McLearningAction mcLearningAction = new McLearningAction();
+	    mcLearningAction.setServlet(servlet);
 	    return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
 	}
 
@@ -343,6 +345,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    }
 	} else if (mode.equals("teacher")) {
 	    McLearningAction mcLearningAction = new McLearningAction();
+	    mcLearningAction.setServlet(servlet);
 	    mcLearningForm.setLearnerProgress(new Boolean(true).toString());
 	    mcLearningForm.setLearnerProgressUserId(userId);
 	    return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
