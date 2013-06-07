@@ -15,6 +15,14 @@
 			$("#passingMark").prop("disabled", false);
 		});
 		
+		$("#display-summary").click(function(){
+			$('#display-summary-area').toggle('slow');
+			$('#allowQuestionFeedback').prop("checked", false);
+			$('#allowRightAnswersAfterQuestion').prop("checked", false);
+			$('#allowWrongAnswersAfterQuestion').prop("checked", false);
+			$('#allowHistoryResponsesAfterAttempt').prop("checked", false);
+		});
+		
 		<c:if test="${formBean.assessment.passingMark == 0}">$("#passingMark").prop("disabled", true);</c:if>
 		<c:if test="${formBean.assessment.passingMark > 0}">$("#attemptsAllowed").prop("disabled", true);</c:if>
 	});
@@ -47,8 +55,7 @@
 </p>
 
 <p>
-	<html:checkbox property="assessment.shuffled" styleClass="noBorder" styleId="shuffled">
-	</html:checkbox>
+	<html:checkbox property="assessment.shuffled" styleClass="noBorder" styleId="shuffled"/>
 	<label for="shuffled">
 		<fmt:message key="label.authoring.advance.shuffle.questions" />
 	</label>
@@ -86,66 +93,56 @@
 	
 </p>
 
+<p class="small-space-top">
+	<html:checkbox property="assessment.displaySummary" styleClass="noBorder" styleId="display-summary"/>
+	<label for="display-summary">
+		<fmt:message key="label.authoring.advance.display.summary" />
+	</label>
+	
+	<div id="display-summary-area" style="padding-left: 50px; <c:if test="${!formBean.assessment.displaySummary}">display:none;</c:if>">
+	
+		<html:checkbox property="assessment.allowQuestionFeedback" styleClass="noBorder" styleId="allowQuestionFeedback"/>
+		<label for="allowQuestionFeedback">
+			<fmt:message key="label.authoring.advance.allow.students.question.feedback" />
+		</label>
+		<br><br>
+		
+		<html:checkbox property="assessment.allowRightAnswersAfterQuestion" styleClass="noBorder" styleId="allowRightAnswersAfterQuestion"/>
+		<label for="allowRightAnswersAfterQuestion">
+			<fmt:message key="label.authoring.advance.allow.students.right.answers" />
+		</label>
+		<br><br>
+	
+		<html:checkbox property="assessment.allowWrongAnswersAfterQuestion" styleClass="noBorder" styleId="allowWrongAnswersAfterQuestion"/>
+		<label for="allowWrongAnswersAfterQuestion">
+			<fmt:message key="label.authoring.advance.allow.students.wrong.answers" />
+		</label>
+		<br><br>
+		
+		<html:checkbox property="assessment.allowHistoryResponses" styleClass="noBorder" styleId="allowHistoryResponsesAfterAttempt"/>
+		<label for="allowHistoryResponsesAfterAttempt">
+			<fmt:message key="label.authoring.advance.allow.students.history.responses" />
+		</label>
+	
+	</div>
+</p>
+
 <p>
-	<html:checkbox property="assessment.allowOverallFeedbackAfterQuestion" styleClass="noBorder" styleId="allowOverallFeedbackAfterQuestion">
-	</html:checkbox>
+	<html:checkbox property="assessment.allowOverallFeedbackAfterQuestion" styleClass="noBorder" styleId="allowOverallFeedbackAfterQuestion"/>
 	<label for="allowOverallFeedbackAfterQuestion">
 		<fmt:message key="label.authoring.advance.allow.students.overall.feedback" />
 	</label>
 </p>
 
 <p>
-	<html:checkbox property="assessment.allowQuestionFeedback" styleClass="noBorder" styleId="allowQuestionFeedback">
-	</html:checkbox>
-	<label for="allowQuestionFeedback">
-		<fmt:message key="label.authoring.advance.allow.students.question.feedback" />
-	</label>
-</p>
-
-<p>
-	<html:checkbox property="assessment.allowRightAnswersAfterQuestion" styleClass="noBorder" styleId="allowRightAnswersAfterQuestion">
-	</html:checkbox>
-	<label for="allowRightAnswersAfterQuestion">
-		<fmt:message key="label.authoring.advance.allow.students.right.answers" />
-	</label>
-</p>
-
-<p>
-	<html:checkbox property="assessment.allowWrongAnswersAfterQuestion" styleClass="noBorder" styleId="allowWrongAnswersAfterQuestion">
-	</html:checkbox>
-	<label for="allowWrongAnswersAfterQuestion">
-		<fmt:message key="label.authoring.advance.allow.students.wrong.answers" />
-	</label>
-</p>
-
-<p>
-	<html:checkbox property="assessment.allowGradesAfterAttempt" styleClass="noBorder" styleId="allowGradesAfterAttempt">
-	</html:checkbox>
+	<html:checkbox property="assessment.allowGradesAfterAttempt" styleClass="noBorder" styleId="allowGradesAfterAttempt"/>
 	<label for="allowGradesAfterAttempt">
 		<fmt:message key="label.authoring.advance.allow.students.grades" />
 	</label>
 </p>
 
 <p>
-	<html:checkbox property="assessment.allowHistoryResponses" styleClass="noBorder" styleId="allowHistoryResponsesAfterAttempt">
-	</html:checkbox>
-	<label for="allowHistoryResponsesAfterAttempt">
-		<fmt:message key="label.authoring.advance.allow.students.history.responses" />
-	</label>
-</p>
-
-<p>
-	<html:checkbox property="assessment.displaySummary" styleClass="noBorder" styleId="displaySummary">
-	</html:checkbox>
-	<label for="displaySummary">
-		<fmt:message key="label.authoring.advance.display.summary" />
-	</label>
-</p>
-
-<p>
-	<html:checkbox property="assessment.notifyTeachersOnAttemptCompletion"
-		styleClass="noBorder" styleId="notifyTeachersOnAttemptCompletion">
-	</html:checkbox>
+	<html:checkbox property="assessment.notifyTeachersOnAttemptCompletion" styleClass="noBorder" styleId="notifyTeachersOnAttemptCompletion"/>
 	<label for="notifyTeachersOnAttemptCompletion">
 		<fmt:message key="label.authoring.advanced.notify.on.attempt.completion" />
 	</label>
