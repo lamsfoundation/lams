@@ -262,6 +262,10 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	for (KalturaAttachment att : atts) {
 	    att.setKaltura(null);
 	}
+	Set<KalturaItem> items = kaltura.getKalturaItems();
+	for (KalturaItem item : items) {
+	    item.setKalturaUid(null);
+	}
 	try {
 	    exportContentService.registerFileClassForExport(KalturaAttachment.class.getName(), "fileUuid",
 		    "fileVersionId");
