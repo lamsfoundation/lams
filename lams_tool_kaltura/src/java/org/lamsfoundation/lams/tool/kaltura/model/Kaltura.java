@@ -452,6 +452,16 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 	toContent = (Kaltura) fromContent.clone();
 	toContent.setToolContentId(toContentId);
 	toContent.setCreateDate(new Date());
+	
+	//reset user info as well
+	if (toContent.getCreatedBy() != null) {
+	    toContent.getCreatedBy().setKaltura(toContent);
+	    Set<KalturaItem> items = toContent.getKalturaItems();
+	    for (KalturaItem item : items) {
+		item.setCreatedBy(toContent.getCreatedBy());
+	    }
+	}
+	
 	return toContent;
     }
 
@@ -486,6 +496,12 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 		}
 		kaltura.kalturaAttachments = set;
 	    }
+	    
+	    // clone KalturaUser as well
+	    if (createdBy != null) {
+		kaltura.setCreatedBy((KalturaUser) createdBy.clone());
+	    }
+	    
 	    // create an empty set for the kalturaSession
 	    kaltura.kalturaSessions = new HashSet();
 

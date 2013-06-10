@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * @hibernate.class table="tl_lakalt11_user"
  */
 
-public class KalturaUser implements java.io.Serializable {
+public class KalturaUser implements java.io.Serializable, Cloneable {
 
     private static final long serialVersionUID = -3701664859818409197L;
     private static Logger log = Logger.getLogger(KalturaUser.class);
