@@ -72,6 +72,12 @@ import org.w3c.dom.svg.SVGDocument;
  * @author Andrey Balan
  */
 public class SVGGenerator {
+    private static class BranchDTO extends LinkedList<ActivityTreeNode> {
+	private Long sequenceActivityId;
+	private Boolean stopAfterActivity;
+	private String branchTitle;
+    }
+
     public final static int OUTPUT_FORMAT_SVG = 1;
     public final static int OUTPUT_FORMAT_PNG = 2;
     public final static int OUTPUT_FORMAT_SYSTEM_OUT = 3;
@@ -208,7 +214,7 @@ public class SVGGenerator {
 	initializeSvgDocument();
 
 	ActivityTreeNode root = new ActivityTreeNode();
-	Set<LinkedList<ActivityTreeNode>> branches = new HashSet<LinkedList<ActivityTreeNode>>();
+	List<BranchDTO> branches = new ArrayList<BranchDTO>();
 	Map<Long, ActivityTreeNode> allNodes = getActivityTree(learningDesign.getActivities(), root,
 		branchingActivityId, branches);
 
@@ -388,8 +394,7 @@ public class SVGGenerator {
 	    Integer height = node.getActivityDimension().height;
 	    int xText = x + (width / 2);
 	    int yText = y + (height / 2) + 18;
-	    createText("TextElement-" + activity.getActivityID(), xText, yText, null, "middle", "11.4", "Verdana",
-		    null, text, g);
+	    createText("TextElement-" + activity.getActivityID(), xText, yText, "middle", "11.4", null, null, text, g);
 	}
 
 	createImage(node, x, y, g);
@@ -432,7 +437,7 @@ public class SVGGenerator {
 	double y2 = y + SVGConstants.GATE_PROPORTIONS[2][1];
 	double midpointY = (y1 + y2) / 2 + 3;
 
-	createText("Gate_" + activity.getActivityID(), midpointX, midpointY, "0", "middle", "10", "Verdana",
+	createText("Gate_" + activity.getActivityID(), midpointX, midpointY, "middle", "10", null,
 		"fill:#FFFFFF;stroke:#FFFFFF;stroke-width:.5;", "STOP", g);
     }
 
@@ -449,7 +454,7 @@ public class SVGGenerator {
 
 	String text = activity.getActivityTitle();
 	if (StringUtils.isNotEmpty(text)) {
-	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, null, "start", "12", "Arial",
+	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, "start", "12", "Arial",
 		    "fill:#828990", text, g);
 	}
     }
@@ -462,12 +467,12 @@ public class SVGGenerator {
 
 	String text = activity.getActivityTitle();
 	if (StringUtils.isNotEmpty(text)) {
-	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, null, "start", "12", "Arial",
+	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, "start", "12", "Arial",
 		    "fill:#828990", text, g);
 	}
 
 	int supportActivityChildrenSize = node.getChildCount();
-	createText("Children-" + activity.getActivityID(), x + 9, y + 19 * 2 + 1, null, "start", "11", "Arial",
+	createText("Children-" + activity.getActivityID(), x + 9, y + 19 * 2 + 1, "start", "11", "Arial",
 		"fill:#828990", supportActivityChildrenSize + " - Activities", g);
     }
 
@@ -487,8 +492,7 @@ public class SVGGenerator {
 	    Integer height = node.getActivityDimension().height;
 	    int xText = x + (width / 2);
 	    int yText = y + (height / 2) + 18;
-	    createText("TextElement-" + activity.getActivityID(), xText, yText, null, "middle", "11.4", "Verdana",
-		    null, text, g);
+	    createText("TextElement-" + activity.getActivityID(), xText, yText, "middle", "11.4", null, null, text, g);
 	}
 
 	createImage(node, x, y, g);
@@ -504,11 +508,11 @@ public class SVGGenerator {
 
 	String text = activity.getActivityTitle();
 	if (StringUtils.isNotEmpty(text)) {
-	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, null, "start", "12", "Arial",
+	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, "start", "12", "Arial",
 		    "fill:#828990", text, g);
 	}
 
-	createText("Children-" + activity.getActivityID(), x + 9, y + 19 * 2 + 1, null, "start", "11", "Arial",
+	createText("Children-" + activity.getActivityID(), x + 9, y + 19 * 2 + 1, "start", "11", "Arial",
 		"fill:#828990", childActivitiesSize + " - Activities", g);
     }
 
@@ -521,11 +525,11 @@ public class SVGGenerator {
 
 	String text = activity.getActivityTitle();
 	if (StringUtils.isNotEmpty(text)) {
-	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, null, "start", "12", "Arial",
+	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, "start", "12", "Arial",
 		    "fill:#828990", text, g);
 	}
 
-	createText("Children-" + activity.getActivityID(), x + 9, y + 19 * 2 + 1, null, "start", "11", "Arial",
+	createText("Children-" + activity.getActivityID(), x + 9, y + 19 * 2 + 1, "start", "11", "Arial",
 		"fill:#828990", node.getChildCount() + " - Sequences", g);
     }
 
@@ -554,11 +558,27 @@ public class SVGGenerator {
 	startingPoint.setAttributeNS(null, "style", "fill:#000000");
 	g.appendChild(startingPoint);
 
-	TreeSet<ActivityTreeNode> sequenceNodes = new TreeSet<ActivityTreeNode>(new ActivityTreeNodeComparator());
-	sequenceNodes.addAll(node.getChildren());
-	Iterator<ActivityTreeNode> sequenceNodeIterator = sequenceNodes.iterator();
-	for (int sequenceIndex = -1; sequenceNodeIterator.hasNext() && (sequenceIndex < 4); sequenceIndex++) {
-	    ActivityTreeNode sequenceNode = sequenceNodeIterator.next();
+	// sort sequences with their order
+	TreeSet<ActivityTreeNode> sequenceNodeSet = new TreeSet<ActivityTreeNode>(new ActivityTreeNodeComparator());
+	sequenceNodeSet.addAll(node.getChildren());
+	LinkedList<ActivityTreeNode> sequenceNodeList = new LinkedList<ActivityTreeNode>();
+	// empty branch (if exists) must be first
+	for (ActivityTreeNode sequenceNode : sequenceNodeSet) {
+	    if (sequenceNode.getChildCount() == 0) {
+		sequenceNodeList.addFirst(sequenceNode);
+	    } else {
+		sequenceNodeList.add(sequenceNode);
+	    }
+	}
+
+	int sequenceIndex = 0;
+
+	for (ActivityTreeNode sequenceNode : sequenceNodeList) {
+	    if (Math.abs(sequenceIndex) >= 3) {
+		// no more than 5 branches in total
+		break;
+	    }
+
 	    double previousActivityPointX = startingPointX + SVGConstants.BRANCHING_ACTIVITY_POINT / 2;
 	    double previousActivityPointY = startingPointY + SVGConstants.BRANCHING_ACTIVITY_POINT / 2;
 
@@ -614,6 +634,12 @@ public class SVGGenerator {
 		activityPoint.setAttributeNS(null, "style", activityStyle);
 		g.appendChild(activityPoint);
 	    }
+
+	    // it goes 0, -1, 1, -2, 2
+	    if (sequenceIndex >= 0) {
+		sequenceIndex++;
+	    }
+	    sequenceIndex *= -1;
 	}
 
 	Element endingPoint = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "rect");
@@ -627,7 +653,7 @@ public class SVGGenerator {
 	String text = activity.getActivityTitle();
 	if (StringUtils.isNotEmpty(text)) {
 	    createText("TextElement-" + activity.getActivityID(), x + SVGConstants.BRANCHING_ACTIVITY_WIDTH / 2,
-		    y + 90, null, "middle", "11.4", "Verdana", null, text, g);
+		    y + 90, "middle", "11.4", null, null, text, g);
 	}
     }
 
@@ -770,12 +796,8 @@ public class SVGGenerator {
 	g.appendChild(groupingRectangle);
     }
 
-    private void createText(String id, double x, double y, String dy, String textAnchor, String fontSize,
-	    String fontFamily, String style, String text, Element g) {
-
-	if (dy == null) {
-	    dy = "0";
-	}
+    private void createText(String id, double x, double y, String textAnchor, String fontSize, String fontFamily,
+	    String style, String text, Element g) {
 	if (textAnchor == null) {
 	    textAnchor = "start";
 	}
@@ -798,7 +820,7 @@ public class SVGGenerator {
 	textNode.setAttributeNS(null, "id", id);
 	textNode.setAttributeNS(null, "x", "" + x);
 	textNode.setAttributeNS(null, "y", "" + y);
-	textNode.setAttributeNS(null, "dy", dy);
+	textNode.setAttributeNS(null, "dy", "0");
 	textNode.setAttributeNS(null, "text-anchor", textAnchor);
 	textNode.setAttributeNS(null, "font-size", fontSize);
 	textNode.setAttributeNS(null, "font-family", fontFamily);
@@ -876,7 +898,8 @@ public class SVGGenerator {
 	}
     }
 
-    private void createTransitionLine(String id, Point2D fromIntersection, Point2D toIntersection, String chosenColor) {
+    private void createTransitionLine(String id, Point2D fromIntersection, Point2D toIntersection, String branchTitle,
+	    String chosenColor) {
 	// Create the line
 	String color = chosenColor == null ? "#8C8FA6" : chosenColor;
 	Element line = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "line");
@@ -888,19 +911,19 @@ public class SVGGenerator {
 	line.setAttributeNS(null, "style", "stroke:" + color + ";stroke-width:2;opacity:1");
 	line.setAttributeNS(null, "parentID", "0");
 
-	double a = (toIntersection.getX() - fromIntersection.getX());
-	double b = (toIntersection.getY() - fromIntersection.getY());
-	double yArrowShift = (a * a + b * b == 0) ? 0 : 5 * b / Math.sqrt(a * a + b * b);
-	double xArrowShift = (a * a + b * b == 0) ? 0 : 5 * a / Math.sqrt(a * a + b * b);
+	double a = toIntersection.getX() - fromIntersection.getX();
+	double b = toIntersection.getY() - fromIntersection.getY();
+	double arrowShiftX = (a * a + b * b == 0) ? 0 : 5 * a / Math.sqrt(a * a + b * b);
+	double arrowShiftY = (a * a + b * b == 0) ? 0 : 5 * b / Math.sqrt(a * a + b * b);
+	double arrowEndX = (fromIntersection.getX() + toIntersection.getX()) / 2 - arrowShiftX;
+	double arrowEndY = (fromIntersection.getY() + toIntersection.getY()) / 2 - arrowShiftY;
 	// Create the arrowhead
 	Element arrowhead = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "line");
 	arrowhead.setAttributeNS(null, "id", "arrowhead_" + id);
 	arrowhead.setAttributeNS(null, "x1", Double.toString(fromIntersection.getX()));
 	arrowhead.setAttributeNS(null, "y1", Double.toString(fromIntersection.getY()));
-	arrowhead.setAttributeNS(null, "x2",
-		Double.toString((fromIntersection.getX() + toIntersection.getX()) / 2 - xArrowShift));
-	arrowhead.setAttributeNS(null, "y2",
-		Double.toString((fromIntersection.getY() + toIntersection.getY()) / 2 - yArrowShift));
+	arrowhead.setAttributeNS(null, "x2", Double.toString(arrowEndX));
+	arrowhead.setAttributeNS(null, "y2", Double.toString(arrowEndY));
 	arrowhead.setAttributeNS(null, "style", "fill:" + color + ";stroke:" + color + ";stroke-width:2;opacity:1");
 	arrowhead.setAttributeNS(null, "marker-end", "url(#Triangle)");
 	arrowhead.setAttributeNS(null, "parentID", "0");
@@ -909,6 +932,13 @@ public class SVGGenerator {
 	Element svgRoot = doc.getDocumentElement();
 	svgRoot.appendChild(line);
 	svgRoot.appendChild(arrowhead);
+
+	// print sequence name, if given
+	if (!StringUtils.isBlank(branchTitle)) {
+	    // top sequences have title above, bottom ones below
+	    double titleY = arrowEndY + (b < 0 ? -10 : 20);
+	    createText("branch_title_" + id, arrowEndX, titleY, "end", null, null, null, branchTitle, svgRoot);
+	}
     }
 
     /**
@@ -942,11 +972,11 @@ public class SVGGenerator {
      * organised in branches.
      */
     private Map<Long, ActivityTreeNode> getActivityTree(List<AuthoringActivityDTO> activities, ActivityTreeNode root,
-	    long branchingActivityId, Set<LinkedList<ActivityTreeNode>> branchesContainter) {
+	    long branchingActivityId, Collection<BranchDTO> branchesContainter) {
 	// this set contains only activities with parents; other activities can not be part of branching
 	Set<AuthoringActivityDTO> allChildActivities = new HashSet<AuthoringActivityDTO>();
 	// maps Sequence Activity ID to activities it contains
-	Map<Long, Set<AuthoringActivityDTO>> branchMapping = new HashMap<Long, Set<AuthoringActivityDTO>>();
+	Map<Long, Set<AuthoringActivityDTO>> sequenceMapping = new HashMap<Long, Set<AuthoringActivityDTO>>();
 	ActivityDTOOrderComparator orderComparator = new ActivityDTOOrderComparator();
 
 	for (AuthoringActivityDTO activity : activities) {
@@ -961,38 +991,48 @@ public class SVGGenerator {
 		allChildActivities.add(activity);
 
 		if (parentActivityId.equals(branchingActivityId)) {
-		    // this is Sequence Activity, so a branch
-		    branchMapping.put(activityId, new TreeSet<AuthoringActivityDTO>(orderComparator));
+		    // this is Sequence Activity, i.e. a branch
+		    sequenceMapping.put(activityId, new TreeSet<AuthoringActivityDTO>(orderComparator));
+		    BranchDTO branchDTO = new BranchDTO();
+		    branchDTO.sequenceActivityId = activityId;
+		    branchDTO.branchTitle = activity.getActivityTitle();
+		    branchDTO.stopAfterActivity = activity.getStopAfterActivity();
+		    branchesContainter.add(branchDTO);
 		}
 	    }
 	}
 
 	// now choose only the activities which belong to the given branching
 	Map<Long, ActivityTreeNode> branchingNodes = new HashMap<Long, ActivityTreeNode>();
-	for (AuthoringActivityDTO activity : allChildActivities) {
-	    Long parentActivityId = activity.getParentActivityID();
+	for (AuthoringActivityDTO childActivity : allChildActivities) {
+	    Long parentActivityId = childActivity.getParentActivityID();
 	    // is the activity part of Sequence Activity, i.e. branch?
-	    if (branchMapping.keySet().contains(parentActivityId)) {
+	    if (sequenceMapping.keySet().contains(parentActivityId)) {
 		// branch parts become top-level activities
-		activity.setParentActivityID(null);
+		childActivity.setParentActivityID(null);
 
-		ActivityTreeNode node = new ActivityTreeNode(activity);
+		ActivityTreeNode node = new ActivityTreeNode(childActivity);
 		root.add(node);
-		branchingNodes.put(activity.getActivityID(), node);
+		branchingNodes.put(childActivity.getActivityID(), node);
 
 		// add the given activity to its branch
-		branchMapping.get(parentActivityId).add(activity);
+		sequenceMapping.get(parentActivityId).add(childActivity);
 	    }
 	}
 
-	// activities in branchMapping are sorted with Comparator
+	// activities in sequenceMapping are sorted with Comparator
 	// now convert them into a list of nodes
-	for (Set<AuthoringActivityDTO> branch : branchMapping.values()) {
-	    LinkedList<ActivityTreeNode> branchNodes = new LinkedList<ActivityTreeNode>();
-	    for (AuthoringActivityDTO activity : branch) {
-		branchNodes.add(branchingNodes.get(activity.getActivityID()));
+	for (Long sequenceActivityId : sequenceMapping.keySet()) {
+	    for (BranchDTO branchDTO : branchesContainter) {
+		if (sequenceActivityId.equals(branchDTO.sequenceActivityId)) {
+		    Set<AuthoringActivityDTO> sequence = sequenceMapping.get(sequenceActivityId);
+		    for (AuthoringActivityDTO childActivity : sequence) {
+			ActivityTreeNode childAcitivityNode = branchingNodes.get(childActivity.getActivityID());
+			branchDTO.add(childAcitivityNode);
+		    }
+		    break;
+		}
 	    }
-	    branchesContainter.add(branchNodes);
 	}
 
 	// run the same code twice, for Optional Activities and Sequences
@@ -1041,14 +1081,14 @@ public class SVGGenerator {
 	    }
 
 	    String id = transition.getFromActivityID() + "_to_" + transition.getToActivityID();
-	    createTransitionLine(id, fromIntersection, toIntersection, null);
+	    createTransitionLine(id, fromIntersection, toIntersection, null, null);
 	}
     }
 
     /**
      * Draws initial (from door) and ending (to door) transition lines in branching.
      */
-    private void createBranchingTransitionLines(Set<LinkedList<ActivityTreeNode>> branches, ActivityTreeNode root) {
+    private void createBranchingTransitionLines(Collection<BranchDTO> branches, ActivityTreeNode root) {
 	String imageFolder = (SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY == outputFormat ? SVGConstants.PATH_TO_LAMSCOMMUNITY_SVG_IMAGES
 		: Configuration.get(ConfigurationKeys.SERVER_URL) + "images/icons/");
 
@@ -1067,43 +1107,65 @@ public class SVGGenerator {
 	Rectangle startRectangle = new Rectangle(branchingStartPoint, edgePointsDimensions);
 	Rectangle endRectangle = new Rectangle(branchingEndPoint, edgePointsDimensions);
 
-	for (LinkedList<ActivityTreeNode> branch : branches) {
-	    ActivityTreeNode branchFirstActivity = branch.getFirst();
-	    Rectangle branchFirstActivityRectangle = new Rectangle(branchFirstActivity.getActivityCoordinates().x,
-		    branchFirstActivity.getActivityCoordinates().y, branchFirstActivity.getActivityDimension().width,
-		    branchFirstActivity.getActivityDimension().height);
+	for (BranchDTO branch : branches) {
+	    if (branch.isEmpty()) {
+		// no activities in branch so just draw a line from door to door
+		Point2D fromIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(startRectangle,
+			endRectangle);
+		Point2D toIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(endRectangle,
+			startRectangle);
 
-	    Point2D fromIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(startRectangle,
-		    branchFirstActivityRectangle);
-	    Point2D toIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(
-		    branchFirstActivityRectangle, startRectangle);
+		// skip lines between overlapped activities
+		if ((fromIntersection == null) || (toIntersection == null)) {
+		    continue;
+		}
 
-	    // skip lines between overlapped activities
-	    if ((fromIntersection == null) || (toIntersection == null)) {
-		continue;
+		// now the last lines
+		String id = "start_to_end";
+		createTransitionLine(id, fromIntersection, toIntersection, branch.branchTitle, "#AFCE63");
+	    } else {
+		ActivityTreeNode branchFirstActivity = branch.getFirst();
+		Rectangle branchFirstActivityRectangle = new Rectangle(branchFirstActivity.getActivityCoordinates().x,
+			branchFirstActivity.getActivityCoordinates().y,
+			branchFirstActivity.getActivityDimension().width,
+			branchFirstActivity.getActivityDimension().height);
+
+		Point2D fromIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(startRectangle,
+			branchFirstActivityRectangle);
+		Point2D toIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(
+			branchFirstActivityRectangle, startRectangle);
+
+		// skip lines between overlapped activities
+		if ((fromIntersection == null) || (toIntersection == null)) {
+		    continue;
+		}
+
+		// now the last lines
+		String id = "start_to_" + branchFirstActivity.getActivity().getActivityID();
+		createTransitionLine(id, fromIntersection, toIntersection, branch.branchTitle, "#AFCE63");
+
+		ActivityTreeNode branchLastActivity = branch.getLast();
+		if (!branch.stopAfterActivity) {
+		    Rectangle branchLastActivityRectangle = new Rectangle(
+			    branchLastActivity.getActivityCoordinates().x,
+			    branchLastActivity.getActivityCoordinates().y,
+			    branchLastActivity.getActivityDimension().width,
+			    branchLastActivity.getActivityDimension().height);
+
+		    fromIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(
+			    branchLastActivityRectangle, endRectangle);
+		    toIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(endRectangle,
+			    branchLastActivityRectangle);
+
+		    // skip lines between overlapped activities
+		    if ((fromIntersection == null) || (toIntersection == null)) {
+			continue;
+		    }
+
+		    id = branchLastActivity.getActivity().getActivityID() + "_to_end";
+		    createTransitionLine(id, fromIntersection, toIntersection, null, "#AFCE63");
+		}
 	    }
-
-	    // now the last lines
-	    String id = "start_to_" + branchFirstActivity.getActivity().getActivityID();
-	    createTransitionLine(id, fromIntersection, toIntersection, "#AFCE63");
-
-	    ActivityTreeNode branchLastActivity = branch.getLast();
-	    Rectangle branchLastActivityRectangle = new Rectangle(branchLastActivity.getActivityCoordinates().x,
-		    branchLastActivity.getActivityCoordinates().y, branchLastActivity.getActivityDimension().width,
-		    branchLastActivity.getActivityDimension().height);
-
-	    fromIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(branchLastActivityRectangle,
-		    endRectangle);
-	    toIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(endRectangle,
-		    branchLastActivityRectangle);
-
-	    // skip lines between overlapped activities
-	    if ((fromIntersection == null) || (toIntersection == null)) {
-		continue;
-	    }
-
-	    id = branchLastActivity.getActivity().getActivityID() + "_to_end";
-	    createTransitionLine(id, fromIntersection, toIntersection, "#AFCE63");
 	}
     }
 }
