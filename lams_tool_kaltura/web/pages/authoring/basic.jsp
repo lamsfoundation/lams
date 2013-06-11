@@ -105,25 +105,24 @@
 			
 		// Get etries titles from Kaltura server. Regrdless of success save the video with LAMS.
 		for(var i = 0; i < entries.length; i++) {
-			var entryId = entries[i].entryId;
+			var kalturaEntryId = entries[i].entryId;
 				
 			kClient.media.get(
 				function (success, data){
-					var title = "";
-					var duration = 0;
-						
+					
 					if(!success) {
 						alert("Error on getting entry title. Data: " + data);
 					} else if (data.code && data.message){
 						alert("Error on getting entry title: " + data.message);
 					} else {
-						title = data.name;
-						duration = data.duration;
-					}
+						var title = data.name;
+						var duration = data.duration;
+						var entryId = data.id;
 						
-					addItem(entryId, title, duration);
-				}, 
-				entryId
+						addItem(entryId, title, duration);
+					}
+				},
+				kalturaEntryId
 			);
 		}
 	}
