@@ -62,6 +62,13 @@
 </p>
 
 <p>
+	<html:checkbox property="assessment.numbered" styleClass="noBorder" styleId="shuffled"/>
+	<label for="shuffled">
+		<fmt:message key="label.authoring.advance.numbered.questions" />
+	</label>
+</p>
+
+<p>
 	<label>
 		<fmt:message key="label.authoring.advance.choose.restriction" />
 	</label>

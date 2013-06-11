@@ -26,7 +26,24 @@
 		
 		<td>
 			<c:choose>
-				<c:when test="${assessment.shuffled == true}">
+				<c:when test="${assessment.shuffled}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.authoring.advance.numbered.questions" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${assessment.numbered}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -77,7 +94,7 @@
 		
 		<td>
 			<c:choose>
-				<c:when test="${assessment.allowOverallFeedbackAfterQuestion == true}">
+				<c:when test="${assessment.allowOverallFeedbackAfterQuestion}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -94,7 +111,7 @@
 		
 		<td>
 			<c:choose>
-				<c:when test="${assessment.allowQuestionFeedback == true}">
+				<c:when test="${assessment.allowQuestionFeedback}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -111,7 +128,7 @@
 		
 		<td>
 			<c:choose>
-				<c:when test="${assessment.allowRightAnswersAfterQuestion == true}">
+				<c:when test="${assessment.allowRightAnswersAfterQuestion}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -127,7 +144,7 @@
 		
 		<td>
 			<c:choose>
-				<c:when test="${assessment.allowWrongAnswersAfterQuestion == true}">
+				<c:when test="${assessment.allowWrongAnswersAfterQuestion}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -143,7 +160,7 @@
 		
 		<td>
 			<c:choose>
-				<c:when test="${assessment.allowGradesAfterAttempt == true}">
+				<c:when test="${assessment.allowGradesAfterAttempt}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -159,7 +176,7 @@
 		
 		<td>
 			<c:choose>
-				<c:when test="${assessment.allowHistoryResponses == true}">
+				<c:when test="${assessment.allowHistoryResponses}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -175,7 +192,7 @@
 		
 		<td>
 			<c:choose>
-				<c:when test="${assessment.notifyTeachersOnAttemptCompletion == true}">
+				<c:when test="${assessment.notifyTeachersOnAttemptCompletion}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -192,7 +209,7 @@
 		
 		<td>
 			<c:choose>
-				<c:when test="${assessment.reflectOnActivity == true}">
+				<c:when test="${assessment.reflectOnActivity}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
@@ -203,7 +220,7 @@
 	</tr>
 	
 	<c:choose>
-		<c:when test="${assessment.reflectOnActivity == true}">
+		<c:when test="${assessment.reflectOnActivity}">
 			<tr>
 				<td>
 					<fmt:message key="monitor.summary.td.notebookInstructions" />

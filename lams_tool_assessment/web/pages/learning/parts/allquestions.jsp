@@ -1,11 +1,14 @@
-<%@ include file="/common/taglibs.jsp"%>		
+<%@ include file="/common/taglibs.jsp"%>
 		<form id="answers" name="answers" method="post" >
 			<table cellspacing="0" class="alternative-color">
 				<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
 					<tr>
-						<td style="padding: 15px 15px 15px; width: 10px; font-weight: bold;" >
-							${status.index + sessionMap.questionNumberingOffset} 
-						</td>
+						<c:if test="${assessment.numbered}">
+							<td style="padding: 15px 15px 15px; width: 10px; font-weight: bold;" >
+								${status.index + sessionMap.questionNumberingOffset} 
+							</td>
+						</c:if>
+						
 						<td style="padding-left: 0px;">
 							<input type="hidden" name="questionUid${status.index}" id="questionUid${status.index}" value="${question.uid}" />						
 							

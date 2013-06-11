@@ -72,6 +72,8 @@ public class Assessment implements Cloneable {
     private boolean runOffline;
 
     private boolean shuffled;
+    
+    private boolean numbered;
 
     private boolean allowQuestionFeedback;
 
@@ -721,6 +723,20 @@ public class Assessment implements Cloneable {
 
     public void setShuffled(boolean shuffled) {
 	this.shuffled = shuffled;
+    }
+    
+    /**
+     * If this is checked, then in learner we display the numbering for learners.
+     * 
+     * @hibernate.property column="numbered"
+     * @return
+     */
+    public boolean isNumbered() {
+	return numbered;
+    }
+
+    public void setNumbered(boolean numbered) {
+	this.numbered = numbered;
     }
 
     public List<AssessmentAttachment> getOfflineFileList() {

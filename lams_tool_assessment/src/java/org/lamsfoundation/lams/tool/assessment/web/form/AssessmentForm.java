@@ -80,6 +80,7 @@ public class AssessmentForm extends ActionForm {
 	    assessment.setAllowWrongAnswersAfterQuestion(false);
 	    assessment.setDefineLater(false);
 	    assessment.setShuffled(false);
+	    assessment.setNumbered(false);
 	    assessment.setRunOffline(false);
 	    assessment.setDisplaySummary(false);
 	    assessment.setReflectOnActivity(false);
