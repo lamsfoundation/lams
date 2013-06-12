@@ -578,6 +578,14 @@ public class Lesson implements Serializable {
 	return (stateId != null && (stateId.equals(STARTED_STATE) || stateId.equals(FINISHED_STATE)
 		|| stateId.equals(ARCHIVED_STATE) || stateId.equals(REMOVED_STATE)));
     }
+    
+    /**
+     * Checks whether learners are allowed to access the lesson based on its state. As they can only access Started or
+     * Finished lessons.
+     */
+    public boolean isLessonAccessibleForLearner() {
+	return (lessonStateId != null && (lessonStateId.equals(STARTED_STATE) || lessonStateId.equals(FINISHED_STATE)));
+    }
 
     public Set<GradebookUserLesson> getGradebookUserLessons() {
 	return gradebookUserLessons;

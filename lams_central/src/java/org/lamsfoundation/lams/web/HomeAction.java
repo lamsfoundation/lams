@@ -190,6 +190,11 @@ public class HomeAction extends DispatchAction {
 
 		    }
 		}
+		
+		//check lesson's state if its suitable for learner's access
+		if (!lesson.isLessonAccessibleForLearner()) {
+		    return displayMessage(mapping, req, "error.lesson.not.accessible.for.learners");
+		}
 
 		if (mode != null) {
 		    req.setAttribute(AttributeNames.PARAM_MODE, mode);
