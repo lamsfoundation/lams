@@ -26,6 +26,8 @@ package org.lamsfoundation.lams.workspace.service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -1174,6 +1176,19 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 			log.warn("getAccessibleOrganisationWorkspaceFolders: User "+user.getUserId()+" does not exist. Returning no folders.");
 		}
 		
+		//sort folders by their names
+	        Collections.sort(folders, new Comparator<FolderContentDTO>() {
+	            
+	            @Override
+	            public int compare(FolderContentDTO fc1, FolderContentDTO fc2) {
+        		if ((fc1.getName() != null) && (fc2.getName() != null)) {
+        		    return fc1.getName().compareToIgnoreCase(fc2.getName());
+        		}
+	        	//return 1 if either of comparable FolderContentDTOs has a null name
+	        	return 1;
+	            }
+	        });
+	        
 		return folders;
 	}
 	/**
