@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
@@ -133,6 +134,15 @@ public class MonitoringAction extends Action {
 
 	Long contentId = (Long) sessionMap.get(ScratchieConstants.ATTR_TOOL_CONTENT_ID);
 	List<GroupSummary> summaryList = getScratchieService().getQuestionSummary(contentId, itemUid);
+	
+	// Removes all the html tags from an answer descriptions
+	for (GroupSummary summary : summaryList) {
+	    for (ScratchieAnswer answer : summary.getAnswers()) {
+		String description = (answer.getDescription() == null) ? "" : answer.getDescription()
+			.replaceAll("\\<.*?>", "").replaceAll("[\"]", "&quot;");
+		answer.setDescription(description);
+	    }
+	}
 
 	request.setAttribute(ScratchieConstants.ATTR_SUMMARY_LIST, summaryList);
 	return mapping.findForward(ScratchieConstants.SUCCESS);

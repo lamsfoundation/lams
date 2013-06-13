@@ -1136,7 +1136,6 @@ public class AuthoringAction extends Action {
 		String answerDescription = answer.getDescription();
 		if (answerDescription != null) {
 		    answerDescription = answerDescription.replaceAll("[\n\r\f]", "");
-		    answerDescription = answerDescription.replaceAll("[\"]", "&quot;");
 		    answer.setDescription(answerDescription);
 		}
 	    }
