@@ -341,6 +341,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		}else {
 			throw new UserAccessDeniedException(user);
 		}
+		
+		Collections.sort(contentDTO);
 		return contentDTO;
 		
 	}	
@@ -1177,17 +1179,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService{
 		}
 		
 		//sort folders by their names
-	        Collections.sort(folders, new Comparator<FolderContentDTO>() {
-	            
-	            @Override
-	            public int compare(FolderContentDTO fc1, FolderContentDTO fc2) {
-        		if ((fc1.getName() != null) && (fc2.getName() != null)) {
-        		    return fc1.getName().compareToIgnoreCase(fc2.getName());
-        		}
-	        	//return 1 if either of comparable FolderContentDTOs has a null name
-	        	return 1;
-	            }
-	        });
+	        Collections.sort(folders);
 	        
 		return folders;
 	}

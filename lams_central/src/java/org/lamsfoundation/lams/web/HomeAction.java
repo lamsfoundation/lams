@@ -101,16 +101,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class HomeAction extends DispatchAction {
 
-    private static final Comparator<FolderContentDTO> LD_NAME_COMPARATOR = new Comparator<FolderContentDTO>() {
-	// folders go first, then sort by name
-	@Override
-	public int compare(FolderContentDTO o1, FolderContentDTO o2) {
-	    return o1.getResourceType().equals(o2.getResourceType()) ? o1.getName().compareTo(o2.getName())
-		    : FolderContentDTO.FOLDER.equals(o1.getResourceType()) ? -1 : 1;
-	}
-
-    };
-
     private static Logger log = Logger.getLogger(HomeAction.class);
 
     private static IUserManagementService service;
@@ -472,7 +462,7 @@ public class HomeAction extends DispatchAction {
 	    // special behaviour for organisation folders
 	} else if (folderID.equals(WorkspaceAction.ORG_FOLDER_ID)) {
 	    folderContents = getWorkspaceManagementService().getAccessibleOrganisationWorkspaceFolders(userID);
-	    Collections.sort(folderContents, HomeAction.LD_NAME_COMPARATOR);
+	    Collections.sort(folderContents);
 
 	    if (folderContents.size() == 1) {
 		FolderContentDTO folder = folderContents.firstElement();
@@ -484,7 +474,7 @@ public class HomeAction extends DispatchAction {
 	    WorkspaceFolder folder = getWorkspaceManagementService().getWorkspaceFolder(folderID);
 	    folderContents = getWorkspaceManagementService().getFolderContents(userID, folder,
 		    WorkspaceManagementService.MONITORING);
-	    Collections.sort(folderContents, HomeAction.LD_NAME_COMPARATOR);
+	    Collections.sort(folderContents);
 	}
 
 	// fill JSON object with folders and LDs

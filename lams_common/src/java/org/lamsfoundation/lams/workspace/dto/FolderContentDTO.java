@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.workspace.WorkspaceFolderContent;
 /**
  * @author Manpreet Minhas
  */
-public class FolderContentDTO {
+public class FolderContentDTO implements Comparable<FolderContentDTO> {
 	
 	public static final String LESSON ="Lesson";
 	public static final String DESIGN ="LearningDesign";
@@ -125,7 +125,19 @@ public class FolderContentDTO {
 		this.versionDetails = new Vector();
 		versionDetails.addAll(details);
 		this.readOnly = Boolean.FALSE;
-	}	
+	}
+	
+	@Override
+        public int compareTo(FolderContentDTO o) {
+        	if ((o != null) && o instanceof FolderContentDTO) {
+        	    FolderContentDTO anotherQuestion = (FolderContentDTO) o;
+        	    // folders go first, then sort by name
+        	    return resourceType.equals(anotherQuestion.getResourceType()) ? name.compareToIgnoreCase(anotherQuestion.getName())
+        		    : FolderContentDTO.FOLDER.equals(anotherQuestion.getResourceType()) ? -1 : 1;
+        	} else {
+        	    return 1;
+        	}
+        }
 
 	/**
 	 * @return Returns the creationDateTime.
