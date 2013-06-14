@@ -12,12 +12,19 @@
 		
 		<link type="text/css" href="<lams:LAMSURL />css/jquery-ui-redmond-theme.css" rel="stylesheet">
 		<link type="text/css" href="<lams:LAMSURL />css/jquery.jqGrid.css" rel="stylesheet" />
+		<style media="screen,projection" type="text/css">
+			.ui-jqgrid tr.jqgrow td {
+			    white-space: normal !important;
+			    height:auto;
+			    vertical-align:text-top;
+			    padding-top:2px;
+			}
+		</style>
+		
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.locale-en.js"></script>
 	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
-
   	    <script>
-  	    	<!--
   	    	var isEdited = false;
   	    	var previousCellValue = "";  	    	
   	    	var numberOfValues = 0;
@@ -28,8 +35,8 @@
 	  				jQuery("#session${session.sessionId}").jqGrid({
 	  					datatype: "local",
 	  					height: 'auto',
-	  					width: 500,
-	  					shrinkToFit: true,
+	  					autowidth: true,
+	  					shrinkToFit: false,
 	  					
 	  				   	colNames:['questionResultUid',
 	  		  				   	"<fmt:message key="label.monitoring.summary.user.name" />",
@@ -37,10 +44,10 @@
 	  						    "<fmt:message key="label.monitoring.user.summary.grade" />"],
 	  						    
 	  				   	colModel:[
-							{name:'questionResultUid', index:'questionResultUid', width:0},
-							{name:'userName',index:'userName', width:100},
-	  				   		{name:'response', index:'response', width:200, sortable:false},
-	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4} }		
+							{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
+							{name:'userName',index:'userName', width:120},
+	  				   		{name:'response', index:'response', width:427, sortable:false},
+	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }		
 	  				   	],
 	  				   	
 	  				   	multiselect: false,
@@ -78,7 +85,7 @@
 	  					onCellSelect: function (rowid, iCol, cellcontent){
 	  						jQuery("#session${session.sessionId}}").resetSelection();
 	  					}*/ 	  				  	
-	  				}).hideCol("questionResultUid");
+	  				});
 	  				
 	  	   	        <c:forEach var="questionResult" items="${questionResultsPerSession}" varStatus="i">
 			   	   	  	<c:choose>
@@ -113,7 +120,6 @@
         			self.parent.tb_remove();
         		}
     		}
-  			-->
   		</script>
 		
 		
@@ -178,7 +184,7 @@
 			
 			<c:forEach var="questionResultsPerSession" items="${questionSummary.questionResultsPerSession}" varStatus="status">
 				<c:set var="session" value="${questionResultsPerSession[0].user.session}"/>
-				<div style="padding-left: 0px; padding-bottom: 30px;">
+				<div style="padding-left: 0px; padding-bottom: 30px; width:645px;">
 					<div style="font-size: small; padding-bottom: 5px;">
 						<fmt:message key="label.monitoring.question.summary.group" /> ${session.sessionName}
 					</div>
@@ -189,7 +195,7 @@
 
 
 			<lams:ImgButtonWrapper>
-				<a href="#" onclick="refreshSummaryPage();" class="button space-left" style="float:right; margin-right:40px; padding-top:5px;">
+				<a href="#" onclick="refreshSummaryPage();" class="button space-left" style="float:right; margin-right:10px; padding-top:5px;">
 					<fmt:message key="label.monitoring.question.summary.ok" /> 
 				</a>
 			</lams:ImgButtonWrapper>

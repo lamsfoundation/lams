@@ -6,7 +6,6 @@
 <c:set var="isShrinkToFit" value="${(145 + fn:length(assessment.questions)*80) < 630}"/>
 
 <script type="text/javascript">
-	<!--	
 	$(document).ready(function(){
 		<c:forEach var="summary" items="${summaryList}" varStatus="status">
 		
@@ -36,7 +35,7 @@
 			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
 			   		var sessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
 					var userSummaryUrl = '<c:url value="/monitoring/userSummary.do?sessionMapID=${sessionMapID}"/>';
-					var newUserSummaryHref = userSummaryUrl + "&userID=" + userId + "&sessionId=" + sessionId + "&KeepThis=true&TB_iframe=true&height=540&width=650&modal=true";
+					var newUserSummaryHref = userSummaryUrl + "&userID=" + userId + "&sessionId=" + sessionId + "&KeepThis=true&TB_iframe=true&height=540&width=750&modal=true";
 					$("#userSummaryHref").attr("href", newUserSummaryHref);	
 					$("#userSummaryHref").click(); 		
 			  	},
@@ -87,10 +86,10 @@
 					    
 			   	colModel:[
 	  			   		{name:'id', index:'id', width:20, sorttype:"int"},
-	  			   		{name:'questionResultUid', index:'questionResultUid', width:0},
+	  			   		{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 	  			   		{name:'title', index:'title', width: 200},
-	  			   		{name:'response', index:'response', width:200, sortable:false},
-	  			   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4} }
+	  			   		{name:'response', index:'response', width:400, sortable:false},
+	  			   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }
 			   	],
 			   	multiselect: false,
 
@@ -116,7 +115,7 @@
   						return {questionResultUid:questionResultUid};		  				  		
   				  	}
   				}
-			}).hideCol("questionResultUid");
+			});
 			
 			
 		</c:forEach>
@@ -125,7 +124,7 @@
 			var questionUid = $("#questionUid").val();
 			if (questionUid != -1) {
 				var questionSummaryUrl = '<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>';
-				var questionSummaryHref = questionSummaryUrl + "&questionUid=" + questionUid + "&KeepThis=true&TB_iframe=true&height=400&width=650&modal=true";
+				var questionSummaryHref = questionSummaryUrl + "&questionUid=" + questionUid + "&KeepThis=true&TB_iframe=true&height=400&width=750&modal=true";
 				$("#questionSummaryHref").attr("href", questionSummaryHref);	
 				$("#questionSummaryHref").click(); 		 
 			}
@@ -168,7 +167,6 @@
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
 		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
 	};
-	-->		
 </script>
 
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>

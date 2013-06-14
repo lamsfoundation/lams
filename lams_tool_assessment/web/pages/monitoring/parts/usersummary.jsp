@@ -12,12 +12,19 @@
 		
 		<link type="text/css" href="<lams:LAMSURL />css/jquery-ui-redmond-theme.css" rel="stylesheet">
 		<link type="text/css" href="<lams:LAMSURL />css/jquery.jqGrid.css" rel="stylesheet" />
+		<style media="screen,projection" type="text/css">
+			.ui-jqgrid tr.jqgrow td {
+			    white-space: normal !important;
+			    height:auto;
+			    vertical-align:text-top;
+			    padding-top:2px;
+			}
+		</style>
+		
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.locale-en.js"></script>
 	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
-
   	    <script>
-  	    	<!--
 	    	var isEdited = false;
   	    	var previousCellValue = "";  	    	
 	  	  	$(document).ready(function(){
@@ -27,8 +34,8 @@
 	  				jQuery("#user${question.uid}").jqGrid({
 	  					datatype: "local",
 	  					height: 'auto',
-	  					width: 500,
-	  					shrinkToFit: true,
+	  					autowidth: true,
+	  					shrinkToFit: false,
 	  					
 	  				   	colNames:["<fmt:message key="label.monitoring.user.summary.attempt" />",
 	  							'questionResultUid',
@@ -37,11 +44,11 @@
 	  						    "<fmt:message key="label.monitoring.user.summary.grade" />"],
 	  						    
 	  				   	colModel:[
-	  				   		{name:'id', index:'id', width:55, sorttype:"int"},
-	  				   		{name:'questionResultUid', index:'questionResultUid', width:0},
+	  				   		{name:'id', index:'id', width:52, sorttype:"int"},
+	  				   		{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 	  				   		{name:'time', index:'time', width:150, sorttype:'date', datefmt:'Y-m-d'},
-	  				   		{name:'response', index:'response', width:200, sortable:false},
-	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4} }		
+	  				   		{name:'response', index:'response', width:341, sortable:false},
+	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }		
 	  				   	],
 	  				   	
 	  				   	multiselect: false,
@@ -79,7 +86,7 @@
 	  					onCellSelect: function (rowid, iCol, cellcontent){
 	  						jQuery("#user${question.uid+1}").resetSelection();
 	  					}*/ 	  				  	
-	  				}).hideCol("questionResultUid");
+	  				});
 	  				
 	  	   	        <c:forEach var="questionResult" items="${userSummaryItem.questionResults}" varStatus="i">
 	  	   	        	var responseStr = "";
@@ -103,7 +110,6 @@
         			self.parent.tb_remove();
         		}
     		}
-  			-->
   		</script>
 		
 		
@@ -159,7 +165,7 @@
 			<br><br>
 			
 			<c:forEach var="userSummaryItem" items="${userSummary.userSummaryItems}" varStatus="status">
-				<div style="padding-left: 0px; padding-bottom: 30px;">
+				<div style="padding-left: 0px; padding-bottom: 30px; width:645px;">
 					<table style="font-size: small; padding-bottom: 5px;">
 						<tr>
 							<td width="50px;">
@@ -185,7 +191,7 @@
 
 
 			<lams:ImgButtonWrapper>
-				<a href="#" onclick="refreshSummaryPage();" class="button space-left" style="float:right; margin-right:40px; padding-top:5px;">
+				<a href="#" onclick="refreshSummaryPage();" class="button space-left" style="float:right; margin-right:10px; padding-top:5px;">
 					<fmt:message key="label.monitoring.user.summary.ok" /> 
 				</a>
 			</lams:ImgButtonWrapper>
