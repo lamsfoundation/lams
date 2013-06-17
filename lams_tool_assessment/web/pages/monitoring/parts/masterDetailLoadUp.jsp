@@ -15,7 +15,6 @@
  	   	   			grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
  	   	   	    });	
 	        </c:forEach>
-	        jQuery("#userSummary${assessmentResult.sessionId}").setGridWidth("629");
 	};	  	   	  
 	masterDetailLoadUp();
 	-->	

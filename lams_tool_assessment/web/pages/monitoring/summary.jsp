@@ -74,8 +74,8 @@
 				gridstate:"hidden",
 				//hiddengrid:true,
 				height: 90,
-				width: 630,
-				shrinkToFit: true,
+				width: 780,
+				shrinkToFit: false,
 				scrollOffset: 0,
 				caption: "<fmt:message key="label.monitoring.summary.learner.summary" />",
 			   	colNames:['#',
@@ -88,7 +88,7 @@
 	  			   		{name:'id', index:'id', width:20, sorttype:"int"},
 	  			   		{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 	  			   		{name:'title', index:'title', width: 200},
-	  			   		{name:'response', index:'response', width:400, sortable:false},
+	  			   		{name:'response', index:'response', width:443, sortable:false},
 	  			   		{name:'grade', index:'grade', width:80, sorttype:"float", editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }
 			   	],
 			   	multiselect: false,
@@ -215,7 +215,7 @@
 			</c:if>
 		</c:forEach>	
 		
-		<html:link href="javascript:exportSummary();" property="exportExcel" styleClass="button space-left" style="margin-left:590px; ">
+		<html:link href="javascript:exportSummary();" property="exportExcel" styleClass="button space-left" style="margin-left:665px; ">
 			<fmt:message key="label.monitoring.summary.export.summary" />
 		</html:link>
 		
