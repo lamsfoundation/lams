@@ -543,10 +543,9 @@ function setCellsR(row,col,item,value) {
   return setCells(arr[0],arr[1],item,value);
 }
 
-function loadScriptFileAndCode(location, spreadsheetCode){
+function loadScriptFileAndCode(location, code){
   var script = document.createElement("script");
   script.type = "text/javascript";
-  var code = spreadsheetCode.value;
   
   if (window.addEventListener) {
     window.addEventListener("load",function() { load(code); },false);

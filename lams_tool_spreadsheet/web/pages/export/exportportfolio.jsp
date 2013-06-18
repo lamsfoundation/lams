@@ -9,9 +9,21 @@
 <c:set var="instructions" value="${sessionMap.instructions}" />
 <c:set var="spreadsheet" value="${sessionMap.spreadsheet}" />
 
-<script>
+<script type="text/javascript">
 	function popitup2(userUid) {
-		window.open('./simple_spreadsheet/spreadsheet_exported.html?userUid=' + userUid, 'name', 'width=800, height=600');
+		
+		var userName = encodeURIComponent(document.getElementById("userName" + userUid).value);
+		var code = encodeURIComponent(document.getElementById("spreadsheet.code" + userUid).value);
+		
+		var url = "./simple_spreadsheet/spreadsheet_exported.html" 
+			    + "?userName=" + userName
+				+ "&code=" + code
+				+ "&lang=<%=request.getLocale().getLanguage()%>"
+				+ "&labelTitle=<fmt:message key='label.reviewitem.title' />"
+				+ "&labelSentBy=<fmt:message key='label.reviewitem.spreadsheet.sent.by' />" 
+				+ "&labelUserHasntSent=<fmt:message key='label.reviewitem.user.hasnot.sent.spreadsheet' />"
+				+ "&labelCloseButton=<fmt:message key='button.close'/>";
+		window.open(url, 'name', 'width=800, height=600');
 	}
 </script>
 
@@ -31,16 +43,6 @@
 <body class="stripes">
 
 	<div id="content">
-	
-		<c:set var='title' ><fmt:message key="label.reviewitem.title" /></c:set>
-		<html:hidden property="title" styleId="title" value="${title}" />
-		<c:set var='sentBy' ><fmt:message key='label.reviewitem.spreadsheet.sent.by' /></c:set>
-		<html:hidden property="sentBy" styleId="sentBy" value="${sentBy}"/>
-		<c:set var='userHasntSent' ><fmt:message key='label.reviewitem.user.hasnot.sent.spreadsheet' /></c:set>
-		<html:hidden property="userHasntSent" styleId="userHasntSent" value="${userHasntSent}"/>
-		<html:hidden property="lang" styleId="lang" value="<%=request.getLocale().getLanguage()%>"/>
-		<c:set var='closeButton' ><fmt:message key='button.close'/></c:set>
-		<html:hidden property="closeButton" styleId="closeButton" value="${closeButton}"/>	
 
 		<h1>
 			${title}
