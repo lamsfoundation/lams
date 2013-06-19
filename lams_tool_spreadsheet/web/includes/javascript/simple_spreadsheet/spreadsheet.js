@@ -543,9 +543,7 @@ function setCellsR(row,col,item,value) {
   return setCells(arr[0],arr[1],item,value);
 }
 
-function loadScriptFileAndCode(location, code){
-  var script = document.createElement("script");
-  script.type = "text/javascript";
+function loadScriptFileAndCode(code){
   
   if (window.addEventListener) {
     window.addEventListener("load",function() { load(code); },false);
@@ -556,30 +554,7 @@ function loadScriptFileAndCode(location, code){
 			    }
 	  	   }
 	}
-  
-  script.src = location;
-  document.getElementsByTagName("head").item(0).appendChild(script);
 }
-
-function loadLamsCode(code) {
-  var script = document.createElement("script");
-  script.type = "text/javascript";
-
-    if (window.addEventListener) {
-    window.addEventListener("load",function() { load(code); },false);
-  } else {
-	  script.onreadystatechange = function() {
-//		  alert("onreadystatechange "+ this.readyState + "!");
-		  if ((this.readyState == 'loaded') || (this.readyState == 'complete'))  {
-				    load(code); 
-			    }
-	  	   }
-	}
-
-  document.getElementsByTagName("head").item(0).appendChild(script);
-}
-
-
 
 function loadStyleFile(location){
   var script = document.createElement("link");
