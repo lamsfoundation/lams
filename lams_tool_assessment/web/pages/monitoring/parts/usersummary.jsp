@@ -101,6 +101,18 @@
 	  		        </c:forEach>			
 	  				
 	  			</c:forEach>
+	  			
+  				//jqgrid autowidth (http://stackoverflow.com/a/1610197)
+	  			$(window).bind('resize', function() {
+	  				var grid;
+	  		        if (grid = jQuery(".ui-jqgrid-btable:visible")) {
+	  		            grid.each(function(index) {
+	  		                var gridId = $(this).attr('id');
+	  		                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+	  		                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+	  		            });
+	  		        }
+	  			});
 	  		});  	    	
 
     		function refreshSummaryPage()  { 
@@ -165,7 +177,7 @@
 			<br><br>
 			
 			<c:forEach var="userSummaryItem" items="${userSummary.userSummaryItems}" varStatus="status">
-				<div style="padding-left: 0px; padding-bottom: 30px; width:645px;">
+				<div style="padding-left: 0px; padding-bottom: 30px; width:99%;">
 					<table style="font-size: small; padding-bottom: 5px;">
 						<tr>
 							<td width="50px;">

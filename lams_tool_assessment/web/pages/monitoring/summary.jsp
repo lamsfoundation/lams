@@ -145,13 +145,20 @@
 		    if ( height == undefined || height == 0 ) {
 		    	// IE doesn't use window.innerHeight.
 		    	height = document.documentElement.clientHeight;
-		    	// alert("using clientHeight");
 		    }
-			// alert("doc height "+height);
 		    height -= document.getElementById('TB_iframeContent').offsetTop + 60;
 		    document.getElementById('TB_iframeContent').style.height = height +"px";
-	
 			TB_HEIGHT = height + 28;
+			
+		    var width = top.window.innerWidth;
+		    if ( width == undefined || width == 0 ) {
+		    	// IE doesn't use window.innerWidth.
+		    	width = document.documentElement.clientWidth;
+		    }
+		    width -= document.getElementById('TB_iframeContent').offsetLeft + 60;
+		    document.getElementById('TB_iframeContent').style.width = width +"px";
+			TB_WIDTH = width + 1;
+			
 			tb_position();
 		}
 	};

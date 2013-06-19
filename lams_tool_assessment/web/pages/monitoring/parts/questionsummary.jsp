@@ -111,6 +111,18 @@
 	  		        </c:forEach>			
 	  				
 	  			</c:forEach>
+
+  				//jqgrid autowidth (http://stackoverflow.com/a/1610197)
+	  			$(window).bind('resize', function() {
+	  				var grid;
+	  		        if (grid = jQuery(".ui-jqgrid-btable:visible")) {
+	  		            grid.each(function(index) {
+	  		                var gridId = $(this).attr('id');
+	  		                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+	  		                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+	  		            });
+	  		        }
+	  			});
 	  		});  	    	
 	  		
     		function refreshSummaryPage()  { 
@@ -184,7 +196,7 @@
 			
 			<c:forEach var="questionResultsPerSession" items="${questionSummary.questionResultsPerSession}" varStatus="status">
 				<c:set var="session" value="${questionResultsPerSession[0].user.session}"/>
-				<div style="padding-left: 0px; padding-bottom: 30px; width:645px;">
+				<div style="padding-left: 0px; padding-bottom: 30px; width:99%;">
 					<div style="font-size: small; padding-bottom: 5px;">
 						<fmt:message key="label.monitoring.question.summary.group" /> ${session.sessionName}
 					</div>
