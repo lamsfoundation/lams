@@ -347,10 +347,11 @@ public class DisplayGroupAction extends Action {
 		lessonLinks = new ArrayList<IndexLinkBean>();
 	    }
 	    
+	    
 	    if ((isGroupManagerOrMonitor && stateId.equals(OrganisationState.ACTIVE))
 		    || (stateId.equals(OrganisationState.ARCHIVED) && contains(roles, Role.ROLE_GROUP_MANAGER))) {
 		lessonLinks.add(new IndexLinkBean("index.monitor",
-			"javascript:openMonitorLesson(" + bean.getId() + ")", null, "mycourses-monitor-img", null));
+			"javascript:showMonitorLessonDialog(" + bean.getId() + ")", null, "mycourses-monitor-img", null));
 	    }
 
 	    // Adding lesson notifications links if enabled
@@ -393,11 +394,11 @@ public class DisplayGroupAction extends Action {
 		lessonLinks.add(new IndexLinkBean("index.remove.lesson", removeLessonLink, null,
 			"mycourses-removelesson-img", "index.remove.lesson.tooltip"));
 	    }
-	    
+
 	    if ((isGroupManagerOrMonitor && stateId.equals(OrganisationState.ACTIVE))
 		    || (stateId.equals(OrganisationState.ARCHIVED) && contains(roles, Role.ROLE_GROUP_MANAGER))) {
 		lessonLinks.add(new IndexLinkBean("index.monitor",
-			"javascript:showMonitorLessonDialog(" + bean.getId() + ")", null, "mycourses-monitor-img", null));
+			"javascript:openMonitorLesson(" + bean.getId() + ")", null, "mycourses-monitor-img", null));
 	    }
 
 	    if (lessonLinks.size() > 0) {
