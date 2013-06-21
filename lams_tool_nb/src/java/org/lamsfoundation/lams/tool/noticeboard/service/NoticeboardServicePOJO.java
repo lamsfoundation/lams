@@ -885,28 +885,13 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    throw new ToolException(error);
 	}
 
-	if ((nbContent = retrieveNoticeboard(toolContentId)) == null) {
-	    // use default content
-	    NoticeboardContent defaultContent = retrieveNoticeboard(getToolDefaultContentIdBySignature(NoticeboardConstants.TOOL_SIGNATURE));
+	nbContent = retrieveNoticeboard(toolContentId);
+	NoticeboardSession nbSession = new NoticeboardSession(toolSessionId, toolSessionName, nbContent, new Date(
+		System.currentTimeMillis()), NoticeboardSession.NOT_ATTEMPTED);
 
-	    if (defaultContent != null) {
-		NoticeboardSession newSession = new NoticeboardSession(toolSessionId, toolSessionName, defaultContent,
-			new Date(System.currentTimeMillis()), NoticeboardSession.NOT_ATTEMPTED);
-		// saveNoticeboardSession(newSession);
-		defaultContent.getNbSessions().add(newSession);
-		saveNoticeboard(defaultContent);
-
-	    } else {
-		throw new ToolException("Default content is missing. Unable to create tool session");
-	    }
-	} else {
-	    NoticeboardSession nbSession = new NoticeboardSession(toolSessionId, toolSessionName, nbContent, new Date(
-		    System.currentTimeMillis()), NoticeboardSession.NOT_ATTEMPTED);
-
-	    nbContent.getNbSessions().add(nbSession);
-	    saveNoticeboard(nbContent);
-	    // saveNoticeboardSession(nbSession);
-	}
+	nbContent.getNbSessions().add(nbSession);
+	saveNoticeboard(nbContent);
+	// saveNoticeboardSession(nbSession);
 
     }
 

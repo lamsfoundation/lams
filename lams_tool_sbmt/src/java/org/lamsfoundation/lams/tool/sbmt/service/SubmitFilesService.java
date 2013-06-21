@@ -213,32 +213,13 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	    throw new SubmitFilesException("Fail to set tool content to run offline - "
 		    + " based on null toolContentId");
 	}
-	try {
-	    SubmitFilesContent content = getSubmitFilesContent(toolContentId);
-	    if (content == null || !toolContentId.equals(content.getContentID())) {
-		content = duplicateDefaultToolContent(toolContentId);
-	    }
-	    content.setRunOffline(value);
-	    submitFilesContentDAO.saveOrUpdate(content);
-	} catch (DataAccessException e) {
-	    throw new SubmitFilesException("Exception occured when LAMS is setting content to run offline"
-		    + e.getMessage(), e);
+	
+	SubmitFilesContent content = getSubmitFilesContent(toolContentId);
+	if (content == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
 	}
-    }
-
-    /**
-     * If the toolContentID does not exist, then get default tool content id from tool core and initialize a emtpy
-     * <code>SubmitFilesContent</code> return.
-     * 
-     * @param toolContentId
-     * @return
-     */
-    private SubmitFilesContent duplicateDefaultToolContent(Long toolContentId) {
-	long contentId = 0;
-	contentId = toolService.getToolDefaultContentIdBySignature(SbmtConstants.TOOL_SIGNATURE);
-	SubmitFilesContent content = new SubmitFilesContent();
-	content.setContentID(new Long(contentId));
-	return content;
+	content.setRunOffline(value);
+	submitFilesContentDAO.saveOrUpdate(content);
     }
 
     /**
@@ -250,17 +231,13 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	    throw new SubmitFilesException("Fail to set tool content to define later - "
 		    + " based on null toolContentId");
 	}
-	try {
-	    SubmitFilesContent content = getSubmitFilesContent(toolContentId);
-	    if (content == null || !toolContentId.equals(content.getContentID())) {
-		content = duplicateDefaultToolContent(toolContentId);
-	    }
-	    content.setDefineLater(value);
-	    submitFilesContentDAO.saveOrUpdate(content);
-	} catch (DataAccessException e) {
-	    throw new SubmitFilesException("Exception occured when LAMS is setting content to run define later"
-		    + e.getMessage(), e);
+	
+	SubmitFilesContent content = getSubmitFilesContent(toolContentId);
+	if (content == null) {
+	    throw new ToolException("No found tool content by given content ID:" + toolContentId);
 	}
+	content.setDefineLater(value);
+	submitFilesContentDAO.saveOrUpdate(content);
 
     }
 
