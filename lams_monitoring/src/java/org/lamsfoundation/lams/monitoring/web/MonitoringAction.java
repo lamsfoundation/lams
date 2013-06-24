@@ -743,7 +743,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		}
 	    }
 	}
-
+	
+	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 	return null;
     }
@@ -1273,7 +1274,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    responseJSON.put("startDate",
 		    indfm.format(tzStartDate) + " " + user.getTimeZone().getDisplayName(userLocale));
 	}
-
+	
+	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 	return null;
     }
@@ -1349,6 +1351,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	responseJSON.put("activities", new JSONArray(activitiesMap.values()));
 	responseJSON.put("numberPossibleLearners", lessonDetails.getNumberPossibleLearners());
+	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 
 	return null;

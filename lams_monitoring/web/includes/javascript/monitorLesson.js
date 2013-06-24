@@ -1255,33 +1255,36 @@ function refreshMonitor(tabName){
 function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceComplete, allowView) {
 	var learnerGroupList = $('#learnerGroupList').empty();
 	var learnerGroupDialog = $('#learnerGroupDialog');
-	$.each(learners, function(learnerIndex, learner) {
-		var learnerDiv = $('<div />').attr({
-								'userId'  : learner.id,
-								'viewUrl'    : learner.url
-								})
-		                      .addClass('dialogListItem')
-						      .text(getLearnerDisplayName(learner))
-						      .appendTo(learnerGroupList);
-		
-		if (allowForceComplete || allowView) {
-			learnerDiv.click(function(){
-		    	  // select a learner
-		    	  $(this).addClass('dialogListItemSelected')
-		    	  	.siblings('div.dialogListItem')
-		    	  	.removeClass('dialogListItemSelected');
-			    	// enable buttons
-			    	$('button.learnerGroupDialogSelectableButton')
-			    		.attr('disabled', null);
-		    });
-			if (allowView){
-				learnerDiv.dblclick(function(){
-					// same as clicking View Learner button
-					openPopUp(LAMS_URL + learner.url, "LearnActivity", 600, 800, true);
-				});
+	
+	if (learners) {
+		$.each(learners, function(learnerIndex, learner) {
+			var learnerDiv = $('<div />').attr({
+									'userId'  : learner.id,
+									'viewUrl'    : learner.url
+									})
+			                      .addClass('dialogListItem')
+							      .text(getLearnerDisplayName(learner))
+							      .appendTo(learnerGroupList);
+			
+			if (allowForceComplete || allowView) {
+				learnerDiv.click(function(){
+			    	  // select a learner
+			    	  $(this).addClass('dialogListItemSelected')
+			    	  	.siblings('div.dialogListItem')
+			    	  	.removeClass('dialogListItemSelected');
+				    	// enable buttons
+				    	$('button.learnerGroupDialogSelectableButton')
+				    		.attr('disabled', null);
+			    });
+				if (allowView){
+					learnerDiv.dblclick(function(){
+						// same as clicking View Learner button
+						openPopUp(LAMS_URL + learner.url, "LearnActivity", 600, 800, true);
+					});
+				}
 			}
-		}
-	});
+		});
+	}
 	
 	// show buttons depending on parameters
 	$('button#learnerGroupDialogForceCompleteButton')
