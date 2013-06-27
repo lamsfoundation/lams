@@ -646,10 +646,11 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 					url : LAMS_URL + 'monitoring/monitoring.do',
 					cache : false,
 					data : {
-						'method'     : 'forceComplete',
-						'lessonID'   : lessonId,
-						'learnerID'  : learnerId,
-						'activityID' : targetActivityId
+						'method'     		 : 'forceComplete',
+						'lessonID'   		 : lessonId,
+						'learnerID'  		 : learnerId,
+						'activityID' 		 : targetActivityId,
+						'isPreviousActivity' : false
 					},
 					success : function(response) {
 						// inform user of result
