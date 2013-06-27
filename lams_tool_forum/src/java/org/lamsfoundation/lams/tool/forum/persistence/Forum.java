@@ -499,6 +499,17 @@ public class Forum implements Cloneable {
 	fromContent.toolContentHandler = forumToolContentHandler;
 	toContent = (Forum) fromContent.clone();
 	toContent.setContentId(contentId);
+	
+	Set topics = toContent.getMessages();
+	if (topics != null) {
+	    Iterator iter = topics.iterator();
+	    while (iter.hasNext()) {
+		Message msg = (Message) iter.next();
+		// clear message forum so that they can be saved when persistent happens
+		msg.setForum(null);
+	    }
+	}
+	
 	return toContent;
     }
 

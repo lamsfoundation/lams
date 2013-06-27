@@ -495,7 +495,7 @@ public class Message implements Cloneable {
     }
 
     /**
-     * @return the set of all messages cloned from this message. See getAuthoredParent().
+     * @return the set of all messages cloned from this message.
      * 
      * @hibernate.set cascade="none" inverse="false"
      * @hibernate.collection-key column="authored_parent_uid"

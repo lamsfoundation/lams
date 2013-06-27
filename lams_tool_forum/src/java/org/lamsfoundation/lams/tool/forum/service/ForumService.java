@@ -499,9 +499,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     public Long getToolDefaultContentIdBySignature(String toolSignature) {
-	Long contentId = null;
-	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
-	if (contentId == null) {
+	Long contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
+	if (contentId.equals(0L)) {
 	    String error = "Could not retrieve default content id for this tool";
 	    ForumService.log.error(error);
 	    throw new ForumException(error);
@@ -1037,18 +1036,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    defaultContent.getConditions().add(getForumOutputFactory().createDefaultTopicDateToAnswersCondition(defaultContent));
 	}
 	// get default content by given ID.
-	Forum content = new Forum();
-	content = Forum.newInstance(defaultContent, contentID, forumToolContentHandler);
-
-	Set topics = content.getMessages();
-	if (topics != null) {
-	    Iterator iter = topics.iterator();
-	    while (iter.hasNext()) {
-		Message msg = (Message) iter.next();
-		// clear message forum so that they can be saved when persistent happens
-		msg.setForum(null);
-	    }
-	}
+	Forum content = Forum.newInstance(defaultContent, contentID, forumToolContentHandler);
 
 	return content;
     }
