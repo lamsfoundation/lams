@@ -977,7 +977,7 @@ function openLiveEdit(){
 					alert(response);
 				} else {
 					openPopUp(LAMS_URL + 'home.do?method=author&layout=editonfly&learningDesignID=' + ldId,
-							'Live Edit', 600, 800, false);
+							'LiveEdit', 600, 800, false);
 					window.parent.closeMonitorLessonDialog();
 				}
 			}
@@ -1112,14 +1112,12 @@ function loadLearnerProgressPage(pageNumber){
 		+ '<a class="button" title="' 
 		+ EXPORT_PORTFOLIO_LEARNER_TOOLTIP_LABEL + '" href="#" onClick="javascript:openPopUp(\''
 		+ LAMS_URL + 'learning/exportWaitingPage.jsp?mode=learner&role=teacher&lessonID='
-		+ lessonId + '&userID=;00;\',\''
-		+ EXPORT_PORTFOLIO_LABEL + '\',240,640,true)">'
+		+ lessonId + '&userID=;00;\',\'ExportPortfolio\',240,640,true)">'
 		+ EXPORT_PORTFOLIO_LABEL
 		+ '</a><a class="button" title="'
 		+ TIME_CHART_TOOLTIP_LABEL + '" href="#" onClick="javascript:openPopUp(\''
 		+ LAMS_URL + 'monitoring/monitoring.do?method=viewTimeChart&lessonID='
-		+ lessonId + '&learnerID=;00;\',\''
-		+ TIME_CHART_LABEL + '\',600,800,true)">'
+		+ lessonId + '&learnerID=;00;\',\'TimeChart\',600,800,true)">'
 		+ TIME_CHART_LABEL 
 		+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
 	}

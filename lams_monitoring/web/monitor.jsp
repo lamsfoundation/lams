@@ -289,7 +289,7 @@
 			   <fmt:message key="button.refresh"/></a>
 			<a class="button" title="<fmt:message key='button.export.tooltip'/>"
 			   href="#"
-			   onClick="javascript:openPopUp('<lams:LAMSURL/>learning/exportWaitingPage.jsp?mode=teacher&lessonID=${lesson.lessonID}', '<fmt:message key="button.export"/>', 240, 640, true)">
+			   onClick="javascript:openPopUp('<lams:LAMSURL/>learning/exportWaitingPage.jsp?mode=teacher&lessonID=${lesson.lessonID}', 'ExportPortfolio', 240, 640, true)">
 			   <fmt:message key="button.export"/></a>
 			<c:if test="${lesson.liveEditEnabled}">
 				<a class="button" title="<fmt:message key='button.live.edit.tooltip'/>"
@@ -350,7 +350,7 @@
 					   <fmt:message key="button.refresh"/></a>
 					<a class="button" title="<fmt:message key='button.journal.entries.tooltip'/>"
 			   		   href="#"
-			           onClick="javascript:openPopUp('<lams:LAMSURL/>learning/notebook.do?method=viewAllJournals&lessonID=${lesson.lessonID}', '<fmt:message key="button.journal.entries"/>', 570, 796, true)">
+			           onClick="javascript:openPopUp('<lams:LAMSURL/>learning/notebook.do?method=viewAllJournals&lessonID=${lesson.lessonID}', 'JournalEntries', 570, 796, true)">
 			           <fmt:message key="button.journal.entries"/></a>
 				</td>
 			</tr>
