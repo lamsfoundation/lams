@@ -169,7 +169,8 @@ public class EmailUserAction extends LamsDispatchAction {
 	    }
 	    if (!StringUtils.isBlank(orgId)) {
 		result = getUserManagementService().isUserInRole(currentUser.getUserID(), new Integer(orgId),
-			Role.MONITOR);
+			Role.MONITOR) || getUserManagementService().isUserInRole(currentUser.getUserID(), new Integer(orgId),
+				Role.GROUP_MANAGER);
 	    }
 	}
 

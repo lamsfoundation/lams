@@ -41,6 +41,7 @@
 		var VIEW_LEARNER_BUTTON_LABEL = '<fmt:message key="button.view.learner"/>';
 		var EMAIL_BUTTON_LABEL = '<fmt:message key="button.email"/>';
 		var CLOSE_BUTTON_LABEL = '<fmt:message key="button.close"/>';
+		var NOTIFCATIONS_LABEL = '<fmt:message key="email.notifications"/>';
 		var LEARNER_FINISHED_COUNT_LABEL = '<fmt:message key="learner.finished.count"/>';
 		var LEARNER_FINISHED_DIALOG_TITLE_LABEL = '<fmt:message key="learner.finished.dialog.title"/>';
 		var LESSON_PRESENCE_ENABLE_ALERT_LABEL = '<fmt:message key="lesson.enable.presence.alert"/>';
@@ -168,6 +169,13 @@
 					   title='<fmt:message key="button.edit.class.tooltip"/>'>
 					   <fmt:message key="button.edit.class"/>
 					</a>
+					<c:if test="${notificationsAvailable}">
+						<a class="button lessonManageField" href="#"
+						   onClick="javascript:window.parent.showNotificationsDialog(null,${lesson.lessonID})">
+						   <fmt:message key="email.notifications"/>
+						</a>
+					</c:if>
+					
 					<a id="openImButton" class="button" href="#"
 					   onClick="javascript:openChatWindow()"
 						<c:if test="${not lesson.learnerImAvailable}">

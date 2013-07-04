@@ -1190,6 +1190,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 	}
 
+
+	IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
+		.getServletContext());
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, lessonDTO.getOrganisationID());
+	request.setAttribute("notificationsAvailable", organisation.getEnableCourseNotifications());
 	request.setAttribute("lesson", lessonDTO);
 	return mapping.findForward("monitorLesson");
     }

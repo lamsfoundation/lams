@@ -48,7 +48,6 @@
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jqGrid.js"></script>
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jstepper.min.js"></script>
 	<script language="JavaScript" type="text/javascript">
-	<!--
 		jQuery(document).ready(function() {
 			
 			//initialize user list 

@@ -176,13 +176,12 @@ public class DisplayGroupAction extends Action {
 			+ "/findUserLessons.do?dispatch=getResults&courseID=" + org.getOrganisationId()
 			+ "&KeepThis=true&TB_iframe=true&height=400&width=600", "search-lesson thickbox"
 			+ org.getOrganisationId(), null, "index.searchlesson.tooltip"));
-		
+
 		// Adding course notifications links if enabled
-		if (org.getEnableCourseNotifications() && (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))) {
-		    moreLinks.add(new IndexLinkBean("index.emailnotifications", Configuration.get(ConfigurationKeys.SERVER_URL)
-			    + "/monitoring/emailNotifications.do?method=getCourseView&organisationID="
-			    + org.getOrganisationId() + "&KeepThis=true&TB_iframe=true&height=500&width=800",
-			    "course-notifications thickbox" + org.getOrganisationId(), null,
+		if (org.getEnableCourseNotifications()
+			&& (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))) {
+		    moreLinks.add(new IndexLinkBean("index.emailnotifications", "javascript:showNotificationsDialog("
+			    + org.getOrganisationId() + ",null)", "course-notifications", null,
 			    "index.emailnotifications.tooltip"));
 		}
 
@@ -356,11 +355,9 @@ public class DisplayGroupAction extends Action {
 
 	    // Adding lesson notifications links if enabled
 	    if (isGroupManagerOrMonitor && bean.isEnableLessonNotifications()) {
-		String emailnotificationsUrl = Configuration.get(ConfigurationKeys.SERVER_URL)
-			+ "/monitoring/emailNotifications.do?method=getLessonView&lessonID=" + bean.getId()
-			+ "&KeepThis=true&TB_iframe=true&height=560&width=800";
-		lessonLinks.add(new IndexLinkBean("index.emailnotifications", emailnotificationsUrl,
-			"thickbox" + orgId, "mycourses-notifications-img", "index.emailnotifications.tooltip"));
+		lessonLinks.add(new IndexLinkBean("index.emailnotifications", "javascript:showNotificationsDialog(null,"
+			+ bean.getId() + ")", null, "mycourses-notifications-img",
+			"index.emailnotifications.tooltip"));
 	    }
 
 	    // Adding gradebook course monitor links if enabled

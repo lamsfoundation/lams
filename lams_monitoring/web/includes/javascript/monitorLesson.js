@@ -175,8 +175,8 @@ function initLessonTab(){
 		'show'      : 'fold',
 		'hide'      : 'fold',
 		'open'      : function(){
-			$('#emailFrame').attr('src', LAMS_URL + 'emailUser.do?method=composeMail&lessonID='
-					+ lessonId
+			$('#emailFrame').attr('src',
+					LAMS_URL + 'emailUser.do?method=composeMail&lessonID=' + lessonId
 					+ '&userID=' + $(this).dialog('option', 'userId'));
 		}
 	});
@@ -482,8 +482,9 @@ function initSequenceTab(){
 			            		var selectedLearner = $('#learnerGroupList div.dialogListItemSelected');
 			            		if (selectedLearner.length == 1) {
 			            			$('#emailDialog').dialog('option',{
-				            				'title'  : 'Email user',
-				            				'userId' : selectedLearner.attr('userId') 
+				            				'title'         : EMAIL_BUTTON_LABEL,
+				            				'userId'        : selectedLearner.attr('userId'),
+				            				'dialogContent' : 'email'
 				            			})
 				            			.dialog('open');
 			            		}

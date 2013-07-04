@@ -51,30 +51,6 @@
 		<script language="JavaScript" type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
 	</c:if>
 	<script language="javascript" type="text/javascript">
-		function showMonitorLessonDialog(lessonID){
-			$("#monitorDialog").dialog('option', 'lessonID', lessonID)
-								 .dialog('open');
-		}
-		
-		function showAddLessonDialog(orgID){
-			$("#addLessonDialog").dialog('option', 'orgID', orgID)
-								 .dialog('open');
-		}
-		
-		function closeAddLessonDialog(refresh) {
-			$('#addLessonFrame').attr('src', null);
-			// was the dialog just closed or a new lesson really added? if latter, refresh the list
-			$("#addLessonDialog").dialog('option', 'refresh', refresh ? true : false)
-								 .dialog('close');
-		}
-	
-		function closeMonitorLessonDialog(refresh) {
-			$('#monitorFrame').attr('src', null);
-			// was the dialog just closed or a new lesson really added? if latter, refresh the list
-			$("#monitorDialog").dialog('option', 'refresh', refresh ? true : false)
-								 .dialog('close');
-		}
-		
 		<!--
 			jQuery(document).ready(function(){
 				<c:if test="${not empty collapsedOrgDTOs}">
@@ -153,6 +129,33 @@
  						}
  					}
  				}).closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
+				
+				// initialise notifications dialog
+				$('#notificationsDialog').dialog({
+ 					'autoOpen'  : false,
+ 					'height'    : 600,
+ 					'width'     : 850,
+ 					'modal'     : true,
+ 					'resizable' : false,
+ 					'hide'      : 'fold',
+ 					'title'     : "<fmt:message key='index.emailnotifications' />",
+ 					'open'      : function(){
+ 						var lessonID = $(this).dialog('option', 'lessonID');
+ 						// if lesson ID is given, use lesson view; otherwise use course view
+ 						if (lessonID) {
+	 						// load contents after opening the dialog
+	 						$('#notificationsFrame').attr('src', '<lams:LAMSURL/>monitoring/emailNotifications.do?method=getLessonView&lessonID='
+	 							+ lessonID);
+ 						} else {
+ 							var orgID = $(this).dialog('option', 'orgID');
+ 							$('#notificationsFrame').attr('src', '<lams:LAMSURL/>monitoring/emailNotifications.do?method=getCourseView&organisationID='
+			                	+ orgID);
+ 						}
+ 					},
+ 					'close' : function() {
+ 						$('#notificationsFrame').attr('src',null);
+ 					}
+ 				});
 			});
 		
 			function removeLesson(lessonID) {
@@ -339,6 +342,9 @@
 </div>
 <div id="monitorDialog" class="dialogContainer">
 	<iframe id="monitorFrame"></iframe>
+</div>
+<div id="notificationsDialog" class="dialogContainer">
+	<iframe id="notificationsFrame"></iframe>
 </div>
 
 </body>

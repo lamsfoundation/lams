@@ -73,8 +73,10 @@
 						},
 						success: function(html) {
 							jQuery(courseBg).append(html);
-							// unregister and re-register thickbox for this group in order to avoid double
-							// registration of thickbox for existing elements (i.e. group 'add lesson' link)
+							// unregister and re-register thickbox for this
+							// group in order to avoid double
+							// registration of thickbox for existing elements
+							// (i.e. group 'add lesson' link)
 							$('a.thickbox'+jQuery(courseBg).attr("id")).unbind("click");
 							tb_init('a.thickbox'+jQuery(courseBg).attr("id"));
 						}
@@ -139,7 +141,8 @@
 						    var $originals = tr.children();
 						    var $helper = tr.clone();
 						    $helper.children().each(function(index) {
-						      // Set helper cell sizes to match the original sizes
+						      // Set helper cell sizes to match the original
+								// sizes
 						      $(this).width($originals.eq(index).width())
 						    });
 						    return $helper;
@@ -167,4 +170,38 @@
 						}
 					}).disableSelection();;
 				}
-	//-->				
+				
+				function showMonitorLessonDialog(lessonID){
+					$("#monitorDialog").dialog('option', 'lessonID', lessonID)
+										 .dialog('open');
+				}
+				
+				function showAddLessonDialog(orgID){
+					$("#addLessonDialog").dialog('option', 'orgID', orgID)
+										 .dialog('open');
+				}
+				
+				function showNotificationsDialog(organisationID, lessonID){
+					$("#notificationsDialog").dialog('option', {
+							'orgID' : organisationID,
+							'lessonID': lessonID
+						}).dialog('open');
+				}
+				
+				function closeAddLessonDialog(refresh) {
+					$('#addLessonFrame').attr('src', null);
+					// was the dialog just closed or a new lesson really added?
+					// if latter, refresh the list
+					$("#addLessonDialog").dialog('option', 'refresh', refresh ? true : false)
+										 .dialog('close');
+				}
+			
+				function closeMonitorLessonDialog(refresh) {
+					$('#monitorFrame').attr('src', null);
+					// was the dialog just closed or a new lesson really added?
+					// if latter, refresh the list
+					$("#monitorDialog").dialog('option', 'refresh', refresh ? true : false)
+										 .dialog('close');
+				}
+				
+	// -->
