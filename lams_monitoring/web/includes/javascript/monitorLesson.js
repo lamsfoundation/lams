@@ -174,6 +174,7 @@ function initLessonTab(){
 		'resizable' : false,
 		'show'      : 'fold',
 		'hide'      : 'fold',
+		'title'     : EMAIL_BUTTON_LABEL,
 		'open'      : function(){
 			$('#emailFrame').attr('src',
 					LAMS_URL + 'emailUser.do?method=composeMail&lessonID=' + lessonId
@@ -407,6 +408,13 @@ function openChatWindow(){
 }
 
 
+function showEmailDialog(userId){
+	$('#emailDialog').dialog('option',{
+		'userId'        : userId
+	}).dialog('open');
+}
+
+
 function closeEmailDialog(){
 	$('#emailFrame').attr('src', null);
 	$('#emailDialog').dialog('close');
@@ -481,12 +489,7 @@ function initSequenceTab(){
 			            	'click'  : function() {
 			            		var selectedLearner = $('#learnerGroupList div.dialogListItemSelected');
 			            		if (selectedLearner.length == 1) {
-			            			$('#emailDialog').dialog('option',{
-				            				'title'         : EMAIL_BUTTON_LABEL,
-				            				'userId'        : selectedLearner.attr('userId'),
-				            				'dialogContent' : 'email'
-				            			})
-				            			.dialog('open');
+			            			showEmailDialog(selectedLearner.attr('userId'));
 			            		}
 			            	}	
 			             },
@@ -1155,6 +1158,8 @@ function loadLearnerProgressPage(pageNumber){
 		+ LAMS_URL + 'monitoring/monitoring.do?method=viewTimeChart&lessonID='
 		+ lessonId + '&learnerID=;00;\',\'TimeChart\',600,800,true)">'
 		+ TIME_CHART_LABEL 
+		+ '</a><a class="button" href="#" onClick="javascript:showEmailDialog(;00;)">'
+		+ EMAIL_BUTTON_LABEL
 		+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
 	}
 	
