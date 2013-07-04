@@ -33,7 +33,6 @@ import java.util.TreeSet;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -55,7 +54,6 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
  * to the tool by the database.
  */
 public class QaContent implements Serializable {
-    static Logger logger = Logger.getLogger(QaContent.class.getName());
 
     /** identifier field */
     private Long uid;
@@ -173,7 +171,6 @@ public class QaContent implements Serializable {
 	this.qaUploadedFiles = qaUploadedFiles;
 	this.conditions = conditions;
 	this.allowRichEditor = allowRichEditor;
-	QaContent.logger.debug(QaContent.logger + " " + this.getClass().getName() + "in full constructor: QaContent()");
     }
 
     /**
@@ -592,21 +589,6 @@ public class QaContent implements Serializable {
      */
     public void setContent(String content) {
 	this.content = content;
-    }
-
-    /**
-     * @return Returns the logger.
-     */
-    public static Logger getLogger() {
-	return QaContent.logger;
-    }
-
-    /**
-     * @param logger
-     *                The logger to set.
-     */
-    public static void setLogger(Logger logger) {
-	QaContent.logger = logger;
     }
 
     /**

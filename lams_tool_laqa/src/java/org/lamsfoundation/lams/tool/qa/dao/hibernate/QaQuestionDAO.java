@@ -26,9 +26,7 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
-import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.dao.IQaQuestionDAO;
 import org.springframework.orm.hibernate3.HibernateTemplate;

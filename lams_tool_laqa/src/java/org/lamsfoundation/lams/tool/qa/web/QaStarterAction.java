@@ -162,11 +162,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * 
  * @author Ozgur Demirtas
- * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
- * 
- * A Map data structure is used to present the UI.
  */
 public class QaStarterAction extends Action implements QaAppConstants {
     static Logger logger = Logger.getLogger(QaStarterAction.class.getName());
@@ -176,12 +171,10 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    HttpServletResponse response) throws IOException, ServletException, QaApplicationException {
 
 	QaUtils.cleanUpSessionAbsolute(request);
-	QaStarterAction.logger.debug("init authoring mode.");
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
 	
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	QaStarterAction.logger.debug("contentFolderID: " + contentFolderID);
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
@@ -191,31 +184,25 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
 	IQaService qaService = null;
 	if (getServlet() == null || getServlet().getServletContext() == null) {
-	    QaStarterAction.logger.debug("obtaining qaService from the form");
 	    qaService = qaAuthoringForm.getQaService();
 	} else {
-	    QaStarterAction.logger.debug("obtaining qaService via proxy");
 	    qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	}
 	
 
 	qaGeneralAuthoringDTO.setCurrentTab("1");
-	QaStarterAction.logger.debug("setting currrent tab to 1:");
 
 	qaGeneralAuthoringDTO.setMonitoringOriginatedDefineLater(new Boolean(false).toString());
 	String servletPath = request.getServletPath();
-	QaStarterAction.logger.debug("getServletPath: " + servletPath);
 	String requestedModule = null;
 	if (servletPath.indexOf("authoringStarter") > 0) {
-	    QaStarterAction.logger.debug("request is for authoring module");
 	    qaGeneralAuthoringDTO.setActiveModule(QaAppConstants.AUTHORING);
 	    qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 	    qaGeneralAuthoringDTO.setShowAuthoringTabs(new Boolean(true).toString());
 	    qaAuthoringForm.setActiveModule(QaAppConstants.AUTHORING);
 	    requestedModule = QaAppConstants.AUTHORING;
 	} else {
-	    QaStarterAction.logger
-		    .debug("request is for define later module either direcly from define later url or monitoring url");
+	    //request is for define later module either direcly from define later url or monitoring url
 	    qaGeneralAuthoringDTO.setActiveModule(QaAppConstants.DEFINE_LATER);
 	    qaGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 	    qaGeneralAuthoringDTO.setShowAuthoringTabs(new Boolean(false).toString());
@@ -223,24 +210,18 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    requestedModule = QaAppConstants.DEFINE_LATER;
 
 	    if (servletPath.indexOf("monitoring") > 0) {
-		QaStarterAction.logger.debug("request is from monitoring  url.");
+		//request is from monitoring  url
 		qaGeneralAuthoringDTO.setMonitoringOriginatedDefineLater(new Boolean(true).toString());
 	    }
 	}
-	QaStarterAction.logger.debug("requestedModule: " + requestedModule);
 	qaGeneralAuthoringDTO.setRequestedModule(requestedModule);
 
 	/* in development this needs to be called only once. */
 	/* QaUtils.configureContentRepository(request); */
 
 	String sourceMcStarter = (String) request.getAttribute(QaAppConstants.SOURCE_MC_STARTER);
-	QaStarterAction.logger.debug("sourceMcStarter: " + sourceMcStarter);
 
 	boolean validateSignature = readSignature(request, mapping, qaService, qaGeneralAuthoringDTO, qaAuthoringForm);
-	QaStarterAction.logger.debug("validateSignature:  " + validateSignature);
-	if (validateSignature == false) {
-	    QaStarterAction.logger.debug("error during validation");
-	}
 
 	/* mark the http session as an authoring activity */
 	qaGeneralAuthoringDTO.setTargetMode(QaAppConstants.TARGET_MODE_AUTHORING);
@@ -249,11 +230,10 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	 * find out whether the request is coming from monitoring module for EditActivity tab or from authoring
 	 * environment url
 	 */
-	QaStarterAction.logger.debug("no problems getting the default content, will render authoring screen");
+	//no problems getting the default content, will render authoring screen
 	String strToolContentID = "";
 	/* the authoring url must be passed a tool content id */
 	strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaStarterAction.logger.debug("strToolContentID: " + strToolContentID);
 	qaGeneralAuthoringDTO.setToolContentID(strToolContentID);
 
 	SessionMap sessionMap = new SessionMap();
@@ -273,27 +253,21 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	     * it is possible that the original request for authoring module is coming from monitoring url which keeps
 	     * the TOOL_CONTENT_ID in the session
 	     */
-	    QaStarterAction.logger.debug("strToolContentID is null, handle this");
+	    //strToolContentID is null, handle this
 
 	    Long toolContentID = (Long) request.getSession().getAttribute(QaAppConstants.TOOL_CONTENT_ID);
-	    QaStarterAction.logger.debug("toolContentID: " + toolContentID);
 	    if (toolContentID != null) {
 		strToolContentID = toolContentID.toString();
-		QaStarterAction.logger.debug("cached strToolContentID from the session: " + strToolContentID);
 	    } else {
-		QaStarterAction.logger
-			.debug("we should IDEALLY not arrive here. The TOOL_CONTENT_ID is NOT available from the url or the session.");
+		//we should IDEALLY not arrive here. The TOOL_CONTENT_ID is NOT available from the url or the session
 		/* use default content instead of giving a warning */
 		defaultContentId = qaAuthoringForm.getDefaultContentIdStr();
-		QaStarterAction.logger.debug("using MCQ defaultContentId: " + defaultContentId);
 		strToolContentID = defaultContentId;
 	    }
 	}
-	QaStarterAction.logger.debug("final strToolContentID: " + strToolContentID);
 
 	if (strToolContentID == null || strToolContentID.equals("")) {
 	    QaUtils.cleanUpSessionAbsolute(request);
-	    QaStarterAction.logger.debug("forwarding to: " + QaAppConstants.ERROR_LIST);
 	    return mapping.findForward(QaAppConstants.ERROR_LIST);
 	}
 
@@ -310,17 +284,12 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	String defaultContentIdStr = null;
 	QaContent qaContent = null;
 	if (!existsContent(new Long(strToolContentID).longValue(), qaService)) {
-	    QaStarterAction.logger.debug("getting default content");
 	    /* fetch default content */
 	    defaultContentIdStr = qaAuthoringForm.getDefaultContentIdStr();
-	    QaStarterAction.logger.debug("defaultContentIdStr:" + defaultContentIdStr);
 	    qaContent = retrieveContent(request, mapping, qaAuthoringForm, new Long(
 		    defaultContentIdStr).longValue(), true, qaService, qaGeneralAuthoringDTO, sessionMap);
 
-	    QaStarterAction.logger.debug("post retrive content :" + sessionMap);
-
 	} else {
-	    QaStarterAction.logger.debug("getting existing content");
 	    /* it is possible that the content is in use by learners. */
 	    qaContent = qaService.getQa(new Long(strToolContentID).longValue());
 	    
@@ -333,8 +302,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    }
 	    qaContent = retrieveContent(request, mapping, qaAuthoringForm, new Long(
 		    strToolContentID).longValue(), false, qaService, qaGeneralAuthoringDTO, sessionMap);
-
-	    QaStarterAction.logger.debug("post retrive content :" + sessionMap);
 	}
 
 	if (qaGeneralAuthoringDTO.getOnlineInstructions() == null
@@ -359,12 +326,8 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	qaAuthoringForm.setAllowRichEditor(qaContent.isAllowRichEditor());
 	sessionMap.put(QaAppConstants.ATTR_QA_AUTHORING_FORM, qaAuthoringForm);
 
-	
-	QaStarterAction.logger.debug("will return to jsp with: " + sourceMcStarter);
 	String destination = QaUtils.getDestination(sourceMcStarter, requestedModule);
-	QaStarterAction.logger.debug("destination: " + destination);
 
-	QaStarterAction.logger.debug("persisting sessionMap into session: " + sessionMap);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
@@ -389,11 +352,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
     protected QaContent retrieveContent(HttpServletRequest request, ActionMapping mapping,
 	    QaAuthoringForm qaAuthoringForm, long toolContentID, boolean isDefaultContent,
 	    IQaService qaService, QaGeneralAuthoringDTO qaGeneralAuthoringDTO, SessionMap sessionMap) {
-	
-	QaStarterAction.logger.debug("toolContentID: " + toolContentID);
-	QaStarterAction.logger.debug("isDefaultContent: " + isDefaultContent);
-
-	QaStarterAction.logger.debug("getting content with id:" + toolContentID);
 	QaContent qaContent = qaService.getQa(toolContentID);
 	if (isDefaultContent && qaContent.getConditions().isEmpty()) {
 	    qaContent.getConditions().add(qaService.createDefaultComplexCondition(qaContent));
@@ -411,7 +369,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
 	qaGeneralAuthoringDTO.setReflect(qaContent.isReflect() ? "1" : "0");
 
-	QaStarterAction.logger.debug("QaContent isReflect: " + qaContent.isReflect());
 	qaAuthoringForm.setReflect(qaContent.isReflect() ? "1" : "0");
 
 	qaAuthoringForm.setReflectionSubject(qaContent.getReflectionSubject());
@@ -477,7 +434,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, conditionSet);
 
 	if (isDefaultContent) {
-	    QaStarterAction.logger.debug("overwriting default question.");
 	    qaGeneralAuthoringDTO.setDefaultQuestionContent("Sample Question 1?");
 
 	}
@@ -489,8 +445,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	qaAuthoringForm.setOfflineInstructions(qaContent.getOfflineInstructions());
 	sessionMap.put(QaAppConstants.ONLINE_INSTRUCTIONS_KEY, qaContent.getOnlineInstructions());
 	sessionMap.put(QaAppConstants.OFFLINE_INSTRUCTIONS_KEY, qaContent.getOfflineInstructions());
-
-	QaStarterAction.logger.debug("ACTIVITY_TITLE_KEY set to:" + sessionMap.get(QaAppConstants.ACTIVITY_TITLE_KEY));
 
 	qaAuthoringForm.resetUserAction();
 	
@@ -517,15 +471,13 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	 */
 	long defaultContentID = 0;
 	try {
-	    QaStarterAction.logger.debug("attempt retrieving tool with signatute : " + QaAppConstants.MY_SIGNATURE);
 	    defaultContentID = qaService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
-	    QaStarterAction.logger.debug("retrieved tool default contentId: " + defaultContentID);
 	    if (defaultContentID == 0) {
 		QaStarterAction.logger.debug("default content id has not been setup");
 		return false;
 	    }
 	} catch (Exception e) {
-	    QaStarterAction.logger.debug("error getting the default content id: " + e.getMessage());
+	    QaStarterAction.logger.error("error getting the default content id: " + e.getMessage());
 	    persistError(request, "error.defaultContent.notSetup");
 	    return false;
 	}
@@ -537,18 +489,17 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    //retrieve uid of the content based on default content id determined above
 	    QaContent qaContent = qaService.getQa(defaultContentID);
 	    if (qaContent == null) {
-		QaStarterAction.logger.debug("Exception occured: No default content");
+		QaStarterAction.logger.error("Exception occured: No default content");
 		persistError(request, "error.defaultContent.notSetup");
 		return false;
 	    }
 	    
 	} catch (Exception e) {
-	    QaStarterAction.logger.debug("Exception occured: No default question content");
+	    QaStarterAction.logger.error("Exception occured: No default question content");
 	    persistError(request, "error.defaultContent.notSetup");
 	    return false;
 	}
 
-	QaStarterAction.logger.debug("QA tool has the default content id: " + defaultContentID);
 	qaGeneralAuthoringDTO.setDefaultContentIdStr(new Long(defaultContentID).toString());
 	qaAuthoringForm.setDefaultContentIdStr(new Long(defaultContentID).toString());
 
@@ -592,7 +543,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
     public ActionForward executeDefineLater(ActionMapping mapping, QaAuthoringForm qaAuthoringForm,
 	    HttpServletRequest request, HttpServletResponse response, IQaService qaService) throws IOException,
 	    ServletException, QaApplicationException {
-	QaStarterAction.logger.debug("calling execute..., qaService will be needed next.");
 	return execute(mapping, qaAuthoringForm, request, response);
     }
 
@@ -605,7 +555,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
     public void persistError(HttpServletRequest request, String message) {
 	ActionMessages errors = new ActionMessages();
 	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-	QaStarterAction.logger.debug("add " + message + "  to ActionMessages:");
 	saveErrors(request, errors);
     }
 

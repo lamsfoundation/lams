@@ -137,44 +137,13 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
     private QaToolContentHandler toolContentHandler;
 
-    /**
-     * <p>
-     * Struts dispatch method.
-     * </p>
-     * 
-     * <p>
-     * It is assuming that progress engine should pass in the tool access mode
-     * and the tool session id as http parameters.
-     * </p>
-     * 
-     * @param mapping
-     *                An ActionMapping class that will be used by the Action
-     *                class to tell the ActionServlet where to send the
-     *                end-user.
-     * 
-     * @param form
-     *                The ActionForm class that will contain any data submitted
-     *                by the end-user via a form.
-     * @param request
-     *                A standard Servlet HttpServletRequest class.
-     * @param response
-     *                A standard Servlet HttpServletResponse class.
-     * @return An ActionForward class that will be returned to the ActionServlet
-     *         indicating where the user is to go next.
-     * @throws IOException
-     * @throws ServletException
-     * @throws QaApplicationException
-     *                 the known runtime exception
-     * 
-     */
-    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
     }
 
     /**
-     * submits content into the tool database ActionForward
+     * submits content into the tool database
      * 
      * @param mapping
      * @param form
@@ -222,13 +191,8 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
 
 	if (activeModule.equals(QaAppConstants.AUTHORING)) {
-	    List attachmentListBackup = new ArrayList();
 	    List attachmentList = (List) sessionMap.get(QaAppConstants.ATTACHMENT_LIST_KEY);
-	    attachmentListBackup = attachmentList;
-
-	    List deletedAttachmentListBackup = new ArrayList();
 	    List deletedAttachmentList = (List) sessionMap.get(QaAppConstants.DELETED_ATTACHMENT_LIST_KEY);
-	    deletedAttachmentListBackup = deletedAttachmentList;
 
 	    String onlineInstructions = (String) sessionMap.get(QaAppConstants.ONLINE_INSTRUCTIONS_KEY);
 	    qaGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
@@ -391,15 +355,11 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
 
-	QaContent qaContent = qaService.getQa(new Long(strToolContentID).longValue());
-
 	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
 
 	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	qaGeneralAuthoringDTO.setSbmtSuccess(new Integer(0).toString());
-
-	AuthoringUtil authoringUtil = new AuthoringUtil();
 
 	List listQuestionContentDTO = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_CONTENT_DTO_KEY);
 
@@ -455,7 +415,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		while (listIterator.hasNext()) {
 		    qaQuestionDTO = (QaQuestionDTO) listIterator.next();
 
-		    String question = qaQuestionDTO.getQuestion();
 		    String displayOrder = qaQuestionDTO.getDisplayOrder();
 
 		    if (displayOrder != null && !displayOrder.equals("")) {

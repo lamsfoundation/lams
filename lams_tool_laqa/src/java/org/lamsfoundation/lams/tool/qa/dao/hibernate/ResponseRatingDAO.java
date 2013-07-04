@@ -23,14 +23,12 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
-import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.tool.qa.ResponseRating;
-import org.lamsfoundation.lams.tool.qa.dao.IQaConfigItemDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IResponseRatingDAO;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
 

@@ -71,8 +71,8 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
@@ -523,18 +523,14 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException
 
     {
-	QaServicePOJO.logger.debug("start of copyToolContent with ids: " + fromContentId + " and " + toContentId);
 	long defaultContentId = 0;
 	if (fromContentId == null) {
-	    QaServicePOJO.logger.debug("fromContentId is null.");
-	    QaServicePOJO.logger.debug("attempt retrieving tool's default content id with signatute : "
-		    + QaAppConstants.MY_SIGNATURE);
 
 	    try {
 		defaultContentId = getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 		fromContentId = new Long(defaultContentId);
 	    } catch (Exception e) {
-		QaServicePOJO.logger.debug("default content id has not been setup for signature: "
+		QaServicePOJO.logger.error("default content id has not been setup for signature: "
 			+ QaAppConstants.MY_SIGNATURE);
 		throw new ToolException("WARNING! default content has not been setup for signature"
 			+ QaAppConstants.MY_SIGNATURE + " Can't continue!");
@@ -542,23 +538,19 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
 
 	if (toContentId == null) {
-	    QaServicePOJO.logger.debug("throwing ToolException: toContentId is null");
+	    QaServicePOJO.logger.error("throwing ToolException: toContentId is null");
 	    throw new ToolException("toContentId is missing");
 	}
-	QaServicePOJO.logger.debug("final - copyToolContent using ids: " + fromContentId + " and " + toContentId);
 
 	try {
 	    QaContent fromContent = qaDAO.getQaByContentId(fromContentId.longValue());
 
 	    if (fromContent == null) {
-		QaServicePOJO.logger.debug("fromContent is null.");
-		QaServicePOJO.logger.debug("attempt retrieving tool's default content id with signatute : "
-			+ QaAppConstants.MY_SIGNATURE);
 		try {
 		    defaultContentId = getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 		    fromContentId = new Long(defaultContentId);
 		} catch (Exception e) {
-		    QaServicePOJO.logger.debug("default content id has not been setup for signature: "
+		    QaServicePOJO.logger.error("default content id has not been setup for signature: "
 			    + QaAppConstants.MY_SIGNATURE);
 		    throw new ToolException("WARNING! default content has not been setup for signature"
 			    + QaAppConstants.MY_SIGNATURE + " Can't continue!");
@@ -572,15 +564,14 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    }
 	    QaContent toContent = QaContent.newInstance(qaToolContentHandler, fromContent, toContentId);
 	    if (toContent == null) {
-		QaServicePOJO.logger.debug("throwing ToolException: WARNING!, retrieved toContent is null.");
+		QaServicePOJO.logger.error("throwing ToolException: WARNING!, retrieved toContent is null.");
 		throw new ToolException("WARNING! Fail to create toContent. Can't continue!");
 	    } else {
 		qaDAO.saveQa(toContent);
 	    }
-	    QaServicePOJO.logger.debug("end of copyToolContent with ids: " + fromContentId + " and " + toContentId);
 	} catch (DataAccessException e) {
 	    QaServicePOJO.logger
-		    .debug("throwing ToolException: Exception occured when lams is copying content between content ids.");
+		    .error("throwing ToolException: Exception occured when lams is copying content between content ids.");
 	    throw new ToolException("Exception occured when lams is copying content between content ids.");
 	} catch (ItemNotFoundException e) {
 	    throw new ToolException("Exception occured when lams is copying content between content ids.");
@@ -598,14 +589,13 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      *                return void
      */
     public void setAsDefineLater(Long toolContentID, boolean value) throws DataMissingException, ToolException {
-	QaServicePOJO.logger.debug("request for setAsDefineLater with toolContentID: " + toolContentID);
 	if (toolContentID == null) {
-	    QaServicePOJO.logger.debug("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
+	    QaServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
 	    throw new DataMissingException("toolContentID is missing");
 	}
 	QaContent qaContent = qaDAO.getQaByContentId(toolContentID.longValue());
 	if (qaContent == null) {
-	    QaServicePOJO.logger.debug("throwing DataMissingException: WARNING!: retrieved qaContent is null.");
+	    QaServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved qaContent is null.");
 	    throw new DataMissingException("qaContent is missing");
 	}
 	qaContent.setDefineLater(value);
@@ -620,14 +610,13 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      *                return void
      */
     public void setAsRunOffline(Long toolContentID, boolean value) throws DataMissingException, ToolException {
-	QaServicePOJO.logger.debug("request for setAsRunOffline with toolContentID:" + toolContentID);
 	if (toolContentID == null) {
-	    QaServicePOJO.logger.debug("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
+	    QaServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved toolContentID is null.");
 	    throw new DataMissingException("toolContentID is missing");
 	}
 	QaContent qaContent = qaDAO.getQaByContentId(toolContentID.longValue());
 	if (qaContent == null) {
-	    QaServicePOJO.logger.debug("throwing DataMissingException: WARNING!: retrieved qaContent is null.");
+	    QaServicePOJO.logger.error("throwing DataMissingException: WARNING!: retrieved qaContent is null.");
 	    throw new DataMissingException("qaContent is missing");
 	}
 	qaContent.setRunOffline(value);
@@ -652,7 +641,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    Iterator sessionIterator = qaContent.getQaSessions().iterator();
 	    while (sessionIterator.hasNext()) {
 		if (removeSessionData == false) {
-		    QaServicePOJO.logger.debug("removeSessionData is false, throwing SessionDataExistsException.");
+		    QaServicePOJO.logger.error("removeSessionData is false, throwing SessionDataExistsException.");
 		    throw new SessionDataExistsException();
 		}
 
@@ -673,7 +662,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    //removed all existing responses of toolContent with toolContentID
 	    qaDAO.removeQa(toolContentID);
 	} else {
-	    QaServicePOJO.logger.debug("Warning!!!, We should have not come here. qaContent is null.");
+	    QaServicePOJO.logger.error("Warning!!!, We should have not come here. qaContent is null.");
 	    throw new ToolException("toolContentID is missing");
 	}
     }
@@ -822,15 +811,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      * @return boolean
      */
     protected boolean existsSession(long toolSessionId) {
-	QaServicePOJO.logger.debug("toolSessionId: " + toolSessionId);
 	QaSession qaSession = getSessionById(toolSessionId);
-	QaServicePOJO.logger.debug("qaSession: " + qaSession);
 
 	if (qaSession == null) {
-	    QaServicePOJO.logger.debug("qaSession does not exist yet: " + toolSessionId);
 	    return false;
-	} else {
-	    QaServicePOJO.logger.debug("Retrieving an existing qaSession: " + toolSessionId);
 	}
 	return true;
     }
@@ -843,46 +827,35 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      * 
      */
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentID) throws ToolException {
-	QaServicePOJO.logger.debug("start of createToolSession with ids: " + toolSessionId + " and " + toolContentID);
-	QaServicePOJO.logger.debug("toolSessionName: " + toolSessionName);
 
 	if (toolSessionId == null) {
-	    QaServicePOJO.logger.debug("toolSessionId is null");
+	    QaServicePOJO.logger.error("toolSessionId is null");
 	    throw new ToolException("toolSessionId is missing");
 	}
 
 	long defaultContentId = 0;
 	if (toolContentID == null) {
-	    QaServicePOJO.logger.debug("toolContentID is null.");
-	    QaServicePOJO.logger.debug("attempt retrieving tool's default content id with signatute : "
-		    + QaAppConstants.MY_SIGNATURE);
 
 	    try {
 		defaultContentId = getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 		toolContentID = new Long(defaultContentId);
-		QaServicePOJO.logger.debug("updated toolContentID to: " + toolContentID);
 	    } catch (Exception e) {
-		QaServicePOJO.logger.debug("default content id has not been setup for signature: "
+		QaServicePOJO.logger.error("default content id has not been setup for signature: "
 			+ QaAppConstants.MY_SIGNATURE);
 		throw new ToolException("WARNING! default content has not been setup for signature"
 			+ QaAppConstants.MY_SIGNATURE + " Can't continue!");
 	    }
 	}
-	QaServicePOJO.logger.debug("final toolSessionId and toolContentID: " + toolSessionId + " " + toolContentID);
 
 	QaContent qaContent = qaDAO.getQaByContentId(toolContentID.longValue());
 
 	if (qaContent == null) {
-	    QaServicePOJO.logger.debug("qaContent is null.");
-	    QaServicePOJO.logger.debug("attempt retrieving tool's default content id with signatute : "
-		    + QaAppConstants.MY_SIGNATURE);
 
 	    try {
 		defaultContentId = getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 		toolContentID = new Long(defaultContentId);
-		QaServicePOJO.logger.debug("updated toolContentID to: " + toolContentID);
 	    } catch (Exception e) {
-		QaServicePOJO.logger.debug("default content id has not been setup for signature: "
+		QaServicePOJO.logger.error("default content id has not been setup for signature: "
 			+ QaAppConstants.MY_SIGNATURE);
 		throw new ToolException("WARNING! default content has not been setup for signature"
 			+ QaAppConstants.MY_SIGNATURE + " Can't continue!");
@@ -903,16 +876,15 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 			QaSession.INCOMPLETE, toolSessionName, qaContent, new TreeSet());
 		qaSessionDAO.CreateQaSession(qaSession);
 	    } catch (Exception e) {
-		QaServicePOJO.logger.debug("Error creating new toolsession in the db");
+		QaServicePOJO.logger.error("Error creating new toolsession in the db");
 		throw new ToolException("Error creating new toolsession in the db: " + e);
 	    }
 	}
     }
 
     public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException {
-	QaServicePOJO.logger.debug("start of removeToolSession with id: " + toolSessionId);
 	if (toolSessionId == null) {
-	    QaServicePOJO.logger.debug("toolSessionId is null");
+	    QaServicePOJO.logger.error("toolSessionId is null");
 	    throw new DataMissingException("toolSessionId is missing");
 	}
 
@@ -926,13 +898,12 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
 
 	if (qaSession == null) {
-	    QaServicePOJO.logger.debug("qaSession is null");
+	    QaServicePOJO.logger.error("qaSession is null");
 	    throw new DataMissingException("qaSession is missing");
 	}
 
 	try {
 	    qaSessionDAO.deleteQaSession(qaSession);
-	    QaServicePOJO.logger.debug("qaSession " + qaSession.getQaSessionId() + " has been deleted successfully.");
 	} catch (QaApplicationException e) {
 	    throw new ToolException("error deleting qaSession:" + e);
 	}
@@ -946,16 +917,14 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      * 
      */
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
-	QaServicePOJO.logger.debug("start of leaveToolSession with toolSessionId:" + toolSessionId);
-	QaServicePOJO.logger.debug("start of leaveToolSession with learnerId:" + learnerId);
 
 	if (toolSessionId == null) {
-	    QaServicePOJO.logger.debug("toolSessionId is null");
+	    QaServicePOJO.logger.error("toolSessionId is null");
 	    throw new DataMissingException("toolSessionId is missing");
 	}
 
 	if (learnerId == null) {
-	    QaServicePOJO.logger.debug("learnerId is null");
+	    QaServicePOJO.logger.error("learnerId is null");
 	    throw new DataMissingException("learnerId is missing");
 	}
 
@@ -963,12 +932,9 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	qaSession.setSession_end_date(new Date(System.currentTimeMillis()));
 	qaSession.setSession_status(QaAppConstants.COMPLETED);
 	updateQaSession(qaSession);
-	QaServicePOJO.logger.debug("tool session has been marked COMPLETE: " + qaSession.getQaSessionId());
 
 	try {
 	    String nextUrl = learnerService.completeToolSession(toolSessionId, learnerId);
-	    QaServicePOJO.logger.debug(QaServicePOJO.logger + " " + this.getClass().getName() + " " + "nextUrl: "
-		    + nextUrl);
 	    return nextUrl;
 	} catch (DataAccessException e) {
 	    throw new ToolException("Exception occured when user is leaving tool session: " + e);
@@ -1015,16 +981,13 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     public IToolVO getToolBySignature(String toolSignature) throws QaApplicationException {
-	QaServicePOJO.logger.debug("attempt retrieving tool with signature : " + toolSignature);
 	IToolVO tool = toolService.getToolBySignature(toolSignature);
 	return tool;
     }
 
     public long getToolDefaultContentIdBySignature(String toolSignature) throws QaApplicationException {
 	long contentId = 0;
-	QaServicePOJO.logger.debug("before attempting retrieving tool with signature : " + toolSignature);
 	contentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
-	QaServicePOJO.logger.debug("tool default contentId : " + contentId);
 	return contentId;
     }
 
@@ -1095,7 +1058,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    throws QaApplicationException {
 	QaUploadedFile qaUploadedFile = new QaUploadedFile(uuid, isOnlineFile, fileName, qaContent);
 	qaUploadedFileDAO.saveUploadFile(qaUploadedFile);
-	QaServicePOJO.logger.debug("persisted qaUploadedFile: " + qaUploadedFile.getUuid());
     }
 
     /**
@@ -1105,7 +1067,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	content.getQaUploadedFiles().add(file);
 	file.setQaContent(content);
 	qaDAO.saveOrUpdateQa(content);
-	QaServicePOJO.logger.debug("persisted qaUploadedFile: " + file.getUuid());
     }
 
     /**
@@ -1113,7 +1074,6 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
      */
     public void removeFile(Long submissionId) throws QaApplicationException {
 	qaUploadedFileDAO.removeUploadFile(submissionId);
-	QaServicePOJO.logger.debug("removed qaUploadedFile: " + submissionId);
     }
 
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {

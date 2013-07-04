@@ -23,7 +23,6 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.tool.qa.dto;
 
-import java.util.List;
 
 public class AverageRatingDTO {
 

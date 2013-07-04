@@ -121,10 +121,9 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
-import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
@@ -530,7 +529,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
-	logger.debug("fwd'ing to INDIVIDUAL_LEARNER_REPORT: " + INDIVIDUAL_LEARNER_REPORT);
 	return (mapping.findForward(INDIVIDUAL_LEARNER_REPORT));
     }
 
@@ -775,7 +773,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	qaService.updateQaSession(qaSession);
 
 	String httpSessionID = qaLearningForm.getHttpSessionID();
-	logger.debug("removing map with httpSessionID: " + httpSessionID);
 	//request.getSession().removeAttribute(httpSessionID);
 	qaLearningForm.setHttpSessionID(httpSessionID);
 
@@ -840,7 +837,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	}
 
 	if (sessionUserCount > 1) {
-	    logger.debug("there are multiple user responses");
+	    //there are multiple user responses
 	    generalLearnerFlowDTO.setExistMultipleUserResponses(new Boolean(true).toString());
 	}
 
@@ -866,7 +863,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
-	logger.debug("fwd'ing to." + REVISITED_LEARNER_REP);
 	return (mapping.findForward(REVISITED_LEARNER_REP));
     }
 
@@ -934,7 +930,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	QaContent qaContent = qaSession.getQaContent();
 
 	String userID = request.getParameter("userID");
-	logger.debug("userID: " + userID);
 	qaLearningForm.setUserID(userID);
 
 	return forwardtoReflection(mapping, request, qaContent, toolSessionID, userID, qaLearningForm);

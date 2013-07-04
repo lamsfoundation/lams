@@ -32,17 +32,15 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
-
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;	
+import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;

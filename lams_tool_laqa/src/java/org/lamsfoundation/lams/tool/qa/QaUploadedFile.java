@@ -29,7 +29,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -38,11 +37,6 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
  * 
  * @author Ozgur Demirtas
  * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
- */
-
-/**
  * QaQueContent Value Object The value object that maps to our model database
  * table: tl_laqa11_que_content The relevant hibernate mapping resides in:
  * QaQueContent.hbm.xml

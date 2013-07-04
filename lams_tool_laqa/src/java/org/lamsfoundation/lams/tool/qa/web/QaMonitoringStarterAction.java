@@ -64,21 +64,10 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * 
- * @author Ozgur Demirtas starts up the monitoring module
+ * @author Ozgur Demirtas 
  * 
- * <action path="/monitoringStarter"
- * type="org.lamsfoundation.lams.tool.qa.web.QaMonitoringStarterAction"
- * name="QaMonitoringForm" scope="session" parameter="method" unknown="false"
- * validate="false">
- * 
- * <forward name="loadMonitoring" path="/monitoring/MonitoringMaincontent.jsp"
- * redirect="true" />
- * 
- * <forward name="errorList" path="/QaErrorBox.jsp" redirect="true" /> </action>
- * 
- * 
+ * starts up the monitoring module
  */
-
 public class QaMonitoringStarterAction extends Action implements QaAppConstants {
     static Logger logger = Logger.getLogger(QaMonitoringStarterAction.class.getName());
 
@@ -264,7 +253,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
 		qaMonitoringForm.setToolContentID(new Long(toolContentId).toString());
 	    } catch (NumberFormatException e) {
-		logger.debug("add error.contentId.numberFormatException to ActionMessages.");
+		logger.error("add error.contentId.numberFormatException to ActionMessages.");
 		QaUtils.cleanUpSessionAbsolute(request);
 		return (mapping.findForward(ERROR_LIST));
 	    }

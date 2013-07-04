@@ -32,7 +32,6 @@ import java.util.TreeSet;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.log4j.Logger;
 
 /**
  * 
@@ -45,7 +44,6 @@ import org.apache.log4j.Logger;
  * Holds tool sessions
  */
 public class QaSession implements Serializable, Comparable, Nullable {
-    static Logger logger = Logger.getLogger(QaSession.class.getName());
 
     public final static String INCOMPLETE = "INCOMPLETE";
 
@@ -96,7 +94,6 @@ public class QaSession implements Serializable, Comparable, Nullable {
 	this.session_name = session_name;
 	this.qaContent = qaContent;
 	this.qaQueUsers = qaQueUsers;
-	logger.debug(logger + " " + this.getClass().getName() + "in full constructor: QaSession()");
     }
 
     public Long getQaSessionId() {

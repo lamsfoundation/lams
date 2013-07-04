@@ -79,7 +79,7 @@ public class QaAdminAction extends LamsDispatchAction {
     public static final String NULL = "null";
     public static final String FILE_EXPORT = "qa-wizard.xml";
 
-    IQaService qaService;
+    private IQaService qaService;
 
     /**
      * Sets up the admin page

@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;

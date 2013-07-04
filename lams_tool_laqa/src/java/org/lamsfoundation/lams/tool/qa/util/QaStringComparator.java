@@ -26,8 +26,6 @@ package org.lamsfoundation.lams.tool.qa.util;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.apache.log4j.Logger;
-
 /**
  * @author Ozgur Demirtas
  * 

@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;

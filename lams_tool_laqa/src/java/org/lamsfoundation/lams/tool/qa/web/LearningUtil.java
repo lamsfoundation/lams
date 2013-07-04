@@ -23,30 +23,22 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa.web;
 
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.QaSession;
+import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.util.QaComparator;
 import org.lamsfoundation.lams.tool.qa.web.form.QaLearningForm;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
@@ -57,7 +49,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  */
 public class LearningUtil implements QaAppConstants {
-    static Logger logger = Logger.getLogger(LearningUtil.class.getName());
 
     public static void saveFormRequestData(HttpServletRequest request, QaLearningForm qaLearningForm) {
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -106,61 +97,6 @@ public class LearningUtil implements QaAppConstants {
 	
 	return generalLearnerFlowDTO;
     }
-
-//    /**
-//     * Create users of the responses
-//     * 
-//     * @param mapAnswers
-//     * 
-//     */
-//    public static void storeResponses(Map<String, String> mapAnswers, IQaService qaService, Long toolContentID, Long toolSessionID) {
-//
-//	// get back login user DTO
-//	HttpSession ss = SessionManager.getSession();
-//	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
-//	Long userId = new Long(toolUser.getUserID().longValue());
-//
-//	// obtain QaContent to be used in creating QaQueUsr
-//	QaContent qaContent = qaService.getQa(toolContentID.longValue());
-//
-//	QaQueUsr user = qaService.getUserByIdAndSession(userId, toolSessionID);
-//
-//	// check if Attempt to Entry is allowed, if so create the responses
-//	if (!user.isResponseFinalized() || !qaContent.isLockWhenFinished()) {
-//	    
-//	    Set<QaQueContent> questionsToStore;
-//	    if (qaContent.isQuestionsSequenced()) {
-//		String currentQuestionIndex = qaLearningForm.getCurrentQuestionIndex();
-//		QaQueContent currentQuestion = qaService.getQuestionContentByDisplayOrder(new Long(currentQuestionIndex), qaContent.getQaContentId());
-//		questionsToStore = new LinkedHashSet<QaQueContent>();
-//		questionsToStore.add(currentQuestion);
-//		
-//	    } else {
-//		questionsToStore = qaContent.getQaQuestions();
-//	    }
-//
-//	    for (QaQueContent question : questionsToStore) {
-//
-//		String displayOrder = new Long(question.getDisplayOrder()).toString();
-//		String answer = (String) mapAnswers.get(displayOrder);
-//
-//		QaUsrResp response = qaService.getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
-//		// if response doesn't exist
-//		if (response == null) {
-//		    response = new QaUsrResp(answer, new Date(System.currentTimeMillis()), "", question, user, true);
-//		    qaService.createQaUsrResp(response);
-//
-//		//if answer has changed
-//		} else if (! answer.equals(response.getAnswer())) {
-//		    response.setAnswer(answer);
-//		    response.setAttemptTime(new Date(System.currentTimeMillis()));
-//		    response.setTimezone("");
-//		    qaService.updateUserResponse(response);
-//		}
-//	    }
-//
-//	}
-//    }
 
     public static String getRemainingQuestionCount(int currentQuestionIndex, String totalQuestionCount) {
 	int remainingQuestionCount = new Long(totalQuestionCount).intValue() - currentQuestionIndex + 1;

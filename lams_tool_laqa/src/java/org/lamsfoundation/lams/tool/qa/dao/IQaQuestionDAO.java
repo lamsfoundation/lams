@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.qa.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 
 /**

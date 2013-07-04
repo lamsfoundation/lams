@@ -41,8 +41,8 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 

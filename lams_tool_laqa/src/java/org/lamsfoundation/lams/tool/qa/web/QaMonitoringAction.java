@@ -122,8 +122,8 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
-import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
+import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.EditActivityDTO;
@@ -1877,7 +1877,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
     public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	QaMonitoringAction.logger.debug("dispatching proxy submitAllContent...");
 
 	/* start authoring code */
 	QaAuthoringForm qaAuthoringForm = (QaMonitoringForm) form;
@@ -2732,10 +2731,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	GeneralMonitoringDTO qaGeneralMonitoringDTO = new GeneralMonitoringDTO();
 
 	if (qaService.isStudentActivityOccurredGlobal(qaContent)) {
-	    QaMonitoringAction.logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to false");
 	    qaGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
 	} else {
-	    QaMonitoringAction.logger.debug("USER_EXCEPTION_NO_TOOL_SESSIONS is set to true");
 	    qaGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 	}
 
