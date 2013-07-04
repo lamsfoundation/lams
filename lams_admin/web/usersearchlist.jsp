@@ -91,7 +91,7 @@
 				[<a href="<lams:LAMSURL/>/loginas.do?login=<c:out value="${user.login}"/>"><fmt:message key="label.login.as"/></a>]
 				
 				<c:if test="${(not empty user.email) && (useInternalSMTPServer || not empty smtpServer)}">
-					[<a href="emailUser.do?method=composeMail&userId=<c:out value="${user.userId}"/>"><fmt:message key="label.email"/></a>]
+					[<a href="<lams:LAMSURL/>emailUser.do?method=composeMail&userID=<c:out value="${user.userId}"/>&returnUrl=admin/usersearch.do"><fmt:message key="label.email"/></a>]
 				</c:if>
 			</td>
 		</tr>

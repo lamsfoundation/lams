@@ -41,4 +41,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
+	<referencedentry kind="lib" path="/lams_build/lib/lams/lams.jar" sourcepath=""/>
 </classpath>

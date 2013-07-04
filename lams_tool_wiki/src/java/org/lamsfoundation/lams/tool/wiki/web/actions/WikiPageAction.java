@@ -513,11 +513,11 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	if (subscribed) {
 	    // unsubscribe the learner to the event
 	    notificationService.unsubscribe(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
-		    toolSessionID, user.getUserID().longValue());
+		    toolSessionID, user.getUserID());
 	} else {
 	    // subscribe the learner to the event
 	    notificationService.subscribe(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
-		    toolSessionID, user.getUserID().longValue(), IEventNotificationService.DELIVERY_METHOD_MAIL,
+		    toolSessionID, user.getUserID(), IEventNotificationService.DELIVERY_METHOD_MAIL,
 		    IEventNotificationService.PERIODICITY_SINGLE);
 	}
 
@@ -547,9 +547,9 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	    boolean isHtmlFormat = false;
 
 	    List<User> users = wikiService.getMonitorsByToolSessionId(toolSessionID);
-	    Long[] monitoringUsersIds = new Long[users.size()];
+	    Integer[] monitoringUsersIds = new Integer[users.size()];
 	    for (int i = 0; i < monitoringUsersIds.length; i++) {
-		monitoringUsersIds[i] = users.get(i).getUserId().longValue();
+		monitoringUsersIds[i] = users.get(i).getUserId();
 	    }
 
 	    String relativePath = "/tool/" + WikiConstants.TOOL_SIGNATURE
@@ -565,7 +565,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	    String body = wikiService.getLocalisedMessage(bodyLangKey, new Object[] { fullName,
 		    wikiSession.getSessionName(), link });
 
-	    notificationService.sendMessage(monitoringUsersIds, IEventNotificationService.DELIVERY_METHOD_MAIL,
+	    notificationService.sendMessage(null, monitoringUsersIds, IEventNotificationService.DELIVERY_METHOD_MAIL,
 		    subject, body, isHtmlFormat);
 	}
 

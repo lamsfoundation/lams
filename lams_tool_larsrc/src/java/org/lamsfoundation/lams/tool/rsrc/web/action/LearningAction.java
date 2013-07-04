@@ -49,6 +49,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.events.DeliveryMethodMail;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -165,8 +166,8 @@ public class LearningAction extends Action {
 	if (mode != null && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // resourceUser may be null if the user was force completed.
-	    resourceUser = getSpecifiedUser(service, sessionId, WebUtil.readIntParam(request,
-		    AttributeNames.PARAM_USER_ID, false));
+	    resourceUser = getSpecifiedUser(service, sessionId,
+		    WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
 	    resourceUser = getCurrentUser(service, sessionId);
 	}
@@ -397,15 +398,16 @@ public class LearningAction extends Action {
 	Resource resource = resSession.getResource();
 	if (resource.isNotifyTeachersOnAssigmentSumbit()) {
 	    final boolean isHtmlFormat = false;
-	    
+
 	    List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
 	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
+		Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
 		for (int i = 0; i < monitoringUsersIds.length; i++) {
-		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId().longValue();
+		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
 		}
 		String fullName = resourceUser.getLastName() + " " + resourceUser.getFirstName();
-		service.getEventNotificationService().sendMessage(monitoringUsersIds, DeliveryMethodMail.getInstance(),
+		service.getEventNotificationService().sendMessage(null, monitoringUsersIds,
+			IEventNotificationService.DELIVERY_METHOD_MAIL,
 			service.getLocalisedMessage("event.assigment.submit.subject", null),
 			service.getLocalisedMessage("event.assigment.submit.body", new Object[] { fullName }),
 			isHtmlFormat);

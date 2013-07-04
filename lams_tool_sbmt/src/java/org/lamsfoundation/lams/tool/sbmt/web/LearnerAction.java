@@ -178,19 +178,19 @@ public class LearnerAction extends DispatchAction {
 	if (content.isRunOffline()) {
 	    return mapping.findForward("runOffline");
 	}
-	
-	//check if there is submission deadline
+
+	// check if there is submission deadline
 	Date submissionDeadline = content.getSubmissionDeadline();
 	if (submissionDeadline != null) {
-	    //store submission deadline to sessionMap
+	    // store submission deadline to sessionMap
 	    sessionMap.put(SbmtConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
-	   
+
 	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
-	    
-	    //calculate whether submission deadline has passed, and if so forward to "runOffline"
+
+	    // calculate whether submission deadline has passed, and if so forward to "runOffline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
 		return mapping.findForward("runOffline");
 	    }
@@ -204,9 +204,8 @@ public class LearnerAction extends DispatchAction {
 		    submitFilesService.getLocalisedMessage("event.mark.release.body", null), isHtmlFormat);
 
 	    submitFilesService.getEventNotificationService().subscribe(SbmtConstants.TOOL_SIGNATURE,
-		    SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(),
-		    learner.getUserID().longValue(), IEventNotificationService.DELIVERY_METHOD_MAIL,
-		    IEventNotificationService.PERIODICITY_SINGLE);
+		    SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(), userID,
+		    IEventNotificationService.DELIVERY_METHOD_MAIL, IEventNotificationService.PERIODICITY_SINGLE);
 	}
 
 	return mapping.findForward(SbmtConstants.SUCCESS);
@@ -235,7 +234,7 @@ public class LearnerAction extends DispatchAction {
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request, getServlet()
 		.getServletContext());
-	
+
 	if (validateUploadForm(learnerForm, request)) {
 	    // get session from shared session.
 	    HttpSession ss = SessionManager.getSession();
@@ -277,13 +276,13 @@ public class LearnerAction extends DispatchAction {
 	    boolean isHtmlFormat = false;
 	    List<User> monitoringUsers = submitFilesService.getMonitorsByToolSessionId(sessionID);
 	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
+		Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
 		for (int i = 0; i < monitoringUsersIds.length; i++) {
-		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId().longValue();
+		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
 		}
 		String fullName = learner.getLastName() + " " + learner.getFirstName();
-		submitFilesService.getEventNotificationService().sendMessage(monitoringUsersIds,
-			DeliveryMethodMail.getInstance(),
+		submitFilesService.getEventNotificationService().sendMessage(null, monitoringUsersIds,
+			IEventNotificationService.DELIVERY_METHOD_MAIL,
 			submitFilesService.getLocalisedMessage("event.file.submit.subject", null),
 			submitFilesService.getLocalisedMessage("event.file.submit.body", new Object[] { fullName }),
 			isHtmlFormat);
@@ -434,8 +433,8 @@ public class LearnerAction extends DispatchAction {
 	// retrieve notebook reflection entry.
 	ISubmitFilesService submitFilesService = getService();
 
-	NotebookEntry notebookEntry = submitFilesService.getEntry((Long) sessionMap
-		.get(AttributeNames.PARAM_TOOL_SESSION_ID), CoreNotebookConstants.NOTEBOOK_TOOL,
+	NotebookEntry notebookEntry = submitFilesService.getEntry(
+		(Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID), CoreNotebookConstants.NOTEBOOK_TOOL,
 		SbmtConstants.TOOL_SIGNATURE, currUser.getUserID());
 
 	if (notebookEntry != null) {

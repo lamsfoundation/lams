@@ -163,7 +163,23 @@ function initLessonTab(){
 	});	
 	$('#classMonitorSortButton').click(function(){
 		sortDialogList('classMonitor');
-	});	
+	});
+	
+	// sets up dialog for emailing learners
+	$('#emailDialog').dialog({
+		'autoOpen'  : false,
+		'height'    : 530,
+		'width'     : 700,
+		'modal'     : true,
+		'resizable' : false,
+		'show'      : 'fold',
+		'hide'      : 'fold',
+		'open'      : function(){
+			$('#emailFrame').attr('src', LAMS_URL + 'emailUser.do?method=composeMail&lessonID='
+					+ lessonId
+					+ '&userID=' + $(this).dialog('option', 'userId'));
+		}
+	});
 }
 
 
@@ -182,7 +198,7 @@ function showLessonLearnersDialog() {
 			'classOnly' : true
 		},
 		success : function(response) {
-			 showLearnerGroupDialog(null, LESSON_GROUP_DIALOG_CLASS_LABEL, response);
+			 showLearnerGroupDialog(null, LESSON_GROUP_DIALOG_CLASS_LABEL, response, false, false, true);
 		}
 	});
 }
@@ -391,6 +407,10 @@ function openChatWindow(){
 }
 
 
+function closeEmailDialog(){
+	$('#emailFrame').attr('src', null);
+	$('#emailDialog').dialog('close');
+}
 
 //********** SEQUENCE TAB FUNCTIONS **********
 
@@ -453,6 +473,21 @@ function initSequenceTab(){
 			            					+ selectedLearner.attr('viewUrl'), "LearnActivity", 600, 800, true);
 			            		}
 							}
+			             },
+			             {
+			            	'text'   : EMAIL_BUTTON_LABEL,
+			            	'id'     : 'learnerGroupDialogEmailButton',
+			            	'class'  : 'learnerGroupDialogSelectableButton',
+			            	'click'  : function() {
+			            		var selectedLearner = $('#learnerGroupList div.dialogListItemSelected');
+			            		if (selectedLearner.length == 1) {
+			            			$('#emailDialog').dialog('option',{
+				            				'title'  : 'Email user',
+				            				'userId' : selectedLearner.attr('userId') 
+				            			})
+				            			.dialog('open');
+			            		}
+			            	}	
 			             },
 			             {
 			            	'text'   : CLOSE_BUTTON_LABEL,
@@ -1251,7 +1286,7 @@ function refreshMonitor(tabName){
 /**
  * Show a dialog with user list and optional Force Complete and View Learner buttons.
  */
-function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceComplete, allowView) {
+function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceComplete, allowView, allowEmail) {
 	var learnerGroupList = $('#learnerGroupList').empty();
 	var learnerGroupDialog = $('#learnerGroupDialog');
 	
@@ -1265,7 +1300,7 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceCom
 							      .text(getLearnerDisplayName(learner))
 							      .appendTo(learnerGroupList);
 			
-			if (allowForceComplete || allowView) {
+			if (allowForceComplete || allowView || allowEmail) {
 				learnerDiv.click(function(){
 			    	  // select a learner
 			    	  $(this).addClass('dialogListItemSelected')
@@ -1290,6 +1325,8 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceCom
 		.css('display', allowForceComplete ? 'inline' : 'none');
 	$('button#learnerGroupDialogViewButton')
 		.css('display', allowView ? 'inline' : 'none');
+	$('button#learnerGroupDialogEmailButton')
+		.css('display', allowEmail ? 'inline' : 'none');
 
 	learnerGroupDialog
 		.dialog('option', 

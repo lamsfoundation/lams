@@ -18,9 +18,9 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.webservice;
 
 import java.io.IOException;
@@ -77,7 +77,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author Andrey Balan
  * 
- * ----------------XDoclet Tags--------------------
+ *         ----------------XDoclet Tags--------------------
  * 
  * @web:servlet name="RegisterServlet"
  * @web:servlet-mapping url-pattern="/services/Register/*"
@@ -86,7 +86,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class RegisterAction extends HttpServlet {
 
     private static Logger logger = Logger.getLogger(RegisterAction.class);
-    
+
     private static IntegrationService integrationService = null;
 
     private static ILearnerProgressDAO learnerProgressDAO = null;
@@ -96,13 +96,13 @@ public class RegisterAction extends HttpServlet {
     private static ICoreLearnerService learnerService = null;
 
     private static IGroupUserDAO groupUserDAO = null;
-    
+
     private static IUserManagementService userManagementService = null;
-    
-    private static IEventNotificationService eventNotificationService  = null;
-    
-    private static MessageService messageService  = null;
-    
+
+    private static IEventNotificationService eventNotificationService = null;
+
+    private static MessageService messageService = null;
+
     public synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
 	    IOException {
 
@@ -118,12 +118,12 @@ public class RegisterAction extends HttpServlet {
 	}
 
     }
-    
+
     /**
      * Initialization of the servlet. <br>
      * 
      * @throws ServletException
-     *                 if an error occured
+     *             if an error occured
      */
     public void init() throws ServletException {
 	learnerProgressDAO = (ILearnerProgressDAO) WebApplicationContextUtils.getRequiredWebApplicationContext(
@@ -138,8 +138,8 @@ public class RegisterAction extends HttpServlet {
 	learnerService = (ICoreLearnerService) WebApplicationContextUtils.getRequiredWebApplicationContext(
 		getServletContext()).getBean("learnerService");
 
-	groupUserDAO = (IGroupUserDAO) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("groupUserDAO");
+	groupUserDAO = (IGroupUserDAO) WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext())
+		.getBean("groupUserDAO");
 
 	userManagementService = (IUserManagementService) WebApplicationContextUtils.getRequiredWebApplicationContext(
 		getServletContext()).getBean("userManagementService");
@@ -150,29 +150,48 @@ public class RegisterAction extends HttpServlet {
 	messageService = (MessageService) WebApplicationContextUtils.getRequiredWebApplicationContext(
 		getServletContext()).getBean(CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
     }
-    
+
     /**
-     * Add user to group lessons. 
+     * Add user to group lessons.
      * 
      * External server call must follow the next format:
-     * http://<<yourlamsserver>>/lams/central/Register.do?method=addUserToGroupLessons&serverId=%serverId%&datetime=%datetime%
-     * &hashValue=%hashValue%&courseId=%courseId%&username=%username%&firstName=%firstName%&lastName=%lastName%&email=%email&isJoinLesson=%isJoinLesson%
+     * http://<<yourlamsserver>>/lams/central/Register.do?method=addUserToGroupLessons
+     * &serverId=%serverId%&datetime=%datetime%
+     * &hashValue=%hashValue%&courseId=%courseId%&username=%username%&firstName=
+     * %firstName%&lastName=%lastName%&email=%email&isJoinLesson=%isJoinLesson%
      * &isEmailParticipant=%isEmailParticipant%&isEmailCoordinator=%isEmailCoordinator%
      * 
      * Here are the parameters explanation:
-     *   @param method=addUserToGroupLessons - selfexplanatory.
-     *   @param serverId - this is a string of characters we'll provide to you
-     *   @param datetime - a character string with the date and time you make this request (format example 2011100608:15:10)
-     *   @param hashValue - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime + username + method + serverId  + serverKey ]
-     *   @param courseId - courseId is essentially a unique identifier for your Functional Speciality (note this is not the name of the Functional Speciality but its unique id)
-     *   @param username - this is your WV Central ID
-     *   @param usePrefix - if set to 1 - force the addition of the server integration prefix to usernames 
-     *   @param firstName - well, first name 
-     *   @param lastName - last name
-     *   @param email - email
-     *   @param isJoinLesson - if set to 1 -then join user to lesson
-     *   @param isEmailParticipant - if set to 1 -then LAMS will email the user his/her login details
-     *   @param isEmailCoordinator - if an email confirmation to and admin is required, just put the email address for the admin person here.
+     * 
+     * @param method
+     *            =addUserToGroupLessons - selfexplanatory.
+     * @param serverId
+     *            - this is a string of characters we'll provide to you
+     * @param datetime
+     *            - a character string with the date and time you make this request (format example 2011100608:15:10)
+     * @param hashValue
+     *            - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime
+     *            + username + method + serverId + serverKey ]
+     * @param courseId
+     *            - courseId is essentially a unique identifier for your Functional Speciality (note this is not the
+     *            name of the Functional Speciality but its unique id)
+     * @param username
+     *            - this is your WV Central ID
+     * @param usePrefix
+     *            - if set to 1 - force the addition of the server integration prefix to usernames
+     * @param firstName
+     *            - well, first name
+     * @param lastName
+     *            - last name
+     * @param email
+     *            - email
+     * @param isJoinLesson
+     *            - if set to 1 -then join user to lesson
+     * @param isEmailParticipant
+     *            - if set to 1 -then LAMS will email the user his/her login details
+     * @param isEmailCoordinator
+     *            - if an email confirmation to and admin is required, just put the email address for the admin person
+     *            here.
      */
     public void addUserToGroupLessons(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	try {
@@ -181,8 +200,8 @@ public class RegisterAction extends HttpServlet {
 	    boolean serverToServerEnable = Configuration.getAsBoolean(ConfigurationKeys.ENABLE_SERVER_REGISTRATION);
 	    if (!serverToServerEnable) {
 		String msg = "Server to server registration is not enabled";
-                logger.error(msg);
-                response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
+		logger.error(msg);
+		response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
 		return;
 	    }
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
@@ -205,12 +224,12 @@ public class RegisterAction extends HttpServlet {
 		logger.error(msg);
 		response.sendError(response.SC_BAD_REQUEST, "Parameters missing");
 	    }
-	    
+
 	    // authenticate external server
 	    ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, method, hashValue);
-	    
-	    //create new password
+
+	    // create new password
 	    String password = RandomPasswordGenerator.nextPassword(8);
 	    String hashedPassword = HashUtil.sha1(password);
 
@@ -220,153 +239,171 @@ public class RegisterAction extends HttpServlet {
 		logger.debug("Adding prefix to username:" + username);
 	    }
 
-	    //get user from the DB if exists, create it otherwise
-	    ExtUserUseridMap userMap = integrationService.getImplicitExtUserUseridMap(extServer, username, hashedPassword,
-		    firstName, lastName, email);
+	    // get user from the DB if exists, create it otherwise
+	    ExtUserUseridMap userMap = integrationService.getImplicitExtUserUseridMap(extServer, username,
+		    hashedPassword, firstName, lastName, email);
 	    User user = userMap.getUser();
-	    
+
 	    HashSet<Lesson> lessonsToJoin = new HashSet<Lesson>();
 	    HashSet<Organisation> organisationsToJoin = new HashSet<Organisation>();
-	    
+
 	    if (StringUtils.isNotBlank(groupName)) {
 		// gets organisation from DB if exists, throws exception otherwise
 		Organisation org = getOrganisationByName(groupName);
 		organisationsToJoin.add(org);
 		lessonsToJoin.addAll(org.getLessons());
 	    }
-	    
+
 	    if (StringUtils.isNotBlank(lessonId)) {
 		Long lessonIdLong = Long.parseLong(lessonId);
 		Lesson lesson = lessonService.getLesson(lessonIdLong);
 		organisationsToJoin.add(lesson.getOrganisation());
 		lessonsToJoin.add(lesson);
 	    }
-	    
-	    //add to all required organisations
+
+	    // add to all required organisations
 	    List learnerRole = new ArrayList();
 	    learnerRole.add(Role.ROLE_LEARNER.toString());
 	    for (Organisation organisationToJoin : organisationsToJoin) {
-		userManagementService.setRolesForUserOrganisation(user, organisationToJoin.getOrganisationId(), learnerRole);
+		userManagementService.setRolesForUserOrganisation(user, organisationToJoin.getOrganisationId(),
+			learnerRole);
 	    }
-	    
+
 	    // add to all required lessons (checks for duplicates)
 	    for (Lesson lesson : lessonsToJoin) {
 		boolean isAdded = lessonService.addLearner(lesson.getLessonId(), user.getUserId());
 		if (isAdded) {
-		    logger.debug("Added user:" + user.getLogin() + " to lesson:" + lesson.getLessonName() + " as a learner");
+		    logger.debug("Added user:" + user.getLogin() + " to lesson:" + lesson.getLessonName()
+			    + " as a learner");
 		}
 	    }
-	    
-	    //join user to all lessons in the group
+
+	    // join user to all lessons in the group
 	    if ("1".equals(isJoinLesson)) {
 		for (Lesson lesson : lessonsToJoin) {
-		    
-		    LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(user.getUserId(), lesson.getLessonId());
+
+		    LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(user.getUserId(),
+			    lesson.getLessonId());
 		    if (learnerProgress == null) {
-			logger.debug("The learner:" + user.getLogin() + " is joining the lesson:" + lesson.getLessonId());
+			logger.debug("The learner:" + user.getLogin() + " is joining the lesson:"
+				+ lesson.getLessonId());
 			learnerService.joinLesson(user.getUserId(), lesson.getLessonId());
-		    } else {//don't join to lessons which user is a part of already but make sure time limit is reset
+		    } else {// don't join to lessons which user is a part of already but make sure time limit is reset
 			resetUserTimeLimit(lesson, user);
 		    }
 		}
-	    }	    
-	    
-	    //send email to participant
+	    }
+
+	    // send email to participant
 	    if ("1".equals(isEmailParticipant)) {
 		boolean isHtmlFormat = false;
-		
-		eventNotificationService.sendMessage(user.getUserId().longValue(), DeliveryMethodMail.getInstance(),
+
+		eventNotificationService.sendMessage(null, user.getUserId(),
+			IEventNotificationService.DELIVERY_METHOD_MAIL,
 			messageService.getMessage("register.user.email.subject"),
 			messageService.getMessage("register.user.email.body", new Object[] { username, password }),
 			isHtmlFormat);
 	    }
-	    
-	    //send email to coordinator
+
+	    // send email to coordinator
 	    if (StringUtils.isNotBlank(isEmailCoordinator)) {
 		boolean isHtmlFormat = false;
-		
+
 		List<User> coordinators = userManagementService.getAllUsersWithEmail(isEmailCoordinator);
 		if ((coordinators == null) || (coordinators.size() == 0)) {
 		    throw new RuntimeException("There are no coordinators with email: " + isEmailCoordinator);
 		}
 		User coordinator = coordinators.get(0);
-		
+
 		String registeredUserName = firstName + " " + lastName + " (" + username + ")";
-		eventNotificationService.sendMessage(coordinator.getUserId().longValue(), DeliveryMethodMail.getInstance(),
-			messageService.getMessage("notify.coordinator.register.user.email.subject"),
-			messageService.getMessage("notify.coordinator.register.user.email.body", new Object[] { registeredUserName }),
-			isHtmlFormat);
+		eventNotificationService.sendMessage(null, coordinator.getUserId(),
+			IEventNotificationService.DELIVERY_METHOD_MAIL, messageService
+				.getMessage("notify.coordinator.register.user.email.subject"), messageService
+				.getMessage("notify.coordinator.register.user.email.body",
+					new Object[] { registeredUserName }), isHtmlFormat);
 	    }
-	    
+
 	    writeAJAXOKResponse(response);
-	    
+
 	} catch (Exception e) {
 	    logger.error(e.getMessage());
 	    writeAJAXResponse(response, "ERROR: " + e.getMessage());
 	}
     }
-    
+
     /**
-     * Remove user from group lessons. 
+     * Remove user from group lessons.
      * 
      * External server call must follow the next format:
-     * http://<<yourlamsserver>>/lams/central/Register.do?method=removeUserFromGroup&serverId=%serverId%&datetime=%datetime%
+     * http://<<yourlamsserver>>/lams/central/Register.do?method=removeUserFromGroup
+     * &serverId=%serverId%&datetime=%datetime%
      * &hashValue=%hashValue%&courseId=%courseId%&username=%username%&isRemoveFromAllCourses=%isRemoveFromAllCourses%
      * 
      * Here are the parameters explanation:
-     *   @param method=removeUserFromGroup - selfexplanatory.
-     *   @param serverId - this is a string of characters we'll provide to you
-     *   @param datetime - a character string with the date and time you make this request (format example 2011100608:15:10)
-     *   @param hashValue - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime + username +  method + serverId  + serverKey ]
-     *   @param courseId - courseId is essentially a unique identifier for your Functional Speciality (note this is not the name of the Functional Speciality but its unique id)
-     *   @param username - this is your WV Central ID
-     *   @param usePrefix - if set to 1 - force the addition of the server integration prefix to usernames 
-     *   @param isRemoveFromAllCourses - if set to 1 -then ignores courseId parameter and removes from all courses
+     * 
+     * @param method
+     *            =removeUserFromGroup - selfexplanatory.
+     * @param serverId
+     *            - this is a string of characters we'll provide to you
+     * @param datetime
+     *            - a character string with the date and time you make this request (format example 2011100608:15:10)
+     * @param hashValue
+     *            - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime
+     *            + username + method + serverId + serverKey ]
+     * @param courseId
+     *            - courseId is essentially a unique identifier for your Functional Speciality (note this is not the
+     *            name of the Functional Speciality but its unique id)
+     * @param username
+     *            - this is your WV Central ID
+     * @param usePrefix
+     *            - if set to 1 - force the addition of the server integration prefix to usernames
+     * @param isRemoveFromAllCourses
+     *            - if set to 1 -then ignores courseId parameter and removes from all courses
      */
     public void removeUserFromGroup(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	try {
-		    // Check if Server registration is available
+	    // Check if Server registration is available
 	    boolean serverToServerEnable = Configuration.getAsBoolean(ConfigurationKeys.ENABLE_SERVER_REGISTRATION);
 	    if (!serverToServerEnable) {
 		String msg = "Server to server registration is not enabled";
-                logger.error(msg);
-                response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
+		logger.error(msg);
+		response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
 		return;
 	    }
-    	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
+	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	    String serverId = request.getParameter(CentralConstants.PARAM_SERVER_ID);
 	    String datetime = request.getParameter(CentralConstants.PARAM_DATE_TIME);
 	    String hashValue = request.getParameter(CentralConstants.PARAM_HASH_VALUE);
 	    String groupName = request.getParameter(CentralConstants.PARAM_COURSE_ID);
 	    String username = request.getParameter(CentralConstants.PARAM_USERNAME);
 	    String isRemoveFromAllCourses = request.getParameter("isRemoveFromAllCourses");
-            String usePrefix = request.getParameter("usePrefix");
+	    String usePrefix = request.getParameter("usePrefix");
 
 	    if (serverId == null || datetime == null || hashValue == null || username == null) {
 		String msg = "Parameters missing";
 		logger.error(msg);
 		response.sendError(response.SC_BAD_REQUEST, "Parameters missing");
 	    }
-		
+
 	    // authenticate external server
 	    ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, method, hashValue);
 
-            // check whether we need to use a prefix for users
-            if ("1".equals(usePrefix)) {
-                username = extServer.getPrefix() + "_" + username.trim();
-                logger.debug("Adding prefix to username:" + username);
-            }
+	    // check whether we need to use a prefix for users
+	    if ("1".equals(usePrefix)) {
+		username = extServer.getPrefix() + "_" + username.trim();
+		logger.debug("Adding prefix to username:" + username);
+	    }
 
-	    //get user from the DB if exists, throws exception otherwise
+	    // get user from the DB if exists, throws exception otherwise
 	    ExtUserUseridMap userMap = getExtUserUseridMap(extServer, username);
 	    User user = userMap.getUser();
 
 	    ArrayList<Lesson> lessons = new ArrayList<Lesson>();
 	    if ("1".equals(isRemoveFromAllCourses)) {
 		Set<UserOrganisation> userOrganisations = user.getUserOrganisations();
-		
-		//create list of organisationDtos in order to be able to delete userOrganisations afterwards
+
+		// create list of organisationDtos in order to be able to delete userOrganisations afterwards
 		List<OrganisationDTO> organisationDtos = new ArrayList<OrganisationDTO>();
 		for (UserOrganisation userOrganisation : userOrganisations) {
 		    Organisation organisation = userOrganisation.getOrganisation();
@@ -374,43 +411,53 @@ public class RegisterAction extends HttpServlet {
 		    organisationDtos.add(organisationDto);
 		    lessons.addAll(organisation.getLessons());
 		}
-		
+
 		for (OrganisationDTO organisationDto : organisationDtos) {
 		    removeGroupMembership(user, organisationDto.getOrganisationID());
 		}
 	    } else {
 		Organisation organisation = getOrganisationByName(groupName);
 		removeGroupMembership(user, organisation.getOrganisationId());
-		
+
 		lessons.addAll(organisation.getLessons());
 	    }
 
 	    // remove user from lessons
 	    removeUserFromLessons(user, lessons);
-	    
+
 	    writeAJAXOKResponse(response);
-	    
+
 	} catch (Exception e) {
 	    writeAJAXResponse(response, "ERROR: " + e.getMessage());
 	}
     }
-    
+
     /**
-     * Resets user's time limit for all lessons in a group with scheduledToCloseForIndividuals setting on.
-     * In case lesson's time limit is not individual it does nothing. 
+     * Resets user's time limit for all lessons in a group with scheduledToCloseForIndividuals setting on. In case
+     * lesson's time limit is not individual it does nothing.
      * 
      * External server call must follow the next format:
-     * http://<<yourlamsserver>>/lams/central/Register.do?method=resetUserTimeLimit&serverId=%serverId%&datetime=%datetime%
-     * &hashValue=%hashValue%&courseId=%courseId%&username=%username%
+     * http://<<yourlamsserver>>/lams/central/Register.do?method=resetUserTimeLimit
+     * &serverId=%serverId%&datetime=%datetime% &hashValue=%hashValue%&courseId=%courseId%&username=%username%
      * 
      * Here are the parameters explanation:
-     *   @param method=resetUserTimeLimit - selfexplanatory.
-     *   @param serverId - this is a string of characters we'll provide to you
-     *   @param datetime - a character string with the date and time you make this request (format example 2011100608:15:10)
-     *   @param hashValue - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime + username + method + serverId  + serverKey ]
-     *   @param courseId - courseId is essentially a unique identifier for your Functional Speciality (note this is not the name of the Functional Speciality but its unique id)
-     *   @param username - this is your WV Central ID
-     *   @param usePrefix - if set to 1 - force the addition of the server integration prefix to usernames 
+     * 
+     * @param method
+     *            =resetUserTimeLimit - selfexplanatory.
+     * @param serverId
+     *            - this is a string of characters we'll provide to you
+     * @param datetime
+     *            - a character string with the date and time you make this request (format example 2011100608:15:10)
+     * @param hashValue
+     *            - The hash value is generated using the SHA1 algorithm on the following (all in lower case) [ datetime
+     *            + username + method + serverId + serverKey ]
+     * @param courseId
+     *            - courseId is essentially a unique identifier for your Functional Speciality (note this is not the
+     *            name of the Functional Speciality but its unique id)
+     * @param username
+     *            - this is your WV Central ID
+     * @param usePrefix
+     *            - if set to 1 - force the addition of the server integration prefix to usernames
      */
     public void resetUserTimeLimit(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	try {
@@ -418,8 +465,8 @@ public class RegisterAction extends HttpServlet {
 	    boolean serverToServerEnable = Configuration.getAsBoolean(ConfigurationKeys.ENABLE_SERVER_REGISTRATION);
 	    if (!serverToServerEnable) {
 		String msg = "Server to server registration is not enabled";
-                logger.error(msg);
-                response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
+		logger.error(msg);
+		response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
 		return;
 	    }
 
@@ -429,29 +476,29 @@ public class RegisterAction extends HttpServlet {
 	    String hashValue = request.getParameter(CentralConstants.PARAM_HASH_VALUE);
 	    String courseId = request.getParameter(CentralConstants.PARAM_COURSE_ID);
 	    String username = request.getParameter(CentralConstants.PARAM_USERNAME);
-            String usePrefix = request.getParameter("usePrefix");
+	    String usePrefix = request.getParameter("usePrefix");
 
 	    if (serverId == null || datetime == null || hashValue == null || username == null || courseId == null) {
 		String msg = "Parameters missing";
 		logger.error(msg);
 		response.sendError(response.SC_BAD_REQUEST, "Parameters missing");
 	    }
-	    
+
 	    // authenticate external server
 	    ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, method, hashValue);
 
-            // check whether we need to use a prefix for users
-            if ("1".equals(usePrefix)) {
-                username = extServer.getPrefix() + "_" + username.trim();
-                logger.debug("Adding prefix to username:" + username);
-            }
+	    // check whether we need to use a prefix for users
+	    if ("1".equals(usePrefix)) {
+		username = extServer.getPrefix() + "_" + username.trim();
+		logger.debug("Adding prefix to username:" + username);
+	    }
 
-	    //get user from the DB if exists, throws exception otherwise
+	    // get user from the DB if exists, throws exception otherwise
 	    ExtUserUseridMap userMap = getExtUserUseridMap(extServer, username);
 	    User user = userMap.getUser();
 
-	    //get organisation from DB if exists, throws exception otherwise
+	    // get organisation from DB if exists, throws exception otherwise
 	    Organisation org = getOrganisationByName(courseId);
 
 	    // reset time limit
@@ -460,15 +507,15 @@ public class RegisterAction extends HttpServlet {
 		    resetUserTimeLimit(lesson, user);
 		}
 	    }
-	    
+
 	    writeAJAXOKResponse(response);
-	    
+
 	} catch (Exception e) {
 	    logger.error(e.getMessage());
 	    writeAJAXResponse(response, "ERROR: " + e.getMessage());
 	}
     }
-    
+
     /**
      * resetUserTimeLimit
      * 
@@ -490,8 +537,9 @@ public class RegisterAction extends HttpServlet {
 	    }
 	}
     }
-    
-    private ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) throws UserInfoFetchException {
+
+    private ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
+	    throws UserInfoFetchException {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("extServerOrgMap.sid", serverMap.getSid());
 	properties.put("extUsername", extUsername);
@@ -503,8 +551,8 @@ public class RegisterAction extends HttpServlet {
 	    return (ExtUserUseridMap) list.get(0);
 	}
     }
-    
-    // newer method which accepts course name, a parent org id, a flag for whether user should get 
+
+    // newer method which accepts course name, a parent org id, a flag for whether user should get
     // 'teacher' roles, and a flag for whether to use a prefix in the org's name
     private Organisation getOrganisationByName(String name) {
 	Map<String, Object> properties = new HashMap<String, Object>();
@@ -518,8 +566,8 @@ public class RegisterAction extends HttpServlet {
 	    return organisation;
 	}
     }
-    
-    // newer method which accepts course name, a parent org id, a flag for whether user should get 
+
+    // newer method which accepts course name, a parent org id, a flag for whether user should get
     // 'teacher' roles, and a flag for whether to use a prefix in the org's name
     private ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
 	    String extCourseId, Boolean isTeacher) {
@@ -534,29 +582,29 @@ public class RegisterAction extends HttpServlet {
 	    return map;
 	}
     }
-    
+
     private void removeGroupMembership(User user, Integer organisationId) {
 	UserOrganisation userOrganisation = userManagementService.getUserOrganisation(user.getUserId(), organisationId);
-	
+
 	Set<UserOrganisation> userOrganisations = user.getUserOrganisations();
 	userOrganisations.remove(userOrganisation);
 	userManagementService.save(user);
-	
-	//userOrganisation and UserOrganisationRoles will be deleted by Hibernate automatically.
+
+	// userOrganisation and UserOrganisationRoles will be deleted by Hibernate automatically.
     }
-    
+
     private void removeUserFromLessons(User user, Collection<Lesson> lessons) {
 	for (Lesson lesson : lessons) {
 	    LessonClass grouping = lesson.getLessonClass();
 	    Group group = grouping.getLearnersGroup();
-	    
+
 	    boolean isSuccefullyRemoved = group.getUsers().remove(user);
 	    if (isSuccefullyRemoved) {
 		logger.debug("Removed user:" + user.getLogin() + " from lesson:" + lesson.getLessonName());
 	    }
 	}
     }
-    
+
     protected void writeAJAXResponse(HttpServletResponse response, String output) throws IOException {
 	response.setContentType("text/html;charset=utf-8");
 	PrintWriter out = response.getWriter();
@@ -564,7 +612,7 @@ public class RegisterAction extends HttpServlet {
 	if (output.length() > 0) {
 	    out.println(output);
 	}
-	
+
 	out.flush();
 	out.close();
     }
@@ -572,5 +620,5 @@ public class RegisterAction extends HttpServlet {
     protected void writeAJAXOKResponse(HttpServletResponse response) throws IOException {
 	writeAJAXResponse(response, "OK");
     }
-    
+
 }

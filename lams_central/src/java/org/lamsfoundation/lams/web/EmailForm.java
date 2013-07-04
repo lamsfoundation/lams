@@ -18,10 +18,10 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
-package org.lamsfoundation.lams.admin.web.form;
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.web;
 
 import org.apache.struts.action.ActionForm;
 
@@ -34,42 +34,43 @@ import org.apache.struts.action.ActionForm;
  * @struts.form name="emailForm"
  */
 public class EmailForm extends ActionForm {
-
     private static final long serialVersionUID = 7775887425863041037L;
-   
-    private Integer userId;
-    
+
+    private Long userId;
+
     private String to;
     private String subject;
     private String body;
-    
-    public Integer getUserId() {
-        return userId;
-    }
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-    
-    public String getTo() {
-        return to;
-    }
-    public void setTo(String name) {
-        this.to = name;
-    }
-    
-    public String getSubject() {
-        return subject;
-    }
-    public void setSubject(String description) {
-        this.subject = description;
-    }
-    
-    public String getBody() {
-        return body;
-    }
-    public void setBody(String imageDirectory) {
-        this.body = imageDirectory;
+
+    public Long getUserId() {
+	return userId;
     }
 
+    public void setUserId(Long userId) {
+	this.userId = userId;
+    }
+
+    public String getTo() {
+	return to;
+    }
+
+    public void setTo(String name) {
+	this.to = name;
+    }
+
+    public String getSubject() {
+	return subject;
+    }
+
+    public void setSubject(String description) {
+	this.subject = description;
+    }
+
+    public String getBody() {
+	return body;
+    }
+
+    public void setBody(String imageDirectory) {
+	this.body = imageDirectory;
+    }
 }
-	

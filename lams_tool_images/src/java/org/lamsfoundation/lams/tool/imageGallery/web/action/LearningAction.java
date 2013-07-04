@@ -49,6 +49,7 @@ import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.config.ForwardConfig;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.DeliveryMethodMail;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -170,8 +171,8 @@ public class LearningAction extends Action {
 	if (mode != null && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // imageGalleryUser may be null if the user was force completed.
-	    imageGalleryUser = getSpecifiedUser(service, sessionId, WebUtil.readIntParam(request,
-		    AttributeNames.PARAM_USER_ID, false));
+	    imageGalleryUser = getSpecifiedUser(service, sessionId,
+		    WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
 	    imageGalleryUser = getCurrentUser(service, sessionId);
 	}
@@ -199,8 +200,8 @@ public class LearningAction extends Action {
 	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_INSTRUCTION, imageGallery.getInstructions());
 	sessionMap.put(ImageGalleryConstants.ATTR_FINISH_LOCK, lock);
 	sessionMap.put(ImageGalleryConstants.ATTR_LOCK_ON_FINISH, imageGallery.getLockWhenFinished());
-	sessionMap.put(ImageGalleryConstants.ATTR_USER_FINISHED, imageGalleryUser != null
-		&& imageGalleryUser.isSessionFinished());
+	sessionMap.put(ImageGalleryConstants.ATTR_USER_FINISHED,
+		imageGalleryUser != null && imageGalleryUser.isSessionFinished());
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
@@ -213,11 +214,11 @@ public class LearningAction extends Action {
 		.getConfigItem(ImageGalleryConfigItem.KEY_MEDIUM_IMAGE_DIMENSIONS);
 	ImageGalleryConfigItem thumbnailImageDimensionsKey = service
 		.getConfigItem(ImageGalleryConfigItem.KEY_THUMBNAIL_IMAGE_DIMENSIONS);
-	sessionMap.put(ImageGalleryConstants.ATTR_MEDIUM_IMAGE_DIMENSIONS, Integer.parseInt(mediumImageDimensionsKey
-		.getConfigValue()));
-	sessionMap.put(ImageGalleryConstants.ATTR_THUMBNAIL_IMAGE_DIMENSIONS, Integer
-		.parseInt(thumbnailImageDimensionsKey.getConfigValue()));
-	
+	sessionMap.put(ImageGalleryConstants.ATTR_MEDIUM_IMAGE_DIMENSIONS,
+		Integer.parseInt(mediumImageDimensionsKey.getConfigValue()));
+	sessionMap.put(ImageGalleryConstants.ATTR_THUMBNAIL_IMAGE_DIMENSIONS,
+		Integer.parseInt(thumbnailImageDimensionsKey.getConfigValue()));
+
 	// add define later support
 	if (imageGallery.isDefineLater()) {
 	    return mapping.findForward("defineLater");
@@ -231,7 +232,7 @@ public class LearningAction extends Action {
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
 		request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
-	
+
 	// add run offline support
 	if (imageGallery.getRunOffline()) {
 	    sessionMap.put(ImageGalleryConstants.PARAM_RUN_OFFLINE, true);
@@ -416,7 +417,7 @@ public class LearningAction extends Action {
 
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
-    
+
     /**
      * Save file or url imageGallery item into database.
      * 
@@ -429,7 +430,7 @@ public class LearningAction extends Action {
     private ActionForward deleteImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	IImageGalleryService service = getImageGalleryService();
-	
+
 	Long imageUid = new Long(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_UID));
 	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -437,8 +438,8 @@ public class LearningAction extends Action {
 	Long sessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
 
 	service.deleteImage(sessionId, imageUid);
-	
-	// redirect	
+
+	// redirect
 	ForwardConfig redirectConfig = mapping.findForwardConfig(ImageGalleryConstants.SUCCESS);
 	ActionRedirect redirect = new ActionRedirect(redirectConfig);
 	redirect.addParameter(AttributeNames.ATTR_MODE, mode);
@@ -512,10 +513,11 @@ public class LearningAction extends Action {
 	    }
 	    sessionMap.put(ImageGalleryConstants.PARAM_IS_VOTED, isVotedForThisImage);
 	}
-	
-	//set visibility of "Delete image" button 
+
+	// set visibility of "Delete image" button
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-	boolean isAuthor = !mode.isTeacher() && !image.isCreateByAuthor() && (createdBy != null) && (createdBy.getUserId().equals(imageGalleryUser.getUserId()));
+	boolean isAuthor = !mode.isTeacher() && !image.isCreateByAuthor() && (createdBy != null)
+		&& (createdBy.getUserId().equals(imageGalleryUser.getUserId()));
 	sessionMap.put(ImageGalleryConstants.PARAM_IS_AUTHOR, isAuthor);
 
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -831,18 +833,18 @@ public class LearningAction extends Action {
 	// notify teachers
 	if (imageGallery.isNotifyTeachersOnImageSumbit()) {
 	    final boolean isHtmlFormat = false;
-	    
+
 	    List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
 	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
+		Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
 		for (int i = 0; i < monitoringUsersIds.length; i++) {
-		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId().longValue();
+		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
 		}
 		String fullName = imageGalleryUser.getLastName() + " " + imageGalleryUser.getFirstName();
-		service.getEventNotificationService().sendMessage(monitoringUsersIds, DeliveryMethodMail.getInstance(),
+		service.getEventNotificationService().sendMessage(null, monitoringUsersIds,
+			IEventNotificationService.DELIVERY_METHOD_MAIL,
 			service.getLocalisedMessage("event.imagesubmit.subject", null),
-			service.getLocalisedMessage("event.imagesubmit.body", new Object[] { fullName }),
-			isHtmlFormat);
+			service.getLocalisedMessage("event.imagesubmit.body", new Object[] { fullName }), isHtmlFormat);
 	    }
 	}
     }

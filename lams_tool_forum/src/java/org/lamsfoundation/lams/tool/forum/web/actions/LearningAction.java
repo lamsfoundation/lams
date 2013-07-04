@@ -137,9 +137,9 @@ public class LearningAction extends Action {
 	    return updateMessageHideFlag(mapping, form, request, response);
 	}
 	if (param.equals("rateMessage")) {
-		return rateMessage(mapping, form, request, response);
+	    return rateMessage(mapping, form, request, response);
 	}
-	
+
 	// ================ Reflection =======================
 	if (param.equals("newReflection")) {
 	    return newReflection(mapping, form, request, response);
@@ -201,7 +201,7 @@ public class LearningAction extends Action {
 
 	// get session from shared session.
 	HttpSession ss = SessionManager.getSession();
-	
+
 	Forum forum = session.getForum();
 	// lock on finish
 	ForumUser forumUser = getCurrentUser(request, sessionId);
@@ -237,7 +237,7 @@ public class LearningAction extends Action {
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
 		request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
-	
+
 	// Should we show the reflection or not? We shouldn't show it when the screen is accessed
 	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
 	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
@@ -278,12 +278,13 @@ public class LearningAction extends Action {
 	if (!forum.isAllowNewTopic()) {
 	    // add the number post the learner has made for each topic.
 	    for (MessageDTO messageDTO : rootTopics) {
-		int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), messageDTO.getMessage().getUid());
+		int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), messageDTO.getMessage()
+			.getUid());
 		messageDTO.setNumOfPosts(numOfPosts);
 	    }
 	}
 	request.setAttribute(ForumConstants.AUTHORING_TOPICS_LIST, rootTopics);
-	
+
 	// update new messages number
 	for (MessageDTO messageDTO : rootTopics) {
 	    int numOfNewPosts = forumService.getNewMessagesNum(messageDTO.getMessage(), forumUser.getUid());
@@ -292,32 +293,31 @@ public class LearningAction extends Action {
 
 	if (forum.isNotifyLearnersOnMarkRelease()) {
 	    boolean isHtmlFormat = false;
-	    
+
 	    forumService.getEventNotificationService().createEvent(ForumConstants.TOOL_SIGNATURE,
 		    ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(),
 		    forumService.getLocalisedMessage("event.mark.release.subject", null),
-		    forumService.getLocalisedMessage("event.mark.release.body", null),
-		    isHtmlFormat);
+		    forumService.getLocalisedMessage("event.mark.release.body", null), isHtmlFormat);
 
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    forumService.getEventNotificationService().subscribe(ForumConstants.TOOL_SIGNATURE,
-		    ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(),
-		    forumUser.getUserId().longValue(), IEventNotificationService.DELIVERY_METHOD_MAIL,
-		    IEventNotificationService.PERIODICITY_SINGLE);
+		    ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(), user.getUserID(),
+		    IEventNotificationService.DELIVERY_METHOD_MAIL, IEventNotificationService.PERIODICITY_SINGLE);
 	}
-	
+
 	// check if there is submission deadline
 	Date submissionDeadline = forum.getSubmissionDeadline();
 	if (submissionDeadline != null) {
-		sessionMap.put(ForumConstants.ATTR_SUBMISSION_DEADLINE, forum.getSubmissionDeadline());
-		UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		TimeZone learnerTimeZone = learnerDto.getTimeZone();
-		Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
-		Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
-		
-		//calculate whether submission deadline has passed, and if so forward to "runOffline"
-		if (currentLearnerDate.after(tzSubmissionDeadline)) {
-			return mapping.findForward("runOffline");
-		}
+	    sessionMap.put(ForumConstants.ATTR_SUBMISSION_DEADLINE, forum.getSubmissionDeadline());
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+
+	    // calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
+		return mapping.findForward("runOffline");
+	    }
 	}
 
 	return mapping.findForward("success");
@@ -559,7 +559,7 @@ public class LearningAction extends Action {
 	    MessageDTO last = rootTopics.get(rootTopics.size() - 1);
 	    maxSeq = last.getMessage().getSequenceId() + 1;
 	}
-	message.setSequenceId(maxSeq);	
+	message.setSequenceId(maxSeq);
 	ForumUser forumUser = getCurrentUser(request, sessionId);
 	message.setCreatedBy(forumUser);
 	message.setModifiedBy(forumUser);
@@ -576,15 +576,15 @@ public class LearningAction extends Action {
 
 	forumService.saveTimestamp(message.getUid(), forumUser);
 
-	//update new messages number
+	// update new messages number
 	for (MessageDTO messageDTO : rootTopics) {
 	    int numOfNewPosts = forumService.getNewMessagesNum(messageDTO.getMessage(), forumUser.getUid());
 	    messageDTO.setNewPostingsNum(numOfNewPosts);
 	}
-	
+
 	// notify learners and teachers
 	forumService.sendNotificationsOnNewPosting(forumId, sessionId, message);
-	
+
 	return mapping.findForward("success");
     }
 
@@ -606,7 +606,7 @@ public class LearningAction extends Action {
 
 	Long parentId = WebUtil.readLongParam(request, ForumConstants.ATTR_PARENT_TOPIC_ID);
 	sessionMap.put(ForumConstants.ATTR_PARENT_TOPIC_ID, parentId);
-	
+
 	// get parent topic, it can decide default subject of reply.
 	MessageDTO topic = getTopic(parentId);
 	if (topic != null && topic.getMessage() != null) {
@@ -623,7 +623,7 @@ public class LearningAction extends Action {
 		msgForm.getMessage().setSubject(reTitle);
 	    }
 	}
-	
+
 	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
 	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
 	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
@@ -696,7 +696,7 @@ public class LearningAction extends Action {
 
 	// Saving or updating user timestamp
 	forumService.saveTimestamp(rootTopicId, forumUser);
-	
+
 	// notify learners and teachers
 	Long forumId = (Long) sessionMap.get(ForumConstants.FORUM_ID);
 	forumService.sendNotificationsOnNewPosting(forumId, sessionId, message);
@@ -744,8 +744,7 @@ public class LearningAction extends Action {
 
     /**
      * Delete attachment from topic. This method only reset attachment information in memory. The finally update will
-     * happen in <code>updateTopic</code> method. So topic can keep this attachment if user choose "Cancel" edit
-     * topic.
+     * happen in <code>updateTopic</code> method. So topic can keep this attachment if user choose "Cancel" edit topic.
      * 
      * @param mapping
      * @param form
@@ -862,7 +861,7 @@ public class LearningAction extends Action {
 	// check if the user has permission to hide posts.
 	// ForumToolSession toolSession = forumService
 	// .getSessionBySessionId(sessionId);
-	//		
+	//
 	// Forum forum = toolSession.getForum();
 	// ForumUser currentUser = getCurrentUser(request,sessionId);
 	// ForumUser forumCreatedBy = forum.getCreatedBy();
@@ -880,12 +879,12 @@ public class LearningAction extends Action {
 	List msgDtoList = forumService.getTopicThread(rootTopicId);
 	updateMesssageFlag(msgDtoList);
 	request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, WebUtil.readStrParam(request,
-		ForumConstants.ATTR_SESSION_MAP_ID));
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID,
+		WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID));
 
 	return mapping.findForward("success");
     }
-    
+
     /**
      * Rates postings submitted by other learners.
      * 
@@ -945,8 +944,8 @@ public class LearningAction extends Action {
 		if (numOfPostsInTopic < forum.getMinimumReply()) {
 		    // create error
 		    ActionMessages errors = new ActionMessages();
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("error.less.mini.post", forum
-			    .getMinimumReply()));
+		    errors.add(ActionMessages.GLOBAL_MESSAGE,
+			    new ActionMessage("error.less.mini.post", forum.getMinimumReply()));
 		    saveErrors(request, errors);
 
 		    // get all root topic to display on init page
@@ -962,8 +961,8 @@ public class LearningAction extends Action {
     }
 
     /**
-     * This method will set flag in message DTO:
-     * <li>If this topic is created by current login user, then set Author mark true.</li>
+     * This method will set flag in message DTO: <li>If this topic is created by current login user, then set Author
+     * mark true.</li>
      * 
      * @param msgDtoList
      */

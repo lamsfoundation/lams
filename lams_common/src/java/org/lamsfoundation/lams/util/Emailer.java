@@ -3,17 +3,14 @@ package org.lamsfoundation.lams.util;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
-import javax.mail.Authenticator;
+import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.Message.RecipientType;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.log4j.Logger;
 import org.masukomi.aspirin.core.MailQue;
 
 /**
@@ -22,10 +19,6 @@ import org.masukomi.aspirin.core.MailQue;
  * @author lfoxton
  */
 public class Emailer {
-
-    public Emailer() {
-    }
-
     /**
      * Sends an email sourced from support email
      * 
@@ -42,7 +35,7 @@ public class Emailer {
 	    throws AddressException, MessagingException, UnsupportedEncodingException {
 	String supportEmail = Configuration.get(ConfigurationKeys.LAMS_ADMIN_EMAIL);
 	Properties properties = new Properties();
-	send(subject, to, supportEmail, body, isHtmlFormat, properties);
+	Emailer.send(subject, to, supportEmail, body, isHtmlFormat, properties);
     }
 
     /**
@@ -91,7 +84,7 @@ public class Emailer {
     public static void send(String subject, String to, String from, String body, boolean isHtmlFormat,
 	    Properties mailServerConfig) throws AddressException, MessagingException, UnsupportedEncodingException {
 
-	send(subject, to, "", from, "", body, isHtmlFormat, mailServerConfig);
+	Emailer.send(subject, to, "", from, "", body, isHtmlFormat, mailServerConfig);
 
     }
 
@@ -117,7 +110,7 @@ public class Emailer {
 	    boolean isHtmlFormat, Properties mailServerConfig) throws AddressException, MessagingException,
 	    UnsupportedEncodingException {
 
-	Session session = getMailSession(mailServerConfig);
+	Session session = Emailer.getMailSession(mailServerConfig);
 	boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration
 		.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
 
@@ -126,7 +119,7 @@ public class Emailer {
 	message.addRecipient(RecipientType.TO, new InternetAddress(to, toPerson));
 	message.setSubject(subject, "UTF-8");
 	message.setText(body, "UTF-8");
-	String contentType = (isHtmlFormat) ? "text/html; charset=UTF-8" : "text/plain; charset=UTF-8";
+	String contentType = (isHtmlFormat) ? "text/html;charset=UTF-8" : "text/plain;charset=UTF-8";
 	message.addHeader("Content-Type", contentType);
 
 	if (useInternalSMTPServer) {
@@ -136,7 +129,5 @@ public class Emailer {
 	} else {
 	    Transport.send(message);
 	}
-
     }
-
 }

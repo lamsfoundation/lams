@@ -52,6 +52,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.events.DeliveryMethodMail;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -739,14 +740,14 @@ public class LearningAction extends Action {
 	    if (assessment.isNotifyTeachersOnAttemptCompletion()) {
 		List<User> monitoringUsers = service.getMonitorsByToolSessionId(toolSessionId);
 		if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		    Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
+		    Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
 		    for (int i = 0; i < monitoringUsersIds.length; i++) {
-			monitoringUsersIds[i] = monitoringUsers.get(i).getUserId().longValue();
+			monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
 		    }
 		    AssessmentUser assessmentUser = getCurrentUser(service, toolSessionId);
 		    String fullName = assessmentUser.getLastName() + " " + assessmentUser.getFirstName();
-		    service.getEventNotificationService().sendMessage(monitoringUsersIds,
-			    DeliveryMethodMail.getInstance(),
+		    service.getEventNotificationService().sendMessage(null, monitoringUsersIds,
+			    IEventNotificationService.DELIVERY_METHOD_MAIL,
 			    service.getLocalisedMessage("event.learner.completes.attempt.subject", null),
 			    service.getLocalisedMessage("event.learner.completes.attempt.body", new Object[] { fullName }),
 			    isHtmlFormat);

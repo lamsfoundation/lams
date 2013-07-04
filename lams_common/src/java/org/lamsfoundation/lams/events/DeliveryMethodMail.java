@@ -2,13 +2,17 @@ package org.lamsfoundation.lams.events;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
+import java.util.Properties;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.EmailValidator;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.Emailer;
 
 /**
@@ -20,27 +24,45 @@ import org.lamsfoundation.lams.util.Emailer;
 public class DeliveryMethodMail extends AbstractDeliveryMethod {
 
     private static DeliveryMethodMail instance;
+    protected static final EmailValidator emailValidator = EmailValidator.getInstance();
+    private static final Logger log = Logger.getLogger(DeliveryMethodMail.class);
 
     protected DeliveryMethodMail() {
 	super((short) 1, "MAIL", "Messages will be send by Mail");
     }
 
     @Override
-    public String send(Long userId, String subject, String message, boolean isHtmlFormat) throws InvalidParameterException {
-	if (userId == null) {
-	    return "User ID should not be null.";
+    public String send(Integer fromUserId, Integer toUserId, String subject, String message, boolean isHtmlFormat)
+	    throws InvalidParameterException {
+	if (toUserId == null) {
+	    log.error("Target user ID must not be null.");
 	}
 	try {
-	    User user = (User) EventNotificationService.getInstance().getUserManagementService().findById(User.class,
-		    userId.intValue());
-	    if (user == null) {
-		return "User with the provided ID was not found.";
+	    User toUser = (User) EventNotificationService.getInstance().getUserManagementService()
+		    .findById(User.class, toUserId);
+	    if (toUser == null) {
+		log.error("Target user with ID " + toUserId + " was not found.");
 	    }
-	    String email = user.getEmail();
-	    if (StringUtils.isBlank(email)) {
-		return "User's e-mail address is blank.";
+	    String toEmail = toUser.getEmail();
+	    if (!DeliveryMethodMail.emailValidator.isValid(toEmail)) {
+		return "Target user's e-mail address is invalid.";
 	    }
-	    sendFromSupportEmail(subject, email, message, isHtmlFormat);
+
+	    if (fromUserId == null) {
+		Emailer.sendFromSupportEmail(subject, toEmail, message, isHtmlFormat);
+	    } else {
+		User fromUser = (User) EventNotificationService.getInstance().getUserManagementService()
+			.findById(User.class, toUserId);
+		if (fromUser == null) {
+		    log.error("Source user with ID " + toUserId + " was not found.");
+		}
+		String fromEmail = fromUser.getEmail();
+		if (!DeliveryMethodMail.emailValidator.isValid(fromEmail)) {
+		    return "Source user's e-mail address is invalid.";
+		}
+
+		Emailer.send(subject, toEmail, fromEmail, message, isHtmlFormat, new Properties());
+	    }
 	    return null;
 	} catch (Exception e) {
 	    return e.toString();
@@ -55,27 +77,6 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
     }
 
     /**
-     * Sends an email sourced from admin. Copied from Emailer class.
-     * 
-     * @param subject
-     *            subject of the message
-     * @param to
-     *            address to send
-     * @param body
-     *            text of the message
-     * @param isHtmlFormat
-     *            whether the message is of HTML content-type or plain text
-     * @throws AddressException
-     *             if address was incorrect
-     * @throws MessagingException
-     *             if the operation failed
-     */
-    public void sendFromSupportEmail(String subject, String to, String body, boolean isHtmlFormat) throws AddressException,
-	    MessagingException, UnsupportedEncodingException {
-	Emailer.sendFromSupportEmail(subject, to, body, isHtmlFormat);
-    }
-
-    /**
      * Sends an email to the address provided by the admin.
      * 
      * @param subject
@@ -85,16 +86,20 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
      * 
      * @param isHtmlFormat
      *            whether the message is of HTML content-type or plain text
+     * @throws UnsupportedEncodingException
      * @throws AddressException
      *             if address was incorrect
      * @throws MessagingException
      *             if the operation failed
      */
     void notifyAdmin(String subject, String body, boolean isHtmlFormat) throws AddressException,
-	    MessagingException, UnsupportedEncodingException {
-	String adminEmail = Configuration.get("LamsSupportEmail");
-	if (!StringUtils.isEmpty(adminEmail)) {
-	    sendFromSupportEmail(subject, adminEmail, body, isHtmlFormat);
+	    UnsupportedEncodingException, MessagingException {
+	String adminEmail = Configuration.get(ConfigurationKeys.LAMS_ADMIN_EMAIL);
+	if (StringUtils.isEmpty(adminEmail)) {
+	    DeliveryMethodMail.log.warn("Could not notify admin as his email is blank. The subject: " + subject
+		    + ". The message: " + body);
+	} else {
+	    Emailer.sendFromSupportEmail(subject, adminEmail, body, isHtmlFormat);
 	}
     }
 }

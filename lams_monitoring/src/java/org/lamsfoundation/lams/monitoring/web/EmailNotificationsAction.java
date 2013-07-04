@@ -231,11 +231,11 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    boolean isSuccessfullySent = true;
 	    String[] userIdStrs = request.getParameterValues("userId");
 	    for (String userIdStr : userIdStrs) {
-		long userId = Long.parseLong(userIdStr);
+		int userId = Integer.parseInt(userIdStr);
 		boolean isHtmlFormat = false;
-		isSuccessfullySent &= eventNotificationService.sendMessage(
+		isSuccessfullySent &= eventNotificationService.sendMessage(null, 
 			userId,
-			DeliveryMethodMail.getInstance(),
+			IEventNotificationService.DELIVERY_METHOD_MAIL,
 			monitoringService.getMessageService().getMessage("event.emailnotifications.email.subject",
 				new Object[] {}), emailBody, isHtmlFormat);
 	    }

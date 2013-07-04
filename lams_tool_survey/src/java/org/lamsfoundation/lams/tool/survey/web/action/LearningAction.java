@@ -49,6 +49,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.events.DeliveryMethodMail;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -139,20 +140,20 @@ public class LearningAction extends Action {
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	answerForm.setSessionMapID(sessionMap.getSessionID());
-	
+
 	// save toolContentID into HTTPSession
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 	Long sessionId = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
 	// it will be use when runOffline or lock on finish page.
 	request.setAttribute(SurveyConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	
+
 	// get back the survey and question list and display them on page
 	ISurveyService service = getSurveyService();
 	SurveyUser surveyUser = null;
 	if (mode != null && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
-	    surveyUser = getSpecifiedUser(service, sessionId, WebUtil.readIntParam(request,
-		    AttributeNames.PARAM_USER_ID, false));
+	    surveyUser = getSpecifiedUser(service, sessionId,
+		    WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	    // setting Learner
 	    Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, true);
 	    answerForm.setUserID(userID);
@@ -178,7 +179,7 @@ public class LearningAction extends Action {
 
 	// get session from shared session.
 	HttpSession ss = SessionManager.getSession();
-	
+
 	// basic information
 	sessionMap.put(SurveyConstants.ATTR_TITLE, survey.getTitle());
 	sessionMap.put(SurveyConstants.ATTR_SURVEY_INSTRUCTION, survey.getInstructions());
@@ -219,20 +220,20 @@ public class LearningAction extends Action {
 	// check if there is submission deadline
 	Date submissionDeadline = survey.getSubmissionDeadline();
 	if (submissionDeadline != null) {
-	    //store submission deadline to sessionMap
+	    // store submission deadline to sessionMap
 	    sessionMap.put(SurveyConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
-	   
+
 	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
-	    
-	    //calculate whether submission deadline has passed, and if so forward to "runOffline"
+
+	    // calculate whether submission deadline has passed, and if so forward to "runOffline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-	    	return mapping.findForward(SurveyConstants.RUN_OFFLINE);
+		return mapping.findForward(SurveyConstants.RUN_OFFLINE);
 	    }
-	}		
-	
+	}
+
 	// init survey item list
 	SortedMap<Integer, AnswerDTO> surveyItemList = getQuestionList(sessionMap);
 	surveyItemList.clear();
@@ -357,16 +358,16 @@ public class LearningAction extends Action {
     private ActionForward doSurvey(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	ISurveyService service = getSurveyService();
-	
+
 	AnswerForm answerForm = (AnswerForm) form;
 	Integer questionSeqID = answerForm.getQuestionSeqID();
 	String sessionMapID = answerForm.getSessionMapID();
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	
+
 	// validate
 	SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
 	Collection<AnswerDTO> surveyItemList = surveyItemMap.values();
-	
+
 	SurveyUser surveyLearner = null;
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -375,7 +376,7 @@ public class LearningAction extends Action {
 	    surveyLearner = service.getUserByIDAndSession(userID, sessionId);
 	    request.setAttribute(AttributeNames.PARAM_USER_ID, userID);
 	}
-	
+
 	ActionErrors errors;
 	if (questionSeqID == null || questionSeqID.equals(0)) {
 	    errors = getAnswers(request);
@@ -404,15 +405,16 @@ public class LearningAction extends Action {
 	UserDTO surveyUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	if (survey.isNotifyTeachersOnAnswerSumbit()) {
 	    final boolean isHtmlFormat = false;
-	    
+
 	    List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
 	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
+		Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
 		for (int i = 0; i < monitoringUsersIds.length; i++) {
-		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId().longValue();
+		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
 		}
 		String fullName = surveyUser.getLastName() + " " + surveyUser.getFirstName();
-		service.getEventNotificationService().sendMessage(monitoringUsersIds, DeliveryMethodMail.getInstance(),
+		service.getEventNotificationService().sendMessage(null, monitoringUsersIds,
+			IEventNotificationService.DELIVERY_METHOD_MAIL,
 			service.getLocalisedMessage("event.answer.submit.subject", null),
 			service.getLocalisedMessage("event.answer.submit.body", new Object[] { fullName }),
 			isHtmlFormat);
@@ -582,7 +584,7 @@ public class LearningAction extends Action {
     private void validateAnswers(HttpServletRequest request, AnswerDTO question, ActionErrors errors,
 	    SurveyAnswer answer) {
 	boolean isAnswerEmpty = (answer.getChoices() == null && StringUtils.isBlank(answer.getAnswerText()));
-	
+
 	// for mandatory questions, answer can not be null.
 	if (!question.isOptional() && isAnswerEmpty) {
 	    errors.add(SurveyConstants.ERROR_MSG_KEY + question.getUid(), new ActionMessage(

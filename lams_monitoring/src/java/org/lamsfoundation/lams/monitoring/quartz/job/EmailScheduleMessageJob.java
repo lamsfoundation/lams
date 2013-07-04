@@ -18,16 +18,15 @@
  * 
  * http://www.gnu.org/licenses/gpl.txt 
  * **************************************************************** 
- */  
- 
-/* $Id$ */  
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.monitoring.quartz.job;
 
 import java.util.Collection;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.events.DeliveryMethodMail;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -57,7 +56,7 @@ public class EmailScheduleMessageJob extends MonitoringJob {
 	Map properties = context.getJobDetail().getJobDataMap();
 	String emailBody = (String) properties.get("emailBody");
 
-	//get users to whom send emails
+	// get users to whom send emails
 	int searchType = (Integer) properties.get("searchType");
 	Long lessonId = (Long) properties.get(AttributeNames.PARAM_LESSON_ID);
 	Integer orgId = (Integer) properties.get(AttributeNames.PARAM_ORGANISATION_ID);
@@ -69,11 +68,14 @@ public class EmailScheduleMessageJob extends MonitoringJob {
 
 	for (User user : users) {
 	    boolean isHtmlFormat = false;
-	    long userId = user.getUserId();
+	    int userId = user.getUserId();
 	    log.debug("Sending scheduled email to user [" + userId + "].");
-	    eventNotificationService.sendMessage(userId, DeliveryMethodMail.getInstance(), monitoringService
-		    .getMessageService().getMessage("event.emailnotifications.email.subject", new Object[] {}),
-		    emailBody, isHtmlFormat);
+	    eventNotificationService.sendMessage(
+		    null,
+		    userId,
+		    IEventNotificationService.DELIVERY_METHOD_MAIL,
+		    monitoringService.getMessageService().getMessage("event.emailnotifications.email.subject",
+			    new Object[] {}), emailBody, isHtmlFormat);
 	}
     }
 
@@ -81,7 +83,7 @@ public class EmailScheduleMessageJob extends MonitoringJob {
 	    throws JobExecutionException {
 	try {
 	    final String CONTEXT_NAME = "context.central";
-	    
+
 	    SchedulerContext sc = context.getScheduler().getContext();
 	    ApplicationContext cxt = (ApplicationContext) sc.get(CONTEXT_NAME);
 	    return (IEventNotificationService) cxt.getBean("eventNotificationService");

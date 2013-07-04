@@ -819,10 +819,10 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	SubmitFilesContent content = session.getContent();
 	boolean notifyLearnersOnMarkRelease = getEventNotificationService().eventExists(SbmtConstants.TOOL_SIGNATURE,
 		SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID());
-	Map<Long, StringBuilder> notificationMessages = null;
+	Map<Integer, StringBuilder> notificationMessages = null;
 	Object[] notificationMessageParameters = null;
 	if (notifyLearnersOnMarkRelease) {
-	    notificationMessages = new TreeMap<Long, StringBuilder>();
+	    notificationMessages = new TreeMap<Integer, StringBuilder>();
 	    notificationMessageParameters = new Object[3];
 	}
 	while (iter.hasNext()) {
@@ -840,14 +840,14 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 		notificationMessageParameters[2] = report.getMarks();
 		notificationMessage
 			.append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
-		notificationMessages.put(user.getUserID().longValue(), notificationMessage);
+		notificationMessages.put(user.getUserID(), notificationMessage);
 	    }
 	    submitFilesReportDAO.updateReport(report);
 	}
 	// current there is no false return
 	if (notifyLearnersOnMarkRelease) {
 	    notificationMessageParameters = new Object[1];
-	    for (Long userID : notificationMessages.keySet()) {
+	    for (Integer userID : notificationMessages.keySet()) {
 		notificationMessageParameters[0] = notificationMessages.get(userID).toString();
 		getEventNotificationService().triggerForSingleUser(SbmtConstants.TOOL_SIGNATURE,
 			SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, content.getContentID(), userID,

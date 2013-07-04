@@ -39,6 +39,7 @@
 		var LEARNER_GROUP_SHOW_LABEL = '<fmt:message key="learner.group.show"/>';
 		var LEARNER_GROUP_LIST_TITLE_LABEL = '<fmt:message key="learner.group.list.title"/>';
 		var VIEW_LEARNER_BUTTON_LABEL = '<fmt:message key="button.view.learner"/>';
+		var EMAIL_BUTTON_LABEL = '<fmt:message key="button.email"/>';
 		var CLOSE_BUTTON_LABEL = '<fmt:message key="button.close"/>';
 		var LEARNER_FINISHED_COUNT_LABEL = '<fmt:message key="learner.finished.count"/>';
 		var LEARNER_FINISHED_DIALOG_TITLE_LABEL = '<fmt:message key="learner.finished.dialog.title"/>';
@@ -393,6 +394,10 @@
 				</td>
 			</tr>
 		</table>
+	</div>
+	
+	<div id="emailDialog" class="dialogContainer">
+		<iframe id="emailFrame"></iframe>
 	</div>
 	
 	<div id="tooltip"></div>

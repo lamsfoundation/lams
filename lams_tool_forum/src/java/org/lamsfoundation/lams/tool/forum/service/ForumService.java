@@ -534,10 +534,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	Forum forum = session.getForum();
 	boolean notifyLearnersOnMarkRelease = getEventNotificationService().eventExists(ForumConstants.TOOL_SIGNATURE,
 		ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId());
-	Map<Long, StringBuilder> notificationMessages = null;
+	Map<Integer, StringBuilder> notificationMessages = null;
 	Object[] notificationMessageParameters = null;
 	if (notifyLearnersOnMarkRelease) {
-	    notificationMessages = new TreeMap<Long, StringBuilder>();
+	    notificationMessages = new TreeMap<Integer, StringBuilder>();
 	    notificationMessageParameters = new Object[3];
 	}
 
@@ -557,7 +557,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		    notificationMessageParameters[2] = report.getMark();
 		    notificationMessage.append(getLocalisedMessage("event.mark.release.mark",
 			    notificationMessageParameters));
-		    notificationMessages.put(user.getUserId(), notificationMessage);
+		    notificationMessages.put(user.getUserId().intValue(), notificationMessage);
 		}
 	    }
 	    messageDao.saveOrUpdate(msg);
@@ -565,7 +565,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 	if (notifyLearnersOnMarkRelease) {
 	    notificationMessageParameters = new Object[1];
-	    for (Long userID : notificationMessages.keySet()) {
+	    for (Integer userID : notificationMessages.keySet()) {
 		notificationMessageParameters[0] = notificationMessages.get(userID).toString();
 		getEventNotificationService().triggerForSingleUser(ForumConstants.TOOL_SIGNATURE,
 			ForumConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, forum.getContentId(), userID,
@@ -1413,13 +1413,13 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	if (forum.isNotifyLearnersOnForumPosting()) {
 	    List<User> learners = lessonService.getLearnersHaveAttemptedActivity(activity);
 	    if (learners != null && !learners.isEmpty()) {
-		ArrayList<Long> learnerIds = new ArrayList<Long>();
+		ArrayList<Integer> learnerIds = new ArrayList<Integer>();
 		for (User learner : learners) {
-		    learnerIds.add(learner.getUserId().longValue());
+		    learnerIds.add(learner.getUserId());
 		}
 
-		getEventNotificationService().sendMessage(learnerIds.toArray(new Long[0]),
-			DeliveryMethodMail.getInstance(),
+		getEventNotificationService().sendMessage(null, learnerIds.toArray(new Integer[0]),
+			IEventNotificationService.DELIVERY_METHOD_MAIL,
 			getLocalisedMessage("event.newposting.subject", new Object[] { forum.getTitle() }),
 			getLocalisedMessage("event.newposting.body", new Object[] { fullName, message.getBody() }),
 			isHtmlFormat);
@@ -1429,13 +1429,13 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	if (forum.isNotifyTeachersOnForumPosting()) {
 	    List<User> monitoringUsers = lessonService.getMonitorsByToolSessionId(sessionId);
 	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		ArrayList<Long> monitoringUsersIds = new ArrayList<Long>();
+		ArrayList<Integer> monitoringUsersIds = new ArrayList<Integer>();
 		for (User monitoringUser : monitoringUsers) {
-		    monitoringUsersIds.add(monitoringUser.getUserId().longValue());
+		    monitoringUsersIds.add(monitoringUser.getUserId());
 		}
 
-		getEventNotificationService().sendMessage(monitoringUsersIds.toArray(new Long[0]),
-			DeliveryMethodMail.getInstance(),
+		getEventNotificationService().sendMessage(null, monitoringUsersIds.toArray(new Integer[0]),
+			IEventNotificationService.DELIVERY_METHOD_MAIL,
 			getLocalisedMessage("event.newposting.subject", new Object[] { forum.getTitle() }),
 			getLocalisedMessage("event.newposting.body", new Object[] { fullName, message.getBody() }),
 			isHtmlFormat);

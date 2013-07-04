@@ -54,6 +54,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.DeliveryMethodMail;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -248,12 +249,12 @@ public class LearningAction extends Action {
 	    
 	    List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
 	    if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
+		Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
 		for (int i = 0; i < monitoringUsersIds.length; i++) {
-		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId().longValue();
+		    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
 		}
 		String fullName = dacoUser.getLastName() + " " + dacoUser.getFirstName();
-		service.getEventNotificationService().sendMessage(monitoringUsersIds, DeliveryMethodMail.getInstance(),
+		service.getEventNotificationService().sendMessage(null, monitoringUsersIds, IEventNotificationService.DELIVERY_METHOD_MAIL,
 			service.getLocalisedMessage("event.learnerentry.subject", null),
 			service.getLocalisedMessage("event.learnerentry.body", new Object[] { fullName }),
 			isHtmlFormat);
@@ -509,13 +510,13 @@ public class LearningAction extends Action {
 		
 		List<User> monitoringUsers = service.getMonitorsByToolSessionId(sessionId);
 		if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
-		    Long[] monitoringUsersIds = new Long[monitoringUsers.size()];
+		    Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
 		    for (int i = 0; i < monitoringUsersIds.length; i++) {
-			monitoringUsersIds[i] = monitoringUsers.get(i).getUserId().longValue();
+			monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
 		    }
 		    String fullName = user.getLastName() + " " + user.getFirstName();
-		    service.getEventNotificationService().sendMessage(monitoringUsersIds,
-			    DeliveryMethodMail.getInstance(),
+		    service.getEventNotificationService().sendMessage(null, monitoringUsersIds,
+			    IEventNotificationService.DELIVERY_METHOD_MAIL,
 			    service.getLocalisedMessage("event.recordsubmit.subject", null),
 			    service.getLocalisedMessage("event.recordsubmit.body", new Object[] { fullName }),
 			    isHtmlFormat);

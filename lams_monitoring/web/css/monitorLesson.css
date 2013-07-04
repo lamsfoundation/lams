@@ -39,8 +39,14 @@ input[type="checkbox"] {
 	border: none;
 }
 
-div.dialogContainer {
+.dialogContainer {
 	display: none;
+}
+
+.dialogContainer iframe {
+	width: 100%;
+	height: 100%;
+	border: none;
 }
 
 .dialogList {
@@ -149,6 +155,10 @@ td.contributeEntryCell a {
 #classDialogTable input[type="checkbox"] {
 	margin: 0 5px 0px 0px;
 	border: none;
+}
+
+#emailDialog {
+	width: 100%;
 }
 
 /********** SEQUENCE TAB STYLES **********/
