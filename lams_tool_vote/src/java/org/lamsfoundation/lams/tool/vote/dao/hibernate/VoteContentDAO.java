@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.vote.dao.hibernate;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -46,7 +45,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 
 public class VoteContentDAO extends HibernateDaoSupport implements IVoteContentDAO {
-    static Logger logger = Logger.getLogger(VoteContentDAO.class.getName());
 
     private static final String FIND_VOTE_CONTENT = "from " + VoteContent.class.getName()
 	    + " as vote where content_id=?";
@@ -60,7 +58,6 @@ public class VoteContentDAO extends HibernateDaoSupport implements IVoteContentD
 
     public void saveOrUpdateVote(VoteContent vote) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
-	VoteContentDAO.logger.debug("before saveOrUpdateVote: " + vote);
 	this.getHibernateTemplate().saveOrUpdate(vote);
     }
 
@@ -88,9 +85,7 @@ public class VoteContentDAO extends HibernateDaoSupport implements IVoteContentD
 
     public void saveVoteContent(VoteContent voteContent) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
-	VoteContentDAO.logger.debug("before saveOrUpdate");
 	this.getHibernateTemplate().saveOrUpdate(voteContent);
-	VoteContentDAO.logger.debug("after saveOrUpdate");
     }
 
     public void updateVoteContent(VoteContent voteContent) {

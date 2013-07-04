@@ -24,7 +24,6 @@ package org.lamsfoundation.lams.tool.vote.dao.hibernate;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteQueContentDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
@@ -40,7 +39,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  * </p>
  */
 public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueContentDAO {
-    static Logger logger = Logger.getLogger(VoteQueContentDAO.class.getName());
 
     private static final String CLEAN_QUESTION_CONTENT_BY_CONTENT_ID_SIMPLE = "from voteQueContent in class VoteQueContent where voteQueContent.voteContentId=:voteContentId";
 
@@ -57,7 +55,6 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
     }
 
     public VoteQueContent getToolDefaultQuestionContent(final long voteContentId) {
-	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setLong("voteContentId",
 		voteContentId).list();
 
@@ -74,7 +71,6 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
     }
 
     public List getAllQuestionEntries(final long voteContentId) {
-	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_CONTENT_ID).setLong("voteContentId",
 		voteContentId).list();
 
@@ -82,7 +78,6 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
     }
 
     public VoteQueContent getQuestionContentByQuestionText(final String question, final Long voteContentUid) {
-	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_QUESTION_TEXT).setString("question", question)
 		.setLong("voteContentUid", voteContentUid.longValue()).list();
 
@@ -94,7 +89,6 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
     }
 
     public VoteQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long voteContentUid) {
-	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSession().createQuery(LOAD_QUESTION_CONTENT_BY_DISPLAY_ORDER).setLong("displayOrder",
 		displayOrder.longValue()).setLong("voteContentUid", voteContentUid.longValue()).list();
 
@@ -169,7 +163,6 @@ public class VoteQueContentDAO extends HibernateDaoSupport implements IVoteQueCo
     }
 
     public List getAllQuestionEntriesSorted(final long voteContentId) {
-	HibernateTemplate templ = this.getHibernateTemplate();
 	List list = getSession().createQuery(SORT_QUESTION_CONTENT_BY_DISPLAY_ORDER).setLong("voteContentId",
 		voteContentId).list();
 

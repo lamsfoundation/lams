@@ -35,10 +35,8 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.tool.vote.ExportPortfolioDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAllGroupsDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAllSessionsDTO;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
@@ -72,25 +70,18 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  */
 public class MonitoringUtil implements VoteAppConstants {
-    static Logger logger = Logger.getLogger(MonitoringUtil.class.getName());
 
     public static Map populateToolSessions(HttpServletRequest request, VoteContent voteContent, IVoteService voteService) {
 	List sessionsList = voteService.getSessionNamesFromContent(voteContent);
-	logger.debug("sessionsList size is:..." + sessionsList.size());
 
 	Map sessionsMap = VoteUtils.convertToStringMap(sessionsList, "String");
-	logger.debug("generated sessionsMap:..." + sessionsMap);
-	logger.debug("sessionsMap size:..." + sessionsMap.size());
 
 	if (sessionsMap.isEmpty()) {
-	    logger.debug("sessionsMap size is 0:");
 	    sessionsMap.put(new Long(1).toString(), "None");
 	} else {
-	    logger.debug("sessionsMap has some entries: " + sessionsMap.size());
 	    sessionsMap.put(new Long(sessionsMap.size() + 1).toString(), "All");
 	}
 
-	logger.debug("final sessionsMap:" + sessionsMap);
 	return sessionsMap;
     }
 
@@ -110,39 +101,27 @@ public class MonitoringUtil implements VoteAppConstants {
     public static List buildGroupsQuestionData(HttpServletRequest request, VoteContent voteContent,
 	    boolean isUserNamesVisible, boolean isLearnerRequest, String currentSessionId, String userId,
 	    IVoteService voteService) {
-	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
-	logger.debug("isLearnerRequest: " + isLearnerRequest);
-	logger.debug("userId: " + userId);
-
-	logger.debug("voteService: " + voteService);
-
-	logger.debug("will be building groups question data  for content:..." + voteContent);
 	List listQuestions = voteService.getAllQuestionEntries(voteContent.getUid());
-	logger.debug("listQuestions:..." + listQuestions);
 
 	List listMonitoredAnswersContainerDTO = new LinkedList();
 
 	Iterator itListQuestions = listQuestions.iterator();
 	while (itListQuestions.hasNext()) {
 	    VoteQueContent voteQueContent = (VoteQueContent) itListQuestions.next();
-	    logger.debug("voteQueContent:..." + voteQueContent);
 
 	    if (voteQueContent != null) {
 		VoteMonitoredAnswersDTO voteMonitoredAnswersDTO = new VoteMonitoredAnswersDTO();
 		voteMonitoredAnswersDTO.setQuestionUid(voteQueContent.getUid().toString());
 		voteMonitoredAnswersDTO.setQuestion(voteQueContent.getQuestion());
 
-		logger.debug("using allUsersData to retrieve users data: " + isUserNamesVisible);
 		Map questionAttemptData = buildGroupsAttemptData(request, voteContent, voteQueContent, voteQueContent
 			.getUid().toString(), isUserNamesVisible, isLearnerRequest, currentSessionId, userId,
 			voteService);
-		logger.debug("questionAttemptData:..." + questionAttemptData);
 		voteMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 		listMonitoredAnswersContainerDTO.add(voteMonitoredAnswersDTO);
 
 	    }
 	}
-	logger.debug("final listMonitoredAnswersContainerDTO:..." + listMonitoredAnswersContainerDTO);
 	return listMonitoredAnswersContainerDTO;
     }
 
@@ -163,19 +142,11 @@ public class MonitoringUtil implements VoteAppConstants {
     public static Map buildGroupsAttemptData(HttpServletRequest request, VoteContent voteContent,
 	    VoteQueContent voteQueContent, String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest,
 	    String currentSessionId, String userId, IVoteService voteService) {
-	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
-	logger.debug("isLearnerRequest: " + isLearnerRequest);
-	logger.debug("currentSessionId: " + currentSessionId);
-	logger.debug("userId: " + userId);
-
-	logger.debug("doing buildGroupsAttemptData...");
-	logger.debug("voteService: " + voteService);
 
 	Map mapMonitoredAttemptsContainerDTO = new TreeMap(new VoteComparator());
 	List listMonitoredAttemptsContainerDTO = new LinkedList();
 
 	Map summaryToolSessions = populateToolSessionsId(request, voteContent, voteService);
-	logger.debug("summaryToolSessions: " + summaryToolSessions);
 
 	Iterator itMap = summaryToolSessions.entrySet().iterator();
 
@@ -183,17 +154,11 @@ public class MonitoringUtil implements VoteAppConstants {
 	if (!isLearnerRequest) {
 	    while (itMap.hasNext()) {
 		Map.Entry pairs = (Map.Entry) itMap.next();
-		logger.debug("using the  summary tool sessions pair: " + pairs.getKey() + " = " + pairs.getValue());
 
 		if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All"))) {
-		    logger.debug("using the  numerical summary tool sessions pair: " + " = " + pairs.getValue());
 		    VoteSession voteSession = voteService.retrieveVoteSession(new Long(pairs.getValue().toString()));
-		    logger.debug("voteSession: " + " = " + voteSession);
 		    if (voteSession != null) {
 			List listUsers = voteService.getUserBySessionOnly(voteSession);
-			logger
-				.debug("listMcUsers for session id:" + voteSession.getVoteSessionId() + " = "
-					+ listUsers);
 			Map sessionUsersAttempts = populateSessionUsersAttempts(request, voteContent, voteSession
 				.getVoteSessionId(), listUsers, questionUid, isUserNamesVisible, isLearnerRequest,
 				userId, voteService);
@@ -203,25 +168,16 @@ public class MonitoringUtil implements VoteAppConstants {
 	    }
 	} else {
 	    /*request is for learner report, use only the passed tool session in the report*/
-	    logger.debug("using currentSessionId for the learner report:" + currentSessionId);
 	    while (itMap.hasNext()) {
 		Map.Entry pairs = (Map.Entry) itMap.next();
-		logger.debug("using the  summary tool sessions pair: " + pairs.getKey() + " = " + pairs.getValue());
 
 		if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All"))) {
-		    logger.debug("using the  numerical summary tool sessions pair: " + " = " + pairs.getValue());
 
 		    if (currentSessionId.equals(pairs.getValue())) {
-			logger
-				.debug("only using this tool session for the learner report: " + " = "
-					+ pairs.getValue());
 			VoteSession voteSession = voteService
 				.retrieveVoteSession(new Long(pairs.getValue().toString()));
-			logger.debug("voteSession: " + " = " + voteSession);
 			if (voteSession != null) {
 			    List listUsers = voteService.getUserBySessionOnly(voteSession);
-			    logger.debug("listMcUsers for session id:" + voteSession.getVoteSessionId() + " = "
-				    + listUsers);
 			    Map sessionUsersAttempts = populateSessionUsersAttempts(request, voteContent, voteSession
 				    .getVoteSessionId(), listUsers, questionUid, isUserNamesVisible, isLearnerRequest,
 				    userId, voteService);
@@ -232,49 +188,30 @@ public class MonitoringUtil implements VoteAppConstants {
 	    }
 	}
 
-	logger.debug("final listMonitoredAttemptsContainerDTO:..." + listMonitoredAttemptsContainerDTO);
 	mapMonitoredAttemptsContainerDTO = convertToMap(listMonitoredAttemptsContainerDTO);
-	logger.debug("final mapMonitoredAttemptsContainerDTO:..." + mapMonitoredAttemptsContainerDTO);
 	return mapMonitoredAttemptsContainerDTO;
     }
 
     public static Map populateSessionUsersAttempts(HttpServletRequest request, VoteContent voteContent, Long sessionId,
 	    List listUsers, String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest, String userId,
 	    IVoteService voteService) {
-	logger.debug("doing populateSessionUsersAttempts for: " + questionUid);
-	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
-	logger.debug("isLearnerRequest: " + isLearnerRequest);
-	logger.debug("voteContent: " + voteContent);
-	logger.debug("userId: " + userId);
-
-	logger.debug("doing populateSessionUsersAttempts...");
-	logger.debug("voteService: " + voteService);
 
 	Map mapMonitoredUserContainerDTO = new TreeMap(new VoteStringComparator());
 	List listMonitoredUserContainerDTO = new LinkedList();
 	Iterator itUsers = listUsers.iterator();
 
 	if (userId == null) {
-	    logger.debug("request is not for learner progress report");
 	    if ((isUserNamesVisible) && (!isLearnerRequest)) {
-		logger.debug("summary reporting case 1");
-		logger.debug("isUserNamesVisible true, isLearnerRequest false");
-		logger.debug("getting alll the user' data");
 		while (itUsers.hasNext()) {
 		    VoteQueUsr voteQueUsr = (VoteQueUsr) itUsers.next();
-		    logger.debug("voteQueUsr: " + voteQueUsr);
 
 		    if (voteQueUsr != null) {
-			logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid()
-				+ " and que content id: " + questionUid);
 			List listUserAttempts = voteService.getAttemptsListForUserAndQuestionContent(voteQueUsr
 				.getUid(), new Long(questionUid));
-			logger.debug("listUserAttempts: " + listUserAttempts);
 
 			Iterator itAttempts = listUserAttempts.iterator();
 			while (itAttempts.hasNext()) {
 			    VoteUsrAttempt voteUsrResp = (VoteUsrAttempt) itAttempts.next();
-			    logger.debug("voteUsrResp: " + voteUsrResp);
 
 			    if (voteUsrResp != null) {
 				VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
@@ -285,34 +222,20 @@ public class MonitoringUtil implements VoteAppConstants {
 				voteMonitoredUserDTO.setSessionId(sessionId.toString());
 				voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
 
-				logger.debug("attempt: " + voteUsrResp);
 				voteMonitoredUserDTO.setQuestionUid(questionUid);
 
 				VoteQueContent voteQueContent = voteUsrResp.getVoteQueContent();
-				logger.debug("voteQueContent: " + voteQueContent);
 				String entry = voteQueContent.getQuestion();
-				logger.debug("entry: " + entry);
 
 				String voteQueContentId = voteUsrResp.getVoteQueContentId().toString();
-				logger.debug("voteQueContentId: " + voteQueContentId);
 
 				VoteSession localUserSession = voteUsrResp.getVoteQueUsr().getVoteSession();
-				logger.debug("localUserSession: " + localUserSession);
-				logger.debug("localUserSession's content id: " + localUserSession.getVoteContentId());
-				logger.debug("incoming content id versus localUserSession's content id: "
-					+ voteContent.getVoteContentId() + " versus "
-					+ localUserSession.getVoteContentId());
-				logger.debug("summary reporting case 1");
 				if (voteContent.getVoteContentId().toString().equals(
 					localUserSession.getVoteContentId().toString())) {
 				    if (entry != null) {
 					if (entry.equals("sample nomination") && (voteQueContentId.equals("1"))) {
-					    logger.debug("this nomination entry points to a user entered nomination: "
-						    + voteUsrResp.getUserEntry());
 					    voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 					} else {
-					    logger.debug("this nomination entry points to a standard nomination: "
-						    + voteQueContent.getQuestion());
 					    voteMonitoredUserDTO.setResponse(voteQueContent.getQuestion());
 					}
 				    }
@@ -324,32 +247,21 @@ public class MonitoringUtil implements VoteAppConstants {
 		    }
 		}
 	    } else if ((isUserNamesVisible) && (isLearnerRequest)) {
-		logger.debug("summary reporting case 2");
-		logger
-			.debug("just populating data normally just like monitoring summary, except that the data is ony for a specific session");
-		logger.debug("isUserNamesVisible true, isLearnerRequest true");
+		//summary reporting case 2
+		//just populating data normally just like monitoring summary, except that the data is ony for a specific session
 		String userID = (String) request.getSession().getAttribute(USER_ID);
-		logger.debug("userID: " + userID);
 		VoteQueUsr voteQueUsr = voteService.getVoteQueUsrById(new Long(userID).longValue());
-		logger
-			.debug("the current user voteQueUsr " + voteQueUsr + " and username: "
-				+ voteQueUsr.getUsername());
 
 		while (itUsers.hasNext()) {
 		    voteQueUsr = (VoteQueUsr) itUsers.next();
-		    logger.debug("voteQueUsr: " + voteQueUsr);
 
 		    if (voteQueUsr != null) {
-			logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid()
-				+ " and que content id: " + questionUid);
 			List listUserAttempts = voteService.getAttemptsListForUserAndQuestionContent(voteQueUsr
 				.getUid(), new Long(questionUid));
-			logger.debug("listUserAttempts: " + listUserAttempts);
 
 			Iterator itAttempts = listUserAttempts.iterator();
 			while (itAttempts.hasNext()) {
 			    VoteUsrAttempt voteUsrResp = (VoteUsrAttempt) itAttempts.next();
-			    logger.debug("voteUsrResp: " + voteUsrResp);
 
 			    if (voteUsrResp != null) {
 				VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
@@ -360,33 +272,19 @@ public class MonitoringUtil implements VoteAppConstants {
 				voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
 				voteMonitoredUserDTO.setSessionId(sessionId.toString());
 				voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
-				logger.debug("attempt: " + voteUsrResp);
 				voteMonitoredUserDTO.setQuestionUid(questionUid);
 
 				VoteQueContent voteQueContent = voteUsrResp.getVoteQueContent();
-				logger.debug("voteQueContent: " + voteQueContent);
 				String entry = voteQueContent.getQuestion();
-				logger.debug("entry: " + entry);
 				String voteQueContentId = voteUsrResp.getVoteQueContentId().toString();
-				logger.debug("voteQueContentId: " + voteQueContentId);
 
 				VoteSession localUserSession = voteUsrResp.getVoteQueUsr().getVoteSession();
-				logger.debug("localUserSession: " + localUserSession);
-				logger.debug("localUserSession's content id: " + localUserSession.getVoteContentId());
-				logger.debug("incoming content id versus localUserSession's content id: "
-					+ voteContent.getVoteContentId() + " versus "
-					+ localUserSession.getVoteContentId());
-				logger.debug("summary reporting case 2");
 				if (voteContent.getVoteContentId().toString().equals(
 					localUserSession.getVoteContentId().toString())) {
 				    if (entry != null) {
 					if (entry.equals("sample nomination") && (voteQueContentId.equals("1"))) {
-					    logger.debug("this nomination entry points to a user entered nomination: "
-						    + voteUsrResp.getUserEntry());
 					    voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 					} else {
-					    logger.debug("this nomination entry points to a standard nomination: "
-						    + voteQueContent.getQuestion());
 					    voteMonitoredUserDTO.setResponse(voteQueContent.getQuestion());
 					}
 				    }
@@ -398,29 +296,20 @@ public class MonitoringUtil implements VoteAppConstants {
 		    }
 		}
 	    } else if ((!isUserNamesVisible) && (isLearnerRequest)) {
-		logger.debug("summary reporting case 3");
-		logger
-			.debug("populating data normally exception are for a specific session and other user names are not visible.");
-		logger.debug("isUserNamesVisible false, isLearnerRequest true");
-		logger.debug("getting only current user's data");
+		//summary reporting case 3
+		//populating data normally exception are for a specific session and other user names are not visible
 		String userID = (String) request.getSession().getAttribute(USER_ID);
-		logger.debug("userID: " + userID);
 
 		while (itUsers.hasNext()) {
 		    VoteQueUsr voteQueUsr = (VoteQueUsr) itUsers.next();
-		    logger.debug("voteQueUsr: " + voteQueUsr);
 
 		    if (voteQueUsr != null) {
-			logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid()
-				+ " and que content id: " + questionUid);
 			List listUserAttempts = voteService.getAttemptsListForUserAndQuestionContent(voteQueUsr
 				.getUid(), new Long(questionUid));
-			logger.debug("listUserAttempts: " + listUserAttempts);
 
 			Iterator itAttempts = listUserAttempts.iterator();
 			while (itAttempts.hasNext()) {
 			    VoteUsrAttempt voteUsrResp = (VoteUsrAttempt) itAttempts.next();
-			    logger.debug("voteUsrResp: " + voteUsrResp);
 
 			    if (voteUsrResp != null) {
 				VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
@@ -428,47 +317,30 @@ public class MonitoringUtil implements VoteAppConstants {
 				voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
 				voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
 
-				logger.debug("userID versus queUsrId: " + userID + "-" + voteQueUsr.getQueUsrId());
 				if (userID.equals(voteQueUsr.getQueUsrId().toString())) {
-				    logger.debug("this is current user, put his name normally.");
 				    voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());
 				} else {
-				    logger.debug("this is  not current user, put his name as blank.");
 				    voteMonitoredUserDTO.setUserName("[        ]");
 				}
 
 				voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
 				voteMonitoredUserDTO.setSessionId(sessionId.toString());
 
-				logger.debug("attempt: " + voteUsrResp);
 				voteMonitoredUserDTO.setQuestionUid(questionUid);
 				voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
 
 				VoteQueContent voteQueContent = voteUsrResp.getVoteQueContent();
-				logger.debug("voteQueContent: " + voteQueContent);
 				String entry = voteQueContent.getQuestion();
-				logger.debug("entry: " + entry);
 
 				String voteQueContentId = voteUsrResp.getVoteQueContentId().toString();
-				logger.debug("voteQueContentId: " + voteQueContentId);
 
 				VoteSession localUserSession = voteUsrResp.getVoteQueUsr().getVoteSession();
-				logger.debug("localUserSession: " + localUserSession);
-				logger.debug("localUserSession's content id: " + localUserSession.getVoteContentId());
-				logger.debug("incoming content id versus localUserSession's content id: "
-					+ voteContent.getVoteContentId() + " versus "
-					+ localUserSession.getVoteContentId());
-				logger.debug("summary reporting case 3");
 				if (voteContent.getVoteContentId().toString().equals(
 					localUserSession.getVoteContentId().toString())) {
 				    if (entry != null) {
 					if (entry.equals("sample nomination") && (voteQueContentId.equals("1"))) {
-					    logger.debug("this nomination entry points to a user entered nomination: "
-						    + voteUsrResp.getUserEntry());
 					    voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 					} else {
-					    logger.debug("this nomination entry points to a standard nomination: "
-						    + voteQueContent.getQuestion());
 					    voteMonitoredUserDTO.setResponse(voteQueContent.getQuestion());
 					}
 				    }
@@ -482,28 +354,22 @@ public class MonitoringUtil implements VoteAppConstants {
 		}
 	    }
 	} else {
-	    logger.debug("summary reporting case 4");
-	    logger.debug("request is for learner progress report: " + userId);
+	    //summary reporting case 4
+	    //request is for learner progress report userId
 	    while (itUsers.hasNext()) {
 		VoteQueUsr voteQueUsr = (VoteQueUsr) itUsers.next();
-		logger.debug("voteQueUsr: " + voteQueUsr);
 
 		if (voteQueUsr != null) {
-		    logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid()
-			    + " and que content id: " + questionUid);
 		    List listUserAttempts = voteService.getAttemptsListForUserAndQuestionContent(voteQueUsr.getUid(),
 			    new Long(questionUid));
-		    logger.debug("listUserAttempts: " + listUserAttempts);
 
 		    Iterator itAttempts = listUserAttempts.iterator();
 		    while (itAttempts.hasNext()) {
 			VoteUsrAttempt voteUsrResp = (VoteUsrAttempt) itAttempts.next();
-			logger.debug("voteUsrResp: " + voteUsrResp);
 
 			if (voteUsrResp != null) {
-			    logger.debug("userID versus queUsrId: " + userId + "-" + voteQueUsr.getQueUsrId());
 			    if (userId.equals(voteQueUsr.getQueUsrId().toString())) {
-				logger.debug("this is the user requested , include his name for learner progress.");
+				//this is the user requested , include his name for learner progress
 				VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
 				voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());
 				voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimeZone());
@@ -512,34 +378,20 @@ public class MonitoringUtil implements VoteAppConstants {
 				voteMonitoredUserDTO.setQueUsrId(voteQueUsr.getUid().toString());
 				voteMonitoredUserDTO.setSessionId(sessionId.toString());
 				voteMonitoredUserDTO.setUserEntry(voteUsrResp.getUserEntry());
-				logger.debug("attempt: " + voteUsrResp);
 				voteMonitoredUserDTO.setQuestionUid(questionUid);
 
 				VoteQueContent voteQueContent = voteUsrResp.getVoteQueContent();
-				logger.debug("voteQueContent: " + voteQueContent);
 				String entry = voteQueContent.getQuestion();
-				logger.debug("entry: " + entry);
 
 				String voteQueContentId = voteUsrResp.getVoteQueContentId().toString();
-				logger.debug("voteQueContentId: " + voteQueContentId);
 
 				VoteSession localUserSession = voteUsrResp.getVoteQueUsr().getVoteSession();
-				logger.debug("localUserSession: " + localUserSession);
-				logger.debug("localUserSession's content id: " + localUserSession.getVoteContentId());
-				logger.debug("incoming content id versus localUserSession's content id: "
-					+ voteContent.getVoteContentId() + " versus "
-					+ localUserSession.getVoteContentId());
-				logger.debug("summary reporting case 4");
 				if (voteContent.getVoteContentId().toString().equals(
 					localUserSession.getVoteContentId().toString())) {
 				    if (entry != null) {
 					if (entry.equals("sample nomination") && (voteQueContentId.equals("1"))) {
-					    logger.debug("this nomination entry points to a user entered nomination: "
-						    + voteUsrResp.getUserEntry());
 					    voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 					} else {
-					    logger.debug("this nomination entry points to a standard nomination: "
-						    + voteQueContent.getQuestion());
 					    voteMonitoredUserDTO.setResponse(voteQueContent.getQuestion());
 					}
 				    }
@@ -554,36 +406,26 @@ public class MonitoringUtil implements VoteAppConstants {
 
 	}
 
-	logger.debug("final listMonitoredUserContainerDTO: " + listMonitoredUserContainerDTO);
 	mapMonitoredUserContainerDTO = convertToVoteMonitoredUserDTOMap(listMonitoredUserContainerDTO);
-	logger.debug("final mapMonitoredUserContainerDTO:..." + mapMonitoredUserContainerDTO);
 	return mapMonitoredUserContainerDTO;
     }
 
     public static Map populateToolSessionsId(HttpServletRequest request, VoteContent voteContent,
 	    IVoteService voteService) {
-	logger.debug("attempt populateToolSessionsId for: " + voteContent);
 	List sessionsList = voteService.getSessionsFromContent(voteContent);
-	logger.debug("sessionsList size is:..." + sessionsList.size());
 
 	Map sessionsMap = VoteUtils.convertToStringMap(sessionsList, "Long");
-	logger.debug("generated sessionsMap:..." + sessionsMap);
-	logger.debug("sessionsMap size:..." + sessionsMap.size());
 
 	if (sessionsMap.isEmpty()) {
-	    logger.debug("sessionsMap size is 0:");
 	    sessionsMap.put(new Long(1).toString(), "None");
 	} else {
-	    logger.debug("sessionsMap has some entries: " + sessionsMap.size());
 	    sessionsMap.put(new Long(sessionsMap.size() + 1).toString(), "All");
 	}
 
-	logger.debug("final sessionsMap:" + sessionsMap);
 	return sessionsMap;
     }
 
     public static Map convertToVoteMonitoredUserDTOMap(List list) {
-	logger.debug("using convertToVoteMonitoredUserDTOMap: " + list);
 	Map map = new TreeMap(new VoteComparator());
 
 	Iterator listIterator = list.iterator();
@@ -591,10 +433,6 @@ public class MonitoringUtil implements VoteAppConstants {
 
 	while (listIterator.hasNext()) {
 	    VoteMonitoredUserDTO data = (VoteMonitoredUserDTO) listIterator.next();
-	    logger.debug("using data: " + data);
-	    logger.debug("using data: " + data.getResponse());
-	    logger.debug("using session id: " + data.getSessionId());
-	    logger.debug("using question uid: " + data.getQuestionUid());
 
 	    map.put(mapIndex.toString(), data);
 	    mapIndex = new Long(mapIndex.longValue() + 1);
@@ -603,23 +441,19 @@ public class MonitoringUtil implements VoteAppConstants {
     }
 
     public static double calculateTotal(Map mapVoteRatesContent) {
-	logger.debug("calculating total for: " + mapVoteRatesContent);
 	double total = 0d;
 	Iterator itMap = mapVoteRatesContent.entrySet().iterator();
 	while (itMap.hasNext()) {
 	    Map.Entry pairs = (Map.Entry) itMap.next();
-	    logger.debug("using the  pair: " + pairs.getKey() + " = " + pairs.getValue());
 
 	    if (pairs.getValue() != null) {
 		total = total + new Double(pairs.getValue().toString()).doubleValue();
 	    }
-	    logger.debug("total: " + total);
 	}
 	return total;
     }
 
     public static Map convertToMap(List list) {
-	logger.debug("using convertToMap: " + list);
 	Map map = new TreeMap(new VoteComparator());
 
 	Iterator listIterator = list.iterator();
@@ -644,48 +478,33 @@ public class MonitoringUtil implements VoteAppConstants {
      */
     public static List prepareChartDTO(HttpServletRequest request, IVoteService voteService,
 	    VoteMonitoringForm voteMonitoringForm, Long toolContentID, MessageService messageService) {
-	logger.debug("start preparing ChartDTO with voteMonitoringForm: " + voteMonitoringForm);
-	logger.debug("start preparing ChartDTO with toolContentID: " + toolContentID);
 
 	List listVoteAllSessionsDTO = new LinkedList();
 
 	VoteContent voteContent = voteService.retrieveVote(toolContentID);
-	logger.debug("existing voteContent:" + voteContent);
-	logger.debug("will be building groups question data  for content:..." + voteContent);
 
 	Iterator itListSessions = voteContent.getVoteSessions().iterator();
 	while (itListSessions.hasNext()) {
 	    VoteSession voteSession = (VoteSession) itListSessions.next();
-	    logger.debug("voteSession:..." + voteSession);
-	    logger.debug("current voteSession id :..." + voteSession.getVoteSessionId());
-	    logger.debug("current toolSessionUid :..." + voteSession.getUid());
 
 	    Map mapOptionsContent = new TreeMap(new VoteComparator());
-	    logger.debug("mapOptionsContent: " + mapOptionsContent);
-
 	    Map mapVoteRatesContent = new TreeMap(new VoteComparator());
-	    logger.debug("mapVoteRatesContent: " + mapVoteRatesContent);
 
 	    VoteAllSessionsDTO voteAllSessionsDTO = new VoteAllSessionsDTO();
 	    voteAllSessionsDTO.setSessionId(voteSession.getVoteSessionId().toString());
 	    voteAllSessionsDTO.setSessionName(voteSession.getSession_name());
 
 	    int entriesCount = voteService.getSessionEntriesCount(voteSession.getUid());
-	    logger.debug("entriesCount: " + entriesCount);
 	    Set userEntries = voteService.getSessionUserEntriesSet(voteSession.getUid());
-	    logger.debug("sessionUserCount: " + userEntries.size());
 
 	    int potentialUserCount = voteService.getVoteSessionPotentialLearnersCount(voteSession.getUid());
-	    logger.debug("potentialUserCount: " + potentialUserCount);
 	    voteAllSessionsDTO.setSessionUserCount(Integer.toString(potentialUserCount));
 
 	    int completedSessionUserCount = voteService.getCompletedVoteUserBySessionUid(voteSession.getUid());
-	    logger.debug("completedSessionUserCount: " + completedSessionUserCount);
 	    voteAllSessionsDTO.setCompletedSessionUserCount(new Integer(completedSessionUserCount).toString());
 
 	    if (potentialUserCount != 0) {
 		double completedPercent = (completedSessionUserCount * 100) / potentialUserCount;
-		logger.debug("completed percent: " + completedPercent);
 
 		if (completedPercent > 100)
 		    completedPercent = 100;
@@ -695,19 +514,13 @@ public class MonitoringUtil implements VoteAppConstants {
 		voteAllSessionsDTO.setCompletedSessionUserPercent("Not Available");
 	    }
 
-	    logger.debug("entriesCount: " + entriesCount);
-	    logger.debug("userEntries: " + userEntries);
-
 	    Map mapStandardUserCount = new TreeMap(new VoteComparator());
 
-	    logger.debug("setting existing content data from the db");
 	    mapOptionsContent.clear();
 	    Iterator queIterator = voteContent.getVoteQueContents().iterator();
 	    Long mapIndex = new Long(1);
-	    logger.debug("mapOptionsContent: " + mapOptionsContent);
 	    int totalStandardVotesCount = 0;
 
-	    logger.debug("using entriesCount: " + entriesCount);
 	    Map mapStandardNominationsHTMLedContent = new TreeMap(new VoteComparator());
 	    Map mapStandardQuestionUid = new TreeMap(new VoteComparator());
 	    Map mapStandardToolSessionUid = new TreeMap(new VoteComparator());
@@ -715,41 +528,29 @@ public class MonitoringUtil implements VoteAppConstants {
 	    while (queIterator.hasNext()) {
 		VoteQueContent voteQueContent = (VoteQueContent) queIterator.next();
 		if (voteQueContent != null) {
-		    logger.debug("question: " + voteQueContent.getQuestion());
 		    mapStandardNominationsHTMLedContent.put(mapIndex.toString(), voteQueContent.getQuestion());
 		    String noHTMLNomination = VoteUtils.stripHTML(voteQueContent.getQuestion());
-		    logger.debug("noHTMLNomination: " + noHTMLNomination);
 		    mapOptionsContent.put(mapIndex.toString(), noHTMLNomination);
 
 		    int votesCount = 0;
-		    logger.debug("getting votesCount based on session: " + voteSession.getUid());
 		    votesCount = voteService.getStandardAttemptsForQuestionContentAndSessionUid(
 			    voteQueContent.getUid(), voteSession.getUid());
 
 		    mapStandardQuestionUid.put(mapIndex.toString(), voteQueContent.getUid().toString());
 		    mapStandardToolSessionUid.put(mapIndex.toString(), voteSession.getUid());
 
-		    logger
-			    .debug("votesCount for questionContent uid: " + votesCount + " for"
-				    + voteQueContent.getUid());
 		    mapStandardUserCount.put(mapIndex.toString(), new Integer(votesCount).toString());
 		    totalStandardVotesCount = totalStandardVotesCount + votesCount;
 
 		    double voteRate = 0d;
 		    double doubleVotesCount = votesCount * 1d;
-		    logger.debug("doubleVotesCount: " + doubleVotesCount);
 		    double doubleEntriesCount = entriesCount * 1d;
-		    logger.debug("doubleEntriesCount: " + doubleEntriesCount);
 
 		    if (entriesCount != 0) {
 			voteRate = ((doubleVotesCount * 100) / doubleEntriesCount);
 		    }
-
-		    logger.debug("voteRate" + voteRate);
-
 		    String stringVoteRate = new Double(voteRate).toString();
 		    int lengthVoteRate = stringVoteRate.length();
-		    logger.debug("lengthVoteRate" + lengthVoteRate);
 		    if (lengthVoteRate > 5)
 			stringVoteRate = stringVoteRate.substring(0, 6);
 
@@ -757,41 +558,25 @@ public class MonitoringUtil implements VoteAppConstants {
 		    mapIndex = new Long(mapIndex.longValue() + 1);
 		}
 	    }
-	    logger.debug("test1: Map initialized with existing contentid to: " + mapOptionsContent);
 	    Map mapStandardNominationsContent = new TreeMap(new VoteComparator());
 	    mapStandardNominationsContent = mapOptionsContent;
-	    logger.debug("mapStandardNominationsContent: " + mapStandardNominationsContent);
-	    logger.debug("mapStandardNominationsHTMLedContent: " + mapStandardNominationsHTMLedContent);
 
 	    Map mapStandardRatesContent = new TreeMap(new VoteComparator());
 	    mapStandardRatesContent = mapVoteRatesContent;
-	    logger.debug("test1: mapStandardRatesContent: " + mapStandardRatesContent);
-	    logger.debug("test1: mapStandardUserCount: " + mapStandardUserCount);
 
 	    Iterator itListQuestions = userEntries.iterator();
 	    int mapVoteRatesSize = mapVoteRatesContent.size();
-	    logger.debug("mapVoteRatesSize: " + mapVoteRatesSize);
 	    mapIndex = new Long(mapVoteRatesSize + 1);
-	    logger.debug("updated mapIndex: " + mapIndex);
 
 	    double total = MonitoringUtil.calculateTotal(mapVoteRatesContent);
-	    logger.debug("updated mapIndex: " + mapIndex);
 	    double share = 100d - total;
-	    logger.debug("share: " + share);
-
-	    logger.debug("totalStandardVotesCount: " + totalStandardVotesCount);
 	    int userEnteredVotesCount = entriesCount - totalStandardVotesCount;
-	    logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
 
 	    if (userEnteredVotesCount != 0) {
 		share = ((userEnteredVotesCount * 100) / entriesCount);
-		logger.debug("calculated share normally, userEnteredVotesCount: " + userEnteredVotesCount);
-		logger.debug("calculated share normally, entriesCount: " + entriesCount);
 	    } else {
 		share = 0;
-		logger.debug("reset share");
 	    }
-	    logger.debug("final share: " + share);
 
 	    if (voteContent.isAllowText()) {
 		mapStandardNominationsContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
@@ -804,13 +589,6 @@ public class MonitoringUtil implements VoteAppConstants {
 	    mapStandardQuestionUid.put(mapIndex.toString(), "1");
 	    mapStandardToolSessionUid.put(mapIndex.toString(), "1");
 
-	    logger.debug("processed for prepareChartDTO: mapStandardNominationsContent: "
-		    + mapStandardNominationsContent);
-	    logger.debug("processed for prepareChartDTO: mapStandardNominationsHTMLedContent: "
-		    + mapStandardNominationsHTMLedContent);
-	    logger.debug("processed for prepareChartDTO: mapStandardUserCount: " + mapStandardUserCount);
-	    logger.debug("processed for prepareChartDTO: mapStandardRatesContent: " + mapStandardRatesContent);
-
 	    voteAllSessionsDTO.setMapStandardNominationsContent(mapStandardNominationsContent);
 	    voteAllSessionsDTO.setMapStandardNominationsHTMLedContent(mapStandardNominationsHTMLedContent);
 	    voteAllSessionsDTO.setMapStandardUserCount(mapStandardUserCount);
@@ -821,7 +599,6 @@ public class MonitoringUtil implements VoteAppConstants {
 	    VoteMonitoringAction voteMonitoringAction = new VoteMonitoringAction();
 	    List listUserEntries = voteMonitoringAction.processUserEnteredNominations(voteService, voteContent,
 		    voteSession.getVoteSessionId().toString(), true, null, false);
-	    logger.debug("listUserEntries: " + listUserEntries);
 	    voteAllSessionsDTO.setListUserEntries(listUserEntries);
 
 	    if (listUserEntries.size() > 0)
@@ -831,7 +608,6 @@ public class MonitoringUtil implements VoteAppConstants {
 
 	    listVoteAllSessionsDTO.add(voteAllSessionsDTO);
 	}
-	logger.debug("listVoteAllSessionsDTO: " + listVoteAllSessionsDTO);
 
 	return listVoteAllSessionsDTO;
     }
@@ -850,41 +626,24 @@ public class MonitoringUtil implements VoteAppConstants {
 	    VoteMonitoringForm voteMonitoringForm, String toolContentID, String toolSessionUid,
 	    VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO, VoteGeneralMonitoringDTO voteGeneralMonitoringDTO,
 	    MessageService messageService) {
-	logger.debug("starting prepareChartData, voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
-	logger.debug("starting prepareChartData, toolContentID: " + toolContentID);
-	logger.debug("starting prepareChartData, toolSessionUid: " + toolSessionUid);
 	VoteContent voteContent = voteService.retrieveVote(new Long(toolContentID));
-	logger.debug("starting prepareChartData, voteContent uid: " + voteContent.getUid());
-
-	logger.debug("starting prepareChartData, voteMonitoringForm: " + voteMonitoringForm);
-
-	logger.debug("existing voteContent:" + voteContent);
 	Map mapOptionsContent = new TreeMap(new VoteComparator());
-	logger.debug("mapOptionsContent: " + mapOptionsContent);
-
 	Map mapVoteRatesContent = new TreeMap(new VoteComparator());
-	logger.debug("mapVoteRatesContent: " + mapVoteRatesContent);
 
 	List distinctSessionUsers = new ArrayList();
 	boolean sessionLevelCharting = true;
 	int entriesCount = 0;
 	Set userEntries = null;
 	if (toolSessionUid != null) {
-	    logger.debug("process for session: " + toolSessionUid);
 	    entriesCount = voteService.getSessionEntriesCount(new Long(toolSessionUid));
-	    logger.debug("entriesCount: " + entriesCount);
 	    userEntries = voteService.getSessionUserEntriesSet(new Long(toolSessionUid));
-	    logger.debug("sessionUserCount: " + userEntries.size());
 
 	    int completedSessionUserCount = voteService.getCompletedVoteUserBySessionUid(new Long(toolSessionUid));
-	    logger.debug("completedSessionUserCount: " + completedSessionUserCount);
 
 	    int completedEntriesCount = voteService.getCompletedSessionEntriesCount(new Long(toolSessionUid));
-	    logger.debug("completedEntriesCount: " + completedEntriesCount);
 
 	    if (voteMonitoringForm != null) {
 		int potentialUserCount = voteService.getVoteSessionPotentialLearnersCount(new Long(toolSessionUid));
-		logger.debug("potentialUserCount: " + potentialUserCount);
 		voteMonitoringForm.setSessionUserCount(Integer.toString(potentialUserCount));
 		voteMonitoringForm.setCompletedSessionUserCount(new Integer(completedSessionUserCount).toString());
 
@@ -896,8 +655,6 @@ public class MonitoringUtil implements VoteAppConstants {
 
 		if (potentialUserCount != 0) {
 		    double completedPercent = (completedSessionUserCount * 100) / potentialUserCount;
-		    logger.debug("completed percent: " + completedPercent);
-
 		    if (completedPercent > 100)
 			completedPercent = 100;
 
@@ -915,20 +672,12 @@ public class MonitoringUtil implements VoteAppConstants {
 	    }
 	}
 
-	logger.debug("entriesCount: " + entriesCount);
-	logger.debug("userEntries: " + userEntries);
-	logger.debug("sessionLevelCharting: " + sessionLevelCharting);
-
 	Map mapStandardUserCount = new TreeMap(new VoteComparator());
 
-	logger.debug("setting existing content data from the db");
 	mapOptionsContent.clear();
 	Iterator queIterator = voteContent.getVoteQueContents().iterator();
 	Long mapIndex = new Long(1);
-	logger.debug("mapOptionsContent: " + mapOptionsContent);
 	int totalStandardVotesCount = 0;
-
-	logger.debug("using entriesCount: " + entriesCount);
 
 	Map mapStandardNominationsHTMLedContent = new TreeMap(new VoteComparator());
 	Map mapStandardQuestionUid = new TreeMap(new VoteComparator());
@@ -936,48 +685,32 @@ public class MonitoringUtil implements VoteAppConstants {
 	while (queIterator.hasNext()) {
 	    VoteQueContent voteQueContent = (VoteQueContent) queIterator.next();
 	    if (voteQueContent != null) {
-		logger.debug("question: " + voteQueContent.getQuestion());
 		mapStandardNominationsHTMLedContent.put(mapIndex.toString(), voteQueContent.getQuestion());
 		String noHTMLNomination = VoteUtils.stripHTML(voteQueContent.getQuestion());
-		logger.debug("noHTMLNomination: " + noHTMLNomination);
 		mapOptionsContent.put(mapIndex.toString(), noHTMLNomination);
 
 		int votesCount = 0;
 		if (sessionLevelCharting == true) {
-		    logger.debug("getting votesCount based on session: " + toolSessionUid);
 		    votesCount = voteService.getStandardAttemptsForQuestionContentAndSessionUid(
 			    voteQueContent.getUid(), new Long(toolSessionUid));
 
 		    mapStandardQuestionUid.put(mapIndex.toString(), voteQueContent.getUid().toString());
 		    mapStandardToolSessionUid.put(mapIndex.toString(), toolSessionUid.toString());
-
-		    logger
-			    .debug("votesCount for questionContent uid: " + votesCount + " for"
-				    + voteQueContent.getUid());
 		    mapStandardUserCount.put(mapIndex.toString(), new Integer(votesCount).toString());
 		    totalStandardVotesCount = totalStandardVotesCount + votesCount;
 		} else {
-		    logger.debug("getting votesCount based on content: " + voteQueContent.getUid());
 		    votesCount = voteService.getAttemptsForQuestionContent(voteQueContent.getUid());
-		    logger
-			    .debug("votesCount for questionContent uid: " + votesCount + " for"
-				    + voteQueContent.getUid());
 		}
 
 		double voteRate = 0d;
 		double doubleVotesCount = votesCount * 1d;
-		logger.debug("doubleVotesCount: " + doubleVotesCount);
 		double doubleEntriesCount = entriesCount * 1d;
-		logger.debug("doubleEntriesCount: " + doubleEntriesCount);
 		if (entriesCount != 0) {
 		    voteRate = ((doubleVotesCount * 100) / doubleEntriesCount);
 		}
 
-		logger.debug("voteRate" + voteRate);
-
 		String stringVoteRate = new Double(voteRate).toString();
 		int lengthVoteRate = stringVoteRate.length();
-		logger.debug("lengthVoteRate" + lengthVoteRate);
 		if (lengthVoteRate > 5)
 		    stringVoteRate = stringVoteRate.substring(0, 6);
 
@@ -986,40 +719,25 @@ public class MonitoringUtil implements VoteAppConstants {
 	    }
 	}
 
-	logger.debug("test1: Map initialized with existing contentid to: " + mapOptionsContent);
 	Map mapStandardNominationsContent = new TreeMap(new VoteComparator());
 	mapStandardNominationsContent = mapOptionsContent;
-	logger.debug("mapStandardNominationsContent: " + mapStandardNominationsContent);
-	logger.debug("mapStandardNominationsHTMLedContent: " + mapStandardNominationsHTMLedContent);
 
 	Map mapStandardRatesContent = new TreeMap(new VoteComparator());
 	mapStandardRatesContent = mapVoteRatesContent;
-	logger.debug("test1: mapStandardRatesContent: " + mapStandardRatesContent);
-	logger.debug("test1: mapStandardUserCount: " + mapStandardUserCount);
 
 	int mapVoteRatesSize = mapVoteRatesContent.size();
-	logger.debug("mapVoteRatesSize: " + mapVoteRatesSize);
 	mapIndex = new Long(mapVoteRatesSize + 1);
-	logger.debug("updated mapIndex: " + mapIndex);
 
 	double total = MonitoringUtil.calculateTotal(mapVoteRatesContent);
-	logger.debug("updated mapIndex: " + mapIndex);
 	double share = 100 - total;
-	logger.debug("share: " + share);
 
-	logger.debug("totalStandardVotesCount: " + totalStandardVotesCount);
 	int userEnteredVotesCount = entriesCount - totalStandardVotesCount;
-	logger.debug("userEnteredVotesCount for this session: " + userEnteredVotesCount);
 
 	if (userEnteredVotesCount != 0) {
 	    share = ((userEnteredVotesCount * 100) / entriesCount);
-	    logger.debug("calculated share normally, userEnteredVotesCount: " + userEnteredVotesCount);
-	    logger.debug("calculated share normally, entriesCount: " + entriesCount);
 	} else {
 	    share = 0;
-	    logger.debug("reset share");
 	}
-	logger.debug("final share: " + share);
 
 	if (voteContent.isAllowText()) {
 	    mapStandardNominationsContent.put(mapIndex.toString(), messageService.getMessage("label.open.vote"));
@@ -1034,18 +752,12 @@ public class MonitoringUtil implements VoteAppConstants {
 	mapStandardToolSessionUid.put(mapIndex.toString(), "1");
 
 	request.setAttribute(LIST_USER_ENTRIES_CONTENT, userEntries);
-	logger.debug("test2: mapUserEntriesContent: " + request.getSession().getAttribute(LIST_USER_ENTRIES_CONTENT));
 
 	request.getSession().setAttribute(MAP_STANDARD_NOMINATIONS_CONTENT, mapStandardNominationsContent);
-	logger.debug("test2: MAP_STANDARD_NOMINATIONS_CONTENT: "
-		+ request.getSession().getAttribute(MAP_STANDARD_NOMINATIONS_CONTENT));
 
 	request.getSession().setAttribute(MAP_STANDARD_RATES_CONTENT, mapStandardRatesContent);
-	logger.debug("test2: MAP_STANDARD_RATES_CONTENT: "
-		+ request.getSession().getAttribute(MAP_STANDARD_RATES_CONTENT));
 
 	if (voteGeneralLearnerFlowDTO != null) {
-	    logger.debug("placing maps within voteGeneralLearnerFlowDTO");
 	    voteGeneralLearnerFlowDTO.setMapStandardNominationsContent(mapStandardNominationsContent);
 	    voteGeneralLearnerFlowDTO.setMapStandardNominationsHTMLedContent(mapStandardNominationsHTMLedContent);
 	    voteGeneralLearnerFlowDTO.setMapStandardRatesContent(mapStandardRatesContent);
@@ -1063,39 +775,27 @@ public class MonitoringUtil implements VoteAppConstants {
 	    voteGeneralMonitoringDTO.setMapStandardQuestionUid(mapStandardQuestionUid);
 	}
 
-	logger.debug("end of prepareChartData,  voteGeneralLearnerFlowDTO: " + voteGeneralLearnerFlowDTO);
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
-
-	logger.debug("end of prepareChartData,  voteGeneralMonitoringDTO: " + voteGeneralMonitoringDTO);
 	request.setAttribute(VOTE_GENERAL_MONITORING_DTO, voteGeneralMonitoringDTO);
     }
 
     public static boolean notebookEntriesExist(IVoteService voteService, VoteContent voteContent) {
-	logger.debug("finding out about content level notebook entries: " + voteContent);
 	Iterator iteratorSession = voteContent.getVoteSessions().iterator();
 	while (iteratorSession.hasNext()) {
 	    VoteSession voteSession = (VoteSession) iteratorSession.next();
-	    logger.debug("voteSession: " + voteSession);
 
 	    if (voteSession != null) {
-		logger.debug("voteSession id: " + voteSession.getVoteSessionId());
 
 		Iterator iteratorUser = voteSession.getVoteQueUsers().iterator();
 		while (iteratorUser.hasNext()) {
 		    VoteQueUsr voteQueUsr = (VoteQueUsr) iteratorUser.next();
-		    logger.debug("voteQueUsr: " + voteQueUsr);
 
 		    if (voteQueUsr != null) {
-			logger.debug("voteQueUsr id: " + voteQueUsr.getQueUsrId());
-
-			logger.debug("attempt getting notebookEntry: ");
 			NotebookEntry notebookEntry = voteService.getEntry(voteSession.getVoteSessionId(),
 				CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(voteQueUsr.getQueUsrId()
 					.intValue()));
 
-			logger.debug("notebookEntry: " + notebookEntry);
 			if (notebookEntry != null) {
-			    logger.debug("found at least one notebookEntry: " + notebookEntry.getEntry());
 			    return true;
 			}
 
@@ -1157,32 +857,21 @@ public class MonitoringUtil implements VoteAppConstants {
 
     public static void generateGroupsSessionData(HttpServletRequest request, IVoteService voteService,
 	    VoteContent voteContent) {
-	logger.debug("generateGroupsSessionData: " + voteContent);
-
 	List listAllGroupsDTO = buildGroupBasedSessionData(request, voteContent, voteService);
-	logger.debug("listAllGroupsDTO: " + listAllGroupsDTO);
-
 	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
     }
 
     public static List buildGroupBasedSessionData(HttpServletRequest request, VoteContent voteContent,
 	    IVoteService voteService) {
-	logger.debug("buildGroupBasedSessionData" + voteContent);
-	logger.debug("will be building groups question data  for content:..." + voteContent);
 	List listQuestions = voteService.getAllQuestionEntries(voteContent.getUid());
-	logger.debug("listQuestions:..." + listQuestions);
-
 	List listAllGroupsContainerDTO = new LinkedList();
 
 	Iterator iteratorSession = voteContent.getVoteSessions().iterator();
 	while (iteratorSession.hasNext()) {
 	    VoteSession voteSession = (VoteSession) iteratorSession.next();
-	    logger.debug("iteration for group based session data: " + voteSession);
 	    String currentSessionId = voteSession.getVoteSessionId().toString();
-	    logger.debug("currentSessionId: " + currentSessionId);
 
 	    String currentSessionName = voteSession.getSession_name();
-	    logger.debug("currentSessionName: " + currentSessionName);
 
 	    VoteAllGroupsDTO voteAllGroupsDTO = new VoteAllGroupsDTO();
 	    List listMonitoredAnswersContainerDTO = new LinkedList();
@@ -1191,10 +880,8 @@ public class MonitoringUtil implements VoteAppConstants {
 		Iterator itListQuestions = listQuestions.iterator();
 		while (itListQuestions.hasNext()) {
 		    VoteQueContent voteQueContent = (VoteQueContent) itListQuestions.next();
-		    logger.debug("voteQueContent:..." + voteQueContent);
 
 		    if (voteQueContent != null) {
-			logger.debug("populating VoteMonitoredAnswersDTO for : " + voteQueContent);
 			VoteMonitoredAnswersDTO voteMonitoredAnswersDTO = new VoteMonitoredAnswersDTO();
 			voteMonitoredAnswersDTO.setQuestionUid(voteQueContent.getUid().toString());
 			voteMonitoredAnswersDTO.setQuestion(voteQueContent.getQuestion());
@@ -1203,48 +890,31 @@ public class MonitoringUtil implements VoteAppConstants {
 
 			Map questionAttemptData = buildGroupsAttemptData(request, voteContent, voteService,
 				voteQueContent, voteQueContent.getUid().toString(), true, false, currentSessionId, null);
-			logger.debug("generated  questionAttemptData: " + questionAttemptData);
 			voteMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 
-			logger.debug("adding voteMonitoredAnswersDTO to the listMonitoredAnswersContainerDTO: "
-				+ voteMonitoredAnswersDTO);
 			listMonitoredAnswersContainerDTO.add(voteMonitoredAnswersDTO);
 		    }
 		}
 	    }
-	    logger.debug("listMonitoredAnswersContainerDTO:" + listMonitoredAnswersContainerDTO);
-
-	    logger.debug("adding listMonitoredAnswersContainerDTO to the voteAllGroupsDTO:"
-		    + listMonitoredAnswersContainerDTO);
 	    voteAllGroupsDTO.setGroupData(listMonitoredAnswersContainerDTO);
 	    voteAllGroupsDTO.setSessionName(currentSessionName);
 	    voteAllGroupsDTO.setSessionId(currentSessionId);
 
-	    logger.debug("built voteAllGroupsDTO:" + voteAllGroupsDTO);
 	    listAllGroupsContainerDTO.add(voteAllGroupsDTO);
 
 	}
 
-	logger.debug("final listAllGroupsContainerDTO:..." + listAllGroupsContainerDTO);
 	return listAllGroupsContainerDTO;
     }
 
     public static Map buildGroupsAttemptData(HttpServletRequest request, VoteContent voteContent,
 	    IVoteService voteService, VoteQueContent voteQueContent, String questionUid, boolean isUserNamesVisible,
 	    boolean isLearnerRequest, String currentSessionId, String userId) {
-	logger.debug("doing buildGroupsAttemptData...");
-	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
-	logger.debug("isLearnerRequest: " + isLearnerRequest);
-	logger.debug("currentSessionId: " + currentSessionId);
-	logger.debug("userId: " + userId);
-
-	logger.debug("voteService: " + voteService);
 
 	Map mapMonitoredAttemptsContainerDTO = new TreeMap(new VoteStringComparator());
 	List listMonitoredAttemptsContainerDTO = new LinkedList();
 
 	Map summaryToolSessions = populateToolSessionsId(request, voteContent, voteService);
-	logger.debug("summaryToolSessions: " + summaryToolSessions);
 
 	Iterator itMap = summaryToolSessions.entrySet().iterator();
 
@@ -1253,24 +923,15 @@ public class MonitoringUtil implements VoteAppConstants {
 
 	    if (currentSessionId != null) {
 		if (currentSessionId.equals("All")) {
-		    logger.debug("**summary request is for All**:");
+		    //**summary request is for All**
 		    while (itMap.hasNext()) {
 			Map.Entry pairs = (Map.Entry) itMap.next();
-			logger.debug("using the  summary tool sessions pair: " + pairs.getKey() + " = "
-				+ pairs.getValue());
-
 			if (!(pairs.getValue().toString().equals("None"))
 				&& !(pairs.getValue().toString().equals("All"))) {
-			    logger
-				    .debug("using the  numerical summary tool sessions pair: " + " = "
-					    + pairs.getValue());
 			    VoteSession voteSession = voteService.retrieveVoteSession(new Long(pairs.getValue()
 				    .toString()));
-			    logger.debug("voteSession: " + " = " + voteSession);
 			    if (voteSession != null) {
 				List listUsers = voteService.getUserBySessionOnly(voteSession);
-				logger.debug("listMcUsers for session id:" + voteSession.getVoteSessionId() + " = "
-					+ listUsers);
 				Map sessionUsersAttempts = populateSessionUsersAttempts(request, voteService,
 					voteSession.getVoteSessionId(), listUsers, questionUid, isUserNamesVisible,
 					isLearnerRequest, userId);
@@ -1279,12 +940,10 @@ public class MonitoringUtil implements VoteAppConstants {
 			}
 		    }
 		} else if (!currentSessionId.equals("All")) {
-		    logger.debug("**summary request is for currentSessionId**:" + currentSessionId);
+		    //**summary request is for currentSessionId** currentSessionId
 		    VoteSession voteSession = voteService.retrieveVoteSession(new Long(currentSessionId.toString()));
-		    logger.debug("voteSession: " + " = " + voteSession);
 
 		    List listUsers = voteService.getUserBySessionOnly(voteSession);
-		    logger.debug("listUsers: " + " = " + listUsers);
 
 		    Map sessionUsersAttempts = populateSessionUsersAttempts(request, voteService, new Long(
 			    currentSessionId), listUsers, questionUid, isUserNamesVisible, isLearnerRequest, userId);
@@ -1293,25 +952,16 @@ public class MonitoringUtil implements VoteAppConstants {
 	    }
 	} else {
 	    /*request is for learner report, use only the passed tool session in the report*/
-	    logger.debug("using currentSessionId for the learner report:" + currentSessionId);
 	    while (itMap.hasNext()) {
 		Map.Entry pairs = (Map.Entry) itMap.next();
-		logger.debug("using the  summary tool sessions pair: " + pairs.getKey() + " = " + pairs.getValue());
 
 		if (!(pairs.getValue().toString().equals("None")) && !(pairs.getValue().toString().equals("All"))) {
-		    logger.debug("using the  numerical summary tool sessions pair: " + " = " + pairs.getValue());
 
 		    if (currentSessionId.equals(pairs.getValue())) {
-			logger
-				.debug("only using this tool session for the learner report: " + " = "
-					+ pairs.getValue());
 			VoteSession voteSession = voteService
 				.retrieveVoteSession(new Long(pairs.getValue().toString()));
-			logger.debug("voteSession: " + " = " + voteSession);
 			if (voteSession != null) {
 			    List listUsers = voteService.getUserBySessionOnly(voteSession);
-			    logger.debug("listVoteUsers for session id:" + voteSession.getVoteSessionId() + " = "
-				    + listUsers);
 			    Map sessionUsersAttempts = populateSessionUsersAttempts(request, voteService, voteSession
 				    .getVoteSessionId(), listUsers, questionUid, isUserNamesVisible, isLearnerRequest,
 				    userId);
@@ -1322,46 +972,30 @@ public class MonitoringUtil implements VoteAppConstants {
 	    }
 	}
 
-	logger.debug("final listMonitoredAttemptsContainerDTO:..." + listMonitoredAttemptsContainerDTO);
 	mapMonitoredAttemptsContainerDTO = convertToMap(listMonitoredAttemptsContainerDTO);
-	logger.debug("final mapMonitoredAttemptsContainerDTO:..." + mapMonitoredAttemptsContainerDTO);
 	return mapMonitoredAttemptsContainerDTO;
     }
 
     public static Map populateSessionUsersAttempts(HttpServletRequest request, IVoteService voteService,
 	    Long sessionId, List listUsers, String questionUid, boolean isUserNamesVisible, boolean isLearnerRequest,
 	    String userId) {
-	logger.debug("isUserNamesVisible: " + isUserNamesVisible);
-	logger.debug("isLearnerRequest: " + isLearnerRequest);
-	logger.debug("userId: " + userId);
-
-	logger.debug("doing populateSessionUsersAttempts...");
-	logger.debug("voteService: " + voteService);
 
 	Map mapMonitoredUserContainerDTO = new TreeMap(new VoteStringComparator());
 	List listMonitoredUserContainerDTO = new LinkedList();
 	Iterator itUsers = listUsers.iterator();
 
 	if (userId == null) {
-	    logger.debug("request is not for learner progress report");
 	    if ((isUserNamesVisible) && (!isLearnerRequest)) {
-		logger.debug("isUserNamesVisible true, isLearnerRequest false");
-		logger.debug("getting alll the user' data");
 		while (itUsers.hasNext()) {
 		    VoteQueUsr voteQueUsr = (VoteQueUsr) itUsers.next();
-		    logger.debug("voteQueUsr: " + voteQueUsr);
 
 		    if (voteQueUsr != null) {
-			logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid()
-				+ " and que content id: " + questionUid);
 			List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(),
 				new Long(questionUid));
-			logger.debug("listUserAttempts: " + listUserAttempts);
 
 			Iterator itAttempts = listUserAttempts.iterator();
 			while (itAttempts.hasNext()) {
 			    VoteUsrAttempt voteUsrResp = (VoteUsrAttempt) itAttempts.next();
-			    logger.debug("voteUsrResp: " + voteUsrResp);
 
 			    if (voteUsrResp != null) {
 				VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
@@ -1374,7 +1008,6 @@ public class MonitoringUtil implements VoteAppConstants {
 				voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 
 				String responsePresentable = VoteUtils.replaceNewLines(voteUsrResp.getUserEntry());
-				logger.debug("responsePresentable: " + responsePresentable);
 				voteMonitoredUserDTO.setResponsePresentable(responsePresentable);
 
 				voteMonitoredUserDTO.setQuestionUid(questionUid);
@@ -1385,32 +1018,21 @@ public class MonitoringUtil implements VoteAppConstants {
 		    }
 		}
 	    } else if ((isUserNamesVisible) && (isLearnerRequest)) {
-		logger
-			.debug("just populating data normally just like monitoring summary, except that the data is ony for a specific session");
-		logger.debug("isUserNamesVisible true, isLearnerRequest true");
+		//just populating data normally just like monitoring summary, except that the data is ony for a specific session
 
 		String userID = VoteUtils.getCurrentLearnerID();
-		logger.debug("userID: " + userID);
 		VoteQueUsr voteQueUsr = voteService.getVoteQueUsrById(new Long(userID).longValue());
-		logger
-			.debug("the current user voteQueUsr " + voteQueUsr + " and username: "
-				+ voteQueUsr.getUsername());
 
 		while (itUsers.hasNext()) {
 		    voteQueUsr = (VoteQueUsr) itUsers.next();
-		    logger.debug("voteQueUsr: " + voteQueUsr);
 
 		    if (voteQueUsr != null) {
-			logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid()
-				+ " and que content id: " + questionUid);
 			List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(),
 				new Long(questionUid));
-			logger.debug("listUserAttempts: " + listUserAttempts);
 
 			Iterator itAttempts = listUserAttempts.iterator();
 			while (itAttempts.hasNext()) {
 			    VoteUsrAttempt voteUsrResp = (VoteUsrAttempt) itAttempts.next();
-			    logger.debug("voteUsrResp: " + voteUsrResp);
 
 			    if (voteUsrResp != null) {
 				VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
@@ -1423,7 +1045,6 @@ public class MonitoringUtil implements VoteAppConstants {
 				voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 
 				String responsePresentable = VoteUtils.replaceNewLines(voteUsrResp.getUserEntry());
-				logger.debug("responsePresentable: " + responsePresentable);
 				voteMonitoredUserDTO.setResponsePresentable(responsePresentable);
 
 				voteMonitoredUserDTO.setQuestionUid(questionUid);
@@ -1434,29 +1055,20 @@ public class MonitoringUtil implements VoteAppConstants {
 		    }
 		}
 	    } else if ((!isUserNamesVisible) && (isLearnerRequest)) {
-		logger
-			.debug("populating data normally exception are for a specific session and other user names are not visible.");
-		logger.debug("isUserNamesVisible false, isLearnerRequest true");
-		logger.debug("getting only current user's data");
+		//populating data normally exception are for a specific session and other user names are not visible
+		//getting only current user's data
 
 		String userID = VoteUtils.getCurrentLearnerID();
-		logger.debug("userID: " + userID);
-
 		while (itUsers.hasNext()) {
 		    VoteQueUsr voteQueUsr = (VoteQueUsr) itUsers.next();
-		    logger.debug("voteQueUsr: " + voteQueUsr);
 
 		    if (voteQueUsr != null) {
-			logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid()
-				+ " and que content id: " + questionUid);
 			List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(),
 				new Long(questionUid));
-			logger.debug("listUserAttempts: " + listUserAttempts);
 
 			Iterator itAttempts = listUserAttempts.iterator();
 			while (itAttempts.hasNext()) {
 			    VoteUsrAttempt voteUsrResp = (VoteUsrAttempt) itAttempts.next();
-			    logger.debug("voteUsrResp: " + voteUsrResp);
 
 			    if (voteUsrResp != null) {
 				VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
@@ -1464,12 +1076,9 @@ public class MonitoringUtil implements VoteAppConstants {
 				//voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
 				voteMonitoredUserDTO.setUid(voteUsrResp.getUid().toString());
 
-				logger.debug("userID versus queUsrId: " + userID + "-" + voteQueUsr.getQueUsrId());
 				if (userID.equals(voteQueUsr.getQueUsrId().toString())) {
-				    logger.debug("this is current user, put his name normally.");
 				    voteMonitoredUserDTO.setUserName(voteQueUsr.getFullname());
 				} else {
-				    logger.debug("this is  not current user, put his name as blank.");
 				    voteMonitoredUserDTO.setUserName("        ");
 				}
 
@@ -1478,7 +1087,6 @@ public class MonitoringUtil implements VoteAppConstants {
 				voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 
 				String responsePresentable = VoteUtils.replaceNewLines(voteUsrResp.getUserEntry());
-				logger.debug("responsePresentable: " + responsePresentable);
 				voteMonitoredUserDTO.setResponsePresentable(responsePresentable);
 
 				voteMonitoredUserDTO.setQuestionUid(questionUid);
@@ -1490,27 +1098,20 @@ public class MonitoringUtil implements VoteAppConstants {
 		}
 	    }
 	} else {
-	    logger.debug("request is for learner progress report: " + userId);
+	    //request is for learner progress report
 	    while (itUsers.hasNext()) {
 		VoteQueUsr voteQueUsr = (VoteQueUsr) itUsers.next();
-		logger.debug("voteQueUsr: " + voteQueUsr);
 
 		if (voteQueUsr != null) {
-		    logger.debug("getting listUserAttempts for user id: " + voteQueUsr.getUid()
-			    + " and que content id: " + questionUid);
 		    List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(),
 			    new Long(questionUid));
-		    logger.debug("listUserAttempts: " + listUserAttempts);
 
 		    Iterator itAttempts = listUserAttempts.iterator();
 		    while (itAttempts.hasNext()) {
 			VoteUsrAttempt voteUsrResp = (VoteUsrAttempt) itAttempts.next();
-			logger.debug("voteUsrResp: " + voteUsrResp);
 
 			if (voteUsrResp != null) {
-			    logger.debug("userID versus queUsrId: " + userId + "-" + voteQueUsr.getQueUsrId());
 			    if (userId.equals(voteQueUsr.getQueUsrId().toString())) {
-				logger.debug("this is the user requested , include his name for learner progress.");
 				VoteMonitoredUserDTO voteMonitoredUserDTO = new VoteMonitoredUserDTO();
 				voteMonitoredUserDTO.setAttemptTime(voteUsrResp.getAttemptTime());
 				//voteMonitoredUserDTO.setTimeZone(voteUsrResp.getTimezone());
@@ -1521,7 +1122,6 @@ public class MonitoringUtil implements VoteAppConstants {
 				voteMonitoredUserDTO.setResponse(voteUsrResp.getUserEntry());
 
 				String responsePresentable = VoteUtils.replaceNewLines(voteUsrResp.getUserEntry());
-				logger.debug("responsePresentable: " + responsePresentable);
 				voteMonitoredUserDTO.setResponsePresentable(responsePresentable);
 
 				voteMonitoredUserDTO.setQuestionUid(questionUid);
@@ -1535,14 +1135,11 @@ public class MonitoringUtil implements VoteAppConstants {
 
 	}
 
-	logger.debug("final listMonitoredUserContainerDTO: " + listMonitoredUserContainerDTO);
 	mapMonitoredUserContainerDTO = convertToMcMonitoredUserDTOMap(listMonitoredUserContainerDTO);
-	logger.debug("final mapMonitoredUserContainerDTO:..." + mapMonitoredUserContainerDTO);
 	return mapMonitoredUserContainerDTO;
     }
 
     public static Map convertToMcMonitoredUserDTOMap(List list) {
-	logger.debug("using convertToVoteMonitoredUserDTOMap: " + list);
 	Map map = new TreeMap(new VoteStringComparator());
 
 	Iterator listIterator = list.iterator();

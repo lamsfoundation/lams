@@ -32,7 +32,6 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.tool.SimpleURL;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -56,7 +55,6 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
  * 
  */
 public class LearningUtil implements VoteAppConstants {
-    static Logger logger = Logger.getLogger(LearningUtil.class.getName());
 
     /**
      * Build a map of the display ids -> nomination text. If checkedOptions != null then only include the display ids in
@@ -123,7 +121,6 @@ public class LearningUtil implements VoteAppConstants {
      * @return
      */
     public static VoteQueUsr createUser(HttpServletRequest request, IVoteService voteService, Long toolSessionID) {
-	LearningUtil.logger.debug("createUser: " + toolSessionID);
 
 	Long queUsrId = VoteUtils.getUserId();
 	String username = VoteUtils.getUserName();
@@ -131,7 +128,6 @@ public class LearningUtil implements VoteAppConstants {
 	VoteSession voteSession = voteService.retrieveVoteSession(toolSessionID);
 	VoteQueUsr voteQueUsr = new VoteQueUsr(queUsrId, username, fullname, voteSession, new TreeSet());
 	voteService.createVoteQueUsr(voteQueUsr);
-	LearningUtil.logger.debug("created voteQueUsr in the db: " + voteQueUsr);
 	return voteQueUsr;
     }
 
@@ -154,38 +150,24 @@ public class LearningUtil implements VoteAppConstants {
     public static void createAttempt(HttpServletRequest request, IVoteService voteService, VoteQueUsr voteQueUsr,
 	    Map mapGeneralCheckedOptionsContent, String userEntry, boolean singleUserEntry, VoteSession voteSession,
 	    Long toolContentUID) {
-	LearningUtil.logger.debug("doing voteSession: " + voteSession);
-	LearningUtil.logger.debug("doing createAttempt: " + mapGeneralCheckedOptionsContent);
-	LearningUtil.logger.debug("userEntry: " + userEntry);
-	LearningUtil.logger.debug("singleUserEntry: " + singleUserEntry);
 
 	Date attempTime = VoteUtils.getGMTDateTime();
 	String timeZone = VoteUtils.getCurrentTimeZone();
-	LearningUtil.logger.debug("timeZone: " + timeZone);
-
-	LearningUtil.logger.debug("toolContentUID: " + toolContentUID);
 
 	if (mapGeneralCheckedOptionsContent.size() == 0) {
-	    LearningUtil.logger.debug("mapGeneralCheckedOptionsContent is empty");
 	    VoteQueContent localVoteQueContent = voteService.getToolDefaultQuestionContent(1);
-	    LearningUtil.logger.debug("localVoteQueContent: " + localVoteQueContent);
 	    createIndividualOptions(request, voteService, localVoteQueContent, voteQueUsr, attempTime, timeZone,
 		    userEntry, singleUserEntry, voteSession);
 
 	} else {
-	    LearningUtil.logger.debug("mapGeneralCheckedOptionsContent is not empty");
 	    if (toolContentUID != null) {
 		Iterator itCheckedMap = mapGeneralCheckedOptionsContent.entrySet().iterator();
-		LearningUtil.logger.debug("iterating mapGeneralCheckedOptionsContent");
 		while (itCheckedMap.hasNext()) {
 		    Map.Entry checkedPairs = (Map.Entry) itCheckedMap.next();
 		    Long questionDisplayOrder = new Long(checkedPairs.getKey().toString());
 
-		    LearningUtil.logger.debug("questionDisplayOrder: " + questionDisplayOrder);
-
 		    VoteQueContent voteQueContent = voteService.getQuestionContentByDisplayOrder(questionDisplayOrder,
 			    toolContentUID);
-		    LearningUtil.logger.debug("voteQueContent: " + voteQueContent);
 		    if (voteQueContent != null) {
 			createIndividualOptions(request, voteService, voteQueContent, voteQueUsr, attempTime, timeZone,
 				userEntry, false, voteSession);
@@ -199,88 +181,59 @@ public class LearningUtil implements VoteAppConstants {
     public static void createIndividualOptions(HttpServletRequest request, IVoteService voteService,
 	    VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry,
 	    boolean singleUserEntry, VoteSession voteSession) {
-	LearningUtil.logger.debug("doing voteSession: " + voteSession);
-	LearningUtil.logger.debug("userEntry: " + userEntry);
-	LearningUtil.logger.debug("singleUserEntry: " + singleUserEntry);
-
-	LearningUtil.logger.debug("voteQueContent: " + voteQueContent);
-	LearningUtil.logger.debug("user " + voteQueUsr.getQueUsrId());
-	LearningUtil.logger.debug("voteQueContent.getVoteContentId() " + voteQueContent.getVoteContentId());
 
 	if (voteQueContent != null) {
 	    VoteUsrAttempt existingVoteUsrAttempt = voteService.getAttemptsForUserAndQuestionContentAndSession(
 		    voteQueUsr.getQueUsrId(), voteQueContent.getVoteContentId(), voteSession.getUid());
-	    LearningUtil.logger.debug("existingVoteUsrAttempt: " + existingVoteUsrAttempt);
 
 	    if (existingVoteUsrAttempt != null) {
-		LearningUtil.logger.debug("update existingVoteUsrAttempt: " + existingVoteUsrAttempt);
 		existingVoteUsrAttempt.setUserEntry(userEntry);
 		existingVoteUsrAttempt.setAttemptTime(attempTime);
 		existingVoteUsrAttempt.setTimeZone(timeZone);
 		voteService.updateVoteUsrAttempt(existingVoteUsrAttempt);
-		LearningUtil.logger.debug("done updating existingVoteUsrAttempt: " + existingVoteUsrAttempt);
 	    } else {
-		LearningUtil.logger.debug("create new attempt");
 		VoteUsrAttempt voteUsrAttempt = new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr,
 			userEntry, singleUserEntry, true);
-		LearningUtil.logger.debug("voteUsrAttempt: " + voteUsrAttempt);
 		voteService.createVoteUsrAttempt(voteUsrAttempt);
-		LearningUtil.logger.debug("created voteUsrAttempt in the db :" + voteUsrAttempt);
 	    }
 	}
     }
 
     public static void readParameters(HttpServletRequest request, VoteLearningForm voteLearningForm) {
 	String optionCheckBoxSelected = request.getParameter("optionCheckBoxSelected");
-	LearningUtil.logger.debug("parameter optionCheckBoxSelected: " + optionCheckBoxSelected);
 	if (optionCheckBoxSelected != null && optionCheckBoxSelected.equals("1")) {
-	    LearningUtil.logger.debug("parameter optionCheckBoxSelected is selected " + optionCheckBoxSelected);
 	    voteLearningForm.setOptionCheckBoxSelected("1");
 	}
 
 	String questionIndex = request.getParameter("questionIndex");
-	LearningUtil.logger.debug("parameter questionIndex: " + questionIndex);
 	if (questionIndex != null) {
-	    LearningUtil.logger.debug("parameter questionIndex is selected " + questionIndex);
 	    voteLearningForm.setQuestionIndex(questionIndex);
 	}
 
 	String optionIndex = request.getParameter("optionIndex");
-	LearningUtil.logger.debug("parameter optionIndex: " + optionIndex);
 	if (optionIndex != null) {
-	    LearningUtil.logger.debug("parameter optionIndex is selected " + optionIndex);
 	    voteLearningForm.setOptionIndex(optionIndex);
 	}
 
 	String optionValue = request.getParameter("optionValue");
-	LearningUtil.logger.debug("parameter optionValue: " + optionValue);
 	if (optionValue != null) {
 	    voteLearningForm.setOptionValue(optionValue);
 	}
 
 	String checked = request.getParameter("checked");
-	LearningUtil.logger.debug("parameter checked: " + checked);
 	if (checked != null) {
-	    LearningUtil.logger.debug("parameter checked is selected " + checked);
 	    voteLearningForm.setChecked(checked);
 	}
     }
 
     public static Map selectOptionsCheckBox(HttpServletRequest request, VoteLearningForm voteLearningForm,
 	    String questionIndex, Map mapGeneralCheckedOptionsContent, Map mapQuestionContentLearner) {
-	LearningUtil.logger.debug("requested optionCheckBoxSelected...");
-	LearningUtil.logger.debug("questionIndex: " + voteLearningForm.getQuestionIndex());
-	LearningUtil.logger.debug("optionValue: " + voteLearningForm.getOptionValue());
-	LearningUtil.logger.debug("checked: " + voteLearningForm.getChecked());
-	LearningUtil.logger.debug("mapQuestionContentLearner: " + mapQuestionContentLearner);
 
 	String selectedNomination = (String) mapQuestionContentLearner.get(voteLearningForm.getQuestionIndex());
-	LearningUtil.logger.debug("selectedNomination: " + selectedNomination);
 
 	Map mapFinal = new TreeMap(new VoteComparator());
 
 	if (mapGeneralCheckedOptionsContent.size() == 0) {
-	    LearningUtil.logger.debug("mapGeneralCheckedOptionsContent size is 0");
 	    Map mapLeanerCheckedOptionsContent = new TreeMap(new VoteComparator());
 
 	    if (voteLearningForm.getChecked().equals("true")) {
@@ -293,7 +246,6 @@ public class LearningUtil implements VoteAppConstants {
 	} else {
 	    Map mapCurrentOptions = mapGeneralCheckedOptionsContent;
 
-	    LearningUtil.logger.debug("mapCurrentOptions: " + mapCurrentOptions);
 	    if (mapCurrentOptions != null) {
 		if (voteLearningForm.getChecked().equals("true")) {
 		    mapCurrentOptions.put(voteLearningForm.getQuestionIndex(), selectedNomination);
@@ -301,11 +253,9 @@ public class LearningUtil implements VoteAppConstants {
 		    mapCurrentOptions.remove(voteLearningForm.getQuestionIndex());
 		}
 
-		LearningUtil.logger.debug("updated mapCurrentOptions: " + mapCurrentOptions);
-
 		mapFinal = mapCurrentOptions;
 	    } else {
-		LearningUtil.logger.debug("no options for this questions has been selected yet");
+		//no options for this questions has been selected yet
 		Map mapLeanerCheckedOptionsContent = new TreeMap(new VoteComparator());
 
 		if (voteLearningForm.getChecked().equals("true")) {
@@ -318,7 +268,6 @@ public class LearningUtil implements VoteAppConstants {
 	    }
 	}
 
-	LearningUtil.logger.debug("mapFinal: " + mapFinal);
 	return mapFinal;
     }
 

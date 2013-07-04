@@ -57,7 +57,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -70,17 +69,14 @@ import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 
 
 public class VoteDLStarterAction extends Action implements VoteAppConstants {
-	static Logger logger = Logger.getLogger(VoteDLStarterAction.class.getName());
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
   								throws IOException, ServletException, VoteApplicationException {
 		VoteUtils.cleanUpSessionAbsolute(request);
-		logger.debug("init defineLater mode. removed attributes...");
 		
 		VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 		
 		IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
-		logger.debug("voteService: " + voteService);
 		voteAuthoringForm.setVoteService(voteService);
 		
 		VoteStarterAction voteStarterAction= new VoteStarterAction();

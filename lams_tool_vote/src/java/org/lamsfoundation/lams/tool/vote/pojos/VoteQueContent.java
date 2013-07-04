@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -41,7 +40,6 @@ import org.apache.log4j.Logger;
  * @author Ozgur Demirtas
  */
 public class VoteQueContent implements Serializable, Comparable {
-	static Logger logger = Logger.getLogger(VoteQueContent.class.getName());
 
     /** identifier field */
     private Long uid;
@@ -206,18 +204,6 @@ public class VoteQueContent implements Serializable, Comparable {
      */
     public void setVoteContentId(Long voteContentId) {
         this.voteContentId = voteContentId;
-    }
-    /**
-     * @return Returns the logger.
-     */
-    public static Logger getLogger() {
-        return logger;
-    }
-    /**
-     * @param logger The logger to set.
-     */
-    public static void setLogger(Logger logger) {
-        VoteQueContent.logger = logger;
     }
     /**
      * @return Returns the voteContent.

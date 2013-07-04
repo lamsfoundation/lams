@@ -171,27 +171,22 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	    HttpServletResponse response) throws IOException, ServletException, VoteApplicationException {
 
 	VoteUtils.cleanUpSessionAbsolute(request);
-	VoteStarterAction.logger.debug("init authoring mode. removed attributes...");
 
 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	VoteStarterAction.logger.debug("contentFolderID: " + contentFolderID);
 	voteAuthoringForm.setContentFolderID(contentFolderID);
 
 	VoteAction voteAction = new VoteAction();
 	voteAction.repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
 
-	VoteStarterAction.logger.debug("getting voteService now: servlet is: " + getServlet());
 	IVoteService voteService = null;
 	if (getServlet() != null) {
 	    voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	} else {
 	    voteService = voteAuthoringForm.getVoteService();
 	}
-
-	VoteStarterAction.logger.debug("final voteService: " + voteService);
 
 	voteAuthoringForm.setSubmissionAttempt(new Boolean(false).toString());
 	voteAuthoringForm.setSbmtSuccess(new Boolean(false).toString());
@@ -201,16 +196,14 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	voteGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	String servletPath = request.getServletPath();
-	VoteStarterAction.logger.debug("getServletPath: " + servletPath);
 	if (servletPath.indexOf("authoringStarter") > 0) {
-	    VoteStarterAction.logger.debug("request is for authoring module");
 	    voteAuthoringForm.setActiveModule(VoteAppConstants.AUTHORING);
 	    voteGeneralAuthoringDTO.setActiveModule(VoteAppConstants.AUTHORING);
 
 	    voteAuthoringForm.setDefineLaterInEditMode(new Boolean(true).toString());
 	    voteGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 	} else {
-	    VoteStarterAction.logger.debug("request is for define later module. either direct or by monitoring module");
+	    //request is for define later module. either direct or by monitoring module
 	    voteAuthoringForm.setActiveModule(VoteAppConstants.DEFINE_LATER);
 	    voteGeneralAuthoringDTO.setActiveModule(VoteAppConstants.DEFINE_LATER);
 
@@ -234,23 +227,19 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	 */
 
 	String sourceVoteStarter = (String) request.getAttribute(VoteAppConstants.SOURCE_VOTE_STARTER);
-	VoteStarterAction.logger.debug("sourceVoteStarter: " + sourceVoteStarter);
 
 	voteAuthoringForm.resetRadioBoxes();
 	voteAuthoringForm.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 	voteGeneralAuthoringDTO.setExceptionMaxNominationInvalid(new Boolean(false).toString());
 
 	ActionForward validateSignature = readSignature(request, mapping, voteService, voteAuthoringForm);
-	VoteStarterAction.logger.debug("validateSignature:  " + validateSignature);
 	if (validateSignature != null) {
-	    VoteStarterAction.logger.debug("validateSignature not null : " + validateSignature);
 	    return validateSignature;
 	} else {
-	    VoteStarterAction.logger.debug("no problems getting the default content, will render authoring screen");
+	    //no problems getting the default content, will render authoring screen
 	    String strToolContentId = "";
 	    /* the authoring url must be passed a tool content id */
 	    strToolContentId = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	    VoteStarterAction.logger.debug("strToolContentId: " + strToolContentId);
 
 	    /* this will be fixed when making changes to Monitoring module */
 	    if (strToolContentId == null) {
@@ -258,20 +247,16 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 		 * watch out for a possibility that the original request for authoring module is coming from monitoring
 		 * url
 		 */
-		VoteStarterAction.logger
-			.debug("we should IDEALLY not arrive here. The TOOL_CONTENT_ID is NOT available.");
+		//we should IDEALLY not arrive here. The TOOL_CONTENT_ID is NOT available
 		/* use default content instead of giving a warning */
 		String defaultContentId = voteAuthoringForm.getDefaultContentId();
-		VoteStarterAction.logger.debug("using Voting defaultContentId: " + defaultContentId);
 		strToolContentId = defaultContentId;
 	    }
-	    VoteStarterAction.logger.debug("final strToolContentId: " + strToolContentId);
 
 	    if (strToolContentId == null || strToolContentId.equals("")) {
 		VoteUtils.cleanUpSessionAbsolute(request);
 		// saveInRequestError(request,"error.contentId.required");
 		VoteUtils.cleanUpSessionAbsolute(request);
-		VoteStarterAction.logger.debug("forwarding to: " + VoteAppConstants.ERROR_LIST);
 		return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	    }
 
@@ -282,13 +267,12 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	    long toolContentID = 0;
 	    try {
 		toolContentID = new Long(strToolContentId).longValue();
-		VoteStarterAction.logger.debug("passed TOOL_CONTENT_ID : " + toolContentID);
 		voteAuthoringForm.setToolContentID(new Long(strToolContentId).toString());
 		voteGeneralAuthoringDTO.setToolContentID(new Long(strToolContentId).toString());
 	    } catch (NumberFormatException e) {
 		VoteUtils.cleanUpSessionAbsolute(request);
 		saveInRequestError(request, "error.numberFormatException");
-		VoteStarterAction.logger.debug("forwarding to: " + VoteAppConstants.ERROR_LIST);
+		VoteStarterAction.logger.error("forwarding to: " + VoteAppConstants.ERROR_LIST);
 		return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	    }
 
@@ -300,41 +284,32 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	     * content is in use in this case. It is always unlocked -> not in use since it is the default content.
 	     */
 	    Map mapOptionsContent = new TreeMap(new VoteComparator());
-	    VoteStarterAction.logger.debug("mapOptionsContent: " + mapOptionsContent);
-
 	    if (!existsContent(toolContentID, request, voteService)) {
-		VoteStarterAction.logger.debug("getting default content");
 		/* fetch default content */
 		String defaultContentIdStr = voteAuthoringForm.getDefaultContentIdStr();
-		VoteStarterAction.logger.debug("will get content for defaultContentIdStr:" + defaultContentIdStr);
 		retrieveContent(request, voteService, voteAuthoringForm, voteGeneralAuthoringDTO, mapOptionsContent,
 			new Long(defaultContentIdStr).longValue(), sessionMap);
 
 	    } else {
-		VoteStarterAction.logger.debug("getting existing content");
 		/* it is possible that the content is in use by learners. */
 		VoteContent voteContent = voteService.retrieveVote(new Long(strToolContentId));
-		VoteStarterAction.logger.debug("voteContent: " + voteContent);
 		if (voteService.studentActivityOccurredStandardAndOpen(voteContent)) {
 		    VoteUtils.cleanUpSessionAbsolute(request);
-		    VoteStarterAction.logger.debug("student activity occurred on this content:" + voteContent);
 		    saveInRequestError(request, "error.content.inUse");
 		    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 		}
 
 		if (servletPath.indexOf("authoringStarter") > 0) {
 		    boolean isDefineLater = VoteUtils.isDefineLater(voteContent);
-		    VoteStarterAction.logger.debug("isDefineLater:" + isDefineLater);
 		    if (isDefineLater == true) {
 			VoteUtils.cleanUpSessionAbsolute(request);
-			VoteStarterAction.logger.debug("student activity occurred on this content:" + voteContent);
+			VoteStarterAction.logger.error("student activity occurred on this content:" + voteContent);
 			saveInRequestError(request, "error.content.inUse");
 			return mapping.findForward(VoteAppConstants.ERROR_LIST);
 
 		    }
 		}
 
-		VoteStarterAction.logger.debug("will get content for strToolContentId:" + strToolContentId);
 		retrieveContent(request, voteService, voteAuthoringForm, voteGeneralAuthoringDTO, mapOptionsContent,
 			new Long(strToolContentId).longValue(), sessionMap);
 	    }
@@ -346,22 +321,15 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	    voteAuthoringForm.setCurrentTab("1");
 	}
 
-	VoteStarterAction.logger.debug("will return to jsp with: " + sourceVoteStarter);
 	String destination = VoteUtils.getDestination(sourceVoteStarter);
-	VoteStarterAction.logger.debug("destination: " + destination);
-	VoteStarterAction.logger.debug("active module is: " + voteAuthoringForm.getActiveModule());
-
-	VoteStarterAction.logger.debug("voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_AUTHORING_DTO, voteGeneralAuthoringDTO);
 
-	VoteStarterAction.logger.debug("persisting sessionMap into session: " + sessionMap);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	return mapping.findForward(destination);
     }
 
     protected void initialiseAttributes(HttpServletRequest request, VoteGeneralAuthoringDTO voteGeneralAuthoringDTO,
 	    IVoteService voteService) {
-	VoteStarterAction.logger.debug("starting initialiseAttributes...");
 
 	/* for development: needs to run only once per tool */
 	/* VoteUtils.configureContentRepository(request, voteService); */
@@ -385,65 +353,49 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
      * other depending content ids are obtained in this method. if all the default content has been setup properly the
      * method saves DEFAULT_CONTENT_ID in the session.
      * 
-     * readSignature(HttpServletRequest request, ActionMapping mapping)
-     * 
      * @param request
      * @param mapping
      * @return ActionForward
      */
     public ActionForward readSignature(HttpServletRequest request, ActionMapping mapping, IVoteService voteService,
 	    VoteAuthoringForm voteAuthoringForm) {
-	VoteStarterAction.logger.debug("start reading tool signature: " + voteService);
 	/*
 	 * retrieve the default content id based on tool signature
 	 */
 	long defaultContentID = 0;
 	try {
-	    VoteStarterAction.logger.debug("attempt retrieving tool with signatute : " + VoteAppConstants.MY_SIGNATURE);
 	    defaultContentID = voteService.getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
-	    VoteStarterAction.logger.debug("retrieved tool default contentId: " + defaultContentID);
 	    if (defaultContentID == 0) {
 		VoteUtils.cleanUpSessionAbsolute(request);
-		VoteStarterAction.logger.debug("default content id has not been setup");
 		saveInRequestError(request, "error.defaultContent.notSetup");
 		return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	    }
 	} catch (Exception e) {
 	    VoteUtils.cleanUpSessionAbsolute(request);
-	    VoteStarterAction.logger.debug("error getting the default content id: " + e.getMessage());
+	    VoteStarterAction.logger.error("error getting the default content id: " + e.getMessage());
 	    saveInRequestError(request, "error.defaultContent.notSetup");
-	    VoteStarterAction.logger.debug("forwarding to: " + VoteAppConstants.ERROR_LIST);
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	}
 
 	/* retrieve uid of the content based on default content id determined above */
 	long contentUID = 0;
 	try {
-	    VoteStarterAction.logger.debug("retrieve uid of the content based on default content id determined above: "
-		    + defaultContentID);
+	    //retrieve uid of the content based on default content id determined above defaultContentID
 	    VoteContent voteContent = voteService.retrieveVote(new Long(defaultContentID));
-	    VoteStarterAction.logger.debug("voteContent: " + voteContent);
 	    if (voteContent == null) {
-		VoteStarterAction.logger.debug("voteContent is null: " + voteContent);
 		VoteUtils.cleanUpSessionAbsolute(request);
-		VoteStarterAction.logger.debug("Exception occured: No default content");
+		VoteStarterAction.logger.error("Exception occured: No default content");
 		saveInRequestError(request, "error.defaultContent.notSetup");
 		return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	    }
-	    VoteStarterAction.logger.debug("using voteContent: " + voteContent);
-	    VoteStarterAction.logger.debug("using mcContent uid: " + voteContent.getUid());
 	    contentUID = voteContent.getUid().longValue();
-	    VoteStarterAction.logger.debug("contentUID: " + contentUID);
 	} catch (Exception e) {
-	    VoteStarterAction.logger.debug("other problems: " + e);
+	    VoteStarterAction.logger.error("other problems: " + e);
 	    VoteUtils.cleanUpSessionAbsolute(request);
-	    VoteStarterAction.logger.debug("Exception occured: No default question content");
+	    VoteStarterAction.logger.error("Exception occured: No default question content");
 	    saveInRequestError(request, "error.defaultContent.notSetup");
-	    VoteStarterAction.logger.debug("forwarding to: " + VoteAppConstants.ERROR_LIST);
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	}
-
-	VoteStarterAction.logger.debug("Voting tool has the default content id: " + defaultContentID);
 
 	voteAuthoringForm.setDefaultContentId(new Long(defaultContentID).toString());
 	voteAuthoringForm.setDefaultContentIdStr(new Long(defaultContentID).toString());
@@ -453,15 +405,10 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
     protected void retrieveContent(HttpServletRequest request, IVoteService voteService,
 	    VoteAuthoringForm voteAuthoringForm, VoteGeneralAuthoringDTO voteGeneralAuthoringDTO,
 	    Map mapOptionsContent, long toolContentID, SessionMap sessionMap) {
-	VoteStarterAction.logger.debug("starting retrieve content for toolContentID: " + toolContentID);
-	VoteStarterAction.logger.debug("voteService: " + voteService);
 
-	VoteStarterAction.logger.debug("getting existing content with id:" + toolContentID);
 	VoteContent voteContent = voteService.retrieveVote(new Long(toolContentID));
-	VoteStarterAction.logger.debug("voteContent: " + voteContent);
 
 	VoteUtils.readContentValues(request, voteContent, voteAuthoringForm, voteGeneralAuthoringDTO);
-	VoteStarterAction.logger.debug("form title is: : " + voteAuthoringForm.getTitle());
 
 	voteAuthoringForm.setIsDefineLater(new Boolean(voteContent.isDefineLater()).toString());
 	voteGeneralAuthoringDTO.setIsDefineLater(new Boolean(voteContent.isDefineLater()).toString());
@@ -509,17 +456,14 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	/*
 	 * get the nominations
 	 */
-	VoteStarterAction.logger.debug("setting existing content data from the db");
 	mapOptionsContent.clear();
 	Iterator queIterator = voteContent.getVoteQueContents().iterator();
 	Long mapIndex = new Long(1);
-	VoteStarterAction.logger.debug("mapOptionsContent: " + mapOptionsContent);
 	while (queIterator.hasNext()) {
 	    VoteNominationContentDTO voteNominationContentDTO = new VoteNominationContentDTO();
 
 	    VoteQueContent voteQueContent = (VoteQueContent) queIterator.next();
 	    if (voteQueContent != null) {
-		VoteStarterAction.logger.debug("question: " + voteQueContent.getQuestion());
 		mapOptionsContent.put(mapIndex.toString(), voteQueContent.getQuestion());
 
 		voteNominationContentDTO.setQuestion(voteQueContent.getQuestion());
@@ -531,11 +475,9 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	}
 
 	request.setAttribute(VoteAppConstants.TOTAL_NOMINATION_COUNT, new Integer(mapOptionsContent.size()));
-	VoteStarterAction.logger.debug("listNominationContentDTO: " + listNominationContentDTO);
 	request.setAttribute(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO, listNominationContentDTO);
 	sessionMap.put(VoteAppConstants.LIST_NOMINATION_CONTENT_DTO_KEY, listNominationContentDTO);
 
-	VoteStarterAction.logger.debug("Map initialized with existing contentid to: " + mapOptionsContent);
 	voteGeneralAuthoringDTO.setMapOptionsContent(mapOptionsContent);
 	sessionMap.put(VoteAppConstants.MAP_OPTIONS_CONTENT_KEY, mapOptionsContent);
 
@@ -582,7 +524,6 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
     public ActionForward executeDefineLater(ActionMapping mapping, VoteAuthoringForm voteAuthoringForm,
 	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException,
 	    VoteApplicationException {
-	VoteStarterAction.logger.debug("calling execute..." + voteAuthoringForm);
 	return execute(mapping, voteAuthoringForm, request, response);
     }
 
@@ -604,7 +545,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
     public void saveInRequestError(HttpServletRequest request, String message) {
 	ActionMessages errors = new ActionMessages();
 	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-	VoteStarterAction.logger.debug("add " + message + "  to ActionMessages:");
+	VoteStarterAction.logger.error("add " + message + "  to ActionMessages:");
 	saveErrors(request, errors);
     }
 }

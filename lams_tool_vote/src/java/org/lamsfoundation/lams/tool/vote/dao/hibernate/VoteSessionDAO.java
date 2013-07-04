@@ -64,7 +64,6 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
     {
     	String query = "from VoteSession votes where votes.voteSessionId=?";
 		
-		HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(query)
 		.setLong(0,voteSessionId.longValue())
 		.list();
@@ -78,7 +77,6 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
     
     public int countSessionComplete()
     {
-    	HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(COUNT_SESSION_COMPLETE)
 		.list();
 		
@@ -90,7 +88,6 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
 
     public int countSessionIncomplete()
     {
-    	HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(COUNT_SESSION_INCOMPLETE)
 		.list();
 		
@@ -122,7 +119,6 @@ public class VoteSessionDAO extends HibernateDaoSupport implements IVoteSessionD
     
     public void removeVoteSessionById(Long voteSessionId)
     {
-        String query = "from VoteSession as votes where votes.voteSessionId =";
         
 		HibernateTemplate templ = this.getHibernateTemplate();
 		if ( voteSessionId != null) {

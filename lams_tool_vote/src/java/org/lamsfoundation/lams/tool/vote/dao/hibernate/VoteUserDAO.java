@@ -42,8 +42,6 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
 	
 	private static final String COUNT_USERS_IN_SESSION = "select voteu.queUsrId from VoteQueUsr voteu where voteu.voteSession= :voteSession";
 	
-	private static final String COUNT_USERS = "select voteu.queUsrId from VoteQueUsr";
-	
 	private static final String LOAD_USER_FOR_SESSION = "from voteQueUsr in class VoteQueUsr where  voteQueUsr.voteSessionId= :voteSessionId";
 	
 	 
@@ -51,7 +49,6 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
 	{
 		String query = "from VoteQueUsr user where user.uid=?";
 		
-			HibernateTemplate templ = this.getHibernateTemplate();
 			List list = getSession().createQuery(query)
 			.setLong(0,uid.longValue())
 			.list();
@@ -68,7 +65,6 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
 	{
 		String query = "from VoteQueUsr user where user.queUsrId=?";
 	
-		HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(query)
 		.setLong(0,userId.longValue())
 		.list();
@@ -83,7 +79,6 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
 	
 	public List getVoteUserBySessionOnly(final VoteSession voteSession)
     {
-        HibernateTemplate templ = this.getHibernateTemplate();
         List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
 		.setLong("voteSessionId", voteSession.getUid().longValue())				
 		.list();
@@ -92,7 +87,6 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
 
 	public List getVoteUserBySessionUid(final Long voteSessionUid)
     {
-        HibernateTemplate templ = this.getHibernateTemplate();
         List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
 		.setLong("voteSessionId", voteSessionUid.longValue())				
 		.list();
@@ -101,7 +95,6 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
 
 	public int getCompletedVoteUserBySessionUid(final Long voteSessionUid)
     {
-        HibernateTemplate templ = this.getHibernateTemplate();
         List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
 		.setLong("voteSessionId", voteSessionUid.longValue())				
 		.list();
@@ -128,7 +121,6 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
 	{
 		
 		String strGetUser = "from voteQueUsr in class VoteQueUsr where voteQueUsr.queUsrId=:queUsrId and voteQueUsr.voteSessionId=:voteSessionId";
-        HibernateTemplate templ = this.getHibernateTemplate();
 		List list = getSession().createQuery(strGetUser)
 			.setLong("queUsrId", queUsrId.longValue())
 			.setLong("voteSessionId", voteSessionId.longValue())				
@@ -146,7 +138,6 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
 	{
 		String query = "from VoteQueUsr user where user.queUsrId=?";
 		
-			HibernateTemplate templ = this.getHibernateTemplate();
 			List list = getSession().createQuery(query)
 			.setLong(0,voteQueUsrId)
 			.list();
@@ -192,7 +183,6 @@ public class VoteUserDAO extends HibernateDaoSupport implements IVoteUserDAO {
     
 	public List getUserBySessionOnly(final VoteSession voteSession)
     {
-        HibernateTemplate templ = this.getHibernateTemplate();
         List list = getSession().createQuery(LOAD_USER_FOR_SESSION)
 		.setLong("voteSessionId", voteSession.getUid().longValue())				
 		.list();

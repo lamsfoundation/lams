@@ -28,9 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
@@ -44,7 +42,6 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
  */
 public class VoteUploadedFile implements Serializable, Comparable
 {
-	static Logger logger = Logger.getLogger(VoteUploadedFile.class.getName());
 	/** identifier field */
     private Long submissionId;
     
@@ -99,7 +96,6 @@ public class VoteUploadedFile implements Serializable, Comparable
     					String fileName,
 						VoteContent voteContent)  
     {
-    	logger.debug("constructor gets called.");
         this.uuid = uuid;
         this.fileOnline = fileOnline;
         this.fileName = fileName;

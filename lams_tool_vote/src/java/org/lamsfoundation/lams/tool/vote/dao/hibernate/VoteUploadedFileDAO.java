@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.vote.dao.hibernate;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUploadedFileDAO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
@@ -41,7 +40,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 
 public class VoteUploadedFileDAO extends HibernateDaoSupport implements IVoteUploadedFileDAO {
- 	static Logger logger = Logger.getLogger(VoteUploadedFileDAO.class.getName());
 
  	
     private static final String GET_UPLOADED_FILES = "from VoteUploadedFile voteUploadedFile where voteUploadedFile.voteContent.voteContentId = :contentId";

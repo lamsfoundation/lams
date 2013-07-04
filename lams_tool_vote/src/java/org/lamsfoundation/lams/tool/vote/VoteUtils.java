@@ -34,7 +34,6 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUploadedFile;
@@ -53,17 +52,13 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * @author Ozgur Demirtas
  */
 public abstract class VoteUtils implements VoteAppConstants {
-
-	static Logger logger = Logger.getLogger(VoteUtils.class.getName());
 	
     public static String replaceNewLines(String text)
     {
-        logger.debug("using text: " + text);
         String newText = "";
         if (text != null)
         {
             newText = text.replaceAll("\n","<br>");
-            logger.debug("newText: " + newText);
         }
         
         return newText;
@@ -73,7 +68,6 @@ public abstract class VoteUtils implements VoteAppConstants {
     {
         String userID = "";
         HttpSession ss = SessionManager.getSession();
-        logger.debug("ss: " + ss);
         
         if (ss != null)
         {
@@ -81,7 +75,6 @@ public abstract class VoteUtils implements VoteAppConstants {
     	    if ((user != null) && (user.getUserID() != null))
     	    {
     	    	userID = user.getUserID().toString();
-    		    logger.debug("retrieved userId: " + userID);
     	    }
         }
         return userID;
@@ -100,7 +93,6 @@ public abstract class VoteUtils implements VoteAppConstants {
     public static Date getGMTDateTime()
     {
     	Date date=new Date(System.currentTimeMillis());
-    	logger.debug("date: " + date);
     	return date;
     }
 
@@ -112,7 +104,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	    HttpSession ss = SessionManager.getSession();
 	    /* get back login user DTO */
 	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		logger.debug("retrieving toolUser: " + toolUser);
 		return 	toolUser;
 	}
 	
@@ -121,7 +112,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	{
 		UserDTO toolUser=getToolUser();
 		long userId=toolUser.getUserID().longValue();
-		logger.debug("userId: " + userId);
 		return new Long(userId);
 	}
 	
@@ -130,36 +120,29 @@ public abstract class VoteUtils implements VoteAppConstants {
 		/* double check if username and login is the same */
 		UserDTO toolUser=getToolUser();
 		String userName=toolUser.getLogin();
-		logger.debug("userName: " + userName);
 		return userName;
 	}
 	
 	public static String getUserFullName()
 	{
 		UserDTO toolUser=getToolUser();
-		String fullName=toolUser.getFirstName() + " " + toolUser.getLastName();  
-		logger.debug("fullName: " + fullName);
+		String fullName=toolUser.getFirstName() + " " + toolUser.getLastName(); 
 		return fullName;
 	}
 	
 	public static String getFormattedDateString(Date date)
 	{
-		logger.debug("getFormattedDateString: " +  
-				DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
 		return (DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(date));
 	}
 	
 	public static void saveTimeZone(HttpServletRequest request)
 	{
 		TimeZone timeZone=TimeZone.getDefault();
-	    logger.debug("current timezone: " + timeZone.getDisplayName());
-	    logger.debug("current timezone id: " + timeZone.getID());
 	}
 	
 	public static String getCurrentTimeZone()
 	{
 		TimeZone timeZone=TimeZone.getDefault();
-	    logger.debug("current timezone: " + timeZone.getDisplayName());
 	    return timeZone.getDisplayName();
 	}
 	
@@ -172,10 +155,8 @@ public abstract class VoteUtils implements VoteAppConstants {
 	 */
 	public static boolean existsContent(Long toolContentId, HttpServletRequest request, IVoteService voteService)
 	{
-	    logger.debug("voteService: " + voteService);
 
     	VoteContent voteContent=voteService.retrieveVote(toolContentId);
-	    logger.debug("retrieving voteContent: " + voteContent);
 	    if (voteContent == null) 
 	    	return false;
 
@@ -191,10 +172,8 @@ public abstract class VoteUtils implements VoteAppConstants {
 	 */
 	public static boolean existsSession(Long toolSessionId, HttpServletRequest request, IVoteService voteService)
 	{
-	    logger.debug("voteService: " + voteService);
 	    
 	    VoteSession voteSession=voteService.retrieveVoteSession(toolSessionId);
-	    logger.debug("voteSession:" + voteSession);
     	
 	    if (voteSession == null) 
 	    	return false;
@@ -206,7 +185,6 @@ public abstract class VoteUtils implements VoteAppConstants {
     public static void readContentValues(HttpServletRequest request, VoteContent defaultVoteContent, 
             VoteAuthoringForm voteAuthoringForm, VoteGeneralAuthoringDTO voteGeneralAuthoringDTO)
 	{
-        logger.debug("setting authoring screen properties");
 		/*should never be null anyway as default content MUST exist in the db*/
         if(defaultVoteContent == null)
             throw new NullPointerException("Default VoteContent cannot be null");
@@ -235,14 +213,12 @@ public abstract class VoteUtils implements VoteAppConstants {
 
 	    
 	    String maxNomcount= defaultVoteContent.getMaxNominationCount();
-	    logger.debug("maxNomcount: " + maxNomcount);
 	    if (maxNomcount.equals(""))
 	        maxNomcount="0";
 	    voteAuthoringForm.setMaxNominationCount(maxNomcount);
 	    voteGeneralAuthoringDTO.setMaxNominationCount(maxNomcount);
 	    
 	    String minNomcount= defaultVoteContent.getMinNominationCount();
-	    logger.debug("minNomcount: " + minNomcount);
 	    if ((minNomcount == null) || minNomcount.equals(""))
 	    	minNomcount="0";
 	    voteAuthoringForm.setMinNominationCount(minNomcount);
@@ -263,10 +239,9 @@ public abstract class VoteUtils implements VoteAppConstants {
             }
         }
         
-        logger.debug("trimmed noHtmlNoNewLineStr: " + noHtmlNoNewLineStr.trim());
         if (noHtmlNoNewLineStr.trim().length()==0)
         {
-            logger.debug("nomination text is just composed of html markup, try getting just a src entry for a picture otherwise give up.");
+            //nomination text is just composed of html markup, try getting just a src entry for a picture otherwise give up
             htmlText = htmlText.toLowerCase();
             int index = htmlText.indexOf("src");
             if ( index > -1 ) {
@@ -302,12 +277,9 @@ public abstract class VoteUtils implements VoteAppConstants {
 	public static void saveRichText(HttpServletRequest request, VoteGeneralAuthoringDTO voteGeneralAuthoringDTO, 
 	        SessionMap sessionMap)
 	{
-	    logger.debug("doing saveRichText, sessionMap: " + sessionMap);
 		String richTextTitle = request.getParameter(TITLE);
 	    String richTextInstructions = request.getParameter(INSTRUCTIONS);
 	    
-	    logger.debug("richTextTitle: " + richTextTitle);
-	    logger.debug("richTextInstructions: " + richTextInstructions);
 	    
 	    
 	    if (richTextTitle != null)
@@ -315,7 +287,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 			voteGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	    }
 	    String noHTMLTitle = stripHTML(richTextTitle);
-	    logger.debug("noHTMLTitle: " + noHTMLTitle);
 
 	
 	    if (richTextInstructions != null)
@@ -324,7 +295,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	    }
 	    
 		String richTextOfflineInstructions=request.getParameter(RICHTEXT_OFFLINEINSTRUCTIONS);
-		logger.debug("read parameter richTextOfflineInstructions: " + richTextOfflineInstructions);
 
 		if ((richTextOfflineInstructions != null) && (richTextOfflineInstructions.length() > 0))
 		{
@@ -333,7 +303,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 		}
 
 		String richTextOnlineInstructions=request.getParameter(RICHTEXT_ONLINEINSTRUCTIONS);
-		logger.debug("read parameter richTextOnlineInstructions: " + richTextOnlineInstructions);
 		
 		if ((richTextOnlineInstructions != null) && (richTextOnlineInstructions.length() > 0))
 		{
@@ -345,9 +314,7 @@ public abstract class VoteUtils implements VoteAppConstants {
 	
 	public static void configureContentRepository(HttpServletRequest request, IVoteService voteService)
 	{
-		logger.debug("attempt configureContentRepository");
     	voteService.configureContentRepository();
-	    logger.debug("configureContentRepository ran successfully");
 	}
 	
 	
@@ -360,7 +327,6 @@ public abstract class VoteUtils implements VoteAppConstants {
     {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		logger.debug(logger + " " + "VoteUtils" +  " Current user is: " + user + " with id: " + user.getUserID());
 		return user.getUserID().intValue();
     }
 	
@@ -396,7 +362,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	public static Map convertToMap(List sessionsList, String listType)
 	{
 		Map map= new TreeMap(new VoteComparator());
-		logger.debug("listType: " + listType);
 		
 		Iterator listIterator=sessionsList.iterator();
     	Long mapIndex=new Long(1);
@@ -430,7 +395,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	public static Map convertToStringMap(List sessionsList, String listType)
 	{
 		Map map= new TreeMap(new VoteComparator());
-		logger.debug("listType: " + listType);
 		
 		Iterator listIterator=sessionsList.iterator();
     	Long mapIndex=new Long(1);
@@ -440,13 +404,11 @@ public abstract class VoteUtils implements VoteAppConstants {
     	{
     		if (listType.equals("String"))
     		{
-    			logger.debug("listType String");
     			String text=(String)listIterator.next();
     			map.put(mapIndex.toString(), text);
     		}
     		else if (listType.equals("Long"))
     		{
-    			logger.debug("listType Long");
     			Long LongValue=(Long)listIterator.next();
     			map.put(mapIndex.toString(), LongValue.toString());
     		}
@@ -467,7 +429,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	 */
 	public static boolean isContentInUse(VoteContent voteContent)
 	{
-		logger.debug("is content inuse: " + voteContent.isContentInUse());
 		return  voteContent.isContentInUse();
 	}
 	
@@ -481,7 +442,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	 */
 	public static boolean isDefineLater(VoteContent voteContent)
 	{
-		logger.debug("is define later: " + voteContent.isDefineLater());
 		return  voteContent.isDefineLater();
 	}
 	
@@ -495,7 +455,6 @@ public abstract class VoteUtils implements VoteAppConstants {
 	 */
 	public static boolean isRunOffline(VoteContent voteContent)
 	{
-		logger.debug("is run offline: " + voteContent.isRunOffline());
 		return voteContent.isRunOffline();
 	}
 
@@ -503,35 +462,31 @@ public abstract class VoteUtils implements VoteAppConstants {
     
 	public static String getDestination(String sourceVoteStarter)
 	{
-		logger.debug("sourceVoteStarter: " + sourceVoteStarter);
 		
 		if ((sourceVoteStarter != null) && !sourceVoteStarter.equals("monitoring"))
 		{
-			logger.debug("request is from authoring or define Later url. return to: " + LOAD_QUESTIONS);
+			//request is from authoring or define Later url. return to: LOAD_QUESTIONS
 			return LOAD_QUESTIONS;	
 		}
 		else if (sourceVoteStarter == null)
 		{
-			logger.debug("request is from authoring url. return to: " + LOAD_QUESTIONS);
+			//request is from authoring url. return to: LOAD_QUESTIONS
 			return LOAD_QUESTIONS;	
 		}
 		else
 		{
-			logger.debug("request is from monitoring url. return to: " + LOAD_MONITORING_CONTENT_EDITACTIVITY);
+			//request is from monitoring url. return to: LOAD_MONITORING_CONTENT_EDITACTIVITY
 			return LOAD_MONITORING_CONTENT_EDITACTIVITY;	
 		}
 	}
 
 	public static void setDefineLater(HttpServletRequest request, boolean value, IVoteService voteService, String toolContentID)
     {
-    	logger.debug("toolContentID:" + toolContentID);
     	
     	VoteContent voteContent=voteService.retrieveVote(new Long(toolContentID));
-    	logger.debug("voteContent:" + voteContent);
     	if (voteContent != null)
     	{
     		voteContent.setDefineLater(value);
-        	logger.debug("defineLater has been set to value: " + value);
         	voteService.updateVote(voteContent);	
     	}
     }
@@ -545,7 +500,6 @@ public abstract class VoteUtils implements VoteAppConstants {
     public static void cleanUpSessionAbsolute(HttpServletRequest request)
     {
     	cleanUpUserExceptions(request);
-    	logger.debug("completely cleaned the session.");
     }
     
     /**
@@ -597,11 +551,6 @@ public abstract class VoteUtils implements VoteAppConstants {
             VoteAuthoringForm  voteAuthoringForm, VoteGeneralAuthoringDTO voteGeneralAuthoringDTO, String strToolContentID, 
             String defaultContentIdStr, String activeModule, SessionMap sessionMap, String httpSessionID)
     {
-    	logger.debug("setFormProperties: ");
-    	logger.debug("using strToolContentID: " + strToolContentID);
-    	logger.debug("using defaultContentIdStr: " + defaultContentIdStr);
-    	logger.debug("using activeModule: " + activeModule);
-    	logger.debug("using httpSessionID: " + httpSessionID);
 
     	voteAuthoringForm.setHttpSessionID(httpSessionID);
     	voteGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
@@ -615,12 +564,10 @@ public abstract class VoteUtils implements VoteAppConstants {
     	voteGeneralAuthoringDTO.setActiveModule(activeModule);
     	
 		String lockOnFinish=request.getParameter("lockOnFinish");
-		logger.debug("lockOnFinish: " + lockOnFinish);
 		voteAuthoringForm.setLockOnFinish(lockOnFinish);
 		voteGeneralAuthoringDTO.setLockOnFinish(lockOnFinish);
 		
 		String allowText=request.getParameter("allowText");
-		logger.debug("allowText: " + allowText);
 		voteAuthoringForm.setAllowText(allowText);
 		voteGeneralAuthoringDTO.setAllowText(allowText);
 		
@@ -629,49 +576,36 @@ public abstract class VoteUtils implements VoteAppConstants {
 		voteGeneralAuthoringDTO.setShowResults(showResults);
 
 		String maxNominationCount=request.getParameter("maxNominationCount");
-		logger.debug("maxNominationCount: " + maxNominationCount);
 		voteAuthoringForm.setMaxNominationCount(maxNominationCount);
 		voteGeneralAuthoringDTO.setMaxNominationCount(maxNominationCount);
 
 		String reflect=request.getParameter("reflect");
-		logger.debug("reflect: " + maxNominationCount);
 		voteAuthoringForm.setReflect(reflect);
 		voteGeneralAuthoringDTO.setReflect(reflect);
 
 		String reflectionSubject=request.getParameter("reflectionSubject");
-		logger.debug("reflectionSubject: " + reflectionSubject);
 		voteAuthoringForm.setReflectionSubject(reflectionSubject);
 		voteGeneralAuthoringDTO.setReflectionSubject(reflectionSubject);
 
 
 		String offlineInstructions=request.getParameter(OFFLINE_INSTRUCTIONS);
-		logger.debug("offlineInstructions: " + offlineInstructions);
 		voteAuthoringForm.setOfflineInstructions(offlineInstructions);
 		voteGeneralAuthoringDTO.setOfflineInstructions(offlineInstructions);
 
 		String onlineInstructions=request.getParameter(ONLINE_INSTRUCTIONS);
-		logger.debug("onlineInstructions: " + onlineInstructions);
 		voteAuthoringForm.setOnlineInstructions(onlineInstructions);
 		voteGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
-		
-		logger.debug("ending setFormProperties with voteAuthoringForm: " + voteAuthoringForm);
-		logger.debug("ending setFormProperties with voteGeneralAuthoringDTO: " + voteGeneralAuthoringDTO);
     }
 
     
 	public static void setDefineLater(HttpServletRequest request, boolean value, String strToolContentID, IVoteService voteService)
     {
-		logger.debug("voteService: " + voteService);
-    	logger.debug("value:" + value);
-    	logger.debug("strToolContentID:" + strToolContentID);
     	
 		VoteContent voteContent=voteService.retrieveVote(new Long(strToolContentID));
 		
-    	logger.debug("voteContent:" + voteContent);
     	if (voteContent != null)
     	{
     		voteContent.setDefineLater(value);
-        	logger.debug("defineLater has been set to:" + value);
         	voteService.updateVote(voteContent);	
     	}
     }
@@ -683,35 +617,25 @@ public abstract class VoteUtils implements VoteAppConstants {
      * then tries to match on that, otherwise uses filename and isOnline. */
     public static List moveToDelete(String uuid, List attachmentsList, List deletedAttachmentsList ) {
 
-        logger.debug("doing moveToDelete: " + attachmentsList);
-        logger.debug("doing moveToDelete: " + deletedAttachmentsList);
         List deletedList = deletedAttachmentsList != null ? deletedAttachmentsList : new ArrayList();
         
-        logger.debug("deletedList: " + deletedList);
-        
         if ( attachmentsList != null ) {
-            logger.debug("attachmentsList not null: " + attachmentsList);
             Iterator iter = attachmentsList.iterator();
             VoteUploadedFile attachment = null;
             while ( iter.hasNext() && attachment == null ) {
                 VoteUploadedFile value = (VoteUploadedFile) iter.next();
-                logger.debug("value: " + value);
                 
                 if ( uuid.equals(value.getUuid()) ) {
-                    logger.debug("value made attachment:");
                     attachment = value;
                 }
 
             }
-            if ( attachment != null ) {
-                logger.debug("attachment not null");                
+            if ( attachment != null ) {               
                 deletedList.add(attachment);
                 attachmentsList.remove(attachment);
             }
         }
         
-        logger.debug("final attachmentsList: " + attachmentsList);
-        logger.debug("final deletedAttachmentsList: " + deletedAttachmentsList);
         return deletedList;
     }
 

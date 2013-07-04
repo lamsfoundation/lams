@@ -25,8 +25,6 @@ package org.lamsfoundation.lams.tool.vote;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.apache.log4j.Logger;
-
 /**
  * @author Ozgur Demirtas
  *  *  A comparator implementation that can be used as a constructor to collections. 
@@ -34,7 +32,6 @@ import org.apache.log4j.Logger;
  * 
  */
 public class VoteStringComparator implements Comparator, Serializable {
-	static Logger logger = Logger.getLogger(VoteStringComparator.class.getName());
 	
 	 public int compare(Object o1, Object o2) {
 	   String s1 = (String)o1;

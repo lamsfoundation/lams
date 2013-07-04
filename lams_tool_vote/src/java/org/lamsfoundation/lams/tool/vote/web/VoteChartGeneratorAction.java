@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -50,7 +49,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  * @author Marcin Cieslak
  */
 public class VoteChartGeneratorAction extends LamsDispatchAction {
-    private static final Logger logger = Logger.getLogger(VoteChartGeneratorAction.class.getName());
 
     private static IVoteService voteService;
     private static MessageService messageService;
