@@ -233,7 +233,11 @@
 						<c:if test="${lesson.learnerPresenceAvailable}">
 							checked="checked"
 						</c:if> 
-					/><fmt:message key="lesson.enable.presence"/><br />
+					/><fmt:message key="lesson.enable.presence"/>
+					<span id="presenceAvailableCount">(<span>0</span>
+						<fmt:message key="lesson.presence.count"/>)
+					</span>
+					<br />
 					<input type="checkbox" id="imAvailableField"
 						<c:if test="${not lesson.learnerPresenceAvailable}">
 							disabled="disabled"

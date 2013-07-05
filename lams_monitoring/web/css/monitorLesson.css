@@ -126,7 +126,7 @@ td.sectionHeader {
 	width: 114px;
 }
 
-#lessonStartDateCell * {
+#lessonStartDateCell *, #presenceAvailableCount {
 	display: none;
 }
 
@@ -160,6 +160,7 @@ td.contributeEntryCell a {
 #emailDialog {
 	width: 100%;
 }
+
 
 /********** SEQUENCE TAB STYLES **********/
 div#sequenceCanvas {

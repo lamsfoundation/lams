@@ -62,6 +62,8 @@ function initLessonTab(){
 				'lessonID'      : lessonId
 			},
 			success : function() {
+				updatePresenceAvailableCount();
+				
 				if (checked) {
 					$('#imAvailableField').attr('disabled', null);
 					alert(LESSON_PRESENCE_ENABLE_ALERT_LABEL);
@@ -343,6 +345,8 @@ function updateLessonTab(){
 			}
 		}
 	});
+	
+	updatePresenceAvailableCount();
 }
 
 
@@ -418,6 +422,30 @@ function showEmailDialog(userId){
 function closeEmailDialog(){
 	$('#emailFrame').attr('src', null);
 	$('#emailDialog').dialog('close');
+}
+
+
+function updatePresenceAvailableCount(){
+	var checked = $('#presenceAvailableField').is(':checked');
+	var counter = $('#presenceAvailableCount');
+	if (checked) {
+		$.ajax({
+			dataType : 'json',
+			url : LAMS_URL + 'PresenceChat.do',
+			cache : false,
+			data : {
+				'method'    : 'getChatContent',
+				'lessonID'      : lessonId
+			},
+			success : function(result) {
+				$('span', counter).text(result.roster.length);
+				counter.css('display', null);
+			}
+		});
+
+	} else {
+		counter.css('display', 'none');
+	}
 }
 
 //********** SEQUENCE TAB FUNCTIONS **********
