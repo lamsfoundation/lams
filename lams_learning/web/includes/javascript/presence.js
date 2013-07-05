@@ -214,18 +214,25 @@ function updateChat(){
 	// skip another attempt if previous did not return yet (slow server?)
 	if (!pollInProgress) {
 		pollInProgress = true;
-		var selected = presenceChatTabs.tabs('option','selected');
-		var from = getUserFromTabIndex(selected);
-		if (groupChatInfo.nick == from) {
-			from = null;
+		var from = null;
+		var selected = null;
+		var lastMessageUid = null;
+		var getMessages = presenceShown && presenceImEnabled;
+		if (getMessages) {
+			selected = presenceChatTabs.tabs('option','active');
+			from = getUserFromTabIndex(selected);
+			if (groupChatInfo.nick == from) {
+				from = null;
+			}
+			lastMessageUid = roster.lastMessageUids[from ? from : 'group'];
 		}
-		
+
 		$.ajax({
 			  url      : actionUrl,
 			  data     : {'method'          : 'getChatContent',
 					  	  'lessonID'        : lessonId,
-					  	  'presenceShown'   : presenceShown,
-					  	  'lastMessageUid'  : roster.lastMessageUids[from ? from : 'group'],
+					  	  'getMessages'     : getMessages,
+					  	  'lastMessageUid'  : lastMessageUid,
 					  	  'to'              : nickname,
 					  	  'from'            : from
 					  	 },

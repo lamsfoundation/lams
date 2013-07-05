@@ -88,7 +88,11 @@ public class PresenceChatAction extends LamsDispatchAction {
 	    // roster is used also to get messages by other users, so we need to synchronise on it
 	    synchronized (roster) {
 		Date currentDate = new Date(currentTime);
-		activeUsers.put(nickname, currentDate);
+		
+		if (!StringUtils.isBlank(nickname)) {
+		    // blank nickname means this is just check but user is not really using chat
+		    activeUsers.put(nickname, currentDate);
+		}
 
 		if (currentTime - lastCheckTime > IPresenceChatService.PRESENCE_IDLE_TIMEOUT) {
 		    // store active users
@@ -104,7 +108,7 @@ public class PresenceChatAction extends LamsDispatchAction {
 		    }
 
 		    lastCheckTime = currentTime;
-		} else {
+		} else if (!StringUtils.isBlank(nickname)) {
 		    roster.put(nickname, currentDate);
 		}
 
@@ -123,13 +127,13 @@ public class PresenceChatAction extends LamsDispatchAction {
 	    HttpServletResponse response) {
 	try {
 	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    boolean presenceShown = Boolean.parseBoolean(request.getParameter("presenceShown"));
+	    boolean getMessages = Boolean.parseBoolean(request.getParameter("getMessages"));
 	    // this is the current user
 	    String nickname = request.getParameter("to");
-
+ 
 	    JSONObject responseJSON = new JSONObject();
 	    // no need to fetch messages if presence is collapsed
-	    if (presenceShown) {
+	    if (getMessages && !StringUtils.isBlank(nickname)) {
 		// this is the other user from opened tab, null if it is group chat
 		String from = request.getParameter("from");
 		if (StringUtils.isBlank(from)) {

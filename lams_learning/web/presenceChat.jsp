@@ -12,9 +12,9 @@
 	var lamsUrl = "<lams:LAMSURL/>";
 	var actionUrl = lamsUrl + "PresenceChat.do";
 	var lessonId = "${param.lessonID}";
-	var presenceEnabled = "${param.presenceEnabledPatch}";
-	var presenceShown = ${param.presenceShown == 'true'};
-	var presenceImEnabled = "${param.presenceImEnabled}";
+	var presenceEnabled = ${param.presenceEnabledPatch eq 'true'};
+	var presenceShown = ${param.presenceShown eq 'true'};
+	var presenceImEnabled = ${param.presenceImEnabled eq 'true'};
 	var nickname = "<lams:user property="firstName"/>" + " " + "<lams:user property="lastName"/>";
 	
 	// labels used in JS file
@@ -37,34 +37,28 @@
 		// otherwise enable presence chat
 		else {
 			// if presence im is enabled
-			if (presenceEnabled == 'true') {
+			if (presenceEnabled) {
 				// make visible
 				presenceChat.removeClass("startHidden");
 				
 				// create chat tabs
-				presenceChatTabs = $("#presenceChatTabs").tabs({'scrollable'    : true,
-																// set default class for new panel
-																'panelTemplate' : '<div class="chatPanel"></div>'
-															   });
-				
-				// bind the select function to do extra stuff
-				presenceChatTabs.bind('tabsselect', function(event, ui) {
-					lastMessageUid = null;
-					// remove visual indicators of new message
-					var nick =  getUserFromTabIndex(ui.index);
-					var tag = nickToTag(nick);
-					$("#" + tagToTabLabel(tag)).removeClass('presenceTabNewMessage');
-					
-					if (nick != groupChatInfo.nick) {
-						$("#" + tagToListing(tag)).removeClass('presenceListingNewMessage');
+				presenceChatTabs = $("#presenceChatTabs").tabs({
+					'scrollable'    : true,
+					// set default class for new panel
+					'panelTemplate' : '<div class="chatPanel"></div>',
+					'activate' : function(event, ui) {
+						// remove visual indicators of new message
+						var nick =  getUserFromTabIndex(presenceChatTabs.tabs('option','active'));
+						var tag = nickToTag(nick);
+						$("#" + tagToTabLabel(tag)).removeClass('presenceTabNewMessage');
+						
+						if (nick != groupChatInfo.nick) {
+							$("#" + tagToListing(tag)).removeClass('presenceListingNewMessage');
+						}
+						
+						updateChat();
 					}
-	
-					// scroll to the clicked tab
-					presenceChatTabs.tabs('scrollTo', ui.tab.offsetLeft);
-				});
-				
-				// bind the show function to do extra stuff
-				presenceChatTabs.bind('tabsshow', updateChat);
+				   });
 			}
 			
 			// create roster tab
