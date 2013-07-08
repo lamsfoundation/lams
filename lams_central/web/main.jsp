@@ -51,6 +51,18 @@
 		<script language="JavaScript" type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
 	</c:if>
 	<script language="javascript" type="text/javascript">
+		var LAMS_URL = '<lams:LAMSURL/>';
+		var LABELS = {
+				EMAIL_NOTIFICATIONS_TITLE : '<fmt:message key="index.emailnotifications" />',
+				REMOVE_LESSON_CONFIRM1 : '<fmt:message key="index.remove.lesson.confirm1"/>',
+				REMOVE_LESSON_CONFIRM2 : '<fmt:message key="index.remove.lesson.confirm2"/>',
+				SORTING_ENABLE : '<fmt:message key="label.enable.lesson.sorting"/>',
+				SORTING_DISABLE : '<fmt:message key="label.disable.lesson.sorting"/>'
+		}
+		
+		var orgsStateId = '<c:if test="${empty tab}">1</c:if><c:if test="${tab eq 'profile'}">3</c:if>';
+		
+	
 		<!--
 			jQuery(document).ready(function(){
 				<c:if test="${not empty collapsedOrgDTOs}">
@@ -329,7 +341,9 @@
 	</div>
 	<div id="footer">
 		<p>
-			<fmt:message key="msg.LAMS.version" /> <%=Configuration.get(ConfigurationKeys.VERSION)%>
+			<a style="color: #999999; text-decoration: none; border: none;" href="index.do?newLayout=true">
+				<fmt:message key="msg.LAMS.version" /> <%=Configuration.get(ConfigurationKeys.VERSION)%>
+			</a>
 			<a href="<lams:LAMSURL/>/www/copyright.jsp" target='copyright' onClick="openCopyRight()">
 				&copy; <fmt:message key="msg.LAMS.copyright.short" /> 
 			</a>

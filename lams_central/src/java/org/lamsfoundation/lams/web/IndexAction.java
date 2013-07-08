@@ -69,6 +69,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action path="/index" validate="false"
  * 
  * @struts.action-forward name="main" path="/main.jsp"
+ * @struts.action-forward name="main2" path="/main2.jsp"
  * @struts.action-forward name="community" path=".community"
  * @struts.action-forward name="profile" path="/profile.do?method=view"
  * @struts.action-forward name="editprofile" path="/profile.do?method=edit"
@@ -159,7 +160,12 @@ public class IndexAction extends Action {
 	List collapsedOrgDTOs = getUserManagementService().getActiveCourseIdsByUser(loggedInUser.getUserId(),
 		request.isUserInRole(Role.SYSADMIN));
 	request.setAttribute("collapsedOrgDTOs", collapsedOrgDTOs);
-
+	boolean newLayout = WebUtil.readBooleanParam(request, "newLayout", false);
+	if (newLayout) {
+	    User user = getUserManagementService().getUserByLogin(userDTO.getLogin());
+	    request.setAttribute("portraitUuid", user.getPortraitUuid());
+	    return mapping.findForward("main2");
+	} 
 	return mapping.findForward("main");
     }
 
