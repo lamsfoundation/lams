@@ -36,21 +36,23 @@
         	document.SbmtMonitoringForm.submit();
         }
         
-        
-	var statisticTargetDiv = "#statisticArea";
-	function doStatistic(){
-		var url = "<c:url value="/monitoring.do"/>";
-	    var reqIDVar = new Date();
-		$(statisticTargetDiv).load(
+		function doStatistic(){
+			var url = "<c:url value="/monitoring.do"/>";
+			
+			$("#statisticArea_Busy").show();
+			$("#statisticArea").load(
 				url,
 				{
 					method: "doStatistic",
 					toolContentID: "${param.toolContentID}", 
-					reqID: reqIDVar.getTime()
+					reqID: (new Date()).getTime()
+				},
+				function() {
+					$("#statisticArea_Busy").hide();
 				}
 			);
+		}
 		
-	}       
 	</script>
 </lams:head>
 

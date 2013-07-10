@@ -53,16 +53,19 @@
 				"mark");
 	}
 
-	var messageTargetDiv = "#messageArea";
 	function releaseMarks(sessionId) {
 		var url = "<c:url value="/monitoring.do"/>";
-		var reqIDVar = new Date();
-		$(messageTargetDiv).load(
+		
+		$("#messageArea_Busy").show();
+		$("#messageArea").load(
 			url,
 			{
 				method: "releaseMarks",
 				toolSessionID: sessionId, 
-				reqID: reqIDVar.getTime()
+				reqID: (new Date()).getTime()
+			},
+			function() {
+				$("#messageArea_Busy").hide();
 			}
 		);
 	}
