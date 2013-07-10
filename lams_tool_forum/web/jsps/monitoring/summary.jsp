@@ -32,43 +32,22 @@
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
 <script type="text/javascript">
-<!--
 
-	var messageTargetDiv = "messageArea";
 	function releaseMarks(sessionId){
 		var url = "<c:url value="/monitoring/releaseMark.do"/>";
-	    var reqIDVar = new Date();
-		var param = "toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
-		messageLoading();
-	    var myAjax = new Ajax.Updater(
-		    	messageTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:messageComplete,
-		    		evalScripts:true
-		    	}
-	    );
+		
+		$("#messageArea_Busy").show();
+		$("#messageArea").load(
+			url,
+			{
+				toolSessionID: sessionId, 
+				reqID: (new Date()).getTime()
+			},
+			function() {
+				$("#messageArea_Busy").hide();
+			}
+		);
 	}
-	
-	function showBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			Element.show(targetDiv+"_Busy");
-		}
-	}
-	function hideBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			Element.hide(targetDiv+"_Busy");
-		}				
-	}
-	function messageLoading(){
-		showBusy(messageTargetDiv);
-	}
-	function messageComplete(){
-		hideBusy(messageTargetDiv);
-	}
-//-->
 </script>
 
 

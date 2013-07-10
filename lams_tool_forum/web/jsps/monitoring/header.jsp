@@ -7,7 +7,6 @@
 </c:set>
 
 <script type="text/javascript">
-     //<![CDATA[
     var initialTabId = "${initialTabId}";
      
 	function init(){
@@ -27,40 +26,21 @@
     	if(tabId == 4)
     		doStatistic();	 		
 	}
-	var statisticTargetDiv = "statisticArea";
+	
 	function doStatistic(){
 		var url = "<c:url value="/monitoring/statistic.do"/>";
-	    var reqIDVar = new Date();
-		var param = "toolContentID=" + ${param.toolContentID} +"&reqID="+reqIDVar.getTime();
-		messageLoading();
-	    var myAjax = new Ajax.Updater(
-		    	statisticTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:messageComplete,
-		    		evalScripts:true
-		    	}
-	    );
 		
-	}
-	
-	function showBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			Element.show(targetDiv+"_Busy");
-		}
-	}
-	function hideBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			Element.hide(targetDiv+"_Busy");
-		}				
-	}
-	function messageLoading(){
-		showBusy(statisticTargetDiv);
-	}
-	function messageComplete(){
-		hideBusy(statisticTargetDiv);
-	}        
-	//]]>        
+		$("#statisticArea_Busy").show();
+		$("#statisticArea").load(
+			url,
+			{
+				toolContentID: ${param.toolContentID}, 
+				reqID: (new Date()).getTime()
+			},
+			function() {
+				$("#statisticArea_Busy").hide();
+			}
+		);
+		
+	}       
 </script>
