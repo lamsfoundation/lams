@@ -1076,10 +1076,12 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	qaUploadedFileDAO.removeUploadFile(submissionId);
     }
 
+    @Override
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
     }
 
+    @Override
     public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
 
 	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
@@ -1090,8 +1092,14 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	}
     }
     
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
+    }
+    
+    @Override
+    public String getLearnerContentFolder(Long toolSessionId, Long userId) {
+	return toolService.getLearnerContentFolder(toolSessionId, userId);
     }
 
     /**

@@ -60,19 +60,19 @@ public interface IQaService {
      * @return the qa object
      */
 
-    public QaContent getQa(long toolContentId) throws QaApplicationException;
+    QaContent getQa(long toolContentId) throws QaApplicationException;
 
-    public void saveOrUpdateQa(QaContent qa) throws QaApplicationException;
+    void saveOrUpdateQa(QaContent qa) throws QaApplicationException;
 
-    public int getTotalNumberOfUsers(QaContent qa) throws QaApplicationException;
+    int getTotalNumberOfUsers(QaContent qa) throws QaApplicationException;
 
-    public int countSessionComplete(QaContent qa) throws QaApplicationException;
+    int countSessionComplete(QaContent qa) throws QaApplicationException;
 
-    public void updateQaQueUsr(QaQueUsr qaQueUsr) throws QaApplicationException;
+    void updateQaQueUsr(QaQueUsr qaQueUsr) throws QaApplicationException;
 
-    public QaQueUsr loadQaQueUsr(Long userId) throws QaApplicationException;
+    QaQueUsr loadQaQueUsr(Long userId) throws QaApplicationException;
 
-    public QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long qaQueContentId)
+    QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long qaQueContentId)
 	    throws QaApplicationException;
     
     /**
@@ -84,25 +84,25 @@ public interface IQaService {
      */
     void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder);
 
-    public void createQaQue(QaQueContent qaQuestion) throws QaApplicationException;
+    void createQaQue(QaQueContent qaQuestion) throws QaApplicationException;
 
-    public void removeQaQueContent(QaQueContent qaQuestion) throws QaApplicationException;
+    void removeQaQueContent(QaQueContent qaQuestion) throws QaApplicationException;
 
-    public void createQaUsrResp(QaUsrResp qaUsrResp) throws QaApplicationException;
+    void createQaUsrResp(QaUsrResp qaUsrResp) throws QaApplicationException;
 
-    public void updateUserResponse(QaUsrResp resp) throws QaApplicationException;
+    void updateUserResponse(QaUsrResp resp) throws QaApplicationException;
 
-    public QaUsrResp getResponseById(Long responseId) throws QaApplicationException;
+    QaUsrResp getResponseById(Long responseId) throws QaApplicationException;
 
-    public QaQueContent getQuestionContentByQuestionText(final String question, Long contentUid)
+    QaQueContent getQuestionContentByQuestionText(final String question, Long contentUid)
 	    throws QaApplicationException;
 
-    public QaQueContent getQuestionByContentAndDisplayOrder(Long displayOrder, Long contentUid)
+    QaQueContent getQuestionByContentAndDisplayOrder(Long displayOrder, Long contentUid)
 	    throws QaApplicationException;
 
-    public List getAllQuestionEntriesSorted(final long qaContentId) throws QaApplicationException;
+    List getAllQuestionEntriesSorted(final long qaContentId) throws QaApplicationException;
 
-    public void saveOrUpdateQaQueContent(QaQueContent qaQuestion) throws QaApplicationException;
+    void saveOrUpdateQaQueContent(QaQueContent qaQuestion) throws QaApplicationException;
 
     /**
      * Return the qa session object according to the requested session id.
@@ -111,41 +111,41 @@ public interface IQaService {
      *                qa session id
      * @return the qa session object
      */
-    public QaSession retrieveQaSession(long qaSessionId) throws QaApplicationException;
+    QaSession retrieveQaSession(long qaSessionId) throws QaApplicationException;
 
-    public QaSession getSessionById(long qaSessionId) throws QaApplicationException;
+    QaSession getSessionById(long qaSessionId) throws QaApplicationException;
 
-    public void createQaSession(QaSession qaSession) throws QaApplicationException;
+    void createQaSession(QaSession qaSession) throws QaApplicationException;
 
-    public List getSessionNamesFromContent(QaContent qaContent) throws QaApplicationException;
+    List getSessionNamesFromContent(QaContent qaContent) throws QaApplicationException;
 
-    public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException;
+    void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException;
 
-    public List getSessionsFromContent(QaContent qaContent) throws QaApplicationException;
+    List getSessionsFromContent(QaContent qaContent) throws QaApplicationException;
 
-    public QaQueUsr createUser(Long toolSessionID) throws QaApplicationException;
+    QaQueUsr createUser(Long toolSessionID) throws QaApplicationException;
 
-    public void updateQaSession(QaSession qaSession) throws QaApplicationException;
+    void updateQaSession(QaSession qaSession) throws QaApplicationException;
 
-    public QaQueUsr getQaQueUsrById(long qaQueUsrId) throws QaApplicationException;
+    QaQueUsr getQaQueUsrById(long qaQueUsrId) throws QaApplicationException;
 
-    public void updateQa(QaContent qa) throws QaApplicationException;
+    void updateQa(QaContent qa) throws QaApplicationException;
 
-    public void createQa(QaContent qa) throws QaApplicationException;
+    void createQa(QaContent qa) throws QaApplicationException;
 
-    public void hideResponse(QaUsrResp qaUsrResp) throws QaApplicationException;
+    void hideResponse(QaUsrResp qaUsrResp) throws QaApplicationException;
 
-    public void showResponse(QaUsrResp qaUsrResp) throws QaApplicationException;
+    void showResponse(QaUsrResp qaUsrResp) throws QaApplicationException;
 
-    public QaContent retrieveQaBySession(long qaSessionId) throws QaApplicationException;
+    QaContent retrieveQaBySession(long qaSessionId) throws QaApplicationException;
 
-    public QaQueUsr getUserByIdAndSession(final Long queUsrId, final Long qaSessionId) throws QaApplicationException;
+    QaQueUsr getUserByIdAndSession(final Long queUsrId, final Long qaSessionId) throws QaApplicationException;
 
-    public void removeUserResponse(QaUsrResp resp) throws QaApplicationException;
+    void removeUserResponse(QaUsrResp resp) throws QaApplicationException;
 
-    public List getAllQuestionEntries(final Long uid) throws QaApplicationException;
+    List getAllQuestionEntries(final Long uid) throws QaApplicationException;
 
-    public List getUserBySessionOnly(final QaSession qaSession) throws QaApplicationException;
+    List getUserBySessionOnly(final QaSession qaSession) throws QaApplicationException;
 
     /**
      * copyToolContent(Long fromContentId, Long toContentId) return void
@@ -153,13 +153,13 @@ public interface IQaService {
      * @param fromContentId
      * @param toContentId
      */
-    public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
+    void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException;
+    void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException;
 
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException;
+    void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException;
 
-    public boolean isStudentActivityOccurredGlobal(QaContent qaContent) throws QaApplicationException;
+    boolean isStudentActivityOccurredGlobal(QaContent qaContent) throws QaApplicationException;
 
     /**
      * createToolSession(Long toolSessionId,String toolSessionName, Long
@@ -171,7 +171,7 @@ public interface IQaService {
      * @param toolSessionId
      * @param toolContentId
      */
-    public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException;
+    void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException;
 
     /**
      * leaveToolSession(Long toolSessionId, Long learnerId)
@@ -182,40 +182,40 @@ public interface IQaService {
      * @param toolSessionId
      * @param toolContentId
      */
-    public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException;
+    String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException;
 
-    public IToolVO getToolBySignature(String toolSignature) throws QaApplicationException;
+    IToolVO getToolBySignature(String toolSignature) throws QaApplicationException;
 
-    public long getToolDefaultContentIdBySignature(String toolSignature) throws QaApplicationException;
+    long getToolDefaultContentIdBySignature(String toolSignature) throws QaApplicationException;
 
-    public ITicket getRepositoryLoginTicket() throws QaApplicationException;
+    ITicket getRepositoryLoginTicket() throws QaApplicationException;
 
-    public void deleteFromRepository(Long uuid, Long versionID) throws QaApplicationException;
+    void deleteFromRepository(Long uuid, Long versionID) throws QaApplicationException;
 
-    public InputStream downloadFile(Long uuid, Long versionID) throws QaApplicationException;
+    InputStream downloadFile(Long uuid, Long versionID) throws QaApplicationException;
 
-    public void persistFile(String uuid, boolean isOnlineFile, String fileName, QaContent qaContent)
+    void persistFile(String uuid, boolean isOnlineFile, String fileName, QaContent qaContent)
 	    throws QaApplicationException;
 
-    public void persistFile(QaContent content, QaUploadedFile file) throws QaApplicationException;
+    void persistFile(QaContent content, QaUploadedFile file) throws QaApplicationException;
 
-    public void removeFile(Long submissionId) throws QaApplicationException;
+    void removeFile(Long submissionId) throws QaApplicationException;
 
-    public List retrieveQaUploadedFiles(QaContent qa) throws QaApplicationException;
+    List retrieveQaUploadedFiles(QaContent qa) throws QaApplicationException;
 
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
+    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 
-    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
+    NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
 
     /**
      * Get the LAMS audit service. Needed as the web layer controls the staff
      * updating of an answer, so the log entry must be made by the web layer.
      */
-    public IAuditService getAuditService();
+    IAuditService getAuditService();
 
-    public void updateEntry(NotebookEntry notebookEntry);
+    void updateEntry(NotebookEntry notebookEntry);
 
-    public QaContent getQaContentBySessionId(Long sessionId);
+    QaContent getQaContentBySessionId(Long sessionId);
 
     /**
      * Creates an unique name for a QaCondition. It consists of the tool output
@@ -226,11 +226,11 @@ public interface IQaService {
      *                the same name does not exist.
      * @return unique QaCondition name
      */
-    public String createConditionName(Collection<QaCondition> existingConditions);
+    String createConditionName(Collection<QaCondition> existingConditions);
 
-    public void deleteCondition(QaCondition condition);
+    void deleteCondition(QaCondition condition);
 
-    public QaCondition createDefaultComplexCondition(QaContent qaContent);
+    QaCondition createDefaultComplexCondition(QaContent qaContent);
 
     /**
      * Gets the qa config item with the given key
@@ -238,21 +238,21 @@ public interface IQaService {
      * @param configKey
      * @return
      */
-    public QaConfigItem getConfigItem(String configKey);
+    QaConfigItem getConfigItem(String configKey);
 
     /**
      * Saves or updates a qa config item
      * 
      * @param configItem
      */
-    public void saveOrUpdateConfigItem(QaConfigItem configItem);
+    void saveOrUpdateConfigItem(QaConfigItem configItem);
 
     /**
      * Gets the set of wizard categories from the database
      * 
      * @return
      */
-    public SortedSet<QaWizardCategory> getWizardCategories();
+    SortedSet<QaWizardCategory> getWizardCategories();
 
     /**
      * Saves the entire set of QaWizardCategories (including the child cognitive
@@ -260,35 +260,35 @@ public interface IQaService {
      * 
      * @param categories
      */
-    public void saveOrUpdateQaWizardCategories(SortedSet<QaWizardCategory> categories);
+    void saveOrUpdateQaWizardCategories(SortedSet<QaWizardCategory> categories);
 
     /**
      * Deletes a wizard category from the db
      * 
      * @param uid
      */
-    public void deleteWizardCategoryByUID(Long uid);
+    void deleteWizardCategoryByUID(Long uid);
 
     /**
      * Deletes a wizard cognitive skill from the db
      * 
      * @param uid
      */
-    public void deleteWizardSkillByUID(Long uid);
+    void deleteWizardSkillByUID(Long uid);
 
     /**
      * Deletes a wizard question from the db
      * 
      * @param uid
      */
-    public void deleteWizardQuestionByUID(Long uid);
+    void deleteWizardQuestionByUID(Long uid);
 
     /**
      * Deletes all categories, sub skills and sub questions
      */
-    public void deleteAllWizardCategories();
+    void deleteAllWizardCategories();
 
-    public void removeQuestionsFromCache(QaContent qaContent);
+    void removeQuestionsFromCache(QaContent qaContent);
     
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
@@ -297,6 +297,16 @@ public interface IQaService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Return content folder (unique to each learner and lesson) which is used for storing user generated content.
+     * It's been used by CKEditor.
+     * 
+     * @param toolSessionId
+     * @param userId
+     * @return
+     */
+    String getLearnerContentFolder(Long toolSessionId, Long userId);
         
     AverageRatingDTO rateResponse(Long responseId, Long userId, Long toolSessionID, float rating);
     

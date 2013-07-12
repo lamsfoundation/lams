@@ -141,13 +141,16 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	Map<String, QaQuestionDTO> mapQuestions = new TreeMap<String,QaQuestionDTO>();
 
 	String httpSessionID = qaLearningForm.getHttpSessionID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 	if (sessionMap == null) {
-	    sessionMap = new SessionMap();
+	    sessionMap = new SessionMap<String, Object>();
 	    Map mapSequentialAnswers = new HashMap();
 	    sessionMap.put(MAP_SEQUENTIAL_ANSWERS_KEY, mapSequentialAnswers);
 	    request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	    qaLearningForm.setHttpSessionID(sessionMap.getSessionID());
+	    
+	    sessionMap.put(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
+		    qaService.getLearnerContentFolder(new Long(toolSessionID), qaUser.getQueUsrId()));
 	}
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);

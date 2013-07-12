@@ -197,27 +197,26 @@ public class LearningAction extends Action {
 	int attemptsAllowed = assessment.getAttemptsAllowed();
 	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());	
 	boolean finishedLockForMonitor =  (mode != null) && mode.isTeacher() && (lastResult != null) && (lastResult.getFinishDate() != null);	
-	boolean finishedLock = ((assessmentUser != null) && assessmentUser.isSessionFinished() && (attemptsAllowed != 0))
+	boolean finishedLock = (assessmentUser.isSessionFinished() && (attemptsAllowed != 0))
 		|| finishedLockForMonitor
 		|| ((attemptsAllowed <= dbResultCount) && (attemptsAllowed != 0));
 
 	// get notebook entry
 	String entryText = new String();
-	if (assessmentUser != null) {
 	    NotebookEntry notebookEntry = service.getEntry(toolSessionId, assessmentUser.getUserId().intValue());
 	    if (notebookEntry != null) {
 		entryText = notebookEntry.getEntry();
 	    }
-	}
 	
 	// basic information
 	sessionMap.put(AssessmentConstants.ATTR_TITLE, assessment.getTitle());
 	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, assessment.getInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, false);
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, finishedLock);
-	sessionMap.put(AssessmentConstants.ATTR_USER_FINISHED, assessmentUser != null && assessmentUser.isSessionFinished());
+	sessionMap.put(AssessmentConstants.ATTR_USER_FINISHED, assessmentUser.isSessionFinished());
 	sessionMap.put(AssessmentConstants.PARAM_RUN_OFFLINE, assessment.getRunOffline());
-
+	sessionMap.put(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
+		service.getLearnerContentFolder(toolSessionId, assessmentUser.getUserId()));
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AssessmentConstants.ATTR_USER, assessmentUser);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);

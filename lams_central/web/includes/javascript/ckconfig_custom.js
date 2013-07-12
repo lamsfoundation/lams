@@ -13,6 +13,18 @@ CKEDITOR.config.toolbar_DefaultLearner = [
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 	['equation','About'],
 	['TextColor','BGColor'],
+	['Image','Table','HorizontalRule','Smiley','SpecialChar'],
+	['Format','Font','FontSize']
+] ;
+
+CKEDITOR.config.toolbar_DefaultMonitor = [
+	['Preview','PasteFromWord'],
+	['Undo','Redo'],
+	['Bold','Italic','Underline', '-','Subscript','Superscript'],
+	['NumberedList','BulletedList','-','Outdent','Indent'],
+	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+	['equation','About'],
+	['TextColor','BGColor'],
 	['Table','HorizontalRule','Smiley','SpecialChar'],
 	['Format','Font','FontSize']
 ] ;

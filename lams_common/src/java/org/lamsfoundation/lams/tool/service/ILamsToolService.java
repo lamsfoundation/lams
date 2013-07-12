@@ -34,39 +34,48 @@ import org.lamsfoundation.lams.util.FileUtilException;
 
 
 /**
- * This interface defines all the service available for self contained tool
- * module from lams. Any service that would be used by other lams module
- * such as, lams_learning etc, should not appear in this interface.
+ * This interface defines all the service available for self contained tool module from lams. Any service that would be
+ * used by other lams module such as, lams_learning etc, should not appear in this interface.
  * 
  * @author chris
  * @author Jacky Fang
  * @author Ozgur Demirtas 24/06/2005
  */
-public interface ILamsToolService
-{
+public interface ILamsToolService {
     /**
-     * Returns a list of all learners who can use a specific set of tool content.
-     * Note that none/some/all of these users may not reach the associated activity
-     * so they may not end up using the content.
-     * The purpose of this method is to provide a way for tools to do logic based on 
-     * completions against potential completions.
-     * @param toolContentID a long value that identifies the tool content (in the Tool and in LAMS).
+     * Returns a list of all learners who can use a specific set of tool content. Note that none/some/all of these users
+     * may not reach the associated activity so they may not end up using the content. The purpose of this method is to
+     * provide a way for tools to do logic based on completions against potential completions.
+     * 
+     * @param toolContentID
+     *            a long value that identifies the tool content (in the Tool and in LAMS).
      * @return a List of all the Learners who are scheduled to use the content.
-     * @exception in case of any problems.
+     * @exception in
+     *                case of any problems.
      */
-    public Set<User> getAllPotentialLearners(long toolSessionID) throws LamsToolServiceException;
+    Set<User> getAllPotentialLearners(long toolSessionID) throws LamsToolServiceException;
     
-    public IToolVO getToolBySignature(final String toolSignature);
+    IToolVO getToolBySignature(final String toolSignature);
     
-    public long getToolDefaultContentIdBySignature(final String toolSignature);
+    long getToolDefaultContentIdBySignature(final String toolSignature);
 
-    public String generateUniqueContentFolder() throws FileUtilException, IOException;
+    String generateUniqueContentFolder() throws FileUtilException, IOException;
     
-    public void saveOrUpdateTool(Tool tool);
+    /**
+     * Return content folder (unique to each learner and lesson) which is used for storing user generated content.
+     * It's been used by CKEditor.
+     * 
+     * @param toolSessionId
+     * @param userId
+     * @return
+     */
+    String getLearnerContentFolder(Long toolSessionId, Long userId);
     
-    public Tool getPersistToolBySignature(final String toolSignature);
+    void saveOrUpdateTool(Tool tool);
     
-    public ToolSession getToolSession(Long toolSessionId);
+    Tool getPersistToolBySignature(final String toolSignature);
+    
+    ToolSession getToolSession(Long toolSessionId);
     
     /**
      * Allows the tool to ask whether or not the activity is grouped and therefore it should expect more than one tool
@@ -75,5 +84,5 @@ public interface ILamsToolService
      * @param toolContentID
      * @return
      */
-    public Boolean isGroupedActivity(long toolContentID);
+    Boolean isGroupedActivity(long toolContentID);
 }

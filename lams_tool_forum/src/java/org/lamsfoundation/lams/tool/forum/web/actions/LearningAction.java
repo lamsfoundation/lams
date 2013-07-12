@@ -231,6 +231,8 @@ public class LearningAction extends Action {
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(ForumConstants.ATTR_FORUM_TITLE, forum.getTitle());
 	sessionMap.put(ForumConstants.ATTR_FORUM_INSTRCUTION, forum.getInstructions());
+	sessionMap.put(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
+		forumService.getLearnerContentFolder(sessionId, forumUser.getUserId()));
 	sessionMap.put(ForumConstants.ATTR_MINIMUM_REPLY, forum.getMinimumReply());
 	sessionMap.put(ForumConstants.ATTR_MAXIMUM_REPLY, forum.getMaximumReply());
 

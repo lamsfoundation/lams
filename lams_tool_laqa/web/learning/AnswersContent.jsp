@@ -9,7 +9,7 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
-<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
+<c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" scope="request"/>
 
 <lams:html>
 <lams:head>

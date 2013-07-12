@@ -58,7 +58,7 @@ public interface IForumService {
      * @param contentID
      * @return
      */
-    public Forum getDefaultContent(Long contentID);
+    Forum getDefaultContent(Long contentID);
 
     /**
      * Update forum by given <code>Forum</code>. If forum does not exist, the create a new forum.
@@ -67,7 +67,7 @@ public interface IForumService {
      * @return
      * @throws PersistenceException
      */
-    public Forum updateForum(Forum forum) throws PersistenceException;
+    Forum updateForum(Forum forum) throws PersistenceException;
 
     /**
      * Upload instruction file
@@ -77,7 +77,7 @@ public interface IForumService {
      * @return
      * @throws PersistenceException
      */
-    public Attachment uploadInstructionFile(FormFile file, String type) throws PersistenceException;
+    Attachment uploadInstructionFile(FormFile file, String type) throws PersistenceException;
 
     /**
      * Get forum by forum UID
@@ -86,7 +86,7 @@ public interface IForumService {
      * @return
      * @throws PersistenceException
      */
-    public Forum getForum(Long forumUid) throws PersistenceException;
+    Forum getForum(Long forumUid) throws PersistenceException;
 
     /**
      * Get forum by forum ID(not record UID)
@@ -95,7 +95,7 @@ public interface IForumService {
      * @return
      * @throws PersistenceException
      */
-    public Forum getForumByContentId(Long contentID) throws PersistenceException;
+    Forum getForumByContentId(Long contentID) throws PersistenceException;
 
     /**
      * Delete authoring page instruction files.
@@ -103,7 +103,7 @@ public interface IForumService {
      * @param attachmentId
      * @throws PersistenceException
      */
-    public void deleteForumAttachment(Long attachmentId) throws PersistenceException;
+    void deleteForumAttachment(Long attachmentId) throws PersistenceException;
 
     // ************************************************************************************
     // Topic Method
@@ -135,7 +135,7 @@ public interface IForumService {
      * @return
      * @throws PersistenceException
      */
-    public Message createRootTopic(Long forumId, Long sessionId, Message message) throws PersistenceException;
+    Message createRootTopic(Long forumId, Long sessionId, Message message) throws PersistenceException;
 
     /**
      * Update a topic by give <code>Message</code> instance.
@@ -144,7 +144,7 @@ public interface IForumService {
      * @return
      * @throws PersistenceException
      */
-    public Message updateTopic(Message message) throws PersistenceException;
+    Message updateTopic(Message message) throws PersistenceException;
 
     /**
      * Hide a message by given <code>Message</code> instance
@@ -153,7 +153,7 @@ public interface IForumService {
      * @return
      * @throws PersistenceException
      */
-    public Message updateMessageHideFlag(Long messageId, boolean hideFlag) throws PersistenceException;
+    Message updateMessageHideFlag(Long messageId, boolean hideFlag) throws PersistenceException;
 
     /**
      * Reply a topic.
@@ -165,7 +165,7 @@ public interface IForumService {
      * @return
      * @throws PersistenceException
      */
-    public Message replyTopic(Long parentId, Long sessionId, Message message) throws PersistenceException;
+    Message replyTopic(Long parentId, Long sessionId, Message message) throws PersistenceException;
 
     /**
      * Delete the topic by given topic ID. The function will delete all children topics under this topic.
@@ -173,7 +173,7 @@ public interface IForumService {
      * @param topicId
      * @throws PersistenceException
      */
-    public void deleteTopic(Long topicId) throws PersistenceException;
+    void deleteTopic(Long topicId) throws PersistenceException;
 
     /**
      * Upload message attachment file into repository. This method only upload the given file into system repository. It
@@ -183,7 +183,7 @@ public interface IForumService {
      * @return Attachment A new instance of attachment has uploaded file VersionID and UUID information.
      * @throws PersistenceException
      */
-    public Attachment uploadAttachment(FormFile file) throws PersistenceException;
+    Attachment uploadAttachment(FormFile file) throws PersistenceException;
 
     /**
      * Delete file from repository.
@@ -192,7 +192,7 @@ public interface IForumService {
      * @param versionID
      * @throws PersistenceException
      */
-    public void deleteFromRepository(Long uuID, Long versionID) throws PersistenceException;
+    void deleteFromRepository(Long uuID, Long versionID) throws PersistenceException;
 
     // ************************************************************************************
     // *********************Get topic methods **********************
@@ -203,7 +203,7 @@ public interface IForumService {
      * @param rootTopicId
      * @return List of MessageDTO
      */
-    public List getTopicThread(Long rootTopicId);
+    List getTopicThread(Long rootTopicId);
 
     /**
      * Get root topics by a given sessionID value. Simultanousely, it gets back topics, which author posted in authoring
@@ -216,14 +216,14 @@ public interface IForumService {
      * @param sessionId
      * @return List of MessageDTO
      */
-    public List<MessageDTO> getRootTopics(Long sessionId);
+    List<MessageDTO> getRootTopics(Long sessionId);
 
     /**
      * Get topics posted by author role. Note that the return type is DTO.
      * 
      * @return List of MessageDTO
      */
-    public List getAuthoredTopics(Long forumId);
+    List getAuthoredTopics(Long forumId);
 
     /**
      * This method will look up root topic ID by any level topicID.
@@ -231,7 +231,7 @@ public interface IForumService {
      * @param topicId
      * @return
      */
-    public Long getRootTopicId(Long topicId);
+    Long getRootTopicId(Long topicId);
 
     /**
      * Get message by given message UID
@@ -240,7 +240,7 @@ public interface IForumService {
      * @return Message
      * @throws PersistenceException
      */
-    public Message getMessage(Long messageUid) throws PersistenceException;
+    Message getMessage(Long messageUid) throws PersistenceException;
 
     /**
      * Get message list posted by given user. Note that the return type is DTO.
@@ -248,7 +248,7 @@ public interface IForumService {
      * @param userId
      * @return
      */
-    public List getMessagesByUserUid(Long userId, Long sessionId);
+    List getMessagesByUserUid(Long userId, Long sessionId);
 
     /**
      * Get how many post of this user post in a special session. DOES NOT include posts from author.
@@ -257,7 +257,7 @@ public interface IForumService {
      * @param sessionId
      * @return
      */
-    public int getTopicsNum(Long userID, Long sessionId);
+    int getTopicsNum(Long userID, Long sessionId);
 
     /**
      * Returns the number of posts this user has made in this topic.
@@ -266,7 +266,7 @@ public interface IForumService {
      * @param topicId
      * @return
      */
-    public int getNumOfPostsByTopic(Long userId, Long topicId);
+    int getNumOfPostsByTopic(Long userId, Long topicId);
 
     // ************************************************************************************
     // Session Method
@@ -277,7 +277,7 @@ public interface IForumService {
      * @param sessionId
      * @return
      */
-    public ForumToolSession getSessionBySessionId(Long sessionId);
+    ForumToolSession getSessionBySessionId(Long sessionId);
 
     /**
      * Get session list according to content ID.
@@ -285,7 +285,7 @@ public interface IForumService {
      * @param contentID
      * @return List
      */
-    public List getSessionsByContentId(Long contentID);
+    List getSessionsByContentId(Long contentID);
 
     /**
      * Get all message according to the given session ID.
@@ -293,7 +293,7 @@ public interface IForumService {
      * @param sessionID
      * @return
      */
-    public List<MessageDTO> getAllTopicsFromSession(Long sessionID);
+    List<MessageDTO> getAllTopicsFromSession(Long sessionID);
 
     // ************************************************************************************
     // User Method
@@ -303,7 +303,7 @@ public interface IForumService {
      * 
      * @param forumUser
      */
-    public void createUser(ForumUser forumUser);
+    void createUser(ForumUser forumUser);
 
     /**
      * Get user by user ID (not record UID).
@@ -311,7 +311,7 @@ public interface IForumService {
      * @param userId
      * @return
      */
-    public ForumUser getUserByUserAndSession(Long userId, Long sessionId);
+    ForumUser getUserByUserAndSession(Long userId, Long sessionId);
 
     /**
      * Get user list by given session ID.
@@ -319,7 +319,7 @@ public interface IForumService {
      * @param sessionID
      * @return
      */
-    public List getUsersBySessionId(Long sessionID);
+    List getUsersBySessionId(Long sessionID);
 
     /**
      * Get user by uid
@@ -327,7 +327,7 @@ public interface IForumService {
      * @param userUid
      * @return
      */
-    public ForumUser getUser(Long userUid);
+    ForumUser getUser(Long userUid);
 
     /**
      * Get user by user ID
@@ -335,7 +335,7 @@ public interface IForumService {
      * @param userId
      * @return
      */
-    public ForumUser getUserByID(Long userId);
+    ForumUser getUserByID(Long userId);
 
     /**
      * Update report contained inside specified message.
@@ -351,17 +351,17 @@ public interface IForumService {
     // ************************************************************************************
     // Miscellaneous Method
     // ************************************************************************************
-    public void releaseMarksForSession(Long sessionID);
+    void releaseMarksForSession(Long sessionID);
 
     /** The topic updates (for monitoring) are done in the web layer, so need the audit service to log the updates */
-    public IAuditService getAuditService();
+    IAuditService getAuditService();
 
     /**
      * Mark user completing a session.
      * 
      * @param currentUser
      */
-    public void finishUserSession(ForumUser currentUser);
+    void finishUserSession(ForumUser currentUser);
 
     /**
      * Create refection entry into notebook tool.
@@ -372,7 +372,7 @@ public interface IForumService {
      * @param userId
      * @param entryText
      */
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
+    Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText);
 
     /**
@@ -384,14 +384,14 @@ public interface IForumService {
      * @param userID
      * @return
      */
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
+    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 
     /**
      * @param notebookEntry
      */
-    public void updateEntry(NotebookEntry notebookEntry);
+    void updateEntry(NotebookEntry notebookEntry);
 
-    public IEventNotificationService getEventNotificationService();
+    IEventNotificationService getEventNotificationService();
 
     /**
      * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages.
@@ -412,9 +412,9 @@ public interface IForumService {
      *                existing conditions; required to check if a condition with the same name does not exist.
      * @return unique ForumCondition name
      */
-    public String createTextSearchConditionName(Collection<ForumCondition> existingConditions);
+    String createTextSearchConditionName(Collection<ForumCondition> existingConditions);
 
-    public void deleteCondition(ForumCondition condition) throws PersistenceException;
+    void deleteCondition(ForumCondition condition) throws PersistenceException;
     
     void sendNotificationsOnNewPosting(Long forumId, Long sessionId, Message message);
     
@@ -425,6 +425,16 @@ public interface IForumService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Return content folder (unique to each learner and lesson) which is used for storing user generated content.
+     * It's been used by CKEditor.
+     * 
+     * @param toolSessionId
+     * @param userId
+     * @return
+     */
+    String getLearnerContentFolder(Long toolSessionId, Long userId);
     
     AverageRatingDTO rateMessage(Long messageId, Long userId, Long toolSessionID, float rating);
     

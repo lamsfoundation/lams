@@ -38,7 +38,7 @@
 			<c:choose>
 				<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
 					<lams:CKEditor id="answer" value="${generalLearnerFlowDTO.currentAnswer}"
-						toolbarSet="DefaultLearner">
+						contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
 					</lams:CKEditor>
 				</c:when>
 	

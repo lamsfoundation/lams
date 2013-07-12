@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -45,7 +46,6 @@ import org.lamsfoundation.lams.util.FileUtilException;
  * 
  * @author Jacky Fang
  * @since 2005-3-17
- * @version
  * 
  * @author Ozgur Demirtas 24/06/2005
  * 
@@ -57,9 +57,7 @@ public class LamsToolService implements ILamsToolService {
     public IToolSessionDAO toolSessionDAO;
     public IToolContentDAO toolContentDAO;
 
-    /**
-     * @see org.lamsfoundation.lams.tool.service.ILamsCoreToolService#getAllPotentialLearners(long)
-     */
+    @Override
     public Set<User> getAllPotentialLearners(long toolSessionId) throws LamsToolServiceException {
 
 	ToolSession session = toolSessionDAO.getToolSession(toolSessionId);
@@ -71,17 +69,64 @@ public class LamsToolService implements ILamsToolService {
 	}
     }
 
+    @Override
     public IToolVO getToolBySignature(final String toolSignature) {
 	Tool tool = toolDAO.getToolBySignature(toolSignature);
 	return tool.createBasicToolVO();
     }
 
+    @Override
     public Tool getPersistToolBySignature(final String toolSignature) {
 	return toolDAO.getToolBySignature(toolSignature);
     }
 
+    @Override
     public long getToolDefaultContentIdBySignature(final String toolSignature) {
 	return toolDAO.getToolDefaultContentIdBySignature(toolSignature);
+    }
+
+    @Override
+    public String generateUniqueContentFolder() throws FileUtilException, IOException {
+
+	return FileUtil.generateUniqueContentFolderID();
+    }
+
+    @Override
+    public String getLearnerContentFolder(Long toolSessionId, Long userId) {
+
+	ToolSession toolSession = this.getToolSession(toolSessionId);
+	Long lessonId = toolSession.getLesson().getLessonId();
+	String learnerContentFolder = FileUtil.getLearnerContentFolder(lessonId, userId);
+
+	return learnerContentFolder;
+    }
+
+    @Override
+    public void saveOrUpdateTool(Tool tool) {
+	toolDAO.saveOrUpdateTool(tool);
+    }
+
+    /**
+     * Get the tool session object using the toolSessionId
+     * 
+     * @param toolSessionId
+     * @return
+     */
+    @Override
+    public ToolSession getToolSession(Long toolSessionId) {
+	return toolSessionDAO.getToolSession(toolSessionId);
+    }
+
+    @Override
+    public Boolean isGroupedActivity(long toolContentID) {
+	List<Activity> activities = toolContentDAO.findByProperty(Activity.class, "toolContentId", toolContentID);
+	if (activities.size() == 1) {
+	    Activity activity = activities.get(0);
+	    return activity.getApplyGrouping();
+	} else {
+	    log.debug("ToolContent contains multiple activities, can't test whether grouping applies.");
+	    return null;
+	}
     }
 
     /**
@@ -93,7 +138,7 @@ public class LamsToolService implements ILamsToolService {
 
     /**
      * @param toolDAO
-     *                The toolDAO to set.
+     *            The toolDAO to set.
      */
     public void setToolDAO(IToolDAO toolDAO) {
 	this.toolDAO = toolDAO;
@@ -112,7 +157,7 @@ public class LamsToolService implements ILamsToolService {
      * @return
      */
     public IToolContentDAO getToolContentDAO() {
-        return toolContentDAO;
+	return toolContentDAO;
     }
 
     /**
@@ -120,37 +165,6 @@ public class LamsToolService implements ILamsToolService {
      * @param toolContentDAO
      */
     public void setToolContentDAO(IToolContentDAO toolContentDAO) {
-        this.toolContentDAO = toolContentDAO;
-    }
-    
-    public String generateUniqueContentFolder() throws FileUtilException, IOException {
-
-	return FileUtil.generateUniqueContentFolderID();
-
-    }
-
-    public void saveOrUpdateTool(Tool tool) {
-	toolDAO.saveOrUpdateTool(tool);
-    }
-    
-    /**
-     * Get the tool session object using the toolSessionId
-     * @param toolSessionId
-     * @return
-     */
-    public ToolSession getToolSession(Long toolSessionId)
-    {
-	return toolSessionDAO.getToolSession(toolSessionId);
-    }
-
-    public Boolean isGroupedActivity(long toolContentID) {
-		List<Activity> activities = toolContentDAO.findByProperty(Activity.class, "toolContentId", toolContentID);
-		if (activities.size() == 1) {
-		    Activity activity = activities.get(0);
-		    return activity.getApplyGrouping();
-		} else {
-		    log.debug("ToolContent contains multiple activities, can't test whether grouping applies.");
-		    return null;
-		}
+	this.toolContentDAO = toolContentDAO;
     }
 }

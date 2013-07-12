@@ -67,6 +67,7 @@ import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
@@ -785,6 +786,21 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public AssessmentUser getUser(Long uid) {
 	return (AssessmentUser) assessmentUserDao.getObject(AssessmentUser.class, uid);
     }
+    
+    @Override
+    public String getMessage(String key) {
+	return messageService.getMessage(key);
+    }
+    
+    @Override
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
+    
+    @Override
+    public String getLearnerContentFolder(Long toolSessionId, Long userId) {
+	return toolService.getLearnerContentFolder(toolSessionId, userId);
+    }
 
     // *****************************************************************************
     // private methods
@@ -900,20 +916,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    }
 	}
 	return node;
-    }
-
-    /**
-     * Get a message from the language files with the given key
-     * 
-     * @param key
-     * @return
-     */
-    public String getMessage(String key) {
-	return messageService.getMessage(key);
-    }
-    
-    public boolean isGroupedActivity(long toolContentID) {
-	return toolService.isGroupedActivity(toolContentID);
     }
 
     // *****************************************************************************

@@ -48,6 +48,7 @@ import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.UUIDHexGenerator;
 import org.jdom.JDOMException;
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
+import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
 import com.thoughtworks.xstream.XStream;
@@ -66,6 +67,7 @@ public class FileUtil {
 
     public static final String LAMS_WWW_SECURE_DIR = "secure";
     public static final String LAMS_WWW_DIR = "lams-www.war";
+    public static final String LAMS_RUNTIME_CONTENT_DIR = "runtime";
     private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
     private static final int FILE_COPY_BUFFER_SIZE = 1024;
 
@@ -699,6 +701,30 @@ public class FileUtil {
 	newUniqueContentFolderID = ((String) uuidGen.generate(null, null)).toLowerCase();
 
 	return newUniqueContentFolderID;
+    }
+    
+    /**
+     * Return content folder (unique to each learner and lesson) which is used for storing user generated content.
+     * It's been used by CKEditor.
+     * 
+     * @param toolSessionId
+     * @param userId
+     * @return
+     */
+    public static String getLearnerContentFolder(Long lessonId, Long userId) {
+	return LAMS_RUNTIME_CONTENT_DIR + "/" + lessonId + "/" + userId;
+    }
+    
+    /**
+     * Return lesson's content folder which is used for storing user generated content.
+     * It's been used by CKEditor.
+     * 
+     * @param toolSessionId
+     * @param userId
+     * @return
+     */
+    public static String getLearnerContentFolder(Long lessonId) {
+	return LAMS_RUNTIME_CONTENT_DIR + "/" + lessonId;
     }
 
     /**

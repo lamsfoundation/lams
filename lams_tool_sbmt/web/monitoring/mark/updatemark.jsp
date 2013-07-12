@@ -87,7 +87,7 @@
 								<span  class="field-name"><fmt:message key="label.learner.comments" /><BR></span>
 								<lams:CKEditor id="comments"
 									value="${fileInfo.comments}"
-									toolbarSet="DefaultLearner"></lams:CKEditor>
+									toolbarSet="DefaultMonitor"></lams:CKEditor>
 							</td>
 						</tr>
 						<tr>

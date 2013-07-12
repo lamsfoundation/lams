@@ -165,6 +165,9 @@ public class LearningAction extends LamsDispatchAction {
 		}
 		request.setAttribute("finishedActivity", notebookUser.isFinishedActivity());
 		
+		request.setAttribute(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
+			notebookService.getLearnerContentFolder(toolSessionID, notebookUser.getUserId()));
+		
 		// date and time restriction LDEV-2657
 		Date submissionDeadline = notebook.getSubmissionDeadline();
 		if (submissionDeadline != null) {

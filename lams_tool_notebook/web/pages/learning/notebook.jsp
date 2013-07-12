@@ -81,14 +81,13 @@
 		<html:hidden property="toolSessionID" />
 
 		<c:set var="lrnForm"
-			value="<%=request
-									.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 		<c:choose>
 			<c:when test="${contentEditable}">
 				<c:choose>
 					<c:when test="${notebookDTO.allowRichEditor}">
-						<lams:CKEditor id="entryText" value="${lrnForm.entryText}"
+						<lams:CKEditor id="entryText" value="${lrnForm.entryText}" contentFolderID="${learnerContentFolder}"
 							toolbarSet="DefaultLearner">
 						</lams:CKEditor>
 					</c:when>

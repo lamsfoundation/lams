@@ -661,8 +661,14 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	}
     }
 
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
+    }
+    
+    @Override
+    public String getLearnerContentFolder(Long toolSessionId, Long userId) {
+	return toolService.getLearnerContentFolder(toolSessionId, userId);
     }
 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {

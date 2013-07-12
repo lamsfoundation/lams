@@ -107,10 +107,12 @@ public class MainExportServlet extends HttpServlet {
 
 	MainExportServlet.log.debug("Doing export portfolio");
 	Portfolio portfolios = null;
-	Long lessonID = null;
 	String role = null;
 	ToolAccessMode accessMode = null;
 	String exportFilename = "";
+	Long lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
+	//lesson's runtime content folder
+	String learnerContentFolder = FileUtil.getLearnerContentFolder(lessonID);
 
 	/**
 	 * Get the cookies that were sent along with this request, then pass it onto export service
@@ -132,7 +134,6 @@ public class MainExportServlet extends HttpServlet {
 	    // TODO check if the user id is coming from the request then the current user should have monitoring
 	    // privilege
 	    Integer userId = getLearnerUserID(request);
-	    lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
 
 	    if ((role = WebUtil.readStrParam(request, AttributeNames.PARAM_ROLE, true)) != null) {
 		accessMode = role.equals(ToolAccessMode.TEACHER.toString()) ? ToolAccessMode.TEACHER : null;
@@ -145,7 +146,6 @@ public class MainExportServlet extends HttpServlet {
 		    + learnerLogin + ".zip";
 	} else if (mode.equals(ToolAccessMode.TEACHER.toString())) {
 	    // done in the monitoring environment
-	    lessonID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID));
 	    portfolios = exportService.exportPortfolioForTeacher(lessonID, cookies);
 	    exportFilename = ExportPortfolioConstants.EXPORT_TEACHER_PREFIX + " " + portfolios.getLessonName() + ".zip";
 	}
@@ -163,14 +163,14 @@ public class MainExportServlet extends HttpServlet {
 	    }
 
 	    // correct all image links in created htmls.
-	    replaceImageFolderLinks(portfolios.getContentFolderID());
+	    replaceImageFolderLinks(portfolios.getContentFolderID(), learnerContentFolder);
 
 	    // bundle the stylesheet with the package
 	    CSSBundler bundler = new CSSBundler(request, cookies, exportTmpDir, exportService.getUserThemes());
 	    bundler.bundleStylesheet();
 
 	    // bundle all user uploaded content and CKEditor smileys with the package
-	    ImageBundler imageBundler = new ImageBundler(exportTmpDir, portfolios.getContentFolderID());
+	    ImageBundler imageBundler = new ImageBundler(exportTmpDir, portfolios.getContentFolderID(), learnerContentFolder);
 	    imageBundler.bundleImages();
 
 	    // zip up the contents of the temp export folder using a constant name
@@ -198,8 +198,10 @@ public class MainExportServlet extends HttpServlet {
      * 
      * @param contentFolderI
      *            32-character content folder name
+     * @param learnerContentFolder
+     *            runtime content folder
      */
-    private void replaceImageFolderLinks(String contentFolderID) {
+    private void replaceImageFolderLinks(String contentFolderID, String learnerContentFolder) {
 	File tempDir = new File(exportTmpDir);
 
 	// finds all the html extension files
@@ -209,7 +211,7 @@ public class MainExportServlet extends HttpServlet {
 	for (Iterator it = jspFiles.iterator(); it.hasNext();) {
 	    Object element = it.next();
 	    MainExportServlet.log.debug("Correcting links in file " + element.toString());
-	    replaceImageFolderLinks(element.toString(), contentFolderID);
+	    replaceImageFolderLinks(element.toString(), contentFolderID, learnerContentFolder);
 	}
     }
 
@@ -220,22 +222,24 @@ public class MainExportServlet extends HttpServlet {
      *            filename
      * @param contentFolderID
      *            32-character content folder name
-     * @param lamsOrRams
-     *            "rams/" if we are running rams and "lams/" otherwise
+     * @param learnerContentFolder
+     *            runtime content folder
      */
-    private void replaceImageFolderLinks(String filename, String contentFolderID) {
+    private void replaceImageFolderLinks(String filename, String contentFolderID, String learnerContentFolder) {
 	try {
 	    // String to find
 	    String ckeditorpath = "/lams/www/secure/" + contentFolderID;
 	    String ckeditorrecpath = "../" + contentFolderID + "/Recordings";
 	    String ckeditorsmiley = "/lams/ckeditor/images/smiley";
 	    String ckeditorvr = "/lams/ckeditor/plugins/videorecorder";
+	    String learnerContentPath = "/+lams/+www/+secure/+" + learnerContentFolder;
 
 	    // Replacing string
 	    String newckeditorpath = "../" + contentFolderID;
 	    String newckeditorrecpath = "../../../../" + contentFolderID + "/Recordings";
 	    String newckeditorsmiley = "../ckeditor/images/smiley";
 	    String newckeditorvr = "../ckeditor/plugins/videorecorder";
+	    String newLearnerContentPath = "../" + learnerContentFolder;;
 
 	    File fin = new File(filename);
 	    // Open and input stream
@@ -255,6 +259,9 @@ public class MainExportServlet extends HttpServlet {
 
 	    Pattern p4 = Pattern.compile(ckeditorvr);
 	    Matcher m4 = p4.matcher("");
+	    
+	    Pattern p5 = Pattern.compile(learnerContentPath);
+	    Matcher m5 = p5.matcher("");
 
 	    String aLine = null;
 	    String output = "";
@@ -275,7 +282,11 @@ public class MainExportServlet extends HttpServlet {
 
 		// Replace the p3 matching patterns with the newckeditorvr
 		m4.reset(thirdpass);
-		String result = m4.replaceAll(newckeditorvr);
+		String forthpass = m4.replaceAll(newckeditorvr);
+		
+		// Replace the p4 matching patterns with the newLearnerContentPath
+		m5.reset(forthpass);
+		String result = m5.replaceAll(newLearnerContentPath);
 
 		output = output + result + "\n";
 	    }

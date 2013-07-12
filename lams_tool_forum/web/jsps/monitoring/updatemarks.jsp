@@ -70,7 +70,7 @@
 				<span  class="field-name"><fmt:message key="lable.topic.title.comment" /><BR></span>
 				<lams:CKEditor id="comment"
 					value="${formBean.comment}"
-					toolbarSet="DefaultLearner"></lams:CKEditor>
+					toolbarSet="DefaultMonitor"></lams:CKEditor>
 			</td>
 		</tr>
 		<tr>

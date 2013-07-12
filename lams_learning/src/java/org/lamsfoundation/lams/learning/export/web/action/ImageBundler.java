@@ -53,6 +53,7 @@ public class ImageBundler extends Bundler {
     List<String> directoriesRequired = null;
     String outputDirectory = null;
     String contentFolderId = null;
+    String learnerContentFolder = null;
     String lamsWwwPath = null;
     String lamsCentralPath = null;
 
@@ -62,11 +63,12 @@ public class ImageBundler extends Bundler {
      * @param contentFolderId
      *            the 32-character content folder name
      */
-    public ImageBundler(String outputDirectory, String contentFolderId) {
+    public ImageBundler(String outputDirectory, String contentFolderId, String learnerContentFolder) {
 	filesToCopy = new HashMap<String, File>();
 	directoriesRequired = new ArrayList<String>();
 	this.outputDirectory = outputDirectory;
 	this.contentFolderId = contentFolderId;
+	this.learnerContentFolder = learnerContentFolder;
 
 	String lamsEarDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
 	if (lamsEarDir == null) {
@@ -89,15 +91,22 @@ public class ImageBundler extends Bundler {
 	if (lamsWwwPath != null) {
 	    ImageBundler.log.debug("Copying user generated content from path " + lamsWwwPath);
 
+	    // copy content folder to output
 	    File contentFolderDir = new File(lamsWwwPath + File.separatorChar + "secure" + File.separatorChar
 		    + contentFolderId);
-
 	    if (contentFolderDir.exists() && contentFolderDir.isDirectory()) {
-		// copy content folder to output
 		File destDir = new File(outputDirectory + File.separatorChar + contentFolderId);
 		FileUtils.copyDirectory(contentFolderDir, destDir);
 	    } else {
 		ImageBundler.log.debug("Folder for contentFolderId:" + contentFolderId + "doesn't exist");
+	    }
+	    
+	    // copy learner content folder to output
+	    File learnerContentFolderDir = new File(lamsWwwPath + File.separatorChar + "secure" + File.separatorChar
+		    + learnerContentFolder);
+	    if (learnerContentFolderDir.exists() && learnerContentFolderDir.isDirectory()) {
+		File destDir = new File(outputDirectory + File.separatorChar + learnerContentFolder);
+		FileUtils.copyDirectory(learnerContentFolderDir, destDir);
 	    }
 	}
 

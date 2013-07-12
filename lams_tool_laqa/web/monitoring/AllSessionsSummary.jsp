@@ -147,7 +147,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 																			<c:choose>
 																				<c:when test="${content.allowRichEditor}">
 																				<lams:CKEditor id="updatedResponse" value="${userData.response}"
-																					toolbarSet="DefaultLearner">
+																					toolbarSet="DefaultMonitor">
 																				</lams:CKEditor>
 																			</c:when>
 																				<c:otherwise>
