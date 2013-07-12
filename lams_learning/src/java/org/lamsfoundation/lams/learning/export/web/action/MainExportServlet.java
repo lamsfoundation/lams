@@ -228,7 +228,7 @@ public class MainExportServlet extends HttpServlet {
     private void replaceImageFolderLinks(String filename, String contentFolderID, String learnerContentFolder) {
 	try {
 	    // String to find
-	    String ckeditorpath = "/lams/www/secure/" + contentFolderID;
+	    String ckeditorpath = "/*lams/+www/+secure/+" + contentFolderID;
 	    String ckeditorrecpath = "../" + contentFolderID + "/Recordings";
 	    String ckeditorsmiley = "/lams/ckeditor/images/smiley";
 	    String ckeditorvr = "/lams/ckeditor/plugins/videorecorder";
