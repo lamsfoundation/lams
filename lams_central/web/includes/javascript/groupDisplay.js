@@ -1,29 +1,12 @@
 function initMainPage() {
-	$('#orgTabs').tabs().addClass('ui-tabs-vertical ui-helper-clearfix')
-		.find('li').removeClass('ui-corner-top').addClass('ui-corner-left');
+	$('#orgTabs').tabs({
+		'activate' : function(event, ui){
+			loadOrgTab(ui.newPanel);
+		}
+	}).addClass('ui-tabs-vertical ui-helper-clearfix')
+	  .find('li').removeClass('ui-corner-top').addClass('ui-corner-left');
 	
-	var stateId = tabName == 'profile' ? 3 : 1; 
-	$("div.orgTab").each(function() {
-		var orgTab = $(this);
-		var orgId = orgTab.attr("id").split('-')[1];
-		
-		orgTab.load(
-			"displayGroup.do",
-			{
-				display : 'group',
-				stateId : stateId,
-				orgId   : orgId
-			},
-			function() {
-				$('#orgTabHeader-' + orgId + ' a').text($('.j-group-header', orgTab).text());
-				$('.mycourses-left-buttons', orgTab).remove();
-				toggleGroupContents(orgTab, stateId);
-				$("a[class*='thickbox']", orgTab).each(function() {
-					tb_init(this);
-				});
-				initMoreActions(orgTab);
-			});
-	});
+	loadOrgTab($('.orgTab').first());
 	
 	$("#actionAccord").accordion({
 		'heightStyle' : 'content'
@@ -149,6 +132,29 @@ function initMainPage() {
 						}
 					});
 }
+
+function loadOrgTab(orgTab) {
+	if (!orgTab.text()) {
+		var orgId = orgTab.attr("id").split('-')[1];
+		
+		orgTab.load(
+			"displayGroup.do",
+			{
+				display : 'group',
+				stateId : stateId,
+				orgId   : orgId
+			},
+			function() {
+				$('.mycourses-left-buttons', orgTab).remove();
+				toggleGroupContents(orgTab, stateId);
+				$("a[class*='thickbox']", orgTab).each(function() {
+					tb_init(this);
+				});
+				initMoreActions(orgTab);
+			});
+	}
+}
+
 
 function initLoadGroup(element, stateId, display) {
 	jQuery(element).load(

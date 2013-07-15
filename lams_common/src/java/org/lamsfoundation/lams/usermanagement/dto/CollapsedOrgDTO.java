@@ -18,31 +18,40 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.usermanagement.dto; 
- 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.usermanagement.dto;
+
 /**
  * @author jliew
- *
+ * 
  */
 public class CollapsedOrgDTO {
 
-	private Integer orgId;
-	private Boolean collapsed;
-	
-	public CollapsedOrgDTO(Integer orgId, Boolean collapsed) {
-		this.orgId = orgId;
-		this.collapsed = collapsed;
-	}
-	
-	public Integer getOrgId() {
-		return orgId;
-	}
-	
-	public Boolean getCollapsed() {
-		return collapsed;
-	}
+    private Integer orgId;
+    private String orgName;
+    private Boolean collapsed;
+
+    public CollapsedOrgDTO(Integer orgId, String orgName, Boolean collapsed) {
+	this.orgId = orgId;
+	this.orgName = orgName;
+	this.collapsed = collapsed;
+    }
+
+    public Integer getOrgId() {
+	return orgId;
+    }
+
+    public Boolean getCollapsed() {
+	return collapsed;
+    }
+
+    public String getOrgName() {
+	return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+	this.orgName = orgName;
+    }
 }
- 

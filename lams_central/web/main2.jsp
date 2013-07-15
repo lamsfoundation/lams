@@ -36,7 +36,7 @@
 		}
 		
 		td#messageCell {
-			width: 100%;
+			width:80%;
 		}
 		
 		#message {
@@ -73,6 +73,11 @@
 			padding: 0;
 			vertical-align: top;
 			font-family: verdana,arial,helvetica,sans-serif;
+		}
+		
+		#orgTabs li {
+			width: 150px;
+			white-space: normal;
 		}
 		
 		#orgTabsPanelCell {
@@ -135,6 +140,7 @@
 			}
 			
 			var tabName = '${tab}';
+			var stateId = tabName == 'profile' ? 3 : 1; 
 
 			$(document).ready(function(){
 				initMainPage();
@@ -269,8 +275,8 @@
 								<td>
 									<ul>
 										<c:forEach items="${collapsedOrgDTOs}" var="dto">
-											<li id="orgTabHeader-${dto.orgId}" class="orgTabHeader">
-												<a href="#orgTab-${dto.orgId}"></a>
+											<li>
+												<a href="#orgTab-${dto.orgId}"><c:out value="${dto.orgName}" /></a>
 											</li>
 										</c:forEach>
 									</ul>
@@ -302,24 +308,6 @@
 					</td>
 				</tr>
 			</table>
-			
-			<%--
-			<c:forEach items="${collapsedOrgDTOs}" var="dto">
-				<div id="<c:out value="${dto.orgId}"/>" style="display:none" class="course-bg">
-					<c:if test="${dto.collapsed}">header</c:if><c:if test="${!dto.collapsed}">group</c:if>
-				</div>
-			</c:forEach>
-			<c:if test="${empty collapsedOrgDTOs}">
-				<c:if test="${not empty showGroups}">
-					<div class="course-bg"><div class="row"><div class="mycourses-right-buttons">
-						<a class="show-all-groups-button" onclick="document.location.href='index.do?groups=show';"><fmt:message key="label.show.groups"/></a>
-					</div></div></div>
-				</c:if>
-				<c:if test="${empty showGroups}">
-					<p class="align-left"><fmt:message key="msg.groups.empty" /></p>
-				</c:if>
-			</c:if>
-			 --%>
 		</c:if>
 		<c:if test="${tab eq 'profile'}">
 			<tiles:insert attribute="profile" />
