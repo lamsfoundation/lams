@@ -992,9 +992,29 @@ function showClassDialog(){
  */
 function fillClassDialogList(listId, users, disableCreator) {
 	var list = $('#' + listId + 'List').empty();
+	var selectAllInitState = true;
+	
 	$.each(users, function(userIndex, user) {
 		var checkbox = $('<input />').attr({
 	    	 'type' : 'checkbox'
+	      }).change(function(){
+	    	var itemState = $(this).is(':checked');
+	    	if (itemState) {
+	    		var selectAllState = true;
+	    		$('input', list).each(function(){
+	    			if (!$(this).is(':checked')) {
+	    				selectAllState = false;
+	    				return false;
+	    			}
+	    		});
+	    		
+	    		if (selectAllState) {
+	    			$('#' + listId + 'SelectAll').attr('checked', 'checked');
+	    		}
+	    	} else {
+	    		$('#' + listId + 'SelectAll').attr('checked', null);
+	    	}
+	    	
 	      });
 		if (user.classMember) {
 			checkbox.attr('checked', 'checked');
@@ -1002,6 +1022,8 @@ function fillClassDialogList(listId, users, disableCreator) {
 				// user creator must not be deselected
 				checkbox.attr('disabled', 'disabled');
 			}
+		} else {
+			selectAllInitState = false;
 		}
 		
 		var userDiv = $('<div />').attr({
@@ -1022,6 +1044,8 @@ function fillClassDialogList(listId, users, disableCreator) {
 		    })
 		}
 	});	
+
+	$('#' + listId + 'SelectAll').attr('checked', selectAllInitState ? 'checked' : null);
 }
 
 
@@ -1408,6 +1432,11 @@ function sortDialogList(listId) {
 			sortOrderAsc[listId] = true;
 		}
 	}
+}
+
+function selectAllInDialogList(listId) {
+	var targetState = $('#' + listId + 'SelectAll').is(':checked') ? 'checked' : null;
+	$('#' + listId + 'List input').attr('checked', targetState);
 }
 
 
