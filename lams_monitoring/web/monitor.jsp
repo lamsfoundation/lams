@@ -400,6 +400,18 @@
 				</td>
 			</tr>
 			<tr>
+				<td>
+					<input type="checkbox" id="classLearnerSelectAll"
+						   onChange="javascript:selectAllInDialogList('classLearner')" />
+					<fmt:message key="learner.group.select.all"/>
+				</td>
+				<td>
+					<input type="checkbox" id="classMonitorSelectAll"
+						   onChange="javascript:selectAllInDialogList('classMonitor')" />
+					<fmt:message key="learner.group.select.all"/>
+				</td>
+			</tr>
+			<tr>
 				<td id="classLearnerList" class="dialogList">
 				</td>
 				<td id="classMonitorList" class="dialogList">

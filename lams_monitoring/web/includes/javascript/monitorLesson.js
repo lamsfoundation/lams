@@ -1436,7 +1436,11 @@ function sortDialogList(listId) {
 
 function selectAllInDialogList(listId) {
 	var targetState = $('#' + listId + 'SelectAll').is(':checked') ? 'checked' : null;
-	$('#' + listId + 'List input').attr('checked', targetState);
+	$('#' + listId + 'List input').each(function(){
+		if (!$(this).is(':disabled')) {
+			$(this).attr('checked', targetState);
+		}		
+	});
 }
 
 
