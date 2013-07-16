@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioConstants;
 import org.lamsfoundation.lams.learning.export.ExportPortfolioException;
@@ -227,12 +228,12 @@ public class MainExportServlet extends HttpServlet {
      */
     private void replaceImageFolderLinks(String filename, String contentFolderID, String learnerContentFolder) {
 	try {
-	    // String to find
-	    String ckeditorpath = "/*lams/+www/+secure/+" + contentFolderID;
+	    // ((\\\\)?/)* stands for any number of slashes(/) or escaped slashes(\/, which was produced by running StringEscapeUtils.escapeJavaScript() beforehand)
+	    String ckeditorpath = "((\\\\)?/)*lams((\\\\)?/)+www((\\\\)?/)+secure((\\\\)?/)+" + contentFolderID;
 	    String ckeditorrecpath = "../" + contentFolderID + "/Recordings";
 	    String ckeditorsmiley = "/lams/ckeditor/images/smiley";
 	    String ckeditorvr = "/lams/ckeditor/plugins/videorecorder";
-	    String learnerContentPath = "/+lams/+www/+secure/+" + learnerContentFolder;
+	    String learnerContentPath = "((\\\\)?/)+lams((\\\\)?/)+www((\\\\)?/)+secure((\\\\)?/)+" + learnerContentFolder.replaceAll("/", "((\\\\\\\\)?/)+");
 
 	    // Replacing string
 	    String newckeditorpath = "../" + contentFolderID;

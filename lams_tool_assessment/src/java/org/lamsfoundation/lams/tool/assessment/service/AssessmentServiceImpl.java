@@ -40,6 +40,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
@@ -806,6 +807,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     // private methods
     // *****************************************************************************
 
+    /**
+     * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly
+     * escapes all quotes in the following way \").
+     */
     private static void escapeQuotes(Object object) {
 	if (object instanceof UserSummary) {
 	    UserSummary userSummary = (UserSummary) object;
@@ -844,24 +849,28 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     private static void escapeQuotesInQuestionResult(AssessmentQuestionResult questionResult) {
 	String answerString = questionResult.getAnswerString();
 	if (answerString != null) {
-	    questionResult.setAnswerString(answerString.replaceAll("[\"]", "&quot;"));
+	    answerString = StringEscapeUtils.escapeJavaScript(answerString);
+	    questionResult.setAnswerString(answerString);
 	}
 
 	AssessmentQuestion question = questionResult.getAssessmentQuestion();
 	String title = question.getTitle();
 	if (title != null) {
-	    question.setTitle(title.replaceAll("[\"]", "&quot;"));
+	    title = StringEscapeUtils.escapeJavaScript(title);
+	    question.setTitle(title);
 	}
 
 	for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
 	    String questionStr = questionOption.getQuestion();
 	    if (questionStr != null) {
-		questionOption.setQuestion(questionStr.replaceAll("[\"]", "&quot;"));
+		questionStr = StringEscapeUtils.escapeJavaScript(questionStr);
+		questionOption.setQuestion(questionStr);
 	    }
 
 	    String optionStr = questionOption.getOptionString();
 	    if (optionStr != null) {
-		questionOption.setOptionString(optionStr.replaceAll("[\"]", "&quot;"));
+		optionStr = StringEscapeUtils.escapeJavaScript(optionStr);
+		questionOption.setOptionString(optionStr);
 	    }
 	}
     }
