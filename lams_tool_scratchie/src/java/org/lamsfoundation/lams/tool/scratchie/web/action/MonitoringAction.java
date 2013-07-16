@@ -34,6 +34,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -135,11 +136,10 @@ public class MonitoringAction extends Action {
 	Long contentId = (Long) sessionMap.get(ScratchieConstants.ATTR_TOOL_CONTENT_ID);
 	List<GroupSummary> summaryList = getScratchieService().getQuestionSummary(contentId, itemUid);
 	
-	// Removes all the html tags from an answer descriptions
+	// escape JS sensitive characters in answer descriptions
 	for (GroupSummary summary : summaryList) {
 	    for (ScratchieAnswer answer : summary.getAnswers()) {
-		String description = (answer.getDescription() == null) ? "" : answer.getDescription()
-			.replaceAll("\\<.*?>", "").replaceAll("[\"]", "&quot;");
+		String description = (answer.getDescription() == null) ? "" : StringEscapeUtils.escapeJavaScript(answer.getDescription());
 		answer.setDescription(description);
 	    }
 	}
