@@ -163,9 +163,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	Wiki wiki = wikiDAO.getByContentId(toolContentId);
 	session.setWiki(wiki);
 
-	// Generate a unique content folder id for the wiki
-	session.setContentFolderID(FileUtil.generateUniqueContentFolderID());
-
 	// Create an empty list to copy the wiki pages into
 	Set<WikiPage> sessionWikiPages = new HashSet<WikiPage>();
 	
@@ -815,8 +812,14 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	this.auditService = auditService;
     }
     
+    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
+    }
+    
+    @Override
+    public String getLearnerContentFolder(Long toolSessionId, Long userId) {
+	return toolService.getLearnerContentFolder(toolSessionId, userId);
     }
 
     private NodeKey processFile(FormFile file, String type) {

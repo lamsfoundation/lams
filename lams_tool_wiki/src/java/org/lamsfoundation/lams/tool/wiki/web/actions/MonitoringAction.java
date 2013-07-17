@@ -194,9 +194,6 @@ public class MonitoringAction extends WikiPageAction {
 	    wikiPageDTOs.add(pageDTO);
 	}
 	
-	// Set the content folder id
-	request.setAttribute(WikiConstants.ATTR_CONTENT_FOLDER_ID, wikiSession.getContentFolderID());
-	
 	request.setAttribute(WikiConstants.ATTR_WIKI_PAGES, wikiPageDTOs);
 	request.setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE, new WikiPageDTO(wikiSession.getMainPage()));
 

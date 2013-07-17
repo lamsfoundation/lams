@@ -347,4 +347,14 @@ public interface IWikiService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Return content folder (unique to each learner and lesson) which is used for storing user generated content.
+     * It's been used by CKEditor.
+     * 
+     * @param toolSessionId
+     * @param userId
+     * @return
+     */
+    String getLearnerContentFolder(Long toolSessionId, Long userId);
 }

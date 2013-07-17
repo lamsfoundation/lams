@@ -546,27 +546,27 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	if (wikiSession.getWiki().isNotifyUpdates()) {
 	    boolean isHtmlFormat = false;
 
-	    List<User> users = wikiService.getMonitorsByToolSessionId(toolSessionID);
-	    Integer[] monitoringUsersIds = new Integer[users.size()];
-	    for (int i = 0; i < monitoringUsersIds.length; i++) {
-		monitoringUsersIds[i] = users.get(i).getUserId();
+	    List<User> monitors = wikiService.getMonitorsByToolSessionId(toolSessionID);
+	    for (User monitor : monitors) {
+		Integer monitorUserId = monitor.getUserId();
+		String contentFolderId = wikiService.getLearnerContentFolder(toolSessionID, monitorUserId.longValue());
+		
+		String relativePath = "/tool/" + WikiConstants.TOOL_SIGNATURE
+			+ "/monitoring.do?dispatch=showWiki&toolSessionID=" + toolSessionID.toString()
+			+ "&contentFolderID=" + contentFolderId;
+
+		String hash = relativePath + "," + toolSessionID.toString() + ",t";
+		hash = new String(Base64.encodeBase64(hash.getBytes()));
+
+		String link = Configuration.get(ConfigurationKeys.SERVER_URL) + "r.do?" + "h=" + hash;
+
+		String body = wikiService.getLocalisedMessage(bodyLangKey,
+			new Object[] { fullName, wikiSession.getSessionName(), link });
+
+		notificationService.sendMessage(null, monitorUserId,
+			IEventNotificationService.DELIVERY_METHOD_MAIL, subject, body, isHtmlFormat);
 	    }
 
-	    String relativePath = "/tool/" + WikiConstants.TOOL_SIGNATURE
-		    + "/monitoring.do?dispatch=showWiki&toolSessionID=" + toolSessionID.toString() 
-		    + "&contentFolderID=" + wikiSession.getContentFolderID();
-	    
-	    String hash = relativePath + "," + toolSessionID.toString() + ",t";
-	    hash = new String(Base64.encodeBase64(hash.getBytes()));
-	    
-	    String link = Configuration.get(ConfigurationKeys.SERVER_URL) + "r.do?" +
-	    	"h=" + hash;
-	  
-	    String body = wikiService.getLocalisedMessage(bodyLangKey, new Object[] { fullName,
-		    wikiSession.getSessionName(), link });
-
-	    notificationService.sendMessage(null, monitoringUsersIds, IEventNotificationService.DELIVERY_METHOD_MAIL,
-		    subject, body, isHtmlFormat);
 	}
 
 	// trigger the event if exists for all the learners who are subscribed

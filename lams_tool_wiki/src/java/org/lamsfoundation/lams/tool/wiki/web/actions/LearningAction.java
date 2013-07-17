@@ -218,7 +218,8 @@ public class LearningAction extends WikiPageAction {
 	request.setAttribute(WikiConstants.ATTR_WIKI_PAGE_CONTENT_HISTORY, currentWikiPageHistoryDTOs);
 
 	// Set the content folder id
-	request.setAttribute(WikiConstants.ATTR_CONTENT_FOLDER_ID, wikiSession.getContentFolderID());
+	request.setAttribute(WikiConstants.ATTR_CONTENT_FOLDER_ID,
+		wikiService.getLearnerContentFolder(toolSessionID, wikiUser.getUserId()));
 
 	// set readOnly flag.
 	if (mode.equals(ToolAccessMode.TEACHER) || (wiki.isLockOnFinished() && wikiUser.isFinishedActivity())) {

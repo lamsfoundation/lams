@@ -184,7 +184,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	    // Update image links
 	    WikiPageContentDTO contentDTO = wikiPageDTO.getCurrentWikiContentDTO();
-	    contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID()));
 	    wikiPageDTO.setCurrentWikiContentDTO(contentDTO);
 
 	    wikiPageDTOs.add(wikiPageDTO);
@@ -197,11 +196,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	// construct main page dto
 	request.getSession()
 		.setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE, new WikiPageDTO(wikiSession.getMainPage()));
-
-	// bundle all user uploaded content and CKEditor smileys with the
-	// package
-	ImageBundler imageBundler = new ImageBundler(directoryName, wikiSession.getContentFolderID());
-	imageBundler.bundleImages();
 
 	// Construct the user dto
 	UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
@@ -285,7 +279,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 		// Update image links
 		WikiPageContentDTO contentDTO = wikiPageDTO.getCurrentWikiContentDTO();
-		contentDTO.setBody(replaceImageFolderLinks(contentDTO.getBody(), wikiSession.getContentFolderID()));
 		wikiPageDTO.setCurrentWikiContentDTO(contentDTO);
 
 		wikiPageDTOs.add(wikiPageDTO);
@@ -300,48 +293,12 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    request.getSession().setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE,
 		    new WikiPageDTO(wikiSession.getMainPage()));
 
-	    // bundle all user uploaded content and CKEditor smileys with the
-	    // package
-	    ImageBundler imageBundler = new ImageBundler(directoryName, wikiSession.getContentFolderID());
-	    imageBundler.bundleImages();
-
 	    writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName,
 		    wikiSession.getSessionId() + ".html", cookies);
 
 	    // Set the mode
 	    request.getSession().setAttribute(WikiConstants.ATTR_MODE, ToolAccessMode.TEACHER);
 	}
-    }
-
-    /**
-     * Goes through the content and changes the references to images so they can be referenced locally
-     * 
-     * @param body
-     * @param contentFolderID
-     * @return
-     */
-    private String replaceImageFolderLinks(String body, String contentFolderID) {
-	String ckeditorpath = "/lams/www/secure/" + contentFolderID;
-	String newckeditorpath = "./" + contentFolderID;
-
-	String ckeditorsmiley = "/lams/ckeditor/images/smiley";
-	String newckeditorsmiley = "./ckeditor/images/smiley";
-
-	// The pattern matches control characters
-	Pattern p = Pattern.compile(ckeditorpath);
-	Matcher m = p.matcher("");
-
-	Pattern p2 = Pattern.compile(ckeditorsmiley);
-	Matcher m2 = p2.matcher("");
-
-	// Replace the p matching pattern with the newckeditorpath
-	m.reset(body);
-	String result = m.replaceAll(newckeditorpath);
-
-	m2.reset(result);
-	result = m2.replaceAll(newckeditorsmiley);
-
-	return result;
     }
 
 }
