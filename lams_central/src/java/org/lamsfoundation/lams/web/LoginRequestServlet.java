@@ -154,28 +154,9 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 
 	    if (extCourseId != null) {
-		ExtCourseClassMap orgMap = getService().getExtCourseClassMap(serverMap, userMap, extCourseId,
-			countryIsoCode, langIsoCode, courseName, method, prefix);
-		Organisation org = orgMap.getOrganisation();
-		IUserManagementService userManagementService = LoginRequestServlet.integrationService.getService();
-		UserOrganisation uo = userManagementService.getUserOrganisation(user.getUserId(),
-			org.getOrganisationId());
-		// make sure external user has minimal set of roles, i.e. learner
-		Integer[] roleIds = new Integer[] { Role.ROLE_LEARNER };
-		// we have to assign all the roles to the external user here, because once the user logged in, the roles
-		// are cached in JBoss, all the calls of request.isUserInRole() will be based on the cached roles
-		Map<String, Object> properties = new HashMap<String, Object>();
-		properties.put("userOrganisation.userOrganisationId", uo.getUserOrganisationId());
-		for (Integer roleId : roleIds) {
-		    properties.put("role.roleId", roleId);
-		    List<UserOrganisationRole> list = userManagementService.findByProperties(
-			    UserOrganisationRole.class, properties);
-		    if ((list == null) || (list.size() == 0)) {
-			UserOrganisationRole uor = new UserOrganisationRole(uo, (Role) userManagementService.findById(
-				Role.class, roleId));
-			userManagementService.save(uor);
-		    }
-		}
+		//check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
+		getService().getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode,
+			courseName, method, prefix);
 	    }
 
 	    LoginRequestServlet.log.debug("Session Id - " + hses.getId());

@@ -129,17 +129,28 @@ public class IntegrationService implements IIntegrationService {
     public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
 	    String extCourseId, String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId,
 	    Boolean isTeacher, Boolean prefix) {
+	ExtCourseClassMap map;
+	Organisation org;
+	User user = userMap.getUser();
+	
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("courseid", extCourseId);
 	properties.put("extServerOrgMap.sid", serverMap.getSid());
-	List list = service.findByProperties(ExtCourseClassMap.class, properties);
-	if (list == null || list.size() == 0) {
-	    return createExtCourseClassMap(serverMap, userMap.getUser(), extCourseId, extCourseName, countryIsoCode,
-		    langIsoCode, parentOrgId, isTeacher, prefix);
+	List<ExtCourseClassMap> mapList = service.findByProperties(ExtCourseClassMap.class, properties);
+	if (mapList == null || mapList.size() == 0) {
+	    //create new ExtCourseClassMap
+	    
+	    org = createOrganisation(serverMap, user, extCourseId, extCourseName, countryIsoCode,
+		    langIsoCode, parentOrgId, prefix);
+	    map = new ExtCourseClassMap();
+	    map.setCourseid(extCourseId);
+	    map.setExtServerOrgMap(serverMap);
+	    map.setOrganisation(org);
+	    service.save(map);
+	    
 	} else {
-	    ExtCourseClassMap map = (ExtCourseClassMap) list.get(0);
-	    User user = userMap.getUser();
-	    Organisation org = map.getOrganisation();
+	    map = mapList.get(0);
+	    org = map.getOrganisation();
 
 	    // update external course name if if has changed
 	    String requestedCourseName = prefix ? buildName(serverMap.getPrefix(), extCourseName) : extCourseName;
@@ -147,16 +158,24 @@ public class IntegrationService implements IIntegrationService {
 		org.setName(requestedCourseName);
 		service.updateOrganisationandWorkspaceNames(org);
 	    }
-	    if (service.getUserOrganisation(user.getUserId(), org.getOrganisationId()) == null) {
-		addMemberships(user, org, isTeacher);
-	    }
-	    return map;
 	}
+	
+	updateUserRoles(user, org, isTeacher);
+	
+	return map;
     }
 
-    private void addMemberships(User user, Organisation org, Boolean isTeacher) {
-	UserOrganisation uo = new UserOrganisation(user, org);
-	service.save(uo);
+    private void updateUserRoles(User user, Organisation org, Boolean isTeacher) {
+	
+	//create UserOrganisation if it doesn't exist
+	UserOrganisation uo = service.getUserOrganisation(user.getUserId(), org.getOrganisationId());
+	if (uo == null) {
+	    uo = new UserOrganisation(user, org);
+	    service.save(uo);
+	    user.addUserOrganisation(uo);
+	    service.save(user);
+	}
+	
 	Integer[] roles;
 	if (isTeacher) {
 	    roles = new Integer[] { Role.ROLE_AUTHOR, Role.ROLE_MONITOR, Role.ROLE_LEARNER };
@@ -164,12 +183,13 @@ public class IntegrationService implements IIntegrationService {
 	    roles = new Integer[] { Role.ROLE_LEARNER };
 	}
 	for (Integer roleId : roles) {
-	    UserOrganisationRole uor = new UserOrganisationRole(uo, (Role) service.findById(Role.class, roleId));
-	    service.save(uor);
-	    uo.addUserOrganisationRole(uor);
+	    if (!service.hasRoleInOrganisation(user, roleId, org)) {
+		UserOrganisationRole uor = new UserOrganisationRole(uo, (Role) service.findById(Role.class, roleId));
+		service.save(uor);
+		uo.addUserOrganisationRole(uor);
+		service.save(uo);
+	    }
 	}
-	user.addUserOrganisation(uo);
-	service.save(user);
     }
 
     public ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, boolean prefix)
@@ -231,20 +251,6 @@ public class IntegrationService implements IIntegrationService {
 	} else {
 	    return (ExtUserUseridMap) list.get(0);
 	}
-    }
-
-    private ExtCourseClassMap createExtCourseClassMap(ExtServerOrgMap serverMap, User user, String extCourseId,
-	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean isTeacher,
-	    Boolean prefix) {
-	Organisation org = createOrganisation(serverMap, user, extCourseId, extCourseName, countryIsoCode, langIsoCode,
-		parentOrgId, prefix);
-	addMemberships(user, org, isTeacher);
-	ExtCourseClassMap map = new ExtCourseClassMap();
-	map.setCourseid(extCourseId);
-	map.setExtServerOrgMap(serverMap);
-	map.setOrganisation(org);
-	service.save(map);
-	return map;
     }
 
     private Organisation createOrganisation(ExtServerOrgMap serverMap, User user, String extCourseId,
