@@ -41,7 +41,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('UploadFileMaxMemorySize','4096', 'config.upload.file.max.memory.size', 'config.header.uploads', 'LONG', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('ExecutableExtensions','.bat,.bin,.com,.cmd,.exe,.msi,.msp,.ocx,.pif,.scr,.sct,.sh,.shs,.vbs', 'config.executable.extensions', 'config.header.uploads', 'STRING', 1);
+values ('ExecutableExtensions','.bat,.bin,.com,.cmd,.exe,.msi,.msp,.ocx,.pif,.scr,.sct,.sh,.shs,.vbs,.php,.jsp,.asp,.aspx,.pl,.do,.py,.tcl,.cgi,.shtml,.stm,.cfm,.adp', 'config.executable.extensions', 'config.header.uploads', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('UserInactiveTimeout','86400', 'config.user.inactive.timeout', 'config.header.system', 'LONG', 1);
