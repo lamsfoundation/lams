@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
+import org.lamsfoundation.lams.authoring.dto.ToolDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -59,7 +60,7 @@ public interface IAuthoringService {
      * Returns a populated LearningDesign object corresponding to the given learningDesignID
      * 
      * @param learningDesignID
-     *                The learning_design_id of the design which has to be fetched
+     *            The learning_design_id of the design which has to be fetched
      * @return LearningDesign The populated LearningDesign object corresponding to the given learningDesignID
      */
     public LearningDesign getLearningDesign(Long learningDesignID);
@@ -69,20 +70,20 @@ public interface IAuthoringService {
      * Does not set the original
      * 
      * @param originalLearningDesign
-     *                The source learning design id.
+     *            The source learning design id.
      * @param copyType
-     *                purpose of copying the design. Can have one of the follwing values
-     *                <ul>
-     *                <li>LearningDesign.COPY_TYPE_NONE (for authoring enviornment)</li>
-     *                <li>LearningDesign.COPY_TYPE_LESSON (for monitoring enviornment while creating a Lesson)</li>
-     *                <li>LearningDesign.COPY_TYPE_PREVIEW (for previewing purposes) </li>
-     *                </ul>
+     *            purpose of copying the design. Can have one of the follwing values
+     *            <ul>
+     *            <li>LearningDesign.COPY_TYPE_NONE (for authoring enviornment)</li>
+     *            <li>LearningDesign.COPY_TYPE_LESSON (for monitoring enviornment while creating a Lesson)</li>
+     *            <li>LearningDesign.COPY_TYPE_PREVIEW (for previewing purposes)</li>
+     *            </ul>
      * @param user
-     *                The user who has sent this request(author/teacher)
+     *            The user who has sent this request(author/teacher)
      * @param setOriginalDesign
-     *                If true, then sets the originalLearningDesign field in the new design
+     *            If true, then sets the originalLearningDesign field in the new design
      * @param custom
-     *                comma separated values used for tool adapters
+     *            comma separated values used for tool adapters
      * @return LearningDesign The new copy of learning design.
      */
     public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign, Integer copyType, User user,
@@ -94,20 +95,20 @@ public interface IAuthoringService {
      * original learning design field, so it should not be used for creating lesson learning designs.
      * 
      * @param originalLearningDesingID
-     *                the source learning design id.
+     *            the source learning design id.
      * @param copyType
-     *                purpose of copying the design. Can have one of the follwing values
-     *                <ul>
-     *                <li>LearningDesign.COPY_TYPE_NONE (for authoring enviornment)</li>
-     *                <li>LearningDesign.COPY_TYPE_LESSON (for monitoring enviornment while creating a Lesson)</li>
-     *                <li>LearningDesign.COPY_TYPE_PREVIEW (for previewing purposes) </li>
-     *                </ul>
+     *            purpose of copying the design. Can have one of the follwing values
+     *            <ul>
+     *            <li>LearningDesign.COPY_TYPE_NONE (for authoring enviornment)</li>
+     *            <li>LearningDesign.COPY_TYPE_LESSON (for monitoring enviornment while creating a Lesson)</li>
+     *            <li>LearningDesign.COPY_TYPE_PREVIEW (for previewing purposes)</li>
+     *            </ul>
      * @param userID
-     *                The user_id of the user who has sent this request(author/teacher)
+     *            The user_id of the user who has sent this request(author/teacher)
      * @param workspaceFolderID
-     *                The workspacefolder where this copy of the design would be saved
+     *            The workspacefolder where this copy of the design would be saved
      * @param setOriginalDesign
-     *                If true, then sets the originalLearningDesign field in the new design
+     *            If true, then sets the originalLearningDesign field in the new design
      * @return new LearningDesign
      */
     public LearningDesign copyLearningDesign(Long originalLearningDesignID, Integer copyType, Integer userID,
@@ -120,22 +121,22 @@ public interface IAuthoringService {
      * sequence activity. Always sets the type to COPY_TYPE_NONE.
      * 
      * @param originalDesignID
-     *                The design to be "modified". Required.
+     *            The design to be "modified". Required.
      * @param designToImportID
-     *                The design to be imported into originalLearningDesign. Required.
+     *            The design to be imported into originalLearningDesign. Required.
      * @param userId
-     *                Current User. Required.
+     *            Current User. Required.
      * @param customCSV
-     *                The custom CSV required to insert tool adapter tools, so their content can be copied in the
-     *                external server
+     *            The custom CSV required to insert tool adapter tools, so their content can be copied in the external
+     *            server
      * @param createNewLearningDesign
-     *                If true, then a copy of the originalLearningDesign is made and the copy modified. If it is false,
-     *                then the originalLearningDesign is modified. Required.
+     *            If true, then a copy of the originalLearningDesign is made and the copy modified. If it is false, then
+     *            the originalLearningDesign is modified. Required.
      * @param newDesignName
-     *                New name for the design if a new design is being create. Optional.
+     *            New name for the design if a new design is being create. Optional.
      * @param workspaceFolderID
-     *                The folder in which to put the new learning design if createNewLearningDesign = true. May be null
-     *                if createNewLearningDesign = false
+     *            The folder in which to put the new learning design if createNewLearningDesign = true. May be null if
+     *            createNewLearningDesign = false
      * @return New / updated learning design
      */
     public LearningDesign insertLearningDesign(Long originalDesignID, Long designToImportID, Integer userID,
@@ -156,7 +157,7 @@ public interface IAuthoringService {
      * Returns a string representing the requested LearningDesign in WDDX format
      * 
      * @param learningDesignID
-     *                The learning_design_id of the design whose WDDX packet is requested
+     *            The learning_design_id of the design whose WDDX packet is requested
      * @return String The requested LearningDesign in WDDX format
      * @throws Exception
      */
@@ -169,7 +170,7 @@ public interface IAuthoringService {
      * Note: it does not validate the design - that must be done separately.
      * 
      * @param wddxPacket
-     *                The WDDX packet to be stored in the database
+     *            The WDDX packet to be stored in the database
      * @return Long learning design id
      * @throws Exception
      */
@@ -223,7 +224,7 @@ public interface IAuthoringService {
      * Saves the LearningDesign to the database. Will update if already saved. Used when a design is run.
      * 
      * @param learningDesign
-     *                The LearningDesign to be saved
+     *            The LearningDesign to be saved
      */
     public void saveLearningDesign(LearningDesign learningDesign);
 
@@ -231,7 +232,7 @@ public interface IAuthoringService {
      * Returns a list of LearningDesign's in WDDX format, belonging to the given user
      * 
      * @param user
-     *                The user_id of the User for whom the designs are to be fetched
+     *            The user_id of the User for whom the designs are to be fetched
      * @return The requested list of LearningDesign's in WDDX format
      * @throws IOException
      */
@@ -253,10 +254,12 @@ public interface IAuthoringService {
      * flash in WDDX format.
      * 
      * @param toolID
-     *                The toolID in which to generate the new tool content id for
+     *            The toolID in which to generate the new tool content id for
      * @return String The new tool content id in WDDX Format
      */
-    public String getToolContentID(Long toolID) throws IOException;
+    public String getToolContentIDFlash(Long toolID) throws IOException;
+
+    public Long generateToolContentID(Long toolID);
 
     /**
      * Calls an appropriate tool to copy the content indicated by toolContentId. Returns a string representing the new
@@ -266,9 +269,9 @@ public interface IAuthoringService {
      * ToolActivity - never a Gate or Grouping or Complex activity.
      * 
      * @param toolContentID
-     *                The toolContentID indicating the content to copy
+     *            The toolContentID indicating the content to copy
      * @param customCSV
-     *                The customCSV if this is a tool adapter tool.
+     *            The customCSV if this is a tool adapter tool.
      * @return String The new tool content id in WDDX Format
      */
     public String copyToolContent(Long toolContentID, String customCSV) throws IOException;
@@ -284,11 +287,11 @@ public interface IAuthoringService {
      * It should only be called on a ToolActivity - never a Gate or Grouping or Complex activity.
      * 
      * @param userId
-     *                Id of the user requesting the copy
+     *            Id of the user requesting the copy
      * @param customCSV
-     *                the customCSV required to copy tool adapter tools
+     *            the customCSV required to copy tool adapter tools
      * @param toolContentIDs
-     *                The toolContentIDs indicating the content to copy
+     *            The toolContentIDs indicating the content to copy
      * @return New Id map in format oldId1=newId1,oldId2=newId2,oldId3=newId3
      */
     public String copyMultipleToolContent(Integer userId, List<Long> toolContentIds, String customCSV);
@@ -321,9 +324,9 @@ public interface IAuthoringService {
      * learning design in WDDX format.
      * 
      * @param design
-     *                The learning design whose WDDX packet is requested
+     *            The learning design whose WDDX packet is requested
      * @param userID
-     *                user_id of the User who will be editing the design.
+     *            user_id of the User who will be editing the design.
      * @throws UserException
      * @throws LearningDesignException
      * @throws IOException
@@ -338,11 +341,11 @@ public interface IAuthoringService {
      * 
      * 
      * @param learningDesignID
-     *                The learning_design_id of the design for which editing has finished.
+     *            The learning_design_id of the design for which editing has finished.
      * @param userID
-     *                user_id of the User who has finished editing the design.
+     *            user_id of the User who has finished editing the design.
      * @param cancelled
-     *                flag specifying whether user cancelled or saved the edit
+     *            flag specifying whether user cancelled or saved the edit
      * @return wddx packet.
      * @throws IOException
      */
@@ -398,5 +401,11 @@ public interface IAuthoringService {
     public String getUniqueNameForLearningDesign(String originalTitle, Integer workspaceFolderId);
 
     public Grouping getGroupingById(Long groupingID);
-
+    
+    public List<ToolDTO> getAllToolDTOs();
+    
+    public String getToolAuthorUrl(Long toolID, Long toolContentID, String contentFolderID);
+    
+    public Long createSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
+	    String contentFolderID);
 }

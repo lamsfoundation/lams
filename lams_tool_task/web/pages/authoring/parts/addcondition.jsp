@@ -44,8 +44,8 @@
 
 		<lams:ImgButtonWrapper>
 			<a href="#" onclick="taskListConditionForm.submit();" class="button-add-item"><fmt:message
-					key="button.add" /> </a>
-			<a href="javascript:;" onclick="window.top.hideConditionMessage();"
+					key="button.add" /> </a> 
+			<a href="javascript:;" onclick="window.hideConditionMessage ? window.hideConditionMessage() : window.top.hideConditionMessage();"
 				class="button space-left"><fmt:message key="label.cancel" /> </a>
 		</lams:ImgButtonWrapper>
 	</body>

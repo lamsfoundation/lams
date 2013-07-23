@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.usermanagement.service;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,6 +62,7 @@ import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTOFactory;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserFlashDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
+import org.lamsfoundation.lams.usermanagement.util.CollapsedOrgDTOComparator;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
@@ -1126,6 +1128,7 @@ public class UserManagementService implements IUserManagementService {
 		}
 	    }
 	}
+	Collections.sort(dtoList, new CollapsedOrgDTOComparator());
 	return dtoList;
     }
 

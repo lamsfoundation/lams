@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,11 +45,14 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.authoring.dto.ToolDTO;
+import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonService;
+import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -77,9 +81,10 @@ public class DisplayGroupAction extends Action {
     private static Logger log = Logger.getLogger(DisplayGroupAction.class);
     private static IUserManagementService service;
     private static LessonService lessonService;
+    private static IAuthoringService authoringService;
     private Integer stateId = OrganisationState.ACTIVE;
 
-    @SuppressWarnings( { "unchecked" })
+    @SuppressWarnings({ "unchecked" })
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -110,8 +115,8 @@ public class DisplayGroupAction extends Action {
 	    if (StringUtils.equals(display, "contents")) {
 		iob = new IndexOrgBean(org.getOrganisationId(), org.getName(), org.getOrganisationType()
 			.getOrganisationTypeId());
-		iob = populateContentsOrgBean(iob, org, roles, request.getRemoteUser(), request
-			.isUserInRole(Role.SYSADMIN));
+		iob = populateContentsOrgBean(iob, org, roles, request.getRemoteUser(),
+			request.isUserInRole(Role.SYSADMIN));
 		forwardPath = "groupContents";
 	    } else if (StringUtils.equals(display, "header")) {
 		iob = createHeaderOrgBean(org, roles, request.getRemoteUser(), request.isUserInRole(Role.SYSADMIN),
@@ -122,6 +127,7 @@ public class DisplayGroupAction extends Action {
 			true);
 	    }
 
+	    request.setAttribute("tools", getAuthoringService().getAllToolDTOs());
 	    request.setAttribute("orgBean", iob);
 	    request.setAttribute("allowSorting", allowSorting);
 	}
@@ -129,7 +135,7 @@ public class DisplayGroupAction extends Action {
 	return mapping.findForward(forwardPath);
     }
 
-    @SuppressWarnings( { "unchecked" })
+    @SuppressWarnings({ "unchecked" })
     private IndexOrgBean createHeaderOrgBean(Organisation org, List<Integer> roles, String username,
 	    boolean isSysAdmin, boolean includeContents) throws SQLException, NamingException {
 	IndexOrgBean orgBean = new IndexOrgBean(org.getOrganisationId(), org.getName(), org.getOrganisationType()
@@ -146,32 +152,33 @@ public class DisplayGroupAction extends Action {
 	}
 
 	if (org.getEnableGradebookForLearners() && contains(roles, Role.ROLE_LEARNER)) {
-		try {
-			// for some reason the name needs to be encoded twice so it's encoded on JSP page as well
-			String encodedOrgName = URLEncoder.encode(URLEncoder.encode(org.getName(), "UTF8"), "UTF8");
-			String link = "javascript:openGradebookLearnerPopup(" + "'" + encodedOrgName + "','"
-			    + Configuration.get(ConfigurationKeys.SERVER_URL)
-			    + "/gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID="
-			    + org.getOrganisationId() + "'," + "750,400,0,0);";
-	
-		    links.add(new IndexLinkBean("index.coursegradebook.learner", link, "my-grades-button", null, null));
-		} catch (UnsupportedEncodingException e) {
-			log.error("Error while encoding course name, skipping gradebook course monitor link", e);
-		}
+	    try {
+		// for some reason the name needs to be encoded twice so it's encoded on JSP page as well
+		String encodedOrgName = URLEncoder.encode(URLEncoder.encode(org.getName(), "UTF8"), "UTF8");
+		String link = "javascript:openGradebookLearnerPopup(" + "'" + encodedOrgName + "','"
+			+ Configuration.get(ConfigurationKeys.SERVER_URL)
+			+ "/gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID="
+			+ org.getOrganisationId() + "'," + "750,400,0,0);";
+
+		links.add(new IndexLinkBean("index.coursegradebook.learner", link, "my-grades-button", null, null));
+	    } catch (UnsupportedEncodingException e) {
+		DisplayGroupAction.log.error(
+			"Error while encoding course name, skipping gradebook course monitor link", e);
+	    }
 	}
-	
+
 	if ((contains(roles, Role.ROLE_GROUP_ADMIN) || contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles,
-		Role.ROLE_MONITOR))
-		&& stateId.equals(OrganisationState.ACTIVE)) {
+		Role.ROLE_MONITOR)) && stateId.equals(OrganisationState.ACTIVE)) {
 	    if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
 		if ((!isSysAdmin)
 			&& (contains(roles, Role.ROLE_GROUP_ADMIN) || contains(roles, Role.ROLE_GROUP_MANAGER))) {
 		    moreLinks.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement("
 			    + org.getOrganisationId() + ")", "manage-group-button", null, null));
 		}
-		if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))
+		if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR)) {
 		    links.add(new IndexLinkBean("index.addlesson", "javascript:showAddLessonDialog("
 			    + org.getOrganisationId() + ")", "add-lesson-button", null, null));
+		}
 		moreLinks.add(new IndexLinkBean("index.searchlesson", Configuration.get(ConfigurationKeys.SERVER_URL)
 			+ "/findUserLessons.do?dispatch=getResults&courseID=" + org.getOrganisationId()
 			+ "&KeepThis=true&TB_iframe=true&height=400&width=600", "search-lesson thickbox"
@@ -186,7 +193,8 @@ public class DisplayGroupAction extends Action {
 		}
 
 		// Adding gradebook course monitor links if enabled
-		if (org.getEnableGradebookForMonitors() && (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))) {
+		if (org.getEnableGradebookForMonitors()
+			&& (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))) {
 		    try {
 			// for some reason the name needs to be encoded twice so it's encoded on JSP page as well
 			String encodedOrgName = URLEncoder.encode(URLEncoder.encode(org.getName(), "UTF8"), "UTF8");
@@ -197,14 +205,16 @@ public class DisplayGroupAction extends Action {
 			moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "course-gradebook-button", null,
 				"index.coursegradebook.tooltip"));
 		    } catch (UnsupportedEncodingException e) {
-			log.error("Error while encoding course name, skipping gradebook course monitor link", e);
+			DisplayGroupAction.log.error(
+				"Error while encoding course name, skipping gradebook course monitor link", e);
 		    }
 		}
 
-	    } else {//CLASS_TYPE
-		if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))
+	    } else {// CLASS_TYPE
+		if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR)) {
 		    links.add(new IndexLinkBean("index.addlesson", "javascript:showAddLessonDialog("
 			    + org.getOrganisationId() + ")", "add-lesson-button", null, null));
+		}
 
 		// Adding gradebook course monitor links if enabled
 		if (org.getParentOrganisation().getEnableGradebookForMonitors()
@@ -219,7 +229,8 @@ public class DisplayGroupAction extends Action {
 			moreLinks.add(new IndexLinkBean("index.coursegradebook.subgroup", link, "mycourses-mark-img",
 				null, null));
 		    } catch (UnsupportedEncodingException e) {
-			log.error("Error while encoding course name, skipping gradebook course monitor link", e);
+			DisplayGroupAction.log.error(
+				"Error while encoding course name, skipping gradebook course monitor link", e);
 		    }
 		}
 	    }
@@ -244,13 +255,13 @@ public class DisplayGroupAction extends Action {
 	    String username, boolean isSysAdmin) throws SQLException, NamingException {
 	User user = (User) getService().findByProperty(User.class, "login", username).get(0);
 
-	//	set lesson beans
+	// set lesson beans
 	List<IndexLessonBean> lessonBeans = null;
 	try {
 	    Map<Long, IndexLessonBean> map = populateLessonBeans(user.getUserId(), org.getOrganisationId(), roles);
 	    lessonBeans = IndexUtils.sortLessonBeans(org.getOrderedLessonIds(), map);
 	} catch (Exception e) {
-	    log.error("Failed retrieving user's lessons from database: " + e, e);
+	    DisplayGroupAction.log.error("Failed retrieving user's lessons from database: " + e, e);
 	}
 	orgBean.setLessons(lessonBeans);
 
@@ -265,7 +276,7 @@ public class DisplayGroupAction extends Action {
 		    List<UserOrganisationRole> userOrganisationRoles = getService().getUserOrganisationRoles(
 			    organisation.getOrganisationId(), username);
 		    // don't list the subgroup if user is not a member, and not a group admin/manager
-		    if (userOrganisationRoles == null || userOrganisationRoles.isEmpty()) {
+		    if ((userOrganisationRoles == null) || userOrganisationRoles.isEmpty()) {
 			if (!contains(roles, Role.ROLE_GROUP_ADMIN) && !contains(roles, Role.ROLE_GROUP_MANAGER)
 				&& !isSysAdmin) {
 			    continue;
@@ -274,8 +285,9 @@ public class DisplayGroupAction extends Action {
 		    for (UserOrganisationRole userOrganisationRole : userOrganisationRoles) {
 			classRoles.add(userOrganisationRole.getRole().getRoleId());
 		    }
-		    if (contains(roles, Role.ROLE_GROUP_MANAGER))
+		    if (contains(roles, Role.ROLE_GROUP_MANAGER)) {
 			classRoles.add(Role.ROLE_GROUP_MANAGER);
+		    }
 		    childOrgBeans.add(createHeaderOrgBean(organisation, classRoles, username, isSysAdmin, true));
 		}
 	    }
@@ -295,12 +307,13 @@ public class DisplayGroupAction extends Action {
 	// remove lessons which do not have preceding lessons completed
 	Iterator<Entry<Long, IndexLessonBean>> lessonIter = map.entrySet().iterator();
 	while (lessonIter.hasNext()) {
-	    Entry<Long,IndexLessonBean> entry = lessonIter.next();
-	    if (entry.getValue().isDependent() && !lessonService.checkLessonReleaseConditions(entry.getKey(), userId)) {
+	    Entry<Long, IndexLessonBean> entry = lessonIter.next();
+	    if (entry.getValue().isDependent()
+		    && !DisplayGroupAction.lessonService.checkLessonReleaseConditions(entry.getKey(), userId)) {
 		lessonIter.remove();
 	    }
 	}
-	
+
 	for (IndexLessonBean bean : map.values()) {
 	    List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
 	    String url = null;
@@ -319,14 +332,14 @@ public class DisplayGroupAction extends Action {
 		    }
 		}
 	    }
-	    if (lessonLinks.size() > 0 || url != null) {
+	    if ((lessonLinks.size() > 0) || (url != null)) {
 		bean.setUrl(url);
 		bean.setLinks(lessonLinks);
 	    }
 	}
 
 	// getting the organisation
-	Organisation org = (Organisation) service.findById(Organisation.class, orgId);
+	Organisation org = (Organisation) DisplayGroupAction.service.findById(Organisation.class, orgId);
 
 	// Getting the parent organisation if applicable
 	Organisation parent = org.getParentOrganisation();
@@ -336,7 +349,8 @@ public class DisplayGroupAction extends Action {
 	Integer userRole = (contains(roles, Role.ROLE_GROUP_MANAGER)) ? Role.ROLE_GROUP_MANAGER : Role.ROLE_MONITOR;
 	Map<Long, IndexLessonBean> staffMap = getLessonService().getLessonsByOrgAndUserWithCompletedFlag(userId, orgId,
 		userRole);
-	boolean isGroupManagerOrMonitor = contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR);
+	boolean isGroupManagerOrMonitor = contains(roles, Role.ROLE_GROUP_MANAGER)
+		|| contains(roles, Role.ROLE_MONITOR);
 	for (IndexLessonBean bean : staffMap.values()) {
 	    if (map.containsKey(bean.getId())) {
 		bean = map.get(bean.getId());
@@ -345,24 +359,23 @@ public class DisplayGroupAction extends Action {
 	    if (lessonLinks == null) {
 		lessonLinks = new ArrayList<IndexLinkBean>();
 	    }
-	    
-	    
+
 	    if ((isGroupManagerOrMonitor && stateId.equals(OrganisationState.ACTIVE))
 		    || (stateId.equals(OrganisationState.ARCHIVED) && contains(roles, Role.ROLE_GROUP_MANAGER))) {
-		lessonLinks.add(new IndexLinkBean("index.monitor",
-			"javascript:showMonitorLessonDialog(" + bean.getId() + ")", null, "mycourses-monitor-img", null));
+		lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:showMonitorLessonDialog(" + bean.getId()
+			+ ")", null, "mycourses-monitor-img", null));
 	    }
 
 	    // Adding lesson notifications links if enabled
 	    if (isGroupManagerOrMonitor && bean.isEnableLessonNotifications()) {
-		lessonLinks.add(new IndexLinkBean("index.emailnotifications", "javascript:showNotificationsDialog(null,"
-			+ bean.getId() + ")", null, "mycourses-notifications-img",
-			"index.emailnotifications.tooltip"));
+		lessonLinks.add(new IndexLinkBean("index.emailnotifications",
+			"javascript:showNotificationsDialog(null," + bean.getId() + ")", null,
+			"mycourses-notifications-img", "index.emailnotifications.tooltip"));
 	    }
 
 	    // Adding gradebook course monitor links if enabled
 	    if (isGroupManagerOrMonitor
-		    && (org.getEnableGradebookForMonitors() || (parent != null && parent
+		    && (org.getEnableGradebookForMonitors() || ((parent != null) && parent
 			    .getEnableGradebookForMonitors()))) {
 		try {
 		    String encodedOrgName = URLEncoder.encode(URLEncoder.encode(org.getName(), "UTF8"), "UTF8");
@@ -372,7 +385,8 @@ public class DisplayGroupAction extends Action {
 		    lessonLinks.add(new IndexLinkBean("index.coursegradebookmonitor", link, null, "mycourses-mark-img",
 			    null));
 		} catch (UnsupportedEncodingException e) {
-		    log.error("Error while encoding course name, skipping gradebook lesson monitor link", e);
+		    DisplayGroupAction.log.error(
+			    "Error while encoding course name, skipping gradebook lesson monitor link", e);
 		}
 	    }
 
@@ -384,7 +398,7 @@ public class DisplayGroupAction extends Action {
 		lessonLinks.add(new IndexLinkBean("index.conditions", conditionsLink, "thickbox" + orgId,
 			"mycourses-conditions-img", "index.conditions.tooltip"));
 	    }
-	    
+
 	    // Add delete lesson option
 	    if (isGroupManagerOrMonitor) {
 		String removeLessonLink = "javascript:removeLesson(" + bean.getId() + ")";
@@ -409,27 +423,37 @@ public class DisplayGroupAction extends Action {
 
     private boolean contains(List<Integer> roles, Integer roleId) {
 	for (int i = 0; i < roles.size(); i++) {
-	    if (roleId.equals(roles.get(i)))
+	    if (roleId.equals(roles.get(i))) {
 		return true;
+	    }
 	}
 	return false;
     }
 
     private IUserManagementService getService() {
-	if (service == null) {
+	if (DisplayGroupAction.service == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
-	    service = (IUserManagementService) ctx.getBean("userManagementService");
+	    DisplayGroupAction.service = (IUserManagementService) ctx.getBean("userManagementService");
 	}
-	return service;
+	return DisplayGroupAction.service;
     }
 
     private LessonService getLessonService() {
-	if (lessonService == null) {
+	if (DisplayGroupAction.lessonService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
-	    lessonService = (LessonService) ctx.getBean("lessonService");
+	    DisplayGroupAction.lessonService = (LessonService) ctx.getBean("lessonService");
 	}
-	return lessonService;
+	return DisplayGroupAction.lessonService;
+    }
+    
+    private IAuthoringService getAuthoringService() {
+	if (DisplayGroupAction.authoringService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    DisplayGroupAction.authoringService = (IAuthoringService) ctx.getBean("authoringService");
+	}
+	return DisplayGroupAction.authoringService;
     }
 }

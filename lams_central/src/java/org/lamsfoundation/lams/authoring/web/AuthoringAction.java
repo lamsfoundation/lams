@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.authoring.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.servlet.ServletException;
@@ -36,9 +38,20 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -60,6 +73,8 @@ public class AuthoringAction extends LamsDispatchAction {
     private static Logger log = Logger.getLogger(AuthoringAction.class);
 
     private static IAuditService auditService;
+    private static IMonitoringService monitoringService;
+    private static IUserManagementService userManagementService;
 
     public IAuthoringService getAuthoringService() {
 	WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this
@@ -85,15 +100,15 @@ public class AuthoringAction extends LamsDispatchAction {
      * to the request's PrintWriter.
      * 
      * @param mapping
-     *                action mapping (for the forward to the success jsp)
+     *            action mapping (for the forward to the success jsp)
      * @param request
-     *                needed to check the USE_JSP_OUTPUT parameter
+     *            needed to check the USE_JSP_OUTPUT parameter
      * @param response
-     *                to write out the wddx packet if not using the jsp
+     *            to write out the wddx packet if not using the jsp
      * @param wddxPacket
-     *                wddxPacket or message to be sent/displayed
+     *            wddxPacket or message to be sent/displayed
      * @param parameterName
-     *                session attribute to set if USE_JSP_OUTPUT is set
+     *            session attribute to set if USE_JSP_OUTPUT is set
      * @throws IOException
      */
     private ActionForward outputPacket(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response,
@@ -111,7 +126,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	try {
 	    Long toolContentID = WebUtil.readLongParam(request, "toolContentID", false);
 	    Integer definitionType = ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION; // WebUtil.readIntParam(request,
-												    // "toolOutputDefinitionType");
+												 // "toolOutputDefinitionType");
 	    wddxPacket = authoringService.getToolOutputDefinitions(toolContentID, definitionType);
 
 	} catch (Exception e) {
@@ -201,7 +216,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	IAuthoringService authoringService = getAuthoringService();
 	try {
 	    Long toolID = WebUtil.readLongParam(request, "toolID", false);
-	    wddxPacket = authoringService.getToolContentID(toolID);
+	    wddxPacket = authoringService.getToolContentIDFlash(toolID);
 	} catch (Exception e) {
 	    wddxPacket = handleException(e, "getAllLearningLibraryDetails", authoringService, true).serializeMessage();
 	}
@@ -239,13 +254,14 @@ public class AuthoringAction extends LamsDispatchAction {
      * @return String The required information in WDDX format
      * @throws IOException
      */
+    @SuppressWarnings("unchecked")
     public ActionForward getAvailableLicenses(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException, Exception {
 
 	FlashMessage flashMessage = null;
 	try {
 	    IAuthoringService authoringService = getAuthoringService();
-	    Vector licenses = authoringService.getAvailableLicenses();
+	    Vector<LicenseDTO> licenses = authoringService.getAvailableLicenses();
 	    flashMessage = new FlashMessage("getAvailableLicenses", licenses);
 	} catch (Exception e) {
 	    AuthoringAction.log.error("getAvailableLicenses: License details unavailable due to system error.", e);
@@ -299,6 +315,74 @@ public class AuthoringAction extends LamsDispatchAction {
     }
 
     /**
+     * Creates a copy of default tool content.
+     */
+    public ActionForward createToolContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	IAuthoringService authoringService = getAuthoringService();
+	Long toolID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_ID);
+	// generate the next unique content ID for the tool
+	Long toolContentID = authoringService.generateToolContentID(toolID);
+	if (toolContentID != null) {
+	    String contentFolderID = FileUtil.generateUniqueContentFolderID();
+	    String authorUrl = authoringService.getToolAuthorUrl(toolID, toolContentID, contentFolderID);
+	    if (authorUrl != null) {
+		JSONObject responseJSON = new JSONObject();
+		responseJSON.put("authorURL", authorUrl);
+		// return the generated values
+		responseJSON.put(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentID);
+		responseJSON.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+		response.setContentType("application/json;charset=utf-8");
+		response.getWriter().write(responseJSON.toString());
+	    }
+	}
+	return null;
+    }
+
+    /**
+     * Creates a LD with the given activity and starts a lesson with default class and settings.
+     */
+    @SuppressWarnings("unchecked")
+    public ActionForward createSingleActivityLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	IAuthoringService authoringService = getAuthoringService();
+	Long toolID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_ID);
+	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String contentFolderID = request.getParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	String learningDesignTitle = request.getParameter(AttributeNames.PARAM_TITLE);
+	// created the LD
+	Long learningDesignID = authoringService.createSingleActivityLearningDesign(learningDesignTitle, toolID,
+		toolContentID, contentFolderID);
+	if (learningDesignID != null) {
+	    Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+	    Integer userID = getUserId();
+	    Lesson lesson = getMonitoringService().initializeLesson(learningDesignTitle, "", learningDesignID,
+		    organisationID, userID, null, false, false, true, false, false, false, false, null, null);
+	    Organisation organisation = getMonitoringService().getOrganisation(organisationID);
+	    User user = (User) getUserManagementService().findById(User.class, userID);
+
+	    List<User> staffList = new LinkedList<User>();
+	    staffList.add(user);
+
+	    // add organisation's learners as lesson participants
+	    List<User> learnerList = new LinkedList<User>();
+	    Vector<User> learnerVector = getUserManagementService().getUsersFromOrganisationByRole(organisationID,
+		    Role.LEARNER, false, true);
+	    learnerList.addAll(learnerVector);
+	    getMonitoringService().createLessonClassForLesson(lesson.getLessonId(), organisation,
+		    organisation.getName() + "Learners", learnerList, organisation.getName() + "Staff", staffList,
+		    userID);
+
+	    getMonitoringService().startLesson(lesson.getLessonId(), userID);
+
+	    if (AuthoringAction.log.isDebugEnabled()) {
+		AuthoringAction.log.debug("Created a single activity lesson with ID: " + lesson.getLessonId());
+	    }
+	}
+	return null;
+    }
+
+    /**
      * Handle flash error.
      * 
      * @param e
@@ -331,4 +415,22 @@ public class AuthoringAction extends LamsDispatchAction {
 	return AuthoringAction.auditService;
     }
 
+    private IMonitoringService getMonitoringService() {
+	if (AuthoringAction.monitoringService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    AuthoringAction.monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
+	}
+	return AuthoringAction.monitoringService;
+    }
+
+    private IUserManagementService getUserManagementService() {
+	if (AuthoringAction.userManagementService == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    AuthoringAction.userManagementService = (IUserManagementService) wac
+		    .getBean(CentralConstants.USER_MANAGEMENT_SERVICE_BEAN_NAME);
+	}
+	return AuthoringAction.userManagementService;
+    }
 }

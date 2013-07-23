@@ -44,7 +44,7 @@
 			<a href="#" onclick="markForm.submit();" class="button space-left">
 				<fmt:message key="label.monitoring.summary.marking.update.marks" /> 
 			</a>
-			<a href="javascript:;" onclick="window.top.hideMessage();" class="button space-left">
+			<a href="javascript:;" onclick="javascript: window.hideMessage ? window.hideMessage() : window.top.hideMessage()" class="button space-left">
 				<fmt:message key="label.cancel" /> 
 			</a>
 		</lams:ImgButtonWrapper>

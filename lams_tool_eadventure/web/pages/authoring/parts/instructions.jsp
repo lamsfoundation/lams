@@ -76,6 +76,9 @@
 <%-- This script will adjust eadventure item input area height according to the new instruction item amount. --%>
 <script type="text/javascript">
 	document.getElementById("instructionCount").value = "${listSize}";
-	var obj = window.top.document.getElementById('reourceInputArea');
+	var obj = window.document.getElementById('reourceInputArea');
+	if (!obj) { 
+		obj = window.top.document.getElementById('reourceInputArea');
+	}
 	obj.style.height=obj.contentWindow.document.body.scrollHeight+'px';
 </script>

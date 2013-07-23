@@ -100,8 +100,12 @@
 
 
 <script lang="javascript">
-			window.top.document.getElementById("conditionInputArea").contentWindow.hideExpressionMessage();
-			var frame = window.top.document.getElementById("conditionInputArea").contentDocument;
+			var area = window.document.getElementById("conditionInputArea");
+			if (!area) {
+				area = window.top.document.getElementById("conditionInputArea");
+			}
+			area.contentWindow.hideExpressionMessage();
+			var frame = area.contentDocument;
 			var obj = frame.getElementById("expressionArea");
 			obj.innerHTML= document.getElementById("expressionList").innerHTML;
 </script>

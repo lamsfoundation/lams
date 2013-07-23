@@ -94,10 +94,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </div>
 <%-- This script will works when a new resoruce item submit in order to refresh "Resource List" panel. --%>
 <script lang="javascript">
- 
-	if(window.top != null){
-		window.top.hideMessage();
-		var obj = window.top.document.getElementById('resourceListArea');
+	var win = window.hideMessage ? window : window.top;
+	if (win.hideMessage != null){
+		win.hideMessage();
+		var obj = win.document.getElementById('resourceListArea');
 		obj.innerHTML= document.getElementById("itemList").innerHTML;
 	}
 </script>

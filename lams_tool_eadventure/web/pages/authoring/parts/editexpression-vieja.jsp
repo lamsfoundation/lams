@@ -89,7 +89,7 @@
 		<lams:ImgButtonWrapper>
 			<a href="#" onclick="eadventureExpressionForm.submit();" class="button-add-item"><fmt:message
 					key="button.add" /> </a>
-			<a href="javascript:;" onclick="window.top.hideExpressionMessage();"
+			<a href="javascript:;" onclick="window.hideExpressionMessage ? window.hideExpressionMessage() : window.top.hideExpressionMessage()"
 				class="button space-left"><fmt:message key="label.cancel" /> </a>
 		</lams:ImgButtonWrapper>
 		

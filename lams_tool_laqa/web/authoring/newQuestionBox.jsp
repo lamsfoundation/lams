@@ -100,7 +100,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                             {
                                 heightOffSet = document.getElementById('wizardDiv').offsetHeight;
                             }
-                            window.top.resizeIframe(heightOffSet);
+                            window.resizeIframe ? window.resizeIframe(heightOffSet) : window.top.resizeIframe(heightOffSet);
                             heightOffSet = heightOffSet * -1;
                         });
                     });

@@ -8,7 +8,7 @@
 	<!-- No se xk no coge el atrubuto delete, ver que pasa-->
 	<c:if test="${gameDelete == 1}">
 	<script lang="javascript">
-		window.top.forceEmptyTable();
+		window.forceEmptyTable ? window.forceEmptyTable() : window.top.forceEmptyTable();
 	</script>
 	
 	
@@ -18,7 +18,7 @@
 			
 		<!-- show the conditions add button -->
 		<script lang="javascript">
-			window.top.showConditionsAddButton();
+			window.showConditionsAddButton ? window.showConditionsAddButton() : window.top.showConditionsAddButton();
 		</script>
 			
 		<table border="0" style="align:left;width:400px">
@@ -44,8 +44,13 @@
 		<c:otherwise>
 				<!-- show the conditions add button -->
 				<script lang="javascript">
-					window.top.hideConditionsAddButton();
-					window.top.forceEmptyTable();
+					if (window.hideConditionsAddButton){
+						window.hideConditionsAddButton();
+						window.forceEmptyTable();
+					} else {
+						window.top.hideConditionsAddButton();
+						window.top.forceEmptyTable();
+					}
 				</script>
 			<p align="small-space-bottom">
 				<a href="javascript:showMessage('<html:rewrite page="/authoring/editGameInit.do?sessionMapID=${sessionMapID}"/>');"  class="button-add-item">
@@ -56,10 +61,11 @@
 	</c:choose>
 </div>			
 <script lang="javascript">
-	if(window.top != null){
-		window.top.hideMessage();
-		window.top.showGame();
-		var obj = window.top.document.getElementById('addGame');
+	var win = window.hideMessage ? window : window.top;
+	if (win.hideMessage != null){
+		win.hideMessage();
+		win.showGame();
+		var obj = win.document.getElementById('addGame');
 		obj.innerHTML= document.getElementById("showGame").innerHTML;
 	}
 </script>

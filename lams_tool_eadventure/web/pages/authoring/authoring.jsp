@@ -45,7 +45,10 @@
 		}
 		
 		function hideShowGame(){
-			var area= window.top.document.getElementById("addGame");
+			var area= window.document.getElementById("addGame");
+			if (!area) { 
+				area = window.top.document.getElementById("addGame");
+			}
 			if(area != null){
 				area.style.display="none";
 			}

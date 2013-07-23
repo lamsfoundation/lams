@@ -110,5 +110,8 @@
 		// then refresh "basic tab" spreadsheetlist and close this window.
 	}
 	function cancelSpreadsheetItem(){
-		window.top.hideMessage();
+		var win = window.hideMessage ? window : window.top;
+		if (win.hideMessage != null){
+			win.hideMessage();
+		}
 	}

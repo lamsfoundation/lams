@@ -11,6 +11,10 @@
    <display-name>LAMSTags</display-name>
    <description><![CDATA[LAMS custom tags]]></description>
 
+   <listener>
+      <listener-class>org.lamsfoundation.lams.web.SessionListener</listener-class>
+   </listener>
+
    <tag>
 
       <description>Output the basic URL for the current webapp. e.g. http://server/lams/tool/nb11/</description>
@@ -35,6 +39,50 @@
       <attribute>
          <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
          <name>id</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+
+   </tag>
+   <tag>
+
+      <description>Help tag</description>
+      <display-name>Help tag</display-name>
+      <icon>    
+      </icon>
+      <name>help</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.HelpTag</tag-class>
+      <body-content>empty</body-content>
+
+      <attribute>
+         <description>Help tag</description>
+         <name>module</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Help tag</description>
+         <name>toolSignature</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Help tag</description>
+         <name>page</name>
+         <required>false</required>
+
+           <rtexprvalue>true</rtexprvalue>
+
+      </attribute>
+      <attribute>
+         <description>Help tag</description>
+         <name>style</name>
          <required>false</required>
 
            <rtexprvalue>true</rtexprvalue>
@@ -143,46 +191,13 @@
    </tag>
    <tag>
 
-      <description>Help tag</description>
-      <display-name>Help tag</display-name>
+      <description>Checks whether Flash enabled for learner</description>
+      <display-name>Checks whether Flash enabled for learner</display-name>
       <icon>    
       </icon>
-      <name>help</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.HelpTag</tag-class>
+      <name>LearnerFlashEnabled</name>
+      <tag-class>org.lamsfoundation.lams.web.tag.LearnerFlashEnabledTag</tag-class>
       <body-content>empty</body-content>
-
-      <attribute>
-         <description>Help tag</description>
-         <name>module</name>
-         <required>false</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
-      <attribute>
-         <description>Help tag</description>
-         <name>toolSignature</name>
-         <required>false</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
-      <attribute>
-         <description>Help tag</description>
-         <name>page</name>
-         <required>false</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
-      <attribute>
-         <description>Help tag</description>
-         <name>style</name>
-         <required>false</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
 
    </tag>
    <tag>
@@ -445,7 +460,7 @@
    	<tag-file>
        <name>Passon</name>
        <path>/WEB-INF/tags/Passon.tag</path>
-   	</tag-file>   
+   	</tag-file>  
    	<tag-file>
 	    <name>Date</name>
 		<path>/WEB-INF/tags/Date.tag</path>
@@ -493,16 +508,17 @@
     </attribute>
   </tag>
   	<tag>
-		<description>Checks whether Flash enabled for learner</description>
-		<display-name>Checks whether Flash enabled for learner</display-name>
-		<icon>    
-		</icon>
-		<name>LearnerFlashEnabled</name>
-		<tag-class>org.lamsfoundation.lams.web.tag.LearnerFlashEnabledTag</tag-class>
-		<body-content>empty</body-content>
- 	</tag>
+	  	<description>Checks whether Flash enabled for learner</description>
+	  	<display-name>Checks whether Flash enabled for learner</display-name>
+	 	<icon>    
+	 	</icon>
+	 	<name>LearnerFlashEnabled</name>
+	 	<tag-class>org.lamsfoundation.lams.web.tag.LearnerFlashEnabledTag</tag-class>
+	 	<body-content>empty</body-content>
+ 	</tag> 
 	<tag-file>
 		<name>head</name>
 	    <path>/WEB-INF/tags/Head.tag</path>
-	</tag-file>  
+	</tag-file>
+
 </taglib>

@@ -33,7 +33,10 @@
 
 	}
 	function adjustInstructionsDisplayAreaHeight(adjustAmount){
-		var obj = window.top.document.getElementById('reourceInputArea');
+		var obj = window.document.getElementById('reourceInputArea');
+		if (!obj) { 
+			obj = window.top.document.getElementById('reourceInputArea');
+		}
 		obj.style.height=obj.contentWindow.document.body.scrollHeight+adjustAmount+'px';
 	}
 	function upItem(itemIdx){
@@ -82,6 +85,6 @@
 		// after submit, it direct to itemlist.jsp, 
 		// then refresh "basic tab" resourcelist and close this window.
 	}
-	function cancelResourceItem(){
-		window.top.hideMessage();
+	function cancelResourceItem(){ 
+		window.hideMessage ? window.hideMessage() : window.top.hideMessage();
 	}

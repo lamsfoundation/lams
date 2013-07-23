@@ -152,9 +152,10 @@
 
 <%-- This script will works when a new resoruce Condition submit in order to refresh "TaskList List" panel. --%>
 <script type="text/javascript">
-	if(window.top != null){
-		window.top.hideMessage();
-		var obj = window.top.document.getElementById('summariesArea');
+	var win = window.hideMessage ? window : window.top;
+	if (win.hideMessage != null){
+		win.hideMessage();
+		var obj = win.document.getElementById('summariesArea');
 		obj.innerHTML= document.getElementById("summaryList2").innerHTML;
 	}
 </script>

@@ -18,7 +18,7 @@
 	<body class="tabpart">
 
 	<script lang="javascript">
-		window.top.hideShowGame();
+		window.hideShowGame ? window.hideShowGame() : window.top.hideShowGame();
 	</script>
 		<!-- Basic Info Form-->
 		<%@ include file="/common/messages.jsp"%>

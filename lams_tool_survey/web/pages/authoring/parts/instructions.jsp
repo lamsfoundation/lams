@@ -61,6 +61,9 @@
 <%-- This script will adjust survey item input area height according to the new instruction item amount. --%>
 <script type="text/javascript">
 	$("instructionCount").value="${listSize}";
-	var obj = window.top.document.getElementById('questionInputArea');
+	var obj = window.document.getElementById('questionInputArea');
+	if (!obj) {
+		obj = window.top.document.getElementById('questionInputArea');
+	}
 	obj.style.height=obj.contentWindow.document.body.scrollHeight+'px';
 </script>

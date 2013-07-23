@@ -100,6 +100,9 @@
 <%-- This script will adjust assessment item input area height according to the new instruction item amount. --%>
 <script type="text/javascript">
 	var obj = window.top.document.getElementById('advancedInputArea');
+	if (!obj) {
+		obj = window.document.getElementById('advancedInputArea');
+	}
 	obj.style.height = eval(155 + ${overallFeedbackListSize}*72) + 'px';
 </script>	
 	

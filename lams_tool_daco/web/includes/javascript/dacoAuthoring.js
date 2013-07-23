@@ -15,7 +15,10 @@
 	
 	//Resizes the question input area so it is visible on the screen.
 	function resizeQuestionInputArea (){
-		var questionInputArea = window.top.document.getElementById('questionInputArea');
+		var questionInputArea = window.document.getElementById('questionInputArea');
+		if (!questionInputArea) { 
+			questionInputArea = window.top.document.getElementById('questionInputArea');
+		}
 		questionInputArea.style.height=questionInputArea.contentWindow.document.body.scrollHeight+10+'px';
 	}
 	
@@ -123,5 +126,5 @@
 	
 	//Cancels a question adding procedure
 	function cancelDacoQuestion(){
-		window.top.hideQuestionInputArea();
+		window.hideQuestionInputArea ? window.hideQuestionInputArea() : window.top.hideQuestionInputArea();
 	}

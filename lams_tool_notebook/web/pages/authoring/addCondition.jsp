@@ -37,7 +37,7 @@
 		<lams:ImgButtonWrapper>
 			<a href="javascript:;" onclick="javascript:notebookConditionForm.submit();" class="button-add-item"><fmt:message
 					key="button.save" /> </a>
-			<a href="javascript:;" onclick="javascript:window.top.hideConditionMessage();"
+			<a href="javascript:;" onclick="javascript:window.hideConditionMessage ? window.hideConditionMessage() : window.top.hideConditionMessage()"
 				class="button space-left"><fmt:message key="label.cancel" /> </a>
 		</lams:ImgButtonWrapper>
 	</body>

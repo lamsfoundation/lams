@@ -37,7 +37,7 @@
 		<lams:ImgButtonWrapper>
 			<a href="#" onclick="videoRecorderConditionForm.submit();" class="button-add-item"><fmt:message
 					key="button.save" /> </a>
-			<a href="#" onclick="window.top.hideConditionMessage();"
+			<a href="#" onclick="window.hideConditionMessage ? window.hideConditionMessage() : window.top.hideConditionMessage()"
 				class="button space-left"><fmt:message key="label.cancel" /> </a>
 		</lams:ImgButtonWrapper>
 	</body>

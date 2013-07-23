@@ -7,9 +7,10 @@
 	</div>
 
 	<script type="text/javascript">
-		if(window.top != null){
-			window.top.hideMessage();
-			var obj = window.top.document.getElementById('itemListArea');
+		var win = window.hideMessage ? window : window.top;
+		if (win.hideMessage != null){
+			win.hideMessage();
+			var obj = win.document.getElementById('itemListArea');
 			obj.innerHTML= document.getElementById("itemList").innerHTML;
 		}
 	</script>

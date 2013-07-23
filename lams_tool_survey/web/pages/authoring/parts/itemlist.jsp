@@ -92,10 +92,10 @@
 </div>
 <%-- This script will works when a new resoruce item submit in order to refresh "Survey List" panel. --%>
 <script lang="javascript">
-
-	if(window.top != null){
-		window.top.hideMessage();
-		var obj = window.top.document.getElementById('surveyListArea');
+	var win = window.hideMessage ? window : window.top;
+	if (win.hideMessage != null){
+		win.hideMessage();
+		var obj = win.document.getElementById('surveyListArea');
 		obj.innerHTML= document.getElementById("itemList").innerHTML;
 	}
 </script>

@@ -36,106 +36,147 @@ function initMainPage() {
 	});
 
 	// initialise lesson dialog
-	$('#addLessonDialog')
-			.dialog(
-					{
-						'autoOpen' : false,
-						'height' : 600,
-						'width' : 800,
-						'modal' : true,
-						'resizable' : false,
-						'hide' : 'fold',
-						'open' : function() {
-							// load contents after opening the dialog
-							$('#addLessonFrame')
-									.attr(
-											'src',
-											LAMS_URL
-													+ 'home.do?method=addLesson&organisationID='
-													+ $(this).dialog('option',
-															'orgID'));
-						},
-						'close' : function() {
-							// refresh if lesson was added
-							if ($(this).dialog('option', 'refresh')) {
-								refresh();
-							}
-						}
-					// tabs are the title bar, so remove dialog's one
-					}).closest('.ui-dialog').children('.ui-dialog-titlebar')
-			.remove();
-
+	$('#addLessonDialog').dialog(
+		{
+			'autoOpen' : false,
+			'height' : 600,
+			'width' : 800,
+			'modal' : true,
+			'resizable' : false,
+			'hide' : 'fold',
+			'open' : function() {
+				// load contents after opening the dialog
+				$('#addLessonFrame')
+						.attr(
+								'src',
+								LAMS_URL
+										+ 'home.do?method=addLesson&organisationID='
+										+ $(this).dialog('option',
+												'orgID'));
+			},
+			'close' : function() {
+				// refresh if lesson was added
+				if ($(this).dialog('option', 'refresh')) {
+					loadOrgTab(null, true);
+				}
+			}
+		// tabs are the title bar, so remove dialog's one
+		}).closest('.ui-dialog').children('.ui-dialog-titlebar')
+		  .remove();
+	
+	// initialise single activity lesson dialog
+	$('#addSingleActivityLessonDialog').dialog(
+		{
+			'autoOpen' : false,
+			'height' : 600,
+			'width' : 850,
+			'modal' : true,
+			'resizable' : false,
+			'hide' : 'fold',
+			'title' : LABELS.SINGLE_ACTIVITY_LESSON_TITLE,
+			'open' : function() {
+				var dialog = $(this);
+				var toolID = dialog.dialog('option', 'toolID');
+				$.ajax({
+					async : false,
+					cache : false,
+					url : LAMS_URL + "authoring/author.do",
+					dataType : 'json',
+					data : {
+						'method' : 'createToolContent',
+						'toolID' : toolID
+					},
+					success : function(response) {
+						dialog.dialog('option', 'toolContentID', response.toolContentID);
+						dialog.dialog('option', 'contentFolderID', response.contentFolderID);
+						$('#addSingleActivityLessonFrame').attr('src',
+								response.authorURL + '&notifyCloseURL='
+								+ encodeURIComponent(LAMS_URL
+										+ 'dialogCloser.jsp?function=closeAddSingleActivityLessonDialog&noopener=true'));
+					}
+				});
+			},
+			'close' : function() {
+				$('#addSingleActivityLessonFrame').attr('src', null);
+				// refresh if lesson was added
+				if ($(this).dialog('option', 'refresh')) {
+					loadOrgTab(null, true);
+				}
+			}
+		});
+	
 	// initialise monitor dialog
-	$('#monitorDialog')
-			.dialog(
-					{
-						'autoOpen' : false,
-						'height' : 600,
-						'width' : 800,
-						'modal' : true,
-						'resizable' : false,
-						'hide' : 'fold',
-						'open' : function() {
-							// load contents after opening the dialog
-							$('#monitorFrame')
-									.attr(
-											'src',
-											LAMS_URL
-													+ 'monitoring/monitoring.do?method=monitorLesson&lessonID='
-													+ $(this).dialog('option',
-															'lessonID'));
-						},
-						'close' : function() {
-							// refresh if lesson was added
-							if ($(this).dialog('option', 'refresh')) {
-								refresh();
-							}
-						}
-					}).closest('.ui-dialog').children('.ui-dialog-titlebar')
-			.remove();
+	$('#monitorDialog').dialog(
+		{
+			'autoOpen' : false,
+			'height' : 600,
+			'width' : 800,
+			'modal' : true,
+			'resizable' : false,
+			'hide' : 'fold',
+			'open' : function() {
+				// load contents after opening the dialog
+				$('#monitorFrame')
+						.attr(
+								'src',
+								LAMS_URL
+										+ 'monitoring/monitoring.do?method=monitorLesson&lessonID='
+										+ $(this).dialog('option',
+												'lessonID'));
+			},
+			'close' : function() {
+				// refresh if lesson was added
+				if ($(this).dialog('option', 'refresh')) {
+					loadOrgTab(null, true);
+				}
+			}
+		}).closest('.ui-dialog').children('.ui-dialog-titlebar')
+		  .remove();
 
 	// initialise notifications dialog
-	$('#notificationsDialog')
-			.dialog(
-					{
-						'autoOpen' : false,
-						'height' : 600,
-						'width' : 850,
-						'modal' : true,
-						'resizable' : false,
-						'hide' : 'fold',
-						'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
-						'open' : function() {
-							var lessonID = $(this).dialog('option', 'lessonID');
-							// if lesson ID is given, use lesson view; otherwise
-							// use course view
-							if (lessonID) {
-								// load contents after opening the dialog
-								$('#notificationsFrame')
-										.attr(
-												'src',
-												LAMS_URL
-														+ 'monitoring/emailNotifications.do?method=getLessonView&lessonID='
-														+ lessonID);
-							} else {
-								var orgID = $(this).dialog('option', 'orgID');
-								$('#notificationsFrame')
-										.attr(
-												'src',
-												LAMS_URL
-														+ 'monitoring/emailNotifications.do?method=getCourseView&organisationID='
-														+ orgID);
-							}
-						},
-						'close' : function() {
-							$('#notificationsFrame').attr('src', null);
-						}
-					});
+	$('#notificationsDialog').dialog(
+		{
+			'autoOpen' : false,
+			'height' : 600,
+			'width' : 850,
+			'modal' : true,
+			'resizable' : false,
+			'hide' : 'fold',
+			'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
+			'open' : function() {
+				var lessonID = $(this).dialog('option', 'lessonID');
+				// if lesson ID is given, use lesson view; otherwise
+				// use course view
+				if (lessonID) {
+					// load contents after opening the dialog
+					$('#notificationsFrame')
+							.attr(
+									'src',
+									LAMS_URL
+											+ 'monitoring/emailNotifications.do?method=getLessonView&lessonID='
+											+ lessonID);
+				} else {
+					var orgID = $(this).dialog('option', 'orgID');
+					$('#notificationsFrame')
+							.attr(
+									'src',
+									LAMS_URL
+											+ 'monitoring/emailNotifications.do?method=getCourseView&organisationID='
+											+ orgID);
+				}
+			},
+			'close' : function() {
+				$('#notificationsFrame').attr('src', null);
+			}
+		});
 }
 
-function loadOrgTab(orgTab) {
-	if (!orgTab.text()) {
-		var orgId = orgTab.attr("id").split('-')[1];
+function loadOrgTab(orgTab, refresh) {
+	if (!orgTab) {
+		orgTab = $('div[id^=orgTab-' + $('#orgTabs').tabs('option','active') + ']');
+	}
+	if (refresh || !orgTab.text()) {
+		var orgId = orgTab.attr("id").split('-')[2];
 		
 		orgTab.load(
 			"displayGroup.do",
@@ -357,6 +398,13 @@ function showAddLessonDialog(orgID) {
 	$("#addLessonDialog").dialog('option', 'orgID', orgID).dialog('open');
 }
 
+function showAddSingleActivityLessonDialog(orgID, toolID) {
+	$("#addSingleActivityLessonDialog").dialog('option', {
+		'orgID' : orgID,
+		'toolID' : toolID
+	}).dialog('open');
+}
+
 function showNotificationsDialog(organisationID, lessonID) {
 	$("#notificationsDialog").dialog('option', {
 		'orgID' : organisationID,
@@ -370,6 +418,40 @@ function closeAddLessonDialog(refresh) {
 	// if latter, refresh the list
 	$("#addLessonDialog").dialog('option', 'refresh', refresh ? true : false)
 			.dialog('close');
+}
+
+function closeAddSingleActivityLessonDialog(action) {
+	$('#addSingleActivityLessonFrame').attr('src', null);
+	var dialog = $('#addSingleActivityLessonDialog');
+	var save = action == 'save';
+	
+	if (save) {
+		var ldTitle = '';
+		while (ldTitle == '') {
+			ldTitle = prompt('Please enter a title for the lesson');
+			if (ldTitle == '') {
+				alert('You must enter a title. If you do not want to save the lesson, click Cancel');
+			}
+		}
+			
+		if (ldTitle) {
+			$.ajax({
+				async : false,
+				cache : false,
+				url : LAMS_URL + "authoring/author.do",
+				dataType : 'text',
+				data : {
+					'method' : 'createSingleActivityLesson',
+					'organisationID'  : dialog.dialog('option', 'orgID'),
+					'toolID' : dialog.dialog('option', 'toolID'),
+					'toolContentID' : dialog.dialog('option', 'toolContentID'),
+					'contentFolderID' : dialog.dialog('option', 'contentFolderID'),
+					'title' : ldTitle
+				}
+			});
+		}
+	}
+	dialog.dialog('option', 'refresh', save).dialog('close');
 }
 
 function closeMonitorLessonDialog(refresh) {

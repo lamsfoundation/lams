@@ -34,7 +34,7 @@
 					</html:submit>
 
 					<html:button property="Cancel" styleClass="button"
-						onclick="window.top.hideMessage();">
+						onclick="javascript:window.hideMessage ? window.hideMessage () : window.top.hideMessage()">
 						<fmt:message key="button.cancel" />
 					</html:button>
 			</html:form>

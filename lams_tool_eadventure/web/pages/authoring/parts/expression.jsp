@@ -50,8 +50,12 @@
 		    		method:'get',
 		    		parameters:param,
 		    		onComplete: function(resp){
-						window.top.document.getElementById("conditionInputArea").contentDocument.getElementById("expressionArea").innerHTML  = resp.responseText;
-						window.top.document.getElementById("conditionInputArea").contentWindow.hideExpressionMessage();
+		    			var obj = window.document.getElementById("conditionInputArea");
+		    			if (!obj) {
+		    				obj = window.top.document.getElementById("conditionInputArea");
+		    			}
+		    			obj.contentDocument.getElementById("expressionArea").innerHTML  = resp.responseText;
+		    			obj.contentWindow.hideExpressionMessage();
 					},
 		    		evalJS:true
 		    	}
@@ -78,7 +82,11 @@
 		    		method:'get',
 		    		parameters:param,
 		    		onComplete: function(resp){
-						window.top.document.getElementById("conditionInputArea").contentDocument.getElementById("expressionArea").innerHTML  = resp.responseText;
+		    			var obj = window.document.getElementById("conditionInputArea");
+		    			if (!obj) {
+		    				obj = window.top.document.getElementById("conditionInputArea");
+		    			}
+						obj.contentDocument.getElementById("expressionArea").innerHTML  = resp.responseText;
 					},
 		    		evalJS:true
 		    	}
@@ -95,7 +103,11 @@
 		    		method:'get',
 		    		parameters:param,
 		    		onComplete: function(resp){
-						window.top.document.getElementById("conditionInputArea").contentDocument.getElementById("expressionArea").innerHTML  = resp.responseText;
+		    			var obj = window.document.getElementById("conditionInputArea");
+		    			if (!obj) {
+		    				obj = window.top.document.getElementById("conditionInputArea");
+		    			}
+						obj.contentDocument.getElementById("expressionArea").innerHTML  = resp.responseText;
 					},
 		    		evalJS:true
 		    	}

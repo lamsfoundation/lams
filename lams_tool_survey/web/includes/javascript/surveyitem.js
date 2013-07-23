@@ -91,6 +91,10 @@
 			$("instructionList").value = Form.serialize("instructionForm");
 		$("surveyItemForm").submit();
 	}
+	
 	function cancelSurveyItem(){
-		window.top.hideMessage();
+		var win = window.hideMessage ? window : window.top;
+		if (win.hideMessage != null){
+			win.hideMessage();
+		}
 	}

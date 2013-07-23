@@ -41,7 +41,10 @@
 
 	}
 	function adjustInstructionsDisplayAreaHeight(adjustAmount){
-		var obj = window.top.document.getElementById('reourceInputArea');
+		var obj = window.document.getElementById('reourceInputArea');
+		if (!obj) { 
+			obj = window.top.document.getElementById('reourceInputArea');
+		}
 		obj.style.height=obj.contentWindow.document.body.scrollHeight+adjustAmount+'px';
 	}
 	function upItem(itemIdx){
@@ -90,9 +93,11 @@
 	}
 	
 	function cancelEadventureGame(){
-		window.top.hideMessage();
-		window.top.showGame();
+		if (window.hideMessage) {
+			window.hideMessage();
+			window.showGame();
+		} else {
+			window.top.hideMessage();
+			window.top.showGame();
+		}
 	}
-	
-	
-	

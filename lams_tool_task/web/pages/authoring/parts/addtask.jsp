@@ -186,7 +186,7 @@
 		<lams:ImgButtonWrapper>
 			<a href="#" onclick="taskListItemForm.submit();" class="button-add-item"><fmt:message
 					key="button.add" /> </a>
-			<a href="javascript:;" onclick="window.top.hideMessage();"
+			<a href="javascript:;" onclick="window.hideMessage ? window.hideMessage() : window.top.hideMessage()"
 				class="button space-left"><fmt:message key="label.cancel" /> </a>
 		</lams:ImgButtonWrapper>
 	</body>
