@@ -1346,29 +1346,6 @@ public class AuthoringUtil implements McAppConstants {
 	return false;
     }
 
-    protected boolean validateOnlyOneCorrectCandidate(List caList) {
-	int correctCandidatesCount = 0;
-
-	Iterator itCaList = caList.iterator();
-	while (itCaList.hasNext()) {
-	    McCandidateAnswersDTO mcCandidateAnswersDTO = (McCandidateAnswersDTO) itCaList.next();
-
-	    String candidateAnswer = mcCandidateAnswersDTO.getCandidateAnswer();
-	    String correct = mcCandidateAnswersDTO.getCorrect();
-
-	    if (correct.equals("Correct")) {
-		// there is at leat one Correct candidate, it is good.
-		++correctCandidatesCount;
-	    }
-	}
-
-	if (correctCandidatesCount > 1) {
-	    return false; // not good
-	}
-
-	return true;
-    }
-
     /**
      * buildDefaultQuestionContent(McContent mcContent, IMcService mcService)
      * 

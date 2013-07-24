@@ -1,80 +1,52 @@
-<%--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
 <%@ include file="/common/taglibs.jsp"%>
 
 <script type="text/javascript">
-<!-- Common Javascript functions for LAMS -->
-	/**
-	 * Launches the popup window for the instruction files
-	 */
-	function showMessage(url) {
-		var area=document.getElementById("messageArea");
-		if(area != null){
-			area.style.width="100%";
-			area.style.height="100%";
-			area.src=url;
-			area.style.display="block";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="none";
-		}
-		
-		location.hash = "messageArea";
-	}
-	function hideMessage(){
-		var area=document.getElementById("messageArea");
-		if(area != null){
-			area.style.width="0px";
-			area.style.height="0px";
-			area.style.display="none";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="block";
-		}
-	}
 	
-	function removeQuestion(questionIndex)
-	{
+	function removeQuestion(questionIndex) {
 		document.McAuthoringForm.questionIndex.value=questionIndex;
-        submitMethod('removeQuestion');
+		document.McAuthoringForm.dispatch.value='removeQuestion'; 
+		
+		$('#authoringForm').ajaxSubmit({ 
+    		target:  $('#resourceListArea'),
+    		iframe: true,
+    		success:    function() { 
+    			document.McAuthoringForm.dispatch.value="submitAllContent";
+    			refreshThickbox();
+    	    }
+	    });
 	}
 
-	function removeMonitoringQuestion(questionIndex)
-	{
+	function removeMonitoringQuestion(questionIndex) {
 		document.McMonitoringForm.questionIndex.value=questionIndex;
         submitMonitoringMethod('removeQuestion');
 	}
 
-        function resizeOnMessageFrameLoad(){
-		var messageAreaFrame = document.getElementById("messageArea");
-		messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
-	}
+	function resizeIframe() {
+		if (document.getElementById('TB_iframeContent') != null) {
+		    var height = top.window.innerHeight;
+		    if ( height == undefined || height == 0 ) {
+		    	// IE doesn't use window.innerHeight.
+		    	height = document.documentElement.clientHeight;
+		    	// alert("using clientHeight");
+		    }
+			// alert("doc height "+height);
+		    height -= document.getElementById('TB_iframeContent').offsetTop + 60;
+		    document.getElementById('TB_iframeContent').style.height = height +"px";
+	
+			TB_HEIGHT = height + 28;
+			tb_position();
+		}
+	};
+	window.onresize = resizeIframe;
+
+	function refreshThickbox(){
+		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
+	};
         
     function importQTI(){
     	window.open('<lams:LAMSURL/>questionFile.jsp?limitType=mc',
     			    'QuestionFile','width=500,height=200,scrollbars=yes');
     }
-    
 	
     function saveQTI(formHTML, formName) {
     	var form = $($.parseHTML(formHTML));
@@ -122,43 +94,31 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </table>
 
 <div id="resourceListArea">
-	<c:if
-		test="${mcGeneralAuthoringDTO.activeModule == 'authoring' || mcGeneralAuthoringDTO.activeModule == 'defineLater'}">
+	<c:if test="${mcGeneralAuthoringDTO.activeModule == 'authoring' || mcGeneralAuthoringDTO.activeModule == 'defineLater'}">
 		<%@ include file="/authoring/itemlist.jsp"%>
 	</c:if>
-	<c:if
-		test="${mcGeneralAuthoringDTO.activeModule != 'authoring' && mcGeneralAuthoringDTO.activeModule != 'defineLater'}">
+	<c:if test="${mcGeneralAuthoringDTO.activeModule != 'authoring' && mcGeneralAuthoringDTO.activeModule != 'defineLater'}">
 		<%@ include file="/monitoring/itemlist.jsp"%>
 	</c:if>
 </div>
 
 <p>
-	<c:if
-		test="${mcGeneralAuthoringDTO.activeModule == 'authoring' || mcGeneralAuthoringDTO.activeModule == 'defineLater'}">
-		<a
-			href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newQuestionBox&requestType=direct&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}"/>');"
-			class="button-add-item"> <fmt:message
-				key="label.save.question" /> </a>
-		<a href="#" onClick="javascript:importQTI()" style="margin-left: 40px"><fmt:message
-				key="label.authoring.import.qti" /></a>
+	<c:if test="${mcGeneralAuthoringDTO.activeModule == 'authoring' || mcGeneralAuthoringDTO.activeModule == 'defineLater'}">
+		<a href="<html:rewrite page="/authoring.do"/>?dispatch=newQuestionBox&requestType=direct&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&KeepThis=true&TB_iframe=true&height=640&width=950&modal=true"
+			class="button-add-item thickbox"> 
+			<fmt:message key="label.save.question" /> 
+		</a>
+		<a href="#" onClick="javascript:importQTI()" style="margin-left: 40px">
+			<fmt:message key="label.authoring.import.qti" />
+		</a>
 	</c:if>
-	<c:if
-		test="${mcGeneralAuthoringDTO.activeModule != 'authoring' && mcGeneralAuthoringDTO.activeModule != 'defineLater'}">
-		<a
-			href="javascript:showMessage('<html:rewrite page="/monitoring.do?dispatch=newQuestionBox&requestType=direct&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}"/>');"
-			class="button-add-item"> <fmt:message
-				key="label.save.question" /> </a>
-
+	
+	<c:if test="${mcGeneralAuthoringDTO.activeModule != 'authoring' && mcGeneralAuthoringDTO.activeModule != 'defineLater'}">
+		<a href="<html:rewrite page="/monitoring.do"/>?dispatch=newQuestionBox&requestType=direct&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&activeModule=${mcGeneralAuthoringDTO.activeModule}&defaultContentIdStr=${mcGeneralAuthoringDTO.defaultContentIdStr}&KeepThis=true&TB_iframe=true&height=640&width=950&modal=true"
+			class="button-add-item thickbox"> 
+			<fmt:message key="label.save.question" /> 
+		</a>
 	</c:if>
-</p>
-
-<p>
-	<iframe
-		onload="javascript:resizeOnMessageFrameLoad();"
-		id="messageArea" name="messageArea"
-		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
-		scrolling="no">
-	</iframe>
 </p>
 
 <c:if test="${mcGeneralAuthoringDTO.activeModule != 'authoring'}">

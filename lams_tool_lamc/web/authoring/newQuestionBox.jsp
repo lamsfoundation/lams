@@ -1,23 +1,3 @@
-<%--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
 
@@ -25,63 +5,67 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
+		<link href="<html:rewrite page='/includes/css/addItem.css'/>" rel="stylesheet" type="text/css">
+		
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 
 		<script language="JavaScript" type="text/JavaScript">
-
-			function submitMethod() {
-				document.McAuthoringForm.submit();
-			}
-			
+		
 			function submitMethod(actionMethod) {
-				document.McAuthoringForm.dispatch.value=actionMethod; 
-				document.McAuthoringForm.submit();
+				document.McAuthoringForm.dispatch.value=actionMethod;
+				$("textarea[name^=ca]").each(function() {
+					var name = $(this).attr("name");
+					var value = CKEDITOR.instances[name].getData();
+					$(this).val(value);
+				});
+				
+	    		$('#newQuestionForm').ajaxSubmit({
+    	    		target:  $('#candidateArea')
+    		    });
 			}
 			
+			function addItem() {
+				document.McAuthoringForm.dispatch.value="addSingleQuestion";
+				$("#newQuestion").val(CKEDITOR.instances.newQuestion.getData());
+				$("textarea[name^=ca]").each(function() {
+					var name = $(this).attr("name");
+					var value = CKEDITOR.instances[name].getData();
+					$(this).val(value);
+				});
+				
+				if (validateSingleCorrectAnswer()) { 
+					$('#newQuestionForm').ajaxSubmit({ 
+	    	    		target:  parent.jQuery('#resourceListArea'), 
+	    	    		success: function() { 
+	    	    			self.parent.refreshThickbox();
+	    	    			self.parent.tb_remove();
+	    	    	    }
+	    		    });
+				}
+			}
 
-			function submitModifyAddedAuthoringCandidate(candidateIndexValue, actionMethod) 
-			{
+			function submitModifyAddedAuthoringCandidate(candidateIndexValue, actionMethod) {
 				document.McAuthoringForm.candidateIndex.value=candidateIndexValue; 
 				submitMethod(actionMethod);
 			}
 
-			function removeAddedCandidate(candidateIndexValue) 
-			{
-				document.McAuthoringForm.candidateIndex.value=candidateIndexValue; 
-				submitMethod("removeAddedCandidate");
-			}
-
-			function validateDuplicateCorrectAnswers() 
-			{
-				var correctCount = 0;
-				for(i = 1; i < 51; i++)
-				{
-					var currentId="select".concat(i)
-					var currentField=document.getElementById(currentId);
-					
-					if (currentField != null)
-					{
-						if ((typeof(currentField) != 'undefined') && (typeof(currentField) != null))
-						{
-							if (currentField.value == 'Correct')
-							{
-								correctCount = correctCount + 1;
-							}
-						}
-					}
+			function removeAddedCandidate(candidateIndexValue) {
+				if (validateMinumumCandidateCount()) { 
+					document.McAuthoringForm.candidateIndex.value=candidateIndexValue; 
+					submitMethod("removeAddedCandidate");
 				}
+			}
+			
+			function validateSingleCorrectAnswer() {
 				
-				if (correctCount > 1)
-				{
-					var msg = "<fmt:message key="candidates.duplicate.correct"/>";
+				//question.blank
+				if (!$("#newQuestion").val()) {
+					var msg = "<fmt:message key="question.blank"/>";
 					alert(msg);
 					return false;
 				}
-				return true;
-			}
-			
-			
-			function validateSingleCorrectAnswer() 
-			{
+				
 				var singleCorrectEntry = 0;
 				var radioCorrect=document.McAuthoringForm.correct;
 
@@ -93,14 +77,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				}
 
 				var radioGroupSize=radioCorrect.length;
-				
 				if ((radioGroupSize == 'undefined') || (radioGroupSize < 2))				
 				{
 					var msg = "<fmt:message key="candidates.groupSize.warning"/>";
 					alert(msg);
-					return false;				
+					return false;
 				}
-				
 				
 				for(i = 0; i < 51; i++)
 				{
@@ -133,9 +115,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				return true;
 			}
 
-
-			function validateMinumumCandidateCount() 
-			{
+			function validateMinumumCandidateCount() {
 				var radioCorrect=document.McAuthoringForm.correct;
 
 				if ((radioCorrect == 'undefined') || (radioCorrect == null))
@@ -160,7 +140,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</script>
 	</lams:head>
 
-	<body>
+	<body class="stripes" onload="parent.resizeIframe();">
+		<div id="content" >
 		<html:form action="/authoring?validate=false"
 			styleId="newQuestionForm" enctype="multipart/form-data" method="POST">
 			<html:hidden property="dispatch" value="addSingleQuestion" />
@@ -181,21 +162,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<lams:CKEditor id="newQuestion"
 				value="${mcGeneralAuthoringDTO.editableQuestionText}"
 				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"
-				width="100%"
-				resizeParentFrameName="messageArea">
+				width="100%">
 			</lams:CKEditor>
 
 			<%@ include file="/authoring/candidateAnswersAddList.jsp"%>
 
 			<div class="space-bottom small-space-top">
 				<div class="right-buttons">
-					<html:submit
+					<html:button property="newAddedCandidate"
 						onclick="javascript:submitMethod('newAddedCandidateBox');"
 						styleClass="button">
 						<fmt:message key="label.add.candidates" />
-					</html:submit>
+					</html:button>
 				</div>
-				<div class="float-right">
+				<div id="questions-worth">
 				<fmt:message key="label.questions.worth"></fmt:message>
 				<select name="mark">
 					<c:forEach var="markEntry"
@@ -219,18 +199,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<fmt:message key="label.feedback"></fmt:message>
 			</div>
 			<html:textarea property="feedback" rows="3" cols="70"></html:textarea>
-
 			
 			<lams:ImgButtonWrapper>
-					<a href="#" onclick="if (validateSingleCorrectAnswer()) { getElementById('newQuestionForm').submit(); }"				
-						class="button-add-item"> <fmt:message key="label.add.new.question" />
+					<a href="#" onclick="addItem();"				
+						onmousedown="self.focus();" class="button-add-item"> 
+						<fmt:message key="label.add.new.question" />
 					</a>
 	
-					<a href="#" onclick="javascript:window.parent.hideMessage()"
-						class="button space-left"> <fmt:message key="label.cancel" />
+					<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="button space-left"> 
+						<fmt:message key="label.cancel" />
 					</a>
 			</lams:ImgButtonWrapper>
 
 		</html:form>
+		</div>
 	</body>
 </lams:html>

@@ -730,17 +730,10 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	boolean validateSingleCorrectCandidate = authoringUtil.validateSingleCorrectCandidate(caList);
 
-	boolean validateOnlyOneCorrectCandidate = authoringUtil.validateOnlyOneCorrectCandidate(caList);
-
 	ActionMessages errors = new ActionMessages();
 
 	if (!validateSingleCorrectCandidate) {
 	    ActionMessage error = new ActionMessage("candidates.none.correct");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	}
-
-	if (!validateOnlyOneCorrectCandidate) {
-	    ActionMessage error = new ActionMessage("candidates.duplicate.correct");
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 	}
 
@@ -1000,17 +993,11 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	caList = AuthoringUtil.removeBlankEntries(caList);
 
 	boolean validateSingleCorrectCandidate = authoringUtil.validateSingleCorrectCandidate(caList);
-	boolean validateOnlyOneCorrectCandidate = authoringUtil.validateOnlyOneCorrectCandidate(caList);
 
 	ActionMessages errors = new ActionMessages();
 
 	if (!validateSingleCorrectCandidate) {
 	    ActionMessage error = new ActionMessage("candidates.none.correct");
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	}
-
-	if (!validateOnlyOneCorrectCandidate) {
-	    ActionMessage error = new ActionMessage("candidates.duplicate.correct");
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 	}
 

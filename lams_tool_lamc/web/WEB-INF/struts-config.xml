@@ -110,7 +110,30 @@
 			path="/authoring/editQuestionBox.jsp"
 			redirect="false"
 	    />
-
+	    
+	   <forward
+			name="itemList"
+			path="/authoring/itemlist.jsp"
+			redirect="false"
+	    />
+	    
+	   <forward
+			name="itemList"
+			path="/authoring/itemlist.jsp"
+			redirect="false"
+	    />
+	    
+	    <forward
+			name="candidateAnswersList"
+			path="/authoring/candidateAnswersList.jsp"
+			redirect="false"
+	    />
+	    
+	    <forward
+			name="candidateAnswersAddList"
+			path="/authoring/candidateAnswersAddList.jsp"
+			redirect="false"
+	    />
 
 	  	<forward
 	        name="starter"

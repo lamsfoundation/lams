@@ -1,31 +1,34 @@
-<%--
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
-
 <%@ include file="/common/taglibs.jsp"%>
+<div id="candidateArea">
 
-<html:hidden property="candidateIndex" />
-<html:hidden property="questionIndex" />
+<c:set var="candidateIndex" >
+	<c:choose>
+		<c:when test="${not empty candidateIndex}">
+			${candidateIndex}
+		</c:when>
+		<c:otherwise>
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			${formBean.candidateIndex}
+		</c:otherwise>
+	</c:choose>
+</c:set>
+<c:set var="questionIndex" >
+	<c:choose>
+		<c:when test="${not empty questionIndex}">
+			${questionIndex}
+		</c:when>
+		<c:otherwise>
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			${formBean.questionIndex}
+		</c:otherwise>
+	</c:choose>
+</c:set>
+
+<input type="hidden" name="candidateIndex" value="${candidateIndex}"/>
+<input type="hidden" name="questionIndex" value="${questionIndex}"/>
 
 <div class="field-name space-top">
-	<fmt:message key="label.add.candidates"></fmt:message>
+	<fmt:message key="label.answers"></fmt:message>
 </div>
 
 <%@ include file="/common/messages.jsp"%>
@@ -35,59 +38,55 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:set var="queIndex" scope="request" value="0" />
 	
 	<tr>
-			<td width="4%" class="align-right">
+			<td width="10px">
 			</td>
 
-			<td class="align-left">
+			<td>
 			</td>
 
-			<td width="16%" align="center">
+			<td width="60px" class="align-center">
 				<fmt:message key="label.isCorrect" />
 			</td>
 
-			<td width="12%" class="align-left">
+			<td width="40px">
 			</td>
 
-			<td width="10%" class="align-left">
+			<td width="20px">
 			</td>
 	</tr>
 	
-	<c:forEach items="${listQuestionContentDTO}" var="currentDTO"
-		varStatus="status">
+	<c:forEach items="${listQuestionContentDTO}" var="currentDTO" varStatus="status">
 		<c:set var="queIndex" scope="request" value="${queIndex +1}" />
-
 		<c:set var="caCount" scope="request" value="${currentDTO.caCount}" />
 
 		<c:if test="${currentEditableQuestionIndex == queIndex}">
 
-			<c:set var="listCandidateAnswersDTO" scope="request"
-				value="${currentDTO.listCandidateAnswersDTO}" />
+			<c:set var="listCandidateAnswersDTO" scope="request" value="${currentDTO.listCandidateAnswersDTO}" />
 
 			<c:set var="caIndex" scope="request" value="0" />
 
-			<c:forEach items="${listCandidateAnswersDTO}"
-				var="currentCandidateDTO" varStatus="status">
+			<c:forEach items="${listCandidateAnswersDTO}" var="currentCandidateDTO" varStatus="status">
 				<c:set var="caIndex" scope="request" value="${caIndex +1}" />
 
 				<tr>
-					<td width="4%" class="align-right">
+					<td>
 						<c:out value="${caIndex}" />
 					</td>
 
-					<td class="align-left">
-						<input type="text" name="ca${caIndex}"
-							value="${currentCandidateDTO.candidateAnswer}" size="50">
+					<td>
+						<lams:CKEditor id="ca${caIndex}" 
+							value="${currentCandidateDTO.candidateAnswer}"
+							contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}">
+						</lams:CKEditor>
 					</td>
 
-					<td width="16%" align="center">
+					<td class="align-center">
 
-							<c:forEach var="correctEntry"
-								items="${mcGeneralAuthoringDTO.correctMap}">
+							<c:forEach var="correctEntry" items="${mcGeneralAuthoringDTO.correctMap}">
 								<c:set var="SELECTED_ANSWER" scope="request" value="" />
 								<c:set var="ISCORRECT" scope="request" value="Incorrect" />
 								
-								<c:if
-									test="${correctEntry.value == currentCandidateDTO.correct}">
+								<c:if test="${correctEntry.value == currentCandidateDTO.correct}">
 									<c:set var="SELECTED_ANSWER" scope="request" value="CHECKED" />
 									<c:set var="ISCORRECT" scope="request" value="Correct" />
 								</c:if>
@@ -97,7 +96,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</c:forEach>
 					</td>
 
-					<td width="12%" class="align-left">
+					<td>
 						<c:if test="${caCount != 1}">
 
 							<c:if test="${caIndex == 1}">
@@ -128,12 +127,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</c:if>
 					</td>
 
-					<td width="10%" class="align-left">
+					<td>
 						<img src="<c:out value="${tool}"/>images/delete.gif" border="0"
 							title="<fmt:message key='label.tip.removeCandidate'/>"
-							onclick=" if (validateMinumumCandidateCount()) {removeCandidate(${queIndex}, ${caIndex});} ">
-							
-							
+							onclick="removeCandidate(${queIndex}, ${caIndex});">
 					</td>
 				</tr>
 			</c:forEach>
@@ -142,3 +139,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</c:forEach>
 
 </table>
+</div>
