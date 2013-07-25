@@ -472,6 +472,8 @@ public class AuthoringAction extends Action {
 	}
 
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE_FORM, resourceForm);
+	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
+		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
 	return mapping.findForward(ResourceConstants.SUCCESS);
     }
 

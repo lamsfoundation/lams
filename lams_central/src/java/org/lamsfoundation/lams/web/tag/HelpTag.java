@@ -23,199 +23,198 @@
 package org.lamsfoundation.lams.web.tag;
 
 import java.io.IOException;
-import java.lang.NullPointerException;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.tool.service.*;
 import org.lamsfoundation.lams.tool.IToolVO;
-import org.lamsfoundation.lams.web.filter.LocaleFilter;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HelpUtil;
+import org.lamsfoundation.lams.web.filter.LocaleFilter;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Generates a help link to a contextualised tool help page.
  * 
- * @jsp.tag name="help"
- * 			body-content="empty"
- * 			display-name="Help tag"
- * 			description="Help tag"
- * 	
+ * @jsp.tag name="help" body-content="empty" display-name="Help tag" description="Help tag"
+ * 
  * @author Fiona Malikoff
  */
 public class HelpTag extends TagSupport {
 
-	private static final Logger log = Logger.getLogger(HelpTag.class);
-	private String module = null;
-	private String page = null;
-	private String toolSignature = null;
-	private String style = null;
-	
-	/**
+    private static final Logger log = Logger.getLogger(HelpTag.class);
+    private String module = null;
+    private String page = null;
+    private String toolSignature = null;
+    private String style = null;
+
+    /**
 	 * 
 	 */
-	public HelpTag() {
-		super();
-	}
-	
-	public int doStartTag() throws JspException {
-		try {
-		    
-			int imgHeight = 25;
-			boolean div = true;
-			
-        	JspWriter writer = pageContext.getOut();
-        	if (StringUtils.equals(style, "no-tabs")) {
-        		writer.println("<div class='help-no-tabs'>");
-        	} else if (StringUtils.equals(style, "small")) {
-           		imgHeight = 18;
-           		div = false;
-        	} else {
-        		writer.println("<div class='help'>");
-        	}
-        	try {
-        		
-        		HttpSession session = ((HttpServletRequest) this.pageContext.getRequest()).getSession();
-        		Locale locale = (Locale) session.getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
-        		String languageCode = locale != null ? locale.getLanguage() : "";
-        		
-        		if(toolSignature != null && module != null) {
-        			
-	        		// retrieve help URL for tool
-		        	ILamsToolService toolService = (ILamsToolService) getContext().getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
-					IToolVO tool = toolService.getToolBySignature(toolSignature);
+    public HelpTag() {
+	super();
+    }
 
-					String fullURL = HelpUtil.constructToolURL(tool.getHelpUrl(), toolSignature, module, languageCode );
-					
-					if(fullURL == null)
-						return SKIP_BODY;
-					
-					writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.jpg\" border=\"0\" width=\""+
-							imgHeight+"\" height=\""+imgHeight+"\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
+    @Override
+    public int doStartTag() throws JspException {
+	try {
 
-	        	
-	        	} else if(page != null){
-	        		
-	        		String fullURL = HelpUtil.constructPageURL(page, languageCode);
+	    int imgHeight = 25;
+	    boolean div = true;
 
-	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/help.jpg\" border=\"0\" width=\""+
-	        				imgHeight+"\" height=\""+imgHeight+"\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
+	    JspWriter writer = pageContext.getOut();
+	    if (StringUtils.equals(style, "no-tabs")) {
+		writer.println("<div class='help-no-tabs'>");
+	    } else if (StringUtils.equals(style, "small")) {
+		imgHeight = 18;
+		div = false;
+	    } else {
+		writer.println("<div class='help'>");
+	    }
+	    try {
 
-	        	} else {
-	        		log.error("HelpTag unable to write out due to unspecified values.");
-	        		writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL) + "images/css/warning.gif\" border=\"0\" width=\""+
-	        				imgHeight+"\" height=\""+imgHeight+"\"/>");
-	        	}
-        	} catch (NullPointerException npe) {
-    			log.error("HelpTag unable to write out due to NullPointerException. Most likely a required paramater was unspecified or incorrect.", npe);
-    			// don't throw a JSPException as we want the system to still function.
+		HttpSession session = ((HttpServletRequest) this.pageContext.getRequest()).getSession();
+		Locale locale = (Locale) session.getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
+		String languageCode = locale != null ? locale.getLanguage() : "";
 
-    		}
-        	
-        	if ( div )
-        		writer.println("</div>");
-        	
-		} catch (IOException e) {
-			log.error("HelpTag unable to write out due to IOException.", e);
-			// don't throw a JSPException as we want the system to still function.
+		if ((toolSignature != null) && (module != null)) {
+
+		    // retrieve help URL for tool
+		    ILamsToolService toolService = (ILamsToolService) getContext().getBean(
+			    AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
+		    IToolVO tool = toolService.getToolBySignature(toolSignature);
+
+		    String fullURL = HelpUtil.constructToolURL(tool.getHelpUrl(), toolSignature, module, languageCode);
+
+		    if (fullURL == null) {
+			return Tag.SKIP_BODY;
+		    }
+
+		    writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL)
+			    + "images/help.jpg\" border=\"0\" width=\"" + imgHeight + "\" height=\"" + imgHeight
+			    + "\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
+
+		} else if (page != null) {
+
+		    String fullURL = HelpUtil.constructPageURL(page, languageCode);
+
+		    writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL)
+			    + "images/help.jpg\" border=\"0\" width=\"" + imgHeight + "\" height=\"" + imgHeight
+			    + "\" onclick=\"window.open('" + fullURL + "', 'help')\"/>");
+
+		} else {
+		    HelpTag.log.error("HelpTag unable to write out due to unspecified values.");
+		    writer.println("<img src=\"" + Configuration.get(ConfigurationKeys.SERVER_URL)
+			    + "images/css/warning.gif\" border=\"0\" width=\"" + imgHeight + "\" height=\"" + imgHeight
+			    + "\"/>");
 		}
-    	return SKIP_BODY;
-	}
+	    } catch (NullPointerException npe) {
+		HelpTag.log
+			.error("HelpTag unable to write out due to NullPointerException. Most likely a required paramater was unspecified or incorrect.",
+				npe);
+		// don't throw a JSPException as we want the system to still function.
 
-	public int doEndTag() {
-		return EVAL_PAGE;
-	}
-	/**
-	 * @return module
-	 * 
-	 * @jsp.attribute required="false"
-	 * 				  rtexprvalue="true"
-	 * 				  description="Module Name"
-	 */
-	public String getModule() {
-		return module;
-	}
-	
-	/**
-	 * 
-	 * @param module
-	 */
-	public void setModule(String module) {
-		this.module = module;
-	}
-	
-	private WebApplicationContext getContext() {
-		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext( pageContext.getServletContext());
-		return ctx;
-	}
-	
-	/**
-	 * @return
-	 * 
-	  * @jsp.attribute required="false"
-	 * 				   rtexprvalue="true"
-	 * 				   description="Tool Signature"
-	 */
-	public String getToolSignature() {
-		return toolSignature;
-	}
-	
-	/**
-	 * 
-	 * @param toolSignature
-	 */
-	public void setToolSignature(String toolSignature) {
-		this.toolSignature = toolSignature;
-	}
-	
-	/**
-	 * @return page
-	 * 
-	 * @jsp.attribute required="false"
-	 * 				  rtexprvalue="true"
-	 * 				  description="Page Name"
-	 */
-	public String getPage() {
-		return module;
-	}
-	
-	/**
-	 * 
-	 * @param page
-	 */
-	public void setPage(String page) {
-		this.page = page;
-	}
+	    }
 
-	/**
-	 * @return style
-	 * 
-	 * @jsp.attribute required="false"
-	 *                rtexprvalue="true"
-	 *                description="Style"
-	 */
-	public String getStyle() {
-		return style;
+	    if (div) {
+		writer.println("</div>");
+	    }
+
+	} catch (IOException e) {
+	    HelpTag.log.error("HelpTag unable to write out due to IOException.", e);
+	    // don't throw a JSPException as we want the system to still function.
 	}
-	
-	/**
-	 * 
-	 * @param style
-	 */
-	public void setStyle(String style) {
-		this.style = style;
-	}
-	
+	return Tag.SKIP_BODY;
+    }
+
+    @Override
+    public int doEndTag() {
+	return Tag.EVAL_PAGE;
+    }
+
+    /**
+     * @return module
+     * 
+     * @jsp.attribute required="false" rtexprvalue="true" description="Module Name"
+     */
+    public String getModule() {
+	return module;
+    }
+
+    /**
+     * 
+     * @param module
+     */
+    public void setModule(String module) {
+	this.module = module;
+    }
+
+    private WebApplicationContext getContext() {
+	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(pageContext
+		.getServletContext());
+	return ctx;
+    }
+
+    /**
+     * @return
+     * 
+     * @jsp.attribute required="false" rtexprvalue="true" description="Tool Signature"
+     */
+    public String getToolSignature() {
+	return toolSignature;
+    }
+
+    /**
+     * 
+     * @param toolSignature
+     */
+    public void setToolSignature(String toolSignature) {
+	this.toolSignature = toolSignature;
+    }
+
+    /**
+     * @return page
+     * 
+     * @jsp.attribute required="false" rtexprvalue="true" description="Page Name"
+     */
+    public String getPage() {
+	return module;
+    }
+
+    /**
+     * 
+     * @param page
+     */
+    public void setPage(String page) {
+	this.page = page;
+    }
+
+    /**
+     * @return style
+     * 
+     * @jsp.attribute required="false" rtexprvalue="true" description="Style"
+     */
+    public String getStyle() {
+	return style;
+    }
+
+    /**
+     * 
+     * @param style
+     */
+    public void setStyle(String style) {
+	this.style = style;
+    }
+
 }

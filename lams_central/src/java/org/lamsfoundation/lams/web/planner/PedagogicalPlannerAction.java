@@ -240,7 +240,6 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     
     // Parameters
     public static final String PARAM_REQUEST_SRC = "requestSrc";
-    public static final String PARAM_NOTIFY_CLOSE_URL = "notifyCloseURL";
     public static final String PARAM_FORBID_BUTTONS = "forbidButtons";
     public static final String PARAM_RETURN_TO_PARENT = "returnToParent";
     
@@ -290,9 +289,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	if (StringUtils.isNotBlank(requestSrc)) {
 	    request.getSession().setAttribute(PARAM_REQUEST_SRC, requestSrc);
 	}
-	String notifyCloseURL = request.getParameter(PARAM_NOTIFY_CLOSE_URL);
+	String notifyCloseURL = request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL);
 	if (StringUtils.isNotBlank(notifyCloseURL)) {
-	    request.getSession().setAttribute(PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
+	    request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
 	}
 
 	return openSequenceNode(mapping, form, request, response);
@@ -365,9 +364,9 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	if (StringUtils.isNotBlank(requestSrc)) {
 	    request.getSession().setAttribute(PARAM_REQUEST_SRC, requestSrc);
 	}
-	String notifyCloseURL = request.getParameter(PARAM_NOTIFY_CLOSE_URL);
+	String notifyCloseURL = request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL);
 	if (StringUtils.isNotBlank(notifyCloseURL)) {
-	    request.getSession().setAttribute(PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
+	    request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
 	}
 
 	return mapping.findForward(PedagogicalPlannerAction.FORWARD_TEMPLATE);

@@ -74,7 +74,6 @@ public abstract class LamsAuthoringFinishAction extends Action {
     private static final String RE_EDIT_URL = "reEditUrl";
 
     private static final String PARAM_DEFINE_LATER = "defineLater";
-    private static final String PARAM_NOTIFY_CLOSE_URL = "notifyCloseURL";
 
     /**
      * Action method, will handle save/cancel action.
@@ -84,7 +83,7 @@ public abstract class LamsAuthoringFinishAction extends Action {
 	String action = request.getParameter(ACTION_NAME);
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, ACTION_MODE, false);
 	String cSessionID = request.getParameter(CUSTOMISE_SESSION_ID);
-	String notifyCloseURL = (String) request.getSession().getAttribute(PARAM_NOTIFY_CLOSE_URL);
+	String notifyCloseURL = (String) request.getSession().getAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL);
 	
 	// clear session according to the ToolAccessMode.
 	clearSession(cSessionID, request.getSession(), mode);
@@ -104,11 +103,12 @@ public abstract class LamsAuthoringFinishAction extends Action {
 	    //add reeditUrl parameter
 	    String reeditUrl = WebUtil.appendParameterToURL(getLamsUrl() + tool.getAuthorUrl(),
 		    AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId.toString());
-	    reeditUrl = WebUtil.appendParameterToURL(reeditUrl, AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+	    reeditUrl = WebUtil
+		    .appendParameterToURL(reeditUrl, AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	    nextUrl = WebUtil.appendParameterToURL(nextUrl, RE_EDIT_URL, URLEncoder.encode(reeditUrl, "UTF-8"));
 
 	    if (!StringUtils.isBlank(notifyCloseURL)) {
-		nextUrl = WebUtil.appendParameterToURL(nextUrl, PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
+		nextUrl = WebUtil.appendParameterToURL(nextUrl, AttributeNames.PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
 	    }
 	    response.sendRedirect(nextUrl);
 	}

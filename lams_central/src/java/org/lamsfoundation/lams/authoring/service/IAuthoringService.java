@@ -259,7 +259,7 @@ public interface IAuthoringService {
      */
     public String getToolContentIDFlash(Long toolID) throws IOException;
 
-    public Long generateToolContentID(Long toolID);
+    public Long insertToolContentID(Long toolID);
 
     /**
      * Calls an appropriate tool to copy the content indicated by toolContentId. Returns a string representing the new
@@ -406,6 +406,6 @@ public interface IAuthoringService {
     
     public String getToolAuthorUrl(Long toolID, Long toolContentID, String contentFolderID);
     
-    public Long createSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
+    public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
 	    String contentFolderID);
 }

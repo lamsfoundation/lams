@@ -259,6 +259,8 @@ public class AuthoringAction extends Action {
 	taskListItemList.addAll(items);
 
 	sessionMap.put(TaskListConstants.ATTR_RESOURCE_FORM, taskListForm);
+	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
+		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
 	return mapping.findForward(TaskListConstants.SUCCESS);
     }
 

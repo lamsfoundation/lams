@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
@@ -61,8 +62,6 @@ public class LoginRequestDispatcher {
 
     public static final String PARAM_REQUEST_SRC = "requestSrc";
 
-    public static final String PARAM_NOTIFY_CLOSE_URL = "notifyCloseURL";
-    
     public static final String PARAM_IS_POST_MESSAGE_TO_PARENT = "isPostMessageToParent";
 
     public static final String PARAM_FIRST_NAME = "firstName";
@@ -129,7 +128,7 @@ public class LoginRequestDispatcher {
 	/** AUTHOR * */
 	else if (METHOD_AUTHOR.equals(method)) {
 	    String requestSrc = request.getParameter(PARAM_REQUEST_SRC);
-	    String notifyCloseURL = request.getParameter(PARAM_NOTIFY_CLOSE_URL);
+	    String notifyCloseURL = request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL);
 	    String isPostMessageToParent = request.getParameter(PARAM_IS_POST_MESSAGE_TO_PARENT);
 
 	    // Custom CSV string to be used for tool adapters
@@ -144,7 +143,7 @@ public class LoginRequestDispatcher {
 		parameters = extLmsId != null ? parameters + "&" + PARAM_EXT_LMS_ID + "=" + extLmsId : parameters;
 		parameters = requestSrc != null ? parameters + "&" + PARAM_REQUEST_SRC + "="
 			+ URLEncoder.encode(requestSrc, "UTF8") : parameters;
-		parameters = notifyCloseURL != null ? parameters + "&" + PARAM_NOTIFY_CLOSE_URL + "="
+		parameters = notifyCloseURL != null ? parameters + "&" + AttributeNames.PARAM_NOTIFY_CLOSE_URL + "="
 			+ URLEncoder.encode(notifyCloseURL, "UTF8") : parameters;
 		parameters = isPostMessageToParent != null ? parameters + "&" + PARAM_IS_POST_MESSAGE_TO_PARENT + "=" + isPostMessageToParent : parameters;
 	    } catch (UnsupportedEncodingException e) {

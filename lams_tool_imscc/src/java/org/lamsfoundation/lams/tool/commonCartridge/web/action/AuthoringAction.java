@@ -434,6 +434,8 @@ public class AuthoringAction extends Action {
 	commonCartridgeItemList.addAll(items);
 
 	sessionMap.put(CommonCartridgeConstants.ATTR_RESOURCE_FORM, commonCartridgeForm);
+	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
+		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
 	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
     }
 

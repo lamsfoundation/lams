@@ -285,6 +285,8 @@ public class AuthoringAction extends Action {
 	
 	  sessionMap.put(EadventureConstants.ATTR_CHANGE_FILE, "false");
 	sessionMap.put(EadventureConstants.ATTR_RESOURCE_FORM, eadventureForm);
+	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
+		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
 	return mapping.findForward(EadventureConstants.SUCCESS);
     }
     

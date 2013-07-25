@@ -1804,11 +1804,11 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	return flashMessage.serializeMessage();
     }
 
-    /** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#generateToolContentID(java.lang.Long) */
+    /** @see org.lamsfoundation.lams.authoring.service.IAuthoringService#insertToolContentID(java.lang.Long) */
 
     @Override
     public String getToolContentIDFlash(Long toolID) throws IOException {
-	Long toolContentID = generateToolContentID(toolID);
+	Long toolContentID = insertToolContentID(toolID);
 	if (toolContentID == null) {
 	    return FlashMessage.getNoSuchTool("getToolContentID", toolID).serializeMessage();
 	}
@@ -1818,7 +1818,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     @Override
-    public Long generateToolContentID(Long toolID) {
+    public Long insertToolContentID(Long toolID) {
 	Tool tool = toolDAO.getToolByID(toolID);
 	if (tool == null) {
 	    log.error("The toolID " + toolID + " is not valid. A Tool with tool id " + toolID
@@ -1973,7 +1973,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Long createSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
+    public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
 	    String contentFolderID) {
 	Integer userID = AuthoringService.getUserId();
 	User user = (User) baseDAO.find(User.class, userID);

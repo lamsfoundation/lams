@@ -71,7 +71,7 @@
 	var win = window.hideMessage ? window : window.top;
 	if (win.hideMessage != null){
 		win.hideQuestionInputArea();
-		var obj = win..document.getElementById('questionListArea');
+		var obj = win.document.getElementById('questionListArea');
 		obj.innerHTML= document.getElementById("questionList").innerHTML;
 	}
 </script>

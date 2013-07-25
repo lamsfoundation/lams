@@ -74,6 +74,7 @@ public class AttributeNames {
     public static final String PARAM_CUSTOM_CSV = "customCSV";
     public static final String PARAM_EXT_LMS_ID = "extlmsid";
     public static final String PARAM_CREATE_DATE_TIME = "createDateTime";
+    public static final String PARAM_NOTIFY_CLOSE_URL = "notifyCloseURL";
 
     public static final String PARAM_LIB = "library";
 

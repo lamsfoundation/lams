@@ -21,7 +21,7 @@
 				refreshParentMonitoringWindow();
 			} else {
 				if (window.parent.opener == null || '${param.noopener}' == 'true' || notifyCloseURL.indexOf('noopener=true') >= 0){
-					window.location.href = notifyCloseURL;
+					window.location.href = notifyCloseURL + '&action=save';
 				} else {
 					window.parent.opener.location.href = notifyCloseURL;
 				}

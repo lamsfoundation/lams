@@ -243,6 +243,8 @@ public class AuthoringAction extends Action {
 
 	sessionMap.put(ImageGalleryConstants.ATTR_RESOURCE_FORM, imageGalleryForm);
 	sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, imageGallery.getNextImageTitle());
+	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
+		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
 

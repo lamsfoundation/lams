@@ -322,7 +322,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	IAuthoringService authoringService = getAuthoringService();
 	Long toolID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_ID);
 	// generate the next unique content ID for the tool
-	Long toolContentID = authoringService.generateToolContentID(toolID);
+	Long toolContentID = authoringService.insertToolContentID(toolID);
 	if (toolContentID != null) {
 	    String contentFolderID = FileUtil.generateUniqueContentFolderID();
 	    String authorUrl = authoringService.getToolAuthorUrl(toolID, toolContentID, contentFolderID);
@@ -351,7 +351,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	String contentFolderID = request.getParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	String learningDesignTitle = request.getParameter(AttributeNames.PARAM_TITLE);
 	// created the LD
-	Long learningDesignID = authoringService.createSingleActivityLearningDesign(learningDesignTitle, toolID,
+	Long learningDesignID = authoringService.insertSingleActivityLearningDesign(learningDesignTitle, toolID,
 		toolContentID, contentFolderID);
 	if (learningDesignID != null) {
 	    Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);

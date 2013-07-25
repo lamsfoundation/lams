@@ -496,6 +496,8 @@ public class AuthoringAction extends Action {
 	conditionSet.addAll(survey.getConditions());
 
 	sessionMap.put(SurveyConstants.ATTR_SURVEY_FORM, surveyForm);
+	request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
+		request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
 	return mapping.findForward(SurveyConstants.SUCCESS);
     }
 
