@@ -71,18 +71,28 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</div>
 	</div>
 
-	<c:forEach var="ca" items="${dto.candidateAnswerUids}">
-
-		<div class="indent">
-			<input type="radio" name="checkedCa${dto.questionUid}" class="noBorder" value="${dto.questionUid}-${ca.value}">
-
-			<c:forEach var="caText" items="${dto.candidateAnswers}">
-				<c:if test="${ca.key == caText.key}">
-					<c:out value="${caText.value}" escapeXml="false" />
-		</div>
-				</c:if>
+	<table class="indent">
+		<tbody>
+			<c:forEach var="ca" items="${dto.candidateAnswerUids}">
+			
+				<tr>
+		
+					<td>
+						<input type="radio" name="checkedCa${dto.questionUid}" class="noBorder" value="${dto.questionUid}-${ca.value}">
+					</td>
+		
+					<c:forEach var="caText" items="${dto.candidateAnswers}">
+						<c:if test="${ca.key == caText.key}">
+							<td width="100%">
+								<c:out value="${caText.value}" escapeXml="false" />
+							</td>
+						</c:if>
+					</c:forEach>
+					
+				</tr>
 			</c:forEach>
-	</c:forEach>
+		</tbody>
+	</table>
 
 </c:forEach>
 

@@ -69,7 +69,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="learnerProgressUserId" />
 			<html:hidden property="questionListingMode" />
 
-
 			<h2>
 				<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
 					<fmt:message key="label.viewAnswers" />
@@ -92,13 +91,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							${status.count})
 						</span>
 						<c:out value="${questionEntry.value}" escapeXml="false" />
-					</div>																			  								
-
+					</div>
 
 					<!--  CANDIDATE ANSWERS  -->
 					<c:set var="queIndex" scope="request" value="0" />
-					<c:forEach var="mainEntry"
-						items="${mcGeneralLearnerFlowDTO.mapGeneralOptionsContent}">
+					<c:forEach var="mainEntry" items="${mcGeneralLearnerFlowDTO.mapGeneralOptionsContent}">
 						<c:set var="queIndex" scope="request" value="${queIndex +1}" />
 
 						<c:if test="${requestScope.mainQueIndex == requestScope.queIndex}">
@@ -121,8 +118,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								</c:forEach>
 	
 								<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
-									<c:forEach var="attemptEntryCorrect"
-										items="${mcGeneralLearnerFlowDTO.mapFinalAnswersIsContent}">
+									<c:forEach var="attemptEntryCorrect" items="${mcGeneralLearnerFlowDTO.mapFinalAnswersIsContent}">
 										<c:if test="${requestScope.mainQueIndex == attemptEntryCorrect.key}">
 											<c:if test="${attemptEntryCorrect.value == 'true'}">
 												<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">									

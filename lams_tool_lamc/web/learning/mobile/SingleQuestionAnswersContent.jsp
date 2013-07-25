@@ -14,8 +14,7 @@
 	</div>
 </c:if>
 
-<c:if
-	test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
+<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
 
 	<strong> <fmt:message key="label.learner.message" /> ( <c:out
 			value="${mcGeneralLearnerFlowDTO.passMark}" /> ) </strong>
@@ -24,15 +23,11 @@
 
 <html:hidden property="nextQuestionSelected" />
 <html:hidden property="continueOptionsCombined" />
-<html:hidden property="questionIndex"
-	value="${mcGeneralLearnerFlowDTO.questionIndex}" />
-
+<html:hidden property="questionIndex" value="${mcGeneralLearnerFlowDTO.questionIndex}" />
 
 <ul data-role="listview" data-inset="true" data-theme="d">
-<c:forEach var="dto" varStatus="status"
-	items="${requestScope.listQuestionCandidateAnswersDto}">
-	<c:if
-		test="${dto.displayOrder == mcGeneralLearnerFlowDTO.questionIndex}">
+<c:forEach var="dto" varStatus="status"	items="${requestScope.listQuestionCandidateAnswersDto}">
+	<c:if test="${dto.displayOrder == mcGeneralLearnerFlowDTO.questionIndex}">
 		
 		<li>
 		<fieldset data-role="controlgroup">
@@ -51,7 +46,7 @@
 				</c:if>
 				</div>
 			</legend>
-		
+			
 			<c:forEach var="ca" varStatus="status"
 				items="${dto.candidateAnswerUids}">
 				<div class="indent">
