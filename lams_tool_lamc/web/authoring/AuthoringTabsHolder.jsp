@@ -40,9 +40,7 @@
 		
 		function submitModifyAuthoringQuestion(questionIndexValue, actionMethod) {
 			document.McAuthoringForm.questionIndex.value=questionIndexValue; 
-			document.McAuthoringForm.dispatch.value=actionMethod; 
-			document.McAuthoringForm.theOfflineFile=null; 
-			document.McAuthoringForm.theOnlineFile=null; 
+			document.McAuthoringForm.dispatch.value=actionMethod;
 			
 			$('#authoringForm').ajaxSubmit({ 
 	    		target:  $('#resourceListArea'),

@@ -69,23 +69,20 @@
 				var singleCorrectEntry = 0;
 				var radioCorrect=document.McAuthoringForm.correct;
 
-				if ((radioCorrect == 'null') || (radioCorrect == 'undefined'))
-				{
+				if ((radioCorrect == 'null') || (radioCorrect == 'undefined')) {
 					var msg = "<fmt:message key="candidates.groupSize.warning"/>";
 					alert(msg);
 					return false;				
 				}
 
 				var radioGroupSize=radioCorrect.length;
-				if ((radioGroupSize == 'undefined') || (radioGroupSize < 2))				
-				{
+				if ((radioGroupSize == 'undefined') || (radioGroupSize < 2)) {
 					var msg = "<fmt:message key="candidates.groupSize.warning"/>";
 					alert(msg);
 					return false;
 				}
 				
-				for(i = 0; i < 51; i++)
-				{
+				for(i = 0; i < 51; i++) {
 					if (radioCorrect[i] != null)
 					{
 						if ((typeof(radioCorrect[i]) != 'undefined') && (typeof(radioCorrect[i]) != null))
@@ -98,8 +95,7 @@
 					}
 				}
 				
-				if (singleCorrectEntry == 0)
-				{
+				if (singleCorrectEntry == 0) {
 					var msg = "<fmt:message key="candidates.none.correct"/>";
 					var msgSetFirst = "<fmt:message key="candidates.setFirst"/>";
 					alert(msg);
@@ -112,6 +108,15 @@
 
 					return false;				
 				}
+				
+				//verify selected radiobutton should not be blank
+				var selectedAnswerIndex = $('input[name=correct]:checked').val();
+				if (!$("textarea[name=ca" + selectedAnswerIndex + "]").val()) {
+					var msg = "<fmt:message key="error.correct.answer.blank"/>";
+					alert(msg);
+					return false;
+				}
+				
 				return true;
 			}
 

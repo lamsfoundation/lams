@@ -237,6 +237,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		List attachmentList = (List) sessionMap.get(McAppConstants.ATTACHMENT_LIST_KEY);
 
 		List deletedAttachmentList = (List) sessionMap.get(McAppConstants.DELETED_ATTACHMENT_LIST_KEY);
+		
+		saveAttachments(mcContent, attachmentList, deletedAttachmentList, mapping, request);
 	    }
 
 	    McUtils.setDefineLater(request, false, strToolContentID, mcService);
