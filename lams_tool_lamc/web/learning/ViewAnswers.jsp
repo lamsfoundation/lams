@@ -113,7 +113,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<c:forEach var="attemptEntryFinal"
 									items="${mcGeneralLearnerFlowDTO.mapFinalAnswersContent}">
 									<c:if test="${requestScope.mainQueIndex == attemptEntryFinal.key}">
-										<c:out value="${attemptEntryFinal.value}" />
+										<c:out value="${attemptEntryFinal.value}" escapeXml="false"/>
 									</c:if>
 								</c:forEach>
 	
