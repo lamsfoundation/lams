@@ -130,6 +130,8 @@ public class DisplayGroupAction extends Action {
 	    request.setAttribute("tools", getAuthoringService().getAllToolDTOs());
 	    request.setAttribute("orgBean", iob);
 	    request.setAttribute("allowSorting", allowSorting);
+	    request.setAttribute("singleActivityLessonsEnabled",
+		    Configuration.get(ConfigurationKeys.SINGLE_ACTIVITY_LESSONS_ENABLED));
 	}
 
 	return mapping.findForward(forwardPath);

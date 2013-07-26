@@ -65,7 +65,7 @@
 <%-- This script will works when a new resoruce item submit in order to refresh "Resource List" panel. --%>
 <script lang="javascript">
 	var win = null;
-	if (window.hideMessage) {
+	if (window.hideMessage) { 
 		win = window;
 	} else if (window.parent && window.parent.hideMessage) {
 		win = window.parent;

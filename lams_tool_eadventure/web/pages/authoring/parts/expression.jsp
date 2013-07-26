@@ -14,11 +14,10 @@
 			if (elem != null) {
 				elem.style.display="none";
 			}
-			
-			window.top.document.location.hash = "expressionInputArea";
-			
-			
+			var win = window.top ? window.top : window;
+			win.document.location.hash = "expressionInputArea";
 		}
+		
 		function hideExpressionMessage(){
 			var area=document.getElementById("expressionInputArea");
 			if(area != null){
@@ -50,9 +49,12 @@
 		    		method:'get',
 		    		parameters:param,
 		    		onComplete: function(resp){
-		    			var obj = window.document.getElementById("conditionInputArea");
+		    			var obj = window.document.getElementById('conditionInputArea');
+		    			if (!obj && window.parent) {
+		    				 obj = window.parent.document.getElementById('conditionInputArea');
+		    			}  
 		    			if (!obj) {
-		    				obj = window.top.document.getElementById("conditionInputArea");
+		    				obj = window.top.document.getElementById('conditionInputArea');
 		    			}
 		    			obj.contentDocument.getElementById("expressionArea").innerHTML  = resp.responseText;
 		    			obj.contentWindow.hideExpressionMessage();
@@ -82,9 +84,12 @@
 		    		method:'get',
 		    		parameters:param,
 		    		onComplete: function(resp){
-		    			var obj = window.document.getElementById("conditionInputArea");
+		    			var obj = window.document.getElementById('conditionInputArea');
+		    			if (!obj && window.parent) {
+		    				 obj = window.parent.document.getElementById('conditionInputArea');
+		    			}  
 		    			if (!obj) {
-		    				obj = window.top.document.getElementById("conditionInputArea");
+		    				obj = window.top.document.getElementById('conditionInputArea');
 		    			}
 						obj.contentDocument.getElementById("expressionArea").innerHTML  = resp.responseText;
 					},
@@ -103,9 +108,12 @@
 		    		method:'get',
 		    		parameters:param,
 		    		onComplete: function(resp){
-		    			var obj = window.document.getElementById("conditionInputArea");
+		    			var obj = window.document.getElementById('conditionInputArea');
+		    			if (!obj && window.parent) {
+		    				 obj = window.parent.document.getElementById('conditionInputArea');
+		    			}  
 		    			if (!obj) {
-		    				obj = window.top.document.getElementById("conditionInputArea");
+		    				obj = window.top.document.getElementById('conditionInputArea');
 		    			}
 						obj.contentDocument.getElementById("expressionArea").innerHTML  = resp.responseText;
 					},

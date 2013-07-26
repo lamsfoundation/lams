@@ -68,10 +68,15 @@
 
 <%-- This script will work when a new question is submited in order to refresh "Question List" panel. --%>
 <script type="text/javascript">
-	var win = window.hideMessage ? window : window.top;
-	if (win.hideMessage != null){
-		win.hideQuestionInputArea();
-		var obj = win.document.getElementById('questionListArea');
-		obj.innerHTML= document.getElementById("questionList").innerHTML;
+	var win = null;
+	if (window.hideQuestionInputArea) { 
+		win = window;
+	} else if (window.parent && window.parent.hideQuestionInputArea) {
+		win = window.parent;
+	} else {
+		win = window.top;
 	}
+	win.hideQuestionInputArea();
+	var obj = win.document.getElementById('questionListArea');
+	obj.innerHTML= document.getElementById("questionList").innerHTML;
 </script>

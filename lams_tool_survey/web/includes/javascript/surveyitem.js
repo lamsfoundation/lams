@@ -93,8 +93,13 @@
 	}
 	
 	function cancelSurveyItem(){
-		var win = window.hideMessage ? window : window.top;
-		if (win.hideMessage != null){
-			win.hideMessage();
+		var win = null;
+		if (window.hideMessage) { 
+			win = window;
+		} else if (window.parent && window.parent.hideMessage) {
+			win = window.parent;
+		} else {
+			win = window.top;
 		}
+		win.hideMessage();
 	}

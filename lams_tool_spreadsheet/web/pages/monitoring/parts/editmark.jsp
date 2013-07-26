@@ -6,6 +6,19 @@
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<lams:css style="tabbed" />
+		<script type="text/javascript"> 
+			function callHideMessage() {
+				var win = null;
+				if (window.hideMessage) {
+					win = window;
+				} else if (window.parent && window.parent.hideMessage) {
+					win = window.parent;
+				} else {
+					win = window.top;
+				}
+				win.hideMessage();
+			}
+		</script>
 	</lams:head>
 	<body class="tabpart">
 		<!-- Basic Info Form-->
@@ -44,7 +57,7 @@
 			<a href="#" onclick="markForm.submit();" class="button space-left">
 				<fmt:message key="label.monitoring.summary.marking.update.marks" /> 
 			</a>
-			<a href="javascript:;" onclick="javascript: window.hideMessage ? window.hideMessage() : window.top.hideMessage()" class="button space-left">
+			<a href="javascript:;" onclick="javascript:callHideMessage" class="button space-left">
 				<fmt:message key="label.cancel" /> 
 			</a>
 		</lams:ImgButtonWrapper>

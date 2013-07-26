@@ -15,6 +15,20 @@
 		<link href="${tool}includes/css/chat.css" rel="stylesheet" type="text/css">
 		<lams:headItems />
 		<lams:css style="tabbed" />
+		
+		<script type="text/javascript"> 
+			function callHideConditionMessage() {
+				var win = null;
+				if (window.hideConditionMessage) {
+					win = window;
+				} else if (window.parent && window.parent.hideConditionMessage) {
+					win = window.parent;
+				} else {
+					win = window.top;
+				}
+				win.hideConditionMessage();
+			}
+		</script>
 	</lams:head>
 	<body class="tabpart">
 		<!-- Basic Info Form-->
@@ -38,7 +52,7 @@
 		<lams:ImgButtonWrapper>
 			<a href="javascript:;" onclick="javascript:chatConditionForm.submit();" class="button-add-item"><fmt:message
 					key="button.save" /> </a>
-			<a href="javascript:;" onclick="javascript:window.hideConditionMessage ? window.hideConditionMessage() : window.top.hideConditionMessage()"
+			<a href="javascript:;" onclick="javascript:callHideConditionMessage()"
 				class="button space-left"><fmt:message key="label.cancel" /> </a>
 		</lams:ImgButtonWrapper>
 	</body>

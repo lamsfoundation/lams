@@ -39,12 +39,17 @@
 
 <%-- This script will works when a new resoruce item submit in order to refresh "Eadventure List" panel. --%>
 <script lang="javascript">
-	var win = window.hideMessage ? window : window.top;
-	if (win.hideMessage != null){
-		win.hideMessage();
-		var obj = win.document.getElementById('eadventureListArea');
-		obj.innerHTML= document.getElementById("itemList").innerHTML;
-		win.document.getElementById('addGame').hide();
+	var win = null;
+	if (window.hideMessage) { 
+		win = window;
+	} else if (window.parent && window.parent.hideMessage) {
+		win = window.parent;
+	} else {
+		win = window.top;
 	}
+	win.hideMessage();
+	var obj = win.document.getElementById('eadventureListArea');
+	obj.innerHTML= document.getElementById("itemList").innerHTML;
+	win.document.getElementById('addGame').hide();
 </script>
 

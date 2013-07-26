@@ -428,9 +428,9 @@ function closeAddSingleActivityLessonDialog(action) {
 	if (save) {
 		var ldTitle = '';
 		while (ldTitle == '') {
-			ldTitle = prompt('Please enter a title for the lesson');
+			ldTitle = prompt(LABELS.SINGLE_ACTIVITY_LESSON_PROMPT);
 			if (ldTitle == '') {
-				alert('You must enter a title. If you do not want to save the lesson, click Cancel');
+				alert(LABELS.SINGLE_ACTIVITY_LESSON_PROMPT_BLANK);
 			}
 		}
 			

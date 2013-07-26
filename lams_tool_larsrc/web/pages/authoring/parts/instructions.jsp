@@ -77,7 +77,10 @@
 <script type="text/javascript">
 	document.getElementById("instructionCount").value = "${listSize}";
 	var obj = window.document.getElementById('reourceInputArea');
-	if (!obj) { 
+	if (!obj && window.parent) {
+		 obj = window.parent.document.getElementById('reourceInputArea');
+	}  
+	if (!obj) {
 		obj = window.top.document.getElementById('reourceInputArea');
 	}
 	obj.style.height=obj.contentWindow.document.body.scrollHeight+'px';

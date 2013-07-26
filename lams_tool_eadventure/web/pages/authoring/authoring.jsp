@@ -45,12 +45,15 @@
 		}
 		
 		function hideShowGame(){
-			var area= window.document.getElementById("addGame");
-			if (!area) { 
-				area = window.top.document.getElementById("addGame");
+			var obj = window.document.getElementById('addGame');
+			if (!obj && window.parent) {
+				 obj = window.parent.document.getElementById('addGame');
+			}  
+			if (!obj) {
+				obj = window.top.document.getElementById('addGame');
 			}
-			if(area != null){
-				area.style.display="none";
+			if (obj){
+				obj.style.display="none";
 			}
 		}
 

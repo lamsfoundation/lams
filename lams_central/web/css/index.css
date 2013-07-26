@@ -1,0 +1,130 @@
+#content-main {
+	padding: 10px;
+}
+
+td#messageCell {
+	width: 80%;
+}
+
+#message {
+	padding: 8px 10px 10px 40px;
+	text-align: left;
+	background: url('../images/css/edit.gif') no-repeat #d8e4f1 10px 8px;
+	border: 1px solid #3c78b5;
+}
+
+#linksCell div {
+	margin: 0 5px 15px 0;
+}
+
+.dialogContainer {
+	display: none;
+}
+
+.dialogContainer iframe {
+	width: 100%;
+	height: 100%;
+	border: none;
+}
+
+#mainContentTable td {
+	vertical-align: top;
+	padding: 0;
+}
+
+#orgTabs {
+	padding-right: 10px;
+}
+
+#orgTabs td {
+	padding: 0;
+	vertical-align: top;
+	font-family: verdana, arial, helvetica, sans-serif;
+}
+
+#orgTabs li.orgTabsHeader {
+	width: 150px;
+	white-space: normal;
+}
+
+#orgTabsPanelCell {
+	width: 100%;
+	border-left: none;
+}
+
+#content-main .row {
+	overflow: visible;
+}
+
+#content-main .row .split-menu-button {
+	margin-top: 6px;
+}
+
+#content-main .row .split-menu-button>ul {
+	margin: 0;
+}
+
+#content-main .row .split-menu-button ul li ul li {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+#content-main .row .split-menu-button a.add-lesson-button {
+	border-top: none;
+	border-left: none;
+	padding-top: 0;
+}
+
+#content-main .row .split-menu-button a.add-lesson-button span {
+	display: block;
+	float: left;
+	padding-top: 4px;
+}
+
+#content-main .row .split-menu-button a.add-lesson-button img {
+	display: block;
+	float: right;
+	padding-top: 3px;
+}
+
+#content-main .row .split-menu-button ul.button-menu span {
+	padding-left: 5px;
+}
+
+#content-main div.j-course-contents {
+	clear: both;
+}
+
+.ui-tabs-vertical {
+	border: none;
+}
+
+.ui-tabs-vertical .ui-tabs-nav {
+	background: none;
+	border: none;
+}
+
+.ui-tabs-vertical .ui-tabs-nav li {
+	width: 100%;
+	margin-bottom: 7px;
+	border: 1px solid #C5DBEC;
+	padding: 3px 0 3px 0 !important;
+}
+
+.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active {
+	border: 1px solid #79B7E7;
+	border-right-width: 0px;
+	margin-bottom: 7px;
+	padding: 3px 0 3px 0 !important;
+}
+
+.ui-tabs-vertical .ui-tabs-nav li a {
+	display: block;
+	float: none;
+	border: none;
+}
+
+td#actionAccord {
+	width: 20%;
+	padding-top: 1px;
+}

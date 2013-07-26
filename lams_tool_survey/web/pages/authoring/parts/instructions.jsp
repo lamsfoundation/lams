@@ -62,6 +62,9 @@
 <script type="text/javascript">
 	$("instructionCount").value="${listSize}";
 	var obj = window.document.getElementById('questionInputArea');
+	if (!obj && window.parent) {
+		 obj = window.parent.document.getElementById('questionInputArea');
+	}  
 	if (!obj) {
 		obj = window.top.document.getElementById('questionInputArea');
 	}

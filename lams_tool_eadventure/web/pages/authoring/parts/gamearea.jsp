@@ -8,7 +8,15 @@
 	<!-- No se xk no coge el atrubuto delete, ver que pasa-->
 	<c:if test="${gameDelete == 1}">
 	<script lang="javascript">
-		window.forceEmptyTable ? window.forceEmptyTable() : window.top.forceEmptyTable();
+		var win = null;
+		if (window.forceEmptyTable) { 
+			win = window;
+		} else if (window.parent && window.parent.forceEmptyTable) {
+			win = window.parent;
+		} else {
+			win = window.top;
+		}
+		win.forceEmptyTable();
 	</script>
 	
 	
@@ -18,7 +26,15 @@
 			
 		<!-- show the conditions add button -->
 		<script lang="javascript">
-			window.showConditionsAddButton ? window.showConditionsAddButton() : window.top.showConditionsAddButton();
+			var win = null;
+			if (window.showConditionsAddButton) { 
+				win = window;
+			} else if (window.parent && window.parent.showConditionsAddButton) {
+				win = window.parent;
+			} else {
+				win = window.top;
+			}
+			win.showConditionsAddButton();
 		</script>
 			
 		<table border="0" style="align:left;width:400px">
@@ -44,13 +60,16 @@
 		<c:otherwise>
 				<!-- show the conditions add button -->
 				<script lang="javascript">
-					if (window.hideConditionsAddButton){
-						window.hideConditionsAddButton();
-						window.forceEmptyTable();
+					var win = null;
+					if (window.hideConditionsAddButton) {
+						win = window;
+					} else if (window.parent && window.parent.hideConditionsAddButton) {
+						win = window.parent;
 					} else {
-						window.top.hideConditionsAddButton();
-						window.top.forceEmptyTable();
+						win = window.top;
 					}
+					win.hideConditionsAddButton();
+					win.forceEmptyTable();
 				</script>
 			<p align="small-space-bottom">
 				<a href="javascript:showMessage('<html:rewrite page="/authoring/editGameInit.do?sessionMapID=${sessionMapID}"/>');"  class="button-add-item">
@@ -61,11 +80,17 @@
 	</c:choose>
 </div>			
 <script lang="javascript">
-	var win = window.hideMessage ? window : window.top;
-	if (win.hideMessage != null){
-		win.hideMessage();
-		win.showGame();
-		var obj = win.document.getElementById('addGame');
-		obj.innerHTML= document.getElementById("showGame").innerHTML;
+	var win = null;
+	if (window.hideMessage) { 
+		win = window;
+	} else if (window.parent && window.parent.hideMessage) {
+		win = window.parent;
+	} else {
+		win = window.top;
 	}
+	win.hideMessage();
+	win.showGame();
+	var obj = win.document.getElementById('addGame');
+	obj.innerHTML= document.getElementById("showGame").innerHTML;
+	
 </script>

@@ -83,10 +83,15 @@
 
 
 <script lang="javascript">
-	var win = window.hideConditionMessage ? window : window.top;
-	if (win.hideConditionMessage != null){
-		win.hideConditionMessage();
-		var obj = win.document.getElementById('conditionsArea');
-		obj.innerHTML= document.getElementById("conditionList").innerHTML;
+	var win = null;
+	if (window.hideConditionMessage) {
+		win = window;
+	} else if (window.parent && window.parent.hideConditionMessage) {
+		win = window.parent;
+	} else {
+		win = window.top;
 	}
+	win.hideConditionMessage();
+	var obj = win.document.getElementById('conditionsArea');
+	obj.innerHTML= document.getElementById("conditionList").innerHTML;
 </script>

@@ -26,100 +26,13 @@
 	</c:choose>
 	
 	<lams:css style="main" />
+	
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>/css/thickbox.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen">
-	<style type="text/css">
-		#content-main {
-			padding: 10px;
-		}
-		
-		td#messageCell {
-			width:80%;
-		}
-		
-		#message {
-			padding:8px 10px 10px 40px;
-			text-align: left;
-			background: url('images/css/edit.gif') no-repeat #d8e4f1 10px 8px;
-			border: 1px solid #3c78b5;
-		}
-		
-		#linksCell div {
-			margin: 0 5px 15px 0;
-		}
-		
-		.dialogContainer {
-			display: none;
-		}
-		
-		.dialogContainer iframe {
-			width: 100%;
-			height: 100%;
-			border: none;
-		}
-		
-		#mainContentTable td {
-			vertical-align: top;
-			padding: 0;
-		}
-		
-		#orgTabs {
-			padding-right: 10px;
-		}
-		
-		#orgTabs td {
-			padding: 0;
-			vertical-align: top;
-			font-family: verdana,arial,helvetica,sans-serif;
-		}
-		
-		#orgTabs li {
-			width: 150px;
-			white-space: normal;
-		}
-		
-		#orgTabsPanelCell {
-			width: 100%;
-			border-left: none;
-		}
-		
-		.ui-tabs-vertical {
-			border: none;
-		}
-		
-		.ui-tabs-vertical .ui-tabs-nav {
-			background: none;
-			border: none;
-		}
-		
-		.ui-tabs-vertical .ui-tabs-nav li {
-			width: 100%;
-			margin-bottom: 7px;
-			border: 1px solid #C5DBEC;
-			padding: 3px 0 3px 0 !important;
-			
-		}
-		
-		.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active {
-			border: 1px solid #79B7E7;
-			border-right-width: 0px;
-			margin-bottom: 7px;
-			padding: 3px 0 3px 0 !important;
-		}	
-			
-		.ui-tabs-vertical .ui-tabs-nav li a {
-			display: block;
-			float: none;
-			border: none;
-		}
-		
-		td#actionAccord {
-			width: 20%;
-			padding-top: 1px;
-		}
-	</style>
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/index.css" type="text/css" media="screen">
+
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="javascript" type="text/javascript" src="loadVars.jsp"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
@@ -136,11 +49,14 @@
 					REMOVE_LESSON_CONFIRM1 : '<fmt:message key="index.remove.lesson.confirm1"/>',
 					REMOVE_LESSON_CONFIRM2 : '<fmt:message key="index.remove.lesson.confirm2"/>',
 					SORTING_ENABLE : '<fmt:message key="label.enable.lesson.sorting"/>',
-					SORTING_DISABLE : '<fmt:message key="label.disable.lesson.sorting"/>'
+					SORTING_DISABLE : '<fmt:message key="label.disable.lesson.sorting"/>',
+					SINGLE_ACTIVITY_LESSON_TITLE : '<fmt:message key="index.single.activity.lesson.title"/>',
+					SINGLE_ACTIVITY_LESSON_PROMPT : '<fmt:message key="index.single.activity.lesson.prompt"/>',
+					SINGLE_ACTIVITY_LESSON_PROMTP_BLANK : '<fmt:message key="index.single.activity.lesson.prompt.blank"/>'
 			}
 			
 			var tabName = '${tab}';
-			var stateId = tabName == 'profile' ? 3 : 1; 
+			var stateId = tabName == 'profile' ? 3 : 1;
 
 			$(document).ready(function(){
 				initMainPage();
@@ -215,12 +131,12 @@
 				<div class="${tabLeft}"></div>
 				<div class="${tabMiddle}">
 						<c:choose>
-						<c:when test="${fn:startsWith(headerlink.name,'index')}">
-							<lams:TabName url="${headerlink.url}" highlight="${highlight}"><fmt:message key="${headerlink.name}" /></lams:TabName>
-						</c:when>
-						<c:otherwise>
-							<lams:TabName url="${headerlink.url}" highlight="${highlight}"><c:out value="${headerlink.name}" /></lams:TabName>						
-						</c:otherwise>
+							<c:when test="${fn:startsWith(headerlink.name,'index')}">
+								<lams:TabName url="${headerlink.url}" highlight="${highlight}"><fmt:message key="${headerlink.name}" /></lams:TabName>
+							</c:when>
+							<c:otherwise>
+								<lams:TabName url="${headerlink.url}" highlight="${highlight}"><c:out value="${headerlink.name}" /></lams:TabName>						
+							</c:otherwise>
 						</c:choose>
 				</div>
 				<div class="${tabRight}"></div>
@@ -254,7 +170,7 @@
 						</c:forEach>
 					</c:if>
 					<div>
-						<a title="<fmt:message key="index.refresh.hint"/>" href="javascript:refresh()" class="button">
+						<a title="<fmt:message key="index.refresh.hint"/>" href="javascript:loadOrgTab(null, true)" class="button">
 							<fmt:message key="index.refresh" />
 						</a>
 					</div>
@@ -274,16 +190,16 @@
 							<tr>
 								<td>
 									<ul>
-										<c:forEach items="${collapsedOrgDTOs}" var="dto">
-											<li>
-												<a href="#orgTab-${dto.orgId}"><c:out value="${dto.orgName}" /></a>
+										<c:forEach items="${collapsedOrgDTOs}" var="dto" varStatus="status">
+											<li class="orgTabsHeader">
+												<a href="#orgTab-${status.index}-${dto.orgId}"><c:out value="${dto.orgName}" /></a>
 											</li>
 										</c:forEach>
 									</ul>
 								</td>
 								<td id="orgTabsPanelCell" class="ui-widget-content ui-corner-all">
-									<c:forEach items="${collapsedOrgDTOs}" var="dto">
-										<div id="orgTab-${dto.orgId}" class="orgTab"></div>
+									<c:forEach items="${collapsedOrgDTOs}" var="dto" varStatus="status">
+										<div id="orgTab-${status.index}-${dto.orgId}" class="orgTab"></div>
 									</c:forEach>
 								</td>
 							</tr>
@@ -330,6 +246,9 @@
 
 <div id="addLessonDialog" class="dialogContainer">
 	<iframe id="addLessonFrame"></iframe>
+</div>
+<div id="addSingleActivityLessonDialog" class="dialogContainer">
+	<iframe id="addSingleActivityLessonFrame"></iframe>
 </div>
 <div id="monitorDialog" class="dialogContainer">
 	<iframe id="monitorFrame"></iframe>

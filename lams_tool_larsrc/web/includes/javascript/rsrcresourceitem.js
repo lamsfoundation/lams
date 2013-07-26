@@ -34,7 +34,10 @@
 	}
 	function adjustInstructionsDisplayAreaHeight(adjustAmount){
 		var obj = window.document.getElementById('reourceInputArea');
-		if (!obj) { 
+		if (!obj && window.parent) {
+			 obj = window.parent.document.getElementById('reourceInputArea');
+		}  
+		if (!obj) {
 			obj = window.top.document.getElementById('reourceInputArea');
 		}
 		obj.style.height=obj.contentWindow.document.body.scrollHeight+adjustAmount+'px';
@@ -86,5 +89,13 @@
 		// then refresh "basic tab" resourcelist and close this window.
 	}
 	function cancelResourceItem(){ 
-		window.hideMessage ? window.hideMessage() : window.top.hideMessage();
+		var win = null;
+		if (window.hideMessage) { 
+			win = window;
+		} else if (window.parent && window.parent.hideMessage) {
+			win = window.parent;
+		} else {
+			win = window.top;
+		}
+		win.hideMessage();
 	}

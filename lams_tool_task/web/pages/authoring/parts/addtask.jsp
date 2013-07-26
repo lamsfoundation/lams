@@ -11,7 +11,18 @@
 	function uncheckIsCommentsRequired() {
 		document.getElementById("isCommentsRequired").checked=false;
 	}
-
+	
+	function callHideMessage() {
+		var win = null;
+		if (window.hideMessage) {
+			win = window;
+		} else if (window.parent && window.parent.hideMessage) {
+			win = window.parent;
+		} else {
+			win = window.top;
+		}
+		win.hideMessage();
+	}
 </script>
 
 <lams:html>
@@ -109,42 +120,6 @@
 					<fmt:message key="label.authoring.basic.task.isFilesRequired" />
 				</label>
 			</div>
-		    
-<%-- 
-			<div class="space-top">
-				<html:checkbox property="commentsAllowed" styleClass="noBorder"	styleId="isCommentsAllowed"
-					onclick="document.taskListItemForm.showCommentsToAll[0].disabled = !document.taskListItemForm.showCommentsToAll[0].disabled;
-					document.taskListItemForm.showCommentsToAll[1].disabled = !document.taskListItemForm.showCommentsToAll[1].disabled">
-				</html:checkbox>
-
-				<label for="isCommentsAllowed">
-					<fmt:message key="label.authoring.basic.task.isCommentsFilesAllowed" />
-				</label>
-			</div>
-					
-			<div class="space-top">
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	
-				<input type="radio" name="showCommentsToAll" value="${false}" styleId="showToMonitoring"
-					<c:if test="${not formBean.showCommentsToAll}">checked="checked"</c:if>
-					<c:if test="${not formBean.commentsAllowed}">disabled="disabled"</c:if>/>
-					
-				<label for="showToMonitoring">
-					<fmt:message key="label.authoring.basic.task.show.only.to.monitoring" />
-				</label>
-			</div>
-			
-			<div class="space-top">
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;	
-				<input type="radio" name="showCommentsToAll" value="${true}" styleId="showToLearners"
-					<c:if test="${formBean.showCommentsToAll}">checked="checked"</c:if>
-					<c:if test="${not formBean.commentsAllowed}">disabled="disabled"</c:if>/>
-					
-				<label for="showToLearners">
-					<fmt:message key="label.authoring.basic.task.show.to.all.learners" />
-				</label>
-			</div>
---%>			
-			
 			
 			<div class="space-top" ">
 				<html:checkbox property="childTask" styleClass="noBorder" 
@@ -186,7 +161,7 @@
 		<lams:ImgButtonWrapper>
 			<a href="#" onclick="taskListItemForm.submit();" class="button-add-item"><fmt:message
 					key="button.add" /> </a>
-			<a href="javascript:;" onclick="window.hideMessage ? window.hideMessage() : window.top.hideMessage()"
+			<a href="javascript:;" onclick="javascript:callHideMessage()"
 				class="button space-left"><fmt:message key="label.cancel" /> </a>
 		</lams:ImgButtonWrapper>
 	</body>

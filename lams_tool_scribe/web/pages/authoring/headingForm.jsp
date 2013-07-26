@@ -1,4 +1,19 @@
 <%@ include file="/common/taglibs.jsp"%>
+
+<script type="text/javascript"> 
+	function callHideMessage() {
+		var win = null;
+		if (window.hideMessage) {
+			win = window;
+		} else if (window.parent && window.parent.hideMessage) {
+			win = window.parent;
+		} else {
+			win = window.top;
+		}
+		win.hideMessage();
+	}
+</script>
+
 <table>
 	<tr>
 		<td>
@@ -34,7 +49,7 @@
 					</html:submit>
 
 					<html:button property="Cancel" styleClass="button"
-						onclick="javascript:window.hideMessage ? window.hideMessage () : window.top.hideMessage()">
+						onclick="javascript:callHideMessage()">
 						<fmt:message key="button.cancel" />
 					</html:button>
 			</html:form>

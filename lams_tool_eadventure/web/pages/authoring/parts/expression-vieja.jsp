@@ -14,11 +14,9 @@
 			if (elem != null) {
 				elem.style.display="none";
 			}
-			var quitar = location.hash;
-			var loque = window.top.document.location.hash ;
-			location.hash = "expressionInputArea";
-			//var soloporhacerhueco = document.getElementById("conditionInputArea");
 			
+			var win = window.top ? window.top : window;
+			win.document.location.hash = "expressionInputArea";
 		}
 		function hideExpressionMessage(){
 			var area=document.getElementById("expressionInputArea");

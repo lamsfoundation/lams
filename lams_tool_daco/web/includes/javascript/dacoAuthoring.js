@@ -15,11 +15,14 @@
 	
 	//Resizes the question input area so it is visible on the screen.
 	function resizeQuestionInputArea (){
-		var questionInputArea = window.document.getElementById('questionInputArea');
-		if (!questionInputArea) { 
-			questionInputArea = window.top.document.getElementById('questionInputArea');
+		var obj = window.document.getElementById('questionInputArea');
+		if (!obj && window.parent) { 
+			 obj = window.parent.document.getElementById('questionInputArea');
+		}  
+		if (!obj) {
+			obj = window.top.document.getElementById('questionInputArea');
 		}
-		questionInputArea.style.height=questionInputArea.contentWindow.document.body.scrollHeight+10+'px';
+		obj.style.height=obj.contentWindow.document.body.scrollHeight + 10 + 'px';
 	}
 	
 	//Checks if the additional options area has all the default values, so it may stay hidden

@@ -78,13 +78,19 @@
 
 <%-- This script will works when a new resoruce item submit in order to refresh "ImageGallery List" panel. --%>
 <script lang="javascript">
-	var win = window.hideMessage ? window : window.top;
-	if (win.hideMessage != null){
-		win.hideMessage();
-		var obj = win.document.getElementById('imageGalleryListArea');
-		obj.innerHTML= document.getElementById("itemList").innerHTML;
-		
-		//call it from parent window as this one was just hidden
-		win.initLytebox();
+	var win = null;
+	if (window.hideMessage) { 
+		win = window;
+	} else if (window.parent && window.parent.hideMessage) {
+		win = window.parent;
+	} else {
+		win = window.top;
 	}
+	win.hideMessage();
+	var obj = win.document.getElementById('imageGalleryListArea');
+	obj.innerHTML= document.getElementById("itemList").innerHTML;
+	
+	//call it from parent window as this one was just hidden
+	win.initLytebox();
+	
 </script>

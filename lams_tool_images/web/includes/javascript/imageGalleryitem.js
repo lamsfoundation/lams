@@ -25,16 +25,28 @@
 	}
 	
 	function cancelImageGalleryItem(){
-		window.hidenMessage ? window.hideMessage() : window.top.hideMessage();
+		var win = null;
+		if (window.hideMessage) { 
+			win = window;
+		} else if (window.parent && window.parent.hideMessage) {
+			win = window.parent;
+		} else {
+			win = window.top;
+		}
+		win.hideMessage();
 	}
 	/**
 	 * Launches the popup window for the instruction files
 	 */
 	function showMessage(url) {
-		var area=window.document.getElementById("reourceInputArea");
+		var area = window.document.getElementById('reourceInputArea');
 		var elem = window.document.getElementById("saveCancelButtons");
-		if (!area)  {
-			area = window.top.document.getElementById("reourceInputArea");
+		if (!area && window.parent) {
+			area = window.parent.document.getElementById('reourceInputArea');
+			elem = window.parent.document.getElementById("saveCancelButtons");
+		}  
+		if (!area) {
+			obj = window.top.document.getElementById('reourceInputArea');
 			elem = window.top.document.getElementById("saveCancelButtons");
 		}
 		

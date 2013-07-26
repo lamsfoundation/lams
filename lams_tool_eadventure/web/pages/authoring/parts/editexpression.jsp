@@ -21,8 +21,8 @@
 			if(area != null && option!="no-option" ){
 				area.src=url;
 			}
-			
-			window.top.document.location.hash = "expressionInputArea";
+			var win = window.top ? window.top : window;
+			win.document.location.hash = "expressionInputArea";
 		}
 		
 		function changeSecondOp(){
@@ -39,7 +39,8 @@
 		
 		function submitExpression(){
 		var eadventureExpressionForm = document.getElementById("eadventureExpressionForm");
-			window.top.document.location.hash = "conditionInputArea";
+			var win = window.top ? window.top : window;
+			win.top.document.location.hash = "conditionInputArea";
 			if (eadventureExpressionForm.group!= null){
 			if(eadventureExpressionForm.group[0].checked){
 				eadventureExpressionForm.secondVarSelected.value = false;

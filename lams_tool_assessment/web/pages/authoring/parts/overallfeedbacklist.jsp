@@ -102,7 +102,7 @@
 	var obj = window.document.getElementById('advancedInputArea');
 	if (!obj && window.parent) {
 		 obj = window.parent.document.getElementById('advancedInputArea');
-	} 
+	}  
 	if (!obj) {
 		obj = window.top.document.getElementById('advancedInputArea');
 	}
