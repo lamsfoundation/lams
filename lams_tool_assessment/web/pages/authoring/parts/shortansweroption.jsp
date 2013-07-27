@@ -10,7 +10,7 @@
 	</tr>
 	<tr>		
 		<td style="padding-left:10px; border-bottom:0px; background:none;">	
-			<input type="text" name="optionString${status.index}" value="${option.optionString}"/>
+			<input type="text" name="optionString${status.index}" value="<c:out value='${option.optionString}' />"/>
 		</td>									
 	</tr>
 	

@@ -48,7 +48,7 @@
 			<div class="field-name">
 				<fmt:message key="label.lesson.name"></fmt:message>
 			</div>
-			<input type="text" name="lessonName" value="${lesson.lessonName}" style="width: 99%;" />
+			<input type="text" name="lessonName" value="<c:out value='${lesson.lessonName}' />" style="width: 99%;" />
 			
 			<div class="field-name space-top">
 				<fmt:message key="label.instructions"></fmt:message>

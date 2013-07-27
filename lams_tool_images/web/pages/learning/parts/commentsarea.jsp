@@ -16,11 +16,11 @@
 </c:if>
 
 <input type="hidden" name="imageUid" id="commentsArea_imageUid" value="${commentsImage.uid}"/>
-<input type="hidden" name="title" id="commentsArea_title" value="${commentsImage.title}"/>
+<input type="hidden" name="title" id="commentsArea_title" value="<c:out value='${commentsImage.title}' />"/>
 <input type="hidden" name="originalImageWidth" id="commentsArea_originalImageWidth" value="${commentsImage.originalImageWidth}"/>
 <input type="hidden" name="originalImageHeight" id="commentsArea_originalImageHeight" value="${commentsImage.originalImageHeight}"/>
 <input type="hidden" name="originalFileUuid" id="commentsArea_originalFileUuid" value="${commentsImage.originalFileUuid}"/>
-<input type="hidden" name="imageDescription" id="commentsArea_description" value="${commentsImage.description}"/>
+<input type="hidden" name="imageDescription" id="commentsArea_description" value="<c:out value='${commentsImage.description}' />"/>
 <input type="hidden" name="averageRating" id="commentsArea_averageRating" value="${commentsSessionMap.averageRating}"/>
 <input type="hidden" name="numberRatings" id="commentsArea_numberRatings" value="${commentsSessionMap.numberRatings}"/>
 <input type="hidden" name="currentRating" id="commentsArea_currentRating" value="${commentsSessionMap.currentRating}"/>

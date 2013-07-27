@@ -87,7 +87,7 @@
 							<div class="field-name space-top">
 								<fmt:message key="label.authoring.basic.bascilti.button.text" />
 							</div>
-							<input type="text" name="buttonText${status.index}" value="${resource.buttonText}" size="55" />
+							<input type="text" name="buttonText${status.index}" value="<c:out value='${resource.buttonText}' />" size="55" />
 				
 							<div class="space-top">
 								<input type="checkbox" name="openUrlNewWindow${status.index}" id="openUrlNewWindow${status.index}" class="noBorder" <c:if test="${resource.openUrlNewWindow}">checked="checked"</c:if> />

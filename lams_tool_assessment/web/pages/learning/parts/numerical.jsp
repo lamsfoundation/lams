@@ -19,7 +19,7 @@
 			</td>		
 		</c:if>		
 		<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; ">
-			<input type="text" name="question${status.index}" value="${question.answerString}" styleClass="noBorder" size="70"
+			<input type="text" name="question${status.index}" value="<c:out value='${question.answerString}' />" styleClass="noBorder" size="70"
 				<c:if test="${finishedLock}">disabled="disabled"</c:if>					 
 			/>	
 		</td>

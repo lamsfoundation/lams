@@ -74,9 +74,9 @@ if (exception != null) {
 %>
 <body>
 <form action="${lams}errorpages/error.jsp" method="post" id="errorForm">
-	<input type="hidden" name="errorName" value="${errorName}"/>
-	<input type="hidden" name="errorMessage" value="${errorMessage}"/>
-	<input type="hidden" name="errorStack" value="${errorStack}"/>
+	<input type="hidden" name="errorName" value="<c:out value='${errorName}' />"/>
+	<input type="hidden" name="errorMessage" value="<c:out value='${errorMessage}' />"/>
+	<input type="hidden" name="errorStack" value="<c:out value='${errorStack}' />"/>
 </form>
 
 <script type="text/javascript">

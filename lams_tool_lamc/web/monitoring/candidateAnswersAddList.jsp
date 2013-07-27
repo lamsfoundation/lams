@@ -71,7 +71,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</td>		
 			
 				<td class="align-left">
-					<input type="text" name="ca${caIndex}"  value="${currentCandidateDTO.candidateAnswer}" size="50">
+					<input type="text" name="ca${caIndex}"  value="<c:out value='${currentCandidateDTO.candidateAnswer}' />" size="50">
 				</td>		
 				
 				<td width="16%" align="center">
