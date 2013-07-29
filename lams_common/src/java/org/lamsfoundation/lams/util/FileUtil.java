@@ -48,7 +48,6 @@ import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.id.UUIDHexGenerator;
 import org.jdom.JDOMException;
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
-import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
 import com.thoughtworks.xstream.XStream;
@@ -70,6 +69,10 @@ public class FileUtil {
     public static final String LAMS_RUNTIME_CONTENT_DIR = "runtime";
     private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
     private static final int FILE_COPY_BUFFER_SIZE = 1024;
+    
+    public static final String ALLOWED_EXTENSIONS_FLASH = ".swf,.fla";
+    public static final String ALLOWED_EXTENSIONS_IMAGE = ".jpg,.gif,.jpeg,.png,.bmp";
+    public static final String ALLOWED_EXTENSIONS_MEDIA = ".jpg,.gif,.jpeg,.png,.bmp";
 
     protected static final String prefix = "lamstmp_"; // protected rather than private to suit junit test
 
@@ -553,6 +556,45 @@ public class FileUtil {
 	}
 
 	return executable;
+    }
+
+    /**
+     * Verify if a file with such extension is allowed to be uploaded.
+     * 
+     * @param fileType file type can be of the following values:File, Image, Flash, Media
+     * @param fileName
+     */
+    public static boolean isExtensionAllowed(String fileType, String fileName) {
+	String ext = UploadFileUtil.getFileExtension(fileName);
+	ext = "." + ext;
+	String allowedExtensions;
+
+	if ("File".equals(fileType)) {
+	    // executables are not allowed
+	    return !isExecutableFile(fileName);
+
+	} else if ("Image".equals(fileType)) {
+	    allowedExtensions = ALLOWED_EXTENSIONS_IMAGE;
+
+	} else if ("Flash".equals(fileType)) {
+	    allowedExtensions = ALLOWED_EXTENSIONS_FLASH;
+
+	} else if ("Media".equals(fileType)) {
+	    allowedExtensions = ALLOWED_EXTENSIONS_MEDIA;
+
+	} else {
+	    // unknown fileType
+	    return false;
+	}
+
+	String[] allowedExtensionsList = StringUtils.split(allowedExtensions, ',');
+	for (String allowedExtension : allowedExtensionsList) {
+	    if (StringUtils.equalsIgnoreCase(ext, allowedExtension)) {
+		return true;
+	    }
+	}
+	
+	return false;
     }
 
     /**

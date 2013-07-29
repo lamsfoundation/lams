@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.UploadFileUtil;
 
 /**
@@ -40,52 +41,14 @@ import org.lamsfoundation.lams.util.UploadFileUtil;
  * @author Mitchell Seaton
  * 
  * @web:servlet name="SimpleUploader" load-on-startup = "1"
- * @web.servlet-init-param name = "AllowedExtensionsFile" value = ""
- * @web.servlet-init-param name = "DeniedExtensionsFile" value =
- *                         "php|php3|php5|phtml|asp|aspx|ascx|jsp|cfm|cfc|pl|bat|exe|dll|reg|cg"
- * @web.servlet-init-param name = "AllowedExtensionsImage" value = "jpg|gif|jpeg|png|bmp"
- * @web.servlet-init-param name = "DeniedExtensionsImage" value = ""
- * @web.servlet-init-param name = "AllowedExtensionsFlash" value = "swf|fla"
- * @web.servlet-init-param name = "DeniedExtensionsFlash" value = ""
  * @web:servlet-mapping url-pattern="/ckeditor/filemanager/upload/simpleuploader"
  * 
  */
 
 public class LAMSUploadServlet extends HttpServlet {
+    
+    private static final long serialVersionUID = 7839808388592495717L;
     private static final Logger log = Logger.getLogger(LAMSUploadServlet.class);
-
-    private static Hashtable<String, ArrayList<String>> allowedExtensions;
-    private static Hashtable<String, ArrayList<String>> deniedExtensions;
-
-    /**
-     * Initialize the servlet.<br>
-     * Retrieve from the servlet configuration the "baseDir" which is the root of the file repository:<br>
-     * If not specified the value of "/UserFiles/" will be used.<br>
-     * Also it retrieve all allowed and denied extensions to be handled.
-     * 
-     */
-    @Override
-    public void init() throws ServletException {
-	if (LAMSUploadServlet.log.isDebugEnabled()) {
-	    LAMSUploadServlet.log.debug("Initialization started");
-	}
-
-	LAMSUploadServlet.allowedExtensions = new Hashtable<String, ArrayList<String>>(3);
-	LAMSUploadServlet.deniedExtensions = new Hashtable<String, ArrayList<String>>(3);
-
-	LAMSUploadServlet.allowedExtensions.put("File", stringToArrayList(getInitParameter("AllowedExtensionsFile")));
-	LAMSUploadServlet.deniedExtensions.put("File", stringToArrayList(getInitParameter("DeniedExtensionsFile")));
-
-	LAMSUploadServlet.allowedExtensions.put("Image", stringToArrayList(getInitParameter("AllowedExtensionsImage")));
-	LAMSUploadServlet.deniedExtensions.put("Image", stringToArrayList(getInitParameter("DeniedExtensionsImage")));
-
-	LAMSUploadServlet.allowedExtensions.put("Flash", stringToArrayList(getInitParameter("AllowedExtensionsFlash")));
-	LAMSUploadServlet.deniedExtensions.put("Flash", stringToArrayList(getInitParameter("DeniedExtensionsFlash")));
-
-	if (LAMSUploadServlet.log.isDebugEnabled()) {
-	    LAMSUploadServlet.log.debug("Initialization completed");
-	}
-    }
 
     /**
      * Manage the Upload requests.<br>
@@ -114,7 +77,7 @@ public class LAMSUploadServlet extends HttpServlet {
 	    returnMessage = "Security error. You probably don't have enough permissions to upload. Please check your server.";
 	} else {
 	    // get realBaseDir and lamsContextPath at request time from config values in memory
-	    String typeStr = request.getParameter("Type");
+	    String fileType = request.getParameter("Type");
 
 	    DiskFileUpload upload = new DiskFileUpload();
 	    try {
@@ -140,14 +103,13 @@ public class LAMSUploadServlet extends HttpServlet {
 		fileNameLong = fileNameLong.replace('\\', '/');
 		String[] pathParts = fileNameLong.split("/");
 		String fileName = pathParts[pathParts.length - 1];
-		String ext = UploadFileUtil.getFileExtension(fileName);
 
-		if (extIsAllowed(typeStr, ext)) {
-		    File uploadDir = UploadFileUtil.getUploadDir(currentFolderStr, typeStr);
+		if (FileUtil.isExtensionAllowed(fileType, fileName)) {
+		    File uploadDir = UploadFileUtil.getUploadDir(currentFolderStr, fileType);
 		    fileName = UploadFileUtil.getUploadFileName(uploadDir, fileName);
 		    File destinationFile = new File(uploadDir, fileName);
 
-		    String currentWebPath = UploadFileUtil.getUploadWebPath(currentFolderStr, typeStr);
+		    String currentWebPath = UploadFileUtil.getUploadWebPath(currentFolderStr, fileType);
 		    fileUrl = currentWebPath + '/' + fileName;
 
 		    uplFile.write(destinationFile);
@@ -189,48 +151,5 @@ public class LAMSUploadServlet extends HttpServlet {
 	if (LAMSUploadServlet.log.isDebugEnabled()) {
 	    LAMSUploadServlet.log.debug("Upload finished");
 	}
-    }
-
-    /**
-     * Helper function to convert the configuration string to an ArrayList.
-     */
-
-    private ArrayList<String> stringToArrayList(String str) {
-	if (LAMSUploadServlet.log.isDebugEnabled()) {
-	    LAMSUploadServlet.log.debug(str);
-	}
-	String[] strArr = str.split("\\|");
-
-	ArrayList<String> tmp = new ArrayList<String>();
-	if (str.length() > 0) {
-	    for (int i = 0; i < strArr.length; ++i) {
-		if (LAMSUploadServlet.log.isDebugEnabled()) {
-		    LAMSUploadServlet.log.debug(i + " - " + strArr[i]);
-		}
-		tmp.add(strArr[i].toLowerCase());
-	    }
-	}
-	return tmp;
-    }
-
-    /**
-     * Helper function to verify if a file extension is allowed or not allowed.
-     */
-
-    private boolean extIsAllowed(String fileType, String ext) {
-	String extLower = ext.toLowerCase();
-
-	ArrayList<String> allowList = LAMSUploadServlet.allowedExtensions.get(fileType);
-	ArrayList<String> denyList = LAMSUploadServlet.deniedExtensions.get(fileType);
-
-	if (allowList.size() == 0) {
-	    return !denyList.contains(extLower);
-	}
-
-	if (denyList.size() == 0) {
-	    return allowList.contains(extLower);
-	}
-
-	return false;
     }
 }

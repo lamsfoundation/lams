@@ -246,11 +246,11 @@ public class LAMSConnectorServlet extends HttpServlet {
 	}
 
 	String commandStr = request.getParameter("Command");
-	String typeStr = request.getParameter("Type");
+	String fileType = request.getParameter("Type");
 	String currentFolderStr = request.getParameter("CurrentFolder");
 	String designFolder = request.getParameter("DesignFolder");
 
-	String currentDirPath = realBaseDir + designFolder + typeStr + "/" + currentFolderStr;
+	String currentDirPath = realBaseDir + designFolder + fileType + "/" + currentFolderStr;
 	String validCurrentDirPath = currentDirPath.replace("/", File.separator);
 
 	if (LAMSConnectorServlet.debug) {
@@ -266,7 +266,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 	    } else if (!commandStr.equals("FileUpload") || currentFolderStr.equals("/-1/")) {
 		throw new Exception("Illegal command.");
 	    } else {
-		newName = createNewFile(validCurrentDirPath, request, retVal);
+		newName = createNewFile(validCurrentDirPath, request, retVal, fileType);
 	    }
 	} catch (Exception e) {
 	    log.error(e);
@@ -285,7 +285,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 	} else {
 	    // send back URL to new Paint file
 	    String currentWebPath = lamsContextPath + AuthoringConstants.LAMS_WWW_FOLDER + FileUtil.LAMS_WWW_SECURE_DIR
-		    + designFolder + typeStr + "/" + currentFolderStr;
+		    + designFolder + fileType + "/" + currentFolderStr;
 	    out.println(currentWebPath + newName);
 	}
 
@@ -297,7 +297,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 	}
     }
 
-    private String createNewFile(String validCurrentDirPath, HttpServletRequest request, StringBuilder retVal)
+    private String createNewFile(String validCurrentDirPath, HttpServletRequest request, StringBuilder retVal, String fileType)
 	    throws FileUploadException, IOException, Exception {
 	if (LAMSConnectorServlet.debug) {
 	    log.debug("File save started");
@@ -323,29 +323,38 @@ public class LAMSConnectorServlet extends HttpServlet {
 	fileNameLong = fileNameLong.replace('\\', '/');
 	String[] pathParts = fileNameLong.split("/");
 	String fileName = pathParts[pathParts.length - 1];
+	
+	if (FileUtil.isExtensionAllowed(fileType, fileName)) {
+	    File pathToSave = new File(validCurrentDirPath, fileName);
 
-	String nameWithoutExt = LAMSConnectorServlet.getNameWithoutExtension(fileName);
-	String ext = getExtension(fileName);
+	    int counter = 1;
+	    while (pathToSave.exists()) {
+		String ext = getExtension(fileName);
+		String nameWithoutExt = LAMSConnectorServlet.getNameWithoutExtension(fileName);
+		fileName = nameWithoutExt + "_" + counter + "." + ext;
+		pathToSave = new File(validCurrentDirPath, fileName);
+		counter++;
+	    }
 
-	File pathToSave = new File(validCurrentDirPath, fileName);
+	    uplFile.write(pathToSave);
 
-	int counter = 1;
-	while (pathToSave.exists()) {
-	    fileName = nameWithoutExt + "_" + counter + "." + ext;
-	    pathToSave = new File(validCurrentDirPath, fileName);
-	    counter++;
-	}
+	    if (counter > 1) {
+		retVal.append("201");
+	    } else {
+		retVal.append("0");
+	    }
 
-	uplFile.write(pathToSave);
-
-	if (counter > 1) {
-	    retVal.append("201");
+	    if (LAMSConnectorServlet.debug) {
+		log.debug("File save finished");
+	    }
+	    
 	} else {
-	    retVal.append("0");
-	}
-
-	if (LAMSConnectorServlet.debug) {
-	    log.debug("File save finished");
+	    if (LAMSConnectorServlet.debug) {
+		log.debug("File extension is prohibited for upload " + fileName);
+	    }
+	    
+	    //will generate client-side alert message 'Invalid file type'
+	    retVal.append("204");
 	}
 
 	return fileName;

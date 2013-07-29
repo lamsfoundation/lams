@@ -84,6 +84,9 @@ function OnUploadCompleted( errorNumber, data )
 		case 202 :
 			alert( 'Invalid file' ) ;
 			break ;
+		case 204 :
+			alert( 'Invalid file type' ) ;
+			break ;
 		default :
 			alert( 'Error on file upload. Error number: ' + errorNumber ) ;
 			break ;
