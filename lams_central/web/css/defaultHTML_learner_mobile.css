@@ -146,6 +146,8 @@ table.forum td {
 	margin-bottom: 10px;
 }
 
+.float-left {float:left;}
+
 .float-right {float:right;}
 
 .small-space-top {padding-top:6px;}
