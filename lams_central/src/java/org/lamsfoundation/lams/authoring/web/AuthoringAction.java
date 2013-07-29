@@ -350,16 +350,16 @@ public class AuthoringAction extends LamsDispatchAction {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String contentFolderID = request.getParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	String learningDesignTitle = request.getParameter(AttributeNames.PARAM_TITLE);
-	// created the LD
+	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+	// create the LD and put it in Run Sequences folder in the given organisation
 	Long learningDesignID = authoringService.insertSingleActivityLearningDesign(learningDesignTitle, toolID,
-		toolContentID, contentFolderID);
+		toolContentID, contentFolderID, organisationID);
 	if (learningDesignID != null) {
-	    Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	    Integer userID = getUserId();
-	    Lesson lesson = getMonitoringService().initializeLesson(learningDesignTitle, "", learningDesignID,
-		    organisationID, userID, null, false, false, true, false, false, false, false, null, null);
-	    Organisation organisation = getMonitoringService().getOrganisation(organisationID);
 	    User user = (User) getUserManagementService().findById(User.class, userID);
+	    Lesson lesson = getMonitoringService().initializeLessonWithoutLDcopy(learningDesignTitle, "",
+		    learningDesignID, user, null, false, false, true, false, false, false, false, null, null);
+	    Organisation organisation = getMonitoringService().getOrganisation(organisationID);
 
 	    List<User> staffList = new LinkedList<User>();
 	    staffList.add(user);

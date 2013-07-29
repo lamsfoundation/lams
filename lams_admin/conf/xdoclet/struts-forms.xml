@@ -14,6 +14,7 @@
 	<form-property name="enableCourseNotifications" type="java.lang.Boolean" initial="false"/>
 	<form-property name="enableGradebookForLearners" type="java.lang.Boolean" initial="false"/>
 	<form-property name="enableGradebookForMonitors" type="java.lang.Boolean" initial="false"/>
+	<form-property name="enableSingleActivityLessons" type="java.lang.Boolean" initial="false"/>
 </form-bean>
 
 <form-bean name="UserRolesForm" type="org.apache.struts.action.DynaActionForm">

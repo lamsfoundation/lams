@@ -23,13 +23,14 @@
 /* $Id$ */
 package org.lamsfoundation.lams.web;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -46,13 +47,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.authoring.dto.ToolDTO;
-import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
+import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
+import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
+import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonService;
-import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
@@ -78,10 +80,18 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class DisplayGroupAction extends Action {
 
+    // sorts Tool display names
+    private static final Comparator<ToolDTO> TOOL_NAME_COMPARATOR = new Comparator<ToolDTO>() {
+	@Override
+	public int compare(ToolDTO o1, ToolDTO o2) {
+	    return o1.getToolDisplayName().toLowerCase().compareTo(o2.getToolDisplayName().toLowerCase());
+	}
+    };
+
     private static Logger log = Logger.getLogger(DisplayGroupAction.class);
     private static IUserManagementService service;
     private static LessonService lessonService;
-    private static IAuthoringService authoringService;
+    private static ILearningDesignService learningDesignService;
     private Integer stateId = OrganisationState.ACTIVE;
 
     @SuppressWarnings({ "unchecked" })
@@ -127,11 +137,13 @@ public class DisplayGroupAction extends Action {
 			true);
 	    }
 
-	    request.setAttribute("tools", getAuthoringService().getAllToolDTOs());
 	    request.setAttribute("orgBean", iob);
 	    request.setAttribute("allowSorting", allowSorting);
-	    request.setAttribute("singleActivityLessonsEnabled",
-		    Configuration.get(ConfigurationKeys.SINGLE_ACTIVITY_LESSONS_ENABLED));
+	    if (org.getEnableSingleActivityLessons()
+		    && (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))) {
+		// if sinble activity lessons are enabled, put sorted list of tools
+		request.setAttribute("tools", getToolDTOs(request.getRemoteUser()));
+	    }
 	}
 
 	return mapping.findForward(forwardPath);
@@ -178,8 +190,10 @@ public class DisplayGroupAction extends Action {
 			    + org.getOrganisationId() + ")", "manage-group-button", null, null));
 		}
 		if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR)) {
-		    links.add(new IndexLinkBean("index.addlesson", "javascript:showAddLessonDialog("
-			    + org.getOrganisationId() + ")", "add-lesson-button", null, null));
+		    String name = org.getEnableSingleActivityLessons() ? "index.addlesson.single" : "index.addlesson";
+		    links.add(new IndexLinkBean(name,
+			    "javascript:showAddLessonDialog(" + org.getOrganisationId() + ")", "add-lesson-button",
+			    null, null));
 		}
 		moreLinks.add(new IndexLinkBean("index.searchlesson", Configuration.get(ConfigurationKeys.SERVER_URL)
 			+ "/findUserLessons.do?dispatch=getResults&courseID=" + org.getOrganisationId()
@@ -214,8 +228,10 @@ public class DisplayGroupAction extends Action {
 
 	    } else {// CLASS_TYPE
 		if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR)) {
-		    links.add(new IndexLinkBean("index.addlesson", "javascript:showAddLessonDialog("
-			    + org.getOrganisationId() + ")", "add-lesson-button", null, null));
+		    String name = org.getEnableSingleActivityLessons() ? "index.addlesson.single" : "index.addlesson";
+		    links.add(new IndexLinkBean(name,
+			    "javascript:showAddLessonDialog(" + org.getOrganisationId() + ")", "add-lesson-button",
+			    null, null));
 		}
 
 		// Adding gradebook course monitor links if enabled
@@ -432,6 +448,30 @@ public class DisplayGroupAction extends Action {
 	return false;
     }
 
+    /**
+     * Gets basic information on available tools: IDs and i18n names.
+     */
+    private List<ToolDTO> getToolDTOs(String userName) throws IOException {
+	User user = (User) getService().findByProperty(User.class, "login", userName).get(0);
+	String languageCode = user.getLocale().getLanguageIsoCode();
+	ArrayList<LearningLibraryDTO> learningLibraries = getLearningDesignService().getAllLearningLibraryDetails(
+		languageCode);
+	List<ToolDTO> tools = new ArrayList<ToolDTO>();
+	for (LearningLibraryDTO learningLibrary : learningLibraries) {
+	    // skip invalid and complex tools
+	    if (learningLibrary.getValidFlag() && (learningLibrary.getTemplateActivities().size() == 1)) {
+		ToolDTO tool = new ToolDTO();
+		tool.setToolId(learningLibrary.getLearningLibraryID());
+		tool.setToolDisplayName(((LibraryActivityDTO) learningLibrary.getTemplateActivities().get(0))
+			.getActivityTitle());
+		tools.add(tool);
+	    }
+	}
+
+	Collections.sort(tools, DisplayGroupAction.TOOL_NAME_COMPARATOR);
+	return tools;
+    }
+
     private IUserManagementService getService() {
 	if (DisplayGroupAction.service == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
@@ -449,13 +489,13 @@ public class DisplayGroupAction extends Action {
 	}
 	return DisplayGroupAction.lessonService;
     }
-    
-    private IAuthoringService getAuthoringService() {
-	if (DisplayGroupAction.authoringService == null) {
+
+    private ILearningDesignService getLearningDesignService() {
+	if (DisplayGroupAction.learningDesignService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		    .getServletContext());
-	    DisplayGroupAction.authoringService = (IAuthoringService) ctx.getBean("authoringService");
+	    DisplayGroupAction.learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
 	}
-	return DisplayGroupAction.authoringService;
+	return DisplayGroupAction.learningDesignService;
     }
 }

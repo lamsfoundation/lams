@@ -889,7 +889,9 @@ public class AuthoringAction extends Action {
 		dacoQuestionList.addAll(questions);
 
 		sessionMap.put(DacoConstants.ATTR_DACO_FORM, dacoForm);
-
+		request.getSession().setAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL,
+			request.getParameter(AttributeNames.PARAM_NOTIFY_CLOSE_URL));
+		
 		return mapping.findForward(DacoConstants.SUCCESS);
 	}
 

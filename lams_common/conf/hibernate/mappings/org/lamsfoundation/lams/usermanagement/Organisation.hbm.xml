@@ -62,7 +62,7 @@
 		<!--  The following admin fields are NOT NULL DEFAULT 0 in the database -->
 		<property name="courseAdminCanAddNewUsers"
 			type="java.lang.Boolean" column="admin_add_new_users"
-			not-null="false" length="1">
+			not-null="true" length="1">
 			<meta attribute="field-description">
 				@hibernate.property column="admin_add_new_users"
 				length="1" not-null="true"
@@ -71,7 +71,7 @@
 
 		<property name="courseAdminCanBrowseAllUsers"
 			type="java.lang.Boolean" column="admin_browse_all_users"
-			not-null="false" length="1">
+			not-null="true" length="1">
 			<meta attribute="field-description">
 				@hibernate.property column="admin_browse_all_users"
 				length="1" not-null="true"
@@ -80,7 +80,7 @@
 
 		<property name="courseAdminCanChangeStatusOfCourse"
 			type="java.lang.Boolean" column="admin_change_status"
-			not-null="false" length="1">
+			not-null="true" length="1">
 			<meta attribute="field-description">
 				@hibernate.property column="admin_change_status"
 				length="1" not-null="true"
@@ -88,7 +88,7 @@
 		</property>
 
 		<property name="courseAdminCanCreateGuestAccounts"
-			type="java.lang.Boolean" column="admin_create_guest" not-null="false"
+			type="java.lang.Boolean" column="admin_create_guest" not-null="true"
 			length="1">
 			<meta attribute="field-description">
 				@hibernate.property column="admin_create_guest"
@@ -97,7 +97,7 @@
 		</property>
 		
 		<property name="enableCourseNotifications"
-			type="java.lang.Boolean" column="enable_course_notifications" not-null="false"
+			type="java.lang.Boolean" column="enable_course_notifications" not-null="true"
 			length="1">
 			<meta attribute="field-description">
 				@hibernate.property column="enable_course_notifications"
@@ -107,7 +107,7 @@
 		
 		<property name="enableGradebookForMonitors"
 			type="java.lang.Boolean" column="enable_monitor_gradebook"
-			not-null="false" length="1">
+			not-null="true" length="1">
 			<meta attribute="field-description">
 				@hibernate.property column="enable_monitor_gradebook"
 				length="1" not-null="true"
@@ -116,12 +116,22 @@
 		
 		<property name="enableGradebookForLearners"
 			type="java.lang.Boolean" column="enable_learner_gradebook"
-			not-null="false" length="1">
+			not-null="true" length="1">
 			<meta attribute="field-description">
 				@hibernate.property column="enable_learner_gradebook"
 				length="1" not-null="true"
 			</meta>
 		</property>
+		
+		<property name="enableSingleActivityLessons"
+			type="java.lang.Boolean" column="enable_single_activity_lessons"
+			not-null="true" length="1">
+			<meta attribute="field-description">
+				@hibernate.property column="enable_single_activity_lessons"
+				length="1" not-null="true"
+			</meta>
+		</property>
+		
 
 		<!-- Associations -->
 

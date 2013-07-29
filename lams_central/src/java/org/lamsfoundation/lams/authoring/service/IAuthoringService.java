@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
@@ -401,11 +402,9 @@ public interface IAuthoringService {
     public String getUniqueNameForLearningDesign(String originalTitle, Integer workspaceFolderId);
 
     public Grouping getGroupingById(Long groupingID);
-    
-    public List<ToolDTO> getAllToolDTOs();
-    
+
     public String getToolAuthorUrl(Long toolID, Long toolContentID, String contentFolderID);
     
     public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
-	    String contentFolderID);
+	    String contentFolderID, Integer organisationID);
 }

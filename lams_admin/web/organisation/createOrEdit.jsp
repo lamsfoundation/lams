@@ -119,6 +119,12 @@
 			<fmt:message key="admin.gradebook.learner.enable"/>
 		</td>
 	</tr>
+	<tr>
+		<td colspan=2>
+			<html-el:checkbox property="enableSingleActivityLessons" />
+			<fmt:message key="config.authoring.single.activity"/>
+		</td>
+	</tr>
 	</logic:equal>
 	<logic:notEmpty name="OrganisationForm" property="orgId">
 	<tr>

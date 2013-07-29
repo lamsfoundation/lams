@@ -219,10 +219,7 @@ public class LearningDesignService implements ILearningDesignService {
 	Locale locale = LocaleContextHolder.getLocale();
 
 	if (log.isDebugEnabled()) {
-	    if (locale != null) {
-		log.debug("internationaliseActivities: Locale has lang/country " + locale.getLanguage() + ","
-			+ locale.getCountry());
-	    } else {
+	    if (locale == null) {
 		log.debug("internationaliseActivities: Locale missing.");
 	    }
 	}

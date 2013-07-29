@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +42,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
-import org.lamsfoundation.lams.authoring.dto.ToolDTO;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
@@ -94,7 +92,9 @@ import org.lamsfoundation.lams.tool.dto.ToolOutputDefinitionDTO;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
@@ -1969,19 +1969,45 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * Creates a LD with only one, given activity.
+     * Creates a LD with only one, given activity. If organisation is given, the LD will not be stored in user folder,
+     * but will be put straight into run sequences folder of the organisation.
      */
     @Override
     @SuppressWarnings("unchecked")
     public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
-	    String contentFolderID) {
+	    String contentFolderID, Integer organisationID) {
 	Integer userID = AuthoringService.getUserId();
 	User user = (User) baseDAO.find(User.class, userID);
 
 	LearningDesign learningDesign = new LearningDesign(null, null, null, learningDesignTitle, null, null, 1, false,
-		false, null, null, 1, new Date(), Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER), user,
+		false, null, null, null, new Date(), Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER), user,
 		user, null, null, null, null, null, null, null, null, null, null, contentFolderID, false, null, 1);
-	learningDesign.setWorkspaceFolder(user.getWorkspace().getDefaultFolder());
+
+	WorkspaceFolder folder = null;
+
+	if (organisationID == null) {
+	    folder = user.getWorkspace().getDefaultFolder();
+	    learningDesign.setCopyTypeID(LearningDesign.COPY_TYPE_NONE);
+	} else {
+	    learningDesign.setCopyTypeID(LearningDesign.COPY_TYPE_LESSON);
+	    // taken from MonitoringService#initializeLesson()
+	    int MAX_DEEP_LEVEL_FOLDER = 50;
+	    Organisation organisation = (Organisation) baseDAO.find(Organisation.class, organisationID);
+	    for (int idx = 0; idx < MAX_DEEP_LEVEL_FOLDER; idx++) {
+		if ((organisation == null) || (folder != null)) {
+		    break;
+		}
+		Workspace workspace = organisation.getWorkspace();
+		if (workspace != null) {
+		    folder = workspace.getDefaultRunSequencesFolder();
+		}
+		if (folder == null) {
+		    organisation = organisation.getParentOrganisation();
+		}
+	    }
+	}
+
+	learningDesign.setWorkspaceFolder(folder);
 	learningDesignDAO.insert(learningDesign);
 
 	ToolActivity templateActivity = (ToolActivity) activityDAO.getTemplateActivityByLibraryID(toolID);
@@ -2017,20 +2043,6 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     @Override
     public Grouping getGroupingById(Long groupingID) {
 	return groupingDAO.getGroupingById(groupingID);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<ToolDTO> getAllToolDTOs() {
-	List<Tool> tools = toolDAO.getAllTools();
-	List<ToolDTO> result = new LinkedList<ToolDTO>();
-	for (Tool tool : tools) {
-	    if (tool.isValid()) {
-		ToolDTO dto = new ToolDTO(tool);
-		result.add(dto);
-	    }
-	}
-	return result;
     }
 
     @Override

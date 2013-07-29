@@ -96,6 +96,9 @@ public class Organisation implements Serializable, Comparable {
 
     /** persistent field */
     private Boolean enableGradebookForLearners;
+    
+    /** persistent field */
+    private Boolean enableSingleActivityLessons;
 
     /** persistent field */
     private Date archivedDate;
@@ -377,4 +380,11 @@ public class Organisation implements Serializable, Comparable {
 	this.enableGradebookForLearners = enableGradebookForLearners;
     }
 
+    public Boolean getEnableSingleActivityLessons() {
+        return enableSingleActivityLessons;
+    }
+
+    public void setEnableSingleActivityLessons(Boolean enableSingleActivityLessons) {
+        this.enableSingleActivityLessons = enableSingleActivityLessons;
+    }
 }

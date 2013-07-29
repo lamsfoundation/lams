@@ -284,7 +284,4 @@ public class ConfigurationKeys {
     // CNG-26 Add to lams_configuration and set to false
     // if you don't want imported LD to have _<timestamp>_<seq_number> appended
     public static String SUFFIX_IMPORTED_LD = "SuffixImportedLD";
-    
-    // LDEV-3070 Allow single activity lesson creation on redesigned index page
-    public static String SINGLE_ACTIVITY_LESSONS_ENABLED = "SingleActivityLessonsEnabled";
 }

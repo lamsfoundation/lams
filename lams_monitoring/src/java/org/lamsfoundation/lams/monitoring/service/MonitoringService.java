@@ -437,18 +437,15 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    // Don't use unlimited loop to avoid dead lock. For instance, orgA
 	    // is orgB parent, but orgB parent is orgA as well.
 	    for (int idx = 0; idx < MAX_DEEP_LEVEL_FOLDER; idx++) {
-		if (org != null) {
-		    Workspace workspace = org.getWorkspace();
-		    if (workspace != null) {
-			runSeqFolder = workspace.getDefaultRunSequencesFolder();
-		    }
-		    if (runSeqFolder == null) {
-			org = org.getParentOrganisation();
-		    } else {
-			break;
-		    }
-		} else {
+		if ((org == null) || (runSeqFolder != null)) {
 		    break;
+		}
+		Workspace workspace = org.getWorkspace();
+		if (workspace != null) {
+		    runSeqFolder = workspace.getDefaultRunSequencesFolder();
+		}
+		if (runSeqFolder == null) {
+		    org = org.getParentOrganisation();
 		}
 	    }
 	}
@@ -483,6 +480,28 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, null,
 		LearningDesign.COPY_TYPE_PREVIEW, customCSV, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE,
 		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, null, null, null);
+    }
+
+    /**
+     * Intialise lesson without creating Learning Design copy, i.e. the original LD will be used.
+     */
+    public Lesson initializeLessonWithoutLDcopy(String lessonName, String lessonDescription, long learningDesignID,
+	    User user, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
+	    Boolean learnerExportAvailable, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
+	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Integer scheduledNumberDaysToLessonFinish,
+	    Lesson precedingLesson) {
+	LearningDesign learningDesign = authoringService.getLearningDesign(learningDesignID);
+	if (learningDesign == null) {
+	    throw new MonitoringServiceException("Learning design for id=" + learningDesignID
+		    + " is missing. Unable to initialize lesson.");
+	}
+	Lesson lesson = createNewLesson(lessonName, lessonDescription, user, learningDesign,
+		enableLessonIntro, displayDesignImage, learnerExportAvailable, learnerPresenceAvailable,
+		learnerImAvailable, liveEditEnabled, enableLessonNotifications, scheduledNumberDaysToLessonFinish,
+		precedingLesson);
+	auditAction(MonitoringService.AUDIT_LESSON_CREATED_KEY, new Object[] { lessonName, learningDesign.getTitle(),
+		learnerExportAvailable });
+	return lesson;
     }
 
     public Lesson initializeLesson(String lessonName, String lessonDescription, LearningDesign originalLearningDesign,
@@ -1353,7 +1372,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    Activity parentActivity = stopActivity.getParentActivity();
 
 	    // if user is moved into branch, see if he is allowed to do that
-	    if (parentActivity != null && parentActivity.isSequenceActivity()) {
+	    if ((parentActivity != null) && parentActivity.isSequenceActivity()) {
 		SequenceActivity sequenceActivity = (SequenceActivity) parentActivity;
 		Group group = sequenceActivity.getSoleGroupForBranch();
 		if ((group == null) || !group.hasLearner(learner)) {
@@ -1390,13 +1409,13 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return stopReason != null ? stopReason : messageService
 		.getMessage(MonitoringService.FORCE_COMPLETE_STOP_MESSAGE_STOPPED_UNEXPECTEDLY);
     }
-    
+
     /**
      * @throws LamsToolServiceException
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#forceCompleteLessonByUser(Integer,long,long)
      */
     public String forceCompleteLessonByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId) {
-	//TODO: REMOVE THIS METHOD AFTER OLD, FLASH MONITORING IS REMOVED 
+	// TODO: REMOVE THIS METHOD AFTER OLD, FLASH MONITORING IS REMOVED
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	checkOwnerOrStaffMember(requesterId, lesson, "force complete");
 
@@ -1415,8 +1434,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	Activity currentActivity = learnerProgress.getCurrentActivity();
 	String stopReason = null;
 	if (currentActivity != null) {
-	    stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, currentActivity,
-		    stopActivity, new ArrayList<Long>());
+	    stopReason = forceCompleteActivity(learner, lessonId, learnerProgress, currentActivity, stopActivity,
+		    new ArrayList<Long>());
 	}
 
 	return stopReason != null ? stopReason : messageService
