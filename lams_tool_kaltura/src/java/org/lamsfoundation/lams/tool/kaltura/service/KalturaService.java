@@ -327,6 +327,10 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
 	return getKalturaOutputFactory().getToolOutputDefinitions(kaltura, definitionType);
     }
 
+    public String getToolContentTitle(Long toolContentId) {
+	return getKalturaByContentId(toolContentId).getTitle();
+    }
+    
     /* ********** IKalturaService Methods ********************************* */
     @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,

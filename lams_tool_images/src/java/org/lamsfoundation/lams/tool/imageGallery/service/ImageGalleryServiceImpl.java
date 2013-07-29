@@ -957,6 +957,10 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
     }
 
+    public String getToolContentTitle(Long toolContentId) {
+	return getImageGalleryByContentId(toolContentId).getTitle();
+    }
+    
     public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 	ImageGallery imageGallery = imageGalleryDao.getByContentId(toolContentId);
 	if (imageGallery == null) {

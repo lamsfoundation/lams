@@ -69,7 +69,6 @@ import org.lamsfoundation.lams.tool.chat.dao.IChatDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatMessageDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatSessionDAO;
 import org.lamsfoundation.lams.tool.chat.dao.IChatUserDAO;
-import org.lamsfoundation.lams.tool.chat.dto.ChatMessageDTO;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatAttachment;
 import org.lamsfoundation.lams.tool.chat.model.ChatCondition;
@@ -89,9 +88,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * An implementation of the IChatService interface.
@@ -275,9 +271,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws DataMissingException
-     *                 if no tool content matches the toolSessionId
+     *             if no tool content matches the toolSessionId
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
 
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
@@ -311,7 +307,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      * 
      * @throws ToolException
-     *                 if any other error occurs
+     *             if any other error occurs
      */
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
@@ -356,6 +352,10 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	return getChatOutputFactory().getToolOutputDefinitions(chat, definitionType);
     }
 
+    public String getToolContentTitle(Long toolContentId) {
+	return getChatByContentId(toolContentId).getTitle();
+    }
+
     /* IChatService Methods */
     public Long getDefaultContentIdBySignature(String toolSignature) {
 	Long toolContentId = null;
@@ -377,7 +377,8 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	    throw new ChatException(error);
 	}
 	if (defaultContent.getConditions().isEmpty()) {
-	    defaultContent.getConditions().add(getChatOutputFactory().createDefaultUserMessagesCondition(defaultContent));
+	    defaultContent.getConditions().add(
+		    getChatOutputFactory().createDefaultUserMessagesCondition(defaultContent));
 	}
 	return defaultContent;
     }
@@ -458,7 +459,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     }
 
     public ChatAttachment uploadFileToContent(Long toolContentId, FormFile file, String type) {
-	if (file == null || StringUtils.isEmpty(file.getFileName())) {
+	if ((file == null) || StringUtils.isEmpty(file.getFileName())) {
 	    throw new ChatException("Could not find upload file: " + file);
 	}
 
@@ -544,7 +545,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 	Matcher matcher = pattern.matcher(message);
 	return matcher.replaceAll(ChatConstants.FILTER_REPLACE_TEXT);
     }
-    
+
     private Pattern getFilterPattern(Chat chat) {
 	if (!chat.isFilteringEnabled()) {
 	    return null;
@@ -622,7 +623,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
 
     private NodeKey processFile(FormFile file, String type) {
 	NodeKey node = null;
-	if (file != null && !StringUtils.isEmpty(file.getFileName())) {
+	if ((file != null) && !StringUtils.isEmpty(file.getFileName())) {
 	    String fileName = file.getFileName();
 	    try {
 		node = getChatToolContentHandler().uploadFile(file.getInputStream(), fileName, file.getContentType(),
@@ -764,7 +765,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
 
 	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
-	if (list == null || list.isEmpty()) {
+	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
 	    return list.get(0);
@@ -864,7 +865,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, Tool
     }
 
     public void deleteCondition(ChatCondition condition) {
-	if (condition != null && condition.getConditionId() != null) {
+	if ((condition != null) && (condition.getConditionId() != null)) {
 	    chatDAO.delete(condition);
 	}
     }

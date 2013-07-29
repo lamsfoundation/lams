@@ -366,6 +366,10 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 	return new TreeMap<String, ToolOutputDefinition>();
     }
 
+    public String getToolContentTitle(Long toolContentId) {
+	return getGmapByContentId(toolContentId).getTitle();
+    }
+    
     /* ********** IGmapService Methods ********************************* */
 
     public Long getDefaultContentIdBySignature(String toolSignature) {

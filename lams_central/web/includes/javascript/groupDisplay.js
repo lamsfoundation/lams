@@ -65,6 +65,11 @@ function initMainPage() {
 		  .remove();
 	
 	// initialise single activity lesson dialog
+	$('#addSingleActivityLessonFrame').load(function(){
+		if ($(this).contents().find('span.editForm').length > 0){
+			closeAddSingleActivityLessonDialog('save');
+		}
+	});
 	$('#addSingleActivityLessonDialog').dialog(
 		{
 			'autoOpen' : false,
@@ -426,30 +431,19 @@ function closeAddSingleActivityLessonDialog(action) {
 	var save = action == 'save';
 	
 	if (save) {
-		var ldTitle = '';
-		while (ldTitle == '') {
-			ldTitle = prompt(LABELS.SINGLE_ACTIVITY_LESSON_PROMPT);
-			if (ldTitle == '') {
-				alert(LABELS.SINGLE_ACTIVITY_LESSON_PROMPT_BLANK);
+		$.ajax({
+			async : false,
+			cache : false,
+			url : LAMS_URL + "authoring/author.do",
+			dataType : 'text',
+			data : {
+				'method' : 'createSingleActivityLesson',
+				'organisationID'  : dialog.dialog('option', 'orgID'),
+				'toolID' : dialog.dialog('option', 'toolID'),
+				'toolContentID' : dialog.dialog('option', 'toolContentID'),
+				'contentFolderID' : dialog.dialog('option', 'contentFolderID')
 			}
-		}
-			
-		if (ldTitle) {
-			$.ajax({
-				async : false,
-				cache : false,
-				url : LAMS_URL + "authoring/author.do",
-				dataType : 'text',
-				data : {
-					'method' : 'createSingleActivityLesson',
-					'organisationID'  : dialog.dialog('option', 'orgID'),
-					'toolID' : dialog.dialog('option', 'toolID'),
-					'toolContentID' : dialog.dialog('option', 'toolContentID'),
-					'contentFolderID' : dialog.dialog('option', 'contentFolderID'),
-					'title' : ldTitle
-				}
-			});
-		}
+		});
 	}
 	dialog.dialog('option', 'refresh', save).dialog('close');
 }

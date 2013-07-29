@@ -1593,7 +1593,11 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	}
 	return getVoteOutputFactory().getToolOutputDefinitions(content, definitionType);
     }
-
+    
+    public String getToolContentTitle(Long toolContentId) {
+	return retrieveVote(toolContentId).getTitle();
+    }
+   
     /**
      * Get the tool output for the given tool output names.
      * 

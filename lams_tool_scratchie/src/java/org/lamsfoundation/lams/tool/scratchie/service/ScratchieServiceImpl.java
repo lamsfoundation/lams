@@ -1568,7 +1568,11 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    }
 	}
     }
-
+    
+    public String getToolContentTitle(Long toolContentId) {
+	return getScratchieByContentId(toolContentId).getTitle();
+    }
+   
     public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 	Scratchie scratchie = scratchieDao.getByContentId(toolContentId);
 	if (scratchie == null) {

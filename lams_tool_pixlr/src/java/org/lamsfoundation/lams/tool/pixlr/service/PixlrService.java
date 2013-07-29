@@ -422,6 +422,10 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	}
 	return getPixlrOutputFactory().getToolOutputDefinitions(pixlr, definitionType);
     }
+    
+    public String getToolContentTitle(Long toolContentId) {
+	return getPixlrByContentId(toolContentId).getTitle();
+    }
 
     /* ********** IPixlrService Methods ********************************* */
 

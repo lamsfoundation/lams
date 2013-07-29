@@ -902,7 +902,11 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	}
 	return getTaskListOutputFactory().getToolOutputDefinitions(taskList, definitionType);
     }
-
+    
+    public String getToolContentTitle(Long toolContentId) {
+	return getTaskListByContentId(toolContentId).getTitle();
+    }
+   
     /**
      * {@inheritDoc}
      */

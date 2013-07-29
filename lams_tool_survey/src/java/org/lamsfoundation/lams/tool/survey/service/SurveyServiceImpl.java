@@ -786,7 +786,11 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    }
 	}
     }
-
+    
+    public String getToolContentTitle(Long toolContentId) {
+	return getSurveyByContentId(toolContentId).getTitle();
+    }
+    
     public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 	Survey survey = surveyDao.getByContentId(toolContentId);
 	if (survey == null) {

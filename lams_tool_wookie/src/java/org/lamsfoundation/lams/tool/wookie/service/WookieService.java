@@ -520,6 +520,10 @@ public class WookieService implements ToolSessionManager, ToolContentManager,
 		return getWookieOutputFactory().getToolOutputDefinitions(wookie,
 				definitionType);
 	}
+	    
+        public String getToolContentTitle(Long toolContentId) {
+    		return getWookieByContentId(toolContentId).getTitle();
+        }
 
 	@SuppressWarnings("unchecked")
 	public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {

@@ -578,6 +578,10 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	return getDacoOutputFactory().getToolOutputDefinitions(daco, definitionType);
     }
 
+    public String getToolContentTitle(Long toolContentId) {
+	return getDacoByContentId(toolContentId).getTitle();
+    }
+    
     public DacoUser getUser(Long uid) {
 	return (DacoUser) dacoUserDao.getObject(DacoUser.class, uid);
     }

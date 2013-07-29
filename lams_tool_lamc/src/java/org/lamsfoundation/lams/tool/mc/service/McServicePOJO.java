@@ -1098,6 +1098,10 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	return getMcOutputFactory().getToolOutputDefinitions(content, definitionType);
     }
 
+    public String getToolContentTitle(Long toolContentId) {
+	return  mcContentDAO.findMcContentById(toolContentId).getTitle();
+    }
+    
     /**
      * it is possible that the tool session id already exists in the tool sessions table as the users from the same
      * session are involved. existsSession(long toolSessionId)

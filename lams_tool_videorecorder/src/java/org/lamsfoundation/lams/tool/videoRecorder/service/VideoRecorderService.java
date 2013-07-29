@@ -368,7 +368,11 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
 	}
 	return getVideoRecorderOutputFactory().getToolOutputDefinitions(videoRecorder, definitionType);
     }
-
+    
+    public String getToolContentTitle(Long toolContentId) {
+	return getVideoRecorderByContentId(toolContentId).getTitle();
+    }
+   
     /* ********** IVideoRecorderService Methods ********************************* */
 
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {

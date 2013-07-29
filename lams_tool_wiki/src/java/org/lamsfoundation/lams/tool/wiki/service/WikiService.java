@@ -260,7 +260,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	}
 	return wikiOutputFactory.getToolOutputDefinitions(wiki, definitionType);
     }
-
+    
+    public String getToolContentTitle(Long toolContentId) {
+	return getWikiByContentId(toolContentId).getTitle();
+    }
+   
     /* ************ Methods from ToolContentManager ************************* */
 
     /**

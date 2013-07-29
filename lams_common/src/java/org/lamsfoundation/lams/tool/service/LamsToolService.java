@@ -70,6 +70,12 @@ public class LamsToolService implements ILamsToolService {
     }
 
     @Override
+    public IToolVO getToolByID(Long toolId) {
+	Tool tool = toolDAO.getToolByID(toolId);
+	return tool.createBasicToolVO();
+    }
+
+    @Override
     public IToolVO getToolBySignature(final String toolSignature) {
 	Tool tool = toolDAO.getToolBySignature(toolSignature);
 	return tool.createBasicToolVO();

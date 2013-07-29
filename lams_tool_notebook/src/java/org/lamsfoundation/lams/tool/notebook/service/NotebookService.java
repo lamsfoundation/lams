@@ -310,7 +310,11 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	}
 	return getNotebookOutputFactory().getToolOutputDefinitions(notebook, definitionType);
     }
-
+    
+    public String getToolContentTitle(Long toolContentId) {
+	return getNotebookByContentId(toolContentId).getTitle();
+    }
+   
     /* ********** INotebookService Methods ********************************* */
 
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {

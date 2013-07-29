@@ -44,7 +44,10 @@ import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -75,12 +78,8 @@ public class AuthoringAction extends LamsDispatchAction {
     private static IAuditService auditService;
     private static IMonitoringService monitoringService;
     private static IUserManagementService userManagementService;
-
-    public IAuthoringService getAuthoringService() {
-	WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this
-		.getServlet().getServletContext());
-	return (IAuthoringService) webContext.getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);
-    }
+    private static ILamsToolService toolService;
+    private static IAuthoringService authoringService;
 
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
@@ -349,16 +348,22 @@ public class AuthoringAction extends LamsDispatchAction {
 	Long toolID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_ID);
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String contentFolderID = request.getParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	String learningDesignTitle = request.getParameter(AttributeNames.PARAM_TITLE);
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+
+	// get title from tool content
+	IToolVO tool = getToolService().getToolByID(toolID);
+	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		.getServletContext());
+	ToolContentManager toolManager = (ToolContentManager) wac.getBean(tool.getServiceName());
+	String title = toolManager.getToolContentTitle(toolContentID);
 	// create the LD and put it in Run Sequences folder in the given organisation
-	Long learningDesignID = authoringService.insertSingleActivityLearningDesign(learningDesignTitle, toolID,
-		toolContentID, contentFolderID, organisationID);
+	Long learningDesignID = authoringService.insertSingleActivityLearningDesign(title, toolID, toolContentID,
+		contentFolderID, organisationID);
 	if (learningDesignID != null) {
 	    Integer userID = getUserId();
 	    User user = (User) getUserManagementService().findById(User.class, userID);
-	    Lesson lesson = getMonitoringService().initializeLessonWithoutLDcopy(learningDesignTitle, "",
-		    learningDesignID, user, null, false, false, true, false, false, false, false, null, null);
+	    Lesson lesson = getMonitoringService().initializeLessonWithoutLDcopy(title, "", learningDesignID, user,
+		    null, false, false, true, false, false, false, false, null, null);
 	    Organisation organisation = getMonitoringService().getOrganisation(organisationID);
 
 	    List<User> staffList = new LinkedList<User>();
@@ -432,5 +437,24 @@ public class AuthoringAction extends LamsDispatchAction {
 		    .getBean(CentralConstants.USER_MANAGEMENT_SERVICE_BEAN_NAME);
 	}
 	return AuthoringAction.userManagementService;
+    }
+
+    public IAuthoringService getAuthoringService() {
+	if (AuthoringAction.authoringService == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    AuthoringAction.authoringService = (IAuthoringService) wac
+		    .getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);
+	}
+	return AuthoringAction.authoringService;
+    }
+
+    public ILamsToolService getToolService() {
+	if (AuthoringAction.toolService == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    AuthoringAction.toolService = (ILamsToolService) wac.getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
+	}
+	return AuthoringAction.toolService;
     }
 }

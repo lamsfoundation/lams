@@ -313,6 +313,10 @@ public class DimdimService implements ToolSessionManager, ToolContentManager, ID
 	return new TreeMap<String, ToolOutputDefinition>();
     }
 
+    public String getToolContentTitle(Long toolContentId) {
+	return getDimdimByContentId(toolContentId).getTitle();
+    }
+    
     /* IDimdimService Methods */
 
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {

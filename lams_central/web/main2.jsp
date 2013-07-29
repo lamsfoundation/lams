@@ -50,9 +50,7 @@
 					REMOVE_LESSON_CONFIRM2 : '<fmt:message key="index.remove.lesson.confirm2"/>',
 					SORTING_ENABLE : '<fmt:message key="label.enable.lesson.sorting"/>',
 					SORTING_DISABLE : '<fmt:message key="label.disable.lesson.sorting"/>',
-					SINGLE_ACTIVITY_LESSON_TITLE : '<fmt:message key="index.single.activity.lesson.title"/>',
-					SINGLE_ACTIVITY_LESSON_PROMPT : '<fmt:message key="index.single.activity.lesson.prompt"/>',
-					SINGLE_ACTIVITY_LESSON_PROMTP_BLANK : '<fmt:message key="index.single.activity.lesson.prompt.blank"/>'
+					SINGLE_ACTIVITY_LESSON_TITLE : '<fmt:message key="index.single.activity.lesson.title"/>'
 			}
 			
 			var tabName = '${tab}';

@@ -872,7 +872,11 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
 	    throws ToolException {
 	return new TreeMap<String, ToolOutputDefinition>();
     }
-
+    
+    public String getToolContentTitle(Long toolContentId) {
+	return retrieveNoticeboard(toolContentId).getTitle();
+    }
+    
     /* ===============Methods implemented from ToolSessionManager =============== */
 
     /**

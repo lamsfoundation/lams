@@ -55,6 +55,8 @@ public interface ILamsToolService {
      */
     Set<User> getAllPotentialLearners(long toolSessionID) throws LamsToolServiceException;
     
+    IToolVO getToolByID(Long toolId);
+    
     IToolVO getToolBySignature(final String toolSignature);
     
     long getToolDefaultContentIdBySignature(final String toolSignature);

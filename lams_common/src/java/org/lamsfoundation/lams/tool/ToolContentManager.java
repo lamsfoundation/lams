@@ -140,4 +140,9 @@ public interface ToolContentManager {
 	    throws ToolException;
 
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType);
+    
+    /**
+     * Finds title entered in the tool content.
+     */
+    public String getToolContentTitle(Long toolContentId);
 }

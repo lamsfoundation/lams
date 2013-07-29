@@ -539,7 +539,11 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	}
 	return getMindmapOutputFactory().getToolOutputDefinitions(mindmap, definitionType);
     }
-
+    
+    public String getToolContentTitle(Long toolContentId) {
+	return getMindmapByContentId(toolContentId).getTitle();
+    }
+    
     /* IMindmapService Methods */
 
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {

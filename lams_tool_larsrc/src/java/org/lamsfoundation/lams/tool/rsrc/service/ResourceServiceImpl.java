@@ -1001,7 +1001,11 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    }
 	}
     }
-
+    
+    public String getToolContentTitle(Long toolContentId) {
+	return getResourceByContentId(toolContentId).getTitle();
+    }
+    
     public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 	Resource resource = resourceDao.getByContentId(toolContentId);
 	if (resource == null) {

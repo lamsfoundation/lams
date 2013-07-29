@@ -1287,4 +1287,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getAssessmentOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
+
+    public String getToolContentTitle(Long toolContentId) {
+	return getAssessmentByContentId(toolContentId).getTitle();
+    }
 }

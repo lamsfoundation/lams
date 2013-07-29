@@ -316,7 +316,12 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	    throws ToolException {
 	return new TreeMap<String, ToolOutputDefinition>();
     }
-
+ 
+    public String getToolContentTitle(Long toolContentId) {
+	return getScribeByContentId(toolContentId).getTitle();
+    }
+   
+    
     /* ********** IScribeService Methods ************************************** */
 
     public void createReportEntry(Long toolSessionId) {

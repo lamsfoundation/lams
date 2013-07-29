@@ -936,6 +936,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	return getForumOutputFactory().getToolOutputDefinitions(forum, definitionType);
     }
 
+    public String getToolContentTitle(Long toolContentId) {
+	return getForumByContentId(toolContentId).getTitle();
+    }
+    
     /**
      * @see org.lamsfoundation.lams.tool.ToolSessionManager#createToolSession(java.lang.Long, java.lang.String,
      *      java.lang.Long)

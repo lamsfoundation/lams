@@ -769,7 +769,11 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	Spreadsheet toContent = Spreadsheet.newInstance(spreadsheet, toContentId, spreadsheetToolContentHandler);
 	spreadsheetDao.saveObject(toContent);
     }
-
+    
+    public String getToolContentTitle(Long toolContentId) {
+	return getSpreadsheetByContentId(toolContentId).getTitle();
+    }
+   
     public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {
 	Spreadsheet spreadsheet = spreadsheetDao.getByContentId(toolContentId);
 	if (spreadsheet == null) {

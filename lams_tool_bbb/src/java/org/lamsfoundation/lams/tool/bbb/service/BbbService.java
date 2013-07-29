@@ -312,6 +312,10 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
 	return new TreeMap<String, ToolOutputDefinition>();
     }
 
+    public String getToolContentTitle(Long toolContentId) {
+	return getBbbByContentId(toolContentId).getTitle();
+    }
+    
     /* IBbbService Methods */
 
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {

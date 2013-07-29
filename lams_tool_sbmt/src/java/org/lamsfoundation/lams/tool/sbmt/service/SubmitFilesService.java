@@ -350,7 +350,11 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 	}
 	return getSubmitFilesOutputFactory().getToolOutputDefinitions(content, definitionType);
     }
-
+    
+    public String getToolContentTitle(Long toolContentId) {
+	return getSubmitFilesContent(toolContentId).getTitle();
+    }
+   
     /*
      * (non-Javadoc)
      * 

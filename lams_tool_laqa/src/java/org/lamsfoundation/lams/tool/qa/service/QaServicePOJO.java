@@ -803,6 +803,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	return getQaOutputFactory().getToolOutputDefinitions(qaContent, definitionType);
     }
 
+    public String getToolContentTitle(Long toolContentId) {
+	return qaDAO.getQaByContentId(toolContentId).getTitle();
+    }
+    
     /**
      * it is possible that the tool session id already exists in the tool sessions table as the users from the same
      * session are involved. existsSession(long toolSessionId)
