@@ -1339,6 +1339,9 @@ border:0px;
 .mycourses-mark-img {background: url('../images/css/mark_bw.png') no-repeat 0 3px; margin-right:3px; padding:5px 0px 5px 20px; 
 }
 
+.mycourses-sub-mark-img {background: url('../images/css/mark.png') no-repeat 0 3px; margin-right:3px; padding:5px 0px 5px 20px;
+}
+
 .mycourses-addlesson-img {background: url('../images/css/mycourses_addlesson.png') no-repeat 0 3px; margin-right:5px; padding:5px 0px 5px 25px;
 }
 
