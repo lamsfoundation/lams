@@ -56,8 +56,9 @@ td#messageCell {
 	overflow: visible;
 }
 
-#content-main .row .split-menu-button {
-	margin-top: 6px;
+#content-main .row .mycourses-right-buttons a {
+	display: block;
+	padding-bottom: 4px;
 }
 
 #content-main .row .split-menu-button>ul {
@@ -66,6 +67,10 @@ td#messageCell {
 
 #content-main .row .split-menu-button ul li ul li {
 	padding-top: 0;
+	padding-bottom: 0;
+}
+
+#content-main .row .split-menu-button ul li ul li {
 	padding-bottom: 0;
 }
 
