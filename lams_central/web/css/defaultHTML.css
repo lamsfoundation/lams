@@ -1312,6 +1312,10 @@ border:0px;
 	text-align: left;
 }
 
+.align-center {
+	text-align: center;
+}
+
 .shading-bg {
 	padding: 5px;
 	padding-left: 10px;
