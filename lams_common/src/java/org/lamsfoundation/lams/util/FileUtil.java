@@ -72,7 +72,7 @@ public class FileUtil {
     
     public static final String ALLOWED_EXTENSIONS_FLASH = ".swf,.fla";
     public static final String ALLOWED_EXTENSIONS_IMAGE = ".jpg,.gif,.jpeg,.png,.bmp";
-    public static final String ALLOWED_EXTENSIONS_MEDIA = ".jpg,.gif,.jpeg,.png,.bmp";
+    public static final String ALLOWED_EXTENSIONS_MEDIA = ".3gp,.avi,.flv,.m4v,.mkv,.mov,.mp3,.mp4,.mpe,.mpeg,.mpg,.mpv,.mts,.m2ts,ogg,.wma,.wmv";
 
     protected static final String prefix = "lamstmp_"; // protected rather than private to suit junit test
 
