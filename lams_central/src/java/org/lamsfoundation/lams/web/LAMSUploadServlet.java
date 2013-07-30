@@ -107,6 +107,7 @@ public class LAMSUploadServlet extends HttpServlet {
 		if (FileUtil.isExtensionAllowed(fileType, fileName)) {
 		    File uploadDir = UploadFileUtil.getUploadDir(currentFolderStr, fileType);
 		    fileName = UploadFileUtil.getUploadFileName(uploadDir, fileName);
+		    newName = fileName;
 		    File destinationFile = new File(uploadDir, fileName);
 
 		    String currentWebPath = UploadFileUtil.getUploadWebPath(currentFolderStr, fileType);
