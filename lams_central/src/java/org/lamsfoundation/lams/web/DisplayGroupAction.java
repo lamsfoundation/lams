@@ -228,7 +228,7 @@ public class DisplayGroupAction extends Action {
 
 	    } else {// CLASS_TYPE
 		if (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR)) {
-		    String name = org.getEnableSingleActivityLessons() ? "index.addlesson.single" : "index.addlesson";
+		    String name = org.getParentOrganisation().getEnableSingleActivityLessons() ? "index.addlesson.single" : "index.addlesson";
 		    links.add(new IndexLinkBean(name,
 			    "javascript:showAddLessonDialog(" + org.getOrganisationId() + ")", "add-lesson-button",
 			    null, null));

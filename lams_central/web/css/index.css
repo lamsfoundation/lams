@@ -56,43 +56,65 @@ td#messageCell {
 	overflow: visible;
 }
 
-#content-main .row .mycourses-right-buttons a {
+#content-main .mycourses-right-buttons a {
 	display: block;
 	padding-bottom: 4px;
 }
 
-#content-main .row .split-menu-button>ul {
+#content-main .split-menu-button>ul {
 	margin: 0;
 }
 
-#content-main .row .split-menu-button ul li ul li {
+#content-main .split-menu-button ul li>a {
+	background-color: inherit;
+}
+
+#content-main .split-menu-button ul li ul {
+	font-size: 11px;
+}
+
+#content-main .split-menu-button ul li ul li {
 	padding-top: 0;
 	padding-bottom: 0;
 }
 
-#content-main .row .split-menu-button ul li ul li {
+#content-main .split-menu-button ul li ul li a {
 	padding-bottom: 0;
 }
 
-#content-main .row .split-menu-button a.add-lesson-button {
+#content-main .split-menu-button a.add-lesson-button{
 	border-top: none;
 	border-left: none;
 	padding-top: 0;
+	padding-right: 2px;
 }
 
-#content-main .row .split-menu-button a.add-lesson-button span {
+#content-main .split-menu-button a.sequence-action-link {
+	padding-top: 1px;
+}
+
+#content-main .split-menu-button a.add-lesson-button span,
+#content-main .split-menu-button a.sequence-action-link span {
 	display: block;
 	float: left;
 	padding-top: 4px;
 }
 
-#content-main .row .split-menu-button a.add-lesson-button img {
+#content-main .split-menu-button a.add-lesson-button img {
 	display: block;
 	float: right;
 	padding-top: 3px;
+	border: none;
 }
 
-#content-main .row .split-menu-button ul.button-menu span {
+#content-main .split-menu-button a.sequence-action-link img {
+	display: block;
+	float: right;
+	padding-top: 4px;
+	border: none;
+}
+
+#content-main .split-menu-button ul.button-menu span {
 	padding-left: 5px;
 }
 
