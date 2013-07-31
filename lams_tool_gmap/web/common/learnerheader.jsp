@@ -35,6 +35,8 @@
 
 	<script type="text/javascript">
 	<!--
+		var GBrowserIsCompatible = GBrowserIsCompatible || function() {return false;};
+		
 		var YELLOW_MARKER_ICON = "${tool}/images/yellow_Marker.png";
 		var BLUE_MARKER_ICON = "${tool}/images/blue_Marker.png";
 		var LIGHTBLUE_MARKER_ICON = "${tool}/images/paleblue_Marker.png";

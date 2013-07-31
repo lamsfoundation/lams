@@ -30,6 +30,7 @@
 		
 		<script type="text/javascript">
 		<!--
+		var GBrowserIsCompatible = GBrowserIsCompatible || function() {return false;};
 		
 		var YELLOW_MARKER_ICON = "tool_images/yellow_Marker.png";
 		var BLUE_MARKER_ICON = "tool_images/blue_Marker.png";

@@ -23,6 +23,8 @@
 
 <script type="text/javascript">
 <!--
+	var GBrowserIsCompatible = GBrowserIsCompatible || function() {return false;};
+	
 	var errorMissingTitle = "<fmt:message key='error.missingMarkerTitle'/>";
 	var confirmDelete = "<fmt:message key='label.authoring.basic.confirmDelete'/>";
 	var authoredMarkerMsg = "<fmt:message key='label.authoring.authoredMarkers' />";
