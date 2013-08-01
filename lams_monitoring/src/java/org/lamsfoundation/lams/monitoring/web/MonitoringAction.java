@@ -1221,7 +1221,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		: new LearnerProgressNameComparator());
 
 	if (!StringUtils.isBlank(searchPhrase)) {
-	    searchPhrase = searchPhrase.toLowerCase();
+	    searchPhrase = searchPhrase.trim().toLowerCase();
 
 	    // get only users whose names match the given phrase
 	    List<LearnerProgress> searchResult = new ArrayList<LearnerProgress>();
@@ -1733,6 +1733,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	if (url != null) {
+	    if (url.startsWith("learner.do")) {
+		url = "learning/" + url;
+	    }
 	    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 	    if (!url.startsWith(serverUrl)) {
 		// monitor mode URLs should be prepended with serve URL
