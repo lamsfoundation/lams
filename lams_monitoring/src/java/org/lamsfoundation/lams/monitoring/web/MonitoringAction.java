@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1190,10 +1191,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 	}
 
-
 	IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
 		.getServletContext());
-	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, lessonDTO.getOrganisationID());
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class,
+		lessonDTO.getOrganisationID());
 	request.setAttribute("notificationsAvailable", organisation.getEnableCourseNotifications());
 	request.setAttribute("lesson", lessonDTO);
 	return mapping.findForward("monitorLesson");
@@ -1221,21 +1222,29 @@ public class MonitoringAction extends LamsDispatchAction {
 		: new LearnerProgressNameComparator());
 
 	if (!StringUtils.isBlank(searchPhrase)) {
-	    searchPhrase = searchPhrase.trim().toLowerCase();
-
 	    // get only users whose names match the given phrase
-	    List<LearnerProgress> searchResult = new ArrayList<LearnerProgress>();
+	    Set<LearnerProgress> searchResult = new LinkedHashSet<LearnerProgress>();
+
+	    // check if there are several search phrases in the query
+	    String[] searchPhrases = searchPhrase.split(";");
+	    for (int searchPhraseIndex = 0; searchPhraseIndex < searchPhrases.length; searchPhraseIndex++) {
+		searchPhrases[searchPhraseIndex] = searchPhrases[searchPhraseIndex].trim().toLowerCase();
+	    }
+
 	    for (LearnerProgress learnerProgress : learnerProgresses) {
 		User learner = learnerProgress.getUser();
 		StringBuilder learnerDisplayName = new StringBuilder(learner.getFirstName().toLowerCase()).append(" ")
 			.append(learner.getLastName().toLowerCase()).append(" ")
 			.append(learner.getLogin().toLowerCase());
-		if (learnerDisplayName.indexOf(searchPhrase) != -1) {
-		    searchResult.add(learnerProgress);
+		for (String searchPhrasePiece : searchPhrases) {
+		    if (!StringUtils.isBlank(searchPhrasePiece) && learnerDisplayName.indexOf(searchPhrasePiece) != -1) {
+			searchResult.add(learnerProgress);
+		    }
 		}
 	    }
 
-	    learnerProgresses = searchResult;
+	    learnerProgresses.clear();
+	    learnerProgresses.addAll(searchResult);
 	}
 
 	// batch size is 10

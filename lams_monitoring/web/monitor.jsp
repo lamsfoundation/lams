@@ -333,7 +333,9 @@
 				</td>
 				<td id="learnersSearchPhraseCell" class="learnersHeaderCell">
 					<fmt:message key='learners.search.phrase' /><br />
-					<input id="learnersSearchPhrase" />
+					<input id="learnersSearchPhrase"
+					       title="<fmt:message key='learners.search.phrase.tooltip' />"
+					/>
 					<img src="<lams:LAMSURL/>images/css/accept.png"
 					     onClick="javascript:learnersRunSearchPhrase()"
 					     title="<fmt:message key='learners.search.phrase.go.tooltip' />"
