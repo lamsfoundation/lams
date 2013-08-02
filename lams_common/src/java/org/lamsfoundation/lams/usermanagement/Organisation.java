@@ -111,7 +111,7 @@ public class Organisation implements Serializable, Comparable {
 	    Set childOrganisations, Set lessons, Boolean courseAdminCanAddNewUsers,
 	    Boolean courseAdminCanBrowseAllUsers, Boolean courseAdminCanChangeStatusOfCourse,
 	    Boolean courseAdminCanCreateGuestAccounts, Boolean enableCourseNotifications, String orderedLessonIds,
-	    Boolean enableGradebookForLearners, Boolean enableGradebookForMonitors) {
+	    Boolean enableGradebookForLearners, Boolean enableGradebookForMonitors, Boolean enableSingleActivityLessons) {
 	this.name = name;
 	this.description = description;
 	this.parentOrganisation = parentOrganisation;
@@ -130,6 +130,7 @@ public class Organisation implements Serializable, Comparable {
 	this.orderedLessonIds = orderedLessonIds;
 	this.enableGradebookForLearners = enableGradebookForLearners;
 	this.enableGradebookForMonitors = enableGradebookForMonitors;
+	this.enableSingleActivityLessons = enableSingleActivityLessons;
     }
 
     /** default constructor */
@@ -141,6 +142,7 @@ public class Organisation implements Serializable, Comparable {
 	this.enableCourseNotifications = Boolean.FALSE;
 	this.enableGradebookForLearners = Boolean.FALSE;
 	this.enableGradebookForMonitors = Boolean.FALSE;
+	this.enableSingleActivityLessons = Boolean.FALSE;
     }
 
     /** minimal constructor */
@@ -161,6 +163,7 @@ public class Organisation implements Serializable, Comparable {
 	this.enableCourseNotifications = Boolean.FALSE;
 	this.enableGradebookForLearners = Boolean.FALSE;
 	this.enableGradebookForMonitors = Boolean.FALSE;
+	this.enableSingleActivityLessons = Boolean.FALSE;
     }
 
     public Organisation(String name, String description, Date createDate, User createdBy,
