@@ -1,6 +1,6 @@
 /********** GENERAL/DIALOG STYLES **********/
 div#tabs {
-	width: 768px;
+	width: 99%;
 	height: 574px;
 	overflow: hidden;
 }
@@ -166,7 +166,7 @@ td.contributeEntryCell a {
 div#sequenceCanvas {
 	text-align: center;
 	height: 478px;
-	width: 768px;
+	width: 1024px;
 	overflow: auto;
 }
 

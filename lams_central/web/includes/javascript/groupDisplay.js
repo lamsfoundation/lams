@@ -115,7 +115,7 @@ function initMainPage() {
 		{
 			'autoOpen' : false,
 			'height' : 600,
-			'width' : 800,
+			'width' : 1024,
 			'modal' : true,
 			'resizable' : false,
 			'hide' : 'fold',
