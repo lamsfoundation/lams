@@ -125,7 +125,7 @@ function initMainPage() {
 						.attr(
 								'src',
 								LAMS_URL
-										+ 'monitoring/monitorLesson.jsp?lessonID='
+										+ 'monitoring/monitoring.do?method=monitorLesson&lessonID='
 										+ $(this).dialog('option',
 												'lessonID'));
 			},
