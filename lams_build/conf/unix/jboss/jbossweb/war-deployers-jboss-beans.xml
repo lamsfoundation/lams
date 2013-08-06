@@ -213,7 +213,7 @@ $Id$
       <property name="lenientEjbLink">true</property>
 
       <!--Flag to delete the Work Dir on Context Destroy -->
-      <property name="deleteWorkDirOnContextDestroy">false</property>
+      <property name="deleteWorkDirOnContextDestroy">true</property>
 
       <!--
           Class of the session manager (used if context is marked as 'distributable'. Currently allowed values:
