@@ -1,38 +1,17 @@
 function initMainPage() {
+	initButtons();
+	
 	$('#orgTabs').tabs({
 		'activate' : function(event, ui){
 			loadOrgTab(ui.newPanel);
 		}
 	}).addClass('ui-tabs-vertical ui-helper-clearfix')
 	  .find('li').removeClass('ui-corner-top').addClass('ui-corner-left');
-	
+
 	loadOrgTab($('.orgTab').first());
 	
 	$("#actionAccord").accordion({
 		'heightStyle' : 'content'
-	});
-	
-	$(".split-menu-button li em")
-			.live(
-					"click",
-					function(event) {
-						var hidden = $(this).parents("li").children("ul").is(
-								":hidden");
-						$(this).parents("li").children("ul").hide();
-						$(this).parents("li").children("a").removeClass(
-								"zoneCur");
-
-						if (hidden) {
-							$(this).parents("li").children("ul").toggle()
-									.parents("li").children("a").addClass(
-											"zoneCur");
-						}
-
-						event.stopPropagation();
-					});
-
-	$("html").click(function() {
-		$(".split-menu-button>ul>li>ul").hide();
 	});
 
 	// initialise lesson dialog
@@ -178,10 +157,11 @@ function initMainPage() {
 
 function loadOrgTab(orgTab, refresh) {
 	if (!orgTab) {
-		orgTab = $('div[id^=orgTab-' + $('#orgTabs').tabs('option','active') + ']');
+		orgTab = $('div.orgTab[id^=orgTab-' + $('#orgTabs').tabs('option','active') + ']');
 	}
 	if (refresh || !orgTab.text()) {
-		var orgId = orgTab.attr("id").split('-')[2];
+		var orgTabId = orgTab.attr("id");
+		var orgId = orgTabId.split('-')[3];
 		
 		orgTab.load(
 			"displayGroup.do",
@@ -191,12 +171,11 @@ function loadOrgTab(orgTab, refresh) {
 				orgId   : orgId
 			},
 			function() {
-				$('.mycourses-left-buttons', orgTab).remove();
-				toggleGroupContents(orgTab, stateId);
 				$("a[class*='thickbox']", orgTab).each(function() {
 					tb_init(this);
 				});
-				initMoreActions(orgTab);
+				
+				initButtons(orgTabId);
 			});
 	}
 }
@@ -287,6 +266,37 @@ function loadGroupContents(courseBg, stateId) {
 	});
 }
 
+function initButtons(containerId) {
+	var container = containerId ? $('#' + containerId) : document;
+
+	$(".ui-button", container).button();
+	$(".split-ui-button", container).each(function(){
+		var buttonContainer = $(this);
+		var buttons = buttonContainer.children();
+		buttons.first().button();
+		if (buttons.length > 1) {
+			buttons.last().button({
+				text : false,
+				icons : {
+					primary : "ui-icon-triangle-1-s"
+				}
+			});
+		}
+		
+		buttons.last().click(function() {
+			var menu = $(this).parent().next().show().position({
+				my : "left top",
+				at : "left bottom",
+				of : $(this)
+			});
+			$(document).one("click", function() {
+				menu.hide();
+			});
+			return false;
+		}).parent().buttonset().next().hide().menu();
+	});
+}
+
 function initMoreActions(element) {
 
 	var id = jQuery(element).attr("id");
@@ -338,6 +348,23 @@ function makeOrgSortable(orgId) {
 	}
 }
 
+// for redesigned main.jsp
+function makeOrgSortable2(orgId) {
+	var org = jQuery("div.orgTab[id$='-org-" + orgId + "']");
+	$(".lesson-table", org).each(function() {
+		makeSortable(this);
+	});
+	
+	$("a.sorting", org).attr({
+		"onClick" : null,
+		"title"   : LABELS.SORTING_DISABLE
+	}).off('click').click(function(){
+		makeOrgUnsortable2(orgId);
+	}).find("img")
+	  .attr("src", "images/sorting_enabled.gif");
+	
+}
+
 function makeOrgUnsortable(orgId) {
 	var org = jQuery("div.course-bg#" + orgId);
 	var jLessons = jQuery("div.j-lessons#" + orgId + "-lessons");
@@ -353,12 +380,28 @@ function makeOrgUnsortable(orgId) {
 					+ "\"><img src=\"images/sorting_disabled.gif\"></a>");
 }
 
+function makeOrgUnsortable2(orgId) {
+	var org = jQuery("div.orgTab[id$='-org-" + orgId + "']");
+	$(".lesson-table", org).each(function() {
+		$(this).sortable('destroy');
+	});
+	
+	$("a.sorting", org).attr({
+		"onClick" : null,
+		"title"   : LABELS.SORTING_ENABLE
+	}).off('click').click(function(){
+		makeOrgSortable2(orgId);
+	}).find("img")
+	  .attr("src", "images/sorting_disabled.gif");
+}
+
 function makeSortable(element) {
-	jQuery(element).sortable(
+	$(element).sortable(
 			{
 				axis : "y",
 				delay : 100,
 				tolerance : 'pointer',
+				cursor : 'n-resize',
 				helper : function(e, tr) {
 					var $originals = tr.children();
 					var $helper = tr.clone();
@@ -373,15 +416,18 @@ function makeSortable(element) {
 				forcePlaceholderSize : true,
 				containment : 'parent',
 				stop : function() {
-					var ids = jQuery(this).sortable('toArray');
+					var ids = $(this).sortable('toArray');
 
-					var jLessonsId = jQuery(this).parents(
+					var jLessonsId = $(this).parents(
 							"div[class$='lessons']").attr("id");
+					if (!jLessonsId) {
+						jLessonsId = $(this).attr("id");
+					}
 					var dashIndex = jLessonsId.indexOf("-");
 					var orgId = (dashIndex > 0 ? jLessonsId.substring(0,
 							dashIndex) : jLessonsId);
 
-					jQuery.ajax({
+					$.ajax({
 						url : "servlet/saveLessonOrder",
 						data : {
 							orgId : orgId,

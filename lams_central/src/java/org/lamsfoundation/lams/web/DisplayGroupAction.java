@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -121,7 +122,7 @@ public class DisplayGroupAction extends Action {
 		}
 	    }
 
-	    IndexOrgBean iob;
+	    IndexOrgBean iob = null;
 	    if (StringUtils.equals(display, "contents")) {
 		iob = new IndexOrgBean(org.getOrganisationId(), org.getName(), org.getOrganisationType()
 			.getOrganisationTypeId());
@@ -139,6 +140,7 @@ public class DisplayGroupAction extends Action {
 
 	    request.setAttribute("orgBean", iob);
 	    request.setAttribute("allowSorting", allowSorting);
+	    iob.setAllowSorting(allowSorting && iob.getAllowSorting());
 	    if (org.getEnableSingleActivityLessons()
 		    && (contains(roles, Role.ROLE_GROUP_MANAGER) || contains(roles, Role.ROLE_MONITOR))) {
 		// if sinble activity lessons are enabled, put sorted list of tools
@@ -282,6 +284,9 @@ public class DisplayGroupAction extends Action {
 	    DisplayGroupAction.log.error("Failed retrieving user's lessons from database: " + e, e);
 	}
 	orgBean.setLessons(lessonBeans);
+	if (!lessonBeans.isEmpty()) {
+	   orgBean.setAllowSorting(true);
+	}
 
 	// create subgroup beans
 	if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
@@ -306,7 +311,12 @@ public class DisplayGroupAction extends Action {
 		    if (contains(roles, Role.ROLE_GROUP_MANAGER)) {
 			classRoles.add(Role.ROLE_GROUP_MANAGER);
 		    }
-		    childOrgBeans.add(createHeaderOrgBean(organisation, classRoles, username, isSysAdmin, true));
+		    IndexOrgBean childOrgBean = createHeaderOrgBean(organisation, classRoles, username, isSysAdmin,
+			    true);
+		    childOrgBeans.add(childOrgBean);
+		    if (childOrgBean.getLessons() != null && !childOrgBean.getLessons().isEmpty()) {
+			orgBean.setAllowSorting(true);
+		    }
 		}
 	    }
 	    Collections.sort(childOrgBeans);
@@ -333,7 +343,7 @@ public class DisplayGroupAction extends Action {
 	}
 
 	for (IndexLessonBean bean : map.values()) {
-	    List<IndexLinkBean> lessonLinks = new ArrayList<IndexLinkBean>();
+	    LinkedList<IndexLinkBean> lessonLinks = new LinkedList<IndexLinkBean>();
 	    String url = null;
 	    Integer lessonStateId = bean.getState();
 	    if (stateId.equals(OrganisationState.ACTIVE)) {
@@ -345,7 +355,7 @@ public class DisplayGroupAction extends Action {
 	    } else if (stateId.equals(OrganisationState.ARCHIVED)) {
 		if (contains(roles, Role.ROLE_LEARNER)) {
 		    if (lessonStateId.equals(Lesson.STARTED_STATE) || lessonStateId.equals(Lesson.FINISHED_STATE)) {
-			lessonLinks.add(new IndexLinkBean("label.export.portfolio", "javascript:openExportPortfolio("
+			lessonLinks.addFirst(new IndexLinkBean("label.export.portfolio", "javascript:openExportPortfolio("
 				+ bean.getId() + ")"));
 		    }
 		}
@@ -373,20 +383,20 @@ public class DisplayGroupAction extends Action {
 	    if (map.containsKey(bean.getId())) {
 		bean = map.get(bean.getId());
 	    }
-	    List<IndexLinkBean> lessonLinks = bean.getLinks();
+	    LinkedList<IndexLinkBean> lessonLinks = (LinkedList<IndexLinkBean>) bean.getLinks();
 	    if (lessonLinks == null) {
-		lessonLinks = new ArrayList<IndexLinkBean>();
+		lessonLinks = new LinkedList<IndexLinkBean>();
 	    }
 
 	    if ((isGroupManagerOrMonitor && stateId.equals(OrganisationState.ACTIVE))
 		    || (stateId.equals(OrganisationState.ARCHIVED) && contains(roles, Role.ROLE_GROUP_MANAGER))) {
-		lessonLinks.add(new IndexLinkBean("index.monitor", "javascript:showMonitorLessonDialog(" + bean.getId()
+		lessonLinks.addFirst(new IndexLinkBean("index.monitor", "javascript:showMonitorLessonDialog(" + bean.getId()
 			+ ")", null, "mycourses-monitor-img", null));
 	    }
 
 	    // Adding lesson notifications links if enabled
 	    if (isGroupManagerOrMonitor && bean.isEnableLessonNotifications()) {
-		lessonLinks.add(new IndexLinkBean("index.emailnotifications",
+		lessonLinks.addFirst(new IndexLinkBean("index.emailnotifications",
 			"javascript:showNotificationsDialog(null," + bean.getId() + ")", null,
 			"mycourses-notifications-img", "index.emailnotifications.tooltip"));
 	    }
@@ -400,7 +410,7 @@ public class DisplayGroupAction extends Action {
 		    String link = "javascript:openGradebookLessonMonitorPopup(" + "'" + encodedOrgName + "','"
 			    + Configuration.get(ConfigurationKeys.SERVER_URL)
 			    + "/gradebook/gradebookMonitoring.do?lessonID=" + bean.getId() + "'," + "850,700,0,0);";
-		    lessonLinks.add(new IndexLinkBean("index.coursegradebookmonitor", link, null, "mycourses-mark-img",
+		    lessonLinks.addFirst(new IndexLinkBean("index.coursegradebookmonitor", link, null, "mycourses-mark-img",
 			    null));
 		} catch (UnsupportedEncodingException e) {
 		    DisplayGroupAction.log.error(
@@ -413,14 +423,14 @@ public class DisplayGroupAction extends Action {
 		String conditionsLink = Configuration.get(ConfigurationKeys.SERVER_URL)
 			+ "/lessonConditions.do?method=getIndexLessonConditions&" + CentralConstants.PARAM_LESSON_ID
 			+ "=" + bean.getId() + "&KeepThis=true&TB_iframe=true&height=480&width=610";
-		lessonLinks.add(new IndexLinkBean("index.conditions", conditionsLink, "thickbox" + orgId,
+		lessonLinks.addFirst(new IndexLinkBean("index.conditions", conditionsLink, "thickbox" + orgId,
 			"mycourses-conditions-img", "index.conditions.tooltip"));
 	    }
 
 	    // Add delete lesson option
 	    if (isGroupManagerOrMonitor) {
 		String removeLessonLink = "javascript:removeLesson(" + bean.getId() + ")";
-		lessonLinks.add(new IndexLinkBean("index.remove.lesson", removeLessonLink, null,
+		lessonLinks.addFirst(new IndexLinkBean("index.remove.lesson", removeLessonLink, null,
 			"mycourses-removelesson-img", "index.remove.lesson.tooltip"));
 	    }
 

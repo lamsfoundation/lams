@@ -3,7 +3,7 @@
 }
 
 td#messageCell {
-	width: 80%;
+	width: 75%;
 }
 
 #message {
@@ -13,8 +13,12 @@ td#messageCell {
 	border: 1px solid #3c78b5;
 }
 
-#linksCell div {
-	margin: 0 5px 15px 0;
+.linksCell {
+	padding: 0 0 10px 0;
+}
+
+.linksCell div {
+	margin: 0 5px 5px 0;
 }
 
 .dialogContainer {
@@ -52,74 +56,17 @@ td#messageCell {
 	border-left: none;
 }
 
-#content-main .row {
-	overflow: visible;
-}
-
-#content-main .mycourses-right-buttons a {
-	display: block;
-	padding-bottom: 4px;
-}
-
-#content-main .split-menu-button>ul {
-	margin: 0;
-}
-
-#content-main .split-menu-button ul li>a {
-	background-color: inherit;
-}
-
-#content-main .split-menu-button ul li ul {
-	font-size: 11px;
-}
-
-#content-main .split-menu-button ul li ul li {
-	padding-top: 0;
-	padding-bottom: 0;
-}
-
-#content-main .split-menu-button ul li ul li a {
-	padding-bottom: 0;
-}
-
-#content-main .split-menu-button a.add-lesson-button{
-	border-top: none;
-	border-left: none;
-	padding-top: 0;
-	padding-right: 2px;
-}
-
-#content-main .split-menu-button a.sequence-action-link {
-	padding-top: 1px;
-}
-
-#content-main .split-menu-button a.add-lesson-button span,
-#content-main .split-menu-button a.sequence-action-link span {
-	display: block;
-	float: left;
-	padding-top: 4px;
-}
-
-#content-main .split-menu-button a.add-lesson-button img {
-	display: block;
-	float: right;
-	padding-top: 3px;
+.sorting img {
 	border: none;
-}
-
-#content-main .split-menu-button a.sequence-action-link img {
-	display: block;
-	float: right;
-	padding-top: 4px;
-	border: none;
-}
-
-#content-main .split-menu-button ul.button-menu span {
-	padding-left: 5px;
 }
 
 #content-main div.j-course-contents {
 	clear: both;
+	padding-top: 5px;
+}
+
+.lesson-actions a {
+	border-bottom: none;	
 }
 
 .ui-tabs-vertical {
@@ -149,6 +96,20 @@ td#messageCell {
 	display: block;
 	float: none;
 	border: none;
+}
+
+.split-ui-button + ul span {
+	color: #999;
+}
+
+.ui-button, .split-ui-button div {
+	font-size: 12px !important;
+	font-weight: normal !important;
+}
+
+.child-org-name {
+	float: left;
+	padding-top: 5px;
 }
 
 td#actionAccord {

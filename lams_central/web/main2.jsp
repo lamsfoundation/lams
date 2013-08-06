@@ -157,25 +157,23 @@
 				<td id="messageCell">
 					<div id="message">Important annoucements might be posted here...</div>
 				</td>
-				<td id="linksCell">
+				<td class="linksCell">
 					<c:if test="${not empty adminLinks}">
 						<c:forEach var="adminlink" items="${adminLinks}">
-							<div>
-								<a title="<fmt:message key="${adminlink.name}"/>" href='<c:out value="${adminlink.url}"/>' class="button">
+							<div class="ui-button" title="<fmt:message key="${adminlink.name}"/>" 
+							     onClick='<c:out value="${adminlink.url}"/>'>
 									<fmt:message key="${adminlink.name}"/>
-								</a>
 							</div> 
 						</c:forEach>
 					</c:if>
-					<div>
-						<a title="<fmt:message key="index.refresh.hint"/>" href="javascript:loadOrgTab(null, true)" class="button">
+				</td>
+				<td class="linksCell">
+					<div class="ui-button" title="<fmt:message key="index.refresh.hint"/>"
+						 onClick="javascript:loadOrgTab(null, true)">
 							<fmt:message key="index.refresh" />
-						</a>
 					</div>
-					<div>
-						<a href="home.do?method=logout" onClick="closeAllChildren()" class="button">
+					<div class="ui-button" onClick="javascript:closeAllChildren();document.location.href='home.do?method=logout'">
 							<fmt:message key="index.logout" />
-						</a>
 					</div>
 				</td>
 			</tr>
@@ -190,14 +188,14 @@
 									<ul>
 										<c:forEach items="${collapsedOrgDTOs}" var="dto" varStatus="status">
 											<li class="orgTabsHeader">
-												<a href="#orgTab-${status.index}-${dto.orgId}"><c:out value="${dto.orgName}" /></a>
+												<a href="#orgTab-${status.index}-org-${dto.orgId}"><c:out value="${dto.orgName}" /></a>
 											</li>
 										</c:forEach>
 									</ul>
 								</td>
 								<td id="orgTabsPanelCell" class="ui-widget-content ui-corner-all">
 									<c:forEach items="${collapsedOrgDTOs}" var="dto" varStatus="status">
-										<div id="orgTab-${status.index}-${dto.orgId}" class="orgTab"></div>
+										<div id="orgTab-${status.index}-org-${dto.orgId}" class="orgTab"></div>
 									</c:forEach>
 								</td>
 							</tr>
