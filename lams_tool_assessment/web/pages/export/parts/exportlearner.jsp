@@ -40,7 +40,7 @@
 	  				   	],
 
 	  				   	multiselect: false,
-	  				   	caption: "${question.title}"
+	  				   	caption: "${question.titleEscaped}"
   						/*  resetSelection() doesn't work in this version
 						    hope it'll be fixed in the next one
 						    

@@ -68,7 +68,6 @@ import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
-import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
@@ -654,7 +653,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(sessionId,
 		userId);
 	if (lastFinishedResult != null) {
-	    SortedSet questionResults = new TreeSet(new AssessmentQuestionResultComparator());
+	    SortedSet<AssessmentQuestionResult> questionResults = new TreeSet<AssessmentQuestionResult>(
+		    new AssessmentQuestionResultComparator());
 	    questionResults.addAll(lastFinishedResult.getQuestionResults());
 	    lastFinishedResult.setQuestionResults(questionResults);
 	    escapeQuotes(lastFinishedResult);
@@ -849,28 +849,28 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     private static void escapeQuotesInQuestionResult(AssessmentQuestionResult questionResult) {
 	String answerString = questionResult.getAnswerString();
 	if (answerString != null) {
-	    answerString = StringEscapeUtils.escapeJavaScript(answerString);
-	    questionResult.setAnswerString(answerString);
+	    String answerStringEscaped = StringEscapeUtils.escapeJavaScript(answerString);
+	    questionResult.setAnswerStringEscaped(answerStringEscaped);
 	}
 
 	AssessmentQuestion question = questionResult.getAssessmentQuestion();
 	String title = question.getTitle();
 	if (title != null) {
-	    title = StringEscapeUtils.escapeJavaScript(title);
-	    question.setTitle(title);
+	    String titleEscaped = StringEscapeUtils.escapeJavaScript(title);
+	    question.setTitleEscaped(titleEscaped);
 	}
 
 	for (AssessmentQuestionOption questionOption : question.getQuestionOptions()) {
 	    String questionStr = questionOption.getQuestion();
 	    if (questionStr != null) {
-		questionStr = StringEscapeUtils.escapeJavaScript(questionStr);
-		questionOption.setQuestion(questionStr);
+		String questionEscaped = StringEscapeUtils.escapeJavaScript(questionStr);
+		questionOption.setQuestionEscaped(questionEscaped);
 	    }
 
 	    String optionStr = questionOption.getOptionString();
 	    if (optionStr != null) {
-		optionStr = StringEscapeUtils.escapeJavaScript(optionStr);
-		questionOption.setOptionString(optionStr);
+		String optionEscaped = StringEscapeUtils.escapeJavaScript(optionStr);
+		questionOption.setOptionStringEscaped(optionEscaped);
 	    }
 	}
     }
@@ -1091,16 +1091,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	Assessment toContent = Assessment.newInstance(assessment, toContentId, assessmentToolContentHandler);
 	assessmentDao.saveObject(toContent);
-
-	// save assessment questions as well
-	Set questions = toContent.getQuestions();
-	if (questions != null) {
-	    Iterator iter = questions.iterator();
-	    while (iter.hasNext()) {
-		AssessmentQuestion question = (AssessmentQuestion) iter.next();
-		// createRootTopic(toContent.getUid(),null,msg);
-	    }
-	}
     }
 
     public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException {

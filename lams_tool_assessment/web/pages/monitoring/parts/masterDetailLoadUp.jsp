@@ -10,7 +10,7 @@
  	     		jQuery("#userSummary${assessmentResult.sessionId}").addRowData(${i.index + 1}, {
  	   	     		id:"${i.index + 1}",
  	   	   			questionResultUid:"${questionResult.uid}",
- 	   	   			title:"${questionResult.assessmentQuestion.title}",
+ 	   	   			title:"${questionResult.assessmentQuestion.titleEscaped}",
  	   	   			response:responseStr,
  	   	   			grade:"<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
  	   	   	    });	

@@ -55,7 +55,7 @@ public class AssessmentOptionAnswer implements Cloneable {
 	return uid;
     }
 
-    private void setUid(Long uid) {
+    public void setUid(Long uid) {
 	this.uid = uid;
     }
     

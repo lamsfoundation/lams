@@ -52,6 +52,7 @@ public class AssessmentQuestionResult {
     // DTO fields:
     private Date finishDate;
     private AssessmentUser user;
+    private String answerStringEscaped;
     
     public AssessmentQuestionResult() {
 	optionAnswers = new LinkedHashSet<AssessmentOptionAnswer>();
@@ -208,6 +209,14 @@ public class AssessmentQuestionResult {
     }
     public void setUser(AssessmentUser user) {
 	this.user = user;
+    }
+    
+    public String getAnswerStringEscaped() {
+	return answerStringEscaped;
+    }
+
+    public void setAnswerStringEscaped(String answerStringEscaped) {
+	this.answerStringEscaped = answerStringEscaped;
     }
  
 }

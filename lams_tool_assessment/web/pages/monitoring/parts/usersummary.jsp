@@ -52,7 +52,7 @@
 	  				   	],
 	  				   	
 	  				   	multiselect: false,
-	  				   	caption: "${question.title}",
+	  				   	caption: "${question.titleEscaped}",
 	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>',
 	  				  	cellEdit: true,
 	  				  	beforeEditCell: function (rowid,name,val,iRow,iCol){

@@ -55,6 +55,10 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
     private int answerInt = -1;
     
     private boolean answerBoolean;
+    
+    private String questionEscaped;
+    
+    private String optionStringEscaped;
 
     // **********************************************************
     // Get/Set methods
@@ -191,7 +195,21 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
     }
     public void setAnswerBoolean(boolean answerBoolean) {
 	this.answerBoolean = answerBoolean;
-    }    
+    }
+    
+    public String getQuestionEscaped() {
+	return questionEscaped;
+    }
+    public void setQuestionEscaped(String questionEscaped) {
+	this.questionEscaped = questionEscaped;
+    }
+    
+    public String getOptionStringEscaped() {
+	return optionStringEscaped;
+    }
+    public void setOptionStringEscaped(String optionStringEscaped) {
+	this.optionStringEscaped = optionStringEscaped;
+    }
 
     @Override
     public Object clone() {

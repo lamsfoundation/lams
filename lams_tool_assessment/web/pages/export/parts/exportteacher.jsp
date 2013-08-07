@@ -31,7 +31,7 @@
 	  				   	colNames:['#',
 	  							"<fmt:message key="label.monitoring.summary.user.name" />",
 	  				   	        <c:forEach var="question" items="${assessment.questions}">
-	  				   	     		"${question.title}", 
+	  				   	     		"${question.titleEscaped}", 
 	  				   	        </c:forEach>
 	  						    "<fmt:message key="label.monitoring.summary.total" />"],
 	  						    

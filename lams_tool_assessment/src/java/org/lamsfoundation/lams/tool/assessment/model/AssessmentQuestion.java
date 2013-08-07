@@ -102,6 +102,8 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     
     private String questionFeedback;
     
+    private String titleEscaped;
+    
     /**
      * Grade acquired from QUestionReference in learner.
      */
@@ -504,6 +506,13 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
     public String getQuestionFeedback() {
 	return questionFeedback;
+    }
+    
+    public String getTitleEscaped() {
+	return titleEscaped;
+    }
+    public void setTitleEscaped(String titleEscaped) {
+	this.titleEscaped = titleEscaped;
     }
     
     /**
