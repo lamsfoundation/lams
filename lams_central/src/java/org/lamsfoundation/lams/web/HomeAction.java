@@ -30,7 +30,6 @@ import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
@@ -91,7 +90,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action-forward name="learner" path="/learner.jsp"
  * @struts:action-forward name="lessonIntro" path="/lessonIntro.jsp"
  * @struts:action-forward name="author" path="/author.jsp"
- * @struts:action-forward name="monitorLesson" path="/monitorLesson.jsp"
  * @struts:action-forward name="addLesson" path="/addLesson.jsp"
  * @struts:action-forward name="error" path=".error"
  * @struts:action-forward name="message" path=".message"
@@ -180,8 +178,8 @@ public class HomeAction extends DispatchAction {
 
 		    }
 		}
-		
-		//check lesson's state if its suitable for learner's access
+
+		// check lesson's state if its suitable for learner's access
 		if (!lesson.isLessonAccessibleForLearner()) {
 		    return displayMessage(mapping, req, "error.lesson.not.accessible.for.learners");
 		}
@@ -296,43 +294,29 @@ public class HomeAction extends DispatchAction {
     }
 
     /**
-     * request for monitor environment
+     * Request for Monitor environment.
      */
     public ActionForward monitorLesson(ActionMapping mapping, ActionForm form, HttpServletRequest req,
 	    HttpServletResponse res) throws IOException, ServletException {
-
-	try {
-	    HomeAction.log.debug("request monitorLesson");
-	    Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
-	    UserDTO user = getUser();
-	    if (user == null) {
-		HomeAction.log.error("admin: User missing from session. ");
-		return mapping.findForward("error");
-	    } else {
-		Lesson lesson = lessonId != null ? getLessonService().getLesson(lessonId) : null;
-		if (lesson == null) {
-		    HomeAction.log.error("monitorLesson: Lesson " + lessonId
-			    + " does not exist. Unable to monitor lesson");
-		    return mapping.findForward("error");
-		}
-
-		if ((lesson.getLessonClass() == null)
-			|| (!lesson.getLessonClass().isStaffMember(getRealUser(user)) && !req
-				.isUserInRole(Role.GROUP_MANAGER))) {
-		    HomeAction.log.error("learner: User " + user.getLogin()
-			    + " is not a learner in the requested lesson. Cannot access the lesson.");
-		    return displayMessage(mapping, req, "error.authorisation");
-		}
-
-		HomeAction.log.debug("user is staff");
-		String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
-		req.setAttribute("serverUrl", serverUrl);
-		req.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
-		return mapping.findForward("monitorLesson");
-	    }
-	} catch (Exception e) {
-	    HomeAction.log.error("Failed to load monitor lesson", e);
+	if (HomeAction.log.isDebugEnabled()) {
+	    HomeAction.log.debug("Requested Lesson Monitor");
+	}
+	Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
+	UserDTO user = getUser();
+	if (user == null) {
+	    HomeAction.log.error("User missing from session. Can not open Lesson Monitor.");
 	    return mapping.findForward("error");
+	} else {
+	    Lesson lesson = lessonId == null ? null : getLessonService().getLesson(lessonId);
+	    if (lesson == null) {
+		HomeAction.log.error("Lesson " + lessonId + " does not exist. Can not open Lesson Monitor.");
+		return mapping.findForward("error");
+	    }
+
+	    String url = Configuration.get(ConfigurationKeys.SERVER_URL)
+		    + "monitoring/monitoring.do?method=monitorLesson&lessonID=" + lessonId;
+	    res.sendRedirect(url);
+	    return null;
 	}
     }
 

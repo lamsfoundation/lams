@@ -55,6 +55,18 @@ import org.lamsfoundation.lams.util.MessageService;
  */
 public interface IMonitoringService {
 
+    /**
+     * Checks whether the user is a staff member for the lesson, the creator of the lesson or simply a group manager. If
+     * not, throws a UserAccessDeniedException exception
+     */
+    public void checkOwnerOrStaffMember(Integer userId, Long lessonId, String actionDescription);
+
+    /**
+     * Checks whether the user is a staff member for the lesson, the creator of the lesson or simply a group manager. If
+     * not, throws a UserAccessDeniedException exception
+     */
+    public void checkOwnerOrStaffMember(Integer userId, Lesson lesson, String actionDescription);
+
     /** Get the message service, which gives access to the I18N text */
     public MessageService getMessageService();
 

@@ -1167,6 +1167,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
+	monitoringService.checkOwnerOrStaffMember(user.getUserID(), lessonId, "monitor lesson");
+	
 	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonId);
 
 	if (contributeActivities != null) {

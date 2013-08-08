@@ -374,11 +374,15 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	auditService.log("Monitoring", message);
     }
 
+    public void checkOwnerOrStaffMember(Integer userId, Long lessonId, String actionDescription) {
+	checkOwnerOrStaffMember(userId, lessonDAO.getLesson(lessonId), actionDescription);
+    }
+
     /**
      * Checks whether the user is a staff member for the lesson, the creator of the lesson or simply a group manager. If
      * not, throws a UserAccessDeniedException exception
      */
-    private void checkOwnerOrStaffMember(Integer userId, Lesson lesson, String actionDescription) {
+    public void checkOwnerOrStaffMember(Integer userId, Lesson lesson, String actionDescription) {
 	User user = (User) baseDAO.find(User.class, userId);
 
 	if ((lesson.getUser() != null) && lesson.getUser().getUserId().equals(userId)) {
@@ -495,10 +499,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    throw new MonitoringServiceException("Learning design for id=" + learningDesignID
 		    + " is missing. Unable to initialize lesson.");
 	}
-	Lesson lesson = createNewLesson(lessonName, lessonDescription, user, learningDesign,
-		enableLessonIntro, displayDesignImage, learnerExportAvailable, learnerPresenceAvailable,
-		learnerImAvailable, liveEditEnabled, enableLessonNotifications, scheduledNumberDaysToLessonFinish,
-		precedingLesson);
+	Lesson lesson = createNewLesson(lessonName, lessonDescription, user, learningDesign, enableLessonIntro,
+		displayDesignImage, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
+		liveEditEnabled, enableLessonNotifications, scheduledNumberDaysToLessonFinish, precedingLesson);
 	auditAction(MonitoringService.AUDIT_LESSON_CREATED_KEY, new Object[] { lessonName, learningDesign.getTitle(),
 		learnerExportAvailable });
 	return lesson;
