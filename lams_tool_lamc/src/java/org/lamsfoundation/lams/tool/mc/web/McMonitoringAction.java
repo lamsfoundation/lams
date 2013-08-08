@@ -3177,12 +3177,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(request, mcContent, mcService);
 	List listMonitoredMarksContainerDTO = MonitoringUtil.buildGroupsMarkData(request, mcContent, mcService);
 
-	Map mapOptionsContent = new TreeMap(new McComparator());
-	mapOptionsContent.clear();
-
-	Iterator queIterator = mcContent.getMcQueContents().iterator();
-	Long mapIndex = new Long(1);
-
 	int idx = 0;
 
 	Iterator marksIterator = listMonitoredMarksContainerDTO.iterator();
@@ -3223,7 +3217,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 		    cell = row.createCell(count++);
 		    cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.question.mark",
-			    new Object[] { count - 1, mcMonitoredAnswersDTO.getMark() }));
+			    new Object[] { count - 2, mcMonitoredAnswersDTO.getMark() }));
 		}
 
 		cell = row.createCell(count++);
