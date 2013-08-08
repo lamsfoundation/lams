@@ -61,7 +61,9 @@ public class LessonOrderServlet extends HttpServlet {
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response) 
 		throws ServletException, IOException {
-		
+	    	// even though response is empty, it is needed so Firefox does not show parsing error
+	    	response.setContentType("text/html;charset=utf-8");
+	    
 		Integer orgId = WebUtil.readIntParam(request, "orgId", false);
 		String ids = request.getParameter("ids");
 		

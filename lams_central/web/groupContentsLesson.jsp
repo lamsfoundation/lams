@@ -37,7 +37,7 @@
 				>
 					<div class="${lessonlink.spanStyle} mycourses-div">
 						<span class="lesson-action-label">
-							<br /><br /><fmt:message key="${lessonlink.name}" />
+							<br /><fmt:message key="${lessonlink.name}" />
 						</span>
 					</div>
 				</a>

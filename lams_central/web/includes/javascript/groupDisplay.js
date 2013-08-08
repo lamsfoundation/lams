@@ -273,27 +273,33 @@ function initButtons(containerId) {
 	$(".split-ui-button", container).each(function(){
 		var buttonContainer = $(this);
 		var buttons = buttonContainer.children();
-		buttons.first().button();
-		if (buttons.length > 1) {
-			buttons.last().button({
-				text : false,
-				icons : {
-					primary : "ui-icon-triangle-1-s"
-				}
-			});
-		}
 		
-		buttons.last().click(function() {
-			var menu = $(this).parent().next().show().position({
-				my : "left top",
-				at : "left bottom",
-				of : $(this)
-			});
-			$(document).one("click", function() {
-				menu.hide();
-			});
-			return false;
-		}).parent().buttonset().next().hide().menu();
+		buttons.first().button()
+			   .next().button({
+			text : false,
+			icons : {
+				primary : "ui-icon-triangle-1-s"
+			}
+		});
+		
+		buttonContainer.buttonset().next().hide().menu();
+		
+		buttons.each(function(){
+			var button = $(this);
+			if (!button.attr('onclick')) {
+				button.click(function() {
+					var menu = $(this).parent().next().show().position({
+						my : "right top",
+						at : "right bottom",
+						of : $(this).parent()
+					});
+					$(document).one("click", function() {
+						menu.hide();
+					});
+					return false;
+				});
+			}
+		});
 	});
 }
 

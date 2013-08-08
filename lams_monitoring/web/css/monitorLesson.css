@@ -3,6 +3,7 @@ div#tabs {
 	width: 99%;
 	height: 574px;
 	overflow: hidden;
+	border: none;
 }
 
 .ui-tabs .ui-tabs-panel {

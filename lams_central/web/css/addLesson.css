@@ -1,6 +1,7 @@
 div#tabs {
-	width: 786px;
+	width: 789px;
 	height: 574px;
+	border: none;
 }
 
 div.tabContent {

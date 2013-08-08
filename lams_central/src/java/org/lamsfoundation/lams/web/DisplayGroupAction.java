@@ -246,7 +246,7 @@ public class DisplayGroupAction extends Action {
 				+ Configuration.get(ConfigurationKeys.SERVER_URL)
 				+ "/gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID="
 				+ org.getOrganisationId() + "'," + "850,400,0,0);";
-			moreLinks.add(new IndexLinkBean("index.coursegradebook.subgroup", link, "mycourses-mark-img",
+			moreLinks.add(new IndexLinkBean("index.coursegradebook.subgroup", link, "my-grades-button",
 				null, null));
 		    } catch (UnsupportedEncodingException e) {
 			DisplayGroupAction.log.error(
