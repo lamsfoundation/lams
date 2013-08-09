@@ -50,7 +50,12 @@
 					REMOVE_LESSON_CONFIRM2 : '<fmt:message key="index.remove.lesson.confirm2"/>',
 					SORTING_ENABLE : '<fmt:message key="label.enable.lesson.sorting"/>',
 					SORTING_DISABLE : '<fmt:message key="label.disable.lesson.sorting"/>',
-					SINGLE_ACTIVITY_LESSON_TITLE : '<fmt:message key="index.single.activity.lesson.title"/>'
+					SINGLE_ACTIVITY_LESSON_TITLE : '<fmt:message key="index.single.activity.lesson.title"/>',
+					GRADEBOOK_COURSE_TITLE : '<fmt:message key="index.gradebook.course.title"/>',
+					GRADEBOOK_LESSON_TITLE : '<fmt:message key="index.gradebook.lesson.title"/>',
+					GRADEBOOK_LEARNER_TITLE : '<fmt:message key="index.gradebook.learner.title"/>',
+					CONDITIONS_TITLE : '<fmt:message key="index.conditions.title"/>',
+					SEARCH_LESSON_TITLE : '<fmt:message key="index.search.lesson.title"/>'
 			}
 			
 			var tabName = '${tab}';
@@ -240,17 +245,8 @@
 	</div>
 </div>
 
-<div id="addLessonDialog" class="dialogContainer">
-	<iframe id="addLessonFrame"></iframe>
-</div>
-<div id="addSingleActivityLessonDialog" class="dialogContainer">
-	<iframe id="addSingleActivityLessonFrame"></iframe>
-</div>
-<div id="monitorDialog" class="dialogContainer">
-	<iframe id="monitorFrame"></iframe>
-</div>
-<div id="notificationsDialog" class="dialogContainer">
-	<iframe id="notificationsFrame"></iframe>
+<div id="dialogContainer">
+	<iframe id="dialogFrame"></iframe>
 </div>
 
 </body>

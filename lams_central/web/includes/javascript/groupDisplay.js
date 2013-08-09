@@ -13,146 +13,6 @@ function initMainPage() {
 	$("#actionAccord").accordion({
 		'heightStyle' : 'content'
 	});
-
-	// initialise lesson dialog
-	$('#addLessonDialog').dialog(
-		{
-			'autoOpen' : false,
-			'height' : 600,
-			'width' : 800,
-			'modal' : true,
-			'resizable' : false,
-			'hide' : 'fold',
-			'open' : function() {
-				// load contents after opening the dialog
-				$('#addLessonFrame')
-						.attr(
-								'src',
-								LAMS_URL
-										+ 'home.do?method=addLesson&organisationID='
-										+ $(this).dialog('option',
-												'orgID'));
-			},
-			'close' : function() {
-				// refresh if lesson was added
-				if ($(this).dialog('option', 'refresh')) {
-					loadOrgTab(null, true);
-				}
-			}
-		// tabs are the title bar, so remove dialog's one
-		}).closest('.ui-dialog').children('.ui-dialog-titlebar')
-		  .remove();
-	
-	// initialise single activity lesson dialog
-	$('#addSingleActivityLessonFrame').load(function(){
-		if ($(this).contents().find('span.editForm').length > 0){
-			closeAddSingleActivityLessonDialog('save');
-		}
-	});
-	$('#addSingleActivityLessonDialog').dialog(
-		{
-			'autoOpen' : false,
-			'height' : 600,
-			'width' : 850,
-			'modal' : true,
-			'resizable' : false,
-			'hide' : 'fold',
-			'title' : LABELS.SINGLE_ACTIVITY_LESSON_TITLE,
-			'open' : function() {
-				var dialog = $(this);
-				var toolID = dialog.dialog('option', 'toolID');
-				$.ajax({
-					async : false,
-					cache : false,
-					url : LAMS_URL + "authoring/author.do",
-					dataType : 'json',
-					data : {
-						'method' : 'createToolContent',
-						'toolID' : toolID
-					},
-					success : function(response) {
-						dialog.dialog('option', 'toolContentID', response.toolContentID);
-						dialog.dialog('option', 'contentFolderID', response.contentFolderID);
-						$('#addSingleActivityLessonFrame').attr('src',
-								response.authorURL + '&notifyCloseURL='
-								+ encodeURIComponent(LAMS_URL
-										+ 'dialogCloser.jsp?function=closeAddSingleActivityLessonDialog&noopener=true'));
-					}
-				});
-			},
-			'close' : function() {
-				$('#addSingleActivityLessonFrame').attr('src', null);
-				// refresh if lesson was added
-				if ($(this).dialog('option', 'refresh')) {
-					loadOrgTab(null, true);
-				}
-			}
-		});
-	
-	// initialise monitor dialog
-	$('#monitorDialog').dialog(
-		{
-			'autoOpen' : false,
-			'height' : 600,
-			'width' : 1024,
-			'modal' : true,
-			'resizable' : false,
-			'hide' : 'fold',
-			'open' : function() {
-				// load contents after opening the dialog
-				$('#monitorFrame')
-						.attr(
-								'src',
-								LAMS_URL
-										+ 'home.do?method=monitorLesson&lessonID='
-										+ $(this).dialog('option',
-												'lessonID'));
-			},
-			'close' : function() {
-				// refresh if lesson was added
-				if ($(this).dialog('option', 'refresh')) {
-					loadOrgTab(null, true);
-				}
-			}
-		}).closest('.ui-dialog').children('.ui-dialog-titlebar')
-		  .remove();
-
-	// initialise notifications dialog
-	$('#notificationsDialog').dialog(
-		{
-			'autoOpen' : false,
-			'height' : 600,
-			'width' : 850,
-			'modal' : true,
-			'resizable' : false,
-			'hide' : 'fold',
-			'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
-			'open' : function() {
-				var lessonID = $(this).dialog('option', 'lessonID');
-				// if lesson ID is given, use lesson view; otherwise
-				// use course view
-				if (lessonID) {
-					// load contents after opening the dialog
-					$('#notificationsFrame')
-							.attr(
-									'src',
-									LAMS_URL
-											+ 'monitoring/emailNotifications.do?method=getLessonView&lessonID='
-											+ lessonID);
-				} else {
-					var orgID = $(this).dialog('option', 'orgID');
-					$('#notificationsFrame')
-							.attr(
-									'src',
-									LAMS_URL
-											+ 'monitoring/emailNotifications.do?method=getCourseView&organisationID='
-											+ orgID);
-				}
-			},
-			'close' : function() {
-				$('#notificationsFrame').attr('src', null);
-			}
-		});
 }
 
 function loadOrgTab(orgTab, refresh) {
@@ -448,38 +308,292 @@ function makeSortable(element) {
 }
 
 function showMonitorLessonDialog(lessonID) {
-	$("#monitorDialog").dialog('option', 'lessonID', lessonID).dialog('open');
+	var dialog = $('#dialogContainer').dialog({
+		'lessonID' : lessonID,
+		'autoOpen' : false,
+		'height' : 600,
+		'width' : 1024,
+		'modal' : true,
+		'resizable' : false,
+		'hide' : 'fold',
+		'open' : function() {
+			// load contents after opening the dialog
+			$('#dialogFrame').attr('src', LAMS_URL
+				+ 'home.do?method=monitorLesson&lessonID='
+				+ $(this).dialog('option', 'lessonID'));
+		},
+		'beforeClose' : function(){
+			$('#dialogFrame').attr('src', null);
+		},
+		'close' : function() {
+			// refresh if lesson was added
+			if ($(this).dialog('option', 'refresh')) {
+				loadOrgTab(null, true);
+			}
+			$(this).dialog('destroy');
+		}
+	});
+	// tabs are the title bar, so remove dialog's one
+	dialog.closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
+	dialog.dialog('open');
 }
 
 function showAddLessonDialog(orgID) {
-	$("#addLessonDialog").dialog('option', 'orgID', orgID).dialog('open');
+	var dialog = $('#dialogContainer').dialog({
+		'orgID' : orgID,
+		'autoOpen' : false,
+		'height' : 600,
+		'width' : 800,
+		'modal' : true,
+		'resizable' : false,
+		'hide' : 'fold',
+		'open' : function() {
+			// load contents after opening the dialog
+			$('#dialogFrame')
+					.attr('src', LAMS_URL
+						+ 'home.do?method=addLesson&organisationID='
+						+ $(this).dialog('option', 'orgID'));
+		},
+		'beforeClose' : function(){
+			$('#dialogFrame').attr('src', null);
+		},
+		'close' : function() {
+			// refresh if lesson was added
+			if ($(this).dialog('option', 'refresh')) {
+				loadOrgTab(null, true);
+			}
+			$(this).dialog('destroy');
+		}
+	});
+	// tabs are the title bar, so remove dialog's one
+	dialog.closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
+	dialog.dialog('open');
 }
 
 function showAddSingleActivityLessonDialog(orgID, toolID) {
-	$("#addSingleActivityLessonDialog").dialog('option', {
+	$('#dialogContainer').dialog({
 		'orgID' : orgID,
-		'toolID' : toolID
+		'toolID' : toolID,
+		'autoOpen' : false,
+		'height' : 600,
+		'width' : 850,
+		'modal' : true,
+		'resizable' : false,
+		'hide' : 'fold',
+		'title' : LABELS.SINGLE_ACTIVITY_LESSON_TITLE,
+		'open' : function() {
+			var dialog = $(this);
+			var toolID = dialog.dialog('option', 'toolID');
+			$.ajax({
+				async : false,
+				cache : false,
+				url : LAMS_URL + "authoring/author.do",
+				dataType : 'json',
+				data : {
+					'method' : 'createToolContent',
+					'toolID' : toolID
+				},
+				success : function(response) {
+					dialog.dialog('option', {
+						'toolContentID' :  response.toolContentID,
+						'contentFolderID' : response.contentFolderID
+					});
+
+					$('#dialogFrame').load(function(){
+						if ($(this).contents().find('span.editForm').length > 0){
+							closeAddSingleActivityLessonDialog('save');
+						}
+					})
+					.attr('src', response.authorURL + '&notifyCloseURL='
+						+ encodeURIComponent(LAMS_URL
+						+ 'dialogCloser.jsp?function=closeAddSingleActivityLessonDialog&noopener=true'));
+				}
+			});
+		},
+		'beforeClose' : function(){
+			$('#dialogFrame').off('load').attr('src', null);
+		},
+		'close' : function() {
+			$('#dialogFrame').off('load').attr('src', null);
+			// refresh if lesson was added
+			if ($(this).dialog('option', 'refresh')) {
+				loadOrgTab(null, true);
+			}
+			$(this).dialog('destroy');
+		}
 	}).dialog('open');
 }
 
-function showNotificationsDialog(organisationID, lessonID) {
-	$("#notificationsDialog").dialog('option', {
-		'orgID' : organisationID,
-		'lessonID' : lessonID
+function showNotificationsDialog(orgID, lessonID) {
+	$('#dialogContainer').dialog({
+		'orgID' : orgID,
+		'lessonID' : lessonID,
+		'autoOpen' : false,
+		'height' : 600,
+		'width' : 850,
+		'modal' : true,
+		'resizable' : false,
+		'hide' : 'fold',
+		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
+		'open' : function() {
+			var lessonID = $(this).dialog('option', 'lessonID');
+			// if lesson ID is given, use lesson view; otherwise
+			// use course view
+			if (lessonID) {
+				// load contents after opening the dialog
+				$('#dialogFrame').attr('src', LAMS_URL
+					+ 'monitoring/emailNotifications.do?method=getLessonView&lessonID='
+					+ lessonID);
+			} else {
+				var orgID = $(this).dialog('option', 'orgID');
+				$('#dialogFrame').attr('src', LAMS_URL
+					+ 'monitoring/emailNotifications.do?method=getCourseView&organisationID='
+					+ orgID);
+			}
+		},
+		'beforeClose' : function(){
+			$('#dialogFrame').attr('src', null);
+		},
+		'close' : function() {
+			$(this).dialog('destroy');
+		}
+	}).dialog('open');
+}
+
+function showGradebookCourseDialog(orgID){
+	$('#dialogContainer').dialog({
+		'orgID' : orgID,
+		'autoOpen' : false,
+		'height' : 650,
+		'width' : 850,
+		'modal' : true,
+		'resizable' : false,
+		'hide' : 'fold',
+		'title' : LABELS.GRADEBOOK_COURSE_TITLE,
+		'open' : function() {
+			var orgID = $(this).dialog('option', 'orgID');
+			// load contents after opening the dialog
+			$('#dialogFrame').attr('src', LAMS_URL
+				+ 'gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID=' + orgID);
+		},
+		'beforeClose' : function(){
+			$('#dialogFrame').attr('src', null);
+		},
+		'close' : function() {
+			$(this).dialog('destroy');
+		}
+	}).dialog('open');
+}
+
+function showGradebookLessonDialog(lessonID){
+	$('#dialogContainer').dialog({
+		'lessonID' : lessonID,
+		'autoOpen' : false,
+		'height' : 650,
+		'width' : 850,
+		'modal' : true,
+		'resizable' : false,
+		'hide' : 'fold',
+		'title' : LABELS.GRADEBOOK_LESSON_TITLE,
+		'open' : function() {
+			var lessonID = $(this).dialog('option', 'lessonID');
+			// load contents after opening the dialog
+			$('#dialogFrame').attr('src', LAMS_URL
+				+ 'gradebook/gradebookMonitoring.do?lessonID=' + lessonID);
+		},
+		'beforeClose' : function(){
+			$('#dialogFrame').attr('src', null);
+		},
+		'close' : function() {
+			$(this).dialog('destroy');
+		}
+	}).dialog('open');
+}
+
+function showGradebookLearnerDialog(orgID){
+	$('#dialogContainer').dialog({
+		'orgID' : orgID,
+		'autoOpen' : false,
+		'height' : 400,
+		'width' : 750,
+		'modal' : true,
+		'resizable' : false,
+		'hide' : 'fold',
+		'title' : LABELS.GRADEBOOK_LEARNER_TITLE,
+		'open' : function() {
+			var orgID = $(this).dialog('option', 'orgID');
+			// load contents after opening the dialog
+			$('#dialogFrame').attr('src', LAMS_URL
+				+ 'gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID=' + orgID);
+		},
+		'beforeClose' : function(){
+			$('#dialogFrame').attr('src', null);
+		},
+		'close' : function() {
+			$(this).dialog('destroy');
+		}
+	}).dialog('open');
+}
+
+function showConditionsDialog(lessonID){
+	$('#dialogContainer').dialog({
+		'lessonID' : lessonID,
+		'autoOpen' : false,
+		'height' : 450,
+		'width' : 610,
+		'modal' : true,
+		'resizable' : false,
+		'hide' : 'fold',
+		'title' : LABELS.CONDITIONS_TITLE,
+		'open' : function() {
+			var lessonID = $(this).dialog('option', 'lessonID');
+			// load contents after opening the dialog
+			$('#dialogFrame').attr('src', LAMS_URL
+				+ 'lessonConditions.do?method=getIndexLessonConditions&lsId=' + lessonID);
+		},
+		'beforeClose' : function(){
+			$('#dialogFrame').attr('src', null);
+		},
+		'close' : function() {
+			$(this).dialog('destroy');
+		}
+	}).dialog('open');
+}
+
+function showSearchLessonDialog(orgID){
+	$('#dialogContainer').dialog({
+		'orgID' : orgID,
+		'autoOpen' : false,
+		'height' : 400,
+		'width' : 600,
+		'modal' : true,
+		'resizable' : false,
+		'hide' : 'fold',
+		'title' : LABELS.SEARCH_LESSON_TITLE,
+		'open' : function() {
+			var orgID = $(this).dialog('option', 'orgID');
+			// load contents after opening the dialog
+			$('#dialogFrame').attr('src', LAMS_URL
+				+ 'findUserLessons.do?dispatch=getResults&courseID=' + orgID);
+		},
+		'beforeClose' : function(){
+			$('#dialogFrame').attr('src', null);
+		},
+		'close' : function() {
+			$(this).dialog('destroy');
+		}
 	}).dialog('open');
 }
 
 function closeAddLessonDialog(refresh) {
-	$('#addLessonFrame').attr('src', null);
 	// was the dialog just closed or a new lesson really added?
 	// if latter, refresh the list
-	$("#addLessonDialog").dialog('option', 'refresh', refresh ? true : false)
+	$("#dialogContainer").dialog('option', 'refresh', refresh ? true : false)
 			.dialog('close');
 }
 
 function closeAddSingleActivityLessonDialog(action) {
-	$('#addSingleActivityLessonFrame').attr('src', null);
-	var dialog = $('#addSingleActivityLessonDialog');
+	var dialog = $('#dialogContainer');
 	var save = action == 'save';
 	
 	if (save) {
@@ -501,10 +615,9 @@ function closeAddSingleActivityLessonDialog(action) {
 }
 
 function closeMonitorLessonDialog(refresh) {
-	$('#monitorFrame').attr('src', null);
 	// was the dialog just closed or a new lesson really added?
 	// if latter, refresh the list
-	$("#monitorDialog").dialog('option', 'refresh', refresh ? true : false)
+	$("#dialogContainer").dialog('option', 'refresh', refresh ? true : false)
 			.dialog('close');
 }
 
