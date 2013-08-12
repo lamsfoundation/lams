@@ -57,22 +57,6 @@
 
 	<div class="group-box">
 
-		<p>
-			<c:choose>
-				<c:when test="${isOptionsWithSequencesActivity}">
-					<fmt:message key="message.activity.set.options.activityCount">
-						<fmt:param value="${optionsActivityForm.minimum}" />
-						<fmt:param value="${optionsActivityForm.maximum}" />
-					</fmt:message>
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="message.activity.options.activityCount">
-						<fmt:param value="${optionsActivityForm.minimum}" />
-						<fmt:param value="${optionsActivityForm.maximum}" />
-					</fmt:message>
-				</c:otherwise>
-			</c:choose>
-		</p>
 
 		<html:form action="/ChooseActivity" method="post"
 			onsubmit="return validate();">
@@ -114,6 +98,24 @@
 				</c:forEach>
 			</table>
 
+	    <c:if test="${optionsActivityForm.maximum != numActivities or optionsActivityForm.minimum != 0}">
+		<p class="error">
+			<c:choose>
+				<c:when test="${isOptionsWithSequencesActivity}">
+					<fmt:message key="message.activity.set.options.activityCount">
+						<fmt:param value="${optionsActivityForm.minimum}" />
+						<fmt:param value="${optionsActivityForm.maximum}" />
+					</fmt:message>
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="message.activity.options.activityCount">
+						<fmt:param value="${optionsActivityForm.minimum}" />
+						<fmt:param value="${optionsActivityForm.maximum}" />
+					</fmt:message>
+				</c:otherwise>
+			</c:choose>
+		</p>
+	    </c:if>
 			<div align="center" class="small-space-bottom">
 				
 				<c:choose>
