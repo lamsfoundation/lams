@@ -86,7 +86,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 	    if (toolContentID != null) {
 		content = mcService.retrieveMc(toolContentID);
 	    } else {
-		McSession session = mcService.retrieveMcSession(toolSessionID);
+		McSession session = mcService.getMcSessionById(toolSessionID);
 		if (session != null)
 		    content = session.getMcContent();
 	    }
@@ -117,7 +117,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 	    throw new McApplicationException(error);
 	}
 
-	McSession mcSession = mcService.retrieveMcSession(toolSessionID);
+	McSession mcSession = mcService.getMcSessionById(toolSessionID);
 
 	// If the learner hasn't selected any options yet, then they won't exist in the session.
 	// Yet we might be asked for their page, as the activity has been commenced. So need to do a "blank" page in

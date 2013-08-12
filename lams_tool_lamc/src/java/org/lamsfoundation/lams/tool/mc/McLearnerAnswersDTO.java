@@ -22,9 +22,10 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc;
 
-import java.util.Map;
+import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 
 /**
  * <p>
@@ -42,9 +43,9 @@ public class McLearnerAnswersDTO implements Comparable {
 
     protected Integer mark;
 
-    protected Map candidateAnswers;
-
-    protected Map candidateAnswerUids;
+    protected McOptsContent answerOption;
+    
+    protected List<McOptsContent> options;
 
     protected String attemptCorrect;
 
@@ -55,18 +56,33 @@ public class McLearnerAnswersDTO implements Comparable {
     protected String feedback;
 
     /**
-     * @return Returns the candidateAnswers.
+     * @return Returns the answerOption.
      */
-    public Map getCandidateAnswers() {
-	return candidateAnswers;
+    public McOptsContent getAnswerOption() {
+	return answerOption;
     }
 
     /**
-     * @param candidateAnswers
-     *            The candidateAnswers to set.
+     * @param answerOption
+     *            The answerOption to set.
      */
-    public void setCandidateAnswers(Map candidateAnswers) {
-	this.candidateAnswers = candidateAnswers;
+    public void setAnswerOption(McOptsContent answerOption) {
+	this.answerOption = answerOption;
+    }
+    
+    /**
+     * @return Returns the options.
+     */
+    public List<McOptsContent> getOptions() {
+	return options;
+    }
+
+    /**
+     * @param options
+     *            The options to set.
+     */
+    public void setOptions(List<McOptsContent> options) {
+	this.options = options;
     }
 
     /**
@@ -86,7 +102,7 @@ public class McLearnerAnswersDTO implements Comparable {
 
     public String toString() {
 	return new ToStringBuilder(this).append("question: ", getQuestion())
-		.append("displayOrder: ", getDisplayOrder()).append("candidateAnswers: ", getCandidateAnswers())
+		.append("displayOrder: ", getDisplayOrder()).append("answerOption: ", getAnswerOption())
 		.toString();
     }
 
@@ -127,21 +143,6 @@ public class McLearnerAnswersDTO implements Comparable {
      */
     public void setQuestionUid(Long questionUid) {
 	this.questionUid = questionUid;
-    }
-
-    /**
-     * @return Returns the candidateAnswerUids.
-     */
-    public Map getCandidateAnswerUids() {
-	return candidateAnswerUids;
-    }
-
-    /**
-     * @param candidateAnswerUids
-     *            The candidateAnswerUids to set.
-     */
-    public void setCandidateAnswerUids(Map candidateAnswerUids) {
-	this.candidateAnswerUids = candidateAnswerUids;
     }
 
     /**

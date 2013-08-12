@@ -23,9 +23,6 @@
 package org.lamsfoundation.lams.tool.mc.pojos;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -57,6 +54,9 @@ public class McOptsContent implements Serializable, Comparable {
 
     /** persistent field */
     private org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent;
+    
+    //DTO field
+    private boolean selected;
 
     public McOptsContent(Integer displayOrder, boolean correctOption, String mcQueOptionText,
 	    org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent) {
@@ -166,5 +166,13 @@ public class McOptsContent implements Serializable, Comparable {
      */
     public void setDisplayOrder(Integer displayOrder) {
 	this.displayOrder = displayOrder;
+    }
+    
+    public boolean isSelected() {
+	return this.selected;
+    }
+
+    public void setSelected(boolean selected) {
+	this.selected = selected;
     }
 }

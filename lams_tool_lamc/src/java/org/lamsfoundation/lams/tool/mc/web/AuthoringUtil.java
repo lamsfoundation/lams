@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -1170,7 +1169,7 @@ public class AuthoringUtil implements McAppConstants {
 			new Integer(currentMark), currentFeedback, mcContent, null, null);
 
 		/* checks if the question is already recorded */
-		McQueContent existingMcQueContent = mcService.getQuestionContentByDisplayOrder(new Long(displayOrder),
+		McQueContent existingMcQueContent = mcService.getQuestionByDisplayOrder(new Long(displayOrder),
 			mcContent.getUid());
 
 		if (existingMcQueContent == null) {

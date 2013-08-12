@@ -1,23 +1,3 @@
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="lams">
@@ -33,14 +13,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
 </p>
 
-	<c:if test="${not empty mcLearnerStarterDTO.submissionDeadline}">
-		<div class="info">
-			<fmt:message key="authoring.info.teacher.set.restriction" >
-				<fmt:param><lams:Date value="${mcLearnerStarterDTO.submissionDeadline}" /></fmt:param>
-			</fmt:message>	
-		</div>
-	</c:if>	
-
+<c:if test="${not empty mcLearnerStarterDTO.submissionDeadline}">
+	<div class="info">
+		<fmt:message key="authoring.info.teacher.set.restriction" >
+			<fmt:param><lams:Date value="${mcLearnerStarterDTO.submissionDeadline}" /></fmt:param>
+		</fmt:message>	
+	</div>
+</c:if>	
 
 <c:if test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
 
@@ -53,7 +32,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 </c:if>
 
-<c:forEach var="dto" varStatus="status" items="${requestScope.listQuestionCandidateAnswersDto}">
+<c:forEach var="dto" varStatus="status" items="${requestScope.learnerAnswersDTOList}">
 
 	<div class="shading-bg">
 		<div style="overflow: auto;">
@@ -73,21 +52,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<table class="indent">
 		<tbody>
-			<c:forEach var="ca" items="${dto.candidateAnswerUids}">
-			
+			<c:forEach var="option" items="${dto.options}">
 				<tr>
 		
 					<td>
-						<input type="radio" name="checkedCa${dto.questionUid}" class="noBorder" value="${dto.questionUid}-${ca.value}">
+						<input type="radio" name="checkedCa${dto.questionUid}" class="noBorder" value="${dto.questionUid}-${option.uid}"
+							<c:if test="${option.selected}">checked="checked"</c:if>>
 					</td>
-		
-					<c:forEach var="caText" items="${dto.candidateAnswers}">
-						<c:if test="${ca.key == caText.key}">
-							<td width="100%">
-								<c:out value="${caText.value}" escapeXml="false" />
-							</td>
-						</c:if>
-					</c:forEach>
+					<td width="100%">
+						<c:out value="${option.mcQueOptionText}" escapeXml="false" />
+					</td>
 					
 				</tr>
 			</c:forEach>
@@ -95,7 +69,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</table>
 
 </c:forEach>
-
 
 <html:hidden property="donePreview" />
 

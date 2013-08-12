@@ -103,7 +103,7 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 		    plannerForm.removeQuestion(questionIndex - 1);
 		} else {
 		    if (questionIndex <= mcContent.getMcQueContents().size()) {
-			McQueContent mcQueContent = getMcService().getQuestionContentByDisplayOrder(
+			McQueContent mcQueContent = getMcService().getQuestionByDisplayOrder(
 				(long) questionIndex, mcContent.getUid());
 			mcQueContent.setQuestion(question);
 			int candidateAnswerDTOIndex = 0;
@@ -145,7 +145,7 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 		}
 	    } while (questionIndex <= plannerForm.getQuestionCount());
 	    for (; questionIndex <= mcContent.getMcQueContents().size(); questionIndex++) {
-		McQueContent mcQueContent = getMcService().getQuestionContentByDisplayOrder((long) questionIndex,
+		McQueContent mcQueContent = getMcService().getQuestionByDisplayOrder((long) questionIndex,
 			mcContent.getUid());
 		mcContent.getMcQueContents().remove(mcQueContent);
 		getMcService().removeMcQueContent(mcQueContent);

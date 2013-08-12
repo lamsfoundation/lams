@@ -267,9 +267,6 @@ public abstract class McUtils implements McAppConstants {
 	request.getSession().removeAttribute(MAP_LEARNER_FEEDBACK_INCORRECT);
 	request.getSession().removeAttribute(MAP_LEARNER_FEEDBACK_CORRECT);
 	request.getSession().removeAttribute(MAP_QUESTION_WEIGHTS);
-	request.getSession().removeAttribute(MAP_QUE_ATTEMPTS);
-	request.getSession().removeAttribute(MAP_QUE_CORRECT_ATTEMPTS);
-	request.getSession().removeAttribute(MAP_QUE_INCORRECT_ATTEMPTS);
 	request.getSession().removeAttribute(MAP_WEIGHTS);
 	request.getSession().removeAttribute(MAP_CHECKBOX_STATES);
 	request.getSession().removeAttribute(MAP_SELECTED_OPTIONS);
@@ -289,7 +286,6 @@ public abstract class McUtils implements McAppConstants {
 	request.getSession().removeAttribute(RICHTEXT_FEEDBACK_INCORRECT);
 	request.getSession().removeAttribute(RICHTEXT_OFFLINEINSTRUCTIONS);
 	request.getSession().removeAttribute(PASSMARK);
-	request.getSession().removeAttribute(VIEW_ANSWERS);
 	request.getSession().removeAttribute(SHOW_AUTHORING_TABS);
 	request.getSession().removeAttribute(RICHTEXT_ONLINEINSTRUCTIONS);
 	request.getSession().removeAttribute(RICHTEXT_REPORT_TITLE);

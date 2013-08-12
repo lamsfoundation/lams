@@ -23,14 +23,19 @@
 package org.lamsfoundation.lams.tool.mc.service;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
 import java.util.Vector;
+
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
@@ -66,6 +71,8 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
+import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
@@ -89,6 +96,8 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -100,9 +109,7 @@ import org.springframework.dao.DataAccessException;
  * 
  */
 public class McServicePOJO implements IMcService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager,
-	McAppConstants
-
-{
+	McAppConstants {
     static Logger logger = Logger.getLogger(McServicePOJO.class.getName());
 
     /* repository access related constants */
@@ -202,7 +209,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    public McQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid)
+    public McQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long mcContentUid)
 	    throws McApplicationException {
 	try {
 	    return mcQueContentDAO.getQuestionContentByDisplayOrder(displayOrder, mcContentUid);
@@ -282,10 +289,20 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		    + e.getMessage(), e);
 	}
     }
-
-    public void createMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException {
+    
+    public McQueUsr createMcUser(Long toolSessionID) throws McApplicationException {
 	try {
-	    mcUserDAO.saveMcUser(mcQueUsr);
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    Long userId = toolUser.getUserID().longValue();
+	    String userName = toolUser.getLogin();
+	    String fullName = toolUser.getFirstName() + " " + toolUser.getLastName();
+	    McSession mcSession = getMcSessionById(toolSessionID.longValue());
+
+	    McQueUsr user = new McQueUsr(userId, userName, fullName, mcSession, new TreeSet());
+	    mcUserDAO.saveMcUser(user);
+	    
+	    return user;
 	} catch (DataAccessException e) {
 	    throw new McApplicationException("Exception occured when lams is creating mc QueUsr: " + e.getMessage(), e);
 	}
@@ -299,9 +316,9 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionId) throws McApplicationException {
+    public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) throws McApplicationException {
 	try {
-	    return mcUserDAO.getMcUserBySession(queUsrId, mcSessionId);
+	    return mcUserDAO.getMcUserBySession(queUsrId, mcSessionUid);
 	} catch (DataAccessException e) {
 	    throw new McApplicationException("Exception occured when lams is getting mc QueUsr: " + e.getMessage(), e);
 	}
@@ -325,12 +342,53 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    public void createMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException {
-	try {
-	    mcUsrAttemptDAO.saveMcUsrAttempt(mcUsrAttempt);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException(
-		    "Exception occured when lams is creating mc UsrAttempt: " + e.getMessage(), e);
+    @Override
+    public void saveUserAttempt(McQueUsr user, List<McLearnerAnswersDTO> selectedQuestionAndCandidateAnswersDTO) {
+
+	Date attemptTime = McUtils.getGMTDateTime();
+
+	for (McLearnerAnswersDTO mcLearnerAnswersDTO : selectedQuestionAndCandidateAnswersDTO) {
+
+	    Long questionUid = mcLearnerAnswersDTO.getQuestionUid();
+	    McQueContent question = this.getQuestionByUid(questionUid);
+	    if (question == null) {
+		throw new McApplicationException("Can't find question with specified question uid: " + mcLearnerAnswersDTO.getQuestionUid());
+	    }
+
+	    McOptsContent answerOption = mcLearnerAnswersDTO.getAnswerOption();
+	    if (answerOption != null) {
+		    
+		Integer mark = mcLearnerAnswersDTO.getMark();
+		boolean passed = user.isMarkPassed(mark);
+		boolean isAttemptCorrect = new Boolean(mcLearnerAnswersDTO.getAttemptCorrect());
+
+		McUsrAttempt userAttempt = this.getUserAttemptByQuestion(user.getUid(), questionUid);
+		if (userAttempt != null) {
+
+		    McOptsContent previosAnswer = userAttempt.getMcOptionsContent();
+		    // check if answer hasn't been changed since the last time
+		    if (previosAnswer.getUid().equals(answerOption.getUid())) {
+			// don't save anything
+			continue;
+
+		    } else {
+			// in case answer has been changed update userttempt
+			userAttempt.setAttemptTime(attemptTime);
+			userAttempt.setMcOptionsContent(answerOption);
+			userAttempt.setMark(mark);
+			userAttempt.setPassed(passed);
+			userAttempt.setAttemptCorrect(isAttemptCorrect);
+		    }
+
+		} else {
+		    // create new userAttempt
+		    userAttempt = new McUsrAttempt(attemptTime, question, user, answerOption, mark, passed, isAttemptCorrect);
+
+		}
+
+		mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
+
+	    }
 	}
     }
 
@@ -342,10 +400,62 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		    "Exception occured when lams is updating mc UsrAttempt: " + e.getMessage(), e);
 	}
     }
+    
+    @Override
+    public List<McLearnerAnswersDTO> buildLearnerAnswersDTOList(McContent mcContent, McQueUsr user) {
+	List<McLearnerAnswersDTO> learnerAnswersDTOList = new LinkedList<McLearnerAnswersDTO>();
+	List<McQueContent> questions = this.getAllQuestionEntries(mcContent.getUid());
 
-    public List getLatestAttemptsForAUser(final Long queUserUid) throws McApplicationException {
+	for (McQueContent question : questions) {
+	    McLearnerAnswersDTO learnerAnswersDTO = new McLearnerAnswersDTO();
+	    Set<McOptsContent> optionSet = question.getMcOptionsContents();
+	    List<McOptsContent> optionList = new LinkedList<McOptsContent>(optionSet);
+	    
+	    boolean randomize = mcContent.isRandomize();
+	    if (randomize) {
+		ArrayList<McOptsContent> shuffledList = new ArrayList<McOptsContent>(optionList);
+		Collections.shuffle(shuffledList);
+		optionList = new LinkedList<McOptsContent>(shuffledList);
+	    }
+
+	    learnerAnswersDTO.setQuestion(question.getQuestion());
+	    learnerAnswersDTO.setDisplayOrder(question.getDisplayOrder().toString());
+	    learnerAnswersDTO.setQuestionUid(question.getUid());
+
+	    learnerAnswersDTO.setMark(question.getMark());
+	    learnerAnswersDTO.setOptions(optionList);
+
+	    learnerAnswersDTOList.add(learnerAnswersDTO);
+	}
+	
+	//populate answers
+	if (user != null) {
+
+	    for (McLearnerAnswersDTO learnerAnswersDTO : learnerAnswersDTOList) {
+		Long questionUid = learnerAnswersDTO.getQuestionUid();
+		
+		McUsrAttempt dbAttempt = this.getUserAttemptByQuestion(user.getUid(), questionUid);
+		if (dbAttempt != null) {
+		    Long selectedOptionUid = dbAttempt.getMcOptionsContent().getUid();
+		    
+		    //mark selected option as selected
+		    for (McOptsContent option : learnerAnswersDTO.getOptions()) {
+			if (selectedOptionUid.equals(option.getUid())) {
+			    option.setSelected(true);
+			}
+		    }
+		}
+	    }
+	}
+
+	return learnerAnswersDTOList;
+    }
+
+    public List<McUsrAttempt> getFinalizedUserAttempts(final McQueUsr user) throws McApplicationException {
 	try {
-	    return mcUsrAttemptDAO.getLatestAttemptsForAUser(queUserUid);
+	    List<McUsrAttempt> finalizedUserAttempts = (user.isResponseFinalised()) ? mcUsrAttemptDAO
+		    .getUserAttempts(user.getUid()) : new LinkedList<McUsrAttempt>();
+	    return finalizedUserAttempts;
 	} catch (DataAccessException e) {
 	    throw new McApplicationException(
 		    "Exception occured when lams is getting the learner's attempts by user id and que content id and attempt order: "
@@ -353,28 +463,10 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    /**
-     * <p>
-     * gets all the attempts for one questions for one user in one tool session <code>queUsrId</code>, ordered by the
-     * attempt id. If there is more than one option selected for a question, the attempts are "batched".
-     * </p>
-     * 
-     * @param queUsrId
-     * @return
-     */
-    public List<McUsrAttempt> getAllAttemptsForAUserForOneQuestionContentOrderByAttempt(final Long queUsrUid,
-	    final Long mcQueContentId) throws McApplicationException {
-	try {
-	    return mcUsrAttemptDAO.getAllAttemptsForAUserForOneQuestionContentOrderByAttempt(queUsrUid, mcQueContentId);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is getting attempts. " + e.getMessage(), e);
-	}
-    }
-
-    public List getLatestAttemptsForAUserForOneQuestionContent(Long queUsrUid, Long mcQueContentId)
+    public McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId)
 	    throws McApplicationException {
 	try {
-	    return mcUsrAttemptDAO.getLatestAttemptsForAUserForOneQuestionContent(queUsrUid, mcQueContentId);
+	    return mcUsrAttemptDAO.getUserAttemptByQuestion(queUsrUid, mcQueContentId);
 	} catch (DataAccessException e) {
 	    throw new McApplicationException(
 		    "Exception occured when lams is getting the learner's attempts by user id and que content id and attempt order: "
@@ -446,16 +538,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    public List getPersistedSelectedOptions(Long mcQueContentId) throws McApplicationException {
-	try {
-	    return mcOptionsContentDAO.getPersistedSelectedOptions(mcQueContentId);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is gettong persisted selected"
-		    + " the mc options content: " + e.getMessage(), e);
-	}
-
-    }
-
     public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentId) {
 	try {
 	    return mcQueContentDAO.getQuestionContentByQuestionText(question, mcContentId);
@@ -465,23 +547,13 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    public McSession retrieveMcSession(Long mcSessionId) throws McApplicationException {
+    public McSession getMcSessionById(Long mcSessionId) throws McApplicationException {
 	try {
-	    return mcSessionDAO.findMcSessionById(mcSessionId);
+	    return mcSessionDAO.getMcSessionById(mcSessionId);
 	} catch (DataAccessException e) {
 	    throw new McApplicationException("Exception occured when lams is retrieving by id mc session : "
 		    + e.getMessage(), e);
 	}
-    }
-
-    public McSession findMcSessionById(Long mcSessionId) throws McApplicationException {
-	try {
-	    return mcSessionDAO.findMcSessionById(mcSessionId);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is retrieving by id mc session : "
-		    + e.getMessage(), e);
-	}
-
     }
 
     public McContent retrieveMcBySessionId(Long mcSessionId) throws McApplicationException {
@@ -525,15 +597,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    mcContentDAO.removeMcById(mcId);
 	} catch (DataAccessException e) {
 	    throw new McApplicationException("Exception occured when lams is removing by id" + " the mc content: "
-		    + e.getMessage(), e);
-	}
-    }
-
-    public void removeAttempt(McUsrAttempt attempt) throws McApplicationException {
-	try {
-	    mcUsrAttemptDAO.removeMcUsrAttempt(attempt);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is removing" + " the attempt: "
 		    + e.getMessage(), e);
 	}
     }
@@ -585,15 +648,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    public List findMcOptionUidsByQueId(Long mcQueContentId) throws McApplicationException {
-	try {
-	    return mcOptionsContentDAO.findMcOptionUidsByQueId(mcQueContentId);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is getting opt uids" + e.getMessage(), e);
-	}
-    }
-
-    public McQueContent findMcQuestionContentByUid(Long uid) throws McApplicationException {
+    public McQueContent getQuestionByUid(Long uid) throws McApplicationException {
 	try {
 	    return mcQueContentDAO.findMcQuestionContentByUid(uid);
 	} catch (DataAccessException e) {
@@ -617,15 +672,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	} catch (DataAccessException e) {
 	    throw new McApplicationException("Exception occured when lams is returning the"
 		    + " option by option text: " + e.getMessage(), e);
-	}
-    }
-
-    public List getCorrectOption(Long mcQueContentId) {
-	try {
-	    return mcOptionsContentDAO.getCorrectOption(mcQueContentId);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is returning the " + " correct option: "
-		    + e.getMessage(), e);
 	}
     }
 
@@ -655,16 +701,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    throw new McApplicationException("Exception occured when lams is removing" + " the mc options content: "
 		    + e.getMessage(), e);
 	}
-    }
-
-    public List findMcOptionNamesByQueId(Long mcQueContentId) throws McApplicationException {
-	try {
-	    return mcOptionsContentDAO.findMcOptionNamesByQueId(mcQueContentId);
-	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is finding" + " the mc options name: "
-		    + e.getMessage(), e);
-	}
-
     }
 
     public void removeMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException {
@@ -888,12 +924,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		Iterator sessionUsersIterator = mcSession.getMcQueUsers().iterator();
 		while (sessionUsersIterator.hasNext()) {
 		    McQueUsr mcQueUsr = (McQueUsr) sessionUsersIterator.next();
-
-		    Iterator sessionUsersAttemptsIterator = mcQueUsr.getMcUsrAttempts().iterator();
-		    while (sessionUsersAttemptsIterator.hasNext()) {
-			McUsrAttempt mcUsrAttempt = (McUsrAttempt) sessionUsersAttemptsIterator.next();
-			removeAttempt(mcUsrAttempt);
-		    }
+		    
+		    mcUsrAttemptDAO.removeAllUserAttempts(mcQueUsr.getUid());
 		}
 	    }
 	    mcContentDAO.removeMcById(toolContentId);
@@ -912,7 +944,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      *            toolSessionId
      */
     public void setAsForceCompleteSession(Long toolSessionId) throws McApplicationException {
-	McSession mcSession = retrieveMcSession(toolSessionId);
+	McSession mcSession = getMcSessionById(toolSessionId);
 	mcSession.setSessionStatus(McSession.COMPLETED);
 	updateMcSession(mcSession);
     }
@@ -933,7 +965,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    if (mcSession != null) {
 		Long usersToolSessionId = mcSession.getMcSessionId();
 
-		mcSession = retrieveMcSession(usersToolSessionId);
+		mcSession = getMcSessionById(usersToolSessionId);
 		mcSession.setSessionStatus(McSession.COMPLETED);
 		updateMcSession(mcSession);
 
@@ -1110,7 +1142,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
      * @return boolean
      */
     public boolean existsSession(Long toolSessionId) {
-	McSession mcSession = retrieveMcSession(toolSessionId);
+	McSession mcSession = getMcSessionById(toolSessionId);
 	return mcSession != null;
     }
 
@@ -1200,7 +1232,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	McSession mcSession = null;
 	try {
-	    mcSession = retrieveMcSession(toolSessionId);
+	    mcSession = getMcSessionById(toolSessionId);
 	} catch (McApplicationException e) {
 	    throw new DataMissingException("error retrieving mcSession: " + e);
 	} catch (Exception e) {
@@ -1248,7 +1280,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	McSession mcSession = null;
 	try {
-	    mcSession = retrieveMcSession(toolSessionId);
+	    mcSession = getMcSessionById(toolSessionId);
 	} catch (McApplicationException e) {
 	    throw new DataMissingException("error retrieving mcSession: " + e);
 	} catch (Exception e) {

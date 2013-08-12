@@ -22,8 +22,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc;
 
-import java.util.Map;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -54,7 +52,7 @@ public class McMonitoredUserDTO implements Comparable {
 
     private String questionUid;
 
-    private Map<Integer, String> usersAttempts;
+    private String userAnswer;
 
     /**
      * @return Returns the queUsrId.
@@ -74,26 +72,19 @@ public class McMonitoredUserDTO implements Comparable {
     public String toString() {
 	return new ToStringBuilder(this).append("queUsrId", queUsrId).append("username", userName)
 		.append("isCorrect", isCorrect).append("mark", mark).append("sessionId", sessionId)
-		.append("questionUid", questionUid).append("usersAttempts", usersAttempts).toString();
+		.append("questionUid", questionUid).append("userAnswer", userAnswer).toString();
+    }
+
+    public String getUserAnswer() {
+	return userAnswer;
     }
 
     /**
-     * UserAttempts is a map, where the key is the attemptOrder and the value is String array with the text of the
-     * attempt. At present, the string array will be of length one, but if we ever support more than one answer to a
-     * question then this will need to be changed to a list of strings.
-     * 
-     * @return Returns the usersAttempts.
+     * @param userAnswer
+     *            The userAnswer to set.
      */
-    public Map<Integer, String> getUsersAttempts() {
-	return usersAttempts;
-    }
-
-    /**
-     * @param usersAttempts
-     *            The usersAttempts to set.
-     */
-    public void setUsersAttempts(Map<Integer, String> usersAttempts) {
-	this.usersAttempts = usersAttempts;
+    public void setUserAnswer(String userAnswer) {
+	this.userAnswer = userAnswer;
     }
 
     public int compareTo(Object o) {

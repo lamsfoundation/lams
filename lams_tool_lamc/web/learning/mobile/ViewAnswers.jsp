@@ -15,10 +15,10 @@
 				elem.disabled = true;
 			}
 		}
-	         function submitForm(methodName){
-        	        var f = document.getElementById('Form1');
-	                f.submit();
-	        }
+	    function submitForm(methodName){
+        	var f = document.getElementById('Form1');
+	    	f.submit();
+	    }
 	</script>
 </lams:head>
 
@@ -90,23 +90,23 @@
 							</c:if>
 							
 							<p>
-								<c:forEach var="attemptEntryFinal"
-									items="${mcGeneralLearnerFlowDTO.mapFinalAnswersContent}">
-									<c:if test="${requestScope.mainQueIndex == attemptEntryFinal.key}">
-										<c:out value="${attemptEntryFinal.value}" escapeXml="false"/>
+								<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
+									<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
+										<c:out value="${attemptEntry.value.mcOptionsContent.mcQueOptionText}" escapeXml="false"/>
 									</c:if>
 								</c:forEach>
 	
 								<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
-									<c:forEach var="attemptEntryCorrect"
-										items="${mcGeneralLearnerFlowDTO.mapFinalAnswersIsContent}">
-										<c:if test="${requestScope.mainQueIndex == attemptEntryCorrect.key}">
-											<c:if test="${attemptEntryCorrect.value == 'true'}">
-												<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">									
-											</c:if>
-											<c:if test="${attemptEntryCorrect.value == 'false'}">
-												<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
-											</c:if>									
+									<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
+										<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
+											<c:choose>
+												<c:when test="${attemptEntry.value.mcOptionsContent.correctOption}">
+													<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">
+												</c:when>
+												<c:otherwise>
+													<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
+												</c:otherwise>	
+											</c:choose>						
 										</c:if>
 									</c:forEach>
 								</c:if>

@@ -70,7 +70,7 @@ public class MCOutputFactory extends OutputFactory {
 
 	TreeMap<String, ToolOutput> output = new TreeMap<String, ToolOutput>();
 
-	McSession session = mcService.findMcSessionById(toolSessionId);
+	McSession session = mcService.getMcSessionById(toolSessionId);
 	if (session != null) {
 
 	    McQueUsr queUser = mcService.getMcUserBySession(learnerId, session.getUid());
@@ -90,7 +90,7 @@ public class MCOutputFactory extends OutputFactory {
 
     public ToolOutput getToolOutput(String name, IMcService mcService, Long toolSessionId, Long learnerId) {
 	if (name != null) {
-	    McSession session = mcService.findMcSessionById(toolSessionId);
+	    McSession session = mcService.getMcSessionById(toolSessionId);
 	    if (session != null) {
 		McQueUsr queUser = mcService.getMcUserBySession(learnerId, session.getUid());
 
@@ -133,16 +133,16 @@ public class MCOutputFactory extends OutputFactory {
 
     // written to cope with more than one correct option for each question but only tested with
     // one correct option for a question.
-    private boolean allQuestionsCorrect(IMcService mcService, McQueUsr queUser) {
+    private boolean allQuestionsCorrect(IMcService mcService, McQueUsr user) {
 
 	// Build a list of all the correct answers. If we hit any options that are not a correct option
 	// we can abort as we know there is a wrong answer.
 	// Otherwise count the number of correct options overall (for comparison later).
 	long correctlearnerOptions = 0;
-	List<McUsrAttempt> latestAttempts = (List<McUsrAttempt>) mcService.getLatestAttemptsForAUser(queUser.getUid());
-	for (McUsrAttempt mcUsrAttempt : latestAttempts) {
-	    McOptsContent mcOptsContent = mcUsrAttempt.getMcOptionsContent();
-	    if (!mcOptsContent.isCorrectOption()) {
+	List<McUsrAttempt> userAttempts = (List<McUsrAttempt>) mcService.getFinalizedUserAttempts(user);
+	for (McUsrAttempt userAttempt : userAttempts) {
+	    McOptsContent option = userAttempt.getMcOptionsContent();
+	    if (!option.isCorrectOption()) {
 		// wrong answer so no point going any further
 		return false;
 	    } else {
@@ -152,7 +152,7 @@ public class MCOutputFactory extends OutputFactory {
 
 	// now count the overall number of correct options
 	long correctOptions = 0;
-	McContent mcContent = queUser.getMcSession().getMcContent();
+	McContent mcContent = user.getMcSession().getMcContent();
 	Iterator questionIterator = mcContent.getMcQueContents().iterator();
 	while (questionIterator.hasNext()) {
 	    McQueContent mcQueContent = (McQueContent) questionIterator.next();

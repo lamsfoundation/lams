@@ -1,24 +1,3 @@
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
 
@@ -110,22 +89,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							</c:if>
 							
 							<p>
-								<c:forEach var="attemptEntryFinal"
-									items="${mcGeneralLearnerFlowDTO.mapFinalAnswersContent}">
-									<c:if test="${requestScope.mainQueIndex == attemptEntryFinal.key}">
-										<c:out value="${attemptEntryFinal.value}" escapeXml="false"/>
+								<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
+									<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
+										<c:out value="${attemptEntry.value.mcOptionsContent.mcQueOptionText}" escapeXml="false"/>
 									</c:if>
 								</c:forEach>
 	
 								<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
-									<c:forEach var="attemptEntryCorrect" items="${mcGeneralLearnerFlowDTO.mapFinalAnswersIsContent}">
-										<c:if test="${requestScope.mainQueIndex == attemptEntryCorrect.key}">
-											<c:if test="${attemptEntryCorrect.value == 'true'}">
-												<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">									
-											</c:if>
-											<c:if test="${attemptEntryCorrect.value == 'false'}">
-												<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
-											</c:if>									
+									<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
+										<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
+											<c:choose>
+												<c:when test="${attemptEntry.value.mcOptionsContent.correctOption}">
+													<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">
+												</c:when>
+												<c:otherwise>
+													<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
+												</c:otherwise>	
+											</c:choose>								
 										</c:if>
 									</c:forEach>
 								</c:if>

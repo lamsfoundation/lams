@@ -44,41 +44,33 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemptDAO {
 
-    private static final String LOAD_LAST_ATTEMPT_BY_ATTEMPT_ORDER = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueUsr.uid=:queUsrUid"
-	    + " and mcUsrAttempt.mcQueContentId=:mcQueContentId and mcUsrAttempt.attemptOrder=mcUsrAttempt.mcQueUsr.lastAttemptOrder"
+    private static final String LOAD_PARTICULAR_QUESTION_ATTEMPT = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueUsr.uid=:queUsrUid"
+	    + " and mcUsrAttempt.mcQueContentId=:mcQueContentId"
 	    + " order by mcUsrAttempt.mcOptionsContent.uid";
 
-    private static final String LOAD_ATTEMPT_FOR_QUESTION_CONTENT = "from mcUsrAttempt in class McUsrAttempt "
-	    + " where mcUsrAttempt.mcQueContentId=:mcQueContentId and mcUsrAttempt.queUsrId=:queUsrUid"
-	    + " order by mcUsrAttempt.attemptOrder";
-
-    private static final String LOAD_LAST_ATTEMPTS = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueUsr.uid=:queUsrUid"
-	    + " and mcUsrAttempt.attemptOrder=mcUsrAttempt.mcQueUsr.lastAttemptOrder"
+    private static final String LOAD_ALL_QUESTION_ATTEMPTS = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueUsr.uid=:queUsrUid"
 	    + " order by mcUsrAttempt.mcQueContentId, mcUsrAttempt.mcOptionsContent.uid";
-
-    public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
+	    
+   public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
 	this.getHibernateTemplate().save(mcUsrAttempt);
     }
 
-    public List getLatestAttemptsForAUser(final Long queUserUid) {
-	return (List) getSession().createQuery(LOAD_LAST_ATTEMPTS).setLong("queUsrUid", queUserUid.longValue()).list();
-    }
-
-    // should be able to get rid of this one by rewriting export portfolio
-    @SuppressWarnings("unchecked")
-    public List<McUsrAttempt> getLatestAttemptsForAUserForOneQuestionContent(final Long queUsrUid,
-	    final Long mcQueContentId) {
-	return (List<McUsrAttempt>) getSession().createQuery(LOAD_LAST_ATTEMPT_BY_ATTEMPT_ORDER)
-		.setLong("queUsrUid", queUsrUid.longValue()).setLong("mcQueContentId", mcQueContentId.longValue())
-		.list();
+    public List<McUsrAttempt> getUserAttempts(final Long queUserUid) {
+	return (List<McUsrAttempt>) getSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
+		.setLong("queUsrUid", queUserUid.longValue()).list();
     }
 
     @SuppressWarnings("unchecked")
-    public List<McUsrAttempt> getAllAttemptsForAUserForOneQuestionContentOrderByAttempt(final Long queUsrUid,
-	    final Long mcQueContentId) {
-	return (List<McUsrAttempt>) getSession().createQuery(LOAD_ATTEMPT_FOR_QUESTION_CONTENT)
-		.setLong("mcQueContentId", mcQueContentId.longValue()).setLong("queUsrUid", queUsrUid.longValue())
-		.list();
+    public McUsrAttempt getUserAttemptByQuestion(final Long queUsrUid, final Long mcQueContentId) {
+	List<McUsrAttempt> userAttemptList = (List<McUsrAttempt>) getSession()
+		.createQuery(LOAD_PARTICULAR_QUESTION_ATTEMPT).setLong("queUsrUid", queUsrUid.longValue())
+		.setLong("mcQueContentId", mcQueContentId.longValue()).list();
+	if (userAttemptList.size() > 1) {
+	    throw new RuntimeException("There are more than 1 latest question attempt");
+	}
+
+	McUsrAttempt userAttempt = (userAttemptList.size() == 0) ? null : userAttemptList.get(0);
+	return userAttempt;
     }
 
     public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
@@ -86,9 +78,15 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	this.getHibernateTemplate().update(mcUsrAttempt);
     }
 
-    public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
+    public void removeAllUserAttempts(Long queUserUid) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
-	this.getHibernateTemplate().delete(mcUsrAttempt);
+
+	List<McUsrAttempt> userAttempts = (List<McUsrAttempt>) getSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
+		.setLong("queUsrUid", queUserUid.longValue()).list();
+
+	for (McUsrAttempt userAttempt : userAttempts) {
+	    this.getHibernateTemplate().delete(userAttempt);
+	}
     }
 
 }

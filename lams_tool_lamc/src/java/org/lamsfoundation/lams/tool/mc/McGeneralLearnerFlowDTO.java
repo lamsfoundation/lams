@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.mc;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 
 /**
  * <p>
@@ -84,12 +85,6 @@ public class McGeneralLearnerFlowDTO implements Comparable {
 
     protected String displayAnswers;
 
-    protected Map mapQueAttempts;
-
-    protected Map mapQueCorrectAttempts;
-
-    protected Map mapQueIncorrectAttempts;
-
     protected Map mapGeneralOptionsContent;
 
     protected Map mapQuestionsContent;
@@ -106,9 +101,7 @@ public class McGeneralLearnerFlowDTO implements Comparable {
 
     protected Map mapFeedbackContent;
 
-    protected Map mapFinalAnswersIsContent;
-
-    protected Map mapFinalAnswersContent;
+    protected Map<String, McUsrAttempt> attemptMap;
 
     /**
      * @return Returns the mapFeedbackContent.
@@ -390,7 +383,7 @@ public class McGeneralLearnerFlowDTO implements Comparable {
     }
 
     public String toString() {
-	return new ToStringBuilder(this).append("retries: ", retries).append("mapQueAttempts: ", mapQueAttempts)
+	return new ToStringBuilder(this).append("retries: ", retries)
 		.append("mapGeneralOptionsContent: ", mapGeneralOptionsContent).append("learnerMark : ", learnerMark)
 		.append("totalQuestionCount: ", totalQuestionCount).append("passMark: ", passMark)
 		.append("passMarkApplicable: ", passMarkApplicable).append("userPassed: ", userPassed)
@@ -460,51 +453,6 @@ public class McGeneralLearnerFlowDTO implements Comparable {
      */
     public void setCurrentQuestionIndex(Integer currentQuestionIndex) {
 	this.currentQuestionIndex = currentQuestionIndex;
-    }
-
-    /**
-     * @return Returns the mapQueAttempts.
-     */
-    public Map getMapQueAttempts() {
-	return mapQueAttempts;
-    }
-
-    /**
-     * @param mapQueAttempts
-     *            The mapQueAttempts to set.
-     */
-    public void setMapQueAttempts(Map mapQueAttempts) {
-	this.mapQueAttempts = mapQueAttempts;
-    }
-
-    /**
-     * @return Returns the mapQueCorrectAttempts.
-     */
-    public Map getMapQueCorrectAttempts() {
-	return mapQueCorrectAttempts;
-    }
-
-    /**
-     * @param mapQueCorrectAttempts
-     *            The mapQueCorrectAttempts to set.
-     */
-    public void setMapQueCorrectAttempts(Map mapQueCorrectAttempts) {
-	this.mapQueCorrectAttempts = mapQueCorrectAttempts;
-    }
-
-    /**
-     * @return Returns the mapQueIncorrectAttempts.
-     */
-    public Map getMapQueIncorrectAttempts() {
-	return mapQueIncorrectAttempts;
-    }
-
-    /**
-     * @param mapQueIncorrectAttempts
-     *            The mapQueIncorrectAttempts to set.
-     */
-    public void setMapQueIncorrectAttempts(Map mapQueIncorrectAttempts) {
-	this.mapQueIncorrectAttempts = mapQueIncorrectAttempts;
     }
 
     /**
@@ -683,32 +631,17 @@ public class McGeneralLearnerFlowDTO implements Comparable {
     }
 
     /**
-     * @return Returns the mapFinalAnswersContent.
+     * @return Returns the attemptMap.
      */
-    public Map getMapFinalAnswersContent() {
-	return mapFinalAnswersContent;
+    public Map<String, McUsrAttempt> getAttemptMap() {
+	return attemptMap;
     }
 
     /**
-     * @param mapFinalAnswersContent
-     *            The mapFinalAnswersContent to set.
+     * @param attemptMap
+     *            The attemptMap to set.
      */
-    public void setMapFinalAnswersContent(Map mapFinalAnswersContent) {
-	this.mapFinalAnswersContent = mapFinalAnswersContent;
-    }
-
-    /**
-     * @return Returns the mapFinalAnswersIsContent.
-     */
-    public Map getMapFinalAnswersIsContent() {
-	return mapFinalAnswersIsContent;
-    }
-
-    /**
-     * @param mapFinalAnswersIsContent
-     *            The mapFinalAnswersIsContent to set.
-     */
-    public void setMapFinalAnswersIsContent(Map mapFinalAnswersIsContent) {
-	this.mapFinalAnswersIsContent = mapFinalAnswersIsContent;
+    public void setAttemptMap(Map<String, McUsrAttempt> attemptMap) {
+	this.attemptMap = attemptMap;
     }
 }

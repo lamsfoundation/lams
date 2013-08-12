@@ -1,23 +1,3 @@
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
 
@@ -42,10 +22,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				elem.disabled = true;
 			}
 		}
-	         function submitForm(methodName){
-	                var f = document.getElementById('Form1');
-	                f.submit();
-	        }
+		
+	    function submitForm(methodName){
+	        var f = document.getElementById('Form1');
+	        f.submit();
+	    }
 	</script>
 </lams:head>
 
@@ -145,20 +126,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:if>
 
 						<p>
-							<c:forEach var="caText" varStatus="status"
-								items="${dto.candidateAnswers}">
-								<c:out value="${caText.value}" escapeXml="false" />
-							</c:forEach>
-
-                    <c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
-	
+							<c:out value="${dto.answerOption.mcQueOptionText}" escapeXml="false" />
+								
+                    		<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
 								<c:if test="${dto.attemptCorrect == 'true'}">
 									<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">
 								</c:if>
 								<c:if test="${dto.attemptCorrect != 'true'}">
 									<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
 								</c:if>
-	
+							</c:if>
 						</p>
 
 						<c:if test="${(dto.feedback != null) && (dto.feedback != '')}">
@@ -166,7 +143,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${dto.feedback}" escapeXml="false" /> 
 							</div>		
 						</c:if>												
-					</c:if>
+					
 				</div>
 			</c:forEach>
 
@@ -206,7 +183,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}"/> 
 				</p>
 				
-				<html:submit property="redoQuestionsOk" styleClass="button">
+				<html:submit property="redoQuestions" styleClass="button">
 					<fmt:message key="label.redo.questions" />
 				</html:submit>
 

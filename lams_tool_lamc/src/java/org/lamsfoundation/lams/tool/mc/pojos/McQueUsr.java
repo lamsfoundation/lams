@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.tool.mc.pojos;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -52,26 +51,28 @@ public class McQueUsr implements Serializable {
 
     private boolean responseFinalised;
 
+    //please pay attention this is *sessionUid* and not sessionId (this is due to Ozgur gave wrongly name to this field)
     private Long mcSessionId;
 
     /** nullable persistent field */
-    private org.lamsfoundation.lams.tool.mc.pojos.McSession mcSession;
+    private McSession mcSession;
 
-    /** persistent field */
-    private Set mcUsrAttempts;
-
-    private Integer lastAttemptOrder;
+    private Integer numberOfAttempts;
 
     private Integer lastAttemptTotalMark;
+    
+    /** default constructor */
+    public McQueUsr() {
+    }
 
     /** full constructor */
     public McQueUsr(Long queUsrId, String username, String fullname,
-	    org.lamsfoundation.lams.tool.mc.pojos.McSession mcSession, Set mcUsrAttempts) {
+	    McSession mcSession, Set mcUsrAttempts) {
 	this.queUsrId = queUsrId;
 	this.username = username;
 	this.fullname = fullname;
 	this.mcSession = mcSession;
-	this.mcUsrAttempts = mcUsrAttempts;
+	this.numberOfAttempts = 0;
     }
 
     /**
@@ -87,16 +88,6 @@ public class McQueUsr implements Serializable {
      */
     public void setResponseFinalised(boolean responseFinalised) {
 	this.responseFinalised = responseFinalised;
-    }
-
-    /** default constructor */
-    public McQueUsr() {
-    }
-
-    /** minimal constructor */
-    public McQueUsr(Long queUsrId, Set mcUsrAttempts) {
-	this.queUsrId = queUsrId;
-	this.mcUsrAttempts = mcUsrAttempts;
     }
 
     public Long getUid() {
@@ -131,33 +122,25 @@ public class McQueUsr implements Serializable {
 	this.fullname = fullname;
     }
 
-    public org.lamsfoundation.lams.tool.mc.pojos.McSession getMcSession() {
+    public McSession getMcSession() {
 	return this.mcSession;
     }
 
-    public void setMcSession(org.lamsfoundation.lams.tool.mc.pojos.McSession mcSession) {
+    public void setMcSession(McSession mcSession) {
 	this.mcSession = mcSession;
-    }
-
-    public Set getMcUsrAttempts() {
-	if (this.mcUsrAttempts == null)
-	    setMcUsrAttempts(new HashSet());
-	return this.mcUsrAttempts;
-    }
-
-    public void setMcUsrAttempts(Set mcUsrAttempts) {
-	this.mcUsrAttempts = mcUsrAttempts;
     }
 
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).append("queUsrId", getQueUsrId())
 		.append("username", getUsername()).append("fullname", getFullname())
 		.append("responseFinalised", isResponseFinalised()).append("mcSessionId", getMcSessionId())
-		.append("lastAttemptOrder", getLastAttemptOrder())
+		.append("numberOfAttempts", getNumberOfAttempts())
 		.append("lastAttemptTotalMark", getLastAttemptTotalMark()).toString();
     }
 
     /**
+     * Please pay attention this is *sessionUid* and not sessionId (this is due to Ozgur gave wrongly name to this field)
+     * 
      * @return Returns the mcSessionId.
      */
     public Long getMcSessionId() {
@@ -172,12 +155,12 @@ public class McQueUsr implements Serializable {
 	this.mcSessionId = mcSessionId;
     }
 
-    public Integer getLastAttemptOrder() {
-	return lastAttemptOrder;
+    public Integer getNumberOfAttempts() {
+	return numberOfAttempts;
     }
 
-    public void setLastAttemptOrder(Integer lastAttemptOrder) {
-	this.lastAttemptOrder = lastAttemptOrder;
+    public void setNumberOfAttempts(Integer numberOfAttempts) {
+	this.numberOfAttempts = numberOfAttempts;
     }
 
     public Integer getLastAttemptTotalMark() {

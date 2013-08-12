@@ -42,13 +42,11 @@
 						<td NOWRAP class="align-left" valign=top><b> <fmt:message key="label.yourAnswers"/>  </b></td>
 						<td align=right valign=top>(<c:out value="${userEntry.mark}"/>)</td>
 						</tr>
- 						<c:forEach var="attemptMapEntry" items="${userEntry.usersAttempts}">
 						 <tr>
 							<td NOWRAP class="align-left" valign=top>
-								<fmt:message key="label.attempt"/> <c:out value="${attemptMapEntry.key}"/>: <c:out value="${attemptMapEntry.value}"  escapeXml="false"/> 
+								<fmt:message key="label.attempt"/> <c:out value="${userEntry.userAnswer}"/>
 							</td>
 						 </tr>
-						</c:forEach>
 					</c:forEach>	
 					</c:forEach>			
 				</table>

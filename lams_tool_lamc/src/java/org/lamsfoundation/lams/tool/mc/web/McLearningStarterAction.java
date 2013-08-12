@@ -26,9 +26,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
-import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -45,9 +43,9 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McLearnerStarterDTO;
@@ -59,99 +57,32 @@ import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * 
- * @author Ozgur Demirtas
- *
- <!--Learning Starter Action: initializes the Learning module -->
- <action 	path="/learningStarter" 
- type="org.lamsfoundation.lams.tool.mc.web.McLearningStarterAction" 
- name="McLearningForm" 
- scope="request"
- validate="false"
- unknown="false"
- input="/learningIndex.jsp"> 
-
- <forward
- name="loadLearner"
- path="/learning/AnswersContent.jsp"
- redirect="false"
- />
-
- <forward
- name="viewAnswers"
- path="/learning/ViewAnswers.jsp"
- redirect="false"
- />
-
- <forward
- name="redoQuestions"
- path="/learning/RedoQuestions.jsp"
- redirect="false"
- />
-
- <forward
- name="preview"
- path="/learning/Preview.jsp"
- redirect="false"
- />
-
- <forward
- name="learningStarter"
- path="/learningIndex.jsp"
- redirect="false"
- />
-
- <forward
- name="defineLater"
- path="/learning/defineLater.jsp"
- redirect="false"
- />
-
- <forward
- name="runOffline"
- path="/learning/RunOffline.jsp"
- redirect="false"
- />
-
- <forward
- name="errorList"
- path="/McErrorBox.jsp"
- redirect="false"
- />
- </action>  
- *
- */
-
-/**
- * 
  * Note: Because of MCQ's learning reporting structure, Show Learner Report is always ON even if in authoring it is set
  * to false.
+ * 
+ * @author Ozgur Demirtas
  */
 public class McLearningStarterAction extends Action implements McAppConstants {
-    static Logger logger = Logger.getLogger(McLearningStarterAction.class.getName());
+    
+    private static Logger logger = Logger.getLogger(McLearningStarterAction.class.getName());
+    
+    private static IMcService mcService;
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, McApplicationException {
 
-	/*
-	 * By now, the passed tool session id MUST exist in the db through the calling of: public void
-	 * createToolSession(Long toolSessionId, Long toolContentId) by the container.
-	 * 
-	 * make sure this session exists in tool's session table by now.
-	 */
-
 	McUtils.cleanUpSessionAbsolute(request);
 
-	Map mapQuestionsContent = new TreeMap(new McComparator());
-	Map mapAnswers = new TreeMap(new McComparator());
-
-	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	if (mcService == null) {
+	    mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	}
 
 	McLearningForm mcLearningForm = (McLearningForm) form;
 	mcLearningForm.setMcService(mcService);
@@ -163,8 +94,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    return validateParameters;
 	}
 
-	SessionMap sessionMap = new SessionMap();
-	List sequentialCheckedCa = new LinkedList();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	List<String> sequentialCheckedCa = new LinkedList<String>();
 	sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, sequentialCheckedCa);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	mcLearningForm.setHttpSessionID(sessionMap.getSessionID());
@@ -177,7 +108,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	 * retrieve it and the relavent content
 	 */
 
-	McSession mcSession = mcService.retrieveMcSession(new Long(toolSessionID));
+	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
 
 	if (mcSession == null) {
 	    McUtils.cleanUpSessionAbsolute(request);
@@ -231,6 +162,16 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		return mapping.findForward(McAppConstants.RUN_OFFLINE);
 	    }
 	}
+	
+	String mode = request.getParameter(McAppConstants.MODE);
+	McQueUsr user = null;
+	if ((mode != null) && mode.equals(ToolAccessMode.TEACHER.toString())) {
+	    // monitoring mode - user is specified in URL
+	    // user may be null if the user was force completed.
+	    user = getSpecifiedUser(toolSessionID, WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
+	} else {
+	    user = getCurrentUser(toolSessionID);
+	}
 
 	/*
 	 * Is the tool activity been checked as Run Offline in the property inspector?
@@ -238,9 +179,35 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	mcLearnerStarterDTO.setToolActivityOffline(new Boolean(mcContent.isRunOffline()).toString());
 	mcLearnerStarterDTO.setActivityTitle(mcContent.getTitle());
 	request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
-
 	mcLearningForm.setToolContentID(mcContent.getMcContentId().toString());
-	commonContentSetup(request, mcContent, mcService, mcLearningForm, toolSessionID);
+	
+	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
+	mcGeneralLearnerFlowDTO.setTotalCountReached(new Boolean(false).toString());
+	mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(1));
+
+	Boolean displayAnswers = mcContent.isDisplayAnswers();
+	mcGeneralLearnerFlowDTO.setDisplayAnswers(displayAnswers.toString());
+	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
+	String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
+	mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
+
+	String userID = mcLearningForm.getUserID();
+	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
+		McAppConstants.MY_SIGNATURE, new Integer(userID));
+
+	if (notebookEntry != null) {
+	    String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+	}
+	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
+	
+
+	List<McLearnerAnswersDTO> learnerAnswersDTOList = mcService.buildLearnerAnswersDTOList(mcContent, user);
+	request.setAttribute(McAppConstants.LEARNER_ANSWERS_DTO_LIST, learnerAnswersDTOList);
+	// should we show the marks for each question - we show the marks if any of the questions
+	// have a mark > 1.
+	Boolean showMarks = LearningUtil.isShowMarksOnQuestion(learnerAnswersDTOList);
+	mcGeneralLearnerFlowDTO.setShowMarks(showMarks.toString());
 
 	/*
 	 * find out if the content is set to run offline or online. If it is set to run offline , the learners are
@@ -257,51 +224,12 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    return (mapping.findForward(McAppConstants.DEFINE_LATER));
 	}
 
-	/*
-	 * Is the request for a preview by the author? Preview The tool must be able to show the specified content as if
-	 * it was running in a lesson. It will be the learner url with tool access mode set to ToolAccessMode.AUTHOR 3
-	 * modes are: author teacher learner
-	 */
-
-	/* handle PREVIEW mode */
-	// String mode=mcLearningForm.getLearningMode();
-	String mode = request.getParameter(McAppConstants.MODE);
-
-	/*
-	 * by now, we know that the mode is either teacher or learner check if the mode is teacher and request is for
-	 * Learner Progress
-	 */
-	String userId = request.getParameter(McAppConstants.USER_ID);
-
-	if ((userId != null) && (mode.equals("teacher"))) {
+	if (mode.equals("teacher")) {
 
 	    /* LEARNER_PROGRESS for jsp */
 	    mcLearningForm.setLearnerProgress(new Boolean(true).toString());
-	    mcLearningForm.setLearnerProgressUserId(userId);
+	    mcLearningForm.setLearnerProgressUserId(user.getQueUsrId().toString());
 
-	    /*
-	     * pay attention that this userId is the learner's userId passed by the request parameter. It is differerent
-	     * than USER_ID kept in the session of the current system user
-	     */
-
-	    McQueUsr mcQueUsr = mcService.getMcUserBySession(new Long(userId), mcSession.getUid());
-	    if (mcQueUsr == null) {
-		McLearningStarterAction.logger.error("error.learner.required");
-		persistError(request, "error.learner.required");
-		McLearningStarterAction.logger.error("forwarding to: " + McAppConstants.SIMPLE_LEARNING_ERROR);
-		return (mapping.findForward(McAppConstants.SIMPLE_LEARNING_ERROR));
-	    }
-
-	    /* check whether the user's session really referrs to the session id passed to the url */
-	    Long sessionUid = mcQueUsr.getMcSessionId();
-	    McSession mcSessionLocal = mcService.getMcSessionByUID(sessionUid);
-
-	    toolSessionID = mcLearningForm.getToolSessionID();
-
-	    if ((mcSessionLocal == null)
-		    || (mcSessionLocal.getMcSessionId().longValue() != new Long(toolSessionID).longValue())) {
-		McLearningStarterAction.logger.error("error.learner.sessionId.inconsistent");
-	    }
 	    LearningUtil.saveFormRequestData(request, mcLearningForm, true);
 
 	    request.setAttribute(McAppConstants.REQUEST_BY_STARTER, new Boolean(true).toString());
@@ -311,90 +239,18 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
 	}
 
-	/* by now, we know that the mode is learner */
-	/*
-	 * verify that userId does not already exist in the db. If it does exist, that means, that user already
-	 * responded to the content and his answers must be displayed read-only
-	 */
-
-	Integer userID = null;
-	HttpSession ss = SessionManager.getSession();
-	if (ss != null) {
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    if (user != null) {
-		userID = user.getUserID();
-	    }
-	}
-
-	McQueUsr mcQueUsr = mcService.getMcUserBySession(new Long(userID.longValue()), mcSession.getUid());
-
 	request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 
-	/* if the user's session id AND user id exists in the tool tables go to redo questions. */
-	if (mcQueUsr != null) {
-	    Long sessionUid = mcQueUsr.getMcSessionId();
-	    McSession mcUserSession = mcService.getMcSessionByUID(sessionUid);
-	    String userSessionId = mcUserSession.getMcSessionId().toString();
-
-	    if (toolSessionID.equals(userSessionId)) {
-		McLearningAction mcLearningAction = new McLearningAction();
-		request.setAttribute(McAppConstants.REQUEST_BY_STARTER, (Boolean.TRUE).toString());
-		mcLearningAction.prepareViewAnswersData(mapping, mcLearningForm, request, getServlet()
-			.getServletContext());
-		return mapping.findForward(McAppConstants.VIEW_ANSWERS);
-	    }
-	} else if (mode.equals("teacher")) {
+	/* user already responded to the content - go to redo questions. */
+	if (user.isResponseFinalised()) {
 	    McLearningAction mcLearningAction = new McLearningAction();
-	    mcLearningAction.setServlet(servlet);
-	    mcLearningForm.setLearnerProgress(new Boolean(true).toString());
-	    mcLearningForm.setLearnerProgressUserId(userId);
-	    return mcLearningAction.viewAnswers(mapping, mcLearningForm, request, response);
+	    request.setAttribute(McAppConstants.REQUEST_BY_STARTER, (Boolean.TRUE).toString());
+	    mcLearningAction.prepareViewAnswersData(mapping, mcLearningForm, request, getServlet().getServletContext());
+	    return mapping.findForward(McAppConstants.VIEW_ANSWERS);
 	}
+	
 	request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 	return (mapping.findForward(McAppConstants.LOAD_LEARNER));
-    }
-
-    /**
-     * sets up question and candidate answers maps commonContentSetup(HttpServletRequest request, McContent mcContent)
-     * 
-     * @param request
-     * @param mcContent
-     */
-    protected void commonContentSetup(HttpServletRequest request, McContent mcContent, IMcService mcService,
-	    McLearningForm mcLearningForm, String toolSessionID) {
-	Map mapQuestionsContent = new TreeMap(new McComparator());
-
-	boolean randomize = mcContent.isRandomize();
-
-	List<McLearnerAnswersDTO> listQuestionAndCandidateAnswersDTO = LearningUtil
-		.buildQuestionAndCandidateAnswersDTO(request, mcContent, randomize, mcService);
-
-	request.setAttribute(McAppConstants.LIST_QUESTION_CANDIDATEANSWERS_DTO, listQuestionAndCandidateAnswersDTO);
-	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
-	mcGeneralLearnerFlowDTO.setTotalCountReached(new Boolean(false).toString());
-	mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(1));
-
-	// should we show the marks for each question - we show the marks if any of the questions
-	// have a mark > 1.
-	Boolean showMarks = LearningUtil.isShowMarksOnQuestion(listQuestionAndCandidateAnswersDTO);
-	mcGeneralLearnerFlowDTO.setShowMarks(showMarks.toString());
-
-	Boolean displayAnswers = mcContent.isDisplayAnswers();
-	mcGeneralLearnerFlowDTO.setDisplayAnswers(displayAnswers.toString());
-	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
-	String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
-	mcGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
-
-	String userID = mcLearningForm.getUserID();
-	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		McAppConstants.MY_SIGNATURE, new Integer(userID));
-
-	if (notebookEntry != null) {
-	    String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
-	}
-
-	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
     }
 
     protected ActionForward validateParameters(HttpServletRequest request, McLearningForm mcLearningForm,
@@ -442,6 +298,32 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	}
 
 	return null;
+    }
+    
+    private McQueUsr getCurrentUser(String toolSessionId) {
+
+	// get back login user DTO 
+	HttpSession ss = SessionManager.getSession();
+	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userId = new Long(toolUser.getUserID().longValue());	
+	
+	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionId));
+	McQueUsr qaUser = mcService.getMcUserBySession(userId, mcSession.getUid());
+	if (qaUser == null) {
+	    qaUser = mcService.createMcUser(new Long(toolSessionId));
+	}
+
+	return qaUser;
+    }
+
+    private McQueUsr getSpecifiedUser(String toolSessionId, Integer userId) {
+	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionId));
+	McQueUsr qaUser = mcService.getMcUserBySession(new Long(userId.intValue()), mcSession.getUid());
+	if (qaUser == null) {
+	    logger.error("Unable to find specified user for Q&A activity. Screens are likely to fail. SessionId="
+		    + new Long(toolSessionId) + " UserId=" + userId);
+	}
+	return qaUser;
     }
 
     /**

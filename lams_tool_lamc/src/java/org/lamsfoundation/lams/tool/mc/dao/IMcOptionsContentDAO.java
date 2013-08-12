@@ -46,8 +46,6 @@ public interface IMcOptionsContentDAO {
      */
     public McOptsContent getMcOptionsContentByUID(Long uid);
 
-    public List findMcOptionUidsByQueId(Long mcQueContentId);
-
     /**
      * <p>
      * Return a list of a McOptsContents with the given identifier <code>mcQueContentId</code>, returns null if not
@@ -71,22 +69,9 @@ public interface IMcOptionsContentDAO {
      */
     public McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
 
-    /**
-     * <p>
-     * Return a list of a persisted McOptsContents with the given identifier <code>mcQueContentId</code>, returns null
-     * if not found.
-     * </p>
-     * 
-     * @param mcQueContentId
-     * @return List
-     */
-    public List getPersistedSelectedOptions(Long mcQueContentId);
-
     public List findMcOptionCorrectByQueId(Long mcQueContentId);
 
     public List populateCandidateAnswersDTO(Long mcQueContentId);
-
-    public List getCorrectOption(Long mcQueContentId);
 
     /**
      * <p>
@@ -132,6 +117,4 @@ public interface IMcOptionsContentDAO {
      * @param mcOptionsContent
      */
     public void removeMcOptionsContent(McOptsContent mcOptsContent);
-
-    public List findMcOptionNamesByQueId(Long mcQueContentId);
 }

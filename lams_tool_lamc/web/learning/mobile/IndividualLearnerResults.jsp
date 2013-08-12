@@ -15,10 +15,10 @@
 				elem.disabled = true;
 			}
 		}
-	         function submitForm(methodName){
-	                var f = document.getElementById('Form1');
-	                f.submit();
-	        }
+	    function submitForm(methodName){
+	    	var f = document.getElementById('Form1');
+	        f.submit();
+	    }
 	</script>
 </lams:head>
 
@@ -121,20 +121,16 @@
 					</c:if>
 
 						<p>
-							<c:forEach var="caText" varStatus="status"
-								items="${dto.candidateAnswers}">
-								<c:out value="${caText.value}" escapeXml="false" />
-							</c:forEach>
+							<c:out value="${dto.answerOption.mcQueOptionText}" escapeXml="false" />
 
-                    <c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
-	
+                    		<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
 								<c:if test="${dto.attemptCorrect == 'true'}">
 									<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">
 								</c:if>
 								<c:if test="${dto.attemptCorrect != 'true'}">
 									<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
 								</c:if>
-	
+							</c:if>
 						</p>
 
 						<c:if test="${(dto.feedback != null) && (dto.feedback != '')}">
@@ -142,7 +138,7 @@
 								<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${dto.feedback}" escapeXml="false" /> 
 							</div>		
 						</c:if>												
-					</c:if>
+					
 					</div>
 				</li>
 			</c:forEach>
@@ -183,7 +179,7 @@
 				</p>
 				
 				<div class="small-space-top button-inside" >
-					<button type="submit" name="redoQuestionsOk" data-icon="back">
+					<button type="submit" name="redoQuestions" data-icon="back">
 						<fmt:message key="label.redo.questions" />
 					</button>
 				</div>

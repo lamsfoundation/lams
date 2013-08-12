@@ -37,11 +37,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class McUsrAttempt implements Serializable {
 
+    private static final long serialVersionUID = 4514268732673337338L;
+
     /** identifier field */
     private Long uid;
-
-    /** persistent field */
-    private Long attemptId;
 
     /** nullable persistent field */
     private Date attemptTime;
@@ -52,92 +51,34 @@ public class McUsrAttempt implements Serializable {
 
     private boolean passed;
 
-    private Integer attemptOrder;
-
     private Long queUsrId;
 
     private Long mcQueContentId;
 
     /** persistent field */
-    private org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent;
+    private McQueContent mcQueContent;
 
     /** persistent field */
-    private org.lamsfoundation.lams.tool.mc.pojos.McQueUsr mcQueUsr;
+    private McQueUsr mcQueUsr;
 
     /** persistent field */
-    private org.lamsfoundation.lams.tool.mc.pojos.McOptsContent mcOptionsContent;
+    private McOptsContent mcOptionsContent;
 
-    /** full constructor */
-    public McUsrAttempt(Long attemptId, Date attemptTime,
-	    org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent,
-	    org.lamsfoundation.lams.tool.mc.pojos.McQueUsr mcQueUsr,
-	    org.lamsfoundation.lams.tool.mc.pojos.McOptsContent mcOptionsContent) {
-	this.attemptId = attemptId;
-	this.attemptTime = attemptTime;
-	this.mcQueContent = mcQueContent;
-	this.mcQueUsr = mcQueUsr;
-	this.mcOptionsContent = mcOptionsContent;
-    }
-
-    public McUsrAttempt(Date attemptTime, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent,
-	    org.lamsfoundation.lams.tool.mc.pojos.McQueUsr mcQueUsr,
-	    org.lamsfoundation.lams.tool.mc.pojos.McOptsContent mcOptionsContent) {
-	this.attemptTime = attemptTime;
-	this.mcQueContent = mcQueContent;
-	this.mcQueUsr = mcQueUsr;
-	this.mcOptionsContent = mcOptionsContent;
-    }
-
-    public McUsrAttempt(Date attemptTime, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent,
-	    org.lamsfoundation.lams.tool.mc.pojos.McQueUsr mcQueUsr,
-	    org.lamsfoundation.lams.tool.mc.pojos.McOptsContent mcOptionsContent, Integer mark, boolean passed) {
+    public McUsrAttempt(Date attemptTime, McQueContent mcQueContent,
+	    McQueUsr mcQueUsr,
+	    McOptsContent mcOptionsContent, Integer mark, boolean passed,
+	    boolean attemptCorrect) {
 	this.attemptTime = attemptTime;
 	this.mcQueContent = mcQueContent;
 	this.mcQueUsr = mcQueUsr;
 	this.mcOptionsContent = mcOptionsContent;
 	this.mark = mark;
 	this.passed = passed;
-    }
-
-    public McUsrAttempt(Date attemptTime, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent,
-	    org.lamsfoundation.lams.tool.mc.pojos.McQueUsr mcQueUsr,
-	    org.lamsfoundation.lams.tool.mc.pojos.McOptsContent mcOptionsContent, Integer mark, boolean passed,
-	    Integer attemptOrder) {
-	this.attemptTime = attemptTime;
-	this.mcQueContent = mcQueContent;
-	this.mcQueUsr = mcQueUsr;
-	this.mcOptionsContent = mcOptionsContent;
-	this.mark = mark;
-	this.passed = passed;
-	this.attemptOrder = attemptOrder;
-    }
-
-    public McUsrAttempt(Date attemptTime, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent,
-	    org.lamsfoundation.lams.tool.mc.pojos.McQueUsr mcQueUsr,
-	    org.lamsfoundation.lams.tool.mc.pojos.McOptsContent mcOptionsContent, Integer mark, boolean passed,
-	    Integer attemptOrder, boolean attemptCorrect) {
-	this.attemptTime = attemptTime;
-	this.mcQueContent = mcQueContent;
-	this.mcQueUsr = mcQueUsr;
-	this.mcOptionsContent = mcOptionsContent;
-	this.mark = mark;
-	this.passed = passed;
-	this.attemptOrder = attemptOrder;
 	this.attemptCorrect = attemptCorrect;
     }
 
     /** default constructor */
     public McUsrAttempt() {
-    }
-
-    /** minimal constructor */
-    public McUsrAttempt(Long attemptId, org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent,
-	    org.lamsfoundation.lams.tool.mc.pojos.McQueUsr mcQueUsr,
-	    org.lamsfoundation.lams.tool.mc.pojos.McOptsContent mcOptionsContent) {
-	this.attemptId = attemptId;
-	this.mcQueContent = mcQueContent;
-	this.mcQueUsr = mcQueUsr;
-	this.mcOptionsContent = mcOptionsContent;
     }
 
     public Long getUid() {
@@ -146,14 +87,6 @@ public class McUsrAttempt implements Serializable {
 
     public void setUid(Long uid) {
 	this.uid = uid;
-    }
-
-    public Long getAttemptId() {
-	return this.attemptId;
-    }
-
-    public void setAttemptId(Long attemptId) {
-	this.attemptId = attemptId;
     }
 
     public Date getAttemptTime() {
@@ -218,8 +151,8 @@ public class McUsrAttempt implements Serializable {
      * @param passed
      *            The passed to set.
      */
-    public void setPassed(boolean passed) {
-	this.passed = passed;
+    public void setPassed(boolean isPassed) {
+	this.passed = isPassed;
     }
 
     /**
@@ -235,21 +168,6 @@ public class McUsrAttempt implements Serializable {
      */
     public void setQueUsrId(Long queUsrId) {
 	this.queUsrId = queUsrId;
-    }
-
-    /**
-     * @return Returns the attemptOrder.
-     */
-    public Integer getAttemptOrder() {
-	return attemptOrder;
-    }
-
-    /**
-     * @param attemptOrder
-     *            The attemptOrder to set.
-     */
-    public void setAttemptOrder(Integer attemptOrder) {
-	this.attemptOrder = attemptOrder;
     }
 
     /**

@@ -40,7 +40,7 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
     private static final String CALC_MARK_STATS_FOR_SESSION = "select max(mu.lastAttemptTotalMark), min(mu.lastAttemptTotalMark), avg(mu.lastAttemptTotalMark)"
 	    + " from McQueUsr mu where mu.mcSessionId = :mcSessionUid";
 
-    private static final String GET_USER_BY_USER_ID_SESSION = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSessionId=:mcSessionId";
+    private static final String GET_USER_BY_USER_ID_SESSION = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSessionId=:mcSessionUid";
 
     private static final String GET_USER_BY_USER_ID = "from McQueUsr user where user.queUsrId=?";
 
@@ -58,10 +58,10 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 	return null;
     }
 
-    public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionId) {
+    public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) {
 
 	List list = getSession().createQuery(GET_USER_BY_USER_ID_SESSION).setLong("queUsrId", queUsrId.longValue())
-		.setLong("mcSessionId", mcSessionId.longValue()).list();
+		.setLong("mcSessionUid", mcSessionUid.longValue()).list();
 
 	if (list != null && list.size() > 0) {
 	    McQueUsr usr = (McQueUsr) list.get(0);

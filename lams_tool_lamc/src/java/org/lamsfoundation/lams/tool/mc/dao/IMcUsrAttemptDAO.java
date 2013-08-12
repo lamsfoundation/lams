@@ -67,7 +67,7 @@ public interface IMcUsrAttemptDAO {
      * @param mcUsrAttempt
      * @return
      */
-    public void removeMcUsrAttempt(McUsrAttempt mcUsrAttempt);
+    public void removeAllUserAttempts(Long queUserUid);
 
     /**
      * Get the most recent attempts (for all questions) for one user in one tool session
@@ -75,23 +75,11 @@ public interface IMcUsrAttemptDAO {
      * @param queUserUid
      * @return
      */
-    public List getLatestAttemptsForAUser(Long queUserUid);
-
-    /**
-     * <p>
-     * gets all the attempts for one questions for one user in one tool session <code>queUsrId</code>, ordered by the
-     * attempt id. If there is more than one option selected for a question, the attempts are "batched".
-     * </p>
-     * 
-     * @param queUsrId
-     * @return
-     */
-    public List<McUsrAttempt> getAllAttemptsForAUserForOneQuestionContentOrderByAttempt(Long queUsrUid,
-	    Long mcQueContentId);
+    public List<McUsrAttempt> getUserAttempts(Long queUserUid);
 
     /**
      * Get the highest attempt order for a user for a particular question
      */
-    public List<McUsrAttempt> getLatestAttemptsForAUserForOneQuestionContent(Long queUsrUid, Long mcQueContentId);
+    public McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId);
 
 }

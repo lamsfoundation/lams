@@ -56,7 +56,7 @@ public interface IMcSessionDAO {
      *            The tool session id
      * @return the persistent instance of a McSession or null if not found.
      */
-    public McSession findMcSessionById(Long mcSessionId);
+    public McSession getMcSessionById(Long mcSessionId);
 
     /**
      * <p>

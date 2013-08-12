@@ -4,15 +4,15 @@
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU General License as published by
  * the Free Software Foundation.
  * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU General License for more details.
  * 
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU General License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
@@ -36,6 +36,7 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
+import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -51,201 +52,177 @@ import org.lamsfoundation.lams.usermanagement.User;
  *         Interface that defines the contract that all MCQ service provider must follow.
  */
 public interface IMcService {
-    public void configureContentRepository() throws McApplicationException;
+    void configureContentRepository() throws McApplicationException;
 
-    public void createMc(McContent mcContent) throws McApplicationException;
+    void createMc(McContent mcContent) throws McApplicationException;
 
-    public McContent retrieveMc(Long toolContentId) throws McApplicationException;
+    McContent retrieveMc(Long toolContentId) throws McApplicationException;
 
-    public void createMcQue(McQueContent mcQueContent) throws McApplicationException;
+    void createMcQue(McQueContent mcQueContent) throws McApplicationException;
 
-    public void updateMcQueContent(McQueContent mcQueContent) throws McApplicationException;
+    void updateMcQueContent(McQueContent mcQueContent) throws McApplicationException;
 
-    public List retrieveMcQueContentsByToolContentId(long mcContentId) throws McApplicationException;
+    List retrieveMcQueContentsByToolContentId(long mcContentId) throws McApplicationException;
 
-    public McQueContent getQuestionContentByDisplayOrder(final Long displayOrder, final Long mcContentUid)
+    McQueContent getQuestionByDisplayOrder(final Long displayOrder, final Long mcContentUid)
 	    throws McApplicationException;
 
-    public void createMcSession(McSession mcSession) throws McApplicationException;
+    void createMcSession(McSession mcSession) throws McApplicationException;
 
-    public void createMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
+    McQueUsr createMcUser(Long toolSessionId) throws McApplicationException;
 
-    public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionId) throws McApplicationException;
+    McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) throws McApplicationException;
 
-    public McQueUsr retrieveMcQueUsr(Long userId) throws McApplicationException;
+    McQueUsr retrieveMcQueUsr(Long userId) throws McApplicationException;
 
-    public void createMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException;
+    void saveUserAttempt(McQueUsr user, List<McLearnerAnswersDTO> selectedQuestionAndCandidateAnswersDTO);
 
-    public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException;
+    void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException;
 
-    public McQueContent retrieveMcQueContentByUID(Long uid) throws McApplicationException;
+    McQueContent retrieveMcQueContentByUID(Long uid) throws McApplicationException;
 
-    public void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException;
+    void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException;
 
-    public McQueContent getMcQueContentByUID(Long uid) throws McApplicationException;
+    McQueContent getMcQueContentByUID(Long uid) throws McApplicationException;
 
-    public void saveOrUpdateMcQueContent(McQueContent mcQueContent) throws McApplicationException;
+    void saveOrUpdateMcQueContent(McQueContent mcQueContent) throws McApplicationException;
 
-    public void removeQuestionContentByMcUid(final Long mcContentUid) throws McApplicationException;
+    void removeQuestionContentByMcUid(final Long mcContentUid) throws McApplicationException;
 
-    public McOptsContent getMcOptionsContentByUID(Long uid) throws McApplicationException;
+    McOptsContent getMcOptionsContentByUID(Long uid) throws McApplicationException;
 
-    public void resetAllQuestions(final Long mcContentUid) throws McApplicationException;
+    void resetAllQuestions(final Long mcContentUid) throws McApplicationException;
 
-    public List refreshQuestionContent(final Long mcContentId) throws McApplicationException;
+    List refreshQuestionContent(final Long mcContentId) throws McApplicationException;
 
-    public List getAllQuestionEntriesSorted(final long mcContentId) throws McApplicationException;
+    List getAllQuestionEntriesSorted(final long mcContentId) throws McApplicationException;
 
-    public List findMcOptionUidsByQueId(Long mcQueContentId) throws McApplicationException;
+    McQueContent getQuestionByUid(Long uid) throws McApplicationException;
 
-    public McQueContent findMcQuestionContentByUid(Long uid) throws McApplicationException;
+    void removeMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException;
 
-    public void removeMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException;
+    void removeMcOptionsContent(McOptsContent mcOptsContent);
 
-    public void removeMcOptionsContent(McOptsContent mcOptsContent);
+    McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
 
-    public McQueContent getQuestionContentByQuestionText(final String question, final Long mcContentUid);
+    void removeMcQueContentByUID(Long uid) throws McApplicationException;
 
-    public List getPersistedSelectedOptions(Long mcQueContentId);
+    McQueUsr getMcUserByUID(Long uid) throws McApplicationException;
 
-    public void removeMcQueContentByUID(Long uid) throws McApplicationException;
+    List<McQueContent> getAllQuestionEntries(final Long mcContentId) throws McApplicationException;
 
-    public McQueUsr getMcUserByUID(Long uid) throws McApplicationException;
+    McSession getMcSessionById(Long mcSessionId) throws McApplicationException;
 
-    public List getCorrectOption(Long mcQueContentId);
+    McContent retrieveMcBySessionId(Long mcSessionId) throws McApplicationException;
 
-    public List<McQueContent> getAllQuestionEntries(final Long mcContentId) throws McApplicationException;
+    void updateMc(McContent mc) throws McApplicationException;
 
-    public McSession retrieveMcSession(Long mcSessionId) throws McApplicationException;
+    void updateMcSession(McSession mcSession) throws McApplicationException;
 
-    public McContent retrieveMcBySessionId(Long mcSessionId) throws McApplicationException;
+    void updateMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
 
-    public void updateMc(McContent mc) throws McApplicationException;
+    List populateCandidateAnswersDTO(Long mcQueContentId) throws McApplicationException;
 
-    public void updateMcSession(McSession mcSession) throws McApplicationException;
+    McSession getMcSessionByUID(Long uid) throws McApplicationException;
 
-    public void updateMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
+    List<McUsrAttempt> getFinalizedUserAttempts(final McQueUsr user) throws McApplicationException;
 
-    public List populateCandidateAnswersDTO(Long mcQueContentId) throws McApplicationException;
+    void deleteMc(McContent mc) throws McApplicationException;
 
-    public McSession getMcSessionByUID(Long uid) throws McApplicationException;
+    void deleteMcById(Long mcId) throws McApplicationException;
 
-    public List getLatestAttemptsForAUser(final Long queUserUid) throws McApplicationException;
+    void deleteMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
 
-    public void deleteMc(McContent mc) throws McApplicationException;
+    List findMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException;
 
-    public void deleteMcById(Long mcId) throws McApplicationException;
+    void saveMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
 
-    public void removeAttempt(McUsrAttempt attempt) throws McApplicationException;
+    McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
 
-    public void deleteMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
+    void updateMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
 
-    public List findMcOptionsContentByQueId(Long mcQueContentId) throws McApplicationException;
+    void deleteMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
 
-    public void saveMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
+    void deleteMcOptionsContentByUID(Long uid) throws McApplicationException;
 
-    public McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
+    User getCurrentUserData(String username) throws McApplicationException;
 
-    public void updateMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
+    Lesson getCurrentLesson(long lessonId) throws McApplicationException;
 
-    public void deleteMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
+    void saveMcContent(McContent mc) throws McApplicationException;
 
-    public void deleteMcOptionsContentByUID(Long uid) throws McApplicationException;
+    boolean studentActivityOccurredGlobal(McContent mcContent) throws McApplicationException;
 
-    public User getCurrentUserData(String username) throws McApplicationException;
-
-    public Lesson getCurrentLesson(long lessonId) throws McApplicationException;
-
-    public void saveMcContent(McContent mc) throws McApplicationException;
-
-    public boolean studentActivityOccurredGlobal(McContent mcContent) throws McApplicationException;
-
-    /**
-     * <p>
-     * gets all the attempts for one questions for one user in one tool session <code>queUsrId</code>, ordered by the
-     * attempt id. If there is more than one option selected for a question, the attempts are "batched".
-     * </p>
-     * 
-     * @param queUsrId
-     * @return
-     */
-    public List<McUsrAttempt> getAllAttemptsForAUserForOneQuestionContentOrderByAttempt(Long queUsrUid,
-	    Long mcQueContentId) throws McApplicationException;
-
-    public List<McUsrAttempt> getLatestAttemptsForAUserForOneQuestionContent(Long queUsrUid, Long mcQueContentId)
+    McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId)
 	    throws McApplicationException;
 
-    public int countIncompleteSession(McContent mc) throws McApplicationException;
+    int countIncompleteSession(McContent mc) throws McApplicationException;
 
-    public boolean studentActivityOccurred(McContent mc) throws McApplicationException;
+    boolean studentActivityOccurred(McContent mc) throws McApplicationException;
 
-    public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
+    void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
-    public void setAsForceCompleteSession(Long toolSessionId) throws McApplicationException;
+    void setAsForceCompleteSession(Long toolSessionId) throws McApplicationException;
 
-    public void setAsForceComplete(Long userId) throws McApplicationException;
+    void setAsForceComplete(Long userId) throws McApplicationException;
 
-    public void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException;
+    void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException;
 
-    public void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException;
+    void setAsRunOffline(Long toolContentId, boolean value) throws DataMissingException, ToolException;
 
-    public void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
+    void removeToolContent(Long toolContentId, boolean removeSessionData) throws SessionDataExistsException,
 	    ToolException;
 
-    public boolean existsSession(Long toolSessionId);
+    boolean existsSession(Long toolSessionId);
 
-    public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException;
+    void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException;
 
-    public void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException;
+    void removeToolSession(Long toolSessionId) throws DataMissingException, ToolException;
 
-    public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException;
+    String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException;
 
-    public ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException;
+    ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException;
 
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
+    ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
 	    ToolException;
 
-    public IToolVO getToolBySignature(String toolSignature) throws McApplicationException;
+    IToolVO getToolBySignature(String toolSignature) throws McApplicationException;
 
-    public long getToolDefaultContentIdBySignature(String toolSignature) throws McApplicationException;
+    long getToolDefaultContentIdBySignature(String toolSignature) throws McApplicationException;
 
-    public McQueContent getToolDefaultQuestionContent(long contentId) throws McApplicationException;
+    McQueContent getToolDefaultQuestionContent(long contentId) throws McApplicationException;
 
-    public ITicket getRepositoryLoginTicket() throws McApplicationException;
+    ITicket getRepositoryLoginTicket() throws McApplicationException;
 
-    public void deleteFromRepository(Long uuid, Long versionID);
+    void deleteFromRepository(Long uuid, Long versionID);
 
-    public NodeKey uploadFileToRepository(InputStream stream, String fileName) throws McApplicationException;
+    NodeKey uploadFileToRepository(InputStream stream, String fileName) throws McApplicationException;
 
-    public InputStream downloadFile(Long uuid, Long versionID) throws McApplicationException;
+    InputStream downloadFile(Long uuid, Long versionID) throws McApplicationException;
 
-    public void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent)
+    void persistFile(String uuid, boolean isOnlineFile, String fileName, McContent mcContent)
 	    throws McApplicationException;
 
-    public McSession findMcSessionById(Long mcSessionId) throws McApplicationException;
+    List getNextAvailableDisplayOrder(final long mcContentId) throws McApplicationException;
 
-    public List getNextAvailableDisplayOrder(final long mcContentId) throws McApplicationException;
-
-    public NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType)
+    NodeKey uploadFile(InputStream istream, String filename, String contentType, String fileType)
 	    throws RepositoryCheckedException;
 
-    public NodeKey copyFile(Long uuid) throws RepositoryCheckedException;
+    NodeKey copyFile(Long uuid) throws RepositoryCheckedException;
 
-    public List findMcOptionCorrectByQueId(Long mcQueContentId) throws McApplicationException;
+    List findMcOptionCorrectByQueId(Long mcQueContentId) throws McApplicationException;
 
-    public List findMcOptionNamesByQueId(Long mcQueContentId) throws McApplicationException;
+    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
+    NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
 
-    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
+    void updateEntry(NotebookEntry notebookEntry);
 
-    public void updateEntry(NotebookEntry notebookEntry);
+    void persistFile(McContent content, McUploadedFile file) throws McApplicationException;
 
-    public void persistFile(McContent content, McUploadedFile file) throws McApplicationException;
+    void removeFile(Long submissionId) throws McApplicationException;
 
-    public void removeFile(Long submissionId) throws McApplicationException;
-
-    public List<McUploadedFile> retrieveMcUploadedFiles(McContent mcContent) throws McApplicationException;
+    List<McUploadedFile> retrieveMcUploadedFiles(McContent mcContent) throws McApplicationException;
 
     /**
      * Return the top, lowest and average mark for all learners for one particular tool session.
@@ -253,7 +230,7 @@ public interface IMcService {
      * @param request
      * @return top mark, lowest mark, average mark in that order
      */
-    public Integer[] getMarkStatistics(McSession mcSession);
+    Integer[] getMarkStatistics(McSession mcSession);
 
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
@@ -262,5 +239,12 @@ public interface IMcService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * @param mcContent
+     * @param user user; pass null if there is no need to populate previous answers
+     * @return
+     */
+    List<McLearnerAnswersDTO> buildLearnerAnswersDTOList(McContent mcContent, McQueUsr user);
 
 }

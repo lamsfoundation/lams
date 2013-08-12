@@ -41,21 +41,13 @@
         column="passed"
         length="1"
     />
-
-
+    
     <property
         name="attemptCorrect"
         type="boolean"
         access="property"        
         column="isAttemptCorrect"
         length="1"
-    />
-
-    <property
-    name="attemptOrder"
-    type="java.lang.Integer"
-    access="property"        
-    column="attemptOrder"
     />
      
      

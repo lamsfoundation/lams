@@ -148,7 +148,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    mcGeneralMonitoringDTO.setSelectionCase(new Long(2));
 	    request.setAttribute(SELECTION_CASE, new Long(2));
 	} else {
-	    McSession mcSession = mcService.retrieveMcSession(new Long(currentMonitoredToolSession));
+	    McSession mcSession = mcService.getMcSessionById(new Long(currentMonitoredToolSession));
 
 	    MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
 
@@ -3241,7 +3241,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		    Integer[] marks = userMark.getMarks();
 		    for (int i = 0; i < marks.length; i++) {
 			cell = row.createCell(count++);
-			cell.setCellValue(marks[i]);
+			Integer mark = (marks[i] == null) ? 0 : marks[i];
+			cell.setCellValue(mark);
 		    }
 
 		    cell = row.createCell(count++);

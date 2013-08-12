@@ -156,9 +156,6 @@ public interface McAppConstants {
     public static final String MAP_LEARNER_FEEDBACK_INCORRECT = "mapLeanerFeedbackIncorrect";
     public static final String MAP_LEARNER_FEEDBACK_CORRECT = "mapLeanerFeedbackCorrect";
     public static final String MAP_QUESTION_WEIGHTS = "mapQuestionWeights";
-    public static final String MAP_QUE_ATTEMPTS = "mapQueAttempts";
-    public static final String MAP_QUE_CORRECT_ATTEMPTS = "mapQueCorrectAttempts";
-    public static final String MAP_QUE_INCORRECT_ATTEMPTS = "mapQueIncorrectAttempts";
     public static final String MAP_RESPONSES = "mapResponses";
 
     public static final String MAP_WEIGHTS = "mapWeights";
@@ -254,7 +251,7 @@ public interface McAppConstants {
 
     /* learner mode contants */
     public static final String MAP_QUESTION_CONTENT_LEARNER = "mapQuestionContentLearner";
-    public static final String LIST_QUESTION_CANDIDATEANSWERS_DTO = "listQuestionCandidateAnswersDto";
+    public static final String LEARNER_ANSWERS_DTO_LIST = "learnerAnswersDTOList";
     public static final String MC_GENERAL_LEARNER_FLOW_DTO = "mcGeneralLearnerFlowDTO";
     public static final String LIST_SELECTED_QUESTION_CANDIDATEANSWERS_DTO = "listSelectedQuestionCandidateAnswersDto";
     public static final String CURRENT_QUESTION_INDEX = "currentQuestionIndex";

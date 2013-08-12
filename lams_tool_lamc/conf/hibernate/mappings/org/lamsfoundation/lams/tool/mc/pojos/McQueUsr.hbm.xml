@@ -62,10 +62,10 @@
     </property>
 
     <property
-    name="lastAttemptOrder"
+    name="numberOfAttempts"
     type="java.lang.Integer"
     access="property"        
-    column="last_attempt_order"
+    column="number_attempts"
     />
  
    <property
@@ -88,23 +88,6 @@
     >
         <column name="mc_session_id" />
     </many-to-one>
-
-   	 <set
-            name="mcUsrAttempts"
-            lazy="true"
-            inverse="true"
-            cascade="all-delete-orphan"
-            sort="unsorted"
-        >
-              <key
-                  column="que_usr_id"
-              >
-              </key>
-
-              <one-to-many
-                  class="org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt"
-              />
-    </set>
 
 </class>
 </hibernate-mapping>

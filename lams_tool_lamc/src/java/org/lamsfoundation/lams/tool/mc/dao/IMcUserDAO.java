@@ -56,7 +56,7 @@ public interface IMcUserDAO {
      */
     public McQueUsr findMcUserById(Long userId);
 
-    public McQueUsr getMcUserBySession(Long userId, Long sessionId);
+    public McQueUsr getMcUserBySession(Long userId, Long sessionUid);
 
     public void saveMcUser(McQueUsr mcUser);
 

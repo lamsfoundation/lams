@@ -91,9 +91,23 @@ public class MonitoringUtil implements McAppConstants {
 
 		List listCandidateAnswersDTO = mcService.populateCandidateAnswersDTO(mcQueContent.getUid());
 		mcMonitoredAnswersDTO.setCandidateAnswersCorrect(listCandidateAnswersDTO);
+		
+		Map<String, List> questionAttemptData = new TreeMap(new McStringComparator());
 
-		Map questionAttemptData = buildGroupsAttemptData(request, mcContent, mcQueContent,
-			mcQueContent.getUid(), mcService, null);
+		Iterator sessionIterator = mcContent.getMcSessions().iterator();
+		while (sessionIterator.hasNext()) {
+		    McSession mcSession = (McSession) sessionIterator.next();
+		    Set<McQueUsr> listMcUsers = mcSession.getMcQueUsers();
+		    List<McMonitoredUserDTO> monitoredUserDTOs = new LinkedList<McMonitoredUserDTO>();
+		    for (McQueUsr mcQueUsr : listMcUsers) {
+			McMonitoredUserDTO mcMonitoredUserDTO = getUserAttempt(request, mcService, mcQueUsr, mcSession,
+				mcQueContent.getUid());
+			monitoredUserDTOs.add(mcMonitoredUserDTO);
+		    }
+		    
+		    questionAttemptData.put(mcSession.getSession_name(), monitoredUserDTOs);
+		}
+		
 		mcMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
 		listMonitoredAnswersContainerDTO.add(mcMonitoredAnswersDTO);
 
@@ -133,8 +147,10 @@ public class MonitoringUtil implements McAppConstants {
 
 		// Get the attempts for this user. The maps must match the maps in buildGroupsAttemptData or the jsp
 		// won't work.
-		List listMonitoredUserContainerDTO = getAttemptEntries(request, mcService, mcQueUsr, mcSession,
-			mcQueContent.getUid(), new LinkedList(), false);
+		McMonitoredUserDTO mcMonitoredUserDTO = getUserAttempt(request, mcService, mcQueUsr, mcSession,
+			mcQueContent.getUid());
+		List<McMonitoredUserDTO> listMonitoredUserContainerDTO = new LinkedList();
+		listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
 		Map questionAttemptData = new TreeMap(new McStringComparator());
 		questionAttemptData.put(mcSession.getSession_name(), listMonitoredUserContainerDTO);
 
@@ -172,14 +188,14 @@ public class MonitoringUtil implements McAppConstants {
 	    Long mapIndex = new Long(1);
 
 	    while (usersIterator.hasNext()) {
-		McQueUsr mcQueUsr = (McQueUsr) usersIterator.next();
+		McQueUsr user = (McQueUsr) usersIterator.next();
 
 		McUserMarkDTO mcUserMarkDTO = new McUserMarkDTO();
 		mcUserMarkDTO.setSessionId(mcSession.getMcSessionId().toString());
 		mcUserMarkDTO.setSessionName(mcSession.getSession_name().toString());
-		mcUserMarkDTO.setFullName(mcQueUsr.getFullname());
-		mcUserMarkDTO.setUserName(mcQueUsr.getUsername());
-		mcUserMarkDTO.setQueUsrId(mcQueUsr.getUid().toString());
+		mcUserMarkDTO.setFullName(user.getFullname());
+		mcUserMarkDTO.setUserName(user.getUsername());
+		mcUserMarkDTO.setQueUsrId(user.getUid().toString());
 
 		// The marks for the user must be listed in the display order of the question.
 		// Other parts of the code assume that the questions will be in consecutive display
@@ -192,7 +208,7 @@ public class MonitoringUtil implements McAppConstants {
 		// we need to check if we've already processed this question in the total.
 		Integer[] userMarks = new Integer[numQuestions];
 		Date attemptTime = null;
-		Iterator attemptIterator = mcService.getLatestAttemptsForAUser(mcQueUsr.getUid()).iterator();
+		Iterator attemptIterator = mcService.getFinalizedUserAttempts(user).iterator();
 		long totalMark = 0;
 		while (attemptIterator.hasNext()) {
 		    McUsrAttempt attempt = (McUsrAttempt) attemptIterator.next();
@@ -204,7 +220,8 @@ public class MonitoringUtil implements McAppConstants {
 			// We get the mark for the attempt if the answer is correct and we don't allow
 			// retries, or if the answer is correct and the learner has met the passmark if
 			// we do allow retries.
-			Integer mark = attempt.getMarkForShow(mcSession.getMcContent().isRetries());
+			boolean isRetries = mcSession.getMcContent().isRetries();
+			Integer mark = attempt.getMarkForShow(isRetries);
 			userMarks[arrayIndex] = mark;
 			totalMark += mark.intValue();
 		    }
@@ -230,86 +247,20 @@ public class MonitoringUtil implements McAppConstants {
 
     /**
      * 
-     * helps populating user's attempt history
-     * 
-     * @param request
-     * @param mcContent
-     * @param mcQueContent
-     * @return Map
      */
-    public static Map buildGroupsAttemptData(HttpServletRequest request, McContent mcContent,
-	    McQueContent mcQueContent, Long questionUid, IMcService mcService, McQueUsr mcQueUsr) {
-	Map<String, List> mapMonitoredAttemptsContainerDTO = new TreeMap(new McStringComparator());
+    public static McMonitoredUserDTO getUserAttempt(HttpServletRequest request, IMcService mcService, McQueUsr mcQueUsr,
+	    McSession mcSession, Long questionUid) {
 
-	Iterator sessionIterator = mcContent.getMcSessions().iterator();
-	while (sessionIterator.hasNext()) {
-	    McSession mcSession = (McSession) sessionIterator.next();
-	    Set listMcUsers = mcSession.getMcQueUsers();
-	    List sessionUsersAttempts = populateSessionUsersAttempts(request, mcSession.getMcSessionId(), listMcUsers,
-		    questionUid, mcService);
-	    mapMonitoredAttemptsContainerDTO.put(mcSession.getSession_name(), sessionUsersAttempts);
-	}
-
-	return mapMonitoredAttemptsContainerDTO;
-    }
-
-    /**
-     * 
-     * ends up populating all the user's attempt data of a particular tool session
-     * 
-     * if userID is not null, it only gets the attempts for that user.
-     * 
-     * @param request
-     * @param listMcUsers
-     * @return List
-     */
-    public static List populateSessionUsersAttempts(HttpServletRequest request, Long sessionId, Set listMcUsers,
-	    Long questionUid, IMcService mcService) {
-
-	McSession mcSession = mcService.retrieveMcSession(sessionId);
-
-	List listMonitoredUserContainerDTO = new LinkedList();
-	Iterator itUsers = listMcUsers.iterator();
-	while (itUsers.hasNext()) {
-	    McQueUsr mcQueUsr = (McQueUsr) itUsers.next();
-	    listMonitoredUserContainerDTO = getAttemptEntries(request, mcService, mcQueUsr, mcSession, questionUid,
-		    listMonitoredUserContainerDTO, true);
-	}
-
-	return listMonitoredUserContainerDTO;
-    }
-
-    /**
-     * 
-     * @param request
-     * @param mcService
-     * @param mcQueUsr
-     * @param mcSession
-     * @param questionUid
-     * @param listMonitoredUserContainerDTO
-     * @param mapMonitoredUserContainerDTO
-     * @return
-     */
-    public static List getAttemptEntries(HttpServletRequest request, IMcService mcService, McQueUsr mcQueUsr,
-	    McSession mcSession, Long questionUid, List listMonitoredUserContainerDTO, boolean latestOnly) {
-
+	McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
 	if (mcQueUsr != null) {
-
-	    McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
 	    mcMonitoredUserDTO.setUserName(mcQueUsr.getFullname());
 	    mcMonitoredUserDTO.setSessionId(mcSession.getMcSessionId().toString());
 	    mcMonitoredUserDTO.setQuestionUid(questionUid.toString());
 	    mcMonitoredUserDTO.setQueUsrId(mcQueUsr.getUid().toString());
 
-	    List<McUsrAttempt> listUserAttempts = null;
-	    if (latestOnly)
-		listUserAttempts = mcService.getLatestAttemptsForAUserForOneQuestionContent(mcQueUsr.getUid(),
-			questionUid);
-	    else
-		listUserAttempts = mcService.getAllAttemptsForAUserForOneQuestionContentOrderByAttempt(
-			mcQueUsr.getUid(), questionUid);
+	    McUsrAttempt userAttempt = mcService.getUserAttemptByQuestion(mcQueUsr.getUid(), questionUid);
 
-	    if (listUserAttempts.size() == 0) {
+	    if (!mcQueUsr.isResponseFinalised() || (userAttempt == null)) {
 
 		mcMonitoredUserDTO.setMark(new Integer(0));
 
@@ -323,20 +274,16 @@ public class MonitoringUtil implements McAppConstants {
 		// retries, or if the answer is correct and the learner has met the passmark if
 		// we do allow retries.
 
-		Map<Integer, String> attemptMap = new TreeMap<Integer, String>();
-		for (McUsrAttempt attempt : listUserAttempts) {
-		    attemptMap.put(attempt.getAttemptOrder(), attempt.getMcOptionsContent().getMcQueOptionText());
-		    mcMonitoredUserDTO.setMark(attempt.getMarkForShow(mcSession.getMcContent().isRetries()));
-		    mcMonitoredUserDTO.setIsCorrect(new Boolean(attempt.isAttemptCorrect()).toString());
-		}
-		mcMonitoredUserDTO.setUsersAttempts(attemptMap);
+		String userAnswer = userAttempt.getMcOptionsContent().getMcQueOptionText();
+		boolean isRetries = mcSession.getMcContent().isRetries();
+		mcMonitoredUserDTO.setMark(userAttempt.getMarkForShow(isRetries));
+		mcMonitoredUserDTO.setIsCorrect(new Boolean(userAttempt.isAttemptCorrect()).toString());
+		mcMonitoredUserDTO.setUserAnswer(userAnswer);
 	    }
-
-	    listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
 
 	}
 
-	return listMonitoredUserContainerDTO;
+	return mcMonitoredUserDTO;
     }
 
     /**

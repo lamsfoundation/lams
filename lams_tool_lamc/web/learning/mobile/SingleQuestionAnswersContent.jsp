@@ -26,7 +26,7 @@
 <html:hidden property="questionIndex" value="${mcGeneralLearnerFlowDTO.questionIndex}" />
 
 <ul data-role="listview" data-inset="true" data-theme="d">
-<c:forEach var="dto" varStatus="status"	items="${requestScope.listQuestionCandidateAnswersDto}">
+<c:forEach var="dto" varStatus="status"	items="${requestScope.learnerAnswersDTOList}">
 	<c:if test="${dto.displayOrder == mcGeneralLearnerFlowDTO.questionIndex}">
 		
 		<li>
@@ -47,18 +47,13 @@
 				</div>
 			</legend>
 			
-			<c:forEach var="ca" varStatus="status"
-				items="${dto.candidateAnswerUids}">
+			<c:forEach var="option" items="${dto.options}">
 				<div class="indent">
-					<input type="radio" name="checkedCa" class="noBorder"
-						value="${dto.questionUid}-${ca.value}" id="checkedCa${ca.key}">
-	
-					<c:forEach var="caText" varStatus="status"
-						items="${dto.candidateAnswers}">
-						<c:if test="${ca.key == caText.key}">
-							<label for="checkedCa${ca.key}"><c:out value="${caText.value}" escapeXml="false" /></label>
-						</c:if>
-					</c:forEach>
+					<input type="radio" name="checkedCa" class="noBorder" value="${dto.questionUid}-${option.uid}" id="checkedCa${option.uid}"
+						<c:if test="${option.selected}">checked="checked"</c:if>>
+					<label for="checkedCa${option.uid}">
+						<c:out value="${option.mcQueOptionText}" escapeXml="false" />
+					</label>
 				</div>
 			</c:forEach>
 

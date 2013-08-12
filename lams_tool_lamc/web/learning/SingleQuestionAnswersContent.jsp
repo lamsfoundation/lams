@@ -1,23 +1,3 @@
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="lams">
@@ -41,8 +21,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</div>
 </c:if>
 
-<c:if
-	test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
+<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
 
 	<strong> <fmt:message key="label.learner.message" /> ( <c:out
 			value="${mcGeneralLearnerFlowDTO.passMark}" /> ) </strong>
@@ -52,7 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <html:hidden property="continueOptionsCombined" />
 <html:hidden property="questionIndex" value="${mcGeneralLearnerFlowDTO.questionIndex}" />
 
-<c:forEach var="dto" varStatus="status"	items="${requestScope.listQuestionCandidateAnswersDto}">
+<c:forEach var="dto" varStatus="status"	items="${requestScope.learnerAnswersDTOList}">
 	<c:if test="${dto.displayOrder == mcGeneralLearnerFlowDTO.questionIndex}">
 		<div class="shading-bg">
 			<div style="overflow: auto;">
@@ -72,20 +51,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		<table class="indent">
 			<tbody>
-				<c:forEach var="ca" varStatus="status" items="${dto.candidateAnswerUids}">
+				<c:forEach var="option" items="${dto.options}">
 					<tr>
 					
 						<td>
-							<input type="radio" name="checkedCa" class="noBorder" value="${dto.questionUid}-${ca.value}">
+							<input type="radio" name="checkedCa" class="noBorder" value="${dto.questionUid}-${option.uid}"
+								<c:if test="${option.selected}">checked="checked"</c:if>>
 						</td>
-		
-						<c:forEach var="caText" varStatus="status" items="${dto.candidateAnswers}">
-							<c:if test="${ca.key == caText.key}">
-								<td width="100%">
-									<c:out value="${caText.value}" escapeXml="false" />
-								</td>
-							</c:if>
-						</c:forEach>
+						<td width="100%">
+							<c:out value="${option.mcQueOptionText}" escapeXml="false" />
+						</td>
 					
 					</tr>
 				</c:forEach>
