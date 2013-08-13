@@ -241,8 +241,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 
 	request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 
-	/* user already responded to the content - go to redo questions. */
-	if (user.isResponseFinalised()) {
+	/* user has already submitted response once - go to viewAnswers page. */
+	if (user.getNumberOfAttempts() > 0) {
 	    McLearningAction mcLearningAction = new McLearningAction();
 	    request.setAttribute(McAppConstants.REQUEST_BY_STARTER, (Boolean.TRUE).toString());
 	    mcLearningAction.prepareViewAnswersData(mapping, mcLearningForm, request, getServlet().getServletContext());
