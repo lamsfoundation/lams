@@ -105,9 +105,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%-- This script will works when a new resoruce item submit in order to refresh "Resource List" panel. --%>
 <script lang="javascript">
 	var win = null;
-	if (window.hideMessage) { 
-		win = window;
-	} else if (window.parent && window.parent.hideMessage) {
+	if (window.parent && window.parent.hideMessage) {
 		win = window.parent;
 	} else {
 		win = window.top;
