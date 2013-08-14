@@ -51,7 +51,7 @@ if ($canmanage) {
   $lessonID = lamslesson_get_lesson($USER->username, $ldId, $course->id, 'preview', 'preview', LAMSLESSON_PARAM_PREVIEW_METHOD, $locale['country'], $locale['lang'],''); 
 
   // With the lesson now we put together the URL 
-  $learnerurl = lamslesson_get_url($USER->username, $locale['lang'], $locale['country'], $lessonID, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_LEARNER_METHOD);
+  $learnerurl = lamslesson_get_url($USER->username, $USER->firstname, $USER->lastname, $USER->email, $locale['lang'], $locale['country'], $lessonID, $course->id, $course->fullname, $course->timecreated, LAMSLESSON_PARAM_LEARNER_METHOD);
   header('Location:'.$learnerurl."'");
   die();
 
