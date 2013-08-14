@@ -42,6 +42,9 @@ require_once($CFG->libdir.'/filelib.php');
 
 define('LAMSLESSON_LOGIN_REQUEST', '/LoginRequest');
 define('LAMSLESSON_PARAM_UID', 'uid');
+define('LAMSLESSON_PARAM_FIRSTNAME', 'firstName');
+define('LAMSLESSON_PARAM_LASTNAME', 'lastName');
+define('LAMSLESSON_PARAM_EMAIL', 'email');
 define('LAMSLESSON_PARAM_SERVERID', 'sid');
 define('LAMSLESSON_PARAM_TIMESTAMP', 'ts');
 define('LAMSLESSON_PARAM_HASH', 'hash');
@@ -297,7 +300,7 @@ function lamslesson_get_design_image($username,$courseid,$coursename,$coursecrea
  * @return string to define the tree structure
  * 
  */
-function lamslesson_get_sequences_rest($username,$courseid,$coursename,$coursecreatedate,$country,$lang) {
+function lamslesson_get_sequences_rest($username,$firstname,$lastname,$email,$courseid,$coursename,$coursecreatedate,$country,$lang) {
     global $CFG,$USER;
     if(!isset($CFG->lamslesson_serverurl)||!isset($CFG->lamslesson_serverid)||!isset($CFG->lamslesson_serverkey))
     {
@@ -315,7 +318,7 @@ function lamslesson_get_sequences_rest($username,$courseid,$coursename,$coursecr
 
 
     // Put together REST URL
-    $request = "$CFG->lamslesson_serverurl".LAMSLESSON_LD_SERVICE."?serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . $hashvalue . "&username=" . $username  . "&courseId=" . $courseid . "&courseName=" . urlencode($coursename) . "&mode=2&country=" . $country . "&lang=$lang";
+    $request = "$CFG->lamslesson_serverurl".LAMSLESSON_LD_SERVICE."?serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . $hashvalue . "&username=" . $username  . "&firstName=" . $firstname . "&lastName=" . $lastname . "&email=" . $email . "&courseId=" . $courseid . "&courseName=" . urlencode($coursename) . "&mode=2&country=" . $country . "&lang=$lang";
 
     // GET call to LAMS
     $xml = lamslesson_http_call($request);
@@ -637,7 +640,7 @@ function lamslesson_get_lams_outputs($username,$lamslesson,$foruser) {
  * Return URL to join a LAMS lesson as a learner or staff depending on method.
  * URL redirects LAMS to learner or monitor interface depending on method.
  */
-function lamslesson_get_url($username, $lang, $country, $lessonid, $courseid, $coursename, $coursecreatedate, $method, $customcsv='') {
+function lamslesson_get_url($username, $firstname, $lastname, $email, $lang, $country, $lessonid, $courseid, $coursename, $coursecreatedate, $method, $customcsv='') {
     global $CFG;
 
     // append month/year to course name
@@ -652,6 +655,9 @@ function lamslesson_get_url($username, $lang, $country, $lessonid, $courseid, $c
     $hash = sha1(strtolower($plaintext));
     $url = $CFG->lamslesson_serverurl. LAMSLESSON_LOGIN_REQUEST .
         '?'.LAMSLESSON_PARAM_UID.'='.$username.
+	'&'.LAMSLESSON_PARAM_FIRSTNAME.'='.urlencode($firstname).
+	'&'.LAMSLESSON_PARAM_LASTNAME.'='.urlencode($lastname).
+	'&'.LAMSLESSON_PARAM_EMAIL.'='.urlencode($email).
         '&'.LAMSLESSON_PARAM_METHOD.'='.$method.
         '&'.LAMSLESSON_PARAM_TIMESTAMP.'='.urlencode($datetime).
         '&'.LAMSLESSON_PARAM_SERVERID.'='.$CFG->lamslesson_serverid.
