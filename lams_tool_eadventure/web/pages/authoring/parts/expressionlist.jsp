@@ -100,14 +100,16 @@
 
 
 <script lang="javascript">
-	var area = window.document.getElementById('conditionInputArea');
-	if (!area && window.parent) {
+	var area = null;
+	if (window.parent) {
 		area = window.parent.document.getElementById('conditionInputArea');
-	}  
-	if (!area) {
+	}
+	if (!area && window.top) {
 		area = window.top.document.getElementById('conditionInputArea');
 	}
-	area.contentWindow.hideExpressionMessage();
-	var obj = area.contentDocument.getElementById("expressionArea");
-	obj.innerHTML = document.getElementById("expressionList").innerHTML;
+	if (area) {
+		area.contentWindow.hideExpressionMessage();
+		var obj = area.contentDocument.getElementById("expressionArea");
+		obj.innerHTML = document.getElementById("expressionList").innerHTML;
+	}
 </script>

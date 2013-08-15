@@ -107,10 +107,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	var win = null;
 	if (window.parent && window.parent.hideMessage) {
 		win = window.parent;
-	} else {
+	} else if (window.top && window.top.hideMessage) {
 		win = window.top;
 	}
-	win.hideMessage();
-	var obj = win.document.getElementById('resourceListArea');
-	obj.innerHTML= document.getElementById("itemList").innerHTML;
+	if (win) {
+		win.hideMessage();
+		var obj = win.document.getElementById('resourceListArea');
+		obj.innerHTML= document.getElementById("itemList").innerHTML;
+	}
 </script>

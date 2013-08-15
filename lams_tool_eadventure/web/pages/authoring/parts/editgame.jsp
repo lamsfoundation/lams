@@ -18,15 +18,11 @@
 	<body class="tabpart">
 
 	<script lang="javascript">
-		var win = null;
-		if (window.hideShowGame) {
-			win = window;
-		} else if (window.parent && window.parent.hideShowGame) {
-			win = window.parent;
-		} else {
-			win = window.top;
+		if (window.parent && window.parent.hideShowGame) {
+			window.parent.hideShowGame();
+		} else if (window.top && window.top.hideShowGame){
+			window.top.hideShowGame();
 		}
-		win.hideShowGame();
 	</script>
 		<!-- Basic Info Form-->
 		<%@ include file="/common/messages.jsp"%>

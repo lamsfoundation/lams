@@ -101,15 +101,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
                                 heightOffSet = document.getElementById('wizardDiv').offsetHeight;
                             }
                             
-                        	var win = null;
-                        	if (window.resizeIframe) { 
-                        		win = window;
-                        	} else if (window.parent && window.parent.resizeIframe) {
-                        		win = window.parent;
-                        	} else {
-                        		win = window.top;
-                        	}
-                        	win.resizeIframe(heightOffSet);
+            				if (window.parent && window.parent.resizeIframe) {
+            					window.parent.resizeIframe(heightOffSet);
+            				} else if (window.top && window.top.resizeIframe) {
+            					window.top.resizeIframe(heightOffSet);
+            				} 
+                        	
                         	heightOffSet = heightOffSet * -1;
                         });
                     });

@@ -18,15 +18,11 @@
 		
 		<script type="text/javascript"> 
 			function callHideConditionMessage() {
-				var win = null;
-				if (window.hideConditionMessage) {
-					win = window;
-				} else if (window.parent && window.parent.hideConditionMessage) {
-					win = window.parent;
-				} else {
-					win = window.top;
+				if (window.parent && window.parent.hideConditionMessage) {
+					window.parent.hideConditionMessage();
+				} else if (window.top && window.top.hideConditionMessage) {
+					window.top.hideConditionMessage();
 				}
-				win.hideConditionMessage();
 			}
 		</script>
 	</lams:head>

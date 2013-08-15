@@ -13,15 +13,11 @@
 	}
 	
 	function callHideMessage() {
-		var win = null;
-		if (window.hideMessage) {
-			win = window;
+		if (window.parent && window.parent.hideMessage) {
+			window.parent.hideMessage();
 		} else if (window.parent && window.parent.hideMessage) {
-			win = window.parent;
-		} else {
-			win = window.top;
+			window.top.hideMessage();
 		}
-		win.hideMessage();
 	}
 </script>
 

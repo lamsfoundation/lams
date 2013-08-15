@@ -9,15 +9,11 @@
 		
 		<script type="text/javascript"> 
 			function callHideExpressionMessage() {
-				var win = null;
-				if (window.hideExpressionMessage) {
-					win = window;
+				if (window.parent && window.parent.hideExpressionMessage) {
+					window.parent.hideExpressionMessage();
 				} else if (window.parent && window.parent.hideExpressionMessage) {
-					win = window.parent;
-				} else {
-					win = window.top;
+					window.top.hideExpressionMessage();
 				}
-				win.hideExpressionMessage();
 			}
 		</script>
 	</lams:head>
