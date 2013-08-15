@@ -370,17 +370,17 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	for (ScratchieAnswerVisitLog leaderLog : leaderLogs) {
 	    ScratchieAnswer answer = leaderLog.getScratchieAnswer();
-	    ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answer.getUid(),
+	    ScratchieAnswerVisitLog userLog = scratchieAnswerVisitDao.getLog(answer.getUid(),
 		    user.getUserId());
 
 	    // create and save new ScratchieAnswerVisitLog
-	    if (log == null) {
-		log = new ScratchieAnswerVisitLog();
-		log.setScratchieAnswer(answer);
-		log.setUser(user);
-		log.setSessionId(user.getSession().getSessionId());
-		log.setAccessDate(leaderLog.getAccessDate());
-		scratchieAnswerVisitDao.saveObject(log);
+	    if (userLog == null) {
+		userLog = new ScratchieAnswerVisitLog();
+		userLog.setScratchieAnswer(answer);
+		userLog.setUser(user);
+		userLog.setSessionId(user.getSession().getSessionId());
+		userLog.setAccessDate(leaderLog.getAccessDate());
+		scratchieAnswerVisitDao.saveObject(userLog);
 	    }
 	}
     }
@@ -479,7 +479,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	List<ScratchieUser> users = getUsersBySession(sessionId);
 	for (ScratchieUser user : users) {
-	    ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answerUid, user.getUserId());
+	    ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(answerUid, user.getUserId());
 	    if (log == null) {
 		log = new ScratchieAnswerVisitLog();
 		ScratchieAnswer answer = getScratchieAnswerById(answerUid);
@@ -592,7 +592,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
 
 		int attemptNumber;
-		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answer.getUid(),
+		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(answer.getUid(),
 			user.getUserId());
 		if (log == null) {
 		    // -1 if there is no log
@@ -609,13 +609,23 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public void retrieveScratched(Collection<ScratchieItem> items, ScratchieUser user) {
+    public Set<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId, ScratchieUser user) {
+	
+	List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsByScratchieUser(user.getUid());
+	// answerUid -> ScratchieAnswerVisitLog map, created to reduce number of queries to DB
+	HashMap<Long, ScratchieAnswerVisitLog> answerUidToLogMap = new HashMap<Long, ScratchieAnswerVisitLog>();
+	for (ScratchieAnswerVisitLog log : logs) {
+	    answerUidToLogMap.put(log.getScratchieAnswer().getUid(), log);
+	}
 
+	Scratchie scratchie = this.getScratchieBySessionId(toolSessionId);
+	Set<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
+	items.addAll(scratchie.getScratchieItems());
+	
 	for (ScratchieItem item : items) {
 
 	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
-		ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answer.getUid(),
-			user.getUserId());
+		ScratchieAnswerVisitLog log = answerUidToLogMap.get(answer.getUid());
 		if (log == null) {
 		    answer.setScratched(false);
 		} else {
@@ -623,15 +633,34 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		}
 	    }
 
-	    item.setUnraveled(isItemUnraveled(item, user.getUserId()));
+	    boolean isItemUnraveled = isItemUnraveled(item, user.getUserId(), answerUidToLogMap);
+	    item.setUnraveled(isItemUnraveled);
 	}
+	
+	return items;
     }
-
-    private boolean isItemUnraveled(ScratchieItem item, Long userId) {
+    
+    /**
+     * Check if the specified item was unraveled by user
+     * 
+     * @param item
+     *            specified item
+     * @param userId
+     *            userId
+     * @param answerUidToLogMap
+     *            if this parameter is provided - uses logs from it, otherwise queries DB. (The main reason to have this
+     *            parameter is to reduce number of queries to DB)
+     * @return
+     */
+    private boolean isItemUnraveled(ScratchieItem item, Long userId, HashMap<Long, ScratchieAnswerVisitLog> answerUidToLogMap) {
 	boolean isItemUnraveled = false;
 
 	for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
-	    ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getScratchieAnswerLog(answer.getUid(), userId);
+	    
+	    //if answerUidToLogMap is provided then uses logs from it, otherwise queries DB
+	    ScratchieAnswerVisitLog log = (answerUidToLogMap != null) ? answerUidToLogMap.get(answer.getUid())
+		    : scratchieAnswerVisitDao.getLog(answer.getUid(), userId);	    
+	    
 	    if (log != null) {
 		isItemUnraveled |= answer.isCorrect();
 	    }
@@ -666,7 +695,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	int mark = 0;
 	// add mark only if an item was unraveled
-	if (isItemUnraveled(item, userId)) {
+	if (isItemUnraveled(item, userId, null)) {
 	    int attempts = scratchieAnswerVisitDao.getLogCountPerItem(sessionId, userId, item.getUid());
 	    mark += item.getAnswers().size() - attempts;
 
@@ -1316,7 +1345,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		    mark = (attempts == 0) ? -1 : getUserMarkPerItem(scratchie, item, sessionId,
 			    groupLeader.getUserId());
 
-		    isFirstChoice = (attempts == 1) && isItemUnraveled(item, groupLeader.getUserId());
+		    isFirstChoice = (attempts == 1) && isItemUnraveled(item, groupLeader.getUserId(), null);
 		}
 
 		newItem.setUid(item.getUid());

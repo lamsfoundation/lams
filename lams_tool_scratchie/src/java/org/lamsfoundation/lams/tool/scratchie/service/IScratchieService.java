@@ -215,7 +215,7 @@ public interface IScratchieService {
      * @param scratchieItemList
      * @param user
      */
-    void retrieveScratched(Collection<ScratchieItem> scratchieItemList, ScratchieUser user);
+    Set<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId, ScratchieUser user);
 
     /**
      * Leader has scratched the specified answer. Will store this scratch for all users in his group.

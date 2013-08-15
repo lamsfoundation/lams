@@ -144,7 +144,6 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 
 	ScratchieUser learner = service.getUserByIDAndSession(userID, toolSessionID);
-
 	if (learner == null) {
 	    String error = "The user with user id " + userID + " does not exist.";
 	    logger.error(error);
@@ -152,21 +151,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 
 	Scratchie content = service.getScratchieBySessionId(toolSessionID);
-
 	if (content == null) {
 	    String error = "The content for this activity has not been defined yet.";
 	    logger.error(error);
 	    throw new ScratchieApplicationException(error);
 	}
 
-	Set<ScratchieItem> initialItems = content.getScratchieItems();
-
 	// set complete flag for display purpose
-	service.retrieveScratched(initialItems, learner);
-
-	// randomize order if needed
-	Collection<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
-	items.addAll(initialItems);
+	Set<ScratchieItem> items = service.getItemsWithIndicatedScratches(toolSessionID, learner);
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
 
 	// Add flag to indicate whether to render user notebook entries

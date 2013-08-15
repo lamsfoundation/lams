@@ -46,7 +46,7 @@ public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implement
 	    + ScratchieAnswerVisitLog.class.getName() + " as l where l.sessionId=? and l.user.userId =? and l.scratchieAnswer.scratchieItem.uid=?";
 
     @Override
-    public ScratchieAnswerVisitLog getScratchieAnswerLog(Long answerUid, Long userId) {
+    public ScratchieAnswerVisitLog getLog(Long answerUid, Long userId) {
 	List list = getHibernateTemplate().find(FIND_BY_ANSWER_AND_USER, new Object[] { userId, answerUid });
 	if (list == null || list.size() == 0)
 	    return null;
