@@ -2,7 +2,6 @@ package org.lamsfoundation.lams.webservice.xml;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,6 +16,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -116,9 +116,9 @@ public class LessonManagerServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-	PrintWriter out = response.getWriter();
+	ServletOutputStream outputStream = response.getOutputStream();
 	response.setContentType("text/xml");
-	response.setCharacterEncoding("UTF8");
+	response.setCharacterEncoding("UTF-8");
 
 	String serverId = request.getParameter(CentralConstants.PARAM_SERVER_ID);
 	String datetime = request.getParameter(CentralConstants.PARAM_DATE_TIME);
@@ -235,9 +235,9 @@ public class LessonManagerServlet extends HttpServlet {
 	    }  else if (method.equals(CentralConstants.METHOD_VERIFY_EXT_SERVER)) {
 		verify(serverId, datetime, hashValue);
 		response.setContentType("text/html");
-		out.write("1");
-		out.flush();
-		out.close();
+		outputStream.write(1);
+		outputStream.flush();
+		outputStream.close();
 		return;
 		
 	    } else {
@@ -253,7 +253,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    LSSerializer lsSerializer = domImplementation.createLSSerializer();
 	    LSOutput lsOutput = domImplementation.createLSOutput();
 	    lsOutput.setEncoding("UTF-8");
-	    lsOutput.setCharacterStream(out);
+	    lsOutput.setByteStream(outputStream);
 	    lsSerializer.write(document, lsOutput);
 
 	} catch (NumberFormatException nfe) {
@@ -276,8 +276,8 @@ public class LessonManagerServlet extends HttpServlet {
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 
-	out.flush();
-	out.close();
+	outputStream.flush();
+	outputStream.close();
     }
 
     /**
