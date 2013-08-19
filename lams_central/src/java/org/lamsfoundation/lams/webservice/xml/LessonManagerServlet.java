@@ -141,6 +141,12 @@ public class LessonManagerServlet extends HttpServlet {
 
 	// Custom CSV string to be used for tool adapters
 	String customCSV = request.getParameter(CentralConstants.PARAM_CUSTOM_CSV);
+	
+	//parameters used for creating user at joinLesson method
+	String usePrefix = request.getParameter(CentralConstants.PARAM_USE_PREFIX);
+	String firstNames = request.getParameter("firstNames");
+	String lastNames = request.getParameter("lastNames");
+	String emails = request.getParameter("emails");
 
 	Long ldId = null;
 	Long lsId = null;
@@ -208,7 +214,8 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    } else if (method.equals(CentralConstants.METHOD_JOIN_LESSON)) {
 		Thread t = new Thread(new AddUsersToLessonThread(serverId, datetime, username, hashValue, lsIdStr,
-			courseId, country, lang, learnerIds, monitorIds, request));
+			courseId, country, lang, learnerIds, monitorIds, usePrefix, firstNames, lastNames, emails,
+			request));
 		t.start();
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
@@ -619,11 +626,15 @@ public class LessonManagerServlet extends HttpServlet {
 	private String lang;
 	private String learnerIds;
 	private String monitorIds;
+	private String usePrefix;
+	private String firstNames;
+	private String lastNames;
+	private String emails;
 	private HttpServletRequest request;
 
 	public AddUsersToLessonThread(String serverId, String datetime, String username, String hashValue,
 		String lsIdStr, String courseId, String country, String lang, String learnerIds, String monitorIds,
-		HttpServletRequest request) {
+		String usePrefix, String firstNames, String lastNames, String emails, HttpServletRequest request) {
 	    this.serverId = serverId;
 	    this.datetime = datetime;
 	    this.username = username;
@@ -634,12 +645,16 @@ public class LessonManagerServlet extends HttpServlet {
 	    this.lang = lang;
 	    this.learnerIds = learnerIds;
 	    this.monitorIds = monitorIds;
+	    this.usePrefix = usePrefix;
+	    this.firstNames = firstNames;
+	    this.lastNames = lastNames;
+	    this.emails = emails;
 	    this.request = request;
 	}
 
 	public void run() {
 	    addUsersToLesson(serverId, datetime, username, hashValue, lsIdStr, courseId, country, lang, learnerIds,
-		    monitorIds, request);
+		    monitorIds, usePrefix, firstNames, lastNames, emails, request);
 	}
 
 	/**
@@ -657,28 +672,65 @@ public class LessonManagerServlet extends HttpServlet {
 	 */
 	public Boolean addUsersToLesson(String serverId, String datetime, String requestorUsername, String hashValue,
 		String lsIdStr, String courseId, String countryIsoCode, String langIsoCode, String learnerIds,
-		String monitorIds, HttpServletRequest request) {
+		String monitorIds, String usePrefix, String firstNames, String lastNames, String emails,
+		HttpServletRequest request) {
 	    try {
-		if (learnerIds != null) {
-		    String[] learnerIdArray = learnerIds.split(",");
-		    for (String learnerId : learnerIdArray) {
-			if (StringUtils.isNotBlank(learnerId)) {
-			    addUserToLesson(request, serverId, datetime, requestorUsername, hashValue,
-				    LoginRequestDispatcher.METHOD_LEARNER, lsIdStr, learnerId, courseId,
-				    countryIsoCode, langIsoCode);
-			}
-		    }
+
+		// get Server map
+		ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
+		// authenticate
+		Authenticator.authenticate(serverMap, datetime, requestorUsername, hashValue);
+		
+		String[] learnerIdArray = (learnerIds != null) ? learnerIds.split(",") : new String[0];
+		String[] monitorIdArray = (monitorIds != null) ? monitorIds.split(",") : new String[0];
+		String[] firstNameArray = (firstNames != null) ? firstNames.split(",") : new String[0];
+		String[] lastNameArray = (lastNames != null) ? lastNames.split(",") : new String[0];
+		String[] emailArray = (emails != null) ? emails.split(",") : new String[0];
+		
+		// in case there is firstNames available - check all arrays have the same length, as otherwise it's
+		// prone to ArrayOutOfBounds exceptions
+		if ((firstNames != null)
+			&& ((firstNameArray.length != lastNameArray.length)
+				|| (firstNameArray.length != emailArray.length) || (firstNameArray.length != (learnerIdArray.length + monitorIdArray.length)))) {
+		    LessonManagerServlet.log.error("Invalid parameters sent: wrong array length.");
+		    return false;
 		}
-		if (monitorIds != null) {
-		    String[] monitorIdArray = monitorIds.split(",");
-		    for (String monitorId : monitorIdArray) {
-			if (StringUtils.isNotBlank(monitorId)) {
-			    addUserToLesson(request, serverId, datetime, requestorUsername, hashValue,
-				    LoginRequestDispatcher.METHOD_MONITOR, lsIdStr, monitorId, courseId,
-				    countryIsoCode, langIsoCode);
-			}
+
+		int i = 0;
+		for (String userName : learnerIdArray) {
+		    String firstName = null;
+		    String lastName = null;
+		    String email = null;
+		    if (firstNames != null) {
+			firstName = firstNameArray[i];
+			lastName = lastNameArray[i];
+			email = emailArray[i];
 		    }
+
+		    if (StringUtils.isNotBlank(userName)) {
+			addUserToLesson(request, serverMap, LoginRequestDispatcher.METHOD_LEARNER, lsIdStr, userName,
+				usePrefix, firstName, lastName, email, courseId, countryIsoCode, langIsoCode);
+		    }
+		    i++;
 		}
+
+		for (String userName : monitorIdArray) {
+		    String firstName = null;
+		    String lastName = null;
+		    String email = null;
+		    if (firstNames != null) {
+			firstName = firstNameArray[i];
+			lastName = lastNameArray[i];
+			email = emailArray[i];
+		    }
+
+		    if (StringUtils.isNotBlank(userName)) {
+			addUserToLesson(request, serverMap, LoginRequestDispatcher.METHOD_MONITOR, lsIdStr, userName,
+				usePrefix, firstName, lastName, email, courseId, countryIsoCode, langIsoCode);
+		    }
+		    i++;
+		}
+		
 		return true;
 	    } catch (UserInfoFetchException e) {
 		LessonManagerServlet.log.error(e, e);
@@ -689,19 +741,25 @@ public class LessonManagerServlet extends HttpServlet {
 	    }
 	}
 
-	private void addUserToLesson(HttpServletRequest request, String serverId, String datetime,
-		String requestorUsername, String hashValue, String method, String lsIdStr, String username,
-		String courseId, String countryIsoCode, String langIsoCode) throws AuthenticationException,
-		UserInfoFetchException {
+	private void addUserToLesson(HttpServletRequest request, ExtServerOrgMap serverMap, String method,
+		String lsIdStr, String username, String usePrefix, String firstName, String lastName, String email,
+		String courseId, String countryIsoCode, String langIsoCode) throws UserInfoFetchException {
 
 	    if (LessonManagerServlet.log.isDebugEnabled()) {
 		LessonManagerServlet.log.debug("Adding user '" + username + "' as " + method + " to lesson with id '"
 			+ lsIdStr + "'.");
 	    }
-
-	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, requestorUsername, hashValue);
-	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	    
+	    ExtUserUseridMap userMap = null;
+	    boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
+	    if (firstName == null && lastName == null) {
+		userMap = integrationService.getExtUserUseridMap(serverMap, username, prefix);
+	    } else {
+		userMap = integrationService.getImplicitExtUserUseridMap(serverMap, username, firstName, lastName,
+			langIsoCode, countryIsoCode, email, prefix);
+	    }
+	    
+//	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
 	    // adds user to group
 	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
 		    courseId, countryIsoCode, langIsoCode, null, method);
