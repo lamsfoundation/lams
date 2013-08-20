@@ -79,8 +79,20 @@ function openActivity(url) {
 }
 
 // loads a new activity to main content frame; alternative to opening in pop up
-function loadFrame(url) {
-	$('#contentFrame').attr('src', url);
+function loadFrame(activity) {
+	$('#contentFrame').attr('src', activity.url);
+	
+	var displayedActivity = activity.bar.displayedActivity;
+	// do not glow current activity
+	activity.bar.displayedActivity = activity.status == 0 ? null : activity;
+	if (displayedActivity) {
+		// remove glow from previusly displayed activity
+		ActivityUtils.removeGlow(displayedActivity);
+	}
+	
+	if (activity.bar.displayedActivity) {
+		ActivityUtils.addGlow(activity);
+	}
 }
 
 // adjusts elements after window resize
@@ -314,7 +326,7 @@ var ActivityUtils = {
 		// so they all can be moved at once
 		var paper = activity.bar.paper;
 		activity.elements = paper.set();
-		// only now do the read drawing, add event handlers etc.
+		// only now do the real drawing, add event handlers etc.
 		activity.shape = paper.path(activity.path);
 		// add Activity attributes
 		activity.shape.attr(ActivityUtils.getShapeAttributes(activity));
@@ -376,8 +388,14 @@ var ActivityUtils = {
 	// adds handlers to activity for mouse interactions
 	// long method with simple actions
 	addEffects : function(activity) {
+		// remove existing glow
+		ActivityUtils.removeGlow(activity, true);
+		// add again, for transformed shape
+		if (activity.bar.displayedActivity == activity && activity.status != 0){
+			ActivityUtils.addGlow(activity);
+		}
+		
 		// remove any existing handlers
-		ActivityUtils.removeHover(activity.shape);
 		if (activity.shape.events) {
 			while (activity.shape.events.length) {
 				// iterate over any handlers bound
@@ -386,25 +404,7 @@ var ActivityUtils = {
 		}
 
 		var mouseover = function(e, x, y) {
-			// add glowing effect on hover
-			if (activity.decorationWraps) {
-				activity.decoration.forEach(function(elem) {
-					// check which decoration element should glow
-					if (elem.decorationWraps) {
-						// glow the wrapping decoration element
-						// for example gray square in Optonal Activity container
-						// is bigger than inner activity shape, so it should glow
-						activity.shape.glowRef = elem.glow({
-							color : elem.attr('fill')
-						});
-						return false;
-					}
-				});
-			} else {
-				activity.shape.glowRef = activity.shape.glow({
-					color : activity.shape.attr('fill')
-				});
-			}
+			ActivityUtils.addGlow(activity);
 
 			// add tooltip
 			var tooltipText = '<b>' + activity.name + '</b><br />'
@@ -416,7 +416,8 @@ var ActivityUtils = {
 
 		var mouseout = function() {
 			// remove glow
-			ActivityUtils.removeHover(activity.shape);
+			ActivityUtils.removeGlow(activity);
+			$('#tooltip').stop(true, true).fadeOut();
 		}
 
 		var isSupportActivity = activity instanceof SupportActivity;
@@ -432,7 +433,7 @@ var ActivityUtils = {
 					activity.transformToAttempted();
 				}
 			} else {
-				loadFrame(activity.url);
+				loadFrame(activity);
 			}
 		} : null;
 
@@ -453,14 +454,37 @@ var ActivityUtils = {
 			});
 		}
 	},
-
-	// remove glow when mouse leaves shape
-	removeHover : function(shape) {
-		if (shape.glowRef) {
-			shape.glowRef.remove();
-			shape.glowRef = null;
+	
+	addGlow : function(activity) {
+		if (!activity.shape.glowRef) {
+			// add glowing effect on hover
+			if (activity.decorationWraps) {
+				activity.decoration.forEach(function(elem) {
+					// check which decoration element should glow
+					if (elem.decorationWraps) {
+						// glow the wrapping decoration element
+						// for example gray square in Optonal Activity container
+						// is bigger than inner activity shape, so it should glow
+						activity.shape.glowRef = elem.glow({
+							color : elem.attr('fill')
+						});
+						return false;
+					}
+				});
+			} else {
+				activity.shape.glowRef = activity.shape.glow({
+					color : activity.shape.attr('fill')
+				});
+			}
 		}
-		$('#tooltip').stop(true, true).fadeOut();
+	},
+	
+	// remove glow when mouse leaves shape
+	removeGlow : function(activity, force) {
+		if (activity.shape.glowRef && (force || activity.bar.displayedActivity != activity)) {
+			activity.shape.glowRef.remove();
+			activity.shape.glowRef = null;
+		}
 	},
 
 	// copy important properties and morph visible elements
@@ -487,17 +511,15 @@ var ActivityUtils = {
 		var isCurrent = targetActivity.status == 0;
 		if (sourceActivity.childActivities) {
 			// run for all inner activities (Optional, Branching)
-			$
-					.each(
-							sourceActivity.childActivities,
-							function(childActivityIndex, childActivity) {
-								var targetChildActivity = targetActivity.childActivities[childActivityIndex];
-								// if child activity is current, parent activity
-								// is current as well
-								isCurrent |= targetChildActivity.status == 0;
-								ActivityUtils.transform(childActivity,
-										targetChildActivity);
-							});
+			$.each(sourceActivity.childActivities,
+				function(childActivityIndex, childActivity) {
+					var targetChildActivity = targetActivity.childActivities[childActivityIndex];
+					// if child activity is current, parent activity
+					// is current as well
+					isCurrent |= targetChildActivity.status == 0;
+					ActivityUtils.transform(childActivity,
+						targetChildActivity);
+				});
 		}
 
 		if (isCurrent) {
@@ -557,22 +579,21 @@ var ActivityUtils = {
 			}, quick ? 0 : 1000, "linear");
 
 			activity.addDecoration(activity);
-			activity.decoration
-					.forEach(function(elem) {
-						if (activity.elements) {
-							activity.elements.push(elem);
-						}
-						if (elem.decorationWraps) {
-							// decoration element is bigger that activity shape,
-							// put it in background
-							elem.toBack();
-						} else {
-							elem.toFront();
-						}
+			activity.decoration.forEach(function(elem) {
+				if (activity.elements) {
+					activity.elements.push(elem);
+				}
+				if (elem.decorationWraps) {
+					// decoration element is bigger that activity shape,
+					// put it in background
+					elem.toBack();
+				} else {
+					elem.toFront();
+				}
 
-						elem.animate(animation.delay(oldDecoration ? 1000
-								: undefined));
-					});
+				elem.animate(animation.delay(oldDecoration ? 1000
+					: undefined));
+			});
 		}
 	},
 
@@ -590,7 +611,7 @@ var ActivityUtils = {
 	showComplexContent : function(activity) {
 		if (activity.isComplex) {
 			// hide glow if shown (IE)
-			ActivityUtils.removeHover(activity.shape);
+			ActivityUtils.removeGlow(activity);
 			// remove other boxes, if shown
 			ActivityUtils
 					.hideOtherComplexContent(activity.optionalContent ? activity.optionalContent
@@ -709,7 +730,7 @@ var ActivityUtils = {
 					if (childActivity.status == 1) {
 						openActivity(childActivity.url);
 					} else {
-						loadFrame(childActivity.url);
+						loadFrame(childActivity);
 					}
 				}
 			}
@@ -775,7 +796,9 @@ var ActivityUtils = {
 						'path' : Raphael.transformPath(path, transform)
 					};
 				}
-				elem.animate(targetProperties, 2000, "linear");
+				elem.animate(targetProperties, 2000, "linear", function(){
+					$('tspan', elem.node).attr('dy', 0);
+				});
 			});
 		}
 
@@ -858,11 +881,11 @@ function Activity(bar, index, id, type, name, status, url, childActivitiesData) 
 		this.y = finalY - (isHorizontalBar ? 5 : 0);
 		ActivityUtils.shapeComplexActivityContainer(this);
 
-		this.childActivities = [ new OptionalActivity(bar, name, status, url) ];
+		this.childActivities = [ new OptionalActivity(bar.paper, name, status, url) ];
 		var childActivities = this.childActivities;
 		$.each(childActivitiesData, function(childActivityIndex,
 				childActivityData) {
-			childActivities[childActivityIndex + 1] = new OptionalActivity(bar,
+			childActivities[childActivityIndex + 1] = new OptionalActivity(bar.paper,
 					childActivityData.name, childActivityData.status,
 					childActivityData.url, childActivityData.childActivities,
 					false);
@@ -871,11 +894,13 @@ function Activity(bar, index, id, type, name, status, url, childActivitiesData) 
 }
 
 // Support (floating) activities are show in separate box and behave differently
-function SupportActivity(bar, index, name, status, url) {
-	this.bar = bar;
+function SupportActivity(paper, index, name, status, url) {
 	this.name = name;
 	this.status = status;
 	this.url = url;
+	this.bar = {
+			'paper' : paper
+	}
 
 	this.middle = 24;
 	this.y = 17 + 33 * index;
@@ -897,11 +922,13 @@ function SupportActivity(bar, index, name, status, url) {
 }
 
 // Optional and Branching inner activities
-function OptionalActivity(bar, name, status, url, childActivitiesData, isNested) {
-	this.bar = bar;
+function OptionalActivity(paper, name, status, url, childActivitiesData, isNested) {
 	this.name = name;
 	this.status = status;
 	this.url = url;
+	this.bar = {
+			'paper' : paper
+	}
 
 	this.middle = isNested ? 22 : 15;
 	this.y = 5;
@@ -914,7 +941,7 @@ function OptionalActivity(bar, name, status, url, childActivitiesData, isNested)
 		var childActivities = this.childActivities;
 		$.each(childActivitiesData, function(childActivityIndex,
 				childActivityData) {
-			childActivities[childActivityIndex] = new OptionalActivity(bar,
+			childActivities[childActivityIndex] = new OptionalActivity(paper,
 					childActivityData.name, childActivityData.status,
 					childActivityData.url, null, true);
 		});
