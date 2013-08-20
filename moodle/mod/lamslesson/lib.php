@@ -59,6 +59,7 @@ define('LAMSLESSON_PARAM_MONITOR_METHOD', 'monitor');
 define('LAMSLESSON_PARAM_LEARNER_METHOD', 'learner');
 define('LAMSLESSON_PARAM_PREVIEW_METHOD', 'preview');
 define('LAMSLESSON_PARAM_VERIFY_METHOD', 'verify');
+define('LAMSLESSON_PARAM_JOIN', 'join');
 define('LAMSLESSON_PARAM_SINGLE_PROGRESS_METHOD', 'singleStudentProgress');
 define('LAMSLESSON_PARAM_PROGRESS_METHOD', 'studentProgress');
 define('LAMSLESSON_PARAM_CUSTOM_CSV', 'customCSV');
@@ -410,7 +411,7 @@ function lamslesson_add_lesson($form) {
 	
     // call threaded lams servlet to populate the class
     $result = lamslesson_fill_lesson($USER->username, $form->lesson_id,
-				     $form->course, $locale['country'], $locale['lang'], $members['learners'], $members['monitors']
+				     $form->course, $locale['country'], $locale['lang'], $members
 				     );
     
     // log adding of lesson
@@ -459,9 +460,17 @@ function lamslesson_get_locale($courseid) {
 function lamslesson_get_members($form) {
   global $CFG, $DB;
 
+  // see LDEV-3098 for changes in LessonManagerServlet
   $learneridstr = '';
-  $monitoridstr = '';
+  $learnerfnamestr = '';
+  $learnerlnamestr = '';
+  $learneremailstr = '';
 	
+  $monitoridstr = '';
+  $monitorfnamestr = '';
+  $monitorlnamestr = '';
+  $monitoremailstr = '';
+
   $context = get_context_instance(CONTEXT_MODULE, $form->coursemodule);
 	
   if (!$form->groupingid) {  // get all course members
@@ -474,20 +483,32 @@ function lamslesson_get_members($form) {
     $user = $DB->get_record('user', array('id'=>$userid));
     if (has_capability('mod/lamslesson:manage', $context, $user->id)) {
       $monitoridstr .= "$user->username,";
+      $monitorfnamestr .= "$user->firstname,";
+      $monitorlnamestr .= "$user->lastname,";
+      $monitoremailstr .= "$user->email,";
     }
     if (has_capability('mod/lamslesson:participate', $context, $user->id)) {
       $learneridstr .= "$user->username,";
+      $learnerfnamestr .= "$user->firstname,";
+      $learnerlnamestr .= "$user->lastname,";
+      $learneremailstr .= "$user->email,";
     }
   }
+
+  // Adding monitor users to firstname / lastnames
+
+  $learnerfnamestr = $learnerfnamestr . $monitorfnamestr;
+  $learnerlnamestr = $learnerlnamestr . $monitorlnamestr;
+  $learneremailstr = $learneremailstr . $monitoremailstr;
 	
   // remove trailing comma
   $learneridstr = substr($learneridstr, 0, strlen($learneridstr)-1);
-  $monitoridstr = substr($monitoridstr, 0, strlen($monitoridstr)-1);
+  $learnerfnamestr = substr($learnerfnamestr, 0, strlen($learnerfnamestr)-1);
+  $learnerlnamestr = substr($learnerlnamestr, 0, strlen($learnerlnamestr)-1);
+  $learneremailstr = substr($learneremailstr, 0, strlen($learneremailstr)-1);
+  $monitoridstr = substr($monitoridstr, 0, strlen($monitoridstr)-1); 
 	
-  //echo "learneridstr: $learneridstr\n";
-  //echo "monitoridstr: $monitoridstr\n";
-	
-  $members = array('learners' => $learneridstr, 'monitors' => $monitoridstr);
+  $members = array('learnersids' => $learneridstr, 'monitorsids' => $monitoridstr, 'firstnames' => $learnerfnamestr, 'lastnames' => $learnerlnamestr, 'emails' => $learneremailstr);
   return $members;
 }
 
@@ -536,7 +557,7 @@ function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$method,$c
  * Make call to LAMS that will populate the LAMS lesson with students and teachers from Moodle course.
  * The method on the LAMS side runs in a separate thread. 
  */
-function lamslesson_fill_lesson($username,$lsid,$courseid,$country,$lang,$learneridstr,$monitoridstr) {
+function lamslesson_fill_lesson($username,$lsid,$courseid,$country,$lang,$members) {
   global $CFG, $USER;
   if (!isset($CFG->lamslesson_serverid, $CFG->lamslesson_serverkey) || $CFG->lamslesson_serverid == '') {
     print_error(get_string('notsetup', 'lamslesson'));
@@ -552,14 +573,31 @@ function lamslesson_fill_lesson($username,$lsid,$courseid,$country,$lang,$learne
   $plaintext = $datetime.$username.$CFG->lamslesson_serverid.$CFG->lamslesson_serverkey;
   $hashvalue = sha1(strtolower($plaintext));
     
-  $learneridstr = urlencode($learneridstr);
-  $monitoridstr = urlencode($monitoridstr);
+  $learnerids = $members['learnersids'];
+  $firstnames = $members['firstnames'];
+  $lastnames = $members['lastnames'];
+  $emails = $members['emails'];
+  $monitorids = $members['monitorsids'];
 
-  // join lesson
-  $request = "$CFG->lamslesson_serverurl" . LAMSLESSON_LESSON_MANAGER . "?method=join&serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . $hashvalue . "&username=" . $username . "&lsId=" . $lsid . "&courseId=" . $courseid . "&country=" . $country . "&lang=" . $lang . "&learnerIds=" . $learneridstr . "&monitorIds=" . $monitoridstr;
+  $url = "$CFG->lamslesson_serverurl" . LAMSLESSON_LESSON_MANAGER;
+  $load = array('method' => 'join',
+		'serverId' => $CFG->lamslesson_serverid,
+		'datetime' => $datetime,
+		'hashValue' => $hashvalue,
+		'username' => $username,
+		'lsId' => $lsid,
+		'courseId' => $courseid,
+		'country' => $country,
+		'lang' => $lang,
+		'learnerIds' => $learnerids,
+		'firstNames' => $firstnames,
+		'lastNames' => $lastnames,
+		'emails' => $emails,
+		'monitorIds' => $monitorids);
     
   // GET call to LAMS
-  return lamslesson_http_call($request);
+  // We use the post method as we might be passing tons of user data.
+  return lamslesson_http_call_post($url,$load);
 }
 
 function lamslesson_get_lams_outputs($username,$lamslesson,$foruser) {
@@ -667,6 +705,7 @@ function lamslesson_get_url($username, $firstname, $lastname, $email, $lang, $co
         '&'. LAMSLESSON_PARAM_COURSENAME .'='.urlencode($coursename).
 		'&'. LAMSLESSON_PARAM_COUNTRY .'='.trim($country).
 		'&'. LAMSLESSON_PARAM_LANG .'='.substr(trim($lang),0,2);
+
     if ($customcsv != '') {
       $url .= '&'. LAMSLESSON_PARAM_CUSTOM_CSV .'='.urlencode($customcsv);
     }
@@ -909,7 +948,7 @@ function lamslesson_verify($url, $id, $key){
 }
 
 /**
- * Submits an HTTP POST to a LAMS server
+ * Submits an HTTP GET to a LAMS server
  * @param string $request
  * @return false or string with response if correct
  */
@@ -929,3 +968,26 @@ function lamslesson_http_call($request) {
             return false;
         }
 }
+
+/**
+ * Submits an HTTP POST to a LAMS server
+ * @param string $request
+ * @return false or string with response if correct
+ */
+function lamslesson_http_call_post($url,$request) {
+        global $CFG;
+
+        # pass charset as part of headers so it is interpreted correctly
+        # on the LAMS side. See LDEV-2875
+        $headers = array(
+                "Content-Type" =>  "application/x-www-form-urlencoded;charset=UTF-8"
+        );
+        $results = download_file_content($url, $headers, $request);
+
+        if ($results) {
+            return $results;
+        } else {
+            return false;
+        }
+}
+
