@@ -16,7 +16,6 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 	<script type="text/javascript" src="includes/javascript/monitorLesson.js"></script>
 	<script type="text/javascript">
 		var userId = '<lams:user property="userID"/>';
@@ -24,9 +23,11 @@
 		var ldId = ${lesson.learningDesignID};
 		var lessonStateId = ${lesson.lessonStateID};
 		var createDateTimeStr = '${lesson.createDateTimeStr}';
+		// settings for progress bar
 		var isHorizontalBar = true;
 		var hasContentFrame = false;
 		var presenceEnabled =  false;
+		var hasDialog = false;
 		
 		var LAMS_URL = '<lams:LAMSURL/>';
 		
@@ -84,6 +85,8 @@
 			refreshMonitor();
 		});
 	</script>
+	<!-- Some settings need to be done in the script first and only then this file can be included -->
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 </lams:head>
 <body>
 <div id="tabs">

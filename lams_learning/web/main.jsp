@@ -41,7 +41,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.layout.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 	<script type="text/javascript" src="includes/javascript/main.js"></script>
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>';
@@ -59,9 +58,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		var parentURL = "${notifyCloseURL}";
 		var lessonId = '${param.lessonID}';
 		var progressPanelEnabled = '<lams:Configuration key="LearnerCollapsProgressPanel" />' != 'false';
+		// settings for progress bar
 		var presenceEnabled = '${param.presenceEnabledPatch}' != 'false';
 		var isHorizontalBar = false;
 		var hasContentFrame = true;
+		var hasDialog = false;
 		var bars = {
 			'learnerMainBar' : {
 				'containerId' : 'progressBarDiv'
@@ -103,6 +104,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			}
 		});
 	</script>
+	<!-- Some settings need to be done in the script first and only then this file can be included -->
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
 </lams:head>
 
 <body class="stripes">

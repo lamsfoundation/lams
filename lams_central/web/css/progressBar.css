@@ -36,3 +36,13 @@ div.optionalActivity td {
 div.optionalActivity td:hover {
 	background-color: rgb(246, 238, 191);
 }
+
+div#progressBarDialog {
+	display: none;
+}
+
+div#progressBarDialog iframe {
+	width: 100%;
+	height: 100%;
+	border: none;
+}

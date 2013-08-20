@@ -1,8 +1,10 @@
 ﻿// ------- GLOBAL VARIABLES ----------
 // IMPORTANT: set following variables on the page which imports this JS file
-// var isHorizontalBar = false;
-// var hasContentFrame = true;
-// above settings are default for Learner page
+var isHorizontalBar = isHorizontalBar || false;
+var hasContentFrame = hasContentFrame || true;
+var hasDialog = hasDialog || false;
+var presenceEnabled = presenceEnabled || false;
+var REVIEW_ACTIVITY_TITLE = REVIEW_ACTIVITY_TITLE || 'Review activity';
 
 // colors used in shapes
 // dark red
@@ -45,7 +47,35 @@ function openPopUp(url, title, h, w, status) {
 
 // just a short cut to openPopUp function
 function openActivity(url) {
-	openPopUp(url, "LearnerActivity", 600, 800, "yes");
+	if (hasDialog) {
+		var dialog = $('#progressBarDialog');
+		if (!dialog.hasClass('ui-dialog')) {
+			dialog.dialog({
+				'autoOpen' : false,
+				'height' : 600,
+				'width' : 800,
+				'modal' : true,
+				'resizable' : false,
+				'hide' : 'fold',
+				'title' : REVIEW_ACTIVITY_TITLE,
+				'open' : function() {
+					// load contents after opening the dialog
+					$('iframe', this).load(function(){
+						// remove finish button
+						// so user can only close dialog with X button
+						$(this).contents().find('#finishButton, #finish').remove();
+					}).attr('src', url);
+				},
+				'beforeClose' : function(){
+					$('iframe', this).off('load').attr('src', null);
+				}
+			});
+		}
+		
+		dialog.dialog('open');
+	} else {
+		openPopUp(url, "LearnerActivity", 600, 800, "yes");
+	}
 }
 
 // loads a new activity to main content frame; alternative to opening in pop up
@@ -391,7 +421,7 @@ var ActivityUtils = {
 
 		var isSupportActivity = activity instanceof SupportActivity;
 		var dblclick = activity.url ? function() {
-			// open pop up if it is a support or completed activity
+			// open pop up or dialog if it is a support or completed activity
 			if (isSupportActivity
 					|| activity.status == 1
 					|| (!hasContentFrame && activity.status <= 2)) {
