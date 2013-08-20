@@ -185,6 +185,25 @@ public class LoginRequestServlet extends HttpServlet {
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 	}
     }
+    
+    /**
+     * The doPost method of the servlet. <br>
+     * 
+     * This method is called when a form has its tag value method equals to post.
+     * 
+     * @param request
+     *            the request send by the client to the server
+     * @param response
+     *            the response send by the server to the client
+     * @throws ServletException
+     *             if an error occurred
+     * @throws IOException
+     *             if an error occurred
+     */
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	doGet(request, response);
+    }
 
     // using JDBC connection to prevent the caching of passwords by hibernate
     private String getUserPassword(String username) throws FailedLoginException, NamingException, SQLException {
