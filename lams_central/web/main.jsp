@@ -13,7 +13,7 @@
 
 <%JspRedirectStrategy.welcomePageStatusUpdate(request, response);%>
 <%HttpSessionManager.getInstance().updateHttpSessionByLogin(request.getSession(),request.getRemoteUser());%>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE HTML>
 <lams:html>
 <lams:head>
 	<c:choose>
@@ -26,51 +26,41 @@
 	</c:choose>
 	
 	<lams:css style="main" />
-	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>/css/thickbox.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen">
-	<style type="text/css">
-		.dialogContainer {
-			display: none;
-		}
-		
-		.dialogContainer iframe {
-			width: 100%;
-			height: 100%;
-			border: none;
-		}
-	</style>
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
-	<script language="javascript" type="text/javascript" src="loadVars.jsp"></script>
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-    <script language="JavaScript" type="text/javascript" src="includes/javascript/thickbox.js"></script>
-	<c:if test="${empty tab}">
-		<script language="JavaScript" type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
-	</c:if>
-	<script language="javascript" type="text/javascript">
-		var LAMS_URL = '<lams:LAMSURL/>';
-		var LABELS = {
-				EMAIL_NOTIFICATIONS_TITLE : '<fmt:message key="index.emailnotifications" />',
-				REMOVE_LESSON_CONFIRM1 : '<fmt:message key="index.remove.lesson.confirm1"/>',
-				REMOVE_LESSON_CONFIRM2 : '<fmt:message key="index.remove.lesson.confirm2"/>',
-				SORTING_ENABLE : '<fmt:message key="label.enable.lesson.sorting"/>',
-				SORTING_DISABLE : '<fmt:message key="label.disable.lesson.sorting"/>'
-		}
-		
-		var orgsStateId = '<c:if test="${empty tab}">1</c:if><c:if test="${tab eq 'profile'}">3</c:if>';
-		
 	
-		<!--
-			jQuery(document).ready(function(){
-				<c:if test="${not empty collapsedOrgDTOs}">
-				jQuery("div.course-bg").each(function(){
-					var display = jQuery.trim(jQuery(this).text());
-					initLoadGroup(this, <c:if test="${empty tab}">1</c:if><c:if test="${tab eq 'profile'}">3</c:if>, display);
-				});
-				</c:if>
+	<link rel="icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
+	<link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/index.css" type="text/css" media="screen">
+
+	<script type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
+	<script type="text/javascript" src="loadVars.jsp"></script>
+	<script type="text/javascript" src="includes/javascript/openUrls.js"></script>
+	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
+
+	<script type="text/javascript">
+			var LAMS_URL = '<lams:LAMSURL/>';
+			var LABELS = {
+					EMAIL_NOTIFICATIONS_TITLE : '<fmt:message key="index.emailnotifications" />',
+					REMOVE_LESSON_CONFIRM1 : '<fmt:message key="index.remove.lesson.confirm1"/>',
+					REMOVE_LESSON_CONFIRM2 : '<fmt:message key="index.remove.lesson.confirm2"/>',
+					SORTING_ENABLE : '<fmt:message key="label.enable.lesson.sorting"/>',
+					SORTING_DISABLE : '<fmt:message key="label.disable.lesson.sorting"/>',
+					SINGLE_ACTIVITY_LESSON_TITLE : '<fmt:message key="index.single.activity.lesson.title"/>',
+					GRADEBOOK_COURSE_TITLE : '<fmt:message key="index.gradebook.course.title"/>',
+					GRADEBOOK_LESSON_TITLE : '<fmt:message key="index.gradebook.lesson.title"/>',
+					GRADEBOOK_LEARNER_TITLE : '<fmt:message key="index.gradebook.learner.title"/>',
+					CONDITIONS_TITLE : '<fmt:message key="index.conditions.title"/>',
+					SEARCH_LESSON_TITLE : '<fmt:message key="index.search.lesson.title"/>'
+			}
+			
+			var tabName = '${tab}';
+			var stateId = tabName == 'profile' ? 3 : 1;
+
+			$(document).ready(function(){
+				initMainPage();
+				
 				<%-- If it's the user's first login, display a dialog asking if tutorial videos should be shown --%>
 				<c:if test="${firstLogin}">
 					<c:url var="disableAllTutorialVideosUrl" value="tutorial.do">
@@ -80,134 +70,8 @@
 				 		$.get("${disableAllTutorialVideosUrl}");
 					}
 				</c:if>
-				
-				$(".split-menu-button li em").live("click", function(event) {
-					var hidden = $(this).parents("li").children("ul").is(":hidden");
-					$(this).parents("li").children("ul").hide();
-					$(this).parents("li").children("a").removeClass("zoneCur");
-						
-					if (hidden) {
-						$(this)
-							.parents("li").children("ul").toggle()
-							.parents("li").children("a").addClass("zoneCur");
-						} 
-
-	                event.stopPropagation();
-				   });
-		       $("html").click(function() {
-	                $(".split-menu-button>ul>li>ul").hide();
-	           });
-				
-		       
-		        // initialise lesson dialog
-				$('#addLessonDialog').dialog({
- 					'autoOpen'  : false,
- 					'height'    : 600,
- 					'width'     : 800,
- 					'modal'     : true,
- 					'resizable' : false,
- 					'hide'      : 'fold',
- 					'open'      : function(){
- 						// load contents after opening the dialog
- 						$('#addLessonFrame').attr('src', '<lams:LAMSURL/>home.do?method=addLesson&organisationID='
- 								                         + $(this).dialog('option', 'orgID'));
- 					},
- 					'close' : function() {
- 						// refresh if lesson was added
- 						if($(this).dialog('option', 'refresh')){
- 							refresh();
- 						}
- 					}
- 				// tabs are the title bar, so remove dialog's one
- 				}).closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
-		        
-				// initialise monitor dialog
-				$('#monitorDialog').dialog({
- 					'autoOpen'  : false,
- 					'height'    : 600,
- 					'width'     : 1024,
- 					'modal'     : true,
- 					'resizable' : false,
- 					'hide'      : 'fold',
- 					'open'      : function(){
- 						// load contents after opening the dialog
- 						$('#monitorFrame').attr('src', '<lams:LAMSURL/>home.do?method=monitorLesson&lessonID='
- 								                         + $(this).dialog('option', 'lessonID'));
- 					},
- 					'close' : function() {
- 						// refresh if lesson was added
- 						if($(this).dialog('option', 'refresh')){
- 							refresh();
- 						}
- 					}
- 				}).closest('.ui-dialog').children('.ui-dialog-titlebar').remove();
-				
-				// initialise notifications dialog
-				$('#notificationsDialog').dialog({
- 					'autoOpen'  : false,
- 					'height'    : 600,
- 					'width'     : 850,
- 					'modal'     : true,
- 					'resizable' : false,
- 					'hide'      : 'fold',
- 					'title'     : "<fmt:message key='index.emailnotifications' />",
- 					'open'      : function(){
- 						var lessonID = $(this).dialog('option', 'lessonID');
- 						// if lesson ID is given, use lesson view; otherwise use course view
- 						if (lessonID) {
-	 						// load contents after opening the dialog
-	 						$('#notificationsFrame').attr('src', '<lams:LAMSURL/>monitoring/emailNotifications.do?method=getLessonView&lessonID='
-	 							+ lessonID);
- 						} else {
- 							var orgID = $(this).dialog('option', 'orgID');
- 							$('#notificationsFrame').attr('src', '<lams:LAMSURL/>monitoring/emailNotifications.do?method=getCourseView&organisationID='
-			                	+ orgID);
- 						}
- 					},
- 					'close' : function() {
- 						$('#notificationsFrame').attr('src',null);
- 					}
- 				});
 			});
-		
-			function removeLesson(lessonID) {
-				if (confirm("<fmt:message key="index.remove.lesson.confirm1"/>")) {
-					if (confirm("<fmt:message key="index.remove.lesson.confirm2"/>")) {
-				        $.ajax({
-				        	async: false,
-				            url: "<lams:LAMSURL/>monitoring/monitoring.do",
-				            data: "method=removeLessonJson&lessonID=" + lessonID,
-				            type: "post",
-				            success: function (json) {
-					            if (json.removeLesson == "true") {
-					            	refresh();	
-								} else {
-									alert(json.removeLesson);
-								}
-				            }
-				       	});
-					}
-				}
 
-			}
-			
-			function getEnableSortingText() {
-				return "<fmt:message key="label.enable.lesson.sorting"/>";
-			}
-			
-			function getDisableSortingText() {
-				return "<fmt:message key="label.disable.lesson.sorting"/>";
-			}
-			
-			function refresh(){
-				document.location.reload();
-			}
-
-			function closeWizard() {
-				setTimeout(refresh, 1000);
-				tb_remove();
-			}
-		//-->
 	</script>
 </lams:head>
 <body class="my-courses">
@@ -267,12 +131,12 @@
 				<div class="${tabLeft}"></div>
 				<div class="${tabMiddle}">
 						<c:choose>
-						<c:when test="${fn:startsWith(headerlink.name,'index')}">
-							<lams:TabName url="${headerlink.url}" highlight="${highlight}"><fmt:message key="${headerlink.name}" /></lams:TabName>
-						</c:when>
-						<c:otherwise>
-							<lams:TabName url="${headerlink.url}" highlight="${highlight}"><c:out value="${headerlink.name}" /></lams:TabName>						
-						</c:otherwise>
+							<c:when test="${fn:startsWith(headerlink.name,'index')}">
+								<lams:TabName url="${headerlink.url}" highlight="${highlight}"><fmt:message key="${headerlink.name}" /></lams:TabName>
+							</c:when>
+							<c:otherwise>
+								<lams:TabName url="${headerlink.url}" highlight="${highlight}"><c:out value="${headerlink.name}" /></lams:TabName>						
+							</c:otherwise>
 						</c:choose>
 				</div>
 				<div class="${tabRight}"></div>
@@ -281,69 +145,103 @@
 		</div>
 	</div>
 	<div id="content-main">
-		<div id="message" style="text-align: center;"></div>
-		<div style="display: block;" class="box">
-			<table cellpadding="0">
-				<tbody>
-					<tr>
-						<td>
-							<div class="welcome">
-								<div class="float-left">
-									<span class="user-img">
-									<fmt:message key="index.welcome" /> 
-									<lams:user property="firstName" /></span>
-								</div>
-								<div class="float-right">
-									<c:if test="${not empty adminLinks}">
-										<c:forEach var="adminlink" items="${adminLinks}">
-											<a title="<fmt:message key="${adminlink.name}"/>" href='<c:out value="${adminlink.url}"/>'><fmt:message key="${adminlink.name}"/></a> | 
+		<table>
+			<tr>
+				<c:if test="${not empty portraitUuid}">
+					<td>
+						<img class="img-border" src="download/?uuid=${portraitUuid}&preferDownload=false" />
+					</td>
+				</c:if>
+				<td>
+					<fmt:message key="index.welcome" />
+					<lams:user property="firstName" />
+				</td>
+				
+				<td id="messageCell">
+				<%--
+					<div id="message">Important annoucements might be posted here...</div>
+				--%>
+				</td>
+				
+				<td class="linksCell">
+					<c:if test="${not empty adminLinks}">
+						<c:forEach var="adminlink" items="${adminLinks}">
+							<div class="ui-button" title="<fmt:message key="${adminlink.name}"/>" 
+							     onClick='<c:out value="${adminlink.url}"/>'>
+									<fmt:message key="${adminlink.name}"/>
+							</div> 
+						</c:forEach>
+					</c:if>
+				</td>
+				<td class="linksCell">
+					<c:if test="${not empty orgDTOs}">
+						<div class="ui-button" title="<fmt:message key="index.refresh.hint"/>"
+							 onClick="javascript:loadOrgTab(null, true)">
+								<fmt:message key="index.refresh" />
+						</div>
+					</c:if>
+					<div class="ui-button" onClick="javascript:closeAllChildren();document.location.href='home.do?method=logout'">
+							<fmt:message key="index.logout" />
+					</div>
+				</td>
+			</tr>
+		</table>
+		<c:if test="${empty tab}">
+			<table id="mainContentTable" cellpadding="0" cellspacing="0">
+				<tr>
+					<td>
+						<c:if test="${not empty orgDTOs}">
+							<table id="orgTabs" cellpadding="0" cellspacing="0">
+								<tr>
+									<td>
+										<ul>
+											<c:forEach items="${orgDTOs}" var="dto" varStatus="status">
+												<li class="orgTabsHeader">
+													<a href="#orgTab-${status.index}-org-${dto.orgId}"><c:out value="${dto.orgName}" /></a>
+												</li>
+											</c:forEach>
+										</ul>
+									</td>
+									<td id="orgTabsPanelCell" class="ui-widget-content ui-corner-all">
+										<c:forEach items="${orgDTOs}" var="dto" varStatus="status">
+											<div id="orgTab-${status.index}-org-${dto.orgId}" class="orgTab"></div>
 										</c:forEach>
-									</c:if>
-									<a title="<fmt:message key="index.refresh.hint"/>" href="javascript:refresh()">
-										<fmt:message key="index.refresh" />
-									</a> | <a href="home.do?method=logout" onClick="closeAllChildren()">
-										<fmt:message key="index.logout" />
-									</a>
-								</div>
+									</td>
+								</tr>
+							</table>
+						</c:if>
+					</td>
+					<%--
+					<td id="actionAccord">
+							<h3>New lessons</h3>
+							<div>New lessons content panel<br />
+							TEXT TEXT TEXT TEXT<br />
+							TEXT TEXT TEXT TEXT<br />
+							TEXT TEXT TEXT TEXT<br />
+							TEXT TEXT TEXT TEXT<br />
+							TEXT TEXT TEXT TEXT<br />
 							</div>
-							<c:if test="${empty tab}">
-								<c:forEach items="${collapsedOrgDTOs}" var="dto">
-									<div id="<c:out value="${dto.orgId}"/>" style="display:none" class="course-bg">
-										<c:if test="${dto.collapsed}">header</c:if><c:if test="${!dto.collapsed}">group</c:if>
-									</div>
-								</c:forEach>
-								<c:if test="${empty collapsedOrgDTOs}">
-									<c:if test="${not empty showGroups}">
-										<!-- div align="center" style="padding:30px;">
-											<a onclick="document.location.href='index.do?groups=show';"><fmt:message key="label.show.groups"/></a>
-										</div-->
-										<div class="course-bg"><div class="row"><div class="mycourses-right-buttons">
-											<a class="show-all-groups-button" onclick="document.location.href='index.do?groups=show';"><fmt:message key="label.show.groups"/></a>
-										</div></div></div>
-									</c:if>
-									<c:if test="${empty showGroups}">
-										<p class="align-left"><fmt:message key="msg.groups.empty" /></p>
-									</c:if>
-								</c:if>
-							</c:if>
-							<c:if test="${tab eq 'profile'}">
-								<tiles:insert attribute="profile" />
-							</c:if>
-							<c:if test="${tab eq 'community'}">
-								<tiles:insert attribute="community" />
-							</c:if>
-						</td>
-					</tr>
-				</tbody>
+							<h3>Recent activity</h3>
+							<div>Recent activity content panel</div>
+							<h3>Gradebooks</h3>
+							<div>Gradebooks content panel</div>
+							<h3>Announcements</h3>
+							<div>Announcements content panel</div>
+					</td>
+					--%>
+				</tr>
 			</table>
-		</div>
-		
+		</c:if>
+		<c:if test="${tab eq 'profile'}">
+			<tiles:insert attribute="profile" />
+		</c:if>
+		<c:if test="${tab eq 'community'}">
+			<tiles:insert attribute="community" />
+		</c:if>
 	</div>
 	<div id="footer">
 		<p>
-			<a style="color: #999999; text-decoration: none; border: none;" href="index.do?newLayout=true">
-				<fmt:message key="msg.LAMS.version" /> <%=Configuration.get(ConfigurationKeys.VERSION)%>
-			</a>
+			<fmt:message key="msg.LAMS.version" /> <%=Configuration.get(ConfigurationKeys.VERSION)%>
 			<a href="<lams:LAMSURL/>/www/copyright.jsp" target='copyright' onClick="openCopyRight()">
 				&copy; <fmt:message key="msg.LAMS.copyright.short" /> 
 			</a>
@@ -351,14 +249,8 @@
 	</div>
 </div>
 
-<div id="addLessonDialog" class="dialogContainer">
-	<iframe id="addLessonFrame"></iframe>
-</div>
-<div id="monitorDialog" class="dialogContainer">
-	<iframe id="monitorFrame"></iframe>
-</div>
-<div id="notificationsDialog" class="dialogContainer">
-	<iframe id="notificationsFrame"></iframe>
+<div id="dialogContainer">
+	<iframe id="dialogFrame"></iframe>
 </div>
 
 </body>

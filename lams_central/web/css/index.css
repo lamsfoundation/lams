@@ -15,6 +15,7 @@ td#messageCell {
 
 .linksCell {
 	padding: 0 0 10px 0;
+	vertical-align: top;
 }
 
 .linksCell div {
@@ -49,6 +50,7 @@ td#messageCell {
 #orgTabs li.orgTabsHeader {
 	width: 150px;
 	white-space: normal;
+	word-break: break-all;
 }
 
 #orgTabsPanelCell {

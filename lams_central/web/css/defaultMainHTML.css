@@ -138,7 +138,7 @@ li.no-list-type  {
 #header { /*layout of the header */
 	width: 90%;
 	min-width:707px;
-	max-width:1024px;
+	max-width:1366px;
 	margin-left:auto;
 	margin-right:auto;
 	margin-bottom:5px;
@@ -150,7 +150,7 @@ li.no-list-type  {
 	margin-left:auto;
 	margin-right:auto;
 	min-width:707px;
-	max-width:1024px;
+	max-width:1366px;
 	height:40px; 
 	background:url('../images/css/top_bg.jpg') no-repeat bottom;
 }
@@ -309,7 +309,7 @@ Layout of main content section
 	height:100%; 
 	padding-bottom:-5px;
 	min-width:707px;
-	max-width:1024px;
+	max-width:1366px;
 }
 
 /*layout of Links within the content area */
@@ -644,7 +644,7 @@ My Courses Pages
 #page-mycourses { /*whole layout of page*/
 	margin: 25px auto;
 	min-width: 707px;
-	max-width: 1024px;
+	max-width: 1366px;
 	width: 100%;
 	background: url('../images/css/lams_logo.gif') no-repeat 5% -7px;
 
@@ -653,7 +653,7 @@ My Courses Pages
 #page-mycourses #footer { /*layout of the footer - the bottom of the box */
 	width: 90%;
 	min-width:707px;
-	max-width:1024px;
+	max-width:1366px;
 	margin-left:auto;
 	margin-right:auto;
 }
@@ -670,7 +670,7 @@ My Courses Pages
 #header-my-courses { /*layout of the header */
 	width:90%;
 	min-width:707px;
-	max-width:1024px;
+	max-width:1366px;
 	margin-left:auto;
 	margin-right:auto;
 	margin-bottom:5px;
@@ -955,7 +955,7 @@ border:0px;
 * html  #header { /*layout of the header */
 	width:90%;
 	min-width:707px;
-	max-width:1024px;
+	max-width:1366px;
 	margin-left:auto;
 	margin-right:auto;
 	margin-bottom:5px;
@@ -964,7 +964,7 @@ border:0px;
 * html  #header-my-courses { /*layout of the header */
 	width:90%;
 	min-width:707px;
-	max-width:1024px;
+	max-width:1366px;
 	margin-left:auto;
 	margin-right:auto;
 	margin-bottom:5px;
@@ -1047,7 +1047,7 @@ border:0px;
 	height:100%; 
 	padding-bottom:-5px;
 	min-width:707px;
-	max-width:1024px;
+	max-width:1366px;
 	position:relative;
 	z-index:1;
 	}

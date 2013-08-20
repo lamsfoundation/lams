@@ -108,7 +108,7 @@ public class ProfileAction extends LamsDispatchAction {
 
 	request.setAttribute("fullName", fullName);
 	request.setAttribute("email", (email != null ? email : ""));
-	request.setAttribute("portraitUuid", (requestor.getPortraitUuid() == null ? 0 : requestor.getPortraitUuid()));
+	request.setAttribute("portraitUuid", requestor.getPortraitUuid());
 	request.setAttribute("tab", "profile");
 
 	return mapping.findForward("view");

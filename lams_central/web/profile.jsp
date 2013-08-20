@@ -10,24 +10,14 @@
 		 import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 		 
 <c:set var="showAllMyLessonLink"><%=Configuration.get(ConfigurationKeys.SHOW_ALL_MY_LESSON_LINK)%></c:set>
-
-<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery.js"></script>
-<c:if test="${not empty collapsedOrgDTOs}">
-<script language="JavaScript" type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-<script language="JavaScript" type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
-</c:if>
 	
 <div style="clear:both;"></div>
 
-<h2 class="small-space-top"><fmt:message key="index.myprofile" />
-</h2>
+<h2 class="small-space-top"><fmt:message key="index.myprofile" /></h2>
 
 <div class="shading-bg">
-
 <table>
-
 	<tr>
-
 		<td class="align-right"><span class="field-name"><fmt:message
 			key="label.name" />:</span></td>
 		<td><bean:write name="fullName" /></td>
@@ -67,33 +57,33 @@
 	<tr>
 		<td class="align-right" valign="top"><span class="field-name"><fmt:message
 			key="label.portrait.current" />:</span></td>
-		<td valign="top"><logic:notEqual name="portraitUuid" value="0">
-			<img class="img-border"
-				src="/lams/download/?uuid=<bean:write name="portraitUuid" />&preferDownload=false" />
-		</logic:notEqual> <logic:equal name="portraitUuid" value="0">
-			<c:set var="lams">
-				<lams:LAMSURL />
-			</c:set>
-				<em><fmt:message key="msg.portrait.none" /></em>
-			<div class="small-space-top">
-			<img src="${lams}/images/default_user.gif" alt="User Portrait"
-				class="img-border">
-				</div>
-		</logic:equal></td>
+		<td valign="top">
+			<c:choose>
+				<c:when test="${empty portraitUuid}">
+					<em><fmt:message key="msg.portrait.none" /></em>
+					<div class="small-space-top">
+						<img src="<lams:LAMSURL />images/default_user.gif" alt="User Portrait"
+						class="img-border">
+					</div>
+				</c:when>
+				<c:otherwise>
+					<img class="img-border"	src="/lams/download/?uuid=<bean:write name="portraitUuid" />&preferDownload=false" />
+				</c:otherwise>
+			</c:choose>
+		</td>
 	<tr>
 </table>
 
 </div>
 
 
-<h2 class="space-top"><fmt:message key="title.archived.groups" />
-</h2>
+<h2 class="space-top"><fmt:message key="title.archived.groups" /></h2>
 
-<c:forEach items="${collapsedOrgDTOs}" var="dto">
-	<div id="<c:out value="${dto.orgId}"/>" style="display:none" class="course-bg">
-		<c:if test="${dto.collapsed}">header</c:if><c:if test="${!dto.collapsed}">group</c:if>
-	</div>
-</c:forEach>
-<c:if test="${empty collapsedOrgDTOs}">
-	<p class="align-left"><fmt:message key="msg.groups.empty" /></p>
-</c:if>
+<p class="align-left">
+	<c:forEach items="${orgDTOs}" var="dto">
+		<span><c:out value="${dto.orgName}" /></span><br />
+	</c:forEach>
+	<c:if test="${empty orgDTOs}">
+		<fmt:message key="msg.groups.empty" />
+	</c:if>
+</p>

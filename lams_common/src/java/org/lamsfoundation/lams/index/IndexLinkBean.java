@@ -24,29 +24,27 @@ package org.lamsfoundation.lams.index;
 
 /**
  * @version
- *
- * <p>
- * <a href="IndexLinkBean.java.html"><i>View Source</i></a>
- * </p>
- *
+ * 
+ *          <p>
+ *          <a href="IndexLinkBean.java.html"><i>View Source</i></a>
+ *          </p>
+ * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- *
- * Created at 10:12:09 on 14/06/2006
+ * 
+ *         Created at 10:12:09 on 14/06/2006
  */
 public class IndexLinkBean {
 
     private String name;
     private String url;
     private String style;
-    private String spanStyle;
     private String tooltip;
 
-    public IndexLinkBean(String name, String url, String style, String spanStyle, String tooltip) {
+    public IndexLinkBean(String name, String url, String style, String tooltip) {
 	super();
 	this.name = name;
 	this.url = url;
 	this.style = style;
-	this.spanStyle = spanStyle;
 	this.tooltip = tooltip;
     }
 
@@ -84,21 +82,13 @@ public class IndexLinkBean {
     public void setUrl(String url) {
 	this.url = url;
     }
-    
+
     public String getStyle() {
 	return style;
     }
 
     public void setStyle(String style) {
 	this.style = style;
-    }
-
-    public String getSpanStyle() {
-	return spanStyle;
-    }
-
-    public void setSpanStyle(String spanStyle) {
-	this.spanStyle = spanStyle;
     }
 
     public String getTooltip() {

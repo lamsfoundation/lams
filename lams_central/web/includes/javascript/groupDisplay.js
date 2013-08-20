@@ -1,14 +1,16 @@
 function initMainPage() {
 	initButtons();
 	
-	$('#orgTabs').tabs({
-		'activate' : function(event, ui){
-			loadOrgTab(ui.newPanel);
-		}
-	}).addClass('ui-tabs-vertical ui-helper-clearfix')
-	  .find('li').removeClass('ui-corner-top').addClass('ui-corner-left');
-
-	loadOrgTab($('.orgTab').first());
+	if ($('#orgTabs').length > 0) {
+		$('#orgTabs').tabs({
+			'activate' : function(event, ui){
+				loadOrgTab(ui.newPanel);
+			}
+		}).addClass('ui-tabs-vertical ui-helper-clearfix')
+		  .find('li').removeClass('ui-corner-top').addClass('ui-corner-left');
+	
+		loadOrgTab($('.orgTab').first());
+	}
 	
 	$("#actionAccord").accordion({
 		'heightStyle' : 'content'
@@ -19,112 +21,22 @@ function loadOrgTab(orgTab, refresh) {
 	if (!orgTab) {
 		orgTab = $('div.orgTab[id^=orgTab-' + $('#orgTabs').tabs('option','active') + ']');
 	}
-	if (refresh || !orgTab.text()) {
+	if (orgTab && (refresh || !orgTab.text())) {
 		var orgTabId = orgTab.attr("id");
 		var orgId = orgTabId.split('-')[3];
 		
 		orgTab.load(
 			"displayGroup.do",
 			{
-				display : 'group',
 				stateId : stateId,
 				orgId   : orgId
 			},
 			function() {
-				$("a[class*='thickbox']", orgTab).each(function() {
-					tb_init(this);
-				});
-				
 				initButtons(orgTabId);
 			});
 	}
 }
 
-
-function initLoadGroup(element, stateId, display) {
-	jQuery(element).load(
-			"displayGroup.do",
-			{
-				display : display,
-				stateId : stateId,
-				orgId : jQuery(element).attr("id")
-			},
-			function() {
-				if (display == 'header') {
-					jQuery("span.j-group-icon", element).html(
-							"<img src='images/tree_closed.gif'/>");
-				} else if (display == 'group') {
-					jQuery("span.j-group-icon", element).html(
-							"<img src='images/tree_open.gif'/>");
-				}
-				toggleGroupContents(element, stateId);
-				jQuery(element).css("display", "block");
-				jQuery("a[class*='thickbox']", element).each(function() {
-					tb_init(this);
-				});
-				initMoreActions(element);
-			});
-}
-
-function toggleGroupContents(element, stateId) {
-	jQuery("a.j-group-header, span.j-group-icon", element).click(function() {
-		var row = jQuery("div.row", element);
-		var courseBg = jQuery(row).parent("div.course-bg");
-		var orgId = jQuery(courseBg).attr("id");
-		var course = jQuery(row).nextAll("div.j-course-contents");
-		var groupIcon = jQuery("span.j-group-icon", element);
-		if (jQuery(course).html() == null) {
-			loadGroupContents(courseBg, stateId);
-			saveCollapsed(orgId, "false");
-			jQuery(groupIcon).html("<img src='images/tree_open.gif'/>");
-		} else {
-			var display = course.css("display");
-			if (jQuery.browser.msie && jQuery.browser.version == '6.0') {
-				course.slideToggle("fast");
-			} else {
-				course.toggle("fast");
-			}
-			if (display == "none") {
-				saveCollapsed(orgId, "false");
-				jQuery(groupIcon).html("<img src='images/tree_open.gif'/>");
-			} else if (display == "block") {
-				saveCollapsed(orgId, "true");
-				jQuery(groupIcon).html("<img src='images/tree_closed.gif'/>");
-			}
-		}
-	});
-}
-
-function saveCollapsed(orgId, collapsed) {
-	jQuery.ajax({
-		url : "servlet/updateCollapsedGroup",
-		data : {
-			orgId : orgId,
-			collapsed : collapsed
-		}
-	});
-}
-
-function loadGroupContents(courseBg, stateId) {
-	var orgId = jQuery(courseBg).attr("id");
-	jQuery.ajax({
-		url : "displayGroup.do",
-		data : {
-			orgId : orgId,
-			stateId : stateId,
-			display : 'contents'
-		},
-		success : function(html) {
-			jQuery(courseBg).append(html);
-			// unregister and re-register thickbox for this
-			// group in order to avoid double
-			// registration of thickbox for existing elements
-			// (i.e. group 'add lesson' link)
-			$('a.thickbox' + jQuery(courseBg).attr("id")).unbind("click");
-			tb_init('a.thickbox' + jQuery(courseBg).attr("id"));
-		}
-	});
-}
 
 function initButtons(containerId) {
 	var container = containerId ? $('#' + containerId) : document;
@@ -163,59 +75,8 @@ function initButtons(containerId) {
 	});
 }
 
-function initMoreActions(element) {
-
-	var id = jQuery(element).attr("id");
-	var menuSelector = "a#more-actions-button-" + id;
-	var ulSelector = "ul#more-actions-list-" + id;
-
-	$(menuSelector).click(
-			function() {
-				// slide up all other menus
-				$("ul[id^=more-actions-list-]:visible:not(" + ulSelector + ")")
-						.slideUp("fast");
-
-				// show this menu
-				$(ulSelector).css("top",
-						$(this).position().top + this.offsetHeight);
-				$(ulSelector).css("left", $(this).position().left);
-				$(ulSelector).slideToggle("fast");
-				return false;
-			});
-
-	$(window).resize(
-			function() {
-				if ($(menuSelector).length == 0)
-					return;
-
-				$(ulSelector).css(
-						"top",
-						$(menuSelector).position().top
-								+ $(menuSelector).offsetHeight);
-				$(ulSelector).css("left", $(menuSelector).position().left);
-			});
-
-}
 
 function makeOrgSortable(orgId) {
-	var org = jQuery("div.course-bg#" + orgId);
-	if (jQuery("div.j-lessons", org).size() > 0) {
-		var jLessons = jQuery("div.j-lessons#" + orgId + "-lessons");
-		var jLessonsTable = jQuery("table.lesson-table tbody", jLessons);
-		makeSortable(jLessonsTable);
-		jQuery("div.j-subgroup-lessons>table.lesson-table tbody", org).each(
-				function() {
-					makeSortable(jQuery(this));
-				});
-		jQuery("div.mycourses-right-buttons", jLessons).html(
-				"<a class=\"sorting\" onclick=\"makeOrgUnsortable(" + orgId
-						+ ")\" title=\"" + LABELS.SORTING_DISABLE
-						+ "\"><img src=\"images/sorting_enabled.gif\"></a>");
-	}
-}
-
-// for redesigned main.jsp
-function makeOrgSortable2(orgId) {
 	var org = jQuery("div.orgTab[id$='-org-" + orgId + "']");
 	$(".lesson-table", org).each(function() {
 		makeSortable(this);
@@ -225,28 +86,13 @@ function makeOrgSortable2(orgId) {
 		"onClick" : null,
 		"title"   : LABELS.SORTING_DISABLE
 	}).off('click').click(function(){
-		makeOrgUnsortable2(orgId);
+		makeOrgUnsortable(orgId);
 	}).find("img")
 	  .attr("src", "images/sorting_enabled.gif");
 	
 }
 
 function makeOrgUnsortable(orgId) {
-	var org = jQuery("div.course-bg#" + orgId);
-	var jLessons = jQuery("div.j-lessons#" + orgId + "-lessons");
-	var jLessonsTable = jQuery("table.lesson-table tbody", jLessons);
-	jLessonsTable.sortable("destroy");
-	jQuery("div.j-subgroup-lessons>table.lesson-table tbody", org).each(
-			function() {
-				jQuery(this).sortable("destroy");
-			});
-	jQuery("div.mycourses-right-buttons", jLessons).html(
-			"<a class=\"sorting\" onclick=\"makeOrgSortable(" + orgId
-					+ ")\" title=\"" + LABELS.SORTING_ENABLE
-					+ "\"><img src=\"images/sorting_disabled.gif\"></a>");
-}
-
-function makeOrgUnsortable2(orgId) {
 	var org = jQuery("div.orgTab[id$='-org-" + orgId + "']");
 	$(".lesson-table", org).each(function() {
 		$(this).sortable('destroy');
@@ -256,7 +102,7 @@ function makeOrgUnsortable2(orgId) {
 		"onClick" : null,
 		"title"   : LABELS.SORTING_ENABLE
 	}).off('click').click(function(){
-		makeOrgSortable2(orgId);
+		makeOrgSortable(orgId);
 	}).find("img")
 	  .attr("src", "images/sorting_disabled.gif");
 }
@@ -286,9 +132,6 @@ function makeSortable(element) {
 
 					var jLessonsId = $(this).parents(
 							"div[class$='lessons']").attr("id");
-					if (!jLessonsId) {
-						jLessonsId = $(this).attr("id");
-					}
 					var dashIndex = jLessonsId.indexOf("-");
 					var orgId = (dashIndex > 0 ? jLessonsId.substring(0,
 							dashIndex) : jLessonsId);
@@ -306,6 +149,7 @@ function makeSortable(element) {
 				}
 			}).disableSelection();
 }
+
 
 function showMonitorLessonDialog(lessonID) {
 	var dialog = $('#dialogContainer').dialog({
@@ -639,13 +483,4 @@ function removeLesson(lessonID) {
 			});
 		}
 	}
-}
-
-function refresh() {
-	document.location.reload();
-}
-
-function closeWizard() {
-	setTimeout(refresh, 1000);
-	tb_remove();
 }

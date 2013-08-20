@@ -69,7 +69,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action path="/index" validate="false"
  * 
  * @struts.action-forward name="main" path="/main.jsp"
- * @struts.action-forward name="main2" path="/main2.jsp"
  * @struts.action-forward name="community" path=".community"
  * @struts.action-forward name="profile" path="/profile.do?method=view"
  * @struts.action-forward name="editprofile" path="/profile.do?method=edit"
@@ -117,12 +116,15 @@ public class IndexAction extends Action {
 		return mapping.findForward("password");
 	    }
 	}
-
+	
+	User user = getUserManagementService().getUserByLogin(userDTO.getLogin());
+	request.setAttribute("portraitUuid", user.getPortraitUuid());
+	
 	String tab = WebUtil.readStrParam(request, "tab", true);
 	if (StringUtils.equals(tab, "profile")) {
-	    List collapsedOrgDTOs = getUserManagementService().getArchivedCourseIdsByUser(loggedInUser.getUserId(),
+	    List orgDTOs = getUserManagementService().getArchivedCourseIdsByUser(loggedInUser.getUserId(),
 		    request.isUserInRole(Role.SYSADMIN));
-	    request.setAttribute("collapsedOrgDTOs", collapsedOrgDTOs);
+	    request.setAttribute("orgDTOs", orgDTOs);
 	    return mapping.findForward("profile");
 	} else if (StringUtils.equals(tab, "editprofile")) {
 	    return mapping.findForward("editprofile");
@@ -142,7 +144,7 @@ public class IndexAction extends Action {
 	    request.setAttribute("tab", tab);
 	    return mapping.findForward("community");
 	}
-
+	
 	if (request.isUserInRole(Role.SYSADMIN)) {
 	    // don't load group ids for sysadmins, unless 'groups' parameter is set
 	    String groups = WebUtil.readStrParam(request, "groups", true);
@@ -157,19 +159,13 @@ public class IndexAction extends Action {
 	    request.setAttribute("lamsCommunityEnabled", reg.isEnableLamsCommunityIntegration());
 	}
 
-	List collapsedOrgDTOs = getUserManagementService().getActiveCourseIdsByUser(loggedInUser.getUserId(),
+	List orgDTOs = getUserManagementService().getActiveCourseIdsByUser(loggedInUser.getUserId(),
 		request.isUserInRole(Role.SYSADMIN));
-	request.setAttribute("collapsedOrgDTOs", collapsedOrgDTOs);
-	boolean newLayout = WebUtil.readBooleanParam(request, "newLayout", false);
-	if (newLayout) {
-	    User user = getUserManagementService().getUserByLogin(userDTO.getLogin());
-	    request.setAttribute("portraitUuid", user.getPortraitUuid());
-	    return mapping.findForward("main2");
-	} 
+	request.setAttribute("orgDTOs", orgDTOs);
 	return mapping.findForward("main");
     }
 
-    private void setHeaderLinks(HttpServletRequest request) {
+    private static void setHeaderLinks(HttpServletRequest request) {
 	List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
 	if (request.isUserInRole(Role.AUTHOR) || request.isUserInRole(Role.AUTHOR_ADMIN)) {
 	    if (isPedagogicalPlannerAvailable()) {
@@ -220,7 +216,7 @@ public class IndexAction extends Action {
 	return IndexAction.userManagementService;
     }
 
-    private boolean isPedagogicalPlannerAvailable() {
+    private static boolean isPedagogicalPlannerAvailable() {
 	String lamsEarPath = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
 	String plannerPath = lamsEarPath + File.separator + IndexAction.PATH_LAMS_CENTRAL + File.separator
 		+ IndexAction.PATH_PEDAGOGICAL_PLANNER;
