@@ -313,7 +313,6 @@ function lamslesson_get_sequences_rest($username,$firstname,$lastname,$email,$co
 
     // generate hash
     $datetime = date('F d,Y g:i a');
-    $datetime_encoded = urlencode($datetime);
     $rawstring = trim($datetime).trim($username).trim($CFG->lamslesson_serverid).trim($CFG->lamslesson_serverkey);
     $hashvalue = sha1(strtolower($rawstring));
 
@@ -549,9 +548,6 @@ function lamslesson_get_lesson($username,$ldid,$courseid,$title,$desc,$method,$c
   $plaintext = $datetime.$username.$CFG->lamslesson_serverid.$CFG->lamslesson_serverkey;
   $hashvalue = sha1(strtolower($plaintext));
 
-  $title = urlencode($title);
-  $desc = urlencode($desc);
-
   $request = "$CFG->lamslesson_serverurl" . LAMSLESSON_LESSON_MANAGER;
 
   $load = array('method'	=>	$method,
@@ -588,7 +584,6 @@ function lamslesson_fill_lesson($username,$lsid,$courseid,$country,$lang,$member
   }
     
   $datetime =    date('F d,Y g:i a');
-  $datetime_encoded = urlencode($datetime);
   if(!isset($username)){
     $username = $USER->username;
   }
