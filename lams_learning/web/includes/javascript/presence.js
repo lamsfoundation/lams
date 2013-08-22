@@ -2,13 +2,21 @@ var windowHeight;
 var pollInProgress = false;
 
 var roster = {
-	users : [],
+	// association nick -> localId, the latter being just some ID made in this script
+	users : {},
+	maxUserLocalId : 0,
 	// map "tab" -> "last message in tab", so we don't fetch all messages every time, only new ones
 	lastMessageUids : [],
 	
 	// when user clicked another user in roster
-	handleUserClicked : function(index) {
-		var nick = roster.users[index];
+	handleUserClicked : function(localId) {
+		var nick = null;
+		$.each(roster.users, function(key, value){
+			if (value == localId) {
+				nick = key;
+				return false;
+			}
+		});
 	
 		if(nick != nickname){
 			var tag = nickToTag(nick);
@@ -31,19 +39,23 @@ var roster = {
 	updateDisplay : function(users) {
 		// sort alphabetically
 		users.sort();
-		this.users = users;
-
-		// for all users
-		jQuery.each(this.users, function(index, nick){
+		// repopulate user objects array
+		var rosterUsers = {};
+		$.each(users, function(index, nick){
+			var localId = roster.users[nick];
+			rosterUsers[nick] = localId ? localId :  ++roster.maxUserLocalId;
+		});
+		this.users = rosterUsers;
+		
+		jQuery.each(this.users, function(nick, localId){
 			var tag = nickToTag(nick);
 			var listingName = tagToListing(tag);
 			var listing = $("#" + listingName);
-								
 			// if no listing in roster exists
 			if (listing.length == 0){
 				// create listing div
 				var listingDiv = $('<div id="' + listingName
-						            + '" onClick="javascript:roster.handleUserClicked(' + index + ');" class="presenceListing">'
+						            + '" onClick="javascript:roster.handleUserClicked(' + localId + ');" class="presenceListing">'
 						            + createPresenceListing(nick, tag)
 						            + '</div>');
 				
@@ -57,7 +69,7 @@ var roster = {
 		
 		// update presenceTabLabel
 		var presenceTabLabelDiv = $("#presence_tabLabel");
-		presenceTabLabelDiv.html(labelUsers + " (" + this.users.length + ")");
+		presenceTabLabelDiv.html(labelUsers + " (" + users.length + ")");
 	}
 }
 
@@ -123,20 +135,7 @@ function resizeChat() {
 }	
 
 function getUserFromTabIndex(tabIndex) {
-	var tabLabelsLocal = $(".ui-tabs-label");
-	var label = tabLabelsLocal[tabIndex].innerHTML;
-
-	if (label == groupChatInfo.nick) {
-		return groupChatInfo.nick;
-	} else {
-		for ( var i = 0; i < roster.users.length; i++) {
-			if (roster.users[i] == label) {
-				return roster.users[i];
-			}
-		}
-	}
-
-	return null;
+	return $(".ui-tabs-label")[tabIndex].innerHTML;
 }
 
 function addTab(nick, tag) {
@@ -148,7 +147,7 @@ function addTab(nick, tag) {
 }
 
 function nickToTag(nick) {
-	return nick == groupChatInfo.nick ? groupChatInfo.tag : nick.replace(/ /g, "_");
+	return nick == groupChatInfo.nick ? groupChatInfo.tag : "presenceUser" + roster.users[nick];
 }
 
 function nickToMessageArea(nick) {
@@ -246,7 +245,7 @@ function updateChat(){
 				  
 				  // real new messages for the opentab
 				  if (result.messages) {
-					  var messageArea = $("#" + (nickToMessageArea(from ? from : groupChatInfo.tag)));
+					  var messageArea = $("#" + (nickToMessageArea(from ? from : groupChatInfo.nick)));
 					  var lastMessageUid = null;
 					  jQuery.each(result.messages, function(){
 						  messageArea.append(generateMessageHTML(this.from, this.message, this.dateSent));

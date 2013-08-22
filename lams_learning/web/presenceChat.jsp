@@ -98,9 +98,9 @@
 			    	</div>
 			    	<br />
 			    	<div id="groupchat_sendArea" class="sendArea">
-						<input id="groupchat_messageInput" onkeydown="javascript:handleMessageInput(event, 'groupchat')" type="text" class="messageInput" />
+						<input id="groupchat_messageInput" onkeydown="javascript:handleMessageInput(event, groupChatInfo.nick)" type="text" class="messageInput" />
 						<input type="button" value="<fmt:message key="learner.im.send"/>" class="sendButton"
-						       onclick="javascript:sendMessage('groupchat')" />
+						       onclick="javascript:sendMessage(groupChatInfo.nick)" />
 				</div>
 	    </div>
 			</div>
