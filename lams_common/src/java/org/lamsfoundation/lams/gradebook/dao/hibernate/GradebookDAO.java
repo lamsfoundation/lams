@@ -39,8 +39,8 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
     private static final String GET_GRADEBOOK_USER_LESSON = "from GradebookUserLesson gles where "
 	    + "gles.learner.userId=:userID and gles.lesson.lessonId=:lessonID";
 
-    private static final String GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM = "select sum(gact.mark) from GradebookUserActivity gact, ToolSession tses where "
-	    + "gact.learner.userId=:userID and tses.toolActivity=gact.activity and tses.lesson.lessonId=:lessonID";
+    private static final String GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM = "select sum(gact.mark) from GradebookUserActivity gact where " +
+    		"gact.learner=:userID and gact.activity in (select distinct tses.toolActivity from ToolSession tses where tses.lesson=:lessonID)";
 
     private static final String GET_GRADEBOOK_USER_ACTIVITIES_FOR_ACTIVITY = "from GradebookUserActivity gact where "
 	    + "gact.activity.activityId=:activityID";
@@ -56,7 +56,7 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
     private static final String GET_AVERAGE_MARK_FOR_ACTIVTY = "select avg(gact.mark) from GradebookUserActivity gact where "
 	    + "gact.activity.activityId=:activityID";
-   
+
     private static final String GET_AVERAGE_MARK_FOR_GROUPED_ACTIVTY = "select avg(gact.mark) from GradebookUserActivity gact, GroupUser gu, Group grp where "
 	    + "gact.activity.activityId=:activityID and grp.groupId=:groupID and gu.user=gact.learner and gu.group=grp";
 
@@ -92,8 +92,8 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
     @SuppressWarnings("unchecked")
     public Double getGradebookUserActivityMarkSum(Long lessonID, Integer userID) {
-	List result = getSession().createQuery(GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM).setInteger("userID",
-		userID.intValue()).setLong("lessonID", lessonID.longValue()).list();
+	List result = getSession().createQuery(GET_GRADEBOOK_ACTIVITIES_FROM_LESSON_SUM)
+		.setInteger("userID", userID.intValue()).setLong("lessonID", lessonID.longValue()).list();
 
 	if (result != null) {
 	    if (result.size() > 0)
@@ -106,8 +106,8 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
     @SuppressWarnings("unchecked")
     public List<GradebookUserActivity> getAllGradebookUserActivitiesForActivity(Long activityID) {
-	List result = getSession().createQuery(GET_GRADEBOOK_USER_ACTIVITIES_FOR_ACTIVITY).setLong("activityID",
-		activityID.longValue()).list();
+	List result = getSession().createQuery(GET_GRADEBOOK_USER_ACTIVITIES_FOR_ACTIVITY)
+		.setLong("activityID", activityID.longValue()).list();
 
 	return (List<GradebookUserActivity>) result;
     }
@@ -127,8 +127,8 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
     @SuppressWarnings("unchecked")
     public long getAverageDurationLesson(Long lessonID) {
-	List<Object[]> result = (List<Object[]>) getSession().createQuery(GET_AVERAGE_COMPLETION_TIME).setLong(
-		"lessonID", lessonID.longValue()).list();
+	List<Object[]> result = (List<Object[]>) getSession().createQuery(GET_AVERAGE_COMPLETION_TIME)
+		.setLong("lessonID", lessonID.longValue()).list();
 
 	if (result != null) {
 	    if (result.size() > 0) {
@@ -191,8 +191,8 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
     @SuppressWarnings("unchecked")
     public Double getAverageMarkForActivity(Long activityID) {
-	List result = getSession().createQuery(GET_AVERAGE_MARK_FOR_ACTIVTY).setLong("activityID",
-		activityID.longValue()).list();
+	List result = getSession().createQuery(GET_AVERAGE_MARK_FOR_ACTIVTY)
+		.setLong("activityID", activityID.longValue()).list();
 
 	if (result != null) {
 	    if (result.size() > 0)
@@ -205,8 +205,8 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
     @SuppressWarnings("unchecked")
     public Double getAverageMarkForGroupedActivity(Long activityID, Long groupID) {
-	List result = getSession().createQuery(GET_AVERAGE_MARK_FOR_GROUPED_ACTIVTY).setLong("activityID",
-		activityID.longValue()).setLong("groupID", groupID.longValue()).list();
+	List result = getSession().createQuery(GET_AVERAGE_MARK_FOR_GROUPED_ACTIVTY)
+		.setLong("activityID", activityID.longValue()).setLong("groupID", groupID.longValue()).list();
 
 	if (result != null) {
 	    if (result.size() > 0)
