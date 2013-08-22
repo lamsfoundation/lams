@@ -937,27 +937,17 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	// initialize tool sessions if necessary
 	LearningDesign design = requestedLesson.getLearningDesign();
 	boolean designModified = false;
-	Set activities = design.getActivities();
-	for (Iterator i = activities.iterator(); i.hasNext();) {
-	    Activity activity = (Activity) i.next();
-	    // if it is a non-grouped and non-branched Tool Activity, create the
-	    // tool sessions now
-	    if (activity.isToolActivity()) {
-		ToolActivity toolActivity = (ToolActivity) activityDAO
-			.getActivityByActivityId(activity.getActivityId());
-		initToolSessionIfSuitable(toolActivity, requestedLesson);
-	    }
 
+	for (Activity activity : (Set<Activity>) design.getActivities()) {
 	    Integer newMaxId = startSystemActivity(activity, design.getMaxID(), lessonStartTime,
 		    requestedLesson.getLessonName());
 	    if (newMaxId != null) {
 		design.setMaxID(newMaxId);
 		designModified = true;
 	    }
-
-	    activity.setInitialised(Boolean.TRUE);
-	    activityDAO.update(activity);
-
+	    if (Boolean.TRUE.equals(activity.isInitialised())){
+		activityDAO.update(activity);
+	    }
 	}
 
 	if (designModified) {
@@ -988,6 +978,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    ScheduleGateActivity gateActivity = (ScheduleGateActivity) activityDAO.getActivityByActivityId(activity
 		    .getActivityId());
 	    activity = runGateScheduler(gateActivity, lessonStartTime, lessonName);
+	    activity.setInitialised(true);
 	}
 	if (activity.isBranchingActivity() && (activity.getGrouping() == null)) {
 	    // all branching activities must have a grouping, as the learner
@@ -1006,6 +997,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 			+ " for branching activity " + activity);
 	    }
 	    newMaxId = new Integer(currentMaxId.intValue() + 1);
+	    activity.setInitialised(true);
 	}
 	return newMaxId;
     }
