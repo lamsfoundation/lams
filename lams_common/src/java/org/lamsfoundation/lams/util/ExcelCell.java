@@ -23,6 +23,8 @@
 /* $Id$ */  
 package org.lamsfoundation.lams.util;
 
+import org.apache.poi.ss.usermodel.IndexedColors;
+
 /**
  * Bean object holding necessary data for excel export.
  */
@@ -30,6 +32,7 @@ public class ExcelCell {
 
     private Object cellValue;
     private Boolean isBold;
+    private IndexedColors color;
 
     public ExcelCell() {
     }
@@ -37,6 +40,18 @@ public class ExcelCell {
     public ExcelCell(Object cellValue, Boolean isBold) {
 	this.cellValue = cellValue;
 	this.isBold = isBold;
+    }
+    
+    public ExcelCell(Object cellValue, IndexedColors color) {
+	this.cellValue = cellValue;
+	this.isBold = false;
+	this.color = color;
+    }
+    
+    public ExcelCell(Object cellValue, Boolean isBold, IndexedColors color) {
+	this.cellValue = cellValue;
+	this.isBold = isBold;
+	this.color = color;
     }
 
     public Object getCellValue() {
@@ -47,11 +62,19 @@ public class ExcelCell {
 	this.cellValue = cellValue;
     }
 
-    public Boolean getIsBold() {
+    public Boolean isBold() {
 	return isBold;
     }
 
     public void setIsBold(Boolean isBold) {
 	this.isBold = isBold;
+    }
+    
+    public IndexedColors getColor() {
+	return color;
+    }
+
+    public void setColor(IndexedColors color) {
+	this.color = color;
     }
 }

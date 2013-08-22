@@ -64,6 +64,7 @@ public class ScratchieItem implements Cloneable {
     private String correctAnswer;
     private int userMark;
     private int userAttempts;
+    private String firstChoiceAnswerLetter;
     
     /**
      * Default contruction method.
@@ -240,5 +241,13 @@ public class ScratchieItem implements Cloneable {
 
     public void setUserAttempts(int userAttempts) {
 	this.userAttempts = userAttempts;
+    }
+    
+    public String getFirstChoiceAnswerLetter() {
+	return firstChoiceAnswerLetter;
+    }
+
+    public void setFirstChoiceAnswerLetter(String firstChoiceAnswerLetter) {
+	this.firstChoiceAnswerLetter = firstChoiceAnswerLetter;
     }
 }

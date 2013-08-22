@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,6 +44,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
@@ -876,17 +878,191 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	Scratchie scratchie = scratchieDao.getByContentId(contentId);
 	Collection<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
 	items.addAll(scratchie.getScratchieItems());
+	int numberOfItems = items.size();
 
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	
+	// ======================================================= For Immediate Analysis page
+	// =======================================
+
+	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+
+	ExcelCell[] row = new ExcelCell[1];
+	row[0] = new ExcelCell(getMessage("label.quick.analysis"), true);
+	rowList.add(row);
+	row = new ExcelCell[2];
+	row[1] = new ExcelCell(getMessage("label.in.table.below.we.show"), false);
+	rowList.add(row);
+	rowList.add(EMPTY_ROW);
+
+	row = new ExcelCell[3];
+	row[2] = new ExcelCell(getMessage("label.questions"), false);
+	rowList.add(row);
+
+	row = new ExcelCell[numberOfItems + 4];
+	int columnCount = 1;
+	row[columnCount++] = new ExcelCell(getMessage("label.teams"), true);
+	for (int itemCount = 0; itemCount < numberOfItems; itemCount++) {
+	    row[columnCount++] = new ExcelCell("Q" + (itemCount + 1), true);
+	}
+	row[columnCount++] = new ExcelCell(getMessage("label.total"), true);
+	row[columnCount++] = new ExcelCell(getMessage("label.total") + " %", true);
+	rowList.add(row);
+
+	int groupCount = 1;
+	List<GroupSummary> summaryByTeam = getSummaryByTeam(scratchie, items);
+	for (GroupSummary summary : summaryByTeam) {
+
+	    row = new ExcelCell[numberOfItems + 4];
+	    columnCount = 1;
+	    row[columnCount++] = new ExcelCell("T" + groupCount++, true);
+
+	    int numberOfFirstChoiceEvents = 0;
+	    for (ScratchieItem item : summary.getItems()) {
+		int attempts = item.getUserAttempts();
+
+		String isFirstChoice;
+		IndexedColors color;
+		if (item.getCorrectAnswer().equals(Boolean.TRUE.toString())) {
+		    isFirstChoice = getMessage("label.correct");
+		    color = IndexedColors.GREEN;
+		    numberOfFirstChoiceEvents++;
+		} else if (attempts == 0) {
+		    isFirstChoice = null;
+		    color = null;
+		} else {
+		    isFirstChoice = getMessage("label.incorrect");
+		    color = IndexedColors.RED;
+		}
+		row[columnCount++] = new ExcelCell(isFirstChoice, color);
+	    }
+	    row[columnCount++] = new ExcelCell(new Integer(numberOfFirstChoiceEvents), false);
+	    int percentage = (numberOfItems == 0) ? 0 : 100*numberOfFirstChoiceEvents/numberOfItems;
+	    row[columnCount++] = new ExcelCell(percentage + "%", false);
+	    rowList.add(row);
+	}
+
+	ExcelCell[][] firstPageData = rowList.toArray(new ExcelCell[][] {});
+	dataToExport.put(getMessage("label.for.immediate.analysis"), firstPageData);
+	
+	
+	// ======================================================= For Report by Team TRA page
+	// =======================================
+
+	rowList = new LinkedList<ExcelCell[]>();
+
+	row = new ExcelCell[1];
+	row[0] = new ExcelCell(getMessage("label.quick.analysis"), true);
+	rowList.add(row);
+	row = new ExcelCell[2];
+	row[1] = new ExcelCell(getMessage("label.table.below.shows.which.answer.teams.selected.first.try"), false);
+	rowList.add(row);
+	rowList.add(EMPTY_ROW);
+
+	row = new ExcelCell[numberOfItems + 3];
+	columnCount = 1;
+	for (int itemCount = 0; itemCount < numberOfItems; itemCount++) {
+	    row[columnCount++] = new ExcelCell(getMessage("label.authoring.basic.instruction") + " " + (itemCount + 1), false);
+	}
+	row[columnCount++] = new ExcelCell(getMessage("label.total"), false);
+	row[columnCount++] = new ExcelCell(getMessage("label.total") + " %", false);
+	rowList.add(row);
+	
+	row = new ExcelCell[numberOfItems + 1];
+	columnCount = 0;
+	row[columnCount++] = new ExcelCell(getMessage("label.correct.answer"), false);
+	for (ScratchieItem item : items) {
+	    
+	    // find out the correct answer's sequential letter - A,B,C...
+	    String correctAnswerLetter = "";
+	    int answerCount = 1;
+	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>)item.getAnswers()) {
+		if (answer.isCorrect()) {
+		    correctAnswerLetter = String.valueOf((char)(answerCount + 'A' - 1));
+		    break;
+		}
+		answerCount++;
+	    }
+	    row[columnCount++] = new ExcelCell(correctAnswerLetter, false);
+	}
+	rowList.add(row);
+	
+	row = new ExcelCell[1];
+	row[0] = new ExcelCell(getMessage("monitoring.label.group"), false);
+	rowList.add(row);
+
+	groupCount = 1;
+	int[] percentages = new int[summaryByTeam.size()];
+	for (GroupSummary summary : summaryByTeam) {
+
+	    row = new ExcelCell[numberOfItems + 3];
+	    columnCount = 0;
+	    row[columnCount++] = new ExcelCell(groupCount, false);
+
+	    int numberOfFirstChoiceEvents = 0;
+	    for (ScratchieItem item : summary.getItems()) {
+
+		IndexedColors color = null;
+		if (item.getCorrectAnswer().equals(Boolean.TRUE.toString())) {
+		    color = IndexedColors.GREEN;
+		    numberOfFirstChoiceEvents++;
+		}
+		row[columnCount++] = new ExcelCell(item.getFirstChoiceAnswerLetter(), color);
+	    }
+	    row[columnCount++] = new ExcelCell(new Integer(numberOfFirstChoiceEvents), false);
+	    int percentage = (numberOfItems == 0) ? 0 : 100*numberOfFirstChoiceEvents/numberOfItems;
+	    row[columnCount++] = new ExcelCell(percentage + "%", false);
+	    rowList.add(row);
+	    percentages[groupCount-1] = percentage;
+	    groupCount++;
+	}
+	
+	Arrays.sort(percentages);
+	
+	//avg mean
+	int sum = 0;
+	for (int i = 0; i < percentages.length; i++) {
+	    sum += percentages[i];
+	}
+	int avgMean = sum / percentages.length;
+	row = new ExcelCell[numberOfItems + 3];
+	row[0] = new ExcelCell(getMessage("label.avg.mean"), false);
+	row[numberOfItems + 2] = new ExcelCell(avgMean + "%", false);
+	rowList.add(row);
+
+	// median
+	int median;
+	int middle = percentages.length / 2;
+	if (percentages.length % 2 == 1) {
+	    median = percentages[middle];
+	} else {
+	    median = (int) ((percentages[middle - 1] + percentages[middle]) / 2.0);
+	}
+	row = new ExcelCell[numberOfItems + 3];
+	row[0] = new ExcelCell(getMessage("label.median"), false);
+	row[numberOfItems + 2] = new ExcelCell(median, false);
+	rowList.add(row);
+	
+	row = new ExcelCell[1];
+	row[0] = new ExcelCell(getMessage("label.legend"), false);
+	rowList.add(row);
+	
+	row = new ExcelCell[1];
+	row[0] = new ExcelCell(getMessage("label.denotes.correct.answer"), IndexedColors.GREEN);
+	rowList.add(row);
+
+	ExcelCell[][] secondPageData = rowList.toArray(new ExcelCell[][] {});
+	dataToExport.put(getMessage("label.report.by.team.tra"), secondPageData);
+	
 
 	// ======================================================= Research and Analysis page
 	// =======================================
 
 	// all rows
-	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+	rowList = new LinkedList<ExcelCell[]>();
 
 	// Caption
-	ExcelCell[] row = new ExcelCell[2];
+	row = new ExcelCell[2];
 	row[0] = new ExcelCell(getMessage("label.scratchie.report"), true);
 	rowList.add(row);
 	rowList.add(EMPTY_ROW);
@@ -897,26 +1073,25 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	row[0] = new ExcelCell(getMessage("label.overall.summary.by.team"), true);
 	rowList.add(row);
 
-	row = new ExcelCell[items.size() * 3 + 1];
-	int columnCount = 1;
-	for (int itemCount = 0; itemCount < items.size(); itemCount++) {
+	row = new ExcelCell[numberOfItems * 3 + 1];
+	columnCount = 1;
+	for (int itemCount = 0; itemCount < numberOfItems; itemCount++) {
 	    row[columnCount] = new ExcelCell(getMessage("label.for.question", new Object[] { itemCount + 1 }), false);
 	    columnCount += 3;
 	}
 	rowList.add(row);
 
-	row = new ExcelCell[items.size() * 3 + 1];
+	row = new ExcelCell[numberOfItems * 3 + 1];
 	columnCount = 1;
-	for (int itemCount = 0; itemCount < items.size(); itemCount++) {
-	    row[columnCount++] = new ExcelCell(getMessage("label.first.choice"), false);
-	    row[columnCount++] = new ExcelCell(getMessage("label.attempts"), false);
-	    row[columnCount++] = new ExcelCell(getMessage("label.mark"), false);
+	for (int itemCount = 0; itemCount < numberOfItems; itemCount++) {
+	    row[columnCount++] = new ExcelCell(getMessage("label.first.choice"), IndexedColors.BLUE);
+	    row[columnCount++] = new ExcelCell(getMessage("label.attempts"), IndexedColors.BLUE);
+	    row[columnCount++] = new ExcelCell(getMessage("label.mark"), IndexedColors.BLUE);
 	}
 	rowList.add(row);
 
-	List<GroupSummary> summaryByTeam = getSummaryByTeam(scratchie, items);
 	for (GroupSummary summary : summaryByTeam) {
-	    row = new ExcelCell[items.size() * 3 + 1];
+	    row = new ExcelCell[numberOfItems * 3 + 1];
 	    columnCount = 0;
 
 	    row[columnCount++] = new ExcelCell(summary.getSessionName(), false);
@@ -925,15 +1100,19 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		int attempts = item.getUserAttempts();
 
 		String isFirstChoice;
+		IndexedColors color;
 		if (item.getCorrectAnswer().equals(Boolean.TRUE.toString())) {
 		    isFirstChoice = getMessage("label.correct");
+		    color = IndexedColors.GREEN;
 		} else if (attempts == 0) {
 		    isFirstChoice = null;
+		    color = null;
 		} else {
 		    isFirstChoice = getMessage("label.incorrect");
+		    color = IndexedColors.RED;
 		}
-		row[columnCount++] = new ExcelCell(isFirstChoice, false);
-		row[columnCount++] = new ExcelCell(new Long(attempts), false);
+		row[columnCount++] = new ExcelCell(isFirstChoice, color);
+		row[columnCount++] = new ExcelCell(new Long(attempts), color);
 		Long mark = (item.getUserMark() == -1) ? null : new Long(item.getUserMark());
 		row[columnCount++] = new ExcelCell(mark, false);
 	    }
@@ -1002,18 +1181,20 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 		row = new ExcelCell[1 + answers.size()];
 		for (int i = 0; i < answers.size(); i++) {
-		    row[i + 1] = new ExcelCell((long) i + 1, false);
+		    row[i + 1] = new ExcelCell((long) i + 1, IndexedColors.YELLOW);
 		}
 		rowList.add(row);
 
 		for (ScratchieAnswer answer : answers) {
 		    row = new ExcelCell[1 + answers.size()];
 		    String answerTitle = removeHtmlMarkup(answer.getDescription());
+		    IndexedColors color = null;
 		    if (answer.isCorrect()) {
 			answerTitle += "(" + getMessage("label.monitoring.item.summary.correct") + ")";
+			color = IndexedColors.GREEN;
 		    }
 		    columnCount = 0;
-		    row[columnCount++] = new ExcelCell(answerTitle, false);
+		    row[columnCount++] = new ExcelCell(answerTitle, color);
 
 		    for (int numberAttempts : answer.getAttempts()) {
 			row[columnCount++] = new ExcelCell(new Long(numberAttempts), false);
@@ -1117,59 +1298,9 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    }
 	}
 
-	ExcelCell[][] firstPageData = rowList.toArray(new ExcelCell[][] {});
-	dataToExport.put(getMessage("label.research.analysis"), firstPageData);
+	ExcelCell[][] thirdPageData = rowList.toArray(new ExcelCell[][] {});
+	dataToExport.put(getMessage("label.research.analysis"), thirdPageData);
 
-	// ======================================================= For Immediate Analysis page
-	// =======================================
-
-	rowList = new LinkedList<ExcelCell[]>();
-
-	row = new ExcelCell[1];
-	row[0] = new ExcelCell(getMessage("label.quick.analysis"), true);
-	rowList.add(row);
-	row = new ExcelCell[2];
-	row[1] = new ExcelCell(getMessage("label.in.table.below.we.show"), false);
-	rowList.add(row);
-	rowList.add(EMPTY_ROW);
-
-	row = new ExcelCell[3];
-	row[2] = new ExcelCell(getMessage("label.questions"), false);
-	rowList.add(row);
-
-	row = new ExcelCell[items.size() + 2];
-	columnCount = 1;
-	row[columnCount++] = new ExcelCell(getMessage("label.teams"), true);
-	for (int itemCount = 0; itemCount < items.size(); itemCount++) {
-	    row[columnCount++] = new ExcelCell("Q" + (itemCount + 1), true);
-	}
-	rowList.add(row);
-
-	int groupCount = 1;
-	for (GroupSummary summary : summaryByTeam) {
-
-	    row = new ExcelCell[items.size() + 2];
-	    columnCount = 1;
-	    row[columnCount++] = new ExcelCell("T" + groupCount++, true);
-
-	    for (ScratchieItem item : summary.getItems()) {
-		int attempts = item.getUserAttempts();
-
-		String isFirstChoice;
-		if (item.getCorrectAnswer().equals(Boolean.TRUE.toString())) {
-		    isFirstChoice = getMessage("label.correct");
-		} else if (attempts == 0) {
-		    isFirstChoice = null;
-		} else {
-		    isFirstChoice = getMessage("label.incorrect");
-		}
-		row[columnCount++] = new ExcelCell(isFirstChoice, false);
-	    }
-	    rowList.add(row);
-	}
-
-	ExcelCell[][] activityData = rowList.toArray(new ExcelCell[][] {});
-	dataToExport.put(getMessage("label.for.immediate.analysis"), activityData);
 
 	// ======================================================= For_XLS_export(SPSS analysis) page
 	// =======================================
@@ -1298,8 +1429,8 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	}
 
-	ExcelCell[][] userData = rowList.toArray(new ExcelCell[][] {});
-	dataToExport.put(getMessage("label.spss.analysis"), userData);
+	ExcelCell[][] fourthPageData = rowList.toArray(new ExcelCell[][] {});
+	dataToExport.put(getMessage("label.spss.analysis"), fourthPageData);
 
 	return dataToExport;
     }
@@ -1332,28 +1463,46 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	    for (ScratchieItem item : sortedItems) {
 		ScratchieItem newItem = new ScratchieItem();
-		int attempts = 0;
+		int numberOfAttempts = 0;
 		int mark = -1;
 		boolean isFirstChoice = false;
+		String firstChoiceAnswerLetter = "";
 
 		// if there is no group leader don't calculate numbers - they aren't any
 		if (groupLeader != null) {
-		    attempts = scratchieAnswerVisitDao.getLogCountPerItem(sessionId, groupLeader.getUserId(),
+		    numberOfAttempts = scratchieAnswerVisitDao.getLogCountPerItem(sessionId, groupLeader.getUserId(),
 			    item.getUid());
 
 		    // for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
-		    mark = (attempts == 0) ? -1 : getUserMarkPerItem(scratchie, item, sessionId,
+		    mark = (numberOfAttempts == 0) ? -1 : getUserMarkPerItem(scratchie, item, sessionId,
 			    groupLeader.getUserId());
 
-		    isFirstChoice = (attempts == 1) && isItemUnraveled(item, groupLeader.getUserId(), null);
+		    isFirstChoice = (numberOfAttempts == 1) && isItemUnraveled(item, groupLeader.getUserId(), null);
+		    
+		    if (numberOfAttempts > 0) {
+			ScratchieAnswer firstChoiceAnswer = scratchieAnswerVisitDao
+				.getFirstScratchedAnswerByUserAndItem(groupLeader.getUid(), item.getUid());
+
+			// find out the correct answer's sequential letter - A,B,C...
+			int answerCount = 1;
+			for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
+			    if (answer.getUid().equals(firstChoiceAnswer.getUid())) {
+				firstChoiceAnswerLetter = String.valueOf((char) (answerCount + 'A' - 1));
+				break;
+			    }
+			    answerCount++;
+			}
+		    }
+
 		}
 
 		newItem.setUid(item.getUid());
 		newItem.setTitle(item.getTitle());
 		newItem.setAnswers(item.getAnswers());
-		newItem.setUserAttempts(attempts);
+		newItem.setUserAttempts(numberOfAttempts);
 		newItem.setUserMark(mark);
 		newItem.setCorrectAnswer("" + isFirstChoice);
+		newItem.setFirstChoiceAnswerLetter(firstChoiceAnswerLetter);
 
 		items.add(newItem);
 	    }

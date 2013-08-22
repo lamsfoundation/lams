@@ -896,7 +896,7 @@ public class AuthoringAction extends Action {
 	int answerIndex = NumberUtils.stringToInt(request.getParameter(ScratchieConstants.PARAM_ANSWER_INDEX), -1);
 	if (answerIndex != -1) {
 	    List<ScratchieAnswer> rList = new ArrayList<ScratchieAnswer>(answerList);
-	    ScratchieAnswer answer = rList.remove(answerIndex);
+	    rList.remove(answerIndex);
 	    answerList.clear();
 	    answerList.addAll(rList);
 	}

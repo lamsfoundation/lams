@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.scratchie.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 
 public interface ScratchieAnswerVisitDAO extends DAO {
@@ -38,5 +39,7 @@ public interface ScratchieAnswerVisitDAO extends DAO {
     List<ScratchieAnswerVisitLog> getLogsByScratchieUserAndItem(Long userUid, Long itemUid);
     
     List<ScratchieAnswerVisitLog> getLogsByScratchieUser(Long userUid);
+    
+    ScratchieAnswer getFirstScratchedAnswerByUserAndItem(Long userUid, Long itemUid);
 
 }

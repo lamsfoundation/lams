@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -44,6 +45,11 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 public class ExcelUtil {
 
     private static CellStyle boldStyle;
+    
+    private static CellStyle greenColor;
+    private static CellStyle blueColor;
+    private static CellStyle redColor;
+    private static CellStyle yellowColor;
 
     /**
      * Create .xlsx file out of provided data and then write out it to an OutputStream.
@@ -64,11 +70,26 @@ public class ExcelUtil {
 	    String dateHeader, boolean displaySheetTitle) throws IOException {
 	Workbook workbook = new SXSSFWorkbook(100); // keep 100 rows in memory, exceeding rows will be flushed to disk
 
+	//create bold style
 	boldStyle = workbook.createCellStyle();
 	Font font = workbook.createFont();
 	font.setBoldweight(Font.BOLDWEIGHT_BOLD);
 	boldStyle.setFont(font);
-
+	
+	//create color style
+	blueColor = workbook.createCellStyle();
+	blueColor.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
+	blueColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	redColor = workbook.createCellStyle();
+	redColor.setFillForegroundColor(IndexedColors.RED.getIndex());
+	redColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	greenColor = workbook.createCellStyle();
+	greenColor.setFillForegroundColor(IndexedColors.LIME.getIndex());
+	greenColor.setFillPattern(CellStyle.SOLID_FOREGROUND);	
+	yellowColor = workbook.createCellStyle();
+	yellowColor.setFillForegroundColor(IndexedColors.GOLD.getIndex());
+	yellowColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	
 	int i = 0;
 	for (String sheetName : dataToExport.keySet()) {
 	    if (dataToExport.get(sheetName) != null) {
@@ -129,12 +150,33 @@ public class ExcelUtil {
 		cell.setCellValue((Double) excelCell.getCellValue());
 	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Long) {
 		cell.setCellValue(((Long) excelCell.getCellValue()).doubleValue());
+	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Integer) {
+		cell.setCellValue(((Integer) excelCell.getCellValue()).doubleValue());		
 	    } else if (excelCell.getCellValue() != null) {
 		cell.setCellValue(excelCell.getCellValue().toString());
 	    }
 
-	    if (excelCell.getIsBold()) {
+	    if (excelCell.isBold()) {
 		cell.setCellStyle(boldStyle);
+	    }
+	    
+	    if (excelCell.getColor() != null) {
+		switch (excelCell.getColor()) { 
+		case BLUE:
+		    cell.setCellStyle(blueColor);
+		    break;
+		case GREEN:
+		    cell.setCellStyle(greenColor);
+		    break;
+		case RED:
+		    cell.setCellStyle(redColor);
+		    break;
+		case YELLOW:
+		    cell.setCellStyle(yellowColor);
+		    break;		    
+		default:
+		    break;
+		}
 	    }
 	}
     }
