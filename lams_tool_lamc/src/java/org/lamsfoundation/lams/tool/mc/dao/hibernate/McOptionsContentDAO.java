@@ -60,21 +60,18 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 	return null;
     }
 
-    public List populateCandidateAnswersDTO(Long mcQueContentId) {
-	List listCandidateAnswersData = new LinkedList();
+    public List<McCandidateAnswersDTO> populateCandidateAnswersDTO(Long mcQueContentId) {
+	List<McCandidateAnswersDTO> listCandidateAnswersData = new LinkedList();
 
-	HibernateTemplate templ = this.getHibernateTemplate();
 	if (mcQueContentId != null) {
-	    List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
+	    List<McOptsContent> options = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
 		    .setLong("mcQueContentUid", mcQueContentId.longValue()).list();
 
-	    if (list != null && list.size() > 0) {
-		Iterator listIterator = list.iterator();
-		while (listIterator.hasNext()) {
-		    McOptsContent mcOptsContent = (McOptsContent) listIterator.next();
+	    if (options != null && options.size() > 0) {
+		for (McOptsContent option : options) {
 		    McCandidateAnswersDTO mcCandidateAnswersDTO = new McCandidateAnswersDTO();
-		    mcCandidateAnswersDTO.setCandidateAnswer(mcOptsContent.getMcQueOptionText());
-		    mcCandidateAnswersDTO.setCorrect(new Boolean(mcOptsContent.isCorrectOption()).toString());
+		    mcCandidateAnswersDTO.setCandidateAnswer(option.getMcQueOptionText());
+		    mcCandidateAnswersDTO.setCorrect(new Boolean(option.isCorrectOption()).toString());
 		    listCandidateAnswersData.add(mcCandidateAnswersDTO);
 		}
 	    }
@@ -82,19 +79,17 @@ public class McOptionsContentDAO extends HibernateDaoSupport implements IMcOptio
 	return listCandidateAnswersData;
     }
 
-    public List findMcOptionCorrectByQueId(Long mcQueContentId) {
+    public List<String> findMcOptionCorrectByQueId(Long mcQueContentId) {
 
-	List listOptionCorrect = new LinkedList();
+	List<String> listOptionCorrect = new LinkedList<String>();
 
 	if (mcQueContentId != null) {
-	    List list = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
+	    List<McOptsContent> options = getSession().createQuery(FIND_MC_OPTIONS_CONTENT)
 		    .setLong("mcQueContentUid", mcQueContentId.longValue()).list();
 
-	    if (list != null && list.size() > 0) {
-		Iterator listIterator = list.iterator();
-		while (listIterator.hasNext()) {
-		    McOptsContent mcOptsContent = (McOptsContent) listIterator.next();
-		    listOptionCorrect.add(new Boolean(mcOptsContent.isCorrectOption()).toString());
+	    if (options != null && options.size() > 0) {
+		for (McOptsContent option : options) {
+		    listOptionCorrect.add(new Boolean(option.isCorrectOption()).toString());
 		}
 	    }
 	}

@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.mc.McAllGroupsDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
+import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.mc.McMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McMonitoredUserDTO;
@@ -45,6 +46,7 @@ import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
 import org.lamsfoundation.lams.tool.mc.McStringComparator;
 import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
@@ -72,48 +74,46 @@ public class MonitoringUtil implements McAppConstants {
      * @param mcContent
      * @return List
      */
-    public static List buildGroupsQuestionData(HttpServletRequest request, McContent mcContent, IMcService mcService) {
+    public static List<McMonitoredAnswersDTO> buildGroupsQuestionData(McContent mcContent, IMcService mcService) {
 	// will be building groups question data for content
 
-	List listQuestions = mcService.getAllQuestionEntries(mcContent.getUid());
+	List<McQueContent> questions = mcService.getAllQuestionEntries(mcContent.getUid());
 
-	List listMonitoredAnswersContainerDTO = new LinkedList();
+	List<McMonitoredAnswersDTO> monitoredAnswersDTOs = new LinkedList<McMonitoredAnswersDTO>();
 
-	Iterator itListQuestions = listQuestions.iterator();
-	while (itListQuestions.hasNext()) {
-	    McQueContent mcQueContent = (McQueContent) itListQuestions.next();
+	for (McQueContent question : questions) {
 
-	    if (mcQueContent != null) {
-		McMonitoredAnswersDTO mcMonitoredAnswersDTO = new McMonitoredAnswersDTO();
-		mcMonitoredAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
-		mcMonitoredAnswersDTO.setQuestion(mcQueContent.getQuestion());
-		mcMonitoredAnswersDTO.setMark(mcQueContent.getMark().toString());
+	    if (question != null) {
+		McMonitoredAnswersDTO monitoredAnswersDTO = new McMonitoredAnswersDTO();
+		monitoredAnswersDTO.setQuestionUid(question.getUid().toString());
+		monitoredAnswersDTO.setQuestion(question.getQuestion());
+		monitoredAnswersDTO.setMark(question.getMark().toString());
 
-		List listCandidateAnswersDTO = mcService.populateCandidateAnswersDTO(mcQueContent.getUid());
-		mcMonitoredAnswersDTO.setCandidateAnswersCorrect(listCandidateAnswersDTO);
-		
-		Map<String, List> questionAttemptData = new TreeMap(new McStringComparator());
+		List<McCandidateAnswersDTO> listCandidateAnswersDTO = mcService.populateCandidateAnswersDTO(question
+			.getUid());
+		monitoredAnswersDTO.setCandidateAnswersCorrect(listCandidateAnswersDTO);
 
-		Iterator sessionIterator = mcContent.getMcSessions().iterator();
-		while (sessionIterator.hasNext()) {
-		    McSession mcSession = (McSession) sessionIterator.next();
-		    Set<McQueUsr> listMcUsers = mcSession.getMcQueUsers();
+		Map<String, List<McMonitoredUserDTO>> questionAttemptData = new TreeMap<String, List<McMonitoredUserDTO>>(
+			new McStringComparator());
+
+		for (McSession session : (Set<McSession>) mcContent.getMcSessions()) {
+		    Set<McQueUsr> users = session.getMcQueUsers();
 		    List<McMonitoredUserDTO> monitoredUserDTOs = new LinkedList<McMonitoredUserDTO>();
-		    for (McQueUsr mcQueUsr : listMcUsers) {
-			McMonitoredUserDTO mcMonitoredUserDTO = getUserAttempt(request, mcService, mcQueUsr, mcSession,
-				mcQueContent.getUid());
-			monitoredUserDTOs.add(mcMonitoredUserDTO);
+		    for (McQueUsr user : users) {
+			McMonitoredUserDTO monitoredUserDTO = getUserAttempt(mcService, user, session,
+				question.getUid());
+			monitoredUserDTOs.add(monitoredUserDTO);
 		    }
-		    
-		    questionAttemptData.put(mcSession.getSession_name(), monitoredUserDTOs);
+
+		    questionAttemptData.put(session.getSession_name(), monitoredUserDTOs);
 		}
-		
-		mcMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
-		listMonitoredAnswersContainerDTO.add(mcMonitoredAnswersDTO);
+
+		monitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
+		monitoredAnswersDTOs.add(monitoredAnswersDTO);
 
 	    }
 	}
-	return listMonitoredAnswersContainerDTO;
+	return monitoredAnswersDTOs;
     }
 
     /**
@@ -125,37 +125,37 @@ public class MonitoringUtil implements McAppConstants {
      * @param mcQueUsr
      * @return
      */
-    public static List buildGroupsQuestionDataForExportLearner(HttpServletRequest request, McContent mcContent,
-	    IMcService mcService, McSession mcSession, McQueUsr mcQueUsr) {
+    public static List buildGroupsQuestionDataForExportLearner(McContent mcContent, IMcService mcService,
+	    McSession mcSession, McQueUsr mcQueUsr) {
 
-	List listQuestions = mcService.getAllQuestionEntries(mcContent.getUid());
+	List<McQueContent> questions = mcService.getAllQuestionEntries(mcContent.getUid());
 
 	List listMonitoredAnswersContainerDTO = new LinkedList();
 
-	Iterator itListQuestions = listQuestions.iterator();
+	Iterator<McQueContent> itListQuestions = questions.iterator();
 	while (itListQuestions.hasNext()) {
-	    McQueContent mcQueContent = (McQueContent) itListQuestions.next();
+	    McQueContent question = itListQuestions.next();
 
-	    if (mcQueContent != null) {
-		McMonitoredAnswersDTO mcMonitoredAnswersDTO = new McMonitoredAnswersDTO();
-		mcMonitoredAnswersDTO.setQuestionUid(mcQueContent.getUid().toString());
-		mcMonitoredAnswersDTO.setQuestion(mcQueContent.getQuestion());
-		mcMonitoredAnswersDTO.setMark(mcQueContent.getMark().toString());
+	    if (question != null) {
+		McMonitoredAnswersDTO monitoredAnswersDTO = new McMonitoredAnswersDTO();
+		monitoredAnswersDTO.setQuestionUid(question.getUid().toString());
+		monitoredAnswersDTO.setQuestion(question.getQuestion());
+		monitoredAnswersDTO.setMark(question.getMark().toString());
 
-		List listCandidateAnswersDTO = mcService.populateCandidateAnswersDTO(mcQueContent.getUid());
-		mcMonitoredAnswersDTO.setCandidateAnswersCorrect(listCandidateAnswersDTO);
+		List<McCandidateAnswersDTO> listCandidateAnswersDTO = mcService.populateCandidateAnswersDTO(question.getUid());
+		monitoredAnswersDTO.setCandidateAnswersCorrect(listCandidateAnswersDTO);
 
 		// Get the attempts for this user. The maps must match the maps in buildGroupsAttemptData or the jsp
 		// won't work.
-		McMonitoredUserDTO mcMonitoredUserDTO = getUserAttempt(request, mcService, mcQueUsr, mcSession,
-			mcQueContent.getUid());
+		McMonitoredUserDTO mcMonitoredUserDTO = getUserAttempt(mcService, mcQueUsr, mcSession,
+			question.getUid());
 		List<McMonitoredUserDTO> listMonitoredUserContainerDTO = new LinkedList();
 		listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
 		Map questionAttemptData = new TreeMap(new McStringComparator());
 		questionAttemptData.put(mcSession.getSession_name(), listMonitoredUserContainerDTO);
 
-		mcMonitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
-		listMonitoredAnswersContainerDTO.add(mcMonitoredAnswersDTO);
+		monitoredAnswersDTO.setQuestionAttempts(questionAttemptData);
+		listMonitoredAnswersContainerDTO.add(monitoredAnswersDTO);
 	    }
 	}
 	return listMonitoredAnswersContainerDTO;
@@ -168,27 +168,27 @@ public class MonitoringUtil implements McAppConstants {
      * @param mcService
      * @return
      */
-    public static List buildGroupsMarkData(HttpServletRequest request, McContent mcContent, IMcService mcService) {
-	List listMonitoredMarksContainerDTO = new LinkedList();
-	Set sessions = mcContent.getMcSessions();
-	Iterator sessionsIterator = sessions.iterator();
+    public static List<McSessionMarkDTO> buildGroupsMarkData(McContent mcContent, IMcService mcService) {
+	List<McSessionMarkDTO> listMonitoredMarksContainerDTO = new LinkedList<McSessionMarkDTO>();
+	Set<McSession> sessions = mcContent.getMcSessions();
+	Iterator<McSession> sessionsIterator = sessions.iterator();
 	int numQuestions = mcContent.getMcQueContents().size();
 
 	while (sessionsIterator.hasNext()) {
-	    McSession mcSession = (McSession) sessionsIterator.next();
+	    McSession mcSession = sessionsIterator.next();
 
 	    McSessionMarkDTO mcSessionMarkDTO = new McSessionMarkDTO();
 	    mcSessionMarkDTO.setSessionId(mcSession.getMcSessionId().toString());
 	    mcSessionMarkDTO.setSessionName(mcSession.getSession_name().toString());
 
-	    Set sessionUsers = mcSession.getMcQueUsers();
-	    Iterator usersIterator = sessionUsers.iterator();
+	    Set<McQueUsr> sessionUsers = mcSession.getMcQueUsers();
+	    Iterator<McQueUsr> usersIterator = sessionUsers.iterator();
 
-	    Map mapSessionUsersData = new TreeMap(new McStringComparator());
+	    Map<String, McUserMarkDTO> mapSessionUsersData = new TreeMap<String, McUserMarkDTO>(new McStringComparator());
 	    Long mapIndex = new Long(1);
 
 	    while (usersIterator.hasNext()) {
-		McQueUsr user = (McQueUsr) usersIterator.next();
+		McQueUsr user = usersIterator.next();
 
 		McUserMarkDTO mcUserMarkDTO = new McUserMarkDTO();
 		mcUserMarkDTO.setSessionId(mcSession.getMcSessionId().toString());
@@ -207,11 +207,11 @@ public class MonitoringUtil implements McAppConstants {
 		// than one in the future and if so, we don't want to count the mark twice hence
 		// we need to check if we've already processed this question in the total.
 		Integer[] userMarks = new Integer[numQuestions];
+		String[] answeredOptions = new String[numQuestions];
 		Date attemptTime = null;
-		Iterator attemptIterator = mcService.getFinalizedUserAttempts(user).iterator();
+		List<McUsrAttempt> finalizedUserAttempts = mcService.getFinalizedUserAttempts(user);
 		long totalMark = 0;
-		while (attemptIterator.hasNext()) {
-		    McUsrAttempt attempt = (McUsrAttempt) attemptIterator.next();
+		for (McUsrAttempt attempt : finalizedUserAttempts) {
 		    Integer displayOrder = attempt.getMcQueContent().getDisplayOrder();
 		    int arrayIndex = displayOrder != null && displayOrder.intValue() > 0 ? displayOrder.intValue() - 1
 			    : 1;
@@ -224,6 +224,18 @@ public class MonitoringUtil implements McAppConstants {
 			Integer mark = attempt.getMarkForShow(isRetries);
 			userMarks[arrayIndex] = mark;
 			totalMark += mark.intValue();
+			
+			// find out the answered option's sequential letter - A,B,C...
+			String answeredOptionLetter = "";
+			int optionCount = 1;
+			for (McOptsContent option : (Set<McOptsContent>) attempt.getMcQueContent().getMcOptionsContents()) {
+			    if (attempt.getMcOptionsContent().getUid().equals(option.getUid())) {
+				answeredOptionLetter = String.valueOf((char) (optionCount + 'A' - 1));
+				break;
+			    }
+			    optionCount++;
+			}
+			answeredOptions[arrayIndex] = answeredOptionLetter;
 		    }
 		    // get the attempt time, (NB all questions will have the same attempt time)
 		    // Not efficient, since we assign this value for each attempt
@@ -231,6 +243,7 @@ public class MonitoringUtil implements McAppConstants {
 		}
 
 		mcUserMarkDTO.setMarks(userMarks);
+		mcUserMarkDTO.setAnsweredOptions(answeredOptions);
 		mcUserMarkDTO.setAttemptTime(attemptTime);
 		mcUserMarkDTO.setTotalMark(new Long(totalMark));
 
@@ -248,7 +261,7 @@ public class MonitoringUtil implements McAppConstants {
     /**
      * 
      */
-    public static McMonitoredUserDTO getUserAttempt(HttpServletRequest request, IMcService mcService, McQueUsr mcQueUsr,
+    public static McMonitoredUserDTO getUserAttempt(IMcService mcService, McQueUsr mcQueUsr,
 	    McSession mcSession, Long questionUid) {
 
 	McMonitoredUserDTO mcMonitoredUserDTO = new McMonitoredUserDTO();
@@ -348,21 +361,11 @@ public class MonitoringUtil implements McAppConstants {
 
     /**
      * @param request
-     * @param mcService
-     * @param mcContent
-     */
-    public static void generateGroupsSessionData(HttpServletRequest request, IMcService mcService, McContent mcContent) {
-	List listAllGroupsDTO = buildGroupBasedSessionData(request, mcContent, mcService);
-	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
-    }
-
-    /**
-     * @param request
      * @param mcContent
      * @param mcService
      * @return
      */
-    public static List buildGroupBasedSessionData(HttpServletRequest request, McContent mcContent, IMcService mcService) {
+    public static List buildGroupBasedSessionData(McContent mcContent, IMcService mcService) {
 	List listQuestions = mcService.getAllQuestionEntries(mcContent.getUid());
 
 	List listAllGroupsContainerDTO = new LinkedList();
@@ -415,10 +418,10 @@ public class MonitoringUtil implements McAppConstants {
      * @param mcService
      */
     protected static void setupAllSessionsData(HttpServletRequest request, McContent mcContent, IMcService mcService) {
-	List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(request, mcContent, mcService);
+	List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(mcContent, mcService);
 	request.setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 
-	List listMonitoredMarksContainerDTO = MonitoringUtil.buildGroupsMarkData(request, mcContent, mcService);
+	List listMonitoredMarksContainerDTO = MonitoringUtil.buildGroupsMarkData(mcContent, mcService);
 	request.setAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO, listMonitoredMarksContainerDTO);
 
 	request.setAttribute(HR_COLUMN_COUNT, new Integer(mcContent.getMcQueContents().size() + 2).toString());

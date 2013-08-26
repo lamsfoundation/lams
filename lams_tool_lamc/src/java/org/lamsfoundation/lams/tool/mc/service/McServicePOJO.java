@@ -22,22 +22,36 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
@@ -56,7 +70,6 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.IToolVO;
@@ -71,7 +84,10 @@ import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
+import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
+import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
@@ -87,8 +103,8 @@ import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
+import org.lamsfoundation.lams.tool.mc.web.MonitoringUtil;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -529,7 +545,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    public List populateCandidateAnswersDTO(Long mcQueContentId) throws McApplicationException {
+    public List<McCandidateAnswersDTO> populateCandidateAnswersDTO(Long mcQueContentId) throws McApplicationException {
 	try {
 	    return mcOptionsContentDAO.populateCandidateAnswersDTO(mcQueContentId);
 	} catch (DataAccessException e) {
@@ -721,45 +737,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
     }
 
-    public User getCurrentUserData(String username) throws McApplicationException {
-	try {
-	    /**
-	     * this will return null if the username not found
-	     */
-	    User user = userManagementService.getUserByLogin(username);
-	    if (user == null) {
-		McServicePOJO.logger.error("No user with the username: " + username + " exists.");
-		throw new McApplicationException("No user with that username exists.");
-	    }
-	    return user;
-	} catch (DataAccessException e) {
-	    throw new McApplicationException("Unable to find current user information" + " Root Cause: ["
-		    + e.getMessage() + "]", e);
-	}
-    }
-
-    /**
-     * 
-     * Unused method
-     * 
-     * @param lessonId
-     * @return
-     * @throws McApplicationException
-     */
-    public Lesson getCurrentLesson(long lessonId) throws McApplicationException {
-	try {
-	    /**
-	     * this is a mock implementation to make the project compile and work. When the Lesson service is ready, we
-	     * need to switch to real service implementation.
-	     */
-	    return new Lesson();
-	    /** return lsDAO.find(lsessionId); */
-	} catch (DataAccessException e) {
-	    throw new McApplicationException("Exception occured when lams is loading" + " learning session:"
-		    + e.getMessage(), e);
-	}
-    }
-
     /**
      * checks the parameter content in the user responses table
      * 
@@ -781,31 +758,309 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	}
 	return false;
     }
-
-    public int countIncompleteSession(McContent mc) throws McApplicationException {
-	// int countIncompleteSession=mcSessionDAO.countIncompleteSession(mc);
-	int countIncompleteSession = 2;
-	return countIncompleteSession;
-    }
-
-    /**
-     * checks the parameter content in the tool sessions table
-     * 
-     * find out if any student has ever used (logged in through the url and replied) to this content return true even if
-     * you have only one content passed as parameter referenced in the tool sessions table
-     * 
-     * @param mc
-     * @return boolean
-     * @throws McApplicationException
-     */
-    public boolean studentActivityOccurred(McContent mc) throws McApplicationException {
-	// int countStudentActivity=mcSessionDAO.studentActivityOccurred(mc);
-	int countStudentActivity = 2;
-
-	if (countStudentActivity > 0) {
-	    return true;
+    
+    @Override
+    public byte[] prepareSessionDataSpreadsheet(HttpServletRequest request, McContent mcContent,
+	    String currentMonitoredToolSession) throws IOException {
+	
+	Set<McQueContent> questions = mcContent.getMcQueContents();
+	int maxOptionsInQuestion = 0;
+	for (McQueContent question : questions) {
+	    if (question.getMcOptionsContents().size() > maxOptionsInQuestion) {
+		maxOptionsInQuestion = question.getMcOptionsContents().size();
+	    }
 	}
-	return false;
+	
+	int totalNumberOfUsers = 0;
+	for (McSession session : (Set<McSession>) mcContent.getMcSessions()) {
+	    totalNumberOfUsers += session.getMcQueUsers().size();
+	}
+	
+	List<McSessionMarkDTO> sessionMarkDTOs = MonitoringUtil.buildGroupsMarkData(mcContent, this);
+	
+	// create an empty excel file
+	HSSFWorkbook wb = new HSSFWorkbook();
+	HSSFCellStyle greenColor = wb.createCellStyle();
+	greenColor.setFillForegroundColor(IndexedColors.GREEN.getIndex());
+	greenColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	
+	// ======================================================= Report by question IRA page
+	// =======================================
+	
+	HSSFSheet sheet = wb.createSheet(messageService.getMessage("label.report.by.question"));
+
+	HSSFRow row;
+	HSSFCell cell;
+	int rowCount = 0;
+	
+	row = sheet.createRow(rowCount++);
+	int count = 0;
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("label.question"));
+	for (int optionCount = 0; optionCount < maxOptionsInQuestion; optionCount++) {
+	    cell = row.createCell(count++);
+	    cell.setCellValue(String.valueOf((char)(optionCount + 'A')));
+	}
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("label.not.available"));
+	
+	for (McQueContent question : questions) {
+
+	    row = sheet.createRow(rowCount);
+	    count = 0;
+
+	    cell = row.createCell(count++);
+	    cell.setCellValue(rowCount);
+	    rowCount++;
+
+	    int totalPercentage = 0;
+	    for (McOptsContent option : (Set<McOptsContent>) question.getMcOptionsContents()) {
+		int optionAttemptCount = mcUsrAttemptDAO.getAttemptsCountPerOption(option.getUid());
+		cell = row.createCell(count++);
+		int percentage = optionAttemptCount * 100 / totalNumberOfUsers;
+		cell.setCellValue(percentage + "%");
+		totalPercentage += percentage;
+		if (option.isCorrectOption()) {
+		    cell.setCellStyle(greenColor);
+		}
+	    }
+	    cell = row.createCell(maxOptionsInQuestion + 1);
+	    cell.setCellValue(100 - totalPercentage + "%");
+	}
+	
+	rowCount++;
+	row = sheet.createRow(rowCount++);
+	cell = row.createCell(0);
+	cell.setCellValue(messageService.getMessage("label.legend"));
+	row = sheet.createRow(rowCount++);
+	cell = row.createCell(0);
+	cell.setCellValue(messageService.getMessage("label.denotes.correct.answer"));
+	cell.setCellStyle(greenColor);
+	cell = row.createCell(1);
+	cell.setCellStyle(greenColor);
+	cell = row.createCell(2);
+	cell.setCellStyle(greenColor);
+	
+	// ======================================================= Report by student IRA page
+	// =======================================
+	
+	sheet = wb.createSheet(messageService.getMessage("label.report.by.student"));
+	rowCount = 0;
+	
+	row = sheet.createRow(rowCount++);
+	count = 2;
+	for (int questionCount = 0; questionCount < questions.size(); questionCount++) {
+	    cell = row.createCell(count++);
+	    cell.setCellValue(messageService.getMessage("label.question") + questionCount);
+	}
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("label.total"));
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("label.total") + " %");
+
+	row = sheet.createRow(rowCount++);
+	count = 1;
+	ArrayList<String> correctAnswers = new ArrayList<String>();
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("label.correct.answer"));
+	for (McQueContent question : questions) {
+
+	    // find out the correct answer's sequential letter - A,B,C...
+	    String correctAnswerLetter = "";
+	    int answerCount = 1;
+	    for (McOptsContent option : (Set<McOptsContent>) question.getMcOptionsContents()) {
+		if (option.isCorrectOption()) {
+		    correctAnswerLetter = String.valueOf((char) (answerCount + 'A' - 1));
+		    break;
+		}
+		answerCount++;
+	    }
+	    cell = row.createCell(count++);
+	    cell.setCellValue(correctAnswerLetter);
+	    correctAnswers.add(correctAnswerLetter);
+	}
+	
+	row = sheet.createRow(rowCount++);
+	count = 0;
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("group.label"));
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("label.learner"));
+	
+	int groupCount = 0;
+	ArrayList<Integer> totalPercentList = new ArrayList<Integer>();
+	int[] numberOfCorrectAnswersPerQuestion = new int[questions.size()];
+	for (McSessionMarkDTO sessionMarkDTO : sessionMarkDTOs) {
+	    Map<String, McUserMarkDTO> usersMarksMap = sessionMarkDTO.getUserMarks();
+	    groupCount++;
+
+	    for (McUserMarkDTO userMark : usersMarksMap.values()) {
+		row = sheet.createRow(rowCount++);
+		count = 0;
+		cell = row.createCell(count++);
+		cell.setCellValue(groupCount);
+		
+		cell = row.createCell(count++);
+		cell.setCellValue(userMark.getFullName());
+		
+		String[] answeredOptions = userMark.getAnsweredOptions();
+		int numberOfCorrectlyAnsweredByUser = 0;
+		for (int i = 0; i < answeredOptions.length; i++) {
+		    String answeredOption = answeredOptions[i];
+		    cell = row.createCell(count++);
+		    cell.setCellValue(answeredOption);
+		    if (StringUtils.equals(answeredOption, correctAnswers.get(i))) {
+			cell.setCellStyle(greenColor);
+			numberOfCorrectlyAnsweredByUser++;
+			numberOfCorrectAnswersPerQuestion[count-3]++;
+		    }
+		}
+		
+		cell = row.createCell(count++);
+		cell.setCellValue(userMark.getTotalMark());
+
+		int totalPercents = numberOfCorrectlyAnsweredByUser * 100 / questions.size(); 
+		totalPercentList.add(totalPercents);
+		cell = row.createCell(count++);
+		cell.setCellValue(totalPercents + "%");
+	    }
+	    
+	    rowCount++;
+	}
+	
+	//ave
+	row = sheet.createRow(rowCount++);
+	count = 1;
+	cell = row.createCell(count++);
+	cell.setCellValue(messageService.getMessage("label.ave"));
+	for (int numberOfCorrectAnswers : numberOfCorrectAnswersPerQuestion) {
+	    cell = row.createCell(count++);
+	    cell.setCellValue(numberOfCorrectAnswers * 100 / totalPercentList.size() + "%");
+	}
+
+	//class mean
+	Integer[] totalPercents = totalPercentList.toArray(new Integer[0]);
+	Arrays.sort(totalPercents);
+	int sum = 0;
+	for (int i = 0; i < totalPercents.length; i++) {
+	    sum += totalPercents[i];
+	}
+	row = sheet.createRow(rowCount++);
+	cell = row.createCell(1);
+	cell.setCellValue(messageService.getMessage("label.class.mean"));
+	if (totalPercents.length != 0) {
+	    int classMean = sum / totalPercents.length;
+	    cell = row.createCell(questions.size() + 3);
+	    cell.setCellValue(classMean + "%");
+	}
+	
+	// median
+	row = sheet.createRow(rowCount++);
+	cell = row.createCell(1);
+	cell.setCellValue(messageService.getMessage("label.median"));
+	if (totalPercents.length != 0) {
+	    int median;
+	    int middle = totalPercents.length / 2;
+	    if (totalPercents.length % 2 == 1) {
+		median = totalPercents[middle];
+	    } else {
+		median = (int) ((totalPercents[middle - 1] + totalPercents[middle]) / 2.0);
+	    }
+	    cell = row.createCell(questions.size() + 3);
+	    cell.setCellValue(median + "%");
+	}
+
+	row = sheet.createRow(rowCount++);
+	cell = row.createCell(0);
+	cell.setCellValue(messageService.getMessage("label.legend"));
+
+	row = sheet.createRow(rowCount++);
+	cell = row.createCell(0);
+	cell.setCellValue(messageService.getMessage("label.denotes.correct.answer"));
+	cell.setCellStyle(greenColor);
+	cell = row.createCell(1);
+	cell.setCellStyle(greenColor);
+	cell = row.createCell(2);
+	cell.setCellStyle(greenColor);
+	
+	// ======================================================= Marks page
+	// =======================================
+	
+	sheet = wb.createSheet("Marks");
+
+	rowCount = 0;
+	count = 0;
+	
+	row = sheet.createRow(rowCount++);
+	for (McQueContent question : questions) {
+	    cell = row.createCell(2 + count++);
+	    cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.question.mark",
+		    new Object[] { count, question.getMark() }));
+	}
+	
+	for (McSessionMarkDTO sessionMarkDTO : sessionMarkDTOs) {
+	    Map<String, McUserMarkDTO> usersMarksMap = sessionMarkDTO.getUserMarks();
+
+	    String currentSessionId = sessionMarkDTO.getSessionId();
+	    String currentSessionName = sessionMarkDTO.getSessionName();
+
+	    if (currentMonitoredToolSession.equals("All") || currentMonitoredToolSession.equals(currentSessionId)) {
+
+		row = sheet.createRow(rowCount++);
+
+		cell = row.createCell(0);
+		cell.setCellValue(messageService.getMessage("group.label"));
+
+		cell = row.createCell(1);
+		cell.setCellValue(currentSessionName);
+		cell.setCellStyle(greenColor);
+
+		rowCount++;
+		count = 0;
+
+		row = sheet.createRow(rowCount++);
+
+		cell = row.createCell(count++);
+		cell.setCellValue(messageService.getMessage("label.learner"));
+
+		cell = row.createCell(count++);
+		cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.username"));
+
+		cell = row.createCell(questions.size() + 2);
+		cell.setCellValue(messageService.getMessage("label.total"));
+
+		for (McUserMarkDTO userMark : usersMarksMap.values()) {
+		    row = sheet.createRow(rowCount++);
+		    count = 0;
+
+		    cell = row.createCell(count++);
+		    cell.setCellValue(userMark.getFullName());
+
+		    cell = row.createCell(count++);
+		    cell.setCellValue(userMark.getUserName());
+
+		    Integer[] marks = userMark.getMarks();
+		    for (int i = 0; i < marks.length; i++) {
+			cell = row.createCell(count++);
+			Integer mark = (marks[i] == null) ? 0 : marks[i];
+			cell.setCellValue(mark);
+		    }
+
+		    cell = row.createCell(count++);
+		    cell.setCellValue(userMark.getTotalMark());
+		}
+
+		rowCount++;
+	    }
+
+	}
+
+	ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	wb.write(bos);
+
+	byte[] data = bos.toByteArray();
+
+	return data;
     }
 
     /**
@@ -932,62 +1187,6 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	} else {
 	    McServicePOJO.logger.error("Warning!!!, We should have not come here. mcContent is null.");
 	    throw new ToolException("toolContentId is missing");
-	}
-    }
-
-    /**
-     * TO BE DEFINED-FUTURE API gets called from monitoring module
-     * 
-     * update the tool session status to COMPLETE for this tool session
-     * 
-     * @param Long
-     *            toolSessionId
-     */
-    public void setAsForceCompleteSession(Long toolSessionId) throws McApplicationException {
-	McSession mcSession = getMcSessionById(toolSessionId);
-	mcSession.setSessionStatus(McSession.COMPLETED);
-	updateMcSession(mcSession);
-    }
-
-    /**
-     * TO BE DEFINED
-     * 
-     * update the tool session status to COMPLETE for this user IMPLEMENT THIS!!!! Is this from ToolContentManager???
-     * 
-     * 
-     * @param userId
-     */
-    public void setAsForceComplete(Long userId) throws McApplicationException {
-	McQueUsr mcQueUsr = retrieveMcQueUsr(userId);
-
-	if (mcQueUsr != null) {
-	    McSession mcSession = mcQueUsr.getMcSession();
-	    if (mcSession != null) {
-		Long usersToolSessionId = mcSession.getMcSessionId();
-
-		mcSession = getMcSessionById(usersToolSessionId);
-		mcSession.setSessionStatus(McSession.COMPLETED);
-		updateMcSession(mcSession);
-
-		McContent mcContent = mcSession.getMcContent();
-
-		/**
-		 * if all the sessions of this content is COMPLETED, unlock the content
-		 * 
-		 */
-		int countIncompleteSession = countIncompleteSession(mcContent);
-
-		if (countIncompleteSession == 0) {
-		    mcContent.setContentInUse(false);
-		    updateMc(mcContent);
-		}
-	    } else {
-		McServicePOJO.logger.error("WARNING!: retrieved mcSession is null.");
-		throw new McApplicationException("Fail to setAsForceComplete" + " based on null mcSession.");
-	    }
-	} else {
-	    McServicePOJO.logger.error("WARNING!: retrieved mcQueUsr is null.");
-	    throw new McApplicationException("Fail to setAsForceComplete" + " based on null mcQueUsr.");
 	}
     }
 

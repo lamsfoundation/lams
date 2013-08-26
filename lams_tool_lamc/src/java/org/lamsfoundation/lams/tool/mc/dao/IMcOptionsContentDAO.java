@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 
 /**
@@ -69,9 +70,9 @@ public interface IMcOptionsContentDAO {
      */
     public McOptsContent getOptionContentByOptionText(final String option, final Long mcQueContentUid);
 
-    public List findMcOptionCorrectByQueId(Long mcQueContentId);
+    public List<String> findMcOptionCorrectByQueId(Long mcQueContentId);
 
-    public List populateCandidateAnswersDTO(Long mcQueContentId);
+    public List<McCandidateAnswersDTO> populateCandidateAnswersDTO(Long mcQueContentId);
 
     /**
      * <p>

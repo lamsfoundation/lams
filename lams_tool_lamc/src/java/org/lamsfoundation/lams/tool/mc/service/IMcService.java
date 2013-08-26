@@ -22,8 +22,11 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
@@ -36,6 +39,7 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
+import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
@@ -121,7 +125,7 @@ public interface IMcService {
 
     void updateMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
 
-    List populateCandidateAnswersDTO(Long mcQueContentId) throws McApplicationException;
+    List<McCandidateAnswersDTO> populateCandidateAnswersDTO(Long mcQueContentId) throws McApplicationException;
 
     McSession getMcSessionByUID(Long uid) throws McApplicationException;
 
@@ -145,10 +149,6 @@ public interface IMcService {
 
     void deleteMcOptionsContentByUID(Long uid) throws McApplicationException;
 
-    User getCurrentUserData(String username) throws McApplicationException;
-
-    Lesson getCurrentLesson(long lessonId) throws McApplicationException;
-
     void saveMcContent(McContent mc) throws McApplicationException;
 
     boolean studentActivityOccurredGlobal(McContent mcContent) throws McApplicationException;
@@ -156,15 +156,7 @@ public interface IMcService {
     McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId)
 	    throws McApplicationException;
 
-    int countIncompleteSession(McContent mc) throws McApplicationException;
-
-    boolean studentActivityOccurred(McContent mc) throws McApplicationException;
-
     void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
-
-    void setAsForceCompleteSession(Long toolSessionId) throws McApplicationException;
-
-    void setAsForceComplete(Long userId) throws McApplicationException;
 
     void setAsDefineLater(Long toolContentId, boolean value) throws DataMissingException, ToolException;
 
@@ -246,5 +238,19 @@ public interface IMcService {
      * @return
      */
     List<McLearnerAnswersDTO> buildLearnerAnswersDTOList(McContent mcContent, McQueUsr user);
+    
+    /**
+     * prepareSessionDataSpreadsheet
+     * 
+     * @param request
+     * @param response
+     * @param mcContent
+     * @param mcService
+     * @param currentMonitoredToolSession
+     * 
+     * @return data to write out
+     */
+    byte[] prepareSessionDataSpreadsheet(HttpServletRequest request, McContent mcContent,
+	    String currentMonitoredToolSession) throws IOException;
 
 }

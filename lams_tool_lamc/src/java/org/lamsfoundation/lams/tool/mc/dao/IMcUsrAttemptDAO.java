@@ -45,7 +45,7 @@ public interface IMcUsrAttemptDAO {
      * @param uid
      * @return
      */
-    public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt);
+    void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt);
 
     /**
      * *
@@ -56,7 +56,7 @@ public interface IMcUsrAttemptDAO {
      * @param mcUsrAttempt
      * @return
      */
-    public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt);
+    void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt);
 
     /**
      * *
@@ -67,7 +67,7 @@ public interface IMcUsrAttemptDAO {
      * @param mcUsrAttempt
      * @return
      */
-    public void removeAllUserAttempts(Long queUserUid);
+    void removeAllUserAttempts(Long queUserUid);
 
     /**
      * Get the most recent attempts (for all questions) for one user in one tool session
@@ -75,11 +75,19 @@ public interface IMcUsrAttemptDAO {
      * @param queUserUid
      * @return
      */
-    public List<McUsrAttempt> getUserAttempts(Long queUserUid);
+    List<McUsrAttempt> getUserAttempts(Long queUserUid);
 
     /**
      * Get the highest attempt order for a user for a particular question
      */
-    public McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId);
+    McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId);
+    
+    /**
+     * Count how many attempts done to this option
+     * 
+     * @param optionUid
+     * @return
+     */
+    int getAttemptsCountPerOption(Long optionUid);
 
 }

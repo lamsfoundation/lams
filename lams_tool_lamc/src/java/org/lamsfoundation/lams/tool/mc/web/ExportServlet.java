@@ -136,8 +136,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 
 	if (learner != null) {
 	    McMonitoringAction mcMonitoringAction = new McMonitoringAction();
-	    List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionDataForExportLearner(request,
-		    content, mcService, mcSession, learner);
+	    List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionDataForExportLearner(content,
+		    mcService, mcSession, learner);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 
 	    request.getSession().setAttribute(LEARNER_MARK, learner.getLastAttemptTotalMark());
@@ -179,10 +179,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 
 	McMonitoringAction mcMonitoringAction = new McMonitoringAction();
 
-	List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(request, content, mcService);
+	List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(content, mcService);
 	request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 
-	List listMonitoredMarksContainerDTO = MonitoringUtil.buildGroupsMarkData(request, content, mcService);
+	List listMonitoredMarksContainerDTO = MonitoringUtil.buildGroupsMarkData(content, mcService);
 	request.getSession().setAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO, listMonitoredMarksContainerDTO);
 
 	request.getSession().setAttribute(PASSMARK, content.getPassMark().toString());
@@ -203,16 +203,12 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
     public void writeOutSessionData(HttpServletRequest request, HttpServletResponse response, McContent mcContent,
 	    IMcService mcService, String directoryName) {
 	String fileName = "lams_mcq_All_" + toolContentID + ".xls";
-	MessageService messageService = McServiceProxy.getMessageService(getServletContext());
 
 	OutputStream out = null;
 	try {
 	    out = new FileOutputStream(directoryName + File.separator + fileName);
 
-	    McMonitoringAction mcMonitoringAction = new McMonitoringAction();
-	    byte[] spreadsheet = mcMonitoringAction.prepareSessionDataSpreadsheet(request, response, mcContent,
-		    mcService, messageService, "All");
-
+	    byte[] spreadsheet = mcService.prepareSessionDataSpreadsheet(request, mcContent, "All");
 	    out.write(spreadsheet);
 
 	    request.getSession().setAttribute(PORTFOLIO_EXPORT_DATA_FILENAME, fileName);

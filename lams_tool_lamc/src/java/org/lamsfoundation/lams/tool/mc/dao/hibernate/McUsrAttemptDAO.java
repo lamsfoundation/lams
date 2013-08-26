@@ -50,11 +50,17 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 
     private static final String LOAD_ALL_QUESTION_ATTEMPTS = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueUsr.uid=:queUsrUid"
 	    + " order by mcUsrAttempt.mcQueContentId, mcUsrAttempt.mcOptionsContent.uid";
+    
+    private static final String FIND_ATTEMPTS_COUNT_BY_OPTION = "select count(*) from "
+	    + McUsrAttempt.class.getName()
+	    + " as attempt where attempt.mcOptionsContent.uid=? AND attempt.mcQueUsr.responseFinalised = true";
 	    
-   public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
+    @Override
+    public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
 	this.getHibernateTemplate().save(mcUsrAttempt);
     }
 
+    @Override
     public List<McUsrAttempt> getUserAttempts(final Long queUserUid) {
 	return (List<McUsrAttempt>) getSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
 		.setLong("queUsrUid", queUserUid.longValue()).list();
@@ -73,11 +79,13 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	return userAttempt;
     }
 
+    @Override
     public void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(mcUsrAttempt);
     }
 
+    @Override
     public void removeAllUserAttempts(Long queUserUid) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 
@@ -87,6 +95,14 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	for (McUsrAttempt userAttempt : userAttempts) {
 	    this.getHibernateTemplate().delete(userAttempt);
 	}
+    }
+    
+    @Override
+    public int getAttemptsCountPerOption(Long optionUid) {
+	List list = getHibernateTemplate().find(FIND_ATTEMPTS_COUNT_BY_OPTION, new Object[] { optionUid });
+	if (list == null || list.size() == 0)
+	    return 0;
+	return ((Number) list.get(0)).intValue();
     }
 
 }

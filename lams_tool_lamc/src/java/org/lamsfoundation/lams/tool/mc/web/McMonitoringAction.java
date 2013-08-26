@@ -22,7 +22,6 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.mc.web;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -40,10 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.struts.Globals;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -60,10 +55,7 @@ import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.mc.McGeneralMonitoringDTO;
-import org.lamsfoundation.lams.tool.mc.McMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McQuestionContentDTO;
-import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
-import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
@@ -141,7 +133,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	McContent mcContent = mcService.retrieveMc(new Long(toolContentID));
 
 	if (currentMonitoredToolSession.equals("All")) {
-	    List listMcAllSessionsDTO = new LinkedList();
 	    // generate DTO for All sessions
 	    MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
 
@@ -185,8 +176,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		mapIndex = new Long(mapIndex.longValue() + 1);
 	    }
 	}
-
-	int maxIndex = mapOptionsContent.size();
 
 	boolean isContentInUse = McUtils.isContentInUse(mcContent);
 	mcGeneralMonitoringDTO.setIsMonitoredContentInUse(new Boolean(false).toString());
@@ -359,9 +348,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	mcGeneralAuthoringDTO.setActivityInstructions(mcContent.getInstructions());
 
-	/* determine whether the request is from Monitoring url Edit Activity */
-	String sourceMcStarter = (String) request.getAttribute(SOURCE_MC_STARTER);
-
 	mcAuthoringForm.setDefineLaterInEditMode(new Boolean(true).toString());
 	mcGeneralAuthoringDTO.setDefineLaterInEditMode(new Boolean(true).toString());
 
@@ -448,7 +434,9 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	}
 	/* ... till here */
 	MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
-	MonitoringUtil.generateGroupsSessionData(request, mcService, mcContent);
+	
+	List listAllGroupsDTO = MonitoringUtil.buildGroupBasedSessionData(mcContent, mcService);
+	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
 
 	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
 
@@ -488,7 +476,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
@@ -507,8 +495,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	Map mapWeights = new TreeMap(new McComparator());
 
-	String totalMarks = request.getParameter("totalMarks");
-
 	Map mapMarks = AuthoringUtil.extractMapMarks(listQuestionContentDTO);
 
 	Map mapCandidatesList = AuthoringUtil.extractMapCandidatesList(listQuestionContentDTO);
@@ -525,13 +511,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
 
 	if (activeModule.equals(AUTHORING)) {
-	    List attachmentListBackup = new ArrayList();
 	    List attachmentList = (List) sessionMap.get(ATTACHMENT_LIST_KEY);
-	    attachmentListBackup = attachmentList;
-
-	    List deletedAttachmentListBackup = new ArrayList();
 	    List deletedAttachmentList = (List) sessionMap.get(DELETED_ATTACHMENT_LIST_KEY);
-	    deletedAttachmentListBackup = deletedAttachmentList;
 
 	    String onlineInstructions = (String) sessionMap.get(ONLINE_INSTRUCTIONS_KEY);
 	    mcGeneralAuthoringDTO.setOnlineInstructions(onlineInstructions);
@@ -686,7 +667,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	}
 	/* ... till here */
 	MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
-	MonitoringUtil.generateGroupsSessionData(request, mcService, mcContent);
+	List listAllGroupsDTO = MonitoringUtil.buildGroupBasedSessionData(mcContent, mcService);
+	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
 
 	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
 
@@ -710,7 +692,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
@@ -886,7 +868,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
      * @param listQuestionContentDTO
      */
     protected void commonSaveCode(HttpServletRequest request, McGeneralAuthoringDTO mcGeneralAuthoringDTO,
-	    McAuthoringForm mcAuthoringForm, SessionMap sessionMap, String activeModule, String strToolContentID,
+	    McAuthoringForm mcAuthoringForm, SessionMap<String, Object> sessionMap, String activeModule, String strToolContentID,
 	    String defaultContentIdStr, IMcService mcService, String httpSessionID, List listQuestionContentDTO) {
 	String richTextTitle = request.getParameter(TITLE);
 	String richTextInstructions = request.getParameter(INSTRUCTIONS);
@@ -956,15 +938,13 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
-	String totalMarks = request.getParameter("totalMarks");
 	String activeModule = request.getParameter(ACTIVE_MODULE);
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
-	;
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
@@ -975,8 +955,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
 	List listAddableQuestionContentDTO = (List) sessionMap.get(NEW_ADDABLE_QUESTION_CONTENT_KEY);
-
-	McQuestionContentDTO mcQuestionContentDTONew = null;
 
 	int listSize = listQuestionContentDTO.size();
 	request.setAttribute(NEW_ADDABLE_QUESTION_CONTENT_LIST, listAddableQuestionContentDTO);
@@ -1100,12 +1078,10 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
-
-	String totalMarks = request.getParameter("totalMarks");
 
 	String activeModule = request.getParameter(ACTIVE_MODULE);
 
@@ -1209,9 +1185,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	String totalMarks = request.getParameter("totalMarks");
-
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndex);
@@ -1304,8 +1278,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	String requestNewEditableQuestionBox = (String) request.getAttribute("requestNewEditableQuestionBox");
 
-	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
-
 	String newQuestion = request.getParameter("newQuestion");
 
 	if ((requestNewEditableQuestionBox != null) && requestNewEditableQuestionBox.equals("true")) {
@@ -1352,11 +1324,9 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 	String questionIndex = request.getParameter("questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndex);
-
-	String totalMarks = request.getParameter("totalMarks");
 
 	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
 
@@ -1475,11 +1445,9 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 	String questionIndex = request.getParameter("questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndex);
-
-	String totalMarks = request.getParameter("totalMarks");
 
 	List listQuestionContentDTO = (List) sessionMap.get(LIST_QUESTION_CONTENT_DTO_KEY);
 
@@ -1571,7 +1539,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 	String questionIndex = request.getParameter("questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
@@ -1585,14 +1553,12 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	String activeModule = request.getParameter(ACTIVE_MODULE);
 	String richTextTitle = request.getParameter(TITLE);
-	String totalMarks = request.getParameter("totalMarks");
 	String richTextInstructions = request.getParameter(INSTRUCTIONS);
 	sessionMap.put(ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String defaultContentIdStr = new Long(mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE)).toString();
-	;
 	McContent mcContent = mcService.retrieveMc(new Long(strToolContentID));
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
@@ -1666,14 +1632,13 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 	String questionIndex = request.getParameter("questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
 	String candidateIndex = request.getParameter("candidateIndex");
 	mcAuthoringForm.setCandidateIndex(candidateIndex);
 
-	String totalMarks = request.getParameter("totalMarks");
 	AuthoringUtil authoringUtil = new AuthoringUtil();
 	boolean validateCandidateAnswersNotBlank = authoringUtil.validateCandidateAnswersNotBlank(request);
 	ActionMessages errors = new ActionMessages();
@@ -1821,7 +1786,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
 	String questionIndex = request.getParameter("questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndex);
 
@@ -3091,7 +3056,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	/* ... till here */
 
 	MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
-	MonitoringUtil.generateGroupsSessionData(request, mcService, mcContent);
+	List listAllGroupsDTO = MonitoringUtil.buildGroupBasedSessionData(mcContent, mcService);
+	request.setAttribute(LIST_ALL_GROUPS_DTO, listAllGroupsDTO);
 	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
     }
 
@@ -3121,8 +3087,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	byte[] spreadsheet = null;
 
 	try {
-	    spreadsheet = prepareSessionDataSpreadsheet(request, response, mcContent, mcService, messageService,
-		    currentMonitoredToolSession);
+	    spreadsheet = mcService.prepareSessionDataSpreadsheet(request, mcContent, currentMonitoredToolSession);
 	} catch (Exception e) {
 	    log.error("Error preparing spreadsheet: ", e);
 	    request.setAttribute("errorName", messageService.getMessage("error.monitoring.spreadsheet.download"));
@@ -3151,115 +3116,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	}
 
 	return null;
-    }
-
-    /**
-     * prepareSessionDataSpreadsheet
-     * 
-     * @param request
-     * @param response
-     * @param mcContent
-     * @param mcService
-     * @param currentMonitoredToolSession
-     * 
-     * @return data to write out
-     */
-    public byte[] prepareSessionDataSpreadsheet(HttpServletRequest request, HttpServletResponse response,
-	    McContent mcContent, IMcService mcService, MessageService messageService, String currentMonitoredToolSession)
-	    throws IOException, ServletException {
-	// create an empty excel file
-	HSSFWorkbook wb = new HSSFWorkbook();
-	HSSFSheet sheet = wb.createSheet("Marks");
-
-	HSSFRow row;
-	HSSFCell cell;
-
-	List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(request, mcContent, mcService);
-	List listMonitoredMarksContainerDTO = MonitoringUtil.buildGroupsMarkData(request, mcContent, mcService);
-
-	int idx = 0;
-
-	Iterator marksIterator = listMonitoredMarksContainerDTO.iterator();
-
-	while (marksIterator.hasNext()) {
-
-	    McSessionMarkDTO mcSessionMarkDTO = (McSessionMarkDTO) marksIterator.next();
-	    Map usersMarksMap = mcSessionMarkDTO.getUserMarks();
-
-	    String currentSessionId = mcSessionMarkDTO.getSessionId();
-	    String currentSessionName = mcSessionMarkDTO.getSessionName();
-
-	    if (currentMonitoredToolSession.equals("All") || currentMonitoredToolSession.equals(currentSessionId)) {
-
-		row = sheet.createRow(idx++);
-
-		cell = row.createCell(0);
-		cell.setCellValue(messageService.getMessage("group.label"));
-
-		cell = row.createCell(1);
-		cell.setCellValue(currentSessionName);
-
-		idx++;
-		int count = 0;
-
-		row = sheet.createRow(idx++);
-
-		cell = row.createCell(count++);
-		cell.setCellValue(messageService.getMessage("label.learner"));
-
-		cell = row.createCell(count++);
-		cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.username"));
-
-		Iterator answersIterator = listMonitoredAnswersContainerDTO.iterator();
-
-		while (answersIterator.hasNext()) {
-		    McMonitoredAnswersDTO mcMonitoredAnswersDTO = (McMonitoredAnswersDTO) answersIterator.next();
-
-		    cell = row.createCell(count++);
-		    cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.question.mark",
-			    new Object[] { count - 2, mcMonitoredAnswersDTO.getMark() }));
-		}
-
-		cell = row.createCell(count++);
-		cell.setCellValue(messageService.getMessage("label.total"));
-
-		Iterator userMarkIterator = usersMarksMap.values().iterator();
-
-		while (userMarkIterator.hasNext()) {
-		    row = sheet.createRow(idx++);
-		    count = 0;
-
-		    McUserMarkDTO userMark = (McUserMarkDTO) userMarkIterator.next();
-		    String currentUserSessionId = userMark.getSessionId();
-
-		    cell = row.createCell(count++);
-		    cell.setCellValue(userMark.getFullName());
-
-		    cell = row.createCell(count++);
-		    cell.setCellValue(userMark.getUserName());
-
-		    Integer[] marks = userMark.getMarks();
-		    for (int i = 0; i < marks.length; i++) {
-			cell = row.createCell(count++);
-			Integer mark = (marks[i] == null) ? 0 : marks[i];
-			cell.setCellValue(mark);
-		    }
-
-		    cell = row.createCell(count++);
-		    cell.setCellValue(userMark.getTotalMark());
-		}
-
-		idx++;
-	    }
-
-	}
-
-	ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	wb.write(bos);
-
-	byte[] data = bos.toByteArray();
-
-	return data;
     }
 
     /**

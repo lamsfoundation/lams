@@ -36,7 +36,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class McSessionMarkDTO implements Comparable {
     private String sessionId;
     private String sessionName;
-    private Map userMarks;
+    private Map<String, McUserMarkDTO> userMarks;
 
     public String toString() {
 	return new ToStringBuilder(this).append("Listing SessionMarkDTO: ").append("sessionId: ", sessionId)
@@ -85,7 +85,7 @@ public class McSessionMarkDTO implements Comparable {
     /**
      * @return Returns the userMarks.
      */
-    public Map getUserMarks() {
+    public Map<String, McUserMarkDTO> getUserMarks() {
 	return userMarks;
     }
 
@@ -93,7 +93,7 @@ public class McSessionMarkDTO implements Comparable {
      * @param userMarks
      *            The userMarks to set.
      */
-    public void setUserMarks(Map userMarks) {
+    public void setUserMarks(Map<String, McUserMarkDTO> userMarks) {
 	this.userMarks = userMarks;
     }
 }

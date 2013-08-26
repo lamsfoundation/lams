@@ -41,6 +41,7 @@ public class McUserMarkDTO implements Comparable {
     private String fullName;
     private Date attemptTime;
     private Integer[] marks;
+    private String[] answeredOptions;
     private Long totalMark;
 
     public String toString() {
@@ -62,6 +63,21 @@ public class McUserMarkDTO implements Comparable {
      */
     public void setMarks(Integer[] marks) {
 	this.marks = marks;
+    }
+    
+    /**
+     * @return Returns the answeredOptions - sequencial letter of the option that was chosen.
+     */
+    public String[] getAnsweredOptions() {
+	return answeredOptions;
+    }
+
+    /**
+     * @param answeredOptions
+     *            The answeredOptions to set.
+     */
+    public void setAnsweredOptions(String[] answeredOptions) {
+	this.answeredOptions = answeredOptions;
     }
 
     /**

@@ -47,7 +47,7 @@ public class McMonitoredAnswersDTO implements Comparable {
 
     private List candidateAnswersCorrect;
 
-    private Map questionAttempts;
+    private Map<String, List<McMonitoredUserDTO>> questionAttempts;
 
     /**
      * @return Returns the question.
@@ -82,7 +82,7 @@ public class McMonitoredAnswersDTO implements Comparable {
     /**
      * @return Returns the questionAttempts.
      */
-    public Map getQuestionAttempts() {
+    public Map<String, List<McMonitoredUserDTO>> getQuestionAttempts() {
 	return questionAttempts;
     }
 
@@ -90,7 +90,7 @@ public class McMonitoredAnswersDTO implements Comparable {
      * @param questionAttempts
      *            The questionAttempts to set.
      */
-    public void setQuestionAttempts(Map questionAttempts) {
+    public void setQuestionAttempts(Map<String, List<McMonitoredUserDTO>> questionAttempts) {
 	this.questionAttempts = questionAttempts;
     }
 
