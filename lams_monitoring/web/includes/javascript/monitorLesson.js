@@ -7,6 +7,8 @@ var originalSequenceCanvas = null;
 var sequenceCanvas = null;
 // ID of currently shown branching activity; if NULL, the whole lesson is shown
 var sequenceBranchingId = null;
+// info box show timeout
+var sequenceInfoTimeout = 10000;
 // how learners in pop up lists are currently sorted
 var sortOrderAsc = {
 	learnerGroup : false,
@@ -27,6 +29,23 @@ var numberActiveLearners = 0;
 var learnerProgressCurrentPageNumber = 1;
 // search phrase in Learners tab
 var learnersSearchPhrase = null;
+
+// ********* GENERAL TABS FUNCTIONS *********
+
+function initTabs(){
+	$('#tabs').tabs({
+		'activate' : function(event, ui) {
+			if (ui.newPanel.attr('id') == 'tabSequence') {
+				var sequenceInfoDialog = $('#sequenceInfoDialog');
+				if (sequenceInfoDialog.length > 0
+						&& !sequenceInfoDialog.dialog('option', 'showed')) {
+					sequenceInfoDialog.dialog('open');
+				}
+			}
+		}
+	});
+}
+
 
 //********** LESSON TAB FUNCTIONS **********
 
@@ -541,8 +560,34 @@ function initSequenceTab(){
 	
 	$('#learnerGroupSortButton').click(function(){
 		sortDialogList('learnerGroup');
-	});	
+	});
+	
+	// small info box on Sequence tab, activated when the tab is showed
+	$('#sequenceInfoDialog').dialog({
+		'autoOpen'   : false,
+		'height'     : 35,
+		'width'      : 290,
+		'modal'      : false,
+		'resizable'  : false,
+		'show'       : 'fold',
+		'hide'       : 'fold',
+		'dialogClass': 'dialog-no-title',
+		'position'   : {my: "left top",
+					   at: "left top+10",
+					   of: '#sequenceTopButtonsContainer'
+				      },
+		'open'      : function(){
+			var dialog = $(this);
+			// show only once in this Monitor
+			dialog.dialog('option', 'showed', true);
+			// close after given time
+			setTimeout(function(){
+				dialog.dialog('close');
+			}, sequenceInfoTimeout);
+		}
+	});
 }
+	
 
 
 /**

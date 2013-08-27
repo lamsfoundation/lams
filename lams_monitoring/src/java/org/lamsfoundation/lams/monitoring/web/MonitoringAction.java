@@ -194,11 +194,13 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	try {
 	    String title = WebUtil.readStrParam(request, "lessonName");
-	    if (title == null)
+	    if (title == null) {
 		title = "lesson";
+	    }
 	    String desc = WebUtil.readStrParam(request, "lessonDescription", true);
-	    if (desc == null)
+	    if (desc == null) {
 		desc = "description";
+	    }
 	    Integer organisationId = WebUtil.readIntParam(request, "organisationID", true);
 	    long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
 	    Boolean learnerExportAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
@@ -1168,7 +1170,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
 	monitoringService.checkOwnerOrStaffMember(user.getUserID(), lessonId, "monitor lesson");
-	
+
 	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonId);
 
 	if (contributeActivities != null) {
@@ -1191,6 +1193,18 @@ public class MonitoringAction extends LamsDispatchAction {
 	    if (!requiredContributeActivities.isEmpty()) {
 		request.setAttribute("contributeActivities", requiredContributeActivities);
 	    }
+	}
+
+	// should info box on Sequence tab be displayed?
+	Short sequenceTabInfoShowCount = (Short) ss.getAttribute("sequenceTabInfoShowCount");
+	if (sequenceTabInfoShowCount == null) {
+	    sequenceTabInfoShowCount = 0;
+	}
+	// only few times per session
+	if (sequenceTabInfoShowCount < MonitoringConstants.SEQUENCE_TAB_SHOW_INFO_MAX_COUNT) {
+	    sequenceTabInfoShowCount++;
+	    ss.setAttribute("sequenceTabInfoShowCount", sequenceTabInfoShowCount);
+	    request.setAttribute("sequenceTabShowInfo", true);
 	}
 
 	IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
@@ -1239,7 +1253,8 @@ public class MonitoringAction extends LamsDispatchAction {
 			.append(learner.getLastName().toLowerCase()).append(" ")
 			.append(learner.getLogin().toLowerCase());
 		for (String searchPhrasePiece : searchPhrases) {
-		    if (!StringUtils.isBlank(searchPhrasePiece) && learnerDisplayName.indexOf(searchPhrasePiece) != -1) {
+		    if (!StringUtils.isBlank(searchPhrasePiece)
+			    && (learnerDisplayName.indexOf(searchPhrasePiece) != -1)) {
 			searchResult.add(learnerProgress);
 		    }
 		}

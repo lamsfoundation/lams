@@ -40,7 +40,8 @@ input[type="checkbox"] {
 	border: none;
 }
 
-.dialogContainer {
+.dialogContainer,
+.dialog-no-title .ui-dialog-titlebar {
 	display: none;
 }
 

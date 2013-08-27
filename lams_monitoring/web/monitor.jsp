@@ -81,8 +81,7 @@
 	    
 	    
 		$(document).ready(function(){
-			$('#tabs').tabs();
-			
+			initTabs();
 			initLessonTab();
 			initSequenceTab();
 			refreshMonitor();
@@ -448,8 +447,13 @@
 		<iframe id="emailFrame"></iframe>
 	</div>
 	
-	<div id="tooltip"></div>
+	<c:if test="${sequenceTabShowInfo}">
+		<div id="sequenceInfoDialog" class="dialogContainer">
+			<fmt:message key="sequence.help.info"/>
+		</div>
+	</c:if>
 	
+	<div id="tooltip"></div>
 </div>
 </body>
 </lams:html>
