@@ -4,13 +4,16 @@ SET AUTOCOMMIT = 0;
 ----------------------Put all sql statements below here-------------------------
 
 --LDEV-3085 Autosave feature for MCQ
-DELETE FROM tl_lamc11_usr_attempt WHERE uid NOT IN ( --remove all attempts except the last one 
+DELETE FROM tl_lamc11_usr_attempt WHERE uid NOT IN ( 
   SELECT uid
   FROM (
-    SELECT uid
-    FROM tl_lamc11_usr_attempt
-    ORDER BY attemptOrder DESC
-    LIMIT 1
+	SELECT attempt.uid
+	FROM tl_lamc11_usr_attempt attempt
+	INNER JOIN(
+	    SELECT que_usr_id, mc_que_content_id, max(attemptOrder) attemptOrder
+	    FROM tl_lamc11_usr_attempt
+	    GROUP BY que_usr_id, mc_que_content_id
+	) ss ON attempt.que_usr_id = ss.que_usr_id AND attempt.mc_que_content_id = ss.mc_que_content_id AND attempt.attemptOrder = ss.attemptOrder
   ) foo
 );
 ALTER TABLE tl_lamc11_usr_attempt DROP COLUMN attemptOrder;
