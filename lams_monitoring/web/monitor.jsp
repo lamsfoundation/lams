@@ -1,11 +1,14 @@
 <%@ page contentType="text/html; charset=utf-8" language="java"%>
+
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 
 <!DOCTYPE HTML>
 <lams:html>
 <lams:head>
+
 	<lams:css style="main" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
@@ -144,6 +147,22 @@
 				</td>
 				<td id="learnersStartedPossibleCell"></td>
 			</tr>
+			<c:set var="showLearnerURL"><%=Configuration.get(ConfigurationKeys.ALLOW_DIRECT_LESSON_LAUNCH)%></c:set>
+			<c:if test="${showLearnerURL}">
+				<tr>
+					<td class="fieldLabel">
+						<fmt:message key="lesson.learner.url"/>
+					</td>
+					<td>
+						<input id="learnerURLField" class="lessonManageField"
+						       value="<lams:LAMSURL/>launchlearner.do?lessonID=${lesson.lessonID}"
+						       readonly="readonly" />
+						<a class="button lessonManageField" href="#"
+						   onClick="javascript:selectLearnerURL()"><fmt:message key="button.select"/></a>
+						<span id="copyLearnerURL"><fmt:message key="lesson.copy.prompt"/></span>
+					</td>
+				</tr>
+			</c:if>
 			<tr>
 				<td class="fieldLabel">
 					<fmt:message key="lesson.class"/>

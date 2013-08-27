@@ -127,6 +127,14 @@ td.sectionHeader {
 	width: 114px;
 }
 
+#learnerURLField {
+	width: 450px;
+}
+
+#copyLearnerURL {
+	display: none;
+}
+
 #lessonStartDateCell *, #presenceAvailableCount {
 	display: none;
 }

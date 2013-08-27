@@ -448,6 +448,14 @@ function updatePresenceAvailableCount(){
 	}
 }
 
+
+function selectLearnerURL(){
+	$('#learnerURLField').select().focus().blur(function(){
+		$('#copyLearnerURL').hide();
+	});
+	$('#copyLearnerURL').show();
+}
+
 //********** SEQUENCE TAB FUNCTIONS **********
 
 /**
