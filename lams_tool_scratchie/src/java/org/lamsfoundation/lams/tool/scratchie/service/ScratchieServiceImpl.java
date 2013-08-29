@@ -282,11 +282,9 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public boolean isUserGroupLeader(ScratchieUser user, Long toolSessionId) {
+    public boolean isUserGroupLeader(ScratchieUser user, ScratchieSession session) {
 
-	ScratchieSession session = this.getScratchieSessionBySessionId(toolSessionId);
 	ScratchieUser groupLeader = session.getGroupLeader();
-	
 	boolean isUserLeader = (groupLeader != null) && user.getUid().equals(groupLeader.getUid());
 	return isUserLeader;
     }
@@ -573,7 +571,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		user.setTotalAttempts(totalAttempts);
 
 		// for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
-		int mark = (totalAttempts == 0) ? -1 : getUserMark(sessionId, user.getUserId());
+		int mark = (totalAttempts == 0) ? -1 : getUserMark(session, user.getUid());
 		user.setMark(mark);
 	    }
 
@@ -613,12 +611,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     @Override
     public Set<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId, ScratchieUser user) {
 	
-	List<ScratchieAnswerVisitLog> logs = scratchieAnswerVisitDao.getLogsByScratchieUser(user.getUid());
-	// answerUid -> ScratchieAnswerVisitLog map, created to reduce number of queries to DB
-	HashMap<Long, ScratchieAnswerVisitLog> answerUidToLogMap = new HashMap<Long, ScratchieAnswerVisitLog>();
-	for (ScratchieAnswerVisitLog log : logs) {
-	    answerUidToLogMap.put(log.getScratchieAnswer().getUid(), log);
-	}
+	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsByScratchieUser(user.getUid());
 
 	Scratchie scratchie = this.getScratchieBySessionId(toolSessionId);
 	Set<ScratchieItem> items = new TreeSet<ScratchieItem>(new ScratchieItemComparator());
@@ -627,7 +620,15 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	for (ScratchieItem item : items) {
 
 	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
-		ScratchieAnswerVisitLog log = answerUidToLogMap.get(answer.getUid());
+		
+		//find according log if it exists
+		ScratchieAnswerVisitLog log = null;
+		for (ScratchieAnswerVisitLog userLog : userLogs) {
+		    if (userLog.getScratchieAnswer().getUid().equals(answer.getUid())) {
+			log = userLog;
+			break;
+		    }
+		}
 		if (log == null) {
 		    answer.setScratched(false);
 		} else {
@@ -635,7 +636,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		}
 	    }
 
-	    boolean isItemUnraveled = isItemUnraveled(item, user.getUserId(), answerUidToLogMap);
+	    boolean isItemUnraveled = isItemUnraveled(item, userLogs);
 	    item.setUnraveled(isItemUnraveled);
 	}
 	
@@ -647,21 +648,22 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
      * 
      * @param item
      *            specified item
-     * @param userId
-     *            userId
-     * @param answerUidToLogMap
-     *            if this parameter is provided - uses logs from it, otherwise queries DB. (The main reason to have this
-     *            parameter is to reduce number of queries to DB)
+     * @param userLogs
+     *            uses logs from it (The main reason to have this parameter is to reduce number of queries to DB)
      * @return
      */
-    private boolean isItemUnraveled(ScratchieItem item, Long userId, HashMap<Long, ScratchieAnswerVisitLog> answerUidToLogMap) {
+    private boolean isItemUnraveled(ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
 	boolean isItemUnraveled = false;
 
 	for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
 	    
-	    //if answerUidToLogMap is provided then uses logs from it, otherwise queries DB
-	    ScratchieAnswerVisitLog log = (answerUidToLogMap != null) ? answerUidToLogMap.get(answer.getUid())
-		    : scratchieAnswerVisitDao.getLog(answer.getUid(), userId);	    
+	    ScratchieAnswerVisitLog log = null;
+	    for (ScratchieAnswerVisitLog userLog : userLogs) {
+		if (userLog.getScratchieAnswer().getUid().equals(answer.getUid())) {
+		    log = userLog;
+		    break;
+		}
+	    }
 	    
 	    if (log != null) {
 		isItemUnraveled |= answer.isCorrect();
@@ -672,14 +674,17 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public int getUserMark(Long sessionId, Long userId) {
-	ScratchieSession session = scratchieSessionDao.getSessionBySessionId(sessionId);
+    public int getUserMark(ScratchieSession session, Long userUid) {
+	
+	//created to reduce number of queries to DB
+	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsByScratchieUser(userUid);
+	
 	Scratchie scratchie = session.getScratchie();
 	Set<ScratchieItem> items = scratchie.getScratchieItems();
 
 	int mark = 0;
 	for (ScratchieItem item : items) {
-	    mark += getUserMarkPerItem(scratchie, item, sessionId, userId);
+	    mark += getUserMarkPerItem(scratchie, item, userLogs);
 	}
 
 	return mark;
@@ -688,40 +693,56 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     /**
      * 
      * 
-     * @param sessionId
-     * @param userId
+     * @param scratchie
      * @param item
+     * @param userLogs
+     *            if this parameter is provided - uses logs from it, otherwise queries DB. (The main reason to have this
+     *            parameter is to reduce number of queries to DB)
      * @return
      */
-    private int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, Long sessionId, Long userId) {
+    private int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
 
 	int mark = 0;
 	// add mark only if an item was unraveled
-	if (isItemUnraveled(item, userId, null)) {
-	    int attempts = scratchieAnswerVisitDao.getLogCountPerItem(sessionId, userId, item.getUid());
-	    mark += item.getAnswers().size() - attempts;
+	if (isItemUnraveled(item, userLogs)) {
+	    
+	    int itemAttempts = calculateItemAttempts(userLogs, item);
+	    mark += item.getAnswers().size() - itemAttempts;
 
 	    // add extra point if needed
-	    if (scratchie.isExtraPoint() && (attempts == 1)) {
+	    if (scratchie.isExtraPoint() && (itemAttempts == 1)) {
 		mark++;
 	    }
 	}
 
 	return mark;
     }
+    
+    private int calculateItemAttempts(List<ScratchieAnswerVisitLog> userLogs, ScratchieItem item) {
+	
+	int itemAttempts = 0;
+	for (ScratchieAnswerVisitLog userLog : userLogs) {
+	    if (userLog.getScratchieAnswer().getScratchieItem().getUid().equals(item.getUid())) {
+		itemAttempts++;
+	    }
+	}
+	
+	return itemAttempts;
+    }
 
     @Override
-    public Set<ScratchieItem> populateItemsResults(Long sessionId, Long userId) {
+    public Set<ScratchieItem> populateItemsResults(Long sessionId, Long userUid) {
 	ScratchieSession session = scratchieSessionDao.getSessionBySessionId(sessionId);
 	Scratchie scratchie = session.getScratchie();
 	Set<ScratchieItem> items = scratchie.getScratchieItems();
+	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsByScratchieUser(userUid);
 
 	for (ScratchieItem item : items) {
-	    int mark = getUserMarkPerItem(scratchie, item, sessionId, userId);
+	    int mark = getUserMarkPerItem(scratchie, item, userLogs);
 	    item.setUserMark(mark);
 
-	    int attempts = scratchieAnswerVisitDao.getLogCountPerItem(sessionId, userId, item.getUid());
-	    item.setUserAttempts(attempts);
+	    int itemAttempts = calculateItemAttempts(userLogs, item);
+	    item.setUserAttempts(itemAttempts);
 
 	    String correctAnswer = "";
 	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
@@ -819,28 +840,21 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public List<ReflectDTO> getReflectionList(Long contentId) {
+    public List<ReflectDTO> getReflectionList(Set<ScratchieUser> users) {
 
 	ArrayList<ReflectDTO> reflections = new ArrayList<ReflectDTO>();
 
-	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
-	for (ScratchieSession session : sessionList) {
-	    Long sessionId = session.getSessionId();
+	for (ScratchieUser user : users) {
+	    ScratchieSession session = user.getSession();
+	    NotebookEntry notebookEntry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+		    ScratchieConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+	    if ((notebookEntry != null) && StringUtils.isNotBlank(notebookEntry.getEntry())) {
+		ReflectDTO reflectDTO = new ReflectDTO(notebookEntry.getUser());
+		reflectDTO.setReflection(notebookEntry.getEntry());
+		reflectDTO.setIsGroupLeader(this.isUserGroupLeader(user, session));
 
-	    List<ScratchieUser> users = scratchieUserDao.getBySessionID(sessionId);
-
-	    for (ScratchieUser user : users) {
-		NotebookEntry notebookEntry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			ScratchieConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		if ((notebookEntry != null) && StringUtils.isNotBlank(notebookEntry.getEntry())) {
-		    ReflectDTO reflectDTO = new ReflectDTO(notebookEntry.getUser());
-		    reflectDTO.setReflection(notebookEntry.getEntry());
-		    reflectDTO.setIsGroupLeader(this.isUserGroupLeader(user, sessionId));
-
-		    reflections.add(reflectDTO);
-		}
+		reflections.add(reflectDTO);
 	    }
-
 	}
 
 	return reflections;
@@ -1267,7 +1281,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		Long attempts = (long) scratchieAnswerVisitDao.getLogCountTotal(sessionId, userId);
 		row[2] = new ExcelCell(attempts, false);
 		row[3] = new ExcelCell(getMessage("label.mark") + ":", false);
-		row[4] = new ExcelCell(new Long(getUserMark(sessionId, userId)), false);
+		row[4] = new ExcelCell(new Long(getUserMark(session, groupLeader.getUid())), false);
 		rowList.add(row);
 
 		row = new ExcelCell[1];
@@ -1461,6 +1475,9 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 	    ScratchieUser groupLeader = session.getGroupLeader();
 
+	    List<ScratchieAnswerVisitLog> groupLeaderLogs = (groupLeader != null) ? scratchieAnswerVisitDao
+		    .getLogsByScratchieUser(groupLeader.getUid()) : null;
+
 	    for (ScratchieItem item : sortedItems) {
 		ScratchieItem newItem = new ScratchieItem();
 		int numberOfAttempts = 0;
@@ -1468,16 +1485,15 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		boolean isFirstChoice = false;
 		String firstChoiceAnswerLetter = "";
 
-		// if there is no group leader don't calculate numbers - they aren't any
+		// if there is no group leader don't calculate numbers - there aren't any
 		if (groupLeader != null) {
-		    numberOfAttempts = scratchieAnswerVisitDao.getLogCountPerItem(sessionId, groupLeader.getUserId(),
-			    item.getUid());
+		    
+		    numberOfAttempts = calculateItemAttempts(groupLeaderLogs, item);
 
 		    // for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
-		    mark = (numberOfAttempts == 0) ? -1 : getUserMarkPerItem(scratchie, item, sessionId,
-			    groupLeader.getUserId());
+		    mark = (numberOfAttempts == 0) ? -1 : getUserMarkPerItem(scratchie, item, groupLeaderLogs);
 
-		    isFirstChoice = (numberOfAttempts == 1) && isItemUnraveled(item, groupLeader.getUserId(), null);
+		    isFirstChoice = (numberOfAttempts == 1) && isItemUnraveled(item, groupLeaderLogs);
 		    
 		    if (numberOfAttempts > 0) {
 			ScratchieAnswer firstChoiceAnswer = scratchieAnswerVisitDao

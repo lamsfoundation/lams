@@ -46,9 +46,6 @@ public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implement
     private static final String FIND_VIEW_COUNT_BY_USER = "select count(*) from "
 	    + ScratchieAnswerVisitLog.class.getName() + " as r where  r.sessionId=? and  r.user.userId =?";
     
-    private static final String FIND_VIEW_COUNT_BY_USER_AND_ITEM = "select count(*) from "
-	    + ScratchieAnswerVisitLog.class.getName() + " as l where l.sessionId=? and l.user.userId =? and l.scratchieAnswer.scratchieItem.uid=?";
-
     @Override
     public ScratchieAnswerVisitLog getLog(Long answerUid, Long userId) {
 	List list = getHibernateTemplate().find(FIND_BY_ANSWER_AND_USER, new Object[] { userId, answerUid });
@@ -60,14 +57,6 @@ public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implement
     @Override
     public int getLogCountTotal(Long toolSessionId, Long userId) {
 	List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER, new Object[] { toolSessionId, userId });
-	if (list == null || list.size() == 0)
-	    return 0;
-	return ((Number) list.get(0)).intValue();
-    }
-    
-    @Override
-    public int getLogCountPerItem(Long toolSessionId, Long userId, Long itemUid) {
-	List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER_AND_ITEM, new Object[] { toolSessionId, userId, itemUid });
 	if (list == null || list.size() == 0)
 	    return 0;
 	return ((Number) list.get(0)).intValue();

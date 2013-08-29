@@ -63,7 +63,7 @@ public class ScratchieServiceProxy {
 
     private static Object getScratchieDomainService(ServletContext servletContext) {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-	return wac.getBean(ScratchieConstants.RESOURCE_SERVICE);
+	return wac.getBean(ScratchieConstants.SCRATCHIE_SERVICE);
     }
 
 }

@@ -63,7 +63,7 @@ public interface IScratchieService {
      * @param toolSessionId
      * @return
      */
-    boolean isUserGroupLeader(ScratchieUser user, Long toolSessionId);
+    boolean isUserGroupLeader(ScratchieUser user, ScratchieSession session);
     
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
@@ -128,11 +128,11 @@ public interface IScratchieService {
     /**
      * Get user by sessionID and UserID
      * 
-     * @param long1
+     * @param userId
      * @param sessionId
      * @return
      */
-    ScratchieUser getUserByIDAndSession(Long long1, Long sessionId);
+    ScratchieUser getUserByIDAndSession(Long userId, Long sessionId);
     
     /**
      * Get users by given toolSessionId.
@@ -222,7 +222,7 @@ public interface IScratchieService {
      */
     void setAnswerAccess(Long scratchieItemUid, Long sessionId);
     
-    int getUserMark(Long sessionId, Long userId);
+    int getUserMark(ScratchieSession session, Long userUid);
     
     /**
      * Mark all users in agroup as ScratchingFinished so that users can't continue scratching after this.
@@ -301,7 +301,7 @@ public interface IScratchieService {
      * @param contentId
      * @return
      */
-    List<ReflectDTO> getReflectionList(Long contentId);
+    List<ReflectDTO> getReflectionList(Set<ScratchieUser> users);
 
     /**
      * Get user by UID
@@ -334,10 +334,10 @@ public interface IScratchieService {
      * Populates items with results, i.e. correctAnswer, userMark, userAttempts. Used for displaying this data on learner results page.
      * 
      * @param sessionId
-     * @param userId
+     * @param userUid
      * @return
      */
-    Set<ScratchieItem> populateItemsResults(Long sessionId, Long userId);
+    Set<ScratchieItem> populateItemsResults(Long sessionId, Long userUid);
     
     /**
      * Return all learners in activity

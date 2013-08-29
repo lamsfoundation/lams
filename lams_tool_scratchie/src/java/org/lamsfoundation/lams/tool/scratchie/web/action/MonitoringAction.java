@@ -62,6 +62,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class MonitoringAction extends Action {
     public static Logger log = Logger.getLogger(MonitoringAction.class);
+    
+    private static IScratchieService service;
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -85,13 +87,14 @@ public class MonitoringAction extends Action {
 
     private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+
+	initializeScratchieService();
 	// initialize Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	IScratchieService service = getScratchieService();
 	List<GroupSummary> summaryList = service.getMonitoringSummary(contentId);
 
 	Scratchie scratchie = service.getScratchieByContentId(contentId);
@@ -112,8 +115,7 @@ public class MonitoringAction extends Action {
 
 	// Create reflectList if reflection is enabled.
 	if (scratchie.isReflectOnActivity()) {
-	    
-	    List<ReflectDTO> reflections = service.getReflectionList(contentId);
+	    List<ReflectDTO> reflections = service.getReflectionList(learners);
 	    sessionMap.put(ScratchieConstants.ATTR_REFLECTIONS, reflections);
 	}
 
@@ -122,6 +124,8 @@ public class MonitoringAction extends Action {
 
     private ActionForward itemSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
+
+	initializeScratchieService();
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
@@ -130,11 +134,11 @@ public class MonitoringAction extends Action {
 	if (itemUid.equals(-1)) {
 	    return null;
 	}
-	ScratchieItem item = getScratchieService().getScratchieItemByUid(itemUid);
+	ScratchieItem item = service.getScratchieItemByUid(itemUid);
 	request.setAttribute(ScratchieConstants.ATTR_ITEM, item);
 
 	Long contentId = (Long) sessionMap.get(ScratchieConstants.ATTR_TOOL_CONTENT_ID);
-	List<GroupSummary> summaryList = getScratchieService().getQuestionSummary(contentId, itemUid);
+	List<GroupSummary> summaryList = service.getQuestionSummary(contentId, itemUid);
 	
 	// escape JS sensitive characters in answer descriptions
 	for (GroupSummary summary : summaryList) {
@@ -155,12 +159,12 @@ public class MonitoringAction extends Action {
     public ActionForward exportExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException  {
 
-	IScratchieService scratchieService = getScratchieService();
+	initializeScratchieService();
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
 	
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = scratchieService.exportExcel(scratchie.getContentId());
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = service.exportExcel(scratchie.getContentId());
 
 	String fileName = "scratchie_export.xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -178,9 +182,11 @@ public class MonitoringAction extends Action {
     // *************************************************************************************
     // Private method
     // *************************************************************************************
-    private IScratchieService getScratchieService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
-	return (IScratchieService) wac.getBean(ScratchieConstants.RESOURCE_SERVICE);
+    private void initializeScratchieService() {
+	if (service == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    service = (IScratchieService) wac.getBean(ScratchieConstants.SCRATCHIE_SERVICE);
+	}
     }
 }

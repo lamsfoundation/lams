@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.tool.scratchie;
 public class ScratchieConstants {
     public static final String TOOL_SIGNATURE = "lascrt11";
 
-    public static final String RESOURCE_SERVICE = "scratchieService";
+    public static final String SCRATCHIE_SERVICE = "scratchieService";
 
     public static final String TOOL_CONTENT_HANDLER_NAME = "scratchieToolContentHandler";
 

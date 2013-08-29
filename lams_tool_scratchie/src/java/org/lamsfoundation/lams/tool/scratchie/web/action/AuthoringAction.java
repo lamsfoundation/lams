@@ -1000,7 +1000,7 @@ public class AuthoringAction extends Action {
     private IScratchieService getScratchieService() {
 	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
 		.getServletContext());
-	return (IScratchieService) wac.getBean(ScratchieConstants.RESOURCE_SERVICE);
+	return (IScratchieService) wac.getBean(ScratchieConstants.SCRATCHIE_SERVICE);
     }
 
     /**

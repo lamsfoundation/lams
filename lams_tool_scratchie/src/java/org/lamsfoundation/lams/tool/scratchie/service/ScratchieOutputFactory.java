@@ -32,6 +32,8 @@ import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 
 public class ScratchieOutputFactory extends OutputFactory {
 
@@ -82,7 +84,9 @@ public class ScratchieOutputFactory extends OutputFactory {
      */
     private ToolOutput getUserMark(IScratchieService scratchieService, Long toolSessionId, Long learnerId) {
 
-	int userMark = scratchieService.getUserMark(toolSessionId, learnerId);
+	ScratchieSession session = scratchieService.getScratchieSessionBySessionId(toolSessionId);
+	ScratchieUser user = scratchieService.getUserByIDAndSession(learnerId, toolSessionId);
+	int userMark = scratchieService.getUserMark(session, user.getUid());
 
 	return new ToolOutput(ScratchieConstants.LEARNER_MARK, getI18NText(
 		ScratchieConstants.LEARNER_MARK, true), userMark);
