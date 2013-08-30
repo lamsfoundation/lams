@@ -35,12 +35,14 @@ var learnersSearchPhrase = null;
 function initTabs(){
 	$('#tabs').tabs({
 		'activate' : function(event, ui) {
+			var sequenceInfoDialog = $('#sequenceInfoDialog');
 			if (ui.newPanel.attr('id') == 'tabSequence') {
-				var sequenceInfoDialog = $('#sequenceInfoDialog');
 				if (sequenceInfoDialog.length > 0
 						&& !sequenceInfoDialog.dialog('option', 'showed')) {
 					sequenceInfoDialog.dialog('open');
 				}
+			} else if (sequenceInfoDialog.dialog('isOpen')) {
+				sequenceInfoDialog.dialog('close');
 			}
 		}
 	});
