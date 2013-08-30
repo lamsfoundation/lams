@@ -471,7 +471,7 @@ function removeLesson(lessonID) {
 			$.ajax({
 				async : false,
 				url : LAMS_URL + "monitoring/monitoring.do",
-				data : "method=removeLessonJson&lessonID=" + lessonID,
+				data : "method=removeLesson&lessonID=" + lessonID,
 				type : "post",
 				success : function(json) {
 					if (json.removeLesson == "true") {

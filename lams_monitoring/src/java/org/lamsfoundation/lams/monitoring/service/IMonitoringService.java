@@ -305,22 +305,6 @@ public interface IMonitoringService {
      */
     public Boolean setLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled);
 
-    /**
-     * Force Complete works on an individual user. The teacher may complete it up to a particular activity, or till the
-     * end of the sequence which activity id is null indicating complete to end. Note, the give activity will be
-     * complete as well.
-     * 
-     * @param learnerId
-     * @param requesterId
-     *            the user id of the person requesting the force complete. For security check
-     * @param lessonId
-     * @param activityId
-     *            force complete to this activity(this activity will be force complete as well). If null value, force
-     *            will complete all activities in this lesson.
-     * @return success message.
-     */
-    public String forceCompleteLessonByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId);
-
     public String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId);
 
     /**
@@ -465,65 +449,6 @@ public interface IMonitoringService {
      * @throws IOException
      */
     public String getLearningDesignDetails(Long lessonID) throws IOException;
-
-    /**
-     * This method returns the progress information of all learners in a given Lesson.
-     * 
-     * @param lessonID
-     *            The lesson_id of the Lesson whose progress information is required
-     * @param userID
-     *            The user id of the user requesting the progress details
-     * @param completedOnly
-     *            true if the data we are affect is completed activities data (included completed time values).
-     * @return String The requested information in wddx format
-     * @throws IOException
-     */
-    public String getAllLearnersProgress(Long lessonID, Integer userID, Boolean completedOnly) throws IOException;
-
-    /**
-     * This method returns the progress information of all learners in a given Lesson.
-     * 
-     * @param lessonID
-     *            The lesson_id of the Lesson whose progress information is required
-     * @param learnerID
-     *            The learner_id of the class learner whose progress information is required If null, provide all
-     *            learner's progress information.
-     * @param userID
-     *            The user id of the user requesting the progress details
-     * @return String The requested information in wddx format
-     * @throws IOException
-     */
-    public String getAllCompletedActivities(Long lessonID, Long learnerID, Integer userID) throws IOException;
-
-    /**
-     * This method returns a batch of progress information of learners in a given Lesson. It returns the first batch of
-     * users, using the learner's name as the sorting order. The batch size is determined by the LEARNER_PROGRESS_BATCH
-     * size in the database.
-     * 
-     * @param lessonID
-     *            The lesson_id of the Lesson whose progress information is required
-     * @param userID
-     *            The user id of the user requesting the progress details
-     * @return String The requested information in wddx format
-     * @throws IOException
-     */
-    public String getInitialLearnersProgress(Long lessonID, Integer userID) throws IOException;
-
-    /**
-     * This method returns the next batch of progress information of learners in a given Lesson. The batch size is
-     * determined by the LEARNER_PROGRESS_BATCH size in the database, and the next batch starts at after the supplied
-     * user_id
-     * 
-     * @param lessonID
-     *            The lesson_id of the Lesson whose progress information is required
-     * @param lastUserID
-     *            The user id of the last user from the previous batch
-     * @param userID
-     *            The user id of the user requesting the progress details
-     * @return String The requested information in wddx format
-     * @throws IOException
-     */
-    public String getAdditionalLearnersProgress(Long lessonID, Integer lastUserID, Integer userID) throws IOException;
 
     /**
      * This method is called when the user clicks the 'Contribute' tab in the monitoring enviornment. It returns a list

@@ -959,7 +959,7 @@ function fillProgressBar(barId) {
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring.do',
 		data : {
-			'method' : 'getLearnerProgressJSON',
+			'method' : 'getLearnerProgress',
 			'lessonID' : lessonId,
 			'userID' : bar.userId
 		},

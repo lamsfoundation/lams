@@ -661,7 +661,7 @@ function updateSequenceTab() {
 		url : LAMS_URL + 'monitoring/monitoring.do',
 		cache : false,
 		data : {
-			'method'    : 'getLessonProgressJSON',
+			'method'    : 'getLessonProgress',
 			'lessonID'  : lessonId,
 			'branchingActivityID' : sequenceBranchingId
 		},		
@@ -774,11 +774,8 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 					},
 					success : function(response) {
 						// inform user of result
-						var messageElem = $(response).find('var[name="messageValue"]');
-						if (messageElem.length > 0){
-							alert(messageElem.text());
-						}
-						
+						alert(response);
+												
 						// progress changed, show it to monitor
 						refreshMonitor('sequence');
 					}
@@ -1280,7 +1277,7 @@ function loadLearnerProgressPage(pageNumber){
 		url : LAMS_URL + 'monitoring/monitoring.do',
 		cache : false,
 		data : {
-			'method'           : 'getLearnerProgressPageJSON',
+			'method'           : 'getLearnerProgressPage',
 			'lessonID'         : lessonId,
 			'searchPhrase'     : learnersSearchPhrase,
 			'pageNumber'       : pageNumber,

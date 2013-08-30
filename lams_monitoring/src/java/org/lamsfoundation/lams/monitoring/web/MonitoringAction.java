@@ -128,9 +128,6 @@ public class MonitoringAction extends LamsDispatchAction {
     private static final String ERROR = "error";
     private static final DateFormat LESSON_SCHEDULING_DATETIME_FORMAT = new SimpleDateFormat("MM/dd/yy HH:mm");
 
-    /** See deleteOldPreviewLessons */
-    public static final String NUM_DELETED = "numDeleted";
-
     private static IAuditService auditService;
 
     private static ITimezoneService timezoneService;
@@ -225,9 +222,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * The Struts dispatch method that starts a lesson that has been created beforehand. Most likely, the request to
-     * start lesson should be triggered by the flash component. This method will delegate to the Spring service bean to
-     * complete all the steps for starting a lesson. Finally, a wddx acknowledgement message will be serialized and sent
-     * back to the flash component.
+     * start lesson should be triggered by the Monitoring This method will delegate to the Spring service bean to
+     * complete all the steps for starting a lesson.
      * 
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
@@ -248,20 +244,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws IOException, ServletException {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
-	FlashMessage flashMessage = null;
 
-	try {
-	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    monitoringService.startLesson(lessonId, getUserId());
-	    flashMessage = new FlashMessage("startLesson", Boolean.TRUE);
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "startLesson", monitoringService);
-	}
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	monitoringService.startLesson(lessonId, getUserId());
 
-	String message = flashMessage.serializeMessage();
-
-	PrintWriter writer = response.getWriter();
-	writer.println(message);
 	return null;
     }
 
@@ -363,51 +349,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
-    /**
-     * The Struts dispatch method that starts a lesson on schedule that has been created beforehand.
-     * 
-     * @param mapping
-     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
-     *            the end-user.
-     * 
-     * @param form
-     *            The ActionForm class that will contain any data submitted by the end-user via a form.
-     * @param request
-     *            A standard Servlet HttpServletRequest class.
-     * @param response
-     *            A standard Servlet HttpServletResponse class.
-     * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
-     *         next.
-     * @throws IOException
-     * @throws ServletException
-     * @throws
-     */
     public ActionForward startOnScheduleLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	FlashMessage flashMessage = null;
-
-	try {
-	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-
-	    String dateStr = WebUtil.readStrParam(request, MonitoringConstants.PARAM_LESSON_START_DATE);
-	    Date startDate = DateUtil.convertFromLAMSFlashFormat(dateStr);
-
-	    monitoringService.startLessonOnSchedule(lessonId, startDate, getUserId());
-	    flashMessage = new FlashMessage("startOnScheduleLesson", Boolean.TRUE);
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "startOnScheduleLesson", monitoringService);
-	}
-
-	String message = flashMessage.serializeMessage();
-
-	PrintWriter writer = response.getWriter();
-	writer.println(message);
-	return null;
-    }
-
-    public ActionForward startOnScheduleLessonJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ParseException {
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
@@ -419,8 +361,7 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     /**
-     * The Struts dispatch method to archive a lesson. A wddx acknowledgement message will be serialized and sent back
-     * to the flash component.
+     * The Struts dispatch method to archive a lesson.
      * 
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
@@ -439,22 +380,11 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward archiveLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	FlashMessage flashMessage = null;
+
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
-
-	try {
-	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    monitoringService.archiveLesson(lessonId, getUserId());
-	    flashMessage = new FlashMessage("archiveLesson", Boolean.TRUE);
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "archiveLesson", monitoringService);
-	}
-
-	String message = flashMessage.serializeMessage();
-
-	PrintWriter writer = response.getWriter();
-	writer.println(message);
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	monitoringService.archiveLesson(lessonId, getUserId());
 	return null;
     }
 
@@ -479,22 +409,10 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward unarchiveLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	FlashMessage flashMessage = null;
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
-
-	try {
-	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    monitoringService.unarchiveLesson(lessonId, getUserId());
-	    flashMessage = new FlashMessage("unarchiveLesson", Boolean.TRUE);
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "unarchiveLesson", monitoringService);
-	}
-
-	String message = flashMessage.serializeMessage();
-
-	PrintWriter writer = response.getWriter();
-	writer.println(message);
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	monitoringService.unarchiveLesson(lessonId, getUserId());
 	return null;
     }
 
@@ -513,22 +431,10 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward suspendLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	FlashMessage flashMessage = null;
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
-
-	try {
-	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    monitoringService.suspendLesson(lessonId, getUserId());
-	    flashMessage = new FlashMessage("suspendLesson", Boolean.TRUE);
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "suspendLesson", monitoringService);
-	}
-
-	String message = flashMessage.serializeMessage();
-
-	PrintWriter writer = response.getWriter();
-	writer.println(message);
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	monitoringService.suspendLesson(lessonId, getUserId());
 	return null;
     }
 
@@ -546,64 +452,11 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward unsuspendLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	FlashMessage flashMessage = null;
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
-
-	try {
-	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    monitoringService.unsuspendLesson(lessonId, getUserId());
-	    flashMessage = new FlashMessage("unsuspendLesson", Boolean.TRUE);
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "unsuspendLesson", monitoringService);
-	}
-
-	String message = flashMessage.serializeMessage();
-
-	PrintWriter writer = response.getWriter();
-	writer.println(message);
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	monitoringService.unsuspendLesson(lessonId, getUserId());
 	return null;
-    }
-
-    /**
-     * <P>
-     * The STRUTS action will send back a WDDX message after marking the lesson by the given lesson ID as
-     * <code>Lesson.REMOVED_STATE</code> status.
-     * </P>
-     * <P>
-     * This action need a lession ID as input.
-     * </P>
-     * 
-     * @param form
-     *            The ActionForm class that will contain any data submitted by the end-user via a form.
-     * @param request
-     *            A standard Servlet HttpServletRequest class.
-     * @param response
-     *            A standard Servlet HttpServletResponse class.
-     * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
-     *         next.
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward removeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	FlashMessage flashMessage = null;
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-
-	try {
-	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    monitoringService.removeLesson(lessonId, getUserId());
-	    flashMessage = new FlashMessage("removeLesson", Boolean.TRUE);
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "removeLesson", monitoringService);
-	}
-	String message = flashMessage.serializeMessage();
-
-	PrintWriter writer = response.getWriter();
-	writer.println(message);
-	return null;
-
     }
 
     /**
@@ -650,8 +503,6 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * <P>
-     * </P>
-     * <P>
      * This action need a lession ID, Learner ID and Activity ID as input. Activity ID is optional, if it is null, all
      * activities for this learner will complete to as end as possible.
      * </P>
@@ -667,7 +518,6 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward forceComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-	FlashMessage flashMessage = null;
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
 	// get parameters
@@ -681,35 +531,20 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 	}
 
-	// force complete
-	try {
-	    long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    Integer learnerId = new Integer(WebUtil.readIntParam(request, MonitoringConstants.PARAM_LEARNER_ID));
-	    Integer requesterId = getUserId();
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Integer learnerId = new Integer(WebUtil.readIntParam(request, MonitoringConstants.PARAM_LEARNER_ID));
+	Integer requesterId = getUserId();
 
-	    // true if old, Flash Monitoring is used; to be removed after new Monitoring is adopted
-	    boolean isPreviousActivity = WebUtil.readBooleanParam(request, "isPreviousActivity", true);
-	    String message = null;
-	    if (isPreviousActivity) {
-		message = monitoringService.forceCompleteLessonByUser(learnerId, requesterId, lessonId, activityId);
-	    } else {
-		message = monitoringService.forceCompleteActivitiesByUser(learnerId, requesterId, lessonId, activityId);
-	    }
+	String message = monitoringService.forceCompleteActivitiesByUser(learnerId, requesterId, lessonId, activityId);
 
-	    if (LamsDispatchAction.log.isDebugEnabled()) {
-		LamsDispatchAction.log.debug("Force complete for learner " + learnerId + " lesson " + lessonId + ". "
-			+ message);
-	    }
-	    flashMessage = new FlashMessage("forceComplete", message);
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "forceComplete", monitoringService);
+	if (LamsDispatchAction.log.isDebugEnabled()) {
+	    LamsDispatchAction.log.debug("Force complete for learner " + learnerId + " lesson " + lessonId + ". "
+		    + message);
 	}
-	String message = flashMessage.serializeMessage();
 
 	PrintWriter writer = response.getWriter();
 	writer.println(message);
 	return null;
-
     }
 
     public ActionForward getLessonDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -850,24 +685,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
-    /** Get the learner progress data for all learners in a lesson. This is called by the sequence tab in monitoring */
-    public ActionForward getAllLearnersProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	String wddxPacket;
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	try {
-	    Long lessonID = WebUtil.readLongParam(request, "lessonID", false);
-	    wddxPacket = monitoringService.getAllLearnersProgress(lessonID, getUserId(), false);
-	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getAllLearnersProgress", monitoringService).serializeMessage();
-	}
-
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
-	return null;
-    }
-
     @SuppressWarnings("unchecked")
     public ActionForward getDictionaryXML(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
@@ -879,68 +696,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	String module = WebUtil.readStrParam(request, "module", false);
 
 	ArrayList<String> languageCollection = new ArrayList<String>();
-	if (module.equals("wizard")) {
-	    // pre-existing flash app (AS 2.0) labels
-	    languageCollection.add(new String("sys.error.msg.start"));
-	    languageCollection.add(new String("sys.error"));
-	    languageCollection.add(new String("wizardTitle.x.lbl"));
-	    languageCollection.add(new String("finish.btn"));
-	    languageCollection.add(new String("title.lbl"));
-	    languageCollection.add(new String("desc.lbl"));
-	    languageCollection.add(new String("learner.lbl"));
-	    languageCollection.add(new String("staff.lbl"));
-	    languageCollection.add(new String("al.alert"));
-	    languageCollection.add(new String("al.ok"));
-	    languageCollection.add(new String("al.validation.msg1"));
-	    languageCollection.add(new String("al.validation.msg2"));
-	    languageCollection.add(new String("al.validation.msg3.2"));
-	    languageCollection.add(new String("al.validation.schtime"));
-	    languageCollection.add(new String("learners.group.name"));
-	    languageCollection.add(new String("staff.group.name"));
-	    languageCollection.add(new String("wizard.splitLearners.splitSum"));
-	    languageCollection.add(new String("wizard.splitLearners.LearnersPerLesson.lbl"));
-	    languageCollection.add(new String("wizard.splitLearners.cb.lbl"));
-	    languageCollection.add(new String("wizard.learner.expp.cb.lbl"));
-	    languageCollection.add(new String("wizard.learner.enLiveEdit.cb.lbl"));
-	    languageCollection.add(new String("wizard.learner.enpres.cb.lbl"));
-	    languageCollection.add(new String("wizard.wkspc.date.modified.lbl"));
-	    languageCollection.add(new String("summery.desc.lbl"));
-
-	    // monitoring webapp existing labels
-	    languageCollection.add(new String("error.system.error"));
-	    languageCollection.add(new String("button.ok"));
-
-	    // new flex (CloudWizard) labels
-	    languageCollection.add(new String("add.lesson.panel.title"));
-	    languageCollection.add(new String("lesson.tab.label"));
-	    languageCollection.add(new String("class.tab.label"));
-	    languageCollection.add(new String("advanced.tab.label"));
-	    languageCollection.add(new String("lesson.tab.heading.label"));
-	    languageCollection.add(new String("add.now.button.label"));
-	    languageCollection.add(new String("advanced.tab.form.advanced.options.label"));
-	    languageCollection.add(new String("advanced.tab.enable.lesson.notifications"));
-	    languageCollection.add(new String("advanced.tab.form.enable.im.label"));
-	    languageCollection.add(new String("advanced.tab.form.time.limits.label"));
-	    languageCollection.add(new String("advanced.tab.form.enter.number.days.label"));
-	    languageCollection.add(new String("advanced.tab.form.individual.not.entire.group.label"));
-	    languageCollection.add(new String("advanced.tab.form.scheduling.label"));
-	    languageCollection.add(new String("advanced.tab.form.enable.label"));
-	    languageCollection.add(new String("advanced.tab.form.validation.no.learners.error"));
-	    languageCollection.add(new String("advanced.tab.form.item.split.lessons.label"));
-	    languageCollection.add(new String("advanced.tab.form.details.label"));
-	    languageCollection.add(new String("class.tab.available.label"));
-	    languageCollection.add(new String("class.tab.selected.label"));
-	    languageCollection.add(new String("class.tab.print.name.label"));
-	    languageCollection.add(new String("class.tab.heading.label"));
-	    languageCollection.add(new String("advanced.tab.form.validation.schedule.date.error"));
-	    languageCollection.add(new String("conditions.tab.label"));
-	    languageCollection.add(new String("conditions.tab.form.preceding.label"));
-	    languageCollection.add(new String("conditions.tab.form.preceding.info.label"));
-	    languageCollection.add(new String("advanced.tab.form.time.limits.info.label"));
-	    languageCollection.add(new String("advanced.tab.enable.lesson.intro"));
-	    languageCollection.add(new String("advanced.tab.display.design.image"));
-
-	} else if (module.equals("timechart")) {
+	if (module.equals("timechart")) {
 
 	    languageCollection.add(new String("sys.error"));
 	    languageCollection.add(new String("chart.btn.activity.split"));
@@ -1004,70 +760,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	response.setCharacterEncoding("UTF-8");
 	response.getWriter().print(languageOutput);
 
-	return null;
-    }
-
-    public ActionForward getAllCompletedActivities(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	String wddxPacket;
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	try {
-	    Long lessonID = WebUtil.readLongParam(request, "lessonID", false);
-	    Long learnerID = WebUtil.readLongParam(request, "learnerID", true);
-	    wddxPacket = monitoringService.getAllCompletedActivities(lessonID, learnerID, getUserId());
-
-	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getAllLearnersProgress", monitoringService).serializeMessage();
-	}
-
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
-	return null;
-
-    }
-
-    /**
-     * Get the first batch of learner progress data learners in a lesson. This is called by the learner progress tab in
-     * monitoring
-     */
-    public ActionForward getInitialLearnersProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	String wddxPacket;
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	try {
-	    Long lessonID = WebUtil.readLongParam(request, "lessonID", false);
-	    wddxPacket = monitoringService.getInitialLearnersProgress(lessonID, getUserId());
-	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getInitialLearnersProgress", monitoringService).serializeMessage();
-	}
-
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
-	return null;
-    }
-
-    /**
-     * Get a followup batch of learner progress data learners in a lesson. This is called by the learner progress tab in
-     * monitoring
-     */
-    public ActionForward getAdditionalLearnersProgress(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException {
-	String wddxPacket;
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	try {
-	    Long lessonID = WebUtil.readLongParam(request, "lessonID", false);
-	    Integer lastUserID = WebUtil.readIntParam(request, "lastUserID", false);
-	    wddxPacket = monitoringService.getAdditionalLearnersProgress(lessonID, lastUserID, getUserId());
-	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getAdditionalLearnersProgress", monitoringService).serializeMessage();
-	}
-
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
 	return null;
     }
 
@@ -1220,7 +912,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * Gets users whose progress bars will be displayed in Learner tab in Monitor.
      */
     @SuppressWarnings("unchecked")
-    public ActionForward getLearnerProgressPageJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward getLearnerProgressPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	String searchPhrase = request.getParameter("searchPhrase");
@@ -1282,7 +974,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * Produces necessary data for learner progress bar.
      */
     @SuppressWarnings("unchecked")
-    public ActionForward getLearnerProgressJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward getLearnerProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	Integer learnerId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, true);
 	Integer monitorId = null;
@@ -1357,7 +1049,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * Produces data for Sequence tab in Monitor.
      */
     @SuppressWarnings("unchecked")
-    public ActionForward getLessonProgressJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward getLessonProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Long branchingActivityId = WebUtil.readLongParam(request, "branchingActivityID", true);
@@ -1427,25 +1119,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 
-	return null;
-    }
-
-    public ActionForward renameLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	String wddxPacket = null;
-	try {
-	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    Integer userID = getUserId();
-	    String name = WebUtil.readStrParam(request, "name");
-	    wddxPacket = monitoringService.renameLesson(lessonID, name, userID);
-	} catch (Exception e) {
-	    FlashMessage flashMessage = handleException(e, "renameLesson", monitoringService);
-	    wddxPacket = flashMessage.serializeMessage();
-	}
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
 	return null;
     }
 
@@ -1537,20 +1210,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	return null;
-    }
-
-    /**
-     * Delete all old preview lessons and their related data, across all organisations. Should go to a monitoring
-     * webservice maybe ?
-     */
-    public ActionForward deleteOldPreviewLessons(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	int numDeleted = monitoringService.deleteAllOldPreviewLessons();
-	request.setAttribute(MonitoringAction.NUM_DELETED, Integer.toString(numDeleted));
-	return mapping.findForward(MonitoringAction.PREVIEW_DELETED_REPORT_SCREEN);
     }
 
     /**
@@ -1654,49 +1313,12 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward presenceImAvailable(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
-	FlashMessage flashMessage = null;
-	try {
-	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    Integer userID = getUserId();
-	    Boolean presenceImAvailable = WebUtil.readBooleanParam(request, "presenceImAvailable", false);
-	    monitoringService.setPresenceImAvailable(lessonID, userID, presenceImAvailable);
-
-	    flashMessage = new FlashMessage("presenceImAvailable", "presenceImAvailable");
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "presenceImAvailable", monitoringService);
-	}
-	String wddxPacket = flashMessage.serializeMessage();
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
-	return null;
-    }
-
-    /**
-     * Set whether or not the presence available button is available in learner. Expects parameters lessonID and
-     * presenceAvailable.
-     */
-    public ActionForward liveEditAvailable(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	FlashMessage flashMessage = null;
-	try {
-	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    Integer userID = getUserId();
-	    Boolean liveEditAvailable = WebUtil.readBooleanParam(request, "liveEditAvailable", false);
-	    monitoringService.setLiveEditEnabled(lessonID, userID, liveEditAvailable);
-
-	    flashMessage = new FlashMessage("liveEditAvailable", "liveEditAvailable");
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "liveEditAvailable", monitoringService);
-	}
-	String wddxPacket = flashMessage.serializeMessage();
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
+	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
+	Integer userID = getUserId();
+	Boolean presenceImAvailable = WebUtil.readBooleanParam(request, "presenceImAvailable", false);
+	monitoringService.setPresenceImAvailable(lessonID, userID, presenceImAvailable);
 	return null;
     }
 
