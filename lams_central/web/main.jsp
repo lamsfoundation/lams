@@ -241,7 +241,10 @@
 	</div>
 	<div id="footer">
 		<p>
-			<fmt:message key="msg.LAMS.version" /> <%=Configuration.get(ConfigurationKeys.VERSION)%>
+			<a style="color: #999999; text-decoration: none; border: none;" href="#"
+			 onClick="javascript:window.open('author2.jsp', 'FlashlessAuthoring','resizable,left=10,top=10,width=800,height=600');">
+				<fmt:message key="msg.LAMS.version" /> <%=Configuration.get(ConfigurationKeys.VERSION)%>
+			</a>
 			<a href="<lams:LAMSURL/>/www/copyright.jsp" target='copyright' onClick="openCopyRight()">
 				&copy; <fmt:message key="msg.LAMS.copyright.short" /> 
 			</a>
