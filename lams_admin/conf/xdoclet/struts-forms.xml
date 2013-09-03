@@ -49,7 +49,6 @@
 	<form-property name="tutorialsDisabled" type="java.lang.Boolean" initial="false" />
 	<form-property name="firstLogin" type="java.lang.Boolean" initial="true" />
 	<form-property name="timeZone" type="java.lang.String" />
-	<form-property name="enableFlash" type="java.lang.Boolean" />	
 	<form-property name="userCSSTheme" type="java.lang.Long" />
 	<form-property name="userFlashTheme" type="java.lang.Long" />
 </form-bean>

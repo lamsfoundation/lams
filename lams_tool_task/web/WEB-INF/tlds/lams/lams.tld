@@ -28,26 +28,6 @@
    </tag>
    <tag>
 
-      <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
-      <display-name>generate unique ID</display-name>
-      <icon>    
-      </icon>
-      <name>generateID</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.GenerateIDTag</tag-class>
-      <body-content>empty</body-content>
-
-      <attribute>
-         <description>Output a random number for the learner and passon flash movies to communicate directly.</description>
-         <name>id</name>
-         <required>false</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
-
-   </tag>
-   <tag>
-
       <description>Help tag</description>
       <display-name>Help tag</display-name>
       <icon>    
@@ -187,17 +167,6 @@
            <rtexprvalue>true</rtexprvalue>
 
       </attribute>
-
-   </tag>
-   <tag>
-
-      <description>Checks whether Flash enabled for learner</description>
-      <display-name>Checks whether Flash enabled for learner</display-name>
-      <icon>    
-      </icon>
-      <name>LearnerFlashEnabled</name>
-      <tag-class>org.lamsfoundation.lams.web.tag.LearnerFlashEnabledTag</tag-class>
-      <body-content>empty</body-content>
 
    </tag>
    <tag>
@@ -461,11 +430,7 @@
    	<tag-file>
        <name>headItems</name>
        <path>/WEB-INF/tags/headItems.tag</path>
-   	</tag-file>   	
-   	<tag-file>
-       <name>Passon</name>
-       <path>/WEB-INF/tags/Passon.tag</path>
-   	</tag-file>  
+   	</tag-file>
    	<tag-file>
 	    <name>Date</name>
 		<path>/WEB-INF/tags/Date.tag</path>
@@ -512,15 +477,6 @@
         <rtexprvalue>true</rtexprvalue>
     </attribute>
   </tag>
-  	<tag>
-	  	<description>Checks whether Flash enabled for learner</description>
-	  	<display-name>Checks whether Flash enabled for learner</display-name>
-	 	<icon>    
-	 	</icon>
-	 	<name>LearnerFlashEnabled</name>
-	 	<tag-class>org.lamsfoundation.lams.web.tag.LearnerFlashEnabledTag</tag-class>
-	 	<body-content>empty</body-content>
- 	</tag> 
 	<tag-file>
 		<name>head</name>
 	    <path>/WEB-INF/tags/Head.tag</path>

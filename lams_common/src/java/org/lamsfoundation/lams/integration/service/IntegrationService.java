@@ -305,7 +305,6 @@ public class IntegrationService implements IIntegrationService {
 	user.setCreateDate(new Date());
 	user.setDisabledFlag(false);
 	user.setLocale(LanguageUtil.getSupportedLocale(userData[13], userData[12]));
-	user.setEnableFlash(Configuration.getAsBoolean(ConfigurationKeys.FLASH_ENABLE));
 	user.setFlashTheme(service.getDefaultFlashTheme());
 	user.setHtmlTheme(service.getDefaultHtmlTheme());
 	service.save(user);

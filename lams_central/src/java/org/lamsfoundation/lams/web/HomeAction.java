@@ -87,7 +87,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * @struts:action path="/home" validate="false" parameter="method"
  * @struts:action-forward name="sysadmin" path="/sysadmin.jsp"
- * @struts:action-forward name="learner" path="/learner.jsp"
  * @struts:action-forward name="lessonIntro" path="/lessonIntro.jsp"
  * @struts:action-forward name="author" path="/author.jsp"
  * @struts:action-forward name="addLesson" path="/addLesson.jsp"
@@ -184,26 +183,30 @@ public class HomeAction extends DispatchAction {
 		    return displayMessage(mapping, req, "error.lesson.not.accessible.for.learners");
 		}
 
+		String learnerURL = Configuration.get(ConfigurationKeys.SERVER_URL) + "learning/main.jsp";
+
 		if (mode != null) {
-		    req.setAttribute(AttributeNames.PARAM_MODE, mode);
+		    learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_MODE, mode);
 		}
 
-		req.setAttribute(AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED,
-			lesson.getLearnerExportAvailable() != null ? lesson.getLearnerExportAvailable() : Boolean.TRUE);
-		req.setAttribute(AttributeNames.PARAM_PRESENCE_ENABLED, lesson.getLearnerPresenceAvailable());
-		req.setAttribute(AttributeNames.PARAM_PRESENCE_IM_ENABLED, lesson.getLearnerImAvailable());
-		req.setAttribute(AttributeNames.PARAM_TITLE, lesson.getLessonName());
+		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED, String
+			.valueOf(lesson.getLearnerExportAvailable() != null ? lesson.getLearnerExportAvailable()
+				: Boolean.TRUE));
+		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_PRESENCE_ENABLED,
+			String.valueOf(lesson.getLearnerPresenceAvailable()));
+		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_PRESENCE_IM_ENABLED,
+			String.valueOf(lesson.getLearnerImAvailable()));
+		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_TITLE, lesson.getLessonName());
 
 		/* Date Format for Chat room append */
 		DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
-		req.setAttribute(AttributeNames.PARAM_CREATE_DATE_TIME, sfm.format(lesson.getCreateDateTime()));
-
-		String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
-		req.setAttribute("serverUrl", serverUrl);
-		req.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
+		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_CREATE_DATE_TIME,
+			sfm.format(lesson.getCreateDateTime()));
+		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_LESSON_ID, String.valueOf(lessonId));
 
 		// show lesson intro page if required
 		if (lesson.isEnableLessonIntro()) {
+		    req.setAttribute("learnerURL", learnerURL);
 		    req.setAttribute("lesson", lesson);
 		    req.setAttribute("displayDesignImage", lesson.isDisplayDesignImage());
 		    req.setAttribute("isMonitor", lesson.getLessonClass().isStaffMember(getRealUser(user)));
@@ -223,9 +226,9 @@ public class HomeAction extends DispatchAction {
 		    }
 		    return mapping.findForward("lessonIntro");
 		} else {
-		    return mapping.findForward("learner");
+		    res.sendRedirect(learnerURL);
+		    return null;
 		}
-
 	    }
 
 	} catch (Exception e) {

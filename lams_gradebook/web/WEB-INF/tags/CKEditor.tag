@@ -53,6 +53,9 @@
 		
 		CKEDITOR.basePath = "${ckEditorBasePath}";
 	    
+	    var editor = CKEDITOR.instances["${id}"];
+	    if (editor) { editor.destroy(true); }
+	    
 		var instance = CKEDITOR.replace( "${id}", {
 				width                         : "${width}",
 				height                        : "${height}",

@@ -38,12 +38,6 @@ if(request.isSecure()){
 String pathToRoot = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
 
 %>
-<c:set var="enableFlash"><lams:LearnerFlashEnabled/></c:set>
-
-<c:if test="${enableFlash}">
-	<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}" version="${activityForm.version}" redirect="true"/>
-</c:if>
-
 <div id="content">
 
 	<c:if test="${!empty activityForm.activityURLs}">
@@ -67,17 +61,11 @@ String pathToRoot = protocol+request.getServerName()+":"+request.getServerPort()
 			//-->
 		</script>
 
-		<c:if test="${not enableFlash}">
-		<script language="JavaScript" type="text/JavaScript"><!--
+		<script language="JavaScript" type="text/JavaScript">
 			window.onload = redirectPage;
-			//-->
 		</script>
-		</c:if>
 		
 		<p><fmt:message key="message.activity.loading"/></p>
-
-	<!-- <p>Tool summary is <c:out value="${activityForm.progressSummary}" escapeXml="false" /></p> -->
-
 	</c:if>
 
 </div>  <!--closes content-->

@@ -1,13 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="enableFlash">
-	<lams:LearnerFlashEnabled />
-</c:set>
-<c:if test="${enableFlash}">
-	<lams:Passon id="${optionsActivityForm.lessonID}"
-		progress="${optionsActivityForm.progressSummary}" />
-</c:if>
-
 <%
 	if (request.getAttribute("activity") instanceof org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity) {
 		request.setAttribute("isOptionsWithSequencesActivity", "true");

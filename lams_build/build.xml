@@ -97,6 +97,7 @@
 		<ant antfile="../${lams_admin}/build.xml"             target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${lams_learning}/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${lams_monitoring}/build.xml"        target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${lams_gradebook}/build.xml"         target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${lams_www}/build.xml"               target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_assessment_dir}/build.xml"    target="copy-tags" inheritAll="false"/>
 		<ant antfile="../${tool_chat_dir}/build.xml"          target="copy-tags" inheritAll="false"/>
@@ -122,6 +123,7 @@
         <ant antfile="../${tool_wookie_dir}/build.xml"        target="copy-tags" inheritAll="false"/>
         <ant antfile="../${tool_imscc_dir}/build.xml"         target="copy-tags" inheritAll="false"/>
         <ant antfile="../${tool_bbb_dir}/build.xml"           target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_mindmap_dir}/build.xml"           target="copy-tags" inheritAll="false"/>
 	</target>
 
 	

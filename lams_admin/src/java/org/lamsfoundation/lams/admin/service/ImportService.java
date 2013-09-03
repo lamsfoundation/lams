@@ -582,7 +582,6 @@ public class ImportService implements IImportService {
 		user.setTimeZone(user.getTimeZone());
 		user.setTutorialsDisabled(false);
 		user.setFirstLogin(true);
-		user.setEnableFlash(Configuration.getAsBoolean(ConfigurationKeys.FLASH_ENABLE));
 		
 		return (hasError ? null : user);
 	}

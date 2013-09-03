@@ -18,7 +18,6 @@
 	<p class="warning"><html:errors/></p>
 </logic:messagesPresent>
 
-<c:set var="serverFlashEnabled"><%=Configuration.get(ConfigurationKeys.FLASH_ENABLE)%></c:set>
 <c:set var="profileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_EDIT_ENABLE)%></c:set>
 <c:set var="partialProfileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)%></c:set>
 
@@ -110,21 +109,6 @@
 		<td class="align-right"><fmt:message key="label.fax"/>:</td>
 		<td><html:text property="fax" size="50" maxlength="64" disabled="${!profileEditEnabled and !partialProfileEditEnabled}" /></td>
 	</tr>
-	<c:choose>
-		<c:when test="${serverFlashEnabled}"> 
-			<tr>
-			<td class="align-right"><fmt:message key="label.enable.flash"/>:</td>
-			<td><html:select property="enableFlash" disabled="${!profileEditEnabled}" >
-				<html:option value="true"><fmt:message key="label.yes"/></html:option>
-				<html:option value="false"><fmt:message key="label.no"/></html:option>
-				</html:select>
-			</td>
-			</tr>
-		</c:when>
-		<c:otherwise>
-			<html:hidden property="enableFlash" />
-		</c:otherwise>
-	</c:choose>
 		
 	<tr>
 		<td class="align-right"><fmt:message key="label.language"/>:</td>

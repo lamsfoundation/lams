@@ -83,7 +83,11 @@
 		}
 	}
     function doSubmit_Form_Only() {
-    	document.getElementById("${formID}").submit();
+    	var form = document.getElementById("${formID}");
+    	//invoke onsubmit event if it's available, submit form afterwards
+    	if (form.onsubmit == null || (form.onsubmit != null) && form.onsubmit()) {
+    		form.submit();
+    	}
     }
     function doCancel() {
     	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
@@ -102,7 +106,7 @@
 			doAjaxCall(clearSessionUrl);
 		} else {
 			if ('${param.noopener}' == 'true' || notifyCloseURL.indexOf('noopener=true') >= 0) {
-				window.location.href = notifyCloseURL;
+				window.location.href = notifyCloseURL + '&action=' + nextAction;
 			} else if (window.parent.opener == null){
 				doAjaxCall(notifyCloseURL);
 			} else {

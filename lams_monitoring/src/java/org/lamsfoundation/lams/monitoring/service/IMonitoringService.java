@@ -36,7 +36,6 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
@@ -449,19 +448,21 @@ public interface IMonitoringService {
      * @throws IOException
      */
     public String getLearningDesignDetails(Long lessonID) throws IOException;
-
+    
     /**
-     * This method is called when the user clicks the 'Contribute' tab in the monitoring enviornment. It returns a list
-     * of activities "in the order" they have to be performed and with additional information as to what kind of
-     * contribution (Define later content, Moderation, Contribution, Permission for gate activity, Chosen Grouing etc.)
-     * is reuired from the user(teacher/staff).
+     * This method returns the progress information of all learners in a given Lesson.
      * 
      * @param lessonID
-     *            The lesson_id of the Lesson for which the information has to be fetched.
-     * @return String The required information in WDDX format
+     *            The lesson_id of the Lesson whose progress information is required
+     * @param learnerID
+     *            The learner_id of the class learner whose progress information is required If null, provide all
+     *            learner's progress information.
+     * @param userID
+     *            The user id of the user requesting the progress details
+     * @return String The requested information in wddx format
      * @throws IOException
      */
-    public String getAllContributeActivities(Long lessonID) throws IOException, LearningDesignProcessorException;
+    public String getAllCompletedActivities(Long lessonID, Long learnerID, Integer userID) throws IOException;
 
     public List<ContributeActivityDTO> getAllContributeActivityDTO(Long lessonID);
 

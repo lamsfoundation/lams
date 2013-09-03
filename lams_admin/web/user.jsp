@@ -1,5 +1,4 @@
 <%@ include file="/taglibs.jsp"%>
-<%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 
 <html-el:form action="/usersave.do" method="post">
 <html-el:hidden property="userId" />
@@ -118,24 +117,7 @@
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.fax"/>:</td>
 					<td><html-el:text property="fax" size="50" maxlength="64" /></td>
-				</tr>
-				
-				<c:set var="serverFlashEnabled"><%=Configuration.get(ConfigurationKeys.FLASH_ENABLE)%></c:set>
-				<c:choose>
-					<c:when test="${serverFlashEnabled}"> 
-						<tr>
-							<td class="align-right"><fmt:message key="admin.user.enable.flash.for.learner.window"/>:</td>
-							<td><html:select property="enableFlash">
-								<html:option value="true"><fmt:message key="label.yes"/></html:option>
-								<html:option value="false"><fmt:message key="label.no"/></html:option>
-								</html:select>
-							</td>
-						</tr>
-					</c:when>
-					<c:otherwise>
-						<html:hidden property="enableFlash" />
-					</c:otherwise>
-				</c:choose>				
+				</tr>					
 				
 				<tr>
 					<td class="align-right"><fmt:message key="admin.organisation.locale"/>:</td>

@@ -151,9 +151,6 @@ public class User implements Serializable, Comparable {
     private Boolean changePassword;
 
     /** persistent field */
-    private Boolean enableFlash;
-
-    /** persistent field */
     private String lamsCommunityToken;
 
     /** persistent field */
@@ -170,9 +167,9 @@ public class User implements Serializable, Comparable {
 
     /** persistent field - for Pedagogical Planner */
     private Set<Long> recentlyModifiedLearningDesigns = new LinkedHashSet<Long>();
-    
+
     private Date modifiedDate;
-    
+
     /** persistent field */
     private String openidURL;
 
@@ -447,6 +444,7 @@ public class User implements Serializable, Comparable {
 	return new EqualsBuilder().append(this.getUserId(), castOther.getUserId()).isEquals();
     }
 
+    @Override
     public int compareTo(Object user) {
 	User u = (User) user;
 	return login.compareTo(u.getLogin());
@@ -479,17 +477,17 @@ public class User implements Serializable, Comparable {
 
 	TimeZone timeZone = TimeZone.getTimeZone(getTimeZone());
 
-	Set<String> tutorialPages = pagesWithDisabledTutorials == null || pagesWithDisabledTutorials.isEmpty() ? null
+	Set<String> tutorialPages = (pagesWithDisabledTutorials == null) || pagesWithDisabledTutorials.isEmpty() ? null
 		: pagesWithDisabledTutorials;
 
 	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
 		new CSSThemeBriefDTO(flashTheme), new CSSThemeBriefDTO(htmlTheme),
 		// TimeZone.getTimeZone("Australia/Sydney"),
-		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, enableFlash,
-		lamsCommunityToken, lamsCommunityUsername,
-		(tutorialsDisabled == null ? false : true),  // assume tutorials enabled if not set 
-		tutorialPages, 
-		(firstLogin == null ? true : false)  // assume no firstLogin value means they haven't logged in
+		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, lamsCommunityToken,
+		lamsCommunityUsername, (tutorialsDisabled == null ? false : true), // assume tutorials enabled if not
+										   // set
+		tutorialPages, (firstLogin == null ? true : false) // assume no firstLogin value means they haven't
+								   // logged in
 	);
     }
 
@@ -578,14 +576,6 @@ public class User implements Serializable, Comparable {
 	this.changePassword = changePassword;
     }
 
-    public Boolean getEnableFlash() {
-	return enableFlash;
-    }
-
-    public void setEnableFlash(Boolean enableFlash) {
-	this.enableFlash = enableFlash;
-    }
-
     public String getLamsCommunityToken() {
 	return lamsCommunityToken;
     }
@@ -646,21 +636,19 @@ public class User implements Serializable, Comparable {
     }
 
     public Date getModifiedDate() {
-        return modifiedDate;
+	return modifiedDate;
     }
 
     public void setModifiedDate(Date modifiedDate) {
-        this.modifiedDate = modifiedDate;
+	this.modifiedDate = modifiedDate;
     }
 
     public String getOpenidURL() {
-		return openidURL;
-	}
+	return openidURL;
+    }
 
-	public void setOpenidURL(String openidURL) {
-		this.openidURL = openidURL;
-	}
-    
-    
+    public void setOpenidURL(String openidURL) {
+	this.openidURL = openidURL;
+    }
 
 }

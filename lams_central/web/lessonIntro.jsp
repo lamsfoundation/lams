@@ -7,7 +7,6 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-html" prefix="html" %>
 <c:set var="lams" ><lams:LAMSURL/></c:set>
-<c:set var="startLessonParams">mode=${mode}&portfolioEnabled=${portfolioEnabled}&presenceEnabledPatch=${presenceEnabledPatch}&presenceImEnabled=${presenceImEnabled}&title=${title}&createDateTime=${createDateTime}&serverUrl=${serverUrl}&lessonID=${lessonID}</c:set>
 <c:set var="pngImageSrc" value="${lams}www/secure/learning-design-images/${learningDesignID}.png" />
 <c:set var="svgImageSrc" value="${lams}www/secure/learning-design-images/${learningDesignID}.svg" />
 
@@ -39,7 +38,7 @@
 		
 		<c:if test="${isMonitor}">
 			 <div class="float-right small-space-top">
-			 	<a class="thickbox button" href="editLessonIntro.do?method=edit&lessonID=${lessonID}&KeepThis=true&TB_iframe=true&height=600&width=850" title="<fmt:message key='label.edit'/>">
+			 	<a class="thickbox button" href="editLessonIntro.do?method=edit&lessonID=${lesson.lessonId}&KeepThis=true&TB_iframe=true&height=600&width=850" title="<fmt:message key='label.edit'/>">
 					<fmt:message key="label.edit"/>
 				</a>
 			</div>
@@ -61,7 +60,7 @@
 		</c:if>
 			
 		<div class="space-bottom-top align-right">
-			<html:link href="learner.jsp?${startLessonParams}" styleClass="button">
+			<html:link href="${learnerURL}" styleClass="button">
 				<span class="nextActivity"><fmt:message key="label.start.lesson" /></span>
 			</html:link>
 		</div>

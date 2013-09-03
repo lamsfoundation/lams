@@ -27,12 +27,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
-<c:set var="enableFlash"><lams:LearnerFlashEnabled/></c:set>
 <c:set var="displayPrintButton"><lams:Configuration key="DisplayPrintButton"/></c:set>
-
-<c:if test="${enableFlash}">
-	<lams:Passon id="${activityForm.lessonID}" progress="${activityForm.progressSummary}" />
-</c:if>
 
 <div id="content">
 

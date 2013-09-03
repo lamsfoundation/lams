@@ -47,7 +47,6 @@ public class UserDTO {
     private CSSThemeBriefDTO htmlTheme;
     private TimeZone timeZone;
     private Integer authenticationMethodId;
-    private Boolean enableFlash;
     private String lamsCommunityToken;
     private String lamsCommunityUsername;
     private Boolean loggedIntoLamsCommunity;
@@ -58,7 +57,7 @@ public class UserDTO {
     public UserDTO(Integer userID, String firstName, String lastName, String login, String localeLanguage,
 	    String localeCountry, String direction, String email, CSSThemeBriefDTO flashTheme,
 	    CSSThemeBriefDTO htmlTheme, TimeZone timezone, Integer authenticationMethodId, String fckLanguageMapping,
-	    Boolean enableFlash, String lamsCommunityToken, String lamsCommunityUsername, Boolean tutorialsDisabled,
+	    String lamsCommunityToken, String lamsCommunityUsername, Boolean tutorialsDisabled,
 	    Set<String> pagesWithDisabledTutorials, Boolean firstLogin) {
 	this.userID = userID;
 	this.firstName = firstName;
@@ -73,7 +72,6 @@ public class UserDTO {
 	timeZone = timezone;
 	this.authenticationMethodId = authenticationMethodId;
 	this.fckLanguageMapping = fckLanguageMapping;
-	this.enableFlash = enableFlash;
 	this.lamsCommunityToken = lamsCommunityToken;
 	this.lamsCommunityUsername = lamsCommunityUsername;
 	this.tutorialsDisabled = tutorialsDisabled;
@@ -86,7 +84,7 @@ public class UserDTO {
      */
     @Override
     public boolean equals(Object o) {
-	if (o != null && o.getClass() == this.getClass()) {
+	if ((o != null) && (o.getClass() == this.getClass())) {
 	    return ((UserDTO) o).userID == userID;
 	} else {
 	    return false;
@@ -175,28 +173,21 @@ public class UserDTO {
 
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("userID", getUserID()).append("firstName", getFirstName()).append(
-		"lastName", getLastName()).append("login", getLogin()).append("localeLanguage", getLocaleLanguage())
-		.append("localeCountry", getLocaleCountry()).append("direction", getDirection()).append("email",
-			getEmail()).append("flashTheme", getFlashTheme()).append("htmlTheme", getHtmlTheme()).append(
-			"timeZone", getTimeZone()).append("authenticationMethodId", getAuthenticationMethodId())
-		.append("fckLanguageMapping", getFckLanguageMapping()).append("enableFlash", getEnableFlash()).append(
-			"lamsCommunityUser", this.getLamsCommunityUsername()).append("lamsCommunityToken",
-			this.getLamsCommunityToken()).append("loggedIntoLamsCommunity",
-			"" + this.getLoggedIntoLamsCommunity())
+	return new ToStringBuilder(this).append("userID", getUserID()).append("firstName", getFirstName())
+		.append("lastName", getLastName()).append("login", getLogin())
+		.append("localeLanguage", getLocaleLanguage()).append("localeCountry", getLocaleCountry())
+		.append("direction", getDirection()).append("email", getEmail()).append("flashTheme", getFlashTheme())
+		.append("htmlTheme", getHtmlTheme()).append("timeZone", getTimeZone())
+		.append("authenticationMethodId", getAuthenticationMethodId())
+		.append("fckLanguageMapping", getFckLanguageMapping())
+		.append("lamsCommunityUser", this.getLamsCommunityUsername())
+		.append("lamsCommunityToken", this.getLamsCommunityToken())
+		.append("loggedIntoLamsCommunity", "" + this.getLoggedIntoLamsCommunity())
 		.append("tutorialsDisabled", "" + getTutorialsDisabled()).toString();
     }
 
     public String getFckLanguageMapping() {
 	return fckLanguageMapping;
-    }
-
-    public Boolean getEnableFlash() {
-	return enableFlash;
-    }
-
-    public void setEnableFlash(Boolean enableFlash) {
-	this.enableFlash = enableFlash;
     }
 
     public String getLamsCommunityToken() {

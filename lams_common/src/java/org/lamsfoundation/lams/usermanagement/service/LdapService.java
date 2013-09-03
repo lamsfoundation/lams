@@ -151,7 +151,6 @@ public class LdapService implements ILdapService {
 		user.setMobilePhone(map.get("mobile"));
 		user.setAuthenticationMethod((AuthenticationMethod) service.findById(AuthenticationMethod.class,
 			AuthenticationMethod.LDAP));
-		user.setEnableFlash(Configuration.getAsBoolean(ConfigurationKeys.FLASH_ENABLE));
 		user.setFlashTheme(service.getDefaultFlashTheme());
 		user.setHtmlTheme(service.getDefaultHtmlTheme());
 		user.setDisabledFlag(getDisabledBoolean(attrs));

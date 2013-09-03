@@ -728,32 +728,6 @@ public class MonitoringAction extends LamsDispatchAction {
 		    + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
 	}
 
-	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
-	if (module.equals("wizard") && (orgId != null)) {
-
-	    Organisation organisation = monitoringService.getOrganisation(orgId);
-
-	    int count = 0;
-	    Set<Lesson> organisationLessons = new TreeSet<Lesson>(new LessonComparator());
-	    organisationLessons.addAll(organisation.getLessons());
-	    for (Lesson lesson : organisationLessons) {
-		if (!Lesson.REMOVED_STATE.equals(lesson.getLessonStateId())
-			&& !Lesson.FINISHED_STATE.equals(lesson.getLessonStateId())) {
-		    languageOutput += "<entry key='lessonID" + count++ + "'>" + "<name>" + lesson.getLessonName()
-			    + "</name>" + "<data>" + lesson.getLessonId() + "</data>" + "</entry>";
-		}
-	    }
-
-	    // // sort lessons
-	    // TreeSet<Timezone> lessons = new TreeSet<Timezone>(new TimezoneComparator());
-	    // lessons.addAll(getTimezoneService().getDefaultTimezones());
-
-	    // let Flex know the number of lessons
-	    languageOutput += "<entry key='lessonsNumber'><data>" + count + "</data></entry>";
-
-	    languageOutput += "<entry key='orgName'><name>" + organisation.getName() + "</name></entry>";
-	}
-
 	languageOutput += "</language></xml>";
 
 	response.setContentType("text/xml");
@@ -762,25 +736,28 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	return null;
     }
-
-    public ActionForward getAllContributeActivities(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    
+    public ActionForward getAllCompletedActivities(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
+	String wddxPacket;
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
-	String wddxPacket = null;
 	try {
-	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    wddxPacket = monitoringService.getAllContributeActivities(lessonID);
+	    Long lessonID = WebUtil.readLongParam(request, "lessonID", false);
+	    Long learnerID = WebUtil.readLongParam(request, "learnerID", true);
+	    wddxPacket = monitoringService.getAllCompletedActivities(lessonID, learnerID, getUserId());
+
 	} catch (Exception e) {
-	    FlashMessage flashMessage = handleException(e, "getAllContributeActivities", monitoringService);
-	    wddxPacket = flashMessage.serializeMessage();
+	    wddxPacket = handleException(e, "getAllLearnersProgress", monitoringService).serializeMessage();
 	}
+
 	PrintWriter writer = response.getWriter();
 	writer.println(wddxPacket);
 	return null;
-    }
 
+    }
+    
     /**
      * Calls the server to bring up the learner progress page. Assumes destination is a new window. The userid that
      * comes from Flash is the user id of the learner for which we are calculating the url. This is different to all the
@@ -1255,24 +1232,12 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward learnerExportPortfolioAvailable(ActionMapping mapping, ActionForm form,
 	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
-	FlashMessage flashMessage = null;
-	try {
-	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    Integer userID = getUserId();
-	    Boolean learnerExportPortfolioAvailable = WebUtil
-		    .readBooleanParam(request, "learnerExportPortfolio", false);
-	    monitoringService.setLearnerPortfolioAvailable(lessonID, userID, learnerExportPortfolioAvailable);
-
-	    flashMessage = new FlashMessage("learnerExportPortfolioAvailable", "learnerExportPortfolioAvailable");
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "renameLesson", monitoringService);
-	}
-	String wddxPacket = flashMessage.serializeMessage();
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
+	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
+	Integer userID = getUserId();
+	Boolean learnerExportPortfolioAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
+	monitoringService.setLearnerPortfolioAvailable(lessonID, userID, learnerExportPortfolioAvailable);
 	return null;
     }
 
@@ -1282,28 +1247,19 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward presenceAvailable(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
-
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
-	FlashMessage flashMessage = null;
-	try {
-	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    Integer userID = getUserId();
-	    Boolean presenceAvailable = WebUtil.readBooleanParam(request, "presenceAvailable", false);
 
-	    monitoringService.setPresenceAvailable(lessonID, userID, presenceAvailable);
+	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
+	Integer userID = getUserId();
+	Boolean presenceAvailable = WebUtil.readBooleanParam(request, "presenceAvailable", false);
 
-	    if (!presenceAvailable) {
-		monitoringService.setPresenceImAvailable(lessonID, userID, false);
-	    }
+	monitoringService.setPresenceAvailable(lessonID, userID, presenceAvailable);
 
-	    flashMessage = new FlashMessage("presenceAvailable", "presenceAvailable");
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "presenceAvailable", monitoringService);
+	if (!presenceAvailable) {
+	    monitoringService.setPresenceImAvailable(lessonID, userID, false);
 	}
-	String wddxPacket = flashMessage.serializeMessage();
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
+
 	return null;
     }
 

@@ -292,19 +292,6 @@
             length="255"
         </meta>    
     </property>
-
-    <property
-        name="enableFlash"
-        type="java.lang.Boolean"
-        column="enable_flash"
-        length="1"
-    >
-        <meta attribute="field-description">
-           @hibernate.property
-            column="enable_flash"
-            length="1"
-        </meta>    
-    </property>
     
     <!-- Associations -->
   
