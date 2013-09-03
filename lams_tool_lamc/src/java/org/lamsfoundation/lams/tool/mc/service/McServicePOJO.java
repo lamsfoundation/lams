@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
@@ -40,7 +39,6 @@ import java.util.SortedMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
@@ -760,8 +758,15 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     }
     
     @Override
-    public byte[] prepareSessionDataSpreadsheet(HttpServletRequest request, McContent mcContent,
-	    String currentMonitoredToolSession) throws IOException {
+    public void changeUserAttemptMark(Long userAttemptUid, Integer newMark) {
+	McUsrAttempt userAttempt = mcUsrAttemptDAO.getUserAttemptByUid(userAttemptUid);
+	float oldMark = userAttempt.getMark();
+	userAttempt.setMark(newMark);
+	mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
+    }
+    
+    @Override
+    public byte[] prepareSessionDataSpreadsheet(McContent mcContent) throws IOException {
 	
 	Set<McQueContent> questions = mcContent.getMcQueContents();
 	int maxOptionsInQuestion = 0;
@@ -1001,57 +1006,53 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	for (McSessionMarkDTO sessionMarkDTO : sessionMarkDTOs) {
 	    Map<String, McUserMarkDTO> usersMarksMap = sessionMarkDTO.getUserMarks();
 
-	    String currentSessionId = sessionMarkDTO.getSessionId();
 	    String currentSessionName = sessionMarkDTO.getSessionName();
 
-	    if (currentMonitoredToolSession.equals("All") || currentMonitoredToolSession.equals(currentSessionId)) {
+	    row = sheet.createRow(rowCount++);
 
+	    cell = row.createCell(0);
+	    cell.setCellValue(messageService.getMessage("group.label"));
+
+	    cell = row.createCell(1);
+	    cell.setCellValue(currentSessionName);
+	    cell.setCellStyle(greenColor);
+
+	    rowCount++;
+	    count = 0;
+
+	    row = sheet.createRow(rowCount++);
+
+	    cell = row.createCell(count++);
+	    cell.setCellValue(messageService.getMessage("label.learner"));
+
+	    cell = row.createCell(count++);
+	    cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.username"));
+
+	    cell = row.createCell(questions.size() + 2);
+	    cell.setCellValue(messageService.getMessage("label.total"));
+
+	    for (McUserMarkDTO userMark : usersMarksMap.values()) {
 		row = sheet.createRow(rowCount++);
-
-		cell = row.createCell(0);
-		cell.setCellValue(messageService.getMessage("group.label"));
-
-		cell = row.createCell(1);
-		cell.setCellValue(currentSessionName);
-		cell.setCellStyle(greenColor);
-
-		rowCount++;
 		count = 0;
 
-		row = sheet.createRow(rowCount++);
+		cell = row.createCell(count++);
+		cell.setCellValue(userMark.getFullName());
 
 		cell = row.createCell(count++);
-		cell.setCellValue(messageService.getMessage("label.learner"));
+		cell.setCellValue(userMark.getUserName());
 
-		cell = row.createCell(count++);
-		cell.setCellValue(messageService.getMessage("label.monitoring.downloadMarks.username"));
-
-		cell = row.createCell(questions.size() + 2);
-		cell.setCellValue(messageService.getMessage("label.total"));
-
-		for (McUserMarkDTO userMark : usersMarksMap.values()) {
-		    row = sheet.createRow(rowCount++);
-		    count = 0;
-
+		Integer[] marks = userMark.getMarks();
+		for (int i = 0; i < marks.length; i++) {
 		    cell = row.createCell(count++);
-		    cell.setCellValue(userMark.getFullName());
-
-		    cell = row.createCell(count++);
-		    cell.setCellValue(userMark.getUserName());
-
-		    Integer[] marks = userMark.getMarks();
-		    for (int i = 0; i < marks.length; i++) {
-			cell = row.createCell(count++);
-			Integer mark = (marks[i] == null) ? 0 : marks[i];
-			cell.setCellValue(mark);
-		    }
-
-		    cell = row.createCell(count++);
-		    cell.setCellValue(userMark.getTotalMark());
+		    Integer mark = (marks[i] == null) ? 0 : marks[i];
+		    cell.setCellValue(mark);
 		}
 
-		rowCount++;
+		cell = row.createCell(count++);
+		cell.setCellValue(userMark.getTotalMark());
 	    }
+
+	    rowCount++;
 
 	}
 

@@ -1,24 +1,3 @@
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
 
@@ -113,26 +92,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			submitMethod(actionMethod);
 		}
 		
-		function submitSession(selectedToolSessionId, actionMethod) {
-			document.McMonitoringForm.selectedToolSessionId.value=selectedToolSessionId; 
-			submitMonitoringMethod(actionMethod);
-		}
-		
-		
-		function submitModifyOption(optionIndexValue, actionMethod) 
-		{
+		function submitModifyOption(optionIndexValue, actionMethod) {
 			document.McMonitoringForm.optIndex.value=optionIndexValue; 
 			submitMethod(actionMethod);
 		}
 
-		function submitModifyQuestion(optionIndexValue, actionMethod) 
-		{
+		function submitModifyQuestion(optionIndexValue, actionMethod) {
 			document.McMonitoringForm.optIndex.value=optionIndexValue; 
 			submitMethod(actionMethod);
 		}
 		
-		function submitOpenMc(currentUid, actionMethod)
-		{
+		function submitOpenMc(currentUid, actionMethod)	{
 			document.McMonitoringForm.currentUid.value=currentUid;
 	        submitMethod(actionMethod);
 		}
@@ -142,38 +112,35 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </lams:head>
 <body onLoad="init();" class="stripes">
 
-
 	<div id="page">
-			<h1> <fmt:message key="label.monitoring"/> </h1>
+		<h1> <fmt:message key="label.monitoring"/> </h1>
 
-	<div id="header">
-		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
-	</div>	
-
-	<div id="content">						
-	    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-		<html:hidden property="dispatch"/>
-		<html:hidden property="toolContentID"/>
-		<html:hidden property="httpSessionID"/>		
-		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="contentFolderID"/>						
-		<html:hidden property="activeModule"/>
-		<html:hidden property="defineLaterInEditMode"/>
-		<html:hidden property="responseId"/>	 
-		<html:hidden property="currentUid"/>
-		<html:hidden property="selectedToolSessionId"/>							
-		<input type="hidden" name="isToolSessionChanged"/>	
-		
-		<lams:help toolSignature="<%= McAppConstants.MY_SIGNATURE %>" module="monitoring"/>
-		
-			<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
-			<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
-			<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />
-			<lams:TabBody id="4" titleKey="label.stats" page="Stats.jsp" />
-		</html:form>
-	</div>	
-
-	<div id="footer"></div>
+		<div id="header">
+			<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
+		</div>	
+	
+		<div id="content">						
+		    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+				<html:hidden property="dispatch"/>
+				<html:hidden property="toolContentID"/>
+				<html:hidden property="httpSessionID"/>		
+				<html:hidden property="currentTab" styleId="currentTab" />
+				<html:hidden property="contentFolderID"/>						
+				<html:hidden property="activeModule"/>
+				<html:hidden property="defineLaterInEditMode"/>
+				<html:hidden property="responseId"/>	 
+				<html:hidden property="currentUid"/>
+			
+				<lams:help toolSignature="<%= McAppConstants.MY_SIGNATURE %>" module="monitoring"/>
+			
+				<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
+				<lams:TabBody id="2" titleKey="label.instructions" page="Instructions.jsp" />
+				<lams:TabBody id="3" titleKey="label.editActivity" page="Edit.jsp" />
+				<lams:TabBody id="4" titleKey="label.stats" page="Stats.jsp" />
+			</html:form>
+		</div>	
+	
+		<div id="footer"></div>
 
 	</div>
 	

@@ -104,6 +104,7 @@ public interface McAppConstants {
     public static final String REFLECTION_SUBJECT = "reflectionSubject";
     public static final String REFLECTIONS_CONTAINER_DTO = "reflectionsContainerDTO";
     public static final String LEARNER_NOTEBOOK = "learnerNotebook";
+    public static final String USER_MASTER_DETAIL = "userMasterDetail";
 
     /*
      * authoring mode controllers
@@ -234,7 +235,6 @@ public interface McAppConstants {
 
     public static final String MAP_TOOL_SESSIONS = "mapToolSessions";
     public static final Integer MAX_TOOL_SESSION_COUNT = new Integer(500);
-    public static final String IS_TOOL_SESSION_CHANGED = "isToolSessionChanged";
     public static final String OPTION_OFF = "false";
     public static final String ACTIVITY_TITLE = "activityTitle";
     public static final String ACTIVITY_INSTRUCTIONS = "activityInstructions";
@@ -289,6 +289,11 @@ public interface McAppConstants {
     public static final String CURRENT_MONITORING_TAB = "currentMonitoringTab";
     public static final String REPORT_TITLE_MONITOR = "reportTitleMonitor";
     public static final String MONITOR_USER_ID = "userId";
+    public static final String USER_UID = "userUid";
+    public static final String USER_ATTEMPTS = "userAttempts";
+    public static final String PARAM_NOT_A_NUMBER = "nan";
+    public static final String PARAM_GRADE = "grade";
+    public static final String PARAM_USER_ATTEMPT_UID = "userAttemptUid";
     public static final String MONITORING_REPORT = "monitoringReport";
     public static final String MONITORING_ERROR = "monitoringError";
     public static final String MAP_MONITORING_QUESTIONS = "mapMonitoringQuestions";
@@ -298,9 +303,6 @@ public interface McAppConstants {
     public static final String MONITORED_CONTENT_ID = "monitoredContentId";
     public static final String EDITACTIVITY_EDITMODE = "editActivityEditMode";
     public static final String FORM_INDEX = "formIndex";
-    public static final String CURRENT_MONITORED_TOOL_SESSION = "currentMonitoredToolSession";
-    public static final String CURRENT_MONITORED_TOOL_SESSION_NAME = "currentMonitoredToolSessionName";
-    public static final String SELECTION_CASE = "selectionCase";
     public static final String LIST_MONITORED_ANSWERS_CONTAINER_DTO = "listMonitoredAnswersContainerDto";
     public static final String LIST_GROUPING_DATA = "listGroupingData";
     public static final String LEARNER_NAME = "learnerName";

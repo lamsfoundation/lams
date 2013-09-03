@@ -89,5 +89,7 @@ public interface IMcUsrAttemptDAO {
      * @return
      */
     int getAttemptsCountPerOption(Long optionUid);
+    
+    McUsrAttempt getUserAttemptByUid(Long uid);
 
 }

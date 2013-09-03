@@ -406,6 +406,12 @@
 			path="/monitoring/editQuestionBox.jsp"
 			redirect="false"
 	    />
+	    
+	   <forward
+          name="userMasterDetail"
+          path="/monitoring/masterDetailLoadUp.jsp"
+          redirect="false"
+        />
 
 
 	  	<forward

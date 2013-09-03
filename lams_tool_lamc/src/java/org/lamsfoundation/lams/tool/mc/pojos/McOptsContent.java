@@ -55,8 +55,10 @@ public class McOptsContent implements Serializable, Comparable {
     /** persistent field */
     private org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent;
     
-    //DTO field
+    //DTO fields
     private boolean selected;
+    
+    private String escapedOptionText;
 
     public McOptsContent(Integer displayOrder, boolean correctOption, String mcQueOptionText,
 	    org.lamsfoundation.lams.tool.mc.pojos.McQueContent mcQueContent) {
@@ -174,5 +176,13 @@ public class McOptsContent implements Serializable, Comparable {
 
     public void setSelected(boolean selected) {
 	this.selected = selected;
+    }
+    
+    public String getEscapedOptionText() {
+	return this.escapedOptionText;
+    }
+
+    public void setEscapedOptionText(String escapedOptionText) {
+	this.escapedOptionText = escapedOptionText;
     }
 }

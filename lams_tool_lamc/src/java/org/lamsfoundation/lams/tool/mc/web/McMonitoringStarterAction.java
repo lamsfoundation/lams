@@ -34,13 +34,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McComparator;
@@ -57,35 +54,21 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * 
  * <p>
  * Starts up the monitoring module
  * </p>
  * 
  * @author Ozgur Demirtas
- * 
- * 
- *         <!--Monitoring Starter Action: initializes the Monitoring module --> <action path="/monitoringStarter"
- *         type="org.lamsfoundation.lams.tool.mc.web.McMonitoringStarterAction" scope="request" name="McMonitoringForm"
- *         unknown="false" validate="false" input="/monitoringIndex.jsp">
- * 
- *         <forward name="loadMonitoring" path="/monitoring/MonitoringMaincontent.jsp" redirect="false" />
- * 
- *         <forward name="refreshMonitoring" path="/monitoring/MonitoringMaincontent.jsp" redirect="false" />
- * 
- * 
- *         <forward name="errorList" path="/McErrorBox.jsp" redirect="false" /> </action>
- * 
  */
-
 public class McMonitoringStarterAction extends Action implements McAppConstants {
-    static Logger logger = Logger.getLogger(McMonitoringStarterAction.class.getName());
+    private static Logger logger = Logger.getLogger(McMonitoringStarterAction.class.getName());
+    private static IMcService service;
 
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, McApplicationException {
+	initializeMcService();
 	McUtils.cleanUpSessionAbsolute(request);
 
-	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
 	McGeneralMonitoringDTO mcGeneralMonitoringDTO = new McGeneralMonitoringDTO();
@@ -102,49 +85,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	    throw (e);
 	}
 
-	initialiseMonitoringData(mapping, form, request, response, mcService, mcGeneralMonitoringDTO);
-
-	mcMonitoringForm.setCurrentTab("1");
-	mcGeneralMonitoringDTO.setCurrentTab("1");
-
-	mcMonitoringForm.setActiveModule(MONITORING);
-	mcGeneralMonitoringDTO.setActiveModule(MONITORING);
-
-	mcMonitoringForm.setSelectedToolSessionId("All");
-	mcGeneralMonitoringDTO.setSelectedToolSessionId("All");
-
-	mcGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
-	mcGeneralMonitoringDTO.setIsPortfolioExport(new Boolean(false).toString());
-
-	/* this section is needed for Edit Activity screen, from here... */
-	mcGeneralAuthoringDTO.setActivityTitle(mcGeneralMonitoringDTO.getActivityTitle());
-	mcGeneralAuthoringDTO.setActivityInstructions(mcGeneralMonitoringDTO.getActivityInstructions());
-	mcGeneralAuthoringDTO.setActiveModule(MONITORING);
-
-	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
-	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-
-	return new McMonitoringAction().commonSubmitSessionCode(mcMonitoringForm, request, mapping, mcService,
-		mcGeneralMonitoringDTO);
-    }
-
-    /**
-     * initialises monitoring data
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @param mcService
-     * @param mcGeneralMonitoringDTO
-     * @return
-     */
-    public void initialiseMonitoringData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, IMcService mcService, McGeneralMonitoringDTO mcGeneralMonitoringDTO) {
-	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
-	String toolContentID = mcMonitoringForm.getToolContentID();
-
-	McContent mcContent = mcService.retrieveMc(new Long(toolContentID));
+	McContent mcContent = service.retrieveMc(new Long(toolContentID));
 	mcGeneralMonitoringDTO.setToolContentID(toolContentID.toString());
 	mcGeneralMonitoringDTO.setActivityTitle(mcContent.getTitle());
 	mcGeneralMonitoringDTO.setActivityInstructions(mcContent.getInstructions());
@@ -185,18 +126,8 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 
 	mcGeneralMonitoringDTO.setExistsOpenMcs(new Boolean(false).toString());
 
-	/* SELECTION_CASE == 2 indicates start up */
-	request.setAttribute(SELECTION_CASE, new Long(2));
-
-	/*
-	 * Default to All for tool Sessions so that all tool sessions' summary information gets displayed when the
-	 * module starts up
-	 */
-	request.setAttribute(CURRENT_MONITORED_TOOL_SESSION, "All");
-	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+	MonitoringUtil.setupAllSessionsData(request, mcContent, service);
 	mcGeneralMonitoringDTO.setGroupName("All Groups");
-	mcGeneralMonitoringDTO.setSelectionCase(new Long(2));
-	mcGeneralMonitoringDTO.setCurrentMonitoredToolSession("All");
 	mcGeneralMonitoringDTO.setListMonitoredAnswersContainerDto(new LinkedList());
 	mcGeneralMonitoringDTO.setExistsOpenMcs(new Boolean(false).toString());
 
@@ -204,17 +135,34 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	SessionMap sessionMap = new SessionMap();
 	mcMonitoringForm.setHttpSessionID(sessionMap.getSessionID());
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-    }
 
-    /**
-     * persists error messages to request scope
-     * 
-     * @param request
-     * @param message
-     */
-    public void persistInRequestError(HttpServletRequest request, String message) {
-	ActionMessages errors = new ActionMessages();
-	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-	saveErrors(request, errors);
+	mcMonitoringForm.setCurrentTab("1");
+	mcGeneralMonitoringDTO.setCurrentTab("1");
+
+	mcMonitoringForm.setActiveModule(MONITORING);
+	mcGeneralMonitoringDTO.setActiveModule(MONITORING);
+
+	mcGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
+	mcGeneralMonitoringDTO.setIsPortfolioExport(new Boolean(false).toString());
+
+	/* this section is needed for Edit Activity screen, from here... */
+	mcGeneralAuthoringDTO.setActivityTitle(mcGeneralMonitoringDTO.getActivityTitle());
+	mcGeneralAuthoringDTO.setActivityInstructions(mcGeneralMonitoringDTO.getActivityInstructions());
+	mcGeneralAuthoringDTO.setActiveModule(MONITORING);
+
+	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
+	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
+
+	return new McMonitoringAction().commonSubmitSessionCode(mcMonitoringForm, request, mapping, service,
+		mcGeneralMonitoringDTO);
+    }
+    
+    // *************************************************************************************
+    // Private method
+    // *************************************************************************************
+    private void initializeMcService() {
+	if (service == null) {
+	    service = McServiceProxy.getMcService(getServlet().getServletContext());
+	}
     }
 }

@@ -32,43 +32,9 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 public class McMonitoringForm extends McAuthoringForm implements McAppConstants {
     protected String method;
 
-    protected String selectedToolSessionId;
-
-    protected String isToolSessionChanged;
-
     private String currentUid;
 
     private String editResponse;
-
-    /**
-     * @return Returns the isToolSessionChanged.
-     */
-    public String getIsToolSessionChanged() {
-	return isToolSessionChanged;
-    }
-
-    /**
-     * @param isToolSessionChanged
-     *            The isToolSessionChanged to set.
-     */
-    public void setIsToolSessionChanged(String isToolSessionChanged) {
-	this.isToolSessionChanged = isToolSessionChanged;
-    }
-
-    /**
-     * @return Returns the selectedToolSessionId.
-     */
-    public String getSelectedToolSessionId() {
-	return selectedToolSessionId;
-    }
-
-    /**
-     * @param selectedToolSessionId
-     *            The selectedToolSessionId to set.
-     */
-    public void setSelectedToolSessionId(String selectedToolSessionId) {
-	this.selectedToolSessionId = selectedToolSessionId;
-    }
 
     /**
      * @return Returns the method.

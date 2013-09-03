@@ -34,6 +34,7 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.mc.McAllGroupsDTO;
@@ -65,6 +66,28 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * 
  */
 public class MonitoringUtil implements McAppConstants {
+    
+    /**
+     * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly
+     * escapes all quotes in the following way \").
+     */
+    public static void escapeQuotes(McUsrAttempt userAttempt) {
+
+	McQueContent question = userAttempt.getMcQueContent();
+	McOptsContent option = userAttempt.getMcOptionsContent();
+
+	String questionText = question.getQuestion();
+	if (questionText != null) {
+	    String escapedQuestion = StringEscapeUtils.escapeJavaScript(questionText);
+	    question.setEscapedQuestion(escapedQuestion);
+	}
+
+	String optionText = option.getMcQueOptionText();
+	if (optionText != null) {
+	    String escapedOptionText = StringEscapeUtils.escapeJavaScript(optionText);
+	    option.setEscapedOptionText(escapedOptionText);
+	}
+    }
 
     /**
      * 

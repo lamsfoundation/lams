@@ -208,7 +208,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 	try {
 	    out = new FileOutputStream(directoryName + File.separator + fileName);
 
-	    byte[] spreadsheet = mcService.prepareSessionDataSpreadsheet(request, mcContent, "All");
+	    byte[] spreadsheet = mcService.prepareSessionDataSpreadsheet(mcContent);
 	    out.write(spreadsheet);
 
 	    request.getSession().setAttribute(PORTFOLIO_EXPORT_DATA_FILENAME, fileName);

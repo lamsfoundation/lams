@@ -311,7 +311,6 @@ public abstract class McUtils implements McAppConstants {
 	request.getSession().removeAttribute(COMPLETED);
 	request.getSession().removeAttribute(MAP_TOOL_SESSIONS);
 	request.getSession().removeAttribute(MAX_TOOL_SESSION_COUNT.toString());
-	request.getSession().removeAttribute(IS_TOOL_SESSION_CHANGED);
 	request.getSession().removeAttribute(ADD_NEW_QUESTION);
 	request.getSession().removeAttribute(OPTION_OFF);
 	request.getSession().removeAttribute(REMOVE_QUESTION);
@@ -350,7 +349,6 @@ public abstract class McUtils implements McAppConstants {
 	request.getSession().removeAttribute(MONITORED_CONTENT_ID);
 	request.getSession().removeAttribute(EDITACTIVITY_EDITMODE);
 	request.getSession().removeAttribute(FORM_INDEX);
-	request.getSession().removeAttribute(SELECTION_CASE);
 	request.getSession().removeAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO);
 	request.getSession().removeAttribute(QUESTION_LISTING_MODE);
 	request.getSession().removeAttribute(QUESTION_LISTING_MODE_SEQUENTIAL);

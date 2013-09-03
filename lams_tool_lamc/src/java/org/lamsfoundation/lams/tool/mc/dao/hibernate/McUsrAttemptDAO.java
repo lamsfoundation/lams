@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -54,7 +55,12 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
     private static final String FIND_ATTEMPTS_COUNT_BY_OPTION = "select count(*) from "
 	    + McUsrAttempt.class.getName()
 	    + " as attempt where attempt.mcOptionsContent.uid=? AND attempt.mcQueUsr.responseFinalised = true";
-	    
+    
+    @Override
+    public McUsrAttempt getUserAttemptByUid(Long uid) {
+	return (McUsrAttempt) this.getHibernateTemplate().get(McUsrAttempt.class, uid);
+    }
+    
     @Override
     public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
 	this.getHibernateTemplate().save(mcUsrAttempt);

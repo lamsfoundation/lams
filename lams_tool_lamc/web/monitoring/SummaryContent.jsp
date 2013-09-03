@@ -1,30 +1,18 @@
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as 
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt
---%>
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="lams">
- 		<lams:LAMSURL />
-</c:set>
+<c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="isShrinkToFit" value="${(145 + fn:length(assessment.questions)*80) < 630}"/>
 
 <link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
+<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>
+<style media="screen,projection" type="text/css">
+	.ui-jqgrid tr.jqgrow td {
+	    white-space: normal !important;
+	    height:auto;
+	    vertical-align:text-top;
+	    padding-top:2px;
+	}
+</style>
 
 <script type="text/javascript"> 
 	//pass settings to monitorToolSummaryAdvanced.js
@@ -42,155 +30,130 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>  
-
-<h1 style="padding-bottom: 10px;">
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
-
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="monitor.summary.th.advancedSettings" />
-	</a>
-</h1>
-<br />
-
-<div class="monitoring-advanced" id="advancedDiv" style="display:none">
-<table class="alternative-color">
-
-	<tr>
-		<td>
-			<fmt:message key="radiobox.onepq" />
-		</td>
+<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		<c:forEach var="sessionMarkDto" items="${listMonitoredMarksContainerDto}" varStatus="status">
 		
-		<td>
-			<c:choose>
-				<c:when test="${questionsSequenced}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.showMarks" />
-		</td>
-		<td>
-			<c:choose>
-				<c:when test="${showMarks}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
+			jQuery("#group${sessionMarkDto.sessionId}").jqGrid({
+				datatype: "local",
+				height: 'auto',
+				width: 630,
+				shrinkToFit: ${isShrinkToFit},
+				
+			   	colNames:['#',
+						'userUid',
+						"<fmt:message key="label.monitoring.summary.user.name" />",
+					    "<fmt:message key="label.monitoring.summary.total" />"],
+					    
+			   	colModel:[
+			   		{name:'id',index:'id', width:20, sorttype:"int"},
+			   		{name:'userUid',index:'userUid', width:0, hidden: true},
+			   		{name:'userName',index:'userName', width:200},
+			   		{name:'total',index:'total', width:50,align:"right",sorttype:"int"}		
+			   	],
+			   	
+			   	multiselect: false,
+			   	caption: "${sessionMarkDto.sessionName}",
+			  	onSelectRow: function(rowid) { 
+			  	    if(rowid == null) { 
+			  	    	rowid=0; 
+			  	    } 
+			   		var userUid = jQuery("#group${sessionMarkDto.sessionId}").getCell(rowid, 'userUid');
+					var userMasterDetailUrl = '<c:url value="/monitoring.do"/>';
+		  	        jQuery("#userSummary${sessionMarkDto.sessionId}").clearGridData().setGridParam({gridstate: "visible"}).trigger("reloadGrid");
+		  	        $("#masterDetailArea").load(
+		  	        	userMasterDetailUrl,
+		  	        	{
+		  	        		dispatch: "userMasterDetail",
+		  	        		userUid: userUid
+		  	       		}
+		  	       	);
+	  	  		} 
+			}).hideCol("userId").hideCol("sessionId");
+			
+   	        <c:forEach var="userMarkEntity" items="${sessionMarkDto.userMarks}" varStatus="i">
+   	     		<c:set var="mcSessionMarkDTO" scope="request" value="${userMarkEntity.value}"/>
+   	     		jQuery("#group${sessionMarkDto.sessionId}").addRowData(${i.index + 1}, {
+   	   	     		id:"${i.index + 1}",
+   	   	     		userUid:"${mcSessionMarkDTO.queUsrId}",
+   	   	     		userName:"${mcSessionMarkDTO.fullName}",
+   	   	     		total:"${mcSessionMarkDTO.totalMark}"
+   	   	   	    });
+	        </c:forEach>
+	        
+	        var oldValue = 0;
+			jQuery("#userSummary${sessionMarkDto.sessionId}").jqGrid({
+				datatype: "local",
+				gridstate:"hidden",
+				//hiddengrid:true,
+				height: 110,
+				width: 780,
+				shrinkToFit: false,
+				scrollOffset: 0,
+				caption: "<fmt:message key="label.monitoring.summary.learner.summary" />",
+			   	colNames:['#',
+						'userAttemptUid',
+  						'Question',
+  						"<fmt:message key="label.monitoring.user.summary.response" />",
+  						"<fmt:message key="label.monitoring.user.summary.grade" />"],
+					    
+			   	colModel:[
+	  			   		{name:'id', index:'id', width:20, sorttype:"int"},
+	  			   		{name:'userAttemptUid', index:'userAttemptUid', width:0, hidden: true},
+	  			   		{name:'title', index:'title', width: 200},
+	  			   		{name:'response', index:'response', width:443, sortable:false},
+	  			   		{name:'grade', index:'grade', width:80, sorttype:"int", editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }
+			   	],
+			   	multiselect: false,
 
-	<tr>
-		<td>
-			<fmt:message key="label.randomize" />
-		</td>
-		<td>	
-			<c:choose>
-				<c:when test="${randomize}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	
-	<tr>
-		<td>
-			<fmt:message key="label.displayAnswers" />
-		</td>	
-		<td>
-			<c:choose>
-				<c:when test="${displayAnswers}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>
-		</td>
-	</tr>
-	 		
-	<tr>
-	 	<td>
-			<fmt:message key="radiobox.retries" />
-		</td>
-		<td>	
-			<c:choose>
-				<c:when test="${retries}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
+				cellurl: '<c:url value="/monitoring.do?dispatch=saveUserMark"/>',
+  				cellEdit: true,
+  				afterEditCell: function (rowid,name,val,iRow,iCol){
+  					oldValue = eval(val);
+				},
+  				afterSaveCell : function (rowid,name,val,iRow,iCol){
+  					var intRegex = /^\d+$/;
+  					if (!intRegex.test(val)) {
+  						jQuery("#userSummary${sessionMarkDto.sessionId}").restoreCell(iRow,iCol); 
+  					} else {
+  						var parentSelectedRowId = jQuery("#group${sessionMarkDto.sessionId}").getGridParam("selrow");
+  						var previousTotal =  eval(jQuery("#group${sessionMarkDto.sessionId}").getCell(parentSelectedRowId, 'total'));
+  						jQuery("#group${sessionMarkDto.sessionId}").setCell(parentSelectedRowId, 'total', previousTotal - oldValue + eval(val), {}, {});
+  					}
+				},	  		
+  				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
+  					var intRegex = /^\d+$/;
+  					if (!intRegex.test(val)) {
+  						return {nan:true};
+  					} else {
+  						var userAttemptUid = jQuery("#userSummary${sessionMarkDto.sessionId}").getCell(rowid, 'userAttemptUid');
+  						return {userAttemptUid:userAttemptUid};		  				  		
+  				  	}
+  				}
+			});
+			
+		</c:forEach>
+	});
 
-	<tr>
-		<td>
-			<fmt:message key="radiobox.passmark" />
-		</td>
-		<td>	
-			${passMark}
-		</td>
-	</tr>
+</script>
 
-	<tr>
-		<td>
-			<fmt:message key="monitor.summary.td.addNotebook" />
-		</td>
-		<td>	
-			<c:choose>
-				<c:when test="${reflect}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<c:choose>
-		<c:when test="${reflect}">
-			<tr>
-				<td>
-					<fmt:message key="monitor.summary.td.notebookInstructions" />
-				</td>
-				<td>	
-					${reflectionSubject}
-				</td>
-			</tr>
-		</c:when>
-	</c:choose>
-</table>
-</div>
+<%@ include file="parts/advanceOptions.jsp"%>
+<%@ include file="parts/dateRestriction.jsp"%>
 
-<%@include file="daterestriction.jsp"%>
-
-		<c:if test="${(mcGeneralMonitoringDTO.userExceptionNoToolSessions == 'true')}"> 	
-			<c:if test="${notebookEntriesExist != 'true' }"> 			
-				<table align="center">
-					<tr> 
-						<td NOWRAP valign=top align=center> 
-							<b>  <fmt:message key="error.noLearnerActivity"/> </b>
-						</td> 
-					<tr>
-				</table>
-			</c:if>							
-		</c:if>			
+	<c:if test="${(mcGeneralMonitoringDTO.userExceptionNoToolSessions == 'true')}"> 	
+		<c:if test="${notebookEntriesExist != 'true' }"> 			
+			<table align="center">
+				<tr> 
+					<td NOWRAP valign=top align=center> 
+						<b>  <fmt:message key="error.noLearnerActivity"/> </b>
+					</td> 
+				<tr>
+			</table>
+		</c:if>
+	</c:if>			
 
 	<c:choose>
 		<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'true'}">
@@ -209,103 +172,41 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:when>
 	</c:choose>
 		
-		<c:if test="${mcGeneralMonitoringDTO.userExceptionNoToolSessions != 'true'}"> 	
+		<c:if test="${mcGeneralMonitoringDTO.userExceptionNoToolSessions != 'true'}">
+
+			<h2>    
+				<fmt:message key="label.studentMarks"/>
+			</h2>
+
+			<div id="masterDetailArea">
+				<%@ include file="masterDetailLoadUp.jsp"%>
+			</div>
 		
-			<html:hidden property="selectedToolSessionId"/>							
-			<input type="hidden" name="isToolSessionChanged"/>
-				<table class="forms">
-				
-					<c:choose>
-					<c:when test="${fn:length(mcGeneralMonitoringDTO.summaryToolSessions) > 2 }">
-						<%-- When grouping is not enabled, we have only 2 items in summaryToolSessions.  The main toolSession and 'All' --%>
-								
-						<tr> 
-							<td NOWRAP  valign=top align=center>  <b> <fmt:message key="label.selectGroup"/> </b>
-
-								<select name="monitoredToolSessionId" onchange="javascript:submitSession(this.value,'submitSession');">
-								<c:forEach var="toolSessionEntry" items="${mcGeneralMonitoringDTO.summaryToolSessions}">
-										<c:set var="SELECTED_SESSION" scope="request" value=""/>
-										<c:if test="${toolSessionEntry.key == mcGeneralMonitoringDTO.currentMonitoredToolSession}"> 			
-												<c:set var="SELECTED_SESSION" scope="request" value="SELECTED"/>
-										</c:if>						
-										<c:choose>										
-										<c:when test="${toolSessionId.value == 'All'}"> 	
-											<option value="<c:out value="${toolSessionEntry.key}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>>All</option>						
-										</c:when>		
-										<c:otherwise> 		
-											<option value="<c:out value="${toolSessionEntry.key}"/>"  <c:out value="${requestScope.SELECTED_SESSION}"/>><c:out value="${toolSessionEntry.value}"/></option>						
-										</c:otherwise>						
-										</c:choose>				
-								</c:forEach>		  	
-								</select>									
-							</td> 
-						</tr>
-					</c:when>
-					<c:otherwise>
-						<tr><td><input type="hidden" name="monitoredToolSessionId" value="All" /></td></tr>
-					</c:otherwise>
-					</c:choose>
+			<c:forEach var="sessionMarkDto" items="${listMonitoredMarksContainerDto}" varStatus="status">
+			
+				<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
+					<c:if test="${isGroupedActivity}">
+						<div style="padding-bottom: 5px; font-size: small;">
+							<B><fmt:message key="group.label" /></B> ${sessionMarkDto.sessionName}
+						</div>
+					</c:if>
 					
-		  	 		<c:set var="queIndex" scope="request" value="0"/>
-					<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
-					<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
-			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
-
-						<tr>			
-							<td NOWRAP valign=top class="align-left"><b>  <fmt:message key="label.question.only"/> <c:out value="${queIndex}"/>:</b>
-								<c:out value="${currentDto.question}" escapeXml="false"/> &nbsp (<fmt:message key="label.mark"/> <c:out value="${currentDto.mark}"/> )
-							 </td>
-						</tr>	
-						<tr>					
-							<td NOWRAP valign=top class="align-left">  <b> <fmt:message key="label.mc.options.col"/>  </b> 
-								<table class="align-left">
-									<c:forEach var="answersData" items="${currentDto.candidateAnswersCorrect}">
-										<tr>			
-											<td NOWRAP valign=top class="align-left">
-												&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-												<c:out value="${answersData.candidateAnswer}" escapeXml="false"/> 
-												
-												<c:if test="${answersData.correct == 'true'}"> 		
-													&nbsp (<fmt:message key="label.correct"/>)
-												</c:if>																		
-											</td>	
-										</tr>
-									</c:forEach>		  	
-								</table>
-							</td>  
-						</tr>			
-
-					</c:forEach>		  	
-
-		  	 		<tr>
-		  	 			<td NOWRAP valign=top class="align-left"> <b> 
-		  	 				<fmt:message key="label.passingMark"/>: </b> <c:out value="${passMark}"/> 
-		  	 			</td>
-		  	 		</tr>
-				</table>
-
-			 <h2>    <fmt:message key="label.studentMarks"/>  </h2>
-
-
-				<c:if test="${mcGeneralMonitoringDTO.currentMonitoredToolSession =='All'}"> 						 
-					<jsp:include page="/monitoring/AllSessionsSummary.jsp" />
-					<jsp:include page="/monitoring/Reflections.jsp" />										
-				</c:if>						
-				<c:if test="${mcGeneralMonitoringDTO.currentMonitoredToolSession !='All'}"> 						 
-					<jsp:include page="/monitoring/IndividualSessionSummary.jsp" />
-				</c:if>
+					<table id="group${sessionMarkDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+					<div style="margin-top: 10px;">
+						<table id="userSummary${sessionMarkDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+					</div>
+				</div>
 				
-				<html:link href="#" onclick="javascript:submitMonitoringMethod('downloadMarks');" styleClass="button">
-					<fmt:message key="label.monitoring.downloadMarks.button" />
-				</html:link>					
+			</c:forEach>
+
+			<jsp:include page="/monitoring/Reflections.jsp" />
+				
+			<html:link href="#" onclick="javascript:submitMonitoringMethod('downloadMarks');" styleClass="button float-right">
+				<fmt:message key="label.monitoring.downloadMarks.button" />
+			</html:link>					
 		</c:if>						
 		
 		
-			<c:if test="${noSessionsNotebookEntriesExist == 'true'}"> 							
-						<jsp:include page="/monitoring/Reflections.jsp" />
-			</c:if>						
-		
-		
-		
-		
-		
+		<c:if test="${noSessionsNotebookEntriesExist == 'true'}"> 							
+			<jsp:include page="/monitoring/Reflections.jsp" />
+		</c:if>

@@ -205,11 +205,14 @@ public class McUsrAttempt implements Serializable {
      * correct If retries and passmark is on, then we only want the marks if the user has passed!
      */
     public Integer getMarkForShow(boolean allowRetries) {
-	if (isAttemptCorrect() && (!allowRetries || (allowRetries && isPassed()))) {
-	    return getMark();
-	} else {
-	    return new Integer(0);
-	}
+	//TODO check if we really allowed to return full mark
+//	if (isAttemptCorrect() && (!allowRetries || (allowRetries && isPassed()))) {
+//	    return getMark();
+//	} else {
+//	    return new Integer(0);
+//	}
+	
+	return getMark();
     }
 
 }

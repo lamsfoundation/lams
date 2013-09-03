@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.Globals;
 import org.apache.struts.action.ActionForm;
@@ -63,6 +64,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
+import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -75,28 +77,9 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * * @author Ozgur Demirtas
- * 
- * <!--Monitoring Main Action: interacts with the Monitoring module user --> <action path="/monitoring"
- * type="org.lamsfoundation.lams.tool.mc.web.McMonitoringAction" name="McMonitoringForm" scope="request"
- * input="/monitoring/MonitoringMaincontent.jsp" parameter="dispatch" unknown="false" validate="false">
- * 
- * <forward name="loadMonitoring" path="/monitoring/MonitoringMaincontent.jsp" redirect="false" />
- * 
- * <forward name="loadMonitoringEditActivity" path="/monitoring/MonitoringMaincontent.jsp" redirect="false" />
- * 
- * <forward name="refreshMonitoring" path="/monitoring/MonitoringMaincontent.jsp" redirect="false" />
- * 
- * 
- * <forward name="learnerNotebook" path="/monitoring/LearnerNotebook.jsp" redirect="false" />
- * 
- * 
- * <forward name="newQuestionBox" path="/monitoring/newQuestionBox.jsp" redirect="false" />
- * 
- * <forward name="editQuestionBox" path="/monitoring/editQuestionBox.jsp" redirect="false" /> </action>
- * 
  */
 public class McMonitoringAction extends LamsDispatchAction implements McAppConstants {
-    static Logger logger = Logger.getLogger(McMonitoringAction.class.getName());
+    private static Logger logger = Logger.getLogger(McMonitoringAction.class.getName());
 
     /**
      * main content/question content management and workflow logic
@@ -108,12 +91,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     }
 
     /**
-     * @param form
-     * @param request
-     * @param mcService
-     * @param mcGeneralMonitoringDTO
-     * @throws IOException
-     * @throws ServletException
+     * 
      */
     protected ActionForward commonSubmitSessionCode(McMonitoringForm mcMonitoringForm, HttpServletRequest request,
 	    ActionMapping mapping, IMcService mcService, McGeneralMonitoringDTO mcGeneralMonitoringDTO)
@@ -121,36 +99,13 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	repopulateRequestParameters(request, mcMonitoringForm, mcGeneralMonitoringDTO);
 
-	String currentMonitoredToolSession = request.getParameter("monitoredToolSessionId");
-
-	if (currentMonitoredToolSession == null) {
-	    // default to All
-	    currentMonitoredToolSession = "All";
-	}
-
 	String toolContentID = mcMonitoringForm.getToolContentID();
 
 	McContent mcContent = mcService.retrieveMc(new Long(toolContentID));
 
-	if (currentMonitoredToolSession.equals("All")) {
-	    // generate DTO for All sessions
-	    MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
+	// generate DTO for All sessions
+	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
 
-	    mcGeneralMonitoringDTO.setSelectionCase(new Long(2));
-	    request.setAttribute(SELECTION_CASE, new Long(2));
-	} else {
-	    McSession mcSession = mcService.getMcSessionById(new Long(currentMonitoredToolSession));
-
-	    MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
-
-	    mcGeneralMonitoringDTO.setGroupName(mcSession.getSession_name());
-	    mcGeneralMonitoringDTO.setSelectionCase(new Long(1));
-	    request.setAttribute(SELECTION_CASE, new Long(1));
-	}
-
-	request.setAttribute(CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
-
-	mcGeneralMonitoringDTO.setCurrentMonitoredToolSession(currentMonitoredToolSession);
 	mcGeneralMonitoringDTO.setSbmtSuccess(new Boolean(false).toString());
 	mcGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
 
@@ -264,14 +219,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     /**
      * 
      * submitSession
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward submitSession(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -285,14 +232,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * displayAnswers
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward displayAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -305,18 +244,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     }
 
     /**
-     * editActivityQuestions
-     * 
      * enables swiching to editable mode in the Edit Activity tab
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     * @throws ToolException
      */
     public ActionForward editActivityQuestions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, ToolException {
@@ -356,7 +284,9 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	mcGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(false).toString());
 	if (isContentInUse == true) {
 	    // monitoring url does not allow editActivity since the content is in use
-	    persistError(request, "error.content.inUse");
+	    ActionMessages errors = new ActionMessages();
+	    errors.add(Globals.ERROR_KEY, new ActionMessage("error.content.inUse"));
+	    saveErrors(request, errors);
 	    mcGeneralAuthoringDTO.setMonitoredContentInUse(new Boolean(true).toString());
 	}
 
@@ -444,28 +374,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     }
 
     /**
-     * persists error messages to request scope
-     * 
-     * @param request
-     * @param message
-     */
-    public void persistError(HttpServletRequest request, String message) {
-	ActionMessages errors = new ActionMessages();
-	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-	saveErrors(request, errors);
-    }
-
-    /**
      * 
      submits content into the tool database
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward submitAllContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -677,13 +587,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward saveSingleQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -856,16 +759,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * 
-     * @param request
-     * @param mcGeneralAuthoringDTO
-     * @param mcAuthoringForm
-     * @param sessionMap
-     * @param activeModule
-     * @param strToolContentID
-     * @param defaultContentIdStr
-     * @param mcService
-     * @param httpSessionID
-     * @param listQuestionContentDTO
      */
     protected void commonSaveCode(HttpServletRequest request, McGeneralAuthoringDTO mcGeneralAuthoringDTO,
 	    McAuthoringForm mcAuthoringForm, SessionMap<String, Object> sessionMap, String activeModule, String strToolContentID,
@@ -923,13 +816,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward addSingleQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -1056,19 +942,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     }
 
     /**
-     * newQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-     * 
      * opens up an new screen within the current page for adding a new question
-     * 
-     * newQuestionBox
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward newQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -1168,14 +1042,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * opens up an new screen within the current page for editing a question
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward newEditableQuestionBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -1308,14 +1174,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * removes a question from the questions map
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward removeQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -1428,16 +1286,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * moves a question down in the list
-     * 
-     * moveQuestionDown
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward moveQuestionDown(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -1524,13 +1372,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward moveQuestionUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -1615,14 +1456,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * moves a candidate dwn in the list
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward moveCandidateDown(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -1771,14 +1604,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     /**
      * 
      * moves a candidate up in the list
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward moveCandidateUp(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -1920,14 +1745,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * removes a candidate from the list
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward removeCandidate(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -2067,14 +1884,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     /**
      * 
      * enables adding a new candidate answer
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward newCandidateBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -2702,12 +2511,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * prepares reflection data
-     * 
-     * @param request
-     * @param mcContent
-     * @param mcService
-     * @param userID
-     * @param exportMode
      */
     public void prepareReflectionData(HttpServletRequest request, McContent mcContent, IMcService mcService,
 	    String userID, boolean exportMode) {
@@ -2773,15 +2576,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * allows viewing users reflection data
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     * @throws ToolException
      */
     public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, ToolException {
@@ -2894,12 +2688,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * returns reflection data for a specific session
-     * 
-     * @param mcContent
-     * @param userID
-     * @param mcService
-     * @param currentSessionId
-     * @return
      */
     public List getReflectionListForSession(McContent mcContent, String userID, IMcService mcService,
 	    String currentSessionId) {
@@ -2964,10 +2752,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     }
 
     /**
-     * prepareEditActivityScreenData
-     * 
-     * @param request
-     * @param mcContent
      */
     public void prepareEditActivityScreenData(HttpServletRequest request, McContent mcContent) {
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
@@ -2978,10 +2762,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     }
 
     /**
-     * 
-     * @param request
-     * @param mcMonitoringForm
-     * @param mcGeneralMonitoringDTO
      */
     protected void repopulateRequestParameters(HttpServletRequest request, McMonitoringForm mcMonitoringForm,
 	    McGeneralMonitoringDTO mcGeneralMonitoringDTO) {
@@ -2998,10 +2778,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	mcMonitoringForm.setDefineLaterInEditMode(defineLaterInEditMode);
 	mcGeneralMonitoringDTO.setDefineLaterInEditMode(defineLaterInEditMode);
 
-	String isToolSessionChanged = request.getParameter(IS_TOOL_SESSION_CHANGED);
-	mcMonitoringForm.setIsToolSessionChanged(isToolSessionChanged);
-	mcGeneralMonitoringDTO.setIsToolSessionChanged(isToolSessionChanged);
-
 	String responseId = request.getParameter(RESPONSE_ID);
 	mcMonitoringForm.setResponseId(responseId);
 	mcGeneralMonitoringDTO.setResponseId(responseId);
@@ -3013,9 +2789,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * 
-     * @param mcContent
-     * @param mcService
-     * @param request
      */
     protected void setupCommonScreenData(McContent mcContent, IMcService mcService, HttpServletRequest request) {
 	/* setting up USER_EXCEPTION_NO_TOOL_SESSIONS, from here */
@@ -3063,20 +2836,11 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * downloadMarks
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public ActionForward downloadMarks(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	MessageService messageService = getMessageService();
 
-	String currentMonitoredToolSession = request.getParameter("monitoredToolSessionId");
 	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
@@ -3087,7 +2851,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	byte[] spreadsheet = null;
 
 	try {
-	    spreadsheet = mcService.prepareSessionDataSpreadsheet(request, mcContent, currentMonitoredToolSession);
+	    spreadsheet = mcService.prepareSessionDataSpreadsheet(mcContent);
 	} catch (Exception e) {
 	    log.error("Error preparing spreadsheet: ", e);
 	    request.setAttribute("errorName", messageService.getMessage("error.monitoring.spreadsheet.download"));
@@ -3097,7 +2861,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	// construct download file response header
 	OutputStream out = response.getOutputStream();
-	String fileName = "lams_mcq_" + currentMonitoredToolSession + ".xls";
+	String fileName = "lams_mcq.xls";
 	String mineType = "application/vnd.ms-excel";
 	String header = "attachment; filename=\"" + fileName + "\";";
 	response.setContentType(mineType);
@@ -3120,20 +2884,14 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * Set Submission Deadline
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	IMcService service = McServiceProxy.getMcService(getServlet().getServletContext());
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	McContent mcContent = mcService.retrieveMc(contentID);
+	McContent mcContent = service.retrieveMc(contentID);
 
 	Long dateParameter = WebUtil.readLongParam(request, McAppConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
@@ -3146,10 +2904,51 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
 	}
 	mcContent.setSubmissionDeadline(tzSubmissionDeadline);
-	mcService.updateMc(mcContent);
+	service.updateMc(mcContent);
 
 	return null;
     }
+    
+    /**
+     * Populate user jqgrid table on summary page.
+     */
+    public ActionForward userMasterDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	
+	Long userUid = WebUtil.readLongParam(request, McAppConstants.USER_UID);
+	McQueUsr user = mcService.getMcUserByUID(userUid);
+	List<McUsrAttempt> userAttempts = mcService.getFinalizedUserAttempts(user);
+
+	if (userAttempts != null) {
+	    for (McUsrAttempt userAttempt : userAttempts) {
+		MonitoringUtil.escapeQuotes(userAttempt);
+	    }
+	}
+
+	request.setAttribute(McAppConstants.USER_ATTEMPTS, userAttempts);
+	request.setAttribute(McAppConstants.TOOL_SESSION_ID, user.getMcSession().getMcSessionId());
+	return (userAttempts == null || userAttempts.isEmpty()) ? null : mapping.findForward(McAppConstants.USER_MASTER_DETAIL);
+    }
+    
+    public ActionForward saveUserMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	if ((request.getParameter(McAppConstants.PARAM_NOT_A_NUMBER) == null)
+		&& !StringUtils.isEmpty(request.getParameter(McAppConstants.PARAM_USER_ATTEMPT_UID))) {
+	    IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	    
+	    Long userAttemptUid = WebUtil.readLongParam(request, McAppConstants.PARAM_USER_ATTEMPT_UID);
+	    Integer newGrade = Integer.valueOf(request.getParameter(McAppConstants.PARAM_GRADE));
+	    mcService.changeUserAttemptMark(userAttemptUid, newGrade);
+	}
+
+	return null;
+    }
+    
+    // *************************************************************************************
+    // Private methods
+    // *************************************************************************************
 
     /**
      * Return ResourceService bean.

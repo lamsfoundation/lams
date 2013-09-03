@@ -242,15 +242,12 @@ public interface IMcService {
     /**
      * prepareSessionDataSpreadsheet
      * 
-     * @param request
-     * @param response
      * @param mcContent
-     * @param mcService
-     * @param currentMonitoredToolSession
      * 
      * @return data to write out
      */
-    byte[] prepareSessionDataSpreadsheet(HttpServletRequest request, McContent mcContent,
-	    String currentMonitoredToolSession) throws IOException;
+    byte[] prepareSessionDataSpreadsheet(McContent mcContent) throws IOException;
+    
+    void changeUserAttemptMark(Long userAttemptUid, Integer newMark);
 
 }

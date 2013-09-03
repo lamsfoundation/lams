@@ -60,10 +60,7 @@ public class McGeneralMonitoringDTO implements Comparable {
     protected Integer countSessionComplete;
     protected String isPortfolioExport;
     protected String groupName;
-    protected String currentMonitoredToolSession;
-    protected Long selectionCase;
     protected String existsOpenMcs;
-    protected String isToolSessionChanged;
     protected String responseId;
     protected String currentUid;
     protected String displayAnswers;
@@ -73,7 +70,6 @@ public class McGeneralMonitoringDTO implements Comparable {
     protected Map summaryToolSessions;
     protected List listMonitoredAnswersContainerDto;
     protected List listUserEntries;
-    protected String selectedToolSessionId;
 
     protected String richTextOnlineInstructions;
     protected String richTextOfflineInstructions;
@@ -474,36 +470,6 @@ public class McGeneralMonitoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the selectionCase.
-     */
-    public Long getSelectionCase() {
-	return selectionCase;
-    }
-
-    /**
-     * @param selectionCase
-     *            The selectionCase to set.
-     */
-    public void setSelectionCase(Long selectionCase) {
-	this.selectionCase = selectionCase;
-    }
-
-    /**
-     * @return Returns the currentMonitoredToolSession.
-     */
-    public String getCurrentMonitoredToolSession() {
-	return currentMonitoredToolSession;
-    }
-
-    /**
-     * @param currentMonitoredToolSession
-     *            The currentMonitoredToolSession to set.
-     */
-    public void setCurrentMonitoredToolSession(String currentMonitoredToolSession) {
-	this.currentMonitoredToolSession = currentMonitoredToolSession;
-    }
-
-    /**
      * @return Returns the groupName.
      */
     public String getGroupName() {
@@ -561,21 +527,6 @@ public class McGeneralMonitoringDTO implements Comparable {
      */
     public void setExistsOpenMcs(String existsOpenMcs) {
 	this.existsOpenMcs = existsOpenMcs;
-    }
-
-    /**
-     * @return Returns the selectedToolSessionId.
-     */
-    public String getSelectedToolSessionId() {
-	return selectedToolSessionId;
-    }
-
-    /**
-     * @param selectedToolSessionId
-     *            The selectedToolSessionId to set.
-     */
-    public void setSelectedToolSessionId(String selectedToolSessionId) {
-	this.selectedToolSessionId = selectedToolSessionId;
     }
 
     /**
@@ -684,21 +635,6 @@ public class McGeneralMonitoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the isToolSessionChanged.
-     */
-    public String getIsToolSessionChanged() {
-	return isToolSessionChanged;
-    }
-
-    /**
-     * @param isToolSessionChanged
-     *            The isToolSessionChanged to set.
-     */
-    public void setIsToolSessionChanged(String isToolSessionChanged) {
-	this.isToolSessionChanged = isToolSessionChanged;
-    }
-
-    /**
      * @return Returns the responseId.
      */
     public String getResponseId() {
@@ -776,8 +712,7 @@ public class McGeneralMonitoringDTO implements Comparable {
     public String toString() {
 	return new ToStringBuilder(this).append("toolContentID: ", toolContentID)
 		.append("activeModule: ", activeModule).append("monitoredContentInUse: ", monitoredContentInUse)
-		.append("currentMonitoringTab: ", currentMonitoringTab).append("selectionCase: ", selectionCase)
-		.append("isToolSessionChanged: ", isToolSessionChanged).append("currentTab: ", currentTab)
+		.append("currentMonitoringTab: ", currentMonitoringTab).append("currentTab: ", currentTab)
 		.append("sbmtSuccess: ", sbmtSuccess).append("defineLaterInEditMode: ", defineLaterInEditMode)
 		.append("requestLearningReport: ", requestLearningReport)
 		.append("userExceptionNoToolSessions: ", userExceptionNoToolSessions)
@@ -789,10 +724,9 @@ public class McGeneralMonitoringDTO implements Comparable {
 		.append("defaultOptionContent: ", defaultOptionContent).append("countAllUsers: ", countAllUsers)
 		.append("countSessionComplete: ", countSessionComplete)
 		.append("isPortfolioExport: ", isPortfolioExport).append("summaryToolSessions: ", summaryToolSessions)
-		.append("currentMonitoredToolSession: ", currentMonitoredToolSession).append("groupName: ", groupName)
+		.append("groupName: ", groupName)
 		.append("listMonitoredAnswersContainerDto: ", listMonitoredAnswersContainerDto)
 		.append("listUserEntries: ", listUserEntries).append("existsOpenMcs: ", existsOpenMcs)
-		.append("selectedToolSessionId: ", selectedToolSessionId)
 		.append("listMcAllSessionsDTO: ", listMcAllSessionsDTO)
 		.append("richTextOnlineInstructions: ", richTextOnlineInstructions)
 		.append("richTextOfflineInstructions: ", richTextOfflineInstructions)

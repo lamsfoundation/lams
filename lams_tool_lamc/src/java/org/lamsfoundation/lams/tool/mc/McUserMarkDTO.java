@@ -124,7 +124,7 @@ public class McUserMarkDTO implements Comparable {
     public void setFullName(String fullName) {
 	this.fullName = fullName;
     }
-
+    
     public int compareTo(Object o) {
 	McUserMarkDTO mcUserMarkDTO = (McUserMarkDTO) o;
 

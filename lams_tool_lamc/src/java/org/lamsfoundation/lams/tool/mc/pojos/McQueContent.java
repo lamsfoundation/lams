@@ -68,6 +68,10 @@ public class McQueContent implements Serializable, Comparable {
     /** persistent field */
     private Set mcOptionsContents;
 
+    //DTO fields
+
+    private String escapedQuestion;
+
     public McQueContent(String question, Integer displayOrder, Integer mark, String feedback, McContent mcContent,
 	    Set mcUsrAttempts, Set mcOptionsContents) {
 	this.question = question;
@@ -244,5 +248,13 @@ public class McQueContent implements Serializable, Comparable {
      */
     public void setMark(Integer mark) {
 	this.mark = mark;
+    }
+    
+    public String getEscapedQuestion() {
+	return this.escapedQuestion;
+    }
+
+    public void setEscapedQuestion(String escapedQuestion) {
+	this.escapedQuestion = escapedQuestion;
     }
 }
