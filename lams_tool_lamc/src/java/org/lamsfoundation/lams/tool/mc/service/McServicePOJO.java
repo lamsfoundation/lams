@@ -854,7 +854,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	
 	row = sheet.createRow(rowCount++);
 	count = 2;
-	for (int questionCount = 0; questionCount < questions.size(); questionCount++) {
+	for (int questionCount = 1; questionCount <= questions.size(); questionCount++) {
 	    cell = row.createCell(count++);
 	    cell.setCellValue(messageService.getMessage("label.question") + questionCount);
 	}

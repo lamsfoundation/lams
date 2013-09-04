@@ -2,7 +2,7 @@
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="isShrinkToFit" value="${(145 + fn:length(assessment.questions)*80) < 630}"/>
 
-<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>
 <style media="screen,projection" type="text/css">
