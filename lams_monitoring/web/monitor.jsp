@@ -132,7 +132,7 @@
 					<fmt:message key="lesson.description"/>
 				</td>
 				<td>
-					<c:out value="${lesson.lessonDescription}" />
+					${lesson.lessonDescription}
 				</td>
 			</tr>
 			<tr>
