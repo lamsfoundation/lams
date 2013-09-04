@@ -90,6 +90,9 @@ public class LamsSecurityUtil {
 
 	String timestamp = new Long(System.currentTimeMillis()).toString();
 	String username = ctx.getUser().getUserName();
+	String firstName = ctx.getUser().getGivenName();
+	String lastName  = ctx.getUser().getFamilyName();
+	String email = ctx.getUser().getEmailAddress();
 	String hash = generateAuthenticationHash(timestamp, username, method, serverId);
 	String courseId = ctx.getCourse().getCourseId();
 
@@ -102,7 +105,10 @@ public class LamsSecurityUtil {
 	    url = serverAddr + "/LoginRequest?" + "&uid=" + URLEncoder.encode(username, "UTF8") + "&method=" + method
 		    + "&ts=" + timestamp + "&sid=" + serverId + "&hash=" + hash + "&courseid="
 		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + lang + "&requestSrc="
-		    + URLEncoder.encode(reqSrc, "UTF8");
+		    + URLEncoder.encode(reqSrc, "UTF8") + "&firstName=" + URLEncoder.encode(firstName, "UTF-8")
+		    + "&lastName=" + URLEncoder.encode(lastName, "UTF-8")
+		    + "&email=" + email;
+		    
 	} catch (UnsupportedEncodingException e) {
 	    throw new RuntimeException();
 	}
@@ -217,6 +223,9 @@ public class LamsSecurityUtil {
 
 	String timestamp = new Long(System.currentTimeMillis()).toString();
 	String username = ctx.getUser().getUserName();
+	String firstName = ctx.getUser().getGivenName();
+	String lastName  = ctx.getUser().getFamilyName();
+	String email = ctx.getUser().getEmailAddress();
 	String hash = generateAuthenticationHash(timestamp, username, serverId);
 	String courseId = ctx.getCourse().getCourseId();
 
@@ -230,7 +239,10 @@ public class LamsSecurityUtil {
 	    String serviceURL = serverAddr + "/services/xml/LearningDesignRepository?" + "datetime=" + timestamp
 		    + "&username=" + URLEncoder.encode(username, "utf8") + "&serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&hashValue=" + hash + "&courseId="
-		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + lang + "&mode=" + mode;
+		    + URLEncoder.encode(courseId, "UTF8") + "&country=" + country + "&lang=" + lang + "&mode=" + mode
+		    + "&firstName=" + URLEncoder.encode(firstName, "UTF-8")
+		    + "&lastName=" + URLEncoder.encode(lastName, "UTF-8")
+		    + "&email=" + email;
 
 	    URL url = new URL(serviceURL);
 	    URLConnection conn = url.openConnection();
