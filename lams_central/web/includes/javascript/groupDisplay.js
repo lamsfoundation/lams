@@ -475,7 +475,7 @@ function removeLesson(lessonID) {
 				type : "post",
 				success : function(json) {
 					if (json.removeLesson == "true") {
-						refresh();
+						loadOrgTab(null, true);
 					} else {
 						alert(json.removeLesson);
 					}

@@ -479,7 +479,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * @throws IOException
      * @throws ServletException
      */
-    public ActionForward removeLessonJson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward removeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException, ServletException {
 	JSONObject jsonObject = new JSONObject();
 	Object removeLessonResult = Boolean.TRUE.toString();
