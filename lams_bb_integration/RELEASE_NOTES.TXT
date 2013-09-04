@@ -38,8 +38,13 @@ https://bugs.lamsfoundation.org/browse/<bug reference>
 * LDEV-2897 Fixed Blackboard gradebook error (occured on Assessment tool outputs)
 * LDEV-2896 Added support for lessons created in LAMS building block version prior to 1.2. Also if there is no title or description don't display them
 
-
 1.2.1 Release Fixes
 ===================
 * LDEV-3034 Remove "External Page" warning introduced in BB (BB9.1 SP12)
+
+1.2.2 Release Fixes
+===================
+* LDEV-3102 Remove user call back URLs from Blackboard integration 
+
+
 
