@@ -56,6 +56,7 @@ import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -107,7 +108,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * 
@@ -146,11 +146,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     private ILearnerService learnerService;
 
-    private IAuditService auditService;
-
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
+    
+    private IGradebookService gradebookService;
 
     private ICoreNotebookService coreNotebookService;
 
@@ -779,8 +779,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	assessmentQuestionResultDao.saveObject(questionResult);
 
 	AssessmentResult result = questionResult.getAssessmentResult();
-	result.setGrade(result.getGrade() - oldMark + newMark);
+	float totalMark = result.getGrade() - oldMark + newMark;
+	result.setGrade(totalMark);
 	assessmentResultDao.saveObject(result);
+
+	// propagade changes to Gradebook
+	Integer userId = result.getUser().getUserId().intValue();
+	Long toolSessionId = result.getUser().getSession().getSessionId();
+	gradebookService.updateActivityMark(new Double(totalMark), null, userId, toolSessionId, true);
     }
 
     @Override
@@ -930,9 +936,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
-    public void setAuditService(IAuditService auditService) {
-	this.auditService = auditService;
-    }
 
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
@@ -1217,6 +1220,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
+    }
+    
+    public void setGradebookService(IGradebookService gradebookService) {
+	this.gradebookService = gradebookService;
     }
 
     public IUserManagementService getUserManagementService() {

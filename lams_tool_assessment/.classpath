@@ -18,5 +18,6 @@
 			<attribute name="javadoc_location" value="http://docs.jboss.org/hibernate/orm/3.3/api/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/lams_gradebook"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
