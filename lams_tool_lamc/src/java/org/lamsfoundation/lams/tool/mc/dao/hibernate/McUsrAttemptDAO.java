@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -56,6 +55,10 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	    + McUsrAttempt.class.getName()
 	    + " as attempt where attempt.mcOptionsContent.uid=? AND attempt.mcQueUsr.responseFinalised = true";
     
+    private static final String FIND_USER_TOTAL_MARK = "select SUM(attempt.mark) from "
+	    + McUsrAttempt.class.getName()
+	    + " as attempt where attempt.mcQueUsr.uid=:userUid AND attempt.mcQueUsr.responseFinalised = true";
+    
     @Override
     public McUsrAttempt getUserAttemptByUid(Long uid) {
 	return (McUsrAttempt) this.getHibernateTemplate().get(McUsrAttempt.class, uid);
@@ -67,9 +70,20 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
     }
 
     @Override
-    public List<McUsrAttempt> getUserAttempts(final Long queUserUid) {
+    public List<McUsrAttempt> getUserAttempts(final Long userUid) {
 	return (List<McUsrAttempt>) getSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
-		.setLong("queUsrUid", queUserUid.longValue()).list();
+		.setLong("queUsrUid", userUid.longValue()).list();
+    }
+    
+    @Override
+    public int getUserTotalMark(final Long userUid) {
+	List list = getSession().createQuery(FIND_USER_TOTAL_MARK).setLong("userUid", userUid.longValue()).list();
+	
+	if (list == null || list.size() == 0) {
+	    return 0;
+	}
+	    
+	return ((Number) list.get(0)).intValue();
     }
 
     @SuppressWarnings("unchecked")

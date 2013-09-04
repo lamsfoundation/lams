@@ -90,6 +90,14 @@ public interface IMcUsrAttemptDAO {
      */
     int getAttemptsCountPerOption(Long optionUid);
     
+    /**
+     * Calculate what is the total mark scored by user in this activity. Only responseFinalised is taken into account.
+     * 
+     * @param userUid
+     * @return
+     */
+    int getUserTotalMark(final Long userUid);
+    
     McUsrAttempt getUserAttemptByUid(Long uid);
 
 }
