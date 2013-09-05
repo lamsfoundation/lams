@@ -112,9 +112,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	mcGeneralMonitoringDTO.setSummaryToolSessions(populateToolSessions(mcContent));
 	mcGeneralMonitoringDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
 
-	boolean isGroupedActivity = mcService.isGroupedActivity(new Long(toolContentID));
-	request.setAttribute("isGroupedActivity", isGroupedActivity);
-
 	/* setting editable screen properties */
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
 	mcGeneralAuthoringDTO.setActivityTitle(mcContent.getTitle());
@@ -141,7 +138,8 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
-	prepareReflectionData(request, mcContent, mcService, null, false, "All");
+	List<ReflectionDTO> reflectionsContainerDTO = mcService.getReflectionList(mcContent, null);
+	request.setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
 
 	if (mcService.studentActivityOccurredGlobal(mcContent)) {
 	    // USER_EXCEPTION_NO_TOOL_SESSIONS is set to false
@@ -168,10 +166,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	}
 	request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
 
-	/* find out if there are any reflection entries, from here */
-	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(mcService, mcContent);
-
-	if (notebookEntriesExist) {
+	if (!reflectionsContainerDTO.isEmpty()) {
 	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
 
 	    String userExceptionNoToolSessions = (String) mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
@@ -186,8 +181,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	/* ... till here */
 
 	MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
-
-	MonitoringUtil.setupAllSessionsData(request, mcContent, mcService);
 
 	return (mapping.findForward(LOAD_MONITORING_CONTENT));
 
@@ -2510,71 +2503,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     }
 
     /**
-     * prepares reflection data
-     */
-    public void prepareReflectionData(HttpServletRequest request, McContent mcContent, IMcService mcService,
-	    String userID, boolean exportMode) {
-	List reflectionsContainerDTO = new LinkedList();
-
-	if (userID == null) {
-	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) {
-		McSession mcSession = (McSession) sessionIter.next();
-		for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) {
-		    McQueUsr user = (McQueUsr) userIter.next();
-
-		    NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
-			    CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
-				    .toString()));
-
-		    if (notebookEntry != null) {
-			ReflectionDTO reflectionDTO = new ReflectionDTO();
-			reflectionDTO.setUserId(user.getQueUsrId().toString());
-			reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
-			reflectionDTO.setUserName(user.getUsername());
-			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-			reflectionDTO.setEntry(notebookEntryPresentable);
-			reflectionsContainerDTO.add(reflectionDTO);
-		    }
-
-		}
-	    }
-	} else {
-	    // single user mode
-	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) {
-		McSession mcSession = (McSession) sessionIter.next();
-		for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) {
-		    McQueUsr user = (McQueUsr) userIter.next();
-		    if (user.getQueUsrId().toString().equals(userID)) {
-			NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
-				CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
-					.toString()));
-
-			if (notebookEntry != null) {
-			    ReflectionDTO reflectionDTO = new ReflectionDTO();
-			    reflectionDTO.setUserId(user.getQueUsrId().toString());
-			    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
-			    reflectionDTO.setUserName(user.getUsername());
-			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			    String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-			    reflectionDTO.setEntry(notebookEntryPresentable);
-			    reflectionsContainerDTO.add(reflectionDTO);
-			}
-
-		    }
-		}
-	    }
-
-	}
-
-	request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
-
-	if (exportMode) {
-	    request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
-	}
-    }
-
-    /**
      * allows viewing users reflection data
      */
     public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -2597,158 +2525,6 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	request.setAttribute(MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 
 	return mapping.findForward(LEARNER_NOTEBOOK);
-    }
-
-    /**
-     * 
-     * @param request
-     * @param mcContent
-     * @param mcService
-     * @param userID
-     * @param exportMode
-     * @param currentSessionId
-     */
-    public void prepareReflectionData(HttpServletRequest request, McContent mcContent, IMcService mcService,
-	    String userID, boolean exportMode, String currentSessionId) {
-
-	List reflectionsContainerDTO = new LinkedList();
-
-	reflectionsContainerDTO = getReflectionList(mcContent, userID, mcService);
-
-	request.setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
-
-	if (exportMode) {
-	    request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
-	}
-    }
-
-    /**
-     * 
-     * returns reflection data for all sessions
-     * 
-     * @param mcContent
-     * @param userID
-     * @param mcService
-     * @return
-     */
-    public List getReflectionList(McContent mcContent, String userID, IMcService mcService) {
-	List reflectionsContainerDTO = new LinkedList();
-	if (userID == null) {
-	    // all users mode
-	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) {
-		McSession mcSession = (McSession) sessionIter.next();
-
-		for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) {
-		    McQueUsr user = (McQueUsr) userIter.next();
-
-		    NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
-			    CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
-				    .toString()));
-
-		    if (notebookEntry != null) {
-			ReflectionDTO reflectionDTO = new ReflectionDTO();
-			reflectionDTO.setUserId(user.getQueUsrId().toString());
-			reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
-			reflectionDTO.setUserName(user.getFullname());
-			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-			reflectionDTO.setEntry(notebookEntryPresentable);
-			reflectionsContainerDTO.add(reflectionDTO);
-		    }
-		}
-	    }
-	} else {
-	    // single user mode
-	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) {
-		McSession mcSession = (McSession) sessionIter.next();
-		for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) {
-		    McQueUsr user = (McQueUsr) userIter.next();
-		    if (user.getQueUsrId().toString().equals(userID)) {
-			NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
-				CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
-					.toString()));
-
-			if (notebookEntry != null) {
-			    ReflectionDTO reflectionDTO = new ReflectionDTO();
-			    reflectionDTO.setUserId(user.getQueUsrId().toString());
-			    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
-			    reflectionDTO.setUserName(user.getFullname());
-			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			    String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-			    reflectionDTO.setEntry(notebookEntryPresentable);
-			    reflectionsContainerDTO.add(reflectionDTO);
-			}
-		    }
-		}
-	    }
-	}
-
-	return reflectionsContainerDTO;
-    }
-
-    /**
-     * returns reflection data for a specific session
-     */
-    public List getReflectionListForSession(McContent mcContent, String userID, IMcService mcService,
-	    String currentSessionId) {
-	List reflectionsContainerDTO = new LinkedList();
-	if (userID == null) {
-	    // all users mode
-	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) {
-		McSession mcSession = (McSession) sessionIter.next();
-
-		if (currentSessionId.equals(mcSession.getMcSessionId())) {
-
-		    for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) {
-			McQueUsr user = (McQueUsr) userIter.next();
-
-			NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
-				CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
-					.toString()));
-
-			if (notebookEntry != null) {
-			    ReflectionDTO reflectionDTO = new ReflectionDTO();
-			    reflectionDTO.setUserId(user.getQueUsrId().toString());
-			    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
-			    reflectionDTO.setUserName(user.getFullname());
-			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			    String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-			    reflectionDTO.setEntry(notebookEntryPresentable);
-			    reflectionsContainerDTO.add(reflectionDTO);
-			}
-		    }
-		}
-	    }
-	} else {
-	    // single user mode
-	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) {
-		McSession mcSession = (McSession) sessionIter.next();
-
-		if (currentSessionId.equals(mcSession.getMcSessionId())) {
-		    for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) {
-			McQueUsr user = (McQueUsr) userIter.next();
-			if (user.getQueUsrId().toString().equals(userID)) {
-			    NotebookEntry notebookEntry = mcService.getEntry(mcSession.getMcSessionId(),
-				    CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
-					    .toString()));
-			    if (notebookEntry != null) {
-				ReflectionDTO reflectionDTO = new ReflectionDTO();
-				reflectionDTO.setUserId(user.getQueUsrId().toString());
-				reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
-				reflectionDTO.setUserName(user.getFullname());
-				reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-				String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-				reflectionDTO.setEntry(notebookEntryPresentable);
-				reflectionsContainerDTO.add(reflectionDTO);
-			    }
-			}
-		    }
-
-		}
-	    }
-	}
-
-	return reflectionsContainerDTO;
     }
 
     /**

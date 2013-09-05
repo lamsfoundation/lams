@@ -75,7 +75,7 @@ public interface IMcUsrAttemptDAO {
      * @param queUserUid
      * @return
      */
-    List<McUsrAttempt> getUserAttempts(Long queUserUid);
+    List<McUsrAttempt> getFinalizedUserAttempts(Long queUserUid);
 
     /**
      * Get the highest attempt order for a user for a particular question

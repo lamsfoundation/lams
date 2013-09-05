@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -70,6 +71,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
@@ -86,8 +88,10 @@ import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
+import org.lamsfoundation.lams.tool.mc.McStringComparator;
 import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.McUtils;
+import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcOptionsContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
@@ -466,12 +470,109 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
 	return learnerAnswersDTOList;
     }
+    
+    @Override
+    public List<McSessionMarkDTO> buildGroupsMarkData(McContent mcContent, boolean isFullAttemptDetailsRequired) {
+	List<McSessionMarkDTO> listMonitoredMarksContainerDTO = new LinkedList<McSessionMarkDTO>();
+	Set<McSession> sessions = mcContent.getMcSessions();
+	Iterator<McSession> sessionsIterator = sessions.iterator();
+	int numQuestions = mcContent.getMcQueContents().size();
+
+	while (sessionsIterator.hasNext()) {
+	    McSession mcSession = sessionsIterator.next();
+
+	    McSessionMarkDTO mcSessionMarkDTO = new McSessionMarkDTO();
+	    mcSessionMarkDTO.setSessionId(mcSession.getMcSessionId().toString());
+	    mcSessionMarkDTO.setSessionName(mcSession.getSession_name().toString());
+
+	    Set<McQueUsr> sessionUsers = mcSession.getMcQueUsers();
+	    Iterator<McQueUsr> usersIterator = sessionUsers.iterator();
+
+	    Map<String, McUserMarkDTO> mapSessionUsersData = new TreeMap<String, McUserMarkDTO>(new McStringComparator());
+	    Long mapIndex = new Long(1);
+
+	    while (usersIterator.hasNext()) {
+		McQueUsr user = usersIterator.next();
+
+		McUserMarkDTO mcUserMarkDTO = new McUserMarkDTO();
+		mcUserMarkDTO.setSessionId(mcSession.getMcSessionId().toString());
+		mcUserMarkDTO.setSessionName(mcSession.getSession_name().toString());
+		mcUserMarkDTO.setFullName(user.getFullname());
+		mcUserMarkDTO.setUserName(user.getUsername());
+		mcUserMarkDTO.setQueUsrId(user.getUid().toString());
+
+		if (isFullAttemptDetailsRequired) {
+
+		    // The marks for the user must be listed in the display order of the question.
+		    // Other parts of the code assume that the questions will be in consecutive display
+		    // order starting 1 (e.g. 1, 2, 3, not 1, 3, 4) so we set up an array and use
+		    // the ( display order - 1) as the index (arrays start at 0, rather than 1 hence -1)
+		    // The user must answer all questions, so we can assume that they will have marks
+		    // for all questions or no questions.
+		    // At present there can only be one answer for each question but there may be more
+		    // than one in the future and if so, we don't want to count the mark twice hence
+		    // we need to check if we've already processed this question in the total.
+		    Integer[] userMarks = new Integer[numQuestions];
+		    String[] answeredOptions = new String[numQuestions];
+		    Date attemptTime = null;
+		    List<McUsrAttempt> finalizedUserAttempts = this.getFinalizedUserAttempts(user);
+		    long totalMark = 0;
+		    for (McUsrAttempt attempt : finalizedUserAttempts) {
+			Integer displayOrder = attempt.getMcQueContent().getDisplayOrder();
+			int arrayIndex = displayOrder != null && displayOrder.intValue() > 0 ? displayOrder.intValue() - 1
+				: 1;
+			if (userMarks[arrayIndex] == null) {
+
+			    // We get the mark for the attempt if the answer is correct and we don't allow
+			    // retries, or if the answer is correct and the learner has met the passmark if
+			    // we do allow retries.
+			    boolean isRetries = mcSession.getMcContent().isRetries();
+			    Integer mark = attempt.getMarkForShow(isRetries);
+			    userMarks[arrayIndex] = mark;
+			    totalMark += mark.intValue();
+
+			    // find out the answered option's sequential letter - A,B,C...
+			    String answeredOptionLetter = "";
+			    int optionCount = 1;
+			    for (McOptsContent option : (Set<McOptsContent>) attempt.getMcQueContent()
+				    .getMcOptionsContents()) {
+				if (attempt.getMcOptionsContent().getUid().equals(option.getUid())) {
+				    answeredOptionLetter = String.valueOf((char) (optionCount + 'A' - 1));
+				    break;
+				}
+				optionCount++;
+			    }
+			    answeredOptions[arrayIndex] = answeredOptionLetter;
+			}
+			// get the attempt time, (NB all questions will have the same attempt time)
+			// Not efficient, since we assign this value for each attempt
+			attemptTime = attempt.getAttemptTime();
+		    }
+
+		    mcUserMarkDTO.setMarks(userMarks);
+		    mcUserMarkDTO.setAnsweredOptions(answeredOptions);
+		    mcUserMarkDTO.setAttemptTime(attemptTime);
+		    mcUserMarkDTO.setTotalMark(new Long(totalMark));
+
+		} else {
+		    int totalMark = mcUsrAttemptDAO.getUserTotalMark(user.getUid());
+		    mcUserMarkDTO.setTotalMark(new Long(totalMark));
+		}
+
+		mapSessionUsersData.put(mapIndex.toString(), mcUserMarkDTO);
+		mapIndex = new Long(mapIndex.longValue() + 1);
+	    }
+
+	    mcSessionMarkDTO.setUserMarks(mapSessionUsersData);
+	    listMonitoredMarksContainerDTO.add(mcSessionMarkDTO);
+	}
+
+	return listMonitoredMarksContainerDTO;
+    }
 
     public List<McUsrAttempt> getFinalizedUserAttempts(final McQueUsr user) throws McApplicationException {
 	try {
-	    List<McUsrAttempt> finalizedUserAttempts = (user.isResponseFinalised()) ? mcUsrAttemptDAO
-		    .getUserAttempts(user.getUid()) : new LinkedList<McUsrAttempt>();
-	    return finalizedUserAttempts;
+	    return mcUsrAttemptDAO.getFinalizedUserAttempts(user.getUid());
 	} catch (DataAccessException e) {
 	    throw new McApplicationException(
 		    "Exception occured when lams is getting the learner's attempts by user id and que content id and attempt order: "
@@ -797,7 +898,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	    totalNumberOfUsers += session.getMcQueUsers().size();
 	}
 	
-	List<McSessionMarkDTO> sessionMarkDTOs = MonitoringUtil.buildGroupsMarkData(mcContent, this);
+	List<McSessionMarkDTO> sessionMarkDTOs = this.buildGroupsMarkData(mcContent, true);
 	
 	// create an empty excel file
 	HSSFWorkbook wb = new HSSFWorkbook();
@@ -938,7 +1039,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		}
 		
 		cell = row.createCell(count++);
-		cell.setCellValue(userMark.getTotalMark());
+		cell.setCellValue(new Long(userMark.getTotalMark()));
 
 		int totalPercents = numberOfCorrectlyAnsweredByUser * 100 / questions.size(); 
 		totalPercentList.add(totalPercents);
@@ -2038,6 +2139,60 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	toolContentObj.getMcQueContents().add(question);
 	question.setMcContent(toolContentObj);
 	question.setMcContentId(toolContentObj.getUid());
+    }
+    
+    @Override
+    public List<ReflectionDTO> getReflectionList(McContent mcContent, Long userID) {
+	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<ReflectionDTO>();
+	if (userID == null) {
+	    // all users mode
+	    for (McSession mcSession : (Set<McSession>)mcContent.getMcSessions()) {
+
+		for (McQueUsr user : (Set<McQueUsr>)mcSession.getMcQueUsers()) {
+
+		    NotebookEntry notebookEntry = this.getEntry(mcSession.getMcSessionId(),
+			    CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
+				    .toString()));
+
+		    if (notebookEntry != null) {
+			ReflectionDTO reflectionDTO = new ReflectionDTO();
+			reflectionDTO.setUserId(user.getQueUsrId().toString());
+			reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
+			reflectionDTO.setUserName(user.getFullname());
+			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
+			String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+			reflectionDTO.setEntry(notebookEntryPresentable);
+			reflectionsContainerDTO.add(reflectionDTO);
+		    }
+		}
+	    }
+	} else {
+	    // single user mode
+	    for (Iterator sessionIter = mcContent.getMcSessions().iterator(); sessionIter.hasNext();) {
+		McSession mcSession = (McSession) sessionIter.next();
+		for (Iterator userIter = mcSession.getMcQueUsers().iterator(); userIter.hasNext();) {
+		    McQueUsr user = (McQueUsr) userIter.next();
+		    if (user.getQueUsrId().equals(userID)) {
+			NotebookEntry notebookEntry = this.getEntry(mcSession.getMcSessionId(),
+				CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(user.getQueUsrId()
+					.toString()));
+
+			if (notebookEntry != null) {
+			    ReflectionDTO reflectionDTO = new ReflectionDTO();
+			    reflectionDTO.setUserId(user.getQueUsrId().toString());
+			    reflectionDTO.setSessionId(mcSession.getMcSessionId().toString());
+			    reflectionDTO.setUserName(user.getFullname());
+			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
+			    String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
+			    reflectionDTO.setEntry(notebookEntryPresentable);
+			    reflectionsContainerDTO.add(reflectionDTO);
+			}
+		    }
+		}
+	    }
+	}
+
+	return reflectionsContainerDTO;
     }
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */

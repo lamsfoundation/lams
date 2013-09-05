@@ -39,6 +39,9 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
+import org.lamsfoundation.lams.tool.mc.McMonitoredAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
+import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
@@ -135,16 +138,16 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
 
 	if (learner != null) {
-	    McMonitoringAction mcMonitoringAction = new McMonitoringAction();
 	    List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionDataForExportLearner(content,
 		    mcService, mcSession, learner);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 
 	    request.getSession().setAttribute(LEARNER_MARK, learner.getLastAttemptTotalMark());
 	    request.getSession().setAttribute(LEARNER_NAME, learner.getFullname());
-
 	    request.getSession().setAttribute(PASSMARK, content.getPassMark().toString());
-	    mcMonitoringAction.prepareReflectionData(request, content, mcService, userID.toString(), true);
+	    
+	    List<ReflectionDTO> reflectionsContainerDTO = mcService.getReflectionList(content, userID);
+	    request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
 	}
 
     }
@@ -177,18 +180,17 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 	    throw new McApplicationException(error);
 	}
 
-	McMonitoringAction mcMonitoringAction = new McMonitoringAction();
-
-	List listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(content, mcService);
+	List<McMonitoredAnswersDTO> listMonitoredAnswersContainerDTO = MonitoringUtil.buildGroupsQuestionData(content, mcService);
 	request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 
-	List listMonitoredMarksContainerDTO = MonitoringUtil.buildGroupsMarkData(content, mcService);
+	List<McSessionMarkDTO> listMonitoredMarksContainerDTO = mcService.buildGroupsMarkData(content, true);
 	request.getSession().setAttribute(LIST_MONITORED_MARKS_CONTAINER_DTO, listMonitoredMarksContainerDTO);
 
 	request.getSession().setAttribute(PASSMARK, content.getPassMark().toString());
 	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
 
-	mcMonitoringAction.prepareReflectionData(request, content, mcService, null, true);
+	List<ReflectionDTO> reflectionsContainerDTO = mcService.getReflectionList(content, userID);
+	request.getSession().setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
 
 	writeOutSessionData(request, response, content, mcService, directoryName);
     }

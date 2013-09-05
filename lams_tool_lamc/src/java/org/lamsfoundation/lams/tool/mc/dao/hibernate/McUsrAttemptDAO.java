@@ -44,18 +44,18 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
  */
 public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemptDAO {
 
-    private static final String LOAD_PARTICULAR_QUESTION_ATTEMPT = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueUsr.uid=:queUsrUid"
-	    + " and mcUsrAttempt.mcQueContentId=:mcQueContentId"
-	    + " order by mcUsrAttempt.mcOptionsContent.uid";
+    private static final String LOAD_PARTICULAR_QUESTION_ATTEMPT = "from attempt in class McUsrAttempt where attempt.mcQueUsr.uid=:queUsrUid"
+	    + " and attempt.mcQueContentId=:mcQueContentId"
+	    + " order by attempt.mcOptionsContent.uid";
 
-    private static final String LOAD_ALL_QUESTION_ATTEMPTS = "from mcUsrAttempt in class McUsrAttempt where mcUsrAttempt.mcQueUsr.uid=:queUsrUid"
-	    + " order by mcUsrAttempt.mcQueContentId, mcUsrAttempt.mcOptionsContent.uid";
+    private static final String LOAD_ALL_QUESTION_ATTEMPTS = "from attempt in class McUsrAttempt where attempt.mcQueUsr.uid=:queUsrUid"
+	    + " AND attempt.mcQueUsr.responseFinalised = true order by attempt.mcQueContentId, attempt.mcOptionsContent.uid";
     
     private static final String FIND_ATTEMPTS_COUNT_BY_OPTION = "select count(*) from "
 	    + McUsrAttempt.class.getName()
 	    + " as attempt where attempt.mcOptionsContent.uid=? AND attempt.mcQueUsr.responseFinalised = true";
     
-    private static final String FIND_USER_TOTAL_MARK = "select SUM(attempt.mark) from "
+    private static final String FIND_USER_TOTAL_MARK = "select COALESCE(SUM(attempt.mark),0) from "
 	    + McUsrAttempt.class.getName()
 	    + " as attempt where attempt.mcQueUsr.uid=:userUid AND attempt.mcQueUsr.responseFinalised = true";
     
@@ -70,7 +70,7 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
     }
 
     @Override
-    public List<McUsrAttempt> getUserAttempts(final Long userUid) {
+    public List<McUsrAttempt> getFinalizedUserAttempts(final Long userUid) {
 	return (List<McUsrAttempt>) getSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
 		.setLong("queUsrUid", userUid.longValue()).list();
     }

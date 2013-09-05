@@ -41,6 +41,8 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McCandidateAnswersDTO;
 import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
+import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -240,6 +242,17 @@ public interface IMcService {
     List<McLearnerAnswersDTO> buildLearnerAnswersDTOList(McContent mcContent, McQueUsr user);
     
     /**
+     * Returns userMarksDtos grouped by sessions.
+     * 
+     * @param mcContent
+     * @param isFullAttemptDetailsRequired
+     *            if true populates complete user attempt history including option select history, used only for export
+     *            and spreadsheet. If not only total mark calculated
+     * @return
+     */
+    List<McSessionMarkDTO> buildGroupsMarkData(McContent mcContent, boolean isFullAttemptDetailsRequired);
+    
+    /**
      * prepareSessionDataSpreadsheet
      * 
      * @param mcContent
@@ -249,5 +262,16 @@ public interface IMcService {
     byte[] prepareSessionDataSpreadsheet(McContent mcContent) throws IOException;
     
     void changeUserAttemptMark(Long userAttemptUid, Integer newMark);
+    
+    /**
+     * 
+     * returns reflection data for all sessions
+     * 
+     * @param mcContent
+     * @param userID
+     * @param mcService
+     * @return
+     */
+    List<ReflectionDTO> getReflectionList(McContent mcContent, Long userID);
 
 }

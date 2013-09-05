@@ -131,46 +131,21 @@
 	</c:choose>
 </table>
 
-		<c:if test="${mcGeneralMonitoringDTO.userExceptionNoToolSessions != 'true'}"> 	
-				
-			<table class="forms">
-					
-		  	 	<c:set var="queIndex" scope="request" value="0"/>
-				<c:forEach var="currentDto" items="${listMonitoredAnswersContainerDto}">
-					<c:set var="queIndex" scope="request" value="${queIndex +1}"/>
-			  	 		<c:set var="currentQuestionId" scope="request" value="${currentDto.questionUid}"/>
+	<c:choose>
+		<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'true'}">
+			<p>
+				<fmt:message key="label.monitoring.yesDisplayAnswers"/>
+			</p>
+		</c:when>
+		<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'false'}">
+			<p>
+				<fmt:message key="label.monitoring.noDisplayAnswers1"/><br>
+				<quote>
+				<fmt:message key="label.monitoring.noDisplayAnswers2"/>
+				<input onclick="javascript:submitChangeDisplayAnswers(this.value, 'displayAnswers');" class="button" name="displayAnswers" class="button" value="<fmt:message key='button.monitoring.noDisplayAnswers'/>" type="button">	
+				</quote>
+			</p>
+		</c:when>
+	</c:choose>
 
-						<tr>			
-							<td NOWRAP valign=top class="align-left"><b>  <fmt:message key="label.question.only"/> <c:out value="${queIndex}"/>:</b>
-								<c:out value="${currentDto.question}" escapeXml="false"/> &nbsp (<fmt:message key="label.mark"/> <c:out value="${currentDto.mark}"/> )
-							 </td>
-						</tr>	
-						<tr>					
-							<td NOWRAP valign=top class="align-left">  <b> <fmt:message key="label.mc.options.col"/>  </b> 
-								<table class="align-left">
-									<c:forEach var="answersData" items="${currentDto.candidateAnswersCorrect}">
-										<tr>			
-											<td NOWRAP valign=top class="align-left">
-												&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-												<c:out value="${answersData.candidateAnswer}" escapeXml="false"/> 
-												
-												<c:if test="${answersData.correct == 'true'}"> 		
-													&nbsp (<fmt:message key="label.correct"/>)
-												</c:if>																		
-											</td>	
-										</tr>
-									</c:forEach>		  	
-								</table>
-							</td>  
-						</tr>			
-
-				</c:forEach>		  	
-
-		  	 	<tr>
-		  	 		<td NOWRAP valign=top class="align-left"> <b> 
-		  	 			<fmt:message key="label.passingMark"/>: </b> <c:out value="${passMark}"/> 
-		  	 		</td>
-		  	 	</tr>
-			</table>
-		</c:if>
 </div>
