@@ -1120,7 +1120,7 @@ function openLiveEdit(){
 					alert(response);
 				} else {
 					openPopUp(LAMS_URL + 'home.do?method=author&layout=editonfly&learningDesignID=' + ldId,
-							'LiveEdit', 600, 800, false);
+							'LiveEdit', 768, 1024, false);
 					window.parent.closeMonitorLessonDialog();
 				}
 			}
