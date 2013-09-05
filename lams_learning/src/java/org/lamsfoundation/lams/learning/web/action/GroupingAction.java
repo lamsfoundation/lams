@@ -25,6 +25,8 @@
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -49,6 +51,8 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.util.FirstNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -241,6 +245,7 @@ public class GroupingAction extends LamsDispatchAction {
      * 
      * @param request
      */
+    @SuppressWarnings("unchecked")
     private void prepareGroupData(HttpServletRequest request) {
 
 	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
@@ -252,6 +257,15 @@ public class GroupingAction extends LamsDispatchAction {
 	if (grouping != null) {
 	    groups.addAll(grouping.getGroups());
 	}
+
+	// sort users with first, then last name, then login
+	Comparator<User> userComparator = new FirstNameAlphabeticComparator();
+	for (Group group : groups) {
+	    Set<User> sortedUsers = new TreeSet<User>(userComparator);
+	    sortedUsers.addAll(group.getUsers());
+	    group.setUsers(sortedUsers);
+	}
+
 	request.setAttribute(GroupingAction.GROUPS, groups);
 	request.setAttribute(GroupingAction.TITLE, activity.getTitle());
 	request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId());
