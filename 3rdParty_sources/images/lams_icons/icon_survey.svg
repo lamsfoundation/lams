@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="-819.2" x2="819.2" spreadMethod="pad" gradientTransform="matrix(0.0051422119140625 0.01580810546875 -0.0128173828125 0.0041656494140625 14.55 14.75)" id="gradient0">
+      <stop offset="0.4980392156862745" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E1E1E1"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <path stroke="none" fill="#010101" fill-opacity="0" d="M30 30.05 L0 30.05 0 0.05 30 0.05 30 30.05"/>
+    <path stroke="none" fill="#CCCCCC" d="M19.9 2 L26.65 22.8 26.7 22.9 26.6 22.95 10.25 28.25 3.45 7.35 19.9 2"/>
+    <path stroke="none" fill="#CCCCCC" fill-opacity="0.24705882352941178" d="M20.15 1.95 L20.3 1.9 27.05 22.7 27.05 23.1 26.75 23.35 10.4 28.65 10.35 28.5 26.7 23.2 26.9 23 26.9 22.75 20.15 1.95"/>
+    <path stroke="none" fill="#CCCCCC" fill-opacity="0.4980392156862745" d="M20.15 1.95 L26.9 22.75 26.9 23 26.7 23.2 10.35 28.5 10.3 28.4 26.65 23.1 26.75 22.95 26.8 22.75 20.05 1.95 20.15 1.95"/>
+    <path stroke="none" fill="#CCCCCC" fill-opacity="0.7490196078431373" d="M19.9 2 L20.05 1.95 26.8 22.75 26.75 22.95 26.65 23.1 10.3 28.4 10.25 28.25 26.6 22.95 26.7 22.9 26.65 22.8 19.9 2"/>
+    <path stroke="none" fill="url(#gradient0)" d="M19.5 1.5 L26.35 22.55 9.7 28 2.85 6.95 19.5 1.5"/>
+    <path stroke="none" fill="#E5E5E5" d="M6.85 8.5 L4.55 8.6 3.95 6.75 18.15 2.1 18.75 3.95 Q18.85 4.3 16.9 5.25 14.9 6.2 11.9 7.15 L6.85 8.5"/>
+    <path stroke="none" fill="#D1E3A4" d="M17.85 3.4 Q17.6 3.85 17.15 4 L5.8 7.45 4.85 7.35 4.3 6.5 Q4.2 5.95 4.45 5.5 4.65 5 5.15 4.85 L16.55 1.4 17.45 1.55 18 2.35 17.85 3.4"/>
+    <path fill="none" stroke="#BFBFBF" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round" d="M19.4 1.5 L26.25 22.55 9.6 28 2.8 7"/>
+    <path fill="none" stroke="#CCCCCC" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round" d="M2.8 7 L19.4 1.5"/>
+    <path fill="none" stroke="#CCE393" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round" d="M17.85 3.4 L18 2.35 17.45 1.55 16.55 1.4 5.15 4.85 Q4.65 5 4.45 5.5 4.2 5.95 4.3 6.5 L4.85 7.35 5.8 7.45 17.15 4 Q17.6 3.85 17.85 3.4"/>
+    <path fill="none" stroke="#FFFFFF" stroke-width="0.5" stroke-opacity="0.7019607843137254" stroke-linecap="round" stroke-linejoin="round" d="M5.2 5.6 L16.8 2.05"/>
+    <path fill="none" stroke="#CCCCCC" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round" d="M7.45 12.4 L18.55 8.75 M10.15 20.8 L21.25 17.2 M8.85 16.4 L13.9 14.75 14.55 14.5 19.9 12.8"/>
+    <path fill="none" stroke="#999999" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" d="M15 16.7 L21.95 19.4 Q22.5 11 27.2 5.9"/>
+    <path fill="none" stroke="#7DB9DF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" d="M14.35 15 L21.25 17.8 Q22.05 9.6 26.6 4.6"/>
+    <path fill="none" stroke="#FFFFFF" stroke-width="0.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round" d="M13.7 13.65 Q16.5 13.8 20.15 16.05 20.3 13.5 22.3 8.95 24.3 4.35 26.85 2.45"/>
+  </g>
+</svg>

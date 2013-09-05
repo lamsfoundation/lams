@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="-819.2" x2="819.2" spreadMethod="pad" gradientTransform="matrix(0.00177001953125 -0.0150909423828125 0.0056915283203125 0.0006866455078125 10.9 13.95)" id="gradient0">
+      <stop offset="0.3686274509803922" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#A4C0EC"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="-819.2" x2="819.2" spreadMethod="pad" gradientTransform="matrix(0.008544921875 0.0009765625 -0.00048828125 0.0043182373046875 10.55 16.55)" id="gradient1">
+      <stop offset="0" stop-color="#BBD87B"/>
+      <stop offset="0.5254901960784314" stop-color="#86B523"/>
+      <stop offset="1" stop-color="#D2E79F"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <path stroke="none" fill="#B3B3B3" d="M25.2 9.3 L25.3 9.75 23.1 28.8 22.95 29.25 22.55 29.4 2.7 27.15 2.4 26.9 2.3 26.45 4.5 7.35 4.7 6.95 5.05 6.8 24.9 9.05 25.2 9.3"/>
+    <path stroke="none" fill="#EAEAEA" d="M22.7 28.85 L2.8 26.55 5 7.15 24.85 9.45 22.7 28.85"/>
+    <path stroke="none" fill="#B3B3B3" d="M22.9 5.65 L23 6.15 20.8 25.2 20.65 25.65 20.3 25.8 0.4 23.5 0.1 23.25 0 22.85 2.2 3.75 2.4 3.3 Q2.55 3.15 2.75 3.15 L22.6 5.45 22.9 5.65"/>
+    <path stroke="none" fill="#FFFFFF" d="M19.95 24.75 L0.3 22.5 2.5 3.45 22.1 5.7 19.95 24.75"/>
+    <path stroke="none" fill="url(#gradient0)" d="M17.15 20.55 L3.35 19 4.7 7.35 18.5 8.9 17.15 20.55"/>
+    <path stroke="none" fill="url(#gradient1)" d="M13.6 15.35 Q15.65 13.65 16.5 13.6 17.25 13.65 17.85 14.65 L17.2 20.65 3.35 19.05 3.65 16.25 4.8 15.45 Q7.05 14.25 8.5 15.7 L9.85 16.95 10.9 17.25 Q11.35 17.15 12 16.65 L13.6 15.35"/>
+    <path stroke="none" fill="#BBBBBB" d="M6.4 1.35 Q6.45 0.9 7.05 0.45 7.75 0 8.55 0 9.3 0 9.75 0.45 10.3 0.9 10.3 1.45 L9.6 8.65 8.8 9.5 7.5 9.95 6.1 9.5 Q5.6 9.15 5.65 8.65 L6.4 1.35"/>
+    <path stroke="none" fill="#010101" fill-opacity="0" d="M30 30.05 L0 30.05 0 0.05 30 0.05 30 30.05"/>
+    <path fill="none" stroke="#FFFFFF" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round" d="M8.15 1.45 L7.55 8.45"/>
+  </g>
+</svg>

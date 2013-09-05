@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="-819.2" x2="819.2" spreadMethod="pad" gradientTransform="matrix(0.0055084228515625 0.0169830322265625 -0.0137481689453125 0.004486083984375 12.6 14.25)" id="gradient0">
+      <stop offset="0.4980392156862745" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E1E1E1"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <path stroke="none" fill="#CCCCCC" d="M18.4 0.45 L25.65 22.8 25.65 22.9 25.6 23 8.05 28.7 0.75 6.2 18.4 0.45"/>
+    <path stroke="none" fill="#CCCCCC" fill-opacity="0.24705882352941178" d="M8.15 28.95 L25.7 23.25 25.9 23.05 25.95 22.7 18.7 0.35 18.8 0.3 26.05 22.65 26.05 23.1 25.75 23.4 8.2 29.1 8.15 28.95"/>
+    <path stroke="none" fill="#CCCCCC" fill-opacity="0.4980392156862745" d="M8.15 28.95 L8.1 28.8 25.65 23.1 25.75 23 25.8 22.75 18.55 0.4 18.7 0.35 25.95 22.7 25.9 23.05 25.7 23.25 8.15 28.95"/>
+    <path stroke="none" fill="#CCCCCC" fill-opacity="0.7490196078431373" d="M18.55 0.4 L25.8 22.75 25.75 23 25.65 23.1 8.1 28.8 8.05 28.7 25.6 23 25.65 22.9 25.65 22.8 18.4 0.45 18.55 0.4"/>
+    <path stroke="none" fill="url(#gradient0)" d="M17.85 0.05 L25.2 22.7 7.35 28.5 0 5.9 17.85 0.05"/>
+    <path stroke="none" fill="#A39DDB" d="M5.55 12.85 Q5.75 12.4 6.35 12.25 L7.25 12.3 7.9 13.05 7.85 14.05 7.1 14.65 6.1 14.6 Q5.65 14.35 5.5 13.85 5.3 13.35 5.55 12.85"/>
+    <path stroke="none" fill="#0299FD" d="M6.55 10.5 L5.8 11.2 4.9 11.05 4.25 10.4 Q4.1 9.9 4.3 9.45 4.55 8.95 5.05 8.85 L6 8.9 6.6 9.6 Q6.75 10.05 6.55 10.5"/>
+    <path stroke="none" fill="#9DC444" d="M6.7 17.8 Q6.55 17.3 6.85 16.85 7.05 16.4 7.55 16.2 L8.5 16.25 9.1 17 9.05 17.95 8.35 18.6 7.4 18.5 Q6.9 18.3 6.7 17.8"/>
+    <path stroke="none" fill="#FFA955" d="M9.65 22.05 L8.65 21.95 Q8.15 21.75 8.05 21.25 7.9 20.75 8.1 20.25 L8.85 19.6 9.8 19.7 Q10.3 19.9 10.45 20.45 L10.35 21.4 9.65 22.05"/>
+    <path stroke="none" fill="#010101" fill-opacity="0" d="M30 30.05 L0 30.05 0 0.05 30 0.05 30 30.05"/>
+    <path fill="none" stroke="#BFBFBF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" d="M17.85 0 L25.2 22.6 7.35 28.4 0 5.85"/>
+    <path fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" d="M0 5.85 L17.85 0"/>
+    <path fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" d="M8.05 9 L16.5 6.25 M10.45 16.35 L18.85 13.6 M9.3 12.6 L17.75 9.85 M11.65 19.95 L20.05 17.2"/>
+  </g>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="-819.2" x2="819.2" spreadMethod="pad" gradientTransform="matrix(0.002838134765625 0.016448974609375 -0.0137481689453125 0.0023651123046875 14.75 14.8)" id="gradient0">
+      <stop offset="0.4980392156862745" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E1E1E1"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <path stroke="none" fill="#010101" fill-opacity="0" d="M30 30.05 L0 30.05 0 0.05 30 0.05 30 30.05"/>
+    <path stroke="none" fill="#CCCCCC" d="M4.6 5.8 L22.45 2.75 22.55 2.75 22.65 2.8 26.4 24.7 26.35 24.75 26.3 24.85 8.45 27.9 8.3 27.9 8.3 27.85 4.55 5.95 4.5 5.9 4.6 5.8"/>
+    <path stroke="none" fill="#CCCCCC" fill-opacity="0.24705882352941178" d="M4.55 5.4 L22.4 2.35 22.85 2.4 23.05 2.75 26.8 24.65 26.7 25 26.35 25.25 8.5 28.3 8.1 28.25 7.9 27.9 4.15 6 4.25 5.65 Q4.35 5.45 4.55 5.4 M4.55 5.55 L4.35 5.7 4.25 6 8 27.9 8.2 28.1 8.45 28.15 26.3 25.1 26.6 24.95 26.65 24.65 22.9 2.75 22.75 2.55 22.4 2.5 4.55 5.55"/>
+    <path stroke="none" fill="#CCCCCC" fill-opacity="0.4980392156862745" d="M4.55 5.55 L22.4 2.5 22.75 2.55 22.9 2.75 26.65 24.65 26.6 24.95 26.3 25.1 8.45 28.15 8.2 28.1 8 27.9 4.25 6 4.35 5.7 4.55 5.55 M4.6 5.65 L4.45 5.8 Q4.35 5.85 4.4 5.95 L8.15 27.85 8.3 28 8.45 28.05 26.3 25 26.5 24.85 26.55 24.7 22.8 2.8 22.65 2.65 22.45 2.6 4.6 5.65"/>
+    <path stroke="none" fill="#CCCCCC" fill-opacity="0.7490196078431373" d="M4.6 5.65 L22.45 2.6 22.65 2.65 22.8 2.8 26.55 24.7 26.5 24.85 26.3 25 8.45 28.05 8.3 28 8.15 27.85 4.4 5.95 Q4.35 5.85 4.45 5.8 L4.6 5.65 M4.6 5.8 L4.5 5.9 4.55 5.95 8.3 27.85 8.3 27.9 8.45 27.9 26.3 24.85 26.35 24.75 26.4 24.7 22.65 2.8 22.55 2.75 22.45 2.75 4.6 5.8"/>
+    <path stroke="none" fill="url(#gradient0)" d="M21.8 2.35 L25.55 24.2 7.7 27.25 3.95 5.4 21.8 2.35"/>
+    <path stroke="none" fill="#999999" d="M10.9 8 L11.4 8.25 12.95 9.5 14.3 7.05 14.7 6.55 14.8 6.45 Q15.05 6.2 15.35 6.1 L16.2 6.15 16.6 6.95 16.5 7.5 16.2 8.15 14.55 10.7 16.8 12.25 16.9 12.3 17.3 12.65 17.45 13.15 17.4 13.5 17.1 14.15 16.3 14.85 15.8 14.9 15.2 14.6 13.2 13.1 11.55 16.05 11 16.75 10.45 17.15 9.65 17.15 Q9.25 16.95 9.25 16.4 L9.3 15.8 9.75 14.95 11.55 11.9 9.75 10.75 9.3 10.3 9.15 9.85 Q9.1 9.3 9.4 8.8 L10.3 8.1 10.9 8"/>
+    <path stroke="none" fill="#C63131" d="M15.9 5.6 L16.3 6.3 16.2 6.85 15.9 7.55 14.25 10.05 16.5 11.6 16.6 11.7 16.95 12 17.15 12.55 17.15 12.95 16.85 13.55 16 14.25 15.45 14.3 14.9 14.05 12.9 12.5 11.3 15.45 10.7 16.15 10.2 16.55 9.35 16.5 Q8.95 16.3 8.95 15.8 L9 15.2 9.45 14.35 11.25 11.3 9.45 10.15 9 9.7 8.8 9.25 Q8.8 8.65 9.1 8.15 9.5 7.65 10.05 7.45 L10.55 7.4 11.1 7.7 12.65 8.9 14 6.45 14.4 5.95 14.45 5.85 Q14.7 5.6 15.05 5.45 L15.9 5.6"/>
+    <path fill="none" stroke="#BFBFBF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" d="M21.8 2.35 L25.55 24.2 7.7 27.25 3.95 5.4"/>
+    <path fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" d="M3.95 5.4 L4 5.4 21.8 2.35 22.35 2.25"/>
+    <path fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" d="M3.95 5.4 L3.55 5.45"/>
+    <path fill="none" stroke="#FFFFFF" stroke-width="0.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round" d="M9.65 7.85 Q10.65 8.05 12.7 9.85 L15.35 5.6"/>
+    <path fill="none" stroke="#999999" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" d="M14.95 19.05 L20.3 20.85 Q20.4 14.4 23.8 10.3"/>
+    <path fill="none" stroke="#A5BF37" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M14.3 18.3 L19.7 20.2 Q20 13.9 23.3 9.85"/>
+    <path fill="none" stroke="#FFFFFF" stroke-width="0.5" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round" d="M12.3 16.95 L18.8 19 Q19.2 16.25 20.1 14.15 20.95 12.05 23.15 8.35"/>
+  </g>
+</svg>

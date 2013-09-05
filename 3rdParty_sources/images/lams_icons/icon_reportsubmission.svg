@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="-819.2" x2="819.2" spreadMethod="pad" gradientTransform="matrix(0.0000152587890625 -0.009521484375 -0.012451171875 -0.0000152587890625 8.25 14.85)" id="gradient0">
+      <stop offset="0.7058823529411765" stop-color="#EAEAEA"/>
+      <stop offset="1" stop-color="#DDDDDD"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="-819.2" x2="819.2" spreadMethod="pad" gradientTransform="matrix(-0.000030517578125 -0.009521484375 0.0214385986328125 -0.0000152587890625 2.5 14.85)" id="gradient1">
+      <stop offset="0.7058823529411765" stop-color="#EAEAEA"/>
+      <stop offset="1" stop-color="#DDDDDD"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="-819.2" x2="819.2" spreadMethod="pad" gradientTransform="matrix(0 0.00640869140625 -0.009063720703125 0 20.65 17.9)" id="gradient2">
+      <stop offset="0.00392156862745098" stop-color="#B1E16B"/>
+      <stop offset="1" stop-color="#94BC32"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <path stroke="none" fill="#010101" fill-opacity="0" d="M30 30.05 L0 30.05 0 0.05 30 0.05 30 30.05"/>
+    <path stroke="none" fill="#CCCCCC" d="M1 24.35 L10.85 24.35 10.95 24.3 15.7 19.3 15.75 19.25 15.75 4.55 15.7 4.45 15.65 4.45 1 4.45 0.9 4.45 0.85 4.55 0.85 24.25 0.9 24.3 1 24.35"/>
+    <path stroke="none" fill="#CCCCCC" fill-opacity="0.24705882352941178" d="M0.65 24.6 L1 24.7 10.85 24.7 11.2 24.55 15.95 19.55 16.1 19.25 16.1 4.55 15.95 4.2 15.65 4.1 1 4.1 0.65 4.2 0.5 4.55 0.5 24.25 0.65 24.6 M0.75 24.5 L0.65 24.25 0.65 4.55 0.75 4.3 1 4.2 15.65 4.2 15.9 4.3 16 4.55 16 19.25 15.9 19.5 11.1 24.5 10.85 24.6 1 24.6 0.75 24.5"/>
+    <path stroke="none" fill="#CCCCCC" fill-opacity="0.4980392156862745" d="M0.75 24.5 L1 24.6 10.85 24.6 11.1 24.5 15.9 19.5 16 19.25 16 4.55 15.9 4.3 15.65 4.2 1 4.2 0.75 4.3 0.65 4.55 0.65 24.25 0.75 24.5 M1 24.45 L0.8 24.4 0.75 24.25 0.75 4.55 0.8 4.4 1 4.3 15.65 4.3 15.8 4.4 15.85 4.55 15.85 19.25 15.8 19.4 11.05 24.4 10.85 24.45 1 24.45"/>
+    <path stroke="none" fill="#CCCCCC" fill-opacity="0.7490196078431373" d="M1 24.45 L10.85 24.45 11.05 24.4 15.8 19.4 15.85 19.25 15.85 4.55 15.8 4.4 15.65 4.3 1 4.3 0.8 4.4 0.75 4.55 0.75 24.25 0.8 24.4 1 24.45 M1 24.35 L0.9 24.3 0.85 24.25 0.85 4.55 0.9 4.45 1 4.45 15.65 4.45 15.7 4.45 15.75 4.55 15.75 19.25 15.7 19.3 10.95 24.3 10.85 24.35 1 24.35"/>
+    <path stroke="none" fill="url(#gradient0)" d="M9.65 25 L0.4 25 0.4 4.6 16 4.6 16 16.55 9.65 16.55 9.65 25"/>
+    <path stroke="none" fill="url(#gradient1)" d="M9.65 25 L9.65 16.55 16 16.55 16.05 16.55 16.05 25 9.65 25"/>
+    <path stroke="none" fill="#799C27" d="M19.8 10.2 Q19.9 10.05 20.1 10.05 L20.45 10.15 29.1 17.65 29.25 17.9 29.25 18.2 29.1 18.4 20.35 25.75 20 25.9 19.65 25.75 19.5 25.4 19.45 22 12.75 22.05 12.4 21.9 12.25 21.55 12.2 15.15 Q12.2 14.9 12.35 14.8 12.5 14.65 12.7 14.65 L19.6 14.6 19.65 10.55 Q19.65 10.3 19.8 10.2"/>
+    <path stroke="none" fill="url(#gradient2)" d="M12.7 21.5 L12.65 15.1 20.05 15.05 20.1 10.5 28.75 18 19.95 25.35 19.9 21.45 12.7 21.5"/>
+    <path stroke="none" fill="#FFFFFF" fill-opacity="0.2" d="M21.65 11.2 L23.45 12.85 26.8 15.65 29.6 18.2 29.3 18.1 29.1 18.1 29 18.1 26.05 18.65 12.2 18 12.2 14.7 19.5 14.7 19.5 14.1 19.6 14.1 19.6 10.6 19.7 10.5 20 10.1 Q20.2 9.75 21.65 11.2"/>
+    <path fill="none" stroke="#C8C8C8" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round" d="M16 25.1 L0.45 25.05 0.45 4.65 16.05 4.65 16 25.1"/>
+    <path fill="none" stroke="#FFFFFF" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round" d="M1.6 5.5 L15.1 5.5 15.1 17.55"/>
+    <path fill="none" stroke="#FFFFFF" stroke-width="1" stroke-opacity="0.4" stroke-linecap="round" stroke-linejoin="round" d="M20.7 11.8 L20.7 15.65 13.45 15.65"/>
+  </g>
+</svg>
