@@ -68,6 +68,7 @@
 				<prop key="closeGate">PROPAGATION_REQUIRED</prop>
 				<prop key="delete*">PROPAGATION_REQUIRED</prop>
 				<prop key="setLearnerPortfolioAvailable">PROPAGATION_REQUIRED</prop>
+				<prop key="force*">PROPAGATION_REQUIRED</prop>
 				<prop key="check*">PROPAGATION_REQUIRED,readOnly</prop>
 			</props>
 		</property>
