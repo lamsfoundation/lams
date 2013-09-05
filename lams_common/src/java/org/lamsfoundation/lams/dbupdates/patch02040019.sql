@@ -3,6 +3,7 @@
 SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
 
+-- LDEV-3112 Remove Flash Learner
 DELETE FROM lams_configuration WHERE config_key = 'EnableFlash'
                                   OR config_key = 'ForceMobileDevToUseFlashless';
 ALTER TABLE lams_user DROP COLUMN enable_flash;
