@@ -123,7 +123,8 @@
         <ant antfile="../${tool_wookie_dir}/build.xml"        target="copy-tags" inheritAll="false"/>
         <ant antfile="../${tool_imscc_dir}/build.xml"         target="copy-tags" inheritAll="false"/>
         <ant antfile="../${tool_bbb_dir}/build.xml"           target="copy-tags" inheritAll="false"/>
-		<ant antfile="../${tool_mindmap_dir}/build.xml"           target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_mindmap_dir}/build.xml"       target="copy-tags" inheritAll="false"/>
+		<ant antfile="../${tool_kaltura_dir}/build.xml"       target="copy-tags" inheritAll="false"/>
 	</target>
 
 	
