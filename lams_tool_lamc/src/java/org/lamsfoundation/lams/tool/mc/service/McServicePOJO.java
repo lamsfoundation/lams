@@ -879,6 +879,10 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	// propagade changes to Gradebook
 	int totalMark = (oldMark == null) ? oldTotalMark + newMark : oldTotalMark - oldMark + newMark;
 	gradebookService.updateActivityMark(new Double(totalMark), null, userId, toolSessionId, true);
+	
+	//record mark change with audit service
+	auditService.logMarkChange(McAppConstants.MY_SIGNATURE, userAttempt.getMcQueUsr().getQueUsrId(), userAttempt
+		.getMcQueUsr().getUsername(), "" + oldMark, "" + totalMark);
 
     }
     

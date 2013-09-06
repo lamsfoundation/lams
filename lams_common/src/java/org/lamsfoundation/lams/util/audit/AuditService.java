@@ -32,98 +32,103 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
-/** 
- * Write out audit entries to a log4j based log file. Gets the user details from the shared session. 
-*/
+/**
+ * Write out audit entries to a log4j based log file. Gets the user details from the shared session.
+ */
 /*
- *  Relies on the followig two entries in the log4j configuration file:
+ * Relies on the followig two entries in the log4j configuration file:
  * 
- *   <category name="org.lamsfoundation.lams.util.audit" additivity="false">
- *    <priority value="INFO"/>
- *    <appender-ref ref="AUDITFILE"/>
- *   </category>
- *
- *
- *  <appender name="AUDITFILE" class="org.jboss.logging.appender.DailyRollingFileAppender">
- *   <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
- *   <param name="File" value="${jboss.server.home.dir}/log/audit.log"/>
- *   <param name="Append" value="true"/>
- *   <param name="Threshold" value="INFO"/>
- *
- *   <!-- Rollover at midnight each day -->
- *   <param name="DatePattern" value="'.'yyyy-MM-dd"/>
- *
- *    <layout class="org.apache.log4j.PatternLayout">
- *     <param name="ConversionPattern" value="%d{ABSOLUTE} [%t:%x] %-5p %c - %m%n"/>
- *   </layout>	    
- *   </appender>
+ * <category name="org.lamsfoundation.lams.util.audit" additivity="false"> <priority value="INFO"/> <appender-ref
+ * ref="AUDITFILE"/> </category>
+ * 
+ * 
+ * <appender name="AUDITFILE" class="org.jboss.logging.appender.DailyRollingFileAppender"> <errorHandler
+ * class="org.jboss.logging.util.OnlyOnceErrorHandler"/> <param name="File"
+ * value="${jboss.server.home.dir}/log/audit.log"/> <param name="Append" value="true"/> <param name="Threshold"
+ * value="INFO"/>
+ * 
+ * <!-- Rollover at midnight each day --> <param name="DatePattern" value="'.'yyyy-MM-dd"/>
+ * 
+ * <layout class="org.apache.log4j.PatternLayout"> <param name="ConversionPattern"
+ * value="%d{ABSOLUTE} [%t:%x] %-5p %c - %m%n"/> </layout> </appender>
  */
 public class AuditService implements IAuditService {
 
-	static Logger logger = Logger.getLogger(AuditService.class.getName());
+    static Logger logger = Logger.getLogger(AuditService.class.getName());
 
-	private final String AUDIT_CHANGE_I18N_KEY = "audit.change.entry";
-	private final String AUDIT_HIDE_I18N_KEY = "audit.hide.entry";
-	private final String AUDIT_SHOW_I18N_KEY = "audit.show.entry";
-	protected MessageService messageService;
+    private final String AUDIT_CHANGE_I18N_KEY = "audit.change.entry";
+    private final String AUDIT_MARK_CHANGE_I18N_KEY = "audit.change.mark";
+    private final String AUDIT_HIDE_I18N_KEY = "audit.hide.entry";
+    private final String AUDIT_SHOW_I18N_KEY = "audit.show.entry";
+    protected MessageService messageService;
 
-	private String getUserString() {
-	   	HttpSession ss = SessionManager.getSession();
-	   	if ( ss != null ) {
-	   		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	   		if ( user != null ) {
-	   			return getUserString(user);
-	   		}
-	   	}
-	   	return "System Generated (No Current User): ";
+    private String getUserString() {
+	HttpSession ss = SessionManager.getSession();
+	if (ss != null) {
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    if (user != null) {
+		return getUserString(user);
+	    }
 	}
-	
-	private String getUserString(UserDTO userDTO) {
-		return userDTO.getLogin()+"("+userDTO.getUserID()+"): ";
-	}
+	return "System Generated (No Current User): ";
+    }
 
-	public void log(String moduleName, String message) {
-		logger.info(getUserString()+moduleName+": "+message);
-	}
-	
-	public void log(UserDTO userDTO, String moduleName, String message) {
-		logger.info(getUserString(userDTO)+moduleName+": "+message);
-	}
+    private String getUserString(UserDTO userDTO) {
+	return userDTO.getLogin() + "(" + userDTO.getUserID() + "): ";
+    }
 
-	public void logChange(String moduleName, Long originalUserId, String originalUserLogin,
-			String originalText, String newText) {
-		String[] args = new String[3];
-		args[0] = originalUserLogin+"("+originalUserId+")";
-		args[1] = originalText;
-		args[2] = newText;
-		String message = messageService.getMessage(AUDIT_CHANGE_I18N_KEY, args);
-		log(moduleName, message);
-	}
+    public void log(String moduleName, String message) {
+	logger.info(getUserString() + moduleName + ": " + message);
+    }
 
-	public void logHideEntry(String moduleName, Long originalUserId, String originalUserLogin, String hiddenItem) {
-		String[] args = new String[3];
-		args[0] = originalUserLogin+"("+originalUserId+")";
-		args[1] = hiddenItem;
-		String message = messageService.getMessage(AUDIT_HIDE_I18N_KEY, args);
-		log(moduleName, message);
-	}
+    public void log(UserDTO userDTO, String moduleName, String message) {
+	logger.info(getUserString(userDTO) + moduleName + ": " + message);
+    }
 
-	public void logShowEntry(String moduleName, Long originalUserId, String originalUserLogin, String hiddenItem) {
-		String[] args = new String[3];
-		args[0] = originalUserLogin+"("+originalUserId+")";
-		args[1] = hiddenItem;
-		String message = messageService.getMessage(AUDIT_SHOW_I18N_KEY, args);
-		log(moduleName, message);
-	}
+    public void logChange(String moduleName, Long originalUserId, String originalUserLogin, String originalText,
+	    String newText) {
+	String[] args = new String[3];
+	args[0] = originalUserLogin + "(" + originalUserId + ")";
+	args[1] = originalText;
+	args[2] = newText;
+	String message = messageService.getMessage(AUDIT_CHANGE_I18N_KEY, args);
+	log(moduleName, message);
+    }
 
-	/* ***  Spring Injection Methods *************/
-	
-	public MessageService getMessageService() {
-		return messageService;
-	}
+    public void logMarkChange(String moduleName, Long originalUserId, String originalUserLogin, String originalMark,
+	    String newMark) {
+	String[] args = new String[3];
+	args[0] = originalUserLogin + "(" + originalUserId + ")";
+	args[1] = originalMark;
+	args[2] = newMark;
+	String message = messageService.getMessage(AUDIT_MARK_CHANGE_I18N_KEY, args);
+	log(moduleName, message);
+    }
 
-	public void setMessageService(MessageService messageService) {
-		this.messageService = messageService;
-	}
+    public void logHideEntry(String moduleName, Long originalUserId, String originalUserLogin, String hiddenItem) {
+	String[] args = new String[3];
+	args[0] = originalUserLogin + "(" + originalUserId + ")";
+	args[1] = hiddenItem;
+	String message = messageService.getMessage(AUDIT_HIDE_I18N_KEY, args);
+	log(moduleName, message);
+    }
+
+    public void logShowEntry(String moduleName, Long originalUserId, String originalUserLogin, String hiddenItem) {
+	String[] args = new String[3];
+	args[0] = originalUserLogin + "(" + originalUserId + ")";
+	args[1] = hiddenItem;
+	String message = messageService.getMessage(AUDIT_SHOW_I18N_KEY, args);
+	log(moduleName, message);
+    }
+
+    /* *** Spring Injection Methods ************ */
+
+    public MessageService getMessageService() {
+	return messageService;
+    }
+
+    public void setMessageService(MessageService messageService) {
+	this.messageService = messageService;
+    }
 
 }

@@ -108,6 +108,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * 
@@ -145,6 +146,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     private ILamsToolService toolService;
 
     private ILearnerService learnerService;
+    
+    private IAuditService auditService;
 
     private IUserManagementService userManagementService;
 
@@ -787,6 +790,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	Integer userId = result.getUser().getUserId().intValue();
 	Long toolSessionId = result.getUser().getSession().getSessionId();
 	gradebookService.updateActivityMark(new Double(totalMark), null, userId, toolSessionId, true);
+	
+	//records mark change with audit service
+	auditService.logMarkChange(AssessmentConstants.TOOL_SIGNATURE, result.getUser().getUserId(), result.getUser()
+		.getLoginName(), "" + oldMark, "" + totalMark);
     }
 
     @Override
@@ -937,6 +944,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     // set methods for Spring Bean
     // *****************************************************************************
 
+    public void setAuditService(IAuditService auditService) {
+	this.auditService = auditService;
+    }
+    
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
     }
