@@ -855,8 +855,9 @@ public class GradebookService implements IGradebookService {
 	    ToolActivity activity = toolSession.getToolActivity();
 	    GradebookUserActivity gradebookUserActivity = getGradebookUserActivity(activity.getActivityId(), userID);
 
-	    // If gradebook user activity is null, save the mark and feedback
-	    if (gradebookUserActivity == null || !gradebookUserActivity.getMarkedInGradebook()) {
+	    // If gradebook user activity is null or the mark is set by teacher or was set previously by user - save the
+	    // mark and feedback
+	    if (gradebookUserActivity == null || markedInGradebook || !gradebookUserActivity.getMarkedInGradebook()) {
 		updateUserActivityGradebookMark(toolSession.getLesson(), learner, activity, mark, markedInGradebook);
 	    }
 
