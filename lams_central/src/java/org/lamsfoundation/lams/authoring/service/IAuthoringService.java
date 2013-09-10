@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
-import org.lamsfoundation.lams.authoring.dto.ToolDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;

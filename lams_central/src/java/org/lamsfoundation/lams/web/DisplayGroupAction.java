@@ -44,7 +44,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.authoring.dto.ToolDTO;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.index.IndexOrgBean;
@@ -72,15 +71,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts.action-forward name="group" path="/group.jsp"
  */
 public class DisplayGroupAction extends Action {
-
-    // sorts Tool display names
-    private static final Comparator<ToolDTO> TOOL_NAME_COMPARATOR = new Comparator<ToolDTO>() {
-	@Override
-	public int compare(ToolDTO o1, ToolDTO o2) {
-	    return o1.getToolDisplayName().toLowerCase().compareTo(o2.getToolDisplayName().toLowerCase());
-	}
-    };
-
     private static Logger log = Logger.getLogger(DisplayGroupAction.class);
     private static IUserManagementService service;
     private static LessonService lessonService;
@@ -121,7 +111,7 @@ public class DisplayGroupAction extends Action {
 	    if (org.getEnableSingleActivityLessons()
 		    && (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR))) {
 		// if sinble activity lessons are enabled, put sorted list of tools
-		request.setAttribute("tools", getToolDTOs(request.getRemoteUser()));
+		request.setAttribute("tools", getLearningDesignService().getToolDTOs(request.getRemoteUser()));
 	    }
 	}
 
@@ -366,30 +356,6 @@ public class DisplayGroupAction extends Action {
 	}
 
 	return map;
-    }
-
-    /**
-     * Gets basic information on available tools: IDs and i18n names.
-     */
-    private List<ToolDTO> getToolDTOs(String userName) throws IOException {
-	User user = (User) getService().findByProperty(User.class, "login", userName).get(0);
-	String languageCode = user.getLocale().getLanguageIsoCode();
-	ArrayList<LearningLibraryDTO> learningLibraries = getLearningDesignService().getAllLearningLibraryDetails(
-		languageCode);
-	List<ToolDTO> tools = new ArrayList<ToolDTO>();
-	for (LearningLibraryDTO learningLibrary : learningLibraries) {
-	    // skip invalid and complex tools
-	    if (learningLibrary.getValidFlag() && (learningLibrary.getTemplateActivities().size() == 1)) {
-		ToolDTO tool = new ToolDTO();
-		tool.setToolId(learningLibrary.getLearningLibraryID());
-		tool.setToolDisplayName(((LibraryActivityDTO) learningLibrary.getTemplateActivities().get(0))
-			.getActivityTitle());
-		tools.add(tool);
-	    }
-	}
-
-	Collections.sort(tools, DisplayGroupAction.TOOL_NAME_COMPARATOR);
-	return tools;
     }
 
     private IUserManagementService getService() {

@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -50,6 +51,9 @@ import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.dto.ToolDTO;
+import org.lamsfoundation.lams.tool.dto.ToolDTONameComparator;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -199,6 +203,40 @@ public class LearningDesignService implements ILearningDesignService {
 	    libraries.add(libraryDTO);
 	}
 	return libraries;
+    }
+    
+    
+    /**
+     * Gets basic information on available tools.
+     */
+    public List<ToolDTO> getToolDTOs(String userName) throws IOException {
+	User user = (User) learningLibraryDAO.findByProperty(User.class, "login", userName).get(0);
+	String languageCode = user.getLocale().getLanguageIsoCode();
+	ArrayList<LearningLibraryDTO> learningLibraries = getAllLearningLibraryDetails(
+		languageCode);
+	List<ToolDTO> tools = new ArrayList<ToolDTO>();
+	for (LearningLibraryDTO learningLibrary : learningLibraries) {
+	    // skip invalid and complex tools
+	    if (learningLibrary.getValidFlag() && (learningLibrary.getTemplateActivities().size() == 1)) {
+		LibraryActivityDTO libraryActivityDTO = (LibraryActivityDTO) learningLibrary.getTemplateActivities().get(0);
+		ToolDTO toolDTO = new ToolDTO();
+		toolDTO.setToolId(learningLibrary.getLearningLibraryID());
+		toolDTO.setToolDisplayName(libraryActivityDTO.getActivityTitle());
+		
+		Tool tool = (Tool) learningLibraryDAO.find(Tool.class, learningLibrary.getLearningLibraryID());
+		if (tool != null) {
+		    String iconPath = libraryActivityDTO.getLibraryActivityUIImage();
+		    iconPath = iconPath.substring(0, iconPath.lastIndexOf('/') + 1);
+		    iconPath += "icon_" + tool.getToolIdentifier() + ".svg";
+		    toolDTO.setIconPath(iconPath);
+		}
+		
+		tools.add(toolDTO);
+	    }
+	}
+
+	Collections.sort(tools, new ToolDTONameComparator());
+	return tools;
     }
 
     @Override

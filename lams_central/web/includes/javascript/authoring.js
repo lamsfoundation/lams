@@ -1,70 +1,204 @@
 ﻿var paper = null;
-var templateContainer = null;
+var canvas = null;
+var maxActivityId = 0;
+var activities = [];
+
+var layout = {
+	'activityWidth' : 125,
+	'activityHeight' : 50
+}
 
 $(document).ready(function() {
 	paper = Raphael('canvas');
-	templateContainer = paper.rect(0, 0, 120, 200).attr({
-		'stroke-width' : 3
-	});
-
-	drawTemplate(1, 'icon_forum.png', 'Forum');
-	drawTemplate(2, 'icon_notebook.png', 'Notebook');
+	canvas = $('#canvas');
+	
+	initTemplates();
 });
 
-function drawTemplate(index, icon, text) {
-	var template = paper.set();
-	var shape = template.shape = paper.rect(10, 10 + (index - 1) * 55, 100, 50)
-			.attr({
-				'fill' : 'yellow'
-			});
-	template.push(shape);
 
-	var icon = paper.image('images/svg/' + icon, shape.attr('x')
-			+ shape.attr('width') / 2 - 10, shape.attr('y') + 5, 30, 30);
-	template.push(icon);
-
-	var label = paper.text(shape.attr('x') + shape.attr('width') / 2, shape
-			.attr('y') + 40, text);
-	template.push(label);
-
-	template.drag(function(dx, dy) {
-		startDrag(this.helper, dx, dy);
-	}, function() {
-		this.helper = this.clone();
-		this.helper.shape = this.helper[0];
-	}, function() {
-		var helper = this.helper;
-		this.helper = null;
-		if (Raphael.isBBoxIntersect(templateContainer.getBBox(), helper
-				.getBBox())) {
-			helper.remove();
-			return;
-		}
-
-		endDrag(helper);
-		helper.drag(function(dx, dy) {
-			startDrag(this, dx, dy);
-		}, null, function() {
-			endDrag(this, Raphael.isBBoxIntersect(templateContainer.getBBox(),
-					this.getBBox()));
-		}, helper, null, helper);
-
-	}, template, null, template);
-}
-
-function startDrag(activity, dx, dy) {
-	activity.transform('t' + dx + ' ' + dy);
-}
-
-function endDrag(activity, cancelDrag) {
-	if (!cancelDrag) {
-		var transformation = activity.shape.attr('transform');
-		activity.forEach(function(elem) {
-			elem.attr({
-				'x' : elem.attr('x') + transformation[0][1],
-				'y' : elem.attr('y') + transformation[0][2]
-			});
+function initTemplates(){
+	$('.template').each(function(){
+		$(this).draggable({
+							'containment' : '#authoringTable',
+						    'revert'      : 'invalid',
+						    'distance'    : 20,
+						    'scroll'      : false,
+						    'helper'      : function(event){
+								var helper = $(this).clone().css({
+									'border' : 'thin black solid',
+									'z-index' : 1,
+									'cursor' : 'move'
+								});
+								return helper;
+							}
 		});
+	});
+	
+	canvas.droppable({
+		   'tolerance'   : 'touch',
+		   'accept'      : function (draggable) {
+			   return true;
+		   },
+		   'drop'	     : function (event, draggable) {
+			   ActivityUtils.constructActivityFromTemplate(draggable);
+		   }
+	});
+}
+
+
+var ActivityUtils = {
+	constructActivityFromTemplate : function(template) {
+		$(template.helper).remove();
+		
+		var activityId = ++maxActivityId;
+		var activity = new Activity(activityId);
+		activities.push(activity);
+		
+		var canvasOffset = canvas.offset();
+		var shape = activity.shape = paper.rect(
+				template.offset.left - canvasOffset.left,
+				template.offset.top - canvasOffset.top,
+				125, 50)
+		.attr({
+			'fill' : '#A9C8FD'
+		});
+		activity.items.push(shape);
+		
+		var icon = paper.image($('img', template.draggable).attr('src'), shape.attr('x')
+				+ shape.attr('width') / 2 - 15, shape.attr('y') + 2, 30, 30);
+		activity.items.push(icon);
+		
+		var label = paper.text(shape.attr('x') + shape.attr('width') / 2, shape
+				.attr('y') + 40, $('div', template.draggable).text());
+		activity.items.push(label);
+		
+		activity.addDecoration();
+		activity.addEffects();
+	},
+	
+	drawTransition : function(fromActivity, toActivity) {
+		if (fromActivity.fromTransition) {
+			fromActivity.fromTransition.remove();
+		}
+		if (toActivity.toTransition) {
+			toActivity.toTransition.remove();
+		}
+		
+		var transition = paper.set();
+		transition.fromActivity = fromActivity;
+		transition.toActivity = toActivity;
+		fromActivity.fromTransition = transition;
+		toActivity.toTransition = transition;
+		
+		var path = paper.path('M ' + 
+				(fromActivity.shape.attr('x') + fromActivity.shape.attr('width') / 2) + ' ' +
+				(fromActivity.shape.attr('y') + fromActivity.shape.attr('height') / 2) + ' L  ' +
+				(toActivity.shape.attr('x') + toActivity.shape.attr('width') / 2) + ' ' +
+				(toActivity.shape.attr('y') + toActivity.shape.attr('height') / 2));
+		transition.push(path);
+		transition.toBack();
 	}
-	activity.transform('');
+};
+
+
+function Activity(id) {
+	this.id = id;
+	this.items = paper.set();
+	
+	this.addEffects = function(){
+		var activity = this;
+		
+		activity.items.mousedown(function(event, x, y){
+			if (event.ctrlKey) {
+				var startX = x - canvas.offset().left;
+				var startY = y - canvas.offset().top;
+				
+				canvas.mousemove(function(event){
+					if (activity.tempTransition) {
+						activity.tempTransition.remove();
+						activity.tempTransition = null;
+					}
+					if (!event.ctrlKey) {
+						canvas.off('mousemove');
+						canvas.off('mouseup');
+						return;
+					}
+					
+					var endX = event.pageX - canvas.offset().left;
+					var endY = event.pageY - canvas.offset().top;
+					
+					activity.tempTransition = paper.set();
+					activity.tempTransition.push(paper.circle(startX, startY, 3));
+					activity.tempTransition.push(paper.path('M ' + startX + ' ' + startY
+							+ 'L ' + endX  + ' ' + endY).attr({
+								'arrow-end' : 'open-wide-long',
+								'stroke-dasharray' : '- '
+							}));
+				}).mouseup(function(event){
+					canvas.off('mousemove');
+					canvas.off('mouseup');
+					
+					if (activity.tempTransition) {
+						activity.tempTransition.remove();
+						activity.tempTransition = null;
+					}
+					
+					var endX = event.pageX - canvas.offset().left;
+					var endY = event.pageY - canvas.offset().top;
+					var endActivity = null;
+					$.each(activities, function(){
+						if (this.shape.isPointInside(endX, endY)) {
+							endActivity = this;
+							return false;
+						}
+					});
+
+					if (endActivity) {
+						ActivityUtils.drawTransition(activity, endActivity);
+					}
+				});
+			}
+			
+			else {
+				activity.items.toFront();
+				activity.items.attr('cursor', 'move');
+				
+				canvas.mousemove(function(event) {
+					var dx = event.pageX - x;
+					var dy = event.pageY - y;
+					activity.items.transform('t' + dx + ' ' + dy);
+				});
+				
+				activity.mouseupHandler = function(){
+					canvas.off('mousemove');
+					activity.items.unmouseup(activity.mouseupHandler);
+					activity.mouseupHandler = null;
+					
+					var transformation = activity.shape.attr('transform');
+					activity.items.forEach(function(elem) {
+						elem.attr({
+							'x' : elem.attr('x') + transformation[0][1],
+							'y' : elem.attr('y') + transformation[0][2]
+						});
+					});
+					activity.items.transform('');
+					
+					if (activity.fromTransition) {
+						ActivityUtils.drawTransition(activity, activity.fromTransition.toActivity);
+					}
+					if (activity.toTransition) {
+						ActivityUtils.drawTransition(activity.toTransition.fromActivity, activity);
+					}
+				};
+				
+				activity.items.mouseup(activity.mouseupHandler);
+			}
+		});
+	};
+	
+	this.addDecoration = function(){
+		this.items.attr({
+			'cursor' : 'pointer'
+		});
+	};
 }

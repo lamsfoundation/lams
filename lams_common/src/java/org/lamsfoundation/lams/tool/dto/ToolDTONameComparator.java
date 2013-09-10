@@ -21,35 +21,13 @@
  */
 
 /* $Id$ */
-package org.lamsfoundation.lams.authoring.dto;
+package org.lamsfoundation.lams.tool.dto;
 
-import org.lamsfoundation.lams.tool.Tool;
+import java.util.Comparator;
 
-public class ToolDTO {
-    private Long toolId;
-    private String toolDisplayName;
-
-    public Long getToolId() {
-	return toolId;
-    }
-
-    public void setToolId(Long toolID) {
-	this.toolId = toolID;
-    }
-
-    public String getToolDisplayName() {
-	return toolDisplayName;
-    }
-
-    public void setToolDisplayName(String displayName) {
-	this.toolDisplayName = displayName;
-    }
-
-    public ToolDTO() {
-    }
-
-    public ToolDTO(Tool tool) {
-	toolId = tool.getToolId();
-	toolDisplayName = tool.getToolDisplayName();
+public class ToolDTONameComparator implements Comparator<ToolDTO> {
+    @Override
+    public int compare(ToolDTO o1, ToolDTO o2) {
+	return o1.getToolDisplayName().toLowerCase().compareTo(o2.getToolDisplayName().toLowerCase());
     }
 }

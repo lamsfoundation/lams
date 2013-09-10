@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.learningdesign.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.batik.transcoder.TranscoderException;
@@ -33,6 +34,7 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
+import org.lamsfoundation.lams.tool.dto.ToolDTO;
 
 /**
  * @author Mitchell Seaton
@@ -100,4 +102,6 @@ public interface ILearningDesignService {
     String createLearningDesignSVG(Long learningDesignId, int imageFormat) throws IOException;
 
     String createBranchingSVG(Long branchingActivityId, int imageFormat) throws IOException;
+    
+    public List<ToolDTO> getToolDTOs(String userName) throws IOException;
 }
