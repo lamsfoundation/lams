@@ -129,9 +129,8 @@ function makeSortable(element) {
 				containment : 'parent',
 				stop : function() {
 					var ids = $(this).sortable('toArray');
-
-					var jLessonsId = $(this).parents(
-							"div[class$='lessons']").attr("id");
+					
+					var jLessonsId = $(this).attr("id");
 					var dashIndex = jLessonsId.indexOf("-");
 					var orgId = (dashIndex > 0 ? jLessonsId.substring(0,
 							dashIndex) : jLessonsId);
@@ -142,8 +141,8 @@ function makeSortable(element) {
 							orgId : orgId,
 							ids : ids.join(",")
 						},
-						error : function(a, b) {
-							refresh();
+						error : function() {
+							loadOrgTab(null, true);
 						}
 					});
 				}
