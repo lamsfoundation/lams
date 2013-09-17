@@ -115,7 +115,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     
     private Set<AssessmentQuestionOption> matchingPairOptions;
     
-    private List<AssessmentQuestionResult> questionResults;
+    private List<Object[]> questionResults;
     
     public AssessmentQuestion() {
 	questionOptions = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
@@ -550,10 +550,10 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 	this.matchingPairOptions = matchingPairOptions;
     }
     
-    public List<AssessmentQuestionResult> getQuestionResults() {
+    public List<Object[]> getQuestionResults() {
 	return questionResults;
     }
-    public void setQuestionResults(List<AssessmentQuestionResult> questionResults) {
-	this.questionResults = questionResults;
+    public void setQuestionResults(List<Object[]> questionResults2) {
+	this.questionResults = questionResults2;
     }
 }

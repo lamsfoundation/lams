@@ -57,7 +57,7 @@ public class AssessmentQuestionResultDAOHibernate extends BaseDAOHibernate imple
 	}
     }
 
-    public List<AssessmentQuestionResult> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
+    public List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid) {
 	return getHibernateTemplate().find(FIND_BY_ASSESSMENT_QUESTION_AND_USER, new Object[] { assessmentUid, userId, questionUid });
     }
     

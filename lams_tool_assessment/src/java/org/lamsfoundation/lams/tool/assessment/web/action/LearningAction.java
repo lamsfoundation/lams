@@ -645,8 +645,8 @@ public class LearningAction extends Action {
 			    }
 			}
 
-			List<AssessmentQuestionResult> questionResults = service.getAssessmentQuestionResultList(
-				assessment.getUid(), userId, question.getUid());
+			List<Object[]> questionResults = service.getAssessmentQuestionResultList(assessment.getUid(),
+				userId, question.getUid());
 			question.setQuestionResults(questionResults);
 		    }
 		}

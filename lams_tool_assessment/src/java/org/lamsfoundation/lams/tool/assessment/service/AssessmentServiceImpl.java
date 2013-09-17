@@ -538,7 +538,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     @Override
-    public List<AssessmentQuestionResult> getAssessmentQuestionResultList(Long assessmentUid, Long userId,
+    public List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId,
 	    Long questionUid) {
 	return assessmentQuestionResultDao.getAssessmentQuestionResultList(assessmentUid, userId, questionUid);
     }

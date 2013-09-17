@@ -32,7 +32,10 @@ public interface AssessmentQuestionResultDAO extends DAO {
     
     int getNumberWrongAnswersDoneBefore(Long assessmentUid, Long userId, Long questionUid);
     
-    List<AssessmentQuestionResult> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid);
+    /**
+     * Returns array, first element is AssessmentQuestionResult, second - according AssessmentResult
+     */
+    List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid);
     
     AssessmentQuestionResult getAssessmentQuestionResultByUid(Long questionResultUid);
 

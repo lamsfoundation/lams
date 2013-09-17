@@ -400,19 +400,23 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    return;
 	}
 	
-	ScratchieUser user = this.getUserByIDAndSession(userId, sessionId);
-	int oldMark = user.getMark();
+	ScratchieUser leader = this.getUserByIDAndSession(userId, sessionId);
+	int oldMark = leader.getMark();
 	
-	user.setMark(newMark);
-	this.saveUser(user);
+	//When changing a mark for leader, the mark should be propagated to all students within the group
+	List<ScratchieUser> users = this.getUsersBySession(leader.getSession().getSessionId());
+	for (ScratchieUser user : users) {
+	    user.setMark(newMark);
+	    this.saveUser(user);
 
-	// propagade changes to Gradebook
-	gradebookService.updateActivityMark(new Double(newMark), null, user.getUserId().intValue(), user.getSession()
-		.getSessionId(), true);
-	
-	//record mark change with audit service
-	auditService.logMarkChange(ScratchieConstants.TOOL_SIGNATURE, user.getUserId(), user.getLoginName(), ""
-		+ oldMark, "" + newMark);
+	    // propagade changes to Gradebook
+	    gradebookService.updateActivityMark(new Double(newMark), null, user.getUserId().intValue(), user
+		    .getSession().getSessionId(), true);
+
+	    // record mark change with audit service
+	    auditService.logMarkChange(ScratchieConstants.TOOL_SIGNATURE, user.getUserId(), user.getLoginName(), ""
+		    + oldMark, "" + newMark);
+	}
 
     }
 

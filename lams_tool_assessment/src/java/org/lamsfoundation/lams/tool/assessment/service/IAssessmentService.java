@@ -187,7 +187,7 @@ public interface IAssessmentService {
     
     int getAssessmentResultCount(Long assessmentUid, Long userId);
     
-    List<AssessmentQuestionResult> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid);
+    List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid);
     
     Long createNotebookEntry(Long sessionId, Integer userId, String entryText);
     
