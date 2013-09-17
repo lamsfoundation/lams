@@ -51,7 +51,7 @@
 	   	   	     		sessionId:"${user.session.sessionId}",
 	   	   	     		userName:"${user.lastName}, ${user.firstName}",
 	   	   				totalAttempts:"${user.totalAttempts}",
-	   	   				mark:"<c:choose> <c:when test='${user.mark == -1}'>-</c:when> <c:otherwise>${user.mark}</c:otherwise> </c:choose>"
+	   	   				mark:"<c:choose> <c:when test='${user.totalAttempts == 0}'>-</c:when> <c:otherwise>${user.mark}</c:otherwise> </c:choose>"
 	   	   	   	    });
 		        </c:forEach>
 		   </c:forEach>

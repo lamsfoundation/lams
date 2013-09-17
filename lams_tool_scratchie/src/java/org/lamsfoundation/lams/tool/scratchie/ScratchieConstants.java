@@ -152,6 +152,10 @@ public class ScratchieConstants {
     public static final String ATTR_GROUP_LEADER = "groupLeader";
     
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
+    
+    public static final String PARAM_NOT_A_NUMBER = "nan";
+    
+    public static final String PARAM_MARK = "mark";
 
     public static final String LEARNER_MARK = "learner.mark";
     

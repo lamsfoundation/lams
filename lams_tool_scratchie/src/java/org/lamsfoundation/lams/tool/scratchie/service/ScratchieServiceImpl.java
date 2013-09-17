@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -105,6 +106,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * 
@@ -143,6 +145,10 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
+    
+    private IGradebookService gradebookService;
+    
+    private IAuditService auditService;
 
     private ICoreNotebookService coreNotebookService;
 
@@ -273,7 +279,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     @Override
     public void deleteScratchieAttachment(Long attachmentUid) {
 	scratchieAttachmentDao.removeObject(ScratchieAttachment.class, attachmentUid);
-
     }
 
     @Override
@@ -383,6 +388,32 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		scratchieAnswerVisitDao.saveObject(userLog);
 	    }
 	}
+	
+	//update user mark
+	user.setMark(leader.getMark());
+	this.saveUser(user);
+    }
+    
+    @Override
+    public void changeUserMark(Long userId, Long sessionId, Integer newMark) {
+	if (newMark == null) {
+	    return;
+	}
+	
+	ScratchieUser user = this.getUserByIDAndSession(userId, sessionId);
+	int oldMark = user.getMark();
+	
+	user.setMark(newMark);
+	this.saveUser(user);
+
+	// propagade changes to Gradebook
+	gradebookService.updateActivityMark(new Double(newMark), null, user.getUserId().intValue(), user.getSession()
+		.getSessionId(), true);
+	
+	//record mark change with audit service
+	auditService.logMarkChange(ScratchieConstants.TOOL_SIGNATURE, user.getUserId(), user.getLoginName(), ""
+		+ oldMark, "" + newMark);
+
     }
 
     @Override
@@ -475,14 +506,16 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public void setAnswerAccess(Long answerUid, Long sessionId) {
+    public void logAnswerAccess(ScratchieUser leader, Long answerUid) {
 
+	ScratchieAnswer answer = getScratchieAnswerById(answerUid);
+	Long sessionId = leader.getSession().getSessionId();
+	
 	List<ScratchieUser> users = getUsersBySession(sessionId);
 	for (ScratchieUser user : users) {
 	    ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(answerUid, user.getUserId());
 	    if (log == null) {
 		log = new ScratchieAnswerVisitLog();
-		ScratchieAnswer answer = getScratchieAnswerById(answerUid);
 		log.setScratchieAnswer(answer);
 		log.setUser(user);
 		log.setSessionId(sessionId);
@@ -490,7 +523,44 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		scratchieAnswerVisitDao.saveObject(log);
 	    }
 	}
+	
+	recalculateMarkForSession(leader, false);
 
+    }
+    
+    /**
+     * Recalculate mark for leader and sets it to all members of a group
+     * 
+     * @param leader
+     * @param answerUid
+     */
+    public void recalculateMarkForSession(ScratchieUser leader, boolean isPropagateToGradebook) {
+	
+	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsByScratchieUser(leader.getUid());
+	Scratchie scratchie = leader.getSession().getScratchie();
+	Set<ScratchieItem> items = scratchie.getScratchieItems();
+
+	//clculate mark
+	int mark = 0;
+	if (!items.isEmpty()) {
+	    for (ScratchieItem item : items) {
+		mark += getUserMarkPerItem(scratchie, item, userLogs);
+	    }
+	}
+
+	//change mark for all learners in a group
+	Long sessionId = leader.getSession().getSessionId();
+	List<ScratchieUser> users = getUsersBySession(sessionId);
+	for (ScratchieUser user : users) {
+	    user.setMark(mark);
+	    this.saveUser(user);
+	    
+	    if (isPropagateToGradebook) {
+		// propagade changes to Gradebook
+		gradebookService.updateActivityMark(new Double(mark), null, user.getUserId().intValue(), user.getSession()
+			.getSessionId(), true);
+	    }
+	}
     }
 
     @Override
@@ -557,8 +627,8 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     @Override
     public List<GroupSummary> getMonitoringSummary(Long contentId) {
 	List<GroupSummary> groupSummaryList = new ArrayList<GroupSummary>();
-
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
+	
 	for (ScratchieSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
 	    // one new summary for one session.
@@ -569,10 +639,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
 		int totalAttempts = scratchieAnswerVisitDao.getLogCountTotal(sessionId, user.getUserId());
 		user.setTotalAttempts(totalAttempts);
-
-		// for displaying purposes if there is no attemps we assign -1 which will be shown as "-"
-		int mark = (totalAttempts == 0) ? -1 : getUserMark(session, user.getUid());
-		user.setMark(mark);
 	    }
 
 	    groupSummary.setUsers(users);
@@ -673,31 +739,13 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	return isItemUnraveled;
     }
 
-    @Override
-    public int getUserMark(ScratchieSession session, Long userUid) {
-	
-	//created to reduce number of queries to DB
-	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsByScratchieUser(userUid);
-	
-	Scratchie scratchie = session.getScratchie();
-	Set<ScratchieItem> items = scratchie.getScratchieItems();
-
-	int mark = 0;
-	for (ScratchieItem item : items) {
-	    mark += getUserMarkPerItem(scratchie, item, userLogs);
-	}
-
-	return mark;
-    }
-
     /**
      * 
      * 
      * @param scratchie
      * @param item
      * @param userLogs
-     *            if this parameter is provided - uses logs from it, otherwise queries DB. (The main reason to have this
-     *            parameter is to reduce number of queries to DB)
+     *            uses list of logs to reduce number of queries to DB
      * @return
      */
     private int getUserMarkPerItem(Scratchie scratchie, ScratchieItem item, List<ScratchieAnswerVisitLog> userLogs) {
@@ -1154,7 +1202,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		row = new ExcelCell[4];
 		row[0] = new ExcelCell(user.getFirstName() + " " + user.getLastName(), false);
 		row[1] = new ExcelCell(new Long(user.getTotalAttempts()), false);
-		Long mark = (user.getMark() == -1) ? null : new Long(user.getMark());
+		Long mark = (user.getTotalAttempts() == 0) ? null : new Long(user.getMark());
 		row[2] = new ExcelCell(mark, false);
 		row[3] = new ExcelCell(summary.getSessionName(), false);
 		rowList.add(row);
@@ -1281,7 +1329,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		Long attempts = (long) scratchieAnswerVisitDao.getLogCountTotal(sessionId, userId);
 		row[2] = new ExcelCell(attempts, false);
 		row[3] = new ExcelCell(getMessage("label.mark") + ":", false);
-		row[4] = new ExcelCell(new Long(getUserMark(session, groupLeader.getUid())), false);
+		row[4] = new ExcelCell(new Long(groupLeader.getMark()), false);
 		rowList.add(row);
 
 		row = new ExcelCell[1];
@@ -1892,6 +1940,14 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
+    }
+    
+    public void setGradebookService(IGradebookService gradebookService) {
+	this.gradebookService = gradebookService;
+    }
+    
+    public void setAuditService(IAuditService auditService) {
+	this.auditService = auditService;
     }
 
     public IUserManagementService getUserManagementService() {

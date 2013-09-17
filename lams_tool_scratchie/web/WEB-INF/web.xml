@@ -92,6 +92,11 @@
 </servlet>
 
 <servlet>
+		<servlet-name>populateMarks</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.tool.scratchie.web.servlet.PopulateMarksServlet</servlet-class>
+</servlet>
+
+<servlet>
 		<servlet-name>completeItem</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.tool.scratchie.web.servlet.CompleteItemServlet</servlet-class>
 </servlet>
@@ -163,6 +168,11 @@
 	<servlet-mapping>
 		<servlet-name>exportPortfolio</servlet-name>
 		<url-pattern>/exportPortfolio</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>populateMarks</servlet-name>
+		<url-pattern>/populateMarks</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>

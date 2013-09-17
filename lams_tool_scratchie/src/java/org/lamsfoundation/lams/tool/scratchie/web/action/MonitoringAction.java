@@ -35,20 +35,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.util.ExcelCell;
@@ -77,6 +75,9 @@ public class MonitoringAction extends Action {
 	}
 	if (param.equals("itemSummary")) {
 	    return itemSummary(mapping, form, request, response);
+	}
+	if (param.equals("saveUserMark")) {
+	    return saveUserMark(mapping, form, request, response);
 	}
 	if (param.equals("exportExcel")) {
 	    return exportExcel(mapping, form, request, response);
@@ -151,12 +152,29 @@ public class MonitoringAction extends Action {
 	request.setAttribute(ScratchieConstants.ATTR_SUMMARY_LIST, summaryList);
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
+    
+    private ActionForward saveUserMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	if ((request.getParameter(ScratchieConstants.PARAM_NOT_A_NUMBER) == null)
+		&& !StringUtils.isEmpty(request.getParameter(ScratchieConstants.ATTR_USER_ID))
+		&& !StringUtils.isEmpty(request.getParameter(ScratchieConstants.PARAM_SESSION_ID))) {
+	    initializeScratchieService();
+	    
+	    Long userId = WebUtil.readLongParam(request, ScratchieConstants.ATTR_USER_ID);
+	    Long sessionId = WebUtil.readLongParam(request, ScratchieConstants.PARAM_SESSION_ID);
+	    Integer newMark = Integer.valueOf(request.getParameter(ScratchieConstants.PARAM_MARK));
+	    service.changeUserMark(userId, sessionId, newMark);
+	}
+
+	return null;
+    }
 
     /**
      * Exports tool results into excel.
      * @throws IOException 
      */
-    public ActionForward exportExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward exportExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException  {
 
 	initializeScratchieService();

@@ -246,7 +246,11 @@
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
 			parameter="itemSummary" >
 			<forward name="success" path="/pages/monitoring/parts/itemSummary.jsp" />
-		</action>		
+		</action>
+		<action path="/monitoring/saveUserMark"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
+			parameter="saveUserMark" >
+		</action>
 		<action path="/monitoring/exportExcel"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
 			parameter="exportExcel" >

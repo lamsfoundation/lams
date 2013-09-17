@@ -8,17 +8,25 @@
 	#user-dropdown-div {padding-left: 30px; margin-top: -5px; margin-bottom: 50px;}
 	.bottom-buttons {margin: 20px 20px 0px; padding-bottom: 20px;}
 	.section-header {padding-left: 20px; margin-bottom: 15px; margin-top: 60px;}
+	.ui-jqgrid tr.jqgrow td {
+	    white-space: normal !important;
+	    height:auto;
+	    vertical-align:text-top;
+	    padding-top:2px;
+	}
 </style>
 
 <script type="text/javascript">
 	<!--	
 	$(document).ready(function(){
+		var oldValue = 0;
+		
 		<c:forEach var="summary" items="${summaryList}" varStatus="status">
 		
 			jQuery("#list${summary.sessionId}").jqGrid({
 				datatype: "local",
 				height: 'auto',
-				width: 900,
+				width: 780,
 				shrinkToFit: true,
 			   	ondblClickRow: function(rowid) {
 			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
@@ -27,24 +35,45 @@
 			   		var userSummaryUrl = "<c:url value='/learning/start.do'/>?userID=" + userId + "&toolSessionID=" + toolSessionId + "&mode=teacher&reqId=" + (new Date()).getTime();
 					launchPopup(userSummaryUrl, "MonitoringReview");		
 			  	},
-				
 			   	colNames:['#',
 						'userId',
 						'sessionId',
 						"<fmt:message key="label.monitoring.summary.user.name" />",
 						"<fmt:message key="label.monitoring.summary.attempts" />",
-					    "<fmt:message key="label.monitoring.summary.mark" />"],
-					    
+					    "<fmt:message key="label.monitoring.summary.mark" />"
+				],
 			   	colModel:[
-			   		{name:'id',index:'id', width:0, sorttype:"int"},
-			   		{name:'userId',index:'userId', width:0},
-			   		{name:'sessionId',index:'sessionId', width:0},
-			   		{name:'userName',index:'userName', width:400},
-			   		{name:'totalAttempts',index:'totalAttempts', width:100,align:"right",sorttype:"int"},
-			   		{name:'mark',index:'mark', width:100,align:"right",sorttype:"int"}		
+			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
+			   		{name:'userId', index:'userId', width:0, hidden: true},
+			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
+			   		{name:'userName', index:'userName', width:400},
+			   		{name:'totalAttempts', index:'totalAttempts', width:100, align:"right", sorttype:"int"},
+			   		{name:'mark', index:'mark', width:100, align:"right", sorttype:"int", editable:true, editoptions: {size:4, maxlength: 4}}		
 			   	],
-			   	caption: "${summary.sessionName}"
-			}).hideCol("id").hideCol("userId").hideCol("sessionId");
+			   	caption: "${summary.sessionName}",
+				cellurl: '<c:url value="/monitoring/saveUserMark.do"/>',
+  				cellEdit: true,
+  				afterEditCell: function (rowid,name,val,iRow,iCol){
+  					oldValue = eval(val);
+				},
+  				afterSaveCell : function (rowid,name,val,iRow,iCol){
+  					var intRegex = /^\d+$/;
+  					if (!intRegex.test(val)) {
+  						jQuery("#list${summary.sessionId}").restoreCell(iRow,iCol); 
+  					}
+				},	  		
+  				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
+  					var intRegex = /^\d+$/;
+  					if (!intRegex.test(val)) {
+  						return {nan:true};
+  					} else {
+  						var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
+  						var sessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
+  						return {userId:userId, sessionId:sessionId};		  				  		
+  				  	}
+  				}
+
+			});
 			
    	        <c:forEach var="user" items="${summary.users}" varStatus="i">
    	     		jQuery("#list${summary.sessionId}").addRowData(${i.index + 1}, {
@@ -53,7 +82,7 @@
    	   	     		sessionId:"${user.session.sessionId}",
    	   	     		userName:"${user.lastName}, ${user.firstName}",
    	   				totalAttempts:"${user.totalAttempts}",
-   	   				mark:"<c:choose> <c:when test='${user.mark == -1}'>-</c:when> <c:otherwise>${user.mark}</c:otherwise> </c:choose>"
+   	   				mark:"<c:choose><c:when test='${user.totalAttempts == 0}'>-</c:when><c:otherwise>${user.mark}</c:otherwise></c:choose>"
    	   	   	    });
 	        </c:forEach>
 			

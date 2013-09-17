@@ -296,9 +296,9 @@ public class LearningAction extends Action {
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
 
-	ScratchieUser user = getCurrentUser(toolSessionId);
+	ScratchieUser leader = getCurrentUser(toolSessionId);
 	// only leaders are allowed to scratch answers
-	if (!service.isUserGroupLeader(user, toolSession)) {
+	if (!service.isUserGroupLeader(leader, toolSession)) {
 	    return null;
 	}
 
@@ -308,7 +308,7 @@ public class LearningAction extends Action {
 	    return mapping.findForward(ScratchieConstants.ERROR);
 	}
 
-	service.setAnswerAccess(answer.getUid(), toolSessionId);
+	service.logAnswerAccess(leader, answer.getUid());
 
 	JSONObject JSONObject = new JSONObject();
 	JSONObject.put(ScratchieConstants.ATTR_ANSWER_CORRECT, answer.isCorrect());

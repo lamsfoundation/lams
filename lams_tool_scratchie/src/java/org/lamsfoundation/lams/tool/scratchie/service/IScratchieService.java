@@ -218,11 +218,12 @@ public interface IScratchieService {
     Set<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId, ScratchieUser user);
 
     /**
-     * Leader has scratched the specified answer. Will store this scratch for all users in his group.
+     * Leader has scratched the specified answer. Will store this scratch for all users in his group. It will also
+     * update all the marks.
      */
-    void setAnswerAccess(Long scratchieItemUid, Long sessionId);
+    void logAnswerAccess(ScratchieUser leader, Long scratchieItemUid);
     
-    int getUserMark(ScratchieSession session, Long userUid);
+    void recalculateMarkForSession(ScratchieUser leader, boolean isPropagateToGradebook);
     
     /**
      * Mark all users in agroup as ScratchingFinished so that users can't continue scratching after this.
@@ -346,4 +347,6 @@ public interface IScratchieService {
      * @return
      */
     Set<ScratchieUser> getAllLearners(Long contentId);
+    
+    void changeUserMark(Long userId, Long userUid, Integer newMark);
 }
