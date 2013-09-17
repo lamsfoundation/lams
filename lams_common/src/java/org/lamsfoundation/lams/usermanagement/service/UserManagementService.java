@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -183,6 +184,40 @@ public class UserManagementService implements IUserManagementService {
 	    user.setModifiedDate(new Date());
 	}
 	return user;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void saveOrganisationGroups(Integer organisationId, List<OrganisationGroup> newGroups) {
+	List<OrganisationGroup> existingGroups = findByProperty(OrganisationGroup.class,
+		"organisationId", organisationId);
+	
+	for (OrganisationGroup newGroup : newGroups) {
+	    OrganisationGroup existingGroup = null;
+	    // check if group already exists
+	    for (OrganisationGroup existingGroupCandidate : existingGroups) {
+		if (existingGroupCandidate.equals(newGroup)) {
+		    existingGroup = existingGroupCandidate;
+		    break;
+		}
+	    }
+	   
+	    if (existingGroup == null) {
+		// it is a new group, so add it
+		baseDAO.insert(newGroup);
+	    } else {
+		// it is an existing group, update it
+		existingGroups.remove(existingGroup);
+		
+		existingGroup.setName(newGroup.getName());
+		existingGroup.setUsers(newGroup.getUsers());
+		baseDAO.update(existingGroup);
+	    }
+	}
+	
+	// groups which were not listed are meant to be removed
+	for (OrganisationGroup obsoleteExistingGroup : existingGroups) {
+	    delete(obsoleteExistingGroup);
+	}
     }
 
     public void saveAll(Collection objects) {

@@ -213,6 +213,32 @@ function showAddLessonDialog(orgID) {
 	dialog.dialog('open');
 }
 
+function showOrgGroupDialog(orgID) {
+	var dialog = $('#dialogContainer').dialog({
+		'orgID' : orgID,
+		'autoOpen' : false,
+		'height' : 460,
+		'width' : 880,
+		'modal' : true,
+		'resizable' : false,
+		'hide' : 'fold',
+		'title' : LABELS.COURSE_GROUPS_TITLE,
+		'open' : function() {
+			// load contents after opening the dialog
+			$('#dialogFrame')
+					.attr('src', LAMS_URL
+						+ 'OrganisationGroup.do?method=view&organisationID='
+						+ $(this).dialog('option', 'orgID'));
+		},
+		'beforeClose' : function(){
+			$('#dialogFrame').attr('src', null);
+		},
+		'close' : function() {
+			$(this).dialog('destroy');
+		}
+	}).dialog('open');
+}
+
 function showAddSingleActivityLessonDialog(orgID, toolID) {
 	$('#dialogContainer').dialog({
 		'orgID' : orgID,
@@ -462,6 +488,13 @@ function closeMonitorLessonDialog(refresh) {
 	// if latter, refresh the list
 	$("#dialogContainer").dialog('option', 'refresh', refresh ? true : false)
 			.dialog('close');
+}
+
+function saveOrgGroups() {
+	var groupsSaved = document.getElementById('dialogFrame').contentWindow.saveGroups();
+	if (groupsSaved) {
+		$("#dialogContainer").dialog('close');
+	}
 }
 
 function removeLesson(lessonID) {

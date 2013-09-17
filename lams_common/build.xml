@@ -35,6 +35,8 @@
 		<include name="**/AuthenticationMethod*.java" />
 		<!-- Tool -->
 		<include name="**/ToolImportSupport.java" />
+		<!-- User Management -->
+		<include name="**/OrganisationGroup.java" />
 	</fileset>
 		
 		

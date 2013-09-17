@@ -32,6 +32,7 @@ import java.util.Vector;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -527,4 +528,9 @@ public interface IUserManagementService {
 	 * @return
 	 */
 	public User getUserDTOByOpenidURL(String openidURL);
+	
+	/**
+	 * Stores organisation (course) groups and removes the unnecessary ones.
+	 */
+	public void saveOrganisationGroups(Integer organisationId, List<OrganisationGroup> newGroups);
 }

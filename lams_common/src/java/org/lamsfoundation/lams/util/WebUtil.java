@@ -17,8 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * helper methods useful for servlets
@@ -48,7 +51,7 @@ public class WebUtil {
 	    String valueRequest = req.getParameter(tokenName);
 	    WebUtil.log.debug("(Session Token) name : " + tokenName + " value : " + valueSession);
 	    WebUtil.log.debug("(Request Token) name : " + tokenName + " value : " + valueRequest);
-	    if (valueSession != null && valueRequest != null) {
+	    if ((valueSession != null) && (valueRequest != null)) {
 		if (valueSession.equals(valueRequest)) {
 		    return true;
 		}
@@ -74,7 +77,7 @@ public class WebUtil {
      */
     public static void saveToken(HttpServletRequest req, String tokenName, String tokenValue) {
 	if (req.getSession().getAttribute(tokenName) != null) {
-	    resetToken(req, tokenName);
+	    WebUtil.resetToken(req, tokenName);
 	}
 	req.getSession().setAttribute(tokenName, tokenValue);
 	WebUtil.log.debug("(Save Session Token) name : " + tokenName + " value : " + tokenValue);
@@ -117,7 +120,7 @@ public class WebUtil {
 	    throws IllegalArgumentException {
 	try {
 	    if (!isOptional) {
-		checkObject(paramName, paramValue);
+		WebUtil.checkObject(paramName, paramValue);
 	    }
 	    String value = paramValue != null ? StringUtils.trimToNull(paramValue) : null;
 	    return value != null ? new Integer(value) : null;
@@ -136,7 +139,7 @@ public class WebUtil {
 	    throws IllegalArgumentException {
 	try {
 	    if (!isOptional) {
-		checkObject(paramName, paramValue);
+		WebUtil.checkObject(paramName, paramValue);
 	    }
 	    String value = paramValue != null ? StringUtils.trimToNull(paramValue) : null;
 	    return value != null ? new Long(value) : null;
@@ -156,7 +159,7 @@ public class WebUtil {
      */
     public static long checkLong(String paramName, Long paramValue, boolean isOptional) throws IllegalArgumentException {
 	if (!isOptional) {
-	    checkObject(paramName, paramValue);
+	    WebUtil.checkObject(paramName, paramValue);
 	}
 	return paramValue.longValue();
     }
@@ -168,7 +171,7 @@ public class WebUtil {
      */
     public static boolean checkBoolean(String paramName, String paramValue) throws IllegalArgumentException {
 
-	checkObject(paramName, paramValue);
+	WebUtil.checkObject(paramName, paramValue);
 	return Boolean.valueOf(paramValue.trim()).booleanValue();
     }
 
@@ -182,7 +185,7 @@ public class WebUtil {
      * @return parameter value
      */
     public static int readIntParam(HttpServletRequest req, String paramName) {
-	return checkInteger(paramName, req.getParameter(paramName), false).intValue();
+	return WebUtil.checkInteger(paramName, req.getParameter(paramName), false).intValue();
     }
 
     /**
@@ -196,7 +199,7 @@ public class WebUtil {
      * @return parameter value
      */
     public static Integer readIntParam(HttpServletRequest req, String paramName, boolean isOptional) {
-	return checkInteger(paramName, req.getParameter(paramName), isOptional);
+	return WebUtil.checkInteger(paramName, req.getParameter(paramName), isOptional);
     }
 
     /**
@@ -209,7 +212,7 @@ public class WebUtil {
      * @return parameter value
      */
     public static long readLongParam(HttpServletRequest req, String paramName) {
-	return checkLong(paramName, req.getParameter(paramName), false).longValue();
+	return WebUtil.checkLong(paramName, req.getParameter(paramName), false).longValue();
     }
 
     /**
@@ -223,7 +226,7 @@ public class WebUtil {
      * @return parameter value
      */
     public static Long readLongParam(HttpServletRequest req, String paramName, boolean isOptional) {
-	return checkLong(paramName, req.getParameter(paramName), isOptional);
+	return WebUtil.checkLong(paramName, req.getParameter(paramName), isOptional);
     }
 
     /**
@@ -234,7 +237,7 @@ public class WebUtil {
      * @return parameter value
      */
     public static String readStrParam(HttpServletRequest req, String paramName) {
-	return readStrParam(req, paramName, false);
+	return WebUtil.readStrParam(req, paramName, false);
     }
 
     /**
@@ -247,7 +250,7 @@ public class WebUtil {
      */
     public static String readStrParam(HttpServletRequest req, String paramName, boolean isOptional) {
 	if (!isOptional) {
-	    checkObject(paramName, req.getParameter(paramName));
+	    WebUtil.checkObject(paramName, req.getParameter(paramName));
 	}
 	return req.getParameter(paramName);
     }
@@ -262,7 +265,7 @@ public class WebUtil {
      *                - if valid boolean parameter value is not found
      */
     public static boolean readBooleanParam(HttpServletRequest req, String paramName) throws IllegalArgumentException {
-	return checkBoolean(paramName, req.getParameter(paramName));
+	return WebUtil.checkBoolean(paramName, req.getParameter(paramName));
     }
 
     /**
@@ -276,14 +279,14 @@ public class WebUtil {
      */
     public static boolean readBooleanParam(HttpServletRequest req, String paramName, boolean defaultValue) {
 	try {
-	    return checkBoolean(paramName, req.getParameter(paramName));
+	    return WebUtil.checkBoolean(paramName, req.getParameter(paramName));
 	} catch (IllegalArgumentException e) {
 	    return defaultValue;
 	}
     }
 
     public static boolean readBooleanAttr(HttpServletRequest req, String attrName) {
-	return checkBoolean(attrName, (String) req.getSession().getAttribute(attrName));
+	return WebUtil.checkBoolean(attrName, (String) req.getSession().getAttribute(attrName));
     }
 
     /**
@@ -325,7 +328,7 @@ public class WebUtil {
      * @return the ToolAccessMode object
      */
     public static ToolAccessMode readToolAccessModeParam(HttpServletRequest request, String param_mode, boolean optional) {
-	String mode = readStrParam(request, param_mode, optional);
+	String mode = WebUtil.readStrParam(request, param_mode, optional);
 	if (mode == null) {
 	    return null;
 	} else if (mode.equals(ToolAccessMode.AUTHOR.toString())) {
@@ -397,7 +400,7 @@ public class WebUtil {
      * @return the url with parameter appended.
      */
     public static String appendParameterToURL(String url, String parameterName, String parameterValue) {
-	return appendParameterDeliminator(url) + parameterName + "=" + parameterValue;
+	return WebUtil.appendParameterDeliminator(url) + parameterName + "=" + parameterValue;
     }
 
     /**
@@ -628,11 +631,23 @@ public class WebUtil {
 	    String[] paramEntries = queryPart.split("&");
 	    for (String paramEntry : paramEntries) {
 		String[] paramEntrySplitted = paramEntry.split("=");
-		if (paramEntrySplitted.length > 1 && param.equalsIgnoreCase(paramEntrySplitted[0])) {
+		if ((paramEntrySplitted.length > 1) && param.equalsIgnoreCase(paramEntrySplitted[0])) {
 		    return paramEntrySplitted[1];
 		}
 	    }
 	}
 	return null;
+    }
+
+    /**
+     * Produces JSON object with basic user details.
+     */
+    public static JSONObject userToJSON(User user) throws JSONException {
+	JSONObject userJSON = new JSONObject();
+	userJSON.put("id", user.getUserId());
+	userJSON.put("firstName", user.getFirstName());
+	userJSON.put("lastName", user.getLastName());
+	userJSON.put("login", user.getLogin());
+	return userJSON;
     }
 }

@@ -52,7 +52,8 @@
 					GRADEBOOK_LESSON_TITLE : '<fmt:message key="index.gradebook.lesson.title"/>',
 					GRADEBOOK_LEARNER_TITLE : '<fmt:message key="index.gradebook.learner.title"/>',
 					CONDITIONS_TITLE : '<fmt:message key="index.conditions.title"/>',
-					SEARCH_LESSON_TITLE : '<fmt:message key="index.search.lesson.title"/>'
+					SEARCH_LESSON_TITLE : '<fmt:message key="index.search.lesson.title"/>',
+					COURSE_GROUPS_TITLE : '<fmt:message key="index.course.groups.title"/>'
 			}
 			
 			var tabName = '${tab}';

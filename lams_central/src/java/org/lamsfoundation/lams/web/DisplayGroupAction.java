@@ -145,6 +145,12 @@ public class DisplayGroupAction extends Action {
 		    moreLinks.add(new IndexLinkBean("index.classman", "javascript:openOrgManagement("
 			    + org.getOrganisationId() + ")", "manage-group-button", null));
 		}
+		if ((roles.contains(Role.ROLE_GROUP_ADMIN) || roles.contains(Role.ROLE_GROUP_MANAGER)
+			|| roles.contains(Role.ROLE_AUTHOR) || roles.contains(Role.ROLE_MONITOR))) {
+		    moreLinks.add(new IndexLinkBean("index.orggroup", "javascript:showOrgGroupDialog("
+			    + org.getOrganisationId() + ")", "manage-group-button", null));
+		}
+
 		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
 		    String name = org.getEnableSingleActivityLessons() ? "index.addlesson.single" : "index.addlesson";
 		    links.add(new IndexLinkBean(name,

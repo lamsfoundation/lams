@@ -38,7 +38,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -64,7 +63,6 @@ import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.util.LearnerProgressComparator;
 import org.lamsfoundation.lams.lesson.util.LearnerProgressNameComparator;
-import org.lamsfoundation.lams.lesson.util.LessonComparator;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
@@ -591,13 +589,13 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean getMonitors = Role.MONITOR.equalsIgnoreCase(role);
 	boolean classOnly = WebUtil.readBooleanParam(request, "classOnly", true);
 	Lesson lesson = getLessonService().getLesson(lessonId);
-	Set<User> classUsers = (Set<User>) (getMonitors ? lesson.getLessonClass().getStaffGroup().getUsers() : lesson
-		.getLessonClass().getLearners());
+	Set<User> classUsers = getMonitors ? lesson.getLessonClass().getStaffGroup().getUsers() : lesson
+		.getLessonClass().getLearners();
 	JSONArray responseJSON = new JSONArray();
 
 	// get class members
 	for (User user : classUsers) {
-	    JSONObject userJSON = MonitoringAction.userToJSON(user);
+	    JSONObject userJSON = WebUtil.userToJSON(user);
 	    if (!classOnly) {
 		// mark that this user is a class member
 		userJSON.put("classMember", true);
@@ -617,7 +615,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		    .getOrganisationId(), getMonitors ? Role.MONITOR : Role.LEARNER, false, true);
 	    for (User user : orgUsers) {
 		if (!classUsers.contains(user)) {
-		    JSONObject userJSON = MonitoringAction.userToJSON(user);
+		    JSONObject userJSON = WebUtil.userToJSON(user);
 		    userJSON.put("classMember", false);
 		    responseJSON.put(userJSON);
 		}
@@ -736,7 +734,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	return null;
     }
-    
+
     public ActionForward getAllCompletedActivities(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 
@@ -757,7 +755,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
 
     }
-    
+
     /**
      * Calls the server to bring up the learner progress page. Assumes destination is a new window. The userid that
      * comes from Flash is the user id of the learner for which we are calculating the url. This is different to all the
@@ -938,7 +936,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	int fromIndex = Math.min((pageNumber - 1) * 10, Math.max(toIndex - 10, 0));
 	// get just the requested chunk
 	for (LearnerProgress learnerProgress : learnerProgresses.subList(fromIndex, toIndex)) {
-	    responseJSON.append("learners", MonitoringAction.userToJSON(learnerProgress.getUser()));
+	    responseJSON.append("learners", WebUtil.userToJSON(learnerProgress.getUser()));
 	}
 
 	responseJSON.put("numberActiveLearners", learnerProgresses.size());
@@ -1064,7 +1062,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	for (LearnerProgress learnerProgress : (Set<LearnerProgress>) lesson.getLearnerProgresses()) {
 	    User learner = learnerProgress.getUser();
 	    if (learnerProgress.isComplete()) {
-		JSONObject learnerJSON = MonitoringAction.userToJSON(learner);
+		JSONObject learnerJSON = WebUtil.userToJSON(learner);
 		// no more details are needed for learners who completed the lesson
 		responseJSON.append("completedLearners", learnerJSON);
 	    } else {
@@ -1072,7 +1070,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		if ((currentActivity != null)
 			&& ((branchingActivityId == null) || MonitoringAction.isBranchingChild(branchingActivityId,
 				currentActivity))) {
-		    JSONObject learnerJSON = MonitoringAction.userToJSON(learner);
+		    JSONObject learnerJSON = WebUtil.userToJSON(learner);
 		    Long currentActivityId = currentActivity.getActivityId();
 		    // monitoring URL for the given learner
 		    String learnerUrl = monitoringService.getLearnerActivityURL(lessonId, currentActivityId,
@@ -1303,18 +1301,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	return mapping.findForward(MonitoringAction.TIME_CHART_SCREEN);
-    }
-
-    /**
-     * Produces JSON object with basic user details.
-     */
-    private static JSONObject userToJSON(User user) throws JSONException {
-	JSONObject userJSON = new JSONObject();
-	userJSON.put("id", user.getUserId());
-	userJSON.put("firstName", user.getFirstName());
-	userJSON.put("lastName", user.getLastName());
-	userJSON.put("login", user.getLogin());
-	return userJSON;
     }
 
     /**

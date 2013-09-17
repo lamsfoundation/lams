@@ -1,0 +1,95 @@
+html, body {
+	height: 100%;
+}
+
+div#titleDiv {
+    font-size: small;
+    font-weight: bold;
+    padding: 5px 0;
+    text-align: center;
+	border-bottom: thin dotted #2E6E9E;
+}
+
+table td {
+	vertical-align: top;
+	height: 348px;
+}
+
+td#unassignedUserCell {
+	width: 200px;
+	padding: 5px;
+	border-right: thin dotted #2E6E9E;
+}
+
+#groupTemplate {
+	display: none;
+}
+
+#newGroupPlaceholder {
+	border: thin dashed #2E6E9E;
+	cursor: pointer;
+}
+
+#newGroupPlaceholder > div {
+	text-align: center;
+	margin: 60px 5px 0 5px;
+}
+
+.groupContainer {
+	float: left;
+	width: 180px;
+	height: 150px;
+	margin: 0 10px 10px 0;
+	padding: 5px;
+	border: thin solid #2E6E9E;
+}
+
+.userContainerTitle {
+	font-weight: bold;
+	text-align: center;
+}
+
+.removeGroupButton, .sortUsersButton {
+	float: right;
+	cursor: pointer;
+}
+
+.removeGroupButton {
+	padding-right: 3px;
+	width: 16px;
+	height: 16px;
+}
+
+.userContainer {
+	overflow: auto;
+	height: 123px;
+	margin-top: 5px;
+}
+
+td#unassignedUserCell .userContainer {
+	height: 100%;
+}
+
+.groupContainer input {
+	width: 135px;
+	margin-right: 5px;
+}
+
+.groupContainer .sortUsersButton, .groupContainer .removeGroupButton {
+	padding-top: 3px;
+}
+
+.draggableUser {
+	padding: 3px 0px 3px 0px;
+	cursor: default;
+}
+
+.droppableHighlight {
+	padding : 1px !important;
+	border: 5px solid #5c9ccc !important;
+}
+
+.draggableUserSelected {
+	background-color: #5c9ccc !important;
+	color: white !important;
+}
