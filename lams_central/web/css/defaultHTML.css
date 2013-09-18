@@ -1653,3 +1653,14 @@ div.growlUI h1 {
 .split-ui-button div:first-child {
 	margin-right: -0.4em;
 }
+
+.customDialogButton {
+	position: absolute;
+	top: 0;
+	padding: 5px 20px 5px 20px;
+	vertical-align: center;
+	font-weight: bolder;
+	border: thin solid #2E6E9E !important;
+	color: #222222 !important;
+	background-color: #D0E5F5;"
+}

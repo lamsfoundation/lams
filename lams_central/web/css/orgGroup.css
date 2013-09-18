@@ -2,17 +2,36 @@ html, body {
 	height: 100%;
 }
 
+.errorMessage {
+	display: none;
+	font-weight: bold;
+	color: red;
+	margin-left: 5px;
+}
+
 div#titleDiv {
     font-size: small;
     font-weight: bold;
-    padding: 5px 0;
-    text-align: center;
+    padding: 5px 10px 5px 10px;
 	border-bottom: thin dotted #2E6E9E;
 }
 
-table td {
+div#titleDiv input {
+	margin-left: 5px;
+	width: 290px;
+}
+
+#titleInstructions{
+	padding-top: 4px;
+	float: right;
+}
+
+table#groupsTable {
+	height: 380px;
+}
+
+table#groupsTable td {
 	vertical-align: top;
-	height: 348px;
 }
 
 td#unassignedUserCell {
@@ -49,13 +68,14 @@ td#unassignedUserCell {
 	text-align: center;
 }
 
-.removeGroupButton, .sortUsersButton {
+.sortUsersButton {
 	float: right;
 	cursor: pointer;
 }
 
 .removeGroupButton {
-	padding-right: 3px;
+	float: left;
+	cursor: pointer;
 	width: 16px;
 	height: 16px;
 }

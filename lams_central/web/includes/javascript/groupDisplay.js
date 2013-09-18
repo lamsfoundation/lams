@@ -218,7 +218,7 @@ function showOrgGroupDialog(orgID) {
 		'orgID' : orgID,
 		'autoOpen' : false,
 		'height' : 460,
-		'width' : 880,
+		'width' : 460,
 		'modal' : true,
 		'resizable' : false,
 		'hide' : 'fold',
@@ -227,7 +227,7 @@ function showOrgGroupDialog(orgID) {
 			// load contents after opening the dialog
 			$('#dialogFrame')
 					.attr('src', LAMS_URL
-						+ 'OrganisationGroup.do?method=view&organisationID='
+						+ 'OrganisationGroup.do?method=viewGroupings&organisationID='
 						+ $(this).dialog('option', 'orgID'));
 		},
 		'beforeClose' : function(){
@@ -490,10 +490,35 @@ function closeMonitorLessonDialog(refresh) {
 			.dialog('close');
 }
 
+/**
+ * Loads contents to already open dialog.
+ */
+function loadDialogContents(title, width, height, url) {
+	if (title) {
+		$("#dialogContainer").dialog('option', 'title', title);
+	}
+	if (width && height) {
+		$("#dialogContainer").dialog('option', {
+			'width'    : width,
+			'height'   : height,
+		}).dialog('option', 'position', 'center');
+	}
+	if (url) {
+		$('#dialogFrame').contents().find("body").html('');
+		$('#dialogFrame').attr('src', url);
+		$('div.ui-dialog-titlebar .customDialogButton').remove();
+	}
+}
+
+/**
+ * Called from within Course Groups dialog, it saves groups and loads grouping page.
+ */
 function saveOrgGroups() {
 	var groupsSaved = document.getElementById('dialogFrame').contentWindow.saveGroups();
 	if (groupsSaved) {
-		$("#dialogContainer").dialog('close');
+		loadDialogContents(null, 460, 460,
+			LAMS_URL + 'OrganisationGroup.do?method=viewGroupings&organisationID='
+			         + $('#dialogContainer').dialog('option', 'orgID'));
 	}
 }
 

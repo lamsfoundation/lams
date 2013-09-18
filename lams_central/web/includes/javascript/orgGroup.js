@@ -3,20 +3,21 @@ var sortOrderAscending = {};
 var lastSelectedUsers = {};
 
 $(document).ready(function(){
+	$('#groupingName').val(grouping.name);
 	// show unassigned users on the left
 	fillGroup(unassignedUsers, $('#unassignedUserCell'));
-	$.each(groups, function(){
+	$.each(grouping.groups, function(){
 		// add existing groups
 		addGroup(this.groupId, this.name, this.users);
 	});
+	// move Save button to the titlebar, i.e. outside of this iframe to the enveloping dialog
+	$('div.ui-dialog-titlebar', window.parent.document).prepend($('.customDialogButton'));
 	
 	if (canEdit) {
 		// allow adding new groups
 		$('#newGroupPlaceholder').click(function(){
 			addGroup(null, LABELS.GROUP_PREFIX_LABEL + $('table .groupContainer').length, null);
 		});
-		// move Save button to the titlebar, i.e. outside of this iframe to the enveloping dialog
-		$('div.ui-dialog-titlebar', window.parent.document).prepend($('#saveButton'));
 	}
 });
 
@@ -210,7 +211,6 @@ function sortUsers(container) {
 	}
 }
 
-
 function removeGroup(container) {
 	// no groupId means this group was just added and it was not persisted in DB yet
 	var executeDelete = !$(container).attr('groupId');
@@ -228,8 +228,15 @@ function saveGroups(){
 	if (!canEdit) {
 		return false;
 	}
+	$('.errorMessage').hide();
 	
-	// ask if removing new, empyt groups is OK
+	var groupingName = $('#groupingName').val();
+	if (!groupingName) {
+		$('#groupingNameBlankError').show();
+		return false;
+	}
+	
+	// ask if removing new, empty groups is OK
 	var acceptEmptyGroups = true;
 	var groupContainers = $('table .groupContainer').not('#newGroupPlaceholder');
 	$.each(groupContainers.not('[groupId]'), function(){
@@ -246,7 +253,11 @@ function saveGroups(){
 	}
 	
 	var groupsSaved = false;
-	var newGroups = [];
+	var newGrouping = {
+			'groupingId' : grouping.groupingId,
+			'name' : groupingName,
+			'groups' : []
+	};
 	groupContainers.each(function(){
 		var groupId = $(this).attr('groupId');
 		var users = $('div.draggableUser', this);
@@ -259,7 +270,7 @@ function saveGroups(){
 			userIds.push($(this).attr('userId'));
 		});
 		
-		newGroups.push({
+		newGrouping.groups.push({
 			'groupId' : groupId,
 			'name'    : $('input', this).val(),
 			'users'   : userIds
@@ -272,9 +283,8 @@ function saveGroups(){
 		url : LAMS_URL + 'OrganisationGroup.do',
 		data : {
 			'method' : 'save',
-			'organisationID' : orgId,
-			'groups' : JSON.stringify(newGroups)
-			
+			'organisationID' : grouping.organisationId,
+			'grouping' : JSON.stringify(newGrouping)
 		},
 		type : 'POST',
 		success : function(json) {

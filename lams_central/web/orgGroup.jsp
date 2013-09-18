@@ -13,9 +13,8 @@
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="includes/javascript/orgGroup.js"></script>
-	<script type="text/javascript">
-		var orgId = '${organisationID}';
-		var groups = ${groups};
+	<script type="text/javascript">;
+		var grouping = ${grouping};
 		var unassignedUsers = ${unassignedUsers};
 		var canEdit = ${canEdit};
 		
@@ -31,34 +30,42 @@
 <c:if test="${canEdit}">
 	<!-- It has to have inline style as it gets appended to dialog titlebar
 	     where local CSS is not visible -->
-	<a id="saveButton" href="#" onClick="javascript:saveOrgGroups()" style="
-		position: absolute;
-		right: 50px;
-		top: 0;
-		width: 50px;
-		padding: 5px 0 5px 25px;
-		vertical-align: center;
-		font-weight:bolder;
-		border: thin solid #2E6E9E;
-		color: #222222;
-		background-color: #D0E5F5;"
-	>
+	<a class="customDialogButton" href="#" onClick="javascript:saveOrgGroups()" style="right: 50px;">
 		<fmt:message key="button.save" />
 	</a>
 </c:if>
+<a class="customDialogButton" href="#"
+   onClick="javascript:loadDialogContents(null, 460, 460,'<lams:LAMSURL/>OrganisationGroup.do?method=viewGroupings&organisationID=' + $('#dialogContainer').dialog('option', 'orgID'))"
+   style="right: 140px;">
+	<fmt:message key="label.course.groups.back" />
+</a>
+
 
 <div id="titleDiv">
-<c:choose>
-	<c:when test="${canEdit}">
-		<fmt:message key="label.course.groups.edit.title" />
-	</c:when>
-	<c:otherwise>
-		<fmt:message key="label.course.groups.viewonly.title" />
-	</c:otherwise>
-</c:choose>
+<fmt:message key="label.course.groups.name" />
+<input id="groupingName" type="text"
+	<c:if test="${not canEdit}">
+		readonly="readonly"
+	</c:if>
+/>
+<span id="groupingNameBlankError" class="errorMessage">
+	<fmt:message key="label.course.groups.name.blank" />
+</span>
+
+<span id="titleInstructions">
+	<c:choose>
+		<c:when test="${canEdit}">
+	
+			<fmt:message key="label.course.groups.edit.title" />
+		</c:when>
+		<c:otherwise>
+			<fmt:message key="label.course.groups.viewonly.title" />
+		</c:otherwise>
+	</c:choose>
+</span>
 </div>
 
-<table>
+<table id="groupsTable">
 	<tr>
 		<td id="unassignedUserCell">
 			<div class="userContainerTitle">
@@ -80,6 +87,10 @@
 
 <div id="groupTemplate" class="groupContainer">
 	<div class="userContainerTitle">
+		<c:if test="${canEdit}">
+			<img class="removeGroupButton" src="<lams:LAMSURL/>images/css/delete.png"
+		    	 title="<fmt:message key='label.course.groups.remove.tooltip' />" />
+		</c:if>
 		<input type="text" 
 			<c:if test="${not canEdit}">
 				readonly="readonly"
@@ -87,10 +98,6 @@
 		/>
 		<span class="sortUsersButton"
 		      title="<fmt:message key='label.course.groups.sort.tooltip' />">▲ </span>
-		<c:if test="${canEdit}">
-			<img class="removeGroupButton" src="<lams:LAMSURL/>images/cross.gif"
-		    	 title="<fmt:message key='label.course.groups.remove.tooltip' />" />
-		</c:if>
 	</div>
 	<div class="userContainer"></div>
 </div>

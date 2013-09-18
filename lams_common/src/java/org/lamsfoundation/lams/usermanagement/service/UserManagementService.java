@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
+import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -185,38 +186,42 @@ public class UserManagementService implements IUserManagementService {
 	}
 	return user;
     }
-    
-    @SuppressWarnings("unchecked")
-    public void saveOrganisationGroups(Integer organisationId, List<OrganisationGroup> newGroups) {
-	List<OrganisationGroup> existingGroups = findByProperty(OrganisationGroup.class,
-		"organisationId", organisationId);
-	
+
+    public void saveOrganisationGrouping(OrganisationGrouping grouping, Collection<OrganisationGroup> newGroups) {
+	if (grouping.getGroupingId() == null) {
+	    grouping.setGroups(new HashSet<OrganisationGroup>());
+	    baseDAO.insert(grouping);
+	}
+
+	Set<OrganisationGroup> obsoleteGroups = new HashSet<OrganisationGroup>(grouping.getGroups());
 	for (OrganisationGroup newGroup : newGroups) {
 	    OrganisationGroup existingGroup = null;
 	    // check if group already exists
-	    for (OrganisationGroup existingGroupCandidate : existingGroups) {
+	    for (OrganisationGroup existingGroupCandidate : grouping.getGroups()) {
 		if (existingGroupCandidate.equals(newGroup)) {
 		    existingGroup = existingGroupCandidate;
 		    break;
 		}
 	    }
-	   
+
 	    if (existingGroup == null) {
+		newGroup.setGroupingId(grouping.getGroupingId());
 		// it is a new group, so add it
+		grouping.getGroups().add(newGroup);
 		baseDAO.insert(newGroup);
 	    } else {
-		// it is an existing group, update it
-		existingGroups.remove(existingGroup);
-		
+		obsoleteGroups.remove(existingGroup);
+
 		existingGroup.setName(newGroup.getName());
 		existingGroup.setUsers(newGroup.getUsers());
 		baseDAO.update(existingGroup);
 	    }
 	}
-	
-	// groups which were not listed are meant to be removed
-	for (OrganisationGroup obsoleteExistingGroup : existingGroups) {
-	    delete(obsoleteExistingGroup);
+
+	// remove gropus from DB
+	for (OrganisationGroup obsoleteGroup : obsoleteGroups) {
+	    grouping.getGroups().remove(obsoleteGroup);
+	    baseDAO.delete(obsoleteGroup);
 	}
     }
 

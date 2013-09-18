@@ -29,52 +29,51 @@ import java.util.Set;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * This is a course-level group of learners.
+ * This is a course-level group of groups of learners, i.e. a grouping.
  * 
- * @hibernate.class table="lams_organisation_group"
+ * @hibernate.class table="lams_organisation_grouping"
  */
-public class OrganisationGroup implements Serializable {
+public class OrganisationGrouping implements Serializable {
 
     /** identifier field */
-    private Long groupId;
+    private Long groupingId;
 
     /** persistent field */
-    private Long groupingId;
+    private Integer organisationId;
 
     /** nullable persistent field */
     private String name;
 
-    /** persistent field */
-    private Set<User> users;
+    private Set<OrganisationGroup> groups;
 
-    public OrganisationGroup() {
+    public OrganisationGrouping() {
     }
 
-    public OrganisationGroup(Long organisationId, String name) {
-	this.groupingId = organisationId;
+    public OrganisationGrouping(Integer organisationId, String name) {
+	this.organisationId = organisationId;
 	this.name = name;
     }
 
     /**
-     * @hibernate.id generator-class="native" type="java.lang.Long" column="group_id"
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="grouping_id"
      */
-    public Long getGroupId() {
-	return groupId;
+    public Long getGroupingId() {
+	return groupingId;
     }
 
-    public void setGroupId(Long groupId) {
-	this.groupId = groupId;
+    public void setGroupingId(Long groupId) {
+	this.groupingId = groupId;
     }
 
     /**
-     * @hibernate.property column="grouping_id"
+     * @hibernate.property column="organisation_id"
      */
-    public Long getGroupingId() {
-	return this.groupingId;
+    public Integer getOrganisationId() {
+	return this.organisationId;
     }
 
-    public void setGroupingId(Long organisationId) {
-	this.groupingId = organisationId;
+    public void setOrganisationId(Integer organisationId) {
+	this.organisationId = organisationId;
     }
 
     /**
@@ -89,21 +88,21 @@ public class OrganisationGroup implements Serializable {
     }
 
     /**
-     * @hibernate.set cascade="none" table="lams_user_organisation_group"
-     * @hibernate.collection-key column="group_id"
-     * @hibernate.collection-many-to-many column="user_id" class="org.lamsfoundation.lams.usermanagement.User"
+     * @hibernate.set cascade="all-delete-orphan" inverse="true"
+     * @hibernate.collection-key column="grouping_id"
+     * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.OrganisationGroup"
      */
-    public Set<User> getUsers() {
-	return users;
+    public Set<OrganisationGroup> getGroups() {
+	return groups;
     }
 
-    public void setUsers(Set<User> users) {
-	this.users = users;
+    public void setGroups(Set<OrganisationGroup> groups) {
+	this.groups = groups;
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(groupId).toHashCode();
+	return new HashCodeBuilder().append(groupingId).toHashCode();
     }
 
     @Override
@@ -117,12 +116,12 @@ public class OrganisationGroup implements Serializable {
 	if (!(obj instanceof OrganisationGroup)) {
 	    return false;
 	}
-	OrganisationGroup other = (OrganisationGroup) obj;
-	if (groupId == null) {
-	    if (other.groupId != null) {
+	OrganisationGrouping other = (OrganisationGrouping) obj;
+	if (groupingId == null) {
+	    if (other.groupingId != null) {
 		return false;
 	    }
-	} else if (!groupId.equals(other.groupId)) {
+	} else if (!groupingId.equals(other.groupingId)) {
 	    return false;
 	}
 	return true;
