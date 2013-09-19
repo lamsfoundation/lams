@@ -39,7 +39,11 @@ var controlFramePadding = 0;
 // ----- CONTROL FRAME & WINDOW MANIPULATION -----
 
 // generic function for opening a pop up
-function openPopUp(url, title, h, w, status) {
+function openPopUp(url, title, h, w, status, forceNewWindow) {
+	if (forceNewWindow) {
+		// opens a new window rather than loading content to existing one
+		title += new Date().getTime();
+	}
 	window.open(url, title, "HEIGHT=" + h + ",WIDTH=" + w
 			+ ",resizable=yes,scrollbars=yes,status=" + status
 			+ ",menubar=no, toolbar=no");

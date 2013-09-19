@@ -707,7 +707,7 @@ function updateSequenceTab() {
 							:
 							function(){
 								// double click on activity shape to open Monitoring for this activity
-								openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true);
+								openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true, true);
 							}
 					);
 				}
@@ -1120,7 +1120,7 @@ function openLiveEdit(){
 					alert(response);
 				} else {
 					openPopUp(LAMS_URL + 'home.do?method=author&layout=editonfly&learningDesignID=' + ldId,
-							'LiveEdit', 768, 1024, false);
+							'LiveEdit', 600, 800, false);
 					window.parent.closeMonitorLessonDialog();
 				}
 			}
