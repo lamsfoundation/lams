@@ -90,9 +90,8 @@
 				gridstate:"hidden",
 				//hiddengrid:true,
 				height: 110,
-				width: 780,
+				autowidth: true,
 				shrinkToFit: false,
-				scrollOffset: 0,
 				caption: "<fmt:message key="label.monitoring.summary.learner.summary" />",
 			   	colNames:['#',
 						'userAttemptUid',
@@ -136,6 +135,22 @@
 			});
 			
 		</c:forEach>
+		
+		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
+		$(window).bind('resize', function() {
+			var grid;
+		    if (grid = jQuery(".ui-jqgrid-btable:visible")) {
+		    	grid.each(function(index) {
+			        var gridId = $(this).attr('id');
+			        
+			        //resize only user summary grids
+			        if (gridId.match("^userSummary")) {
+				        var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+				        jQuery('#' + gridId).setGridWidth(gridParentWidth, true);			        	
+			        }
+		        });
+		    }
+		});
 	});
 
 </script>
@@ -176,7 +191,7 @@
 					</c:if>
 					
 					<table id="group${sessionMarkDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-					<div style="margin-top: 10px;">
+					<div style="margin-top: 10px; width:99%;">
 						<table id="userSummary${sessionMarkDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 					</div>
 				</div>
