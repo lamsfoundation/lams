@@ -629,7 +629,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public List<GroupSummary> getMonitoringSummary(Long contentId) {
+    public List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders) {
 	List<GroupSummary> groupSummaryList = new ArrayList<GroupSummary>();
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
 	
@@ -638,14 +638,21 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    // one new summary for one session.
 	    GroupSummary groupSummary = new GroupSummary(sessionId, session.getSessionName());
 
-	    List<ScratchieUser> users = scratchieUserDao.getBySessionID(sessionId);
-	    for (ScratchieUser user : users) {
+	    List<ScratchieUser> sessionUsers = scratchieUserDao.getBySessionID(sessionId);
+	    List<ScratchieUser> usersToShow = new LinkedList<ScratchieUser>();
+	    for (ScratchieUser user : sessionUsers) {
+		
+		boolean isUserGroupLeader = isUserGroupLeader(user, session);
+		//include only leaders in case isUserGroupLeader is ON, include all otherwise
+		if (isIncludeOnlyLeaders && isUserGroupLeader || !isIncludeOnlyLeaders) {
+		    int totalAttempts = scratchieAnswerVisitDao.getLogCountTotal(sessionId, user.getUserId());
+		    user.setTotalAttempts(totalAttempts);
 
-		int totalAttempts = scratchieAnswerVisitDao.getLogCountTotal(sessionId, user.getUserId());
-		user.setTotalAttempts(totalAttempts);
+		    usersToShow.add(user);
+		}
 	    }
 
-	    groupSummary.setUsers(users);
+	    groupSummary.setUsers(usersToShow);
 	    groupSummaryList.add(groupSummary);
 	}
 
@@ -1200,7 +1207,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	row[3] = new ExcelCell(getMessage("label.group"), false);
 	rowList.add(row);
 
-	List<GroupSummary> summaryList = getMonitoringSummary(contentId);
+	List<GroupSummary> summaryList = getMonitoringSummary(contentId, false);
 	for (GroupSummary summary : summaryList) {
 	    for (ScratchieUser user : summary.getUsers()) {
 		row = new ExcelCell[4];

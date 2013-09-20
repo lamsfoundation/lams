@@ -184,7 +184,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    throw new ScratchieApplicationException(error);
 	}
 
-	List<GroupSummary> summaryList = service.getMonitoringSummary(content.getContentId());
+	List<GroupSummary> summaryList = service.getMonitoringSummary(content.getContentId(), false);
 
 	content.toDTO();
 

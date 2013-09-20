@@ -243,7 +243,12 @@ public interface IScratchieService {
 
     ScratchieItem getScratchieItemByUid(Long itemUid);
     
-    List<GroupSummary> getMonitoringSummary(Long contentId);
+    /**
+     * @param contentId
+     * @param isIncludeOnlyLeaders if true - return Summaries only for leader, all users in a group otherwise
+     * @return
+     */
+    List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders);
     
     List<GroupSummary> getQuestionSummary(Long contentId, Long itemUid);
     

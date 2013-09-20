@@ -96,7 +96,7 @@ public class MonitoringAction extends Action {
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	List<GroupSummary> summaryList = service.getMonitoringSummary(contentId);
+	List<GroupSummary> summaryList = service.getMonitoringSummary(contentId, true);
 
 	Scratchie scratchie = service.getScratchieByContentId(contentId);
 	scratchie.toDTO();
