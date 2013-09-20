@@ -26,8 +26,8 @@
 			jQuery("#list${summary.sessionId}").jqGrid({
 				datatype: "local",
 				height: 'auto',
-				width: 780,
-				shrinkToFit: true,
+				autowidth: true,
+				shrinkToFit: false,
 			   	ondblClickRow: function(rowid) {
 			   		var userId = jQuery("#list${summary.sessionId}").getCell(rowid, 'userId');
 			   		var toolSessionId = jQuery("#list${summary.sessionId}").getCell(rowid, 'sessionId');
@@ -46,7 +46,7 @@
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 			   		{name:'userId', index:'userId', width:0, hidden: true},
 			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
-			   		{name:'userName', index:'userName', width:400},
+			   		{name:'userName', index:'userName', width:570},
 			   		{name:'totalAttempts', index:'totalAttempts', width:100, align:"right", sorttype:"int"},
 			   		{name:'mark', index:'mark', width:100, align:"right", sorttype:"int", editable:true, editoptions: {size:4, maxlength: 4}}		
 			   	],
@@ -87,6 +87,44 @@
 	        </c:forEach>
 			
 		</c:forEach>
+		
+		<!-- Display reflection entries -->
+		
+		jQuery("#reflections").jqGrid({
+			datatype: "local",
+			height: 'auto',
+			autowidth: true,
+			shrinkToFit: false,
+		   	colNames:['#',
+					"<fmt:message key="label.monitoring.summary.user.name" />",
+				    "<fmt:message key='label.learners.feedback' />"
+			],
+		   	colModel:[
+		   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
+		   		{name:'userName', index:'userName', width:200},
+		   		{name:'feedback', index:'feedback', width:570}
+		   	],
+		   	caption: "<fmt:message key='label.learners.feedback' />"
+		});
+	    <c:forEach var="reflectDTO" items="${sessionMap.reflections}" varStatus="i">
+	    	jQuery("#reflections").addRowData(${i.index + 1}, {
+	   			id:"${i.index + 1}",
+	   	     	userName:"${reflectDTO.fullName}",
+		   	    feedback:"<lams:out value='${reflectDTO.reflection}' escapeHtml='true' />"
+	   	   	});
+        </c:forEach>
+        
+			//jqgrid autowidth (http://stackoverflow.com/a/1610197)
+			$(window).bind('resize', function() {
+				var grid;
+		        if (grid = jQuery(".ui-jqgrid-btable:visible")) {
+		            grid.each(function(index) {
+		                var gridId = $(this).attr('id');
+		                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+		                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+		            });
+		        }
+			});
 
 		$("#item-uid").change(function() {
 			var itemUid = $(this).val();
@@ -153,7 +191,7 @@
 		</div>
 	
 		<c:forEach var="summary" items="${summaryList}" varStatus="status">
-			<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
+			<div style="width:96%; padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
 				<c:if test="${sessionMap.isGroupedActivity}">
 					<div style="padding-bottom: 5px; font-size: small;">
 						<B><fmt:message key="monitoring.label.group" /></B> ${summary.sessionName}
@@ -205,20 +243,10 @@
 			<div class="section-header">
 				<H1><fmt:message key="label.learners.feedback" /></H1>
 			</div>
-		
-			<c:forEach var="reflectDTO" items="${sessionMap.reflections}">
-				<div style="padding-left: 30px;">
-					<b>
-						${reflectDTO.fullName}
-					</b>
-					
-					<c:if test="${reflectDTO.groupLeader}">
-						(<fmt:message key="label.monitoring.team.leader" />)
-					</c:if>
-					
-					: <lams:out value="${reflectDTO.reflection}" escapeHtml="true" />
-				</div>
-			</c:forEach>
+			
+			<div style="padding-left: 30px; width:96%;">
+				<table id="reflections" class="scroll" cellpadding="0" cellspacing="0"></table>
+			</div>
 			
 		</c:if>
 		
