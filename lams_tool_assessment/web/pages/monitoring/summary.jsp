@@ -25,8 +25,8 @@
 			   		{name:'id',index:'id', width:20, sorttype:"int"},
 			   		{name:'userId',index:'userId', width:0},
 			   		{name:'sessionId',index:'sessionId', width:0},
-			   		{name:'userName',index:'userName', width:200},
-			   		{name:'total',index:'total', width:50,align:"right",sorttype:"float", formatter:'number', formatoptions:{decimalPlaces: 2}}		
+			   		{name:'userName',index:'userName', width:350},
+			   		{name:'total',index:'total', width:120,align:"right",sorttype:"float", formatter:'number', formatoptions:{decimalPlaces: 2}}		
 			   	],
 			   	
 			   	multiselect: false,
@@ -74,9 +74,8 @@
 				gridstate:"hidden",
 				//hiddengrid:true,
 				height: 90,
-				width: 780,
+				autowidth: true,
 				shrinkToFit: false,
-				scrollOffset: 0,
 				caption: "<fmt:message key="label.monitoring.summary.learner.summary" />",
 			   	colNames:['#',
 						'questionResultUid',
@@ -117,8 +116,23 @@
   				}
 			});
 			
-			
 		</c:forEach>
+		
+		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
+		$(window).bind('resize', function() {
+			var grid;
+		    if (grid = jQuery(".ui-jqgrid-btable:visible")) {
+		        grid.each(function(index) {
+		            var gridId = $(this).attr('id');
+		            
+			        //resize only user summary grids
+			        if (gridId.match("^userSummary")) {
+		            	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+		            	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+			        }
+		        });
+		    }
+		});
 
 		$("#questionUid").change(function() {
 			var questionUid = $("#questionUid").val();
@@ -213,7 +227,7 @@
 				</c:if>
 				
 				<table id="list${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-				<div style="margin-top: 10px;">
+				<div style="margin-top: 10px; width:99%;">
 					<table id="userSummary${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 				</div>
 			</div>	
@@ -222,7 +236,7 @@
 			</c:if>
 		</c:forEach>	
 		
-		<html:link href="javascript:exportSummary();" property="exportExcel" styleClass="button space-left" style="margin-left:665px; ">
+		<html:link href="javascript:exportSummary();" property="exportExcel" styleClass="button space-right float-right">
 			<fmt:message key="label.monitoring.summary.export.summary" />
 		</html:link>
 		
