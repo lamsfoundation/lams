@@ -9,7 +9,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 public class ReflectDTO {
     private String fullName;
     private boolean isGroupLeader;
-    
+    private String groupName;
     private String reflection;
 
     public ReflectDTO(User user) {
@@ -30,6 +30,14 @@ public class ReflectDTO {
 
     public void setIsGroupLeader(boolean isGroupLeader) {
 	this.isGroupLeader = isGroupLeader;
+    }
+    
+    public String getGroupName() {
+	return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+	this.groupName = groupName;
     }
     
     public String getReflection() {

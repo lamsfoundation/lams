@@ -1,16 +1,16 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-	<%-- param has higher level for request attribute --%>
-	<c:if test="${not empty param.sessionMapID}">
-		<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	</c:if>
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<%-- param has higher level for request attribute --%>
+<c:if test="${not empty param.sessionMapID}">
+	<c:set var="sessionMapID" value="${param.sessionMapID}" />
+</c:if>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-	<c:set var="mode" value="${sessionMap.mode}" />
-	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
-	<c:set var="scratchie" value="${sessionMap.scratchie}" />
-	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
-	<c:set var="isScratchingFinished" value="${sessionMap.isScratchingFinished}" />
+<c:set var="mode" value="${sessionMap.mode}" />
+<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
+<c:set var="scratchie" value="${sessionMap.scratchie}" />
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
+<c:set var="isScratchingFinished" value="${sessionMap.isScratchingFinished}" />
 
 		<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 			<h3>${item.title}</h3>
@@ -55,7 +55,8 @@
 					
 		</c:forEach>
 
-		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and (!sessionMap.isShowResultsPage or (mode == 'teacher'))}">
+		<%-- show reflection (only for teacher) --%>
+		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and (mode == 'teacher')}">
 			<div class="small-space-top">
 				<h2>
 					${sessionMap.reflectInstructions}
@@ -74,47 +75,23 @@
 						</p>
 					</c:otherwise>
 				</c:choose>
-
-				<c:if test="${(mode != 'teacher') && isUserLeader}">
-					<html:button property="finishButton" onclick="return continueReflect()" styleClass="button">
-						<fmt:message key="label.edit" />
-					</html:button>
-				</c:if>
 			</div>
 		</c:if>
 
 		<c:if test="${(mode != 'teacher') &&  (isUserLeader || isScratchingFinished)}">
 			<div class="space-bottom-top align-right">
 				<c:choose>
-					<c:when test="${sessionMap.reflectOn && !sessionMap.userFinished && !sessionMap.isShowResultsPage && isUserLeader}">
+					<c:when test="${sessionMap.reflectOn && isUserLeader}">
 						<html:button property="finishButton" styleId="finishButton" onclick="return continueReflect()" styleClass="button">
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
 					<c:otherwise>
-						<c:choose>
-							<c:when test="${sessionMap.isShowResultsPage}">
-								<html:button property="finishButton" styleId="finishButton" onclick="return finish(true)" styleClass="button">
-									<fmt:message key="label.submit" />
-								</html:button>
-							</c:when>
-							<c:otherwise>
-								<html:link href="#nogo" property="finishButton" styleId="finishButton" onclick="return finish(false)" styleClass="button">
-									<span class="nextActivity">
-										<c:choose>
-											<c:when test="${sessionMap.activityPosition.last}">
-												<fmt:message key="label.submit" />
-											</c:when>
-											<c:otherwise>
-												<fmt:message key="label.finished" />
-											</c:otherwise>
-										</c:choose>
-									</span>
-								</html:link>
-							</c:otherwise>
-						</c:choose>
-
+						<html:button property="finishButton" styleId="finishButton" onclick="return finish()" styleClass="button">
+							<fmt:message key="label.submit" />
+						</html:button>
 					</c:otherwise>
 				</c:choose>
 			</div>
 		</c:if>
+		

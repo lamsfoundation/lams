@@ -11,13 +11,6 @@
 </p>
 
 <p>
-	<html:checkbox property="scratchie.showResultsPage" styleClass="noBorder" styleId="showResultsPage"/>
-	<label for="showResultsPage">
-		<fmt:message key="label.authoring.advanced.show.results.page" />
-	</label>
-</p>
-
-<p>
 	<html:checkbox property="scratchie.reflectOnActivity" styleClass="noBorder" styleId="reflectOn"/>
 	<label for="reflectOn">
 		<fmt:message key="label.authoring.advanced.reflectOnActivity" />

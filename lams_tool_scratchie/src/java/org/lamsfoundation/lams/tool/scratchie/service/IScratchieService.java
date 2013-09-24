@@ -307,7 +307,7 @@ public interface IScratchieService {
      * @param contentId
      * @return
      */
-    List<ReflectDTO> getReflectionList(Set<ScratchieUser> users);
+    List<ReflectDTO> getReflectionList(Long contentId);
 
     /**
      * Get user by UID
@@ -335,15 +335,6 @@ public interface IScratchieService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
-    /**
-     * Populates items with results, i.e. correctAnswer, userMark, userAttempts. Used for displaying this data on learner results page.
-     * 
-     * @param sessionId
-     * @param userUid
-     * @return
-     */
-    Set<ScratchieItem> populateItemsResults(Long sessionId, Long userUid);
     
     /**
      * Return all learners in activity

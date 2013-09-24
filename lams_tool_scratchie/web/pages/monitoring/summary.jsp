@@ -114,17 +114,17 @@
 	   	   	});
         </c:forEach>
         
-			//jqgrid autowidth (http://stackoverflow.com/a/1610197)
-			$(window).bind('resize', function() {
-				var grid;
-		        if (grid = jQuery(".ui-jqgrid-btable:visible")) {
-		            grid.each(function(index) {
-		                var gridId = $(this).attr('id');
-		                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-		                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-		            });
-		        }
-			});
+		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
+		$(window).bind('resize', function() {
+			var grid;
+		    if (grid = jQuery(".ui-jqgrid-btable:visible")) {
+		    	grid.each(function(index) {
+		        	var gridId = $(this).attr('id');
+		        	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+		        	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+		    	});
+		    }
+		});
 
 		$("#item-uid").change(function() {
 			var itemUid = $(this).val();

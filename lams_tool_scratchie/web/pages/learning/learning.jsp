@@ -26,7 +26,6 @@
 
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript">
-	<!--
 
 		function scratchItem(itemUid, answerUid){
 			var id = '-' + itemUid + '-' + answerUid;
@@ -58,21 +57,18 @@
 	       	});
 		}
 
-		function finish(isShowResultsPage){
+		function finish(){
 			var numberOfAvailableScratches = $("[id^=imageLink-][onclick]").length;
 			var	finishConfirmed = (numberOfAvailableScratches > 0) ? confirm("<fmt:message key="label.one.or.more.questions.not.completed"></fmt:message>") : true;
 			
 			if (finishConfirmed) {
 				document.getElementById("finishButton").disabled = true;
-				if (isShowResultsPage) {
-					document.location.href ='<c:url value="/learning/showResults.do?sessionMapID=${sessionMapID}"/>';
-				} else {
-					document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
-				}
+				document.location.href ='<c:url value="/learning/showResults.do?sessionMapID=${sessionMapID}"/>';
 				
 				return false;
 			}
 		}
+		
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
@@ -88,15 +84,10 @@
 				{
 					sessionMapID: "${sessionMapID}",
 					reqId: (new Date()).getTime()
-				},
-				function(){
-					//reinitializePassingMarkSelect(false);
-					//refreshThickbox();
 				}
 			);
 		}
 		
-	-->        
     </script>
 </lams:head>
 <body class="stripes">

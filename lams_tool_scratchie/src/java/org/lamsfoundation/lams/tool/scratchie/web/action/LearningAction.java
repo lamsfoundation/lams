@@ -27,9 +27,9 @@ package org.lamsfoundation.lams.tool.scratchie.web.action;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
+import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
@@ -58,7 +59,6 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.service.ScratchieApplicationException;
-import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -187,7 +187,6 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_IS_USER_LEADER, isUserLeader);
 	boolean isUserFinished = user != null && user.isSessionFinished();
 	sessionMap.put(ScratchieConstants.ATTR_USER_FINISHED, isUserFinished);
-	sessionMap.put(ScratchieConstants.ATTR_IS_SHOW_RESULTS_PAGE, scratchie.isShowResultsPage());
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	// reflection information
@@ -232,13 +231,23 @@ public class LearningAction extends Action {
 	    service.retrieveScratchesOrder(items, user);
 	}
 	
+	//calculate max score
+	int maxScore = 0;
+	for (ScratchieItem item : items) {
+	    maxScore += item.getAnswers().size() - 1;
+	    if (scratchie.isExtraPoint()) {
+		maxScore++;
+	    }
+	}
+	
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
+	sessionMap.put(ScratchieConstants.ATTR_MAX_SCORE, maxScore);
 	boolean isScratchingFinished = user != null && user.isScratchingFinished();
 	sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, isScratchingFinished);
 
 	// decide whether to show results page or learning one
-	if (scratchie.isShowResultsPage() && isScratchingFinished && !mode.isTeacher()) {
+	if (isScratchingFinished && !mode.isTeacher()) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
 	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
@@ -319,7 +328,8 @@ public class LearningAction extends Action {
     }
 
     /**
-     * Leader presses button show results. All the users set scratchingFinished to true.
+     * Displays results page.
+     * When leader gets to this page, scratchingFinished column is set to true for all users.
      * 
      * @param mapping
      * @param form
@@ -335,14 +345,40 @@ public class LearningAction extends Action {
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// only leaders should get to here to finalize scratching
-	service.setScratchingFinished(toolSessionId);
-
+	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
 	ScratchieUser user = (ScratchieUser) sessionMap.get(ScratchieConstants.ATTR_USER);
-	Set<ScratchieItem> items = service.populateItemsResults(toolSessionId, user.getUid());
-	request.setAttribute(ScratchieConstants.ATTR_ITEM_LIST, items);
+
+	// in case of the leader we should let all other learners see Next Activity button
+	if (service.isUserGroupLeader(user, toolSession)) {
+	    service.setScratchingFinished(toolSessionId);
+	}
+	
+	//get user from DB to get his updated score
+	ScratchieUser userUpdated = service.getUser(user.getUid());
+	int score = userUpdated.getMark();
+	int maxScore = (Integer) sessionMap.get(ScratchieConstants.ATTR_MAX_SCORE);
+	double percentage = (maxScore == 0) ? 0 : (score * 100/maxScore);
+	request.setAttribute(ScratchieConstants.ATTR_SCORE, (int)percentage);
+	
+	// Create reflectList if reflection is enabled.
+	boolean isReflectOnActivity = (Boolean) sessionMap.get(ScratchieConstants.ATTR_REFLECTION_ON);
+	if (isReflectOnActivity) {
+	    List<ReflectDTO> reflections = service.getReflectionList(toolSession.getScratchie().getContentId());
+	    
+	    //remove current session leader reflection
+	    Iterator<ReflectDTO> refIterator = reflections.iterator();
+	    while (refIterator.hasNext()) {
+		ReflectDTO reflection = refIterator.next();
+		if (toolSession.getSessionName().equals(reflection.getGroupName())) {
+		    refIterator.remove();
+		    break;
+		}
+	    }
+	    
+	    request.setAttribute(ScratchieConstants.ATTR_REFLECTIONS, reflections);
+	}
 
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
@@ -366,11 +402,6 @@ public class LearningAction extends Action {
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
 	ScratchieUser user = (ScratchieUser) sessionMap.get(AttributeNames.USER);
-
-	// in case of the leader we should let all other learners see Next Activity button
-	if (service.isUserGroupLeader(user, toolSession)) {
-	    service.setScratchingFinished(toolSessionId);
-	}
 
 	String nextActivityUrl = null;
 	try {
@@ -420,7 +451,7 @@ public class LearningAction extends Action {
     }
 
     /**
-     * Submit reflection form input database.
+     * Submit reflection form input database. Only leaders can submit reflections.
      * 
      * @param mapping
      * @param form
@@ -433,6 +464,7 @@ public class LearningAction extends Action {
 	initializeScratchieService();
 	ReflectionForm refForm = (ReflectionForm) form;
 	Integer userId = refForm.getUserID();
+	String entryText = refForm.getEntryText();
 
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
@@ -445,15 +477,16 @@ public class LearningAction extends Action {
 	if (entry == null) {
 	    // create new entry
 	    service.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ScratchieConstants.TOOL_SIGNATURE, userId, refForm.getEntryText());
+		    ScratchieConstants.TOOL_SIGNATURE, userId, entryText);
 	} else {
 	    // update existing entry
-	    entry.setEntry(refForm.getEntryText());
+	    entry.setEntry(entryText);
 	    entry.setLastModified(new Date());
 	    service.updateEntry(entry);
 	}
-
-	return finish(mapping, form, request, response);
+	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, entryText);
+	
+	return showResults(mapping, refForm, request, response);
     }
 
     // *************************************************************************************

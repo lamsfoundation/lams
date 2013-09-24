@@ -126,10 +126,12 @@ public class ScratchieConstants {
     public static final String ATTR_TITLE = "title";
     
     public static final String ATTR_ITEM = "item";
+    
+    public static final String ATTR_SCORE = "score";
+    
+    public static final String ATTR_MAX_SCORE = "maxScore";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
-    
-    public static final String ATTR_IS_SHOW_RESULTS_PAGE = "isShowResultsPage";
 
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 

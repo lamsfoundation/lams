@@ -76,7 +76,6 @@ public class ScratchieForm extends ActionForm {
 	    scratchie.setRunOffline(false);
 	    scratchie.setReflectOnActivity(false);
 	    scratchie.setExtraPoint(false);
-	    scratchie.setShowResultsPage(false);
 	}
     }
 

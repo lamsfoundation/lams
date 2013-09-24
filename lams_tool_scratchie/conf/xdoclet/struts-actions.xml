@@ -233,7 +233,7 @@
 			input="/pages/learning/notebook.jsp"
 			parameter="submitReflection" 
 			scope="request">
-			<forward name="success" path="/pages/learning/finish.jsp" />
+			<forward name="success" path="/pages/learning/results.jsp" />
 
 		</action>
 		<!-- ========== BEGIN: Monitoring Definitions ============================== -->

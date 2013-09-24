@@ -789,33 +789,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	
 	return itemAttempts;
     }
-
-    @Override
-    public Set<ScratchieItem> populateItemsResults(Long sessionId, Long userUid) {
-	ScratchieSession session = scratchieSessionDao.getSessionBySessionId(sessionId);
-	Scratchie scratchie = session.getScratchie();
-	Set<ScratchieItem> items = scratchie.getScratchieItems();
-	List<ScratchieAnswerVisitLog> userLogs = scratchieAnswerVisitDao.getLogsByScratchieUser(userUid);
-
-	for (ScratchieItem item : items) {
-	    int mark = getUserMarkPerItem(scratchie, item, userLogs);
-	    item.setUserMark(mark);
-
-	    int itemAttempts = calculateItemAttempts(userLogs, item);
-	    item.setUserAttempts(itemAttempts);
-
-	    String correctAnswer = "";
-	    for (ScratchieAnswer answer : (Set<ScratchieAnswer>) item.getAnswers()) {
-		if (answer.isCorrect()) {
-		    correctAnswer = answer.getDescription();
-		}
-	    }
-	    item.setCorrectAnswer(correctAnswer);
-	}
-
-	return items;
-    }
-
+    
     @Override
     public List<GroupSummary> getQuestionSummary(Long contentId, Long itemUid) {
 
@@ -900,24 +874,29 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public List<ReflectDTO> getReflectionList(Set<ScratchieUser> users) {
-
+    public List<ReflectDTO> getReflectionList(Long contentId) {
 	ArrayList<ReflectDTO> reflections = new ArrayList<ReflectDTO>();
+	
+	// get all available leaders associated with this content as only leaders have reflections
+	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
+	for (ScratchieSession session : sessionList) {
+	    
+	    ScratchieUser leader = session.getGroupLeader();
+	    if (leader != null) {
+		NotebookEntry notebookEntry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			ScratchieConstants.TOOL_SIGNATURE, leader.getUserId().intValue());
+		if ((notebookEntry != null) && StringUtils.isNotBlank(notebookEntry.getEntry())) {
+		    ReflectDTO reflectDTO = new ReflectDTO(notebookEntry.getUser());
+		    String reflection = StringEscapeUtils.escapeJavaScript(notebookEntry.getEntry());
+		    reflectDTO.setGroupName(session.getSessionName());
+		    reflectDTO.setReflection(reflection);
+		    reflectDTO.setIsGroupLeader(this.isUserGroupLeader(leader, session));
 
-	for (ScratchieUser user : users) {
-	    ScratchieSession session = user.getSession();
-	    NotebookEntry notebookEntry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ScratchieConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-	    if ((notebookEntry != null) && StringUtils.isNotBlank(notebookEntry.getEntry())) {
-		ReflectDTO reflectDTO = new ReflectDTO(notebookEntry.getUser());
-		String reflection = StringEscapeUtils.escapeJavaScript(notebookEntry.getEntry());
-		reflectDTO.setReflection(reflection);
-		reflectDTO.setIsGroupLeader(this.isUserGroupLeader(user, session));
-
-		reflections.add(reflectDTO);
+		    reflections.add(reflectDTO);
+		}
 	    }
 	}
-
+	
 	return reflections;
     }
 
