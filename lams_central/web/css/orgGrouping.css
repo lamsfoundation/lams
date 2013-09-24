@@ -1,0 +1,41 @@
+div#titleDiv {
+	font-size: small;
+	font-weight: bold;
+	padding: 5px 0;
+	text-align: center;
+	border-bottom: thin dotted #2E6E9E;
+}
+
+.removeGroupingButton {
+	float: right;
+	cursor: pointer;
+	padding-right: 3px;
+	width: 16px;
+	height: 16px;
+}
+
+#addGroupingButton {
+	float: right;
+	margin: 20px 10px 10px 0;
+}
+
+.groupingContainer {
+	padding: 10px 10px 0 10px;
+}
+
+.groupingName {
+	font-size: 12px;
+	border-bottom: 1px dotted #0087E5;
+	color: #0087E5;
+	text-decoration: none;
+}
+
+.groupingName:hover {
+	border-bottom: 1px solid #0087E5;
+	color: #0087E5;
+}
+
+.groupCount {
+	font-size: 12px;
+	padding-left: 10px;
+}

@@ -10,24 +10,29 @@ html, body {
 }
 
 div#titleDiv {
+	padding: 0 5px 0 5px;
     font-size: small;
     font-weight: bold;
-    padding: 5px 10px 5px 10px;
 	border-bottom: thin dotted #2E6E9E;
 }
 
 div#titleDiv input {
-	margin-left: 5px;
+	margin: 5px 0 5px 0;
 	width: 290px;
 }
 
-#titleInstructions{
-	padding-top: 4px;
+div#titleDiv .ui-button {
+	margin-bottom: 5px;
+	font-size: inherit;
+}
+
+#titleInstructions {
+	margin-top: 7px;
 	float: right;
 }
 
 table#groupsTable {
-	height: 380px;
+	height: 375px;
 }
 
 table#groupsTable td {
@@ -104,9 +109,18 @@ td#unassignedUserCell .userContainer {
 	cursor: default;
 }
 
+.userContainer .ui-state-disabled {
+	opacity: 1 !important;
+}
+
 .droppableHighlight {
 	padding : 1px !important;
 	border: 5px solid #5c9ccc !important;
+}
+
+.locked {
+	padding : 4px;
+	border: 2px solid red;
 }
 
 .draggableUserSelected {

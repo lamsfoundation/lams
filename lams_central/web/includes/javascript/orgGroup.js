@@ -1,22 +1,36 @@
-﻿// ********** MAIN FUNCTIONS **********
+﻿// for user selecting and sorting purposes
 var sortOrderAscending = {};
 var lastSelectedUsers = {};
 
 $(document).ready(function(){
-	$('#groupingName').val(grouping.name);
+	$('.ui-button').button();
 	// show unassigned users on the left
 	fillGroup(unassignedUsers, $('#unassignedUserCell'));
+	// add existing groups
 	$.each(grouping.groups, function(){
-		// add existing groups
-		addGroup(this.groupId, this.name, this.users);
+		// if a course grouping is being copied as lesson grouping,
+		// do not use group IDs as they will be created when assiging users to created groups
+		var groupId = !lessonMode || skipInitialAssigning ? this.groupId : null;
+		var group = addGroup(groupId, this.name, this.users);
+		if (this.locked) {
+			markGroupLocked(group);
+		}
 	});
-	// move Save button to the titlebar, i.e. outside of this iframe to the enveloping dialog
-	$('div.ui-dialog-titlebar', window.parent.document).prepend($('.customDialogButton'));
+	
+	// initialisation based on mode
+	if (lessonMode) {
+		toggleBackButton();
+	} else {
+		$('#groupingName').val(grouping.name);
+		// move Save button to the titlebar, i.e. outside of this iframe to the enveloping dialog
+		$('div.ui-dialog-titlebar', window.parent.document).prepend($('.customDialogButton'));
+	}
 	
 	if (canEdit) {
 		// allow adding new groups
 		$('#newGroupPlaceholder').click(function(){
-			addGroup(null, LABELS.GROUP_PREFIX_LABEL + $('table .groupContainer').length, null);
+			// the label is "Group X" where X is the top group number
+			addGroup(null, LABELS.GROUP_PREFIX_LABEL + ' ' + $('#groupsTable .groupContainer').length, null);
 		});
 	}
 });
@@ -26,23 +40,48 @@ $(document).ready(function(){
  * Add a group and fills it with given users.
  */
 function addGroup(groupId, name, users) {
-	var groupCount = $('table .groupContainer').length;
 	var group = $('#groupTemplate').clone()
 					.attr({
-						'id' : 'group-' + groupCount,
+						// remove template's HTML ID
+						'id'      : null,
 						'groupId' : groupId
 					})
 					.css('display', null);
+	
+	var groupNameFields = $('#groupsTable .groupContainer input');
+	var groupTopIndex = groupNameFields.length;
+	// names can be blank in course groups,
+	// but in lesson groups they have to exist and be unique
+	if (lessonMode && !name) {
+		name = LABELS.GROUP_PREFIX_LABEL + ' ' + groupTopIndex;
+	}
+	var nameIsUnique;
+	do {
+		nameIsUnique = true;
+		groupNameFields.each(function(){
+			if (name == $(this).val()) {
+				nameIsUnique = false;
+				return false;
+			}
+		});
+		if (!nameIsUnique) {
+			groupTopIndex++;
+			name = LABELS.GROUP_PREFIX_LABEL + groupTopIndex;
+		}
+	} while (!nameIsUnique);
+	
 	group.find('input').val(name);
 	
-	// there is no placeholder in read-only mode
 	if (canEdit) {
 		group.insertBefore('#newGroupPlaceholder');
 	} else {
+		// there is no placeholder in read-only mode
 		$('#groupsCell').append(group);
 	}
 	
 	fillGroup(users, group);
+	
+	return group;
 }
 
 
@@ -63,7 +102,7 @@ function fillGroup(users, container) {
 			if (canEdit) {
 	    		userDiv.draggable({ 
 							'appendTo'    : 'body',
-							'containment' : 'table',
+							'containment' : '#groupsTable',
 						    'revert'      : 'invalid',
 						    'distance'    : 20,
 						    'scroll'      : false,
@@ -117,7 +156,17 @@ function fillGroup(users, container) {
 					});
 			}
 			
-			$('.userContainer', container).append(userDiv);
+			if (lessonMode && !skipInitialAssigning && container.attr('id') != 'unassignedUserCell') {
+				// copy course groups as lesson groups, creating new instances
+				if (assignUsersToGroup([userJSON.id], container)) {
+					$('.userContainer', container).append(userDiv);
+				} else {
+					// if it fails, put them in unassigned list
+					$('#unassignedUserCell .userContainer').append(userDiv);
+				}
+			} else {
+				$('.userContainer', container).append(userDiv);
+			}
 		});
 		
 		sortUsers(container);
@@ -131,14 +180,31 @@ function fillGroup(users, container) {
 		$(container).droppable({
 		   'activeClass' : 'droppableHighlight',
 		   'tolerance'   : 'touch',
-		   'drop'        : function (event, draggable) {
-			   var draggableUserContainer = $(draggable.draggable).parent();
+		   'drop'        : function (event, ui) {
+			   var draggableUserContainer = $(ui.draggable).parent();
 			   var thisUserContainer = $('.userContainer', this);
 			   // do not do anything if it is the same container
 			   // using "accept" feature breaks the layout
 			   if (draggableUserContainer[0] !=  thisUserContainer[0]) {
-				   transferUsers(draggableUserContainer, thisUserContainer);
-			   }
+				   var executeDrop = !lessonMode;
+				   if (!executeDrop) {
+					   var transferToLocked = $(this).hasClass('locked');
+					   // make sure user wants to transfer learners to a group which is already in use
+					   executeDrop = !transferToLocked || confirm(LABELS.TRANSFER_LOCKED_LABEL);
+					   if (executeDrop) {
+						   var userIds = [];
+						   $('div.draggableUserSelected', draggableUserContainer).each(function(){
+							   userIds.push($(this).attr('userId'));
+						   });
+						   // execute transfer on server side
+						   executeDrop = assignUsersToGroup(userIds, $(this));
+					   }
+			       }
+				   
+				   if (executeDrop) {
+					   transferUsers(draggableUserContainer, thisUserContainer);
+				   }
+			   }  
 		   }
 		});
 	
@@ -146,24 +212,35 @@ function fillGroup(users, container) {
 		$('.removeGroupButton', container).click(function(){
 			removeGroup(container);
 		});
+		
+		if (lessonMode) {
+			$('input', container).blur(function(){
+				renameGroup(container);
+			});
+		}
 	}
 }
 
-
+/**
+ * Move user DIVs from one group to another
+ */
 function transferUsers(fromContainer, toContainer) {
 	var selectedUsers =  $('.draggableUserSelected', fromContainer);
-	if (selectedUsers.length > 0){
+	var locked = toContainer.parent().hasClass('locked');
+	if (selectedUsers.length > 0){   
 	   // move the selected users
-	   selectedUsers.each(function(){
+	   selectedUsers.each(function(){	  
 		  $(this).css({'top'  : '0px',
               		   'left' : '0px',
-          })
-          .appendTo(toContainer);
+          }).removeClass('draggableUserSelected')
+            .appendTo(toContainer);
+		  
+		  if (locked) {
+            $(this).draggable('disable');
+		  }
 	   });
-	            
 	   
 	   // recolour both containers
-	   toContainer.children().removeClass('draggableUserSelected');
 	   colorDraggableUsers(toContainer);
 	   colorDraggableUsers(fromContainer);
 	}
@@ -211,34 +288,87 @@ function sortUsers(container) {
 	}
 }
 
+/**
+ * Remove a group both from the server and the page.
+ */
 function removeGroup(container) {
 	// no groupId means this group was just added and it was not persisted in DB yet
-	var executeDelete = !$(container).attr('groupId');
-	if (!executeDelete) {
+	var groupId = container.attr('groupId');
+	var executeDelete = true;
+	if (groupId) {
 		executeDelete = confirm(LABELS.GROUP_REMOVE_LABEL);
 	}
 	if (executeDelete) {
-		$('#unassignedUserCell .userContainer').append($('.userContainer div.draggableUser', container));
-		container.remove();
+		executeDelete = !lessonMode;
+		
+		if (lessonMode) {
+			$.ajax({
+				async    : false,
+				cache    : false,
+				dataType : 'json',
+				url : LAMS_URL + 'monitoring/grouping.do',
+				data : {
+					'method'     : 'removeGroupJSON',
+					'activityID' : groupingActivityId,
+					'groupID'    : groupId
+				},
+				type : 'POST',
+				success : function(response) {
+					executeDelete = response.result;
+				}
+			});
+		}
+		
+		if (executeDelete) {
+			$('#unassignedUserCell .userContainer').append($('.userContainer div.draggableUser', container));
+			container.remove();
+			toggleBackButton();
+		}
 	}
 }
 
+/**
+ * Change name of a group both on the server and on the page.
+ */
+function renameGroup(container) {
+	var groupId = $(container).attr('groupId');
+	var nameInput = $('input', container);
+	var inputEditable = !nameInput.attr('readonly');
+	// only lesson groups which exist on the server need to have their names changed immediatelly
+	if (lessonMode && groupId && inputEditable) {
+		var groupName = nameInput.val();
+		$.ajax({
+			cache    : false,
+			url : LAMS_URL + 'monitoring/grouping.do',
+			data : {
+				'method'     : 'changeGroupNameJSON',
+				'groupID'    : groupId,
+				'name'       : groupName
+			},
+			type : 'POST'
+		});
+	}
+}
 
+/**
+ * Save a course grouping.
+ */
 function saveGroups(){
-	if (!canEdit) {
+	if (!canEdit || lessonMode) {
 		return false;
 	}
 	$('.errorMessage').hide();
 	
 	var groupingName = $('#groupingName').val();
 	if (!groupingName) {
+		// course grouping name can not be blank
 		$('#groupingNameBlankError').show();
 		return false;
 	}
 	
 	// ask if removing new, empty groups is OK
 	var acceptEmptyGroups = true;
-	var groupContainers = $('table .groupContainer').not('#newGroupPlaceholder');
+	var groupContainers = $('#groupsTable .groupContainer').not('#newGroupPlaceholder');
 	$.each(groupContainers.not('[groupId]'), function(){
 		if ($('div.draggableUser', this).length == 0) {
 			 acceptEmptyGroups = false;
@@ -270,13 +400,14 @@ function saveGroups(){
 			userIds.push($(this).attr('userId'));
 		});
 		
+		// add the group JSON to grouping JSON
 		newGrouping.groups.push({
 			'groupId' : groupId,
 			'name'    : $('input', this).val(),
 			'users'   : userIds
 		});
 	});
-
+	
 	$.ajax({
 		async : false,
 		cache : false,
@@ -287,10 +418,69 @@ function saveGroups(){
 			'grouping' : JSON.stringify(newGrouping)
 		},
 		type : 'POST',
-		success : function(json) {
+		success : function() {
 			groupsSaved = true;
 		}
 	});
 	
 	return groupsSaved;
+}
+
+/**
+ * Transfer learners between groups on the server.
+ */
+function assignUsersToGroup(userIds, groupContainer) {
+	// if removing from any groups, set group ID as -1; server understands this
+	var groupId = groupContainer.attr('id') == 'unassignedUserCell' ? -1 : groupContainer.attr('groupId');
+	// name is only needed when creating a new group, i.e. a group which does not have ID yet
+	var groupName = groupId ? null : $('input', groupContainer).val();
+	var result = false;
+	
+	$.ajax({
+		async    : false,
+		cache    : false,
+		dataType : 'json',
+		url : LAMS_URL + 'monitoring/grouping.do',
+		data : {
+			'method'     : 'addMembersJSON',
+			'activityID' : groupingActivityId,
+			'groupID'    : groupId,
+			'name'       : groupName,
+			'members'    : userIds.join()
+		},
+		type : 'POST',
+		success : function(response) {
+			result = response.result;
+			if (response.groupId) {
+				groupContainer.attr('groupId', response.groupId);
+			}
+			if (!result && response.locked) {
+				// the server says that the group became in use while teacher was working with this screen
+				markGroupLocked($('div[userId="' + userIds[0] + '"]').parents('.groupContainer'));
+				alert(LABELS.GROUP_LOCK_LABEL);
+			}
+			toggleBackButton();
+		}
+	});
+	
+	return result;
+}
+
+/**
+ * If there are any existing (not new) groups, forbid going back to grouping list.
+ */
+function toggleBackButton() {
+	if (lessonMode) {
+		$('#backButton').button('option', 'disabled', $('.groupContainer[groupId]').length > 0);
+	}
+}
+
+/**
+ * Makes a group almost immutable as server does not allow changed.
+ */
+function markGroupLocked(container) {
+	container.addClass('locked');
+	$('.removeGroupButton', container).remove();
+	// $('input', container).attr('readonly', 'readonly');
+	$('div.draggableUser', container).off('click').draggable('disable');
 }
