@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.IndexedColors;
@@ -909,7 +910,8 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		    ScratchieConstants.TOOL_SIGNATURE, user.getUserId().intValue());
 	    if ((notebookEntry != null) && StringUtils.isNotBlank(notebookEntry.getEntry())) {
 		ReflectDTO reflectDTO = new ReflectDTO(notebookEntry.getUser());
-		reflectDTO.setReflection(notebookEntry.getEntry());
+		String reflection = StringEscapeUtils.escapeJavaScript(notebookEntry.getEntry());
+		reflectDTO.setReflection(reflection);
 		reflectDTO.setIsGroupLeader(this.isUserGroupLeader(user, session));
 
 		reflections.add(reflectDTO);
