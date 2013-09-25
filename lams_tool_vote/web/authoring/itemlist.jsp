@@ -115,6 +115,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		win.hideMessage();
 		var obj = win.document.getElementById('resourceListArea');
 		obj.innerHTML= document.getElementById("itemList").innerHTML;
+        
+        win.changeMinMaxVotes(-1, -1);
 	}
 </script>
 

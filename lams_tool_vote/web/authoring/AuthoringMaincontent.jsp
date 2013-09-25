@@ -79,11 +79,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         	var tag = document.getElementById("currentTab");
 	    	tag.value = tabId;
 	    	selectTab(tabId);
-
-	    	//for advanceTab
-	    	if(tabId == 2) {
-	    		changeMinMaxVotes(-1, -1);
-	    	}
         } 
 
         function changeMinMaxVotes(maxNominationCount, minNominationCount) {
@@ -91,35 +86,37 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
         	processSelect("minNominationCount", minNominationCount);
 		}
 
-        function processSelect(id, initSelectedItem) {
-			var table = document.getElementById("itemTable");
-			var trs = table.getElementsByTagName("tr");            
+        function processSelect(id, initSelectedItem) {        
 			var select = document.getElementById(id);
-			var options = select.options;
-			var numberOptions = select.length;
-			
-			//when first enter, it should get value from VoteContent
-			var selectedItem = (initSelectedItem < 0) ? -1 : initSelectedItem;
-			for (var i = 0; i < numberOptions; i++) {
-				if(options[0].selected && selectedItem == -1 ){
-					selectedItem = options[0].value;
+			if (select) {
+				var table = document.getElementById("itemTable");
+				var trs = table.getElementsByTagName("tr");    
+				var options = select.options;
+				var numberOptions = select.length;
+				
+				//when first enter, it should get value from VoteContent
+				var selectedItem = (initSelectedItem < 0) ? -1 : initSelectedItem;
+				for (var i = 0; i < numberOptions; i++) {
+					if(options[0].selected && selectedItem == -1 ){
+						selectedItem = options[0].value;
+					}
+					select.removeChild(options[0]);
 				}
-				select.removeChild(options[0]);
-			}
-
-			var isTextAllowed = document.getElementById("allowText").checked ? 1 : 0;
-			for(var i = 1; i <= (trs.length+isTextAllowed); i++){
-				var opt = document.createElement("option");
-				var optT = document.createTextNode(i);
-				opt.value = i;
-				//get back user choosen value
-				if(selectedItem > 0 && selectedItem == i){
-					opt.selected = true;
-				} else {
-					opt.selected = false;
+	
+				var isTextAllowed = document.getElementById("allowText").checked ? 1 : 0;
+				for(var i = 1; i <= (trs.length+isTextAllowed); i++){
+					var opt = document.createElement("option");
+					var optT = document.createTextNode(i);
+					opt.value = i;
+					//get back user choosen value
+					if(selectedItem > 0 && selectedItem == i){
+						opt.selected = true;
+					} else {
+						opt.selected = false;
+					}
+					opt.appendChild(optT);
+					select.appendChild(opt);
 				}
-				opt.appendChild(optT);
-				select.appendChild(opt);
 			}
         }		
         
