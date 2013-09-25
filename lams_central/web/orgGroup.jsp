@@ -23,7 +23,7 @@
 		var lessonMode = ${lessonMode};
 		// This attribute can be empty.
 		// When true, it means that it shows already existing groups so no calls to server are needed.
-		var skipInitialAssigning = ${skipInitialAssigning eq true};
+		var skipAssigningWhenCreatingGroup = ${skipInitialAssigning eq true};
 		// This attribute can be empty.
 		// When true, it means that groups can not be added or removed, but user can be still moved.
 		var usedForBranching = ${usedForBranching eq true};

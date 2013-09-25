@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -544,42 +545,44 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	boolean result = true;
 
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	String members = WebUtil.readStrParam(request, GroupingAJAXAction.PARAM_MEMBERS);
-	String[] membersSplit = members.split(",");
+	String membersParam = WebUtil.readStrParam(request, GroupingAJAXAction.PARAM_MEMBERS, true);
+	String[] members = StringUtils.isBlank(membersParam) ? null : membersParam.split(",");
 
 	// remove users from current group
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
-	GroupingActivity groupingActivity = monitoringService.getGroupingActivityById(activityID);
-	Grouping grouping = groupingActivity.getCreateGrouping();
-	User exampleUser = (User) MonitoringServiceProxy.getUserManagementService(getServlet().getServletContext())
-		.findById(User.class, Integer.valueOf(membersSplit[0]));
-	Group group = grouping.getGroupBy(exampleUser);
-	// null group means that user is not assigned anywhere in this grouping
-	if (!group.isNull()) {
-	    // check if user can be moved outside of this group
-	    result = group.mayBeDeleted();
+	if (members != null) {
+	    GroupingActivity groupingActivity = monitoringService.getGroupingActivityById(activityID);
+	    Grouping grouping = groupingActivity.getCreateGrouping();
+	    User exampleUser = (User) MonitoringServiceProxy.getUserManagementService(getServlet().getServletContext())
+		    .findById(User.class, Integer.valueOf(members[0]));
+	    Group group = grouping.getGroupBy(exampleUser);
+	    // null group means that user is not assigned anywhere in this grouping
+	    if (!group.isNull()) {
+		// check if user can be moved outside of this group
+		result = group.mayBeDeleted();
 
-	    if (result) {
-		if (LamsDispatchAction.log.isDebugEnabled()) {
-		    LamsDispatchAction.log.debug("Removing users " + members.toString() + " from group "
-			    + group.getGroupId() + " in activity " + activityID);
+		if (result) {
+		    if (LamsDispatchAction.log.isDebugEnabled()) {
+			LamsDispatchAction.log.debug("Removing users " + membersParam.toString() + " from group "
+				+ group.getGroupId() + " in activity " + activityID);
+		    }
+
+		    try {
+			monitoringService.removeUsersFromGroup(activityID, group.getGroupId(), members);
+		    } catch (LessonServiceException e) {
+			LamsDispatchAction.log.error(e);
+			result = false;
+		    }
 		}
 
-		try {
-		    monitoringService.removeUsersFromGroup(activityID, group.getGroupId(), membersSplit);
-		} catch (LessonServiceException e) {
-		    LamsDispatchAction.log.error(e);
-		    result = false;
+		if (!result) {
+		    // let JSP page know that this group became immutable
+		    responseJSON.put("locked", true);
 		}
-	    }
-
-	    if (!result) {
-		// let JSP page know that this group became immutable
-		responseJSON.put("locked", true);
 	    }
 	}
-
+	
 	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID, true);
 	// no group ID means that it has to be created
 	// group ID = -1 means that user is not being assigned to any new group, i.e. becomse unassigned
@@ -589,7 +592,7 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 		if (LamsDispatchAction.log.isDebugEnabled()) {
 		    LamsDispatchAction.log.debug("Creating group with name \"" + name + "\" in activity " + activityID);
 		}
-		group = monitoringService.addGroup(activityID, name, true);
+		Group group = monitoringService.addGroup(activityID, name, true);
 		if (group == null) {
 		    // group creation failed
 		    result = false;
@@ -600,15 +603,15 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 		}
 	    }
 
-	    if (result) {
+	    if (result && members != null) {
 		if (LamsDispatchAction.log.isDebugEnabled()) {
-		    LamsDispatchAction.log.debug("Adding users " + members.toString() + " to group " + groupID
+		    LamsDispatchAction.log.debug("Adding users " + membersParam.toString() + " to group " + groupID
 			    + " in activity " + activityID);
 		}
 
 		// add users to the given group
 		try {
-		    monitoringService.addUsersToGroup(activityID, groupID, membersSplit);
+		    monitoringService.addUsersToGroup(activityID, groupID, members);
 		} catch (LessonServiceException e) {
 		    LamsDispatchAction.log.error(e);
 		    result = false;

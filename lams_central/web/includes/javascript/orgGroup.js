@@ -10,12 +10,14 @@ $(document).ready(function(){
 	$.each(grouping.groups, function(){
 		// if a course grouping is being copied as lesson grouping,
 		// do not use group IDs as they will be created when assiging users to created groups
-		var groupId = !lessonMode || skipInitialAssigning ? this.groupId : null;
+		var groupId = !lessonMode || skipAssigningWhenCreatingGroup ? this.groupId : null;
 		var group = addGroup(groupId, this.name, this.users);
 		if (this.locked) {
 			markGroupLocked(group);
 		}
 	});
+	// after initial group creation, all new groups will be created on server
+	skipAssigningWhenCreatingGroup = false;
 	
 	// initialisation based on mode
 	if (lessonMode) {
@@ -72,8 +74,9 @@ function addGroup(groupId, name, users) {
 	
 	group.find('input').val(name);
 	
-	if (canEdit) {
-		group.insertBefore('#newGroupPlaceholder');
+	var newGroupPlaceholder = $('#newGroupPlaceholder');
+	if (newGroupPlaceholder.length > 0) {
+		group.insertBefore(newGroupPlaceholder);
 	} else {
 		// there is no placeholder in read-only mode
 		$('#groupsCell').append(group);
@@ -89,6 +92,9 @@ function addGroup(groupId, name, users) {
  * Makes a list of users and adds drag&drop functionality to them.
  */
 function fillGroup(users, container) {
+	// make calls to server or just create users in HTML
+	var createOnServer = lessonMode && !skipAssigningWhenCreatingGroup
+									&& container.attr('id') != 'unassignedUserCell';
 	if (users) {
 		// create user DIVs
 		$.each(users, function(index, userJSON) {
@@ -156,7 +162,7 @@ function fillGroup(users, container) {
 					});
 			}
 			
-			if (lessonMode && !skipInitialAssigning && container.attr('id') != 'unassignedUserCell') {
+			if (createOnServer) {
 				// copy course groups as lesson groups, creating new instances
 				if (assignUsersToGroup([userJSON.id], container)) {
 					$('.userContainer', container).append(userDiv);
@@ -170,6 +176,9 @@ function fillGroup(users, container) {
 		});
 		
 		sortUsers(container);
+	} else if (createOnServer) {
+		// just createa an empty group
+		assignUsersToGroup(null, container);
 	}
 	
 	$('.sortUsersButton', container).click(function(){
@@ -446,7 +455,7 @@ function assignUsersToGroup(userIds, groupContainer) {
 			'activityID' : groupingActivityId,
 			'groupID'    : groupId,
 			'name'       : groupName,
-			'members'    : userIds.join()
+			'members'    : userIds ? userIds.join() : null
 		},
 		type : 'POST',
 		success : function(response) {
@@ -471,7 +480,16 @@ function assignUsersToGroup(userIds, groupContainer) {
  */
 function toggleBackButton() {
 	if (lessonMode) {
-		$('#backButton').button('option', 'disabled', $('.groupContainer[groupId]').length > 0);
+		var backButton = $('#backButton');
+		var disabled = $('.groupContainer[groupId]').length > 0;
+		if (disabled) {
+			backButton.off('click').button('option', 'disabled', true);
+		} else {
+			backButton.click(function(){
+				document.location.href = LAMS_URL + 'OrganisationGroup.do?method=viewGroupings&activityID='
+					+ groupingActivityId + '&organisationID=' + grouping.organisationId;
+			}).button('option', 'disabled', false);
+		}
 	}
 }
 
