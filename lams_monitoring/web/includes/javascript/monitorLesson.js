@@ -764,15 +764,14 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 			if (executeForceComplete) {
 				// tell server to force complete the learner
 				$.ajax({
-					dataType : 'xml',
+					dataType : 'text',
 					url : LAMS_URL + 'monitoring/monitoring.do',
 					cache : false,
 					data : {
 						'method'     		 : 'forceComplete',
 						'lessonID'   		 : lessonId,
 						'learnerID'  		 : learnerId,
-						'activityID' 		 : targetActivityId,
-						'isPreviousActivity' : false
+						'activityID' 		 : targetActivityId
 					},
 					success : function(response) {
 						// inform user of result
@@ -953,7 +952,7 @@ function addCompletedLearnerIcons(learners, learnerTotalCount) {
 					'title'      : LEARNER_GROUP_SHOW_LABEL
 				}).css('cursor', 'pointer')
 				  .dblclick(function(){
-					showLearnerGroupDialog(null, LEARNER_FINISHED_DIALOG_TITLE_LABEL, learners);
+					showLearnerGroupDialog(null, LEARNER_FINISHED_DIALOG_TITLE_LABEL, learners, true, false);
 				}).appendTo(iconsContainer);
 				// stop processing learners
 				return false;
