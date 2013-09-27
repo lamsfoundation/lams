@@ -179,7 +179,16 @@ public interface IAssessmentService {
      */
     void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId);    
 
-    void processUserAnswers(Long assessmentUid, Long userId, ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions);
+    /**
+     * Store user answers into DB. It can be autosave and non-autosave requests.
+     * 
+     * @param assessmentUid
+     * @param userId
+     * @param pagedQuestions
+     * @param isAutosave indicates whether it's autosave request
+     */
+    void storeUserAnswers(Long assessmentUid, Long userId, ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions,
+	    boolean isAutosave);
     
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
     

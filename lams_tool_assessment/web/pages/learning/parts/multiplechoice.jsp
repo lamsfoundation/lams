@@ -25,7 +25,8 @@
 					</c:if>
 						
 				</td>		
-			</c:if>		
+			</c:if>
+			
 			<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; width: 5px; border-bottom:0px; ">
 				<c:choose>
 					<c:when test="${question.multipleAnswersAllowed}">
@@ -41,11 +42,12 @@
 						/>
 					</c:otherwise>
 				</c:choose>
-				
 			</td>
+			
 			<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px;">
 				<c:out value="${option.optionString}" escapeXml="false" />
 			</td>
+			
 			<c:if test="${finishedLock && option.answerBoolean && assessment.allowQuestionFeedback}">
 
 				<c:choose>
@@ -61,6 +63,7 @@
 					<c:out value="${option.feedback}" escapeXml="false" />
 				</td>		
 			</c:if>
+			
 		</tr>
 	</c:forEach>
 </table>	

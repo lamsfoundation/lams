@@ -51,7 +51,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.events.DeliveryMethodMail;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -115,6 +114,9 @@ public class LearningAction extends Action {
 	}
 	if (param.equals("downOption")) {
 	    return downOption(mapping, form, request, response);
+	}
+	if (param.equals("autoSaveAnswers")) {
+	    return autoSaveAnswers(mapping, form, request, response);
 	}
 	// ================ Reflection =======================
 	if (param.equals("newReflection")) {
@@ -195,11 +197,13 @@ public class LearningAction extends Action {
 
 	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), assessmentUser.getUserId());
 	int attemptsAllowed = assessment.getAttemptsAllowed();
-	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());	
-	boolean finishedLockForMonitor =  (mode != null) && mode.isTeacher() && (lastResult != null) && (lastResult.getFinishDate() != null);	
-	boolean finishedLock = (assessmentUser.isSessionFinished() && (attemptsAllowed != 0))
-		|| finishedLockForMonitor
-		|| ((attemptsAllowed <= dbResultCount) && (attemptsAllowed != 0));
+	boolean isResubmitAllowed = ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0));
+	
+	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());
+	boolean isLastResultFinished = (lastResult != null) && (lastResult.getFinishDate() != null);
+	//finishedLockForMonitor is a lock for displaying results page for teacher only if user see it, and displaying learner page if user see it accordingly
+	boolean finishedLockForMonitor =  (mode != null) && mode.isTeacher() && isLastResultFinished;	
+	boolean finishedLock = assessmentUser.isSessionFinished() || finishedLockForMonitor || isLastResultFinished;
 
 	// get notebook entry
 	String entryText = new String();
@@ -211,7 +215,7 @@ public class LearningAction extends Action {
 	// basic information
 	sessionMap.put(AssessmentConstants.ATTR_TITLE, assessment.getTitle());
 	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, assessment.getInstructions());
-	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, false);
+	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed);
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, finishedLock);
 	sessionMap.put(AssessmentConstants.ATTR_USER_FINISHED, assessmentUser.isSessionFinished());
 	sessionMap.put(AssessmentConstants.PARAM_RUN_OFFLINE, assessment.getRunOffline());
@@ -322,11 +326,12 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 	
 	// loadupLastAttempt for display purpose
-	if (dbResultCount > 0) {
-	    loadupLastAttempt(sessionMap);    
-	    if (finishedLock) {
-		loadupResultMarks(sessionMap);
-	    }
+	loadupLastAttempt(sessionMap);
+	
+	//check if need to display results page
+	if ((dbResultCount > 0) && finishedLock) {
+	    // display results page
+	    populateResultsPage(sessionMap);
 	}
 
 	return mapping.findForward(AssessmentConstants.SUCCESS);
@@ -339,9 +344,14 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	
 	boolean finishedLock = (Boolean) sessionMap.get(AssessmentConstants.ATTR_FINISHED_LOCK);
 	if (! finishedLock) {
-	    preserveUserAnswers(request);   
+	    //get user answers from request and store them into sessionMap
+	    storeUserAnswersIntoSessionMap(request);
+	    // store results from sessionMap into DB
+	    storeUserAnswersIntoDatabase(sessionMap, true);
+		
 	    request.setAttribute(AssessmentConstants.PARAM_SECONDS_LEFT, 
 		    request.getParameter(AssessmentConstants.PARAM_SECONDS_LEFT));
 	}
@@ -367,9 +377,13 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
-	preserveUserAnswers(request);
-	processUserAnswers(sessionMap);
-	loadupResultMarks(sessionMap);
+	//get user answers from request and store them into sessionMap
+	storeUserAnswersIntoSessionMap(request);
+	//store results from sessionMap into DB
+	storeUserAnswersIntoDatabase(sessionMap, false);
+	
+	// populate info for displaying results page
+	populateResultsPage(sessionMap);
 	
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	//calculate whether isResubmitAllowed
@@ -386,7 +400,7 @@ public class LearningAction extends Action {
 	AssessmentResult result = (AssessmentResult) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_RESULT);
 	int passingMark = assessment.getPassingMark();
 	boolean isUserFailed = ((passingMark != 0) && (passingMark > result.getGrade()));
-	request.setAttribute(AssessmentConstants.ATTR_IS_USER_FAILED, isUserFailed);
+	sessionMap.put(AssessmentConstants.ATTR_IS_USER_FAILED, isUserFailed);
 	
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, true);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -498,6 +512,23 @@ public class LearningAction extends Action {
     }
     
     /**
+     * auto saves responses 
+     */
+    private ActionForward autoSaveAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	IAssessmentService service = getAssessmentService();
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	
+	//get user answers from request and store them into sessionMap
+	storeUserAnswersIntoSessionMap(request);
+	//store results from sessionMap into DB
+	storeUserAnswersIntoDatabase(sessionMap, true);
+	
+	return null;
+    }
+    
+    /**
      * Display empty reflection form.
      */
     private ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -561,7 +592,12 @@ public class LearningAction extends Action {
     // Private method
     // *************************************************************************************
     
-    private void preserveUserAnswers(HttpServletRequest request){
+    /**
+     * Get back user answers from request and store it into sessionMap.
+     * 
+     * @param request
+     */
+    private void storeUserAnswersIntoSessionMap(HttpServletRequest request){
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
@@ -622,13 +658,13 @@ public class LearningAction extends Action {
 	}
     }
     
-    private void loadupResultMarks(SessionMap<String, Object> sessionMap){
+    private void populateResultsPage(SessionMap<String, Object> sessionMap){
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	IAssessmentService service = getAssessmentService();
-	AssessmentResult result = service.getLastAssessmentResult(assessment.getUid(), userId);
+	AssessmentResult result = service.getLastFinishedAssessmentResult(assessment.getUid(), userId);
 	
 	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
@@ -677,7 +713,7 @@ public class LearningAction extends Action {
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	IAssessmentService service = getAssessmentService();
-	AssessmentResult result = service.getLastFinishedAssessmentResult(assessmentUid,userId);
+	AssessmentResult result = service.getLastAssessmentResult(assessmentUid,userId);
 	
 	for(LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
@@ -719,24 +755,25 @@ public class LearningAction extends Action {
     }
     
     /**
-     * Get answer options from <code>HttpRequest</code>
+     * Store user answers in DB in last unfinished attempt and notify teachers about it.
      */
-    private void processUserAnswers(SessionMap<String, Object> sessionMap) {
+    private void storeUserAnswersIntoDatabase(SessionMap<String, Object> sessionMap, boolean isAutosave) {
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	IAssessmentService service = getAssessmentService();
-	service.processUserAnswers(assessmentUid, userId, pagedQuestions);
+	service.storeUserAnswers(assessmentUid, userId, pagedQuestions, isAutosave);
 	
 	// notify teachers
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-	if ((mode != null) && !mode.isTeacher()) {
-	    Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
-	    Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	    final boolean isHtmlFormat = false;
+	if ((mode != null) && !mode.isTeacher() && !isAutosave) {
 	    
+	    Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	    if (assessment.isNotifyTeachersOnAttemptCompletion()) {
+		
+		Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+		final boolean isHtmlFormat = false;
 		List<User> monitoringUsers = service.getMonitorsByToolSessionId(toolSessionId);
 		if (monitoringUsers != null && !monitoringUsers.isEmpty()) {
 		    Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
@@ -751,6 +788,7 @@ public class LearningAction extends Action {
 			    service.getLocalisedMessage("event.learner.completes.attempt.body", new Object[] { fullName }),
 			    isHtmlFormat);
 		}
+		
 	    }
 	}
     }

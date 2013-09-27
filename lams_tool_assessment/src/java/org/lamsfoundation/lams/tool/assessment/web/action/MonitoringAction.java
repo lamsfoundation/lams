@@ -408,7 +408,7 @@ public class MonitoringAction extends Action {
 				data.add(userTitleRow);
 			    }
 
-			    AssessmentResult assessmentResult = service.getLastAssessmentResult(assessment.getUid(),
+			    AssessmentResult assessmentResult = service.getLastFinishedAssessmentResult(assessment.getUid(),
 				    assessmentUser.getUserId());
 
 			    if (assessmentResult != null) {

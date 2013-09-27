@@ -8,8 +8,7 @@
 
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.learning.title" />
-	</title>
+	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 
 	<%-- param has higher level for request attribute --%>
@@ -34,8 +33,15 @@
 	</c:choose>	
 	
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
+	<style media="screen,projection" type="text/css">
+		div.growlUI { background: url(check48.png) no-repeat 10px 10px }
+		div.growlUI h1, div.growlUI h2 {
+			color: white; padding: 5px 5px 5px 0px; text-align: center;
+		}
+	</style>
 
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script> 
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript">
@@ -92,6 +98,34 @@
 		            }); 
 		        }, 4000); 
 			}	
+		</c:if>
+		
+		//autosave feature
+		<c:if test="${(!finishedLock) && (mode != 'teacher')}">
+			var autosaveInterval = "30000"; // 30 seconds interval
+			window.setInterval(
+				function(){
+					//copy value from CKEditor (only available in essay type of questions) to textarea before ajax submit
+					$("span[id^=cke_question]").each(function() {
+						var questionNumber = "" + this.id.substring("cke_question".length);
+						
+						$("textarea[id=question" + questionNumber + "]").each(function() {
+							
+							var ckeditorData = CKEDITOR.instances[this.name].getData();
+							//skip out empty values
+							this.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;
+						});
+					});
+					
+					//ajax form submit
+					$('#answers').ajaxSubmit({
+						url: "<c:url value='/learning/autoSaveAnswers.do'/>?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
+		                success: function() {
+		                	$.growlUI('<fmt:message key="label.learning.draft.autosaved" />');
+		                }
+					});
+	        	}, autosaveInterval
+	        );
 		</c:if>
 		
 		function finishSession(){
@@ -169,7 +203,7 @@
 			</div>
 		</c:if>
 		
-		<c:if test="${isUserFailed}">
+		<c:if test="${sessionMap.isUserFailed}">
 			<div class="warning">
 				<fmt:message key="label.learning.havent.reached.passing.mark">
 					<fmt:param>${assessment.passingMark}</fmt:param>
@@ -190,11 +224,7 @@
 		
 		<%@ include file="parts/attemptsummary.jsp"%>
 		
-		<c:if test="${not finishedLock}">
-			<%@ include file="parts/allquestions.jsp"%>
-		</c:if>
-
-		<c:if test="${finishedLock && assessment.displaySummary}">
+		<c:if test="${!finishedLock || finishedLock && assessment.displaySummary}">
 			<%@ include file="parts/allquestions.jsp"%>
 		</c:if>
 		
@@ -238,10 +268,10 @@
 						<c:if test="${isResubmitAllowed}">
 							<html:link href="javascript:;" property="resubmit" onclick="return resubmit()" styleClass="button">
 								<fmt:message key="label.learning.resubmit" />
-							</html:link>						
+							</html:link>
 						</c:if>	
 						
-						<c:if test="${! isUserFailed}">
+						<c:if test="${! sessionMap.isUserFailed}">
 						
 							<c:choose>
 								<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">

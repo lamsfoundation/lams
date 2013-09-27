@@ -141,7 +141,7 @@ public class AssessmentOutputFactory extends OutputFactory {
      * Get total score for a user. Will always return a ToolOutput object.
      */
     private ToolOutput getTotalScore(IAssessmentService assessmentService, Long learnerId, Assessment assessment) {
-	AssessmentResult assessmentResult = assessmentService.getLastAssessmentResult(assessment.getUid(), learnerId);
+	AssessmentResult assessmentResult = assessmentService.getLastFinishedAssessmentResult(assessment.getUid(), learnerId);
 	
 	float totalScore = (assessmentResult == null) ? 0 : assessmentResult.getGrade();
 	
@@ -153,7 +153,7 @@ public class AssessmentOutputFactory extends OutputFactory {
      * Get time taken for a specific user to accomplish this assessment. Will always return a ToolOutput object.
      */
     private ToolOutput getTimeTaken(IAssessmentService assessmentService, Long learnerId, Assessment assessment) {
-	AssessmentResult assessmentResult = assessmentService.getLastAssessmentResult(assessment.getUid(), learnerId);
+	AssessmentResult assessmentResult = assessmentService.getLastFinishedAssessmentResult(assessment.getUid(), learnerId);
 	
 	long timeTaken = 0;
 	if ((assessmentResult != null) && (assessmentResult.getFinishDate() != null)) {
@@ -179,7 +179,7 @@ public class AssessmentOutputFactory extends OutputFactory {
      */
     private ToolOutput getQuestionScore(IAssessmentService assessmentService, Long learnerId, Assessment assessment,
 	    int questionSequenceId) {
-	AssessmentResult assessmentResult = assessmentService.getLastAssessmentResult(assessment.getUid(), learnerId);
+	AssessmentResult assessmentResult = assessmentService.getLastFinishedAssessmentResult(assessment.getUid(), learnerId);
 
 	float questionScore = 0;
 	for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {

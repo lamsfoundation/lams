@@ -355,6 +355,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     @Override
     public void setAttemptStarted(Assessment assessment, AssessmentUser assessmentUser, Long toolSessionId) {
+	AssessmentResult lastResult = this.getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());
+	//don't instantiate new attempt if the previous one wasn't finished and thus continue working with it
+	if ((lastResult != null) && (lastResult.getFinishDate() == null)) {
+	    return;
+	}
+	
 	AssessmentResult result = new AssessmentResult();
 	result.setAssessment(assessment);
 	result.setUser(assessmentUser);
@@ -364,32 +370,38 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     @Override
-    public void processUserAnswers(Long assessmentUid, Long userId,
-	    ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions) {
+    public void storeUserAnswers(Long assessmentUid, Long userId,
+	    ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions, boolean isAutosave) {
+	
 	SortedSet<AssessmentQuestionResult> questionResultList = new TreeSet<AssessmentQuestionResult>(
 		new AssessmentQuestionResultComparator());
 	int maximumGrade = 0;
 	float grade = 0;
+	
 	for (LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
 		int numberWrongAnswers = assessmentQuestionResultDao.getNumberWrongAnswersDoneBefore(assessmentUid,
 			userId, question.getUid());
-		AssessmentQuestionResult processedAnswer = this.processUserAnswer(question, numberWrongAnswers);
+		AssessmentQuestionResult processedAnswer = this.storeUserAnswer(question, numberWrongAnswers);
 		questionResultList.add(processedAnswer);
 
 		maximumGrade += question.getGrade();
 		grade += processedAnswer.getMark();
 	    }
 	}
+	
 	AssessmentResult result = assessmentResultDao.getLastAssessmentResult(assessmentUid, userId);
 	result.setQuestionResults(questionResultList);
-	result.setMaximumGrade(maximumGrade);
-	result.setGrade(grade);
-	result.setFinishDate(new Timestamp(new Date().getTime()));
+	//store grades and finished date only on user hitting submit all answers button 
+	if (!isAutosave) {
+	    result.setMaximumGrade(maximumGrade);
+	    result.setGrade(grade);
+	    result.setFinishDate(new Timestamp(new Date().getTime()));
+	}
 	assessmentResultDao.saveObject(result);
     }
 
-    private AssessmentQuestionResult processUserAnswer(AssessmentQuestion question, int numberWrongAnswers) {
+    private AssessmentQuestionResult storeUserAnswer(AssessmentQuestion question, int numberWrongAnswers) {
 	AssessmentQuestionResult questionResult = new AssessmentQuestionResult();
 
 	Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();

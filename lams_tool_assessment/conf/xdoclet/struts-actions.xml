@@ -251,6 +251,10 @@
 			parameter="downOption">
 			<forward name="success" path="/pages/learning/parts/ordering.jsp" />
 		</action>
+		<action path="/learning/autoSaveAnswers"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
+			parameter="autoSaveAnswers">
+		</action>
 		
 		<!--  ========= Reflection =============== -->
 		<action path="/learning/newReflection"
