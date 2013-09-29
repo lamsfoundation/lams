@@ -117,6 +117,9 @@
 						});
 					});
 					
+					//fire onchange event for lams:textarea
+					$("[id$=__lamstextarea]").change();
+					
 					//ajax form submit
 					$('#answers').ajaxSubmit({
 						url: "<c:url value='/learning/autoSaveAnswers.do'/>?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
