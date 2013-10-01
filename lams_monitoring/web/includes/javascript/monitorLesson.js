@@ -379,7 +379,7 @@ function scheduleLesson(){
 			url : LAMS_URL + 'monitoring/monitoring.do',
 			cache : false,
 			data : {
-				'method'          : 'startOnScheduleLessonJSON',
+				'method'          : 'startOnScheduleLesson',
 				'lessonID'        : lessonId,
 				'lessonStartDate' : date
 			},
