@@ -49,3 +49,8 @@
 	<servlet-name>GradebookServlet</servlet-name>
 	<url-pattern>/services/Gradebook</url-pattern>
 </servlet-mapping>
+
+<servlet-mapping>
+	<servlet-name>CourseGroupManager</servlet-name>
+	<url-pattern>/services/CourseGroupManager</url-pattern>
+</servlet-mapping>

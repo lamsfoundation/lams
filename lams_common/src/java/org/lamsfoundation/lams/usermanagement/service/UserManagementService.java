@@ -193,35 +193,37 @@ public class UserManagementService implements IUserManagementService {
 	    baseDAO.insert(grouping);
 	}
 
-	Set<OrganisationGroup> obsoleteGroups = new HashSet<OrganisationGroup>(grouping.getGroups());
-	for (OrganisationGroup newGroup : newGroups) {
-	    OrganisationGroup existingGroup = null;
-	    // check if group already exists
-	    for (OrganisationGroup existingGroupCandidate : grouping.getGroups()) {
-		if (existingGroupCandidate.equals(newGroup)) {
-		    existingGroup = existingGroupCandidate;
-		    break;
+	if (newGroups != null) {
+	    Set<OrganisationGroup> obsoleteGroups = new HashSet<OrganisationGroup>(grouping.getGroups());
+	    for (OrganisationGroup newGroup : newGroups) {
+		OrganisationGroup existingGroup = null;
+		// check if group already exists
+		for (OrganisationGroup existingGroupCandidate : grouping.getGroups()) {
+		    if (existingGroupCandidate.equals(newGroup)) {
+			existingGroup = existingGroupCandidate;
+			break;
+		    }
+		}
+
+		if (existingGroup == null) {
+		    newGroup.setGroupingId(grouping.getGroupingId());
+		    // it is a new group, so add it
+		    grouping.getGroups().add(newGroup);
+		    baseDAO.insert(newGroup);
+		} else {
+		    obsoleteGroups.remove(existingGroup);
+
+		    existingGroup.setName(newGroup.getName());
+		    existingGroup.setUsers(newGroup.getUsers());
+		    baseDAO.update(existingGroup);
 		}
 	    }
 
-	    if (existingGroup == null) {
-		newGroup.setGroupingId(grouping.getGroupingId());
-		// it is a new group, so add it
-		grouping.getGroups().add(newGroup);
-		baseDAO.insert(newGroup);
-	    } else {
-		obsoleteGroups.remove(existingGroup);
-
-		existingGroup.setName(newGroup.getName());
-		existingGroup.setUsers(newGroup.getUsers());
-		baseDAO.update(existingGroup);
+	    // remove gropus from DB
+	    for (OrganisationGroup obsoleteGroup : obsoleteGroups) {
+		grouping.getGroups().remove(obsoleteGroup);
+		baseDAO.delete(obsoleteGroup);
 	    }
-	}
-
-	// remove gropus from DB
-	for (OrganisationGroup obsoleteGroup : obsoleteGroups) {
-	    grouping.getGroups().remove(obsoleteGroup);
-	    baseDAO.delete(obsoleteGroup);
 	}
     }
 

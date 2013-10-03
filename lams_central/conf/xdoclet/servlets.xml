@@ -92,3 +92,11 @@
 		org.lamsfoundation.lams.web.GradebookServlet
 	</servlet-class>
 </servlet>
+
+<servlet>
+	<servlet-name>CourseGroupManager</servlet-name>
+	
+	<servlet-class>
+		org.lamsfoundation.lams.web.OrganisationGroupServlet
+	</servlet-class>
+</servlet>

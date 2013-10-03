@@ -50,8 +50,8 @@ public class OrganisationGroup implements Serializable {
     public OrganisationGroup() {
     }
 
-    public OrganisationGroup(Long organisationId, String name) {
-	this.groupingId = organisationId;
+    public OrganisationGroup(Long groupingId, String name) {
+	this.groupingId = groupingId;
 	this.name = name;
     }
 
