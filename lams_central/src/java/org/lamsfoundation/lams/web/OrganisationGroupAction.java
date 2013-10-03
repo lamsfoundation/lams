@@ -29,7 +29,9 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -45,6 +47,7 @@ import org.apache.struts.actions.DispatchAction;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
@@ -306,9 +309,11 @@ public class OrganisationGroupAction extends DispatchAction {
 
     /**
      * Saves a course grouping.
+     * 
+     * @throws InvalidParameterException
      */
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException {
+	    HttpServletResponse response) throws JSONException, InvalidParameterException {
 	// check if user is allowed to edit groups
 	Integer userId = getUserDTO().getUserID();
 	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
@@ -371,8 +376,24 @@ public class OrganisationGroupAction extends DispatchAction {
 	    orgGrouping = new OrganisationGrouping();
 	    orgGrouping.setOrganisationId(organisationId);
 	}
-	orgGrouping.setName(orgGroupingJSON.getString("name"));
 
+	// check if there is no grouping with the same name
+	String orgGroupingName = orgGroupingJSON.getString("name");
+	if (!orgGroupingName.equals(orgGrouping.getName())) {
+	    Map<String, Object> duplicateCheckProperties = new TreeMap<String, Object>();
+	    duplicateCheckProperties.put("organisationId", organisationId);
+	    duplicateCheckProperties.put("name", orgGroupingName);
+
+	    OrganisationGrouping duplicateOrgGrouping = (OrganisationGrouping) getUserManagementService()
+		    .findByProperties(OrganisationGrouping.class, duplicateCheckProperties);
+	    if (duplicateOrgGrouping == null) {
+		orgGrouping.setName(orgGroupingName);
+	    } else {
+		throw new InvalidParameterException("Grouping with name \"" + orgGroupingName + "\" already exists");
+	    }
+
+	}
+	
 	getUserManagementService().saveOrganisationGrouping(orgGrouping, orgGroups);
 	return null;
     }
