@@ -23,6 +23,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<%
+String userAgent = request.getHeader("User-Agent").toLowerCase();
+boolean isTouchInterface = (userAgent.matches("(?i).*(iphone|ipod|ipad).*"));
+%>
+<c:set var="isTouchInterface"><%=isTouchInterface%></c:set>
 
 <!DOCTYPE html>
 
@@ -63,6 +68,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		var isHorizontalBar = false;
 		var hasContentFrame = true;
 		var hasDialog = false;
+		var isTouchInterface = ${isTouchInterface};
 		var bars = {
 			'learnerMainBar' : {
 				'containerId' : 'progressBarDiv'
@@ -93,7 +99,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						togglerLength_closed : 130,
 						togglerTip_open : '<fmt:message key="label.learner.progress.open.tooltip"/>',
 						togglerTip_closed : '<fmt:message key="label.learner.progress.closed.tooltip"/>',
-						onopen_start : function() {$('#controlFrame').css('visibility','visible');}
+						onopen_start : function() {$('#controlFrame').css('visibility','visible');},
+						onopen_end : function() {
+										//expand contentFrame width altogether with content-frame-container
+										if (isTouchInterface) {
+											$("#contentFrame").width($("#content-frame-container").width());
+										};
+									 },
+						onclose_end : function() {
+										//shrink contentFrame width altogether with content-frame-container
+										if (isTouchInterface) {
+											$("#contentFrame").width($("#content-frame-container").width());
+										};
+									 },
 					}
 				});
 				
@@ -177,10 +195,21 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:if test="${param.presenceEnabledPatch}">
 		<%@ include file="presenceChat.jsp"%>
 	</c:if>
-	
-	<iframe id="contentFrame" name="contentFrame" onload="javascript:fillProgressBar('learnerMainBar')" class="ui-layout-center"
-		src="content.do?lessonID=<c:out value="${param.lessonID}"/>"> </iframe>
+
+	<c:choose>
+		<c:when test="${isTouchInterface}">
+			<div id="content-frame-container" class="ui-layout-center">
+				<iframe id="contentFrame" name="contentFrame" onload="javascript:fillProgressBar('learnerMainBar')" 
+					src="content.do?lessonID=<c:out value="${param.lessonID}"/>"> </iframe>
+			</div>
+		</c:when>
 		
+		<c:otherwise>
+			<iframe id="contentFrame" name="contentFrame" onload="javascript:fillProgressBar('learnerMainBar')" class="ui-layout-center"
+				src="content.do?lessonID=<c:out value="${param.lessonID}"/>"> </iframe>
+		</c:otherwise>
+	</c:choose>
+	
 	<div id="tooltip"></div>
 	
 </body>

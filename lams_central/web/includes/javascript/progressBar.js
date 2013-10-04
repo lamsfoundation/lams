@@ -2,6 +2,7 @@
 // IMPORTANT: set following variables on the page which imports this JS file
 var isHorizontalBar = isHorizontalBar || false;
 var hasContentFrame = hasContentFrame || true;
+var isTouchInterface = isTouchInterface || false;
 var hasDialog = hasDialog || false;
 var presenceEnabled = presenceEnabled || false;
 var REVIEW_ACTIVITY_TITLE = REVIEW_ACTIVITY_TITLE || 'Review activity';
@@ -106,10 +107,11 @@ function resizeElements() {
 
 	if (hasContentFrame) {
 		// resize main content frame, if it is present
+		var position = (isTouchInterface) ? 'static' : 'fixed';
 		$('#contentFrame').css({
 			'width' : width + "px",
 			'height' : height + "px",
-			'position' : 'fixed'
+			'position' : position
 		});
 	}
 
