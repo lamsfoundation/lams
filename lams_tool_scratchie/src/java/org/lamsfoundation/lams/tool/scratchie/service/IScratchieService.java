@@ -305,9 +305,10 @@ public interface IScratchieService {
      * Get Reflection list grouped by sessionID.
      * 
      * @param contentId
+     * @param isEscapeText whether it's required to escape test for displaying in jqgrid
      * @return
      */
-    List<ReflectDTO> getReflectionList(Long contentId);
+    List<ReflectDTO> getReflectionList(Long contentId, boolean isEscapeText);
 
     /**
      * Get user by UID

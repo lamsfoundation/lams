@@ -116,7 +116,7 @@ public class MonitoringAction extends Action {
 
 	// Create reflectList if reflection is enabled.
 	if (scratchie.isReflectOnActivity()) {
-	    List<ReflectDTO> reflections = service.getReflectionList(contentId);
+	    List<ReflectDTO> reflections = service.getReflectionList(contentId, true);
 	    sessionMap.put(ScratchieConstants.ATTR_REFLECTIONS, reflections);
 	}
 

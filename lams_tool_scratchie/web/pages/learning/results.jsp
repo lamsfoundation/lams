@@ -84,7 +84,7 @@
 					
 				    <c:forEach var="reflectDTO" items="${reflections}">
 				    	<div>
-				    		${reflectDTO.groupName}: ${reflectDTO.reflection}
+				    		${reflectDTO.groupName}: <c:out value="${reflectDTO.reflection}" escapeXml="true"></c:out> 
 				    	</div>
 			        </c:forEach>
 		        </c:if>
