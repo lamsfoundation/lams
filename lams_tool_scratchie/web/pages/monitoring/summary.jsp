@@ -101,7 +101,7 @@
 			],
 		   	colModel:[
 		   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
-		   		{name:'userName', index:'userName', width:200},
+		   		{name:'groupName', index:'groupName', width:200},
 		   		{name:'feedback', index:'feedback', width:570}
 		   	],
 		   	caption: "<fmt:message key='label.learners.feedback' />"
@@ -109,7 +109,7 @@
 	    <c:forEach var="reflectDTO" items="${sessionMap.reflections}" varStatus="i">
 	    	jQuery("#reflections").addRowData(${i.index + 1}, {
 	   			id:"${i.index + 1}",
-	   	     	userName:"${reflectDTO.fullName}",
+	   	     	groupName:"${reflectDTO.groupName}",
 		   	    feedback:"<lams:out value='${reflectDTO.reflection}' escapeHtml='true' />"
 	   	   	});
         </c:forEach>
@@ -147,6 +147,22 @@
 	
 				launchPopup(userSummaryUrl, "MonitoringReview");
 			}
+	    });
+		
+		//filter reflections by group name
+		$("#reflection-group-selector").change(function() {
+            var grid = $("#reflections");
+            var searchFiler = $(this).val();
+
+            if (searchFiler.length === 0) {
+                grid[0].p.search = false;
+                $.extend(grid[0].p.postData,{filters:""});
+            }
+            var f = {groupOp:"OR",rules:[]};
+            f.rules.push({field:"groupName",op:"cn",data:searchFiler});
+            grid[0].p.search = true;
+            $.extend(grid[0].p.postData,{filters:JSON.stringify(f)});
+            grid.trigger("reloadGrid",[{page:1,current:true}]);
 	    });
 	});
 	
@@ -209,7 +225,6 @@
 		</div>
 		
 		<div style="padding-left: 30px; margin-top: -5px; margin-bottom: 25px;">
-
 			<select id="item-uid" style="float: left">
 				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
     			<c:forEach var="item" items="${scratchie.scratchieItems}">
@@ -241,7 +256,16 @@
 		<c:if test="${sessionMap.reflectOn}">
 		
 			<div class="section-header">
-				<H1><fmt:message key="label.learners.feedback" /></H1>
+				<H1>
+					<fmt:message key="label.learners.feedback" />
+					
+					<select id="reflection-group-selector" class="space-left">
+						<option selected="selected" value=""><fmt:message key="label.all" /></option>
+		    			<c:forEach var="reflectDTO" items="${sessionMap.reflections}">
+							<option value="${reflectDTO.groupName}">${reflectDTO.groupName}</option>
+					   	</c:forEach>
+					</select>
+				</H1>
 			</div>
 			
 			<div style="padding-left: 30px; width:96%;">
