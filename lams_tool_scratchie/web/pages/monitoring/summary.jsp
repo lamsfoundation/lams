@@ -259,7 +259,7 @@
 			<select id="userid-dropdown" class="float-left">
 				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
     			<c:forEach var="learner" items="${sessionMap.learners}">
-					<option value="${learner.userId}" alt="${learner.session.sessionId}">${learner.firstName} ${learner.lastName}</option>
+					<option value="${learner.userId}" alt="${learner.session.sessionId}">${learner.firstName} ${learner.lastName} (${learner.session.sessionName})</option>
 			   	</c:forEach>
 			</select>
 		</div>

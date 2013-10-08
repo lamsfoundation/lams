@@ -605,18 +605,19 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public Set<ScratchieUser> getAllLearners(Long contentId) {
+    public Set<ScratchieUser> getAllLeaders(Long contentId) {
 
-	Set<ScratchieUser> users = new TreeSet<ScratchieUser>();
+	Set<ScratchieUser> leaders = new TreeSet<ScratchieUser>();
 
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
 	for (ScratchieSession session : sessionList) {
-	    Long sessionId = session.getSessionId();
-	    List<ScratchieUser> sessionUsers = scratchieUserDao.getBySessionID(sessionId);
-	    users.addAll(sessionUsers);
+	    ScratchieUser leader = session.getGroupLeader();
+	    if (leader != null) {
+		leaders.add(leader);
+	    }
 	}
 
-	return users;
+	return leaders;
     }
 
     @Override

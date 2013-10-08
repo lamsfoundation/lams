@@ -338,12 +338,12 @@ public interface IScratchieService {
     boolean isGroupedActivity(long toolContentID);
     
     /**
-     * Return all learners in activity
+     * Return all leaders in activity for all groups
      * 
      * @param contentId
      * @return
      */
-    Set<ScratchieUser> getAllLearners(Long contentId);
+    Set<ScratchieUser> getAllLeaders(Long contentId);
     
     void changeUserMark(Long userId, Long userUid, Integer newMark);
 }

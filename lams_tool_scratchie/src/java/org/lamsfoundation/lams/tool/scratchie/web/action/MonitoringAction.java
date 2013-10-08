@@ -109,7 +109,7 @@ public class MonitoringAction extends Action {
 
 	Scratchie scratchie = service.getScratchieByContentId(contentId);
 	scratchie.toDTO();
-	Set<ScratchieUser> learners = service.getAllLearners(contentId);
+	Set<ScratchieUser> learners = service.getAllLeaders(contentId);
 	
 	//set SubmissionDeadline, if any
 	if (scratchie.getSubmissionDeadline() != null) {
