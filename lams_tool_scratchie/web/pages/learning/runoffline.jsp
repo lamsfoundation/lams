@@ -8,7 +8,7 @@
 	<%@ include file="/common/header.jsp"%>
 
 	<script type="text/javascript">
-	<!--
+	
 		function finishSession(){
 			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&runOffline=true"/>';
@@ -18,7 +18,6 @@
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
-	-->        
     </script>
 </lams:head>
 
@@ -28,11 +27,20 @@
 			${sessionMap.title}
 		</h1>
 
-		<p>
-			<fmt:message key="run.offline.message" />
-		</p>
+		<c:choose>
+			<c:when test="${empty sessionMap.submissionDeadline}">
+				<p>
+					<fmt:message key="run.offline.message" />
+				</p>			
+			</c:when>
+			<c:otherwise>
+				<div class="warning">
+					<fmt:message key="label.sorry.the.deadline.has.passed" />
+				</div>
+			</c:otherwise>
+		</c:choose>
 
-		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
+		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and empty sessionMap.submissionDeadline}">
 			<div class="small-space-top">
 				<h2>
 					${sessionMap.reflectInstructions}
@@ -61,16 +69,13 @@
 
 		<div class="space-bottom-top align-right">
 			<c:choose>
-				<c:when
-					test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-					<html:button property="FinishButton"
-						onclick="return continueReflect()" styleClass="button">
+				<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished) && empty sessionMap.submissionDeadline}">
+					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
 						<fmt:message key="label.continue" />
 					</html:button>
 				</c:when>
 				<c:otherwise>
-					<html:link href="#nogo" property="FinishButton" styleId="finishButton"
-						onclick="return finishSession()" styleClass="button">
+					<html:link href="#nogo" property="FinishButton" styleId="finishButton"	onclick="return finishSession()" styleClass="button">
 						<span class="nextActivity">
 							<c:choose>
 								<c:when test="${sessionMap.activityPosition.last}">

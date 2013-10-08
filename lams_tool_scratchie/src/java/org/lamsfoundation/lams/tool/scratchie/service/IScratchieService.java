@@ -161,7 +161,7 @@ public interface IScratchieService {
      * 
      * @param Scratchie
      */
-    void saveOrUpdateScratchie(Scratchie Scratchie);
+    void saveOrUpdateScratchie(Scratchie scratchie);
 
     /**
      * Delete reource attachment(i.e., offline/online instruction file) from database. This method does not delete the

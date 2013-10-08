@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -61,6 +62,7 @@ import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.service.ScratchieApplicationException;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -187,6 +189,7 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_IS_USER_LEADER, isUserLeader);
 	boolean isUserFinished = user != null && user.isSessionFinished();
 	sessionMap.put(ScratchieConstants.ATTR_USER_FINISHED, isUserFinished);
+	sessionMap.put(ScratchieConstants.PARAM_RUN_OFFLINE, scratchie.getRunOffline());
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	// reflection information
@@ -208,12 +211,27 @@ public class LearningAction extends Action {
 		toolSessionId, request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
-	// add run offline support
+	// run offline support
 	if (scratchie.getRunOffline()) {
-	    sessionMap.put(ScratchieConstants.PARAM_RUN_OFFLINE, true);
 	    return mapping.findForward("runOffline");
-	} else {
-	    sessionMap.put(ScratchieConstants.PARAM_RUN_OFFLINE, false);
+	}
+	
+	//check if there is submission deadline
+	Date submissionDeadline = scratchie.getSubmissionDeadline();
+	if (submissionDeadline != null) {
+	    //store submission deadline to sessionMap
+	    sessionMap.put(ScratchieConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
+	   
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+	    
+	    //calculate whether submission deadline has passed, and if so forward to "runOffline"
+	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
+		return mapping.findForward("runOffline");
+	    }
 	}
 
 	// set scratched flag for display purpose

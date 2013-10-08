@@ -17,7 +17,6 @@
 </style>
 
 <script type="text/javascript">
-	<!--	
 	$(document).ready(function(){
 		var oldValue = 0;
 		
@@ -185,10 +184,24 @@
 		}
 	};
 	window.onresize = resizeIframe;
-	-->		
+	
+	// pass settings to monitorToolSummaryAdvanced.js
+	var submissionDeadlineSettings = {
+		lams: '<lams:LAMSURL />',
+		submissionDeadline: '${submissionDeadline}',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
+		toolContentID: '${param.toolContentID}',
+		messageNotification: '<fmt:message key="monitor.summary.notification" />',
+		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
+		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+	};
+
 </script>
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
 <%@ include file="parts/advanceOptions.jsp"%>
+
+<%@ include file="parts/dateRestriction.jsp"%>
 
 <c:choose>
 	<c:when test="${empty summaryList}">

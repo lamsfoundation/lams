@@ -61,6 +61,10 @@ public class ScratchieConstants {
     public static final String PARAM_ANSWER_INDEX = "answerIndex";
 
     public static final String PARAM_RUN_OFFLINE = "runOffline";
+    
+    public static final String PARAM_NOT_A_NUMBER = "nan";
+    
+    public static final String PARAM_MARK = "mark";
 
     // for request attribute name
     public static final String ATTR_TOOL_CONTENT_ID = "toolContentID";
@@ -155,9 +159,9 @@ public class ScratchieConstants {
     
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
     
-    public static final String PARAM_NOT_A_NUMBER = "nan";
+    public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
     
-    public static final String PARAM_MARK = "mark";
+    public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 
     public static final String LEARNER_MARK = "learner.mark";
     

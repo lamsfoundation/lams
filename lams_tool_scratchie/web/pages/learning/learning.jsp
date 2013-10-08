@@ -106,6 +106,14 @@
 		<p style="font-style: italic;">
 			${scratchie.instructions}
 		</p>
+		
+		<c:if test="${not empty sessionMap.submissionDeadline}">
+			<div class="info">
+				<fmt:message key="authoring.info.teacher.set.restriction" >
+					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
+				</fmt:message>
+			</div>
+		</c:if>
 
 		<%@ include file="/common/messages.jsp"%>
 

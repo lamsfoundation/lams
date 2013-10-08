@@ -251,6 +251,10 @@
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
 			parameter="saveUserMark" >
 		</action>
+		<action path="/monitoring/setSubmissionDeadline"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
+			parameter="setSubmissionDeadline" >
+		</action>
 		<action path="/monitoring/exportExcel"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.MonitoringAction"
 			parameter="exportExcel" >

@@ -25,14 +25,17 @@
 package org.lamsfoundation.lams.tool.scratchie.web.action;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -49,10 +52,13 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.ExcelUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
@@ -79,6 +85,9 @@ public class MonitoringAction extends Action {
 	if (param.equals("saveUserMark")) {
 	    return saveUserMark(mapping, form, request, response);
 	}
+	if (param.equals("setSubmissionDeadline")) {
+	    return setSubmissionDeadline(mapping, form, request, response);
+	}
 	if (param.equals("exportExcel")) {
 	    return exportExcel(mapping, form, request, response);
 	}
@@ -101,6 +110,16 @@ public class MonitoringAction extends Action {
 	Scratchie scratchie = service.getScratchieByContentId(contentId);
 	scratchie.toDTO();
 	Set<ScratchieUser> learners = service.getAllLearners(contentId);
+	
+	//set SubmissionDeadline, if any
+	if (scratchie.getSubmissionDeadline() != null) {
+	    Date submissionDeadline = scratchie.getSubmissionDeadline();
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone teacherTimeZone = teacher.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
+	    request.setAttribute(ScratchieConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	}
 
 	// cache into sessionMap
 	boolean isGroupedActivity = service.isGroupedActivity(contentId);
@@ -166,6 +185,37 @@ public class MonitoringAction extends Action {
 	    Integer newMark = Integer.valueOf(request.getParameter(ScratchieConstants.PARAM_MARK));
 	    service.changeUserMark(userId, sessionId, newMark);
 	}
+
+	return null;
+    }
+    
+    /**
+     * Set Submission Deadline
+     * 
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    private ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	initializeScratchieService();
+	
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Scratchie scratchie = service.getScratchieByContentId(contentID);
+	
+	Long dateParameter = WebUtil.readLongParam(request, ScratchieConstants.ATTR_SUBMISSION_DEADLINE, true);
+	Date tzSubmissionDeadline = null;
+	if (dateParameter != null) {
+	    Date submissionDeadline = new Date(dateParameter);
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone teacherTimeZone = teacher.getTimeZone();
+	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+	}
+	scratchie.setSubmissionDeadline(tzSubmissionDeadline);
+	service.saveOrUpdateScratchie(scratchie);
 
 	return null;
     }
