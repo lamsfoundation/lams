@@ -1743,11 +1743,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    }
 	    toolContentObj.setCreatedBy(user);
 
-	    // reset all scratchieItem createBy user
-	    Set<ScratchieItem> items = toolContentObj.getScratchieItems();
-	    for (ScratchieItem item : items) {
-		item.setCreateBy(user);
-	    }
 	    scratchieDao.saveObject(toolContentObj);
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);

@@ -237,13 +237,6 @@ public class LearningAction extends Action {
 	// set scratched flag for display purpose
 	Collection<ScratchieItem> items = service.getItemsWithIndicatedScratches(toolSessionId, user);
 
-	// becuase webpage will use login name here is just initialize it to avoid session close error in proxy object.
-	for (ScratchieItem item : items) {
-	    if (item.getCreateBy() != null) {
-		item.getCreateBy().getLoginName();
-	    }
-	}
-
 	// for teacher in monitoring display the number of attempt.
 	if (mode.isTeacher()) {
 	    service.retrieveScratchesOrder(items, user);

@@ -44,10 +44,8 @@ public class Summary {
     private String sessionName;
     private Long itemUid;
     private short itemType;
-    private boolean itemCreateByAuthor;
     private String itemTitle;
     private List<String> itemInstructions = new ArrayList<String>();
-    private String username;
     private int viewNumber;
 
     // following is used for export portfolio programs:
@@ -64,27 +62,6 @@ public class Summary {
     }
 
     /**
-     * Contruction method for monitoring summary function.
-     * 
-     * <B>Don't not set isInitGroup and viewNumber fields</B>
-     * 
-     * @param sessionName
-     * @param item
-     * @param isInitGroup
-     */
-    public Summary(Long sessionId, String sessionName, ScratchieItem item) {
-	this.sessionId = sessionId;
-	this.sessionName = sessionName;
-	if (item != null) {
-	    this.itemUid = item.getUid();
-	    this.itemCreateByAuthor = item.isCreateByAuthor();
-	    this.itemTitle = item.getDescription();
-	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getLoginName();
-	} else
-	    this.itemUid = new Long(-1);
-    }
-
-    /**
      * Contruction method for export profolio function.
      * 
      * <B>Don't not set sessionId and viewNumber fields</B>
@@ -98,21 +75,11 @@ public class Summary {
 	this.sessionName = sessionName;
 	if (item != null) {
 	    this.itemUid = item.getUid();
-	    this.itemCreateByAuthor = item.isCreateByAuthor();
 	    // TODO maybe a,b,c,d ?
 	    this.itemTitle = item.getDescription();
-	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getLoginName();
 	} else
 	    this.itemUid = new Long(-1);
 	this.isInitGroup = isInitGroup;
-    }
-
-    public boolean isItemCreateByAuthor() {
-	return itemCreateByAuthor;
-    }
-
-    public void setItemCreateByAuthor(boolean itemCreateByAuthor) {
-	this.itemCreateByAuthor = itemCreateByAuthor;
     }
 
     public String getItemTitle() {
@@ -153,14 +120,6 @@ public class Summary {
 
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
-    }
-
-    public String getUsername() {
-	return username;
-    }
-
-    public void setUsername(String username) {
-	this.username = username;
     }
 
     public int getViewNumber() {

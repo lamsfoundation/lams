@@ -253,16 +253,6 @@ public class AuthoringAction extends Action {
 		TreeSet<ScratchieAnswer> answerList = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
 		answerList.addAll(item.getAnswers());
 		item.setAnswers(answerList);
-
-		if (item.getCreateBy() == null) {
-		    if (scratchieUser == null) {
-			// get back login user DTO
-			HttpSession ss = SessionManager.getSession();
-			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			scratchieUser = new ScratchieUser(user, scratchie);
-		    }
-		    item.setCreateBy(scratchieUser);
-		}
 	    }
 	}
 	// init scratchie item list
@@ -409,8 +399,6 @@ public class AuthoringAction extends Action {
 	while (iter.hasNext()) {
 	    ScratchieItem item = (ScratchieItem) iter.next();
 	    if (item != null) {
-		// This flushs user UID info to message if this user is a new user.
-		item.setCreateBy(scratchieUser);
 		removeNewLineCharacters(item);
 		itemList.add(item);
 	    }

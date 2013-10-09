@@ -52,7 +52,6 @@ public class ScratchieItem implements Cloneable {
     private boolean isCreateByAuthor;
 
     private Date createDate;
-    private ScratchieUser createBy;
     
     // scratchie Items
     private Set answers;
@@ -92,10 +91,6 @@ public class ScratchieItem implements Cloneable {
 		}
 		item.answers = set;
 	    }
-	    
-	    // clone ReourceUser as well
-	    if (this.createBy != null)
-		((ScratchieItem) item).setCreateBy((ScratchieUser) this.createBy.clone());
 
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + ScratchieItem.class + " failed");
@@ -145,19 +140,6 @@ public class ScratchieItem implements Cloneable {
 
     public void setDescription(String description) {
 	this.description = description;
-    }
-
-    /**
-     * @hibernate.many-to-one cascade="none" column="create_by"
-     * 
-     * @return
-     */
-    public ScratchieUser getCreateBy() {
-	return createBy;
-    }
-
-    public void setCreateBy(ScratchieUser createBy) {
-	this.createBy = createBy;
     }
 
     /**

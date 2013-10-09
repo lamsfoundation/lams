@@ -120,10 +120,6 @@ public class Scratchie implements Cloneable {
 	// reset user info as well
 	if (toContent.getCreatedBy() != null) {
 	    toContent.getCreatedBy().setScratchie(toContent);
-	    Set<ScratchieItem> items = toContent.getScratchieItems();
-	    for (ScratchieItem item : items) {
-		item.setCreateBy(toContent.getCreatedBy());
-	    }
 	}
 	return toContent;
     }
