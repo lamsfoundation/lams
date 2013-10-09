@@ -614,8 +614,14 @@ public class LearningAction extends Action {
 		    break;
 		}
 	    }
+	    
+	    // in case learner goes to the next page and refreshes it right after this. And thus it's not possible to know
+	    // previous page number in this case. but anyway no need to save answers
+	    if (question == null) {
+		break;
+	    }
+	    
 	    int questionType = question.getType();
-
 	    if (questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 		for (AssessmentQuestionOption option : question.getQuestionOptions()) {
 		    boolean answerBoolean = false;
