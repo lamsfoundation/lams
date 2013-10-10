@@ -104,7 +104,7 @@
     	} else {// code for IE6, IE5
     		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
     	}
-    	xmlhttp.open("POST", url, true);
+    	xmlhttp.open("POST", url, false);
     	xmlhttp.send();
     }
 	
