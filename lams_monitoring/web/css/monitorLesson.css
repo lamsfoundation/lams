@@ -225,10 +225,6 @@ td.learnersHeaderCell {
 	vertical-align: middle;
 }
 
-#tabLearnerControlTable td.topButtonsContainer {
-	width: 90px;
-}
-
 td.learnersHeaderPageCell,td.learnersPageShifter {
 	min-width: 25px;
 	cursor: pointer;

@@ -1072,10 +1072,6 @@ public class MonitoringAction extends LamsDispatchAction {
 				currentActivity))) {
 		    JSONObject learnerJSON = WebUtil.userToJSON(learner);
 		    Long currentActivityId = currentActivity.getActivityId();
-		    // monitoring URL for the given learner
-		    String learnerUrl = monitoringService.getLearnerActivityURL(lessonId, currentActivityId,
-			    learner.getUserId(), monitorUserId);
-		    learnerJSON.put("url", learnerUrl);
 
 		    Activity parentActivity = currentActivity.getParentActivity();
 		    Long targetActivityId = (branchingActivityId != null) || (parentActivity == null)
@@ -1319,7 +1315,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	    IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		    .getServletContext());
 	    // URL in monitor mode
-	    url = monitoringService.getLearnerActivityURL(lessonId, activity.getActivityId(), learnerId, monitorId);
+	    url = Configuration.get(ConfigurationKeys.SERVER_URL)
+		    + "monitoring/monitoring.do?method=getLearnerActivityURL&lessonID=" + lessonId + "&activityID="
+		    + activity.getActivityId() + "&userID=" + learnerId;
 	}
 
 	if (url != null) {
@@ -1328,7 +1326,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 	    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 	    if (!url.startsWith(serverUrl)) {
-		// monitor mode URLs should be prepended with serve URL
+		// monitor mode URLs should be prepended with server URL
 		url = serverUrl + url;
 	    }
 	    activityJSON.put("url", url);

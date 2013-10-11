@@ -534,8 +534,7 @@ function initSequenceTab(){
 			            		var selectedLearner = $('#learnerGroupList div.dialogListItemSelected');
 			            		if (selectedLearner.length == 1) {
 			            			// open pop up with user progress in the given activity
-			            			openPopUp(LAMS_URL 
-			            					+ selectedLearner.attr('viewUrl'), "LearnActivity", 600, 800, true);
+			            			openPopUp(selectedLearner.attr('viewUrl'), "LearnActivity", 600, 800, true);
 			            		}
 							}
 			             },
@@ -909,7 +908,9 @@ function addLearnerIconsHandlers(activity) {
 			learnerIcon.dblclick(function(event){
 				 // double click on learner icon to see activity from his perspective
 				event.stopPropagation();
-				openPopUp(LAMS_URL + learner.url, "LearnActivity", 600, 800, true);
+				var url = LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
+					               + learner.id + '&activityID=' + activity.id + '&lessonID=' + lessonId;
+				openPopUp(url, "LearnActivity", 600, 800, true);
 			});
 		}
 	});
@@ -945,7 +946,7 @@ function addCompletedLearnerIcons(learners, learnerTotalCount) {
 		// create learner icons, along with handlers
 		$.each(learners, function(learnerIndex, learner){
 			// maximum 41 icons in the bar
-			if (learners.length > 43 && learnerIndex == 42) {
+			if (learners.length > 56 && learnerIndex == 55) {
 				// if icons do not fit in cell anymore, show a group icon
 				$('<img />').attr({
 					'src' : LAMS_URL + 'images/icons/group.png',
@@ -1401,9 +1402,11 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceCom
 	
 	if (learners) {
 		$.each(learners, function(learnerIndex, learner) {
+			var viewUrl = LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
+            				       + learner.id + '&activityID=' + activityId + '&lessonID' + lessonId;
 			var learnerDiv = $('<div />').attr({
 									'userId'  : learner.id,
-									'viewUrl'    : learner.url
+									'viewUrl'    : viewUrl
 									})
 			                      .addClass('dialogListItem')
 							      .text(getLearnerDisplayName(learner))
@@ -1422,7 +1425,7 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceCom
 				if (allowView){
 					learnerDiv.dblclick(function(){
 						// same as clicking View Learner button
-						openPopUp(LAMS_URL + learner.url, "LearnActivity", 600, 800, true);
+						openPopUp(viewUrl, "LearnActivity", 600, 800, true);
 					});
 				}
 			}
