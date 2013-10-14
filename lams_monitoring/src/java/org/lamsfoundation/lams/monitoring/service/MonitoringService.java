@@ -945,9 +945,9 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		design.setMaxID(newMaxId);
 		designModified = true;
 	    }
-	    if (Boolean.TRUE.equals(activity.isInitialised())){
-		activityDAO.update(activity);
-	    }
+	    
+	    activity.setInitialised(Boolean.TRUE);
+	    activityDAO.update(activity);
 	}
 
 	if (designModified) {
