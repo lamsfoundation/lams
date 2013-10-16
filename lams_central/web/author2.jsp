@@ -7,47 +7,9 @@
 <lams:html>
 <lams:head>
 	<title>Flashless Authoring</title>
-	<style type="text/css">
-		table#authoringTable {
-			table-layout: fixed;
-			width: 100%;
-		}
-		
-		td#templateContainerCell {
-			width: 150px;
-			border: black thin solid;
-			vertical-align: top;
-			background-color: rgb(219,230,252);
-		}
-		
-		div#templateContainer {
-			height: 800px;
-			overflow: auto;
-		}
-		
-		div.template {
-			height: 40px;
-			border-bottom: black thin solid;
-			cursor: pointer;
-			vertical-align: middle;
-		}
-		
-		div.template img {
-			display: block;
-			float: left;
-			margin: 5px 8px 5px 5px;
-		}
-		
-		div.template div {
-			float: left;
-			width: 90px;
-			padding-top: 10px;
-			font-size: 10pt;
-		}
 	
-		td#canvas {
-		}
-	</style>
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/authoring.css" type="text/css" media="screen">
 
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
@@ -58,7 +20,28 @@
 	<script type="text/javascript" src="includes/javascript/authoring.js"></script>
 </lams:head>
 <body>
+	<div id="toolbar" class="ui-widget-header ui-corner-all">
+		<div>
+			<div class="split-ui-button">
+				<div>
+					<span>Flow</span>
+				</div>
+				<div>&nbsp;</div>
+			</div>
+			<ul>
+				<li><span>Gate</span></li>
+				<li><span>Branch</span></li>
+			</ul>
+		</div>
+		<div id="groupingButton" class="ui-button">
+			Group
+		</div>
+	</div>
 	<table id="authoringTable">
+		<tr>
+			<td id="layoutCell"></td>
+			<td></td>
+		</tr>
 		<tr>
 			<td id="templateContainerCell">
 				<div id="templateContainer">
