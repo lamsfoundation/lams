@@ -79,7 +79,8 @@
 		onsubmit="return validateForm();" styleId="messageForm">
 		<html:hidden property="dispatch" value="finishActivity" />
 		<html:hidden property="toolSessionID" />
-
+		<html:hidden property="contentEditable" value="${contentEditable}" />
+		
 		<c:set var="lrnForm"
 			value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
@@ -97,28 +98,26 @@
 							styleClass="text-area"></html:textarea>
 					</c:otherwise>
 				</c:choose>
-
-				<div class="space-bottom-top align-right">
-					<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-						<span class="nextActivity">
-							<c:choose>
-								<c:when test="${activityPosition.last}">
-									<fmt:message key="button.submit" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="button.finish" />
-								</c:otherwise>
-							</c:choose>
-						</span>
-					</html:link>
-				</div>
-
 			</c:when>
 
 			<c:otherwise>
 				<lams:out value="${lrnForm.entryText}" />
 			</c:otherwise>
 		</c:choose>
-
+		
+		<div class="space-bottom-top align-right">
+			<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
+				<span class="nextActivity">
+					<c:choose>
+						<c:when test="${activityPosition.last}">
+							<fmt:message key="button.submit" />
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="button.finish" />
+						</c:otherwise>
+					</c:choose>
+				</span>
+			</html:link>
+		</div>
 	</html:form>
 </div>

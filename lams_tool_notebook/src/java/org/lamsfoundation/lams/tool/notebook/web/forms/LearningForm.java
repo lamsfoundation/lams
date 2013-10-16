@@ -35,62 +35,71 @@ import org.apache.struts.action.ActionForm;
  */
 public class LearningForm extends ActionForm {
 
-	private static final long serialVersionUID = -4728946254882237144L;
-	
-	String title;
-	String instructions;
-	
-	String dispatch;
-	Long toolSessionID;
-	String mode;
-	
-	String entryText;
+    private static final long serialVersionUID = -4728946254882237144L;
 
-	public String getMode() {
-		return mode;
-	}
+    String title;
+    String instructions;
 
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
+    String dispatch;
+    Long toolSessionID;
+    String mode;
+    Boolean contentEditable;
 
-	public String getDispatch() {
-		return dispatch;
-	}
+    String entryText;
 
-	public void setDispatch(String dispatch) {
-		this.dispatch = dispatch;
-	}
+    public String getMode() {
+	return mode;
+    }
 
-	public Long getToolSessionID() {
-		return toolSessionID;
-	}
+    public void setMode(String mode) {
+	this.mode = mode;
+    }
 
-	public void setToolSessionID(Long toolSessionID) {
-		this.toolSessionID = toolSessionID;
-	}
+    public String getDispatch() {
+	return dispatch;
+    }
 
-	public String getInstructions() {
-		return instructions;
-	}
+    public void setDispatch(String dispatch) {
+	this.dispatch = dispatch;
+    }
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    public Long getToolSessionID() {
+	return toolSessionID;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public void setToolSessionID(Long toolSessionID) {
+	this.toolSessionID = toolSessionID;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public String getInstructions() {
+	return instructions;
+    }
 
-	public String getEntryText() {
-		return entryText;
-	}
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
-	public void setEntryText(String entryText) {
-		this.entryText = entryText;
-	}
+    public String getTitle() {
+	return title;
+    }
+
+    public void setTitle(String title) {
+	this.title = title;
+    }
+
+    public Boolean getContentEditable() {
+	return contentEditable;
+    }
+
+    public void setContentEditable(Boolean contentEditable) {
+	this.contentEditable = contentEditable;
+    }
+
+    public String getEntryText() {
+	return entryText;
+    }
+
+    public void setEntryText(String entryText) {
+	this.entryText = entryText;
+    }
 }
