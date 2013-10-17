@@ -4,6 +4,7 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 
+<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<title>Flashless Authoring</title>
@@ -29,11 +30,11 @@
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li><span>Gate</span></li>
-				<li><span>Branch</span></li>
+				<li><div onClick="javascript:MenuUtils.addGate()">Gate</div></li>
+				<li><div>Branch</div></li>
 			</ul>
 		</div>
-		<div id="groupingButton" class="ui-button">
+		<div id="groupingButton" class="ui-button" onClick="javascript:MenuUtils.addGrouping()">
 			Group
 		</div>
 	</div>

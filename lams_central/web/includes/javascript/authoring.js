@@ -10,14 +10,18 @@ var layout = {
 		'activityHeight' : 50,
 		'propertiesDialogDimOpacity'   : 0.3,
 		'propertiesDialogDimThreshold' : 100,
-		'propertiesDialogDimThrottle'  : 100
+		'propertiesDialogDimThrottle'  : 100,
+		'dragStartThreshold'           : 300
 	},
 	'defs' : {
-		'bin'        : 'M 830 700 h -50 l 10 50 h 30 Z',
-		'transArrow' : ' l 10 15 a 25 25 0 0 0 -20 0 z'
+		'bin'        : 'M 830 680 h -50 l 10 50 h 30 z',
+		'transArrow' : ' l 10 15 a 25 25 0 0 0 -20 0 z',
+		'gate'       : ' l-8 8 v14 l8 8 h14 l8 -8 v-14 l-8 -8 z'
 	},
 	'colors' : {
 		'activity'     : '#A9C8FD',
+		'gate'         : 'red',
+		'gateText'         : 'white',
 		'transition'   : 'rgb(119,126,157)',
 		'binActive'    : 'red',
 		'selectEffect' : 'blue'
@@ -25,7 +29,7 @@ var layout = {
 	'items' : {
 		'bin'              : null,
 		'selectedActivity' : null,
-		'propertiesDialogDimLastRun' : 0
+		'propertiesDialog' : null
 	}
 };
 
@@ -40,6 +44,11 @@ $(document).ready(function() {
 
 function initTemplates(){
 	$('.template').each(function(){
+		var toolName = $('div', this);
+		if (toolName.text().length > 14){
+			toolName.text(toolName.text().substring(0, 12) + '...');
+		}
+		
 		$(this).draggable({
 			'containment' : '#authoringTable',
 		    'revert'      : 'invalid',
@@ -89,8 +98,8 @@ function initLayout() {
 			if (!button.attr('onclick')) {
 				button.click(function() {
 					var menu = $(this).parent().next().show().position({
-						my : "right top",
-						at : "right bottom",
+						my : "left top+2px",
+						at : "left bottom",
 						of : $(this).parent()
 					});
 					$(document).one("click", function() {
@@ -102,16 +111,26 @@ function initLayout() {
 		});
 	});
 	
-	
-	$('#groupingButton').click(function(){
-		canvas.css('cursor', 'url("images/grouping.gif"), move').click(function(event){
-			var x = event.pageX - canvas.offset().left;
-			var y = event.pageY - canvas.offset().top;
-			
-			ActivityUtils.addGrouping(x, y);
-			CanvasHandlers.resetCanvasMode();
-		});
-	});
+	var propertiesDialog = layout.items.propertiesDialog =
+		$('<div>Properties go here</div>')
+			.appendTo('body')
+			.dialog({
+				'autoOpen'      : false,
+				'closeOnEscape' : false,
+				'position'      : {
+					'my' : 'left top',
+					'at' : 'left top',
+					'of' :  '#canvas'
+				},
+				'resizable'     : false,
+				'title'         : 'Properties'
+			});
+	propertiesDialog.lastRun = 0;
+	propertiesDialog.container = propertiesDialog.closest('.ui-dialog');
+	propertiesDialog.container.addClass('propertiesDialog')
+							  .css('opacity', layout.conf.propertiesDialogDimOpacity)
+	 						  .mousemove(CanvasHandlers.approachPropertiesDialogHandler)
+	                          .find('.ui-dialog-titlebar-close').remove();
 	
 	CanvasHandlers.resetCanvasMode();
 }
@@ -145,7 +164,6 @@ var ActivityUtils = {
 		
 		activity.items = paper.setFinish();
 		activity.items.shape = shape;
-		activity.addDecoration();
 		activity.addEffects();
 	},
 	
@@ -175,7 +193,31 @@ var ActivityUtils = {
 		
 		activity.items = paper.setFinish();
 		activity.items.shape = shape;
-		activity.addDecoration();
+		activity.addEffects();
+	},
+	
+	
+	addGate : function(x, y) {
+		var activityId = ++maxActivityId;
+		var activity = new Activity(activityId, 'gate');
+		activities.push(activity);
+		
+
+		paper.setStart();
+		var shape = paper.path('M ' + x + ' ' + y + layout.defs.gate)
+						 .attr({
+							 'fill' : layout.colors.gate
+						 });
+		
+		paper.text(x + 7, y + 14, 'STOP')
+		     .attr({
+				'font-size' : 9,
+				'font' : 'sans-serif',
+				'stroke' : layout.colors.gateText
+		     })
+		
+		activity.items = paper.setFinish();
+		activity.items.shape = shape;
 		activity.addEffects();
 	},
 	
@@ -195,7 +237,7 @@ var ActivityUtils = {
 			activity.toTransition.remove();
 		}
 		
-		activities = activities.splice(activities.indexOf(activity), 1);
+		activities.splice(activities.indexOf(activity), 1);
 		activity.items.remove();
 	},
 	
@@ -207,11 +249,13 @@ var ActivityUtils = {
 		if (toActivity.toTransition) {
 			toActivity.toTransition.remove();
 		}
-
-		var startX = fromActivity.items.shape.attr('x') + fromActivity.items.shape.attr('width') / 2;
-		var startY = fromActivity.items.shape.attr('y') + fromActivity.items.shape.attr('height') / 2;
-		var endX =   toActivity.items.shape.attr('x') + toActivity.items.shape.attr('width') / 2;
-		var endY =   toActivity.items.shape.attr('y') + toActivity.items.shape.attr('height') / 2;
+		
+		var fromActivityBox = fromActivity.items.shape.getBBox();
+		var toActivityBox = toActivity.items.shape.getBBox();
+		var startX = fromActivityBox.x + fromActivityBox.width / 2;
+		var startY = fromActivityBox.y + fromActivityBox.height / 2;
+		var endX   =   toActivityBox.x + toActivityBox.width / 2;
+		var endY   =   toActivityBox.y + toActivityBox.height / 2;
 		
 		paper.setStart();
 		paper.path('M ' + startX + ' ' + startY + ' L  ' + endX + ' ' + endY)
@@ -244,7 +288,7 @@ var ActivityUtils = {
 			CanvasHandlers.dragItemsStartHandler(transition, this, mouseupHandler, event, x, y)
 		});
 		
-		if (fromActivity.type == 'group') {
+		if (fromActivity.type == 'group' && toActivity.type != 'gate') {
 			ActivityUtils.addGroupingEffect(toActivity);
 		}
 	},
@@ -263,13 +307,13 @@ var ActivityUtils = {
 	
 	addSelectEffect : function (activity) {
 		if (!activity.items.selectEffect) {
-			var shape = activity.items.shape;
-			
+			var box = activity.items.shape.getBBox();
+
 			activity.items.selectEffect = paper.rect(
-					shape.attr('x') - 7,
-					shape.attr('y') - 7,
-					layout.conf.activityWidth + 14,
-					layout.conf.activityHeight + 14)
+					box.x - 7,
+					box.y - 7,
+					box.width + 14,
+					box.height + 14)
 				.attr({
 					'stroke'           : layout.colors.selectEffect,
 					'stroke-dasharray' : '-'
@@ -277,13 +321,7 @@ var ActivityUtils = {
 			activity.items.push(activity.items.selectEffect);
 			
 			layout.items.selectedActivity = activity;
-			
-			var propertiesDialog = activity.propertiesDialog;
-			if (!activity.propertiesDialog) {
-				propertiesDialog = ActivityUtils.addPropertiesDialog(activity);
-			}
-			
-			propertiesDialog.dialog('open');
+			layout.items.propertiesDialog.dialog('open');
 		}
 	},
 	
@@ -303,30 +341,6 @@ var ActivityUtils = {
 				.toBack();
 			activity.items.push(activity.items.groupingEffect);
 		}
-	},
-	
-	
-	addPropertiesDialog : function(activity) {
-		var propertiesDialog = activity.propertiesDialog =
-			$('<div>Properties go here</div>')
-				.appendTo('body')
-				.dialog({
-					'closeOnEscape' : false,
-					'position'      : {
-						'my' : 'left top',
-						'at' : 'left top',
-						'of' :  '#canvas'
-					},
-					'resizable'     : false,
-					'title'         : 'Properties'
-				});
-		propertiesDialog.container = propertiesDialog.closest('.ui-dialog');
-		propertiesDialog.container.addClass('propertiesDialog')
-								  .css('opacity', layout.conf.propertiesDialogDimOpacity)
-		 						  .mousemove(CanvasHandlers.approachPropertiesDialogHandler)
-		                          .find('.ui-dialog-titlebar-close').remove();
-		
-		return propertiesDialog;
 	}
 };
 
@@ -336,32 +350,34 @@ var CanvasHandlers = {
 		canvas.css('cursor', 'default')
 		      .off('click')
 		      .click(CanvasHandlers.unselectActivityHandler)
+		      .off('mouseup')
 		      .off('mousemove')
 		      .mousemove(CanvasHandlers.approachPropertiesDialogHandler);
 	},
 	
 	
 	approachPropertiesDialogHandler : function(event) {
+		var dialog = layout.items.propertiesDialog;
 		var thisRun = new Date().getTime();
-		if (thisRun - layout.items.propertiesDialogDimLastRun < layout.conf.propertiesDialogDimThrottle){
+		if (thisRun - dialog.lastRun < layout.conf.propertiesDialogDimThrottle){
 			return;
 		}
-		layout.items.propertiesDialogDimLastRun = thisRun;
+		dialog.lastRun = thisRun;
 		
 		var activity = layout.items.selectedActivity;
-		if (activity && activity.propertiesDialog) {
-			var dialog = $(activity.propertiesDialog.container),
-			    dialogPosition = dialog.offset(),
+		if (activity) {
+			var container = dialog.container,
+			    dialogPosition = container.offset(),
 			    dialogStartX = dialogPosition.left,
 			    dialogStartY = dialogPosition.top,
-			    dialogEndX   = dialogStartX + dialog.width(),
-			    dialogEndY   = dialogStartY + dialog.height(),
+			    dialogEndX   = dialogStartX + container.width(),
+			    dialogEndY   = dialogStartY + container.height(),
 			    dimTreshold = layout.conf.propertiesDialogDimThreshold,
 			    tooFarX = event.pageX < dialogStartX - dimTreshold || event.pageX > dialogEndX + dimTreshold,
 			    tooFarY = event.pageY < dialogStartY - dimTreshold || event.pageY > dialogEndY + dimTreshold,
 			    opacity = tooFarX || tooFarY ? layout.conf.propertiesDialogDimOpacity : 1;
 
-			dialog.css('opacity', opacity);
+			container.css('opacity', opacity);
 		}
 	},
 	
@@ -384,9 +400,7 @@ var CanvasHandlers = {
 				selectedActivity.items.selectEffect.remove();
 				selectedActivity.items.selectEffect = null;
 				
-				if (selectedActivity.propertiesDialog) {
-					selectedActivity.propertiesDialog.dialog('close');
-				}
+				layout.items.propertiesDialog.dialog('close');
 				layout.items.selectedActivity = null;
 			}
 		}
@@ -394,20 +408,30 @@ var CanvasHandlers = {
 	
 	
 	dragItemsStartHandler : function(items, draggedElement, mouseupHandler, event, startX, startY) {
-		items.toFront();
-		items.attr('cursor', 'move');
+		items.clicked = false;
 		
-		canvas.mousemove(function(event) {
-			 CanvasHandlers.dragItemsMoveHandler(items, event, startX, startY);
-		});
-		
-		items.mouseup(function(){
-			CanvasHandlers.resetCanvasMode();
-			this.unmouseup();
-			layout.items.bin.attr('fill', 'transparent');
+		setTimeout(function(){
+			if (items.clicked) {
+				items.clicked = false;
+				return;
+			}
+			items.toFront();
+			items.attr('cursor', 'move');
 			
-			mouseupHandler();
-		});
+			canvas.mousemove(function(event) {
+				 CanvasHandlers.dragItemsMoveHandler(items, event, startX, startY);
+			});
+			
+			var mouseup = function(){
+				items.unmouseup();
+				CanvasHandlers.resetCanvasMode();
+				layout.items.bin.attr('fill', 'transparent');
+				
+				mouseupHandler();
+			};
+			canvas.mouseup(mouseup);
+			items.mouseup(mouseup);
+		}, layout.conf.dragStartThreshold);
 	},
 	
 	
@@ -435,15 +459,20 @@ var CanvasHandlers = {
 		}
 		
 		var transformation = activity.items.shape.attr('transform');
+		activity.items.transform('');
 		if (transformation.length > 0) {
 			activity.items.forEach(function(elem) {
-				elem.attr({
-					'x' : elem.attr('x') + transformation[0][1],
-					'y' : elem.attr('y') + transformation[0][2]
-				});
+				if (elem.attr('x')) {
+					elem.attr({
+						'x' : elem.attr('x') + transformation[0][1],
+						'y' : elem.attr('y') + transformation[0][2]
+					});
+				} else {
+					var path = elem.attr('path');
+					elem.attr('path', Raphael.transformPath(path, transformation));
+				}
 			});
 		}
-		activity.items.transform('');
 		
 		if (activity.items.groupingEffect) {
 			activity.items.groupingEffect.toBack();
@@ -534,6 +563,31 @@ var CanvasHandlers = {
 };
 
 
+var MenuUtils = {
+	
+	addGrouping : function() {
+		canvas.css('cursor', 'url("images/grouping.gif"), move').click(function(event){
+			var x = event.pageX - canvas.offset().left;
+			var y = event.pageY - canvas.offset().top;
+			
+			ActivityUtils.addGrouping(x, y);
+			CanvasHandlers.resetCanvasMode();
+		});
+	},
+	
+	
+	addGate : function() {
+		canvas.css('cursor', 'url("images/stop.gif"), move').click(function(event){
+			var x = event.pageX - canvas.offset().left;
+			var y = event.pageY - canvas.offset().top;
+			
+			ActivityUtils.addGate(x, y);
+			CanvasHandlers.resetCanvasMode();
+		});
+	}
+};
+
+
 function Activity(id, type) {
 	this.id = id;
 	this.type = type;
@@ -549,16 +603,15 @@ function Activity(id, type) {
 				var mouseupHandler = function(){
 					CanvasHandlers.dragActivityEndHandler(activity);
 				};
+
 				CanvasHandlers.dragItemsStartHandler(activity.items, this, mouseupHandler, event, x, y);
 			}
 		})
 		.click(function(event){
+			activity.items.clicked = true;
 			CanvasHandlers.selectActivityHandler(event, activity);
-		});
-	};
-	
-	this.addDecoration = function(){
-		this.items.attr({
+		})
+		.attr({
 			'cursor' : 'pointer'
 		});
 	};

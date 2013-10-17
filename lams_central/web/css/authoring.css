@@ -5,6 +5,7 @@ div#toolbar {
 
 div#toolbar > div {
 	float: left;
+	height: 30px;
 	margin-right: 10px;
 }
 
@@ -14,12 +15,14 @@ div#toolbar .ui-button, div#toolbar .split-ui-button {
 }
 
 div#toolbar .split-ui-button + ul {
-	z-index: 2;
-}
-
-div#toolbar .split-ui-button + ul span {
+	padding: 0 5px 5px 5px;
 	font-size: 11px;
 	color: #2E6E9E;
+}
+
+div#toolbar .split-ui-button + ul li div {
+	padding-top: 5px;
+	cursor: pointer;
 }
 
 table#authoringTable {
@@ -51,18 +54,15 @@ div.template {
 	height: 40px;
 	border-bottom: black thin solid;
 	cursor: pointer;
-	vertical-align: middle;
 }
 
 div.template img {
-	display: block;
-	float: left;
-	margin: 5px 8px 5px 5px;
+	margin: 5px 0 5px 5px;
 }
 
 div.template div {
-	float: left;
-	width: 90px;
+	float: right;
+	width: 92px;
 	padding-top: 10px;
 	font-size: 10pt;
 }
