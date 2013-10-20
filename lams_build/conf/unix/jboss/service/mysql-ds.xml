@@ -16,6 +16,7 @@ http://www.mysql.com/downloads/api-jdbc-stable.html
     <connection-property name="characterEncoding">utf8</connection-property>
     <connection-property name="zeroDateTimeBehavior">convertToNull</connection-property>
     <connection-property name="useUnicode">true</connection-property>
+    <valid-connection-checker-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLValidConnectionChecker</valid-connection-checker-class-name>
     
     <!-- Properties below are used only for embedded MySQL server -->
     <connection-property name="server.basedir">@db.location@</connection-property>
