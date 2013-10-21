@@ -1,3 +1,78 @@
+div.dialogContainer, .ldChoiceDependentCanvasElement {
+	display: none;
+}
+
+div#openLearningDesignDialog {
+	font-size: 12px;
+}
+
+div.dialogTitle {
+	padding: 5px 0px 5px 0px;
+	font-weight: bold;
+	text-align: center;
+}
+
+div#openLearningDesignDialog > table {
+	width: 100%;
+	height: 735px;
+	table-layout: fixed;
+	border-top: thin dotted #2E6E9E;
+}
+
+a.ygtvspacer {
+	border-bottom: none;
+}
+
+td#learningDesignTreeCell {
+	padding: 2px 2px 0px 5px;
+	vertical-align: top;
+	width: 200px;
+	border-right: thin dotted #2E6E9E;
+}
+
+div#learningDesignTree {
+	overflow: auto;
+}
+
+.ygtv-highlight1, .ygtv-highlight1 .ygtvlabel {
+	background-color: #dfeffc;
+}
+
+#recentlyUsedCell {
+	height: 200px;
+	vertical-align: top;
+	border-top: thin dotted #2E6E9E;
+	border-right: thin dotted #2E6E9E;
+	padding: 5px 0px 5px 0px;
+	font-size: 11px;
+	font-weight: bold;
+	text-align: center;
+}
+
+td#canvasCell {
+	text-align: center;
+	padding: 10px 0px 0px 10px;
+}
+
+div#canvasDiv {
+	overflow: auto;
+	height: 685px;
+}
+
+img#ldScreenshotLoading  {
+	padding-top: 200px;
+}
+
+#buttonsCell {
+	border-top: thin dotted #2E6E9E;
+	padding-top: 5px;
+}
+
+#buttonsCell > div {
+	float: right;
+	margin-left: 10px;
+}
+
 div#toolbar {
 	padding: 3px;
 	height: 27px;
@@ -63,7 +138,7 @@ div.template img {
 div.template div {
 	float: right;
 	width: 92px;
-	padding-top: 10px;
+	padding-top: 11px;
 	font-size: 10pt;
 }
 

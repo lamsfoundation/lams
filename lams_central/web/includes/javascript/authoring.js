@@ -1,7 +1,6 @@
 ﻿var paper = null;
 var canvas = null;
 var bin = null;
-var maxActivityId = 0;
 var activities = [];
 
 var layout = {
@@ -45,8 +44,8 @@ $(document).ready(function() {
 function initTemplates(){
 	$('.template').each(function(){
 		var toolName = $('div', this);
-		if (toolName.text().length > 14){
-			toolName.text(toolName.text().substring(0, 12) + '...');
+		if (toolName.text().length > 15){
+			toolName.css('padding-top', '4px');
 		}
 		
 		$(this).draggable({
@@ -57,10 +56,12 @@ function initTemplates(){
 		    'scope'       : 'template',
 		    'helper'      : function(event){
 				var helper = $(this).clone().css({
-					'border' : 'thin black solid',
+					'width'   : '135px',
+					'border'  : 'thin black solid',
 					'z-index' : 1,
-					'cursor' : 'move'
+					'cursor'  : 'move'
 				});
+				helper.children('div').remove();
 				return helper;
 			}
 		});
@@ -70,7 +71,7 @@ function initTemplates(){
 		   'tolerance'   : 'touch',
 		   'scope'       : 'template',
 		   'drop'	     : function (event, draggable) {
-			   ActivityUtils.addActivity(draggable);
+				activities.push(new ToolActivity(null, draggable));
 		   }
 	});
 }
@@ -132,95 +133,59 @@ function initLayout() {
 	 						  .mousemove(CanvasHandlers.approachPropertiesDialogHandler)
 	                          .find('.ui-dialog-titlebar-close').remove();
 	
+	var openLDDialog = $('#openLearningDesignDialog').dialog({
+		'autoOpen'      : false,
+		'position'      : {
+			'my' : 'left top',
+			'at' : 'left+5px top+5px',
+			'of' :  'body'
+		},
+		'resizable'     : false,
+		'width'			: 990,
+		'height'		: 780
+	});
+	openLDDialog.closest('.ui-dialog').find('.ui-dialog-titlebar').remove();
+	$('#ldScreenshotAuthor', openLDDialog).load(function(){
+		// hide "loading" animation
+		$('.ldChoiceDependentCanvasElement').css('display', 'none');
+		// show the thumbnail
+		$(this).css('display', 'inline');
+	});
+	// there should be no focus, just highlight
+	YAHOO.widget.TreeView.FOCUS_CLASS_NAME = null;
+	
+	
 	CanvasHandlers.resetCanvasMode();
 }
 
 
 var ActivityUtils = {
 		
-	addActivity : function(template) {
-		$(template.helper).remove();
-		
-		var activityId = ++maxActivityId;
-		var activity = new Activity(activityId, 'tool');
-		activities.push(activity);
-		
-		var canvasOffset = canvas.offset();
-		
-		paper.setStart();
-		var shape = paper.rect(
-				template.offset.left - canvasOffset.left,
-				template.offset.top - canvasOffset.top,
-				layout.conf.activityWidth, layout.conf.activityHeight)
-		.attr({
-			'fill' : layout.colors.activity
-		});
-		
-		paper.image($('img', template.draggable).attr('src'), shape.attr('x')
-				+ shape.attr('width') / 2 - 15, shape.attr('y') + 2, 30, 30);
-		
-		paper.text(shape.attr('x') + shape.attr('width') / 2, shape
-				.attr('y') + 40, $('div', template.draggable).text());
-		
-		activity.items = paper.setFinish();
-		activity.items.shape = shape;
-		activity.addEffects();
-	},
-	
-	
-	addGrouping : function(x, y) {
-		var activityId = ++maxActivityId;
-		var activity = new Activity(activityId, 'group');
-		activities.push(activity);
-		
+	initActivity : function(activity) {	
+		activity.items.mousedown(function(event, x, y){
+			if (event.ctrlKey) {
+				 CanvasHandlers.drawTransitionStartHandler(activity, event, x, y);
+			} else {			
+				var mouseupHandler = function(){
+					CanvasHandlers.dragActivityEndHandler(activity);
+				};
 
-		paper.setStart();
-		var shape = paper.rect(
-				x - layout.conf.activityWidth/2,
-				y - layout.conf.activityHeight/2,
-				layout.conf.activityWidth, layout.conf.activityHeight)
+				CanvasHandlers.dragItemsStartHandler(activity.items, this, mouseupHandler, event, x, y);
+			}
+		})
+		.click(function(event){
+			activity.items.clicked = true;
+			CanvasHandlers.selectActivityHandler(event, activity);
+		})
+		.dblclick(function(){
+			activity.items.clicked = true;
+			CanvasHandlers.openActivityAuthoringHandler(activity);
+		})
 		.attr({
-			'fill' : layout.colors.activity
+			'cursor' : 'pointer'
 		});
-		
-		paper.image('images/grouping.gif',
-				    shape.attr('x') + shape.attr('width') / 2 - 15,
-				    shape.attr('y') + 2,
-				    30, 30);
-		
-		paper.text(shape.attr('x') + shape.attr('width') / 2, shape
-				.attr('y') + 40, 'Grouping');
-		
-		activity.items = paper.setFinish();
-		activity.items.shape = shape;
-		activity.addEffects();
 	},
-	
-	
-	addGate : function(x, y) {
-		var activityId = ++maxActivityId;
-		var activity = new Activity(activityId, 'gate');
-		activities.push(activity);
-		
 
-		paper.setStart();
-		var shape = paper.path('M ' + x + ' ' + y + layout.defs.gate)
-						 .attr({
-							 'fill' : layout.colors.gate
-						 });
-		
-		paper.text(x + 7, y + 14, 'STOP')
-		     .attr({
-				'font-size' : 9,
-				'font' : 'sans-serif',
-				'stroke' : layout.colors.gateText
-		     })
-		
-		activity.items = paper.setFinish();
-		activity.items.shape = shape;
-		activity.addEffects();
-	},
-	
 	
 	removeActivity : function(activity) {
 		if (activity.fromTransition) {
@@ -407,15 +372,49 @@ var CanvasHandlers = {
 	},
 	
 	
+	openActivityAuthoringHandler : function(activity){
+		if (!activity.authorURL && activity.toolID) {
+			$.ajax({
+				async : false,
+				cache : false,
+				url : LAMS_URL + "authoring/author.do",
+				dataType : 'json',
+				data : {
+					'method'          : 'createToolContent',
+					'toolID'          : activity.toolID,
+					'contentFolderID' : contentFolderID
+				},
+				success : function(response) {
+					activity.authorURL = response.authorURL;
+					activity.id = response.toolContentID;
+					if (!contentFolderID) {
+						contentFolderID = response.contentFolderID;
+					}
+				}
+			});
+		}
+		
+		if (activity.authorURL) {
+			window.open(activity.authorURL, 'activityAuthoring' + activity.id,
+					"HEIGHT=800,WIDTH=1024,resizable=yes,scrollbars=yes,status=false," +
+					"menubar=no,toolbar=no");
+		}
+	},
+	
+	
 	dragItemsStartHandler : function(items, draggedElement, mouseupHandler, event, startX, startY) {
+		items.toFront();
 		items.clicked = false;
 		
-		setTimeout(function(){
+		if (items.dragStarter) {
+			clearTimeout(items.dragStarter);
+		}
+		items.dragStarter = setTimeout(function(){
+			items.dragStarter = null;
 			if (items.clicked) {
 				items.clicked = false;
 				return;
 			}
-			items.toFront();
 			items.attr('cursor', 'move');
 			
 			canvas.mousemove(function(event) {
@@ -566,53 +565,197 @@ var CanvasHandlers = {
 var MenuUtils = {
 	
 	addGrouping : function() {
-		canvas.css('cursor', 'url("images/grouping.gif"), move').click(function(event){
+		canvas.css('cursor', 'url("../images/grouping.gif"), move').click(function(event){
 			var x = event.pageX - canvas.offset().left;
 			var y = event.pageY - canvas.offset().top;
 			
-			ActivityUtils.addGrouping(x, y);
+			activities.push(new GroupingActivity(null, x, y));
 			CanvasHandlers.resetCanvasMode();
 		});
 	},
 	
 	
 	addGate : function() {
-		canvas.css('cursor', 'url("images/stop.gif"), move').click(function(event){
+		canvas.css('cursor', 'url("../images/stop.gif"), move').click(function(event){
 			var x = event.pageX - canvas.offset().left;
 			var y = event.pageY - canvas.offset().top;
 			
-			ActivityUtils.addGate(x, y);
+			activities.push(new GateActivity(null, x, y));
 			CanvasHandlers.resetCanvasMode();
 		});
+	},
+	
+	
+	openLearningDesign : function(){
+		var dialog = $('#openLearningDesignDialog');
+		$('#learningDesignTree', dialog).empty();
+		dialog.dialog('open');
+		
+		var treeNodes = MenuUtils.getFolderContents();
+		var tree = new YAHOO.widget.TreeView('learningDesignTree', treeNodes);
+		tree.setDynamicLoad(function(node, callback){
+			// load subfolder contents
+			var childNodeData = MenuUtils.getFolderContents(node.data.folderID);
+			if (childNodeData) {
+			$.each(childNodeData, function(){
+					new YAHOO.widget.TextNode(this, node);
+				});
+			}
+			
+			// required by YUI
+			callback();
+		});
+		
+		tree.singleNodeHighlight = true;
+		tree.subscribe('clickEvent', function(event){
+	
+			if (!event.node.data.learningDesignId){
+				// it is a folder
+				return false;
+			}
+
+			// display "loading" animation and finally LD thumbnail
+			$('.ldChoiceDependentCanvasElement').css('display', 'none');
+			if (event.node.highlightState == 0) {
+				$('#ldScreenshotLoading').css('display', 'inline');
+				$('#ldScreenshotAuthor').attr('src', LD_THUMBNAIL_URL_BASE + event.node.data.learningDesignId);
+				$('#ldScreenshotAuthor').css('width', 'auto').css('height', 'auto');
+			} else {
+				// toggleCanvasResize(CANVAS_RESIZE_OPTION_NONE);
+			}
+		});
+		tree.subscribe('clickEvent',tree.onEventToggleHighlight);
+		tree.render();
+		
+		// expand the first (user) folder
+		tree.getRoot().children[0].expand();
+	},
+	
+	
+	getFolderContents : function(folderID) {
+		var result = null;
+		
+		var parseFolderContents = function(nodeJSON) {
+			var result = [];
+
+			if (nodeJSON.folders) {
+				$.each(nodeJSON.folders, function(){
+					result.push({'type'            : 'text',
+							  	 'label'           : this.isRunSequencesFolder ?
+							  			 				LABEL_RUN_SEQUENCES_FOLDER : this.name,
+							  	 'folderID'		   : this.folderID
+								 });
+				});
+			}
+			if (nodeJSON.learningDesigns) {
+				$.each(nodeJSON.learningDesigns, function(){
+					result.push({'type'             : 'text',
+					  	         'label'            : this.name,
+					  	         'isLeaf'           : true,
+					  	         'learningDesignId' : this.learningDesignId
+						        });
+				});
+			}
+			
+			return result;
+		};
+		
+		$.ajax({
+			url : LAMS_URL + 'home.do',
+			data : {
+				'method' : 'getFolderContents',
+				'folderID' : folderID
+			},
+			cache : false,
+			async: false,
+			dataType : 'json',
+			success : function(response) {
+				result = parseFolderContents(response);
+			}
+		});
+		
+		return result;
 	}
 };
 
 
-function Activity(id, type) {
+function ToolActivity(id, template) {
 	this.id = id;
-	this.type = type;
-	this.items = paper.set();
+	this.type = 'tool';
+	this.toolID = template.draggable.attr('toolId');
 	
-	this.addEffects = function(){
-		var activity = this;
-		
-		activity.items.mousedown(function(event, x, y){
-			if (event.ctrlKey) {
-				 CanvasHandlers.drawTransitionStartHandler(activity, event, x, y);
-			} else {			
-				var mouseupHandler = function(){
-					CanvasHandlers.dragActivityEndHandler(activity);
-				};
+	$(template.helper).remove();
+	var canvasOffset = canvas.offset();
+	
+	paper.setStart();
+	var shape = paper.rect(
+			template.offset.left - canvasOffset.left,
+			template.offset.top - canvasOffset.top,
+			layout.conf.activityWidth, layout.conf.activityHeight)
+	.attr({
+		'fill' : layout.colors.activity
+	});
+	
+	paper.image($('img', template.draggable).attr('src'), shape.attr('x')
+			+ shape.attr('width') / 2 - 15, shape.attr('y') + 2, 30, 30);
+	
+	paper.text(shape.attr('x') + shape.attr('width') / 2, shape
+			.attr('y') + 40, $('div', template.draggable).text());
+	
+	this.items = paper.setFinish();
+	this.items.shape = shape;
+	
+	ActivityUtils.initActivity(this);
+}
 
-				CanvasHandlers.dragItemsStartHandler(activity.items, this, mouseupHandler, event, x, y);
-			}
-		})
-		.click(function(event){
-			activity.items.clicked = true;
-			CanvasHandlers.selectActivityHandler(event, activity);
-		})
-		.attr({
-			'cursor' : 'pointer'
-		});
-	};
+
+function GroupingActivity(id, x, y) {
+	this.id = id;
+	this.type = 'group';
+	
+	paper.setStart();
+	var shape = paper.rect(
+			x - layout.conf.activityWidth/2,
+			y - layout.conf.activityHeight/2,
+			layout.conf.activityWidth, layout.conf.activityHeight)
+	.attr({
+		'fill' : layout.colors.activity
+	});
+	
+	paper.image('../images/grouping.gif',
+			    shape.attr('x') + shape.attr('width') / 2 - 15,
+			    shape.attr('y') + 2,
+			    30, 30);
+	
+	paper.text(shape.attr('x') + shape.attr('width') / 2, shape
+			.attr('y') + 40, 'Grouping');
+	
+	this.items = paper.setFinish();
+	this.items.shape = shape;
+	
+	ActivityUtils.initActivity(this);
+}
+
+
+function GateActivity(id, x, y) {
+	this.id = id;
+	this.type = 'gate';
+
+	paper.setStart();
+	var shape = paper.path('M ' + x + ' ' + y + layout.defs.gate)
+					 .attr({
+						 'fill' : layout.colors.gate
+					 });
+	
+	paper.text(x + 7, y + 14, 'STOP')
+	     .attr({
+			'font-size' : 9,
+			'font' : 'sans-serif',
+			'stroke' : layout.colors.gateText
+	     })
+	
+	this.items = paper.setFinish();
+	this.items.shape = shape;
+	
+	ActivityUtils.initActivity(this);
 }

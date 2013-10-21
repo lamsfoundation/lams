@@ -389,7 +389,7 @@ public class HomeAction extends DispatchAction {
     public ActionForward getFolderContents(ActionMapping mapping, ActionForm form, HttpServletRequest req,
 	    HttpServletResponse res) throws UserAccessDeniedException, JSONException, IOException,
 	    RepositoryCheckedException {
-	Integer folderID = new Integer(WebUtil.readIntParam(req, "folderID"));
+	Integer folderID = WebUtil.readIntParam(req, "folderID", true);
 	JSONObject responseJSON = getFolderContents(folderID, getUser().getUserID());
 
 	res.setContentType("application/json;charset=utf-8");

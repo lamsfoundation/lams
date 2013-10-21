@@ -10,18 +10,33 @@
 	<title>Flashless Authoring</title>
 	
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/yui/treeview.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/yui/folders.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/authoring.css" type="text/css" media="screen">
 
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/raphael/raphael.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/yahoo-dom-event.js" ></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/animation-min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/json-min.js" ></script> 
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/treeview-min.js" ></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
 	<script type="text/javascript">
+		var LAMS_URL = '<lams:LAMSURL/>';
+		var LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=createLearningDesignThumbnail&ldId=';
 		
+		var contentFolderID = '${contentFolderID}';
+		if (contentFolderID == '') {
+			contentFolderID = null;
+		}
 	</script>
-	<script type="text/javascript" src="includes/javascript/authoring.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring.js"></script>
 </lams:head>
 <body>
 	<div id="toolbar" class="ui-widget-header ui-corner-all">
+		<div class="ui-button" onClick="javascript:MenuUtils.openLearningDesign()">
+			Open
+		</div>
 		<div>
 			<div class="split-ui-button">
 				<div>
@@ -34,7 +49,7 @@
 				<li><div>Branch</div></li>
 			</ul>
 		</div>
-		<div id="groupingButton" class="ui-button" onClick="javascript:MenuUtils.addGrouping()">
+		<div class="ui-button" onClick="javascript:MenuUtils.addGrouping()">
 			Group
 		</div>
 	</div>
@@ -47,9 +62,9 @@
 			<td id="templateContainerCell">
 				<div id="templateContainer">
 					<c:forEach var="tool" items="${tools}">
-						<div id="template_${tool.toolId}" class="template">
+						<div toolId="${tool.toolId}" class="template">
 							<c:if test="${not empty tool.iconPath}">
-								<img src="${tool.iconPath}" />
+								<img src="<lams:LAMSURL/>${tool.iconPath}" />
 							</c:if>
 							<div><c:out value="${tool.toolDisplayName}" /></div>
 						</div>
@@ -59,5 +74,37 @@
 			<td id="canvas"></td>
 		</tr>
 	</table>
+	
+	<div id="openLearningDesignDialog" class="dialogContainer">
+		<div class="dialogTitle">Open sequence</div>
+		<table>
+			<tr>
+				<td id="learningDesignTreeCell">
+					<div id="learningDesignTree"></div>
+				</td>
+				<td id="canvasCell" rowspan="2">
+					<div id="canvasDiv">
+			    		<img id="ldScreenshotAuthor" class="ldChoiceDependentCanvasElement" />
+		    			<img id="ldScreenshotLoading" class="ldChoiceDependentCanvasElement" src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
+			    	</div>
+				</td>
+			</tr>
+			<tr>
+				<td id="recentlyUsedCell" >
+					Recently used sequences
+				</td>
+			</tr>
+			<tr>
+				<td id="buttonsCell" colspan="2">
+					<div class="ui-button">
+			    		Open
+			    	</div>
+					<div class="ui-button" onClick="javascript:$('#openLearningDesignDialog').dialog('close')">
+			    		Cancel
+			    	</div>
+				</td>
+			</tr>
+		</table>
+	</div>
 </body>
 </lams:html>

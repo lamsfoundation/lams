@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -42,6 +43,7 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
+import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.IToolVO;
@@ -69,7 +71,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Manpreet Minhas
  * 
  * @struts.action path = "/authoring/author" parameter = "method" validate = "false"
- * 
+ * @struts:action-forward name="openAutoring" path="/author2.jsp"
  */
 public class AuthoringAction extends LamsDispatchAction {
 
@@ -80,6 +82,7 @@ public class AuthoringAction extends LamsDispatchAction {
     private static IUserManagementService userManagementService;
     private static ILamsToolService toolService;
     private static IAuthoringService authoringService;
+    private static ILearningDesignService learningDesignService;
 
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
@@ -93,6 +96,12 @@ public class AuthoringAction extends LamsDispatchAction {
 	return user != null ? user.getLocaleLanguage() : "";
     }
 
+    public ActionForward openAuthoring(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	request.setAttribute("tools", getLearningDesignService().getToolDTOs(request.getRemoteUser()));
+	return mapping.findForward("openAutoring");
+    }
+    
     /**
      * Output the supplied WDDX packet. If the request parameter USE_JSP_OUTPUT is set, then it sets the session
      * attribute "parameterName" to the wddx packet string. If USE_JSP_OUTPUT is not set, then the packet is written out
@@ -323,7 +332,12 @@ public class AuthoringAction extends LamsDispatchAction {
 	// generate the next unique content ID for the tool
 	Long toolContentID = authoringService.insertToolContentID(toolID);
 	if (toolContentID != null) {
-	    String contentFolderID = FileUtil.generateUniqueContentFolderID();
+
+	    String contentFolderID = request.getParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	    if (StringUtils.isBlank(contentFolderID)) {
+		contentFolderID = FileUtil.generateUniqueContentFolderID();
+	    }
+
 	    String authorUrl = authoringService.getToolAuthorUrl(toolID, toolContentID, contentFolderID);
 	    if (authorUrl != null) {
 		JSONObject responseJSON = new JSONObject();
@@ -456,5 +470,15 @@ public class AuthoringAction extends LamsDispatchAction {
 	    AuthoringAction.toolService = (ILamsToolService) wac.getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
 	}
 	return AuthoringAction.toolService;
+    }
+    
+
+    private ILearningDesignService getLearningDesignService() {
+	if (AuthoringAction.learningDesignService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
+		    .getServletContext());
+	    AuthoringAction.learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
+	}
+	return AuthoringAction.learningDesignService;
     }
 }
