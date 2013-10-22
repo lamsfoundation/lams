@@ -23,5 +23,5 @@
    		LAMS Valve
     -->
    	<Valve className="org.lamsfoundation.lams.web.session.LoginFormAuthenticator"
-			disableProxyCaching="false" />
+			disableProxyCaching="false" characterEncoding="UTF-8" />
 </Context>
