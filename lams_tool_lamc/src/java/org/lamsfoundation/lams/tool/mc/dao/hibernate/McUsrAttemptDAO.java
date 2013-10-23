@@ -66,7 +66,7 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
     
     @Override
     public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
-	this.getHibernateTemplate().save(mcUsrAttempt);
+	this.getHibernateTemplate().saveOrUpdate(mcUsrAttempt);
     }
 
     @Override

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -64,6 +65,9 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.dao.DataIntegrityViolationException;
+
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 
 /**
  * @author Ozgur Demirtas
@@ -326,7 +330,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	mcGeneralLearnerFlowDTO.setUserOverPassMark(new Boolean(passed).toString());
 	mcGeneralLearnerFlowDTO.setPassMarkApplicable(new Boolean(mcContent.getPassMark() != null).toString());
 
-	mcService.saveUserAttempt(mcQueUsr, selectedQuestionAndCandidateAnswersDTO);
+	McLearningAction.saveUserAttempt(mcQueUsr, selectedQuestionAndCandidateAnswersDTO);
 
 	Integer numberOfAttempts = mcQueUsr.getNumberOfAttempts() + 1;
 	mcQueUsr.setNumberOfAttempts(numberOfAttempts);
@@ -393,7 +397,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	//save user attempt
 	List<McLearnerAnswersDTO> selectedQuestionAndCandidateAnswersDTO = buildSelectedQuestionAndCandidateAnswersDTO(
 		learnerInput, new McTempDataHolderDTO(), mcContent);
-	mcService.saveUserAttempt(user, selectedQuestionAndCandidateAnswersDTO);
+	McLearningAction.saveUserAttempt(user, selectedQuestionAndCandidateAnswersDTO);
 
 	McQueUsr mcQueUsr = getCurrentUser(toolSessionID);
 	List<McLearnerAnswersDTO> learnerAnswersDTOList = mcService.buildLearnerAnswersDTOList(mcContent, mcQueUsr);
@@ -725,9 +729,34 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	
 	List<McLearnerAnswersDTO> selectedQuestionAndCandidateAnswersDTO = buildSelectedQuestionAndCandidateAnswersDTO(
 		learnerInput, new McTempDataHolderDTO(), mcContent);
-	mcService.saveUserAttempt(user, selectedQuestionAndCandidateAnswersDTO);
+	McLearningAction.saveUserAttempt(user, selectedQuestionAndCandidateAnswersDTO);
 	
 	return null;
+    }
+    
+    /**
+     * Makes a call to mcService.saveUserAttempt(). This method is designed purely for exception handling purposes. It
+     * needs to be performed inside Action class as otherwise Hibernate tries to flush the session which leads to another exception.
+     */
+    private static void saveUserAttempt(McQueUsr user, List<McLearnerAnswersDTO> selectedQuestionAndCandidateAnswersDTO) {
+	try {
+	    mcService.saveUserAttempt(user, selectedQuestionAndCandidateAnswersDTO);
+
+	} catch (DataIntegrityViolationException e) {
+
+	    // log DB exceptions occurred due to creating non-unique McUsrAttempt. And propagate all the other exceptions
+	    if (e.getRootCause() instanceof MySQLIntegrityConstraintViolationException) {
+		String rootCauseMessage = e.getRootCause().getMessage();
+		
+		Pattern pattern = Pattern.compile("Duplicate entry.*attempt_unique_index");
+		if ((rootCauseMessage != null) && pattern.matcher(rootCauseMessage).find()) {
+		    logger.error("Prevented creation of McUsrAttempt which was not unique for user and question: " + rootCauseMessage);
+		    return;
+		}
+	    }
+	    
+	    throw e;
+	}
     }
     
     private static List<String> parseLearnerAnswers(McLearningForm mcLearningForm, HttpServletRequest request) {
