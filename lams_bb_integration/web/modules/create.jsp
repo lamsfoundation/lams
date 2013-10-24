@@ -112,6 +112,7 @@
 				<div id="updatesequence"></div>
 				<div style="vertical-align: text-bottom; margin-top: 15px;">
 					<input type="checkbox" name="isDisplayDesignImage" value="true">  Display image design?
+
 				</div>
 				
                 <%-- Display LAMS Sequence tree (Using tigra) --%>
@@ -134,6 +135,13 @@
                     <input type="Radio" name="isAvailable" value="true" checked>Yes 
                     <input type="Radio" name="isAvailable" value="false">No
                 </bbNG:dataElement>
+
+                <bbNG:dataElement label="Do you want to add a mark/completion column in Gradecenter?" labelFor="isGradecenter">
+                    <input type="Radio" name="isGradecenter" value="true" checked>Yes
+                    <input type="Radio" name="isGradecenter" value="false">No
+                </bbNG:dataElement>
+
+
                 <bbNG:dataElement label="Track number of views" labelFor="isTracked">
                     <input type="radio" name="isTracked" value="true">Yes
                     <input type="radio" name="isTracked" value="false" checked>No

@@ -45,6 +45,7 @@ https://bugs.lamsfoundation.org/browse/<bug reference>
 1.2.2 Release Fixes
 ===================
 * LDEV-3102 Remove user call back URLs from Blackboard integration 
+* LDEV-3143 Create an option to opt out from Gradecenter column
 
 
 
