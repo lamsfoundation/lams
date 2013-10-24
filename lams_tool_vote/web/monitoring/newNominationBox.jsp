@@ -25,7 +25,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-		
+		<lams:css style="tabbed" />
 		<script language="JavaScript" type="text/JavaScript">
 
 			function submitMethod() {
@@ -40,13 +40,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</script>		
 	</lams:head>
 	
-	<body class="stripes">
-	
-	<div id="content">
-
-		<table cellpadding="0">
-	
-
+	<body>
 			<html:form  action="/monitoring?validate=false" styleId="newNominationForm" enctype="multipart/form-data" method="POST">				
 			<html:hidden property="dispatch" value="addSingleNomination"/>
 			<html:hidden property="toolContentID"/>
@@ -58,24 +52,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="contentFolderID"/>														
 			<html:hidden property="editNominationBoxRequest" value="false"/>																				
 			
-			<tr>
-			<td>
-			<table class="innerforms">
-		
-				<tr>
-					<td>
-						<div class="field-name">
-							<fmt:message key="label.add.new.nomination"></fmt:message>
-						</div>
-						<lams:CKEditor id="newNomination"
-							value="${voteGeneralAuthoringDTO.editableNominationText}"
-							contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
-					</td>
-				</tr>
-			</table>				
-			</td>
-			</tr>
-			</table>
+
+			<div class="field-name">
+				<fmt:message key="label.add.new.nomination"></fmt:message>
+			</div>
+			<lams:CKEditor id="newNomination"
+				value="${voteGeneralAuthoringDTO.editableNominationText}"
+				contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"
+				height="370px"
+				resizeParentFrameName="messageArea">
+			</lams:CKEditor>
+
 			
 			<lams:ImgButtonWrapper>
 				<a href="#" onclick="getElementById('newNominationForm').submit();" class="button-add-item">
@@ -86,9 +73,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</a>
 			</lams:ImgButtonWrapper>
 			</html:form>
-
-	</div>
-	
-	<div id="footer"></div>
 	</body>
 </lams:html>
