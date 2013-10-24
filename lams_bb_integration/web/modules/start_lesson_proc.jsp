@@ -93,8 +93,11 @@
         long ldId = Long.parseLong(strSequenceID);
 
         String strIsAvailable = request.getParameter("isAvailable");
+        String strIsGradecenter = request.getParameter("isGradecenter");
+
         String strIsTracked = request.getParameter("isTracked");
         boolean isAvailable = strIsAvailable.equals("true")?true:false;
+        boolean isGradecenter = strIsGradecenter.equals("true")?true:false;
         boolean isTracked = strIsTracked.equals("true")?true:false;
 
         String isDisplayDesignImage = request.getParameter("isDisplayDesignImage");
@@ -141,8 +144,10 @@
             throw new ServletException(e.getMessage(), e);
         }
 
-        //Create new Gradebook column for current lesson
+	
         Lineitem lineitem = new Lineitem();
+	if (isGradecenter) {
+        //Create new Gradebook column for current lesson
 	    lineitem.setCourseId(courseId);
 	    lineitem.setName(strTitle);
 	    lineitem.setPointsPossible(Constants.GRADEBOOK_POINTS_POSSIBLE);
@@ -180,7 +185,7 @@
 	    uutcomeDefinitionScaleDbPersister.persist(ods);
 	    ocd.setScale(ods);
 	    ocdPersister.persist(ocd);
-
+	}
 
 
 
@@ -196,8 +201,15 @@
 	        bbportstr +
 	        request.getContextPath() +
 	        "/modules/learnermonitor.jsp?lsid=" + lessonIdStr +
-	        "&course_id=" + request.getParameter("course_id") + "&lineitemid=" + lineitem.getId() +
+	        "&course_id=" + request.getParameter("course_id") +
 	        "&ldid=" + ldId + "&isDisplayDesignImage=" + isDisplayDesignImage + "&title=" + URLEncoder.encode(strTitle);
+
+	    if (isGradecenter) {
+
+ 		contentUrl += "&lineitemid=" + lineitem.getId();
+
+	    }
+
 	        //+ "&description=" + URLEncoder.encode(strDescription);
 
 	    newLesson.setUrl(contentUrl);
