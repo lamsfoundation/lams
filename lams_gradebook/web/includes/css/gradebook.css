@@ -10,6 +10,27 @@
 	padding:20px 25px;
 }
 		
-#export-link-area {padding-bottom: 20px;}
+#export-link-area {
+	padding-bottom: 20px;
+}
 
-.grid-holder {width: 700px; margin-left: 10px; margin-right: 10px;}
+#select-lessons-area {
+	display: none;
+	padding-top: 10px;
+}
+
+#export-selected-lessons-button {
+	margin-left: 200px;
+	margin-bottom: 10px;
+}
+
+.grid-holder {
+	width: 700px; 
+	margin-left: 10px; 
+	margin-right: 10px; 
+	margin-top: 20px;
+}
+
+#gbox_lessons-jqgrid {
+    margin: 15px auto 25px auto;
+}

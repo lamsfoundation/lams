@@ -775,10 +775,10 @@ public class GradebookService implements IGradebookService {
 	// Dont include lesson in list if the user doesnt have permission
 	Integer organisationToCheckPermission = (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) 
 		? organisation.getOrganisationId() : organisation.getParentOrganisation().getOrganisationId();
+	boolean isGroupManager = userService.isUserInRole(userId, organisationToCheckPermission, Role.GROUP_MANAGER);
 	List<Lesson> lessons = new LinkedList<Lesson>();
 	for (Lesson lesson : lessonsFromDB) {
-	    if (!(lesson.getLessonClass().isStaffMember(user) || userService.isUserInRole(userId, organisationToCheckPermission,
-		    Role.GROUP_MANAGER))) {
+	    if (!(lesson.getLessonClass().isStaffMember(user) || isGroupManager)) {
 		continue;
 	    }
 
@@ -839,6 +839,178 @@ public class GradebookService implements IGradebookService {
 		}
 
 		rowList.add(userDataRow);
+	    }
+	}
+	
+	ExcelCell[][] summaryData = rowList.toArray(new ExcelCell[][] {});
+	dataToExport.put(getMessage("gradebook.exportcourse.course.summary"), summaryData);
+	return dataToExport;
+    }
+    
+    @Override
+    public LinkedHashMap<String, ExcelCell[][]> exportSelectedLessonsGradebook(Integer userId, Integer organisationId, String[]  lessonIds) {
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	
+	Organisation organisation = (Organisation) userService.findById(Organisation.class, organisationId);
+	
+	// The entire data list
+	List<ExcelCell[]> rowList = new LinkedList<ExcelCell[]>();
+
+	User user = (User) userService.findById(User.class, userId);
+	Set<Lesson> selectedLessons = new TreeSet<Lesson>(new LessonComparator());
+
+	// Don't include lesson in list if the user doesnt have permission
+	Integer organisationToCheckPermission = (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) 
+		? organisation.getOrganisationId() : organisation.getParentOrganisation().getOrganisationId();
+	boolean isGroupManager = userService.isUserInRole(userId, organisationToCheckPermission, Role.GROUP_MANAGER);
+	
+	// collect users from all lessons
+	Set<User> allLearners = new LinkedHashSet<User>();
+	Map<Long, Set<ToolActivity>> lessonActivitiesMap = new HashMap<Long, Set<ToolActivity>>();
+	List<ToolActivity> allActivities = new ArrayList<ToolActivity>();
+	
+	for (String lessonIdStr : lessonIds) {
+	    Long lessonId = Long.parseLong(lessonIdStr);
+	    Lesson lesson = lessonService.getLesson(lessonId);
+	    
+	    if (!(lesson.getLessonClass().isStaffMember(user) || isGroupManager)) {
+		continue;
+	    }
+	    
+	    selectedLessons.add(lesson);
+	    
+	    allLearners.addAll(lesson.getAllLearners());
+	    
+	    Set<ToolActivity> lessonActivities = getLessonActivities(lesson);
+	    lessonActivitiesMap.put(lesson.getLessonId(), lessonActivities);
+	    allActivities.addAll(lessonActivities);
+	}
+	
+	if (!selectedLessons.isEmpty()) {
+	    
+	    Map<Long, Long> activityToTotalMarkMap = getActivityToTotalMarkMap(allActivities);
+	    
+	    Map<Long, Map<Integer, GradebookUserActivity>> activityTouserToGradebookUserActivityMap = new HashMap<Long, Map<Integer, GradebookUserActivity>>();
+	    for (ToolActivity activity : allActivities) {
+		Map<Integer, GradebookUserActivity> userToGradebookUserActivityMap = getUserToGradebookUserActivityMap(activity);
+		activityTouserToGradebookUserActivityMap.put(activity.getActivityId(), userToGradebookUserActivityMap);
+	    }
+
+	    int numberCellsPerRow = selectedLessons.size() * 6 + allActivities.size() * 2 + 5;
+
+	    // Lesson names row----------------------
+	    ExcelCell[] lessonsNames = new ExcelCell[numberCellsPerRow];
+	    int i = 4;
+	    for (Lesson lesson : selectedLessons) {
+		Set<ToolActivity> lessonActivities = lessonActivitiesMap.get(lesson.getLessonId());
+		int numberActivities = lessonActivities.size();
+		lessonsNames[i + numberActivities] = new ExcelCell(lesson.getLessonName(), true);
+		i += 6 + numberActivities * 2;
+	    }
+	    i -= 2;
+	    lessonsNames[i++] = new ExcelCell("", ExcelCell.BORDER_STYLE_LEFT_THIN);
+	    lessonsNames[i++] = new ExcelCell(getMessage("label.overall.totals"), true);
+	    lessonsNames[i++] = new ExcelCell("", ExcelCell.BORDER_STYLE_RIGHT_THICK);
+	    
+	    rowList.add(lessonsNames);
+
+	    // Headers row----------------------
+	    ExcelCell[] headerRow = new ExcelCell[numberCellsPerRow];
+	    i = 0;
+
+	    for (Lesson lesson : selectedLessons) {
+		headerRow[i++] = new ExcelCell(getMessage("gradebook.export.last.name"), false);
+		headerRow[i++] = new ExcelCell(getMessage("gradebook.export.first.name"), false);
+		headerRow[i++] = new ExcelCell(getMessage("label.group"), false);
+
+		Set<ToolActivity> activities = lessonActivitiesMap.get(lesson.getLessonId());
+		for (Activity activity : activities) {
+		    headerRow[i++] = new ExcelCell(activity.getTitle(), true);
+		    headerRow[i++] = new ExcelCell(getMessage("label.max.possible"), false);
+		}
+		
+		headerRow[i++] = new ExcelCell(getMessage("label.total.actuals"), true, ExcelCell.BORDER_STYLE_LEFT_THIN);
+		headerRow[i++] = new ExcelCell(getMessage("label.max.mark"), false);
+		headerRow[i++] = new ExcelCell("%", ExcelCell.BORDER_STYLE_RIGHT_THICK);
+	    }
+	    i += 2;
+	    headerRow[i++] = new ExcelCell(getMessage("label.actuals"), true, ExcelCell.BORDER_STYLE_LEFT_THIN);
+	    headerRow[i++] = new ExcelCell(getMessage("label.max"), true);
+	    headerRow[i++] = new ExcelCell("%", true, ExcelCell.BORDER_STYLE_RIGHT_THICK);
+	    rowList.add(headerRow);
+
+	    // Actual data rows----------------------
+	    for (User learner : allLearners) {
+		
+		Double overallTotal = 0d;
+		Double overallMaxMark = 0d;
+		ExcelCell[] userRow = new ExcelCell[numberCellsPerRow];
+		i = 0;
+		
+		
+		for (Lesson lesson : selectedLessons) {
+
+		    Double lessonTotal = 0d;
+		    Double lessonMaxMark = 0d;
+		    Set<ToolActivity> activities = lessonActivitiesMap.get(lesson.getLessonId());
+		    
+		    userRow[i++] = new ExcelCell(learner.getFirstName().toUpperCase(), false);
+		    userRow[i++] = new ExcelCell(learner.getLastName().toUpperCase(), false);
+		    
+		    //check if learner is participating in this lesson
+		    if (!lesson.getAllLearners().contains(learner)) {
+			i += 1 + activities.size() * 2;
+			userRow[i++] = new ExcelCell("", ExcelCell.BORDER_STYLE_LEFT_THIN);
+			userRow[i++] = new ExcelCell("", false);
+			userRow[i++] = new ExcelCell("", ExcelCell.BORDER_STYLE_RIGHT_THICK);
+			continue;
+		    }
+		    
+		    //getUserGroupName
+		    String groupName = "";
+		    for (Group group : (Set<Group>)lesson.getLessonClass().getGroups()) {
+			if (group.hasLearner(learner)) {
+			    groupName = group.getGroupName();
+			    break;
+			}
+		    }
+		    userRow[i++] = new ExcelCell(groupName, false);
+
+		    for (ToolActivity activity : activities) {
+			Map<Integer, GradebookUserActivity> userToGradebookUserActivityMap = activityTouserToGradebookUserActivityMap.get(activity.getActivityId());
+			GradebookUserActivity gradebookUserActivity = userToGradebookUserActivityMap.get(learner.getUserId());
+			Double mark = 0d;
+			if (gradebookUserActivity != null) {
+			    mark = gradebookUserActivity.getMark();
+			    userRow[i++] = new ExcelCell(mark, false);
+			} else {
+			    userRow[i++] = new ExcelCell("", false);
+			}
+			
+			Long activityTotalMarks = (activityToTotalMarkMap.get(activity.getActivityId()) != null) ? activityToTotalMarkMap
+				.get(activity.getActivityId()) : 0l;
+			userRow[i++] = new ExcelCell(activityTotalMarks, false);
+		
+			lessonTotal += mark;
+			overallTotal += mark;
+			lessonMaxMark += activityTotalMarks;
+			overallMaxMark += activityTotalMarks;
+		    }
+		    
+		    userRow[i++] = new ExcelCell(lessonTotal, ExcelCell.BORDER_STYLE_LEFT_THIN);
+		    userRow[i++] = new ExcelCell(lessonMaxMark, false);
+		    Double percentage = (lessonMaxMark != 0) ? lessonTotal/lessonMaxMark : 0d;
+		    userRow[i++] = new ExcelCell(percentage, ExcelCell.BORDER_STYLE_RIGHT_THICK);
+
+		}
+		
+		i += 2;
+		userRow[i++] = new ExcelCell(overallTotal, ExcelCell.BORDER_STYLE_LEFT_THIN);
+		userRow[i++] = new ExcelCell(overallMaxMark, false);
+		Double percentage = (overallMaxMark != 0) ? overallTotal/overallMaxMark : 0d;
+		userRow[i++] = new ExcelCell(percentage, true, ExcelCell.BORDER_STYLE_RIGHT_THICK);
+
+		rowList.add(userRow);
 	    }
 	}
 	

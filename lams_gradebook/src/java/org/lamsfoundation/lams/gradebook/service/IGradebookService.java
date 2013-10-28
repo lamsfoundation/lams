@@ -207,12 +207,23 @@ public interface IGradebookService {
     LinkedHashMap<String, ExcelCell[][]> exportLessonGradebook(Lesson lesson);
     
     /**
-     * Get the summary data for course for an excel export
+     * Get the summary data for course in order to create excel export
      * 
      * @param userId
      * @param organisationId
      * @return
      */
     LinkedHashMap<String, ExcelCell[][]> exportCourseGradebook(Integer userId, Integer organisationId);
+    
+
+    /**
+     * Get the summary data for selected lessons in order to create excel export
+     * 
+     * @param userId
+     * @param organisationId
+     * @return
+     */
+    LinkedHashMap<String, ExcelCell[][]> exportSelectedLessonsGradebook(Integer userId, Integer organisationId, String[]  lessonIds);
+    
 }
  

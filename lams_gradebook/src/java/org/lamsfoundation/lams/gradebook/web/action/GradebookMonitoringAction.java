@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -366,6 +367,50 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	//Code to generate file and write file contents to response
 	ServletOutputStream out = response.getOutputStream();
 	ExcelUtil.createExcel(out, dataToExport, gradebookService.getMessage("gradebook.export.dateheader"), true);
+
+	return null;
+    }
+    
+    /**
+     * Exports selected lessons Gradebook into excel.
+     */
+    public ActionForward exportExcelSelectedLessons(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	initServices();
+	Integer oranisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+	User user = getRealUser(getUser());
+
+	Organisation organisation = (Organisation) userService.findById(Organisation.class, oranisationID);
+	if (organisation == null || user == null) {
+	    String errorMsg = "Organisation " + oranisationID + " does not exist or user is null. Unable to load gradebook";
+	    logger.error(errorMsg);
+	    throw new Exception(errorMsg);
+	}
+	
+	Integer organisationId = organisation.getOrganisationId();
+	logger.debug("Exporting to a spreadsheet course: " + organisationId);
+
+	String[] lessonIds = request.getParameterValues(AttributeNames.PARAM_LESSON_ID);
+	Assert.notNull(lessonIds);
+
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = gradebookService.exportSelectedLessonsGradebook(user.getUserId(), organisationId, lessonIds);
+
+	String fileName = organisation.getName().replaceAll(" ", "_") + ".xlsx";
+	fileName  = FileUtil.encodeFilenameForDownload(request, fileName);
+	
+	response.setContentType("application/x-download");
+	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);	
+	
+	//set cookie that will tell JS script that export has been finished
+	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
+	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
+	fileDownloadTokenCookie.setPath("/");
+	response.addCookie(fileDownloadTokenCookie); 
+	
+	//Code to generate file and write file contents to response
+	ServletOutputStream out = response.getOutputStream();
+	ExcelUtil.createExcel(out, dataToExport, null, false);
 
 	return null;
     }

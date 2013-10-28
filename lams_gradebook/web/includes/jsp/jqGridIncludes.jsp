@@ -66,7 +66,7 @@ Include this jsp in your jqGrid page head to get some jqGrid functionaility
 	};
 	
 	// setcolumns module
-	$.jgrid.col ={
+	$.jgrid.col = {
 	    caption: "<fmt:message key="gradebook.function.window.showColumns"/>",
 	    bSubmit: "<fmt:message key="label.ok"/>",
 	    bCancel: "<fmt:message key="label.cancel"/>"
@@ -163,8 +163,7 @@ Include this jsp in your jqGrid page head to get some jqGrid functionaility
 	 	return strTagStrippedText;
 	}
 	
-	function trim(str)
-	{
+	function trim(str) {
 		str = str.replace(/^\s+|\s+$/g, '');
 		return str;
 	}

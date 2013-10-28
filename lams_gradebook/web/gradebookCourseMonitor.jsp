@@ -17,10 +17,6 @@
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
-	<script type="text/javascript">
-		var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelCourseGradebook&organisationID=${organisationID}";
-		var languageLabelWait = "<fmt:message key='gradebook.coursemonitor.wait'/>";
-	</script>
 	<script type="text/javascript" src="includes/javascript/blockexportbutton.js"></script>
 
 	<script type="text/javascript">
@@ -151,7 +147,7 @@
 					gridComplete: function(){
 						toolTip($(".jqgrow"));	// enable tooltips for grid
 					}	
-				}).navGrid("#organisationGridPager", {edit:false,add:false,del:false,search:false})
+			}).navGrid("#organisationGridPager", {edit:false,add:false,del:false,search:false})
 				
 			jQuery("#organisationGrid").navButtonAdd("#organisationGridPager",{
 				caption: "",
@@ -342,31 +338,87 @@
 					gridComplete: function(){
 						toolTip($(".jqgrow"));  // allowing tooltips for this grid	
 					}
-				}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false}); // applying refresh button
+			}).navGrid("#userViewPager", {edit:false,add:false,del:false,search:false}); // applying refresh button
 				
-				// Allowing search for this grid
-				jQuery("#userView").navButtonAdd('#userViewPager',{
-					caption: "",
-					title: "Search Names",
-					buttonimg:"<lams:LAMSURL />images/find.png", 
-					onClickButton: function(){
-						jQuery("#userView").searchGrid({
-								top:10, 
-								left:10,
-								sopt:['cn','bw','eq','ne','ew']
-							});
-						}
-				});
+			// Allowing search for this grid
+			jQuery("#userView").navButtonAdd('#userViewPager',{
+				caption: "",
+				title: "Search Names",
+				buttonimg:"<lams:LAMSURL />images/find.png", 
+				onClickButton: function(){
+					jQuery("#userView").searchGrid({
+						top:10, 
+						left:10,
+						sopt:['cn','bw','eq','ne','ew']
+					});
+				}
+			});
 				
-				// Allowing column editing for this grid
-				jQuery("#userView").navButtonAdd('#userViewPager',{
-					caption: "",
-					buttonimg:"<lams:LAMSURL />images/table_edit.png", 
-					onClickButton: function(){
-						jQuery("#userView").setColumns();
-					}
-				});
+			// Allowing column editing for this grid
+			jQuery("#userView").navButtonAdd('#userViewPager',{
+				caption: "",
+				buttonimg:"<lams:LAMSURL />images/table_edit.png", 
+				onClickButton: function(){
+					jQuery("#userView").setColumns();
+				}
+			});
+			
+			//initialize lesson list 
+			jQuery("#lessons-jqgrid").jqGrid({
+				datatype: "xml",
+			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getCourseGridData&view=monCourse&organisationID=${organisationID}",
+				colNames:['Id', '<fmt:message key="gradebook.columntitle.lessonName"/>'],
+				colModel:[
+					{name:'id',index:'id', width:35, sorttype:"int", hidden:true},
+				   	{name:'rowName',index:'rowName', width:225, firstsortorder:'desc', sorttype: 'text'}
+				],
+				sortname: 'id',
+				multiselect: true,
+				sortorder: "asc",
+				height:'auto',
+				ignoreCase: true
+			});
+			jQuery("#lessons-jqgrid").jqGrid('filterToolbar',{stringResult: true, searchOnEnter: true, defaultSearch: 'cn'});
+				
+			<c:forEach var="lesson" items="${lessons}" varStatus="i">
+				jQuery("#lessons-jqgrid").jqGrid('addRowData',${lesson.lessonId}, {id2:'${lesson.lessonId}',name:'${lesson.lessonName}'});
+			</c:forEach>
+
+			var languageLabelWait = "<fmt:message key='gradebook.coursemonitor.wait'/>";
+			
+			$("#export-course-button").click(function() {
+				var areaToBlock = "export-link-area";
+				var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelCourseGradebook&organisationID=${organisationID}";
+				blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait);
+				
+				return false;
+			});
+			
+			$("#export-selected-lessons-button").click(function() {
+				
+				var ids = jQuery("#lessons-jqgrid").getGridParam('selarrrow');
+				// if at least one lesson selceted do export
+				if(ids.length) {
+					var lessonIds = "";
+				    for (var i=0; i<ids.length; i++) {
+				    	lessonIds += "&lessonID=" + ids[i];
+				    }
+					
+					var areaToBlock = "select-lessons-area";
+					var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelSelectedLessons&organisationID=${organisationID}" + lessonIds;
+					blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait);
+				}
+				
+				return false;
+			});
+			
 		});
+		
+		function openSelectLessonsArea() {
+			$("#select-lessons-area").toggle("slow");
+			return false;
+		}
+
 	</script>
 
 </lams:head>
@@ -388,10 +440,23 @@
 			<br />
 			
 			<div id="export-link-area">
-				<a href="#nogo" onclick="JavaScript:blockExportButton();" >
+				<a href="#nogo" id="export-course-button">
 					<fmt:message key="gradebook.export.excel.1" />
 				</a> 
 				<fmt:message key="gradebook.export.excel.2" />
+			</div>
+			
+			<div>
+				<a href="#nogo" onclick="return openSelectLessonsArea();" >
+					<fmt:message key="label.select" />
+				</a>
+				<fmt:message key="label.lessons.to.export" />
+			</div>
+			
+			<div id="select-lessons-area" >
+				<table id="lessons-jqgrid" style="text-align: center;"></table>
+				
+				<input class="button" type="button" value="<fmt:message key="label.button.export"/>" id="export-selected-lessons-button" />			
 			</div>
 			
 			<div class="grid-holder">

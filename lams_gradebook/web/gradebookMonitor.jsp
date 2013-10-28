@@ -16,10 +16,6 @@
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
-	<script type="text/javascript">
-		var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelLessonGradebook&lessonID=${lessonDetails.lessonID}";
-		var languageLabelWait = "<fmt:message key='gradebook.coursemonitor.wait'/>";
-	</script>
 	<script type="text/javascript" src="includes/javascript/blockexportbutton.js"></script>
 	
 	<script type="text/javascript">
@@ -441,6 +437,16 @@
 						jQuery("#activityView").setColumns();
 					}
 				});
+				
+				$("#export-grades-button").click(function() {
+					
+					var areaToBlock = "export-link-area";
+					var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelLessonGradebook&lessonID=${lessonDetails.lessonID}";
+					var languageLabelWait = "<fmt:message key='gradebook.coursemonitor.wait'/>";
+					blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait);
+					
+					return false;
+				});
 		});
 	</script>
 	
@@ -472,7 +478,7 @@
 			</div>
 			
 			<div id="export-link-area">
-				<a href="#nogo" onclick="JavaScript:blockExportButton();" >
+				<a href="#nogo" id="export-grades-button">
 					<fmt:message key="gradebook.export.excel.1" />
 				</a> 
 				<fmt:message key="gradebook.export.excel.2" />
