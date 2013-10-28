@@ -50,6 +50,11 @@ public class ExcelUtil {
     private static CellStyle blueColor;
     private static CellStyle redColor;
     private static CellStyle yellowColor;
+    
+    private static CellStyle borderStyleLeftThin;
+    private static CellStyle borderStyleRightThick;
+    private static CellStyle borderStyleLeftThinBoldFont;
+    private static CellStyle borderStyleRightThickBoldFont;
 
     /**
      * Create .xlsx file out of provided data and then write out it to an OutputStream.
@@ -72,9 +77,9 @@ public class ExcelUtil {
 
 	//create bold style
 	boldStyle = workbook.createCellStyle();
-	Font font = workbook.createFont();
-	font.setBoldweight(Font.BOLDWEIGHT_BOLD);
-	boldStyle.setFont(font);
+	Font boldFont = workbook.createFont();
+	boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
+	boldStyle.setFont(boldFont);
 	
 	//create color style
 	blueColor = workbook.createCellStyle();
@@ -89,6 +94,18 @@ public class ExcelUtil {
 	yellowColor = workbook.createCellStyle();
 	yellowColor.setFillForegroundColor(IndexedColors.GOLD.getIndex());
 	yellowColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
+	
+	//create border style
+	borderStyleLeftThin = workbook.createCellStyle();
+	borderStyleLeftThin.setBorderLeft(CellStyle.BORDER_THIN);
+	borderStyleRightThick = workbook.createCellStyle();
+	borderStyleRightThick.setBorderRight(CellStyle.BORDER_THICK);
+	borderStyleLeftThinBoldFont = workbook.createCellStyle();
+	borderStyleLeftThinBoldFont.setBorderLeft(CellStyle.BORDER_THIN);
+	borderStyleLeftThinBoldFont.setFont(boldFont);
+	borderStyleRightThickBoldFont = workbook.createCellStyle();
+	borderStyleRightThickBoldFont.setBorderRight(CellStyle.BORDER_THICK);
+	borderStyleRightThickBoldFont.setFont(boldFont);
 	
 	int i = 0;
 	for (String sheetName : dataToExport.keySet()) {
@@ -178,6 +195,30 @@ public class ExcelUtil {
 		    break;
 		}
 	    }
+	    
+	    if (excelCell.getBorderStyle() != 0) {
+
+		switch (excelCell.getBorderStyle()) {
+		case ExcelCell.BORDER_STYLE_LEFT_THIN:
+		    if (excelCell.isBold()) {
+			cell.setCellStyle(borderStyleLeftThinBoldFont);
+		    } else {
+			cell.setCellStyle(borderStyleLeftThin);
+		    }
+		    break;
+		case ExcelCell.BORDER_STYLE_RIGHT_THICK:
+		    if (excelCell.isBold()) {
+			cell.setCellStyle(borderStyleRightThickBoldFont);
+		    } else {
+			cell.setCellStyle(borderStyleRightThick);
+		    }
+		    break;
+		default:
+		    break;
+		}
+
+	    }
+
 	}
     }
 

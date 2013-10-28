@@ -29,10 +29,14 @@ import org.apache.poi.ss.usermodel.IndexedColors;
  * Bean object holding necessary data for excel export.
  */
 public class ExcelCell {
+    
+    public final static int BORDER_STYLE_LEFT_THIN = 1;
+    public final static int BORDER_STYLE_RIGHT_THICK = 2;
 
     private Object cellValue;
     private Boolean isBold;
     private IndexedColors color;
+    private int borderStyle = 0;
 
     public ExcelCell() {
     }
@@ -48,10 +52,16 @@ public class ExcelCell {
 	this.color = color;
     }
     
-    public ExcelCell(Object cellValue, Boolean isBold, IndexedColors color) {
+    public ExcelCell(Object cellValue, int borderStyle) {
+	this.cellValue = cellValue;
+	this.isBold = false;
+	this.borderStyle = borderStyle;
+    }
+    
+    public ExcelCell(Object cellValue, Boolean isBold, int borderStyle) {
 	this.cellValue = cellValue;
 	this.isBold = isBold;
-	this.color = color;
+	this.borderStyle = borderStyle;
     }
 
     public Object getCellValue() {
@@ -76,5 +86,13 @@ public class ExcelCell {
 
     public void setColor(IndexedColors color) {
 	this.color = color;
+    }
+    
+    public int getBorderStyle() {
+	return borderStyle;
+    }
+
+    public void setBorderStyle(int borderStyle) {
+	this.borderStyle = borderStyle;
     }
 }
