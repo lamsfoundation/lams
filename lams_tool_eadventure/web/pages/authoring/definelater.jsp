@@ -60,7 +60,8 @@
 </div>
 <div id="content">
 		<%@ include file="/common/messages.jsp"%>
-
+		
+		<lams:help toolSignature="<%= EadventureConstants.TOOL_SIGNATURE %>" module="authoring"/>
 		<!-- end tab buttons -->
 		<div class="tabbody">
 			<!-- tab content 1 (Basic) -->
