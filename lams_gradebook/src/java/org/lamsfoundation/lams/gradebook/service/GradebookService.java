@@ -954,8 +954,11 @@ public class GradebookService implements IGradebookService {
 		    Double lessonMaxMark = 0d;
 		    Set<ToolActivity> activities = lessonActivitiesMap.get(lesson.getLessonId());
 		    
-		    userRow[i++] = new ExcelCell(learner.getFirstName().toUpperCase(), false);
-		    userRow[i++] = new ExcelCell(learner.getLastName().toUpperCase(), false);
+		    String lastName = (learner.getLastName() == null) ? learner.getLogin().toUpperCase() : learner
+			    .getLastName().toUpperCase();
+		    userRow[i++] = new ExcelCell(lastName, false);
+		    String firstName = (learner.getFirstName() == null) ? "" : learner.getFirstName().toUpperCase();
+		    userRow[i++] = new ExcelCell(firstName, false);
 		    
 		    //check if learner is participating in this lesson
 		    if (!lesson.getAllLearners().contains(learner)) {
