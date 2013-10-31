@@ -326,7 +326,9 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 	
 	// loadupLastAttempt for display purpose
-	loadupLastAttempt(sessionMap);
+	if (dbResultCount > 0) {
+	    loadupLastAttempt(sessionMap);
+	}
 	
 	//check if need to display results page
 	if ((dbResultCount > 0) && finishedLock) {
