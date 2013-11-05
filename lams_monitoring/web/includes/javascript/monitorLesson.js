@@ -815,52 +815,51 @@ function addLearnerIcons(activity) {
 		actY = +activityShape.attr('y') + 1;
 	}
 	
+	// add group of users icon
+	var actRightBorder = actX + (isGate? 40 : +activityShape.attr('width'));
+	var groupTitle = activity.learners.length + ' ' + LEARNER_GROUP_COUNT_LABEL
+		+ ' ' + LEARNER_GROUP_SHOW_LABEL;
+	// if icons do not fit in shape anymore, show a group icon
+	var element = appendXMLElement('image', {
+		'id'         : 'act' + activity.id + 'learnerGroup',
+		'x'          : actRightBorder - 19,
+		'y'          : actY + 1,
+		'height'     : 16,
+		'width'      : 16,
+		'xlink:href' : LAMS_URL + 'images/icons/group.png'
+	}, null, activityGroup[0]);
+	appendXMLElement('title', null, groupTitle, element);
+	// add a small number telling how many learners are in the group
+	element = appendXMLElement('text', {
+		'id'         : 'act' + activity.id + 'learnerGroupText',
+		'x'          : actRightBorder - 10,
+		'y'          : actY + 24,
+		'text-anchor': 'middle',
+		'font-family': 'Verdana',
+		'font-size'  : 8
+	}, activity.learners.length, activityGroup[0]);
+	appendXMLElement('title', null, groupTitle, element);
+
 	var actTooltip = LEARNER_GROUP_LIST_TITLE_LABEL;
-	
-	$.each(activity.learners, function(learnerIndex, learner){
-		if (isGate || (activity.learners.length > 8 && learnerIndex == 7)) {
-			// maximum 8 icons fit in an activity 
-			var actRightBorder = actX + (isGate? 40 : +activityShape.attr('width'));
-			var groupTitle = activity.learners.length + ' ' + LEARNER_GROUP_COUNT_LABEL
-				+ ' ' + LEARNER_GROUP_SHOW_LABEL;
-			// if icons do not fit in shape anymore, show a group icon
-			var element = appendXMLElement('image', {
-				'id'         : 'act' + activity.id + 'learnerGroup',
-				'x'          : actRightBorder - 19,
-				'y'          : actY + 1,
-				'height'     : 16,
-				'width'      : 16,
-				'xlink:href' : LAMS_URL + 'images/icons/group.png'
-			}, null, activityGroup[0]);
-			appendXMLElement('title', null, groupTitle, element);
-			// add a small number telling how many learners are in the group
-			element = appendXMLElement('text', {
-				'id'         : 'act' + activity.id + 'learnerGroupText',
-				'x'          : actRightBorder - 10,
-				'y'          : actY + 24,
-				'text-anchor': 'middle',
-				'font-family': 'Verdana',
-				'font-size'  : 8
-			}, activity.learners.length, activityGroup[0]);
-			appendXMLElement('title', null, groupTitle, element);
-			// stop processing learners
-			return false;
-			
-		} else {
-			/* make an icon for each learner */
-			var element = appendXMLElement('image', {
-				'id'         : 'act' + activity.id + 'learner' + learner.id,
-				'x'          :  actX + learnerIndex*15,
-				'y'          :  actY,
-				'height'     : 16,
-				'width'      : 16,
-				'xlink:href' : LAMS_URL + 'images/icons/user.png'
-			}, null, activityGroup[0]);
+	// draw single user icons for the first few
+	if (!isGate) {
+		$.each(activity.learners, function(learnerIndex, learner){
 			var learnerDisplayName = getLearnerDisplayName(learner);
-			appendXMLElement('title', null, learnerDisplayName, element);
 			actTooltip += '\n' + learnerDisplayName;
-		}
-	});
+			
+			if (learnerIndex < 8) {
+				element = appendXMLElement('image', {
+					'id'         : 'act' + activity.id + 'learner' + learner.id,
+					'x'          :  actX + learnerIndex*15,
+					'y'          :  actY,
+					'height'     : 16,
+					'width'      : 16,
+					'xlink:href' : LAMS_URL + 'images/icons/user.png'
+				}, null, activityGroup[0]);
+				appendXMLElement('title', null, learnerDisplayName, element);
+			}
+		});
+	}
 	
 	appendXMLElement('title', null, actTooltip, activityGroup[0]);
 }

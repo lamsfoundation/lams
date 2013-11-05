@@ -809,8 +809,8 @@ public class SVGGenerator {
 	}
 
 	// trim text to fit into container
-	if (text.length() > 21) {
-	    text = text.substring(0, 20);
+	if (text.length() > 20) {
+	    text = text.substring(0, 19);
 	}
 
 	Element textNode = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "text");
