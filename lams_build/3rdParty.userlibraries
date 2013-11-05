@@ -45,5 +45,6 @@
         <archive javadoc="http://www.jgroups.org/javadoc/" path="/lams_build/lib/jboss/jgroups-all.jar" source="/3rdParty_sources/jgroups"/>
         <archive javadoc="http://hc.apache.org/httpclient-3.x/apidocs/" path="/lams_build/lib/jakarta-commons/commons-httpclient-3.0.jar" source="/3rdParty_sources/commons-httpclient"/>
         <archive javadoc="http://joda-time.sourceforge.net/api-release/" path="/lams_build/lib/xstream/joda-time-2.1.jar" source="/3rdParty_sources/joda-time"/>
+        <archive javadoc="http://google-gson.googlecode.com/svn/tags/gson-2.2.4/docs/javadocs/" path="/lams_build/lib/json/gson-2.2.4.jar" source="/3rdParty_sources/gson"/>
     </library>
 </eclipse-userlibraries>

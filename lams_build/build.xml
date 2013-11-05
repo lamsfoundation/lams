@@ -199,6 +199,7 @@
 				<include name="csv/*.jar" />
 				<include name="joid/*.jar" />
 				<include name="urlrewritefilter/*.jar" />
+				<include name="json/*.jar" />
 			</fileset> 
 			<fileset dir="..">
 				<include name="${lams_common}/${sub.build.lib}/lams.jar" />

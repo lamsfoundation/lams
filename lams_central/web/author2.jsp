@@ -21,6 +21,10 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/json-min.js" ></script> 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/treeview-min.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringGeneral.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringActivity.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringHandler.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringMenu.js"></script>
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>';
 		var LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home.do?method=createLearningDesignThumbnail&ldId=';
@@ -30,11 +34,10 @@
 			contentFolderID = null;
 		}
 	</script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring.js"></script>
 </lams:head>
 <body>
 	<div id="toolbar" class="ui-widget-header ui-corner-all">
-		<div class="ui-button" onClick="javascript:MenuUtils.openLearningDesign()">
+		<div class="ui-button" onClick="javascript:MenuLib.openLearningDesign()">
 			Open
 		</div>
 		<div>
@@ -45,11 +48,11 @@
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li><div onClick="javascript:MenuUtils.addGate()">Gate</div></li>
-				<li><div>Branch</div></li>
+				<li><div onClick="javascript:MenuLib.addGate()">Gate</div></li>
+				<li><div onClick="javascript:MenuLib.addBranching()">Branch</div></li>
 			</ul>
 		</div>
-		<div class="ui-button" onClick="javascript:MenuUtils.addGrouping()">
+		<div class="ui-button" onClick="javascript:MenuLib.addGrouping()">
 			Group
 		</div>
 	</div>
@@ -94,17 +97,10 @@
 					Recently used sequences
 				</td>
 			</tr>
-			<tr>
-				<td id="buttonsCell" colspan="2">
-					<div class="ui-button">
-			    		Open
-			    	</div>
-					<div class="ui-button" onClick="javascript:$('#openLearningDesignDialog').dialog('close')">
-			    		Cancel
-			    	</div>
-				</td>
-			</tr>
 		</table>
+	</div>
+	
+	<div id="infoDialog" class="dialogContainer">
 	</div>
 </body>
 </lams:html>

@@ -2,7 +2,7 @@ div.dialogContainer, .ldChoiceDependentCanvasElement {
 	display: none;
 }
 
-div#openLearningDesignDialog {
+.ui-dialog {
 	font-size: 12px;
 }
 
@@ -14,7 +14,7 @@ div.dialogTitle {
 
 div#openLearningDesignDialog > table {
 	width: 100%;
-	height: 735px;
+	height: 684px;
 	table-layout: fixed;
 	border-top: thin dotted #2E6E9E;
 }
@@ -52,25 +52,16 @@ div#learningDesignTree {
 td#canvasCell {
 	text-align: center;
 	padding: 10px 0px 0px 10px;
+	vertical-align: middle;
 }
 
 div#canvasDiv {
 	overflow: auto;
-	height: 685px;
+	height: 665px;
 }
 
 img#ldScreenshotLoading  {
 	padding-top: 200px;
-}
-
-#buttonsCell {
-	border-top: thin dotted #2E6E9E;
-	padding-top: 5px;
-}
-
-#buttonsCell > div {
-	float: right;
-	margin-left: 10px;
 }
 
 div#toolbar {

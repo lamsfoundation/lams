@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.authoring.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -42,6 +43,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -66,6 +68,9 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * @author Manpreet Minhas
@@ -101,7 +106,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	request.setAttribute("tools", getLearningDesignService().getToolDTOs(request.getRemoteUser()));
 	return mapping.findForward("openAutoring");
     }
-    
+
     /**
      * Output the supplied WDDX packet. If the request parameter USE_JSP_OUTPUT is set, then it sets the session
      * attribute "parameterName" to the wddx packet string. If USE_JSP_OUTPUT is not set, then the packet is written out
@@ -155,6 +160,21 @@ public class AuthoringAction extends LamsDispatchAction {
 	    wddxPacket = handleException(e, "getLearningDesignDetails", authoringService, true).serializeMessage();
 	}
 	return outputPacket(mapping, request, response, wddxPacket, "details");
+    }
+
+    public ActionForward getLearningDesignJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException, IOException {
+	JSONObject responseJSON = new JSONObject();
+
+	long learningDesignID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
+	LearningDesignDTO learningDesignDTO = getLearningDesignService().getLearningDesignDTO(learningDesignID,
+		getUserLanguage());
+	
+	response.setContentType("application/json;charset=utf-8");
+	Writer responseWriter = response.getWriter();
+	Gson gson = new GsonBuilder().create();
+	gson.toJson(learningDesignDTO, responseWriter);
+	return null;
     }
 
     public ActionForward finishLearningDesignEdit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -471,7 +491,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 	return AuthoringAction.toolService;
     }
-    
 
     private ILearningDesignService getLearningDesignService() {
 	if (AuthoringAction.learningDesignService == null) {
