@@ -78,6 +78,7 @@
 	
 		<html:hidden property="dispatch" value="finishActivity" />
 		<html:hidden property="toolSessionID" />
+		<html:hidden property="contentEditable" value="${contentEditable}" />
 
 		<c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
