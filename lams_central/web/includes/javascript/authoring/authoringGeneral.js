@@ -3,23 +3,26 @@
  */
 
 // few publicly visible variables 
-var paper = null;
-var canvas = null;
-var activities = [];
+var paper = null,
+	canvas = null,
+	activities = null;
 
 // configuration and storage of various elements
 var layout = {
 	'toolIcons': {},
 	'conf' : {
-		'activityWidth'  : 125,
-		'activityHeight' : 50,
 		'propertiesDialogDimOpacity'   : 0.3,
 		'propertiesDialogDimThreshold' : 100,
 		'propertiesDialogDimThrottle'  : 100,
-		'dragStartThreshold'           : 300
+		'dragStartThreshold'           : 300,
+		'arrangeHorizontalSpace'       : 200,
+		'arrangeVerticalSpace'         : 100,
+		'arrangeHorizontalPadding'     : 40,
+		'arrangeVerticalPadding'       : 50
 	},
 	'defs' : {
-		'bin'           : 'M 830 680 h -50 l 10 50 h 30 z',
+		'activity'      : ' h 125 v 50 h -125 z',
+		'bin'           : 'M 0 0 h -50 l 10 50 h 30 z',
 		'transArrow'    : ' l 10 15 a 25 25 0 0 0 -20 0 z',
 		'gate'          : ' l-8 8 v14 l8 8 h14 l8 -8 v-14 l-8 -8 z',
 		'branchingEdgeStart' : ' m -8 0 a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0',
@@ -48,8 +51,8 @@ var layout = {
  * Initialises the whole Authoring window.
  */
 $(document).ready(function() {
-	paper = Raphael('canvas');
 	canvas = $('#canvas');
+	MenuLib.newLearningDesign(true);
 	
 	initLayout();
 	initTemplates();
@@ -121,9 +124,6 @@ function initTemplates(){
  * Initialises various Authoring widgets.
  */
 function initLayout() {
-	// draw rubbish bin on canvas
-	layout.items.bin = paper.path(layout.defs.bin);
-	
 	// add jQuery UI button functionality
 	$('.ui-button').button();
 	$(".split-ui-button").each(function(){
@@ -246,8 +246,6 @@ function initLayout() {
 					   of: '#canvas'
 				      }
 	});
-	
-	HandlerLib.resetCanvasMode();
 }
 
 
@@ -270,15 +268,10 @@ function openLearningDesign(learningDesignId) {
 				return;
 			}
 			
-			// reset the canvas
-			paper.clear();
-			// draw the rubbish bin again
-			layout.items.bin = paper.path(layout.defs.bin);
+			MenuLib.newLearningDesign(true);
 			// create visual representation of the loaded activities
-			activities = [];
 			$.each(ld.activities, function() {
 				var activity = this;
-				
 				activities.push(new ActivityLib.ToolActivity(activity.activityID,
 						activity.toolID, activity.xCoord, activity.yCoord,
 						activity.activityTitle));
@@ -310,4 +303,30 @@ function openLearningDesign(learningDesignId) {
 			HandlerLib.resetCanvasMode();
 		}
 	});
+}
+
+
+function resizePaper(width, height) {
+	if (!paper) {
+		return;
+	}
+
+	if (!width) {
+		width = canvas.width() - 5;
+	}
+	if (!height || (height == canvas.height() - 5)) {
+		height = canvas.height() - 5 - (width > canvas.width() - 5 ? 20 : 0);
+	}
+	paper.setSize(width, height);
+	
+	if (layout.items.bin) {
+		layout.items.bin.remove();
+	}
+	
+	// draw rubbish bin on canvas
+	var binPath = Raphael.parsePathString(layout.defs.bin);
+	binPath = Raphael.transformPath(binPath, Raphael.format('t {0} {1}', width, height - 50));
+	layout.items.bin = paper.path(binPath);
+	
+	HandlerLib.resetCanvasMode();
 }

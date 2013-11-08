@@ -37,6 +37,9 @@
 </lams:head>
 <body>
 	<div id="toolbar" class="ui-widget-header ui-corner-all">
+		<div class="ui-button" onClick="javascript:MenuLib.newLearningDesign()">
+			New
+		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.openLearningDesign()">
 			Open
 		</div>
@@ -55,12 +58,11 @@
 		<div class="ui-button" onClick="javascript:MenuLib.addGrouping()">
 			Group
 		</div>
+		<div class="ui-button" onClick="javascript:MenuLib.arrangeActivities()">
+			Arrange
+		</div>
 	</div>
 	<table id="authoringTable">
-		<tr>
-			<td id="layoutCell"></td>
-			<td></td>
-		</tr>
 		<tr>
 			<td id="templateContainerCell">
 				<div id="templateContainer">
@@ -74,7 +76,9 @@
 					</c:forEach>
 				</div>
 			</td>
-			<td id="canvas"></td>
+			<td>
+				<div id="canvas"></div>
+			</td>
 		</tr>
 	</table>
 	

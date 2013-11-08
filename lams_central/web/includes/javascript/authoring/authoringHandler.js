@@ -8,10 +8,13 @@ var HandlerLib = {
 	 * Default mode for canvas. Run after special mode is no longer needed.
 	 */
 	resetCanvasMode : function(){
+		// remove selection if exists
+		ActivityLib.removeSelectEffect();
+		
 		canvas.css('cursor', 'default')
 		      .off('click')
 		      // if clicked anywhere, activity selection is gone
-		      .click(HandlerLib.unselectActivityHandler)
+		      .click(HandlerLib.canvasClickHandler)
 		      .off('mouseup')
 		      .off('mousemove')
 		      // when mouse gets closer to properties dialog, make it fully visible
@@ -50,76 +53,17 @@ var HandlerLib = {
 			container.css('opacity', opacity);
 		}
 	},
-	
-	
-	/**
-	 * Show selection border around the clicked activity.
-	 */
-	selectActivityHandler : function(event, activity) {
-		if (activity != layout.items.selectedActivity) {
-			HandlerLib.unselectActivityHandler(event);
-			ActivityLib.addSelectEffect(activity);
-		}
-		// so canvas handler unselectActivityHandler() is not run
-		event.preventDefault();
-	},
-	
-	
+
 	/**
 	 * Remove activity selection when user clicks on canvas.
 	 */
-	unselectActivityHandler : function(event) {
+	canvasClickHandler : function(event) {
 		// check if user clicked on empty space on canvas
 		// or on some element on top of it
 		var defaultPrevented = event.originalEvent ?
 				event.originalEvent.defaultPrevented : event.defaultPrevented;
 		if (!defaultPrevented) {
-			var selectedActivity = layout.items.selectedActivity;
-			// does selection exist at all?
-			if (selectedActivity) {
-				selectedActivity.items.selectEffect.remove();
-				selectedActivity.items.selectEffect = null;
-				
-				// no selected activity = no properties dialog
-				layout.items.propertiesDialog.dialog('close');
-				layout.items.selectedActivity = null;
-			}
-		}
-	},
-	
-	
-	/**
-	 * Open separate window with activity authoring on double click.
-	 */
-	openActivityAuthoringHandler : function(activity){
-		// fetch authoring URL for a Tool Activity
-		if (!activity.authorURL && activity.toolID) {
-			$.ajax({
-				async : false,
-				cache : false,
-				url : LAMS_URL + "authoring/author.do",
-				dataType : 'json',
-				data : {
-					'method'          : 'createToolContent',
-					'toolID'          : activity.toolID,
-					'contentFolderID' : contentFolderID
-				},
-				success : function(response) {
-					activity.authorURL = response.authorURL;
-					activity.id = response.toolContentID;
-					if (!contentFolderID) {
-						// if LD did not have contentFolderID, it was just generated
-						// so remember it
-						contentFolderID = response.contentFolderID;
-					}
-				}
-			});
-		}
-		
-		if (activity.authorURL) {
-			window.open(activity.authorURL, 'activityAuthoring' + activity.id,
-					"HEIGHT=800,WIDTH=1024,resizable=yes,scrollbars=yes,status=false," +
-					"menubar=no,toolbar=no");
+			ActivityLib.removeSelectEffect();
 		}
 	},
 	
@@ -153,7 +97,7 @@ var HandlerLib = {
 				 HandlerLib.dragItemsMoveHandler(items, event, startX, startY);
 			});
 			
-			var mouseup = function(){
+			var mouseup = function(mouseupEvent){
 				// finish dragging - restore various elements' default state
 				items.isDragged = false;
 				items.unmouseup();
@@ -161,7 +105,7 @@ var HandlerLib = {
 				layout.items.bin.attr('fill', 'transparent');
 				
 				// do whetver needs to be done with the dragged elements
-				mouseupHandler();
+				mouseupHandler(mouseupEvent);
 			};
 			
 			// if user moves mouse very quickly, mouseup event can be triggered
@@ -185,67 +129,10 @@ var HandlerLib = {
 		}
 		
 		// highlight rubbish bin if dragged elements are over it
-		if (Raphael.isBBoxIntersect(layout.items.bin.getBBox(), items.getBBox())) {
+		if (HandlerLib.isElemenentBinned(event)) {
 			layout.items.bin.attr('fill', layout.colors.binActive);
 		} else {
 			layout.items.bin.attr('fill', 'transparent');
-		}
-	},
-	
-	
-	/**
-	 * Drop the dragged activity on the canvas.
-	 */
-	dragActivityEndHandler : function(activity) {
-		// if the activity was over rubbish bin, remove it
-		if (Raphael.isBBoxIntersect(layout.items.bin.getBBox(), activity.items.shape.getBBox())) {
-			ActivityLib.removeActivity(activity);
-			return;
-		}
-		
-		// finally transform the dragged elements
-		var transformation = activity.items.shape.attr('transform');
-		activity.items.transform('');
-		if (transformation.length > 0) {
-			activity.items.forEach(function(elem) {
-				// some elements (rectangles) have "x", some are paths
-				if (elem.attr('x')) {
-					elem.attr({
-						'x' : elem.attr('x') + transformation[0][1],
-						'y' : elem.attr('y') + transformation[0][2]
-					});
-				} else {
-					var path = elem.attr('path');
-					elem.attr('path', Raphael.transformPath(path, transformation));
-				}
-			});
-		}
-		
-		if (activity.items.groupingEffect) {
-			activity.items.groupingEffect.toBack();
-		}
-		
-		// redraw transitions
-		if (activity.fromTransition) {
-			ActivityLib.drawTransition(activity, activity.fromTransition.toActivity);
-		}
-		if (activity.toTransition) {
-			ActivityLib.drawTransition(activity.toTransition.fromActivity, activity);
-		}
-	},
-	
-	
-	/**
-	 * Drop the dragged transition.
-	 */
-	dragTransitionEndHandler : function(transition) {
-		// if the transition was over rubbish bin, remove it
-		if (Raphael.isBBoxIntersect(layout.items.bin.getBBox(), transition.getBBox())) {
-			ActivityLib.removeTransition(transition);
-		} else {
-			// cancel drag
-			transition.transform('');
-			transition.toBack();
 		}
 	},
 	
@@ -263,7 +150,8 @@ var HandlerLib = {
 		
 		canvas.mousemove(function(event){
 			HandlerLib.drawTransitionMoveHandler(activity, event, startX, startY);
-		}).mouseup(function(event){
+		})
+		.mouseup(function(event){
 			HandlerLib.drawTransitionEndHandler(activity, event);
 		});
 	},
@@ -302,27 +190,133 @@ var HandlerLib = {
 	 * Finalise transition drawing.
 	 */
 	drawTransitionEndHandler : function(activity, event) {
+		// prevent triggering event on several activity items; we just need on transition
+		event.stopImmediatePropagation();
 		HandlerLib.resetCanvasMode();
 		
-		//remove the temporary transition
+		//remove the temporary transition (dashed line)
 		if (activity.tempTransition) {
 			activity.tempTransition.remove();
 			activity.tempTransition = null;
 		}
 		
-		var endX = event.pageX - canvas.offset().left;
-		var endY = event.pageY - canvas.offset().top;
 		var endActivity = null;
-		// find the target activity
-		$.each(activities, function(){
-			if (this.items.shape.isPointInside(endX, endY)) {
-				endActivity = this;
-				return false;
-			}
-		});
+		var targetElement = paper.getElementByPoint(event.pageX, event.pageY);
+		if (targetElement) {
+			endActivity = targetElement.data('activity');
+		}
 
-		if (endActivity) {
+		if (endActivity && activity != endActivity) {
 			ActivityLib.drawTransition(activity, endActivity);
 		}
+	},
+	
+	
+	/**
+	 * Lighthens up branching edges in the same colour for identifictation.
+	 */
+	branchingEdgeMouseoverHandler : function() {
+		var branchingActivity = this.data('activity').branchingActivity;
+		var startItems = branchingActivity.start.items;
+		var endItems = branchingActivity.end.items;
+		if (!startItems.isDragged && !endItems.isDragged) {
+			startItems.shape.attr('fill', layout.colors.branchingEdgeMatch);
+			endItems.shape.attr('fill', layout.colors.branchingEdgeMatch);
+		}
+	},
+	
+	
+	/**
+	 * Return branching edges to their normal colours.
+	 */
+	branchingEdgeMouseoutHandler : function() {
+		var branchingActivity = this.data('activity').branchingActivity;
+		var startItems = branchingActivity.start.items;
+		var endItems = branchingActivity.end.items;
+		if (!startItems.isDragged && !endItems.isDragged) {
+			startItems.shape.attr('fill', layout.colors.branchingEdgeStart);
+			endItems.shape.attr('fill', layout.colors.branchingEdgeEnd);
+		}
+	},
+	
+	
+	/**
+	 * Starts drawing a transition or dragging an activity.
+	 */
+	activityMousedownHandler : function(event, x, y){
+		var activity = this.data('activity');
+		if (event.ctrlKey) {
+			 // when CTRL is held down, start drawing a transition
+			 HandlerLib.drawTransitionStartHandler(activity, event, x, y);
+		} else {
+			var mouseupHandler = function(event){
+				if (HandlerLib.isElemenentBinned(event)) {
+					// if the activity was over rubbish bin, remove it
+					ActivityLib.removeActivity(activity);
+				} else {
+					ActivityLib.dropActivity(activity);
+				}
+			}
+			// start dragging the activity
+			HandlerLib.dragItemsStartHandler(activity.items, this, mouseupHandler, event, x, y);
+		}
+	},
+	
+	
+	/**
+	 * Selects an activity.
+	 */
+	activityClickHandler : function(event) {
+		var activity = this.data('activity');
+		// inform that user wants to select, not drag the activity
+		activity.items.clicked = true;
+		if (activity != layout.items.selectedActivity) {
+			HandlerLib.canvasClickHandler(event);
+			ActivityLib.addSelectEffect(activity);
+		}
+		// so canvas handler unselectActivityHandler() is not run
+		event.preventDefault();
+	},
+	
+	
+	/**
+	 * Opens activity authoring.
+	 */
+	activityDblclickHandler : function(event) {
+		var activity = this.data('activity');
+		// inform that user wants to open, not drag the activity
+		activity.items.clicked = true;
+		ActivityLib.openActivityAuthoring(activity);
+	},
+	
+	
+	/**
+	 * Starts dragging a transition.
+	 */
+	transitionMousedownHandler : function(event, x, y){
+		var transition = this.data('transition');
+		// allow transition dragging
+		var mouseupHandler = function(event){
+			if (HandlerLib.isElemenentBinned(event)) {
+				// if the transition was over rubbish bin, remove it
+				ActivityLib.removeTransition(transition);
+			} else {
+				ActivityLib.dropTransition(transition);
+			}
+		}
+			
+		HandlerLib.dragItemsStartHandler(transition, this, mouseupHandler, event, x, y);
+	},
+	
+	
+	/**
+	 * Checks whether activity or transition is over rubbish bin.
+	 */
+	isElemenentBinned : function(event) {
+		var canvasX = event.pageX - canvas.offset().left;
+		var canvasY = event.pageY - canvas.offset().top;
+		
+		// highlight rubbish bin if dragged elements are over it
+		return Raphael.isPointInsideBBox(layout.items.bin.getBBox(), canvasX, canvasY); 
 	}
 };

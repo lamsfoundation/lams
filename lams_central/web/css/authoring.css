@@ -1,9 +1,22 @@
-div.dialogContainer, .ldChoiceDependentCanvasElement {
-	display: none;
+.ygtv-highlight1, .ygtv-highlight1 .ygtvlabel {
+	background-color: #dfeffc;
+}
+
+a.ygtvspacer {
+	border-bottom: none;
 }
 
 .ui-dialog {
 	font-size: 12px;
+}
+
+div.dialogContainer, .ldChoiceDependentCanvasElement, 
+.dialog-no-title .ui-dialog-titlebar {
+	display: none;
+}
+
+#infoDialog {
+	font-weight: bold;
 }
 
 div.dialogTitle {
@@ -19,26 +32,18 @@ div#openLearningDesignDialog > table {
 	border-top: thin dotted #2E6E9E;
 }
 
-a.ygtvspacer {
-	border-bottom: none;
-}
-
-td#learningDesignTreeCell {
+div#openLearningDesignDialog td#learningDesignTreeCell {
 	padding: 2px 2px 0px 5px;
 	vertical-align: top;
 	width: 200px;
 	border-right: thin dotted #2E6E9E;
 }
 
-div#learningDesignTree {
+div#openLearningDesignDialog div#learningDesignTree {
 	overflow: auto;
 }
 
-.ygtv-highlight1, .ygtv-highlight1 .ygtvlabel {
-	background-color: #dfeffc;
-}
-
-#recentlyUsedCell {
+div#openLearningDesignDialog #recentlyUsedCell {
 	height: 200px;
 	vertical-align: top;
 	border-top: thin dotted #2E6E9E;
@@ -49,18 +54,18 @@ div#learningDesignTree {
 	text-align: center;
 }
 
-td#canvasCell {
+div#openLearningDesignDialog td#canvasCell {
 	text-align: center;
 	padding: 10px 0px 0px 10px;
 	vertical-align: middle;
 }
 
-div#canvasDiv {
+div#openLearningDesignDialog div#canvasDiv {
 	overflow: auto;
 	height: 665px;
 }
 
-img#ldScreenshotLoading  {
+div#openLearningDesignDialog img#ldScreenshotLoading  {
 	padding-top: 200px;
 }
 
@@ -96,23 +101,20 @@ table#authoringTable {
 	width: 100%;
 }
 
-td#layoutCell {
-	width: 152px;
-}
-
 #groupingButton span {
 	background: url('../images/icons/group.png') no-repeat 3px 3px;
 	padding-left: 25px;
 }
 
 td#templateContainerCell {
+	width: 152px;
 	border: black thin solid;
 	vertical-align: top;
 	background-color: rgb(219, 230, 252);
 }
 
 div#templateContainer {
-	height: 800px;
+	height: 745px;
 	overflow: auto;
 }
 
@@ -131,6 +133,13 @@ div.template div {
 	width: 92px;
 	padding-top: 11px;
 	font-size: 10pt;
+}
+
+#canvas {
+	overflow: auto;
+	width: 100%;
+	height: 745px;
+	vertical-align: top;
 }
 
 div.propertiesDialog {
