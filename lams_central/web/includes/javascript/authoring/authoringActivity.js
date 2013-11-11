@@ -7,71 +7,37 @@ var ActivityLib = {
 	/**
 	 * Constructor for a Tool Activity.
 	 */
-	ToolActivity: function(id, toolID, x, y, label) {
+	ToolActivity: function(id, toolID, x, y, title) {
 		this.id = id;
+		this.toolID = toolID;
+		this.title = title;
 		this.type = 'tool';
 		this.transitions = {
 			'from' : [],
 			'to'   : []
 		};
-		this.toolID = toolID;
-		this.draw = function(x, y) {
-			if (this.items) {
-				this.items.remove();
-			}
-			
-			// create activity SVG elements
-			paper.setStart();
-			var shape = paper.path(Raphael.format('M {0} {1}' + layout.defs.activity, x, y))
-							 .attr({
-								'fill' : layout.colors.activity
-							 });
-			paper.image(layout.toolIcons[toolID], x + 47, y + 2, 30, 30);
-			paper.text(x + 62, y + 40, label);
-			
-			this.items = paper.setFinish();
-			this.items.shape = shape;
-			
-			ActivityLib.initActivity(this);
-		};
 		
+		this.loadPropertiesDialogContent = ActivityLib.loadPropertiesDialogContent.tool;
+		
+		this.draw = ActivityLib.draw.tool;
 		this.draw(x, y);
 	},
 
 	/**
 	 * Constructor for a Grouping Activity.
 	 */
-	GroupingActivity : function(id, x, y) {
+	GroupingActivity : function(id, x, y, title) {
 		this.id = id;
-		this.type = 'group';
+		this.type = 'grouping';
+		this.title = title;
 		this.transitions = {
 			'from' : [],
 			'to'   : []
 		};
-		this.draw = function(x, y) {
-			if (this.items) {
-				this.items.remove();
-			}
-				
-			x-=47;
-			y-=2;
-			
-			// create activity SVG elements
-			paper.setStart();
-			var shape = paper.path(Raphael.format('M {0} {1}' + layout.defs.activity, x, y))
-							 .attr({
-									'fill' : layout.colors.activity
-								 });
-			
-			paper.image('../images/grouping.gif', x + 47, y + 2, 30, 30);
-			paper.text(x + 62, y + 40, 'Grouping');
-			
-			this.items = paper.setFinish();
-			this.items.shape = shape;
-			
-			ActivityLib.initActivity(this);
-		};
 		
+		this.loadPropertiesDialogContent = ActivityLib.loadPropertiesDialogContent.grouping;
+
+		this.draw = ActivityLib.draw.grouping;		
 		this.draw(x, y);
 	},
 
@@ -85,31 +51,8 @@ var ActivityLib = {
 			'from' : [],
 			'to'   : []
 		};
-		this.draw = function(x, y) {
-			if (this.items) {
-				this.items.remove();
-			}
-			
-			// create activity SVG elements
-			paper.setStart();
-			var shape = paper.path(Raphael.format('M {0} {1}' + layout.defs.gate, x, y))
-							 .attr({
-								 'fill' : layout.colors.gate
-							 });
-			
-			paper.text(x + 7, y + 14, 'STOP')
-			     .attr({
-					'font-size' : 9,
-					'font' : 'sans-serif',
-					'stroke' : layout.colors.gateText
-			     });
-			
-			this.items = paper.setFinish();
-			this.items.shape = shape;
-			
-			ActivityLib.initActivity(this);
-		};
 		
+		this.draw = ActivityLib.draw.gate;
 		this.draw(x, y);
 	},
 	
@@ -134,33 +77,8 @@ var ActivityLib = {
 			branchingActivity = new ActivityLib.BranchingActivity(id, this);
 		}
 		this.branchingActivity = branchingActivity;
-		this.draw = function(x, y) {
-			if (this.items) {
-				this.items.remove();
-			}
-			
-			// create activity SVG elements
-			paper.setStart();
-			var shape = paper.path('M ' + x + ' ' + y +
-				(this.isStart ? layout.defs.branchingEdgeStart : layout.defs.branchingEdgeEnd))
-							 .attr({
-								 'fill' : this.isStart ? layout.colors.branchingEdgeStart
-							                           : layout.colors.branchingEdgeEnd
-							 });
-							
-			paper.text(x, y + 14,  this.isStart ? 'Branching point'
-		                                        : 'Converge point')
-			     .attr({
-					'font-size' : 9,
-					'font' : 'sans-serif'
-			     });
-			
-			this.items = paper.setFinish();
-			this.items.shape = shape;
-			
-			ActivityLib.initActivity(this);
-		};
 		
+		this.draw = ActivityLib.draw.branching;
 		this.draw(x, y);
 	},
 	
@@ -186,9 +104,196 @@ var ActivityLib = {
 	
 	
 	/**
+	 * Mehtods for drawing various kinds of activities.
+	 */
+	draw : {
+		tool : function(x, y) {
+			if (x == undefined || y == undefined) {
+				x = this.items.shape.getBBox().x;
+				y = this.items.shape.getBBox().y;
+			}
+			
+			if (this.items) {
+				this.items.remove();
+			}
+			
+			// create activity SVG elements
+			paper.setStart();
+			var shape = paper.path(Raphael.format('M {0} {1}' + layout.defs.activity, x, y))
+							 .attr({
+								'fill' : layout.colors.activity
+							 });
+			paper.image(layout.toolIcons[this.toolID], x + 47, y + 2, 30, 30);
+			paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title));
+			
+			this.items = paper.setFinish();
+			this.items.shape = shape;
+			
+			if (this.grouping) {
+				ActivityLib.addGroupingEffect(this);
+			}
+			
+			ActivityLib.activityHandlersInit(this);
+		},
+		
+		
+		grouping : function(x, y) {
+			if (x == undefined || y == undefined) {
+				x = this.items.shape.getBBox().x;
+				y = this.items.shape.getBBox().y;
+			}
+
+			if (this.items) {
+				this.items.remove();
+			}
+			
+			// create activity SVG elements
+			paper.setStart();
+			var shape = paper.path(Raphael.format('M {0} {1}' + layout.defs.activity, x, y))
+							 .attr({
+									'fill' : layout.colors.activity
+								 });
+			
+			paper.image('../images/grouping.gif', x + 47, y + 2, 30, 30);
+			paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title));
+			
+			this.items = paper.setFinish();
+			this.items.shape = shape;
+			
+			ActivityLib.activityHandlersInit(this);
+		},
+		
+		
+		gate : function(x, y) {
+			if (x == undefined || y == undefined) {
+				x = this.items.shape.getBBox().x;
+				y = this.items.shape.getBBox().y;
+			}
+
+			if (this.items) {
+				this.items.remove();
+			}
+			
+			// create activity SVG elements
+			paper.setStart();
+			var shape = paper.path(Raphael.format('M {0} {1}' + layout.defs.gate, x, y))
+							 .attr({
+								 'fill' : layout.colors.gate
+							 });
+			
+			paper.text(x + 7, y + 14, 'STOP')
+			     .attr({
+					'font-size' : 9,
+					'font' : 'sans-serif',
+					'stroke' : layout.colors.gateText
+			     });
+			
+			this.items = paper.setFinish();
+			this.items.shape = shape;
+			
+			ActivityLib.activityHandlersInit(this);
+		},
+		
+		
+		branching : function(x, y) {
+			if (x == undefined || y == undefined) {
+				x = this.items.shape.getBBox().x;
+				y = this.items.shape.getBBox().y;
+			}
+			
+			if (this.items) {
+				this.items.remove();
+			}
+			
+			// create activity SVG elements
+			paper.setStart();
+			var shape = paper.path(Raphael.format('M {0} {1}'
+								                  + (this.isStart ? layout.defs.branchingEdgeStart : layout.defs.branchingEdgeEnd),
+								                  x, y))
+							 .attr({
+								 'fill' : this.isStart ? layout.colors.branchingEdgeStart
+							                           : layout.colors.branchingEdgeEnd
+							 });
+							
+			paper.text(x, y + 14,  this.isStart ? 'Branching point'
+		                                        : 'Converge point')
+			     .attr({
+					'font-size' : 9,
+					'font' : 'sans-serif'
+			     });
+			
+			this.items = paper.setFinish();
+			this.items.shape = shape;
+			
+			ActivityLib.activityHandlersInit(this);
+		}
+	},
+	
+	
+	/**
+	 * Methods initialising and refreshing properties dialog for various kinds of activities.
+	 */
+	loadPropertiesDialogContent : {
+		tool : function() {
+			var activity = this;
+			var content = activity.propertiesContent;
+			if (!content) {
+				// first run, create the content
+				content = activity.propertiesContent = $('#propertiesContentTool').clone().show();
+				$('.title', content).val(activity.title);
+				
+				$('input, select', content).change(function(){
+					// extract changed properties and redraw the activity
+					activity.title = $('.title', activity.propertiesContent).val();
+					activity.grouping = $('.grouping option:selected', activity.propertiesContent)
+										.data('grouping');
+					activity.draw();
+				});
+			}
+			
+			// find all groupings on canvas and fill dropdown menu with their titles
+			var emptyOption = $('<option />'),
+				groupingDropdown = $('.grouping', content).empty().append(emptyOption);
+			$.each(layout.activities, function(){
+				if (this.type == 'grouping') {
+					var option = $('<option />').text(this.title)
+												.appendTo(groupingDropdown)
+												// store reference to grouping object
+												.data('grouping', this);
+					if (this == activity.grouping) {
+						option.attr('selected', 'selected');
+					}
+				}
+			});
+			if (!activity.grouping) {
+				// no grouping selected
+				emptyOption.attr('selected', 'selected');
+			}
+		},
+		
+		
+		grouping : function(title) {
+			var activity = this;
+			var content = activity.propertiesContent;
+			if (!content) {
+				// first run, create the content
+				content = activity.propertiesContent = $('#propertiesContentGrouping').clone().show();
+				$('.title', content).val(activity.title);
+
+				$('input, select', content).change(function(){
+					// extract changed properties and redraw the activity
+					activity.title = $('.title', activity.propertiesContent).val();
+					activity.draw();
+				});
+			}
+		}
+	},
+	
+	
+	/**
 	 * Make a new activity fully functional on canvas.
 	 */
-	initActivity : function(activity) {
+	activityHandlersInit : function(activity) {
 		// set all the handlers
 		activity.items
 			.data('activity', activity)
@@ -227,7 +332,7 @@ var ActivityLib = {
 		// remove the transitions
 		$.each(activity.transitions.from.slice(), function() {
 			// if grouping activity is gone, remove the grouping effect
-			if (activity.type == 'group' && this.toActivity.items.groupingEffect) {
+			if (activity.type == 'grouping' && this.toActivity.items.groupingEffect) {
 				this.toActivity.items.groupingEffect.remove();
 				this.toActivity.items.groupingEffect = null;
 			}
@@ -238,8 +343,8 @@ var ActivityLib = {
 			ActivityLib.removeTransition(this);
 		});
 		
-		// remove the activity from activities table
-		activities.splice(activities.indexOf(activity), 1);
+		// remove the activity from reference tables
+		layout.activities.splice(layout.activities.indexOf(activity), 1);
 		// visually remove the activity
 		activity.items.remove();
 	},
@@ -314,11 +419,6 @@ var ActivityLib = {
 			fromActivity.branchingActivity.branches.push(branch);
 			transition.data('branch', branch);
 		}
-		
-		// add grouping effect if previous activity is of grouping type
-		if (fromActivity.type == 'group' && toActivity.type != 'gate') {
-			ActivityLib.addGroupingEffect(toActivity);
-		}
 	},
 	
 	
@@ -379,7 +479,7 @@ var ActivityLib = {
 			    branchEdgeStartY = branchPoints1.middleY + (branchPoints2.middleY - branchPoints1.middleY)/2,
 			    branchingEdgeStart = new ActivityLib.BranchingEdgeActivity(null, branchEdgeStartX,
 			    		branchEdgeStartY, null);
-			activities.push(branchingEdgeStart);
+			layout.activities.push(branchingEdgeStart);
 			
 			// find last activities in subsequences and make an converge point between them
 			while (convergeActivity2.transitions.from.length > 0) {
@@ -389,7 +489,7 @@ var ActivityLib = {
 			var convergePoints = ActivityLib.findTransitionPoints(convergeActivity1, convergeActivity2),
 				branchingEdgeEnd = new ActivityLib.BranchingEdgeActivity(null, convergePoints.middleX,
 					convergePoints.middleY, branchingEdgeStart.branchingActivity);
-			activities.push(branchingEdgeEnd);
+			layout.activities.push(branchingEdgeEnd);
 			
 			// draw all required transitions
 			ActivityLib.drawTransition(fromActivity, branchingEdgeStart);
@@ -421,10 +521,17 @@ var ActivityLib = {
 					'stroke-dasharray' : '-'
 				});
 			activity.items.push(activity.items.selectEffect);
+			layout.items.selectedActivity = activity;
 			
 			// show the properties dialog for the selected activity
-			layout.items.selectedActivity = activity;
-			layout.items.propertiesDialog.dialog('open');
+			if (activity.loadPropertiesDialogContent) {
+				activity.loadPropertiesDialogContent();
+				var dialog = layout.items.propertiesDialog;
+				dialog.children().detach();
+				dialog.append(activity.propertiesContent);
+				dialog.dialog('open');
+				dialog.find('input').blur();
+			}
 		}
 	},
 	
@@ -450,13 +557,14 @@ var ActivityLib = {
 	 */
 	addGroupingEffect : function(activity) {
 		if (!activity.items.groupingEffect) {
-			var shape = activity.items.shape;
+			var shape = activity.items.shape,
+				activityBox = shape.getBBox();
 			
 			activity.items.groupingEffect = paper.rect(
-					shape.attr('x') + 5,
-					shape.attr('y') + 5,
-					layout.conf.activityWidth,
-					layout.conf.activityHeight)
+					activityBox.x + 5,
+					activityBox.y + 5,
+					activityBox.width,
+					activityBox.height)
 				.attr({
 					'fill' : shape.attr('fill')
 				})
@@ -609,5 +717,16 @@ var ActivityLib = {
 		});
 		
 		branchingActivity.longestBranchLength = longestBranchLength;
+	},
+	
+	
+	/**
+	 * Reduce length of activity's title so it fits in its SVG shape.
+	 */
+	shortenActivityTitle : function(title) {
+		if (title.length > 18) {
+			title = title.substring(0, 17) + '...';
+		}
+		return title;
 	}
 };

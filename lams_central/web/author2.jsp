@@ -106,5 +106,41 @@
 	
 	<div id="infoDialog" class="dialogContainer">
 	</div>
+	
+	
+	<div id="propertiesContentTool" class="dialogContainer">
+		<table>
+			<tr>
+				<td>
+					Title:
+				</td>
+				<td>
+					 <input class="title" type="text"></input>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Grouping:
+				</td>
+				<td>
+					  <select class="grouping"></select>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<div id="propertiesContentGrouping" class="dialogContainer">
+		<table>
+			<tr>
+				<td>
+					Title:
+				</td>
+				<td>
+					 <input class="title" type="text"></input>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
 </body>
 </lams:html>

@@ -4,11 +4,16 @@
 
 // few publicly visible variables 
 var paper = null,
-	canvas = null,
-	activities = null;
+	canvas = null;
 
 // configuration and storage of various elements
 var layout = {
+	'activities' : null,
+	'items' : {
+		'bin'              : null,
+		'selectedActivity' : null,
+		'propertiesDialog' : null
+	},
 	'toolIcons': {},
 	'conf' : {
 		'propertiesDialogDimOpacity'   : 0.3,
@@ -39,11 +44,6 @@ var layout = {
 		'branchingEdgeEnd'   : 'red',
 		'branchingEdgeMatch' : 'blue'
 	},
-	'items' : {
-		'bin'              : null,
-		'selectedActivity' : null,
-		'propertiesDialog' : null
-	}
 };
 
 
@@ -114,7 +114,7 @@ function initTemplates(){
 				var y = draggable.offset.top - canvasOffset.top;
 				var label = $('div', draggable.draggable).text();
 				
-				activities.push(new ActivityLib.ToolActivity(null, toolID, x, y, label));
+				layout.activities.push(new ActivityLib.ToolActivity(null, toolID, x, y, label));
 		   }
 	});
 }
@@ -160,7 +160,7 @@ function initLayout() {
 	
 	// initialise the properties dialog singleton
 	var propertiesDialog = layout.items.propertiesDialog =
-		$('<div>Properties go here</div>')
+		$('<div />')
 			.appendTo('body')
 			.dialog({
 				'autoOpen'      : false,
@@ -271,20 +271,33 @@ function openLearningDesign(learningDesignId) {
 			MenuLib.newLearningDesign(true);
 			// create visual representation of the loaded activities
 			$.each(ld.activities, function() {
-				var activity = this;
-				activities.push(new ActivityLib.ToolActivity(activity.activityID,
-						activity.toolID, activity.xCoord, activity.yCoord,
-						activity.activityTitle));
+				var activityData = this,
+					activity = null;
+				
+				if (activityData.toolID) {
+					activity = new ActivityLib.ToolActivity(activityData.activityID,
+							activityData.toolID, activityData.xCoord, activityData.yCoord,
+							activityData.activityTitle);
+				} else if (activity.groupingType) {
+					activity = new ActivityLib.GroupingActivity(activityData.activityID,
+							activityData.xCoord, activityData.yCoord,
+							activityData.activityTitle);
+				} else if (activity.gateOpen) {
+					activity = new ActivityLib.GroupingActivity(activityData.activityID,
+							activityData.xCoord, activityData.yCoord);
+				}
+				
+				layout.activities.push(activity);
 			});
 			
 			// draw transitions
 			$.each(ld.transitions, function(){
-				var transition = this;
-				var fromActivity = null
-				var toActivity = null;
+				var transition = this,
+					fromActivity = null,
+					toActivity = null;
 				
 				// find which activities the transition belongs to
-				$.each(activities, function(){
+				$.each(layout.activities, function(){
 					var activity = this;
 					if (activity.id == transition.fromActivityID) {
 						fromActivity = activity;

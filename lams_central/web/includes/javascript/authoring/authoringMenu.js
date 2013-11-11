@@ -3,7 +3,10 @@
  */
 
 var MenuLib = {
-		
+	
+	/**
+	 * Run when branching is selected from menu. Allows placing branching and converge points on canvas.
+	 */
 	addBranching : function(){
 		var dialog = $('#infoDialog').text('Place the branching point');
 		dialog.dialog('open');
@@ -12,18 +15,21 @@ var MenuLib = {
 		canvas.css('cursor', 'pointer').click(function(event){
 			// pageX and pageY tell event coordinates relative to the whole page
 			// we need relative to canvas
-			var x = event.pageX - canvas.offset().left;
-			var y = event.pageY - canvas.offset().top;
+			var x = event.pageX - canvas.offset().left,
+				y = event.pageY - canvas.offset().top;
 			
+			// if it is start point, branchingActivity is null and constructor acts accordingly
 			var branchingEdge = new ActivityLib.BranchingEdgeActivity(null, x, y, branchingActivity);
-			activities.push(branchingEdge);
+			layout.activities.push(branchingEdge);
 			
 			if (branchingActivity) {
+				// converge point was just place, end of function
 				HandlerLib.resetCanvasMode();
 				
 				dialog.text('');
 				dialog.dialog('close');
 			} else {
+				// extract main branchingActivity structure from created start point
 				branchingActivity = branchingEdge.branchingActivity;
 				dialog.text('Place the converge point');
 			}
@@ -39,10 +45,10 @@ var MenuLib = {
 			
 			// pageX and pageY tell event coordinates relative to the whole page
 			// we need relative to canvas
-			var x = event.pageX - canvas.offset().left;
-			var y = event.pageY - canvas.offset().top;
-			
-			activities.push(new ActivityLib.GroupingActivity(null, x, y));
+			var x = event.pageX - canvas.offset().left - 47,
+				y = event.pageY - canvas.offset().top - 2;
+
+			layout.activities.push(new ActivityLib.GroupingActivity(null, x, y, 'Grouping'));
 		});
 	},
 	
@@ -56,10 +62,10 @@ var MenuLib = {
 			
 			// pageX and pageY tell event coordinates relative to the whole page
 			// we need relative to canvas
-			var x = event.pageX - canvas.offset().left;
-			var y = event.pageY - canvas.offset().top;
+			var x = event.pageX - canvas.offset().left,
+				y = event.pageY - canvas.offset().top;
 			
-			activities.push(new ActivityLib.GateActivity(null, x, y));
+			layout.activities.push(new ActivityLib.GateActivity(null, x, y));
 		});
 	},
 	
@@ -172,7 +178,7 @@ var MenuLib = {
 		// just to refresh the state of canvas
 		HandlerLib.resetCanvasMode();
 
-		if (activities.length == 0) {
+		if (layout.activities.length == 0) {
 			// no activities, nothing to do
 			return;
 		}
@@ -189,13 +195,13 @@ var MenuLib = {
 			maxRows = Math.floor((paper.height - layout.conf.arrangeVerticalPadding)
 	                 			  / layout.conf.arrangeVerticalSpace),
 	        // make a shallow copy of activities array
-			activitiesCopy = activities.slice(),
+			activitiesCopy = layout.activities.slice(),
 			// just to speed up processing when there are only activities with no transitions left
 			onlyDetachedLeft = false;
 		
 		// branches will not be broken into few rows; if they are long, paper will be resized
 		// find the longes branch to find the new paper size
-		$.each(activities, function(){
+		$.each(layout.activities, function(){
 			if (this.type == 'branchingEdge' && this.isStart) {
 				// refresh branching metadata
 				ActivityLib.updateBranchesLength(this.branchingActivity);
@@ -293,6 +299,12 @@ var MenuLib = {
 					var x = layout.conf.arrangeHorizontalPadding + column * layout.conf.arrangeHorizontalSpace,
 						y = layout.conf.arrangeVerticalPadding + row * layout.conf.arrangeVerticalSpace;
 					
+					if (activity.type == 'gate') {
+						// adjust placement for gate activity, so it's in the middle of its cell
+						x += 57;
+						y += 10;
+					}
+					
 					activity.draw(x, y);
 					// remove the activity so we do not process it twice
 					activitiesCopy.splice(activitiesCopy.indexOf(activity), 1);
@@ -341,7 +353,7 @@ var MenuLib = {
 		};
 		
 		// redraw transitions one by one
-		$.each(activities, function(){
+		$.each(layout.activities, function(){
 			$.each(this.transitions.from.slice(), function(){
 				ActivityLib.drawTransition(this.fromActivity, this.toActivity, true);
 			});
@@ -353,11 +365,11 @@ var MenuLib = {
 	 * Removes existing activities and prepares canvas for a new sequence.
 	 */
 	newLearningDesign : function(force){
-		if (!force && activities.length > 0 && !confirm('Are you sure you want to remove all existing activities?')){
+		if (!force && layout.activities.length > 0 && !confirm('Are you sure you want to remove all existing activities?')){
 			return;
 		}
 		
-		activities = [];
+		layout.activities = [];
 		if (paper) {
 			paper.clear();
 		} else {

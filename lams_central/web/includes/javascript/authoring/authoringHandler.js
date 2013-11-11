@@ -120,8 +120,9 @@ var HandlerLib = {
 	 * Moves dragged elements on the canvas.
 	 */
 	dragItemsMoveHandler : function(items, event, startX, startY) {
-		var dx = event.pageX - startX;
-		var dy = event.pageY - startY;
+		var dx = event.pageX - startX,
+			dy = event.pageY - startY;
+		
 		items.transform('t' + dx + ' ' + dy);
 		
 		if (items.groupingEffect) {
@@ -145,8 +146,8 @@ var HandlerLib = {
 			return;
 		}
 		
-		var startX = x - canvas.offset().left;
-		var startY = y - canvas.offset().top;
+		var startX = x - canvas.offset().left,
+			startY = y - canvas.offset().top;
 		
 		canvas.mousemove(function(event){
 			HandlerLib.drawTransitionMoveHandler(activity, event, startX, startY);
@@ -172,8 +173,8 @@ var HandlerLib = {
 			return;
 		}
 		
-		var endX = event.pageX - canvas.offset().left;
-		var endY = event.pageY - canvas.offset().top;
+		var endX = event.pageX - canvas.offset().left,
+			endY = event.pageY - canvas.offset().top;
 		
 		// draw a temporary transition so user sees what he is doing
 		activity.tempTransition = paper.set();
@@ -216,9 +217,9 @@ var HandlerLib = {
 	 * Lighthens up branching edges in the same colour for identifictation.
 	 */
 	branchingEdgeMouseoverHandler : function() {
-		var branchingActivity = this.data('activity').branchingActivity;
-		var startItems = branchingActivity.start.items;
-		var endItems = branchingActivity.end.items;
+		var branchingActivity = this.data('activity').branchingActivity,
+			startItems = branchingActivity.start.items,
+			endItems = branchingActivity.end.items;
 		if (!startItems.isDragged && !endItems.isDragged) {
 			startItems.shape.attr('fill', layout.colors.branchingEdgeMatch);
 			endItems.shape.attr('fill', layout.colors.branchingEdgeMatch);
@@ -230,9 +231,10 @@ var HandlerLib = {
 	 * Return branching edges to their normal colours.
 	 */
 	branchingEdgeMouseoutHandler : function() {
-		var branchingActivity = this.data('activity').branchingActivity;
-		var startItems = branchingActivity.start.items;
-		var endItems = branchingActivity.end.items;
+		var branchingActivity = this.data('activity').branchingActivity,
+			startItems = branchingActivity.start.items,
+			endItems = branchingActivity.end.items;
+		
 		if (!startItems.isDragged && !endItems.isDragged) {
 			startItems.shape.attr('fill', layout.colors.branchingEdgeStart);
 			endItems.shape.attr('fill', layout.colors.branchingEdgeEnd);
@@ -313,8 +315,8 @@ var HandlerLib = {
 	 * Checks whether activity or transition is over rubbish bin.
 	 */
 	isElemenentBinned : function(event) {
-		var canvasX = event.pageX - canvas.offset().left;
-		var canvasY = event.pageY - canvas.offset().top;
+		var canvasX = event.pageX + canvas.scrollLeft() - canvas.offset().left,
+			canvasY = event.pageY + canvas.scrollTop()  - canvas.offset().top;
 		
 		// highlight rubbish bin if dragged elements are over it
 		return Raphael.isPointInsideBBox(layout.items.bin.getBBox(), canvasX, canvasY); 
