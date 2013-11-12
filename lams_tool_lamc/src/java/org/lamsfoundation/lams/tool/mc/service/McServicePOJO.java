@@ -106,6 +106,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
+import org.lamsfoundation.lams.tool.mc.util.McSessionComparator;
 import org.lamsfoundation.lams.tool.mc.web.MonitoringUtil;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -474,18 +475,17 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     @Override
     public List<McSessionMarkDTO> buildGroupsMarkData(McContent mcContent, boolean isFullAttemptDetailsRequired) {
 	List<McSessionMarkDTO> listMonitoredMarksContainerDTO = new LinkedList<McSessionMarkDTO>();
-	Set<McSession> sessions = mcContent.getMcSessions();
-	Iterator<McSession> sessionsIterator = sessions.iterator();
+	Set<McSession> sessions = new TreeSet<McSession>(new McSessionComparator());
+	sessions.addAll(mcContent.getMcSessions());
 	int numQuestions = mcContent.getMcQueContents().size();
 
-	while (sessionsIterator.hasNext()) {
-	    McSession mcSession = sessionsIterator.next();
+	for (McSession session : sessions) {
 
 	    McSessionMarkDTO mcSessionMarkDTO = new McSessionMarkDTO();
-	    mcSessionMarkDTO.setSessionId(mcSession.getMcSessionId().toString());
-	    mcSessionMarkDTO.setSessionName(mcSession.getSession_name().toString());
+	    mcSessionMarkDTO.setSessionId(session.getMcSessionId().toString());
+	    mcSessionMarkDTO.setSessionName(session.getSession_name().toString());
 
-	    Set<McQueUsr> sessionUsers = mcSession.getMcQueUsers();
+	    Set<McQueUsr> sessionUsers = session.getMcQueUsers();
 	    Iterator<McQueUsr> usersIterator = sessionUsers.iterator();
 
 	    Map<String, McUserMarkDTO> mapSessionUsersData = new TreeMap<String, McUserMarkDTO>(new McStringComparator());
@@ -495,8 +495,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 		McQueUsr user = usersIterator.next();
 
 		McUserMarkDTO mcUserMarkDTO = new McUserMarkDTO();
-		mcUserMarkDTO.setSessionId(mcSession.getMcSessionId().toString());
-		mcUserMarkDTO.setSessionName(mcSession.getSession_name().toString());
+		mcUserMarkDTO.setSessionId(session.getMcSessionId().toString());
+		mcUserMarkDTO.setSessionName(session.getSession_name().toString());
 		mcUserMarkDTO.setFullName(user.getFullname());
 		mcUserMarkDTO.setUserName(user.getUsername());
 		mcUserMarkDTO.setQueUsrId(user.getUid().toString());
@@ -526,7 +526,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 			    // We get the mark for the attempt if the answer is correct and we don't allow
 			    // retries, or if the answer is correct and the learner has met the passmark if
 			    // we do allow retries.
-			    boolean isRetries = mcSession.getMcContent().isRetries();
+			    boolean isRetries = session.getMcContent().isRetries();
 			    Integer mark = attempt.getMarkForShow(isRetries);
 			    userMarks[arrayIndex] = mark;
 			    totalMark += mark.intValue();

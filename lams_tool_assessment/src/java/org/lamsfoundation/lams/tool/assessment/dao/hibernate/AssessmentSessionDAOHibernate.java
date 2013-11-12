@@ -33,7 +33,7 @@ public class AssessmentSessionDAOHibernate extends BaseDAOHibernate implements A
     private static final String FIND_BY_SESSION_ID = "from " + AssessmentSession.class.getName()
 	    + " as p where p.sessionId=?";
     private static final String FIND_BY_CONTENT_ID = "from " + AssessmentSession.class.getName()
-	    + " as p where p.assessment.contentId=?";
+	    + " as p where p.assessment.contentId=? order by p.sessionName asc";
 
     public AssessmentSession getSessionBySessionId(Long sessionId) {
 	List list = getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
