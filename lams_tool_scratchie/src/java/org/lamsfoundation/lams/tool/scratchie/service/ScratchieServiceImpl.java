@@ -47,6 +47,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.struts.upload.FormFile;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -61,8 +63,8 @@ import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -308,38 +310,15 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	if (leader == null) {
 
 	    ToolSession toolSession = toolService.getToolSession(toolSessionId);
-	    LearningDesign learningDesign = toolSession.getToolActivity().getLearningDesign();
+	    ToolActivity qaActivity = toolSession.getToolActivity();
+	    Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(qaActivity);
 
-	    // find leaderSelection Tool in a lesson
-	    /*
-	     * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some
-	     * mysterious reason Causes a ClassCastException when you try to cast it, even if it is a ToolActivity.
-	     * 
-	     * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it
-	     * is one
-	     */
-	    Set<Activity> activities = new TreeSet<Activity>();
-	    Activity firstActivity = activityDAO.getActivityByActivityId(learningDesign.getFirstActivity()
-		    .getActivityId());
-	    activities.add(firstActivity);
-	    activities.addAll(learningDesign.getActivities());
-
-	    ToolActivity leaderSelectionTool = null;
-	    for (Activity activity : activities) {
-		if (activity instanceof ToolActivity) {
-		    ToolActivity toolActivity = (ToolActivity) activity;
-		    if (ScratchieConstants.LEADER_SELECTION_TOOL_SIGNATURE.equals(toolActivity.getTool().getToolSignature())) {
-			leaderSelectionTool = toolActivity;
-		    }
-		}
-	    }
-
-	    // check if there is leaderSelectionTool in a sequence
-	    if (leaderSelectionTool != null) {
+	    // check if there is leaderSelectionTool available
+	    if (leaderSelectionActivity != null) {
 		User learner = (User) getUserManagementService().findById(User.class, user.getUserId().intValue());
 		String outputName = ScratchieConstants.LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID;
 		ToolSession leaderSelectionSession = lamsCoreToolService.getToolSessionByLearner(learner,
-			leaderSelectionTool);
+			leaderSelectionActivity);
 		ToolOutput output = lamsCoreToolService.getOutputFromTool(outputName, leaderSelectionSession, null);
 
 		// check if tool produced output
@@ -363,6 +342,48 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	}
 
 	return leader;
+    }
+    
+    /**
+     * Finds the nearest Leader Select activity. Works recursively. Tries to find Leader Select activity in the previous activities set first,
+     * and then inside the parent set.
+     */
+    private static Activity getNearestLeaderSelectionActivity(Activity activity) {
+	
+	//check if current activity is Leader Select one. if so - stop searching and return it.
+	Class activityClass = Hibernate.getClass(activity);
+	if (activityClass.equals(ToolActivity.class)) {
+	    ToolActivity toolActivity;
+	    
+	    // activity is loaded as proxy due to lazy loading and in order to prevent quering DB we just re-initialize
+	    // it here again
+	    Hibernate.initialize(activity);
+	    if (activity instanceof HibernateProxy) {
+		toolActivity = (ToolActivity) ((HibernateProxy) activity).getHibernateLazyInitializer()
+	                .getImplementation();
+	    } else {
+		toolActivity = (ToolActivity) activity;
+	    }
+	    
+	    if (ScratchieConstants.LEADER_SELECTION_TOOL_SIGNATURE.equals(toolActivity.getTool().getToolSignature())) {
+		return activity;
+	    }
+	}
+	
+	//check previous activity
+	Transition transitionTo = activity.getTransitionTo();
+	if (transitionTo != null) {
+	    Activity fromActivity = transitionTo.getFromActivity();
+	    return getNearestLeaderSelectionActivity(fromActivity);
+	}
+	
+	//check parent activity
+	Activity parent = activity.getParentActivity();
+	if (parent != null) {
+	    return getNearestLeaderSelectionActivity(parent);
+	}
+	
+	return null;
     }
 
     @Override
