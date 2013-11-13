@@ -29,8 +29,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -49,6 +51,7 @@ import org.lamsfoundation.lams.tool.qa.dto.QaMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaStatsDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
+import org.lamsfoundation.lams.tool.qa.util.QaSessionComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -390,25 +393,25 @@ public class MonitoringUtil implements QaAppConstants {
     }
     }
     
-    public static List buildGroupBasedSessionData(HttpServletRequest request, QaContent qaContent, IQaService qaService) {
-	List listQuestions = qaService.getAllQuestionEntries(qaContent.getUid());
+    public static List<QaAllGroupsDTO> buildGroupBasedSessionData(HttpServletRequest request, QaContent qaContent, IQaService qaService) {
+	List<QaQueContent> listQuestions = qaService.getAllQuestionEntries(qaContent.getUid());
 
-	List listAllGroupsContainerDTO = new LinkedList();
+	List<QaAllGroupsDTO> listAllGroupsContainerDTO = new LinkedList<QaAllGroupsDTO>();
 
-	Iterator iteratorSession = qaContent.getQaSessions().iterator();
-	while (iteratorSession.hasNext()) {
-	    QaSession qaSession = (QaSession) iteratorSession.next();
-	    String currentSessionId = qaSession.getQaSessionId().toString();
+	Set<QaSession> sessions = new TreeSet<QaSession>(new QaSessionComparator());
+	sessions.addAll(qaContent.getQaSessions());
+	for (QaSession session : sessions) {
+	    String currentSessionId = session.getQaSessionId().toString();
 
-	    String currentSessionName = qaSession.getSession_name();
+	    String currentSessionName = session.getSession_name();
 
 	    QaAllGroupsDTO qaAllGroupsDTO = new QaAllGroupsDTO();
-	    List listMonitoredAnswersContainerDTO = new LinkedList();
+	    List<QaMonitoredAnswersDTO> listMonitoredAnswersContainerDTO = new LinkedList<QaMonitoredAnswersDTO>();
 
-	    if (qaSession != null) {
-		Iterator itListQuestions = listQuestions.iterator();
+	    if (session != null) {
+		Iterator<QaQueContent> itListQuestions = listQuestions.iterator();
 		while (itListQuestions.hasNext()) {
-		    QaQueContent qaQuestion = (QaQueContent) itListQuestions.next();
+		    QaQueContent qaQuestion = itListQuestions.next();
 
 		    if (qaQuestion != null) {
 			QaMonitoredAnswersDTO qaMonitoredAnswersDTO = new QaMonitoredAnswersDTO();

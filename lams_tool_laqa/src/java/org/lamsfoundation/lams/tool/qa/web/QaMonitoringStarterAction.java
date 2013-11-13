@@ -53,6 +53,7 @@ import org.lamsfoundation.lams.tool.qa.dto.EditActivityDTO;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
+import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
@@ -138,9 +139,8 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	}
 	request.setAttribute(EDIT_ACTIVITY_DTO, editActivityDTO);
 
-	qaMonitoringAction.prepareReflectionData(request, qaContent, qaService, null, false, "All");
-
-	
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 	
 	request.setAttribute(QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 

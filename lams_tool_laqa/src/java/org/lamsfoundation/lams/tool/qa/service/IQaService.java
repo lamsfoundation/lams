@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.IToolVO;
@@ -43,6 +45,7 @@ import org.lamsfoundation.lams.tool.qa.QaUploadedFile;
 import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.QaWizardCategory;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
+import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
@@ -311,5 +314,14 @@ public interface IQaService {
     AverageRatingDTO rateResponse(Long responseId, Long userId, Long toolSessionID, float rating);
     
     AverageRatingDTO getAverageRatingDTOByResponse(Long responseId);
+    
+    /**
+     * Return reflection data for all sessions.
+     * 
+     * @param content
+     * @param userID
+     * @return
+     */
+    List<ReflectionDTO> getReflectList(QaContent content, String userID);
 
 }

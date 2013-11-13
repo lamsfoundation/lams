@@ -103,6 +103,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -134,6 +135,7 @@ import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
+import org.lamsfoundation.lams.tool.qa.util.QaSessionComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 import org.lamsfoundation.lams.tool.qa.web.form.QaMonitoringForm;
@@ -208,7 +210,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	}
 	request.setAttribute(QaAppConstants.EDIT_ACTIVITY_DTO, editActivityDTO);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -305,7 +308,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	generalMonitoringDTO.setEditResponse(new Boolean(false).toString());
 
-	prepareReflectionData(request, qaContent, qaService, null, false, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -436,7 +440,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, generalMonitoringDTO);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -526,7 +531,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	}
 	request.setAttribute(QaAppConstants.EDIT_ACTIVITY_DTO, editActivityDTO);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -595,7 +601,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	prepareEditActivityScreenData(request, qaContent);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	if (qaService.isStudentActivityOccurredGlobal(qaContent)) {
 	    generalMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
@@ -717,8 +724,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 	
-
-	prepareReflectionData(request, qaContent, qaService, null, false, currentMonitoredToolSession);
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -814,7 +821,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, true,
 		currentMonitoredToolSession);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, currentMonitoredToolSession);
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -896,7 +904,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, true,
 		currentMonitoredToolSession);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, currentMonitoredToolSession);
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -1002,7 +1011,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false,
 		currentMonitoredToolSession);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, currentMonitoredToolSession);
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -1090,7 +1100,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false,
 		currentMonitoredToolSession);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, currentMonitoredToolSession);
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -1178,7 +1189,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false,
 		currentMonitoredToolSession);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, currentMonitoredToolSession);
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -1370,7 +1382,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	}
 
-	prepareReflectionData(request, qaContent, qaService, null, false, currentMonitoredToolSession);
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -1427,7 +1440,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	generalMonitoringDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
 
-	prepareReflectionData(request, qaContent, qaService, null, false, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -1520,7 +1534,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 	request.setAttribute(QaAppConstants.CURRENT_MONITORED_TOOL_SESSION, currentMonitoredToolSession);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, currentMonitoredToolSession);
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -1600,9 +1615,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    request.setAttribute(QaAppConstants.SELECTION_CASE, new Long(1));
 	}
 
-	
-
-	prepareReflectionData(request, qaContent, qaService, null, false, currentMonitoredToolSession);
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -1687,7 +1701,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false,
 		currentMonitoredToolSession);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, currentMonitoredToolSession);
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -1766,7 +1781,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	refreshSummaryData(request, qaContent, qaService, true, false, null, null, generalLearnerFlowDTO, false,
 		currentMonitoredToolSession);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, currentMonitoredToolSession);
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	prepareEditActivityScreenData(request, qaContent);
 
@@ -2021,7 +2037,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	/* find out if there are any reflection entries, from here */
 	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(qaService, qaContent);
@@ -2225,7 +2242,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	/* find out if there are any reflection entries, from here */
 	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(qaService, qaContent);
@@ -2380,7 +2398,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	/* find out if there are any reflection entries, from here */
 	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(qaService, qaContent);
@@ -2474,7 +2493,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	/* find out if there are any reflection entries, from here */
 	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(qaService, qaContent);
@@ -2597,7 +2617,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	/* find out if there are any reflection entries, from here */
 	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(qaService, qaContent);
@@ -2748,7 +2769,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	/* find out if there are any reflection entries, from here */
 	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(qaService, qaContent);
@@ -2882,7 +2904,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	/* find out if there are any reflection entries, from here */
 	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(qaService, qaContent);
@@ -3018,7 +3041,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	
 	request.setAttribute(QaAppConstants.QA_GENERAL_MONITORING_DTO, qaGeneralMonitoringDTO);
 
-	prepareReflectionData(request, qaContent, qaService, null, false, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(qaContent, null);
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	/* find out if there are any reflection entries, from here */
 	boolean notebookEntriesExist = MonitoringUtil.notebookEntriesExist(qaService, qaContent);
@@ -3071,89 +3095,6 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	qaService.saveOrUpdateQa(content);
 
 	return null;
-    }    
-    
-
-    public void prepareReflectionData(HttpServletRequest request, QaContent qaContent, IQaService qaService,
-	    String userID, boolean exportMode, String currentSessionId) {
-
-	List reflectionsContainerDTO = getReflectionList(qaContent, userID, qaService);
-	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
-
-	if (exportMode) {
-	    request.getSession().setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
-	}
-    }
-
-    /**
-     * returns reflection data for all sessions
-     * 
-     * getReflectionList
-     * 
-     * @param qaContent
-     * @param userID
-     * @param qaService
-     * @return
-     */
-    public List getReflectionList(QaContent qaContent, String userID, IQaService qaService) {
-	List reflectionsContainerDTO = new LinkedList();
-	if (userID == null) {
-	    //all users mode
-	    for (Iterator sessionIter = qaContent.getQaSessions().iterator(); sessionIter.hasNext();) {
-		QaSession qaSession = (QaSession) sessionIter.next();
-
-		for (Iterator userIter = qaSession.getQaQueUsers().iterator(); userIter.hasNext();) {
-		    QaQueUsr user = (QaQueUsr) userIter.next();
-
-		    NotebookEntry notebookEntry = qaService.getEntry(qaSession.getQaSessionId(),
-			    CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(user
-				    .getQueUsrId().toString()));
-
-		    
-
-		    if (notebookEntry != null) {
-			ReflectionDTO reflectionDTO = new ReflectionDTO();
-			reflectionDTO.setUserId(user.getQueUsrId().toString());
-			reflectionDTO.setSessionId(qaSession.getQaSessionId().toString());
-			reflectionDTO.setUserName(user.getFullname());
-			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
-			reflectionDTO.setEntry(notebookEntryPresentable);
-			reflectionsContainerDTO.add(reflectionDTO);
-		    }
-		}
-	    }
-	} else {
-	    //single user mode
-	    for (Iterator sessionIter = qaContent.getQaSessions().iterator(); sessionIter.hasNext();) {
-		QaSession qaSession = (QaSession) sessionIter.next();
-		
-		for (Iterator userIter = qaSession.getQaQueUsers().iterator(); userIter.hasNext();) {
-		    QaQueUsr user = (QaQueUsr) userIter.next();
-
-		    if (user.getQueUsrId().toString().equals(userID)) {
-			NotebookEntry notebookEntry = qaService.getEntry(qaSession.getQaSessionId(),
-				CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(user
-					.getQueUsrId().toString()));
-
-			
-
-			if (notebookEntry != null) {
-			    ReflectionDTO reflectionDTO = new ReflectionDTO();
-			    reflectionDTO.setUserId(user.getQueUsrId().toString());
-			    reflectionDTO.setSessionId(qaSession.getQaSessionId().toString());
-			    reflectionDTO.setUserName(user.getFullname());
-			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			    String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
-			    reflectionDTO.setEntry(notebookEntryPresentable);
-			    reflectionsContainerDTO.add(reflectionDTO);
-			}
-		    }
-		}
-	    }
-	}
-
-	return reflectionsContainerDTO;
     }
 
     private IQaService getQAService() {

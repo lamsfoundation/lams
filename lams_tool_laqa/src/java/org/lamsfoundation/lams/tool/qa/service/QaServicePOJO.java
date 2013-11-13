@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -36,6 +37,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -56,6 +58,7 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
@@ -88,7 +91,10 @@ import org.lamsfoundation.lams.tool.qa.dao.IQaUsrRespDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IQaWizardDAO;
 import org.lamsfoundation.lams.tool.qa.dao.IResponseRatingDAO;
 import org.lamsfoundation.lams.tool.qa.dto.AverageRatingDTO;
+import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
+import org.lamsfoundation.lams.tool.qa.util.QaSessionComparator;
+import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -687,6 +693,66 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     
     public AverageRatingDTO getAverageRatingDTOByResponse(Long responseId) {
 	return qaResponseRatingDAO.getAverageRatingDTOByResponse(responseId);
+    }
+    
+    public List<ReflectionDTO> getReflectList(QaContent content, String userID) {
+
+	//reflection data for all sessions
+	List<ReflectionDTO> reflectionDTOs = new LinkedList<ReflectionDTO>();
+	Set<QaSession> sessions = new TreeSet<QaSession>(new QaSessionComparator());
+	sessions.addAll(content.getQaSessions());
+
+	if (userID == null) {
+	    // all users mode
+	    for (QaSession session : sessions) {
+
+		for (Iterator userIter = session.getQaQueUsers().iterator(); userIter.hasNext();) {
+		    QaQueUsr user = (QaQueUsr) userIter.next();
+
+		    NotebookEntry notebookEntry = this.getEntry(session.getQaSessionId(),
+			    CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(user
+				    .getQueUsrId().toString()));
+
+		    if (notebookEntry != null) {
+			ReflectionDTO reflectionDTO = new ReflectionDTO();
+			reflectionDTO.setUserId(user.getQueUsrId().toString());
+			reflectionDTO.setSessionId(session.getQaSessionId().toString());
+			reflectionDTO.setUserName(user.getFullname());
+			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
+			String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
+			reflectionDTO.setEntry(notebookEntryPresentable);
+			reflectionDTOs.add(reflectionDTO);
+		    }
+		}
+	    }
+	} else {
+	    // single user mode
+	    for (QaSession session : sessions) {
+
+		for (Iterator userIter = session.getQaQueUsers().iterator(); userIter.hasNext();) {
+		    QaQueUsr user = (QaQueUsr) userIter.next();
+
+		    if (user.getQueUsrId().toString().equals(userID)) {
+			NotebookEntry notebookEntry = this.getEntry(session.getQaSessionId(),
+				CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(user
+					.getQueUsrId().toString()));
+
+			if (notebookEntry != null) {
+			    ReflectionDTO reflectionDTO = new ReflectionDTO();
+			    reflectionDTO.setUserId(user.getQueUsrId().toString());
+			    reflectionDTO.setSessionId(session.getQaSessionId().toString());
+			    reflectionDTO.setUserName(user.getFullname());
+			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
+			    String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
+			    reflectionDTO.setEntry(notebookEntryPresentable);
+			    reflectionDTOs.add(reflectionDTO);
+			}
+		    }
+		}
+	    }
+	}
+	
+	return reflectionDTOs;
     }
 
     /**

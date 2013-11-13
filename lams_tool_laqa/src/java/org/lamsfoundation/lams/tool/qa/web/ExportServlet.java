@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
+import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
@@ -135,8 +136,10 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	    qaMonitoringAction
 		    .refreshSummaryData(request, content, qaService, content.isUsernameVisible(), true, toolSessionID
 			    .toString(), userID.toString(), generalLearnerFlowDTO, false, toolSessionID.toString());
-	    qaMonitoringAction.prepareReflectionData(request, content, qaService, userID.toString(), true,
-		    toolSessionID.toString());
+
+	    List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(content, userID.toString());
+	    request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
+	    request.getSession().setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 	}
 
 	generalLearnerFlowDTO = (GeneralLearnerFlowDTO) request.getAttribute(GENERAL_LEARNER_FLOW_DTO);
@@ -173,7 +176,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");
 
-	qaMonitoringAction.prepareReflectionData(request, content, qaService, null, true, "All");
+	List<ReflectionDTO> reflectionDTOs = qaService.getReflectList(content, userID.toString());
+	request.setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
+	request.getSession().setAttribute(QaAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionDTOs);
 
 	request.setAttribute("currentMonitoredToolSession", "All");
 	
