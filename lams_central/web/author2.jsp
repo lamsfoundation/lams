@@ -61,6 +61,12 @@
 		<div class="ui-button" onClick="javascript:MenuLib.arrangeActivities()">
 			Arrange
 		</div>
+		<div class="ui-button" onClick="javascript:MenuLib.copyActivity()">
+			Copy
+		</div>
+		<div class="ui-button" onClick="javascript:MenuLib.pasteActivity()">
+			Paste
+		</div>
 	</div>
 	<table id="authoringTable">
 		<tr>
@@ -82,29 +88,28 @@
 		</tr>
 	</table>
 	
-	<div id="openLearningDesignDialog" class="dialogContainer">
-		<div class="dialogTitle">Open sequence</div>
+	
+	<div id="ldStoreDialog" class="dialogContainer">
+		<div class="ldStoreDialogTitle">Open sequence</div>
 		<table>
 			<tr>
-				<td id="learningDesignTreeCell">
-					<div id="learningDesignTree"></div>
+				<td id="ldStoreDialogTreeCell">
+					<div id="ldStoreDialogTree"></div>
 				</td>
-				<td id="canvasCell" rowspan="2">
-					<div id="canvasDiv">
+				<td id="ldStoreDialogCanvasCell" rowspan="2">
+					<div id="ldStoreDialogCanvasDiv">
 			    		<img id="ldScreenshotAuthor" class="ldChoiceDependentCanvasElement" />
-		    			<img id="ldScreenshotLoading" class="ldChoiceDependentCanvasElement" src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
+		    			<img id="ldScreenshotLoading" class="ldChoiceDependentCanvasElement"
+		    			     src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
 			    	</div>
 				</td>
 			</tr>
 			<tr>
-				<td id="recentlyUsedCell" >
+				<td id="ldStoreDialogRecentlyUsedCell" >
 					Recently used sequences
 				</td>
 			</tr>
 		</table>
-	</div>
-	
-	<div id="infoDialog" class="dialogContainer">
 	</div>
 	
 	
@@ -115,7 +120,7 @@
 					Title:
 				</td>
 				<td>
-					 <input class="title" type="text"></input>
+					 <input class="propertiesContentFieldTitle" type="text"></input>
 				</td>
 			</tr>
 			<tr>
@@ -123,7 +128,23 @@
 					Grouping:
 				</td>
 				<td>
-					  <select class="grouping"></select>
+					  <select class="propertiesContentFieldGrouping"></select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Offline Activity:
+				</td>
+				<td>
+					  <input type="checkbox" class="propertiesContentFieldOffline" /> 
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Define in Monitor:
+				</td>
+				<td>
+					  <input type="checkbox" class="propertiesContentFieldDefineMonitor" />
 				</td>
 			</tr>
 		</table>
@@ -136,11 +157,36 @@
 					Title:
 				</td>
 				<td>
-					 <input class="title" type="text"></input>
+					 <input class="propertiesContentFieldTitle" type="text"></input>
 				</td>
 			</tr>
 		</table>
 	</div>
 	
+	<div id="propertiesContentGate" class="dialogContainer">
+		<table>
+			<tr>
+				<td>
+					Title:
+				</td>
+				<td>
+					 <input class="propertiesContentFieldTitle" type="text"></input>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Title:
+				</td>
+				<td>
+					 <select class="propertiesContentFieldGateType">
+					 	<option value="condition">Condition</option>
+					 	<option value="sync">Synchronise</option>
+					 	<option value="schedule">Schedule</option>
+					 	<option value="permission">Permission</option>
+					 </select>
+				</td>
+			</tr>
+		</table>
+	</div>
 </body>
 </lams:html>

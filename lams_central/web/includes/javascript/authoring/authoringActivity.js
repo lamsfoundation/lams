@@ -44,14 +44,17 @@ var ActivityLib = {
 	/**
 	 * Constructor for a Gate Activity.
 	 */
-	GateActivity : function(id, x, y) {
+	GateActivity : function(id, x, y, gateType) {
 		this.id = id;
 		this.type = 'gate';
+		this.gateType = gateType || 'permission';
 		this.transitions = {
 			'from' : [],
 			'to'   : []
 		};
 		
+		this.loadPropertiesDialogContent = ActivityLib.loadPropertiesDialogContent.gate;
+
 		this.draw = ActivityLib.draw.gate;
 		this.draw(x, y);
 	},
@@ -96,8 +99,9 @@ var ActivityLib = {
 	/**
 	 * Represents a subsequence of activities. It is not displayed on canvas.
 	 */
-	BranchActivity : function(id, branchingActivity, transitionFrom) {
+	BranchActivity : function(id, title, branchingActivity, transitionFrom) {
 		this.id = id;
+		this.title = title;
 		this.transitionFrom = transitionFrom;
 		this.branchingActivity = branchingActivity;
 	},
@@ -121,10 +125,13 @@ var ActivityLib = {
 			paper.setStart();
 			var shape = paper.path(Raphael.format('M {0} {1}' + layout.defs.activity, x, y))
 							 .attr({
-								'fill' : layout.colors.activity
+								'fill' : this.offline ? layout.colors.offlineActivity : layout.colors.activity
 							 });
 			paper.image(layout.toolIcons[this.toolID], x + 47, y + 2, 30, 30);
-			paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title));
+			paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title))
+				 .attr({
+					 'fill' : this.offline ? layout.colors.offlineActivityText : layout.colors.activityText
+				 });
 			
 			this.items = paper.setFinish();
 			this.items.shape = shape;
@@ -176,12 +183,12 @@ var ActivityLib = {
 			
 			// create activity SVG elements
 			paper.setStart();
-			var shape = paper.path(Raphael.format('M {0} {1}' + layout.defs.gate, x, y))
+			var shape = paper.path(Raphael.format('M {0} {1}' + layout.defs.gate, x + 8, y))
 							 .attr({
 								 'fill' : layout.colors.gate
 							 });
 			
-			paper.text(x + 7, y + 14, 'STOP')
+			paper.text(x + 15, y + 14, 'STOP')
 			     .attr({
 					'font-size' : 9,
 					'font' : 'sans-serif',
@@ -240,20 +247,25 @@ var ActivityLib = {
 			if (!content) {
 				// first run, create the content
 				content = activity.propertiesContent = $('#propertiesContentTool').clone().show();
-				$('.title', content).val(activity.title);
+				$('.propertiesContentFieldTitle', content).val(activity.title);
 				
 				$('input, select', content).change(function(){
 					// extract changed properties and redraw the activity
-					activity.title = $('.title', activity.propertiesContent).val();
-					activity.grouping = $('.grouping option:selected', activity.propertiesContent)
+					activity.title = $('.propertiesContentFieldTitle', activity.propertiesContent).val();
+					activity.grouping = $('.propertiesContentFieldGrouping option:selected', activity.propertiesContent)
 										.data('grouping');
+					activity.offline = $('.propertiesContentFieldOffline', activity.propertiesContent)
+										.is(':checked');
+					activity.defineInMonitor = $('.propertiesContentFieldDefineMonitor', activity.propertiesContent)
+												.is(':checked');
+					
 					activity.draw();
 				});
 			}
 			
 			// find all groupings on canvas and fill dropdown menu with their titles
 			var emptyOption = $('<option />'),
-				groupingDropdown = $('.grouping', content).empty().append(emptyOption);
+				groupingDropdown = $('.propertiesContentFieldGrouping', content).empty().append(emptyOption);
 			$.each(layout.activities, function(){
 				if (this.type == 'grouping') {
 					var option = $('<option />').text(this.title)
@@ -272,20 +284,40 @@ var ActivityLib = {
 		},
 		
 		
-		grouping : function(title) {
+		grouping : function() {
 			var activity = this;
 			var content = activity.propertiesContent;
 			if (!content) {
 				// first run, create the content
 				content = activity.propertiesContent = $('#propertiesContentGrouping').clone().show();
-				$('.title', content).val(activity.title);
+				$('.propertiesContentFieldTitle', content).val(activity.title);
 
 				$('input, select', content).change(function(){
 					// extract changed properties and redraw the activity
-					activity.title = $('.title', activity.propertiesContent).val();
+					activity.title = $('.propertiesContentFieldTitle', activity.propertiesContent).val();
 					activity.draw();
 				});
 			}
+		},
+		
+		
+		gate : function() {
+			var activity = this;
+			var content = activity.propertiesContent;
+			if (!content) {
+				// first run, create the content
+				content = activity.propertiesContent = $('#propertiesContentGate').clone().show();
+				$('.propertiesContentFieldTitle', content).val(activity.title);
+
+				$('input, select', content).change(function(){
+					// extract changed properties and redraw the activity
+					activity.title = $('.propertiesContentFieldTitle', activity.propertiesContent).val();
+					activity.gateType = $('.propertiesContentFieldGateType', activity.propertiesContent).val();
+					activity.draw();
+				});
+			}
+			
+			$('.propertiesContentFieldGateType', activity.propertiesContent).val(activity.gateType);
 		}
 	},
 	
@@ -330,21 +362,28 @@ var ActivityLib = {
 		}
 		
 		// remove the transitions
+		// need to use slice() to copy the array as it gets modified in removeTransition()
 		$.each(activity.transitions.from.slice(), function() {
-			// if grouping activity is gone, remove the grouping effect
-			if (activity.type == 'grouping' && this.toActivity.items.groupingEffect) {
-				this.toActivity.items.groupingEffect.remove();
-				this.toActivity.items.groupingEffect = null;
-			}
 			ActivityLib.removeTransition(this);
 		});
-		// need to use slice() to copy the array as it gets modified in removeTransition()
 		$.each(activity.transitions.to.slice(), function() {
 			ActivityLib.removeTransition(this);
 		});
 		
 		// remove the activity from reference tables
 		layout.activities.splice(layout.activities.indexOf(activity), 1);
+		if (layout.items.copiedActivity = activity) {
+			layout.items.copiedActivity = null;
+		}
+		if (activity.type == 'grouping') {
+			$.each(layout.activities, function(){
+				if (activity == this.grouping) {
+					this.grouping = null;
+					this.draw();
+				}
+			});
+		}
+		
 		// visually remove the activity
 		activity.items.remove();
 	},
@@ -413,12 +452,14 @@ var ActivityLib = {
 		transition.toBack();
 		transition.mousedown(HandlerLib.transitionMousedownHandler);
 		
-		if (fromActivity.type == 'branchingEdge' && fromActivity.isStart) {
+		if (!redraw && fromActivity.type == 'branchingEdge' && fromActivity.isStart) {
 			// create a new branch
-			var branch = new ActivityLib.BranchActivity(null, fromActivity.branchingActivity, transition);
+			var branch = new ActivityLib.BranchActivity(null, null, fromActivity.branchingActivity, transition);
 			fromActivity.branchingActivity.branches.push(branch);
 			transition.data('branch', branch);
 		}
+		
+		return transition;
 	},
 	
 	
@@ -426,12 +467,6 @@ var ActivityLib = {
 	 * Removes the given transition.
 	 */
 	removeTransition : function(transition) {
-		if (transition.toActivity.items.groupingEffect) {
-			// if toActivity had a grouping effect, remove it
-			transition.toActivity.items.groupingEffect.remove();
-			transition.toActivity.items.groupingEffect = null;
-		}
-		
 		// find the transition and remove it
 		var transitions = transition.fromActivity.transitions.from;
 		transitions.splice(transitions.indexOf(transition), 1);
@@ -582,22 +617,10 @@ var ActivityLib = {
 		var transformation = activity.items.shape.attr('transform');
 		activity.items.transform('');
 		if (transformation.length > 0) {
-			activity.items.forEach(function(elem) {
-				// some elements (rectangles) have "x", some are paths
-				if (elem.attr('x')) {
-					elem.attr({
-						'x' : elem.attr('x') + transformation[0][1],
-						'y' : elem.attr('y') + transformation[0][2]
-					});
-				} else {
-					var path = elem.attr('path');
-					elem.attr('path', Raphael.transformPath(path, transformation));
-				}
-			});
-		}
-		
-		if (activity.items.groupingEffect) {
-			activity.items.groupingEffect.toBack();
+			// find new X and Y and redraw the activity
+			var activityBox =  activity.items.shape.getBBox();
+			activity.draw(activityBox.x + transformation[0][1],
+						  activityBox.y + transformation[0][2]);
 		}
 
 		// redraw transitions
@@ -706,7 +729,9 @@ var ActivityLib = {
 			while (activity.transitions.from.length > 0) {
 				activity = activity.transitions.from[0].toActivity;
 				// check if reached the end of branch
-				if (activity.type != 'branchingEdge') {
+				if (activity.type == 'branchingEdge') {
+					break;
+				} else {
 					branchLength++;
 				}
 			};
@@ -728,5 +753,14 @@ var ActivityLib = {
 			title = title.substring(0, 17) + '...';
 		}
 		return title;
+	},
+	
+	
+	/**
+	 * Get real coordinates on paper, based on event coordinates.
+	 */
+	translateEventOnCanvas : function(event) {
+		return [event.pageX + canvas.scrollLeft() - canvas.offset().left,
+		        event.pageY + canvas.scrollTop()  - canvas.offset().top];
 	}
 };

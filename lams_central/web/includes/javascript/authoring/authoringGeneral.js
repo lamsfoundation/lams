@@ -12,9 +12,14 @@ var layout = {
 	'items' : {
 		'bin'              : null,
 		'selectedActivity' : null,
-		'propertiesDialog' : null
+		'propertiesDialog' : null,
+		'infoDialog'       : null,
+		'copiedActivity'   : null
 	},
-	'toolIcons': {},
+	'toolIcons': {
+		'grouping' : '../images/grouping.gif',
+		'gate'     : '../images/stop.gif'
+	},
 	'conf' : {
 		'propertiesDialogDimOpacity'   : 0.3,
 		'propertiesDialogDimThreshold' : 100,
@@ -34,15 +39,18 @@ var layout = {
 		'branchingEdgeEnd'   : ' m -8 0 a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0'
 	},
 	'colors' : {
-		'activity'     : '#A9C8FD',
-		'gate'         : 'red',
-		'gateText'     : 'white',
-		'transition'   : 'rgb(119,126,157)',
-		'binActive'    : 'red',
-		'selectEffect' : 'blue',
-		'branchingEdgeStart' : 'green',
-		'branchingEdgeEnd'   : 'red',
-		'branchingEdgeMatch' : 'blue'
+		'activity'     		  : '#A9C8FD',
+		'offlineActivity' 	  : 'black',
+		'activityText' 		  : 'black',
+		'offlineActivityText' : 'white',
+		'gate'         		  : 'red',
+		'gateText'     		  : 'white',
+		'transition'   		  : 'rgb(119,126,157)',
+		'binActive'    		  : 'red',
+		'selectEffect'        : 'blue',
+		'branchingEdgeStart'  : 'green',
+		'branchingEdgeEnd'    : 'red',
+		'branchingEdgeMatch'  : 'blue'
 	},
 };
 
@@ -108,11 +116,10 @@ function initTemplates(){
 				$(draggable.helper).remove();
 				
 				// calculate the position and create an instance of the tool activity
-			    var toolID = draggable.draggable.attr('toolId');
-				var canvasOffset = canvas.offset();
-				var x = draggable.offset.left - canvasOffset.left;
-				var y = draggable.offset.top - canvasOffset.top;
-				var label = $('div', draggable.draggable).text();
+			    var toolID = draggable.draggable.attr('toolId'),
+			    	x = draggable.offset.left  + canvas.scrollLeft() - canvas.offset().left,
+			    	y = draggable.offset.top   + canvas.scrollTop()  - canvas.offset().top,
+			    	label = $('div', draggable.draggable).text();
 				
 				layout.activities.push(new ActivityLib.ToolActivity(null, toolID, x, y, label));
 		   }
@@ -158,6 +165,7 @@ function initLayout() {
 		});
 	});
 	
+	
 	// initialise the properties dialog singleton
 	var propertiesDialog = layout.items.propertiesDialog =
 		$('<div />')
@@ -177,13 +185,14 @@ function initLayout() {
 	propertiesDialog.lastRun = 0;
 	// remove close button, add dimming
 	propertiesDialog.container = propertiesDialog.closest('.ui-dialog');
-	propertiesDialog.container.addClass('propertiesDialog')
+	propertiesDialog.container.addClass('propertiesDialogContainer')
 							  .css('opacity', layout.conf.propertiesDialogDimOpacity)
 	 						  .mousemove(HandlerLib.approachPropertiesDialogHandler)
 	                          .find('.ui-dialog-titlebar-close').remove();
 	
+	
 	// initalise open Learning Design dialog
-	var openLDDialog = $('#openLearningDesignDialog').dialog({
+	var ldStoreDialog = $('#ldStoreDialog').dialog({
 		'autoOpen'      : false,
 		'position'      : {
 			'my' : 'left top',
@@ -221,18 +230,53 @@ function initLayout() {
 		             }
 		]
 	});
-
-	$('#ldScreenshotAuthor', openLDDialog).load(function(){
+	$('#ldScreenshotAuthor', ldStoreDialog).load(function(){
 		// hide "loading" animation
-		$('.ldChoiceDependentCanvasElement').css('display', 'none');
+		$('#ldStoreDialog .ldChoiceDependentCanvasElement').css('display', 'none');
 		// show the thumbnail
 		$(this).css('display', 'inline');
 	});
 	// there should be no focus, just highlight
 	YAHOO.widget.TreeView.FOCUS_CLASS_NAME = null;
+	var tree = new YAHOO.widget.TreeView('ldStoreDialogTree');
+	// store the tree in the dialog's data
+	ldStoreDialog.dialog('option', 'ldTree', tree);
+	// make folder contents load dynamically on open
+	tree.setDynamicLoad(function(node, callback){
+		// load subfolder contents
+		var childNodeData = MenuLib.getFolderContents(node.data.folderID);
+		if (childNodeData) {
+		$.each(childNodeData, function(){
+				// create and add a leaf
+				new YAHOO.widget.TextNode(this, node);
+			});
+		}
+		
+		// required by YUI
+		callback();
+	});
+	tree.singleNodeHighlight = true;
+	tree.subscribe('clickEvent', function(event){
+		if (!event.node.data.learningDesignId){
+			// it is a folder
+			return false;
+		}
+
+		// display "loading" animation and finally LD thumbnail
+		$('#ldStoreDialog .ldChoiceDependentCanvasElement').css('display', 'none');
+		if (event.node.highlightState == 0) {
+			$('#ldStoreDialog #ldScreenshotLoading').css('display', 'inline');
+			// get the image of the chosen LD
+			$('#ldStoreDialog #ldScreenshotAuthor').attr('src', LD_THUMBNAIL_URL_BASE + event.node.data.learningDesignId);
+			$('#ldStoreDialog #ldScreenshotAuthor').css('width', 'auto').css('height', 'auto');
+		} else {
+			// toggleCanvasResize(CANVAS_RESIZE_OPTION_NONE);
+		}
+	});
+	tree.subscribe('clickEvent',tree.onEventToggleHighlight);
+
 	
-	
-	$('#infoDialog').dialog({
+	layout.items.infoDialog = $('<div />').attr('id', 'infoDialog').dialog({
 		'autoOpen'   : false,
 		'height'     : 35,
 		'width'      : 290,
@@ -242,8 +286,8 @@ function initLayout() {
 		'hide'       : 'fold',
 		'dialogClass': 'dialog-no-title',
 		'position'   : {my: "right top",
-					   at: "right top+5px",
-					   of: '#canvas'
+					    at: "right top+5px",
+					    of: '#canvas'
 				      }
 	});
 }
@@ -268,29 +312,160 @@ function openLearningDesign(learningDesignId) {
 				return;
 			}
 			
+			// remove existing activities
 			MenuLib.newLearningDesign(true);
+			
+			var resizeNeeded = false,
+				arrangeNeeded = false,
+				// current paper dimensions 
+				paperWidth = paper.width,
+				paperHeight = paper.height,
+				// helper for finding last activity in a branch
+				branchToLastActivityMapping = {};
+			
 			// create visual representation of the loaded activities
 			$.each(ld.activities, function() {
 				var activityData = this,
 					activity = null;
-				
-				if (activityData.toolID) {
-					activity = new ActivityLib.ToolActivity(activityData.activityID,
-							activityData.toolID, activityData.xCoord, activityData.yCoord,
-							activityData.activityTitle);
-				} else if (activity.groupingType) {
-					activity = new ActivityLib.GroupingActivity(activityData.activityID,
-							activityData.xCoord, activityData.yCoord,
-							activityData.activityTitle);
-				} else if (activity.gateOpen) {
-					activity = new ActivityLib.GroupingActivity(activityData.activityID,
-							activityData.xCoord, activityData.yCoord);
+
+				switch(activityData.activityTypeID) {
+					// Tool Activity
+					case 1 :
+						activity = new ActivityLib.ToolActivity(activityData.activityID,
+										activityData.toolID,
+										activityData.xCoord,
+										activityData.yCoord,
+										activityData.activityTitle);
+						break;
+					
+					// Grouping Activity
+					case 2 :
+						activity = new ActivityLib.GroupingActivity(activityData.activityID,
+								activityData.xCoord,
+								activityData.yCoord,
+								activityData.activityTitle);
+						break;
+					
+					// Gate Activity
+					case 3:				
+						activity = new ActivityLib.GateActivity(activityData.activityID,
+							activityData.xCoord,
+							activityData.yCoord,
+							'sync');
+						break;
+					
+					// Gate Activity
+					case 4:
+						activity = new ActivityLib.GateActivity(activityData.activityID,
+								activityData.xCoord,
+								activityData.yCoord,
+								'schedule');
+						break;
+						
+					// Gate Activity	
+					case 5:
+						activity = new ActivityLib.GateActivity(activityData.activityID,
+							activityData.xCoord,
+							activityData.yCoord,
+							'permission');
+						break;
+						
+					// Gate Activity
+					case 14:
+						activity = new ActivityLib.GateActivity(activityData.activityID,
+							activityData.xCoord,
+							activityData.yCoord,
+							'condition');
+						break;
+					
+					// Branching Activity
+					case 10:
+					case 11:
+					case 12:
+						// draw both edge points straight away and mark the whole canvas for auto reaarange
+						arrangeNeeded = true;
+						var branchingEdge = new ActivityLib.BranchingEdgeActivity(activityData.activityID, 0, 0, null);
+						layout.activities.push(branchingEdge);
+						branchingEdge = new ActivityLib.BranchingEdgeActivity(
+								null, 0, 0, branchingEdge.branchingActivity);
+						layout.activities.push(branchingEdge);
+						break;
+					
+					// Sequence Activity, i.e. a branch
+					case 8: 
+						$.each(layout.activities, function(){
+							if (this.type == 'branchingEdge'
+								&& activityData.parentActivityID == this.branchingActivity.id) {
+								this.branchingActivity.branches.push(
+										new ActivityLib.BranchActivity(activityData.activityID,
+																	   activityData.activityTitle,
+																	   this.branchingActivity));
+								return false;
+							}
+						});
+						break;
 				}
 				
+				
+				if (!activity) {
+					// activity type not supported yet
+					return true;
+				}
 				layout.activities.push(activity);
+				
+				// find the branch the activity belongs to
+				if (activityData.parentActivityID) {
+					$.each(layout.activities, function(){
+						if (this.type == 'branchingEdge' && this.isStart) {
+							var branchingActivity = this.branchingActivity;
+							$.each(branchingActivity.branches, function(){
+								var branch = this;
+								// is this the branch?
+								if (activityData.parentActivityID == branch.id) {
+									if (activityData.orderID == 1) {
+										// this is the first activity in the branch
+										branch.transitionFrom = ActivityLib.drawTransition(
+												branchingActivity.start, activity, true);
+									}
+									
+									// check if this is the last activity in the branch
+									var branchData = branchToLastActivityMapping[branch.id];
+									if (!branchData || branchData.orderID < activityData.orderID) {
+										branchToLastActivityMapping[branch.id] = {
+											'branch'     : branch,
+											'orderID'    : activityData.orderID,
+											'activity'   : activity
+										};
+									}
+								}
+							});
+						}
+					});
+				}
+				
+				// if we do arranging afterwards, paper will be resized anyway
+				if (!arrangeNeeded) {
+					// find new dimensions of paper
+					var activityBox = activity.items.shape.getBBox(),
+						maxX = activityBox.x + activityBox.width,
+						maxY = activityBox.y + activityBox.height;
+					if (maxX > paperWidth) {
+						resizeNeeded = true;
+						paperWidth = maxX;
+					}
+					if (maxY > paperHeight) {
+						resizeNeeded = true;
+						paperHeight = maxY;
+					}
+				}
 			});
 			
-			// draw transitions
+			// draw transitions from last activities in branches to end edge point
+			$.each(branchToLastActivityMapping, function(branchID, branchData) {
+				ActivityLib.drawTransition(branchData.activity, branchData.branch.branchingActivity.end, true);
+			});
+			
+			// draw plain transitions
 			$.each(ld.transitions, function(){
 				var transition = this,
 					fromActivity = null,
@@ -298,27 +473,42 @@ function openLearningDesign(learningDesignId) {
 				
 				// find which activities the transition belongs to
 				$.each(layout.activities, function(){
-					var activity = this;
-					if (activity.id == transition.fromActivityID) {
+					var activity = this,
+						isBranching = activity.type == 'branchingEdge';
+					
+					// check if transition IDs match either a plain activity or a complex one
+					if (isBranching ? !activity.isStart && transition.fromActivityID == activity.branchingActivity.id 
+									: transition.fromActivityID == activity.id) {
 						fromActivity = activity;
-					} else if (activity.id == transition.toActivityID) {
+					} else if (isBranching ? activity.isStart && transition.toActivityID == activity.branchingActivity.id 
+										  : transition.toActivityID == activity.id) {
 						toActivity = activity;
 					}
 					
 					// found both transition ends, draw it and stop the iteration
 					if (fromActivity && toActivity) {
-						ActivityLib.drawTransition(fromActivity, toActivity);
+						ActivityLib.drawTransition(fromActivity, toActivity, true);
 						return false;
 					}
 				});
 			});
 			
-			HandlerLib.resetCanvasMode();
+			
+			if (arrangeNeeded) {
+				MenuLib.arrangeActivities();
+			} else if (resizeNeeded) {
+				ActivityLib.resizePaper(paperWidth, paperHeight);
+			} else {	
+				HandlerLib.resetCanvasMode();
+			}
 		}
 	});
 }
 
 
+/**
+ * Sets new paper dimensions and moves some static elements.
+ */
 function resizePaper(width, height) {
 	if (!paper) {
 		return;
@@ -328,6 +518,7 @@ function resizePaper(width, height) {
 		width = canvas.width() - 5;
 	}
 	if (!height || (height == canvas.height() - 5)) {
+		// take into account the horizontal scrollbar
 		height = canvas.height() - 5 - (width > canvas.width() - 5 ? 20 : 0);
 	}
 	paper.setSize(width, height);

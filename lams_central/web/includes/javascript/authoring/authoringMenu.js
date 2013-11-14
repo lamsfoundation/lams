@@ -8,15 +8,16 @@ var MenuLib = {
 	 * Run when branching is selected from menu. Allows placing branching and converge points on canvas.
 	 */
 	addBranching : function(){
-		var dialog = $('#infoDialog').text('Place the branching point');
+		var dialog = layout.items.infoDialog.text('Place the branching point');
 		dialog.dialog('open');
 		
 		var branchingActivity = null;
 		canvas.css('cursor', 'pointer').click(function(event){
 			// pageX and pageY tell event coordinates relative to the whole page
 			// we need relative to canvas
-			var x = event.pageX - canvas.offset().left,
-				y = event.pageY - canvas.offset().top;
+			var translatedEvent = ActivityLib.translateEventOnCanvas(event),
+				x = translatedEvent[0] + 2,
+				y = translatedEvent[1];
 			
 			// if it is start point, branchingActivity is null and constructor acts accordingly
 			var branchingEdge = new ActivityLib.BranchingEdgeActivity(null, x, y, branchingActivity);
@@ -40,13 +41,14 @@ var MenuLib = {
 	 * Run when grouping is dropped on canvas. Creates a new grouping activity.
 	 */
 	addGrouping : function() {
-		canvas.css('cursor', 'url("../images/grouping.gif"), move').click(function(event){
+		canvas.css('cursor', 'url("' + layout.toolIcons.grouping + '"), move').click(function(event){
 			HandlerLib.resetCanvasMode();
 			
 			// pageX and pageY tell event coordinates relative to the whole page
 			// we need relative to canvas
-			var x = event.pageX - canvas.offset().left - 47,
-				y = event.pageY - canvas.offset().top - 2;
+			var translatedEvent = ActivityLib.translateEventOnCanvas(event),
+				x = translatedEvent[0] - 47,
+				y = translatedEvent[1] -  2;
 
 			layout.activities.push(new ActivityLib.GroupingActivity(null, x, y, 'Grouping'));
 		});
@@ -57,13 +59,14 @@ var MenuLib = {
 	 * Run when gate is dropped on canvas. Creates a new gate activity.
 	 */
 	addGate : function() {
-		canvas.css('cursor', 'url("../images/stop.gif"), move').click(function(event){
+		canvas.css('cursor', 'url("' + layout.toolIcons.gate + '"), move').click(function(event){
 			HandlerLib.resetCanvasMode();
 			
 			// pageX and pageY tell event coordinates relative to the whole page
 			// we need relative to canvas
-			var x = event.pageX - canvas.offset().left,
-				y = event.pageY - canvas.offset().top;
+			var translatedEvent = ActivityLib.translateEventOnCanvas(event),
+				x = translatedEvent[0],
+				y = translatedEvent[1] + 2;
 			
 			layout.activities.push(new ActivityLib.GateActivity(null, x, y));
 		});
@@ -74,52 +77,18 @@ var MenuLib = {
 	 * Opens "Open sequence" dialog where an user can choose a Learning Design to load.
 	 */
 	openLearningDesign : function(){
-		var dialog = $('#openLearningDesignDialog');
+		var dialog = $('#ldStoreDialog');
 		// remove the directory tree, if it remained for last dialog opening
-		$('#learningDesignTree', dialog).empty();
 		dialog.dialog('open');
 		
-		// get users' folders and LDs
-		var treeNodes = MenuLib.getFolderContents();
-		// genearate folder tree for the widget
-		var tree = new YAHOO.widget.TreeView('learningDesignTree', treeNodes);
-		// store the tree in the dialog's data
-		dialog.dialog('option', 'ldTree', tree);
-		// make folder contents load dynamically on open
-		tree.setDynamicLoad(function(node, callback){
-			// load subfolder contents
-			var childNodeData = MenuLib.getFolderContents(node.data.folderID);
-			if (childNodeData) {
-			$.each(childNodeData, function(){
-					// create and add a leaf
-					new YAHOO.widget.TextNode(this, node);
-				});
-			}
-			
-			// required by YUI
-			callback();
+		var tree = dialog.dialog('option', 'ldTree'),
+			rootNode = tree.getRoot();
+		// remove existing folders
+		$.each(rootNode.children, function(){
+			tree.removeNode(this);
 		});
-		
-		tree.singleNodeHighlight = true;
-		tree.subscribe('clickEvent', function(event){
-	
-			if (!event.node.data.learningDesignId){
-				// it is a folder
-				return false;
-			}
-
-			// display "loading" animation and finally LD thumbnail
-			$('.ldChoiceDependentCanvasElement').css('display', 'none');
-			if (event.node.highlightState == 0) {
-				$('#ldScreenshotLoading').css('display', 'inline');
-				// get the image of the chosen LD
-				$('#ldScreenshotAuthor').attr('src', LD_THUMBNAIL_URL_BASE + event.node.data.learningDesignId);
-				$('#ldScreenshotAuthor').css('width', 'auto').css('height', 'auto');
-			} else {
-				// toggleCanvasResize(CANVAS_RESIZE_OPTION_NONE);
-			}
-		});
-		tree.subscribe('clickEvent',tree.onEventToggleHighlight);
+		// (re)load user's folders and LDs
+		tree.buildTreeFromObject(MenuLib.getFolderContents());
 		tree.render();
 		
 		// expand the first (user) folder
@@ -264,11 +233,12 @@ var MenuLib = {
 				if (activity.type == 'branchingEdge') {
 					// draw branching edges straight away and remove them from normall processing
 					branchingActivity = activity.branchingActivity;
+					row++;
 					var start = branchingActivity.start,
 						end = branchingActivity.end,
 						complexActivityEnd = end,
 						// edge points go to middle of rows with branches
-						branchingRow = row + 1 + Math.floor(branchingActivity.branches.length / 2);
+						branchingRow = row + Math.floor(branchingActivity.branches.length / 2);
 					
 					activitiesCopy.splice(activitiesCopy.indexOf(start), 1);
 					activitiesCopy.splice(activitiesCopy.indexOf(end), 1);
@@ -280,7 +250,6 @@ var MenuLib = {
                                                      					 * layout.conf.arrangeHorizontalSpace + 62,
                              layout.conf.arrangeVerticalPadding + branchingRow * layout.conf.arrangeVerticalSpace + 25);
 					
-					row++;
 					if (branchingActivity.branches.length > 0) {
 						// set up branch drawing
 						branchIndex = 0;
@@ -377,5 +346,66 @@ var MenuLib = {
 		}
 		
 		resizePaper();
+	},
+	
+	
+	/**
+	 * Mark an activity as ready for pasting.
+	 */
+	copyActivity : function(){
+		layout.items.copiedActivity = layout.items.selectedActivity;
+	},
+	
+	
+	/**
+	 * Make a copy of an existing activity.
+	 */
+	pasteActivity : function(){
+		var activity = layout.items.copiedActivity;
+		if (!activity) {
+			return;
+		}
+		// check if the activity was not removed
+		if (layout.activities.indexOf(activity) < 0){
+			layout.items.copiedActivity = null;
+			return;
+		}
+		// only tool activities can be copied (todo?)
+		if (activity.type != 'tool') {
+			alert('Sorry, you can not paste this type of activity');
+			return;
+		}
+		
+		// find an unqiue title for the new activity
+		var copyCount = 1, 
+			title = 'Copy of ' + activity.title;
+		while (true) {
+			var sameTitleFound = false;
+			$.each(layout.activities, function(){
+				if (title == this.title) {
+					sameTitleFound = true;
+					return false;
+				}
+			});
+			
+			if (sameTitleFound) {
+				copyCount++;
+				title = 'Copy (' + copyCount + ') of ' + activity.title;
+			} else {
+				break;
+			}
+		};
+		
+		// draw the new activity next to the existing one
+		var x = activity.items.shape.getBBox().x + 10,
+			y = activity.items.shape.getBBox().y + 10,
+			newActivity = new ActivityLib.ToolActivity(null, activity.toolID, x, y, title);
+		layout.activities.push(newActivity);
+		
+		if (activity.grouping) {
+			// add grouping effect if the existing activity had one
+			newActivity.grouping = activity.grouping;
+			newActivity.draw();
+		}
 	}
 };

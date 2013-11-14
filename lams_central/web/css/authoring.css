@@ -1,3 +1,5 @@
+/**** Global styles ****/
+
 .ygtv-highlight1, .ygtv-highlight1 .ygtvlabel {
 	background-color: #dfeffc;
 }
@@ -5,6 +7,10 @@
 a.ygtvspacer {
 	border-bottom: none;
 }
+
+
+
+/**** Dialog styles ****/
 
 .ui-dialog {
 	font-size: 12px;
@@ -15,35 +21,44 @@ div.dialogContainer, .ldChoiceDependentCanvasElement,
 	display: none;
 }
 
-#infoDialog {
-	font-weight: bold;
-}
-
 div.dialogTitle {
 	padding: 5px 0px 5px 0px;
 	font-weight: bold;
 	text-align: center;
 }
 
-div#openLearningDesignDialog > table {
+
+
+div.propertiesDialogContainer .ui-dialog-titlebar {
+	padding: 0 0 0 5px;
+}
+
+
+div#infoDialog {
+	font-weight: bold;
+	display: none;
+}
+
+
+div#ldStoreDialog > table {
 	width: 100%;
 	height: 684px;
 	table-layout: fixed;
 	border-top: thin dotted #2E6E9E;
 }
 
-div#openLearningDesignDialog td#learningDesignTreeCell {
+div#ldStoreDialog td#ldStoreDialogTreeCell {
 	padding: 2px 2px 0px 5px;
 	vertical-align: top;
 	width: 200px;
 	border-right: thin dotted #2E6E9E;
 }
 
-div#openLearningDesignDialog div#learningDesignTree {
+div#ldStoreDialog div#ldStoreDialogTree {
 	overflow: auto;
 }
 
-div#openLearningDesignDialog #recentlyUsedCell {
+div#ldStoreDialog #ldStoreDialogRecentlyUsedCell {
 	height: 200px;
 	vertical-align: top;
 	border-top: thin dotted #2E6E9E;
@@ -54,20 +69,24 @@ div#openLearningDesignDialog #recentlyUsedCell {
 	text-align: center;
 }
 
-div#openLearningDesignDialog td#canvasCell {
+div#ldStoreDialog td#ldStoreDialogCanvasCell {
 	text-align: center;
 	padding: 10px 0px 0px 10px;
 	vertical-align: middle;
 }
 
-div#openLearningDesignDialog div#canvasDiv {
+div#ldStoreDialog div#ldStoreDialogCanvasDiv {
 	overflow: auto;
 	height: 665px;
 }
 
-div#openLearningDesignDialog img#ldScreenshotLoading  {
+div#ldStoreDialog img#ldScreenshotLoading  {
 	padding-top: 200px;
 }
+
+
+/**** Main authoring styles ****/
+
 
 div#toolbar {
 	padding: 3px;
@@ -140,12 +159,4 @@ div.template div {
 	width: 100%;
 	height: 745px;
 	vertical-align: top;
-}
-
-div.propertiesDialog {
-	font-size: 12px;
-}
-
-div.propertiesDialog .ui-dialog-titlebar {
-	padding: 0 0 0 5px;
 }

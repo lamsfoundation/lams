@@ -146,8 +146,8 @@ var HandlerLib = {
 			return;
 		}
 		
-		var startX = x - canvas.offset().left,
-			startY = y - canvas.offset().top;
+		var startX = x  + canvas.scrollLeft() - canvas.offset().left,
+			startY = y  + canvas.scrollTop()  - canvas.offset().top;
 		
 		canvas.mousemove(function(event){
 			HandlerLib.drawTransitionMoveHandler(activity, event, startX, startY);
@@ -173,8 +173,9 @@ var HandlerLib = {
 			return;
 		}
 		
-		var endX = event.pageX - canvas.offset().left,
-			endY = event.pageY - canvas.offset().top;
+		var translatedEvent = ActivityLib.translateEventOnCanvas(event),
+			endX = translatedEvent[0],
+			endY = translatedEvent[1];
 		
 		// draw a temporary transition so user sees what he is doing
 		activity.tempTransition = paper.set();
@@ -315,10 +316,10 @@ var HandlerLib = {
 	 * Checks whether activity or transition is over rubbish bin.
 	 */
 	isElemenentBinned : function(event) {
-		var canvasX = event.pageX + canvas.scrollLeft() - canvas.offset().left,
-			canvasY = event.pageY + canvas.scrollTop()  - canvas.offset().top;
+		var translatedEvent = ActivityLib.translateEventOnCanvas(event);
 		
 		// highlight rubbish bin if dragged elements are over it
-		return Raphael.isPointInsideBBox(layout.items.bin.getBBox(), canvasX, canvasY); 
+		return Raphael.isPointInsideBBox(layout.items.bin.getBBox(),
+										 translatedEvent[0], translatedEvent[1]); 
 	}
 };
