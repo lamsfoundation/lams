@@ -190,10 +190,31 @@ public interface IAssessmentService {
     void storeUserAnswers(Long assessmentUid, Long userId, ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions,
 	    boolean isAutosave);
     
+    /**
+     * Return the latest result (it can be unfinished).
+     * 
+     * @param assessmentUid
+     * @param userId
+     * @return
+     */
     AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId);
     
+    /**
+     * Return the latest result (only finished ones).
+     * 
+     * @param assessmentUid
+     * @param userId
+     * @return
+     */
     AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId);
     
+    /**
+     * Return number of finished results. I.e. don't count the last not-yet-finished result (it can be autosave one).
+     * 
+     * @param assessmentUid
+     * @param userId
+     * @return
+     */
     int getAssessmentResultCount(Long assessmentUid, Long userId);
     
     List<Object[]> getAssessmentQuestionResultList(Long assessmentUid, Long userId, Long questionUid);

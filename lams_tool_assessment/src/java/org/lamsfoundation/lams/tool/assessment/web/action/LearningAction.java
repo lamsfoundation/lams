@@ -326,9 +326,7 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 	
 	// loadupLastAttempt for display purpose
-	if (dbResultCount > 0) {
-	    loadupLastAttempt(sessionMap);
-	}
+	loadupLastAttempt(sessionMap);
 	
 	//check if need to display results page
 	if ((dbResultCount > 0) && finishedLock) {
@@ -716,16 +714,22 @@ public class LearningAction extends Action {
     }    
     
     private void loadupLastAttempt(SessionMap<String, Object> sessionMap){
+	IAssessmentService service = getAssessmentService();
+	
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = (ArrayList<LinkedHashSet<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
-	IAssessmentService service = getAssessmentService();
-	AssessmentResult result = service.getLastAssessmentResult(assessmentUid,userId);
+	//get the latest result (it can be unfinished one)
+	AssessmentResult lastResult = service.getLastAssessmentResult(assessmentUid,userId);
+	//if there is no results yet - no action required 
+	if (lastResult == null) {
+	    return;
+	}
 	
 	for(LinkedHashSet<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
-		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
+		for (AssessmentQuestionResult questionResult : lastResult.getQuestionResults()) {
 		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
 			question.setAnswerBoolean(questionResult.getAnswerBoolean());
 			question.setAnswerFloat(questionResult.getAnswerFloat());
