@@ -10,11 +10,12 @@ var paper = null,
 var layout = {
 	'activities' : null,
 	'items' : {
-		'bin'              : null,
-		'selectedActivity' : null,
-		'propertiesDialog' : null,
-		'infoDialog'       : null,
-		'copiedActivity'   : null
+		'bin'               : null,
+		'selectedActivity'  : null,
+		'propertiesDialog'  : null,
+		'infoDialog'        : null,
+		'copiedActivity'    : null,
+		'groupNamingDialog' : null
 	},
 	'toolIcons': {
 		'grouping' : '../images/grouping.gif',
@@ -178,7 +179,7 @@ function initLayout() {
 					'at' : 'left top',
 					'of' :  '#canvas'
 				},
-				'resizable'     : false,
+				'resizable'     : true,
 				'title'         : 'Properties'
 			});
 	// for proximity detection throttling (see handlers)
@@ -189,6 +190,8 @@ function initLayout() {
 							  .css('opacity', layout.conf.propertiesDialogDimOpacity)
 	 						  .mousemove(HandlerLib.approachPropertiesDialogHandler)
 	                          .find('.ui-dialog-titlebar-close').remove();
+	
+
 	
 	
 	// initalise open Learning Design dialog
@@ -206,7 +209,6 @@ function initLayout() {
 		'buttons' : [
 		             {
 		            	'text'   : 'Open',
-		            	'id'     : 'openLDButton',
 		            	'click'  : function() {
 		            		var dialog = $(this);
 		            		var tree = dialog.dialog('option', 'ldTree');
@@ -223,7 +225,6 @@ function initLayout() {
 		             },
 		             {
 		            	'text'   : 'Cancel',
-		            	'id'     : 'cancelLDButton',
 		            	'click'  : function() {
 							$(this).dialog('close');
 						}
@@ -275,20 +276,60 @@ function initLayout() {
 	});
 	tree.subscribe('clickEvent',tree.onEventToggleHighlight);
 
-	
+	// initialise a small info dialog
 	layout.items.infoDialog = $('<div />').attr('id', 'infoDialog').dialog({
 		'autoOpen'   : false,
-		'height'     : 35,
 		'width'      : 290,
-		'modal'      : false,
+		'height'     : 35,
 		'resizable'  : false,
 		'show'       : 'fold',
 		'hide'       : 'fold',
 		'dialogClass': 'dialog-no-title',
-		'position'   : {my: "right top",
+		'position'   : {
+						my: "right top",
 					    at: "right top+5px",
 					    of: '#canvas'
 				      }
+	});
+	
+	
+	// initialise dialog from group nameing
+	layout.items.groupNamingDialog = $('<div />').dialog({
+		'autoOpen' : false,
+		'modal'  : true,
+		'show'   : 'fold',
+		'hide'   : 'fold',
+		'position' : {
+			'of' :  '#canvas'
+		},
+		'title'  : 'Group Naming',
+		'buttons' : [
+		             {
+		            	'text'   : 'OK',
+		            	'click'  : function() {
+		            		var dialog = $(this),
+		            			activity = dialog.dialog('option', 'activity');
+		            		
+		            		// extract group names from text fields
+		            		activity.groupNames = [];
+		            		$('input', dialog).each(function(){
+		            			// do not take into account empty group names
+		            			var groupName = $(this).val().trim();
+		            			if (groupName) {
+		            				activity.groupNames.push(groupName);
+		            			}
+		            		});
+		            		
+		            		dialog.dialog('close');
+						}
+		             },
+		             {
+		            	'text'   : 'Cancel',
+		            	'click'  : function() {
+							$(this).dialog('close');
+						}
+		             }
+		]
 	});
 }
 
@@ -321,7 +362,7 @@ function openLearningDesign(learningDesignId) {
 				paperWidth = paper.width,
 				paperHeight = paper.height,
 				// helper for finding last activity in a branch
-				branchToLastActivityMapping = {};
+				branchToActivities = {};
 			
 			// create visual representation of the loaded activities
 			$.each(ld.activities, function() {
@@ -340,10 +381,45 @@ function openLearningDesign(learningDesignId) {
 					
 					// Grouping Activity
 					case 2 :
-						activity = new ActivityLib.GroupingActivity(activityData.activityID,
-								activityData.xCoord,
-								activityData.yCoord,
-								activityData.activityTitle);
+						// find extra metadata for this grouping
+						$.each(ld.groupings, function(){
+							var groupingData = this;
+							if (groupingData.groupingID == activityData.createGroupingID) {
+								var groupingType = null,
+									groupNames = [];
+								
+								// translate backend grouping type to human readable for better understanding
+								switch(groupingData.groupingTypeID) {
+									case 2:
+										groupingType = 'monitor';
+										break;
+									case 4:
+										groupingType = 'learner';
+										break;
+									default: 
+										groupingType = 'random';
+										break;
+								};
+								// get groups names
+								$.each(groupingData.groups, function(){
+									groupNames.push(this.groupName);
+								});
+								
+								activity = new ActivityLib.GroupingActivity(activityData.activityID,
+										activityData.xCoord,
+										activityData.yCoord,
+										activityData.activityTitle,
+										groupingData.groupingID,
+										groupingType,
+										groupingData.learnersPerGroup ? 'learners' : 'groups',
+										groupingData.numberOfGroups,
+										groupingData.learnersPerGroup,
+										groupingData.equalNumberOfLearnersPerGroup,
+										groupingData.viewStudentsBeforeSelection,
+										groupNames);
+								return false;
+							}
+						})
 						break;
 					
 					// Gate Activity
@@ -396,6 +472,7 @@ function openLearningDesign(learningDesignId) {
 						$.each(layout.activities, function(){
 							if (this.type == 'branchingEdge'
 								&& activityData.parentActivityID == this.branchingActivity.id) {
+								// create a branch inside the branching activity
 								this.branchingActivity.branches.push(
 										new ActivityLib.BranchActivity(activityData.activityID,
 																	   activityData.activityTitle,
@@ -412,35 +489,29 @@ function openLearningDesign(learningDesignId) {
 					return true;
 				}
 				layout.activities.push(activity);
+				// for later reference
+				activityData.activity = activity;
 				
-				// find the branch the activity belongs to
+				
+				// store information about the branch the activity belongs to
 				if (activityData.parentActivityID) {
-					$.each(layout.activities, function(){
-						if (this.type == 'branchingEdge' && this.isStart) {
-							var branchingActivity = this.branchingActivity;
-							$.each(branchingActivity.branches, function(){
-								var branch = this;
-								// is this the branch?
-								if (activityData.parentActivityID == branch.id) {
-									if (activityData.orderID == 1) {
-										// this is the first activity in the branch
-										branch.transitionFrom = ActivityLib.drawTransition(
-												branchingActivity.start, activity, true);
-									}
-									
-									// check if this is the last activity in the branch
-									var branchData = branchToLastActivityMapping[branch.id];
-									if (!branchData || branchData.orderID < activityData.orderID) {
-										branchToLastActivityMapping[branch.id] = {
-											'branch'     : branch,
-											'orderID'    : activityData.orderID,
-											'activity'   : activity
-										};
-									}
-								}
-							});
-						}
-					});
+					var branchData = branchToActivities[activityData.parentActivityID];
+					if (!branchData) {
+						branchData = branchToActivities[activityData.parentActivityID] = {
+							'lastActivityOrderID' : activityData.orderID,
+							'lastActivity'        : activity
+						};
+					}
+					
+					if (activityData.orderID > branchData.lastActivityOrderID) {
+						// is it the last activity in the branch?
+						branchData.lastActivityOrderID = activityData.orderID;
+						branchData.lastActivity = activity;
+					}
+					if (activityData.orderID == 1) {
+						// is it the first activity in the branch
+						branchData.firstActivity = activity;
+					}
 				}
 				
 				// if we do arranging afterwards, paper will be resized anyway
@@ -460,10 +531,41 @@ function openLearningDesign(learningDesignId) {
 				}
 			});
 			
-			// draw transitions from last activities in branches to end edge point
-			$.each(branchToLastActivityMapping, function(branchID, branchData) {
-				ActivityLib.drawTransition(branchData.activity, branchData.branch.branchingActivity.end, true);
+			// apply existing groupings to activities 
+			$.each(ld.activities, function(){
+				if (this.applyGrouping && this.activity) {
+					var groupedActivity = this.activity,
+						groupingID = this.groupingID;
+					$.each(layout.activities, function(){
+						if (this.type == 'grouping' && groupingID == this.groupingID) {
+							// add reference and redraw the grouped activity
+							groupedActivity.grouping = this;
+							groupedActivity.draw();
+							return false;
+						}
+					});
+				}
 			});
+			
+			
+			// draw starting and ending transitions in branches
+			$.each(layout.activities, function(){
+				if (this.type == 'branchingEdge' && this.isStart) {
+					var branchingActivity = this.branchingActivity;
+					$.each(branchingActivity.branches, function(){
+						var branch = this,
+							branchData = branchToActivities[branch.id];
+						
+						// add reference to the transition inside branch
+						branch.transitionFrom = ActivityLib.drawTransition(branchingActivity.start,
+								branchData.firstActivity, true);
+						ActivityLib.drawTransition(branchData.lastActivity, branchingActivity.end, true);	
+					});
+				}
+			});
+			
+			// draw transitions from last activities in branches to end edge point
+
 			
 			// draw plain transitions
 			$.each(ld.transitions, function(){

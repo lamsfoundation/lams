@@ -26,10 +26,19 @@ var ActivityLib = {
 	/**
 	 * Constructor for a Grouping Activity.
 	 */
-	GroupingActivity : function(id, x, y, title) {
+	GroupingActivity : function(id, x, y, title, groupingID, groupingType, groupDivide, groupCount, learnerCount,
+			equalSizes, viewLearners, groupNames) {
 		this.id = id;
+		this.groupingID = groupingID;
 		this.type = 'grouping';
 		this.title = title;
+		this.groupingType = groupingType || 'random';
+		this.groupDivide = groupDivide || 'groups';
+		this.groupCount = groupCount || 2;
+		this.learnerCount = learnerCount || 1;
+		this.equalSizes = equalSizes || false;
+		this.viewLearners = viewLearners || false;
+		this.groupNames = groupNames || [];
 		this.transitions = {
 			'from' : [],
 			'to'   : []
@@ -242,24 +251,36 @@ var ActivityLib = {
 	 */
 	loadPropertiesDialogContent : {
 		tool : function() {
-			var activity = this;
-			var content = activity.propertiesContent;
+			var activity = this,
+				content = activity.propertiesContent;
 			if (!content) {
 				// first run, create the content
-				content = activity.propertiesContent = $('#propertiesContentTool').clone().show();
+				content = activity.propertiesContent = $('#propertiesContentTool').clone().attr('id', null).show();
 				$('.propertiesContentFieldTitle', content).val(activity.title);
 				
 				$('input, select', content).change(function(){
 					// extract changed properties and redraw the activity
-					activity.title = $('.propertiesContentFieldTitle', activity.propertiesContent).val();
+					var redrawNeeded = false,
+						newTitle = $('.propertiesContentFieldTitle', activity.propertiesContent).val();
+					if (newTitle != activity.title) {
+						activity.title = newTitle;
+						redrawNeeded = true;
+					}
+					
 					activity.grouping = $('.propertiesContentFieldGrouping option:selected', activity.propertiesContent)
 										.data('grouping');
-					activity.offline = $('.propertiesContentFieldOffline', activity.propertiesContent)
-										.is(':checked');
 					activity.defineInMonitor = $('.propertiesContentFieldDefineMonitor', activity.propertiesContent)
-												.is(':checked');
+										.is(':checked');
+					var newOfflineValue = $('.propertiesContentFieldOffline', activity.propertiesContent)
+										.is(':checked');
+					if (newOfflineValue != activity.offline) {
+						activity.offline = newOfflineValue;
+						redrawNeeded = true;
+					}
 					
-					activity.draw();
+					if (redrawNeeded) {
+						activity.draw();
+					}
 				});
 			}
 			
@@ -285,39 +306,111 @@ var ActivityLib = {
 		
 		
 		grouping : function() {
-			var activity = this;
-			var content = activity.propertiesContent;
-			if (!content) {
-				// first run, create the content
-				content = activity.propertiesContent = $('#propertiesContentGrouping').clone().show();
-				$('.propertiesContentFieldTitle', content).val(activity.title);
+			var activity = this,
+				content = activity.propertiesContent;
 
-				$('input, select', content).change(function(){
-					// extract changed properties and redraw the activity
-					activity.title = $('.propertiesContentFieldTitle', activity.propertiesContent).val();
-					activity.draw();
+			if (!content) {
+				
+				// make onChange function a local variable, because it's used several times
+				var changeFunction = function(){
+					// extract changed properties and redraw the activity, if needed
+					var redrawNeeded = false,
+						newTitle = $('.propertiesContentFieldTitle', activity.propertiesContent).val();
+					if (newTitle != activity.title) {
+						activity.title = newTitle;
+						redrawNeeded = true;
+					}
+					
+					activity.groupingType = $('.propertiesContentFieldGroupingType', activity.propertiesContent).val();
+					
+					$('input[name="propertiesContentFieldGroupDivide"]', activity.propertiesContent).each(function(){
+							// enable/disable division types, depending on radio buttons next to them
+							$(this).next().find('.spinner').spinner('option', 'disabled', !$(this).is(':checked'));
+						})
+						// hide group/learner division with some grouping types
+						.add($('.propertiesContentFieldLearnerCount', activity.propertiesContent).closest('tr'))
+						.css('display', activity.groupingType == 'monitor' ? 'none' : '');
+					
+					$('.propertiesContentFieldEqualSizes, .propertiesContentFieldViewLearners', activity.propertiesContent)
+						.closest('tr').css('display', activity.groupingType == 'learner' ? '' : 'none');
+					
+					activity.groupDivide = activity.groupingType == 'monitor' ||
+						$('.propertiesContentFieldGroupCountEnable', activity.propertiesContent).is(':checked') ?
+						'groups' : 'learners';
+					$('.propertiesContentFieldNameGroups', activity.propertiesContent).css('display',
+							activity.groupDivide == 'groups' ? '' : 'none');		
+					
+					activity.groupCount = $('.propertiesContentFieldGroupCount', activity.propertiesContent).val();
+					activity.learnerCount = $('.propertiesContentFieldLearnerCount', activity.propertiesContent).val();
+					activity.equalSizes = $('.propertiesContentFieldEqualSizes', activity.propertiesContent).is(':checked');
+					activity.viewLearners = $('.propertiesContentFieldViewLearners', activity.propertiesContent).is(':checked');
+					
+					if (redrawNeeded) {
+						activity.draw();
+					}
+				};
+				
+				// first run, create the content
+				content = activity.propertiesContent = $('#propertiesContentGrouping').clone().attr('id', null).show();
+				
+				// init widgets
+				$('.propertiesContentFieldTitle', content).val(activity.title);
+				$('.propertiesContentFieldGroupingType', content).val(activity.groupingType);
+				if (activity.groupDivide == 'learners') {
+					$('.propertiesContentFieldLearnerCountEnable', content).attr('checked', 'checked');
+				} else {
+					$('.propertiesContentFieldGroupCountEnable', content).attr('checked', 'checked');
+				}	
+				
+				// create groups/learners spinners
+				$('.propertiesContentFieldGroupCount', content).spinner({
+					'min' : 2,
+					'disabled' : activity.groupDivide == 'learners'
+				}).spinner('value', activity.groupCount)
+				  .on('spinchange', changeFunction);
+				
+				$('.propertiesContentFieldLearnerCount', content).spinner({
+					'min' 	   : 1,
+					'disabled' : activity.groupDivide == 'groups'
+				}).spinner('value', activity.learnerCount)
+				  .on('spinchange', changeFunction);
+				
+				$('.propertiesContentFieldEqualSizes').attr('checked', activity.equalSizes ? 'checked' : null);
+				$('.propertiesContentFieldViewLearners').attr('checked', activity.viewLearners ? 'checked' : null);
+				$('.propertiesContentFieldNameGroups', content).button().click(function(){
+					ActivityLib.openGroupNamingDialog(activity);
 				});
+				
+				$('input, select', content).change(changeFunction);
+				changeFunction();
 			}
 		},
 		
 		
 		gate : function() {
-			var activity = this;
-			var content = activity.propertiesContent;
+			var activity = this,
+				content = activity.propertiesContent;
 			if (!content) {
 				// first run, create the content
-				content = activity.propertiesContent = $('#propertiesContentGate').clone().show();
+				content = activity.propertiesContent = $('#propertiesContentGate').clone().attr('id', null).show();
 				$('.propertiesContentFieldTitle', content).val(activity.title);
+				$('.propertiesContentFieldGateType', content).val(activity.gateType);
 
 				$('input, select', content).change(function(){
 					// extract changed properties and redraw the activity
-					activity.title = $('.propertiesContentFieldTitle', activity.propertiesContent).val();
+					var redrawNeeded = false,
+						newTitle = $('.propertiesContentFieldTitle', activity.propertiesContent).val();
+					if (newTitle != activity.title) {
+						activity.title = newTitle;
+						redrawNeeded = true;
+					}
 					activity.gateType = $('.propertiesContentFieldGateType', activity.propertiesContent).val();
-					activity.draw();
+					
+					if (redrawNeeded) {
+						activity.draw();
+					}
 				});
 			}
-			
-			$('.propertiesContentFieldGateType', activity.propertiesContent).val(activity.gateType);
 		}
 	},
 	
@@ -762,5 +855,25 @@ var ActivityLib = {
 	translateEventOnCanvas : function(event) {
 		return [event.pageX + canvas.scrollLeft() - canvas.offset().left,
 		        event.pageY + canvas.scrollTop()  - canvas.offset().top];
+	},
+	
+	
+	/**
+	 * Fills group naming dialog with existing group names and opens it.
+	 */
+	openGroupNamingDialog : function(activity) {
+		var dialog = layout.items.groupNamingDialog;
+		// remove existing entries and add reference to the initiating activity
+		dialog.empty().dialog('option', 'activity', activity);
+		
+		for (var groupIndex = 1; groupIndex <= activity.groupCount; groupIndex++) {
+			// generate group names if they do not exist
+			var groupName = groupIndex > activity.groupNames.length ?
+					'Group ' + groupIndex : activity.groupNames[groupIndex - 1];
+			$('<input type="text" />').addClass('groupName').appendTo(dialog).val(groupName);
+			dialog.append('<br />');
+		}
+		
+		dialog.dialog('open');
 	}
 };

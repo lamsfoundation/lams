@@ -89,8 +89,11 @@
 	</table>
 	
 	
+	
+	<!-- DIALOGS CONTENTS -->
+	
 	<div id="ldStoreDialog" class="dialogContainer">
-		<div class="ldStoreDialogTitle">Open sequence</div>
+		<div class="dialogTitle">Open sequence</div>
 		<table>
 			<tr>
 				<td id="ldStoreDialogTreeCell">
@@ -112,6 +115,8 @@
 		</table>
 	</div>
 	
+	
+	<!-- PROPERTY DIALOG CONTENTS FOR DIFFERENT ACTIVITY TYPES -->
 	
 	<div id="propertiesContentTool" class="dialogContainer">
 		<table>
@@ -150,6 +155,7 @@
 		</table>
 	</div>
 	
+	
 	<div id="propertiesContentGrouping" class="dialogContainer">
 		<table>
 			<tr>
@@ -160,9 +166,63 @@
 					 <input class="propertiesContentFieldTitle" type="text"></input>
 				</td>
 			</tr>
+			<tr>
+				<td>
+					Grouping type:
+				</td>
+				<td>
+					 <select class="propertiesContentFieldGroupingType">
+					 	<option value="random">Random</option>
+					 	<option value="monitor">Choose in Monitor</option>
+					 	<option value="learner">Learner's choice</option>
+					 </select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Number of groups:
+				</td>
+				<td>
+					 <input class="propertiesContentFieldGroupCountEnable" type="radio"
+					 		name="propertiesContentFieldGroupDivide"></input>
+					 <input class="propertiesContentFieldGroupCount spinner" type="text"></input>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Number of learners:
+				</td>
+				<td>
+					<input class="propertiesContentFieldLearnerCountEnable" type="radio"
+					 		name="propertiesContentFieldGroupDivide"></input>
+					 <input class="propertiesContentFieldLearnerCount spinner" type="text"></input>
+				</td>
+			</tr>
+			<tr class="" style="display: none">
+				<td>
+					Equal group sizes?
+				</td>
+				<td>
+					 <input class="propertiesContentFieldEqualSizes" type="checkbox"></input>
+				</td>
+			</tr>
+			<tr style="display: none">
+				<td>
+					View learners before selection?
+				</td>
+				<td>
+					 <input class="propertiesContentFieldViewLearners" type="checkbox"></input>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<div class="propertiesContentFieldNameGroups">Name Groups</div>
+				</td>
+			</tr>
 		</table>
 	</div>
-	
+
+
 	<div id="propertiesContentGate" class="dialogContainer">
 		<table>
 			<tr>
@@ -175,7 +235,7 @@
 			</tr>
 			<tr>
 				<td>
-					Title:
+					Type:
 				</td>
 				<td>
 					 <select class="propertiesContentFieldGateType">
@@ -188,5 +248,6 @@
 			</tr>
 		</table>
 	</div>
+	
 </body>
 </lams:html>

@@ -13,7 +13,7 @@ a.ygtvspacer {
 /**** Dialog styles ****/
 
 .ui-dialog {
-	font-size: 12px;
+	font-size: 12px !important;
 }
 
 div.dialogContainer, .ldChoiceDependentCanvasElement, 
@@ -33,10 +33,22 @@ div.propertiesDialogContainer .ui-dialog-titlebar {
 	padding: 0 0 0 5px;
 }
 
+input[name="propertiesContentFieldGroupDivide"] {
+	margin-right: 10px;
+}
+
+input.propertiesContentFieldLearnerCount, input.propertiesContentFieldGroupCount {
+	width: 40px;
+}
+
+input.groupName {
+	margin-bottom: 5px;
+	width: 100%;
+}
+
 
 div#infoDialog {
 	font-weight: bold;
-	display: none;
 }
 
 
