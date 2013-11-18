@@ -523,7 +523,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
     
     /**
-     * @param grade Grade acquired from QUestionReference in learner.
+     * @param grade Grade acquired from QuestionReference in learner.
      */
     public void setGrade(int grade) {
 	this.grade = grade;

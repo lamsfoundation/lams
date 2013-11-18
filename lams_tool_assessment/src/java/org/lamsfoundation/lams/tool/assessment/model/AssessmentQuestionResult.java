@@ -46,6 +46,7 @@ public class AssessmentQuestionResult {
     private boolean answerBoolean;
     private Long submittedOptionUid;    
     private float mark;
+    private Float maxMark;
     private float penalty;
     private Set<AssessmentOptionAnswer> optionAnswers;
     
@@ -157,6 +158,22 @@ public class AssessmentQuestionResult {
 
     public void setMark(Float mark) {
 	this.mark = mark;
+    }
+    
+    /**
+     * Maximum mark user could have scored for this question. (It is stored in AssessmentQuestionResult class due to
+     * existence of random questions which makes it's impossible to obtain this info from question)
+     * 
+     * @hibernate.property column="max_mark"
+     * 
+     * @return Returns the mark.
+     */
+    public Float getMaxMark() {
+	return maxMark;
+    }
+
+    public void setMaxMark(Float maxMark) {
+	this.maxMark = maxMark;
     }
     
     /**

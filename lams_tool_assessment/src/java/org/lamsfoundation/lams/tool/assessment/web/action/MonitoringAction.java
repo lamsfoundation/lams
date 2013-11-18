@@ -32,6 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -58,7 +59,9 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
+import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
+import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
@@ -111,7 +114,7 @@ public class MonitoringAction extends Action {
     private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	// initialize Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
@@ -158,7 +161,7 @@ public class MonitoringAction extends Action {
     private ActionForward questionSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long questionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID);
@@ -176,7 +179,7 @@ public class MonitoringAction extends Action {
     private ActionForward userSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
@@ -246,7 +249,7 @@ public class MonitoringAction extends Action {
     private ActionForward exportSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	String fileName = null;
 	boolean showUserNames = true;
 
@@ -329,27 +332,53 @@ public class MonitoringAction extends Action {
 	    data.add(summaryRowTitle);
 	    Float totalGradesPossible = new Float(0);
 	    Float totalAverage = new Float(0);
-	    if (assessment.getQuestions() != null) {
-		Set<AssessmentQuestion> questions = (Set<AssessmentQuestion>) assessment.getQuestions();
+	    if (assessment.getQuestionReferences() != null) {
+		Set<QuestionReference> questionReferences = new TreeSet<QuestionReference>(new SequencableComparator());
+		questionReferences.addAll(assessment.getQuestionReferences());
 
-		for (AssessmentQuestion question : questions) {
+		int randomQuestionsCount = 1;
+		for (QuestionReference questionReference : questionReferences) {
+		    
+		    String title;
+		    String questionType;
+		    Float penaltyFactor;
+		    Float averageMark = null;
+		    if (questionReference.isRandomQuestion()) {
 
-		    QuestionSummary questionSummary = service.getQuestionSummary(assessment.getContentId(), question
-			    .getUid());
+			title = service.getMessage("label.authoring.basic.type.random.question")
+				+ randomQuestionsCount++;
+			questionType = service.getMessage("label.authoring.basic.type.random.question");
+			penaltyFactor = null;
+			averageMark = null;
+		    } else {
+
+			AssessmentQuestion question = questionReference.getQuestion();
+			title = question.getTitle();
+			questionType = getQuestionTypeLanguageLabel(question.getType());
+			penaltyFactor = question.getPenaltyFactor();
+
+			QuestionSummary questionSummary = service.getQuestionSummary(assessment.getContentId(),
+				question.getUid());
+			if (questionSummary != null) {
+			    averageMark = questionSummary.getAverageMark();
+			    totalAverage += questionSummary.getAverageMark();
+			}
+		    }
+
+		    int maxGrade = questionReference.getDefaultGrade();
+		    totalGradesPossible += maxGrade;
 
 		    ExcelCell[] questCell = new ExcelCell[5];
-		    questCell[0] = new ExcelCell(question.getTitle(), false);
-		    questCell[1] = new ExcelCell(getQuestionTypeLanguageLabel(question.getType()), false);
-		    questCell[2] = new ExcelCell(question.getPenaltyFactor(), false);
-		    questCell[3] = new ExcelCell(new Long(question.getDefaultGrade()), false);
-		    totalGradesPossible += question.getDefaultGrade();
-		    if (questionSummary != null) {
-			questCell[4] = new ExcelCell(questionSummary.getAverageMark(), false);
-			totalAverage += questionSummary.getAverageMark();
-		    }
+		    questCell[0] = new ExcelCell(title, false);
+		    questCell[1] = new ExcelCell(questionType, false);
+		    questCell[2] = new ExcelCell(penaltyFactor, false);
+		    questCell[3] = new ExcelCell(maxGrade, false);
+		    questCell[4] = new ExcelCell(averageMark, false);
+
 		    data.add(questCell);
 
 		}
+		
 		if (totalGradesPossible.floatValue() > 0) {
 		    ExcelCell[] totalCell = new ExcelCell[5];
 		    totalCell[2] = new ExcelCell(service.getMessage("label.monitoring.summary.total"), true);
@@ -548,8 +577,9 @@ public class MonitoringAction extends Action {
 					.getAssessmentQuestion().getType()), false);
 				userResultRow[2] = new ExcelCell(new Float(assessmentQuestionResult
 					.getAssessmentQuestion().getPenaltyFactor()), false);
-				userResultRow[3] = new ExcelCell(new Long(assessmentQuestionResult
-					.getAssessmentQuestion().getDefaultGrade()), false);
+				Float maxMark = (assessmentQuestionResult.getMaxMark() == null) ? 0 : new Float(
+					assessmentQuestionResult.getMaxMark());
+				userResultRow[3] = new ExcelCell(maxMark, false);
 				userResultRow[4] = new ExcelCell(assessmentQuestionResult.getUser().getUserId(), false);
 				userResultRow[5] = new ExcelCell(assessmentQuestionResult.getUser().getFullName(),
 					false);
@@ -584,8 +614,9 @@ public class MonitoringAction extends Action {
 					.getAssessmentQuestion().getType()), false);
 				userResultRow[2] = new ExcelCell(new Float(assessmentQuestionResult
 					.getAssessmentQuestion().getPenaltyFactor()), false);
-				userResultRow[3] = new ExcelCell(new Long(assessmentQuestionResult
-					.getAssessmentQuestion().getDefaultGrade()), false);
+				Float maxMark = (assessmentQuestionResult.getMaxMark() == null) ? 0 : new Float(
+					assessmentQuestionResult.getMaxMark());
+				userResultRow[3] = new ExcelCell(maxMark, false);
 				userResultRow[4] = new ExcelCell(assessmentQuestionResult.getUser().getUserId(), false);
 				userResultRow[5] = new ExcelCell(assessmentQuestionResult.getFinishDate(), false);
 				userResultRow[6] = new ExcelCell(getAnswerObject(assessmentQuestionResult), false);

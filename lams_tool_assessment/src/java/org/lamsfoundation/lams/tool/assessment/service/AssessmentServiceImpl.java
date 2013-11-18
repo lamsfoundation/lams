@@ -164,35 +164,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     // *******************************************************************************
     // Service method
     // *******************************************************************************
-    /**
-     * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
-     * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
-     * 
-     * @param uuid
-     * @param versionId
-     * @param relativePath
-     * @param attemptCount
-     * @return file node
-     */
-    private IVersionedNode getFile(Long uuid, Long versionId, String relativePath)
-	    throws AssessmentApplicationException {
-
-	ITicket tic = getRepositoryLoginTicket();
-	try {
-	    return repositoryService.getFileItem(tic, uuid, versionId, relativePath);
-	} catch (AccessDeniedException e) {
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + ".";
-	    error = error + "AccessDeniedException: " + e.getMessage() + " Unable to retry further.";
-	    AssessmentServiceImpl.log.error(error);
-	    throw new AssessmentApplicationException(error, e);
-	} catch (Exception e) {
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + "." + " Exception: " + e.getMessage();
-	    AssessmentServiceImpl.log.error(error);
-	    throw new AssessmentApplicationException(error, e);
-	}
-    }
 
     /**
      * This method verifies the credentials of the Assessment Tool and gives it the <code>Ticket</code> to login and
@@ -531,6 +502,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    mark = 0;
 	}
 	questionResult.setMark(mark);
+	questionResult.setMaxMark(maxMark);
+	
 	return questionResult;
     }
 

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -36,6 +37,8 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
+import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
+import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 
 public class AssessmentOutputFactory extends OutputFactory {
 
@@ -58,24 +61,34 @@ public class AssessmentOutputFactory extends OutputFactory {
 	
 	if (toolContentObject != null) {
 	    Assessment assessment = (Assessment) toolContentObject;
-	    Set<AssessmentQuestion> questions = assessment.getQuestions();
+	    Set<QuestionReference> questionReferences = new TreeSet<QuestionReference>(new SequencableComparator());
+	    questionReferences.addAll(assessment.getQuestionReferences());
 
 	    Long totalMarksPossible = new Long(0);
-	    for(AssessmentQuestion question : questions) {
-		totalMarksPossible += question.getDefaultGrade();
+	    for(QuestionReference questionReference : questionReferences) {
+		totalMarksPossible += questionReference.getDefaultGrade();
 	    };	    
 	    definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_TOTAL_SCORE, new Long(0), totalMarksPossible, true);
 	    definitionMap.put(OUTPUT_NAME_LEARNER_TOTAL_SCORE, definition);
 
-	    for(AssessmentQuestion question : questions) {
+	    int randomQuestionsCount = 1;
+	    for(QuestionReference questionReference : questionReferences) {
 		Long markAvailable = null;
-		if (question.getDefaultGrade() != 0) {
-		    markAvailable = new Long(question.getDefaultGrade());
+		if (questionReference.getDefaultGrade() != 0) {
+		    markAvailable = new Long(questionReference.getDefaultGrade());
 		}
 		
-		definition = buildRangeDefinition(String.valueOf(question.getSequenceId()), new Long(0), markAvailable);
-		definition.setDescription(getI18NText("output.user.score.for.question", false) + question.getTitle());
-		definitionMap.put(String.valueOf(question.getSequenceId()), definition);		
+		String description = getI18NText("output.user.score.for.question", false);
+		if (questionReference.isRandomQuestion()) {
+		    description += getI18NText("label.authoring.basic.type.random.question", false) + " "
+			    + randomQuestionsCount++;
+		} else {
+		    description += questionReference.getQuestion().getTitle();
+		}
+		
+		definition = buildRangeDefinition(String.valueOf(questionReference.getSequenceId()), new Long(0), markAvailable);
+		definition.setDescription(description);
+		definitionMap.put(String.valueOf(questionReference.getSequenceId()), definition);		
 	    };
 	}
 
