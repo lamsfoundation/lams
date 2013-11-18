@@ -72,7 +72,6 @@ var HandlerLib = {
 	 * Start dragging an activity or transition.
 	 */
 	dragItemsStartHandler : function(items, draggedElement, mouseupHandler, event, startX, startY) {
-		items.toFront();
 		// clear "clicked" flag, just in case
 		items.clicked = false;
 		
@@ -120,6 +119,7 @@ var HandlerLib = {
 	 * Moves dragged elements on the canvas.
 	 */
 	dragItemsMoveHandler : function(items, event, startX, startY) {
+		alert('bbb');
 		var dx = event.pageX - startX,
 			dy = event.pageY - startY;
 		

@@ -342,7 +342,8 @@ var MenuLib = {
 		if (paper) {
 			paper.clear();
 		} else {
-			paper = Raphael('canvas');
+			// need to set size right away for Chrome
+			paper = Raphael('canvas', canvas.width() - 5, canvas.height() - 5);
 		}
 		
 		resizePaper();

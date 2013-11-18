@@ -261,14 +261,17 @@ var ActivityLib = {
 				$('input, select', content).change(function(){
 					// extract changed properties and redraw the activity
 					var redrawNeeded = false,
-						newTitle = $('.propertiesContentFieldTitle', activity.propertiesContent).val();
+						newTitle =  $('.propertiesContentFieldTitle', activity.propertiesContent).val();
 					if (newTitle != activity.title) {
 						activity.title = newTitle;
 						redrawNeeded = true;
 					}
-					
-					activity.grouping = $('.propertiesContentFieldGrouping option:selected', activity.propertiesContent)
+					var newGroupingValue = $('.propertiesContentFieldGrouping option:selected', activity.propertiesContent)
 										.data('grouping');
+					if (newGroupingValue != activity.grouping) {
+						activity.grouping = newGroupingValue;
+						redrawNeeded = true;
+					}
 					activity.defineInMonitor = $('.propertiesContentFieldDefineMonitor', activity.propertiesContent)
 										.is(':checked');
 					var newOfflineValue = $('.propertiesContentFieldOffline', activity.propertiesContent)
@@ -423,6 +426,8 @@ var ActivityLib = {
 		activity.items
 			.data('activity', activity)
 			.mousedown(HandlerLib.activityMousedownHandler)
+			//.touchstart(HandlerLib.activityMousedownHandler)
+			.touchmove(HandlerLib.dragItemsMoveHandler)
 			.click(HandlerLib.activityClickHandler)
 			.dblclick(HandlerLib.activityDblclickHandler)
 			.attr({
@@ -636,7 +641,7 @@ var ActivityLib = {
 	addSelectEffect : function (activity) {
 		// do not draw twice
 		if (!activity.items.selectEffect) {
-			var box = activity.items.shape.getBBox();
+			var box = activity.items.getBBox();
 			
 			// a simple rectange a bit wider than the actual activity boundaries
 			activity.items.selectEffect = paper.rect(
@@ -698,6 +703,9 @@ var ActivityLib = {
 				})
 				.toBack();
 			activity.items.push(activity.items.groupingEffect);
+			
+			// this is needed, for some reason, otherwise the activity can not be selected
+			HandlerLib.resetCanvasMode();
 		}
 	},
 	

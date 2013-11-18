@@ -43,7 +43,7 @@ input.propertiesContentFieldLearnerCount, input.propertiesContentFieldGroupCount
 
 input.groupName {
 	margin-bottom: 5px;
-	width: 100%;
+	width: 98%;
 }
 
 
@@ -54,7 +54,7 @@ div#infoDialog {
 
 div#ldStoreDialog > table {
 	width: 100%;
-	height: 684px;
+	height: 682px;
 	table-layout: fixed;
 	border-top: thin dotted #2E6E9E;
 }
@@ -145,7 +145,7 @@ td#templateContainerCell {
 }
 
 div#templateContainer {
-	height: 745px;
+	height: 741px;
 	overflow: auto;
 }
 
@@ -168,7 +168,7 @@ div.template div {
 
 #canvas {
 	overflow: auto;
-	width: 100%;
-	height: 745px;
+	width: 844px;
+	height: 741px;
 	vertical-align: top;
 }
