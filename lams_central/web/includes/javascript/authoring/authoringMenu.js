@@ -16,11 +16,11 @@ var MenuLib = {
 			// pageX and pageY tell event coordinates relative to the whole page
 			// we need relative to canvas
 			var translatedEvent = ActivityLib.translateEventOnCanvas(event),
-				x = translatedEvent[0] + 2,
-				y = translatedEvent[1];
+				x = translatedEvent[0] - 6,
+				y = translatedEvent[1] - 8;
 			
 			// if it is start point, branchingActivity is null and constructor acts accordingly
-			var branchingEdge = new ActivityLib.BranchingEdgeActivity(null, x, y, branchingActivity);
+			var branchingEdge = new ActivityLib.BranchingEdgeActivity(null, x, y, null, null, branchingActivity);
 			layout.activities.push(branchingEdge);
 			
 			if (branchingActivity) {
@@ -37,6 +37,7 @@ var MenuLib = {
 		});
 	},
 	
+	
 	/**
 	 * Run when grouping is dropped on canvas. Creates a new grouping activity.
 	 */
@@ -51,6 +52,26 @@ var MenuLib = {
 				y = translatedEvent[1] -  2;
 
 			layout.activities.push(new ActivityLib.GroupingActivity(null, x, y, 'Grouping'));
+		});
+	},
+	
+	
+	/**
+	 * Run when gate is dropped on canvas. Creates a new gate activity.
+	 */
+	addTransition : function() {
+		canvas.css('cursor', 'pointer').click(function(event){
+			HandlerLib.resetCanvasMode();
+
+			var startActivity = null,
+				targetElement = paper.getElementByPoint(event.pageX, event.pageY);
+			
+			if (targetElement) {
+				startActivity = targetElement.data('activity');
+				if (startActivity) {
+					HandlerLib.drawTransitionStartHandler(startActivity, null, event.pageX, event.pageY);
+				}
+			}
 		});
 	},
 	
@@ -233,35 +254,44 @@ var MenuLib = {
 				if (activity.type == 'branchingEdge') {
 					// draw branching edges straight away and remove them from normall processing
 					branchingActivity = activity.branchingActivity;
-					row++;
+
 					var start = branchingActivity.start,
 						end = branchingActivity.end,
 						complexActivityEnd = end,
-						// edge points go to middle of rows with branches
-						branchingRow = row + Math.floor(branchingActivity.branches.length / 2);
+						// can the whole branching fit in curren canvas width?
+						branchingFits = column + branchingActivity.longestBranchLength + 2 <= maxColumns;
+					if (!branchingFits) {
+						// start branching from the left side of canvas
+						row++;
+						column = 0;
+					}
+					// store the column of converge point
+					end.column = column + branchingActivity.longestBranchLength + 1;
+					
+					// edge points go to middle of rows with branches
+					var branchingRow = row + Math.floor(branchingActivity.branches.length / 2),
+						startX = layout.conf.arrangeHorizontalPadding + column * layout.conf.arrangeHorizontalSpace + 54,
+						edgeY = layout.conf.arrangeVerticalPadding + branchingRow * layout.conf.arrangeVerticalSpace + 17,
+						endX = layout.conf.arrangeHorizontalPadding + end.column * layout.conf.arrangeHorizontalSpace + 54;
 					
 					activitiesCopy.splice(activitiesCopy.indexOf(start), 1);
 					activitiesCopy.splice(activitiesCopy.indexOf(end), 1);
 					
 					// start point goes to very left, end goes wherever the longes branch ends
-					start.draw(layout.conf.arrangeHorizontalPadding + 62,
-						       layout.conf.arrangeVerticalPadding + branchingRow * layout.conf.arrangeVerticalSpace + 25);
-					end.draw(layout.conf.arrangeHorizontalPadding + (activity.branchingActivity.longestBranchLength + 1)
-                                                     					 * layout.conf.arrangeHorizontalSpace + 62,
-                             layout.conf.arrangeVerticalPadding + branchingRow * layout.conf.arrangeVerticalSpace + 25);
-					
+					start.draw(startX, edgeY);
+					end.draw(endX, edgeY);
+
+					column++;
 					if (branchingActivity.branches.length > 0) {
 						// set up branch drawing
 						branchIndex = 0;
-						activity = branchingActivity.branches[branchIndex].transitionFrom.toActivity;
 						// next activity for normal processing will be first one from the first branch
+						activity = branchingActivity.branches[branchIndex].transitionFrom.toActivity;
 						continue;
 					} else {
-						// no branches, nothing to do, carry on with normall activity processing
+						// no branches, nothing to do, carry on with normal activity processing
 						activity = complexActivityEnd;
 						complexActivityEnd = null;
-						// this will be incremented in the same iteration by normal activity processing
-						column = 1;
 					}
 				} else {
 					// it is a simple activity, so redraw it
@@ -295,22 +325,23 @@ var MenuLib = {
 				if (complexActivityEnd && (!activity || activity == complexActivityEnd)) {
 					// end of branch
 					branchIndex++;
-					row++;
+
 					if (complexActivityEnd.branchingActivity.branches.length > branchIndex) {
 						// there is another branch to process
 						activity = complexActivityEnd.branchingActivity.branches[branchIndex].transitionFrom.toActivity;
 						// go back to left side of canvas and draw next branch
+						row++;
 						column = 1;
-						continue;
 					} else {
 						// no more branches, return to normal activity processing
-						activity = complexActivityEnd;
+						activity = complexActivityEnd.transitions.from.length == 0 ?
+								null : complexActivityEnd.transitions.from[0].toActivity;
+						column = (complexActivityEnd.column + 1) % maxColumns;
+						if (column == 0) {
+							row++;
+						}
 						branchIndex = null;
 						complexActivityEnd = null;
-						column = 0;
-						if (activity.transitions.from.length == 0) {
-							break;
-						}
 					}
 				}
 				

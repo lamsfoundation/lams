@@ -41,6 +41,10 @@ input.propertiesContentFieldLearnerCount, input.propertiesContentFieldGroupCount
 	width: 40px;
 }
 
+input.propertiesContentFieldTitle {
+	width: 98%;	
+}
+
 input.groupName {
 	margin-bottom: 5px;
 	width: 98%;
@@ -120,9 +124,10 @@ div#toolbar .split-ui-button + ul {
 	padding: 0 5px 5px 5px;
 	font-size: 11px;
 	color: #2E6E9E;
+	z-index: 1003;
 }
 
-div#toolbar .split-ui-button + ul li div {
+div#toolbar .split-ui-button + ul li {
 	padding-top: 5px;
 	cursor: pointer;
 }

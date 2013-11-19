@@ -28,7 +28,7 @@ var layout = {
 		'dragStartThreshold'           : 300,
 		'arrangeHorizontalSpace'       : 200,
 		'arrangeVerticalSpace'         : 100,
-		'arrangeHorizontalPadding'     : 40,
+		'arrangeHorizontalPadding'     : 35,
 		'arrangeVerticalPadding'       : 50
 	},
 	'defs' : {
@@ -36,8 +36,8 @@ var layout = {
 		'bin'           : 'M 0 0 h -50 l 10 50 h 30 z',
 		'transArrow'    : ' l 10 15 a 25 25 0 0 0 -20 0 z',
 		'gate'          : ' l-8 8 v14 l8 8 h14 l8 -8 v-14 l-8 -8 z',
-		'branchingEdgeStart' : ' m -8 0 a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0',
-		'branchingEdgeEnd'   : ' m -8 0 a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0'
+		'branchingEdgeStart' : ' a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0',
+		'branchingEdgeEnd'   : ' a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0'
 	},
 	'colors' : {
 		'activity'     		  : '#A9C8FD',
@@ -376,7 +376,8 @@ function openLearningDesign(learningDesignId) {
 										activityData.toolID,
 										activityData.xCoord,
 										activityData.yCoord,
-										activityData.activityTitle);
+										activityData.activityTitle,
+										activityData.supportsOutputs);
 						break;
 					
 					// Grouping Activity
@@ -423,47 +424,29 @@ function openLearningDesign(learningDesignId) {
 						break;
 					
 					// Gate Activity
-					case 3:				
+					case 3: var gateType = 'sync';
+					case 4: var gateType = gateType || 'schedule';
+					case 5: var gateType = gateType || 'permision';
+					case 6:
+						var gateType = gateType || 'condition';
 						activity = new ActivityLib.GateActivity(activityData.activityID,
 							activityData.xCoord,
 							activityData.yCoord,
-							'sync');
+							gateType);
 						break;
-					
-					// Gate Activity
-					case 4:
-						activity = new ActivityLib.GateActivity(activityData.activityID,
-								activityData.xCoord,
-								activityData.yCoord,
-								'schedule');
-						break;
-						
-					// Gate Activity	
-					case 5:
-						activity = new ActivityLib.GateActivity(activityData.activityID,
-							activityData.xCoord,
-							activityData.yCoord,
-							'permission');
-						break;
-						
-					// Gate Activity
-					case 14:
-						activity = new ActivityLib.GateActivity(activityData.activityID,
-							activityData.xCoord,
-							activityData.yCoord,
-							'condition');
-						break;
-					
+
 					// Branching Activity
-					case 10:
-					case 11:
+					case 10: var branchingType = 'chosen';
+					case 11: var branchingType = branchingType || 'group';
 					case 12:
 						// draw both edge points straight away and mark the whole canvas for auto reaarange
 						arrangeNeeded = true;
-						var branchingEdge = new ActivityLib.BranchingEdgeActivity(activityData.activityID, 0, 0, null);
+						var branchingType = branchingType || 'tool',
+							branchingEdge = new ActivityLib.BranchingEdgeActivity(activityData.activityID, 0, 0, 
+									activityData.activityTitle, branchingType, null);
 						layout.activities.push(branchingEdge);
 						branchingEdge = new ActivityLib.BranchingEdgeActivity(
-								null, 0, 0, branchingEdge.branchingActivity);
+								null, 0, 0, null, null, branchingEdge.branchingActivity);
 						layout.activities.push(branchingEdge);
 						break;
 					

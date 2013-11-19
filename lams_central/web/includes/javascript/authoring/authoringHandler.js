@@ -119,7 +119,6 @@ var HandlerLib = {
 	 * Moves dragged elements on the canvas.
 	 */
 	dragItemsMoveHandler : function(items, event, startX, startY) {
-		alert('bbb');
 		var dx = event.pageX - startX,
 			dy = event.pageY - startY;
 		
@@ -167,11 +166,6 @@ var HandlerLib = {
 			activity.tempTransition.remove();
 			activity.tempTransition = null;
 		}
-		if (!event.ctrlKey) {
-			canvas.off('mousemove');
-			canvas.off('mouseup');
-			return;
-		}
 		
 		var translatedEvent = ActivityLib.translateEventOnCanvas(event),
 			endX = translatedEvent[0],
@@ -180,11 +174,12 @@ var HandlerLib = {
 		// draw a temporary transition so user sees what he is doing
 		activity.tempTransition = paper.set();
 		activity.tempTransition.push(paper.circle(startX, startY, 3));
-		activity.tempTransition.push(paper.path('M ' + startX + ' ' + startY
-				+ 'L ' + endX  + ' ' + endY).attr({
-					'arrow-end' : 'open-wide-long',
-					'stroke-dasharray' : '- '
-				}));
+		activity.tempTransition.push(paper.path(Raphael.format('M {0} {1} L {2} {3}',
+														startX, startY, endX, endY))
+					.attr({
+						'arrow-end' : 'open-wide-long',
+						'stroke-dasharray' : '- '
+					}));
 	},
 	
 	
@@ -202,8 +197,8 @@ var HandlerLib = {
 			activity.tempTransition = null;
 		}
 		
-		var endActivity = null;
-		var targetElement = paper.getElementByPoint(event.pageX, event.pageY);
+		var endActivity = null,
+			targetElement = paper.getElementByPoint(event.pageX, event.pageY);
 		if (targetElement) {
 			endActivity = targetElement.data('activity');
 		}

@@ -7,11 +7,12 @@ var ActivityLib = {
 	/**
 	 * Constructor for a Tool Activity.
 	 */
-	ToolActivity: function(id, toolID, x, y, title) {
+	ToolActivity: function(id, toolID, x, y, title, supportsOutputs) {
 		this.id = id;
+		this.type = 'tool';
 		this.toolID = toolID;
 		this.title = title;
-		this.type = 'tool';
+		this.supportsOutputs = supportsOutputs;
 		this.transitions = {
 			'from' : [],
 			'to'   : []
@@ -72,7 +73,7 @@ var ActivityLib = {
 	/**
 	 * Either branching or converge point.
 	 */
-	BranchingEdgeActivity : function(id, x, y, branchingActivity) {
+	BranchingEdgeActivity : function(id, x, y, title, branchingType, branchingActivity) {
 		this.type = 'branchingEdge';
 		this.transitions = {
 			'from' : [],
@@ -87,8 +88,12 @@ var ActivityLib = {
 			// this is the branching point
 			this.isStart = true;
 			branchingActivity = new ActivityLib.BranchingActivity(id, this);
+			branchingActivity.branchingType = branchingType || 'chosen';
+			branchingActivity.title = title || 'Branching';
 		}
 		this.branchingActivity = branchingActivity;
+		
+		this.loadPropertiesDialogContent = ActivityLib.loadPropertiesDialogContent.branching;
 		
 		this.draw = ActivityLib.draw.branching;
 		this.draw(x, y);
@@ -122,6 +127,7 @@ var ActivityLib = {
 	draw : {
 		tool : function(x, y) {
 			if (x == undefined || y == undefined) {
+				// just redraw the activity
 				x = this.items.shape.getBBox().x;
 				y = this.items.shape.getBBox().y;
 			}
@@ -155,6 +161,7 @@ var ActivityLib = {
 		
 		grouping : function(x, y) {
 			if (x == undefined || y == undefined) {
+				// just redraw the activity
 				x = this.items.shape.getBBox().x;
 				y = this.items.shape.getBBox().y;
 			}
@@ -213,6 +220,7 @@ var ActivityLib = {
 		
 		branching : function(x, y) {
 			if (x == undefined || y == undefined) {
+				// just redraw the activity
 				x = this.items.shape.getBBox().x;
 				y = this.items.shape.getBBox().y;
 			}
@@ -225,14 +233,15 @@ var ActivityLib = {
 			paper.setStart();
 			var shape = paper.path(Raphael.format('M {0} {1}'
 								                  + (this.isStart ? layout.defs.branchingEdgeStart : layout.defs.branchingEdgeEnd),
-								                  x, y))
+								                  x, y + 8))
 							 .attr({
 								 'fill' : this.isStart ? layout.colors.branchingEdgeStart
 							                           : layout.colors.branchingEdgeEnd
 							 });
-							
-			paper.text(x, y + 14,  this.isStart ? 'Branching point'
-		                                        : 'Converge point')
+			
+			var title = this.branchingActivity.title;
+			paper.text(x + 8, y + 27,  title + (this.isStart ? '\nstart'
+		                                        		 : '\nend'))
 			     .attr({
 					'font-size' : 9,
 					'font' : 'sans-serif'
@@ -255,26 +264,29 @@ var ActivityLib = {
 				content = activity.propertiesContent;
 			if (!content) {
 				// first run, create the content
-				content = activity.propertiesContent = $('#propertiesContentTool').clone().attr('id', null).show();
+				content = activity.propertiesContent = $('#propertiesContentTool').clone().attr('id', null)
+														.show().data('activity', activity);
 				$('.propertiesContentFieldTitle', content).val(activity.title);
 				
 				$('input, select', content).change(function(){
 					// extract changed properties and redraw the activity
-					var redrawNeeded = false,
-						newTitle =  $('.propertiesContentFieldTitle', activity.propertiesContent).val();
+					var content = $(this).closest('.dialogContainer'),
+						activity = content.data('activity'),
+						redrawNeeded = false,
+						newTitle =  $('.propertiesContentFieldTitle', content).val();
 					if (newTitle != activity.title) {
 						activity.title = newTitle;
 						redrawNeeded = true;
 					}
-					var newGroupingValue = $('.propertiesContentFieldGrouping option:selected', activity.propertiesContent)
+					var newGroupingValue = $('.propertiesContentFieldGrouping option:selected', content)
 										.data('grouping');
 					if (newGroupingValue != activity.grouping) {
 						activity.grouping = newGroupingValue;
 						redrawNeeded = true;
 					}
-					activity.defineInMonitor = $('.propertiesContentFieldDefineMonitor', activity.propertiesContent)
+					activity.defineInMonitor = $('.propertiesContentFieldDefineMonitor', content)
 										.is(':checked');
-					var newOfflineValue = $('.propertiesContentFieldOffline', activity.propertiesContent)
+					var newOfflineValue = $('.propertiesContentFieldOffline', content)
 										.is(':checked');
 					if (newOfflineValue != activity.offline) {
 						activity.offline = newOfflineValue;
@@ -287,24 +299,7 @@ var ActivityLib = {
 				});
 			}
 			
-			// find all groupings on canvas and fill dropdown menu with their titles
-			var emptyOption = $('<option />'),
-				groupingDropdown = $('.propertiesContentFieldGrouping', content).empty().append(emptyOption);
-			$.each(layout.activities, function(){
-				if (this.type == 'grouping') {
-					var option = $('<option />').text(this.title)
-												.appendTo(groupingDropdown)
-												// store reference to grouping object
-												.data('grouping', this);
-					if (this == activity.grouping) {
-						option.attr('selected', 'selected');
-					}
-				}
-			});
-			if (!activity.grouping) {
-				// no grouping selected
-				emptyOption.attr('selected', 'selected');
-			}
+			ActivityLib.loadPropertiesDialogContent.fillGroupingDropdown(content, activity.grouping);
 		},
 		
 		
@@ -313,40 +308,41 @@ var ActivityLib = {
 				content = activity.propertiesContent;
 
 			if (!content) {
-				
 				// make onChange function a local variable, because it's used several times
 				var changeFunction = function(){
 					// extract changed properties and redraw the activity, if needed
-					var redrawNeeded = false,
-						newTitle = $('.propertiesContentFieldTitle', activity.propertiesContent).val();
+					var content = $(this).closest('.dialogContainer'),
+						activity = content.data('activity'),
+						redrawNeeded = false,
+						newTitle = $('.propertiesContentFieldTitle', content).val();
 					if (newTitle != activity.title) {
 						activity.title = newTitle;
 						redrawNeeded = true;
 					}
 					
-					activity.groupingType = $('.propertiesContentFieldGroupingType', activity.propertiesContent).val();
+					activity.groupingType = $('.propertiesContentFieldGroupingType', content).val();
 					
-					$('input[name="propertiesContentFieldGroupDivide"]', activity.propertiesContent).each(function(){
+					$('input[name="propertiesContentFieldGroupDivide"]', content).each(function(){
 							// enable/disable division types, depending on radio buttons next to them
 							$(this).next().find('.spinner').spinner('option', 'disabled', !$(this).is(':checked'));
 						})
 						// hide group/learner division with some grouping types
-						.add($('.propertiesContentFieldLearnerCount', activity.propertiesContent).closest('tr'))
+						.add($('.propertiesContentFieldLearnerCount', content).closest('tr'))
 						.css('display', activity.groupingType == 'monitor' ? 'none' : '');
 					
-					$('.propertiesContentFieldEqualSizes, .propertiesContentFieldViewLearners', activity.propertiesContent)
+					$('.propertiesContentFieldEqualSizes, .propertiesContentFieldViewLearners', content)
 						.closest('tr').css('display', activity.groupingType == 'learner' ? '' : 'none');
 					
 					activity.groupDivide = activity.groupingType == 'monitor' ||
-						$('.propertiesContentFieldGroupCountEnable', activity.propertiesContent).is(':checked') ?
+						$('.propertiesContentFieldGroupCountEnable', content).is(':checked') ?
 						'groups' : 'learners';
-					$('.propertiesContentFieldNameGroups', activity.propertiesContent).css('display',
+					$('.propertiesContentFieldNameGroups', content).css('display',
 							activity.groupDivide == 'groups' ? '' : 'none');		
 					
-					activity.groupCount = $('.propertiesContentFieldGroupCount', activity.propertiesContent).val();
-					activity.learnerCount = $('.propertiesContentFieldLearnerCount', activity.propertiesContent).val();
-					activity.equalSizes = $('.propertiesContentFieldEqualSizes', activity.propertiesContent).is(':checked');
-					activity.viewLearners = $('.propertiesContentFieldViewLearners', activity.propertiesContent).is(':checked');
+					activity.groupCount = $('.propertiesContentFieldGroupCount', content).val();
+					activity.learnerCount = $('.propertiesContentFieldLearnerCount', content).val();
+					activity.equalSizes = $('.propertiesContentFieldEqualSizes', content).is(':checked');
+					activity.viewLearners = $('.propertiesContentFieldViewLearners', content).is(':checked');
 					
 					if (redrawNeeded) {
 						activity.draw();
@@ -354,7 +350,8 @@ var ActivityLib = {
 				};
 				
 				// first run, create the content
-				content = activity.propertiesContent = $('#propertiesContentGrouping').clone().attr('id', null).show();
+				content = activity.propertiesContent = $('#propertiesContentGrouping').clone().attr('id', null)
+														.show().data('activity', activity);
 				
 				// init widgets
 				$('.propertiesContentFieldTitle', content).val(activity.title);
@@ -378,14 +375,14 @@ var ActivityLib = {
 				}).spinner('value', activity.learnerCount)
 				  .on('spinchange', changeFunction);
 				
-				$('.propertiesContentFieldEqualSizes').attr('checked', activity.equalSizes ? 'checked' : null);
-				$('.propertiesContentFieldViewLearners').attr('checked', activity.viewLearners ? 'checked' : null);
+				$('.propertiesContentFieldEqualSizes', content).attr('checked', activity.equalSizes ? 'checked' : null);
+				$('.propertiesContentFieldViewLearners', content).attr('checked', activity.viewLearners ? 'checked' : null);
 				$('.propertiesContentFieldNameGroups', content).button().click(function(){
 					ActivityLib.openGroupNamingDialog(activity);
 				});
 				
 				$('input, select', content).change(changeFunction);
-				changeFunction();
+				changeFunction.call(content);
 			}
 		},
 		
@@ -395,24 +392,139 @@ var ActivityLib = {
 				content = activity.propertiesContent;
 			if (!content) {
 				// first run, create the content
-				content = activity.propertiesContent = $('#propertiesContentGate').clone().attr('id', null).show();
+				content = activity.propertiesContent = $('#propertiesContentGate').clone().attr('id', null)
+														.show().data('activity', activity);
 				$('.propertiesContentFieldTitle', content).val(activity.title);
 				$('.propertiesContentFieldGateType', content).val(activity.gateType);
 
 				$('input, select', content).change(function(){
 					// extract changed properties and redraw the activity
-					var redrawNeeded = false,
-						newTitle = $('.propertiesContentFieldTitle', activity.propertiesContent).val();
+					var content = $(this).closest('.dialogContainer'),
+						activity = content.data('activity'),
+						redrawNeeded = false,
+						newTitle = $('.propertiesContentFieldTitle', content).val();
 					if (newTitle != activity.title) {
 						activity.title = newTitle;
 						redrawNeeded = true;
 					}
-					activity.gateType = $('.propertiesContentFieldGateType', activity.propertiesContent).val();
+					activity.gateType = $('.propertiesContentFieldGateType', content).val();
 					
 					if (redrawNeeded) {
 						activity.draw();
 					}
 				});
+			}
+		},
+		
+		
+		branching : function() {
+			var activity = this,
+			content = activity.propertiesContent;
+			
+			var fillWidgetsFunction = function(){
+				$('.propertiesContentFieldTitle', content).val(activity.branchingActivity.title);
+				$('.propertiesContentFieldBranchingType', content).val(activity.branchingActivity.branchingType);
+				ActivityLib.loadPropertiesDialogContent.fillGroupingDropdown(content, activity.branchingActivity.grouping);
+				ActivityLib.loadPropertiesDialogContent.fillToolInputDropdown(content, activity.branchingActivity.input);
+			}
+			
+			if (!content) {
+				// first run, create the content
+				content = activity.propertiesContent = $('#propertiesContentBranching').clone().attr('id', null)
+														.show().data('activity', activity);
+				$('.propertiesContentFieldMatchGroups', content).button();
+				
+				var changeFunction = function(){
+					// extract changed properties and redraw the activity
+					var content = $(this).closest('.dialogContainer'),
+						activity = content.data('activity'),
+						branchingActivity = activity.branchingActivity,
+						redrawNeeded = false,
+						newTitle = $('.propertiesContentFieldTitle', content).val();
+					if (newTitle != branchingActivity.title) {
+						branchingActivity.title = newTitle;
+						redrawNeeded = true;
+					}
+					branchingActivity.branchingType = $('.propertiesContentFieldBranchingType', content).val();
+					
+					var groupingRow = $('.propertiesContentFieldGrouping', content).closest('tr');
+					if (branchingActivity.branchingType == 'group') {
+						branchingActivity.grouping = groupingRow.show()
+													.find('option:selected').data('grouping');
+					} else {
+						groupingRow.hide();
+						branchingActivity.grouping = null;
+					}
+					$('.propertiesContentFieldMatchGroups', content).closest('tr')
+						.css('display', branchingActivity.grouping ? '' : 'none');
+					
+					var inputRow = $('.propertiesContentFieldInput', content).closest('tr');
+					if (branchingActivity.branchingType == 'tool') {
+						branchingActivity.input = inputRow.show()
+							.find('option:selected').data('activity');
+					} else {
+						inputRow.hide();
+						branchingActivity.input = null;
+					}
+
+					if (redrawNeeded) {
+						branchingActivity.start.draw();
+						branchingActivity.end.draw();
+					}
+				}
+				
+				$('input, select', content).change(changeFunction);
+				fillWidgetsFunction();
+				changeFunction.call(content);
+			}
+			
+			fillWidgetsFunction();
+		},
+		
+		
+		/**
+		 * 	Find all groupings on canvas and fill dropdown menu with their titles
+		 */
+		fillGroupingDropdown : function(content, grouping) {
+			// find all groupings on canvas and fill dropdown menu with their titles
+			var emptyOption = $('<option />'),
+				groupingDropdown = $('.propertiesContentFieldGrouping', content).empty().append(emptyOption);
+			$.each(layout.activities, function(){
+				if (this.type == 'grouping') {
+					var option = $('<option />').text(this.title)
+												.appendTo(groupingDropdown)
+												// store reference to grouping object
+												.data('grouping', this);
+					if (this == grouping) {
+						option.attr('selected', 'selected');
+					}
+				}
+			});
+			if (!grouping) {
+				// no grouping selected
+				emptyOption.attr('selected', 'selected');
+			}
+		},
+		
+		
+		fillToolInputDropdown : function(content, input) {
+			// find all tools that support input and fill dropdown menu with their titles
+			var emptyOption = $('<option />'),
+				inputDropdown = $('.propertiesContentFieldInput', content).empty().append(emptyOption);
+			$.each(layout.activities, function(){
+				if (this.supportsOutputs) {
+					var option = $('<option />').text(this.title)
+												.appendTo(inputDropdown)
+												// store reference to grouping object
+												.data('activity', this);
+					if (this == input) {
+						option.attr('selected', 'selected');
+					}
+				}
+			});
+			if (!input) {
+				// no grouping selected
+				emptyOption.attr('selected', 'selected');
 			}
 		}
 	},
@@ -426,7 +538,6 @@ var ActivityLib = {
 		activity.items
 			.data('activity', activity)
 			.mousedown(HandlerLib.activityMousedownHandler)
-			//.touchstart(HandlerLib.activityMousedownHandler)
 			.touchmove(HandlerLib.dragItemsMoveHandler)
 			.click(HandlerLib.activityClickHandler)
 			.dblclick(HandlerLib.activityDblclickHandler)
@@ -550,7 +661,8 @@ var ActivityLib = {
 		transition.toBack();
 		transition.mousedown(HandlerLib.transitionMousedownHandler);
 		
-		if (!redraw && fromActivity.type == 'branchingEdge' && fromActivity.isStart) {
+		if (!redraw && fromActivity.type == 'branchingEdge' && fromActivity.isStart
+				&& (toActivity.type != 'branchingEdge' || fromActivity.branchingActivity != toActivity.branchingActivity)) {
 			// create a new branch
 			var branch = new ActivityLib.BranchActivity(null, null, fromActivity.branchingActivity, transition);
 			fromActivity.branchingActivity.branches.push(branch);
@@ -611,7 +723,7 @@ var ActivityLib = {
 			    branchEdgeStartX = branchPoints1.middleX + (branchPoints2.middleX - branchPoints1.middleX)/2,
 			    branchEdgeStartY = branchPoints1.middleY + (branchPoints2.middleY - branchPoints1.middleY)/2,
 			    branchingEdgeStart = new ActivityLib.BranchingEdgeActivity(null, branchEdgeStartX,
-			    		branchEdgeStartY, null);
+			    		branchEdgeStartY, null, null, null);
 			layout.activities.push(branchingEdgeStart);
 			
 			// find last activities in subsequences and make an converge point between them
@@ -621,7 +733,7 @@ var ActivityLib = {
 
 			var convergePoints = ActivityLib.findTransitionPoints(convergeActivity1, convergeActivity2),
 				branchingEdgeEnd = new ActivityLib.BranchingEdgeActivity(null, convergePoints.middleX,
-					convergePoints.middleY, branchingEdgeStart.branchingActivity);
+					convergePoints.middleY, null, null, branchingEdgeStart.branchingActivity);
 			layout.activities.push(branchingEdgeEnd);
 			
 			// draw all required transitions

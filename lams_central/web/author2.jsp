@@ -16,7 +16,9 @@
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.ui.touch-punch.js"></script>
+	<!-- Fix for iPad
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.ui.touch-punch.js"></script>
+	-->
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/yahoo-dom-event.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/animation-min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/json-min.js" ></script> 
@@ -44,6 +46,15 @@
 		<div class="ui-button" onClick="javascript:MenuLib.openLearningDesign()">
 			Open
 		</div>
+		<div class="ui-button" onClick="javascript:MenuLib.copyActivity()">
+			Copy
+		</div>
+		<div class="ui-button" onClick="javascript:MenuLib.pasteActivity()">
+			Paste
+		</div>
+		<div class="ui-button" onClick="javascript:MenuLib.addTransition()">
+			Transition
+		</div>
 		<div>
 			<div class="split-ui-button">
 				<div>
@@ -52,8 +63,8 @@
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li><div onClick="javascript:MenuLib.addGate()">Gate</div></li>
-				<li><div onClick="javascript:MenuLib.addBranching()">Branch</div></li>
+				<li onClick="javascript:MenuLib.addGate()">Gate</li>
+				<li onClick="javascript:MenuLib.addBranching()">Branch</li>
 			</ul>
 		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.addGrouping()">
@@ -62,12 +73,7 @@
 		<div class="ui-button" onClick="javascript:MenuLib.arrangeActivities()">
 			Arrange
 		</div>
-		<div class="ui-button" onClick="javascript:MenuLib.copyActivity()">
-			Copy
-		</div>
-		<div class="ui-button" onClick="javascript:MenuLib.pasteActivity()">
-			Paste
-		</div>
+
 	</div>
 	<table id="authoringTable">
 		<tr>
@@ -199,7 +205,7 @@
 					 <input class="propertiesContentFieldLearnerCount spinner" type="text"></input>
 				</td>
 			</tr>
-			<tr class="" style="display: none">
+			<tr>
 				<td>
 					Equal group sizes?
 				</td>
@@ -207,7 +213,7 @@
 					 <input class="propertiesContentFieldEqualSizes" type="checkbox"></input>
 				</td>
 			</tr>
-			<tr style="display: none">
+			<tr>
 				<td>
 					View learners before selection?
 				</td>
@@ -250,5 +256,51 @@
 		</table>
 	</div>
 	
+	
+	<div id="propertiesContentBranching" class="dialogContainer">
+		<table>
+			<tr>
+				<td>
+					Title:
+				</td>
+				<td>
+					 <input class="propertiesContentFieldTitle" type="text"></input>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Branching type:
+				</td>
+				<td>
+					 <select class="propertiesContentFieldBranchingType">
+					 	<option value="chosen">Instructor's choice</option>
+					 	<option value="group">Group-based</option>
+					 	<option value="tool">Learner's output</option>
+					 </select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Grouping:
+				</td>
+				<td>
+					  <select class="propertiesContentFieldGrouping"></select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Input (Tool):
+				</td>
+				<td>
+					  <select class="propertiesContentFieldInput"></select>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<div class="propertiesContentFieldMatchGroups">Match Groups to Branches</div>
+				</td>
+			</tr>
+		</table>
+	</div>
 </body>
 </lams:html>
