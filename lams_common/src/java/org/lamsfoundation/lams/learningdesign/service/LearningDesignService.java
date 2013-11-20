@@ -229,6 +229,8 @@ public class LearningDesignService implements ILearningDesignService {
 		    iconPath = iconPath.substring(0, iconPath.lastIndexOf('/') + 1);
 		    iconPath += "icon_" + tool.getToolIdentifier() + ".svg";
 		    toolDTO.setIconPath(iconPath);
+		    
+		    toolDTO.setSupportsOutputs(tool.getSupportsOutputs());
 		}
 		
 		tools.add(toolDTO);

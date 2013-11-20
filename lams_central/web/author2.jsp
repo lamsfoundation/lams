@@ -26,6 +26,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/raphael/raphael.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringGeneral.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringActivity.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringProperty.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringHandler.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringMenu.js"></script>
 	<script type="text/javascript">
@@ -80,7 +81,8 @@
 			<td id="templateContainerCell">
 				<div id="templateContainer">
 					<c:forEach var="tool" items="${tools}">
-						<div toolId="${tool.toolId}" class="template">
+						<div toolId="${tool.toolId}" supportsOutputs="${tool.supportsOutputs}"
+							 class="template">
 							<c:if test="${not empty tool.iconPath}">
 								<img src="<lams:LAMSURL/>${tool.iconPath}" />
 							</c:if>
@@ -99,6 +101,7 @@
 	
 	<!-- DIALOGS CONTENTS -->
 	
+	<!-- SEQUENCE LOAD DIALOG -->
 	<div id="ldStoreDialog" class="dialogContainer">
 		<div class="dialogTitle">Open sequence</div>
 		<table>
@@ -118,6 +121,40 @@
 				<td id="ldStoreDialogRecentlyUsedCell" >
 					Recently used sequences
 				</td>
+			</tr>
+		</table>
+	</div>
+	
+	
+	<!-- GROUP TO BRANCH MATCHING DIALOG -->
+	
+	<div id="gtbDialog" class="dialogContainer">
+		<table>
+			<tr>
+				<td></td>
+				<td></td>
+				<td rowspan="2"></td>
+				<td colspan="2" class="gtbLabelCell">
+					Mappings
+				</td>
+			</tr>
+			<tr>
+				<td class="gtbLabelCell">Groups</td>
+				<td class="gtbLabelCell">Branches</td>
+				<td class="gtbLabelCell">Group</td>
+				<td class="gtbLabelCell">Branch</td>
+			</tr>
+			<tr>
+				<td id="gtbGroupsCell" class="gtbListCell"></td>
+				<td id="gtbBranchesCell" class="gtbListCell"></td>
+				<td id="gtbButtonCell">
+					<div id="gtbAddButton"
+					     onClick="javascript:PropertyLib.addGroupToBranchMapping()"></div>
+					<div id="gtbRemoveButton"
+					     onClick="javascript:PropertyLib.removeGroupToBranchMapping()"></div>
+				</td>
+				<td id="gtbMappingGroupCell" class="gtbListCell"></td>
+				<td id="gtbMappingBranchCell" class="gtbListCell"></td>
 			</tr>
 		</table>
 	</div>

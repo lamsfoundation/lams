@@ -3,6 +3,43 @@
  */
 
 var MenuLib = {
+		
+	init : function(){
+		// add jQuery UI button functionality
+		$('.ui-button').button();
+		$(".split-ui-button").each(function(){
+			// drop down buttons
+			var buttonContainer = $(this);
+			var buttons = buttonContainer.children();
+			
+			buttons.first().button()
+				   .next().button({
+				text : false,
+				icons : {
+					primary : "ui-icon-triangle-1-s"
+				}
+			});
+			buttonContainer.buttonset().next().hide().menu();
+			
+			buttons.each(function(){
+				var button = $(this);
+				if (!button.attr('onclick')) {
+					button.click(function() {
+						var menu = $(this).parent().next().show().position({
+							my : "left top+2px",
+							at : "left bottom",
+							of : $(this).parent()
+						});
+						$(document).one("click", function() {
+							menu.hide();
+						});
+						return false;
+					});
+				}
+			});
+		});
+	},
+	
 	
 	/**
 	 * Run when branching is selected from menu. Allows placing branching and converge points on canvas.
@@ -42,7 +79,8 @@ var MenuLib = {
 	 * Run when grouping is dropped on canvas. Creates a new grouping activity.
 	 */
 	addGrouping : function() {
-		canvas.css('cursor', 'url("' + layout.toolIcons.grouping + '"), move').click(function(event){
+		canvas.css('cursor', 'url("' + layout.toolMetadata.grouping.iconPath + '"), move')
+			  .click(function(event){
 			HandlerLib.resetCanvasMode();
 			
 			// pageX and pageY tell event coordinates relative to the whole page
@@ -80,7 +118,7 @@ var MenuLib = {
 	 * Run when gate is dropped on canvas. Creates a new gate activity.
 	 */
 	addGate : function() {
-		canvas.css('cursor', 'url("' + layout.toolIcons.gate + '"), move').click(function(event){
+		canvas.css('cursor', 'url("' + layout.toolMetadata.gate.iconPath + '"), move').click(function(event){
 			HandlerLib.resetCanvasMode();
 			
 			// pageX and pageY tell event coordinates relative to the whole page

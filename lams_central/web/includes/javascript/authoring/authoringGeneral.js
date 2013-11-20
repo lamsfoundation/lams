@@ -11,15 +11,23 @@ var layout = {
 	'activities' : null,
 	'items' : {
 		'bin'               : null,
+		
 		'selectedActivity'  : null,
+		'copiedActivity'    : null,
+		
 		'propertiesDialog'  : null,
 		'infoDialog'        : null,
-		'copiedActivity'    : null,
-		'groupNamingDialog' : null
+		'groupNamingDialog' : null,
+		'groupsToBranchesMappingDialog' : null
 	},
-	'toolIcons': {
-		'grouping' : '../images/grouping.gif',
-		'gate'     : '../images/stop.gif'
+	
+	'toolMetadata': {
+		'grouping' : {
+			'iconPath' : '../images/grouping.gif'
+		},
+		'gate'     : {		
+			'iconPath' : '../images/stop.gif'
+		}
 	},
 	'conf' : {
 		'propertiesDialogDimOpacity'   : 0.3,
@@ -33,11 +41,11 @@ var layout = {
 	},
 	'defs' : {
 		'activity'      : ' h 125 v 50 h -125 z',
-		'bin'           : 'M 0 0 h -50 l 10 50 h 30 z',
+		'branchingEdgeStart' : ' a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0',
+		'branchingEdgeEnd'   : ' a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0',
 		'transArrow'    : ' l 10 15 a 25 25 0 0 0 -20 0 z',
 		'gate'          : ' l-8 8 v14 l8 8 h14 l8 -8 v-14 l-8 -8 z',
-		'branchingEdgeStart' : ' a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0',
-		'branchingEdgeEnd'   : ' a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0'
+		'bin'           : 'M 0 0 h -50 l 10 50 h 30 z'
 	},
 	'colors' : {
 		'activity'     		  : '#A9C8FD',
@@ -46,12 +54,12 @@ var layout = {
 		'offlineActivityText' : 'white',
 		'gate'         		  : 'red',
 		'gateText'     		  : 'white',
-		'transition'   		  : 'rgb(119,126,157)',
-		'binActive'    		  : 'red',
-		'selectEffect'        : 'blue',
 		'branchingEdgeStart'  : 'green',
 		'branchingEdgeEnd'    : 'red',
-		'branchingEdgeMatch'  : 'blue'
+		'branchingEdgeMatch'  : 'blue',
+		'transition'   		  : 'rgb(119,126,157)',
+		'binActive'    		  : 'red',
+		'selectEffect'        : 'blue'
 	},
 };
 
@@ -65,6 +73,8 @@ $(document).ready(function() {
 	
 	initLayout();
 	initTemplates();
+	PropertyLib.init();
+	MenuLib.init();
 });
 
 
@@ -74,9 +84,12 @@ $(document).ready(function() {
 function initTemplates(){
 	$('.template').each(function(){
 		var toolId = $(this).attr('toolId');
-		// register tool icons so they are later easily accessible
-		layout.toolIcons[toolId] = $('img', this).attr('src');
-
+		// register tool properties so they are later easily accessible
+		layout.toolMetadata[toolId] = {
+			'iconPath' : $('img', this).attr('src'),
+			'supportsOutputs' : $(this).attr('supportsOutputs')
+		};
+		
 		// if a tool's name is too long and gets broken into two lines
 		// make some adjustments to layout
 		var toolName = $('div', this);
@@ -132,68 +145,6 @@ function initTemplates(){
  * Initialises various Authoring widgets.
  */
 function initLayout() {
-	// add jQuery UI button functionality
-	$('.ui-button').button();
-	$(".split-ui-button").each(function(){
-		// drop down buttons
-		var buttonContainer = $(this);
-		var buttons = buttonContainer.children();
-		
-		buttons.first().button()
-			   .next().button({
-			text : false,
-			icons : {
-				primary : "ui-icon-triangle-1-s"
-			}
-		});
-		buttonContainer.buttonset().next().hide().menu();
-		
-		buttons.each(function(){
-			var button = $(this);
-			if (!button.attr('onclick')) {
-				button.click(function() {
-					var menu = $(this).parent().next().show().position({
-						my : "left top+2px",
-						at : "left bottom",
-						of : $(this).parent()
-					});
-					$(document).one("click", function() {
-						menu.hide();
-					});
-					return false;
-				});
-			}
-		});
-	});
-	
-	
-	// initialise the properties dialog singleton
-	var propertiesDialog = layout.items.propertiesDialog =
-		$('<div />')
-			.appendTo('body')
-			.dialog({
-				'autoOpen'      : false,
-				'closeOnEscape' : false,
-				'position'      : {
-					'my' : 'left top',
-					'at' : 'left top',
-					'of' :  '#canvas'
-				},
-				'resizable'     : true,
-				'title'         : 'Properties'
-			});
-	// for proximity detection throttling (see handlers)
-	propertiesDialog.lastRun = 0;
-	// remove close button, add dimming
-	propertiesDialog.container = propertiesDialog.closest('.ui-dialog');
-	propertiesDialog.container.addClass('propertiesDialogContainer')
-							  .css('opacity', layout.conf.propertiesDialogDimOpacity)
-	 						  .mousemove(HandlerLib.approachPropertiesDialogHandler)
-	                          .find('.ui-dialog-titlebar-close').remove();
-	
-
-	
-	
 	// initalise open Learning Design dialog
 	var ldStoreDialog = $('#ldStoreDialog').dialog({
 		'autoOpen'      : false,
@@ -291,46 +242,6 @@ function initLayout() {
 					    of: '#canvas'
 				      }
 	});
-	
-	
-	// initialise dialog from group nameing
-	layout.items.groupNamingDialog = $('<div />').dialog({
-		'autoOpen' : false,
-		'modal'  : true,
-		'show'   : 'fold',
-		'hide'   : 'fold',
-		'position' : {
-			'of' :  '#canvas'
-		},
-		'title'  : 'Group Naming',
-		'buttons' : [
-		             {
-		            	'text'   : 'OK',
-		            	'click'  : function() {
-		            		var dialog = $(this),
-		            			activity = dialog.dialog('option', 'activity');
-		            		
-		            		// extract group names from text fields
-		            		activity.groupNames = [];
-		            		$('input', dialog).each(function(){
-		            			// do not take into account empty group names
-		            			var groupName = $(this).val().trim();
-		            			if (groupName) {
-		            				activity.groupNames.push(groupName);
-		            			}
-		            		});
-		            		
-		            		dialog.dialog('close');
-						}
-		             },
-		             {
-		            	'text'   : 'Cancel',
-		            	'click'  : function() {
-							$(this).dialog('close');
-						}
-		             }
-		]
-	});
 }
 
 
@@ -378,6 +289,8 @@ function openLearningDesign(learningDesignId) {
 										activityData.yCoord,
 										activityData.activityTitle,
 										activityData.supportsOutputs);
+						// for later reference
+						activityData.activity = activity;
 						break;
 					
 					// Grouping Activity
@@ -445,9 +358,13 @@ function openLearningDesign(learningDesignId) {
 							branchingEdge = new ActivityLib.BranchingEdgeActivity(activityData.activityID, 0, 0, 
 									activityData.activityTitle, branchingType, null);
 						layout.activities.push(branchingEdge);
+						// for later reference
+						activityData.activity = branchingEdge;
+						
 						branchingEdge = new ActivityLib.BranchingEdgeActivity(
 								null, 0, 0, null, null, branchingEdge.branchingActivity);
 						layout.activities.push(branchingEdge);
+
 						break;
 					
 					// Sequence Activity, i.e. a branch
@@ -472,8 +389,6 @@ function openLearningDesign(learningDesignId) {
 					return true;
 				}
 				layout.activities.push(activity);
-				// for later reference
-				activityData.activity = activity;
 				
 				
 				// store information about the branch the activity belongs to
@@ -522,8 +437,12 @@ function openLearningDesign(learningDesignId) {
 					$.each(layout.activities, function(){
 						if (this.type == 'grouping' && groupingID == this.groupingID) {
 							// add reference and redraw the grouped activity
-							groupedActivity.grouping = this;
-							groupedActivity.draw();
+							if (groupedActivity.type == 'branchingEdge') {
+								groupedActivity.branchingActivity.grouping = this;
+							} else {
+								groupedActivity.grouping = this;
+								groupedActivity.draw();
+							}
 							return false;
 						}
 					});

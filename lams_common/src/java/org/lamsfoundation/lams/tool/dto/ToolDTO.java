@@ -28,6 +28,7 @@ public class ToolDTO {
     private Long toolId;
     private String toolDisplayName;
     private String iconPath;
+    private Boolean supportsOutputs;
 
     public ToolDTO() {
     }
@@ -54,5 +55,13 @@ public class ToolDTO {
 
     public void setIconPath(String iconPath) {
 	this.iconPath = iconPath;
+    }
+
+    public Boolean getSupportsOutputs() {
+        return supportsOutputs;
+    }
+
+    public void setSupportsOutputs(Boolean supportsOutputs) {
+        this.supportsOutputs = supportsOutputs;
     }
 }

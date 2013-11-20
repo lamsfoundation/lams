@@ -33,6 +33,10 @@ div.propertiesDialogContainer .ui-dialog-titlebar {
 	padding: 0 0 0 5px;
 }
 
+div.propertiesDialogContainer .dialogContainer td {
+	padding-bottom: 5px;
+}
+
 input[name="propertiesContentFieldGroupDivide"] {
 	margin-right: 10px;
 }
@@ -101,6 +105,48 @@ div#ldStoreDialog img#ldScreenshotLoading  {
 }
 
 
+div#gtbDialog > table {
+	width: 100%;
+	height: 98%;
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+
+div#gtbDialog td {
+	text-align: center;
+	vertical-align: top;
+}
+
+div#gtbDialog td.gtbLabelCell {
+	height: 15px;
+	font-weight: bold;
+}
+
+div#gtbDialog td.gtbListCell {
+	border: thin black solid;
+	padding: 3px;
+}
+
+div#gtbDialog td.gtbListCell .selected {
+	background-color: #5c9ccc;
+	color: white;
+}
+
+div#gtbDialog #gtbAddButton, div#gtbDialog #gtbRemoveButton {
+	width: 40%;
+	height: 25px;
+	display: block;
+	margin: auto;
+	margin-bottom: 20px;
+}
+
+div#gtbDialog td.gtbListCell div {
+	text-align: left;
+	cursor: pointer;
+}
+
+
+
 /**** Main authoring styles ****/
 
 
@@ -124,7 +170,7 @@ div#toolbar .split-ui-button + ul {
 	padding: 0 5px 5px 5px;
 	font-size: 11px;
 	color: #2E6E9E;
-	z-index: 1003;
+	z-index: 1100;
 }
 
 div#toolbar .split-ui-button + ul li {
