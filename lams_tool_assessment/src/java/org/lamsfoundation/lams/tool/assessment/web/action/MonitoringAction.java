@@ -245,9 +245,10 @@ public class MonitoringAction extends Action {
      * @param request
      * @param response
      * @return
+     * @throws IOException 
      */
     private ActionForward exportSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IOException {
 	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	String fileName = null;
@@ -266,46 +267,29 @@ public class MonitoringAction extends Action {
 
 	service = getAssessmentService();
 	Assessment assessment = service.getAssessmentByContentId(contentId);
-
-	String errors = null;
+	
 	if (assessment != null) {
-	    try {
-		LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
+	    LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
-		ExcelCell[][] questionSummaryData = getQuestionSummaryData(assessment, showUserNames);
-		dataToExport.put(service.getMessage("lable.export.summary.by.question"), questionSummaryData);
+	    ExcelCell[][] questionSummaryData = getQuestionSummaryData(assessment, showUserNames);
+	    dataToExport.put(service.getMessage("lable.export.summary.by.question"), questionSummaryData);
 
-		ExcelCell[][] userSummaryData = getUserSummaryData(assessment, showUserNames);
-		dataToExport.put(service.getMessage("label.export.summary.by.user"), userSummaryData);
+	    ExcelCell[][] userSummaryData = getUserSummaryData(assessment, showUserNames);
+	    dataToExport.put(service.getMessage("label.export.summary.by.user"), userSummaryData);
 
-		// Setting the filename if it wasn't passed in the request
-		if (fileName == null && assessment.getTitle() != null) {
-		    fileName = assessment.getTitle().replaceAll(" ", "_") + "_export.xlsx";
-		} else if (fileName == null) {
-		    fileName = "assessment_export.xlsx";
-		}
-
-		response.setContentType("application/x-download");
-		response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-		log.debug("Exporting assessment to a spreadsheet: " + assessment.getContentId());
-		ServletOutputStream out = response.getOutputStream();
-
-		ExcelUtil.createExcel(out, dataToExport, service.getMessage("label.export.exported.on"), true);
-
-	    } catch (IOException e) {
-		MonitoringAction.log.error(e);
-		errors = new ActionMessage("error.monitoring.export.excel", e.toString()).toString();
+	    // Setting the filename if it wasn't passed in the request
+	    if (fileName == null) {
+		fileName = "assessment_" + assessment.getUid() + "_export.xlsx";
 	    }
 
+	    response.setContentType("application/x-download");
+	    response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+	    log.debug("Exporting assessment to a spreadsheet: " + assessment.getContentId());
+
+	    ServletOutputStream out = response.getOutputStream();
+	    ExcelUtil.createExcel(out, dataToExport, service.getMessage("label.export.exported.on"), true);
 	}
-	if (errors != null) {
-	    try {
-		PrintWriter out = response.getWriter();
-		out.write(errors);
-		out.flush();
-	    } catch (IOException e) {
-	    }
-	}
+	
 	return null;
     }
 
