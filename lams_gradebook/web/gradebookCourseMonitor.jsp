@@ -372,6 +372,7 @@
 					{name:'id',index:'id', width:35, sorttype:"int", hidden:true},
 				   	{name:'rowName',index:'rowName', width:225, firstsortorder:'desc', sorttype: 'text'}
 				],
+				rowNum: 10000,
 				sortname: 'id',
 				multiselect: true,
 				sortorder: "asc",
@@ -379,10 +380,6 @@
 				ignoreCase: true
 			});
 			jQuery("#lessons-jqgrid").jqGrid('filterToolbar',{stringResult: true, searchOnEnter: true, defaultSearch: 'cn'});
-				
-			<c:forEach var="lesson" items="${lessons}" varStatus="i">
-				jQuery("#lessons-jqgrid").jqGrid('addRowData',${lesson.lessonId}, {id2:'${lesson.lessonId}',name:'${lesson.lessonName}'});
-			</c:forEach>
 
 			var languageLabelWait = "<fmt:message key='gradebook.coursemonitor.wait'/>";
 			
