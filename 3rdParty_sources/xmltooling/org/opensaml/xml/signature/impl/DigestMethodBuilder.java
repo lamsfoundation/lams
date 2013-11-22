@@ -42,7 +42,7 @@ public class DigestMethodBuilder extends AbstractXMLObjectBuilder<DigestMethod>
 
     /** {@inheritDoc} */
     public DigestMethod buildObject() {
-        return buildObject(XMLConstants.XMLENC_NS, DigestMethod.DEFAULT_ELEMENT_LOCAL_NAME, XMLConstants.XMLENC_PREFIX);
+        return buildObject(XMLConstants.XMLSIG_NS, DigestMethod.DEFAULT_ELEMENT_LOCAL_NAME, XMLConstants.XMLSIG_PREFIX);
     }
 
 }

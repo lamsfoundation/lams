@@ -34,6 +34,7 @@ import org.opensaml.xml.Configuration;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.io.Marshaller;
 import org.opensaml.xml.io.MarshallingException;
+import org.opensaml.xml.io.Unmarshaller;
 import org.opensaml.xml.io.UnmarshallerFactory;
 import org.opensaml.xml.io.UnmarshallingException;
 import org.opensaml.xml.parse.BasicParserPool;
@@ -52,6 +53,7 @@ import org.opensaml.xml.security.keyinfo.KeyInfoCriteria;
 import org.opensaml.xml.signature.DigestMethod;
 import org.opensaml.xml.signature.SignatureConstants;
 import org.opensaml.xml.util.DatatypeHelper;
+import org.opensaml.xml.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -465,7 +467,16 @@ public class Decrypter {
             }
 
             try {
-                xmlObject = unmarshallerFactory.getUnmarshaller(element).unmarshall(element);
+                Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
+                if (unmarshaller == null) {
+                    unmarshaller = unmarshallerFactory.getUnmarshaller(Configuration.getDefaultProviderQName());
+                    if (unmarshaller == null) {
+                        String errorMsg = "Unable to locate unmarshaller for " + XMLHelper.getNodeQName(element);
+                        log.error(errorMsg);
+                        throw new DecryptionException(errorMsg);
+                    }
+                }
+                xmlObject = unmarshaller.unmarshall(element);
             } catch (UnmarshallingException e) {
                 log.error("There was an error during unmarshalling of the decrypted element", e);
                 throw new DecryptionException("Unmarshalling error during decryption", e);
@@ -927,6 +938,15 @@ public class Decrypter {
         Element targetElement = xmlObject.getDOM();
         if (targetElement == null) {
             Marshaller marshaller = Configuration.getMarshallerFactory().getMarshaller(xmlObject);
+            if (marshaller == null) {
+                marshaller =
+                        Configuration.getMarshallerFactory().getMarshaller(Configuration.getDefaultProviderQName());
+                if (marshaller == null) {
+                    String errorMsg = "No marshaller available for " + xmlObject.getElementQName();
+                    log.error(errorMsg);
+                    throw new DecryptionException(errorMsg);
+                }
+            }
             try {
                 targetElement = marshaller.marshall(xmlObject);
             } catch (MarshallingException e) {

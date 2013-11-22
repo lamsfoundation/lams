@@ -42,6 +42,13 @@ public interface Keywords extends SAMLObject, LangBearing  {
     /** Default element name. */
     public static final QName DEFAULT_ELEMENT_NAME = new QName(UIInfo.MDUI_NS, 
             DEFAULT_ELEMENT_LOCAL_NAME, UIInfo.MDUI_PREFIX);
+
+    /** Local name of the XSI type. */
+    public static final String TYPE_LOCAL_NAME = "KeywordsType";
+
+    /** QName of the XSI type. */
+    public static final QName TYPE_NAME =
+        new QName(UIInfo.MDUI_NS, TYPE_LOCAL_NAME, UIInfo.MDUI_PREFIX);
     
     /**
      * Gets the keywords.

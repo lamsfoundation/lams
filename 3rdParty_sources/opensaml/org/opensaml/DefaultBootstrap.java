@@ -17,8 +17,6 @@
 
 package org.opensaml;
 
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.xml.security.Init;
 import org.opensaml.saml1.binding.artifact.SAML1ArtifactBuilderFactory;
 import org.opensaml.saml2.binding.artifact.SAML2ArtifactBuilderFactory;
@@ -58,10 +56,13 @@ public class DefaultBootstrap {
         "/saml2-metadata-attr-config.xml",
         "/saml2-metadata-idp-discovery-config.xml",
         "/saml2-metadata-ui-config.xml",
+        "/saml2-protocol-aslo-config.xml",
         "/saml2-protocol-thirdparty-config.xml",
         "/saml2-metadata-query-config.xml", 
         "/saml2-assertion-delegation-restriction-config.xml",    
         "/saml2-ecp-config.xml",
+        "/saml2-channel-binding-config.xml",
+        "/saml-ec-gss-config.xml",
         "/xacml10-saml2-profile-config.xml",
         "/xacml11-saml2-profile-config.xml",
         "/xacml20-context-config.xml",
@@ -70,6 +71,8 @@ public class DefaultBootstrap {
         "/xacml3-saml2-profile-config.xml",    
         "/wsaddressing-config.xml",
         "/wssecurity-config.xml",
+        "/wstrust-config.xml",
+        "/wspolicy-config.xml",
     };
 
     /** Constructor. */
@@ -86,9 +89,7 @@ public class DefaultBootstrap {
 
         initializeXMLSecurity();
 
-        initializeVelocity();
-
-        initializeXMLTooling(xmlToolingConfigs);
+        initializeXMLTooling();
 
         initializeArtifactBuilderFactories();
 
@@ -103,7 +104,23 @@ public class DefaultBootstrap {
      * Initializes the OWASPI ESAPI library.
      */
     protected static void initializeESAPI() {
-        ESAPI.initialize("org.opensaml.ESAPISecurityConfig");
+        Logger log = getLogger();
+        String systemPropertyKey = "org.owasp.esapi.SecurityConfiguration";
+        String opensamlConfigImpl = ESAPISecurityConfig.class.getName();
+        
+        String currentValue = System.getProperty(systemPropertyKey);
+        if (currentValue == null || currentValue.isEmpty()) {
+            log.debug("Setting ESAPI SecurityConfiguration impl to OpenSAML internal class: {}", opensamlConfigImpl);
+            System.setProperty(systemPropertyKey, opensamlConfigImpl);
+            // We still need to call ESAPI.initialize() despite setting the system property, b/c within the ESAPI class
+            // the property is only evaluated once in a static initializer and stored. The initialize method however
+            // does overwrite the statically-set value from the system property. But still set the system property for 
+            // consistency, so other callers can see what has been set.
+            ESAPI.initialize(opensamlConfigImpl);
+        } else {
+            log.debug("ESAPI SecurityConfiguration impl was already set non-null and non-empty via system property, leaving existing value in place: {}",
+                    currentValue);
+        }
     }
 
     /**
@@ -159,31 +176,18 @@ public class DefaultBootstrap {
             Init.init();
         }
     }
-
+    
     /**
-     * Intializes the Apache Velocity template engine.
+     * Initializes the XMLTooling library with a default set of object providers.
      * 
-     * @throws ConfigurationException thrown if there is a problem initializing Velocity
+     * @throws ConfigurationException thrown if there is a problem loading the configuration files
      */
-    protected static void initializeVelocity() throws ConfigurationException {
-        Logger log = getLogger();
-        try {
-            log.debug("Initializing Velocity template engine");
-            Velocity.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
-                    "org.apache.velocity.runtime.log.NullLogChute");
-            Velocity.setProperty(RuntimeConstants.ENCODING_DEFAULT, "UTF-8");
-            Velocity.setProperty(RuntimeConstants.OUTPUT_ENCODING, "UTF-8");
-            Velocity.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
-            Velocity.setProperty("classpath.resource.loader.class",
-                    "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-            Velocity.init();
-        } catch (Exception e) {
-            throw new ConfigurationException("Unable to initialize Velocity template engine", e);
-        }
+    protected static void initializeXMLTooling() throws ConfigurationException {
+        initializeXMLTooling(xmlToolingConfigs);
     }
 
     /**
-     * Initializes the XMLTooling library with a default set of object providers.
+     * Initializes the XMLTooling library with an explicitly supplied set of object providers.
      * 
      * @param providerConfigs list of provider configuration files located on the classpath
      * 

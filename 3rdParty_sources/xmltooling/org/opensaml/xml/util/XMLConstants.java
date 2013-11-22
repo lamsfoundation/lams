@@ -66,17 +66,29 @@ public class XMLConstants {
     /** XML Schema Instance QName prefix. */
     public static final String XSI_PREFIX = "xsi";
 
-    /** XML XMLSecSignatureImpl namespace. */
+    /** XML Signature 1.0 namespace. */
     public static final String XMLSIG_NS = "http://www.w3.org/2000/09/xmldsig#";
 
-    /** XML XMLSecSignatureImpl QName prefix. */
+    /** XML Signature 1.0 QName prefix. */
     public static final String XMLSIG_PREFIX = "ds";
 
-    /** XML Encryption namespace. */
+    /** XML Signature 1.1 namespace. */
+    public static final String XMLSIG11_NS = "http://www.w3.org/2009/xmldsig11#";
+
+    /** XML Signature 1.1 QName prefix. */
+    public static final String XMLSIG11_PREFIX = "ds11";
+    
+    /** XML Encryption 1.0 namespace. */
     public static final String XMLENC_NS = "http://www.w3.org/2001/04/xmlenc#";
 
-    /** XML Encryption QName prefix. */
+    /** XML Encryption 1.0 QName prefix. */
     public static final String XMLENC_PREFIX = "xenc";
+    
+    /** XML Encryption 1.1 namespace. */
+    public static final String XMLENC11_NS = "http://www.w3.org/2009/xmlenc11#";
+
+    /** XML Encryption 1.1 QName prefix. */
+    public static final String XMLENC11_PREFIX = "xenc11";
     
     /** XML Schema instance <code>xsi:type</code> attribute QName. */
     public static final QName XSI_TYPE_ATTRIB_NAME = 
@@ -94,4 +106,8 @@ public class XMLConstants {
     public static final QName XSI_NIL_ATTRIB_NAME = 
         new QName(XSI_NS, "nil", XSI_PREFIX);
 
+    /** Constructor. */
+    protected XMLConstants() {
+        
+    }
 }

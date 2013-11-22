@@ -21,8 +21,11 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CRLException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateParsingException;
@@ -43,6 +46,7 @@ import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERString;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.util.Arrays;
 import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.opensaml.xml.schema.SchemaBuilder;
@@ -118,8 +122,13 @@ public class X509Util {
         }
 
         for (X509Certificate certificate : certs) {
-            if (SecurityHelper.matchKeyPair(certificate.getPublicKey(), privateKey)) {
-                return certificate;
+            try {
+                if (SecurityHelper.matchKeyPair(certificate.getPublicKey(), privateKey)) {
+                    return certificate;
+                }
+            } catch (SecurityException e) {
+                // An exception here is just a false match.
+                // Java 7 apparently throws in this case.
             }
         }
 
@@ -265,15 +274,38 @@ public class X509Util {
         SubjectKeyIdentifier ski = null;
         try {
             ski = new SubjectKeyIdentifierStructure(derValue);
+            return ski.getKeyIdentifier();
         } catch (IOException e) {
             log.error("Unable to extract subject key identifier from certificate: ASN.1 parsing failed: " + e);
             return null;
         }
+    }
 
-        if (ski != null) {
-            return ski.getKeyIdentifier();
-        } else {
-            return null;
+    /**
+     * Get the XML Signature-compliant digest of an X.509 certificate.
+     * 
+     * @param certificate an X.509 certificate
+     * @param algorithmURI URI of digest algorithm to apply
+     * @return the raw digest of the certificate
+     * @throws SecurityException is algorithm is unsupported or encoding is not possible
+     */
+    public static byte[] getX509Digest(X509Certificate certificate, String algorithmURI)
+            throws SecurityException {
+        Logger log = getLogger();
+        String alg = SecurityHelper.getAlgorithmIDFromURI(algorithmURI);
+        if (alg == null) {
+            log.error("Algorithm {} is unsupported", algorithmURI);
+            throw new SecurityException("Algorithm " + algorithmURI + " is unsupported");
+        }
+        try {
+            MessageDigest hasher = MessageDigest.getInstance(alg);
+            return hasher.digest(certificate.getEncoded());
+        } catch (CertificateEncodingException e) {
+            log.error("Unable to encode certificate for digest operation", e);
+            throw new SecurityException("Unable to encode certificate for digest operation", e);
+        } catch (NoSuchAlgorithmException e) {
+            log.error("Algorithm {} is unsupported", alg);
+            throw new SecurityException("Algorithm " + alg + " is unsupported", e);
         }
     }
     

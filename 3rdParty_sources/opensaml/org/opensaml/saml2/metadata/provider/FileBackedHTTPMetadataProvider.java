@@ -53,7 +53,7 @@ public class FileBackedHTTPMetadataProvider extends HTTPMetadataProvider {
      * @param backupFilePath the file that will keep a backup copy of the metadata,
      * 
      * @throws MetadataProviderException thrown if the URL is not a valid URL, the metadata can not be retrieved from
-     *             the URL, the given file can not be created or written to
+     *             the URL
      */
     @Deprecated
     public FileBackedHTTPMetadataProvider(String metadataURL, int requestTimeout, String backupFilePath)
@@ -71,7 +71,7 @@ public class FileBackedHTTPMetadataProvider extends HTTPMetadataProvider {
      * @param backupFilePath the file that will keep a backup copy of the metadata,
      * 
      * @throws MetadataProviderException thrown if the URL is not a valid URL, the metadata can not be retrieved from
-     *             the URL, the given file can not be created or written to
+     *             the URL
      */
     public FileBackedHTTPMetadataProvider(Timer backgroundTaskTimer, HttpClient client, String metadataURL,
             String backupFilePath) throws MetadataProviderException {
@@ -86,6 +86,22 @@ public class FileBackedHTTPMetadataProvider extends HTTPMetadataProvider {
         super.destroy();
     }
 
+    /** {@inheritDoc} */
+    protected void doInitialization() throws MetadataProviderException {
+        try {
+            validateBackupFile(metadataBackupFile);
+        } catch (MetadataProviderException e) {
+            if (isFailFastInitialization()) {
+                log.error("Metadata backup file path was invalid, initialization is fatal");
+                throw e;
+            } else {
+                log.error("Metadata backup file path was invalid, continuing without known good backup file");
+            }
+        }
+        
+        super.doInitialization();
+    }
+
     /**
      * Sets the file used to backup metadata. The given file path is checked to see if it is a read/writable file if it
      * exists or if can be created if it does not exist.
@@ -96,31 +112,40 @@ public class FileBackedHTTPMetadataProvider extends HTTPMetadataProvider {
      */
     protected void setBackupFile(String backupFilePath) throws MetadataProviderException {
         File backingFile = new File(backupFilePath);
+        metadataBackupFile = backingFile;
+    }
 
-        if (!backingFile.exists()) {
+    /**
+     * Validate the basic properties of the specified metadata backup file, for example that it 
+     * exists and/or can be created; that it is not a directory; and that it is readable and writable.
+     *
+     * @param backupFile the file to evaluate
+     * @throws MetadataProviderException if file does not pass basic properties required of a metadata backup file
+     */
+    protected void validateBackupFile(File backupFile) throws MetadataProviderException {
+        if (!backupFile.exists()) {
             try {
-                backingFile.createNewFile();
+                backupFile.createNewFile();
             } catch (IOException e) {
-                log.error("Unable to create backing file " + backupFilePath, e);
-                throw new MetadataProviderException("Unable to create backing file " + backupFilePath, e);
+                log.error("Unable to create backing file " + backupFile, e);
+                throw new MetadataProviderException("Unable to create backing file " + backupFile.getAbsolutePath(), e);
             }
         }
 
-        if (backingFile.isDirectory()) {
-            throw new MetadataProviderException("Filepath " + backupFilePath
+        if (backupFile.isDirectory()) {
+            throw new MetadataProviderException("Filepath " + backupFile.getAbsolutePath()
                     + " is a directory and may not be used as a backing metadata file");
         }
 
-        if (!backingFile.canRead()) {
-            throw new MetadataProviderException("Filepath " + backupFilePath
+        if (!backupFile.canRead()) {
+            throw new MetadataProviderException("Filepath " + backupFile.getAbsolutePath()
                     + " exists but can not be read by this user");
         }
 
-        if (!backingFile.canWrite()) {
-            throw new MetadataProviderException("Filepath " + backupFilePath
+        if (!backupFile.canWrite()) {
+            throw new MetadataProviderException("Filepath " + backupFile.getAbsolutePath()
                     + " exists but can not be written to by this user");
         }
-        metadataBackupFile = backingFile;
     }
 
     /** {@inheritDoc} */
@@ -149,15 +174,17 @@ public class FileBackedHTTPMetadataProvider extends HTTPMetadataProvider {
     protected void postProcessMetadata(byte[] metadataBytes, Document metadataDom, XMLObject metadata)
             throws MetadataProviderException {
         try {
+            validateBackupFile(metadataBackupFile);
             FileOutputStream out = new FileOutputStream(metadataBackupFile);
             out.write(metadataBytes);
             out.flush();
             out.close();
-            super.postProcessMetadata(metadataBytes, metadataDom, metadata);
+        } catch (MetadataProviderException e) {
+            log.error("Unable to write metadata to backup file: " + metadataBackupFile.getAbsoluteFile(), e);
         } catch (IOException e) {
-            String errMsg = "Unable to write metadata to backup file " + metadataBackupFile.getAbsolutePath();
-            log.error(errMsg);
-            throw new MetadataProviderException(errMsg, e);
+            log.error("Unable to write metadata to backup file: " + metadataBackupFile.getAbsoluteFile(), e);
+        } finally {
+            super.postProcessMetadata(metadataBytes, metadataDom, metadata);
         }
     }
 }

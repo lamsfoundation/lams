@@ -26,7 +26,7 @@ import org.opensaml.common.SAMLObject;
 import org.opensaml.common.SignableSAMLObject;
 import org.opensaml.common.binding.SAMLMessageContext;
 import org.opensaml.common.binding.encoding.SAMLMessageEncoder;
-import org.opensaml.saml2.core.Response;
+import org.opensaml.saml1.core.Response;
 import org.opensaml.saml2.metadata.Endpoint;
 import org.opensaml.util.URLBuilder;
 import org.opensaml.ws.message.encoder.BaseMessageEncoder;
@@ -105,7 +105,7 @@ public abstract class BaseSAML1MessageEncoder extends BaseMessageEncoder impleme
         }
 
         URLBuilder urlBuilder;
-        if (messageContext.getOutboundMessage() instanceof Response
+        if (messageContext.getOutboundSAMLMessage() instanceof Response
                 && !DatatypeHelper.isEmpty(endpoint.getResponseLocation())) {
             urlBuilder = new URLBuilder(endpoint.getResponseLocation());
         } else {

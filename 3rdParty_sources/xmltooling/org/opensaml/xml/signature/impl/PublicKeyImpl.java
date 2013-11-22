@@ -15,27 +15,24 @@
  * limitations under the License.
  */
 
-package org.opensaml.samlext.saml1md.impl;
+package org.opensaml.xml.signature.impl;
 
-import org.opensaml.common.impl.AbstractSAMLObjectMarshaller;
-import org.opensaml.samlext.saml1md.SourceID;
-import org.opensaml.xml.XMLObject;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.util.DatatypeHelper;
-import org.opensaml.xml.util.XMLHelper;
-import org.w3c.dom.Element;
+import org.opensaml.xml.signature.PublicKey;
 
 /**
- * Marshaller of {@link SourceID} objects.
+ * Concrete implementation of {@link PublicKey}.
  */
-public class SourceIDMarshaller extends AbstractSAMLObjectMarshaller {
+public class PublicKeyImpl extends ECPointTypeImpl implements PublicKey {
 
-    /** {@inheritDoc} */
-    protected void marshallElementContent(XMLObject xmlObject, Element domElement) throws MarshallingException {
-        SourceID sourceID = (SourceID) xmlObject;
-
-        if (!DatatypeHelper.isEmpty(sourceID.getValue())) {
-            XMLHelper.appendTextContent(domElement, sourceID.getValue());
-        }
+    /**
+     * Constructor.
+     *
+     * @param namespaceURI the namespace the element is in
+     * @param elementLocalName the local name of the XML element this Object represents
+     * @param namespacePrefix the prefix for the given namespace
+     */
+    protected PublicKeyImpl(String namespaceURI, String elementLocalName, String namespacePrefix) {
+        super(namespaceURI, elementLocalName, namespacePrefix);
     }
+
 }

@@ -130,6 +130,7 @@ public class HTTPPostEncoder extends BaseSAML1MessageEncoder {
             String encodedEndpointURL = esapiEncoder.encodeForHTMLAttribute(endpointURL);
             log.debug("Encoding action url of '{}' with encoded value '{}'", endpointURL, encodedEndpointURL);
             context.put("action", encodedEndpointURL);
+            context.put("binding", getBindingURI());
 
             log.debug("Marshalling and Base64 encoding SAML message");
             String messageXML = XMLHelper.nodeToString(marshallMessage(messageContext.getOutboundSAMLMessage()));

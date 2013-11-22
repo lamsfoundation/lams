@@ -158,6 +158,7 @@ public class HTTPArtifactEncoder extends BaseSAML2MessageEncoder {
         log.debug("Setting action parameter to: '{}', encoded as '{}'", endpointURL, encodedEndpointURL);
         context.put("action", encodedEndpointURL);
         context.put("SAMLArt", buildArtifact(artifactContext).base64Encode());
+        context.put("binding", getBindingURI());
 
         if (checkRelayState(artifactContext.getRelayState())) {
             String encodedRelayState = esapiEncoder.encodeForHTMLAttribute(artifactContext.getRelayState());

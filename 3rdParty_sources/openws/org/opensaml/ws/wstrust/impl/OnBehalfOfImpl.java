@@ -21,8 +21,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.opensaml.ws.wstrust.OnBehalfOf;
 import org.opensaml.xml.XMLObject;
+import org.opensaml.xml.util.IndexedXMLObjectChildrenList;
 
 /**
  * OnBehalfOfImpl.
@@ -30,8 +33,13 @@ import org.opensaml.xml.XMLObject;
  */
 public class OnBehalfOfImpl extends AbstractWSTrustObject implements OnBehalfOf {
     
-    /** Wildcard child element. */
+    /** Wildcard child element.
+     * @deprecated This was an schema implementation mistake, should have implemented a sequence.
+     * */
     private XMLObject unknownChild;
+    
+    /** Wildcard child elements. */
+    private IndexedXMLObjectChildrenList<XMLObject> unknownChildren;
 
     /**
      * Constructor.
@@ -42,11 +50,20 @@ public class OnBehalfOfImpl extends AbstractWSTrustObject implements OnBehalfOf 
      */
     public OnBehalfOfImpl(String namespaceURI, String elementLocalName, String namespacePrefix) {
         super(namespaceURI, elementLocalName, namespacePrefix);
+        unknownChildren = new IndexedXMLObjectChildrenList<XMLObject>(this);
     }
 
     /** {@inheritDoc} */
     public XMLObject getUnknownXMLObject() {
-        return unknownChild;
+        // Have to do this b/c don't want to break existing code for both the
+        // setUnknownXMLObject case as well as the unmarshalling case, which will be in the list.
+        if (unknownChild != null) {
+            return unknownChild;
+        } else if (!unknownChildren.isEmpty()) {
+            return unknownChildren.get(0);
+        } else {
+            return null;
+        }
     }
 
     /** {@inheritDoc} */
@@ -60,6 +77,17 @@ public class OnBehalfOfImpl extends AbstractWSTrustObject implements OnBehalfOf 
         if (unknownChild != null) {
             children.add(unknownChild);
         }
+        children.addAll(unknownChildren);
         return Collections.unmodifiableList(children);
+    }
+
+    /** {@inheritDoc} */
+    public List<XMLObject> getUnknownXMLObjects() {
+        return unknownChildren;
+    }
+
+    /** {@inheritDoc} */
+    public List<XMLObject> getUnknownXMLObjects(QName typeOrName) {
+        return (List<XMLObject>) unknownChildren.subList(typeOrName);
     }
 }

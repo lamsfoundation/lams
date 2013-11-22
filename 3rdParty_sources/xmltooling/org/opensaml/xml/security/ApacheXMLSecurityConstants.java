@@ -20,7 +20,7 @@ package org.opensaml.xml.security;
 /**
  * Constants used within the Apache XML Security library.
  */
-public class ApacheXMLSecurityConstants {
+public final class ApacheXMLSecurityConstants {
     
     /** Block encryption algorithm class. */
     public static final String ALGO_CLASS_BLOCK_ENCRYPTION = "BlockEncryption";
@@ -43,4 +43,8 @@ public class ApacheXMLSecurityConstants {
     /** Symmetric key wrap algorithm class. */
     public static final String ALGO_CLASS_SYMMETRIC_KEY_WRAP = "SymmetricKeyWrap";
 
+    /** Constructor. */
+    private ApacheXMLSecurityConstants() {
+        
+    }
 }

@@ -25,14 +25,14 @@ import org.opensaml.xacml.XACMLConstants;
 public interface PolicySetCombinerParametersType extends CombinerParametersType {
 
     /** Local name of the element PolicySetCombineParameters. */
-    public static final String DEFAULT_ELEMENT_LOCAL_NAME = "PolicySetCombineParameters";
+    public static final String DEFAULT_ELEMENT_LOCAL_NAME = "PolicySetCombinerParameters";
 
     /** QName of the element PolicySetCombineParameters. */
     public static final QName DEFAULT_ELEMENT_NAME = new QName(XACMLConstants.XACML20_NS, DEFAULT_ELEMENT_LOCAL_NAME,
             XACMLConstants.XACML_PREFIX);
 
     /** Local name of the XSI type. */
-    public static final String SCHEMA_TYPE_LOCAL_NAME = "PolicySetCombineParametersType";
+    public static final String SCHEMA_TYPE_LOCAL_NAME = "PolicySetCombinerParametersType";
 
     /** QName of the XSI type. */
     public static final QName SCHEMA_TYPE_NAME = new QName(XACMLConstants.XACML20_NS, SCHEMA_TYPE_LOCAL_NAME,

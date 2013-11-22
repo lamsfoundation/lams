@@ -23,7 +23,6 @@ import javax.xml.namespace.QName;
 
 import org.opensaml.xacml.XACMLConstants;
 import org.opensaml.xacml.XACMLObject;
-import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.util.IndexedXMLObjectChildrenList;
 
 /** XACML PolicySet schema types. */

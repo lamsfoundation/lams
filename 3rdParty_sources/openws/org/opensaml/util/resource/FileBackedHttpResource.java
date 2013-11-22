@@ -28,6 +28,8 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.joda.time.DateTime;
 import org.joda.time.chrono.ISOChronology;
 import org.opensaml.xml.util.DatatypeHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A resource representing a file read from an HTTP(S) location. Every time the file is successfully read from the URL
@@ -38,6 +40,9 @@ import org.opensaml.xml.util.DatatypeHelper;
  * to disk and then returned.
  */
 public class FileBackedHttpResource extends HttpResource {
+    
+    /** Logger. */
+    private Logger log = LoggerFactory.getLogger(FileBackedHttpResource.class);
 
     /** Backing resource file. */
     private File resourceFile;
@@ -117,11 +122,23 @@ public class FileBackedHttpResource extends HttpResource {
 
     /** {@inheritDoc} */
     public boolean exists() throws ResourceException {
-        if (!super.exists()) {
+        boolean httpExists;
+        try {
+            httpExists = super.exists();
+        } catch (ResourceException e) {
+            log.warn("HTTP resource '{}' was inaccessible for exists(), trying backing file '{}'", 
+                    getLocation(), resourceFile.getAbsolutePath());
+            return resourceFile.exists();
+        }
+        
+        if (httpExists) {
+            return true;
+        } else {
+            log.warn("HTTP resource '{}' did not exist, trying backing file '{}'",
+                    getLocation(), resourceFile.getAbsolutePath());
             return resourceFile.exists();
         }
 
-        return true;
     }
 
     /** {@inheritDoc} */
@@ -134,6 +151,8 @@ public class FileBackedHttpResource extends HttpResource {
             ins = getMethod.getResponseBodyAsStream();
         } catch (Exception e) {
             try {
+                log.warn("HTTP resource '{}' was inaccessible for getInputStream(), trying backing file '{}'", 
+                        getLocation(), resourceFile.getAbsolutePath());
                 ins = new FileInputStream(resourceFile);
             } catch (IOException ioe) {
                 throw new ResourceException("Unable to read resource URL or backing file "
@@ -149,6 +168,8 @@ public class FileBackedHttpResource extends HttpResource {
         try {
             return super.getLastModifiedTime();
         } catch (ResourceException e) {
+            log.warn("HTTP resource '{}' was inaccessible for getLastModifiedTime(), trying backing file '{}'", 
+                    getLocation(), resourceFile.getAbsolutePath());
             long lastModifiedTime = resourceFile.lastModified();
             if (lastModifiedTime == 0) {
                 throw new ResourceException("URL resource is not reachable and backing file is not readable");

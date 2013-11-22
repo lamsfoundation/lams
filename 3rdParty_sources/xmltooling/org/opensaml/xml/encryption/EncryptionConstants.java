@@ -20,29 +20,28 @@ package org.opensaml.xml.encryption;
 import org.opensaml.xml.util.XMLConstants;
 
 /**
- * Constants defined in or related to the XML Encryption specification, version 20021210.
+ * Constants defined in or related to the XML Encryption 1.0 and 1.1 specifications.
  */
-public class EncryptionConstants {
+public final class EncryptionConstants {
     
     // *********************************************************
     // URI values which represent type attribute values
     // *********************************************************
     /** URI for Content. */
-    public static final String TYPE_CONTENT                = XMLConstants.XMLENC_NS + "Content";
+    public static final String TYPE_CONTENT = XMLConstants.XMLENC_NS + "Content";
     
     /** URI for Element. */
-    public static final String TYPE_ELEMENT                = XMLConstants.XMLENC_NS + "Element";
+    public static final String TYPE_ELEMENT = XMLConstants.XMLENC_NS + "Element";
     
     /** URI for EncryptionProperties. */
-    public static final String TYPE_ENCRYPTION_PROPERTIES =  XMLConstants.XMLENC_NS + "EncryptionProperties";
+    public static final String TYPE_ENCRYPTION_PROPERTIES = XMLConstants.XMLENC_NS + "EncryptionProperties";
     
     /** URI for EncryptedKey. */
-    public static final String TYPE_ENCRYPTED_KEY          = XMLConstants.XMLENC_NS + "EncryptedKey";
+    public static final String TYPE_ENCRYPTED_KEY = XMLConstants.XMLENC_NS + "EncryptedKey";
     
     /** URI for DHKeyValue. */
-    public static final String TYPE_KEYINFO_DH_KEYVALUE =  XMLConstants.XMLENC_NS + "DHKeyValue";
+    public static final String TYPE_KEYINFO_DH_KEYVALUE = XMLConstants.XMLENC_NS + "DHKeyValue";
     
-
     // *************************************************
     // Block encryption algorithms
     // *************************************************
@@ -61,10 +60,10 @@ public class EncryptionConstants {
     // *************************************************
     // Key Transport
     // *************************************************
-    /** Key Transport - REQUIRED RSA-v1.5. */
+    /** Key Transport - OPTIONAL RSA-v1.5. */
     public static final String ALGO_ID_KEYTRANSPORT_RSA15 = XMLConstants.XMLENC_NS + "rsa-1_5";
     
-    /** Key Transport - REQUIRED RSA-OAEP.  */
+    /** Key Transport - REQUIRED RSA-OAEP (including MGF1 with SHA1).  */
     public static final String ALGO_ID_KEYTRANSPORT_RSAOAEP = XMLConstants.XMLENC_NS + "rsa-oaep-mgf1p";
 
     // *************************************************
@@ -91,7 +90,7 @@ public class EncryptionConstants {
     // *************************************************
     // Message Digest
     // *************************************************
-    /** Message Digest - RECOMMENDED SHA256. */
+    /** Message Digest - REQUIRED SHA256. */
     public static final String ALGO_ID_DIGEST_SHA256 = XMLConstants.XMLENC_NS + "sha256";
     
     /** Message Digest - OPTIONAL SHA512. */
@@ -100,4 +99,26 @@ public class EncryptionConstants {
     /** Message Digest - OPTIONAL RIPEMD-160. */
     public static final String ALGO_ID_DIGEST_RIPEMD160 = XMLConstants.XMLENC_NS + "ripemd160";
 
+    // *********************************************************
+    // Some additional algorithm URIs from XML Encryption 1.1
+    // *********************************************************
+    /** Key Transport - OPTIONAL RSA-OAEP.  */
+    public static final String ALGO_ID_KEYTRANSPORT_RSAOAEP11 = XMLConstants.XMLENC11_NS + "rsa-oaep";
+
+    /** Block Encryption - REQUIRED AES128-GCM. */
+    public static final String ALGO_ID_BLOCKCIPHER_AES128_GCM = XMLConstants.XMLENC11_NS + "aes128-gcm";
+        
+    /** Block Encryption - OPTIONAL AES192-GCM. */
+    public static final String ALGO_ID_BLOCKCIPHER_AES192_GCM = XMLConstants.XMLENC11_NS + "aes192-gcm";
+
+    /** Block Encryption - OPTIONAL AES256-GCM. */
+    public static final String ALGO_ID_BLOCKCIPHER_AES256_GCM = XMLConstants.XMLENC11_NS + "aes256-gcm";
+
+    /** URI for DerivedKey. */
+    public static final String TYPE_DERIVED_KEY = XMLConstants.XMLENC11_NS + "DerivedKey";
+    
+    /** Constructor. */
+    private EncryptionConstants() {
+        
+    }
 }

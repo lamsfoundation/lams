@@ -58,7 +58,7 @@ public class HTTPSOAP11Decoder extends SOAP11Decoder {
 
         HTTPInTransport inTransport = (HTTPInTransport) messageContext.getInboundMessageTransport();
         if (!inTransport.getHTTPMethod().equalsIgnoreCase("POST")) {
-            throw new MessageDecodingException("This message deocoder only supports the HTTP POST method");
+            throw new MessageDecodingException("This message decoder only supports the HTTP POST method");
         }
         
         super.doDecode(messageContext);

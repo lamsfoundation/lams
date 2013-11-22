@@ -44,6 +44,13 @@ public interface UIInfo extends SAMLObject {
     /** Default element name. */
     public static final QName DEFAULT_ELEMENT_NAME = new QName(MDUI_NS, DEFAULT_ELEMENT_LOCAL_NAME,
             MDUI_PREFIX);
+
+    /** Local name of the XSI type. */
+    public static final String TYPE_LOCAL_NAME = "UIInfoType";
+
+    /** QName of the XSI type. */
+    public static final QName TYPE_NAME =
+        new QName(UIInfo.MDUI_NS, TYPE_LOCAL_NAME, UIInfo.MDUI_PREFIX);
     
     /** Language attribute name. */
     public static final String LANG_ATTRIB_NAME = "lang";

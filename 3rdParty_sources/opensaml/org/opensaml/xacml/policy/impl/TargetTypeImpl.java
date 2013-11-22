@@ -65,12 +65,12 @@ public class TargetTypeImpl extends AbstractXACMLObject implements TargetType {
         if(subjects != null){
             children.add(subjects);  
         }
-        if(actions != null){
-            children.add(actions);  
-        }        
         if(resources != null){
             children.add(resources);  
         }
+        if(actions != null){
+            children.add(actions);  
+        }        
         if(environments != null){
             children.add(environments);  
         }

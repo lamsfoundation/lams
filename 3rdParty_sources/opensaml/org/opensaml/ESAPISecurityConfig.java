@@ -18,7 +18,6 @@
 package org.opensaml;
 
 import java.io.File;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -30,9 +29,26 @@ import org.owasp.esapi.SecurityConfiguration;
  * Minimal implementation of OWASP ESAPI {@link SecurityConfiguration}, providing the support used within OpenSAML.
  */
 public class ESAPISecurityConfig implements SecurityConfiguration {
+    
+    /** The singleton instance of this class. */
+    private static volatile SecurityConfiguration instance;
 
     /** Constructor. */
     public ESAPISecurityConfig() {
+    }
+    
+    /**
+     * Factory method which implements the singleton pattern per the ESAPI reference impl.
+     * 
+     * @return the singleton instance of this class
+     */
+    public static SecurityConfiguration getInstance() {
+        synchronized (ESAPISecurityConfig.class) {
+            if ( instance == null ) {
+                instance = new ESAPISecurityConfig();
+            }
+        }
+        return instance;
     }
 
     /** {@inheritDoc} */
@@ -87,7 +103,7 @@ public class ESAPISecurityConfig implements SecurityConfiguration {
 
     /** {@inheritDoc} */
     public String getCharacterEncoding() {
-        return null;
+        return "UTF-8";
     }
 
     /** {@inheritDoc} */

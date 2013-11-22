@@ -105,7 +105,7 @@ public abstract class BaseSAML2MessageEncoder extends BaseMessageEncoder impleme
         }
         
         URLBuilder urlBuilder;
-        if (messageContext.getOutboundMessage() instanceof StatusResponseType
+        if (messageContext.getOutboundSAMLMessage() instanceof StatusResponseType
                 && !DatatypeHelper.isEmpty(endpoint.getResponseLocation())) {
             urlBuilder = new URLBuilder(endpoint.getResponseLocation());
         } else {

@@ -40,7 +40,7 @@ public class BasicSecurityConfiguration implements SecurityConfiguration {
     /** Class logger. */
     private final Logger log = LoggerFactory.getLogger(BasicSecurityConfiguration.class);
     
-    /** JCA algorithm to signature URI mappings. */
+    /** JCA key algorithm to signature URI mappings. */
     private Map<String, String> signatureAlgorithms;
     
     /** Signature canonicalization algorithm URI. */
@@ -52,10 +52,10 @@ public class BasicSecurityConfiguration implements SecurityConfiguration {
     /** Signature HMAC output length. */
     private Integer signatureHMACOutputLength;
     
-    /** JCA algorithm to data encryption URI mappings. */
+    /** JCA key algorithm to data encryption URI mappings. */
     private Map<DataEncryptionIndex, String> dataEncryptionAlgorithms;
     
-    /** JCA algorithm to key transport encryption URI mappings. */
+    /** JCA key algorithm to key transport encryption URI mappings. */
     private Map<KeyTransportEncryptionIndex, String> keyTransportEncryptionAlgorithms;
     
     /** Encryption algorithm URI for auto-generated data encryption keys. */
@@ -100,9 +100,9 @@ public class BasicSecurityConfiguration implements SecurityConfiguration {
     }
     
     /**
-     * Register a mapping from the specified JCA algorithm name to a signature algorithm URI.
+     * Register a mapping from the specified JCA key algorithm name to a signature algorithm URI.
      * 
-     * @param jcaAlgorithmName the JCA algorithm name to register
+     * @param jcaAlgorithmName the JCA key algorithm name to register
      * @param algorithmURI the algorithm URI to register
      */
     public void registerSignatureAlgorithmURI(String jcaAlgorithmName, String algorithmURI) {
@@ -110,9 +110,9 @@ public class BasicSecurityConfiguration implements SecurityConfiguration {
     }
     
     /**
-     * Deregister a mapping for the specified JCA algorithm name.
+     * Deregister a mapping for the specified JCA key algorithm name.
      * 
-     * @param jcaAlgorithmName the JCA algorithm name to deregister
+     * @param jcaAlgorithmName the JCA key algorithm name to deregister
      */
     public void deregisterSignatureAlgorithmURI(String jcaAlgorithmName) {
         signatureAlgorithms.remove(jcaAlgorithmName);

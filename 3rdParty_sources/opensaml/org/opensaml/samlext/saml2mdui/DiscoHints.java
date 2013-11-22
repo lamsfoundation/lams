@@ -43,6 +43,13 @@ public interface DiscoHints extends SAMLObject {
     /** Default element name. */
     public static final QName DEFAULT_ELEMENT_NAME = new QName(MDUI_NS, DEFAULT_ELEMENT_LOCAL_NAME,
             MDUI_PREFIX);
+
+    /** Local name of the XSI type. */
+    public static final String TYPE_LOCAL_NAME = "DiscoHintsType";
+
+    /** QName of the XSI type. */
+    public static final QName TYPE_NAME =
+        new QName(UIInfo.MDUI_NS, TYPE_LOCAL_NAME, UIInfo.MDUI_PREFIX);
     
     /** 
      * The <IPHint> element specifies a set of [CIDR] blocks associated with, 

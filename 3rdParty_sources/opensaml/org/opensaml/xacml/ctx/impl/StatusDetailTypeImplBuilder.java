@@ -30,7 +30,7 @@ public class StatusDetailTypeImplBuilder extends AbstractXACMLObjectBuilder<Stat
 
     /** {@inheritDoc} */
     public StatusDetailType buildObject() {
-        return null;
+        return buildObject(StatusDetailType.DEFAULT_ELEMENT_NAME);
     }
 
     /** {@inheritDoc} */

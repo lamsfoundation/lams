@@ -52,6 +52,18 @@ public interface LogoutRequest extends RequestAbstractType {
     /** NotOnOrAfter attribute name. */
     public static final String NOT_ON_OR_AFTER_ATTRIB_NAME = "NotOnOrAfter";
     
+    /** User-initiated logout reason. */
+    public static final String USER_REASON = "urn:oasis:names:tc:SAML:2.0:logout:user";
+
+    /** Admin-initiated logout reason. */
+    public static final String ADMIN_REASON = "urn:oasis:names:tc:SAML:2.0:logout:admin";
+    
+    /** Global timeout logout reason. */
+    public static final String GLOBAL_TIMEOUT_REASON = "urn:oasis:names:tc:SAML:2.0:logout:global-timeout";
+    
+    /** SP timeout logout reason. */
+    public static final String SP_TIMEOUT_REASON = "urn:oasis:names:tc:SAML:2.0:logout:sp-timeout";
+    
     /**
      * Get the Reason attrib value of the request.
      * 

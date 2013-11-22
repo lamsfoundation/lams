@@ -97,8 +97,7 @@ public class HTTPSOAP11Encoder extends BaseSAML2MessageEncoder {
         }
 
         signMessage(samlMsgCtx);
-        Envelope envelope = buildSOAPMessage(samlMessage);
-        samlMsgCtx.setOutboundMessage(envelope);
+        Envelope envelope = buildSOAPMessage(samlMsgCtx, samlMessage);
 
         Element envelopeElem = marshallMessage(envelope);
         try {
@@ -117,6 +116,47 @@ public class HTTPSOAP11Encoder extends BaseSAML2MessageEncoder {
             log.error("Unable to write message content to outbound stream", e);
             throw new MessageEncodingException("Unable to write message content to outbound stream", e);
         }
+    }
+
+    /**
+     * Builds the SOAP message to be encoded.
+     * 
+     * <p>If {@link SAMLMessageContext#getOutboundMessage()} contains
+     * a pre-existing SOAP envelope, it will be used.  Any existing body content will be removed
+     * before the SAML protocol message is added.
+     * </p>
+     * 
+     * <p>
+     * Otherwise, a new Envelope will be constructed.
+     * </p>
+     * 
+     * @param samlMsgCtx the SAML message context
+     * @param samlMessage body of the SOAP message
+     * 
+     * @return the SOAP message
+     */
+    @SuppressWarnings("unchecked")
+    protected Envelope buildSOAPMessage(SAMLMessageContext samlMsgCtx, SAMLObject samlMessage) {
+        Envelope envelope = null;
+        if (samlMsgCtx.getOutboundMessage() != null && samlMsgCtx.getOutboundMessage() instanceof Envelope) {
+            envelope = (Envelope) samlMsgCtx.getOutboundMessage();
+            Body body = envelope.getBody();
+            if (body == null) {
+                XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+                SOAPObjectBuilder<Body> bodyBuilder = (SOAPObjectBuilder<Body>) builderFactory
+                        .getBuilder(Body.DEFAULT_ELEMENT_NAME);
+                body = bodyBuilder.buildObject();
+                envelope.setBody(body);
+            } else if (!body.getUnknownXMLObjects().isEmpty()) {
+                log.warn("Supplied SOAP Envelope Body was not empty. Existing contents will be removed.");
+                body.getUnknownXMLObjects().clear();
+            }
+            body.getUnknownXMLObjects().add(samlMessage);
+        } else {
+            envelope = buildSOAPMessage(samlMessage);
+            samlMsgCtx.setOutboundMessage(envelope);
+        }
+        return envelope;
     }
 
     /**

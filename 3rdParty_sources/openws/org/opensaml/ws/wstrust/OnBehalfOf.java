@@ -19,6 +19,7 @@ package org.opensaml.ws.wstrust;
 
 import javax.xml.namespace.QName;
 
+import org.opensaml.xml.ElementExtensibleXMLObject;
 import org.opensaml.xml.XMLObject;
 
 /**
@@ -27,7 +28,7 @@ import org.opensaml.xml.XMLObject;
  * @see "WS-Trust 1.3, Chapter 9.1 On-Behalf-Of Parameters."
  * 
  */
-public interface OnBehalfOf extends WSTrustObject {
+public interface OnBehalfOf extends ElementExtensibleXMLObject, WSTrustObject {
 
     /** Element local name. */
     public static final String ELEMENT_LOCAL_NAME = "OnBehalfOf";
@@ -47,6 +48,8 @@ public interface OnBehalfOf extends WSTrustObject {
      * Get the unknown child element.
      * 
      * @return the child element
+     * 
+     * @deprecated Use instead {@link #getUnknownXMLObjects()}
      */
     public XMLObject getUnknownXMLObject();
     
@@ -54,6 +57,8 @@ public interface OnBehalfOf extends WSTrustObject {
      * Set the unknown child element.
      * 
      * @param unknownObject the new child element
+     * 
+     * @deprecated Use instead {@link #getUnknownXMLObjects()}
      */
     public void setUnknownXMLObject(XMLObject unknownObject);
     

@@ -38,6 +38,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAParams;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
@@ -69,6 +70,7 @@ import org.opensaml.xml.security.keyinfo.KeyInfoGenerator;
 import org.opensaml.xml.security.keyinfo.KeyInfoGeneratorFactory;
 import org.opensaml.xml.security.keyinfo.KeyInfoProvider;
 import org.opensaml.xml.security.keyinfo.NamedKeyInfoGeneratorManager;
+import org.opensaml.xml.security.keyinfo.provider.DEREncodedKeyValueProvider;
 import org.opensaml.xml.security.keyinfo.provider.DSAKeyValueProvider;
 import org.opensaml.xml.security.keyinfo.provider.InlineX509DataProvider;
 import org.opensaml.xml.security.keyinfo.provider.RSAKeyValueProvider;
@@ -148,7 +150,7 @@ public final class SecurityHelper {
             return "DSA";
         }
         if (ecdsaAlgorithmURIs.contains(algorithmURI)) {
-            return "ECDSA";
+            return "EC";
         }
 
         return null;
@@ -371,18 +373,15 @@ public final class SecurityHelper {
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(key);
         try {
             return buildKey(keySpec, "RSA");
-        }
-        catch (KeyException ex) {
+        } catch (KeyException ex) {
         }
         try {
             return buildKey(keySpec, "DSA");
-        }
-        catch (KeyException ex) {
+        } catch (KeyException ex) {
         }
         try {
             return buildKey(keySpec, "EC");
-        }
-        catch (KeyException ex) {
+        } catch (KeyException ex) {
         }
         throw new KeyException("Unsupported key type.");
     }
@@ -564,6 +563,21 @@ public final class SecurityHelper {
         }
         return (DSAPrivateKey) key;
     }
+
+    /**
+     * Build Java EC private key from base64 encoding.
+     * 
+     * @param base64EncodedKey base64-encoded EC private key
+     * @return a native Java ECPrivateKey
+     * @throws KeyException thrown if there is an error constructing key
+     */
+    public static ECPrivateKey buildJavaECPrivateKey(String base64EncodedKey)  throws KeyException {
+        PrivateKey key =  buildJavaPrivateKey(base64EncodedKey);
+        if (! (key instanceof ECPrivateKey)) {
+            throw new KeyException("Generated key was not an ECPrivateKey instance");
+        }
+        return (ECPrivateKey) key;
+    }
     
     /**
      * Build Java private key from base64 encoding. The key should have no password.
@@ -713,7 +727,7 @@ public final class SecurityHelper {
     
     /**
      * Get a basic KeyInfo credential resolver which can process standard inline
-     * data - RSAKeyValue, DSAKeyValue, X509Data.
+     * data - RSAKeyValue, DSAKeyValue, DEREncodedKeyValue, X509Data.
      * 
      * @return a new KeyInfoCredentialResolver instance
      */
@@ -721,6 +735,7 @@ public final class SecurityHelper {
         List<KeyInfoProvider> providers = new ArrayList<KeyInfoProvider>();
         providers.add( new RSAKeyValueProvider() );
         providers.add( new DSAKeyValueProvider() );
+        providers.add( new DEREncodedKeyValueProvider() );
         providers.add( new InlineX509DataProvider() );
         return new BasicProviderKeyInfoCredentialResolver(providers);
     }
@@ -1072,13 +1087,16 @@ public final class SecurityHelper {
             Init.init();
         }
 
-        // Additonal algorithm URI to JCA key algorithm mappins, beyond what is currently
+        // Additional algorithm URI to JCA key algorithm mappings, beyond what is currently
         // supplied in the Apache XML Security mapper config.
         dsaAlgorithmURIs = new LazySet<String>();
         dsaAlgorithmURIs.add(SignatureConstants.ALGO_ID_SIGNATURE_DSA);
 
         ecdsaAlgorithmURIs = new LazySet<String>();
         ecdsaAlgorithmURIs.add(SignatureConstants.ALGO_ID_SIGNATURE_ECDSA_SHA1);
+        ecdsaAlgorithmURIs.add(SignatureConstants.ALGO_ID_SIGNATURE_ECDSA_SHA256);
+        ecdsaAlgorithmURIs.add(SignatureConstants.ALGO_ID_SIGNATURE_ECDSA_SHA384);
+        ecdsaAlgorithmURIs.add(SignatureConstants.ALGO_ID_SIGNATURE_ECDSA_SHA512);
 
         rsaAlgorithmURIs = new HashSet<String>(10);
         rsaAlgorithmURIs.add(SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1);

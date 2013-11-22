@@ -25,7 +25,7 @@ import org.w3c.dom.Attr;
 /**
  * Unmarshaller for {@link SubjectAttributeDesignatorType}.
  */
-public class SubjectAttributeDesignatorTypeUnmarshaller extends AttributeValueTypeUnmarshaller {
+public class SubjectAttributeDesignatorTypeUnmarshaller extends AttributeDesignatorTypeUnmarshaller {
 
     /** Constructor. */
     public SubjectAttributeDesignatorTypeUnmarshaller() {

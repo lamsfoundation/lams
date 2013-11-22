@@ -352,6 +352,9 @@ public class XMLConfigurator {
         try {
             log.trace("Creating instance of {}", className);
             ClassLoader classLoader = this.getClass().getClassLoader();
+            if (classLoader == null) {
+                classLoader = ClassLoader.getSystemClassLoader();
+            }
             Class clazz = classLoader.loadClass(className);
             Constructor constructor = clazz.getConstructor();
             return constructor.newInstance();

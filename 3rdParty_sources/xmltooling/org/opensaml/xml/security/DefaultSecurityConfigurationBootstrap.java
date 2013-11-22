@@ -67,7 +67,7 @@ public class DefaultSecurityConfigurationBootstrap {
         // Asymmetric key algorithms
         config.registerSignatureAlgorithmURI("RSA", SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1);
         config.registerSignatureAlgorithmURI("DSA", SignatureConstants.ALGO_ID_SIGNATURE_DSA);
-        config.registerSignatureAlgorithmURI("ECDSA", SignatureConstants.ALGO_ID_SIGNATURE_ECDSA_SHA1);
+        config.registerSignatureAlgorithmURI("EC", SignatureConstants.ALGO_ID_SIGNATURE_ECDSA_SHA1);
         
         // HMAC algorithms
         config.registerSignatureAlgorithmURI("AES", SignatureConstants.ALGO_ID_MAC_HMAC_SHA1);

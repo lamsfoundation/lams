@@ -46,7 +46,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
@@ -384,13 +383,13 @@ public final class XMLHelper {
         }
 
         String elementContent = null;
-        NodeList nodeList = element.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node node = nodeList.item(i);
-            if (node.getNodeType() == Node.TEXT_NODE) {
-                elementContent = DatatypeHelper.safeTrimOrNullString(((Text) node).getWholeText());
+        Node child = element.getFirstChild();
+        while (child != null) {
+            if (child.getNodeType() == Node.TEXT_NODE) {
+                elementContent = DatatypeHelper.safeTrimOrNullString(((Text) child).getWholeText());
                 break;
             }
+            child = child.getNextSibling();
         }
 
         if (elementContent == null) {
@@ -740,20 +739,15 @@ public final class XMLHelper {
      */
     public static List<Element> getChildElementsByTagNameNS(Element root, String namespaceURI, String localName) {
         ArrayList<Element> children = new ArrayList<Element>();
-        NodeList childNodes = root.getChildNodes();
 
-        int numOfNodes = childNodes.getLength();
-        Node childNode;
-        Element e;
-        for (int i = 0; i < numOfNodes; i++) {
-            childNode = childNodes.item(i);
-            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-                e = (Element) childNode;
-                if (DatatypeHelper.safeEquals(e.getNamespaceURI(), namespaceURI)
-                        && DatatypeHelper.safeEquals(e.getLocalName(), localName)) {
-                    children.add(e);
-                }
+        Element e = getFirstChildElement(root);
+        while (e != null) {
+            if (DatatypeHelper.safeEquals(e.getNamespaceURI(), namespaceURI)
+                    && DatatypeHelper.safeEquals(e.getLocalName(), localName)) {
+                children.add(e);
             }
+            
+            e = getNextSiblingElement(e);
         }
 
         return children;
@@ -770,19 +764,14 @@ public final class XMLHelper {
      */
     public static List<Element> getChildElementsByTagName(Element root, String localName) {
         ArrayList<Element> children = new ArrayList<Element>();
-        NodeList childNodes = root.getChildNodes();
-
-        int numOfNodes = childNodes.getLength();
-        Node childNode;
-        Element e;
-        for (int i = 0; i < numOfNodes; i++) {
-            childNode = childNodes.item(i);
-            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-                e = (Element) childNode;
-                if (DatatypeHelper.safeEquals(e.getLocalName(), localName)) {
-                    children.add(e);
-                }
+        
+        Element e = getFirstChildElement(root);
+        while (e != null) {
+            if (DatatypeHelper.safeEquals(e.getLocalName(), localName)) {
+                children.add(e);
             }
+
+            e = getNextSiblingElement(e);
         }
 
         return children;
@@ -797,26 +786,18 @@ public final class XMLHelper {
      */
     public static Map<QName, List<Element>> getChildElements(Element root) {
         Map<QName, List<Element>> children = new HashMap<QName, List<Element>>();
-        NodeList childNodes = root.getChildNodes();
 
-        int numOfNodes = childNodes.getLength();
-        Node childNode;
-        Element e;
-        QName qname;
-        List<Element> elements;
-        for (int i = 0; i < numOfNodes; i++) {
-            childNode = childNodes.item(i);
-            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-                e = (Element) childNode;
-                qname = getNodeQName(e);
-                elements = children.get(qname);
-                if (elements == null) {
-                    elements = new ArrayList<Element>();
-                    children.put(qname, elements);
-                }
-
-                elements.add(e);
+        Element e = getFirstChildElement(root);
+        while (e != null) {
+            QName qname = getNodeQName(e);
+            List<Element> elements = children.get(qname);
+            if (elements == null) {
+                elements = new ArrayList<Element>();
+                children.put(qname, elements);
             }
+
+            elements.add(e);
+            e = getNextSiblingElement(e);
         }
 
         return children;
@@ -1120,13 +1101,10 @@ public final class XMLHelper {
 
         // Now for the child elements, we pass a copy of the resolved namespace list in order to
         // maintain proper scoping of namespaces.
-        NodeList childNodes = domElement.getChildNodes();
-        Node childNode;
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            childNode = childNodes.item(i);
-            if (childNode.getNodeType() == Node.ELEMENT_NODE) {
-                rootNamespaces((Element) childNode, upperNamespaceSearchBound);
-            }
+        Element childNode = getFirstChildElement(domElement);
+        while (childNode != null) {
+            rootNamespaces(childNode, upperNamespaceSearchBound);
+            childNode = getNextSiblingElement(childNode);
         }
     }
 

@@ -17,7 +17,6 @@
 
 package org.opensaml.samlext.saml2mdui.impl;
 
-import org.opensaml.saml2.metadata.LocalizedString;
 import org.opensaml.samlext.saml2mdui.PrivacyStatementURL;
 
 

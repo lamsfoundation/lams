@@ -17,7 +17,6 @@
 
 package org.opensaml.saml2.binding.decoding;
 
-import org.opensaml.common.xml.SAMLConstants;
 import org.opensaml.common.binding.SAMLMessageContext;
 import org.opensaml.ws.message.MessageContext;
 import org.opensaml.ws.message.decoder.MessageDecodingException;

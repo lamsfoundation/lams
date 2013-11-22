@@ -408,10 +408,12 @@ public abstract class AbstractMetadataProvider extends BaseMetadataProvider {
             initialized = true;
         } catch (MetadataProviderException e) {
             if (failFastInitialization) {
-                log.error("Metadata provider failed to properly initializing, halting", e);
+                log.error("Metadata provider failed to properly initialize, fail-fast=true, halting", e);
                 throw e;
             } else {
-                log.error("Metadata provider failed to properly initializing, continuing on without metadata", e);
+                log.error("Metadata provider failed to properly initialize, fail-fast=false, " 
+                        + "continuing on in a degraded state", e);
+                initialized = true;
             }
         }
     }

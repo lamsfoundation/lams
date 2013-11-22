@@ -20,6 +20,7 @@ package org.opensaml.xml.security.keyinfo;
 import java.math.BigInteger;
 import java.security.KeyException;
 import java.security.KeyFactory;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.CRLException;
@@ -30,19 +31,24 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAParams;
 import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAParameterSpec;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.opensaml.xml.Configuration;
+import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.XMLObjectBuilderFactory;
+import org.opensaml.xml.security.SecurityHelper;
 import org.opensaml.xml.security.x509.X509Util;
+import org.opensaml.xml.signature.DEREncodedKeyValue;
 import org.opensaml.xml.signature.DSAKeyValue;
 import org.opensaml.xml.signature.Exponent;
 import org.opensaml.xml.signature.G;
@@ -54,6 +60,7 @@ import org.opensaml.xml.signature.P;
 import org.opensaml.xml.signature.Q;
 import org.opensaml.xml.signature.RSAKeyValue;
 import org.opensaml.xml.signature.X509Data;
+import org.opensaml.xml.signature.X509Digest;
 import org.opensaml.xml.signature.X509IssuerName;
 import org.opensaml.xml.signature.X509IssuerSerial;
 import org.opensaml.xml.signature.X509SKI;
@@ -421,7 +428,35 @@ public class KeyInfoHelper {
         
         return xmlSKI;
     }
-
+    
+    /**
+     * Build an {@link X509Digest} containing the digest of the specified certificate.
+     * 
+     * @param javaCert the Java X509Certificate to digest
+     * @param algorithmURI  digest algorithm URI
+     * @return a new X509Digest object
+     * @throws NoSuchAlgorithmException if the algorithm specified cannot be used
+     * @throws CertificateEncodingException if the certificate cannot be encoded
+     */
+    public static X509Digest buildX509Digest(X509Certificate javaCert, String algorithmURI)
+            throws NoSuchAlgorithmException, CertificateEncodingException {
+        
+        String jceAlg = SecurityHelper.getAlgorithmIDFromURI(algorithmURI);
+        if (jceAlg == null) {
+            throw new NoSuchAlgorithmException("No JCE algorithm found for " + algorithmURI);
+        }
+        MessageDigest md = MessageDigest.getInstance(jceAlg);
+        byte[] hash = md.digest(javaCert.getEncoded());
+        
+        X509Digest xmlDigest = (X509Digest) Configuration.getBuilderFactory()
+            .getBuilder(X509Digest.DEFAULT_ELEMENT_NAME)
+            .buildObject(X509Digest.DEFAULT_ELEMENT_NAME);
+        xmlDigest.setAlgorithm(algorithmURI);
+        xmlDigest.setValue(Base64.encodeBytes(hash));
+        
+        return xmlDigest;
+    }
+    
     /**
      * Converts a Java DSA or RSA public key into the corresponding XMLObject and stores it
      * in a {@link KeyInfo} in a new {@link KeyValue} element.
@@ -509,12 +544,32 @@ public class KeyInfoHelper {
         return dsaKeyValue;
     }
 
-
     /**
-     * Extracts all the public keys within the given {@link KeyInfo}'s {@link KeyValue}s.  This method only
-     * supports DSA and RSA key types.
+     * Converts a Java public key into a {@link DEREncodedKeyValue} element and adds it to
+     * a {@link KeyInfo}.
      * 
-     * @param keyInfo {@link KeyInfo} to extract the keys out of
+     * @param keyInfo the {@link KeyInfo} element to which to add the key
+     * @param pk the native Java {@link PublicKey} to add
+     * @throws NoSuchAlgorithmException if the key type is unsupported
+     * @throws InvalidKeySpecException if the key type does not support X.509 SPKI encoding
+     */
+    public static void addDEREncodedPublicKey(KeyInfo keyInfo, PublicKey pk)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+        DEREncodedKeyValue keyValue = (DEREncodedKeyValue) Configuration.getBuilderFactory()
+            .getBuilder(DEREncodedKeyValue.DEFAULT_ELEMENT_NAME)
+            .buildObject(DEREncodedKeyValue.DEFAULT_ELEMENT_NAME);
+        
+        KeyFactory keyFactory = KeyFactory.getInstance(pk.getAlgorithm());
+        X509EncodedKeySpec keySpec = keyFactory.getKeySpec(pk, X509EncodedKeySpec.class);
+        keyValue.setValue(Base64.encodeBytes(keySpec.getEncoded()));
+        keyInfo.getXMLObjects().add(keyValue);
+    }    
+    
+    /**
+     * Extracts all the public keys within the given {@link KeyInfo}'s {@link KeyValue}s and
+     * {@link DEREncodedKeyValue}s.
+     * 
+     * @param keyInfo {@link KeyInfo} to extract the keys from
      * 
      * @return a list of native Java {@link PublicKey} objects
      * 
@@ -523,14 +578,18 @@ public class KeyInfoHelper {
     public static List<PublicKey> getPublicKeys(KeyInfo keyInfo) throws KeyException{
         List<PublicKey> keys = new LinkedList<PublicKey>();
 
-        if (keyInfo == null || keyInfo.getKeyValues() == null) {
+        if (keyInfo == null) {
             return keys;
         }
         
-        for(KeyValue keyDescriptor : keyInfo.getKeyValues()){
+        for (KeyValue keyDescriptor : keyInfo.getKeyValues()) {
             keys.add(getKey(keyDescriptor));
         }
 
+        for (XMLObject keyDescriptor : keyInfo.getXMLObjects(DEREncodedKeyValue.DEFAULT_ELEMENT_NAME)) {
+            keys.add(getKey((DEREncodedKeyValue) keyDescriptor));
+        }
+        
         return keys;
     }
 
@@ -679,6 +738,41 @@ public class KeyInfoHelper {
             log.error("Invalid key information", e);
             throw new KeyException("Invalid key information", e);
         }
+    }
+
+    /**
+     * Extracts the public key within the {@link DEREncodedKeyValue}.
+     * 
+     * @param keyValue the {@link DEREncodedKeyValue} to extract the key from
+     * 
+     * @return a native Java security {@link java.security.Key} object
+     * 
+     * @throws KeyException thrown if the given key data cannot be converted into {@link PublicKey}
+     */
+    public static PublicKey getKey(DEREncodedKeyValue keyValue) throws KeyException{
+        String[] supportedKeyTypes = { "RSA", "DSA", "EC"};
+        
+        if (keyValue.getValue() == null) {
+            throw new KeyException("No data found in key value element");
+        }
+        byte[] encodedKey = Base64.decode(keyValue.getValue());
+
+        // Iterate over the supported key types until one produces a public key.
+        for (String keyType : supportedKeyTypes) {
+            try {
+                KeyFactory keyFactory = KeyFactory.getInstance(keyType);
+                X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encodedKey);
+                PublicKey publicKey = keyFactory.generatePublic(keySpec);
+                if (publicKey != null) {
+                    return publicKey;
+                }
+            } catch (NoSuchAlgorithmException e) {
+                // ignore
+            } catch (InvalidKeySpecException e) {
+                // ignore
+            }
+        }
+        throw new KeyException("DEREncodedKeyValue did not contain a supported key type");
     }
     
     /**

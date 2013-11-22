@@ -111,16 +111,27 @@ public class ResourceChangeWatcher extends TimerTask {
         maxRetryAttempts = retryAttempts;
         currentRetryAttempts = 0;
 
-        if (watchedResource.exists()) {
-            resourceExist = true;
-            lastModification = watchedResource.getLastModifiedTime();
-        } else {
-            resourceExist = false;
-        }
-
         resourceListeners = new ArrayList<ResourceChangeListener>(5);
         log.debug("Watching resource: " + watchedResource.getLocation()
                 + ", polling frequency: {}ms, max retry attempts: {}", pollFrequency, maxRetryAttempts);
+        
+        try {
+            if (watchedResource.exists()) {
+                resourceExist = true;
+                lastModification = watchedResource.getLastModifiedTime();
+            } else {
+                resourceExist = false;
+            }
+        } catch (ResourceException e) {
+            log.warn("Resource " + watchedResource.getLocation() + " could not be accessed", e);
+            currentRetryAttempts++;
+            if (currentRetryAttempts >= maxRetryAttempts) {
+                log.error("Resource {} was not accessible at time of ResourceChangeWatcher construction and max retrys are exceeded",
+                        watchedResource.getLocation());
+                throw e;
+            }
+        }
+
     }
 
     /**
@@ -169,8 +180,8 @@ public class ResourceChangeWatcher extends TimerTask {
             currentRetryAttempts++;
             if (currentRetryAttempts >= maxRetryAttempts) {
                 cancel();
-                log.error("Resource " + watchedResource.getLocation()
-                            + " was not accessible for max number of retry attempts.  This resource will no longer be watched");
+                log.error("Resource {} was not accessible for max number of retry attempts.  This resource will no longer be watched",
+                        watchedResource.getLocation());
             }
         }
     }

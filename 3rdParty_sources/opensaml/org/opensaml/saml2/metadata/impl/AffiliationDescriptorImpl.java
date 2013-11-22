@@ -103,7 +103,12 @@ public class AffiliationDescriptorImpl extends AbstractSignableSAMLObject implem
 
     /** {@inheritDoc} */
     public boolean isValid() {
-        return validUntil.isBeforeNow();
+        if (null == validUntil) {
+            return true;
+        }
+        
+        DateTime now = new DateTime();
+        return now.isBefore(validUntil);
     }
 
     /** {@inheritDoc} */

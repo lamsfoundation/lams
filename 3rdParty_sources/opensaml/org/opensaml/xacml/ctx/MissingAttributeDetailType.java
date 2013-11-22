@@ -31,15 +31,15 @@ public interface MissingAttributeDetailType extends XACMLObject {
     public static final String DEFAULT_ELEMENT_LOCAL_NAME = "MissingAttributeDetail";
 
     /** QName of the element MissingAttributeDetail. */
-    public static final QName DEFAULT_ELEMENT_NAME = new QName(XACMLConstants.XACML20_NS, DEFAULT_ELEMENT_LOCAL_NAME,
-            XACMLConstants.XACML_PREFIX);
+    public static final QName DEFAULT_ELEMENT_NAME = new QName(XACMLConstants.XACML20CTX_NS, DEFAULT_ELEMENT_LOCAL_NAME,
+            XACMLConstants.XACMLCONTEXT_PREFIX);
 
     /** Local name of the XSI type. */
     public static final String SCHEMA_TYPE_LOCAL_NAME = "MissingAttributeDetailType";
 
     /** QName of the XSI type. */
-    public static final QName SCHEMA_TYPE_NAME = new QName(XACMLConstants.XACML20_NS, SCHEMA_TYPE_LOCAL_NAME,
-            XACMLConstants.XACML_PREFIX);
+    public static final QName SCHEMA_TYPE_NAME = new QName(XACMLConstants.XACML20CTX_NS, SCHEMA_TYPE_LOCAL_NAME,
+            XACMLConstants.XACMLCONTEXT_PREFIX);
 
     /** AttributeId attribute name. */
     public static final String ATTRIBUTE_ID_ATTRIB_NAME = "AttributeId";

@@ -38,9 +38,6 @@ public class ResourceBackedMetadataProvider extends AbstractReloadingMetadataPro
     /** Resource from which metadata is read. */
     private Resource metadataResource;
 
-    /** Time the metadata resource was last updated. */
-    private DateTime lastResourceUpdate;
-
     /**
      * Constructor.
      * 
@@ -113,7 +110,6 @@ public class ResourceBackedMetadataProvider extends AbstractReloadingMetadataPro
     /** {@inheritDoc} */
     public synchronized void destroy() {
         metadataResource = null;
-        lastResourceUpdate = null;
         
         super.destroy();
     }

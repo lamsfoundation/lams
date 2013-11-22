@@ -15,21 +15,17 @@
  * limitations under the License.
  */
 
-package org.opensaml.samlext.saml1md.impl;
+/**
+ * 
+ */
+
+package org.opensaml.samlext.saml2aslo.impl;
 
 import org.opensaml.common.impl.AbstractSAMLObjectUnmarshaller;
-import org.opensaml.samlext.saml1md.SourceID;
-import org.opensaml.xml.XMLObject;
 
 /**
- * Unmarshaller for {@link SourceID} objects.
+ * A thread-safe Unmarshaller for {@link org.opensaml.samlext.saml2aslo.Asynchronous} objects.
  */
-public class SourceIDUnmarshaller extends AbstractSAMLObjectUnmarshaller {
+public class AsynchronousUnmarshaller extends AbstractSAMLObjectUnmarshaller {
 
-    /** {@inheritDoc} */
-    protected void processElementContent(XMLObject samlObject, String elementContent) {
-        SourceID sourceID = (SourceID) samlObject;
-
-        sourceID.setValue(elementContent);
-    }
 }

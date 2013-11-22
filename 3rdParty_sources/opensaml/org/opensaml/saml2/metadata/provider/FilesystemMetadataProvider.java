@@ -55,8 +55,7 @@ public class FilesystemMetadataProvider extends AbstractReloadingMetadataProvide
      * 
      * @param metadata the metadata file
      * 
-     * @throws MetadataProviderException thrown if the given file path is null, does not exist, does not represent a
-     *             file, or if the metadata can not be parsed
+     * @throws MetadataProviderException  this exception is no longer thrown
      */
     public FilesystemMetadataProvider(File metadata) throws MetadataProviderException {
         super();
@@ -69,8 +68,7 @@ public class FilesystemMetadataProvider extends AbstractReloadingMetadataProvide
      * @param metadata the metadata file
      * @param backgroundTaskTimer timer used to refresh metadata in the background
      * 
-     * @throws MetadataProviderException thrown if the given file path is null, does not exist, does not represent a
-     *             file, or if the metadata can not be parsed
+     * @throws MetadataProviderException  this exception is no longer thrown
      */
     public FilesystemMetadataProvider(Timer backgroundTaskTimer, File metadata) throws MetadataProviderException {
         super(backgroundTaskTimer);
@@ -78,27 +76,13 @@ public class FilesystemMetadataProvider extends AbstractReloadingMetadataProvide
     }
 
     /**
-     * Sets the file from which metadata is read. The given file path is checked to see if it exists, is a file, and is
-     * readable.
+     * Sets the file from which metadata is read.
      * 
      * @param file path to the metadata file
      * 
-     * @throws MetadataProviderException thrown if the file does not exist or is not a readable file
+     * @throws MetadataProviderException this exception is no longer thrown
      */
     protected void setMetadataFile(File file) throws MetadataProviderException {
-
-        if (!file.exists()) {
-            throw new MetadataProviderException("Give metadata file, " + file.getAbsolutePath() + " does not exist");
-        }
-
-        if (!file.isFile()) {
-            throw new MetadataProviderException("Give metadata file, " + file.getAbsolutePath() + " is not a file");
-        }
-
-        if (!file.canRead()) {
-            throw new MetadataProviderException("Give metadata file, " + file.getAbsolutePath() + " is not readable");
-        }
-
         metadataFile = file;
     }
 
@@ -139,8 +123,9 @@ public class FilesystemMetadataProvider extends AbstractReloadingMetadataProvide
     /** {@inheritDoc} */
     protected byte[] fetchMetadata() throws MetadataProviderException {
         try {
+            validateMetadataFile(metadataFile);
             DateTime metadataUpdateTime = new DateTime(metadataFile.lastModified(), ISOChronology.getInstanceUTC());
-            if (getLastRefresh() == null || metadataUpdateTime.isAfter(getLastRefresh())) {
+            if (getLastRefresh() == null || getLastUpdate() == null || metadataUpdateTime.isAfter(getLastRefresh())) {
                 return inputstreamToByteArray(new FileInputStream(metadataFile));
             }
 
@@ -151,4 +136,26 @@ public class FilesystemMetadataProvider extends AbstractReloadingMetadataProvide
             throw new MetadataProviderException(errMsg, e);
         }
     }
+    
+    /**
+     * Validate the basic properties of the specified metadata file, for example that it exists; 
+     * that it is a file; and that it is readable.
+     *
+     * @param file the file to evaluate
+     * @throws MetadataProviderException if file does not pass basic properties required of a metadata file
+     */
+    protected void validateMetadataFile(File file) throws MetadataProviderException {
+        if (!file.exists()) {
+            throw new MetadataProviderException("Metadata file '" + file.getAbsolutePath() + "' does not exist");
+        }
+
+        if (!file.isFile()) {
+            throw new MetadataProviderException("Metadata file '" + file.getAbsolutePath() + "' is not a file");
+        }
+
+        if (!file.canRead()) {
+            throw new MetadataProviderException("Metadata file '" + file.getAbsolutePath() + "' is not readable");
+        }
+    }
+
 }

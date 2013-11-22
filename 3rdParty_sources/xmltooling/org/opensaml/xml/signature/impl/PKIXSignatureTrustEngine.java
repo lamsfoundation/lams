@@ -178,17 +178,22 @@ public class PKIXSignatureTrustEngine extends
         Pair<Set<String>, Iterable<PKIXValidationInformation>> validationPair = 
             resolveValidationInfo(trustBasisCriteria);
 
-        if (SigningUtil.verifyWithURI(candidateCredential, algorithmURI, signature, content)) {
-            log.debug("Successfully verified raw signature using supplied candidate credential");
-            log.debug("Attempting to establish trust of supplied candidate credential");
-            if (evaluateTrust(candidateCredential, validationPair)) {
-                log.debug("Successfully established trust of supplied candidate credential");
-                return true;
+        try {
+            if (SigningUtil.verifyWithURI(candidateCredential, algorithmURI, signature, content)) {
+                log.debug("Successfully verified raw signature using supplied candidate credential");
+                log.debug("Attempting to establish trust of supplied candidate credential");
+                if (evaluateTrust(candidateCredential, validationPair)) {
+                    log.debug("Successfully established trust of supplied candidate credential");
+                    return true;
+                } else {
+                    log.debug("Failed to establish trust of supplied candidate credential");
+                }
             } else {
-                log.debug("Failed to establish trust of supplied candidate credential");
+                log.debug("Cryptographic verification of raw signature failed with candidate credential");
             }
-        } else {
-            log.debug("Cryptographic verification of raw signature failed with candidate credential");
+        } catch (SecurityException e) {
+            // Java 7 now throws this exception under conditions such as mismatched key sizes.
+            // Swallow this, it's logged by the verifyWithURI method already.
         }
 
         log.debug("PKIX validation of raw signature failed, "

@@ -17,19 +17,16 @@
 
 package org.opensaml.samlext.saml1md.impl;
 
-import java.util.List;
-
-import org.opensaml.common.impl.AbstractSAMLObject;
 import org.opensaml.samlext.saml1md.SourceID;
-import org.opensaml.xml.XMLObject;
+import org.opensaml.xml.schema.impl.XSStringImpl;
 
-public class SourceIDImpl extends AbstractSAMLObject implements SourceID {
+/**
+ * Concrete implementation of {@link SourceID}.
+ */
+public class SourceIDImpl extends XSStringImpl implements SourceID {
 
-    /** Source ID */
-    private String sourceID;
-    
     /**
-     * Constructor
+     * Constructor.
      * 
      * @param namespaceURI the namespace the element is in
      * @param elementLocalName the local name of the XML element this Object represents
@@ -37,21 +34,5 @@ public class SourceIDImpl extends AbstractSAMLObject implements SourceID {
      */
     protected SourceIDImpl(String namespaceURI, String elementLocalName, String namespacePrefix) {
         super(namespaceURI, elementLocalName, namespacePrefix);
-    }
-    
-    /** {@inheritDoc} */
-    public String getValue() {
-        return sourceID;
-    }
-
-    /** {@inheritDoc} */
-    public void setValue(String newSourceID) {
-        sourceID = prepareForAssignment(sourceID, newSourceID);
-    }
-    
-    /** {@inheritDoc} */
-    public List<XMLObject> getOrderedChildren() {
-        // no children
-        return null;
     }
 }

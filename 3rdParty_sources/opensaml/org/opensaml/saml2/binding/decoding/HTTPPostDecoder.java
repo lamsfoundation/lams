@@ -80,7 +80,7 @@ public class HTTPPostDecoder extends BaseSAML2MessageDecoder {
 
         HTTPInTransport inTransport = (HTTPInTransport) samlMsgCtx.getInboundMessageTransport();
         if (!inTransport.getHTTPMethod().equalsIgnoreCase("POST")) {
-            throw new MessageDecodingException("This message deocoder only supports the HTTP POST method");
+            throw new MessageDecodingException("This message decoder only supports the HTTP POST method");
         }
 
         String relayState = inTransport.getParameterValue("RelayState");

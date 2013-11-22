@@ -118,10 +118,10 @@ public abstract class AbstractReloadingMetadataProvider extends AbstractObservab
 
     /**
      * Gets the time that the currently available metadata was last updated. Note, this may be different than the time
-     * retrieved by {@link #getLastUpdate()} is the metadata was known not to have changed during the last refresh
+     * retrieved by {@link #getLastRefresh()} if the metadata was known not to have changed during the last refresh
      * cycle.
      * 
-     * @return time when the currently metadata was last update, 0 if metadata has never successfully been read in
+     * @return time when the currently metadata was last update, null if metadata has never successfully been read in
      */
     public DateTime getLastUpdate() {
         return lastUpdate;
@@ -261,7 +261,7 @@ public abstract class AbstractReloadingMetadataProvider extends AbstractObservab
                 processNewMetadata(mdId, now, mdBytes);
             }
         } catch (Exception e) {
-            log.debug("Error occurred while attempting to refresh metadata from '{}'", e);
+            log.debug("Error occurred while attempting to refresh metadata from '" + mdId + "'", e);
             nextRefresh = new DateTime(ISOChronology.getInstanceUTC()).plus(minRefreshDelay);
             throw new MetadataProviderException(e);
         } finally {

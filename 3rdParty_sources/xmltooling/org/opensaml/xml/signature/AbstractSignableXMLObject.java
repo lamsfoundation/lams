@@ -19,20 +19,19 @@ package org.opensaml.xml.signature;
 
 import org.opensaml.xml.AbstractXMLObject;
 import org.opensaml.xml.util.XMLConstants;
+import org.opensaml.xml.util.XMLHelper;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Base for signable XMLObjects.
  */
 public abstract class AbstractSignableXMLObject extends AbstractXMLObject implements SignableXMLObject {
 
-    /** XMLSecSignatureImpl */
+    /** Signature object. */
     private Signature signature;
 
     /**
-     * Constructor
+     * Constructor.
      * 
      * @param namespaceURI the namespace the element is in
      * @param elementLocalName the local name of the XML element this Object represents
@@ -49,19 +48,15 @@ public abstract class AbstractSignableXMLObject extends AbstractXMLObject implem
         if (domElement == null) {
             return false;
         }
+        
 
-        NodeList children = domElement.getChildNodes();
-        Element childElement;
-        for (int i = 0; i < children.getLength(); i++) {
-            if (children.item(i).getNodeType() != Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            childElement = (Element) children.item(i);
-            if (childElement.getNamespaceURI().equals(XMLConstants.XMLSIG_NS)
-                    && childElement.getLocalName().equals(Signature.DEFAULT_ELEMENT_LOCAL_NAME)) {
+        Element childElement = XMLHelper.getFirstChildElement(domElement);
+        while (childElement != null) {
+            if (XMLHelper.isElementNamed(childElement, XMLConstants.XMLSIG_NS, Signature.DEFAULT_ELEMENT_LOCAL_NAME)) {
                 return true;
             }
+            
+            childElement = XMLHelper.getNextSiblingElement(childElement);
         }
 
         return false;

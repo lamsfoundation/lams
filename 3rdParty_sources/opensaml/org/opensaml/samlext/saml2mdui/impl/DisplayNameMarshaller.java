@@ -17,14 +17,6 @@
 
 package org.opensaml.samlext.saml2mdui.impl;
 
-import org.opensaml.common.impl.AbstractSAMLObjectMarshaller;
-import org.opensaml.common.xml.SAMLConstants;
-import org.opensaml.xml.XMLObject;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.util.XMLHelper;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Element;
-
 /**
  * A thread safe Marshaller for {@link org.opensaml.samlext.saml2mdui.DisplayName} objects.
  */

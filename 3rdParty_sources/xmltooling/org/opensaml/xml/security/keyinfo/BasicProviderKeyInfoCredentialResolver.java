@@ -36,6 +36,7 @@ import org.opensaml.xml.security.SecurityHelper;
 import org.opensaml.xml.security.credential.AbstractCriteriaFilteringCredentialResolver;
 import org.opensaml.xml.security.credential.BasicCredential;
 import org.opensaml.xml.security.credential.Credential;
+import org.opensaml.xml.signature.DEREncodedKeyValue;
 import org.opensaml.xml.signature.KeyInfo;
 import org.opensaml.xml.signature.KeyName;
 import org.opensaml.xml.signature.KeyValue;
@@ -210,8 +211,8 @@ public class BasicProviderKeyInfoCredentialResolver extends AbstractCriteriaFilt
      * @param credentials the list which will store the resolved credentials
      * @throws SecurityException thrown if there is an error during processing
      */
-    protected void postProcess(KeyInfoResolutionContext kiContext, CriteriaSet criteriaSet, List<Credential> credentials)
-            throws SecurityException {
+    protected void postProcess(KeyInfoResolutionContext kiContext, CriteriaSet criteriaSet,
+            List<Credential> credentials) throws SecurityException {
 
     }
 
@@ -231,7 +232,7 @@ public class BasicProviderKeyInfoCredentialResolver extends AbstractCriteriaFilt
     }
 
     /**
-     * Use registered providers to process the non-KeyValue children of KeyInfo.
+     * Use registered providers to process the non-KeyValue/DEREncodedKeyValue children of KeyInfo.
      * 
      * Each child element is processed in document order. Each child element is processed by each provider in the
      * ordered list of providers. The credential or credentials resolved by the first provider to successfully do so are
@@ -247,7 +248,7 @@ public class BasicProviderKeyInfoCredentialResolver extends AbstractCriteriaFilt
 
         for (XMLObject keyInfoChild : kiContext.getKeyInfo().getXMLObjects()) {
 
-            if (keyInfoChild instanceof KeyValue) {
+            if (keyInfoChild instanceof KeyValue || keyInfoChild instanceof DEREncodedKeyValue) {
                 continue;
             }
 
@@ -330,45 +331,51 @@ public class BasicProviderKeyInfoCredentialResolver extends AbstractCriteriaFilt
 
         // Extract the Credential based on the (singular) key from an existing KeyValue(s).
         resolveKeyValue(kiContext, criteriaSet, keyInfo.getKeyValues());
+
+        // Extract the Credential based on the (singular) key from an existing DEREncodedKeyValue(s).
+        resolveKeyValue(kiContext, criteriaSet, keyInfo.getXMLObjects(DEREncodedKeyValue.DEFAULT_ELEMENT_NAME));
     }
 
     /**
-     * Resolve the key from any KeyValue element that may be present, and store the resulting key in the resolution
-     * context.
+     * Resolve the key from any KeyValue or DEREncodedKeyValue element that may be present, and store the resulting
+     * key in the resolution context.
      * 
-     * Each KeyValue element is processed in turn in document order. Each Keyvalue will be processed by each provider in
-     * the ordered list of registered providers. The key from the first credential successfully resolved from a KeyValue
+     * Each element is processed in turn in document order. Each element will be processed by each provider in
+     * the ordered list of registered providers. The key from the first credential successfully resolved
      * will be stored in the resolution context.
      * 
-     * Note: This resolver implementation assumes that KeyInfo/KeyValue will not be abused via-a-vis the Signature
-     * specificiation, and that therefore all KeyValue elements (if there is even more than one) will all resolve to the
+     * Note: This resolver implementation assumes that KeyInfo will not be abused via-a-vis the Signature
+     * specificiation, and that therefore all elements (if there are even more than one) will all resolve to the
      * same key value. The KeyInfo might, for example have multiple KeyValue children, containing different
-     * representations of the same key. Therefore, only the first credential derived from a KeyValue will be be
-     * utilized.
+     * representations of the same key. Therefore, only the first credential derived will be be utilized.
      * 
      * @param kiContext KeyInfo resolution context
      * @param criteriaSet the credential criteria used to resolve credentials
-     * @param keyValues the KeyValue children to evaluate
+     * @param keyValues the KeyValue or DEREncodedKeyValue children to evaluate
      * @throws SecurityException thrown if there is an error resolving the key from the KeyValue
      */
-    protected void resolveKeyValue(KeyInfoResolutionContext kiContext, CriteriaSet criteriaSet, List<KeyValue> keyValues)
-            throws SecurityException {
+    protected void resolveKeyValue(KeyInfoResolutionContext kiContext, CriteriaSet criteriaSet,
+            List<? extends XMLObject> keyValues) throws SecurityException {
 
-        for (KeyValue keyValue : keyValues) {
+        for (XMLObject keyValue : keyValues) {
+            if (!(keyValue instanceof KeyValue) && !(keyValue instanceof DEREncodedKeyValue)) {
+                continue;
+            }
             Collection<Credential> creds = processKeyInfoChild(kiContext, criteriaSet, keyValue);
             if (creds != null) {
                 for (Credential cred : creds) {
                     Key key = extractKeyValue(cred);
                     if (key != null) {
                         kiContext.setKey(key);
-                        log.debug("Found a credential based on a KeyValue having key type: {}", key.getAlgorithm());
+                        log.debug("Found a credential based on a KeyValue/DEREncodedKeyValue having key type: {}",
+                                key.getAlgorithm());
                         return;
                     }
                 }
             }
         }
     }
-
+    
     /**
      * Construct a basic credential containing the specified key and set of key names.
      * 

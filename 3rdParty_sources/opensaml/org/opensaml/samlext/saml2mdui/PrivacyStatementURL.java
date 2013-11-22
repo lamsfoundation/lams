@@ -19,8 +19,6 @@ package org.opensaml.samlext.saml2mdui;
 
 import javax.xml.namespace.QName;
 
-import org.opensaml.saml2.metadata.LocalizedString;
-
 /**
  * PrivacyStatementURL.
  *

@@ -21,6 +21,7 @@ import java.security.Key;
 import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPublicKey;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -575,12 +576,13 @@ public class Encrypter {
         if (key == null) {
             log.error("Key encryption credential and contained key are required");
             throw new EncryptionException("Key encryption credential and contained key are required");
-        }
-        if (key instanceof DSAPublicKey) {
+        } else if (key instanceof DSAPublicKey) {
             log.error("Attempt made to use DSA key for encrypted key transport");
             throw new EncryptionException("DSA keys may not be used for encrypted key transport");
-        }
-        if (DatatypeHelper.isEmpty(kekParams.getAlgorithm())) {
+        } else if (key instanceof ECPublicKey) {
+            log.error("Attempt made to use EC key for encrypted key transport");
+            throw new EncryptionException("EC keys may not be used for encrypted key transport");
+        } else if (DatatypeHelper.isEmpty(kekParams.getAlgorithm())) {
             log.error("Key encryption algorithm URI is required");
             throw new EncryptionException("Key encryption algorithm URI is required");
         }

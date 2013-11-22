@@ -17,8 +17,10 @@
 
 package org.opensaml.xml.security.x509;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.Set;
 
@@ -26,15 +28,18 @@ import javax.security.auth.x500.X500Principal;
 
 import org.opensaml.xml.Configuration;
 import org.opensaml.xml.XMLObject;
+import org.opensaml.xml.encryption.EncryptionConstants;
 import org.opensaml.xml.security.SecurityException;
 import org.opensaml.xml.security.credential.BasicKeyInfoGeneratorFactory;
 import org.opensaml.xml.security.credential.Credential;
 import org.opensaml.xml.security.keyinfo.KeyInfoGenerator;
 import org.opensaml.xml.security.keyinfo.KeyInfoHelper;
 import org.opensaml.xml.signature.KeyInfo;
+import org.opensaml.xml.signature.SignatureConstants;
 import org.opensaml.xml.signature.X509CRL;
 import org.opensaml.xml.signature.X509Certificate;
 import org.opensaml.xml.signature.X509Data;
+import org.opensaml.xml.signature.X509Digest;
 import org.opensaml.xml.signature.X509SKI;
 import org.opensaml.xml.signature.impl.KeyInfoBuilder;
 import org.opensaml.xml.signature.impl.X509DataBuilder;
@@ -225,6 +230,47 @@ public class X509KeyInfoGeneratorFactory extends BasicKeyInfoGeneratorFactory {
         options.emitX509SKI = newValue;
     }
 
+    /**
+     * Get the option to emit the entity certificate digest as an X509Digest element within X509Data.
+     * 
+     * @return the option value
+     */
+    public boolean emitX509Digest() {
+        return options.emitX509Digest;
+    }
+
+    /**
+     * Set the option to emit the entity certificate digest as an X509Digest element within X509Data.
+     * 
+     * @param newValue the new option value
+     */
+    public void setEmitX509Digest(boolean newValue) {
+        options.emitX509Digest = newValue;
+    }
+
+    
+    /**
+     * Get the algorithm URI for X509Digest digests.
+     * 
+     * Defaults to SHA-256.
+     * 
+     * @return returns the digest algorithm URI
+     */
+    public String getX509DigestAlgorithmURI() {
+        return options.x509DigestAlgorithmURI;
+    }
+
+    /**
+     * Set the algorithm URI for X509Digest digests.
+     * 
+     * Defaults to SHA-256.
+     * 
+     * @param alg the new digest algorithmURI
+     */
+    public void setX509DigestAlgorithmURI(String alg) {
+        options.x509DigestAlgorithmURI = alg;
+    }
+    
     /**
      * Get the option to emit the entity certificate subject DN as an X509SubjectName element within X509Data.
      * 
@@ -446,6 +492,7 @@ public class X509KeyInfoGeneratorFactory extends BasicKeyInfoGeneratorFactory {
             processCertX509SubjectName(x509Data, cert);
             processCertX509IssuerSerial(x509Data, cert);
             processCertX509SKI(x509Data, cert);
+            processCertX509Digest(x509Data, cert);
         }
         
         /**
@@ -505,6 +552,30 @@ public class X509KeyInfoGeneratorFactory extends BasicKeyInfoGeneratorFactory {
                 X509SKI xmlSKI = KeyInfoHelper.buildX509SKI(cert);
                 if (xmlSKI != null) {
                     x509Data.getX509SKIs().add(xmlSKI);
+                }
+            }
+        }
+        
+        /**
+         * Process the options related to generation of the X509Digest child element of X509Data 
+         * based on certificate data.
+         * 
+         * @param x509Data the X509Data element being processed.
+         * @param cert the certificate being processed
+         */ 
+        protected void processCertX509Digest(X509Data x509Data, java.security.cert.X509Certificate cert) {
+            if (options.emitX509Digest) {
+                try {
+                    X509Digest xmlDigest = KeyInfoHelper.buildX509Digest(cert, options.x509DigestAlgorithmURI);
+                    if (xmlDigest != null) {
+                        x509Data.getXMLObjects(X509Digest.DEFAULT_ELEMENT_NAME).add(xmlDigest);
+                    }
+                } catch (CertificateEncodingException e) {
+                    // TODO: should wrap in SecurityException once API can be changed
+                    log.error("Can't digest certificate, certificate encoding error", e);
+                } catch (NoSuchAlgorithmException e) {
+                    // TODO: should wrap in SecurityException once API can be changed
+                    log.error("Can't digest certificate, unsupported digest algorithm", e);
                 }
             }
         }
@@ -675,6 +746,12 @@ public class X509KeyInfoGeneratorFactory extends BasicKeyInfoGeneratorFactory {
        /** Emit the entity certificate subject key identifier as an X509SKI element within X509Data. */
        private boolean emitX509SKI;
        
+       /** Emit the entity certificate digest as an X509Digest element within X509Data. */
+       private boolean emitX509Digest;
+       
+       /** X509Digest digest algorithm URI. */
+       private String x509DigestAlgorithmURI;
+
        /** Emit the entity certificate subject DN as a KeyName element. */
        private boolean emitSubjectDNAsKeyName;
        
@@ -698,6 +775,7 @@ public class X509KeyInfoGeneratorFactory extends BasicKeyInfoGeneratorFactory {
        
        /** Constructor. */
        protected X509Options() {
+           x509DigestAlgorithmURI = EncryptionConstants.ALGO_ID_DIGEST_SHA256;
            subjectAltNames = new LazySet<Integer>();
            x500DNHandler = new InternalX500DNHandler();
            x500SubjectDNFormat = X500DNHandler.FORMAT_RFC2253;

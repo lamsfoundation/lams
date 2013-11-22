@@ -136,15 +136,20 @@ public class ExplicitKeySignatureTrustEngine extends BaseSignatureTrustEngine<It
 
         // First try the optional supplied candidate credential
         if (candidateCredential != null) {
-            if (SigningUtil.verifyWithURI(candidateCredential, algorithmURI, signature, content)) {
-                log.debug("Successfully verified signature using supplied candidate credential");
-                log.debug("Attempting to establish trust of supplied candidate credential");
-                if (evaluateTrust(candidateCredential, trustedCredentials)) {
-                    log.debug("Successfully established trust of supplied candidate credential");
-                    return true;
-                } else {
-                    log.debug("Failed to establish trust of supplied candidate credential");
+            try {
+                if (SigningUtil.verifyWithURI(candidateCredential, algorithmURI, signature, content)) {
+                    log.debug("Successfully verified signature using supplied candidate credential");
+                    log.debug("Attempting to establish trust of supplied candidate credential");
+                    if (evaluateTrust(candidateCredential, trustedCredentials)) {
+                        log.debug("Successfully established trust of supplied candidate credential");
+                        return true;
+                    } else {
+                        log.debug("Failed to establish trust of supplied candidate credential");
+                    }
                 }
+            } catch (SecurityException e) {
+                // Java 7 now throws this exception under conditions such as mismatched key sizes.
+                // Swallow this, it's logged by the verifyWithURI method already.
             }
         }
 
@@ -154,9 +159,14 @@ public class ExplicitKeySignatureTrustEngine extends BaseSignatureTrustEngine<It
         log.debug("Attempting to verify signature using trusted credentials");
 
         for (Credential trustedCredential : trustedCredentials) {
-            if (SigningUtil.verifyWithURI(trustedCredential, algorithmURI, signature, content)) {
-                log.debug("Successfully verified signature using resolved trusted credential");
-                return true;
+            try {
+                if (SigningUtil.verifyWithURI(trustedCredential, algorithmURI, signature, content)) {
+                    log.debug("Successfully verified signature using resolved trusted credential");
+                    return true;
+                }
+            } catch (SecurityException e) {
+                // Java 7 now throws this exception under conditions such as mismatched key sizes.
+                // Swallow this, it's logged by the verifyWithURI method already.
             }
         }
         log.debug("Failed to verify signature using either supplied candidate credential"

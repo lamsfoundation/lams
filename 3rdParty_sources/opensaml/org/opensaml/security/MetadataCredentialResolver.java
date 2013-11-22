@@ -109,6 +109,15 @@ public class MetadataCredentialResolver extends AbstractCriteriaFilteringCredent
         }
 
     }
+    
+    /**
+     * Get the metadata provider instance used by this resolver.
+     * 
+     * @return the resolver's metadata provider instance
+     */
+    public MetadataProvider getMetadataProvider() {
+        return metadata;
+    }
 
     /**
      * Get the KeyInfo credential resolver used by this metadata resolver to handle KeyInfo elements.

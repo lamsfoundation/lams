@@ -56,8 +56,14 @@ public final class SAMLSchemaBuilder {
     private static SoftReference<Schema> saml11Schema;
 
     /** Classpath relative location of basic XML schemas. */
-    private static String[] baseXMLSchemas = { "/schema/xml.xsd", "/schema/XMLSchema.xsd",
-            "/schema/xmldsig-core-schema.xsd", "/schema/xenc-schema.xsd", };
+    private static String[] baseXMLSchemas = {
+        "/schema/xml.xsd",
+        "/schema/XMLSchema.xsd",
+        "/schema/xmldsig-core-schema.xsd",
+        "/schema/xenc-schema.xsd",
+        "/schema/xmldsig11-schema.xsd",
+        "/schema/xenc11-schema.xsd",
+    };
 
     /** Classpath relative location of SOAP 1_1 schemas. */
     private static String[] soapSchemas = { "/schema/soap-envelope.xsd", };
@@ -105,16 +111,23 @@ public final class SAMLSchemaBuilder {
         "/schema/saml-schema-protocol-2.0.xsd",
         "/schema/saml-schema-x500-2.0.xsd",
         "/schema/saml-schema-xacml-2.0.xsd",
-        "/schema/sstc-saml-delegation.xsd",
-        "/schema/sstc-saml-idp-discovery.xsd",
-        "/schema/sstc-saml-metadata-ext-query.xsd",
-        "/schema/sstc-saml-protocol-ext-thirdparty.xsd",
-        "/schema/sstc-saml1x-metadata.xsd",
     };
 
     /** Classpath relative location of SAML extension schemas. */
-    private static String[] baseExtSchemas = { "/schema/sstc-saml-protocol-ext-thirdparty.xsd",
-            "/schema/sstc-saml-metadata-ext-query.xsd", "/schema/sstc-saml1x-metadata.xsd", };
+    private static String[] baseExtSchemas = {
+        "/schema/sstc-saml1x-metadata.xsd",
+        "/schema/sstc-saml-idp-discovery.xsd",
+        "/schema/sstc-saml-protocol-ext-thirdparty.xsd",
+        "/schema/sstc-saml-metadata-ext-query.xsd",
+        "/schema/sstc-saml-metadata-ui-v1.0.xsd",
+        "/schema/sstc-metadata-attr.xsd",
+        "/schema/sstc-saml-delegation.xsd",
+        "/schema/saml-metadata-rpi-v1.0.xsd",
+        "/schema/sstc-saml-delegation.xsd",
+        "/schema/sstc-saml-channel-binding-ext-v1.0.xsd",
+        "/schema/saml-async-slo-v1.0.xsd",
+        "/schema/ietf-kitten-sasl-saml-ec.xsd",
+    };
 
     /** Additional schema locations relative to classpath. */
     private static List<String> extensionSchema = new ArrayList<String>();
@@ -155,9 +168,9 @@ public final class SAMLSchemaBuilder {
     }
 
     /**
-     * Gets an unmodifiable list of currently registered schema extension.
+     * Gets an unmodifiable list of currently registered schema extensions.
      * 
-     * @return unmodifiable list of currently registered schema extension
+     * @return unmodifiable list of currently registered schema extensions
      */
     public static List<String> getExtensionSchema() {
         return Collections.unmodifiableList(extensionSchema);
