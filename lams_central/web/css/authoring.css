@@ -9,9 +9,7 @@ a.ygtvspacer {
 }
 
 
-
 /**** Dialog styles ****/
-
 .ui-dialog {
 	font-size: 12px !important;
 }
@@ -149,6 +147,41 @@ div#gtbDialog td.gtbListCell div {
 
 /**** Main authoring styles ****/
 
+#tabs {
+	padding: 0;
+	border: none;
+	font-size: 12px;
+}
+
+#tabs .ui-tabs-panel {
+	padding: 0;
+	height: 718px;
+}
+
+#tabs .tabs-spacer {
+	float: left;
+	height: 200px;
+}
+
+#tabs .ui-tabs-nav {
+	clear: left;
+	padding: 0 .2em .2em .2em;
+	background: none;
+	border: none;
+}
+
+#tabs .ui-tabs-nav li {
+	top: auto;
+	bottom: 0;
+	border: 1px solid #C5DBEC;
+	border-top: 0;
+}
+
+#tabs .ui-tabs-nav li.ui-tabs-active {
+	margin-top: 0;
+	padding-top: 0;
+}
+
 
 div#toolbar {
 	padding: 3px;
@@ -196,7 +229,7 @@ td#templateContainerCell {
 }
 
 div#templateContainer {
-	height: 741px;
+	height: 711px;
 	overflow: auto;
 }
 
@@ -215,11 +248,31 @@ div.template div {
 	width: 92px;
 	padding-top: 11px;
 	font-size: 10pt;
+	font-family: serif;
 }
 
 #canvas {
 	overflow: auto;
 	width: 844px;
-	height: 741px;
+	height: 711px;
 	vertical-align: top;
+}
+
+
+#tabDescription > table {
+	margin: auto;
+	padding-top: 180px;
+}
+
+#tabDescription > table td {
+	padding: 0 0 30px 20px;
+}
+
+td.ldDescriptionLabel {
+	font-weight: bold;
+}
+
+#ldDescriptionFieldDescription {
+	width: 500px;
+	height: 200px;
 }

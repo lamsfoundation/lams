@@ -98,9 +98,14 @@ var MenuLib = {
 	 * Run when gate is dropped on canvas. Creates a new gate activity.
 	 */
 	addTransition : function() {
+		var dialog = layout.items.infoDialog.text('Click on an activity');
+		dialog.dialog('open');
+		
 		canvas.css('cursor', 'pointer').click(function(event){
 			HandlerLib.resetCanvasMode();
-
+			dialog.text('');
+			dialog.dialog('close');
+			
 			var startActivity = null,
 				targetElement = paper.getElementByPoint(event.pageX, event.pageY);
 			
@@ -407,6 +412,8 @@ var MenuLib = {
 			return;
 		}
 		
+		$('.ldDescriptionField').text('');
+		
 		layout.activities = [];
 		if (paper) {
 			paper.clear();
@@ -476,6 +483,20 @@ var MenuLib = {
 			// add grouping effect if the existing activity had one
 			newActivity.grouping = activity.grouping;
 			newActivity.draw();
+		}
+	},
+	
+	
+	zoom : function(){
+		var zoomButton = $('#zoomButton > span');
+		if (layout.isZoomed) {
+			paper.setViewBox(0, 0, paper.width, paper.height, true);
+			layout.isZoomed = false;
+			zoomButton.text('Zoom out');
+		} else {
+			paper.setViewBox(-paper.width / 2, -paper.height / 2, paper.width * 2, paper.height * 2, true);
+			layout.isZoomed = true;
+			zoomButton.text('Cancel zoom');
 		}
 	}
 };

@@ -47,13 +47,8 @@ var PropertyLib = {
 			            			activity = dialog.dialog('option', 'activity');
 			            		
 			            		// extract group names from text fields
-			            		activity.groupNames = [];
-			            		$('input', dialog).each(function(){
-			            			// do not take into account empty group names
-			            			var groupName = $(this).val().trim();
-			            			if (groupName) {
-			            				activity.groupNames.push(groupName);
-			            			}
+			            		$('input', dialog).each(function(index){
+		            				activity.groups[index].groupName = $(this).val().trim();
 			            		});
 			            		
 			            		dialog.dialog('close');
@@ -86,23 +81,32 @@ var PropertyLib = {
 			            	'text'   : 'OK',
 			            	'click'  : function() {
 			            		var dialog = $(this),
-			            			activity = dialog.dialog('option', 'activity');
+			            			branchingActivity = dialog.dialog('option', 'branchingActivity');
 			            		
 			            		// find references to groups and branches
-			            		activity.groupsToBranches = [];
+			            		branchingActivity.groupsToBranches = [];
 			            		$('#gtbMappingGroupCell div', dialog).each(function(){
-			            			var groupName = $(this).text(),
-			            				branchName = $(this).data('boundItem').text(),
+			            			var groupUIID = $(this).attr('uiid'),
+			            				branchUIID = $(this).data('boundItem').attr('uiid'),
+			            				group = null,
 			            				branch = null;
 			            			
-			            			$.each(activity.branchingActivity.branches, function(){
-			            				if (branchName == this.title) {
+			            			$.each(branchingActivity.branches, function(){
+			            				if (branchUIID == this.uiid) {
 			            					branch = this;
 			            					return false;
 			            				}
 			            			});
-			            			activity.groupsToBranches.push({
-			            				'group'  : groupName,
+			            			$.each(branchingActivity.grouping.groups, function(){
+			            				if (groupUIID == this.uiid) {
+			            					group = this;
+			            					return false;
+			            				}
+			            			});
+			            			
+			            			// add the mapping
+			            			branchingActivity.groupsToBranches.push({
+			            				'group'  : group,
 			            				'branch' : branch
 			            			});
 			            		});
@@ -306,7 +310,7 @@ var PropertyLib = {
 	 */
 	branchingProperties : function() {
 		var activity = this,
-		content = activity.propertiesContent;
+			content = activity.propertiesContent;
 		
 		var fillWidgetsFunction = function(){
 			$('.propertiesContentFieldTitle', content).val(activity.branchingActivity.title);
@@ -429,10 +433,10 @@ var PropertyLib = {
 		// remove existing entries and add reference to the initiating activity
 		dialog.empty().dialog('option', 'activity', activity);
 		
-		activity.groupNames = PropertyLib.createNameList(activity.groupCount,
-				activity.groupNames, 'Group ');
-		$.each(activity.groupNames, function(){
-			$('<input type="text" />').addClass('groupName').appendTo(dialog).val(this);
+		activity.groups = PropertyLib.fillNameAndUIIDList(activity.groupCount,
+				activity.groups, 'name', 'Group ');
+		$.each(activity.groups, function(){
+			$('<input type="text" />').addClass('groupName').appendTo(dialog).val(this.groupName);
 			dialog.append('<br />');
 		});
 		
@@ -449,28 +453,47 @@ var PropertyLib = {
 			grouping = branchingActivity.grouping,
 			groupsCell = $('#gtbGroupsCell', dialog),
 			branchesCell = $('#gtbBranchesCell', dialog),
-			branchNames = [];
+			groupCell = $('#gtbMappingGroupCell', dialog),
+			branchCell = $('#gtbMappingBranchCell', dialog),
+			branches = branchingActivity.branches;
+		
 		// remove existing entries and add reference to the initiating activity
-		dialog.dialog('option', 'activity', activity);
+		dialog.dialog('option', 'branchingActivity', branchingActivity);
 		$('.gtbListCell', dialog).empty();
 		
 		// find group names and create DOM elements out of them
-		grouping.groupNames = PropertyLib.createNameList(grouping.groupCount,
-				grouping.groupNames, 'Group ');
-		$.each(grouping.groupNames, function(){
-			$('<div />').click(PropertyLib.selectGroupsToBranchesListItem).appendTo(groupsCell)
-						.text(this);
-		});
+		grouping.groups = PropertyLib.fillNameAndUIIDList(grouping.groupCount,
+				grouping.groups, 'name', 'Group ');
+		branches = branchingActivity.branches = PropertyLib.fillNameAndUIIDList(branches.length,
+				branches, 'title', 'Branch ');
 		
-		// find branch names and create DOM elements out of them
-		$.each(branchingActivity.branches, function(){
-			branchNames.push(this.title);
+		$.each(grouping.groups, function(){
+			var group = this,
+				groupElem = $('<div />').click(PropertyLib.selectGroupsToBranchesListItem)
+										.text(group.name).attr('uiid', group.uiid);
+			
+			// check if a group-branch mapping is already defined
+			$.each(branchingActivity.groupsToBranches, function() {
+				if (this.group == group) {
+					var branchElem = $('<div />').click(PropertyLib.selectGroupsToBranchesListItem)
+												 .appendTo(branchCell)
+												 .text(this.branch.title)
+												 .attr('uiid', this.branch.uiid)
+												 .data('boundItem', groupElem);
+					groupElem.appendTo(groupCell).data('boundItem', branchElem);
+					groupElem = null;
+					return false;
+				}
+			});
+			
+			if (groupElem) {
+				// no existing mapping was found, make the group available for mapping
+				groupElem.appendTo(groupsCell);
+			}
 		});
-		branchNames = PropertyLib.createNameList(branchNames.length,
-				branchNames, 'Branch ');
-		$.each(branchNames, function(){
+		$.each(branches, function(){
 			$('<div />').click(PropertyLib.selectGroupsToBranchesListItem).appendTo(branchesCell)
-						.text(this);
+						.text(this.title).attr('uiid', this.uiid);
 		});
 		
 		dialog.dialog('open');
@@ -497,12 +520,19 @@ var PropertyLib = {
 	/**
 	 * Creates group and branch names, if they are not already provided.
 	 */
-	createNameList : function(size, existingList, prefix) {
+	fillNameAndUIIDList : function(size, existingList, nameAttr, prefix) {
 		var list = [];
 		for (var itemIndex = 1; itemIndex <= size; itemIndex++) {
-			// generate a name if it does not exist
-			list.push(itemIndex > existingList.length || !existingList[itemIndex - 1] ?
-					prefix + itemIndex : existingList[itemIndex - 1]);
+			// generate a name and an UIID if they do not exist
+			var item = itemIndex > existingList.length ? {} : existingList[itemIndex - 1];
+			if (!item[nameAttr]) {
+				item[nameAttr] = prefix + itemIndex;
+			}
+			if (!item.uiid) {
+				// new unique UIID; TODO: change
+				item.uiid = new Date().getTime() + '_' + itemIndex;
+			}
+			list.push(item);
 		}
 		return list;
 	},

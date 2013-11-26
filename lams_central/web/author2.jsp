@@ -74,30 +74,57 @@
 		<div class="ui-button" onClick="javascript:MenuLib.arrangeActivities()">
 			Arrange
 		</div>
+		<div id="zoomButton" class="ui-button" onClick="javascript:MenuLib.zoom()">
+			Zoom out
+		</div>
 
 	</div>
-	<table id="authoringTable">
-		<tr>
-			<td id="templateContainerCell">
-				<div id="templateContainer">
-					<c:forEach var="tool" items="${tools}">
-						<div toolId="${tool.toolId}" supportsOutputs="${tool.supportsOutputs}"
-							 class="template">
-							<c:if test="${not empty tool.iconPath}">
-								<img src="<lams:LAMSURL/>${tool.iconPath}" />
-							</c:if>
-							<div><c:out value="${tool.toolDisplayName}" /></div>
+	
+	<div id="tabs" class="tabs-bottom">
+		<ul>
+			<li><a href="#tabCanvas">Canvas</a></li>
+			<li><a href="#tabDescription">Description</a></li>
+		</ul>
+		<div class="tabs-spacer"></div>
+		
+		<div id="tabCanvas">
+			<table id="authoringTable">
+				<tr>
+					<td id="templateContainerCell">
+						<div id="templateContainer">
+							<c:forEach var="tool" items="${tools}">
+								<div toolId="${tool.toolId}" supportsOutputs="${tool.supportsOutputs}"
+									 class="template">
+									<c:if test="${not empty tool.iconPath}">
+										<img src="<lams:LAMSURL/>${tool.iconPath}" />
+									</c:if>
+									<div><c:out value="${tool.toolDisplayName}" /></div>
+								</div>
+							</c:forEach>
 						</div>
-					</c:forEach>
-				</div>
-			</td>
-			<td>
-				<div id="canvas"></div>
-			</td>
-		</tr>
-	</table>
-	
-	
+					</td>
+					<td>
+						<div id="canvas"></div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		
+		<div id="tabDescription">
+			<table>
+				<tr>
+					<td class="ldDescriptionLabel">Title</td>
+					<td id="ldDescriptionFieldTitle" class="ldDescriptionField"></td>
+				</tr>
+				<tr>
+					<td class="ldDescriptionLabel">Description</td>
+					<td><textarea id="ldDescriptionFieldDescription" class="ldDescriptionField"></textarea></td>
+				</tr>
+			</table>
+		</div>
+		
+	</div>
+
 	
 	<!-- DIALOGS CONTENTS -->
 	

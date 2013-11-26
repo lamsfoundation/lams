@@ -28,7 +28,7 @@ var ActivityLib = {
 	 * Constructor for a Grouping Activity.
 	 */
 	GroupingActivity : function(id, x, y, title, groupingID, groupingType, groupDivide, groupCount, learnerCount,
-			equalSizes, viewLearners, groupNames) {
+			equalSizes, viewLearners, groups) {
 		this.id = id;
 		this.groupingID = groupingID;
 		this.type = 'grouping';
@@ -39,7 +39,7 @@ var ActivityLib = {
 		this.learnerCount = learnerCount || 1;
 		this.equalSizes = equalSizes || false;
 		this.viewLearners = viewLearners || false;
-		this.groupNames = groupNames || [];
+		this.groups = groups || [];
 		this.transitions = {
 			'from' : [],
 			'to'   : []
@@ -107,14 +107,17 @@ var ActivityLib = {
 		this.id = id;
 		this.start = branchingEdgeStart;
 		this.branches = [];
+		// mapping between groups and branches, if applicable
+		this.groupsToBranches = [];
 	},
 	
 	
 	/**
 	 * Represents a subsequence of activities. It is not displayed on canvas.
 	 */
-	BranchActivity : function(id, title, branchingActivity, transitionFrom) {
+	BranchActivity : function(id, uiid, title, branchingActivity, transitionFrom) {
 		this.id = id;
+		this.uiid = uiid;
 		this.title = title;
 		this.transitionFrom = transitionFrom;
 		this.branchingActivity = branchingActivity;
@@ -387,9 +390,10 @@ var ActivityLib = {
 		transition.mousedown(HandlerLib.transitionMousedownHandler);
 		
 		if (!redraw && fromActivity.type == 'branchingEdge' && fromActivity.isStart
-				&& (toActivity.type != 'branchingEdge' || fromActivity.branchingActivity != toActivity.branchingActivity)) {
+				&& (toActivity.type != 'branchingEdge'
+					|| fromActivity.branchingActivity != toActivity.branchingActivity)) {
 			// create a new branch
-			var branch = new ActivityLib.BranchActivity(null, null, fromActivity.branchingActivity, transition);
+			var branch = new ActivityLib.BranchActivity(null, null, null, fromActivity.branchingActivity, transition);
 			fromActivity.branchingActivity.branches.push(branch);
 			transition.data('branch', branch);
 		}

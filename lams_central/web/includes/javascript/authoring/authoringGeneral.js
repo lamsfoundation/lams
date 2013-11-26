@@ -8,6 +8,7 @@ var paper = null,
 
 // configuration and storage of various elements
 var layout = {
+	'isZoomed'   : false,
 	'activities' : null,
 	'items' : {
 		'bin'               : null,
@@ -145,6 +146,13 @@ function initTemplates(){
  * Initialises various Authoring widgets.
  */
 function initLayout() {
+	$('#tabs').tabs();
+	$('#tabs .ui-tabs-nav, #tabs .ui-tabs-nav > *')
+		.removeClass( "ui-corner-all ui-corner-top" )
+		.addClass( "ui-corner-bottom" );
+	$('#tabs .ui-tabs-nav').appendTo('#tabs');
+	
+	
 	// initalise open Learning Design dialog
 	var ldStoreDialog = $('#ldStoreDialog').dialog({
 		'autoOpen'      : false,
@@ -267,6 +275,9 @@ function openLearningDesign(learningDesignId) {
 			// remove existing activities
 			MenuLib.newLearningDesign(true);
 			
+			$('#ldDescriptionFieldTitle').text(ld.title);
+			$('#ldDescriptionFieldDescription').text(ld.description);
+			
 			var resizeNeeded = false,
 				arrangeNeeded = false,
 				// current paper dimensions 
@@ -300,7 +311,7 @@ function openLearningDesign(learningDesignId) {
 							var groupingData = this;
 							if (groupingData.groupingID == activityData.createGroupingID) {
 								var groupingType = null,
-									groupNames = [];
+									groups = [];
 								
 								// translate backend grouping type to human readable for better understanding
 								switch(groupingData.groupingTypeID) {
@@ -316,7 +327,11 @@ function openLearningDesign(learningDesignId) {
 								};
 								// get groups names
 								$.each(groupingData.groups, function(){
-									groupNames.push(this.groupName);
+									groups.push({
+										'name' : this.groupName,
+										'id'   : this.groupID,
+										'uiid' : this.groupUIID
+										});
 								});
 								
 								activity = new ActivityLib.GroupingActivity(activityData.activityID,
@@ -330,7 +345,7 @@ function openLearningDesign(learningDesignId) {
 										groupingData.learnersPerGroup,
 										groupingData.equalNumberOfLearnersPerGroup,
 										groupingData.viewStudentsBeforeSelection,
-										groupNames);
+										groups);
 								return false;
 							}
 						})
@@ -375,6 +390,7 @@ function openLearningDesign(learningDesignId) {
 								// create a branch inside the branching activity
 								this.branchingActivity.branches.push(
 										new ActivityLib.BranchActivity(activityData.activityID,
+																	   activityData.activityUIID,
 																	   activityData.activityTitle,
 																	   this.branchingActivity));
 								return false;
@@ -449,6 +465,45 @@ function openLearningDesign(learningDesignId) {
 				}
 			});
 			
+			// apply group -> branch mappings
+			$.each(ld.branchMappings, function(){
+				var groupUIID = this.groupUIID,
+					branchUIID = this.sequenceActivityUIID,
+					group = null,
+					branch = null;
+				$.each(layout.activities, function(){
+					// is it the branch we're looking for?
+					if (this.type == 'branchingEdge' && this.isStart) {
+						$.each(this.branchingActivity.branches, function(){
+							if (branchUIID == this.uiid) {
+								branch = this;
+								return false;
+							}
+						});
+					// is it the grouping we're looking for
+					} else if (this.type == 'grouping') {
+						$.each(this.groups, function(){
+							if (groupUIID == this.uiid) {
+								group = this;
+								return false;
+							}
+						});
+					}
+					
+					// found both, no need to continue iteration
+					if (group && branch) {
+						return false;
+					}
+				});
+				
+				if (group && branch) {
+					branch.branchingActivity.groupsToBranches.push({
+						'group'  : group,
+						'branch' : branch 
+					});
+				}
+			});
+			
 			
 			// draw starting and ending transitions in branches
 			$.each(layout.activities, function(){
@@ -466,9 +521,7 @@ function openLearningDesign(learningDesignId) {
 				}
 			});
 			
-			// draw transitions from last activities in branches to end edge point
 
-			
 			// draw plain transitions
 			$.each(ld.transitions, function(){
 				var transition = this,
@@ -501,7 +554,7 @@ function openLearningDesign(learningDesignId) {
 			if (arrangeNeeded) {
 				MenuLib.arrangeActivities();
 			} else if (resizeNeeded) {
-				ActivityLib.resizePaper(paperWidth, paperHeight);
+				resizePaper(paperWidth, paperHeight);
 			} else {	
 				HandlerLib.resetCanvasMode();
 			}
