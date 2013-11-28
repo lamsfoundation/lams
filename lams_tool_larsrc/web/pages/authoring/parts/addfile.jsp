@@ -39,17 +39,6 @@
 
 			<html:text property="title" size="55" tabindex="1" />
 
-			<%--  Remove description in as LDEV-617
-							<tr>
-								<td width="130px">
-									<fmt:message key="label.authoring.basic.resource.description.input" />
-								</td>
-								<td>
-									<lams:STRUTS-textarea rows="5" cols="55" tabindex="2" property="description" />
-								</td>
-							</tr>
-							--%>
-
 			<div class="field-name space-top">
 				<fmt:message key="label.authoring.basic.resource.file.input" />
 			</div>
@@ -63,9 +52,7 @@
 		</html:form>
 
 		<!-- Instructions -->
-
 		<%@ include file="instructions.jsp"%>
-		
 		
 		<lams:ImgButtonWrapper>
 			<a href="#" onclick="submitResourceItem()" class="button-add-item"><fmt:message

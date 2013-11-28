@@ -1,18 +1,26 @@
 	/*
-	 This is Resource Item instrcution area.
+	 This is Resource Item instruction area.
 	 */
 	var instructionTargetDiv = "instructionArea";
     var itemAttachmentTargetDiv = "itemAttachmentArea";
-    var singleInstructionHeight = 40;
+    var singleInstructionHeight = 74;
     
 	function removeInstruction(idx){
+		//prepare lams_textarea value to Ajax submit
+		$('textarea').trigger('change');
+		
 	    var param = $("#instructionForm").serialize() + "&removeIdx="+idx;
 	    removeInstructionLoading();
-	    $.post(removeInstructionUrl, param, function(xml) {
-	    	removeInstructionComplete();	
-	    	document.getElementById("instructionArea").innerHTML = xml;
-	    });
+	    $.post(
+	    	removeInstructionUrl, 
+	    	param, 
+	    	function(xml) {
+	    		removeInstructionComplete();	
+	    		document.getElementById("instructionArea").innerHTML = xml;
+	    	}
+	    );
 	}
+	
 	function removeItemAttachment(idx){
 	    removeItemAttachmentLoading();
 		$("#" + itemAttachmentTargetDiv).load(
@@ -22,16 +30,26 @@
 			}
 		);	    
 	}
+	
 	function addInstruction(){
+		//prepare lams_textarea value to Ajax submit
+		$('textarea').trigger('change');
+		
 	    var param = $("#instructionForm").serialize();
 		addInstructionLoading();
-	    $.post(addInstructionUrl, param, function(xml) {
-	    	addInstructionComplete();
-	    	document.getElementById("instructionArea").innerHTML = xml;
-	    });
+		
+	    $.post(
+	    	addInstructionUrl, 
+	    	param, 
+	    	function(xml) {
+	    		addInstructionComplete();
+	    		document.getElementById("instructionArea").innerHTML = xml;
+	    	}
+	    );
+	    
 	    return false;
-
 	}
+	
 	function adjustInstructionsDisplayAreaHeight(adjustAmount){
 		var obj = window.document.getElementById('reourceInputArea');
 		if (!obj && window.parent) {
@@ -43,6 +61,9 @@
 		obj.style.height=obj.contentWindow.document.body.scrollHeight+adjustAmount+'px';
 	}
 	function upItem(itemIdx){
+		//prepare lams_textarea value to Ajax submit
+		$('textarea').trigger('change');
+		
 		if(itemIdx == 0)
 			return;
 		var currId = "instructionItemDesc" + itemIdx;
@@ -50,6 +71,9 @@
 		switchValue(currId,repId);
 	}
 	function downItem(itemIdx,maxSize){
+		//prepare lams_textarea value to Ajax submit
+		$('textarea').trigger('change');
+		
 		if(itemIdx == (maxSize -1))
 			return;
 		var currId = "instructionItemDesc" + itemIdx;
@@ -83,6 +107,9 @@
 	}
 	
 	function submitResourceItem(){
+		//prepare lams_textarea value to Ajax submit
+		$('textarea').trigger('change');
+		
 		document.getElementById("instructionList").value = $("#instructionForm").serialize();
 		$("#resourceItemForm").submit();
 		// after submit, it direct to itemlist.jsp, 

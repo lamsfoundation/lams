@@ -1,36 +1,30 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="ctxPath" value="${pageContext.request.contextPath}"
-	scope="request" />
+<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
 <c:set var="listSize" value="${fn:length(instructionList)}" />
+
 <div id="instructionArea">
 	<form id="instructionForm">
-		<input type="hidden" name="instructionCount" id="instructionCount">
+		<input type="hidden" name="instructionCount" id="instructionCount" value="${listSize}">
 
 		<div class="field-name space-top">
 			<fmt:message key="label.authoring.basic.resource.instructions" />
 		</div>
 
-		<a href="javascript:;" onclick="addInstruction()"
-			class="button-add-item"><fmt:message
-				key="label.authoring.basic.resource.add.instruction" /> </a>
-		<img src="${ctxPath}/includes/images/indicator.gif"
-			style="display:none" id="instructionArea_Busy" />
-
+		<img src="${ctxPath}/includes/images/indicator.gif" style="display:none" id="instructionArea_Busy" />
 
 		<table>
 			<c:forEach var="item" items="${instructionList}" varStatus="status">
 				<tr id="instructionItem${status.index}">
-					<td width="3px">
+					<td width="10px">
 						${status.index+1}
 					</td>
 					<td>
-						<input type="text" name="instructionItemDesc${status.index}"
-							id="instructionItemDesc${status.index}" size="60" maxlength="255" value="<c:out value='${item}' />" />
+						<lams:STRUTS-textarea property="instructionItemDesc${status.index}" 
+							styleId="instructionItemDesc${status.index}" rows="3" cols="82" value="${item}" />
 					</td>
 
-					<td>
+					<td style="width: 20px; vertical-align: middle;">
 						<%-- Don't display down icon if last line --%>
-
 						<c:choose>
 							<c:when test="${0 != status.index}">
 								<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
@@ -38,8 +32,7 @@
 									onclick="upItem('${status.index}')">
 							</c:when>
 							<c:otherwise>
-								<img
-									src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
+								<img src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
 									border="0" title="<fmt:message key="label.up"/>">
 							</c:otherwise>
 						</c:choose>
@@ -52,8 +45,7 @@
 							</c:when>
 
 							<c:otherwise>
-								<img
-									src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
+								<img src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
 									border="0" title="<fmt:message key="label.down"/>">
 							</c:otherwise>
 
@@ -61,7 +53,7 @@
 
 						<%-- Don't display down icon if last line --%>
 					</td>
-					<td>
+					<td style="width: 20px; vertical-align: middle;">
 						<img src="<html:rewrite page='/includes/images/cross.gif'/>"
 							border="0" title="<fmt:message key="label.delete"/>"
 							onclick="removeInstruction('${status.index}')">
@@ -70,12 +62,16 @@
 			</c:forEach>
 		</table>
 
+		<a href="#nogo" onclick="javascript:addInstruction();" class="button-add-item float-right">
+			<fmt:message key="label.authoring.basic.resource.add.instruction" /> 
+		</a>
+
 	</form>
 </div>
+<br>
 
 <%-- This script will adjust resource item input area height according to the new instruction item amount. --%>
 <script type="text/javascript">
-	document.getElementById("instructionCount").value = "${listSize}";
 	var obj = window.document.getElementById('reourceInputArea');
 	if (!obj && window.parent) {
 		 obj = window.parent.document.getElementById('reourceInputArea');

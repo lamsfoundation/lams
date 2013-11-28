@@ -100,7 +100,7 @@
 	</lams:head>
 	<body>
 
-		<div id="instructions">
+		<div id="instructions" style="padding: 0 10px;">
 			
 			<h2>
 				<c:if test="${instructions.total > 0}" >
@@ -114,45 +114,37 @@
 				</c:if>
 			</h2>
 			
-				<span class="right-buttons">
+			<span style="position: fixed; right: 10px;">
 				<c:choose>
-				
-				<c:when test="${instructions.current < instructions.total}">
-					<input type="button" id="NextInstruction" name="NextInstruction"
-						onClick="javascript:nextIns(${instructions.current})"
-						class="button" value="<fmt:message key='label.next.instruction' />" />
-				</c:when>
-				<c:when test="${reflectOn && runAuto}">
-					<input type="button" id="FinishInstruction" name="FinishInstruction"
-						onClick="javascript:continueReflect()" class="button" value="<fmt:message
-							key='label.continue' />" />
-				</c:when>
-				<c:otherwise>
-					<input type="button" id="FinishInstruction" name="FinishInstruction" class="button" value="<fmt:message key='label.finish' />" />
-				</c:otherwise>
-			</c:choose>
+					<c:when test="${instructions.current < instructions.total}">
+						<input type="button" id="NextInstruction" name="NextInstruction"
+							onClick="javascript:nextIns(${instructions.current})"
+							class="button" value="<fmt:message key='label.next.instruction' />" />
+					</c:when>
+					<c:when test="${reflectOn && runAuto}">
+						<input type="button" id="FinishInstruction" name="FinishInstruction"
+							onClick="javascript:continueReflect()" class="button" value="<fmt:message
+								key='label.continue' />" />
+					</c:when>
+					<c:otherwise>
+						<input type="button" id="FinishInstruction" name="FinishInstruction" class="button" value="<fmt:message key='label.finish' />" />
+					</c:otherwise>
+				</c:choose>
 			</span>
 
 			<p>
-
+			
 				<c:choose>
 					<c:when test="${instructions.instruction == null}">
 						<fmt:message key="msg.no.instruction" />
 					</c:when>
+					
 					<c:otherwise>
-					${instructions.instruction.description}
-				</c:otherwise>
+						${instructions.instruction.description}
+					</c:otherwise>
 				</c:choose>
-
-
-
-
-
+				
 			</p>
-
-
-
-
 
 		</div>
 	</body>

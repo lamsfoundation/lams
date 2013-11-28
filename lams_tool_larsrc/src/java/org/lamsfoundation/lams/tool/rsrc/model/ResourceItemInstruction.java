@@ -26,65 +26,73 @@ package org.lamsfoundation.lams.tool.rsrc.model;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+
 /**
  * @hibernate.class table="tl_larsrc11_item_instruction"
  * @author Steve.Ni
  * 
  * @version $Revision$
  */
-public class ResourceItemInstruction  implements Cloneable{
-	private static final Logger log = Logger.getLogger(ResourceItemInstruction.class);
-	
-	private Long uid;
-	private int sequenceId;
-	private String description;
+public class ResourceItemInstruction implements Cloneable {
+    private static final Logger log = Logger.getLogger(ResourceItemInstruction.class);
 
-    public Object clone(){
-		Object obj = null;
-		try {
-			obj = super.clone();
-			((ResourceItemInstruction)obj).setUid(null);
-		} catch (CloneNotSupportedException e) {
-			log.error("When clone " + ResourceItemInstruction.class + " failed");
-		}
-		
-		return obj;
+    private Long uid;
+    private int sequenceId;
+    private String description;
+
+    public Object clone() {
+	Object obj = null;
+	try {
+	    obj = super.clone();
+	    ((ResourceItemInstruction) obj).setUid(null);
+	} catch (CloneNotSupportedException e) {
+	    log.error("When clone " + ResourceItemInstruction.class + " failed");
 	}
-// **********************************************************
-	  	//		Get/Set methods
-//	  **********************************************************
-		/**
-		 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-		 * @return Returns the uid.
-		 */
-		public Long getUid() {
-			return uid;
-		}
-		/**
-		 * @param uid The uid to set.
-		 */
-		public void setUid(Long userID) {
-			this.uid = userID;
-		}
-		/**
-		 * @hibernate.property column="description"
-		 * @return
-		 */
-		public String getDescription() {
-			return description;
-		}
-		public void setDescription(String description) {
-			this.description = description;
-		}
-		/**
-		 * @hibernate.property column="sequence_id"
-		 * @return
-		 */
-		public int getSequenceId() {
-			return sequenceId;
-		}
-		public void setSequenceId(int sequenceId) {
-			this.sequenceId = sequenceId;
-		}
+
+	return obj;
+    }
+
+    // **********************************************************
+    // Get/Set methods
+    // **********************************************************
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     * @return Returns the uid.
+     */
+    public Long getUid() {
+	return uid;
+    }
+
+    /**
+     * @param uid
+     *            The uid to set.
+     */
+    public void setUid(Long userID) {
+	this.uid = userID;
+    }
+
+    /**
+     * @hibernate.property column="description" type="text"
+     * @return
+     */
+    public String getDescription() {
+	return description;
+    }
+
+    public void setDescription(String description) {
+	this.description = description;
+    }
+
+    /**
+     * @hibernate.property column="sequence_id"
+     * @return
+     */
+    public int getSequenceId() {
+	return sequenceId;
+    }
+
+    public void setSequenceId(int sequenceId) {
+	this.sequenceId = sequenceId;
+    }
 
 }

@@ -2,9 +2,7 @@
 
 <%-- If you change this file, remember to update the copy made for CNG-36 --%>
 
-<c:set var="formBean"
-	value="<%=request
-									.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script lang="javascript">
 <!-- Common Javascript functions for LAMS -->
 
@@ -14,7 +12,7 @@
 	function showMessage(url) {
 		var area=document.getElementById("reourceInputArea");
 		if(area != null){
-			area.style.width="650px";
+			area.style.width="90%";
 			area.style.height="100%";
 			area.src=url;
 			area.style.display="block";
@@ -55,18 +53,19 @@
 	function deleteItem(idx,sessionMapID){
 		var url = "<c:url value="/authoring/removeItem.do"/>";
 	    var reqIDVar = new Date();
-		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
 		deleteItemLoading();
-	    var myAjax = new Ajax.Updater(
-		    	resourceListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteItemComplete,
-		    		evalScripts:true
-		    	}
-	    );
+	    
+		$("#" + resourceListTargetDiv).load(
+			url,
+			{
+				itemIndex: idx,
+				reqID: reqIDVar.getTime(), 
+				sessionMapID: sessionMapID
+			},
+			function() {
+				deleteItemComplete();
+			}
+		);
 	}
 	function deleteItemLoading(){
 		showBusy(resourceListTargetDiv);
@@ -80,18 +79,19 @@
 		resourceItemOrderID2++;
 		
 		var url = "<c:url value="/authoring/switchResourceItemPosition.do"/>";
-		var param = "sessionMapID=" + sessionMapID + "&resourceItemOrderID1=" + resourceItemOrderID1 + "&resourceItemOrderID2=" + resourceItemOrderID2;
 		deleteItemLoading();
-		var myAjax = new Ajax.Updater(
-	    	resourceListTargetDiv,
-	    	url,
-	    	{
-	    		method:'get',
-	    		parameters:param,
-	    		onComplete:deleteItemComplete,
-	    		evalScripts:true
-	    	}
-	    );
+		
+		$("#" + resourceListTargetDiv).load(
+			url,
+			{
+				sessionMapID: sessionMapID,
+				resourceItemOrderID1: resourceItemOrderID1, 
+				resourceItemOrderID2: resourceItemOrderID2
+			},
+			function() {
+				deleteItemComplete();
+			}
+		);
 	}
 
 </script>
@@ -136,9 +136,6 @@
 				<a
 				href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=4"/>');" class="space-left">
 				<fmt:message key="label.authoring.basic.add.learning.object" /> </a>
-				
-				
-
 </p>
 
 <p>

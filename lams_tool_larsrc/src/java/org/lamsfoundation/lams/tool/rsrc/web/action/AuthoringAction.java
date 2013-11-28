@@ -29,7 +29,6 @@ import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -274,8 +273,8 @@ public class AuthoringAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
 	((ResourceItemForm) form).setSessionMapID(sessionMapID);
 
-	short type = (short) NumberUtils.stringToInt(request.getParameter(AuthoringAction.ITEM_TYPE));
-	List instructionList = new ArrayList(AuthoringAction.INIT_INSTRUCTION_COUNT);
+	short type = (short) WebUtil.readIntParam(request, AuthoringAction.ITEM_TYPE);
+	List<String> instructionList = new ArrayList<String>(AuthoringAction.INIT_INSTRUCTION_COUNT);
 	for (int idx = 0; idx < AuthoringAction.INIT_INSTRUCTION_COUNT; idx++) {
 	    instructionList.add("");
 	}
@@ -339,8 +338,8 @@ public class AuthoringAction extends Action {
      * @return
      */
     private ActionForward newInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-	int numberOfInstructions = getNumberOfInstructionsInRequest(request);
-	List instructionList = new ArrayList(++numberOfInstructions);
+	int numberOfInstructions = WebUtil.readIntParam(request, INSTRUCTION_ITEM_COUNT); 
+	List<String> instructionList = new ArrayList<String>(++numberOfInstructions);
 	for (int idx = 0; idx < numberOfInstructions; idx++) {
 	    String item = request.getParameter(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX + idx);
 	    if (item == null) {
@@ -363,9 +362,9 @@ public class AuthoringAction extends Action {
      * @return
      */
     private ActionForward removeInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-	int numberOfInstructions = getNumberOfInstructionsInRequest(request);
-	int removeIdx = NumberUtils.stringToInt(request.getParameter("removeIdx"), -1);
-	List instructionList = new ArrayList(numberOfInstructions - 1);
+	int numberOfInstructions = WebUtil.readIntParam(request, INSTRUCTION_ITEM_COUNT);
+	int removeIdx = WebUtil.readIntParam(request, "removeIdx");
+	List<String> instructionList = new ArrayList<String>(numberOfInstructions - 1);
 	for (int idx = 0; idx < numberOfInstructions; idx++) {
 	    String item = request.getParameter(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX + idx);
 	    if (idx == removeIdx) {
@@ -946,23 +945,6 @@ public class AuthoringAction extends Action {
 
 	return instructionList;
 
-    }
-
-    /**
-     * Get number of instruction items in the <code>HttpRequest</code>
-     * 
-     * @param request
-     *            the HttpServletRequest
-     * @return numberOfInstruction the number of instructions in the request
-     */
-    private int getNumberOfInstructionsInRequest(HttpServletRequest request) {
-	int numberOfInstructions = 0;
-	Enumeration e = request.getParameterNames();
-	while (e.hasMoreElements()) {
-	    if (e.nextElement().toString().indexOf(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX) != -1)
-		numberOfInstructions++;
-	}
-	return numberOfInstructions;
     }
 
     /**
