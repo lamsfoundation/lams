@@ -589,15 +589,15 @@ var ActivityLib = {
 				data : {
 					'method'          : 'createToolContent',
 					'toolID'          : activity.toolID,
-					'contentFolderID' : contentFolderID
+					'contentFolderID' : layout.contentFolderID
 				},
 				success : function(response) {
 					activity.authorURL = response.authorURL;
 					activity.id = response.toolContentID;
-					if (!contentFolderID) {
+					if (!layout.contentFolderID) {
 						// if LD did not have contentFolderID, it was just generated
 						// so remember it
-						contentFolderID = response.contentFolderID;
+						layout.contentFolderID = response.contentFolderID;
 					}
 				}
 			});

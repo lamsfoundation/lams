@@ -24,10 +24,10 @@
 package org.lamsfoundation.lams.authoring.service;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,7 +42,10 @@ import java.util.Vector;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
+import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
@@ -61,6 +64,7 @@ import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.learningdesign.dao.IBranchActivityEntryDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.ActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.CompetenceDAO;
 import org.lamsfoundation.lams.learningdesign.dao.hibernate.CompetenceMappingDAO;
@@ -73,8 +77,6 @@ import org.lamsfoundation.lams.learningdesign.dao.hibernate.TransitionDAO;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.DesignDetailDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
-import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
-import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
@@ -112,7 +114,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
-import org.lamsfoundation.lams.web.DisplayGroupAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
@@ -172,6 +173,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     /** The bean factory is used to create ObjectExtractor objects */
     protected BeanFactory beanFactory;
 
+    protected IBranchActivityEntryDAO branchActivityEntryDAO;
+
     public AuthoringService() {
 
     }
@@ -200,6 +203,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     public void setGroupingDAO(GroupingDAO groupingDAO) {
 	this.groupingDAO = groupingDAO;
+    }
+
+    public void setBranchActivityEntryDAO(IBranchActivityEntryDAO branchActivityEntryDAO) {
+	this.branchActivityEntryDAO = branchActivityEntryDAO;
     }
 
     /**
@@ -767,7 +774,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
 		    Integer x2 = toActivity.getXcoord() != null ? toActivity.getXcoord() : 0;
 
-		    gate.setXcoord(new Integer((x1.intValue() + 123 + x2.intValue()) / 2 - 13));
+		    gate.setXcoord(new Integer(((x1.intValue() + 123 + x2.intValue()) / 2) - 13));
 
 		    Integer y1 = activity.getYcoord() != null ? activity.getYcoord() : 0;
 		    Integer y2 = toActivity.getYcoord() != null ? toActivity.getYcoord() : 0;
@@ -1702,6 +1709,56 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		null, null);
 
 	return design.getLearningDesignId();
+    }
+
+    @Override
+    public LearningDesign saveLearningDesignDetails(JSONObject ldJSON) throws UserException, JSONException,
+	    WorkspaceFolderException, ObjectExtractorException, ParseException {
+	User user = null;
+	Integer userID = AuthoringService.getUserId();
+	if (userID != null) {
+	    user = (User) baseDAO.find(User.class, userID);
+	}
+	if (user == null) {
+	    throw new UserException("UserID missing or user not found.");
+	}
+
+	Integer workspaceFolderID = ldJSON.getInt("workspaceFolderID");
+	WorkspaceFolder workspaceFolder = null;
+	boolean authorised = false;
+	if (workspaceFolderID != null) {
+	    workspaceFolder = (WorkspaceFolder) baseDAO.find(WorkspaceFolder.class, workspaceFolderID);
+	    authorised = workspaceManagementService.isUserAuthorizedToModifyFolderContents(workspaceFolderID, userID);
+	}
+
+	Long learningDesignId = ldJSON.optLong(AttributeNames.PARAM_LEARNINGDESIGN_ID);
+	LearningDesign existingLearningDesign = learningDesignId == null ? null : learningDesignDAO
+		.getLearningDesignById(learningDesignId);
+	if (!authorised && (existingLearningDesign != null)
+		&& Boolean.TRUE.equals(existingLearningDesign.getEditOverrideLock())) {
+	    authorised = userID.equals(existingLearningDesign.getEditOverrideUser().getUserId());
+	}
+	if (!authorised) {
+	    throw new UserException("User with ID " + userID
+		    + " is not authorized to store a design in this workspace folder " + workspaceFolderID);
+	}
+
+	IObjectExtractor extractor = (IObjectExtractor) beanFactory
+		.getBean(IObjectExtractor.OBJECT_EXTRACTOR_SPRING_BEANNAME);
+	LearningDesign design = extractor.extractSaveLearningDesign(ldJSON, existingLearningDesign, workspaceFolder,
+		user);
+
+	if (extractor.getMode().intValue() == 1) {
+	    // adding the customCSV to the call if it is present
+	    String customCSV = ldJSON.optString("customCSV");
+
+	    copyLearningDesignToolContent(design, design, design.getCopyTypeID(), customCSV);
+	}
+
+	logEventService.logEvent(LogEvent.TYPE_TEACHER_LEARNING_DESIGN_CREATE, userID, design.getLearningDesignId(),
+		null, null);
+
+	return design;
     }
 
     /**

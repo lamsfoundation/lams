@@ -143,9 +143,42 @@ var MenuLib = {
 	openLearningDesign : function(){
 		var dialog = $('#ldStoreDialog');
 		// remove the directory tree, if it remained for last dialog opening
-		dialog.dialog('open');
+		dialog.dialog('option', {
+			'title'  : 'Open sequence',
+			'buttons' : dialog.dialog('option', 'buttonsLoad'),
+			// it informs widgets that it is load dialog
+			'dialogClass': 'ldStoreDialogLoad'
+		})			   
+		.dialog('open');
 		
-		var tree = dialog.dialog('option', 'ldTree'),
+		MenuLib.initLearningDesignTree();
+	},
+	
+	
+	/**
+	 * Opens "Save sequence" dialog where an user can choose where to save the Learning Design.
+	 */
+	saveLearningDesign : function(){
+		var dialog = $('#ldStoreDialog');
+		// remove the directory tree, if it remained for last dialog opening
+		dialog.dialog('option', {
+			'title'  : 'Save sequence',
+			'buttons' : dialog.dialog('option', 'buttonsSave'),
+			// it informs widgets that it is saved dialog
+			'dialogClass': 'ldStoreDialogSave'
+		})			   
+		.dialog('open');
+		
+		MenuLib.initLearningDesignTree();
+	},
+	
+	
+	/**
+	 * Loads Learning Design Tree from DB
+	 */
+	initLearningDesignTree : function(){
+		var dialog = $('#ldStoreDialog'),
+			tree = dialog.dialog('option', 'ldTree'),
 			rootNode = tree.getRoot();
 		// remove existing folders
 		$.each(rootNode.children, function(){

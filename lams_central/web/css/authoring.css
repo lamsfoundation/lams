@@ -62,7 +62,6 @@ div#ldStoreDialog > table {
 	width: 100%;
 	height: 682px;
 	table-layout: fixed;
-	border-top: thin dotted #2E6E9E;
 }
 
 div#ldStoreDialog td#ldStoreDialogTreeCell {
@@ -100,6 +99,24 @@ div#ldStoreDialog div#ldStoreDialogCanvasDiv {
 
 div#ldStoreDialog img#ldScreenshotLoading  {
 	padding-top: 200px;
+}
+
+.ldStoreDialogLoad .ldStoreDialogSaveOnly {
+	display: none;
+}
+
+div#ldStoreDialogNameContainer {
+	float: left;
+	padding: 8px 0 0 215px;
+}
+
+div#ldStoreDialogNameContainer span {
+	font-weight: bold;
+}
+
+#ldStoreDialogNameContainer input#ldStoreDialogNameField {
+	width: 300px;
+	margin-left: 20px;	
 }
 
 

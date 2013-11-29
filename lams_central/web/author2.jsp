@@ -47,6 +47,17 @@
 		<div class="ui-button" onClick="javascript:MenuLib.openLearningDesign()">
 			Open
 		</div>
+		<div>
+			<div class="split-ui-button">
+				<div onClick="javascript:MenuLib.saveLearningDesign()">
+					<span>Save</span>
+				</div>
+				<div>&nbsp;</div>
+			</div>
+			<ul>
+				<li onClick="javascript:MenuLib.saveLearningDesign()">Save as...</li>
+			</ul>
+		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.copyActivity()">
 			Copy
 		</div>
@@ -128,9 +139,8 @@
 	
 	<!-- DIALOGS CONTENTS -->
 	
-	<!-- SEQUENCE LOAD DIALOG -->
+	<!-- SEQUENCE LOAD/SAVE DIALOG -->
 	<div id="ldStoreDialog" class="dialogContainer">
-		<div class="dialogTitle">Open sequence</div>
 		<table>
 			<tr>
 				<td id="ldStoreDialogTreeCell">
@@ -150,6 +160,10 @@
 				</td>
 			</tr>
 		</table>
+		<%-- This will be moved to dialog's button pane --%>
+		<div id="ldStoreDialogNameContainer" class="ldStoreDialogSaveOnly">
+			<span>Title:</span><input id="ldStoreDialogNameField" type="text" />
+		</div>
 	</div>
 	
 	

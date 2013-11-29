@@ -24,9 +24,13 @@
 package org.lamsfoundation.lams.authoring.service;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -34,7 +38,6 @@ import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
-import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
@@ -175,6 +178,9 @@ public interface IAuthoringService {
      * @throws Exception
      */
     public Long storeLearningDesignDetails(String wddxPacket) throws Exception;
+
+    public LearningDesign saveLearningDesignDetails(JSONObject ldJSON) throws UserException, JSONException,
+	    WorkspaceFolderException, ObjectExtractorException, ParseException;
 
     /**
      * Validate the learning design, updating the valid flag appropriately.
@@ -403,7 +409,7 @@ public interface IAuthoringService {
     public Grouping getGroupingById(Long groupingID);
 
     public String getToolAuthorUrl(Long toolID, Long toolContentID, String contentFolderID);
-    
+
     public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
 	    String contentFolderID, Integer organisationID);
 }

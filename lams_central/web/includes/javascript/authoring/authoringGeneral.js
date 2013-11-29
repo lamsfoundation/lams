@@ -152,26 +152,33 @@ function initLayout() {
 		.addClass( "ui-corner-bottom" );
 	$('#tabs .ui-tabs-nav').appendTo('#tabs');
 	
-	
-	// initalise open Learning Design dialog
-	var ldStoreDialog = $('#ldStoreDialog').dialog({
+	// the close button is shared by both load and save dialogs
+	var closeLdStoreDialogButton ={
+    	'text'   : 'Cancel',
+    	'click'  : function() {
+			$(this).dialog('close');
+		}
+    },
+    
+	// initalise Learning Design load/save dialog
+	ldStoreDialog = $('#ldStoreDialog').dialog({
 		'autoOpen'      : false,
 		'position'      : {
 			'my' : 'left top',
-			'at' : 'left+5px top+5px',
+			'at' : 'left top',
 			'of' :  'body'
 		},
 		'resizable'     : false,
-		'width'			: 990,
-		'height'		: 780,
-		'dialogClass': 'dialog-no-title',
-		'buttons' : [
+		'width'			: 1000,
+		'height'		: 785,
+		'draggable'     : false,
+		'buttonsLoad' : [
 		             {
 		            	'text'   : 'Open',
 		            	'click'  : function() {
-		            		var dialog = $(this);
-		            		var tree = dialog.dialog('option', 'ldTree');
-		            		var ldNode = tree.getHighlightedNode();
+		            		var dialog = $(this),
+		            			tree = dialog.dialog('option', 'ldTree'),
+		            			ldNode = tree.getHighlightedNode();
 		            		// no LD was chosen
 		            		if (!ldNode || !ldNode.data.learningDesignId) {
 		            			alert("Please choose a sequence");
@@ -182,20 +189,64 @@ function initLayout() {
 		            		openLearningDesign(ldNode.data.learningDesignId);
 						}
 		             },
-		             {
-		            	'text'   : 'Cancel',
-		            	'click'  : function() {
-							$(this).dialog('close');
-						}
-		             }
-		]
+		             closeLdStoreDialogButton
+		],
+		
+		'buttonsSave' : [
+			             {
+			            	'text'   : 'Save',
+			            	'click'  : function() {	
+			            		var dialog = $(this),
+			            			container = dialog.closest('.ui-dialog'),
+			            			title = $('#ldStoreDialogNameField', container).val();
+			            		if (!title) {
+			            			alert('Please enter a title for the sequence');
+			            			return;
+			            		}
+			            		
+			            		var tree = dialog.dialog('option', 'ldTree'),
+			            			node = tree.getHighlightedNode();
+			            		if (!node) {
+			            			// although an existing sequence can be highlighted 
+			            			alert('Please choose a folder');
+			            			return;
+			            		}
+			            		
+			            		var nodeTitle = $(node.getContentHtml()).text(),
+			            			// if a node is highlighted but user modified the title,
+			            			// it is considered a new sequence
+			            			learningDesingID = node.data.learningDesignId && nodeTitle == title ?
+			            					node.data.learningDesignId : null;
+			            		if (learningDesingID
+			            				&& !confirm('Are you sure you want to overwrite an existing sequence?')) {
+			            			return;
+			            		}
+			            		
+			            		var folderID = node.data.folderID;
+			            		if (!folderID) {
+			            			folderID = node.parent.data.folderID;
+			            		}
+
+			            		dialog.dialog('close');
+			            		saveLearningDesign(folderID, learningDesingID, title);
+							}
+			             },
+			             closeLdStoreDialogButton
+		],
+		'open' : function(){
+			var nameContainer = $('#ldStoreDialogNameContainer');
+			$('input', nameContainer).val(null);
+			$(this).siblings('.ui-dialog-buttonpane').append(nameContainer);
+		}
 	});
+	
 	$('#ldScreenshotAuthor', ldStoreDialog).load(function(){
 		// hide "loading" animation
 		$('#ldStoreDialog .ldChoiceDependentCanvasElement').css('display', 'none');
 		// show the thumbnail
 		$(this).css('display', 'inline');
 	});
+	
 	// there should be no focus, just highlight
 	YAHOO.widget.TreeView.FOCUS_CLASS_NAME = null;
 	var tree = new YAHOO.widget.TreeView('ldStoreDialogTree');
@@ -217,23 +268,34 @@ function initLayout() {
 	});
 	tree.singleNodeHighlight = true;
 	tree.subscribe('clickEvent', function(event){
-		if (!event.node.data.learningDesignId){
-			// it is a folder
+		var dialog = $(this.getEl()).closest('.ui-dialog'),
+			isSaveDialog = dialog.hasClass('ldStoreDialogSave');
+		
+		if (!isSaveDialog && !event.node.data.learningDesignId){
+			// it is a folder in load sequence dialog, do not highlight
 			return false;
 		}
-
 		// display "loading" animation and finally LD thumbnail
-		$('#ldStoreDialog .ldChoiceDependentCanvasElement').css('display', 'none');
+		$('.ldChoiceDependentCanvasElement', dialog).css('display', 'none');
 		if (event.node.highlightState == 0) {
-			$('#ldStoreDialog #ldScreenshotLoading').css('display', 'inline');
-			// get the image of the chosen LD
-			$('#ldStoreDialog #ldScreenshotAuthor').attr('src', LD_THUMBNAIL_URL_BASE + event.node.data.learningDesignId);
-			$('#ldStoreDialog #ldScreenshotAuthor').css('width', 'auto').css('height', 'auto');
-		} else {
-			// toggleCanvasResize(CANVAS_RESIZE_OPTION_NONE);
+			if (event.node.data.learningDesignId) {
+				$('#ldStoreDialog #ldScreenshotLoading', dialog).css('display', 'inline');
+				// get the image of the chosen LD
+				$('#ldStoreDialog #ldScreenshotAuthor', dialog)
+					.attr('src', LD_THUMBNAIL_URL_BASE + event.node.data.learningDesignId);
+				$('#ldStoreDialog #ldScreenshotAuthor', dialog).css({
+					'width'  : 'auto',
+					'height' : 'auto'
+				});
+				if (isSaveDialog) {
+					// copy title of the highligthed sequence to title field
+					var title = $(event.node.getContentHtml()).text();
+					$('#ldStoreDialogNameField', dialog).val(title);
+				}
+			}
 		}
 	});
-	tree.subscribe('clickEvent',tree.onEventToggleHighlight);
+	tree.subscribe('clickEvent', tree.onEventToggleHighlight);
 
 	// initialise a small info dialog
 	layout.items.infoDialog = $('<div />').attr('id', 'infoDialog').dialog({
@@ -243,6 +305,7 @@ function initLayout() {
 		'resizable'  : false,
 		'show'       : 'fold',
 		'hide'       : 'fold',
+		'draggable'  : false,
 		'dialogClass': 'dialog-no-title',
 		'position'   : {
 						my: "right top",
@@ -256,7 +319,7 @@ function initLayout() {
 /**
  * Replace current canvas contents with the loaded sequence.
  */
-function openLearningDesign(learningDesignId) {
+function openLearningDesign(learningDesignID) {
 	// get LD details
 	$.ajax({
 		cache : false,
@@ -264,7 +327,7 @@ function openLearningDesign(learningDesignId) {
 		dataType : 'json',
 		data : {
 			'method'          : 'getLearningDesignJSON',
-			'learningDesignID': learningDesignId
+			'learningDesignID': learningDesignID
 		},
 		success : function(ld) {
 			if (!ld) {
@@ -558,6 +621,58 @@ function openLearningDesign(learningDesignId) {
 			} else {	
 				HandlerLib.resetCanvasMode();
 			}
+		}
+	});
+}
+
+
+/**
+ * Stores the sequece into database.
+ */
+function saveLearningDesign(folderID, learningDesignID, title) {
+	// serialise the sequence
+	var ld = {
+		// it is null if it is a new sequence
+		'learningDesignID'   : learningDesignID,
+		'workspaceFolderID'  : folderID,
+		'copyTypeID'         : 1,
+		'originalUserID'     : null,
+		'learningDesignUIID' : null,
+		'title'              : title.trim(),
+		'description'        : $('#ldDescriptionFieldDescription').val().trim(),
+		'maxID'				 : null,
+		'readOnly'			 : false,
+		'editOverrideLock'   : false,
+		'dateReadOnly'       : null,
+		'helpText'           : null,
+		'version'        	 : null,
+		'duration'			 : null,
+		'contentFolderID'    : layout.contentFolderID,
+		'saveMode'			 : 0,
+		'licenseID'			 : null,
+		'licenseText'   	 : null,
+		'originalLearningDesignID' : null,
+		
+		'activities'		 : null,
+		'transitions'		 : null,
+		'groupings'			 : null,
+		'branchMappings'     : null,
+		'competences'        : null,
+		'competenceMappings' : null
+	};
+	
+	// get LD details
+	$.ajax({
+		cache : false,
+		async : false,
+		url : LAMS_URL + "authoring/author.do",
+		dataType : 'json',
+		data : {
+			'method'          : 'saveLearningDesign',
+			'ld'			  : ld
+		},
+		success : function(responseLd) {
+			
 		}
 	});
 }

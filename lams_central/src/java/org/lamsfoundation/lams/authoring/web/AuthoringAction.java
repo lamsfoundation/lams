@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.authoring.web;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -42,7 +43,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
@@ -56,6 +59,8 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.exception.UserException;
+import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -169,7 +174,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	long learningDesignID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
 	LearningDesignDTO learningDesignDTO = getLearningDesignService().getLearningDesignDTO(learningDesignID,
 		getUserLanguage());
-	
+
 	response.setContentType("application/json;charset=utf-8");
 	Writer responseWriter = response.getWriter();
 	Gson gson = new GsonBuilder().create();
@@ -438,6 +443,18 @@ public class AuthoringAction extends LamsDispatchAction {
 	msg[0] = e.getMessage();
 	return new FlashMessage(methodKey, authoringService.getMessageService().getMessage("error.system.error", msg),
 		useCriticalError ? FlashMessage.CRITICAL_ERROR : FlashMessage.ERROR);
+    }
+
+    public ActionForward saveLearningDesign(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, UserException, WorkspaceFolderException, IOException, ObjectExtractorException, ParseException {
+	JSONObject ldJSON = new JSONObject(request.getParameter("ld"));
+
+	LearningDesign learningDesign = getAuthoringService().saveLearningDesignDetails(ldJSON);
+	ldJSON.put(AttributeNames.PARAM_LEARNINGDESIGN_ID, learningDesign.getLearningDesignId());
+	
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().write(ldJSON.toString());
+	return null;
     }
 
     /**
