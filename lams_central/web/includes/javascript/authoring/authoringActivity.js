@@ -7,10 +7,12 @@ var ActivityLib = {
 	/**
 	 * Constructor for a Tool Activity.
 	 */
-	ToolActivity: function(id, toolID, x, y, title, supportsOutputs) {
-		this.id = id;
+	ToolActivity : function(id, uiid, toolContentID, toolID, x, y, title, supportsOutputs) {
+		this.id = +id;
+		this.uiid = +uiid || ++layout.maxUIID;
+		this.toolContentID = toolContentID;
 		this.type = 'tool';
-		this.toolID = toolID;
+		this.toolID = +toolID;
 		this.title = title;
 		this.supportsOutputs = supportsOutputs;
 		this.transitions = {
@@ -27,16 +29,17 @@ var ActivityLib = {
 	/**
 	 * Constructor for a Grouping Activity.
 	 */
-	GroupingActivity : function(id, x, y, title, groupingID, groupingType, groupDivide, groupCount, learnerCount,
+	GroupingActivity : function(id, uiid, x, y, title, groupingID, groupingType, groupDivide, groupCount, learnerCount,
 			equalSizes, viewLearners, groups) {
-		this.id = id;
-		this.groupingID = groupingID;
+		this.id = +id;
+		this.uiid = +uiid || ++layout.maxUIID;
+		this.groupingID = +groupingID;
 		this.type = 'grouping';
 		this.title = title;
 		this.groupingType = groupingType || 'random';
 		this.groupDivide = groupDivide || 'groups';
-		this.groupCount = groupCount || 2;
-		this.learnerCount = learnerCount || 1;
+		this.groupCount = +groupCount || 2;
+		this.learnerCount = +learnerCount || 1;
 		this.equalSizes = equalSizes || false;
 		this.viewLearners = viewLearners || false;
 		this.groups = groups || [];
@@ -54,8 +57,9 @@ var ActivityLib = {
 	/**
 	 * Constructor for a Gate Activity.
 	 */
-	GateActivity : function(id, x, y, gateType) {
-		this.id = id;
+	GateActivity : function(id, uiid, x, y, gateType) {
+		this.id = +id;
+		this.uiid = +uiid || ++layout.maxUIID;
 		this.type = 'gate';
 		this.gateType = gateType || 'permission';
 		this.transitions = {
@@ -73,7 +77,7 @@ var ActivityLib = {
 	/**
 	 * Either branching or converge point.
 	 */
-	BranchingEdgeActivity : function(id, x, y, title, branchingType, branchingActivity) {
+	BranchingEdgeActivity : function(id, uiid, x, y, title, branchingType, branchingActivity) {
 		this.type = 'branchingEdge';
 		this.transitions = {
 			'from' : [],
@@ -87,7 +91,7 @@ var ActivityLib = {
 		} else {
 			// this is the branching point
 			this.isStart = true;
-			branchingActivity = new ActivityLib.BranchingActivity(id, this);
+			branchingActivity = new ActivityLib.BranchingActivity(id, uiid, this);
 			branchingActivity.branchingType = branchingType || 'chosen';
 			branchingActivity.title = title || 'Branching';
 		}
@@ -103,8 +107,9 @@ var ActivityLib = {
 	/**
 	 * Represents a set of branches. It is not displayed on canvas.
 	 */
-	BranchingActivity : function(id, branchingEdgeStart) {
-		this.id = id;
+	BranchingActivity : function(id, uiid, branchingEdgeStart) {
+		this.id = +id;
+		this.uiid = +uiid || ++layout.maxUIID;
 		this.start = branchingEdgeStart;
 		this.branches = [];
 		// mapping between groups and branches, if applicable
@@ -116,8 +121,8 @@ var ActivityLib = {
 	 * Represents a subsequence of activities. It is not displayed on canvas.
 	 */
 	BranchActivity : function(id, uiid, title, branchingActivity, transitionFrom) {
-		this.id = id;
-		this.uiid = uiid;
+		this.id = +id;
+		this.uiid = +uiid || ++layout.maxUIID;
 		this.title = title;
 		this.transitionFrom = transitionFrom;
 		this.branchingActivity = branchingActivity;
@@ -143,12 +148,12 @@ var ActivityLib = {
 			paper.setStart();
 			var shape = paper.path(Raphael.format('M {0} {1}' + layout.defs.activity, x, y))
 							 .attr({
-								'fill' : this.offline ? layout.colors.offlineActivity : layout.colors.activity
+								'fill' : layout.colors.activity[layout.toolMetadata[this.toolID].activityCategoryID]
 							 });
 			paper.image(layout.toolMetadata[this.toolID].iconPath, x + 47, y + 2, 30, 30);
 			paper.text(x + 62, y + 40, ActivityLib.shortenActivityTitle(this.title))
 				 .attr({
-					 'fill' : this.offline ? layout.colors.offlineActivityText : layout.colors.activityText
+					 'fill' : layout.colors.activityText
 				 });
 			
 			this.items = paper.setFinish();
@@ -329,7 +334,7 @@ var ActivityLib = {
 	/**
 	 * Draws a transition between two activities.
 	 */
-	drawTransition : function(fromActivity, toActivity, redraw) {
+	drawTransition : function(fromActivity, toActivity, redraw, id, uiid) {
 		// only converge points are allowed to have few inbound transitions
 		if (!redraw
 				&& toActivity.transitions.to.length > 0
@@ -353,6 +358,7 @@ var ActivityLib = {
 		// remove the existing transition
 		$.each(fromActivity.transitions.from, function(index) {
 			if (this.toActivity == toActivity) {
+				uiid = this.uiid;
 				ActivityLib.removeTransition(this);
 				return false;
 			}
@@ -379,6 +385,8 @@ var ActivityLib = {
 							'fill'   : layout.colors.transition
 						 });
 		var transition = paper.setFinish();
+		transition.uiid = uiid || ++layout.maxUIID;
+		transition.id = id;
 		transition.data('transition', transition);
 		
 		// set up references in activities and the transition
@@ -593,7 +601,7 @@ var ActivityLib = {
 				},
 				success : function(response) {
 					activity.authorURL = response.authorURL;
-					activity.id = response.toolContentID;
+					activity.toolContentID = response.toolContentID;
 					if (!layout.contentFolderID) {
 						// if LD did not have contentFolderID, it was just generated
 						// so remember it

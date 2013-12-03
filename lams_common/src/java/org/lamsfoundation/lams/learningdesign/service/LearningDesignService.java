@@ -222,6 +222,7 @@ public class LearningDesignService implements ILearningDesignService {
 		ToolDTO toolDTO = new ToolDTO();
 		toolDTO.setToolId(learningLibrary.getLearningLibraryID());
 		toolDTO.setToolDisplayName(libraryActivityDTO.getActivityTitle());
+		toolDTO.setActivityCategoryID(libraryActivityDTO.getActivityCategoryID());
 		
 		Tool tool = (Tool) learningLibraryDAO.find(Tool.class, learningLibrary.getLearningLibraryID());
 		if (tool != null) {

@@ -23,12 +23,12 @@
 /* $Id$ */
 package org.lamsfoundation.lams.tool.dto;
 
-
 public class ToolDTO {
     private Long toolId;
     private String toolDisplayName;
     private String iconPath;
     private Boolean supportsOutputs;
+    private Integer activityCategoryID;
 
     public ToolDTO() {
     }
@@ -48,7 +48,7 @@ public class ToolDTO {
     public void setToolDisplayName(String displayName) {
 	this.toolDisplayName = displayName;
     }
-    
+
     public String getIconPath() {
 	return iconPath;
     }
@@ -58,10 +58,18 @@ public class ToolDTO {
     }
 
     public Boolean getSupportsOutputs() {
-        return supportsOutputs;
+	return supportsOutputs;
     }
 
     public void setSupportsOutputs(Boolean supportsOutputs) {
-        this.supportsOutputs = supportsOutputs;
+	this.supportsOutputs = supportsOutputs;
+    }
+
+    public Integer getActivityCategoryID() {
+	return activityCategoryID;
+    }
+
+    public void setActivityCategoryID(Integer activityCategoryID) {
+	this.activityCategoryID = activityCategoryID;
     }
 }

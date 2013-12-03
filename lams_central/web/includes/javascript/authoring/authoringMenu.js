@@ -158,7 +158,14 @@ var MenuLib = {
 	/**
 	 * Opens "Save sequence" dialog where an user can choose where to save the Learning Design.
 	 */
-	saveLearningDesign : function(){
+	saveLearningDesign : function(showDialog){
+		if (!showDialog && layout.learningDesignID) {
+			if (confirm('Are you sure you want to overwrite the existing sequence?')) {
+				saveLearningDesign(layout.folderID, layout.learningDesignID, layout.title);
+			}
+			return;
+		}
+		
 		var dialog = $('#ldStoreDialog');
 		// remove the directory tree, if it remained for last dialog opening
 		dialog.dialog('option', {
@@ -169,7 +176,8 @@ var MenuLib = {
 		})			   
 		.dialog('open');
 		
-		MenuLib.initLearningDesignTree();
+		var tree = MenuLib.initLearningDesignTree();
+		tree.getRoot().children[0].highlight();
 	},
 	
 	
@@ -190,20 +198,23 @@ var MenuLib = {
 		
 		// expand the first (user) folder
 		tree.getRoot().children[0].expand();
+		
+		return tree;
 	},
 	
 	
 	/**
 	 * Loads subfolders and LDs from the server.
 	 */
-	getFolderContents : function(folderID) {
+	getFolderContents : function(folderID, allowInvalidDesigns) {
 		var result = null;
 			
 		$.ajax({
 			url : LAMS_URL + 'home.do',
 			data : {
 				'method' : 'getFolderContents',
-				'folderID' : folderID
+				'folderID' : folderID,
+				'allowInvalidDesigns' : allowInvalidDesigns
 			},
 			cache : false,
 			async: false,
@@ -447,6 +458,7 @@ var MenuLib = {
 		
 		$('.ldDescriptionField').text('');
 		
+		layout.maxUIID = 0;
 		layout.activities = [];
 		if (paper) {
 			paper.clear();
@@ -517,10 +529,10 @@ var MenuLib = {
 			newActivity.grouping = activity.grouping;
 			newActivity.draw();
 		}
-	},
+	}
 	
-	
-	zoom : function(){
+	/*
+	,zoom : function(){
 		var zoomButton = $('#zoomButton > span');
 		if (layout.isZoomed) {
 			paper.setViewBox(0, 0, paper.width, paper.height, true);
@@ -532,4 +544,5 @@ var MenuLib = {
 			zoomButton.text('Cancel zoom');
 		}
 	}
+	*/
 };

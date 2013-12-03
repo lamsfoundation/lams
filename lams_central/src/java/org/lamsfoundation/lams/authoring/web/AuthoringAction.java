@@ -41,13 +41,16 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
+import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
@@ -446,14 +449,32 @@ public class AuthoringAction extends LamsDispatchAction {
     }
 
     public ActionForward saveLearningDesign(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, UserException, WorkspaceFolderException, IOException, ObjectExtractorException, ParseException {
+	    HttpServletResponse response) throws JSONException, UserException, WorkspaceFolderException, IOException,
+	    ObjectExtractorException, ParseException {
 	JSONObject ldJSON = new JSONObject(request.getParameter("ld"));
 
 	LearningDesign learningDesign = getAuthoringService().saveLearningDesignDetails(ldJSON);
-	ldJSON.put(AttributeNames.PARAM_LEARNINGDESIGN_ID, learningDesign.getLearningDesignId());
-	
+
+	JSONObject responseJSON = new JSONObject();
+	if (learningDesign != null) {
+	    Long learningDesignID = learningDesign.getLearningDesignId();
+	    if (learningDesignID != null) {
+		responseJSON.put(AttributeNames.PARAM_LEARNINGDESIGN_ID, learningDesignID);
+		responseJSON.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, learningDesign.getContentFolderID());
+
+		Vector<AuthoringActivityDTO> activityDTOs = getAuthoringService().getToolActivities(learningDesignID,
+			getUserLanguage());
+		Vector<ValidationErrorDTO> validationDTOs =getAuthoringService().validateLearningDesign(learningDesignID);
+		Gson gson = new GsonBuilder().create();
+		String activitiesJSON = gson.toJson(activityDTOs);
+		String validationJSON = gson.toJson(validationDTOs);
+		responseJSON.put("activities", new JSONArray(activitiesJSON));
+		responseJSON.put("validation", new JSONArray(validationJSON));
+	    }
+	}
+
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().write(ldJSON.toString());
+	response.getWriter().write(responseJSON.toString());
 	return null;
     }
 

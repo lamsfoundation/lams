@@ -94,6 +94,8 @@ import org.lamsfoundation.lams.util.AuthoringJsonTags;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
@@ -503,7 +505,7 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	// Check the copy type. Can only update it if it is COPY_TYPE_NONE (ie
 	// authoring copy)
-	Integer copyTypeID = ldJSON.optInt(AuthoringJsonTags.COPY_TYPE);
+	Integer copyTypeID = (Integer) JsonUtil.opt(ldJSON, AuthoringJsonTags.COPY_TYPE);
 	if (copyTypeID == null) {
 	    copyTypeID = LearningDesign.COPY_TYPE_NONE;
 	}
@@ -519,9 +521,15 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	learningDesign.setWorkspaceFolder(workspaceFolder);
 	learningDesign.setUser(user);
+	String contentFolderID = (String) JsonUtil.opt(ldJSON, AuthoringJsonTags.CONTENT_FOLDER_ID);
+	if (contentFolderID == null) {
+	    contentFolderID = FileUtil.generateUniqueContentFolderID();
+	    ldJSON.put(AuthoringJsonTags.CONTENT_FOLDER_ID, contentFolderID);
+	}
+	learningDesign.setContentFolderID(contentFolderID);
 
 	if (existingLearningDesign == null) {
-	    Integer originalUserID = ldJSON.optInt(AuthoringJsonTags.ORIGINAL_USER_ID);
+	    Integer originalUserID = (Integer) JsonUtil.opt(ldJSON, AuthoringJsonTags.ORIGINAL_USER_ID);
 	    if (originalUserID == null) {
 		learningDesign.setOriginalUser(user);
 	    } else {
@@ -549,24 +557,24 @@ public class ObjectExtractor implements IObjectExtractor {
 	initialiseToolSessionMap(learningDesign);
 
 	// get the core learning design stuff - default to invalid
-	learningDesign.setValidDesign(ldJSON.optBoolean(AuthoringJsonTags.VALID_DESIGN, false));
-	learningDesign.setLearningDesignUIID(ldJSON.optInt(AuthoringJsonTags.LEARNING_DESIGN_UIID));
-	learningDesign.setDescription(ldJSON.optString(AuthoringJsonTags.DESCRIPTION));
-	learningDesign.setTitle(ldJSON.optString(AuthoringJsonTags.TITLE));
-	learningDesign.setMaxID(ldJSON.optInt(AuthoringJsonTags.MAX_ID));
-	learningDesign.setReadOnly(ldJSON.optBoolean(AuthoringJsonTags.READ_ONLY));
-	learningDesign.setEditOverrideLock(ldJSON.optBoolean(AuthoringJsonTags.EDIT_OVERRIDE_LOCK));
-	learningDesign.setDateReadOnly(DateUtil.convertFromString(ldJSON.optString(AuthoringJsonTags.DATE_READ_ONLY)));
-	learningDesign.setHelpText(ldJSON.optString(AuthoringJsonTags.HELP_TEXT));
-	String version = ldJSON.optString(AuthoringJsonTags.VERSION);
+	learningDesign.setValidDesign(JsonUtil.opt(ldJSON, AuthoringJsonTags.VALID_DESIGN, false));
+	learningDesign.setLearningDesignUIID((Integer) JsonUtil.opt(ldJSON, AuthoringJsonTags.LEARNING_DESIGN_UIID));
+	learningDesign.setDescription((String) JsonUtil.opt(ldJSON, AuthoringJsonTags.DESCRIPTION));
+	learningDesign.setTitle((String) JsonUtil.opt(ldJSON, AuthoringJsonTags.TITLE));
+	learningDesign.setMaxID((Integer) JsonUtil.opt(ldJSON, AuthoringJsonTags.MAX_ID));
+	learningDesign.setReadOnly((Boolean) JsonUtil.opt(ldJSON, AuthoringJsonTags.READ_ONLY));
+	learningDesign.setEditOverrideLock((Boolean) JsonUtil.opt(ldJSON, AuthoringJsonTags.EDIT_OVERRIDE_LOCK));
+	learningDesign.setDateReadOnly(DateUtil.convertFromString((String) JsonUtil.opt(ldJSON,
+		AuthoringJsonTags.DATE_READ_ONLY)));
+	learningDesign.setHelpText((String) JsonUtil.opt(ldJSON, AuthoringJsonTags.HELP_TEXT));
+	String version = (String) JsonUtil.opt(ldJSON, AuthoringJsonTags.VERSION);
 	if (version == null) {
 	    version = Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER);
 	}
 	learningDesign.setVersion(version);
-	learningDesign.setDuration(ldJSON.optLong(AuthoringJsonTags.DURATION));
-	learningDesign.setContentFolderID(ldJSON.optString(AuthoringJsonTags.CONTENT_FOLDER_ID));
+	learningDesign.setDuration(JsonUtil.optLong(ldJSON, AuthoringJsonTags.DURATION));
 
-	mode = ldJSON.optInt(AuthoringJsonTags.SAVE_MODE);
+	mode = (Integer) JsonUtil.opt(ldJSON, AuthoringJsonTags.SAVE_MODE);
 
 	// Set creation date and modification date based on the server timezone,
 	// not the client.
@@ -575,14 +583,14 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 	learningDesign.setLastModifiedDateTime(modificationDate);
 
-	Long licenseID = ldJSON.optLong(AuthoringJsonTags.LICENCE_ID);
+	Long licenseID = JsonUtil.optLong(ldJSON, AuthoringJsonTags.LICENCE_ID);
 	if (licenseID != null) {
 	    License license = licenseDAO.getLicenseByID(licenseID);
 	    learningDesign.setLicense(license);
 	}
-	learningDesign.setLicenseText(ldJSON.optString(AuthoringJsonTags.LICENSE_TEXT));
+	learningDesign.setLicenseText((String) JsonUtil.opt(ldJSON, AuthoringJsonTags.LICENSE_TEXT));
 
-	Long originalLearningDesignID = ldJSON.optLong(AuthoringJsonTags.ORIGINAL_DESIGN_ID);
+	Long originalLearningDesignID = JsonUtil.optLong(ldJSON, AuthoringJsonTags.ORIGINAL_DESIGN_ID);
 	if (originalLearningDesignID != null) {
 	    LearningDesign originalLearningDesign = learningDesignDAO.getLearningDesignById(originalLearningDesignID);
 	    learningDesign.setOriginalLearningDesign(originalLearningDesign);
@@ -591,12 +599,11 @@ public class ObjectExtractor implements IObjectExtractor {
 	learningDesignDAO.insertOrUpdate(learningDesign);
 
 	// now process the "parts" of the learning design
-	parseCompetences(ldJSON.optJSONArray(AuthoringJsonTags.COMPETENCES));
-	parseGroupings(ldJSON.optJSONArray(AuthoringJsonTags.GROUPINGS));
-	parseActivities(ldJSON.optJSONArray(AuthoringJsonTags.ACTIVITIES));
-	parseActivitiesToMatchUpParentandInputActivities(ldJSON.optJSONArray(AuthoringJsonTags.ACTIVITIES));
-	parseTransitions(ldJSON.optJSONArray(AuthoringJsonTags.TRANSITIONS));
-	parseBranchMappings(ldJSON.optJSONArray(AuthoringJsonTags.BRANCH_MAPPINGS));
+	parseGroupings((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.GROUPINGS));
+	parseActivities((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.ACTIVITIES));
+	parseActivitiesToMatchUpParentandInputActivities((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.ACTIVITIES));
+	parseTransitions((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.TRANSITIONS));
+	parseBranchMappings((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.BRANCH_MAPPINGS));
 
 	progressDefaultChildActivities();
 
@@ -606,7 +613,6 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	deleteUnwantedGroupings();
 	deleteUnwantedToolSessions(learningDesign);
-	parseCompetenceMappings(ldJSON.optJSONArray(AuthoringJsonTags.ACTIVITIES));
 	learningDesignDAO.insertOrUpdate(learningDesign);
 	return learningDesign;
     }
@@ -887,8 +893,8 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     public Grouping extractGroupingObject(JSONObject groupingDetails) throws JSONException {
-	Integer groupingUIID = groupingDetails.optInt("groupingUIID");
-	Integer groupingTypeID = groupingDetails.getInt("groupingTypeID");
+	Integer groupingUIID = (Integer) JsonUtil.opt(groupingDetails, "groupingUIID");
+	Integer groupingTypeID = (Integer) JsonUtil.opt(groupingDetails, "groupingTypeID");
 
 	Grouping grouping = groupings.get(groupingUIID);
 	// check that the grouping type is still okay - if it is we keep the
@@ -921,11 +927,11 @@ public class ObjectExtractor implements IObjectExtractor {
 	    createLessonClass((LessonClass) grouping, groupingDetails);
 	}
 
-	grouping.setMaxNumberOfGroups(groupingDetails.optInt("maxNumberOfGroups"));
+	grouping.setMaxNumberOfGroups((Integer) JsonUtil.opt(groupingDetails, "maxNumberOfGroups"));
 
 	Set<Group> groupsToDelete = new HashSet<Group>(grouping.getGroups());
 
-	JSONArray groupsList = groupingDetails.optJSONArray("groups");
+	JSONArray groupsList = (JSONArray) JsonUtil.opt(groupingDetails, "groups");
 	if (groupsList != null) {
 	    for (int groupIndex = 0; groupIndex < groupsList.length(); groupIndex++) {
 		JSONObject groupDetails = groupsList.getJSONObject(groupIndex);
@@ -1010,7 +1016,7 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	Group group = null;
 	Integer groupUIID = groupDetails.getInt(AuthoringJsonTags.GROUP_UIID);
-	Long groupID = groupDetails.optLong(AuthoringJsonTags.GROUP_ID);
+	Long groupID = JsonUtil.optLong(groupDetails, AuthoringJsonTags.GROUP_ID);
 
 	// Does it exist already? If the group was created at runtime, there
 	// will be an ID but no IU ID field.
@@ -1041,10 +1047,10 @@ public class ObjectExtractor implements IObjectExtractor {
 	    grouping.getGroups().add(group);
 	}
 
-	group.setGroupName(groupDetails.optString(AuthoringJsonTags.GROUP_NAME));
+	group.setGroupName((String) JsonUtil.opt(groupDetails, AuthoringJsonTags.GROUP_NAME));
 	group.setGrouping(grouping);
 	group.setGroupUIID(groupUIID);
-	group.setOrderId(groupDetails.optInt(AuthoringJsonTags.ORDER_ID, 0));
+	group.setOrderId(JsonUtil.opt(groupDetails, AuthoringJsonTags.ORDER_ID, 0));
 
 	return group;
     }
@@ -1068,15 +1074,15 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
     }
 
-    private void createRandomGrouping(RandomGrouping randomGrouping, JSONObject groupingDetails) {
+    private void createRandomGrouping(RandomGrouping randomGrouping, JSONObject groupingDetails) throws JSONException {
 	// the two settings are mutually exclusive. Flash takes care of this,
 	// but we'll code it here too just to make sure.
-	Integer numLearnersPerGroup = groupingDetails.optInt(AuthoringJsonTags.LEARNERS_PER_GROUP);
+	Integer numLearnersPerGroup = (Integer) JsonUtil.opt(groupingDetails, AuthoringJsonTags.LEARNERS_PER_GROUP);
 	if ((numLearnersPerGroup != null) && (numLearnersPerGroup.intValue() > 0)) {
 	    randomGrouping.setLearnersPerGroup(numLearnersPerGroup);
 	    randomGrouping.setNumberOfGroups(null);
 	} else {
-	    Integer numGroups = groupingDetails.optInt(AuthoringJsonTags.NUMBER_OF_GROUPS);
+	    Integer numGroups = (Integer) JsonUtil.opt(groupingDetails, AuthoringJsonTags.NUMBER_OF_GROUPS);
 	    if ((numGroups != null) && (numGroups.intValue() > 0)) {
 		randomGrouping.setNumberOfGroups(numGroups);
 	    } else {
@@ -1223,7 +1229,7 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     private void extractEvaluationObject(JSONObject activityDetails, ToolActivity toolActivity)
-	    throws ObjectExtractorException {
+	    throws ObjectExtractorException, JSONException {
 
 	Set<ActivityEvaluation> activityEvaluations = toolActivity.getActivityEvaluations();
 	ActivityEvaluation activityEvaluation;
@@ -1235,7 +1241,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    activityEvaluation = new ActivityEvaluation();
 	}
 
-	String toolOutputDefinition = activityDetails.optString(AuthoringJsonTags.TOOL_OUTPUT_DEFINITION);
+	String toolOutputDefinition = (String) JsonUtil.opt(activityDetails, AuthoringJsonTags.TOOL_OUTPUT_DEFINITION);
 	if (!StringUtils.isBlank(toolOutputDefinition)) {
 	    activityEvaluations = new HashSet<ActivityEvaluation>();
 	    activityEvaluation.setActivity(toolActivity);
@@ -1359,104 +1365,6 @@ public class ObjectExtractor implements IObjectExtractor {
 			competenceMappingDAO.deleteAll(removeCompetenceMappings);
 			toolActivity.getCompetenceMappings().removeAll(removeCompetenceMappings);
 		    }
-		}
-	    }
-	}
-    }
-
-    private void parseCompetenceMappings(JSONArray activitiesList) throws ObjectExtractorException, JSONException {
-
-	if (activitiesList != null) {
-	    for (int activityIndex = 0; activityIndex < activitiesList.length(); activityIndex++) {
-		JSONObject activityDetails = activitiesList.getJSONObject(activityIndex);
-		// Check that this is a tool activity, otherwise continue to the
-		// next iteration
-		Integer actType = activityDetails.optInt(AuthoringJsonTags.ACTIVITY_TYPE_ID);
-		if ((actType == null) || (actType != Activity.TOOL_ACTIVITY_TYPE)) {
-		    continue;
-		}
-
-		// Get the tool activity using the UIID and the learningDesignID
-		ToolActivity toolActivity = null;
-		Integer activityUIID = activityDetails.optInt(AuthoringJsonTags.ACTIVITY_UIID);
-		if (activityUIID == null) {
-		    continue;
-		} else {
-		    Activity activity = activityDAO.getActivityByUIID(activityUIID, learningDesign);
-		    toolActivity = (ToolActivity) activity;
-		}
-
-		JSONArray competenceMappingsList = activityDetails.optJSONArray(AuthoringJsonTags.COMPETENCE_MAPPINGS);
-
-		if (competenceMappingsList != null) {
-		    for (int competenceMappingIndex = 0; competenceMappingIndex < competenceMappingsList.length(); competenceMappingIndex++) {
-			String competenceMappingEntry = competenceMappingsList.getString(competenceMappingIndex);
-
-			if (toolActivity.getActivityId() != null) {
-
-			    // First get the competence from the competence
-			    // mapping entry in the hashtable
-			    Competence competence = competenceDAO.getCompetence(toolActivity.getLearningDesign(),
-				    competenceMappingEntry);
-			    if (competence == null) {
-				continue;
-			    }
-
-			    // Now get the competence mapping using the tool
-			    // activity and the competence as reference
-			    CompetenceMapping competenceMapping = competenceMappingDAO.getCompetenceMapping(
-				    toolActivity, competence);
-
-			    // Only save new competence mappings, no need to
-			    // update existing
-			    if (competenceMapping == null) {
-				CompetenceMapping newMapping = new CompetenceMapping();
-				newMapping.setCompetence(competence);
-				newMapping.setToolActivity(toolActivity);
-
-				// newMappings.add(newMapping);
-				competenceMappingDAO.saveOrUpdate(newMapping);
-				// toolActivity.getCompetenceMappings().add(newMapping);
-			    }
-			} else {
-			    Competence competence = competenceDAO.getCompetence(learningDesign, competenceMappingEntry);
-			    CompetenceMapping newMapping = new CompetenceMapping();
-			    newMapping.setCompetence(competence);
-			    newMapping.setToolActivity(toolActivity);
-			    competenceMappingDAO.saveOrUpdate(newMapping);
-			    // toolActivity.getCompetenceMappings().add(newMapping);
-			}
-		    }
-		}
-
-		// delete any pre-existing mappings that have been deleted
-		Set<CompetenceMapping> existingMappings = toolActivity.getCompetenceMappings();
-		if (existingMappings != null) {
-		    Set<CompetenceMapping> removeCompetenceMappings = new HashSet();
-
-		    if ((competenceMappingsList != null) && (competenceMappingsList.length() > 0)) {
-			for (CompetenceMapping competenceMapping : existingMappings) {
-			    boolean remove = true;
-
-			    for (int competenceMappingIndex = 0; competenceMappingIndex < competenceMappingsList
-				    .length(); competenceMappingIndex++) {
-				String competenceMappingEntry = competenceMappingsList
-					.getString(competenceMappingIndex);
-				if (competenceMappingEntry.equals(competenceMapping.getCompetence().getTitle())) {
-				    remove = false;
-				    break;
-				}
-			    }
-
-			    if (remove) {
-				removeCompetenceMappings.add(competenceMapping);
-			    }
-			}
-		    } else {
-			removeCompetenceMappings.addAll(existingMappings);
-		    }
-		    competenceMappingDAO.deleteAll(removeCompetenceMappings);
-		    toolActivity.getCompetenceMappings().removeAll(removeCompetenceMappings);
 		}
 	    }
 	}
@@ -1664,7 +1572,7 @@ public class ObjectExtractor implements IObjectExtractor {
 		Activity existingActivity = newActivityMap.get(activityUUID);
 
 		// match up activity to parent based on UIID
-		Integer parentUIID = activityDetails.optInt(AuthoringJsonTags.PARENT_UIID);
+		Integer parentUIID = (Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.PARENT_UIID);
 		if (parentUIID != null) {
 
 		    Activity parentActivity = newActivityMap.get(parentUIID);
@@ -1690,7 +1598,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		// match up activity to input activities based on UIID. At
 		// present there will be only one input activity
 		existingActivity.getInputActivities().clear();
-		Integer inputActivityUIID = activityDetails.optInt(AuthoringJsonTags.INPUT_TOOL_ACTIVITY_UIID);
+		Integer inputActivityUIID = (Integer) JsonUtil.opt(activityDetails,
+			AuthoringJsonTags.INPUT_TOOL_ACTIVITY_UIID);
 		if (inputActivityUIID != null) {
 		    Activity inputActivity = newActivityMap.get(inputActivityUIID);
 		    if (inputActivity == null) {
@@ -1804,8 +1713,8 @@ public class ObjectExtractor implements IObjectExtractor {
     public Activity extractActivityObject(JSONObject activityDetails) throws ObjectExtractorException, JSONException {
 
 	// it is assumed that the activityUUID will always be sent by flash.
-	Integer activityUIID = activityDetails.optInt(AuthoringJsonTags.ACTIVITY_UIID);
-	Integer activityTypeID = activityDetails.getInt(AuthoringJsonTags.ACTIVITY_TYPE_ID);
+	Integer activityUIID = (Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.ACTIVITY_UIID);
+	Integer activityTypeID = (Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.ACTIVITY_TYPE_ID);
 	Activity activity = null;
 
 	// get the activity with the particular activity uuid, if null, then new
@@ -1824,14 +1733,18 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	activity.setActivityTypeId(activityTypeID);
 	activity.setActivityUIID(activityUIID);
-	activity.setDescription(activityDetails.optString(AuthoringJsonTags.DESCRIPTION));
-	activity.setTitle(activityDetails.optString(AuthoringJsonTags.ACTIVITY_TITLE));
-	activity.setHelpText(activityDetails.optString(AuthoringJsonTags.HELP_TEXT));
+	activity.setDescription((String) JsonUtil.opt(activityDetails, AuthoringJsonTags.DESCRIPTION));
+	activity.setTitle((String) JsonUtil.opt(activityDetails, AuthoringJsonTags.ACTIVITY_TITLE));
+	activity.setHelpText((String) JsonUtil.opt(activityDetails, AuthoringJsonTags.HELP_TEXT));
+	
+	// to be removed soon
+	activity.setDefineLater(false);
+	activity.setRunOffline(false);
 
 	activity.setXcoord(getCoord(activityDetails, AuthoringJsonTags.XCOORD));
 	activity.setYcoord(getCoord(activityDetails, AuthoringJsonTags.YCOORD));
 
-	Integer groupingUIID = activityDetails.optInt(AuthoringJsonTags.GROUPING_UIID);
+	Integer groupingUIID = (Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.GROUPING_UIID);
 
 	if (groupingUIID == null) {
 	    clearGrouping(activity);
@@ -1847,12 +1760,11 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	}
 
-	activity.setOrderId(activityDetails.optInt(AuthoringJsonTags.ORDER_ID));
-	activity.setDefineLater(activityDetails.optBoolean(AuthoringJsonTags.DEFINE_LATER));
+	activity.setOrderId((Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.ORDER_ID));
 
 	activity.setLearningDesign(learningDesign);
 
-	Long learningLibraryID = activityDetails.optLong(AuthoringJsonTags.LEARNING_LIBRARY_ID);
+	Long learningLibraryID = JsonUtil.optLong(activityDetails, AuthoringJsonTags.LEARNING_LIBRARY_ID);
 
 	if (learningLibraryID != null) {
 	    LearningLibrary library = learningLibraryDAO.getLearningLibraryById(learningLibraryID);
@@ -1864,11 +1776,11 @@ public class ObjectExtractor implements IObjectExtractor {
 	    activity.setCreateDateTime(modificationDate);
 	}
 
-	activity.setRunOffline(activityDetails.optBoolean(AuthoringJsonTags.RUN_OFFLINE));
-	activity.setActivityCategoryID(activityDetails.optInt(AuthoringJsonTags.ACTIVITY_CATEGORY_ID));
-	activity.setLibraryActivityUiImage(activityDetails.optString(AuthoringJsonTags.LIBRARY_IMAGE));
-	activity.setGroupingSupportType(activityDetails.optInt(AuthoringJsonTags.GROUPING_SUPPORT_TYPE));
-	activity.setStopAfterActivity(activityDetails.optBoolean(AuthoringJsonTags.STOP_AFTER_ACTIVITY));
+	activity.setActivityCategoryID((Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.ACTIVITY_CATEGORY_ID));
+	activity.setLibraryActivityUiImage((String) JsonUtil.opt(activityDetails, AuthoringJsonTags.LIBRARY_IMAGE));
+	activity.setGroupingSupportType((Integer) JsonUtil
+		.opt(activityDetails, AuthoringJsonTags.GROUPING_SUPPORT_TYPE));
+	activity.setStopAfterActivity((Boolean) JsonUtil.opt(activityDetails, AuthoringJsonTags.STOP_AFTER_ACTIVITY));
 
 	return activity;
     }
@@ -1990,8 +1902,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	return (coord == null) || (coord >= 0) ? coord : ObjectExtractor.DEFAULT_COORD;
     }
 
-    private Integer getCoord(JSONObject details, String tag) {
-	Integer coord = details.optInt(tag);
+    private Integer getCoord(JSONObject details, String tag) throws JSONException {
+	Integer coord = (Integer) JsonUtil.opt(details, tag);
 	return (coord == null) || (coord >= 0) ? coord : ObjectExtractor.DEFAULT_COORD;
     }
 
@@ -2062,7 +1974,7 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     private void buildComplexActivity(ComplexActivity activity, JSONObject activityDetails)
-	    throws ObjectExtractorException {
+	    throws ObjectExtractorException, JSONException {
 	// clear all the children - will be built up again by
 	// parseActivitiesToMatchUpParentActivityByParentUIID
 	// we don't use all-delete-orphan on the activities relationship so we
@@ -2070,7 +1982,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	activity.getActivities().clear();
 
 	activity.setDefaultActivity(null);
-	Integer defaultActivityMapUIID = activityDetails.optInt(AuthoringJsonTags.DEFAULT_ACTIVITY_UIID);
+	Integer defaultActivityMapUIID = (Integer) JsonUtil.opt(activityDetails,
+		AuthoringJsonTags.DEFAULT_ACTIVITY_UIID);
 	if (defaultActivityMapUIID != null) {
 	    defaultActivityMap.put(defaultActivityMapUIID, activity);
 	}
@@ -2100,8 +2013,9 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     private void buildFloatingActivity(FloatingActivity floatingActivity, JSONObject activityDetails)
-	    throws ObjectExtractorException {
-	floatingActivity.setMaxNumberOfActivities(activityDetails.optInt(AuthoringJsonTags.MAX_ACTIVITIES));
+	    throws ObjectExtractorException, JSONException {
+	floatingActivity.setMaxNumberOfActivities((Integer) JsonUtil.opt(activityDetails,
+		AuthoringJsonTags.MAX_ACTIVITIES));
 
 	SystemTool systemTool = getSystemTool(SystemTool.FLOATING_ACTIVITIES);
 	floatingActivity.setSystemTool(systemTool);
@@ -2124,7 +2038,7 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     private void buildBranchingActivity(BranchingActivity branchingActivity, JSONObject activityDetails)
-	    throws ObjectExtractorException {
+	    throws ObjectExtractorException, JSONException {
 	if (branchingActivity.isChosenBranchingActivity()) {
 	    branchingActivity.setSystemTool(getSystemTool(SystemTool.TEACHER_CHOSEN_BRANCHING));
 	} else if (branchingActivity.isGroupBranchingActivity()) {
@@ -2164,11 +2078,11 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     private void buildGroupingActivity(GroupingActivity groupingActivity, JSONObject activityDetails)
-	    throws ObjectExtractorException {
+	    throws ObjectExtractorException, JSONException {
 	/**
 	 * read the createGroupingUUID, get the Grouping Object, and set CreateGrouping to that object
 	 */
-	Integer createGroupingUIID = activityDetails.optInt(AuthoringJsonTags.CREATE_GROUPING_UIID);
+	Integer createGroupingUIID = (Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.CREATE_GROUPING_UIID);
 	Grouping grouping = groupings.get(createGroupingUIID);
 	if (grouping != null) {
 	    groupingActivity.setCreateGrouping(grouping);
@@ -2195,10 +2109,11 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
     }
 
-    private void buildOptionsActivity(OptionsActivity optionsActivity, JSONObject activityDetails) {
-	optionsActivity.setMaxNumberOfOptions(activityDetails.optInt(AuthoringJsonTags.MAX_OPTIONS));
-	optionsActivity.setMinNumberOfOptions(activityDetails.optInt(AuthoringJsonTags.MIN_OPTIONS));
-	optionsActivity.setOptionsInstructions(activityDetails.optString(AuthoringJsonTags.OPTIONS_INSTRUCTIONS));
+    private void buildOptionsActivity(OptionsActivity optionsActivity, JSONObject activityDetails) throws JSONException {
+	optionsActivity.setMaxNumberOfOptions((Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.MAX_OPTIONS));
+	optionsActivity.setMinNumberOfOptions((Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.MIN_OPTIONS));
+	optionsActivity.setOptionsInstructions((String) JsonUtil.opt(activityDetails,
+		AuthoringJsonTags.OPTIONS_INSTRUCTIONS));
     }
 
     private void buildParallelActivity(ParallelActivity activity) {
@@ -2226,11 +2141,11 @@ public class ObjectExtractor implements IObjectExtractor {
 
     private void buildToolActivity(ToolActivity toolActivity, JSONObject activityDetails) throws JSONException {
 	if (log.isDebugEnabled()) {
-	    log.debug("In tool activity UUID " + activityDetails.opt(AuthoringJsonTags.ACTIVITY_UIID)
-		    + " tool content id=" + activityDetails.get(AuthoringJsonTags.TOOL_CONTENT_ID));
+	    log.debug("In tool activity UUID " + JsonUtil.opt(activityDetails, AuthoringJsonTags.ACTIVITY_UIID)
+		    + " tool content id " + JsonUtil.opt(activityDetails, AuthoringJsonTags.TOOL_CONTENT_ID));
 	}
-	toolActivity.setToolContentId(activityDetails.optLong(AuthoringJsonTags.TOOL_CONTENT_ID));
-	Tool tool = toolDAO.getToolByID(activityDetails.getLong(AuthoringJsonTags.TOOL_ID));
+	toolActivity.setToolContentId(JsonUtil.optLong(activityDetails, AuthoringJsonTags.TOOL_CONTENT_ID));
+	Tool tool = toolDAO.getToolByID(JsonUtil.optLong(activityDetails, AuthoringJsonTags.TOOL_ID));
 	toolActivity.setTool(tool);
     }
 
@@ -2266,8 +2181,9 @@ public class ObjectExtractor implements IObjectExtractor {
 	    buildScheduleGateActivity((ScheduleGateActivity) activity, activityDetails);
 	}
 	GateActivity gateActivity = (GateActivity) activity;
-	gateActivity.setGateActivityLevelId(activityDetails.getInt(AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID));
-	gateActivity.setGateOpen(activityDetails.getBoolean(AuthoringJsonTags.GATE_OPEN));
+	gateActivity.setGateActivityLevelId((Integer) JsonUtil.opt(activityDetails,
+		AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID));
+	gateActivity.setGateOpen((Boolean) JsonUtil.opt(activityDetails, AuthoringJsonTags.GATE_OPEN));
 
     }
 
@@ -2295,8 +2211,8 @@ public class ObjectExtractor implements IObjectExtractor {
 
     private void buildScheduleGateActivity(ScheduleGateActivity activity, JSONObject activityDetails)
 	    throws JSONException {
-	activity.setGateStartTimeOffset(activityDetails.getLong(AuthoringJsonTags.GATE_START_OFFSET));
-	activity.setGateEndTimeOffset(activityDetails.getLong(AuthoringJsonTags.GATE_END_OFFSET));
+	activity.setGateStartTimeOffset(JsonUtil.optLong(activityDetails, AuthoringJsonTags.GATE_START_OFFSET));
+	activity.setGateEndTimeOffset(JsonUtil.optLong(activityDetails, AuthoringJsonTags.GATE_END_OFFSET));
 	SystemTool systemTool = getSystemTool(SystemTool.SCHEDULE_GATE);
 	activity.setSystemTool(systemTool);
     }
@@ -2311,8 +2227,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
     }
 
-    private void createLessonClass(LessonClass lessonClass, JSONObject groupingDetails) {
-	Long groupId = groupingDetails.optLong(AuthoringJsonTags.STAFF_GROUP_ID);
+    private void createLessonClass(LessonClass lessonClass, JSONObject groupingDetails) throws JSONException {
+	Long groupId = JsonUtil.optLong(groupingDetails, AuthoringJsonTags.STAFF_GROUP_ID);
 	if (groupId != null) {
 	    Group group = groupDAO.getGroupById(groupId);
 	    if (group != null) {
@@ -2467,8 +2383,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	    transition.setFromUIID(null);
 	}
 
-	transition.setDescription(transitionDetails.optString(AuthoringJsonTags.DESCRIPTION));
-	transition.setTitle(transitionDetails.optString(AuthoringJsonTags.TITLE));
+	transition.setDescription((String) JsonUtil.opt(transitionDetails, AuthoringJsonTags.DESCRIPTION));
+	transition.setTitle((String) JsonUtil.opt(transitionDetails, AuthoringJsonTags.TITLE));
 
 	// Set creation date based on the server timezone, not the client.
 	if (transition.getCreateDateTime() == null) {
@@ -2785,7 +2701,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	Integer entryUIID = details.getInt(AuthoringJsonTags.BRANCH_ACTIVITY_ENTRY_UIID);
 
 	Integer sequenceActivityUIID = details.getInt(AuthoringJsonTags.BRANCH_SEQUENCE_ACTIVITY_UIID);
-	Boolean gateOpenWhenConditionMet = details.optBoolean(AuthoringJsonTags.BRANCH_GATE_OPENS_WHEN_CONDITION_MET);
+	Boolean gateOpenWhenConditionMet = (Boolean) JsonUtil.opt(details,
+		AuthoringJsonTags.BRANCH_GATE_OPENS_WHEN_CONDITION_MET);
 	Integer branchingActivityUIID = null;
 	if (gateOpenWhenConditionMet != null) {
 	    branchingActivityUIID = details.getInt(AuthoringJsonTags.BRANCH_GATE_ACTIVITY_UIID);
@@ -2995,7 +2912,7 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	if (conditionDetails != null) {
 
-	    Long conditionID = conditionDetails.optLong(AuthoringJsonTags.CONDITION_ID);
+	    Long conditionID = JsonUtil.optLong(conditionDetails, AuthoringJsonTags.CONDITION_ID);
 	    if (entry != null) {
 		condition = entry.getCondition();
 	    }
@@ -3089,15 +3006,16 @@ public class ObjectExtractor implements IObjectExtractor {
 	learnerChoiceGrouping.setViewStudentsBeforeSelection(viewStudentsBeforeSelection);
     }
 
-    private void createLearnerChoiceGrouping(LearnerChoiceGrouping learnerChoiceGrouping, JSONObject groupingDetails) {
-	Integer numLearnersPerGroup = groupingDetails.optInt(AuthoringJsonTags.LEARNERS_PER_GROUP);
+    private void createLearnerChoiceGrouping(LearnerChoiceGrouping learnerChoiceGrouping, JSONObject groupingDetails)
+	    throws JSONException {
+	Integer numLearnersPerGroup = (Integer) JsonUtil.opt(groupingDetails, AuthoringJsonTags.LEARNERS_PER_GROUP);
 
 	if ((numLearnersPerGroup != null) && (numLearnersPerGroup.intValue() > 0)) {
 	    learnerChoiceGrouping.setLearnersPerGroup(numLearnersPerGroup);
 	    learnerChoiceGrouping.setNumberOfGroups(null);
 	    learnerChoiceGrouping.setEqualNumberOfLearnersPerGroup(null);
 	} else {
-	    Integer numGroups = groupingDetails.optInt(AuthoringJsonTags.NUMBER_OF_GROUPS);
+	    Integer numGroups = (Integer) JsonUtil.opt(groupingDetails, AuthoringJsonTags.NUMBER_OF_GROUPS);
 
 	    if ((numGroups != null) && (numGroups.intValue() > 0)) {
 		learnerChoiceGrouping.setNumberOfGroups(numGroups);
@@ -3106,13 +3024,14 @@ public class ObjectExtractor implements IObjectExtractor {
 	    }
 	    learnerChoiceGrouping.setLearnersPerGroup(null);
 
-	    Boolean equalNumberOfLearnersPerGroup = groupingDetails.optBoolean(AuthoringJsonTags.NUMBER_OF_GROUPS);
+	    Boolean equalNumberOfLearnersPerGroup = (Boolean) JsonUtil.opt(groupingDetails,
+		    AuthoringJsonTags.NUMBER_OF_GROUPS);
 	    if (equalNumberOfLearnersPerGroup != null) {
 		learnerChoiceGrouping.setEqualNumberOfLearnersPerGroup(equalNumberOfLearnersPerGroup);
 	    }
 	}
-	learnerChoiceGrouping.setViewStudentsBeforeSelection(groupingDetails
-		.optBoolean(AuthoringJsonTags.VIEW_STUDENTS_BEFORE_SELECTION));
+	learnerChoiceGrouping.setViewStudentsBeforeSelection((Boolean) JsonUtil.opt(groupingDetails,
+		AuthoringJsonTags.VIEW_STUDENTS_BEFORE_SELECTION));
     }
 
     private void buildConditionGateActivity(ConditionGateActivity activity) {

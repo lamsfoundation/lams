@@ -55,7 +55,7 @@
 				<div>&nbsp;</div>
 			</div>
 			<ul>
-				<li onClick="javascript:MenuLib.saveLearningDesign()">Save as...</li>
+				<li onClick="javascript:MenuLib.saveLearningDesign(true)">Save as...</li>
 			</ul>
 		</div>
 		<div class="ui-button" onClick="javascript:MenuLib.copyActivity()">
@@ -85,10 +85,11 @@
 		<div class="ui-button" onClick="javascript:MenuLib.arrangeActivities()">
 			Arrange
 		</div>
+		<!-- 
 		<div id="zoomButton" class="ui-button" onClick="javascript:MenuLib.zoom()">
 			Zoom out
 		</div>
-
+ 		-->
 	</div>
 	
 	<div id="tabs" class="tabs-bottom">
@@ -105,6 +106,7 @@
 						<div id="templateContainer">
 							<c:forEach var="tool" items="${tools}">
 								<div toolId="${tool.toolId}" supportsOutputs="${tool.supportsOutputs}"
+									 activityCategoryID="${tool.activityCategoryID}"
 									 class="template">
 									<c:if test="${not empty tool.iconPath}">
 										<img src="<lams:LAMSURL/>${tool.iconPath}" />
@@ -219,22 +221,6 @@
 				</td>
 				<td>
 					  <select class="propertiesContentFieldGrouping"></select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Offline Activity:
-				</td>
-				<td>
-					  <input type="checkbox" class="propertiesContentFieldOffline" /> 
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Define in Monitor:
-				</td>
-				<td>
-					  <input type="checkbox" class="propertiesContentFieldDefineMonitor" />
 				</td>
 			</tr>
 		</table>

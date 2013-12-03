@@ -35,9 +35,6 @@ public interface AuthoringJsonTags {
     public static final String GROUPINGS = "groupings";
     public static final String TRANSITIONS = "transitions";
     public static final String ACTIVITIES = "activities";
-    public static final String COMPETENCES = "competences";
-    public static final String COMPETENCE_MAPPINGS = "competenceMappings";
-    public static final String COMPETENCE_MAPPING = "competenceMapping";
     public static final String BRANCH_MAPPINGS = "branchMappings";
 
     /* Learning Library specific tags */
@@ -59,10 +56,6 @@ public interface AuthoringJsonTags {
 
     public static final String ACTIVITY_CATEGORY_ID = "activityCategoryID";
 
-    public static final String DEFINE_LATER = "defineLater";
-    public static final String RUN_OFFLINE = "runOffline";
-    public static final String OFFLINE_INSTRUCTIONS = "offlineInstructions";
-    public static final String ONLINE_INSTRUCTIONS = "onlineInstructions";
     public static final String LIBRARY_IMAGE = "libraryActivityUIImage";
     public static final String LIBRARY_ACTIVITY = "libraryActivityID";
 

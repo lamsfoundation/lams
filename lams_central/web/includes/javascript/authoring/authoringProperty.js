@@ -166,14 +166,6 @@ var PropertyLib = {
 					activity.grouping = newGroupingValue;
 					redrawNeeded = true;
 				}
-				activity.defineInMonitor = $('.propertiesContentFieldDefineMonitor', content)
-									.is(':checked');
-				var newOfflineValue = $('.propertiesContentFieldOffline', content)
-									.is(':checked');
-				if (newOfflineValue != activity.offline) {
-					activity.offline = newOfflineValue;
-					redrawNeeded = true;
-				}
 				
 				if (redrawNeeded) {
 					activity.draw();

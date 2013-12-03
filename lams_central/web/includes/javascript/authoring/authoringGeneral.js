@@ -4,11 +4,12 @@
 
 // few publicly visible variables 
 var paper = null,
-	canvas = null;
-
+	canvas = null,
+	
 // configuration and storage of various elements
-var layout = {
-	'isZoomed'   : false,
+	layout = {
+	'maxUIID' : 0,
+	// 'isZoomed'   : false,
 	'activities' : null,
 	'items' : {
 		'bin'               : null,
@@ -49,7 +50,7 @@ var layout = {
 		'bin'           : 'M 0 0 h -50 l 10 50 h 30 z'
 	},
 	'colors' : {
-		'activity'     		  : '#A9C8FD',
+		'activity'     		  : ['','#d0defd','#fffccb','#ece9f7','#fdf1d3','#FFFFFF','#e9f9c0'],
 		'offlineActivity' 	  : 'black',
 		'activityText' 		  : 'black',
 		'offlineActivityText' : 'white',
@@ -84,11 +85,12 @@ $(document).ready(function() {
  */
 function initTemplates(){
 	$('.template').each(function(){
-		var toolId = $(this).attr('toolId');
+		var toolId = +$(this).attr('toolId');
 		// register tool properties so they are later easily accessible
 		layout.toolMetadata[toolId] = {
-			'iconPath' : $('img', this).attr('src'),
-			'supportsOutputs' : $(this).attr('supportsOutputs')
+			'iconPath' 			 : $('img', this).attr('src'),
+			'supportsOutputs' 	 : $(this).attr('supportsOutputs'),
+			'activityCategoryID' : +$(this).attr('activityCategoryID')
 		};
 		
 		// if a tool's name is too long and gets broken into two lines
@@ -136,7 +138,7 @@ function initTemplates(){
 			    	y = draggable.offset.top   + canvas.scrollTop()  - canvas.offset().top,
 			    	label = $('div', draggable.draggable).text();
 				
-				layout.activities.push(new ActivityLib.ToolActivity(null, toolID, x, y, label));
+				layout.activities.push(new ActivityLib.ToolActivity(null, null, null, toolID, x, y, label));
 		   }
 	});
 }
@@ -218,7 +220,7 @@ function initLayout() {
 			            			learningDesingID = node.data.learningDesignId && nodeTitle == title ?
 			            					node.data.learningDesignId : null;
 			            		if (learningDesingID
-			            				&& !confirm('Are you sure you want to overwrite an existing sequence?')) {
+			            				&& !confirm('Are you sure you want to overwrite the existing sequence?')) {
 			            			return;
 			            		}
 			            		
@@ -227,8 +229,10 @@ function initLayout() {
 			            			folderID = node.parent.data.folderID;
 			            		}
 
-			            		dialog.dialog('close');
-			            		saveLearningDesign(folderID, learningDesingID, title);
+			            		var result = saveLearningDesign(folderID, learningDesingID, title);
+			            		if (result) {
+			            			dialog.dialog('close');
+			            		}
 							}
 			             },
 			             closeLdStoreDialogButton
@@ -254,8 +258,10 @@ function initLayout() {
 	ldStoreDialog.dialog('option', 'ldTree', tree);
 	// make folder contents load dynamically on open
 	tree.setDynamicLoad(function(node, callback){
+		var dialog = $(this.getEl()).closest('.ui-dialog'),
+					 isSaveDialog = dialog.hasClass('ldStoreDialogSave');
 		// load subfolder contents
-		var childNodeData = MenuLib.getFolderContents(node.data.folderID);
+		var childNodeData = MenuLib.getFolderContents(node.data.folderID, isSaveDialog);
 		if (childNodeData) {
 		$.each(childNodeData, function(){
 				// create and add a leaf
@@ -353,11 +359,18 @@ function openLearningDesign(learningDesignID) {
 			$.each(ld.activities, function() {
 				var activityData = this,
 					activity = null;
+				
+				// find max uiid so newly created elements have, unique ones
+				if (activityData.activityUIID && layout.maxUIID < activityData.activityUIID) {
+					layout.maxUIID = activityData.activityUIID;
+				}
 
 				switch(activityData.activityTypeID) {
 					// Tool Activity
 					case 1 :
 						activity = new ActivityLib.ToolActivity(activityData.activityID,
+										activityData.activityUIID,
+										activityData.toolContentID,
 										activityData.toolID,
 										activityData.xCoord,
 										activityData.yCoord,
@@ -398,6 +411,7 @@ function openLearningDesign(learningDesignID) {
 								});
 								
 								activity = new ActivityLib.GroupingActivity(activityData.activityID,
+										activityData.activityUIID,
 										activityData.xCoord,
 										activityData.yCoord,
 										activityData.activityTitle,
@@ -421,6 +435,7 @@ function openLearningDesign(learningDesignID) {
 					case 6:
 						var gateType = gateType || 'condition';
 						activity = new ActivityLib.GateActivity(activityData.activityID,
+							activityData.activityUIID,
 							activityData.xCoord,
 							activityData.yCoord,
 							gateType);
@@ -433,8 +448,11 @@ function openLearningDesign(learningDesignID) {
 						// draw both edge points straight away and mark the whole canvas for auto reaarange
 						arrangeNeeded = true;
 						var branchingType = branchingType || 'tool',
-							branchingEdge = new ActivityLib.BranchingEdgeActivity(activityData.activityID, 0, 0, 
-									activityData.activityTitle, branchingType, null);
+							branchingEdge = new ActivityLib.BranchingEdgeActivity(activityData.activityID,
+									activityData.activityUIID,
+									0, 0, 
+									activityData.activityTitle,
+									branchingType);
 						layout.activities.push(branchingEdge);
 						// for later reference
 						activityData.activity = branchingEdge;
@@ -607,7 +625,8 @@ function openLearningDesign(learningDesignID) {
 					
 					// found both transition ends, draw it and stop the iteration
 					if (fromActivity && toActivity) {
-						ActivityLib.drawTransition(fromActivity, toActivity, true);
+						ActivityLib.drawTransition(fromActivity, toActivity, true,
+								transition.transitionID, transition.transitionUIID);
 						return false;
 					}
 				});
@@ -630,6 +649,59 @@ function openLearningDesign(learningDesignID) {
  * Stores the sequece into database.
  */
 function saveLearningDesign(folderID, learningDesignID, title) {
+	var activities = [],
+		transitions = [],
+		result = false;
+	
+	$.each(layout.activities, function(){
+		var activity = this,
+			activityBox = activity.items.shape.getBBox(),
+			toolID = activity.toolID,
+			iconPath = null;
+		if (toolID) {
+			var templateIcon = $('.template[toolId=' + toolID +'] img');
+			if (templateIcon.width() > 0) {
+				// iconPath = layout.toolMetadata[toolID].iconPath;
+			}
+		}
+			
+		
+		activities.push({
+			'activityID' 			 : activity.id,
+			'activityUIID' 			 : activity.uiid,
+			'toolID' 				 : toolID,
+			'learningLibraryID' 	 : toolID,
+			'toolContentID' 	 	 : activity.toolContentID,
+			'stopAfterActivity' 	 : false,
+			'groupingSupportType' 	 : 2,
+			'applyGrouping' 		 : false,
+			'parentActivityID' 		 : null,
+			'parentUIID' 			 : null,
+			'libraryActivityUIImage' : iconPath,
+			'xCoord' 				 : activityBox.x,
+			'yCoord' 				 : activityBox.y,
+			'activityTitle' 		 : activity.title,
+			'activityCategoryID' 	 : layout.toolMetadata[toolID].activityCategoryID,
+			'activityTypeID'     	 : 1,
+			
+			'gradebookToolOutputDefinitionName' : null,
+			'helpText' : null,
+			'description' : null
+		});
+		
+		$.each(activity.transitions.from, function(){
+			var transition = this;
+			
+			transitions.push({
+				'transitionID'   : transition.id,
+				'transitionUIID' : transition.uiid,
+				'fromUIID' 		 : activity.uiid,
+				'toUIID'   		 : transition.toActivity.uiid,
+				'transitionType' : 0
+			});
+		});
+	});
+	
 	// serialise the sequence
 	var ld = {
 		// it is null if it is a new sequence
@@ -637,28 +709,28 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		'workspaceFolderID'  : folderID,
 		'copyTypeID'         : 1,
 		'originalUserID'     : null,
-		'learningDesignUIID' : null,
 		'title'              : title.trim(),
 		'description'        : $('#ldDescriptionFieldDescription').val().trim(),
-		'maxID'				 : null,
+		'maxID'				 : layout.maxUIID,
 		'readOnly'			 : false,
 		'editOverrideLock'   : false,
 		'dateReadOnly'       : null,
-		'helpText'           : null,
 		'version'        	 : null,
-		'duration'			 : null,
 		'contentFolderID'    : layout.contentFolderID,
 		'saveMode'			 : 0,
-		'licenseID'			 : null,
-		'licenseText'   	 : null,
 		'originalLearningDesignID' : null,
 		
-		'activities'		 : null,
-		'transitions'		 : null,
+		'activities'		 : activities,
+		'transitions'		 : transitions,
 		'groupings'			 : null,
 		'branchMappings'     : null,
-		'competences'        : null,
-		'competenceMappings' : null
+		
+		'learningDesignUIID' : null,
+		'helpText'           : null,
+		'duration'			 : null,
+		'licenseID'			 : null,
+		'licenseText'   	 : null
+		
 	};
 	
 	// get LD details
@@ -669,12 +741,55 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		dataType : 'json',
 		data : {
 			'method'          : 'saveLearningDesign',
-			'ld'			  : ld
+			'ld'			  : JSON.stringify(ld)
 		},
-		success : function(responseLd) {
-			
+		success : function(response) {
+			if (response.learningDesignID) {
+				layout.learningDesignID = response.learningDesignID;
+				layout.folderID = folderID;
+				layout.title = title;
+				if (!layout.contentFolderID) {
+					layout.contentFolderID = response.contentFolderID;
+				}
+				if (response.validation.length > 0) {
+					var message = 'While saving the sequence there were following validation issues:\n';
+					$.each(response.validation, function() {
+						var uiid = this.UIID,
+							title = '';
+						$.each(layout.activities, function(){
+							if (uiid == this.uiid) {
+								title = this.title + ': ';
+							}
+						});
+						message += title + this.message + '\n';
+					});
+					
+					alert(message);
+					return;
+				}
+				
+				$.each(response.activities, function() {
+					var updatedActivity = this;
+					$.each(layout.activities, function(){
+						var activity = this;
+						if (updatedActivity.activityUIID == activity.uiid) {
+							activity.id = updatedActivity.activityID;
+							activity.toolContentID = updatedActivity.toolContentID;
+						}
+					});
+				});
+				
+				result = true;
+			} else {
+				alert('Error while saving the sequence');
+			}
+		},
+		error : function(){
+			alert('Error while saving the sequence');
 		}
 	});
+	
+	return result;
 }
 
 

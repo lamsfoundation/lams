@@ -189,20 +189,22 @@ public class HomeAction extends DispatchAction {
 		    learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_MODE, mode);
 		}
 
-		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED, String
-			.valueOf(lesson.getLearnerExportAvailable() != null ? lesson.getLearnerExportAvailable()
+		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED,
+			String.valueOf(lesson.getLearnerExportAvailable() != null ? lesson.getLearnerExportAvailable()
 				: Boolean.TRUE));
 		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_PRESENCE_ENABLED,
 			String.valueOf(lesson.getLearnerPresenceAvailable()));
 		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_PRESENCE_IM_ENABLED,
 			String.valueOf(lesson.getLearnerImAvailable()));
-		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_TITLE, lesson.getLessonName());
+		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_TITLE,
+			lesson.getLessonName());
 
 		/* Date Format for Chat room append */
 		DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
 		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_CREATE_DATE_TIME,
 			sfm.format(lesson.getCreateDateTime()));
-		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_LESSON_ID, String.valueOf(lessonId));
+		learnerURL = WebUtil.appendParameterToURL(learnerURL, AttributeNames.PARAM_LESSON_ID,
+			String.valueOf(lessonId));
 
 		// show lesson intro page if required
 		if (lesson.isEnableLessonIntro()) {
@@ -330,7 +332,7 @@ public class HomeAction extends DispatchAction {
 	UserDTO userDTO = getUser();
 
 	// get all user accessible folders and LD descriptions as JSON
-	JSONObject learningDesigns = getFolderContents(null, userDTO.getUserID());
+	JSONObject learningDesigns = getFolderContents(null, userDTO.getUserID(), false);
 	req.setAttribute("folderContents", learningDesigns.toString());
 
 	Integer organisationID = new Integer(WebUtil.readIntParam(req, "organisationID"));
@@ -390,7 +392,8 @@ public class HomeAction extends DispatchAction {
 	    HttpServletResponse res) throws UserAccessDeniedException, JSONException, IOException,
 	    RepositoryCheckedException {
 	Integer folderID = WebUtil.readIntParam(req, "folderID", true);
-	JSONObject responseJSON = getFolderContents(folderID, getUser().getUserID());
+	boolean allowInvalidDesigns = WebUtil.readBooleanParam(req, "allowInvalidDesigns", false);
+	JSONObject responseJSON = getFolderContents(folderID, getUser().getUserID(), allowInvalidDesigns);
 
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(responseJSON.toString());
@@ -421,8 +424,8 @@ public class HomeAction extends DispatchAction {
     }
 
     @SuppressWarnings("unchecked")
-    private JSONObject getFolderContents(Integer folderID, Integer userID) throws JSONException, IOException,
-	    UserAccessDeniedException, RepositoryCheckedException {
+    private JSONObject getFolderContents(Integer folderID, Integer userID, boolean allowInvalidDesigns)
+	    throws JSONException, IOException, UserAccessDeniedException, RepositoryCheckedException {
 	JSONObject result = new JSONObject();
 	Vector<FolderContentDTO> folderContents = null;
 
@@ -454,13 +457,14 @@ public class HomeAction extends DispatchAction {
 	    if (folderContents.size() == 1) {
 		FolderContentDTO folder = folderContents.firstElement();
 		if (folder.getResourceID().equals(WorkspaceAction.ROOT_ORG_FOLDER_ID)) {
-		    return getFolderContents(WorkspaceAction.ROOT_ORG_FOLDER_ID, userID);
+		    return getFolderContents(WorkspaceAction.ROOT_ORG_FOLDER_ID, userID, allowInvalidDesigns);
 		}
 	    }
 	} else {
 	    WorkspaceFolder folder = getWorkspaceManagementService().getWorkspaceFolder(folderID);
-	    folderContents = getWorkspaceManagementService().getFolderContents(userID, folder,
-		    WorkspaceManagementService.MONITORING);
+	    Integer mode = allowInvalidDesigns ? WorkspaceManagementService.AUTHORING
+		    : WorkspaceManagementService.MONITORING;
+	    folderContents = getWorkspaceManagementService().getFolderContents(userID, folder, mode);
 	    Collections.sort(folderContents);
 	}
 
