@@ -792,11 +792,11 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
  * Draw user icons on top of activities.
  */
 function addLearnerIcons(activity) {
-	var isGate = false;
-	var actX = null
-	var actY = null;
-	var activityGroup = $('g#' + activity.id, sequenceCanvas);
-	var activityShape = $('rect[id="act' + activity.id + '"]', activityGroup);
+	var isGate = false,
+		actX = null,
+		actY = null,
+		activityGroup = $('g#' + activity.id, sequenceCanvas),
+		activityShape = $('rect[id="act' + activity.id + '"]', activityGroup);
 	if (activityShape.length == 0){
 		// is it Gate activity?
 		activityShape = $('polygon', activityGroup);
@@ -816,11 +816,11 @@ function addLearnerIcons(activity) {
 	}
 	
 	// add group of users icon
-	var actRightBorder = actX + (isGate? 40 : +activityShape.attr('width'));
-	var groupTitle = activity.learners.length + ' ' + LEARNER_GROUP_COUNT_LABEL
-		+ ' ' + LEARNER_GROUP_SHOW_LABEL;
+	var actRightBorder = actX + (isGate? 40 : +activityShape.attr('width')),
+		groupTitle = activity.learners.length + ' ' + LEARNER_GROUP_COUNT_LABEL
+		+ ' ' + LEARNER_GROUP_SHOW_LABEL,
 	// if icons do not fit in shape anymore, show a group icon
-	var element = appendXMLElement('image', {
+		element = appendXMLElement('image', {
 		'id'         : 'act' + activity.id + 'learnerGroup',
 		'x'          : actRightBorder - 19,
 		'y'          : actY + 1,
@@ -847,7 +847,7 @@ function addLearnerIcons(activity) {
 			var learnerDisplayName = getLearnerDisplayName(learner);
 			actTooltip += '\n' + learnerDisplayName;
 			
-			if (learnerIndex < 8) {
+			if (learnerIndex < 7) {
 				element = appendXMLElement('image', {
 					'id'         : 'act' + activity.id + 'learner' + learner.id,
 					'x'          :  actX + learnerIndex*15,
