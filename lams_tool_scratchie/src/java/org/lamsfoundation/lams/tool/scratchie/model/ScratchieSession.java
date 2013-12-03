@@ -173,5 +173,11 @@ public class ScratchieSession {
     public void setGroupLeader(ScratchieUser groupLeader) {
 	this.groupLeader = groupLeader;
     }
+    
+    public boolean isUserGroupLeader(ScratchieUser user) {
+
+	boolean isUserLeader = (this.groupLeader != null) && user.getUid().equals(this.groupLeader.getUid());
+	return isUserLeader;
+    }
 
 }

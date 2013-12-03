@@ -185,7 +185,7 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_USER_ID, user.getUserId());
 	sessionMap.put(ScratchieConstants.ATTR_USER, user);
 	sessionMap.put(ScratchieConstants.ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = service.isUserGroupLeader(user, toolSession);
+	boolean isUserLeader = toolSession.isUserGroupLeader(user);
 	sessionMap.put(ScratchieConstants.ATTR_IS_USER_LEADER, isUserLeader);
 	boolean isUserFinished = user != null && user.isSessionFinished();
 	sessionMap.put(ScratchieConstants.ATTR_USER_FINISHED, isUserFinished);
@@ -239,7 +239,7 @@ public class LearningAction extends Action {
 
 	// for teacher in monitoring display the number of attempt.
 	if (mode.isTeacher()) {
-	    service.retrieveScratchesOrder(items, user);
+	    service.getScratchesOrder(items, user);
 	}
 	
 	//calculate max score
@@ -281,7 +281,7 @@ public class LearningAction extends Action {
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	ScratchieUser user = getCurrentUser(toolSessionId);
+	ScratchieUser user = this.getCurrentUser(toolSessionId);
 
 	// set scratched flag for display purpose
 	Set<ScratchieItem> items = service.getItemsWithIndicatedScratches(toolSessionId, user);
@@ -316,14 +316,14 @@ public class LearningAction extends Action {
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
 
-	ScratchieUser leader = getCurrentUser(toolSessionId);
+	ScratchieUser leader = this.getCurrentUser(toolSessionId);
 	// only leaders are allowed to scratch answers
-	if (!service.isUserGroupLeader(leader, toolSession)) {
+	if (!toolSession.isUserGroupLeader(leader)) {
 	    return null;
 	}
 
 	Long answerUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_ANSWER_UID));
-	ScratchieAnswer answer = service.getScratchieAnswerById(answerUid);
+	ScratchieAnswer answer = service.getScratchieAnswerByUid(answerUid);
 	if (answer == null) {
 	    return mapping.findForward(ScratchieConstants.ERROR);
 	}
@@ -362,7 +362,7 @@ public class LearningAction extends Action {
 	ScratchieUser user = (ScratchieUser) sessionMap.get(ScratchieConstants.ATTR_USER);
 
 	// in case of the leader we should let all other learners see Next Activity button
-	if (service.isUserGroupLeader(user, toolSession)) {
+	if (toolSession.isUserGroupLeader(user)) {
 	    service.setScratchingFinished(toolSessionId);
 	}
 	
@@ -517,7 +517,7 @@ public class LearningAction extends Action {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	ScratchieUser scratchieUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()), sessionId);
+	ScratchieUser scratchieUser = service.getUserByIDAndSession(user.getUserID().longValue(), sessionId);
 
 	if (scratchieUser == null) {
 	    ScratchieSession session = service.getScratchieSessionBySessionId(sessionId);
@@ -528,7 +528,7 @@ public class LearningAction extends Action {
     }
 
     private ScratchieUser getSpecifiedUser(Long sessionId, Integer userId) {
-	ScratchieUser scratchieUser = service.getUserByIDAndSession(new Long(userId.intValue()), sessionId);
+	ScratchieUser scratchieUser = service.getUserByIDAndSession(userId.longValue(), sessionId);
 	if (scratchieUser == null) {
 	    log.error("Unable to find specified user for scratchie activity. Screens are likely to fail. SessionId="
 		    + sessionId + " UserId=" + userId);

@@ -290,14 +290,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public boolean isUserGroupLeader(ScratchieUser user, ScratchieSession session) {
-
-	ScratchieUser groupLeader = session.getGroupLeader();
-	boolean isUserLeader = (groupLeader != null) && user.getUid().equals(groupLeader.getUid());
-	return isUserLeader;
-    }
-
-    @Override
     public ScratchieUser checkLeaderSelectToolForSessionLeader(ScratchieUser user, Long toolSessionId) {
 	if (user == null || toolSessionId == null) {
 	    return null;
@@ -443,76 +435,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public List<Summary> exportBySessionId(Long sessionId) {
-	ScratchieSession session = scratchieSessionDao.getSessionBySessionId(sessionId);
-	if (session == null) {
-	    ScratchieServiceImpl.log.error("Failed get ScratchieSession by ID [" + sessionId + "]");
-	    return null;
-	}
-	// initial scratchie items list
-	List<Summary> itemList = new ArrayList();
-	Set<ScratchieItem> resList = session.getScratchie().getScratchieItems();
-	for (ScratchieItem item : resList) {
-	    // if item is create by author
-	    if (item.isCreateByAuthor()) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
-		itemList.add(sum);
-	    }
-	}
-
-	// get this session's all scratchie items
-	Set<ScratchieItem> sessList = session.getScratchieItems();
-	for (ScratchieItem item : sessList) {
-
-	    // to skip all item create by author
-	    if (!item.isCreateByAuthor()) {
-		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
-		itemList.add(sum);
-	    }
-	}
-
-	return itemList;
-    }
-
-    @Override
-    public List<List<Summary>> exportByContentId(Long contentId) {
-	Scratchie scratchie = scratchieDao.getByContentId(contentId);
-	List<List<Summary>> groupList = new ArrayList();
-
-	// create init scratchie items list
-	List<Summary> initList = new ArrayList();
-	groupList.add(initList);
-	Set<ScratchieItem> resList = scratchie.getScratchieItems();
-	for (ScratchieItem item : resList) {
-	    if (item.isCreateByAuthor()) {
-		Summary sum = new Summary(null, null, item, true);
-		initList.add(sum);
-	    }
-	}
-
-	// session by session
-	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
-	for (ScratchieSession session : sessionList) {
-	    List<Summary> group = new ArrayList<Summary>();
-	    // get this session's all scratchie items
-	    Set<ScratchieItem> sessList = session.getScratchieItems();
-	    for (ScratchieItem item : sessList) {
-		// to skip all item create by author
-		if (!item.isCreateByAuthor()) {
-		    Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item, false);
-		    group.add(sum);
-		}
-	    }
-	    if (group.size() == 0) {
-		group.add(new Summary(session.getSessionId(), session.getSessionName(), null, false));
-	    }
-	    groupList.add(group);
-	}
-
-	return groupList;
-    }
-
-    @Override
     public Scratchie getScratchieBySessionId(Long sessionId) {
 	ScratchieSession session = scratchieSessionDao.getSessionBySessionId(sessionId);
 	// to skip CGLib problem
@@ -534,10 +456,10 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     @Override
     public void logAnswerAccess(ScratchieUser leader, Long answerUid) {
 
-	ScratchieAnswer answer = getScratchieAnswerById(answerUid);
+	ScratchieAnswer answer = this.getScratchieAnswerByUid(answerUid);
 	Long sessionId = leader.getSession().getSessionId();
 	
-	List<ScratchieUser> users = getUsersBySession(sessionId);
+	List<ScratchieUser> users = this.getUsersBySession(sessionId);
 	for (ScratchieUser user : users) {
 	    ScratchieAnswerVisitLog log = scratchieAnswerVisitDao.getLog(answerUid, user.getUserId());
 	    if (log == null) {
@@ -550,7 +472,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    }
 	}
 	
-	recalculateMarkForSession(leader, false);
+	this.recalculateMarkForSession(leader, false);
 
     }
     
@@ -590,7 +512,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public ScratchieAnswer getScratchieAnswerById(Long answerUid) {
+    public ScratchieAnswer getScratchieAnswerByUid(Long answerUid) {
 	return (ScratchieAnswer) userManagementService.findById(ScratchieAnswer.class, answerUid);
     }
 
@@ -665,7 +587,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    List<ScratchieUser> usersToShow = new LinkedList<ScratchieUser>();
 	    for (ScratchieUser user : sessionUsers) {
 		
-		boolean isUserGroupLeader = isUserGroupLeader(user, session);
+		boolean isUserGroupLeader = session.isUserGroupLeader(user);
 		//include only leaders in case isUserGroupLeader is ON, include all otherwise
 		if (isIncludeOnlyLeaders && isUserGroupLeader || !isIncludeOnlyLeaders) {
 		    int totalAttempts = scratchieAnswerVisitDao.getLogCountTotal(sessionId, user.getUserId());
@@ -683,7 +605,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public void retrieveScratchesOrder(Collection<ScratchieItem> items, ScratchieUser user) {
+    public void getScratchesOrder(Collection<ScratchieItem> items, ScratchieUser user) {
 
 	for (ScratchieItem item : items) {
 	    List<ScratchieAnswerVisitLog> itemLogs = scratchieAnswerVisitDao.getLogsByScratchieUserAndItem(
@@ -736,7 +658,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		}
 	    }
 
-	    boolean isItemUnraveled = isItemUnraveled(item, userLogs);
+	    boolean isItemUnraveled = this.isItemUnraveled(item, userLogs);
 	    item.setUnraveled(isItemUnraveled);
 	}
 	
@@ -908,14 +830,17 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		NotebookEntry notebookEntry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
 			ScratchieConstants.TOOL_SIGNATURE, leader.getUserId().intValue());
 		if ((notebookEntry != null) && StringUtils.isNotBlank(notebookEntry.getEntry())) {
-		    ReflectDTO reflectDTO = new ReflectDTO(notebookEntry.getUser());
+		    User user = new User();
+		    user.setLastName(leader.getLastName());
+		    user.setFirstName(leader.getFirstName());
+		    ReflectDTO reflectDTO = new ReflectDTO(user);
 		    reflectDTO.setGroupName(session.getSessionName());
 		    String reflection = notebookEntry.getEntry();
 		    if (isEscapeText) {
 			reflection = StringEscapeUtils.escapeJavaScript(reflection);
 		    }
 		    reflectDTO.setReflection(reflection);
-		    reflectDTO.setIsGroupLeader(this.isUserGroupLeader(leader, session));
+		    reflectDTO.setIsGroupLeader(session.isUserGroupLeader(leader));
 
 		    reflections.add(reflectDTO);
 		}

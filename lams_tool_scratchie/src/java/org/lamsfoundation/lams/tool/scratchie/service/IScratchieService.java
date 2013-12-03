@@ -59,13 +59,6 @@ public interface IScratchieService {
     Scratchie getScratchieByContentId(Long contentId);
     
     /**
-     * @param user
-     * @param toolSessionId
-     * @return
-     */
-    boolean isUserGroupLeader(ScratchieUser user, ScratchieSession session);
-    
-    /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
      * 
      * @param userId
@@ -73,7 +66,7 @@ public interface IScratchieService {
      */
     ScratchieUser checkLeaderSelectToolForSessionLeader(ScratchieUser user, Long toolSessionId);
     
-    ScratchieAnswer getScratchieAnswerById (Long answerUid);
+    ScratchieAnswer getScratchieAnswerByUid (Long answerUid);
     
     /**
      * Check user has the same scrathes logs as group leader. If not - creates missing ones. 
@@ -207,7 +200,7 @@ public interface IScratchieService {
      * @param items
      * @param user
      */
-    void retrieveScratchesOrder(Collection<ScratchieItem> items, ScratchieUser user);
+    void getScratchesOrder(Collection<ScratchieItem> items, ScratchieUser user);
 
     /**
      * Fill in scratchieItems with information about whether they were unraveled; and answers with information on their scratched.
@@ -259,19 +252,6 @@ public interface IScratchieService {
      * @return
      */
     LinkedHashMap<String, ExcelCell[][]> exportExcel(Long contentId);
-
-    /**
-     * Get scratchie item <code>Summary</code> list according to sessionId and skipHide flag.
-     * 
-     * @param sessionId
-     * @param skipHide
-     *                true, don't get scratchie item if its <code>isHide</code> flag is true. Otherwise, get all
-     *                scratchie item
-     * @return
-     */
-    List<Summary> exportBySessionId(Long sessionId);
-
-    List<List<Summary>> exportByContentId(Long contentId);
 
     /**
      * Create refection entry into notebook tool.

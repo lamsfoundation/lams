@@ -119,7 +119,8 @@
         </property>
         <property name="transactionAttributes">
             <props>
-            	<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+            	<prop key="get*">PROPAGATION_SUPPORTS,readOnly</prop>
+            	<prop key="export*">PROPAGATION_SUPPORTS,readOnly</prop>
             	<prop key="recalculateMarkForSession">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="create*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="delete*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
@@ -141,6 +142,7 @@
                 <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
 				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
 				<prop key="setReflectiveData">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="*">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
             </props>
         </property>
     </bean>
