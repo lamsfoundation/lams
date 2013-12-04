@@ -9,7 +9,7 @@ var ActivityLib = {
 	 */
 	ToolActivity : function(id, uiid, toolContentID, toolID, x, y, title, supportsOutputs) {
 		this.id = +id;
-		this.uiid = +uiid || ++layout.maxUIID;
+		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.toolContentID = toolContentID;
 		this.type = 'tool';
 		this.toolID = +toolID;
@@ -29,11 +29,12 @@ var ActivityLib = {
 	/**
 	 * Constructor for a Grouping Activity.
 	 */
-	GroupingActivity : function(id, uiid, x, y, title, groupingID, groupingType, groupDivide, groupCount, learnerCount,
-			equalSizes, viewLearners, groups) {
+	GroupingActivity : function(id, uiid, x, y, title, groupingID, groupingUIID, groupingType, groupDivide,
+								groupCount, learnerCount, equalSizes, viewLearners, groups) {
 		this.id = +id;
-		this.uiid = +uiid || ++layout.maxUIID;
 		this.groupingID = +groupingID;
+		this.groupingUIID = +groupingUIID  || ++layout.ld.maxUIID;
+		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.type = 'grouping';
 		this.title = title;
 		this.groupingType = groupingType || 'random';
@@ -59,7 +60,7 @@ var ActivityLib = {
 	 */
 	GateActivity : function(id, uiid, x, y, gateType) {
 		this.id = +id;
-		this.uiid = +uiid || ++layout.maxUIID;
+		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.type = 'gate';
 		this.gateType = gateType || 'permission';
 		this.transitions = {
@@ -109,7 +110,7 @@ var ActivityLib = {
 	 */
 	BranchingActivity : function(id, uiid, branchingEdgeStart) {
 		this.id = +id;
-		this.uiid = +uiid || ++layout.maxUIID;
+		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.start = branchingEdgeStart;
 		this.branches = [];
 		// mapping between groups and branches, if applicable
@@ -122,7 +123,7 @@ var ActivityLib = {
 	 */
 	BranchActivity : function(id, uiid, title, branchingActivity, transitionFrom) {
 		this.id = +id;
-		this.uiid = +uiid || ++layout.maxUIID;
+		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.title = title;
 		this.transitionFrom = transitionFrom;
 		this.branchingActivity = branchingActivity;
@@ -182,7 +183,7 @@ var ActivityLib = {
 			paper.setStart();
 			var shape = paper.path(Raphael.format('M {0} {1}' + layout.defs.activity, x, y))
 							 .attr({
-									'fill' : layout.colors.activity
+									'fill' : layout.colors.grouping
 								 });
 			
 			paper.image('../images/grouping.gif', x + 47, y + 2, 30, 30);
@@ -385,7 +386,7 @@ var ActivityLib = {
 							'fill'   : layout.colors.transition
 						 });
 		var transition = paper.setFinish();
-		transition.uiid = uiid || ++layout.maxUIID;
+		transition.uiid = uiid || ++layout.ld.maxUIID;
 		transition.id = id;
 		transition.data('transition', transition);
 		
@@ -597,15 +598,15 @@ var ActivityLib = {
 				data : {
 					'method'          : 'createToolContent',
 					'toolID'          : activity.toolID,
-					'contentFolderID' : layout.contentFolderID
+					'contentFolderID' : layout.ld.contentFolderID
 				},
 				success : function(response) {
 					activity.authorURL = response.authorURL;
 					activity.toolContentID = response.toolContentID;
-					if (!layout.contentFolderID) {
+					if (!layout.ld.contentFolderID) {
 						// if LD did not have contentFolderID, it was just generated
 						// so remember it
-						layout.contentFolderID = response.contentFolderID;
+						layout.ld.contentFolderID = response.contentFolderID;
 					}
 				}
 			});

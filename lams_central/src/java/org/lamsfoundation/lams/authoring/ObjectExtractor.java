@@ -1753,7 +1753,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    if (grouping != null) {
 		setGrouping(activity, grouping, groupingUIID);
 	    } else {
-		log.warn("Unable to find matching grouping for groupingUIID" + groupingUIID + ". Activity UUID "
+		log.warn("Unable to find matching grouping for groupingUIID " + groupingUIID + ". Activity UUID "
 			+ activityUIID + " will not be grouped.");
 		clearGrouping(activity);
 	    }

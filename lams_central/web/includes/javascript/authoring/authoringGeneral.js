@@ -8,7 +8,6 @@ var paper = null,
 	
 // configuration and storage of various elements
 	layout = {
-	'maxUIID' : 0,
 	// 'isZoomed'   : false,
 	'activities' : null,
 	'items' : {
@@ -22,7 +21,7 @@ var paper = null,
 		'groupNamingDialog' : null,
 		'groupsToBranchesMappingDialog' : null
 	},
-	
+	'dialogs' : [],
 	'toolMetadata': {
 		'grouping' : {
 			'iconPath' : '../images/grouping.gif'
@@ -54,6 +53,7 @@ var paper = null,
 		'offlineActivity' 	  : 'black',
 		'activityText' 		  : 'black',
 		'offlineActivityText' : 'white',
+		'grouping'			  : '#A9C8FD',
 		'gate'         		  : 'red',
 		'gateText'     		  : 'white',
 		'branchingEdgeStart'  : 'green',
@@ -148,7 +148,14 @@ function initTemplates(){
  * Initialises various Authoring widgets.
  */
 function initLayout() {
-	$('#tabs').tabs();
+	$('#tabs').tabs({
+		'activate' : function(){
+			// close all opened dialogs
+			$.each(layout.dialogs, function() {
+				this.dialog('close');
+			});
+		}
+	});
 	$('#tabs .ui-tabs-nav, #tabs .ui-tabs-nav > *')
 		.removeClass( "ui-corner-all ui-corner-top" )
 		.addClass( "ui-corner-bottom" );
@@ -244,6 +251,8 @@ function initLayout() {
 		}
 	});
 	
+	layout.dialogs.push(ldStoreDialog);
+	
 	$('#ldScreenshotAuthor', ldStoreDialog).load(function(){
 		// hide "loading" animation
 		$('#ldStoreDialog .ldChoiceDependentCanvasElement').css('display', 'none');
@@ -286,9 +295,9 @@ function initLayout() {
 		if (event.node.highlightState == 0) {
 			if (event.node.data.learningDesignId) {
 				$('#ldStoreDialog #ldScreenshotLoading', dialog).css('display', 'inline');
-				// get the image of the chosen LD
+				// get the image of the chosen LD and prevent caching
 				$('#ldStoreDialog #ldScreenshotAuthor', dialog)
-					.attr('src', LD_THUMBNAIL_URL_BASE + event.node.data.learningDesignId);
+					.attr('src', LD_THUMBNAIL_URL_BASE + event.node.data.learningDesignId + '&_=' + new Date().getTime());
 				$('#ldStoreDialog #ldScreenshotAuthor', dialog).css({
 					'width'  : 'auto',
 					'height' : 'auto'
@@ -319,6 +328,8 @@ function initLayout() {
 					    of: '#canvas'
 				      }
 	});
+	
+	layout.dialogs.push(layout.items.infoDialog);
 }
 
 
@@ -343,6 +354,12 @@ function openLearningDesign(learningDesignID) {
 			
 			// remove existing activities
 			MenuLib.newLearningDesign(true);
+			layout.ld = {
+				'learningDesignID' : learningDesignID,
+				'folderID'		   : ld.workspaceFolderID,
+				'contentFolderID'  : ld.contentFolderID,
+				'title'			   : ld.title
+			};
 			
 			$('#ldDescriptionFieldTitle').text(ld.title);
 			$('#ldDescriptionFieldDescription').text(ld.description);
@@ -361,8 +378,8 @@ function openLearningDesign(learningDesignID) {
 					activity = null;
 				
 				// find max uiid so newly created elements have, unique ones
-				if (activityData.activityUIID && layout.maxUIID < activityData.activityUIID) {
-					layout.maxUIID = activityData.activityUIID;
+				if (activityData.activityUIID && layout.ld.maxUIID < activityData.activityUIID) {
+					layout.ld,maxUIID = activityData.activityUIID;
 				}
 
 				switch(activityData.activityTypeID) {
@@ -416,6 +433,7 @@ function openLearningDesign(learningDesignID) {
 										activityData.yCoord,
 										activityData.activityTitle,
 										groupingData.groupingID,
+										groupingData.groupingUIID,
 										groupingType,
 										groupingData.learnersPerGroup ? 'learners' : 'groups',
 										groupingData.numberOfGroups,
@@ -646,26 +664,44 @@ function openLearningDesign(learningDesignID) {
 
 
 /**
- * Stores the sequece into database.
+ * Stores the sequece in database.
  */
 function saveLearningDesign(folderID, learningDesignID, title) {
 	var activities = [],
 		transitions = [],
+		groupings = [],
+		// trim the 
+		title = title.trim(),
+		description = $('#ldDescriptionFieldDescription').val().trim(),
+		// final success/failure of the save
 		result = false;
 	
 	$.each(layout.activities, function(){
 		var activity = this,
 			activityBox = activity.items.shape.getBBox(),
+			activityTypeID = null,
 			toolID = activity.toolID,
-			iconPath = null;
+			iconPath = null,
+			isGrouped = activity.grouping ? true : false;
+		
 		if (toolID) {
+			// find out what is the icon for tool acitivty
 			var templateIcon = $('.template[toolId=' + toolID +'] img');
 			if (templateIcon.width() > 0) {
-				// iconPath = layout.toolMetadata[toolID].iconPath;
+				 iconPath = layout.toolMetadata[toolID].iconPath;
 			}
 		}
-			
+		// translate grouping type to back-end understandable
+		switch(activity.type) {
+			case 'tool' :
+				activityTypeID = 1;
+				break;
+			case 'grouping' :
+				activityTypeID = 2;
+				break;
+		}
 		
+		// add activity
 		activities.push({
 			'activityID' 			 : activity.id,
 			'activityUIID' 			 : activity.uiid,
@@ -674,21 +710,25 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'toolContentID' 	 	 : activity.toolContentID,
 			'stopAfterActivity' 	 : false,
 			'groupingSupportType' 	 : 2,
-			'applyGrouping' 		 : false,
+			'applyGrouping' 		 : isGrouped,
+			'groupingUIID'			 : isGrouped ? activity.grouping.groupingUIID : null,
+		    'createGroupingUIID'	 : activity.type == 'grouping' ? activity.groupingUIID : null,
 			'parentActivityID' 		 : null,
 			'parentUIID' 			 : null,
 			'libraryActivityUIImage' : iconPath,
 			'xCoord' 				 : activityBox.x,
 			'yCoord' 				 : activityBox.y,
 			'activityTitle' 		 : activity.title,
-			'activityCategoryID' 	 : layout.toolMetadata[toolID].activityCategoryID,
-			'activityTypeID'     	 : 1,
+			'activityCategoryID' 	 : activity.type == 'tool' ?
+											layout.toolMetadata[toolID].activityCategoryID : 1,
+			'activityTypeID'     	 : activityTypeID,
 			
 			'gradebookToolOutputDefinitionName' : null,
 			'helpText' : null,
 			'description' : null
 		});
-		
+
+		// iterate over transitions and create a list
 		$.each(activity.transitions.from, function(){
 			var transition = this;
 			
@@ -700,6 +740,43 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 				'transitionType' : 0
 			});
 		});
+		
+		if (activity.type == 'grouping') {
+			// create a list of groupings
+			var groups = [],
+				groupingType = null;
+			$.each(activity.groups, function(groupIndex, group){
+				groups.push({
+					'groupName' : group.name,
+					'groupID'   : group.id,
+					'groupUIID' : group.uiid,
+					'orderID'   : groupIndex
+				});
+			});
+			
+			switch(activity.groupingType) {
+				case 'random' :
+					groupingType = 1;
+					break;
+				case 'monitor' :
+					groupingType = 2;
+					break;
+				case 'learner' :
+					groupingType = 4;
+					break;
+			}
+			
+			groupings.push({
+				'groupingUIID'   				: activity.groupingUIID,
+				'groupingTypeID' 				: groupingType,
+				'learnersPerGroup' 				: activity.learnerCount,
+				'equalNumberOfLearnersPerGroup' : activity.equalSizes,
+				'viewStudentsBeforeSelection'   : activity.viewLearners,
+				'maxNumberOfGroups' 			: activity.groupCount,
+				'numberOfGroups' 				: groups.length,
+				'groups' 						: groups
+			});
+		}
 	});
 	
 	// serialise the sequence
@@ -709,28 +786,26 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 		'workspaceFolderID'  : folderID,
 		'copyTypeID'         : 1,
 		'originalUserID'     : null,
-		'title'              : title.trim(),
-		'description'        : $('#ldDescriptionFieldDescription').val().trim(),
-		'maxID'				 : layout.maxUIID,
+		'title'              : title,
+		'description'        : description,
+		'maxID'				 : layout.ld.maxUIID,
 		'readOnly'			 : false,
 		'editOverrideLock'   : false,
 		'dateReadOnly'       : null,
 		'version'        	 : null,
-		'contentFolderID'    : layout.contentFolderID,
+		'contentFolderID'    : layout.ld.contentFolderID,
 		'saveMode'			 : 0,
 		'originalLearningDesignID' : null,
 		
 		'activities'		 : activities,
 		'transitions'		 : transitions,
-		'groupings'			 : null,
+		'groupings'			 : groupings,
 		'branchMappings'     : null,
 		
-		'learningDesignUIID' : null,
 		'helpText'           : null,
 		'duration'			 : null,
 		'licenseID'			 : null,
 		'licenseText'   	 : null
-		
 	};
 	
 	// get LD details
@@ -744,18 +819,25 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 			'ld'			  : JSON.stringify(ld)
 		},
 		success : function(response) {
+			// if save was successful
 			if (response.learningDesignID) {
-				layout.learningDesignID = response.learningDesignID;
-				layout.folderID = folderID;
-				layout.title = title;
-				if (!layout.contentFolderID) {
-					layout.contentFolderID = response.contentFolderID;
+				// assing the database-generated values
+				layout.ld.learningDesignID = response.learningDesignID;
+				layout.ld.folderID = folderID;
+				layout.ld.title = title;
+				if (!layout.ld.contentFolderID) {
+					layout.ld.contentFolderID = response.contentFolderID;
 				}
+				$('#ldDescriptionFieldTitle').text(title);
+				$('#ldDescriptionFieldDescription').text(description);
+				
+				// check if there were any validation errors
 				if (response.validation.length > 0) {
 					var message = 'While saving the sequence there were following validation issues:\n';
 					$.each(response.validation, function() {
 						var uiid = this.UIID,
 							title = '';
+						// find which activity is the error about
 						$.each(layout.activities, function(){
 							if (uiid == this.uiid) {
 								title = this.title + ': ';
@@ -768,6 +850,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 					return;
 				}
 				
+				// assign database-generated properties to activities
 				$.each(response.activities, function() {
 					var updatedActivity = this;
 					$.each(layout.activities, function(){
@@ -779,6 +862,7 @@ function saveLearningDesign(folderID, learningDesignID, title) {
 					});
 				});
 				
+				alert('Congratulations! Your design is valid and has been saved.');
 				result = true;
 			} else {
 				alert('Error while saving the sequence');

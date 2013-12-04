@@ -27,7 +27,7 @@ var PropertyLib = {
 								  .css('opacity', layout.conf.propertiesDialogDimOpacity)
 		 						  .mousemove(HandlerLib.approachPropertiesDialogHandler)
 		                          .find('.ui-dialog-titlebar-close').remove();
-		
+		layout.dialogs.push(propertiesDialog);
 		
 		// initialise dialog from group naming
 		layout.items.groupNamingDialog = $('<div />').dialog({
@@ -62,6 +62,7 @@ var PropertyLib = {
 			             }
 			]
 		});
+		layout.dialogs.push(layout.items.groupNamingDialog);
 		
 		
 		// initialise dialog from matching groups to branches in branching activities
@@ -86,8 +87,8 @@ var PropertyLib = {
 			            		// find references to groups and branches
 			            		branchingActivity.groupsToBranches = [];
 			            		$('#gtbMappingGroupCell div', dialog).each(function(){
-			            			var groupUIID = $(this).attr('uiid'),
-			            				branchUIID = $(this).data('boundItem').attr('uiid'),
+			            			var groupUIID = +$(this).attr('uiid'),
+			            				branchUIID = +$(this).data('boundItem').attr('uiid'),
 			            				group = null,
 			            				branch = null;
 			            			
@@ -135,6 +136,8 @@ var PropertyLib = {
 			},
 			'text' : false
 		});
+		
+		layout.dialogs.push(gtbDialog);
 	},
 	
 	
@@ -216,8 +219,8 @@ var PropertyLib = {
 				$('.propertiesContentFieldNameGroups', content).css('display',
 						activity.groupDivide == 'groups' ? '' : 'none');		
 				
-				activity.groupCount = $('.propertiesContentFieldGroupCount', content).val();
-				activity.learnerCount = $('.propertiesContentFieldLearnerCount', content).val();
+				activity.groupCount = +$('.propertiesContentFieldGroupCount', content).val();
+				activity.learnerCount = +$('.propertiesContentFieldLearnerCount', content).val();
 				activity.equalSizes = $('.propertiesContentFieldEqualSizes', content).is(':checked');
 				activity.viewLearners = $('.propertiesContentFieldViewLearners', content).is(':checked');
 				

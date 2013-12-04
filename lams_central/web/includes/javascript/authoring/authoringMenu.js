@@ -89,7 +89,7 @@ var MenuLib = {
 				x = translatedEvent[0] - 47,
 				y = translatedEvent[1] -  2;
 
-			layout.activities.push(new ActivityLib.GroupingActivity(null, x, y, 'Grouping'));
+			layout.activities.push(new ActivityLib.GroupingActivity(null, null, x, y, 'Grouping'));
 		});
 	},
 	
@@ -159,9 +159,9 @@ var MenuLib = {
 	 * Opens "Save sequence" dialog where an user can choose where to save the Learning Design.
 	 */
 	saveLearningDesign : function(showDialog){
-		if (!showDialog && layout.learningDesignID) {
+		if (!showDialog && layout.ld.learningDesignID) {
 			if (confirm('Are you sure you want to overwrite the existing sequence?')) {
-				saveLearningDesign(layout.folderID, layout.learningDesignID, layout.title);
+				saveLearningDesign(layout.ld.folderID, layout.ld.learningDesignID, layout.ld.title);
 			}
 			return;
 		}
@@ -458,7 +458,9 @@ var MenuLib = {
 		
 		$('.ldDescriptionField').text('');
 		
-		layout.maxUIID = 0;
+		layout.ld = {
+			'maxUIID' : 0	
+		};
 		layout.activities = [];
 		if (paper) {
 			paper.clear();

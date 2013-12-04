@@ -195,7 +195,7 @@ public class SVGGenerator {
 
 	// **************** Draw transitions********************************************************
 
-	ArrayList<TransitionDTO> transitions = (ArrayList<TransitionDTO>) learningDesign.getTransitions();
+	ArrayList<TransitionDTO> transitions = learningDesign.getTransitions();
 	createActivityTransitionLines(allNodes, transitions);
 
 	// **************** Draw activities ********************************************************
@@ -435,7 +435,7 @@ public class SVGGenerator {
 
 	double y1 = y + SVGConstants.GATE_PROPORTIONS[6][1];
 	double y2 = y + SVGConstants.GATE_PROPORTIONS[2][1];
-	double midpointY = (y1 + y2) / 2 + 3;
+	double midpointY = ((y1 + y2) / 2) + 3;
 
 	createText("Gate_" + activity.getActivityID(), midpointX, midpointY, "middle", "10", null,
 		"fill:#FFFFFF;stroke:#FFFFFF;stroke-width:.5;", "STOP", g);
@@ -472,7 +472,7 @@ public class SVGGenerator {
 	}
 
 	int supportActivityChildrenSize = node.getChildCount();
-	createText("Children-" + activity.getActivityID(), x + 9, y + 19 * 2 + 1, "start", "11", "Arial",
+	createText("Children-" + activity.getActivityID(), x + 9, y + (19 * 2) + 1, "start", "11", "Arial",
 		"fill:#828990", supportActivityChildrenSize + " - Activities", g);
     }
 
@@ -512,7 +512,7 @@ public class SVGGenerator {
 		    "fill:#828990", text, g);
 	}
 
-	createText("Children-" + activity.getActivityID(), x + 9, y + 19 * 2 + 1, "start", "11", "Arial",
+	createText("Children-" + activity.getActivityID(), x + 9, y + (19 * 2) + 1, "start", "11", "Arial",
 		"fill:#828990", childActivitiesSize + " - Activities", g);
     }
 
@@ -529,7 +529,7 @@ public class SVGGenerator {
 		    "fill:#828990", text, g);
 	}
 
-	createText("Children-" + activity.getActivityID(), x + 9, y + 19 * 2 + 1, "start", "11", "Arial",
+	createText("Children-" + activity.getActivityID(), x + 9, y + (19 * 2) + 1, "start", "11", "Arial",
 		"fill:#828990", node.getChildCount() + " - Sequences", g);
     }
 
@@ -579,17 +579,17 @@ public class SVGGenerator {
 		break;
 	    }
 
-	    double previousActivityPointX = startingPointX + SVGConstants.BRANCHING_ACTIVITY_POINT / 2;
-	    double previousActivityPointY = startingPointY + SVGConstants.BRANCHING_ACTIVITY_POINT / 2;
+	    double previousActivityPointX = startingPointX + (SVGConstants.BRANCHING_ACTIVITY_POINT / 2);
+	    double previousActivityPointY = startingPointY + (SVGConstants.BRANCHING_ACTIVITY_POINT / 2);
 
 	    // Create the lines
 	    Iterator<ActivityTreeNode> activityNodeIterator = sequenceNode.getChildren().iterator();
 	    for (int activityIndex = 1; activityNodeIterator.hasNext() && (activityIndex <= 6); activityIndex++, activityNodeIterator
 		    .next()) {
-		double activityPointX = startingPointX + activityIndex * SVGConstants.BRANCHING_STEP
-			+ SVGConstants.BRANCHING_ACTIVITY_POINT / 2;
-		double activityPointY = startingPointY + sequenceIndex * SVGConstants.BRANCHING_STEP
-			+ SVGConstants.BRANCHING_ACTIVITY_POINT / 2;
+		double activityPointX = startingPointX + (activityIndex * SVGConstants.BRANCHING_STEP)
+			+ (SVGConstants.BRANCHING_ACTIVITY_POINT / 2);
+		double activityPointY = startingPointY + (sequenceIndex * SVGConstants.BRANCHING_STEP)
+			+ (SVGConstants.BRANCHING_ACTIVITY_POINT / 2);
 
 		Element line = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "line");
 		line.setAttributeNS(null, "x1", Double.toString(previousActivityPointX));
@@ -608,9 +608,9 @@ public class SVGGenerator {
 		Element line = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "line");
 		line.setAttributeNS(null, "x1", Double.toString(previousActivityPointX));
 		line.setAttributeNS(null, "y1", Double.toString(previousActivityPointY));
-		line.setAttributeNS(null, "x2", Double.toString(x + 132 + SVGConstants.BRANCHING_ACTIVITY_POINT / 2));
+		line.setAttributeNS(null, "x2", Double.toString(x + 132 + (SVGConstants.BRANCHING_ACTIVITY_POINT / 2)));
 		line.setAttributeNS(null, "y2",
-			Double.toString(startingPointY + SVGConstants.BRANCHING_ACTIVITY_POINT / 2));
+			Double.toString(startingPointY + (SVGConstants.BRANCHING_ACTIVITY_POINT / 2)));
 		line.setAttributeNS(null, "style", "stroke:black;stroke-width:1;");
 		g.appendChild(line);
 
@@ -623,8 +623,8 @@ public class SVGGenerator {
 		String activityStyle = sequenceNode.getActivity().getStopAfterActivity()
 			&& !activityNodeIterator.hasNext() ? "stroke:red" : "stroke:black";
 		activityStyle += ";stroke-width:0.8;opacity:1" + activityNode.getActivityColor();
-		double activityPointX = startingPointX + activityIndex * SVGConstants.BRANCHING_STEP;
-		double activityPointY = startingPointY + sequenceIndex * SVGConstants.BRANCHING_STEP;
+		double activityPointX = startingPointX + (activityIndex * SVGConstants.BRANCHING_STEP);
+		double activityPointY = startingPointY + (sequenceIndex * SVGConstants.BRANCHING_STEP);
 
 		Element activityPoint = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "rect");
 		activityPoint.setAttributeNS(null, "x", Double.toString(activityPointX));
@@ -652,7 +652,7 @@ public class SVGGenerator {
 
 	String text = activity.getActivityTitle();
 	if (StringUtils.isNotEmpty(text)) {
-	    createText("TextElement-" + activity.getActivityID(), x + SVGConstants.BRANCHING_ACTIVITY_WIDTH / 2,
+	    createText("TextElement-" + activity.getActivityID(), x + (SVGConstants.BRANCHING_ACTIVITY_WIDTH / 2),
 		    y + 90, "middle", "11.4", null, null, text, g);
 	}
     }
@@ -701,7 +701,7 @@ public class SVGGenerator {
 	for (Point branchingEdgePoint : new Point[] { branchingStartPoint, branchingEndPoint }) {
 	    if (branchingEdgePoint != null) {
 		int x = new Double(branchingEdgePoint.getX()).intValue();
-		if (x + 27 > maxX) {
+		if ((x + 27) > maxX) {
 		    maxX = x + 27;
 		}
 
@@ -710,7 +710,7 @@ public class SVGGenerator {
 		}
 
 		int y = new Double(branchingEdgePoint.getY()).intValue();
-		if (y + 27 > maxY) {
+		if ((y + 27) > maxY) {
 		    maxY = y + 27;
 		}
 
@@ -725,8 +725,8 @@ public class SVGGenerator {
 	// Removes padding of the SVG image.
 	minX--;
 	minY--;
-	int width = maxX - minX + 5;
-	int height = maxY - minY + 5;
+	int width = (maxX - minX) + 5;
+	int height = (maxY - minY) + 5;
 	svg.setAttributeNS(null, "viewBox",
 		minX + " " + minY + " " + Integer.toString(width) + " " + Integer.toString(height));
 
@@ -847,15 +847,22 @@ public class SVGGenerator {
 	Dimension dimension = node.getActivityDimension();
 
 	// Create image
-	int imageX = x + (dimension.width / 2) - 15;
-	int imageY = y + (dimension.height / 2) - 22;
+	int imageX = (x + (dimension.width / 2)) - 15;
+	int imageY = (y + (dimension.height / 2)) - 22;
 	if (node.isOptionalSequenceActivityChild()) {
 	    imageX += 2;
 	    imageY += 7;
 	}
 	String imagePath = activity.getLibraryActivityUIImage();
+	if (!StringUtils.isBlank(imagePath) && imagePath.endsWith("svg")) {
+	    if (SVGGenerator.log.isDebugEnabled()) {
+		SVGGenerator.log.debug("SVG image rendering is not supported at the moment. Skipping: " + imagePath);
+	    }
+	    return;
+	}
+
 	// if png_filename is empty then this is a grouping act:
-	String imageFileName;
+	String imageFileName = null;
 	if (!StringUtils.isBlank(imagePath)) {
 	    imageFileName = FileUtil.getFileName(imagePath);
 	    imageFileName = imageFileName.replaceFirst(".swf$", ".png");
@@ -875,11 +882,12 @@ public class SVGGenerator {
 	    imageFileName = "icon_grouping.png";
 	}
 
-	imageFileName = (SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY == outputFormat ? SVGConstants.PATH_TO_LAMSCOMMUNITY_SVG_IMAGES
+	imagePath = (SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY == outputFormat ? SVGConstants.PATH_TO_LAMSCOMMUNITY_SVG_IMAGES
 		: localSvgIconsPath)
 		+ imageFileName;
+
 	String imageId = "image-" + activity.getActivityID();
-	createImage(g, imageFileName, imageId, imageX, imageY);
+	createImage(g, imagePath, imageId, imageX, imageY);
     }
 
     private void createImage(Element g, String imageFileName, String id, int x, int y) {
@@ -913,10 +921,10 @@ public class SVGGenerator {
 
 	double a = toIntersection.getX() - fromIntersection.getX();
 	double b = toIntersection.getY() - fromIntersection.getY();
-	double arrowShiftX = (a * a + b * b == 0) ? 0 : 5 * a / Math.sqrt(a * a + b * b);
-	double arrowShiftY = (a * a + b * b == 0) ? 0 : 5 * b / Math.sqrt(a * a + b * b);
-	double arrowEndX = (fromIntersection.getX() + toIntersection.getX()) / 2 - arrowShiftX;
-	double arrowEndY = (fromIntersection.getY() + toIntersection.getY()) / 2 - arrowShiftY;
+	double arrowShiftX = (((a * a) + (b * b)) == 0) ? 0 : (5 * a) / Math.sqrt((a * a) + (b * b));
+	double arrowShiftY = (((a * a) + (b * b)) == 0) ? 0 : (5 * b) / Math.sqrt((a * a) + (b * b));
+	double arrowEndX = ((fromIntersection.getX() + toIntersection.getX()) / 2) - arrowShiftX;
+	double arrowEndY = ((fromIntersection.getY() + toIntersection.getY()) / 2) - arrowShiftY;
 	// Create the arrowhead
 	Element arrowhead = doc.createElementNS(SVGConstants.SVG_NAMESPACE, "line");
 	arrowhead.setAttributeNS(null, "id", "arrowhead_" + id);
