@@ -147,8 +147,10 @@
 		<echo>${ant.project.name}: Compiling Java sources</echo>
 		<javac srcdir="${src.java.dir}"
 			   compiler="modern"
-               source="1.5"
+	           source="1.6"
+			   target="1.6"
                debug="on"
+               includeantruntime="false"
 			   debuglevel="lines,vars,source"
                classpathref="libs.classpath"
                destdir="${build.classes.java}"
@@ -439,8 +441,10 @@
 		<mkdir dir="${build.war}/WEB-INF/classes"/>
 	    <javac destdir="${build.war}/WEB-INF/classes"
 			   compiler="modern"
-           	   source="1.5"
+               source="1.6"
+			   target="1.6"
 	           debug="off"
+			   includeantruntime="false"
 	    	   failonerror="true"
 	           srcdir="${build.war}/WEB-INF/src" 
 		  	   excludes="**/*.smap"

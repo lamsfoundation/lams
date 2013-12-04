@@ -49,8 +49,10 @@
 		<echo>${ant.project.name}: Compiling Java sources</echo>
 		<javac srcdir="${src.java.dir}"
 			   compiler="modern"
-               source="1.5"
+               source="1.6"
+			   target="1.6"
                debug="${debug}"
+			   includeantruntime="false"
 			   debuglevel="lines,vars,source"
                classpathref="libs.classpath"
                destdir="${build.classes.java}"
