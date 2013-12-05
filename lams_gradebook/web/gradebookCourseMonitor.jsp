@@ -379,7 +379,7 @@
 				height:'auto',
 				ignoreCase: true
 			});
-			jQuery("#lessons-jqgrid").jqGrid('filterToolbar',{stringResult: true, searchOnEnter: true, defaultSearch: 'cn'});
+			jQuery("#lessons-jqgrid").jqGrid('filterToolbar');
 
 			var languageLabelWait = "<fmt:message key='gradebook.coursemonitor.wait'/>";
 			

@@ -304,6 +304,13 @@ public class GradebookAction extends LamsDispatchAction {
 	Integer courseID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	Organisation organisation = (Organisation) userService.findById(Organisation.class, courseID);
 	
+	// in case of toolbar searching (which uses different parameters than a single field searching) get those parameters 
+	if (isSearch && (searchField == null)) {
+	    searchField = GradebookConstants.PARAM_ROW_NAME;
+	    searchOper = GradebookConstants.SEARCH_CONTAINS;
+	    searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_ROW_NAME, true);
+	}
+	
 	Set<Lesson> lessons = (Set<Lesson>) organisation.getLessons();
 	if (lessons == null) {
 	    return null;
