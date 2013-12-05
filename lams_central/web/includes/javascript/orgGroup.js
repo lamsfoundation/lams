@@ -188,7 +188,7 @@ function fillGroup(users, container) {
 	if (canEdit) {
 		$(container).droppable({
 		   'activeClass' : 'droppableHighlight',
-		   'tolerance'   : 'touch',
+		   'tolerance'   : 'pointer',
 		   'drop'        : function (event, ui) {
 			   var draggableUserContainer = $(ui.draggable).parent();
 			   var thisUserContainer = $('.userContainer', this);

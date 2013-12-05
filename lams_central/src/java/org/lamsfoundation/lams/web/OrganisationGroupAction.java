@@ -312,6 +312,7 @@ public class OrganisationGroupAction extends DispatchAction {
      * 
      * @throws InvalidParameterException
      */
+    @SuppressWarnings("unchecked")
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, InvalidParameterException {
 	// check if user is allowed to edit groups
@@ -384,9 +385,9 @@ public class OrganisationGroupAction extends DispatchAction {
 	    duplicateCheckProperties.put("organisationId", organisationId);
 	    duplicateCheckProperties.put("name", orgGroupingName);
 
-	    OrganisationGrouping duplicateOrgGrouping = (OrganisationGrouping) getUserManagementService()
+	    List<OrganisationGrouping> duplicateOrgGrouping = getUserManagementService()
 		    .findByProperties(OrganisationGrouping.class, duplicateCheckProperties);
-	    if (duplicateOrgGrouping == null) {
+	    if (duplicateOrgGrouping.isEmpty()) {
 		orgGrouping.setName(orgGroupingName);
 	    } else {
 		throw new InvalidParameterException("Grouping with name \"" + orgGroupingName + "\" already exists");
