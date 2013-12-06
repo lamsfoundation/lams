@@ -31,9 +31,8 @@
 			var id = '-' + itemUid + '-' + answerUid;
 			
 	        $.ajax({
-	        	async: false,
-	            url: '<c:url value="/learning/scratchItem.do"/>',
-	            data: 'sessionMapID=${sessionMapID}&answerUid=' + answerUid,
+	            url: '<c:url value="/learning/isAnswerCorrect.do"/>',
+	            data: 'answerUid=' + answerUid,
 	            dataType: 'json',
 	            type: 'post',
 	            success: function (json) {
@@ -54,6 +53,13 @@
 	            		$('#imageLink' + id).css('cursor','default');
 	            	}
 	            }
+	       	});
+	        
+	        $.ajax({
+	            url: '<c:url value="/learning/recordItemScratched.do"/>',
+	            data: 'sessionMapID=${sessionMapID}&answerUid=' + answerUid,
+	            dataType: 'json',
+	            type: 'post'
 	       	});
 		}
 

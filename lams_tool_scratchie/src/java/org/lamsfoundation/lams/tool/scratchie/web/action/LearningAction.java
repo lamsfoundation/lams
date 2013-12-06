@@ -91,8 +91,11 @@ public class LearningAction extends Action {
 	if (param.equals("refreshQuestionList")) {
 	    return refreshQuestionList(mapping, form, request, response);
 	}
-	if (param.equals("scratchItem")) {
-	    return scratchItem(mapping, form, request, response);
+	if (param.equals("isAnswerCorrect")) {
+	    return isAnswerCorrect(mapping, form, request, response);
+	}
+	if (param.equals("recordItemScratched")) {
+	    return recordItemScratched(mapping, form, request, response);
 	}
 	if (param.equals("finish")) {
 	    return finish(mapping, form, request, response);
@@ -295,19 +298,32 @@ public class LearningAction extends Action {
 
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
+    
+    /**
+     * Return whether scratchie answer is correct or not
+     */
+    private ActionForward isAnswerCorrect(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+
+	initializeScratchieService();
+
+	Long answerUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_ANSWER_UID));
+	ScratchieAnswer answer = service.getScratchieAnswerByUid(answerUid);
+	if (answer == null) {
+	    return mapping.findForward(ScratchieConstants.ERROR);
+	}
+
+	JSONObject JSONObject = new JSONObject();
+	JSONObject.put(ScratchieConstants.ATTR_ANSWER_CORRECT, answer.isCorrect());
+	response.setContentType("application/x-json;charset=utf-8");
+	response.getWriter().print(JSONObject);
+	return null;
+    }
 
     /**
-     * Scratch specified answer.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws JSONException
-     * @throws IOException
+     * Record in DB that leader has scratched specified answer.
      */
-    private ActionForward scratchItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward recordItemScratched(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 
 	initializeScratchieService();
@@ -323,19 +339,9 @@ public class LearningAction extends Action {
 	}
 
 	Long answerUid = NumberUtils.createLong(request.getParameter(ScratchieConstants.PARAM_ANSWER_UID));
-	ScratchieAnswer answer = service.getScratchieAnswerByUid(answerUid);
-	if (answer == null) {
-	    return mapping.findForward(ScratchieConstants.ERROR);
-	}
-
-	service.logAnswerAccess(leader, answer.getUid());
-
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put(ScratchieConstants.ATTR_ANSWER_CORRECT, answer.isCorrect());
-	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(JSONObject);
+	service.recordItemScratched(leader, answerUid);
+	
 	return null;
-
     }
 
     /**

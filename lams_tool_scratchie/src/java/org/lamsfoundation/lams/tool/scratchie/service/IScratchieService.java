@@ -214,7 +214,7 @@ public interface IScratchieService {
      * Leader has scratched the specified answer. Will store this scratch for all users in his group. It will also
      * update all the marks.
      */
-    void logAnswerAccess(ScratchieUser leader, Long scratchieItemUid);
+    void recordItemScratched(ScratchieUser leader, Long scratchieItemUid);
     
     void recalculateMarkForSession(ScratchieUser leader, boolean isPropagateToGradebook);
     

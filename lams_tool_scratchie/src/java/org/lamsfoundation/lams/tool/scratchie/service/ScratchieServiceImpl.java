@@ -454,9 +454,12 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public void logAnswerAccess(ScratchieUser leader, Long answerUid) {
+    public void recordItemScratched(ScratchieUser leader, Long answerUid) {
 
 	ScratchieAnswer answer = this.getScratchieAnswerByUid(answerUid);
+	if (answer == null) {
+	    return;
+	}
 	Long sessionId = leader.getSession().getSessionId();
 	
 	List<ScratchieUser> users = this.getUsersBySession(sessionId);

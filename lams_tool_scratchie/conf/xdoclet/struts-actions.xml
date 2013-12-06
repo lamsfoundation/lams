@@ -199,9 +199,13 @@
 			parameter="refreshQuestionList" >
 			<forward name="success" path="/pages/learning/questionlist.jsp" />		
 		</action>
-		<action path="/learning/scratchItem"
+		<action path="/learning/isAnswerCorrect"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
-			parameter="scratchItem" >
+			parameter="isAnswerCorrect" >
+		</action>
+		<action path="/learning/recordItemScratched"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
+			parameter="recordItemScratched" >
 		</action>
 		<action path="/learning/showResults"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"

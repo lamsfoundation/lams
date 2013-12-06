@@ -3,7 +3,7 @@ SET AUTOCOMMIT = 0;
 
 ----------------------Put all sql statements below here-------------------------
 
--- LDEV-xxx(LDEV-3110) Ability to modify marks in monitor 
+-- LKC-28 Ability to modify marks in monitor 
 ALTER TABLE tl_lascrt11_user ADD COLUMN mark INTEGER DEFAULT 0;
 
 ----------------------Put all sql statements above here-------------------------
