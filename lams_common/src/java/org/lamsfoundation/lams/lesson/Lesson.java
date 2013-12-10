@@ -535,7 +535,7 @@ public class Lesson implements Serializable {
     }
 
     public Set getAllLearners() {
-	return lessonClass.getLearners();
+	return lessonClass == null ? null : lessonClass.getLearners();
     }
 
     // ---------------------------------------------------------------------

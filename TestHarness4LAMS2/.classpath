@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="var" path="JRE_LIB" sourcepath="JRE_SRC"/>
-	<classpathentry exported="true" kind="lib" path="lib/httpunit.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/httpunit.jar" sourcepath="/3rdParty_sources/httpunit"/>
 	<classpathentry exported="true" kind="lib" path="lib/nekohtml-0.9.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/wddx.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/BrowserLauncher2-all-10rc4.jar"/>
@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="lib/junit-3.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-2.4.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl-2.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/jbossweb.jar" sourcepath="/3rdParty_sources/jbossweb"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

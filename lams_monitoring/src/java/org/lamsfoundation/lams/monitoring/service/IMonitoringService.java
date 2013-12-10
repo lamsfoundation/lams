@@ -799,4 +799,6 @@ public interface IMonitoringService {
      */
     public int cloneLessons(String[] lessonIds, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
 	    String[] learnerIds, Organisation group) throws MonitoringServiceException;
+    
+    public String getAllLearnersProgress(Long lessonID, Integer userID, Boolean completedDataOnly) throws IOException;
 }

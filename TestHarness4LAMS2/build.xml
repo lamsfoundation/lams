@@ -15,7 +15,7 @@
 
 	<target name="compile" depends="clean">
 		<javac destdir="${build}" srcdir="${src}"
-        	deprecation="on" debug="on">
+        	deprecation="on" debug="on" source="1.6" target="1.6">
 			<classpath>
 				<path refid="project.classpath"/>
 			</classpath>

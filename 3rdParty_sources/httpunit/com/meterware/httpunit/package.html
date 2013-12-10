@@ -1,0 +1,63 @@
+<HTML><BODY>
+Classes for testing http server systems. Each test session should begin by creating a 
+{@link com.meterware.httpunit.WebConversation WebConversation} to which it should submit an 
+initial {@link com.meterware.httpunit.GetMethodWebRequest http request} using the 
+{@link com.meterware.httpunit.WebConversation#getResponse getResponse} method. With each 
+subsequent step,
+it will typically examine the response either textually or as a DOM, and create new
+requests based on either submitting a form or clicking on a link.
+
+<H2>Installation</H2>
+The package depends on a number of external jar files, provided in the <code>jar</code> directory:
+<dl><dt>nekohtml.jar</dt><dd>The <a href="http://www.apache.org/~andyc/neko/doc/html/index.html">NekoHTML parser</a>,
+used to convert raw HTML into an XML DOM. This is required for handling HTML.</dd>
+<dt>js.jar</dt><dd>The <a href="http://www.mozilla.org/rhino">Rhino JavaScript interpreter<a>, required for any JavaScript processing.</dd>
+<dt>xmlParserAPIs.jar</dt><dd>The interfaces for a W3-compliant XML parser. Required for interpreting either HTML or XML pages.</dd>
+<dt>xercesImpl.jar</dt><dd>The <a href="http://xml.apache.org/xerces2-j/index.html">Xerces 2 implementation</a> of an XML parser.
+NekoHTML requires this implementation.
+<dt>servlet.jar</dt><dd>The APIs and common classes for the Java Servlet 1.3 standard. Required for use with <a href="../../../../servletunit-intro.html">ServletUnit.</a></dd>
+<dt>junit.jar</dt><dd><a href="http://www.junit.org">JUnit</a>, the unit test framework. Used to test HttpUnit and
+recommended for writing tests that use HttpUnit.</dd>
+<dt>tidy.jar</dt><dd><A HREF="http://lempinen.net/sami/jtidy">JTidy</A>, an alternate HTML parser/validator.
+JTidy is a lot pickier about HTML structure than NekoHTML, and uses its own implementation of the DOM classes, rather than using those
+found in the xerces jar. Some JavaScript features, such as <code>document.write()</code> will only work with NekoHTML.</dd>
+</dl>
+
+
+<H2>Example</H2>
+In the following code, a web conversation is started and an initial request sent. The program
+then prints out the response and extracts the first form (the login form) from it. After
+setting the <TT>name</TT> parameter to the desired value, it submits the form and prints the response.
+<PRE>
+import com.meterware.httpunit.*;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+
+import org.xml.sax.*;
+
+public class Example {
+
+
+    public static void main( String[] params ) {
+        try {
+            WebConversation     conversation = new WebConversation();
+            
+            WebResponse response = conversation.getResponse( "http://www.meterware.com/servlet/TopSecret" );
+            System.out.println( response );
+
+            WebForm loginForm = response.getForms()[0];
+
+            loginForm.setParameter( "name", "master" );
+            response = loginForm.submit();
+            System.out.println( response );
+
+        } catch (Exception e) {
+            System.err.println( "Exception: " + e );
+        }
+    }
+}
+</PRE>
+
+Please direct any questions to <A HREF="mailto:russgold@httpunit.org">Russell Gold</A>.
+</BODY></HTML>

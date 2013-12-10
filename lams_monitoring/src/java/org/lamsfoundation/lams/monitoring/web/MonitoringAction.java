@@ -91,6 +91,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 /**
  * <p>
  * The action servlet that provide all the monitoring functionalities. It interact with the teacher via flash and JSP
@@ -246,6 +249,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	monitoringService.startLesson(lessonId, getUserId());
 
+	response.setContentType("text/plain;charset=utf-8");
+	response.getWriter().write("true");
 	return null;
     }
 
@@ -545,23 +550,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
-    public ActionForward getLessonDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	String wddxPacket;
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	try {
-	    Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	    wddxPacket = monitoringService.getLessonDetails(lessonID, getUserId());
-	} catch (Exception e) {
-	    wddxPacket = handleException(e, "getLessonDetails", monitoringService).serializeMessage();
-	}
-	PrintWriter writer = response.getWriter();
-	writer.println(wddxPacket);
-	return null;
-    }
-
     public ActionForward getLessonLearners(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	String wddxPacket;
@@ -756,6 +744,19 @@ public class MonitoringAction extends LamsDispatchAction {
 
     }
 
+    public ActionForward getAllContributeActivities(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
+		.getServletContext());
+	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
+	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonID);
+	
+	response.setContentType("application/json;charset=utf-8");
+	Gson gson = new GsonBuilder().create();
+	gson.toJson(contributeActivities, response.getWriter());
+	return null;
+    }
+
     /**
      * Calls the server to bring up the learner progress page. Assumes destination is a new window. The userid that
      * comes from Flash is the user id of the learner for which we are calculating the url. This is different to all the
@@ -945,6 +946,24 @@ public class MonitoringAction extends LamsDispatchAction {
 	return null;
     }
 
+    /** Get the learner progress data for all learners in a lesson. This is called by the sequence tab in monitoring */
+    public ActionForward getAllLearnersProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	String wddxPacket;
+	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
+		.getServletContext());
+	try {
+	    Long lessonID = WebUtil.readLongParam(request, "lessonID", false);
+	    wddxPacket = monitoringService.getAllLearnersProgress(lessonID, getUserId(), false);
+	} catch (Exception e) {
+	    wddxPacket = handleException(e, "getAllLearnersProgress", monitoringService).serializeMessage();
+	}
+
+	PrintWriter writer = response.getWriter();
+	writer.println(wddxPacket);
+	return null;
+    }
+    
     /**
      * Produces necessary data for learner progress bar.
      */
@@ -1003,6 +1022,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Locale userLocale = new Locale(user.getLocaleLanguage(), user.getLocaleCountry());
 
+	responseJSON.put(AttributeNames.PARAM_LEARNINGDESIGN_ID, lessonDetails.getLearningDesignID());
 	responseJSON.put("numberPossibleLearners", lessonDetails.getNumberPossibleLearners());
 	responseJSON.put("lessonStateID", lessonDetails.getLessonStateID());
 

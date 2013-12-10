@@ -1,7 +1,7 @@
 Jars used:
 
 (runtime)
-httpunit 1.6
+httpunit 1.7
 junit   3.8.1
 servlet 2.3
 jtidy   04aug2000r7-dev

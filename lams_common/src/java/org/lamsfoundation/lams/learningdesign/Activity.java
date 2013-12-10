@@ -46,8 +46,8 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.Nullable;
 
 /**
- * Base class for all activities. If you add another subclass, you must update
- * ActivityDAO.getActivityByActivityId() and add a ACTIVITY_TYPE constant.
+ * Base class for all activities. If you add another subclass, you must update ActivityDAO.getActivityByActivityId() and
+ * add a ACTIVITY_TYPE constant.
  */
 public abstract class Activity implements Serializable, Nullable, Comparable<Activity> {
 
@@ -109,8 +109,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     // Instance variables
     // ---------------------------------------------------------------------
     /**
-     * WDDX packet specific attribute created to identify the type of object
-     * being passed.
+     * WDDX packet specific attribute created to identify the type of object being passed.
      */
     public static final String OBJECT_TYPE = "Activity";
 
@@ -142,14 +141,12 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     private Integer ycoord;
 
     /**
-     * Indicates the order in which the activities appear inside complex
-     * activities. Starts from 0, 1 and so on.
+     * Indicates the order in which the activities appear inside complex activities. Starts from 0, 1 and so on.
      */
     private Integer orderId;
 
     /**
-     * Indicates whether the content of this activity would be defined later in
-     * the monitoring environment or not.
+     * Indicates whether the content of this activity would be defined later in the monitoring environment or not.
      */
     private Boolean defineLater;
 
@@ -168,15 +165,13 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     private LearningLibrary learningLibrary;
 
     /**
-     * The activity that acts as a container/parent for this activity. Normally
-     * would be one of the complex activities which have child activities
-     * defined inside them.
+     * The activity that acts as a container/parent for this activity. Normally would be one of the complex activities
+     * which have child activities defined inside them.
      */
     private Activity parentActivity;
 
     /**
-     * Single Library can have one or more activities defined inside it. This
-     * field indicates which activity is this.
+     * Single Library can have one or more activities defined inside it. This field indicates which activity is this.
      */
     private Activity libraryActivity;
 
@@ -211,31 +206,26 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     private Integer groupingSupportType;
 
     /**
-     * Name of the file (including the package) that contains the text strings
-     * for this activity. e.g.
+     * Name of the file (including the package) that contains the text strings for this activity. e.g.
      * org.lamsfoundation.lams.tool.sbmt.SbmtResources.properties.
      */
     private String languageFile;
 
     /**
-     * An activity is readOnly when a learner starts doing the activity. Used in
-     * editOnFly.
+     * An activity is readOnly when a learner starts doing the activity. Used in editOnFly.
      */
     private Boolean readOnly;
 
     /**
-     * An activity is initialised if it is ready to be used in lesson ie the
-     * tool content is set up, schedule gates are scheduled, etc. Used to detect
-     * which activities need to be initialised for live edit.
+     * An activity is initialised if it is ready to be used in lesson ie the tool content is set up, schedule gates are
+     * scheduled, etc. Used to detect which activities need to be initialised for live edit.
      */
     private Boolean initialised;
 
     /**
-     * If stopAfterActivity is true, then the progress engine should "end" the
-     * lesson at this point. Used to arbitrarily stop somewhere in a design,
-     * such as at the end of the branch. The normal final activity of a design
-     * does not necessarily have this set - the progress engine will just stop
-     * when it runs out of transitions to follow.
+     * If stopAfterActivity is true, then the progress engine should "end" the lesson at this point. Used to arbitrarily
+     * stop somewhere in a design, such as at the end of the branch. The normal final activity of a design does not
+     * necessarily have this set - the progress engine will just stop when it runs out of transitions to follow.
      */
     private Boolean stopAfterActivity;
 
@@ -245,8 +235,8 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     private Set inputActivities;
 
     /**
-     * The BranchActivityEntries that map conditions to this Activity;
-     * bi-directional association required (e.g. LDEV-1910)
+     * The BranchActivityEntries that map conditions to this Activity; bi-directional association required (e.g.
+     * LDEV-1910)
      */
     private Set branchActivityEntries;
 
@@ -481,7 +471,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	this.parentActivity = parentActivity;
     }
 
-   public org.lamsfoundation.lams.learningdesign.LearningDesign getLearningDesign() {
+    public org.lamsfoundation.lams.learningdesign.LearningDesign getLearningDesign() {
 	return learningDesign;
     }
 
@@ -514,7 +504,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * @param applyGrouping
-     *                The applyGrouping to set.
+     *            The applyGrouping to set.
      */
     public void setApplyGrouping(Boolean applyGrouping) {
 	this.applyGrouping = applyGrouping;
@@ -529,7 +519,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * @param groupingSupportType
-     *                The groupingSupportType to set.
+     *            The groupingSupportType to set.
      */
     public void setGroupingSupportType(Integer groupingSupportType) {
 	this.groupingSupportType = groupingSupportType;
@@ -544,7 +534,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * @param readOnly
-     *                The readOnly to set.
+     *            The readOnly to set.
      */
     public void setReadOnly(Boolean readOnly) {
 	this.readOnly = readOnly;
@@ -559,7 +549,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * @param readOnly
-     *                The readOnly to set.
+     *            The readOnly to set.
      */
     public void setInitialised(Boolean initialised) {
 	this.initialised = initialised;
@@ -574,7 +564,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * @param readOnly
-     *                The stopAfterActivity to set.
+     *            The stopAfterActivity to set.
      */
     public void setStopAfterActivity(Boolean stopAfterActivity) {
 	this.stopAfterActivity = stopAfterActivity;
@@ -592,7 +582,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * @param InputActivities
-     *                The InputActivities to set.
+     *            The InputActivities to set.
      */
     public void setInputActivities(Set inputActivities) {
 	this.inputActivities = inputActivities;
@@ -607,7 +597,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * @param branchActivityEntries
-     *                The branchActivityEntries to set.
+     *            The branchActivityEntries to set.
      */
     public void setBranchActivityEntries(Set branchActivityEntries) {
 	this.branchActivityEntries = branchActivityEntries;
@@ -615,8 +605,8 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("activityId", activityId).append("activityUIID", activityUIID).append(
-		"description", description).toString();
+	return new ToStringBuilder(this).append("activityId", activityId).append("activityUIID", activityUIID)
+		.append("description", description).toString();
     }
 
     @Override
@@ -628,8 +618,8 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	    return false;
 	}
 	Activity castOther = (Activity) other;
-	return new EqualsBuilder().append(this.getActivityId(), castOther.getActivityId()).append(
-		this.getActivityUIID(), castOther.getActivityUIID()).isEquals();
+	return new EqualsBuilder().append(this.getActivityId(), castOther.getActivityId())
+		.append(this.getActivityUIID(), castOther.getActivityUIID()).isEquals();
     }
 
     @Override
@@ -646,19 +636,18 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * @param libraryActivityUiImage
-     *                The libraryActivityUiImage to set.
+     *            The libraryActivityUiImage to set.
      */
     public void setLibraryActivityUiImage(String libraryActivityUiImage) {
 	this.libraryActivityUiImage = libraryActivityUiImage;
     }
 
     /**
-     * This function returns the Transition that STARTS FROM THIS ACTIVITY. In
-     * simpler words the next activity in the transition.
+     * This function returns the Transition that STARTS FROM THIS ACTIVITY. In simpler words the next activity in the
+     * transition.
      * 
-     * For example, if we have a transition as following A --> B --> C. For
-     * activity B this function would return C. That is the Transition FROM
-     * activity B.
+     * For example, if we have a transition as following A --> B --> C. For activity B this function would return C.
+     * That is the Transition FROM activity B.
      * 
      * @return Returns the transitionFrom.
      */
@@ -668,19 +657,18 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * @param transitionFrom
-     *                The transitionFrom to set.
+     *            The transitionFrom to set.
      */
     public void setTransitionFrom(Transition transitionFrom) {
 	this.transitionFrom = transitionFrom;
     }
 
     /**
-     * This function returns the Transition that POINTS TO THIS ACTIVITY and NOT
-     * the transition that this activity points to.
+     * This function returns the Transition that POINTS TO THIS ACTIVITY and NOT the transition that this activity
+     * points to.
      * 
-     * For example, if we have a transition as following A --> B --> C. For
-     * activity B this function would return A. That is the Transition that
-     * points TO activity B.
+     * For example, if we have a transition as following A --> B --> C. For activity B this function would return A.
+     * That is the Transition that points TO activity B.
      * 
      * @return Returns the transitionTo.
      */
@@ -690,7 +678,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * @param transitionTo
-     *                The transitionTo to set.
+     *            The transitionTo to set.
      */
     public void setTransitionTo(Transition transitionTo) {
 	this.transitionTo = transitionTo;
@@ -759,13 +747,10 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     /**
      * This method that get all tool activities belong to the current activity.
      * 
-     * As the activity object structure might be infinite, we recursively loop
-     * through the entire structure and added all tool activities into the set
-     * that we want to return. This method calls a method
-     * getToolActivitiesInActivity() which must be defined in subclasses for
-     * tool or a complex activities. This handles the polymorphic aspect of this
-     * function. (Note: we can't use instanceOf as we are dealing with Hibernate
-     * proxies.)
+     * As the activity object structure might be infinite, we recursively loop through the entire structure and added
+     * all tool activities into the set that we want to return. This method calls a method getToolActivitiesInActivity()
+     * which must be defined in subclasses for tool or a complex activities. This handles the polymorphic aspect of this
+     * function. (Note: we can't use instanceOf as we are dealing with Hibernate proxies.)
      * 
      * @return the set of all tool activities.
      */
@@ -782,11 +767,11 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     /**
-     * Return the group information for the requested user when he is running
-     * current activity instance, based on the grouping data in the activity.
+     * Return the group information for the requested user when he is running current activity instance, based on the
+     * grouping data in the activity.
      * 
      * @param learner
-     *                the requested user
+     *            the requested user
      * @return the group that this user belongs to.
      */
     public Group getGroupFor(User learner) {
@@ -794,29 +779,26 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     /**
-     * Return the group information for the requested user when he is running
-     * current activity instance, based on the given grouping.
+     * Return the group information for the requested user when he is running current activity instance, based on the
+     * given grouping.
      * <P>
-     * If we are using the grouping set up in the activity, the grouping will be
-     * this.getGrouping(). If the activity isn't grouped, then it should use the
-     * class grouping.
+     * If we are using the grouping set up in the activity, the grouping will be this.getGrouping(). If the activity
+     * isn't grouped, then it should use the class grouping.
      * 
      * @param learner
-     *                the requested user
+     *            the requested user
      * @return the group that this user belongs to.
      */
     protected Group getGroupFor(User learner, Grouping inGrouping) {
-	if (inGrouping == null) {
-	    throw new IllegalArgumentException("Exception occured in " + "getGroupFor, no grouping has been defined");
-	}
-
-	for (Iterator i = inGrouping.getGroups().iterator(); i.hasNext();) {
-	    Group group = (Group) i.next();
-	    if (inGrouping.isLearnerGroup(group) && group.hasLearner(learner)) {
-		return group;
+	if (inGrouping != null) {
+	    for (Iterator i = inGrouping.getGroups().iterator(); i.hasNext();) {
+		Group group = (Group) i.next();
+		if (inGrouping.isLearnerGroup(group) && group.hasLearner(learner)) {
+		    return group;
+		}
 	    }
 	}
-
+	
 	return new NullGroup();
     }
 
@@ -934,8 +916,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     /**
-     * Check up whether an activity is branching activity based on the monitor
-     * choice or not.
+     * Check up whether an activity is branching activity based on the monitor choice or not.
      * 
      * @return is this activity a branching activity
      */
@@ -944,8 +925,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     /**
-     * Check up whether an activity is branching activity based on an existing
-     * group or not.
+     * Check up whether an activity is branching activity based on an existing group or not.
      * 
      * @return is this activity a branching activity
      */
@@ -954,8 +934,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     /**
-     * Check up whether an activity is branching activity based on another
-     * activity's output or not.
+     * Check up whether an activity is branching activity based on another activity's output or not.
      * 
      * @return is this activity a branching activity
      */
@@ -1003,13 +982,12 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     /**
-     * Create a deep copy of the this activity. It should return the same
-     * subclass as the activity being copied. Generally doesn't copy the "link"
-     * type fields like transitions, learning design, etc.
+     * Create a deep copy of the this activity. It should return the same subclass as the activity being copied.
+     * Generally doesn't copy the "link" type fields like transitions, learning design, etc.
      * 
-     * @param uiidOffset -
-     *                this should be added to UIID fields in any new objects.
-     *                Used when importing a design into another design.
+     * @param uiidOffset
+     *            - this should be added to UIID fields in any new objects. Used when importing a design into another
+     *            design.
      * @return deep copy of this object
      */
     public abstract Activity createCopy(int uiidOffset);
@@ -1065,8 +1043,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     /**
-     * Get the input activity UIIDs in a format suitable for Flash. See also
-     * getToolInputActivityID
+     * Get the input activity UIIDs in a format suitable for Flash. See also getToolInputActivityID
      */
     public ArrayList<Integer> getInputActivityUIIDs() {
 	ArrayList<Integer> list = new ArrayList<Integer>();
@@ -1081,9 +1058,8 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     /**
-     * Get the first input activity's UIID as the tool input activity. The db is
-     * set up to allow multiple input activities, but at present we only support
-     * one. See also getInputActivityUIIDs.
+     * Get the first input activity's UIID as the tool input activity. The db is set up to allow multiple input
+     * activities, but at present we only support one. See also getInputActivityUIIDs.
      */
     public Integer getToolInputActivityUIID() {
 	if (getInputActivities() != null) {
@@ -1096,9 +1072,8 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     }
 
     /**
-     * Is this activity inside a branch? If so, return turn branch activity (ie
-     * the sequence, not the branching activity. Returns null if not in a
-     * branch.
+     * Is this activity inside a branch? If so, return turn branch activity (ie the sequence, not the branching
+     * activity. Returns null if not in a branch.
      */
     public Activity getParentBranch() {
 	if (isSequenceActivity() && getParentActivity() != null && getParentActivity().isBranchingActivity()) {
