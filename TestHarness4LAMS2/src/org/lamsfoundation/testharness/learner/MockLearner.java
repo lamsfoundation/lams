@@ -30,6 +30,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -95,7 +96,7 @@ public class MockLearner extends MockUser implements Runnable {
 
     private static final String SCRATCHIE_FINISH_SUBSTRING = "/lams/tool/lascrt11/learning/finish.do";
     private static final String SCRATCHIE_RESULTS_SUBSTRING = "/lams/tool/lascrt11/learning/showResults.do";
-    private static final Pattern SCRATCHIE_SCRATCH_PATTERN = Pattern.compile("scratchItem\\(\\d+, (\\d+)\\)");
+    private static final Pattern SCRATCHIE_SCRATCH_PATTERN = Pattern.compile("scratchItem\\((\\d+), (\\d+)\\)");
 
     private static final Pattern SESSION_MAP_ID_PATTERN = Pattern.compile("sessionMapID=(.+)\\&");
 
@@ -335,9 +336,15 @@ public class MockLearner extends MockUser implements Runnable {
     private WebResponse handleScratchie(WebResponse resp) throws SAXException, IOException {
 	String asText = resp.getText();
 	Matcher m = MockLearner.SCRATCHIE_SCRATCH_PATTERN.matcher(asText);
-	List<Long> answerUids = new ArrayList<Long>();
+	Map<Long, List<Long>> uids = new TreeMap<Long, List<Long>>();
 	while (m.find()) {
-	    answerUids.add(Long.valueOf(m.group(1)));
+	    Long questionID = Long.valueOf(m.group(1));
+	    List<Long> answerUids = uids.get(questionID);
+	    if (answerUids == null) {
+		answerUids = new ArrayList<Long>();
+		uids.put(questionID, answerUids);
+	    }
+	    answerUids.add(Long.valueOf(m.group(2)));
 	}
 
 	String scratchURL = "/lams/tool/lascrt11/learning/isAnswerCorrect.do?answerUid=";
@@ -356,15 +363,22 @@ public class MockLearner extends MockUser implements Runnable {
 	}
 	Random generator = new Random();
 
-	while (!answerUids.isEmpty()) {
+	while (!uids.isEmpty()) {
+	    Long questionID = uids.keySet().iterator().next();
+	    List<Long> answerUids = uids.get(questionID);
+
 	    int index = generator.nextInt(answerUids.size());
 	    Long answerUid = answerUids.get(index);
 	    answerUids.remove(index);
 	    WebResponse scratchResponse = (WebResponse) new Call(wc, test, "Scratch response", scratchURL + answerUid)
 		    .execute();
 	    boolean answerCorrect = scratchResponse.getText().indexOf("true") != -1;
-	    MockLearner.log.debug("Scratched answer UID " + answerUid + " and it was "
+	    MockLearner.log.debug("Scratched answer UID " + answerUid + " for question " + questionID + " and it was "
 		    + (answerCorrect ? "correct" : "incorrect"));
+
+	    if (answerCorrect) {
+		uids.remove(questionID);
+	    }
 
 	    if (recordScratchedURL != null) {
 		MockLearner.log.debug("Recording scratched answer UID " + answerUid);
@@ -382,10 +396,6 @@ public class MockLearner extends MockUser implements Runnable {
 		} catch (InterruptedException e) {
 		    log.warn("Waiting to scratch was interuppted");
 		}
-	    }
-
-	    if (answerCorrect) {
-		break;
 	    }
 	}
 
