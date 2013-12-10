@@ -944,19 +944,8 @@ function addCompletedLearnerIcons(learners, learnerTotalCount) {
 	if (learners) {
 		// create learner icons, along with handlers
 		$.each(learners, function(learnerIndex, learner){
-			// maximum 41 icons in the bar
-			if (learners.length > 56 && learnerIndex == 55) {
-				// if icons do not fit in cell anymore, show a group icon
-				$('<img />').attr({
-					'src' : LAMS_URL + 'images/icons/group.png',
-					'title'      : LEARNER_GROUP_SHOW_LABEL
-				}).css('cursor', 'pointer')
-				  .dblclick(function(){
-					showLearnerGroupDialog(null, LEARNER_FINISHED_DIALOG_TITLE_LABEL, learners, true, false);
-				}).appendTo(iconsContainer);
-				// stop processing learners
-				return false;
-			} else {
+			// maximum 55 icons in the bar
+			if (learnerIndex < 55) {
 				// make an icon for each learner
 				$('<img />').attr({
 					'src' : LAMS_URL + 'images/icons/user.png',
@@ -982,6 +971,15 @@ function addCompletedLearnerIcons(learners, learnerTotalCount) {
 				.appendTo(iconsContainer);
 			}
 		});
+		
+		// show a group icon
+		$('<img />').attr({
+			'src' : LAMS_URL + 'images/icons/group.png',
+			'title'      : LEARNER_GROUP_SHOW_LABEL
+		}).css('cursor', 'pointer')
+		  .dblclick(function(){
+			showLearnerGroupDialog(null, LEARNER_FINISHED_DIALOG_TITLE_LABEL, learners, true, false);
+		}).appendTo(iconsContainer);
 	}
 }
 
