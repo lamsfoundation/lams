@@ -86,6 +86,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.servlet.AbstractStoreWDDXPacketServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -251,6 +252,19 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	response.setContentType("text/plain;charset=utf-8");
 	response.getWriter().write("true");
+	return null;
+    }
+
+    public ActionForward createLessonClass(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
+		.getServletContext());
+
+	Integer userID = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID);
+	String lessonPacket = AbstractStoreWDDXPacketServlet.getBody(request);
+
+	monitoringService.createLessonClassForLessonWDDX(userID, lessonPacket);
+
 	return null;
     }
 
@@ -750,7 +764,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		.getServletContext());
 	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
 	List<ContributeActivityDTO> contributeActivities = monitoringService.getAllContributeActivityDTO(lessonID);
-	
+
 	response.setContentType("application/json;charset=utf-8");
 	Gson gson = new GsonBuilder().create();
 	gson.toJson(contributeActivities, response.getWriter());
@@ -963,7 +977,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	writer.println(wddxPacket);
 	return null;
     }
-    
+
     /**
      * Produces necessary data for learner progress bar.
      */
