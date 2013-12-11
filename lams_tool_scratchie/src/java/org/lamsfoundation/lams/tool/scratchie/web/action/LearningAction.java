@@ -47,6 +47,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.hibernate.exception.LockAcquisitionException;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -439,13 +440,32 @@ public class LearningAction extends Action {
 
 	String nextActivityUrl = null;
 	try {
-	    nextActivityUrl = service.finishToolSession(toolSessionId, user.getUserID().longValue());
+	    nextActivityUrl = finishToolSession(toolSessionId, user.getUserID().longValue());
 	    request.setAttribute(ScratchieConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
 	} catch (ScratchieApplicationException e) {
 	    LearningAction.log.error("Failed get next activity url:" + e.getMessage());
 	}
 
 	return mapping.findForward(ScratchieConstants.SUCCESS);
+    }
+    
+    public String finishToolSession(Long toolSessionId, Long userId) throws ScratchieApplicationException {
+	final int MAX_TRANSACTION_RETRIES = 5;
+	String nextActivityUrl = null;
+	for (int i = 0; i < MAX_TRANSACTION_RETRIES; i++) {
+	    try {
+		nextActivityUrl = service.finishToolSession(toolSessionId, userId);;
+		break;
+	    } catch (LockAcquisitionException e) {
+		if (i == MAX_TRANSACTION_RETRIES - 1) {
+		    throw new ScratchieApplicationException(e);
+		}
+	    } catch (Exception e) {
+		throw new ScratchieApplicationException(e);
+	    }
+	    log.warn("Transaction retry: " + (i + 1));
+	}
+	return nextActivityUrl;
     }
 
     /**
