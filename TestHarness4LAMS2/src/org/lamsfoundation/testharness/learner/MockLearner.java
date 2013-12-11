@@ -98,6 +98,9 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String SCRATCHIE_RESULTS_SUBSTRING = "/lams/tool/lascrt11/learning/showResults.do";
     private static final Pattern SCRATCHIE_SCRATCH_PATTERN = Pattern.compile("scratchItem\\((\\d+), (\\d+)\\)");
 
+    private static final Pattern ASSESSMENT_FINISH_PATTERN = Pattern
+	    .compile("'(/lams/tool/laasse10/learning/finish\\.do\\?.*)'");
+
     private static final Pattern SESSION_MAP_ID_PATTERN = Pattern.compile("sessionMapID=(.+)\\&");
 
     private static final String LOAD_TOOL_ACTIVITY_SUBSTRING = "Load Tool Activity";
@@ -281,7 +284,7 @@ public class MockLearner extends MockUser implements Runnable {
 		String httpString = respAsText.substring(index + 1, indexEnd);
 		if ((httpString.indexOf("www.w3.org") == -1) && !httpString.endsWith(".js")
 			&& !httpString.endsWith(".css")) {
-		    MockLearner.log.debug("Forwarding to discovered link " + httpString);
+		    MockLearner.log.debug("Forwarding user " + username + " to discovered link " + httpString);
 		    return (WebResponse) new Call(wc, test, "", httpString).execute();
 		}
 	    }
@@ -348,7 +351,7 @@ public class MockLearner extends MockUser implements Runnable {
 	}
 
 	String scratchURL = "/lams/tool/lascrt11/learning/isAnswerCorrect.do?answerUid=";
-	m = SESSION_MAP_ID_PATTERN.matcher(asText);
+	m = MockLearner.SESSION_MAP_ID_PATTERN.matcher(asText);
 
 	String sessionMapID = null;
 	String recordScratchedURL = null;
@@ -359,7 +362,7 @@ public class MockLearner extends MockUser implements Runnable {
 		    + "&answerUid=";
 	    refreshQuestionsURL = "/lams/tool/lascrt11/learning/refreshQuestionList.do?sessionMapID=" + sessionMapID;
 	} else {
-	    log.warn("Session map ID was not found in Scratchie Tool");
+	    MockLearner.log.warn("Session map ID was not found in Scratchie Tool");
 	}
 	Random generator = new Random();
 
@@ -394,7 +397,7 @@ public class MockLearner extends MockUser implements Runnable {
 		try {
 		    Thread.sleep(3000);
 		} catch (InterruptedException e) {
-		    log.warn("Waiting to scratch was interuppted");
+		    MockLearner.log.warn("Waiting to scratch was interuppted");
 		}
 	    }
 	}
@@ -505,7 +508,16 @@ public class MockLearner extends MockUser implements Runnable {
 	    }
 	    form = forms[index];
 	}
-	return (WebResponse) new Call(wc, test, "", fillFormArbitrarily(form)).execute();
+	WebResponse resp = (WebResponse) new Call(wc, test, "", fillFormArbitrarily(form)).execute();
+
+	// check if it is assessment activity
+	String asText = resp.getText();
+	Matcher m = MockLearner.ASSESSMENT_FINISH_PATTERN.matcher(asText);
+	if (m.find()) {
+	    resp = (WebResponse) new Call(wc, test, "", m.group(1)).execute();
+	}
+
+	return resp;
     }
 
     private String getLesson(String getLessonURL, String lsId) throws WddxDeserializationException, IOException {

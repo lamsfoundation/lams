@@ -1,5 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-		<form id="answers" name="answers" method="post" >
+		<form id="answers" name="answers" method="post" action="<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>">
 			<table cellspacing="0" class="alternative-color">
 				<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
 					<tr>

@@ -25,150 +25,143 @@ package org.lamsfoundation.testharness.monitor;
 import java.util.concurrent.CountDownLatch;
 
 import org.lamsfoundation.testharness.AbstractTest;
-import org.lamsfoundation.testharness.TestUtil;
 import org.lamsfoundation.testharness.Call.CallType;
+import org.lamsfoundation.testharness.TestUtil;
 
 /**
  * @version
- *
- * <p>
- * <a href="MonitorTest.java.html"><i>View Source</i></a>
- * </p>
- *
+ * 
+ *          <p>
+ *          <a href="MonitorTest.java.html"><i>View Source</i></a>
+ *          </p>
+ * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class MonitorTest extends AbstractTest {
-	
-	public static final String DEFAULT_LESSON_NAME = "Lesson";
-	
+
+    public static final String DEFAULT_LESSON_NAME = "Lesson";
+
     private String initLessonURL;
-    
+
     private String createLessonClassURL;
-    
+
     private String startLessonURL;
-    
+
     private String getLessonDetailsURL;
-    
+
     private String getContributeActivitiesURL;
-    
+
     private String getLearningDesignDetailsURL;
-    
+
     private String getAllLearnersProgressURL;
-    
+
     private String lessonName;
-    
+
     private String lsId;
-    
+
     private Thread monitorThread;
 
     /**
      * MonitorTest Construtor
      * 
      */
-    public MonitorTest(String testName, CallType callType, String rmiRegistryName, String webServiceAddress, Integer minDelay, Integer maxDelay, String initLessonURL, String createLessonClassURL, String startLessonURL, String getLessonDetailsURL, String getContributeActivitiesURL, String getLearningDesignDetailsURL, String getAllLearnersProgressURL, String lessonName, String lsId) {
-        super(testName, callType, rmiRegistryName, webServiceAddress, minDelay, maxDelay);
-        this.initLessonURL = initLessonURL;
-        this.createLessonClassURL = createLessonClassURL;
-        this.startLessonURL = startLessonURL;
-        this.getLessonDetailsURL = getLessonDetailsURL;
-        this.getContributeActivitiesURL = getContributeActivitiesURL;
-        this.getLearningDesignDetailsURL = getLearningDesignDetailsURL;
-        this.getAllLearnersProgressURL = getAllLearnersProgressURL;
-        this.lessonName = lessonName==null? TestUtil.buildName(testName,DEFAULT_LESSON_NAME) : TestUtil.buildName(testName, lessonName);
-        this.lsId = lsId;
+    public MonitorTest(String testName, CallType callType, String rmiRegistryName, String webServiceAddress,
+	    Integer minDelay, Integer maxDelay, String initLessonURL, String createLessonClassURL,
+	    String startLessonURL, String getLessonDetailsURL, String getContributeActivitiesURL,
+	    String getLearningDesignDetailsURL, String getAllLearnersProgressURL, String lessonName, String lsId) {
+	super(testName, callType, rmiRegistryName, webServiceAddress, minDelay, maxDelay);
+	this.initLessonURL = initLessonURL;
+	this.createLessonClassURL = createLessonClassURL;
+	this.startLessonURL = startLessonURL;
+	this.getLessonDetailsURL = getLessonDetailsURL;
+	this.getContributeActivitiesURL = getContributeActivitiesURL;
+	this.getLearningDesignDetailsURL = getLearningDesignDetailsURL;
+	this.getAllLearnersProgressURL = getAllLearnersProgressURL;
+	this.lessonName = lessonName == null ? TestUtil.buildName(testName, MonitorTest.DEFAULT_LESSON_NAME) : TestUtil
+		.buildName(testName, lessonName);
+	this.lsId = lsId;
     }
 
-
-	@Override
-	protected void startWEB(){
-		MockMonitor monitor = (MockMonitor)users[0];
-		if(lsId == null){
-			monitor.login();
-			String ldId = getTestSuite().getAuthorTest().getLdId();
-			setLsId(monitor.initLesson(initLessonURL,ldId,monitor.getUserId(),lessonName));
-			monitor.createLessonClass(createLessonClassURL,monitor.getUserId());
-			monitor.startLesson(startLessonURL,lsId,monitor.getUserId());
-		}
-		//monitor learners progress
-		monitorThread = new Thread(monitor, monitor.getUsername());
-		monitorThread.start();
+    @Override
+    protected void startWEB() {
+	MockMonitor monitor = (MockMonitor) users[0];
+	if (lsId == null) {
+	    monitor.login();
+	    String organisationID = getTestSuite().getAdminTest().getCourseId();
+	    String ldId = getTestSuite().getAuthorTest().getLdId();
+	    setLsId(monitor.initLesson(initLessonURL, ldId, organisationID, monitor.getUserId(), lessonName));
+	    monitor.createLessonClass(createLessonClassURL, monitor.getUserId());
+	    monitor.startLesson(startLessonURL, lsId, monitor.getUserId());
 	}
+	// monitor learners progress
+	monitorThread = new Thread(monitor, monitor.getUsername());
+	monitorThread.start();
+    }
 
-	@Override
-	protected void startWS(){
-		//TODO implement me
+    @Override
+    protected void startWS() {
+	// TODO implement me
+    }
+
+    @Override
+    protected void startRMI() {
+	// TODO implement me
+    }
+
+    public void notifyMonitorToStop(CountDownLatch stopSignal) {
+	if ((monitorThread != null) && monitorThread.isAlive()) {
+	    ((MockMonitor) users[0]).setStopFlag(stopSignal);
+	} else {
+	    stopSignal.countDown();
 	}
+    }
 
-	@Override
-	protected void startRMI(){
-		//TODO implement me
-	}
+    public final String getCreateLessonClassURL() {
+	return createLessonClassURL;
+    }
 
-	public void notifyMonitorToStop(CountDownLatch stopSignal){
-		if((monitorThread != null) && monitorThread.isAlive()){
-			((MockMonitor)users[0]).setStopFlag(stopSignal);
-		}else{
-			stopSignal.countDown();
-		}
-	}
+    public final void setCreateLessonClassURL(String createLessonClassURL) {
+	this.createLessonClassURL = createLessonClassURL;
+    }
 
-	public final String getCreateLessonClassURL() {
-		return createLessonClassURL;
-	}
+    public final String getInitLessonURL() {
+	return initLessonURL;
+    }
 
+    public final void setInitLessonURL(String initLessonURL) {
+	this.initLessonURL = initLessonURL;
+    }
 
-	public final void setCreateLessonClassURL(String createLessonClassURL) {
-		this.createLessonClassURL = createLessonClassURL;
-	}
+    public final String getStartLessonURL() {
+	return startLessonURL;
+    }
 
+    public final void setStartLessonURL(String startLessonURL) {
+	this.startLessonURL = startLessonURL;
+    }
 
-	public final String getInitLessonURL() {
-		return initLessonURL;
-	}
+    public final String getLsId() {
+	return lsId;
+    }
 
+    public final void setLsId(String lsId) {
+	this.lsId = lsId;
+    }
 
-	public final void setInitLessonURL(String initLessonURL) {
-		this.initLessonURL = initLessonURL;
-	}
+    public final String getGetAllLearnersProgressURL() {
+	return getAllLearnersProgressURL;
+    }
 
+    public final String getGetContributeActivitiesURL() {
+	return getContributeActivitiesURL;
+    }
 
-	public final String getStartLessonURL() {
-		return startLessonURL;
-	}
+    public final String getGetLearningDesignDetailsURL() {
+	return getLearningDesignDetailsURL;
+    }
 
-
-	public final void setStartLessonURL(String startLessonURL) {
-		this.startLessonURL = startLessonURL;
-	}
-
-
-	public final String getLsId() {
-		return lsId;
-	}
-
-
-	public final void setLsId(String lsId) {
-		this.lsId = lsId;
-	}
-
-
-	public final String getGetAllLearnersProgressURL() {
-		return getAllLearnersProgressURL;
-	}
-
-
-	public final String getGetContributeActivitiesURL() {
-		return getContributeActivitiesURL;
-	}
-
-
-	public final String getGetLearningDesignDetailsURL() {
-		return getLearningDesignDetailsURL;
-	}
-
-
-	public final String getGetLessonDetailsURL() {
-		return getLessonDetailsURL;
-	}
+    public final String getGetLessonDetailsURL() {
+	return getLessonDetailsURL;
+    }
 
 }
