@@ -417,7 +417,6 @@ public class LearningAction extends Action {
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
 	ScratchieUser user = (ScratchieUser) sessionMap.get(AttributeNames.USER);
 
 	String nextActivityUrl = null;
