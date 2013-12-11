@@ -48,7 +48,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.hibernate.exception.LockAcquisitionException;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -71,6 +70,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -498,7 +498,7 @@ public class LearningAction extends Action {
 	    try {
 		returnValue = command.call();
 		break;
-	    } catch (LockAcquisitionException e) {
+	    } catch (CannotAcquireLockException e) {
 		if (i == MAX_TRANSACTION_RETRIES - 1) {
 		    throw new ScratchieApplicationException(e);
 		}
