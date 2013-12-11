@@ -590,7 +590,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    List<ScratchieUser> usersToShow = new LinkedList<ScratchieUser>();
 	    for (ScratchieUser user : sessionUsers) {
 		
-		boolean isUserGroupLeader = session.isUserGroupLeader(user);
+		boolean isUserGroupLeader = session.isUserGroupLeader(user.getUid());
 		//include only leaders in case isUserGroupLeader is ON, include all otherwise
 		if (isIncludeOnlyLeaders && isUserGroupLeader || !isIncludeOnlyLeaders) {
 		    int totalAttempts = scratchieAnswerVisitDao.getLogCountTotal(sessionId, user.getUserId());
@@ -843,7 +843,7 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 			reflection = StringEscapeUtils.escapeJavaScript(reflection);
 		    }
 		    reflectDTO.setReflection(reflection);
-		    reflectDTO.setIsGroupLeader(session.isUserGroupLeader(leader));
+		    reflectDTO.setIsGroupLeader(session.isUserGroupLeader(leader.getUid()));
 
 		    reflections.add(reflectDTO);
 		}

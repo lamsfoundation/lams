@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.scratchie.web.action;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -61,6 +62,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.service.ScratchieApplicationException;
 import org.lamsfoundation.lams.tool.scratchie.web.form.ReflectionForm;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -146,8 +148,16 @@ public class LearningAction extends Action {
 	// forwards to the leaderSelection page
 	if (groupLeader == null && !mode.isTeacher()) {
 
+	    //get group users and store it to request as DTO objects
 	    List<ScratchieUser> groupUsers = service.getUsersBySession(toolSessionId);
-	    request.setAttribute(ScratchieConstants.ATTR_GROUP_USERS, groupUsers);
+	    List<User> groupUserDtos = new ArrayList<User>();
+	    for (ScratchieUser groupUser : groupUsers) {
+		User groupUserDto = new User();
+		groupUserDto.setFirstName(groupUser.getFirstName());
+		groupUserDto.setLastName(groupUser.getLastName());
+		groupUserDtos.add(groupUserDto);
+	    }
+	    request.setAttribute(ScratchieConstants.ATTR_GROUP_USERS, groupUserDtos);
 	    request.setAttribute(ScratchieConstants.PARAM_TOOL_SESSION_ID, toolSessionId);
 	    request.setAttribute(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 
@@ -186,9 +196,14 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_TITLE, scratchie.getTitle());
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_INSTRUCTION, scratchie.getInstructions());
 	sessionMap.put(ScratchieConstants.ATTR_USER_ID, user.getUserId());
-	sessionMap.put(ScratchieConstants.ATTR_USER, user);
-	sessionMap.put(ScratchieConstants.ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = toolSession.isUserGroupLeader(user);
+	sessionMap.put(ScratchieConstants.ATTR_USER_UID, user.getUid());
+	User groupLeaderDto = new User();
+	if (groupLeader != null) {
+	    user.setFirstName(groupLeader.getFirstName());
+	    user.setLastName(groupLeader.getLastName());
+	}
+	sessionMap.put(ScratchieConstants.ATTR_GROUP_LEADER, groupLeaderDto);
+	boolean isUserLeader = toolSession.isUserGroupLeader(user.getUid());
 	sessionMap.put(ScratchieConstants.ATTR_IS_USER_LEADER, isUserLeader);
 	boolean isUserFinished = user != null && user.isSessionFinished();
 	sessionMap.put(ScratchieConstants.ATTR_USER_FINISHED, isUserFinished);
@@ -284,6 +299,7 @@ public class LearningAction extends Action {
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
 	ScratchieUser user = this.getCurrentUser(toolSessionId);
 
 	// set scratched flag for display purpose
@@ -291,7 +307,8 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
 	
 	// refresh leadership status
-	sessionMap.put(ScratchieConstants.ATTR_USER, user);
+	boolean isUserLeader = toolSession.isUserGroupLeader(user.getUid());
+	sessionMap.put(ScratchieConstants.ATTR_IS_USER_LEADER, isUserLeader);
 	// refresh ScratchingFinished status
 	boolean isScratchingFinished = user != null && user.isScratchingFinished();
 	sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, isScratchingFinished);
@@ -334,7 +351,7 @@ public class LearningAction extends Action {
 
 	ScratchieUser leader = this.getCurrentUser(toolSessionId);
 	// only leaders are allowed to scratch answers
-	if (!toolSession.isUserGroupLeader(leader)) {
+	if (!toolSession.isUserGroupLeader(leader.getUid())) {
 	    return null;
 	}
 
@@ -365,15 +382,15 @@ public class LearningAction extends Action {
 	
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
-	ScratchieUser user = (ScratchieUser) sessionMap.get(ScratchieConstants.ATTR_USER);
+	Long userUid = (Long) sessionMap.get(ScratchieConstants.ATTR_USER_UID);
 
 	// in case of the leader we should let all other learners see Next Activity button
-	if (toolSession.isUserGroupLeader(user)) {
+	if (toolSession.isUserGroupLeader(userUid)) {
 	    service.setScratchingFinished(toolSessionId);
 	}
 	
 	//get user from DB to get his updated score
-	ScratchieUser userUpdated = service.getUser(user.getUid());
+	ScratchieUser userUpdated = service.getUser(userUid);
 	int score = userUpdated.getMark();
 	int maxScore = (Integer) sessionMap.get(ScratchieConstants.ATTR_MAX_SCORE);
 	double percentage = (maxScore == 0) ? 0 : (score * 100/maxScore);
@@ -417,11 +434,12 @@ public class LearningAction extends Action {
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	ScratchieUser user = (ScratchieUser) sessionMap.get(AttributeNames.USER);
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
 	String nextActivityUrl = null;
 	try {
-	    nextActivityUrl = service.finishToolSession(toolSessionId, user.getUserId());
+	    nextActivityUrl = service.finishToolSession(toolSessionId, user.getUserID().longValue());
 	    request.setAttribute(ScratchieConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
 	} catch (ScratchieApplicationException e) {
 	    LearningAction.log.error("Failed get next activity url:" + e.getMessage());

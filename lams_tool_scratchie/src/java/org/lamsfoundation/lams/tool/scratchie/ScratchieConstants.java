@@ -153,8 +153,6 @@ public class ScratchieConstants {
     
     public static final String ATTR_USER_ID = "userId";
     
-    public static final String ATTR_USER = "user";
-    
     public static final String ATTR_GROUP_LEADER = "groupLeader";
     
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
