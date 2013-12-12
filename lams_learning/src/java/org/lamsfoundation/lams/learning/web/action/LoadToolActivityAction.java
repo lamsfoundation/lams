@@ -78,6 +78,17 @@ public class LoadToolActivityAction extends ActivityAction {
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
+	/* Synchronise calls to the same activity and attempt to create a session, if it does not exist.
+	 * Even though the method creating sessions in LamsCoreToolService is synchronised,
+	 * subsequent reads from DB are (probably) dirty,
+	 * i.e. they show that session does not exist while it is already there,
+	 * created by another, isolated transaction.
+	 * Reattempting session creation from within transaction not only is broken (because of the dirty reads)
+	 * but also does not make sense, because if the session already exists,
+	 * there is no point in repeating a failed attempt to create it.
+	 * 
+	 * The synchronisation code below prevents threads from creating sessions at the same time.
+	 */
 	Object toolSessionCreationLock = null;
 	Long activityID = activity.getActivityId();
 	synchronized (toolSessionCreationLocks) {
