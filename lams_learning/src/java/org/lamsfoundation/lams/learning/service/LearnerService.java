@@ -1057,18 +1057,6 @@ public class LearnerService implements ICoreLearnerService {
 	     * This exception should never occur, as lamsCoreToolService.createToolSession is now synchronized.
 	     * Nevertheless, it sometimes occurs, so additional security measures stay.
 	     */
-	    try {
-		Thread.sleep(2000);
-	    } catch (InterruptedException e1) {
-		// do nothing, it does not hurt us
-	    }
-	    try {
-		toolSession = lamsCoreToolService.createToolSession(learner, toolActivity, lesson);
-	    } catch (DataIntegrityViolationException e1) {
-		LearnerService.log
-			.warn("There was an attempt to create two tool sessions with the same name. Retry failed, carrying on",
-				e1);
-	    }
 	}
 	if (toolSession != null) {
 	    toolActivity.getToolSessions().add(toolSession);
