@@ -97,6 +97,7 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String SCRATCHIE_FINISH_SUBSTRING = "/lams/tool/lascrt11/learning/finish.do";
     private static final String SCRATCHIE_RESULTS_SUBSTRING = "/lams/tool/lascrt11/learning/showResults.do";
     private static final Pattern SCRATCHIE_SCRATCH_PATTERN = Pattern.compile("scratchItem\\((\\d+), (\\d+)\\)");
+    private static final String SCRATCHIE_FINISH_AVAILABLE = "return finish()";
 
     private static final String KNOCK_GATE_SUBSTRING = "/lams/learning/gate.do?method=knockGate";
 
@@ -403,6 +404,14 @@ public class MockLearner extends MockUser implements Runnable {
 		    MockLearner.log.warn("Waiting to scratch was interuppted");
 		}
 	    }
+	}
+
+	while (refreshQuestionsURL != null && !asText.contains(MockLearner.SCRATCHIE_FINISH_AVAILABLE)) {
+	    MockLearner.log.debug("Waiting for leader to finish scratchie");
+	    delay();
+	    String url = resp.getURL().toString() + "&reqId=" + System.currentTimeMillis();
+	    WebResponse questionRefreshResp = (WebResponse) new Call(wc, test, "Scratchie refresh", refreshQuestionsURL).execute();
+	    asText = questionRefreshResp.getText();
 	}
 
 	String resultsURL = findURLInLocationHref(resp, MockLearner.SCRATCHIE_RESULTS_SUBSTRING);
