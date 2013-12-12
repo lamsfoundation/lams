@@ -186,36 +186,6 @@ public class LearningAction extends Action {
 	    return mapping.findForward("waitforleader");
 	}
 
-	if ((groupLeader != null) && !mode.isTeacher()) {
-	    // in case user joins the lesson after leader has scratched some answers already - we need to make sure
-	    // he has the same scratches as leader
-	    LearningAction.log.info("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: trying to execute copyScratchesFromLeade for user ID: " + user.getUserId()
-		    + " and leader ID: " + groupLeader.getUserId());
-	    tryExecute(new Callable<Object>() {
-		@Override
-		public Object call() throws ScratchieApplicationException {
-		    LearningAction.service.copyScratchesFromLeader(user, groupLeader);
-		    return null;
-		}
-	    });
-
-	    // if user joins a lesson after leader has already finished an activity set his scratchingFinished
-	    // parameter to true
-	    if (groupLeader.isScratchingFinished()) {
-		user.setScratchingFinished(true);
-		LearningAction.log.info("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			+ "]: trying to execute saveUser for user ID: " + user.getUserId());
-		tryExecute(new Callable<Object>() {
-		    @Override
-		    public Object call() throws ScratchieApplicationException {
-			LearningAction.service.saveUser(user);
-			return null;
-		    }
-		});
-	    }
-	}
-
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -310,14 +280,14 @@ public class LearningAction extends Action {
 
 	// set scratched flag for display purpose
 	LearningAction.log.info("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		+ "]: getting ScratchieItems for user ID: " + user.getUserId() + " and session ID: " + toolSessionId);
-	Collection<ScratchieItem> items = LearningAction.service.getItemsWithIndicatedScratches(toolSessionId, user);
+		+ "]: getting ScratchieItems for  session ID: " + toolSessionId);
+	Collection<ScratchieItem> items = LearningAction.service.getItemsWithIndicatedScratches(toolSessionId);
 
 	// for teacher in monitoring display the number of attempt.
 	if (mode.isTeacher()) {
 	    LearningAction.log.info("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: getting Scratches order for user ID: " + user.getUserId());
-	    LearningAction.service.getScratchesOrder(items, user);
+		    + "]: getting Scratches order for toolSessionId: " + toolSessionId);
+	    LearningAction.service.getScratchesOrder(items, toolSessionId);
 	}
 
 	// calculate max score
@@ -332,7 +302,7 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 	sessionMap.put(ScratchieConstants.ATTR_MAX_SCORE, maxScore);
-	boolean isScratchingFinished = (user != null) && user.isScratchingFinished();
+	boolean isScratchingFinished = toolSession.isScratchingFinished();
 	sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, isScratchingFinished);
 
 	// decide whether to show results page or learning one
@@ -371,21 +341,21 @@ public class LearningAction extends Action {
 	LearningAction.log.info("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
 		+ "]: getting ScratchieSession by ID: " + toolSessionId);
 	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);
-	ScratchieUser user = this.getCurrentUser(toolSessionId);
 
 	// set scratched flag for display purpose
 	LearningAction.log.info("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		+ "]: getting ScratchieItems by user ID: " + user.getUserId() + " and session ID: " + toolSessionId
+		+ "]: getting ScratchieItems by  session ID: " + toolSessionId
 		+ " and putting them in sessionMap(!)");
-	Set<ScratchieItem> items = LearningAction.service.getItemsWithIndicatedScratches(toolSessionId, user);
+	Set<ScratchieItem> items = LearningAction.service.getItemsWithIndicatedScratches(toolSessionId);
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
 
 	// refresh leadership status
+	ScratchieUser user = this.getCurrentUser(toolSessionId);
 	boolean isUserLeader = toolSession.isUserGroupLeader(user.getUid());
 	sessionMap.put(ScratchieConstants.ATTR_IS_USER_LEADER, isUserLeader);
+	
 	// refresh ScratchingFinished status
-	boolean isScratchingFinished = (user != null) && user.isScratchingFinished();
-	sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, isScratchingFinished);
+	sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, toolSession.isScratchingFinished());
 	LearningAction.log.info("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
 		+ "]: leaving refreshQuestionList()");
 	return mapping.findForward(ScratchieConstants.SUCCESS);
@@ -433,12 +403,12 @@ public class LearningAction extends Action {
 		+ "]: sessionMapID is " + sessionMapID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
 		sessionMapID);
-	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	LearningAction.log.info("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
 		+ "]: getting ScratchieSession by ID: " + toolSessionId);
 	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);
 
-	final ScratchieUser leader = this.getCurrentUser(toolSessionId);
+	ScratchieUser leader = this.getCurrentUser(toolSessionId);
 	// only leaders are allowed to scratch answers
 	if (!toolSession.isUserGroupLeader(leader.getUid())) {
 	    LearningAction.log.info("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
@@ -453,7 +423,7 @@ public class LearningAction extends Action {
 	tryExecute(new Callable<Object>() {
 	    @Override
 	    public Object call() throws ScratchieApplicationException {
-		LearningAction.service.recordItemScratched(leader, answerUid);
+		LearningAction.service.recordItemScratched(toolSessionId, answerUid);
 		return null;
 	    }
 	});
@@ -504,11 +474,8 @@ public class LearningAction extends Action {
 	    });
 	}
 
-	// get user from DB to get his updated score
-	LearningAction.log.info("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		+ "]: getting ScratchieUser by UID: " + userUid);
-	ScratchieUser userUpdated = LearningAction.service.getUser(userUid);
-	int score = userUpdated.getMark();
+	// get updated score from ScratchieSession
+	int score = toolSession.getMark();
 	int maxScore = (Integer) sessionMap.get(ScratchieConstants.ATTR_MAX_SCORE);
 	double percentage = (maxScore == 0) ? 0 : ((score * 100) / maxScore);
 	request.setAttribute(ScratchieConstants.ATTR_SCORE, (int) percentage);

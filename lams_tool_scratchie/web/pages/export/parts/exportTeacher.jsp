@@ -50,8 +50,8 @@
 	   	   	     		userId:"${user.userId}",
 	   	   	     		sessionId:"${user.session.sessionId}",
 	   	   	     		userName:"${user.lastName}, ${user.firstName}",
-	   	   				totalAttempts:"${user.totalAttempts}",
-	   	   				mark:"<c:choose> <c:when test='${user.totalAttempts == 0}'>-</c:when> <c:otherwise>${user.mark}</c:otherwise> </c:choose>"
+	   	   				totalAttempts:"${summary.totalAttempts}",
+	   	   				mark:"<c:choose> <c:when test='${summary.totalAttempts == 0}'>-</c:when> <c:otherwise>${summary.mark}</c:otherwise> </c:choose>"
 	   	   	   	    });
 		        </c:forEach>
 		   </c:forEach>

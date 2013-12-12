@@ -37,7 +37,6 @@ import java.util.Date;
 public class ScratchieAnswerVisitLog {
 
     private Long uid;
-    private ScratchieUser user;
     private ScratchieAnswer scratchieAnswer;
     private Date accessDate;
     private Long sessionId;
@@ -76,18 +75,6 @@ public class ScratchieAnswerVisitLog {
 
     public void setUid(Long uid) {
 	this.uid = uid;
-    }
-
-    /**
-     * @hibernate.many-to-one column="user_uid" cascade="none"
-     * @return
-     */
-    public ScratchieUser getUser() {
-	return user;
-    }
-
-    public void setUser(ScratchieUser user) {
-	this.user = user;
     }
 
     /**

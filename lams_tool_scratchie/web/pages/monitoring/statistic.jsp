@@ -38,8 +38,8 @@
 				</td>
 				<td>
 					<c:choose>
-						<c:when test='${user.totalAttempts == 0}'>-</c:when> 
-						<c:otherwise>${user.mark}</c:otherwise>
+						<c:when test='${summary.totalAttempts == 0}'>-</c:when> 
+						<c:otherwise>${summary.mark}</c:otherwise>
 					</c:choose>
 				</td>
 			</tr>

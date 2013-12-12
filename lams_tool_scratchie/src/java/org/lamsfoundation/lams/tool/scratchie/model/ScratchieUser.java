@@ -46,14 +46,9 @@ public class ScratchieUser implements Cloneable, Comparable {
     private String lastName;
     private String loginName;
     private boolean sessionFinished;
-    private boolean scratchingFinished;
-    private int mark;
 
     private ScratchieSession session;
     private Scratchie scratchie;
-
-    // =============== NON Persisit value: for display use ===========
-    private int totalAttempts;
 
     public ScratchieUser() {
     }
@@ -207,32 +202,6 @@ public class ScratchieUser implements Cloneable, Comparable {
     public void setSessionFinished(boolean sessionFinished) {
 	this.sessionFinished = sessionFinished;
     }
-    
-    /**
-     * Indicates whether user pressed Submit button in learning.
-     * 
-     * @hibernate.property column="scratching_finished"
-     * @return
-     */
-    public boolean isScratchingFinished() {
-	return scratchingFinished;
-    }
-
-    public void setScratchingFinished(boolean scratchingFinished) {
-	this.scratchingFinished = scratchingFinished;
-    }
-    
-    /**
-     * @hibernate.property column="mark"
-     * @return
-     */
-    public int getMark() {
-	return mark;
-    }
-
-    public void setMark(int mark) {
-	this.mark = mark;
-    }
 
     public boolean equals(Object obj) {
 	if (this == obj)
@@ -249,14 +218,6 @@ public class ScratchieUser implements Cloneable, Comparable {
 
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(firstName).append(lastName).append(loginName).toHashCode();
-    }
-    
-    public int getTotalAttempts() {
-	return totalAttempts;
-    }
-
-    public void setTotalAttempts(int totalAttempts) {
-	this.totalAttempts = totalAttempts;
     }
 
 }

@@ -84,8 +84,8 @@ public class ScratchieOutputFactory extends OutputFactory {
      */
     private ToolOutput getUserMark(IScratchieService scratchieService, Long toolSessionId, Long learnerId) {
 
-	ScratchieUser user = scratchieService.getUserByIDAndSession(learnerId, toolSessionId);
-	int userMark = user.getMark();
+	ScratchieSession session = scratchieService.getScratchieSessionBySessionId(toolSessionId);
+	int userMark = session.getMark();
 
 	return new ToolOutput(ScratchieConstants.LEARNER_MARK, getI18NText(ScratchieConstants.LEARNER_MARK, true),
 		userMark);

@@ -64,7 +64,7 @@ public class PopulateMarksServlet extends HttpServlet {
 
 		    ScratchieUser leader = session.getGroupLeader();
 		    if ((leader != null)) {
-			service.recalculateMarkForSession(leader, true);
+			service.recalculateMarkForSession(session.getSessionId(), true);
 			log.debug("recalculateMarkForSession uid:" + session.getUid());
 			out.println("recalculateMarkForSession uid:" + session.getUid());
 		    }

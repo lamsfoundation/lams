@@ -27,16 +27,22 @@ import java.util.Collection;
 
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 
 public class GroupSummary {
 
     private Long sessionId;
     private String sessionName;
+    private int mark;
+    private int totalAttempts;
 
     private Collection<ScratchieUser> users;
     private Collection<ScratchieItem> items;
     private Collection<ScratchieAnswer> answers;
+    
+    public GroupSummary() {
+    }
 
     /**
      * Contruction method for monitoring summary function.
@@ -47,9 +53,10 @@ public class GroupSummary {
      * @param item
      * @param isInitGroup
      */
-    public GroupSummary(Long sessionId, String sessionName) {
-	this.sessionId = sessionId;
-	this.sessionName = sessionName;
+    public GroupSummary(ScratchieSession session) {
+	this.sessionId = session.getSessionId();
+	this.sessionName = session.getSessionName();
+	this.mark = session.getMark();
     }
 
     public Long getSessionId() {
@@ -66,6 +73,22 @@ public class GroupSummary {
 
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
+    }
+    
+    public int getMark() {
+	return mark;
+    }
+
+    public void setMark(int mark) {
+	this.mark = mark;
+    }
+    
+    public int getTotalAttempts() {
+	return totalAttempts;
+    }
+
+    public void setTotalAttempts(int totalAttempts) {
+	this.totalAttempts = totalAttempts;
     }
 
     public Collection<ScratchieUser> getUsers() {

@@ -31,50 +31,50 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 
 public class ScratchieAnswerVisitDAOHibernate extends BaseDAOHibernate implements ScratchieAnswerVisitDAO {
 
-    private static final String FIND_BY_ANSWER_AND_USER = "from " + ScratchieAnswerVisitLog.class.getName()
-	    + " as r where r.user.userId = ? and r.scratchieAnswer.uid=?";
+    private static final String FIND_BY_SESSION_AND_ANSWER = "from " + ScratchieAnswerVisitLog.class.getName()
+	    + " as r where r.sessionId = ? and r.scratchieAnswer.uid=?";
     
-    private static final String FIND_BY_USER_AND_ITEM = "from " + ScratchieAnswerVisitLog.class.getName()
-	    + " as r where r.user.uid=? and r.scratchieAnswer.scratchieItem.uid = ?  order by r.accessDate asc";
+    private static final String FIND_BY_SESSION_AND_ITEM = "from " + ScratchieAnswerVisitLog.class.getName()
+	    + " as r where r.sessionId=? and r.scratchieAnswer.scratchieItem.uid = ?  order by r.accessDate asc";
     
-    private static final String FIND_FIRST_SCRATCHED_ANSWER_BY_USER_AND_ITEM = "SELECT r.scratchieAnswer from " + ScratchieAnswerVisitLog.class.getName()
-	    + " as r where r.user.uid=? and r.scratchieAnswer.scratchieItem.uid = ?  order by r.accessDate asc LIMIT 1;";
+    private static final String FIND_FIRST_SCRATCHED_ANSWER_BY_SESSION_AND_ITEM = "SELECT r.scratchieAnswer from " + ScratchieAnswerVisitLog.class.getName()
+	    + " as r where r.sessionId=? and r.scratchieAnswer.scratchieItem.uid = ?  order by r.accessDate asc LIMIT 1;";
     
-    private static final String FIND_BY_USER = "from " + ScratchieAnswerVisitLog.class.getName()
-	    + " as r where r.user.uid=? order by r.accessDate asc";
+    private static final String FIND_BY_SESSION = "from " + ScratchieAnswerVisitLog.class.getName()
+	    + " as r where r.sessionId=? order by r.accessDate asc";
 
-    private static final String FIND_VIEW_COUNT_BY_USER = "select count(*) from "
-	    + ScratchieAnswerVisitLog.class.getName() + " as r where  r.sessionId=? and  r.user.userId =?";
+    private static final String FIND_VIEW_COUNT_BY_SESSION = "select count(*) from "
+	    + ScratchieAnswerVisitLog.class.getName() + " as r where  r.sessionId=?";
     
     @Override
-    public ScratchieAnswerVisitLog getLog(Long answerUid, Long userId) {
-	List list = getHibernateTemplate().find(FIND_BY_ANSWER_AND_USER, new Object[] { userId, answerUid });
+    public ScratchieAnswerVisitLog getLog(Long answerUid, Long sessionId) {
+	List list = getHibernateTemplate().find(FIND_BY_SESSION_AND_ANSWER, new Object[] { sessionId, answerUid });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (ScratchieAnswerVisitLog) list.get(0);
     }
 
     @Override
-    public int getLogCountTotal(Long toolSessionId, Long userId) {
-	List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_USER, new Object[] { toolSessionId, userId });
+    public int getLogCountTotal(Long sessionId) {
+	List list = getHibernateTemplate().find(FIND_VIEW_COUNT_BY_SESSION, new Object[] { sessionId});
 	if (list == null || list.size() == 0)
 	    return 0;
 	return ((Number) list.get(0)).intValue();
     }
     
     @Override
-    public List<ScratchieAnswerVisitLog> getLogsByScratchieUserAndItem(Long userUid, Long itemUid) {
-	return getHibernateTemplate().find(FIND_BY_USER_AND_ITEM, new Object[] { userUid, itemUid });
+    public List<ScratchieAnswerVisitLog> getLogsBySessionAndItem(Long sessionId, Long itemUid) {
+	return getHibernateTemplate().find(FIND_BY_SESSION_AND_ITEM, new Object[] { sessionId, itemUid });
     }
     
     @Override
-    public List<ScratchieAnswerVisitLog> getLogsByScratchieUser(Long userUid) {
-	return getHibernateTemplate().find(FIND_BY_USER, new Object[] { userUid });
+    public List<ScratchieAnswerVisitLog> getLogsBySession(Long sessionId) {
+	return getHibernateTemplate().find(FIND_BY_SESSION, new Object[] { sessionId });
     }
     
     @Override
-    public ScratchieAnswer getFirstScratchedAnswerByUserAndItem(Long userUid, Long itemUid) {
-	List list = getHibernateTemplate().find(FIND_FIRST_SCRATCHED_ANSWER_BY_USER_AND_ITEM, new Object[] { userUid, itemUid });
+    public ScratchieAnswer getFirstScratchedAnswerBySessionAndItem(Long sessionId, Long itemUid) {
+	List list = getHibernateTemplate().find(FIND_FIRST_SCRATCHED_ANSWER_BY_SESSION_AND_ITEM, new Object[] { sessionId, itemUid });
 	if (list == null || list.size() == 0)
 	    return null;
 	return (ScratchieAnswer) list.get(0);

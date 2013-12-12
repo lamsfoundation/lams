@@ -67,14 +67,6 @@ public interface IScratchieService {
     ScratchieUser checkLeaderSelectToolForSessionLeader(ScratchieUser user, Long toolSessionId);
     
     ScratchieAnswer getScratchieAnswerByUid (Long answerUid);
-    
-    /**
-     * Check user has the same scrathes logs as group leader. If not - creates missing ones. 
-     * 
-     * @param user
-     * @param leader
-     */
-    void copyScratchesFromLeader(ScratchieUser user, ScratchieUser leader);
 
     /**
      * Get a cloned copy of tool default tool content (Scratchie) and assign the toolContentId of that copy as the given
@@ -200,23 +192,22 @@ public interface IScratchieService {
      * @param items
      * @param user
      */
-    void getScratchesOrder(Collection<ScratchieItem> items, ScratchieUser user);
+    void getScratchesOrder(Collection<ScratchieItem> items, Long toolSessionId);
 
     /**
      * Fill in scratchieItems with information about whether they were unraveled; and answers with information on their scratched.
      * 
      * @param scratchieItemList
-     * @param user
      */
-    Set<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId, ScratchieUser user);
+    Set<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId);
 
     /**
      * Leader has scratched the specified answer. Will store this scratch for all users in his group. It will also
      * update all the marks.
      */
-    void recordItemScratched(ScratchieUser leader, Long scratchieItemUid);
+    void recordItemScratched(Long toolSessionId, Long scratchieItemUid);
     
-    void recalculateMarkForSession(ScratchieUser leader, boolean isPropagateToGradebook);
+    void recalculateMarkForSession(Long sessionId, boolean isPropagateToGradebook);
     
     /**
      * Mark all users in agroup as ScratchingFinished so that users can't continue scratching after this.

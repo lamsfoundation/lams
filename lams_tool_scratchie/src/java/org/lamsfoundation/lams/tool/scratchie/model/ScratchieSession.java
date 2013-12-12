@@ -51,6 +51,8 @@ public class ScratchieSession {
     // scratchie Items
     private Set scratchieItems;
     private ScratchieUser groupLeader;
+    private int mark;
+    private boolean scratchingFinished;
 
     // **********************************************************
     // Get/Set methods
@@ -178,6 +180,34 @@ public class ScratchieSession {
 
 	boolean isUserLeader = (this.groupLeader != null) && userUid.equals(this.groupLeader.getUid());
 	return isUserLeader;
+    }
+    
+    /**
+     * Mark scored by a leader and shared by all users in a group.
+     * 
+     * @hibernate.property column="mark"
+     * @return
+     */
+    public int getMark() {
+	return mark;
+    }
+
+    public void setMark(int mark) {
+	this.mark = mark;
+    }
+    
+    /**
+     * Indicates whether leader has pressed Submit button in learning. And is shared by all users in a group.
+     * 
+     * @hibernate.property column="scratching_finished"
+     * @return
+     */
+    public boolean isScratchingFinished() {
+	return scratchingFinished;
+    }
+
+    public void setScratchingFinished(boolean scratchingFinished) {
+	this.scratchingFinished = scratchingFinished;
     }
 
 }

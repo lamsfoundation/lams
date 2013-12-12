@@ -158,7 +158,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 
 	// set complete flag for display purpose
-	Set<ScratchieItem> items = service.getItemsWithIndicatedScratches(toolSessionID, learner);
+	Set<ScratchieItem> items = service.getItemsWithIndicatedScratches(toolSessionID);
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
 
 	// Add flag to indicate whether to render user notebook entries
