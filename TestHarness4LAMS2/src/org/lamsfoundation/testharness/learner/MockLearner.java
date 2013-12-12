@@ -98,6 +98,8 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String SCRATCHIE_RESULTS_SUBSTRING = "/lams/tool/lascrt11/learning/showResults.do";
     private static final Pattern SCRATCHIE_SCRATCH_PATTERN = Pattern.compile("scratchItem\\((\\d+), (\\d+)\\)");
 
+    private static final String KNOCK_GATE_SUBSTRING = "/lams/learning/gate.do?method=knockGate";
+
     private static final Pattern ASSESSMENT_FINISH_PATTERN = Pattern
 	    .compile("'(/lams/tool/laasse10/learning/finish\\.do\\?.*)'");
 
@@ -373,6 +375,7 @@ public class MockLearner extends MockUser implements Runnable {
 	    int index = generator.nextInt(answerUids.size());
 	    Long answerUid = answerUids.get(index);
 	    answerUids.remove(index);
+	    MockLearner.log.debug("Scratching answer UID " + answerUid + " for question " + questionID);
 	    WebResponse scratchResponse = (WebResponse) new Call(wc, test, "Scratch response", scratchURL + answerUid)
 		    .execute();
 	    boolean answerCorrect = scratchResponse.getText().indexOf("true") != -1;
@@ -441,7 +444,7 @@ public class MockLearner extends MockUser implements Runnable {
 	}
 
 	// now we are back on the topic page, so go back to the main forum page.
-	String returnToForumURL = findURLInLocationHref(resp, MockLearner.FORUM_VIEW_FORUM_SUBSTRING);
+	String returnToForumURL = findURLInAHREF(resp, MockLearner.FORUM_VIEW_FORUM_SUBSTRING);
 	if (returnToForumURL != null) {
 	    MockLearner.log.debug("Returning to forum page " + returnToForumURL);
 	    return (WebResponse) new Call(wc, test, "Return to Forum", returnToForumURL).execute();
@@ -508,7 +511,18 @@ public class MockLearner extends MockUser implements Runnable {
 	    }
 	    form = forms[index];
 	}
-	WebResponse resp = (WebResponse) new Call(wc, test, "", fillFormArbitrarily(form)).execute();
+
+	WebResponse resp = null;
+	while (form.getAction().startsWith(MockLearner.KNOCK_GATE_SUBSTRING)) {
+	    delay();
+	    MockLearner.log.debug("Knocking gate");
+	    resp = (WebResponse) new Call(wc, test, "Knock Gate", form).execute();
+	    if (resp.getText().indexOf(MockLearner.KNOCK_GATE_SUBSTRING) == -1) {
+		return resp;
+	    }
+	}
+
+	resp = (WebResponse) new Call(wc, test, "", fillFormArbitrarily(form)).execute();
 
 	// check if it is assessment activity
 	String asText = resp.getText();
