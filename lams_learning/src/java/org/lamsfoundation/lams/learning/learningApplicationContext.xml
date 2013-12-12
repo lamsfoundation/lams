@@ -55,7 +55,7 @@
 				<prop key="knockGate">PROPAGATION_REQUIRED</prop>
 				<prop key="determineBranch">PROPAGATION_REQUIRED</prop>				
 				<prop key="selectBranch">PROPAGATION_REQUIRED</prop>
-				<prop key="create*">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="create*">PROPAGATION_REQUIRED</prop>
 				<prop key="learner*">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
    			</props>

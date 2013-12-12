@@ -1042,21 +1042,9 @@ public class LearnerService implements ICoreLearnerService {
 	try {
 	    toolSession = lamsCoreToolService.createToolSession(learner, toolActivity, lesson);
 	} catch (DataIntegrityViolationException e) {
-	    LearnerService.log.warn("There was an attempt to create two tool sessions with the same name. Retrying...",
-		    e);
-	    /*
-	     * LDEV-1533: Two users tried to create a tool session with the same name. One of them was successful, the
-	     * other got an error. The second one will now retry. This might create a loop; on the other hand the second
-	     * attempt should be successful, since either the existing session will be retrieved or a session with a new
-	     * name will be created.
-	     * 
-	     * This workaround can not be in LamsCoreToolService (initially it was). If the exception occurs, the
-	     * transaction is unusable anymore and any further DB actions will throw an error. We need to restart the
-	     * transaction on the higher level - here.
-	     * 
-	     * This exception should never occur, as lamsCoreToolService.createToolSession is now synchronized.
-	     * Nevertheless, it sometimes occurs, so additional security measures stay.
-	     */
+	    LearnerService.log
+		    .warn("There was an attempt to create two tool sessions with the same name. Skipping further attempts as the session exists.",
+			    e);
 	}
 	if (toolSession != null) {
 	    toolActivity.getToolSessions().add(toolSession);

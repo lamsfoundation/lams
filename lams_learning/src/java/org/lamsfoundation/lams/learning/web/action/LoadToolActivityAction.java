@@ -75,14 +75,10 @@ public class LoadToolActivityAction extends ActivityAction {
 		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
 		
 		ICoreLearnerService learnerService = getLearnerService();
-        	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
-        	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
-        	try {
-        	    learnerService.createToolSessionsIfNecessary(activity, learnerProgress);
-        	} catch (Exception e) {
-        	    log.warn("Got exception while trying to create a tool session, but carrying on.", e);
-        	}
-
+		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,learnerService);
+		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+		learnerService.createToolSessionsIfNecessary(activity, learnerProgress);
+				
 		form.setActivityID(activity.getActivityId());
 		
 		String mappingName = "displayTool";
