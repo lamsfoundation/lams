@@ -21,9 +21,11 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.learning.web.action;
 
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,16 +42,16 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.transaction.UnexpectedRollbackException;
 
-/** 
- * Action class to forward the user to a Tool using an intermediate loading page. Can handle
- * regular tools + grouping and gates (system tools). Displays the activity that is in the 
- * request. This allows it to show any arbitrary activity, not just the current activity.
+/**
+ * Action class to forward the user to a Tool using an intermediate loading page. Can handle regular tools + grouping
+ * and gates (system tools). Displays the activity that is in the request. This allows it to show any arbitrary
+ * activity, not just the current activity.
  * 
  * XDoclet definition:
  * 
- * @struts:action path="/LoadToolActivity" name="activityForm"
- *                validate="false" scope="request"
+ * @struts:action path="/LoadToolActivity" name="activityForm" validate="false" scope="request"
  * 
  * @struts:action-forward name="displayTool" path=".loadToolActivity"
  * @struts:action-forward name="previewDefineLater" path=".previewDefineLater"
@@ -57,58 +59,68 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 public class LoadToolActivityAction extends ActivityAction {
 
-	public static final String DEFINE_LATER = "previewDefineLater";
-	public static final String PARAM_ACTIVITY_URL = "activityURL";
-	public static final String PARAM_IS_BRANCHING = "isBranching";
+    public static final String DEFINE_LATER = "previewDefineLater";
+    public static final String PARAM_ACTIVITY_URL = "activityURL";
+    public static final String PARAM_IS_BRANCHING = "isBranching";
 
-	/**
-	 * Gets an activity from the request (attribute) and forwards onto a
-	 * loading page.
-	 */
-	public ActionForward execute(ActionMapping mapping,
-	                             ActionForm actionForm,
-	                             HttpServletRequest request,
-	                             HttpServletResponse response) 
-	{
+    private static final Map<Long, Object> toolSessionCreationLocks = new TreeMap<Long, Object>();
 
-		ActivityForm form = (ActivityForm)actionForm;
-		ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
-		
-		ICoreLearnerService learnerService = getLearnerService();
-		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,learnerService);
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
-        	try {
+    /**
+     * Gets an activity from the request (attribute) and forwards onto a loading page.
+     */
+    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	ActivityForm form = (ActivityForm) actionForm;
+	ActivityMapping actionMappings = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+
+	ICoreLearnerService learnerService = getLearnerService();
+	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
+	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+
+	Object toolSessionCreationLock = null;
+	Long activityID = activity.getActivityId();
+	synchronized (toolSessionCreationLocks) {
+	    toolSessionCreationLock = toolSessionCreationLocks.get(activityID);
+	    if (toolSessionCreationLock == null) {
+		toolSessionCreationLock = activityID;
+		toolSessionCreationLocks.put(activityID, toolSessionCreationLock);
+	    }
+	}
+	synchronized (toolSessionCreationLock) {
+	    try {
 		learnerService.createToolSessionsIfNecessary(activity, learnerProgress);
-        	} catch (Exception e) {
-        	    log.warn("Got exception while trying to create a tool session, but carrying on.", e);
-        	}
-				
-		form.setActivityID(activity.getActivityId());
-		
-		String mappingName = "displayTool";
-		if (activity.isToolActivity() || activity.isSystemToolActivity() ) {
-
-			String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(),activity, learnerProgress.getUser());
-
-			if ( activity.getDefineLater() && learnerProgress.getLesson().isPreviewLesson() ) {
-				// preview define later
-				request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
-				request.setAttribute(PARAM_ACTIVITY_URL, url);
-				request.setAttribute(PARAM_IS_BRANCHING, activity.isBranchingActivity());
-				mappingName = "previewDefineLater";
-			} else {
-				// normal case
-				form.addActivityURL(new ActivityURL(activity.getActivityId(),url));
-			}
-			
-		} else {
-		    log.error(className+": activity not ToolActivity");
-			return mapping.findForward(ActivityMapping.ERROR);
-		}
-		
-		LearningWebUtil.setupProgressInRequest(form, request, learnerProgress);
-		return mapping.findForward(mappingName);
+	    } catch (UnexpectedRollbackException e) {
+		log.warn("Got exception while trying to create a tool session, but carrying on.", e);
+	    }
 	}
 
+	form.setActivityID(activityID);
+
+	String mappingName = "displayTool";
+	if (activity.isToolActivity() || activity.isSystemToolActivity()) {
+
+	    String url = actionMappings.getLearnerToolURL(learnerProgress.getLesson(), activity,
+		    learnerProgress.getUser());
+
+	    if (activity.getDefineLater() && learnerProgress.getLesson().isPreviewLesson()) {
+		// preview define later
+		request.setAttribute(AttributeNames.PARAM_TITLE, activity.getTitle());
+		request.setAttribute(PARAM_ACTIVITY_URL, url);
+		request.setAttribute(PARAM_IS_BRANCHING, activity.isBranchingActivity());
+		mappingName = "previewDefineLater";
+	    } else {
+		// normal case
+		form.addActivityURL(new ActivityURL(activity.getActivityId(), url));
+	    }
+
+	} else {
+	    log.error(className + ": activity not ToolActivity");
+	    return mapping.findForward(ActivityMapping.ERROR);
+	}
+
+	LearningWebUtil.setupProgressInRequest(form, request, learnerProgress);
+	return mapping.findForward(mappingName);
+    }
 
 }
