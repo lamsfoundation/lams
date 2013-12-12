@@ -77,7 +77,11 @@ public class LoadToolActivityAction extends ActivityAction {
 		ICoreLearnerService learnerService = getLearnerService();
 		LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request,learnerService);
 		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+        	try {
 		learnerService.createToolSessionsIfNecessary(activity, learnerProgress);
+        	} catch (Exception e) {
+        	    log.warn("Got exception while trying to create a tool session, but carrying on.", e);
+        	}
 				
 		form.setActivityID(activity.getActivityId());
 		
