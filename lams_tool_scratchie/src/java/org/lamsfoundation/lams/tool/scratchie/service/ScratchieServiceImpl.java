@@ -1923,6 +1923,17 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	toolContentObj.setToolContentHandler(null);
 	toolContentObj.setOfflineFileList(null);
 	toolContentObj.setOnlineFileList(null);
+	
+	// wipe out the links from ScratchieAnswer back to ScratchieItem, or it will try to
+	// include the hibernate object version of the ScratchieItem within the XML
+	Set<ScratchieItem> items = toolContentObj.getScratchieItems();
+	for (ScratchieItem item : items) {
+	    Set<ScratchieAnswer> answers = item.getAnswers();
+	    for (ScratchieAnswer answer : answers) {
+		answer.setScratchieItem(null);
+	    }
+	}
+	
 	try {
 	    exportContentService.registerFileClassForExport(ScratchieAttachment.class.getName(), "fileUuid",
 		    "fileVersionId");
