@@ -390,10 +390,10 @@ public class MockLearner extends MockUser implements Runnable {
 		uids.remove(questionID);
 	    }
 
-	    if (recordScratchedURL != null) {
-		MockLearner.log.debug("Recording scratched answer UID " + answerUid);
-		new Call(wc, test, "Record answer scratched", recordScratchedURL + answerUid).execute();
-	    }
+//	    if (recordScratchedURL != null) {
+//		MockLearner.log.debug("Recording scratched answer UID " + answerUid);
+//		new Call(wc, test, "Record answer scratched", recordScratchedURL + answerUid).execute();
+//	    }
 
 	    if (refreshQuestionsURL != null) {
 		MockLearner.log.debug("Refreshing scratchie question list");
