@@ -100,6 +100,7 @@ public class MockLearner extends MockUser implements Runnable {
     private static final Pattern SCRATCHIE_SCRATCH_PATTERN = Pattern.compile("scratchItem\\((\\d+), (\\d+)\\)");
     private static final String SCRATCHIE_FINISH_AVAILABLE = "return finish()";
     private static final String SCRATCHIE_REFLECTION_AVAILABLE = "return continueReflect()";
+    private static final String SCRATCHIE_IS_LEADER_SUBSTRING = "isUserLeader=true";
 
     private static final String KNOCK_GATE_SUBSTRING = "/lams/learning/gate.do?method=knockGate";
 
@@ -344,24 +345,11 @@ public class MockLearner extends MockUser implements Runnable {
 
     private WebResponse handleScratchie(WebResponse resp) throws SAXException, IOException {
 	String asText = resp.getText();
-	Matcher m = MockLearner.SCRATCHIE_SCRATCH_PATTERN.matcher(asText);
-	Map<Long, List<Long>> uids = new TreeMap<Long, List<Long>>();
-	while (m.find()) {
-	    Long questionID = Long.valueOf(m.group(1));
-	    List<Long> answerUids = uids.get(questionID);
-	    if (answerUids == null) {
-		answerUids = new ArrayList<Long>();
-		uids.put(questionID, answerUids);
-	    }
-	    answerUids.add(Long.valueOf(m.group(2)));
-	}
-
-	String scratchURL = "/lams/tool/lascrt11/learning/isAnswerCorrect.do?answerUid=";
-	m = MockLearner.SESSION_MAP_ID_PATTERN.matcher(asText);
-
+	boolean isLeader = asText.contains(SCRATCHIE_IS_LEADER_SUBSTRING);
 	String sessionMapID = null;
 	String recordScratchedURL = null;
 	String refreshQuestionsURL = null;
+	Matcher m = MockLearner.SESSION_MAP_ID_PATTERN.matcher(asText);
 	if (m.find()) {
 	    sessionMapID = m.group(1);
 	    recordScratchedURL = "/lams/tool/lascrt11/learning/recordItemScratched.do?sessionMapID=" + sessionMapID
@@ -370,54 +358,64 @@ public class MockLearner extends MockUser implements Runnable {
 	} else {
 	    MockLearner.log.warn("Session map ID was not found in Scratchie Tool");
 	}
-	Random generator = new Random();
 
-	while (!uids.isEmpty()) {
-	    Long questionID = uids.keySet().iterator().next();
-	    List<Long> answerUids = uids.get(questionID);
-
-	    int index = generator.nextInt(answerUids.size());
-	    Long answerUid = answerUids.get(index);
-	    answerUids.remove(index);
-	    MockLearner.log.debug("Scratching answer UID " + answerUid + " for question " + questionID);
-	    WebResponse scratchResponse = (WebResponse) new Call(wc, test, "Scratch response", scratchURL + answerUid)
-		    .execute();
-	    boolean answerCorrect = scratchResponse.getText().indexOf("true") != -1;
-	    MockLearner.log.debug("Scratched answer UID " + answerUid + " for question " + questionID + " and it was "
-		    + (answerCorrect ? "correct" : "incorrect"));
-
-	    if (answerCorrect) {
-		uids.remove(questionID);
+	if (isLeader) {
+	    m = MockLearner.SCRATCHIE_SCRATCH_PATTERN.matcher(asText);
+	    Map<Long, List<Long>> uids = new TreeMap<Long, List<Long>>();
+	    while (m.find()) {
+		Long questionID = Long.valueOf(m.group(1));
+		List<Long> answerUids = uids.get(questionID);
+		if (answerUids == null) {
+		    answerUids = new ArrayList<Long>();
+		    uids.put(questionID, answerUids);
+		}
+		answerUids.add(Long.valueOf(m.group(2)));
 	    }
 
-//	    if (recordScratchedURL != null) {
-//		MockLearner.log.debug("Recording scratched answer UID " + answerUid);
-//		new Call(wc, test, "Record answer scratched", recordScratchedURL + answerUid).execute();
-//	    }
+	    String scratchURL = "/lams/tool/lascrt11/learning/isAnswerCorrect.do?answerUid=";
+	    Random generator = new Random();
 
-	    if (refreshQuestionsURL != null) {
-		MockLearner.log.debug("Refreshing scratchie question list");
-		new Call(wc, test, "Refresh question list", refreshQuestionsURL).execute();
+	    while (!uids.isEmpty()) {
+		Long questionID = uids.keySet().iterator().next();
+		List<Long> answerUids = uids.get(questionID);
+
+		int index = generator.nextInt(answerUids.size());
+		Long answerUid = answerUids.get(index);
+		answerUids.remove(index);
+		MockLearner.log.debug("Scratching answer UID " + answerUid + " for question " + questionID);
+		WebResponse scratchResponse = (WebResponse) new Call(wc, test, "Scratch response", scratchURL
+			+ answerUid).execute();
+		boolean answerCorrect = scratchResponse.getText().indexOf("true") != -1;
+		MockLearner.log.debug("Scratched answer UID " + answerUid + " for question " + questionID
+			+ " and it was " + (answerCorrect ? "correct" : "incorrect"));
+
+		if (recordScratchedURL != null) {
+		    MockLearner.log.debug("Recording scratched answer UID " + answerUid);
+		    new Call(wc, test, "Record answer scratched", recordScratchedURL + answerUid).execute();
+		}
+
+		if (answerCorrect) {
+		    uids.remove(questionID);
+		}
+		if (!answerUids.isEmpty()) {
+		    delay();
+		}
 	    }
-
-	    if (!answerCorrect && !answerUids.isEmpty()) {
+	} else {
+	    while (refreshQuestionsURL != null
+		    && !(asText.contains(MockLearner.SCRATCHIE_FINISH_AVAILABLE) || asText
+			    .contains(MockLearner.SCRATCHIE_REFLECTION_AVAILABLE))) {
+		MockLearner.log.debug("Waiting for leader to finish scratchie");
 		try {
 		    Thread.sleep(3000);
 		} catch (InterruptedException e) {
-		    MockLearner.log.warn("Waiting to scratch was interuppted");
+		    log.error("Interrupted waiting between question list refresh in scratchie");
 		}
+		String url = resp.getURL().toString() + "&reqId=" + System.currentTimeMillis();
+		WebResponse questionRefreshResp = (WebResponse) new Call(wc, test, "Scratchie refresh question list",
+			refreshQuestionsURL).execute();
+		asText = questionRefreshResp.getText();
 	    }
-	}
-
-	while (refreshQuestionsURL != null
-		&& !(asText.contains(MockLearner.SCRATCHIE_FINISH_AVAILABLE) || asText
-			.contains(MockLearner.SCRATCHIE_REFLECTION_AVAILABLE))) {
-	    MockLearner.log.debug("Waiting for leader to finish scratchie");
-	    delay();
-	    String url = resp.getURL().toString() + "&reqId=" + System.currentTimeMillis();
-	    WebResponse questionRefreshResp = (WebResponse) new Call(wc, test, "Scratchie refresh", refreshQuestionsURL)
-		    .execute();
-	    asText = questionRefreshResp.getText();
 	}
 
 	String reflectionURL = findURLInLocationHref(resp, MockLearner.SCRATCHIE_REFLECTION_SUBSTRING);

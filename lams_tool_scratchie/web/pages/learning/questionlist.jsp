@@ -12,6 +12,8 @@
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
 <c:set var="isScratchingFinished" value="${sessionMap.isScratchingFinished}" />
 
+<!-- isUserLeader=${sessionMap.isUserLeader} -->
+
 		<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 			<h3>${item.title}</h3>
 			<div>${item.description}</div>
