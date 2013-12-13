@@ -15,7 +15,6 @@ DROP TABLE temp_select;
 ALTER TABLE tl_lascrt11_answer_log DROP FOREIGN KEY FK_NEW_610529188_693580A441F9365D;
 ALTER TABLE tl_lascrt11_answer_log DROP INDEX  FK_NEW_610529188_693580A441F9365D;
 ALTER TABLE tl_lascrt11_answer_log DROP COLUMN user_uid;
-ALTER TABLE tl_lascrt11_answer_log ADD INDEX sessionIdIndex (session_id);
 
 -- Make mark belong to session and not user, thus being shared by all users
 ALTER TABLE tl_lascrt11_session ADD COLUMN mark INTEGER DEFAULT 0;
@@ -30,6 +29,10 @@ UPDATE tl_lascrt11_session, tl_lascrt11_user
 		SET tl_lascrt11_session.scratching_finished = tl_lascrt11_user.scratching_finished 
 		WHERE tl_lascrt11_user.uid = tl_lascrt11_session.group_leader_uid;
 ALTER TABLE tl_lascrt11_user DROP COLUMN scratching_finished;
+
+ALTER TABLE tl_lascrt11_session ADD UNIQUE INDEX session_id_UNIQUE (session_id ASC);
+ALTER TABLE tl_lascrt11_answer_log ADD INDEX sessionIdIndex (session_id), ADD CONSTRAINT sessionIdIndex FOREIGN KEY (session_id) REFERENCES tl_lascrt11_session (session_id);
+ALTER TABLE tl_lascrt11_scratchie_answer ADD INDEX FK_scratchie_answer_1 (scratchie_item_uid), ADD CONSTRAINT FK_scratchie_answer_1 FOREIGN KEY (scratchie_item_uid) REFERENCES tl_lascrt11_scratchie_item (uid);
 
 ----------------------Put all sql statements above here-------------------------
 
