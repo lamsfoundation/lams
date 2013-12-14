@@ -230,7 +230,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
     private String saveFileToLocal(List<Summary> list, String directoryName) {
     	handler = getToolContentHandler();
-	//TODO revisar exportación	
+	//TODO revisar exportaciÃ³n	
     	String localURL = null;
     	for (Summary summary : list) {
 			try{

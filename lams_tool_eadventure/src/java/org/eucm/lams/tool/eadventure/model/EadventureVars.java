@@ -44,7 +44,7 @@ public class EadventureVars implements Cloneable{
     private String name;
     private String type;
     private String value;
-    //TODO necesito tener el visitLog entero o solo el uid??¡?¿??
+    //TODO necesito tener el visitLog entero o solo el uid??Â¡?Â¿??
     private EadventureItemVisitLog visitLog;
     
     public EadventureVars(){

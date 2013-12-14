@@ -166,7 +166,7 @@ public class AuthoringEadventureConditionAction extends Action {
 		
 	String sessionMapID = WebUtil.readStrParam(request, EadventureConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	//TODO ver lo de recargar la p·gina
+	//TODO ver lo de recargar la p√°gina
 	//sessionMap.put(EadventureConstants., value)
 	  return mapping.findForward(EadventureConstants.SUCCESS);
     }
@@ -190,7 +190,7 @@ public class AuthoringEadventureConditionAction extends Action {
 	sessionMap.put(EadventureConstants.ATTR_EXPRESSION_LIST, null);
 	
 	// check if some edventure game has been added
-	// it is not necessary, anulo el boton con javascriptÁ
+	// it is not necessary, anulo el boton con javascript√ß
 	//TODO se puede quitar
 	/*ActionErrors errors = new ActionErrors();
 	String hasFile = (String)sessionMap.get(EadventureConstants.ATTR_HAS_FILE);
@@ -600,7 +600,7 @@ public class AuthoringEadventureConditionAction extends Action {
 	    // add to delList 
 	    List delList = getDeletedEadventureExpressionList(sessionMap);
 	    delList.add(expression);
-	    // TODO preguntar si esto es necesario, quiz·s no interesa si no lo damos a salvar!!!!!!!!!!!!!!!!!!!
+	    // TODO preguntar si esto es necesario, quiz√°s no interesa si no lo damos a salvar!!!!!!!!!!!!!!!!!!!
 	    //check if we need delete this expression from a condition in conditions list
 	 /*   boolean isConditionEdit = Boolean.getBoolean((String)sessionMap.get(EadventureConstants.ATTR_EDIT_CONDITION));
 	    if (isConditionEdit){
@@ -751,7 +751,7 @@ public class AuthoringEadventureConditionAction extends Action {
 	    expressionList.clear();
 	    expressionList.addAll(rList);
 	    
-	    // TODO comprobar si esto es necesario, quiz·s no interesa si no le doy a salvar!!!!!!!!!!!!!!!!!!!!!!!!!!
+	    // TODO comprobar si esto es necesario, quiz√°s no interesa si no le doy a salvar!!!!!!!!!!!!!!!!!!!!!!!!!!
 	//check if we need delete this expression from a condition in conditions list
 	/*    boolean isConditionEdit = Boolean.getBoolean((String)sessionMap.get(EadventureConstants.ATTR_EDIT_CONDITION));
 	if (isConditionEdit){
@@ -828,7 +828,7 @@ public class AuthoringEadventureConditionAction extends Action {
      */
     private String[] prepareListOfParams(List<EadventureParam> list, String type, String name){
 	// Initialise the LabelValueBeans in the possibleOptions array.
-	//TODO como para el caso de un tipo especÌfico no sabemos cual va a ser el tamaÒo del array, mejor usa run arrayListparcial y luego
+	//TODO como para el caso de un tipo espec√≠fico no sabemos cual va a ser el tama√±o del array, mejor usa run arrayListparcial y luego
 	// pasarlo a array normal
 	
 	ArrayList<String> paramAux = new ArrayList<String>();

@@ -40,7 +40,7 @@ import org.eucm.lams.tool.eadventure.util.EadventureToolContentHandler;
 /**
  * Eadventure
  * @author Dapeng Ni
- * @author ángel del Blanco
+ * @author Ã¡ngel del Blanco
  * 
  * @hibernate.class  table="tl_eueadv10_eadventure"
  *

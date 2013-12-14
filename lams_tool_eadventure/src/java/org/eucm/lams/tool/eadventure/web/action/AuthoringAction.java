@@ -586,7 +586,7 @@ public class AuthoringAction extends Action {
 
 	ToolAccessMode mode = getAccessMode(request);
 	
-	//TODO mirar si merece la pena llevar el form por sessionMap?¿?¿?
+	//TODO mirar si merece la pena llevar el form por sessionMap?Â¿?Â¿?
 	//Eadventure eadventure = eadventureForm.getEadventure();
 	Eadventure eadventure =  ((EadventureForm)sessionMap.get(EadventureConstants.ATTR_RESOURCE_FORM)).getEadventure();
 	//TODO fix this...
