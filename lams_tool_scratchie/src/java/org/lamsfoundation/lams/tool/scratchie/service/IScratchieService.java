@@ -103,14 +103,6 @@ public interface IScratchieService {
     void createUser(ScratchieUser scratchieUser);
 
     /**
-     * Get user by given userID and toolContentID.
-     * 
-     * @param long1
-     * @return
-     */
-    ScratchieUser getUserByIDAndContent(Long userID, Long contentId);
-
-    /**
      * Get user by sessionID and UserID
      * 
      * @param userId

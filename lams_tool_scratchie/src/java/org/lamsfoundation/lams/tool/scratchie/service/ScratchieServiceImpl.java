@@ -270,22 +270,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
     }
 
     @Override
-    public ScratchieUser getUserByIDAndContent(Long userId, Long contentId) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered getUserByIDAndContent(), getting ScratchieUser by ID: " + userId
-		    + " and content ID: " + contentId);
-	}
-	ScratchieUser res = scratchieUserDao.getUserByUserIDAndContentID(userId, contentId);
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getUserByIDAndContent(), retrieved ScratchieUser by ID: " + userId
-		    + " and content ID: " + contentId);
-	}
-	return res;
-    }
-
-    @Override
     public ScratchieUser getUserByIDAndSession(Long userId, Long sessionId) {
 	if (ScratchieServiceImpl.log.isDebugEnabled()) {
 	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
@@ -1952,6 +1936,9 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	    exportContentService.registerFileClassForImport(ScratchieAttachment.class.getName(), "fileUuid",
 		    "fileVersionId", "fileName", "fileType", null, null);
 
+	    // register version filter class
+	    exportContentService.registerImportVersionFilterClass(ScratchieImportContentVersionFilter.class);
+
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, scratchieToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof Scratchie)) {
@@ -1973,7 +1960,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		user.setUserId(new Long(newUserUid.longValue()));
 		user.setScratchie(toolContentObj);
 	    }
-	    toolContentObj.setCreatedBy(user);
 
 	    scratchieDao.saveObject(toolContentObj);
 	} catch (ImportToolContentException e) {

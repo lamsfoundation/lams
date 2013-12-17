@@ -63,16 +63,6 @@ public class ScratchieUser implements Cloneable, Comparable {
 	this.sessionFinished = false;
     }
 
-    public ScratchieUser(UserDTO user, Scratchie content) {
-	this.userId = new Long(user.getUserID().intValue());
-	this.firstName = user.getFirstName();
-	this.lastName = user.getLastName();
-	this.loginName = user.getLogin();
-	this.session = null;
-	this.scratchie = content;
-	this.sessionFinished = false;
-    }
-
     /**
      * Clone method from <code>java.lang.Object</code>
      */

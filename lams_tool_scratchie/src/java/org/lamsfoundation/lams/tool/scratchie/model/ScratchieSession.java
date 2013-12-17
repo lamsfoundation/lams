@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 
 /**
  * Scratchie
@@ -197,7 +198,8 @@ public class ScratchieSession {
     }
     
     /**
-     * Indicates whether leader has pressed Submit button in learning. And is shared by all users in a group.
+     * Indicates whether leader has pressed Continue button in learning thus finishing scratching. And is shared by all
+     * users in a group.
      * 
      * @hibernate.property column="scratching_finished"
      * @return
@@ -208,6 +210,11 @@ public class ScratchieSession {
 
     public void setScratchingFinished(boolean scratchingFinished) {
 	this.scratchingFinished = scratchingFinished;
+    }
+
+    public boolean isSessionFinished() {
+	boolean isSessionFinished = (status == ScratchieConstants.COMPLETED);
+	return isSessionFinished;
     }
 
 }

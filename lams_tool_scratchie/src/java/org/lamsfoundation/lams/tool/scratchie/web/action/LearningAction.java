@@ -150,6 +150,7 @@ public class LearningAction extends Action {
 		    + "]: getting Scratchi by session ID: " + toolSessionId);
 	}
 	final Scratchie scratchie = LearningAction.service.getScratchieBySessionId(toolSessionId);
+	boolean isReflectOnActivity = scratchie.isReflectOnActivity();
 
 	final ScratchieUser user;
 	if ((mode != null) && mode.isTeacher()) {
@@ -209,7 +210,7 @@ public class LearningAction extends Action {
 
 	// get notebook entry
 	String entryText = new String();
-	if (groupLeader != null) {
+	if (isReflectOnActivity && (groupLeader != null)) {
 	    NotebookEntry notebookEntry = LearningAction.service.getEntry(toolSessionId,
 		    CoreNotebookConstants.NOTEBOOK_TOOL, ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId()
 			    .intValue());
@@ -237,7 +238,7 @@ public class LearningAction extends Action {
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	// reflection information
-	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ON, scratchie.isReflectOnActivity());
+	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ON, isReflectOnActivity);
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_INSTRUCTION, scratchie.getReflectInstructions());
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, entryText);
 
@@ -328,11 +329,12 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_ITEM_LIST, items);
 	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 	sessionMap.put(ScratchieConstants.ATTR_MAX_SCORE, maxScore);
+	
 	boolean isScratchingFinished = toolSession.isScratchingFinished();
-	sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, isScratchingFinished);
 
 	// decide whether to show results page or learning one
-	if (isScratchingFinished && !mode.isTeacher()) {
+	boolean isShowResults = isScratchingFinished && !mode.isTeacher();
+	if (isShowResults) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
 	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
@@ -346,6 +348,8 @@ public class LearningAction extends Action {
 		LearningAction.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
 			+ "]: leaving start()");
 	    }
+	    
+	    sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, (Boolean) isScratchingFinished);
 	    return mapping.findForward(ScratchieConstants.SUCCESS);
 	}
 
@@ -394,6 +398,7 @@ public class LearningAction extends Action {
 
 	// refresh ScratchingFinished status
 	sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, toolSession.isScratchingFinished());
+	
 	if (LearningAction.log.isDebugEnabled()) {
 	    LearningAction.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
 		    + "]: leaving refreshQuestionList()");
@@ -516,6 +521,7 @@ public class LearningAction extends Action {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
 		sessionMapID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	boolean isReflectOnActivity = (Boolean) sessionMap.get(ScratchieConstants.ATTR_REFLECTION_ON);
 
 	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	if (LearningAction.log.isDebugEnabled()) {
@@ -525,8 +531,8 @@ public class LearningAction extends Action {
 	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);
 	Long userUid = (Long) sessionMap.get(ScratchieConstants.ATTR_USER_UID);
 
-	// in case of the leader we should let all other learners see Next Activity button
-	if (toolSession.isUserGroupLeader(userUid)) {
+	// in case of the leader (and if he hasn't done this when accessing notebook) we should let all other learners see Next Activity button
+	if (toolSession.isUserGroupLeader(userUid) && !toolSession.isScratchingFinished()) {
 	    if (LearningAction.log.isDebugEnabled()) {
 		LearningAction.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
 			+ "]: trying to execute setScratchingFinished() for session ID: " + toolSessionId);
@@ -547,7 +553,6 @@ public class LearningAction extends Action {
 	request.setAttribute(ScratchieConstants.ATTR_SCORE, (int) percentage);
 
 	// Create reflectList if reflection is enabled.
-	boolean isReflectOnActivity = (Boolean) sessionMap.get(ScratchieConstants.ATTR_REFLECTION_ON);
 	if (isReflectOnActivity) {
 	    if (LearningAction.log.isDebugEnabled()) {
 		LearningAction.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
@@ -630,31 +635,6 @@ public class LearningAction extends Action {
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
 
-    private Object tryExecute(Callable<Object> command) throws ScratchieApplicationException {
-	final int MAX_TRANSACTION_RETRIES = 5;
-	Object returnValue = null;
-
-	for (int i = 0; i < MAX_TRANSACTION_RETRIES; i++) {
-	    try {
-		returnValue = command.call();
-		if (LearningAction.log.isDebugEnabled()) {
-		    LearningAction.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			    + "]: successfully called command");
-		}
-		break;
-	    } catch (CannotAcquireLockException e) {
-		if (i == (MAX_TRANSACTION_RETRIES - 1)) {
-		    throw new ScratchieApplicationException(e);
-		}
-	    } catch (Exception e) {
-		throw new ScratchieApplicationException(e);
-	    }
-	    LearningAction.log.warn("Transaction retry: " + (i + 1));
-	}
-
-	return returnValue;
-    }
-
     /**
      * Display empty reflection form.
      * 
@@ -663,29 +643,47 @@ public class LearningAction extends Action {
      * @param request
      * @param response
      * @return
+     * @throws ScratchieApplicationException 
      */
     private ActionForward newReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws ScratchieApplicationException {
 
 	initializeScratchieService();
-	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	Long userUid = (Long) sessionMap.get(ScratchieConstants.ATTR_USER_UID);
 
-	ReflectionForm refForm = (ReflectionForm) form;
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
+	ReflectionForm refForm = (ReflectionForm) form;
 	refForm.setUserID(user.getUserID());
 	refForm.setSessionMapID(sessionMapID);
-
+	
 	// get the existing reflection entry
-	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
-	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = LearningAction.service.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+	NotebookEntry entry = LearningAction.service.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
 		ScratchieConstants.TOOL_SIGNATURE, user.getUserID());
 
 	if (entry != null) {
 	    refForm.setEntryText(entry.getEntry());
+	}
+	
+	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);
+
+	// in case of the leader we should let all other learners see Next Activity button
+	if (toolSession.isUserGroupLeader(userUid) && !toolSession.isScratchingFinished()) {
+	    if (LearningAction.log.isDebugEnabled()) {
+		LearningAction.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
+			+ "]: trying to execute setScratchingFinished() for session ID: " + toolSessionId);
+	    }
+	    tryExecute(new Callable<Object>() {
+		@Override
+		public Object call() throws ScratchieApplicationException {
+		    LearningAction.service.setScratchingFinished(toolSessionId);
+		    return null;
+		}
+	    });
 	}
 
 	return mapping.findForward(ScratchieConstants.SUCCESS);
@@ -747,6 +745,35 @@ public class LearningAction extends Action {
     // *************************************************************************************
     // Private method
     // *************************************************************************************
+
+    /**
+     * Tries to execute supplied command. If it fails due to CannotAcquireLockException it tries again, and gives up
+     * after 5 consecutive fails.
+     */
+    private Object tryExecute(Callable<Object> command) throws ScratchieApplicationException {
+	final int MAX_TRANSACTION_RETRIES = 5;
+	Object returnValue = null;
+
+	for (int i = 0; i < MAX_TRANSACTION_RETRIES; i++) {
+	    try {
+		returnValue = command.call();
+		if (LearningAction.log.isDebugEnabled()) {
+		    LearningAction.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
+			    + "]: successfully called command");
+		}
+		break;
+	    } catch (CannotAcquireLockException e) {
+		if (i == (MAX_TRANSACTION_RETRIES - 1)) {
+		    throw new ScratchieApplicationException(e);
+		}
+	    } catch (Exception e) {
+		throw new ScratchieApplicationException(e);
+	    }
+	    LearningAction.log.warn("Transaction retry: " + (i + 1));
+	}
+
+	return returnValue;
+    }
 
     private void initializeScratchieService() {
 	if (LearningAction.service == null) {

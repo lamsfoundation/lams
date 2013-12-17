@@ -80,8 +80,6 @@ public class Scratchie implements Cloneable {
     
     private Date submissionDeadline;
 
-    private ScratchieUser createdBy;
-
     // scratchie Items
     private Set scratchieItems;
     
@@ -117,10 +115,6 @@ public class Scratchie implements Cloneable {
 	toContent = (Scratchie) defaultContent.clone();
 	toContent.setContentId(contentId);
 
-	// reset user info as well
-	if (toContent.getCreatedBy() != null) {
-	    toContent.getCreatedBy().setScratchie(toContent);
-	}
 	return toContent;
     }
 
@@ -155,10 +149,6 @@ public class Scratchie implements Cloneable {
 		}
 		scratchie.attachments = set;
 	    }
-	    // clone ReourceUser as well
-	    if (createdBy != null) {
-		scratchie.setCreatedBy((ScratchieUser) createdBy.clone());
-	    }
 	} catch (CloneNotSupportedException e) {
 	    Scratchie.log.error("When clone " + Scratchie.class + " failed");
 	}
@@ -181,13 +171,13 @@ public class Scratchie implements Cloneable {
 		.append(instructions, genericEntity.instructions)
 		.append(onlineInstructions, genericEntity.onlineInstructions)
 		.append(offlineInstructions, genericEntity.offlineInstructions).append(created, genericEntity.created)
-		.append(updated, genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
+		.append(updated, genericEntity.updated).isEquals();
     }
 
     @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(onlineInstructions)
-		.append(offlineInstructions).append(created).append(updated).append(createdBy).toHashCode();
+		.append(offlineInstructions).append(created).append(updated).toHashCode();
     }
 
     /**
@@ -275,24 +265,6 @@ public class Scratchie implements Cloneable {
      */
     public void setSubmissionDeadline(Date submissionDeadline) {
 	this.submissionDeadline = submissionDeadline;
-    }
-
-    /**
-     * @return Returns the userid of the user who created the Share scratchie.
-     * 
-     * @hibernate.many-to-one cascade="save-update" column="create_by"
-     * 
-     */
-    public ScratchieUser getCreatedBy() {
-	return createdBy;
-    }
-
-    /**
-     * @param createdBy
-     *            The userid of the user who created this Share scratchie.
-     */
-    public void setCreatedBy(ScratchieUser createdBy) {
-	this.createdBy = createdBy;
     }
 
     /**

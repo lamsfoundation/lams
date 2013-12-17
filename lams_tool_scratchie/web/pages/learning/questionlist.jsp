@@ -14,6 +14,13 @@
 
 <!-- isUserLeader=${sessionMap.isUserLeader} -->
 
+<script type="text/javascript">
+	//stop refreshing non-leaders in case scratching is finished
+	if (${isScratchingFinished} && (refreshIntervalId != null)) {
+		clearInterval(refreshIntervalId);
+	}
+</script>
+
 		<c:forEach var="item" items="${sessionMap.itemList}" varStatus="status">
 			<h3>${item.title}</h3>
 			<div>${item.description}</div>

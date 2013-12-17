@@ -336,19 +336,6 @@ public class AuthoringAction extends Action {
 	    scratchiePO.setUpdated(new Timestamp(new Date().getTime()));
 	}
 
-	// *******************************Handle user*******************
-	// try to get form system session
-	HttpSession ss = SessionManager.getSession();
-	// get back login user DTO
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	ScratchieUser scratchieUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
-		scratchieForm.getScratchie().getContentId());
-	if (scratchieUser == null) {
-	    scratchieUser = new ScratchieUser(user, scratchiePO);
-	}
-
-	scratchiePO.setCreatedBy(scratchieUser);
-
 	// **********************************Handle Authoring Instruction
 	// Attachement *********************
 	// merge attachment info

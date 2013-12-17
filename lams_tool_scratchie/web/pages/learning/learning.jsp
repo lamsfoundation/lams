@@ -11,7 +11,6 @@
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="scratchie" value="${sessionMap.scratchie}" />
 	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
-	<c:set var="isScratchingFinished" value="${sessionMap.isScratchingFinished}" />
 
 <lams:html>
 <lams:head>
@@ -79,8 +78,9 @@
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
+		var refreshIntervalId = null;
 		if (${!isUserLeader && mode != "teacher"}) {
-			setInterval("refreshQuestionList();",3000);// Auto-Refresh every 3 seconds
+			refreshIntervalId = setInterval("refreshQuestionList();",3000);// Auto-Refresh every 3 seconds
 		}
 		
 		function refreshQuestionList() {
