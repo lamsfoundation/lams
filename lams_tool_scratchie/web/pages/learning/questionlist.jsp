@@ -11,13 +11,47 @@
 <c:set var="scratchie" value="${sessionMap.scratchie}" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
 <c:set var="isScratchingFinished" value="${sessionMap.isScratchingFinished}" />
+<c:set var="isWaitingForLeaderToSubmitNotebook" value="${sessionMap.isWaitingForLeaderToSubmitNotebook}" />
 
 <!-- isUserLeader=${sessionMap.isUserLeader} -->
 
 <script type="text/javascript">
+
 	//stop refreshing non-leaders in case scratching is finished
 	if (${isScratchingFinished} && (refreshIntervalId != null)) {
 		clearInterval(refreshIntervalId);
+	}
+	
+	//hide finish button if isWaitingForLeaderToSubmitNotebook
+	$(document).ready(function(){
+		if (${!isUserLeader && isWaitingForLeaderToSubmitNotebook}) {
+			$("#finishButton").hide();
+		}
+	});
+	
+	//query for leader status (only in case there is notebook at the end of activity and leader hasn't answered it yet)
+	var checkLeaderIntervalId = null;
+	if (${!isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitNotebook && mode != "teacher"}) {
+		checkLeaderIntervalId = setInterval("checkLeaderSubmittedNotebook();",20000);// ask for leader status every 20 seconds
+	}
+	
+	//check Leader Submitted Notebook and if true show finishButton
+	function checkLeaderSubmittedNotebook() {
+        $.ajax({
+            url: '<c:url value="/learning/checkLeaderSubmittedNotebook.do"/>',
+            data: 'sessionMapID=${sessionMapID}',
+            dataType: 'json',
+            type: 'post',
+            success: function (json) {
+            	if (!json.isWaitingForLeaderToSubmitNotebook) {
+            		if (checkLeaderIntervalId != null) {
+            			clearInterval(checkLeaderIntervalId);
+            		}
+					
+					$("#finishButton").show();
+            	}
+            }
+       	});
 	}
 </script>
 
@@ -87,20 +121,19 @@
 			</div>
 		</c:if>
 
-		<c:if test="${(mode != 'teacher') &&  (isUserLeader || isScratchingFinished)}">
-			<div class="space-bottom-top align-right">
-				<c:choose>
-					<c:when test="${sessionMap.reflectOn && isUserLeader}">
-						<html:button property="finishButton" styleId="finishButton" onclick="return continueReflect()" styleClass="button">
-							<fmt:message key="label.continue" />
-						</html:button>
-					</c:when>
-					<c:otherwise>
-						<html:button property="finishButton" styleId="finishButton" onclick="return finish()" styleClass="button">
-							<fmt:message key="label.submit" />
-						</html:button>
-					</c:otherwise>
-				</c:choose>
-			</div>
-		</c:if>
-		
+<c:if test="${mode != 'teacher'}">
+	<div class="space-bottom-top align-right">
+		<c:choose>
+			<c:when test="${isUserLeader && sessionMap.reflectOn}">
+				<html:button property="finishButton" styleId="finishButton" onclick="return continueReflect()" styleClass="button">
+					<fmt:message key="label.continue" />
+				</html:button>
+			</c:when>
+			<c:when test="${isUserLeader && !sessionMap.reflectOn || !isUserLeader && isScratchingFinished}">
+				<html:button property="finishButton" styleId="finishButton" onclick="return finish()" styleClass="button">
+					<fmt:message key="label.submit" />
+				</html:button>
+			</c:when>
+		</c:choose>
+	</div>
+</c:if>

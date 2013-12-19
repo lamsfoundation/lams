@@ -105,6 +105,8 @@ public class ScratchieConstants {
     
     public static final String ATTR_IS_SCRATCHING_FINISHED = "isScratchingFinished";
     
+    public static final String ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK = "isWaitingForLeaderToSubmitNotebook";
+    
     public static final String ATTR_LEARNERS = "learners";
     
     public static final String ATTR_VISIT_LOGS = "visitLogs";

@@ -96,6 +96,9 @@ public class LearningAction extends Action {
 	if (param.equals("refreshQuestionList")) {
 	    return refreshQuestionList(mapping, form, request, response);
 	}
+	if (param.equals("checkLeaderSubmittedNotebook")) {
+	    return checkLeaderSubmittedNotebook(mapping, form, request, response);
+	}
 	if (param.equals("isAnswerCorrect")) {
 	    return isAnswerCorrect(mapping, form, request, response);
 	}
@@ -209,15 +212,12 @@ public class LearningAction extends Action {
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	// get notebook entry
-	String entryText = new String();
+	NotebookEntry notebookEntry = null;
 	if (isReflectOnActivity && (groupLeader != null)) {
-	    NotebookEntry notebookEntry = LearningAction.service.getEntry(toolSessionId,
-		    CoreNotebookConstants.NOTEBOOK_TOOL, ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId()
-			    .intValue());
-	    if (notebookEntry != null) {
-		entryText = notebookEntry.getEntry();
-	    }
+	    notebookEntry = LearningAction.service.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId().intValue());
 	}
+	String entryText = (notebookEntry == null) ? new String() : notebookEntry.getEntry();
 
 	// basic information
 	sessionMap.put(ScratchieConstants.ATTR_TITLE, scratchie.getTitle());
@@ -331,10 +331,19 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_MAX_SCORE, maxScore);
 	
 	boolean isScratchingFinished = toolSession.isScratchingFinished();
-
-	// decide whether to show results page or learning one
-	boolean isShowResults = isScratchingFinished && !mode.isTeacher();
-	if (isShowResults) {
+	boolean isWaitingForLeaderToSubmitNotebook = isReflectOnActivity && (notebookEntry == null);
+	boolean isShowResults = (isScratchingFinished && !isWaitingForLeaderToSubmitNotebook) && !mode.isTeacher();
+	
+	//show leader notebook page 
+	if (isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitNotebook) {
+	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("newReflection"));
+	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
+	    return redirect;
+	    
+	// show results page
+	} else if (isShowResults) {
+	
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
 	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
@@ -343,13 +352,17 @@ public class LearningAction extends Action {
 			+ "]: leaving start()");
 	    }
 	    return redirect;
+	    
+	//show learning.jsp page
 	} else {
 	    if (LearningAction.log.isDebugEnabled()) {
 		LearningAction.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
 			+ "]: leaving start()");
 	    }
-	    
+
 	    sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, (Boolean) isScratchingFinished);
+	    sessionMap.put(ScratchieConstants.ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK,
+		    (Boolean) isWaitingForLeaderToSubmitNotebook);
 	    return mapping.findForward(ScratchieConstants.SUCCESS);
 	}
 
@@ -404,6 +417,47 @@ public class LearningAction extends Action {
 		    + "]: leaving refreshQuestionList()");
 	}
 	return mapping.findForward(ScratchieConstants.SUCCESS);
+    }
+    
+    /**
+     * Return whether leader still needs submit notebook.
+     */
+    private ActionForward checkLeaderSubmittedNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	if (LearningAction.log.isDebugEnabled()) {
+	    LearningAction.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
+		    + "]: entered checkLeaderSubmittedNotebook()");
+	}
+	initializeScratchieService();
+	
+	// get back SessionMap
+	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
+	boolean isReflectOnActivity = (Boolean) sessionMap.get(ScratchieConstants.ATTR_REFLECTION_ON);
+	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	
+	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
+	ScratchieUser groupLeader = toolSession.getGroupLeader();
+	
+	// get notebook entry
+	NotebookEntry notebookEntry = null;
+	if (isReflectOnActivity && (groupLeader != null)) {
+	    notebookEntry = service.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId().intValue());
+	}
+	boolean isWaitingForLeaderToSubmitNotebook = isReflectOnActivity && (notebookEntry == null);
+
+	JSONObject JSONObject = new JSONObject();
+	JSONObject.put(ScratchieConstants.ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK, isWaitingForLeaderToSubmitNotebook);
+	response.setContentType("application/x-json;charset=utf-8");
+	response.getWriter().print(JSONObject);
+
+	if (LearningAction.log.isDebugEnabled()) {
+	    LearningAction.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
+		    + "]: leaving checkLeaderSubmittedNotebook()");
+	}
+	return null;
     }
 
     /**

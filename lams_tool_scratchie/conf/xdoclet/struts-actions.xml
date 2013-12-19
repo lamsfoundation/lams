@@ -190,6 +190,7 @@
 			parameter="start" >
 			<forward name="success" path="/pages/learning/start.jsp" />
 			<forward name="waitforleader" path="/pages/learning/waitforleader.jsp" />
+			<forward name="newReflection" path="/learning/newReflection.do" />
 			<forward name="showResults" path="/learning/showResults.do" />
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
 			<forward name="runOffline" path="/pages/learning/runoffline.jsp" />			
@@ -198,6 +199,10 @@
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
 			parameter="refreshQuestionList" >
 			<forward name="success" path="/pages/learning/questionlist.jsp" />		
+		</action>
+		<action path="/learning/checkLeaderSubmittedNotebook"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
+			parameter="checkLeaderSubmittedNotebook" >
 		</action>
 		<action path="/learning/isAnswerCorrect"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
