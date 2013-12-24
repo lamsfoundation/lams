@@ -5,6 +5,7 @@ SET FOREIGN_KEY_CHECKS=0;
 
 -- LKC-40 
 -- Remove logs belong to all other users except leader
+DROP TABLE IF EXISTS temp_select;
 CREATE TABLE temp_select AS SELECT group_leader_uid uid
 		FROM tl_lascrt11_session WHERE group_leader_uid IS NOT NULL;
 ALTER TABLE temp_select ADD INDEX index1 (uid ASC);
@@ -35,9 +36,9 @@ ALTER TABLE tl_lascrt11_answer_log ADD INDEX sessionIdIndex (session_id), ADD CO
 ALTER TABLE tl_lascrt11_scratchie_answer ADD INDEX FK_scratchie_answer_1 (scratchie_item_uid), ADD CONSTRAINT FK_scratchie_answer_1 FOREIGN KEY (scratchie_item_uid) REFERENCES tl_lascrt11_scratchie_item (uid);
 
 --Remove create_by from tl_lascrt11_scratchie
-ALTER TABLE table tl_lascrt11_scratchie DROP FOREIGN KEY FK_NEW_610529188_89093BF758092FB;
-ALTER TABLE table tl_lascrt11_scratchie DROP INDEX  FK_NEW_610529188_89093BF758092FB;
-ALTER TABLE table tl_lascrt11_scratchie DROP COLUMN create_by;
+ALTER TABLE tl_lascrt11_scratchie DROP FOREIGN KEY FK_NEW_610529188_89093BF758092FB;
+ALTER TABLE tl_lascrt11_scratchie DROP INDEX  FK_NEW_610529188_89093BF758092FB;
+ALTER TABLE tl_lascrt11_scratchie DROP COLUMN create_by;
 
 UPDATE lams_tool SET tool_version='20131212' WHERE tool_signature='lascrt11';
 
