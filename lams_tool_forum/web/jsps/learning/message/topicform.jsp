@@ -18,7 +18,7 @@
 	<c:if test="${sessionMap.allowUpload}">
 		<tr>
 			<td>
-				<span class="field-name"><fmt:message key="message.label.attachment" /></span>
+				<span class="field-name"><fmt:message key="message.label.attachment" /></span><br>
 				<html:file tabindex="3" property="attachmentFile" /><BR>
 				<html:errors property="message.attachment" />
 			</td>

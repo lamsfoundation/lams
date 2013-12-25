@@ -90,12 +90,8 @@
 		
 	</c:if>
 
-
-
 	<%@ include file="/common/messages.jsp"%>
-
-	<%@ include file="/jsps/learning/message/topiclist.jsp"%>
-
+	
 	<c:set var="newtopic">
 		<html:rewrite
 			page="/learning/newTopic.do?sessionMapID=${sessionMapID}" />
@@ -105,6 +101,28 @@
 		<html:rewrite
 			page="/learning/viewForum.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}&hideReflection=${sessionMap.hideReflection}" />
 	</c:set>
+	
+	<div class="space-bottom-top">
+		<c:set var="buttonClass" value="button" />
+		<c:if test="${sessionMap.finishedLock}">
+			<c:set var="buttonClass" value="disabled" />
+		</c:if>
+
+		<c:if test='${sessionMap.allowNewTopics}'>
+			<html:button property="newtopic"
+				onclick="javascript:location.href='${newtopic}';"
+				disabled="${sessionMap.finishedLock}" styleClass="${buttonClass}">
+				<fmt:message key="label.newtopic" />
+			</html:button>
+		</c:if>
+
+		<html:button property="refresh"
+			onclick="javascript:location.href='${refresh}';" styleClass="button space-left">
+			<fmt:message key="label.refresh" />
+		</html:button>
+	</div>
+
+	<%@ include file="/jsps/learning/message/topiclist.jsp"%>
 
 	<c:set var="continue">
 		<html:rewrite
@@ -114,27 +132,6 @@
 	<c:set var="finish">
 		<html:rewrite page="/learning/finish.do?sessionMapID=${sessionMapID}" />
 	</c:set>
-
-	<div>
-		<c:set var="buttonClass" value="button" />
-		<c:if test="${sessionMap.finishedLock}">
-			<c:set var="buttonClass" value="disabled" />
-		</c:if>
-
-		<c:if
-			test='${sessionMap.allowNewTopics}'>
-			<html:button property="newtopic"
-				onclick="javascript:location.href='${newtopic}';"
-				disabled="${sessionMap.finishedLock}" styleClass="${buttonClass}">
-				<fmt:message key="label.newtopic" />
-			</html:button>
-		</c:if>
-
-		<html:button property="refresh"
-			onclick="javascript:location.href='${refresh}';" styleClass="button">
-			<fmt:message key="label.refresh" />
-		</html:button>
-	</div>
 
 	<c:if
 		test="${sessionMap.userFinished and sessionMap.reflectOn and !sessionMap.hideReflection}">
@@ -168,7 +165,7 @@
 
 	<script type="text/javascript">
 		function submitFinish() {
-			document.getElementById("finish").disabled = true;
+			document.getElementById("finishButton").disabled = true;
 			location.href = '${finish}';
 		}		
 	</script>
@@ -186,7 +183,7 @@
 				</c:when>
 
 				<c:otherwise>
-					<html:link href="#nogo" property="finish" styleId="finish"
+					<html:link href="#nogo" property="finish" styleId="finishButton"
 						onclick="submitFinish();" styleClass="button">
 						<span class="nextActivity">
 							<c:choose>

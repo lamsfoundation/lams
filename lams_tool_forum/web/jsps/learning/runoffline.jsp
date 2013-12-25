@@ -33,7 +33,7 @@
 		
 		<script type="text/javascript">
 			function submitFinish() {
-				document.getElementById("finish").disabled = true;
+				document.getElementById("finishButton").disabled = true;
 				location.href = '${finish}';
 			}		
 		</script>
@@ -48,7 +48,7 @@
 				</html:button>
 			</c:when>
 			<c:otherwise>
-				<html:link href="#nogo"  property="finish" styleId="finish"
+				<html:link href="#nogo"  property="finish" styleId="finishButton"
 					onclick="submitFinish();" styleClass="button">
 					<span class="nextActivity">
 						<c:choose>

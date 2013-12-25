@@ -7,7 +7,7 @@
 
 <script type="text/javascript">
 	function finishForum() {
-		document.getElementById("finishForum").disabled = true;
+		document.getElementById("finishButton").disabled = true;
 		location.href = '${finish}';
 	};			
 </script>
@@ -144,7 +144,7 @@
 						</c:when>
 		
 						<c:otherwise>
-							<button name="finish" id="finishForum" data-icon="arrow-r" onclick="finishForum();">
+							<button name="finishButton" id="finishButton" data-icon="arrow-r" onclick="finishForum();">
 								<c:choose>
 				 					<c:when test="${sessionMap.activityPosition.last}">
 				 						<fmt:message key="label.submit" />

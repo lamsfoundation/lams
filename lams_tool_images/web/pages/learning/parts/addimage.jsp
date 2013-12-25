@@ -56,7 +56,7 @@
 				<a href="#" onclick="document.imageGalleryItemForm.submit();" class="button-add-item">
 					<fmt:message key="label.authoring.basic.add.image" /> 
 				</a>
-				<a href="#" onclick="self.parent.tb_remove();" class="button space-left">
+				<a href="#" onclick="self.parent.tb_remove();" class="button space-left" name="goback">
 					<fmt:message key="label.cancel" /> 
 				</a>
 			</lams:ImgButtonWrapper>

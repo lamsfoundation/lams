@@ -173,7 +173,7 @@
 			
 			<div  style="margin-top: 40px">
 				<lams:ImgButtonWrapper>
-					<a href="#nogo" onclick="return closeThickbox();" onmousedown="self.focus();" class="button space-left float-right">
+					<a href="#nogo" onclick="return closeThickbox();" onmousedown="self.focus();" class="button space-left float-right" name="goback">
 						<fmt:message key="label.close" /> 
 					</a>
 				</lams:ImgButtonWrapper>
