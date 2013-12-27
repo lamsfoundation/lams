@@ -636,19 +636,22 @@ public class MonitoringAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws IOException, JSONException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	Lesson lesson = getLessonService().getLesson(lessonId);
-	Organisation organisation = lesson.getOrganisation();
+
+	// monitor user opted for removing lesson progress for following users
+	List<User> removedLearners = parseUserList(request, "removedLearners");
+	for (User removedLearner : removedLearners) {
+	    getLessonService().removeLearnerProgress(lessonId, removedLearner.getUserId());
+	    if (LamsDispatchAction.log.isDebugEnabled()) {
+		LamsDispatchAction.log.debug("Removed progress for user ID: " + removedLearner.getUserId()
+			+ " in lesson ID: " + lessonId);
+	    }
+	}
 
 	List<User> learners = parseUserList(request, "learners");
-	String learnerGroupName = organisation.getName() + " learners";
+	getLessonService().setLearners(lesson, learners);
 
 	List<User> staff = parseUserList(request, "monitors");
-	// add the creator as staff, if not already done
-	String staffGroupName = organisation.getName() + " staff";
-
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
-	monitoringService.createLessonClassForLesson(lessonId, organisation, learnerGroupName, learners,
-		staffGroupName, staff, getUserId());
+	getLessonService().setStaffMembers(lesson, staff);
 
 	return null;
     }

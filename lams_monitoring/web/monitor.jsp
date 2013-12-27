@@ -41,6 +41,7 @@
 		var FORCE_COMPLETE_DROP_FAIL_LABEL = '<fmt:message key="force.complete.drop.fail"/>';
 		var LEARNER_GROUP_COUNT_LABEL = '<fmt:message key="learner.group.count"/>';
 		var LEARNER_GROUP_SHOW_LABEL = '<fmt:message key="learner.group.show"/>';
+		var LEARNER_GROUP_REMOVE_PROGRESS = '<fmt:message key="learner.group.remove.progress"/>';
 		var LEARNER_GROUP_LIST_TITLE_LABEL = '<fmt:message key="learner.group.list.title"/>';
 		var VIEW_LEARNER_BUTTON_LABEL = '<fmt:message key="button.view.learner"/>';
 		var EMAIL_BUTTON_LABEL = '<fmt:message key="button.email"/>';

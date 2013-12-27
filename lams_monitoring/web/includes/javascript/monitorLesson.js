@@ -146,27 +146,50 @@ function initLessonTab(){
 			sortDialogList('classMonitor');
 			colorDialogList('classLearner');
 			colorDialogList('classMonitor');
+			
+			var selectedLearners = getSelectedClassUserList('classLearnerList');
+			$(this).dialog('option', 'initSelectedLearners', selectedLearners);
 		},
 		'buttons' : [
 		             {
 		            	'text'   : 'Save',
 		            	'id'     : 'classDialogSaveButton',
 		            	'click'  : function() {
-		            		var dialog = $(this);
-		            		var learners = getSelectedClassUserList('classLearnerList');
-		            		var monitors = getSelectedClassUserList('classMonitorList');
+		            		var removedLearners = [],
+		            			dialog = $(this),
+		            			initSelectedLearners = dialog.dialog('option', 'initSelectedLearners'),
+		            			learners = getSelectedClassUserList('classLearnerList'),
+		            			monitors = getSelectedClassUserList('classMonitorList');
+		            		
+		            		// check for learners removed from lesson
+		            		$.each(initSelectedLearners, function(index, selectedLearnerId){
+		            			if ($.inArray(selectedLearnerId, learners) == -1) {
+		            				removedLearners.push(selectedLearnerId);
+		            			}
+		            		});
+		            		
+		            		// check if monitoring user really wants to remove progress
+		            		if (removedLearners.length > 0 && !confirm(LEARNER_GROUP_REMOVE_PROGRESS)){
+		            			removedLearners = [];
+		            		}
+		            		
 		            		$.ajax({
 		            			url : LAMS_URL + 'monitoring/monitoring.do',
 		            			cache : false,
 		            			data : {
-		            				'method'    : 'updateLessonClass',
-		            				'lessonID'  : lessonId,
-		            				'learners'  : learners,
-		            				'monitors'  : monitors
+		            				'method'    	  : 'updateLessonClass',
+		            				'lessonID'  	  : lessonId,
+		            				'learners'  	  : learners.join(),
+		            				'monitors'  	  : monitors.join(),
+		            				'removedLearners' : removedLearners.join()
 		            			},
 		            			success : function() {
 		            				dialog.dialog('close');
-		            				refreshMonitor('lesson');
+		            				if (removedLearners.length > 0) {
+		            					refreshMonitor();
+		            				} else {
+		            					refreshMonitor('lesson');
+		            				}
 		            			}
 		            		});
 						}
@@ -413,10 +436,10 @@ function startLesson(){
  * Stringifies user IDs who were selected in Edit Class dialog. 
  */
 function getSelectedClassUserList(containerId) {
-	var list = '';
+	var list = [];
 	$('#' + containerId).children('div.dialogListItem').each(function(){
 		if ($('input:checked', this).length > 0){
-			list += $(this).attr('userId') + ',';
+			list.push($(this).attr('userId'));
 		}
 	});
 	return list;

@@ -481,6 +481,17 @@ public class LessonService implements ILessonService {
 	    }
 	}
     }
+    
+    /**
+     * Completely removes learner progress as if the user has not started the lesson yet.
+     */
+    @Override
+    public void removeLearnerProgress(Long lessonId, Integer userId) {
+	LearnerProgress learnerProgress = getUserProgressForLesson(userId, lessonId);
+	if (learnerProgress != null) {
+	    learnerProgressDAO.deleteLearnerProgress(learnerProgress);
+	}
+    }
 
     private boolean removeActivityReference(Activity activity, LearnerProgress progress) {
 

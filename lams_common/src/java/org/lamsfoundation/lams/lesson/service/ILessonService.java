@@ -434,4 +434,6 @@ public interface ILessonService {
      * Find lessons which just got available after the given lesson has been completed.
      */
     Set<Lesson> getReleasedSucceedingLessons(Long completedLessonId, Integer learnerId);
+
+    void removeLearnerProgress(Long lessonId, Integer userId);
 }
