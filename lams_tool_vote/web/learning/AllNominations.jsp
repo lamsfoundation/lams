@@ -249,7 +249,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true'}">
 						<html:link href="#" property="learnerFinished"
 							onclick="javascript:submitMethod('learnerFinished');return false"
-							styleClass="button" style="float:right" styleId="finishButton">
+							styleClass="button big-space-top" style="float:right" styleId="finishButton">
 							<span class="nextActivity">
 								<c:choose>
 									<c:when test="${activityPosition.last}">
