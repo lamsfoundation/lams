@@ -74,6 +74,8 @@ public class VoteContent implements Serializable {
 
     /** nullable persistent field */
     private long createdBy;
+    
+    private boolean useSelectLeaderToolOuput;
 
     private boolean reflect;
 
@@ -121,11 +123,11 @@ public class VoteContent implements Serializable {
 
     /** full constructor */
     public VoteContent(Long voteContentId, String content, String title, String instructions, boolean defineLater,
-	    boolean runOffline, Date creationDate, Date updateDate, boolean allowText, boolean reflect,
-	    String reflectionSubject, String maxNominationCount, String minNominationCount, long createdBy,
-	    boolean lockOnFinish, boolean contentInUse, String offlineInstructions, String onlineInstructions,
-	    boolean showResults, Short maxExternalInputs, Short externalInputsAdded, Set voteQueContents,
-	    Set voteSessions, Set voteAttachments) {
+	    boolean runOffline, Date creationDate, Date updateDate, boolean allowText,
+	    boolean useSelectLeaderToolOuput, boolean reflect, String reflectionSubject, String maxNominationCount,
+	    String minNominationCount, long createdBy, boolean lockOnFinish, boolean contentInUse,
+	    String offlineInstructions, String onlineInstructions, boolean showResults, Short maxExternalInputs,
+	    Short externalInputsAdded, Set voteQueContents, Set voteSessions, Set voteAttachments) {
 	this.voteContentId = voteContentId;
 	this.content = content;
 	this.title = title;
@@ -137,6 +139,7 @@ public class VoteContent implements Serializable {
 	this.maxNominationCount = maxNominationCount;
 	this.minNominationCount = minNominationCount;
 	this.allowText = allowText;
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
 	this.reflect = reflect;
 	this.reflectionSubject = reflectionSubject;
 	this.createdBy = createdBy;
@@ -179,7 +182,7 @@ public class VoteContent implements Serializable {
 	    throws ItemNotFoundException, RepositoryCheckedException {
 	VoteContent newContent = new VoteContent(newContentId, vote.getContent(), vote.getTitle(), vote
 		.getInstructions(), vote.isDefineLater(), vote.isRunOffline(), vote.getCreationDate(), vote
-		.getUpdateDate(), vote.isAllowText(), vote.isReflect(), vote.getReflectionSubject(), vote
+		.getUpdateDate(), vote.isAllowText(), vote.isUseSelectLeaderToolOuput(), vote.isReflect(), vote.getReflectionSubject(), vote
 		.getMaxNominationCount(), vote.getMinNominationCount(), vote.getCreatedBy(), vote.isLockOnFinish(),
 		vote.isContentInUse(), vote.getOfflineInstructions(), vote.getOnlineInstructions(), vote
 			.isShowResults(), vote.getMaxExternalInputs(), vote.getExternalInputsAdded(), new TreeSet(),
@@ -490,6 +493,21 @@ public class VoteContent implements Serializable {
      */
     public void setReflect(boolean reflect) {
 	this.reflect = reflect;
+    }
+    
+    /**
+     * @param useSelectLeaderToolOuput
+     *            The useSelectLeaderToolOuput to set.
+     */
+    public boolean isUseSelectLeaderToolOuput() {
+        return useSelectLeaderToolOuput;
+    }
+
+    /**
+     * @return Returns the useSelectLeaderToolOuput.
+     */
+    public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
+        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 
     /**

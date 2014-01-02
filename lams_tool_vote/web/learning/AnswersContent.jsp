@@ -37,6 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:css />
 	<title><fmt:message key="activity.title" />	</title>
 
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
 
 	var noSelected = 0;
@@ -92,14 +93,45 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		var msg = "<fmt:message key="error.maxNominationCount.reached"/> "+maxVotes+" <fmt:message key="label.nominations"/>";
 		alert(msg);
 	}
-	</script>
-
-	<script language="JavaScript" type="text/JavaScript">
-		function submitMethod(actionMethod) 
-		{
-			document.VoteLearningForm.dispatch.value=actionMethod; 
-			document.VoteLearningForm.submit();
+	
+	function submitMethod(actionMethod) {
+		document.VoteLearningForm.dispatch.value=actionMethod; 
+		document.VoteLearningForm.submit();
+	}
+	
+	function checkLeaderProgress() {
+		
+        $.ajax({
+        	async: false,
+            url: '<c:url value="/learning.do"/>',
+            data: 'dispatch=checkLeaderProgress&toolSessionID=' + $('[name="toolSessionID"]').val(),
+            dataType: 'json',
+            type: 'post',
+            success: function (json) {
+            	if (json.isLeaderResponseFinalized) {
+            		location.reload();
+            	}
+            }
+       	});
+	}
+	
+	$(document).ready(function(){
+		
+		var mode = "${voteGeneralLearnerFlowDTO.learningMode}"; 
+		var isUserLeader = ($('[name="userLeader"]').val() === "true");
+		var isLeadershipEnabled = ($('[name="useSelectLeaderToolOuput"]').val() === "true");
+		var hasEditRight = !isLeadershipEnabled || isLeadershipEnabled && isUserLeader;
+		
+		if (!hasEditRight && (mode != "teacher")) {
+			setInterval("checkLeaderProgress();",60000);// Auto-Refresh every 1 minute for non-leaders
 		}
+		
+		if (!hasEditRight) {
+			$('[name="userEntry"]').prop('disabled', true);
+			$('[name="checkedVotes"]').prop('disabled', true);
+			$('[name="continueOptionsCombined"]').hide();
+		}
+	});
 	</script>
 </lams:head>
 
@@ -107,13 +139,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div id="content">
 		<h1>
-			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}"
-				escapeXml="false" />
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 		</h1>
 
-		<html:form onsubmit="return validate();"
-			action="/learning?validate=false&dispatch=continueOptionsCombined"
-			method="POST" target="_self">
+		<html:form onsubmit="return validate();" action="/learning?validate=false&dispatch=continueOptionsCombined" method="POST" target="_self">
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<html:hidden property="dispatch" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="userID" />
@@ -125,7 +155,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="lockOnFinish" />
 			<html:hidden property="reportViewOnly" />
 			<html:hidden property="showResults" />
-			
+			<html:hidden property="userLeader" />
+			<html:hidden property="groupLeaderName" />
+			<html:hidden property="useSelectLeaderToolOuput" />
+						
+			<c:if test="${formBean.useSelectLeaderToolOuput}">
+				<h4>
+					<fmt:message key="label.group.leader" >
+						<fmt:param>${formBean.groupLeaderName}</fmt:param>
+					</fmt:message>
+				</h4>
+			</c:if>
 			
 			<c:if test="${not empty voteGeneralLearnerFlowDTO.submissionDeadline}">
 				<div class="info">
@@ -168,23 +208,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>
 
 				<table class="shading-bg">
-
-					<c:forEach var="subEntry" varStatus="status"
-						items="${requestScope.mapQuestionContentLearner}">
+					<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
 
 						<tr>
 							<td width="50px">
-
 								<input type="checkbox" name="checkedVotes" class="noBorder"
 									value="${subEntry.key}" onClick="updateCount(this);">
-
 							</td>
 
 							<td>
-
 								<c:out value="${subEntry.value}" escapeXml="false" />
-
 							</td>
+						</tr>
+						
 					</c:forEach>
 				</table>
 
@@ -196,9 +232,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<html:hidden property="donePreview" />
 
 				<div class="space-bottom-top">
-					<html:submit property="continueOptionsCombined" styleClass="button">
-						<fmt:message key="label.submit.vote" />
-					</html:submit>
+						<html:submit property="continueOptionsCombined" styleClass="button">
+							<fmt:message key="label.submit.vote" />
+						</html:submit>
 				</div>
 				
 			</c:if>

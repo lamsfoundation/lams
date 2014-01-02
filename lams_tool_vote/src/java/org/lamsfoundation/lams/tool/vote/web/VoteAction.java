@@ -508,6 +508,10 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	String lockOnFinish = request.getParameter(VoteAppConstants.LOCK_ON_FINISH);
 	voteAuthoringForm.setLockOnFinish(lockOnFinish);
 	voteGeneralAuthoringDTO.setLockOnFinish(lockOnFinish);
+	
+	String useSelectLeaderToolOuput = request.getParameter(VoteAppConstants.USE_SELECT_LEADER_TOOL_OUTPUT);
+	voteAuthoringForm.setUseSelectLeaderToolOuput(useSelectLeaderToolOuput);
+	voteGeneralAuthoringDTO.setUseSelectLeaderToolOuput(useSelectLeaderToolOuput);
 
 	String allowText = request.getParameter(VoteAppConstants.ALLOW_TEXT);
 	voteAuthoringForm.setAllowText(allowText);

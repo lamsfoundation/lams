@@ -124,7 +124,7 @@ public class VoteOutputFactory extends OutputFactory {
 
     public ToolOutput getToolOutput(String name, IVoteService voteService, Long toolSessionId, Long learnerId) {
 	if (name != null && name.startsWith(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION)) {
-	    VoteSession session = voteService.findVoteSessionById(toolSessionId);
+	    VoteSession session = voteService.retrieveVoteSession(toolSessionId);
 	    VoteQueUsr queUser = voteService.getVoteUserBySession(learnerId, session.getUid());
 
 	    return new ToolOutput(name, getI18NText(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION, true),
@@ -169,8 +169,8 @@ public class VoteOutputFactory extends OutputFactory {
 		Iterator iter = voteAttempts.iterator();
 		while (iter.hasNext()) {
 		    VoteUsrAttempt attempt = (VoteUsrAttempt) iter.next();
-		    if (attempt.getVoteQueContentId().longValue() == 1
-			    && displayOrder == VoteOutputFactory.FREE_TEXT_NOM_SELECTION) {
+		    Long questionUid = attempt.getVoteQueContent().getUid();
+		    if (questionUid.longValue() == 1 && displayOrder == VoteOutputFactory.FREE_TEXT_NOM_SELECTION) {
 			// VoteQueContentId == 1 indicates that it is a free text entry
 			return true;
 		    } else {
@@ -194,7 +194,7 @@ public class VoteOutputFactory extends OutputFactory {
 
 	TreeMap<String, ToolOutput> output = null;
 
-	VoteSession session = voteService.findVoteSessionById(toolSessionId);
+	VoteSession session = voteService.retrieveVoteSession(toolSessionId);
 	VoteContent content = session.getVoteContent();
 	VoteQueUsr queUser = voteService.getVoteUserBySession(learnerId, session.getUid());
 	String i18nDescription = getI18NText(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION, true);
@@ -207,7 +207,8 @@ public class VoteOutputFactory extends OutputFactory {
 		Iterator iter = voteAttempts.iterator();
 		while (iter.hasNext() && !found) {
 		    VoteUsrAttempt attempt = (VoteUsrAttempt) iter.next();
-		    found = attempt.getVoteQueContentId().longValue() == 1;
+		    Long questionUid = attempt.getVoteQueContent().getUid();
+		    found = questionUid.longValue() == 1;
 		}
 	    }
 	    String name = buildConditionName(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION,

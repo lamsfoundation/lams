@@ -52,6 +52,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     protected String lockOnFinish;
     protected String allowText;
     protected String showResults;
+    protected String useSelectLeaderToolOuput;
 
     protected String reflect;
     protected String reflectionSubject;
@@ -197,6 +198,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	richTextOfflineInstructions = null;
 	richTextOnlineInstructions = null;
 
+	useSelectLeaderToolOuput = null;
 	reflect = null;
 	lockOnFinish = null;
 	allowText = null;
@@ -221,6 +223,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	allowText = "0";
 	showResults = "0";
 	reflect = "0";
+	useSelectLeaderToolOuput = "0";
     }
 
     /**
@@ -1057,6 +1060,21 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 			activityInstructions).append("richTextOfflineInstructions: ", richTextOfflineInstructions)
 		.append("richTextOnlineInstructions: ", richTextOnlineInstructions).append("onlineInstructions: ",
 			onlineInstructions).append("offlineInstructions: ", offlineInstructions).toString();
+    }
+    
+    /**
+     * @return Returns the useSelectLeaderToolOuput.
+     */
+    public String getUseSelectLeaderToolOuput() {
+	return useSelectLeaderToolOuput;
+    }
+
+    /**
+     * @param useSelectLeaderToolOuput
+     *            The useSelectLeaderToolOuput to set.
+     */
+    public void setUseSelectLeaderToolOuput(String useSelectLeaderToolOuput) {
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 
     /**

@@ -72,8 +72,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<div data-role="content">
 
-		<html:form action="/learning?validate=false"
-			enctype="multipart/form-data" method="POST" target="_self">
+		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<c:set var="isUserLeader" value="${formBean.userLeader}" />
+			<c:set var="isLeadershipEnabled" value="${formBean.useSelectLeaderToolOuput}" />
+			<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
+			
 			<html:hidden property="dispatch" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="userID" />
@@ -86,6 +90,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="reportViewOnly" />
 			<html:hidden property="userEntry" />
 			<html:hidden property="showResults" />
+			<html:hidden property="userLeader" />
+			<html:hidden property="groupLeaderName" />
+			<html:hidden property="useSelectLeaderToolOuput" />
+
+			<c:if test="${isLeadershipEnabled}">
+				<h4>
+					<fmt:message key="label.group.leader" >
+						<fmt:param>${formBean.groupLeaderName}</fmt:param>
+					</fmt:message>
+				</h4>
+			</c:if>
 
 			<c:if test="${VoteLearningForm.showResults == 'true'}">
 				<jsp:include page="RevisitedDisplay.jsp" />
@@ -101,7 +116,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeXml="false" />
 			
-			<c:if test="${voteGeneralLearnerFlowDTO.lockOnFinish == 'true' }">					
+			<c:if test="${voteGeneralLearnerFlowDTO.lockOnFinish == 'true' && hasEditRight}">					
 				<br>
 				<span class="button-inside">
 					<button name="forwardtoReflection" 
@@ -111,12 +126,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</span>
 			</c:if>													
 
-			<div class="space-bottom-top button-inside">
-				<button name="redoQuestionsOk" 
-					onclick="submitMethod('redoQuestionsOk');" data-icon="back">
-					<fmt:message key="label.retake" />
-				</button>
-			</div>
+			<c:if test="${hasEditRight}">
+				<div class="space-bottom-top button-inside">
+					<button name="redoQuestionsOk" 
+						onclick="submitMethod('redoQuestionsOk');" data-icon="back">
+						<fmt:message key="label.retake" />
+					</button>
+				</div>
+			</c:if>
 		</html:form>
 
 	</div>

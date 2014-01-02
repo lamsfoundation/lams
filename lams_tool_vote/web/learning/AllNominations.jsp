@@ -61,12 +61,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div id="content">
 		<h1>
-			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}"
-				escapeXml="false" />
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 		</h1>
 
-		<html:form action="/learning?validate=false"
-			enctype="multipart/form-data" method="POST" target="_self">
+		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<c:set var="isUserLeader" value="${formBean.userLeader}" />
+			<c:set var="isLeadershipEnabled" value="${formBean.useSelectLeaderToolOuput}" />
+			<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
+			
 			<html:hidden property="dispatch" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="userID" />
@@ -79,6 +82,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="reportViewOnly" />
 			<html:hidden property="userEntry" />
 			<html:hidden property="showResults" />
+			<html:hidden property="userLeader" />
+			<html:hidden property="groupLeaderName" />
+			<html:hidden property="useSelectLeaderToolOuput" />
+			
+			<c:if test="${isLeadershipEnabled}">
+				<h4>
+					<fmt:message key="label.group.leader" >
+						<fmt:param>${formBean.groupLeaderName}</fmt:param>
+					</fmt:message>
+				</h4>
+			</c:if>
 
 			<h2>
 				<fmt:message key="label.progressiveResults" />
@@ -96,20 +110,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</th>
 				</tr>
 
-				<c:forEach var="currentNomination"
-					items="${voteGeneralLearnerFlowDTO.mapStandardNominationsHTMLedContent}">
-					<c:set var="currentNominationKey" scope="request"
-						value="${currentNomination.key}" />
+				<c:forEach var="currentNomination"	items="${voteGeneralLearnerFlowDTO.mapStandardNominationsHTMLedContent}">
+					<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}" />
 					<tr>
 						<td class="space">
 							<c:out value="${currentNomination.value}" escapeXml="false" />
 						</td>
 
 						<td>
-							<c:forEach var="currentUserCount"
-								items="${voteGeneralLearnerFlowDTO.mapStandardUserCount}">
-								<c:set var="currentUserKey" scope="request"
-									value="${currentUserCount.key}" />
+							<c:forEach var="currentUserCount" items="${voteGeneralLearnerFlowDTO.mapStandardUserCount}">
+								<c:set var="currentUserKey" scope="request"	value="${currentUserCount.key}" />
 								<c:if test="${currentNominationKey == currentUserKey}">
 
 									<c:if test="${currentUserCount.value != '0' }">
@@ -216,16 +226,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</div>
 
 
-				<c:if
-					test="${voteGeneralLearnerFlowDTO.notebookEntry != null && voteGeneralLearnerFlowDTO.notebookEntry != ''}">
+			<c:if test="${voteGeneralLearnerFlowDTO.notebookEntry != null && voteGeneralLearnerFlowDTO.notebookEntry != ''}">
 	
 				<h2>
 					<fmt:message key="label.notebook.entries" />
 				</h2>
 	
 				<p>
-					<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
-						escapeXml="false" />
+					<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeXml="false" />
 				</p>
 			</c:if>							
 
@@ -239,14 +247,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<fmt:message key="label.refresh" />
 					</html:submit>
 
-					<c:if test="${VoteLearningForm.lockOnFinish != 'true'}">
+					<c:if test="${VoteLearningForm.lockOnFinish != 'true' && hasEditRight}">
 						<html:submit property="redoQuestionsOk" styleClass="button"
 							onclick="submitMethod('redoQuestionsOk');">
 							<fmt:message key="label.retake" />
 						</html:submit>
 					</c:if>
 
-					<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true'}">
+					<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
 						<html:link href="#" property="learnerFinished"
 							onclick="javascript:submitMethod('learnerFinished');return false"
 							styleClass="button big-space-top" style="float:right" styleId="finishButton">
@@ -263,7 +271,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</html:link>
 					</c:if>
 
-					<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}">
+					<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true' && hasEditRight}">
 						<html:submit property="forwardtoReflection"
 							onclick="javascript:submitMethod('forwardtoReflection');"
 							styleClass="button">

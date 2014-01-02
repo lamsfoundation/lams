@@ -28,77 +28,58 @@ import java.util.Set;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 
-
 /**
  * @author Ozgur Demirtas
  * 
- * <p>Interface that defines the contract for VoteUsrAttempt access </p>
+ *         <p>
+ *         Interface that defines the contract for VoteUsrAttempt access
+ *         </p>
  */
-public interface IVoteUsrAttemptDAO
-{
- 	public VoteUsrAttempt getVoteUserAttemptByUID(Long uid);
-	
-	public void saveVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
-	
-	public List getAttemptsForUser(final Long queUsrId);
-	
-	public List getUserRecords(final String userEntry);
-	
-	public Set getUserEntries();
-	
-	public int getUserEnteredVotesCountForContent(final Long voteContentUid);
-	
-	public boolean isVoteVisibleForSession(final String userEntry, final Long voteSessionUid);
-	
-	public List getSessionUserEntries(final Long voteSessionUid);
-	
-	public Set getSessionUserEntriesSet(final Long voteSessionUid);
-	
-	public List getUserEnteredVotesForSession(final String userEntry, final Long voteSessionUid);
-	
-	public VoteUsrAttempt getAttemptByUID(Long uid);
-	
-	public int getCompletedSessionEntriesCount(final Long voteSessionUid);
-	
-	public int getSessionEntriesCount(final Long voteSessionId);
-	
-	public int getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId, final Long voteContentUid);
-	
-	public int getSessionUserRecordsEntryCount(final String userEntry, final Long voteSessionUid, IVoteService voteService);
-	
-	public int getUserRecordsEntryCount(final String userEntry);
-	
-	public int getAttemptsForQuestionContent(final Long voteQueContentId);
-	
-	public int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid);
-	
-	public List getStandardAttemptUsersForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid);
-	
-	public void removeAttemptsForUser(final Long queUsrId);
-	
-	public void removeAttemptsForUserandSession(final Long queUsrId, final Long voteSessionId);
-	
-	public int  getLastNominationCount(Long userId);
-	
-	//public VoteUsrAttempt getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
-	
-	public VoteUsrAttempt getAttemptsForUserAndQuestionContentAndSession(final Long queUsrId, final Long voteQueContentId, final Long voteSessionId);
-	
-	public List getAttemptsListForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
-	
-	public List getAttemptForQueContent(final Long queUsrId, final Long voteQueContentId);
-	
-	public void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
-	
-	public void removeVoteUsrAttemptByUID(Long uid);
-	
-	public void removeVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
-	
-	public Set getAttemptsForUserAndSession(final Long queUsrId,  final Long voteSessionId);
-	
-	public Set getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId,  final Long voteSessionId);
-	
-	public List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
+public interface IVoteUsrAttemptDAO {
+
+    void saveVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
+
+    List<VoteUsrAttempt> getAttemptsForUser(final Long queUsrId);
+
+    List getUserRecords(final String userEntry);
+
+    Set getUserEntries();
+
+    int getUserEnteredVotesCountForContent(final Long voteContentUid);
+
+    List getSessionUserEntries(final Long voteSessionUid);
+
+    Set getSessionUserEntriesSet(final Long voteSessionUid);
+
+    List getUserEnteredVotesForSession(final String userEntry, final Long voteSessionUid);
+
+    VoteUsrAttempt getAttemptByUID(Long uid);
+
+    int getCompletedSessionEntriesCount(final Long voteSessionUid);
+
+    int getSessionEntriesCount(final Long voteSessionId);
+
+    int getStandardAttemptsForQuestionContentAndContentUid(final Long voteQueContentId, final Long voteContentUid);
+
+    int getAttemptsForQuestionContent(final Long voteQueContentId);
+
+    int getStandardAttemptsForQuestionContentAndSessionUid(final Long voteQueContentId, final Long voteSessionUid);
+
+    List getStandardAttemptUsersForQuestionContentAndSessionUid(final Long voteQueContentId,
+	    final Long voteSessionUid);
+
+    void removeAttemptsForUserandSession(final Long queUsrId, final Long voteSessionId);
+
+    VoteUsrAttempt getAttemptForUserAndQuestionContentAndSession(final Long queUsrId,
+	    final Long voteQueContentId, final Long voteSessionId);
+
+    void updateVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
+
+    void removeVoteUsrAttempt(VoteUsrAttempt voteUsrAttempt);
+
+    Set getAttemptsForUserAndSession(final Long queUsrId, final Long voteSessionUid);
+
+    Set getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId, final Long voteSessionId);
+
+    List getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long voteQueContentId);
 }
-
-

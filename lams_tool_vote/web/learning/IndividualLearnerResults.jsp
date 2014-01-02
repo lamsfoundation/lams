@@ -19,8 +19,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
 <%@ include file="/common/taglibs.jsp"%>
 
@@ -35,12 +34,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:head>
 	<html:base />
 	<lams:css />
-	<title><fmt:message key="activity.title" />
-	</title>
+	<title><fmt:message key="activity.title" /></title>
 
 	<script language="JavaScript" type="text/JavaScript">
-		function submitMethod(actionMethod) 
-		{
+		function submitMethod(actionMethod) {
 			if (actionMethod == 'learnerFinished') {
 				document.getElementById("finishButton").disabled = true;
 			}
@@ -53,8 +50,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <body class="stripes">
 	<div id="content">
 		<h1>
-			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}"
-				escapeXml="false" />
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 		</h1>
 		
 		<c:if test="${VoteLearningForm.lockOnFinish and voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
@@ -63,8 +59,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</div>
 		</c:if>	
 			
-		<html:form action="/learning?validate=false"
-			enctype="multipart/form-data" method="POST" target="_self">
+		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<c:set var="isUserLeader" value="${formBean.userLeader}" />
+			<c:set var="isLeadershipEnabled" value="${formBean.useSelectLeaderToolOuput}" />
+			<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
+			
 			<html:hidden property="dispatch" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="userID" />
@@ -77,7 +77,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="reportViewOnly" />
 			<html:hidden property="userEntry" />
 			<html:hidden property="showResults" />
-
+			<html:hidden property="userLeader" />
+			<html:hidden property="groupLeaderName" />
+			<html:hidden property="useSelectLeaderToolOuput" />
+			
+			<c:if test="${isLeadershipEnabled}">
+				<h4>
+					<fmt:message key="label.group.leader" >
+						<fmt:param>${formBean.groupLeaderName}</fmt:param>
+					</fmt:message>
+				</h4>
+			</c:if>
 			
 			<p>
 				<strong> <fmt:message key="label.learning.reportMessage" />
@@ -102,10 +112,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</ul>
 
 			<div class="space-bottom-top">
-				<html:submit property="redoQuestions" styleClass="button"
-					onclick="submitMethod('redoQuestions');">
-					<fmt:message key="label.retake" />
-				</html:submit>
+				<c:if test="${hasEditRight}">
+					<html:submit property="redoQuestions" styleClass="button"
+						onclick="submitMethod('redoQuestions');">
+						<fmt:message key="label.retake" />
+					</html:submit>
+				</c:if>
 
 				<c:choose>
 
@@ -116,11 +128,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</html:submit>
 				</c:when>
 				
-				<c:when test="${voteGeneralLearnerFlowDTO.reflection != 'true'}">
+				<c:when test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
 					<span class="right-buttons">
 						<html:link href="#nogo" property="learnerFinished" styleId="finishButton"
 							onclick="javascript:submitMethod('learnerFinished');return false"
-							styleClass="button">
+							styleClass="button big-space-top">
 							<span class="nextActivity">
 								<c:choose>
 									<c:when test="${activityPosition.last}">

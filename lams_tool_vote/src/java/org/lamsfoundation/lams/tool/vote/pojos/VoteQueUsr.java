@@ -39,6 +39,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class VoteQueUsr implements Serializable {
 
+    private static final long serialVersionUID = 7303944502340276133L;
+
     /** identifier field */
     private Long uid;
 
@@ -58,17 +60,18 @@ public class VoteQueUsr implements Serializable {
     private Long voteSessionId;
     
     /** nullable persistent field */
-    private org.lamsfoundation.lams.tool.vote.pojos.VoteSession voteSession;
+    private VoteSession voteSession;
 
     /** persistent field */
     private Set voteUsrAttempts;
 
     /** full constructor */
-    public VoteQueUsr(Long queUsrId, String username, String fullname,  org.lamsfoundation.lams.tool.vote.pojos.VoteSession voteSession, Set voteUsrAttempts) {
+    public VoteQueUsr(Long queUsrId, String username, String fullname,  VoteSession voteSession, Set voteUsrAttempts) {
         this.queUsrId = queUsrId;
         this.username = username;
         this.fullname = fullname;
         this.voteSession = voteSession;
+        this.voteSessionId = voteSession.getUid();
         this.voteUsrAttempts = voteUsrAttempts;
     }
 
@@ -131,12 +134,16 @@ public class VoteQueUsr implements Serializable {
             .toString();
     }
     /**
+     * Beware, it references Votesession.uid field (not the Votesession.voteSessionId).
+     * 
      * @return Returns the voteSessionId.
      */
     public Long getVoteSessionId() {
         return voteSessionId;
     }
     /**
+     * Beware, it references Votesession.uid field (not the Votesession.voteSessionId).
+     * 
      * @param voteSessionId The voteSessionId to set.
      */
     public void setVoteSessionId(Long voteSessionId) {
@@ -145,14 +152,14 @@ public class VoteQueUsr implements Serializable {
     /**
      * @return Returns the voteSession.
      */
-    public org.lamsfoundation.lams.tool.vote.pojos.VoteSession getVoteSession() {
+    public VoteSession getVoteSession() {
         return voteSession;
     }
     /**
      * @param voteSession The voteSession to set.
      */
     public void setVoteSession(
-            org.lamsfoundation.lams.tool.vote.pojos.VoteSession voteSession) {
+            VoteSession voteSession) {
         this.voteSession = voteSession;
     }
     /**

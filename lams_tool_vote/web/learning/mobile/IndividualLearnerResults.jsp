@@ -41,8 +41,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
-		function submitMethod(actionMethod) 
-		{
+		function submitMethod(actionMethod) {
 			if (actionMethod == 'learnerFinished') {
 				document.getElementById("finishButton").disabled = true;
 			}
@@ -69,8 +68,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</div>
 		</c:if>	
 			
-		<html:form action="/learning?validate=false"
-			enctype="multipart/form-data" method="POST" target="_self">
+		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<c:set var="isUserLeader" value="${formBean.userLeader}" />
+			<c:set var="isLeadershipEnabled" value="${formBean.useSelectLeaderToolOuput}" />
+			<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
+			
 			<html:hidden property="dispatch" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="userID" />
@@ -83,7 +86,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="reportViewOnly" />
 			<html:hidden property="userEntry" />
 			<html:hidden property="showResults" />
-
+			<html:hidden property="userLeader" />
+			<html:hidden property="groupLeaderName" />
+			<html:hidden property="useSelectLeaderToolOuput" />
+			
+			<c:if test="${isLeadershipEnabled}">
+				<h4>
+					<fmt:message key="label.group.leader" >
+						<fmt:param>${formBean.groupLeaderName}</fmt:param>
+					</fmt:message>
+				</h4>
+			</c:if>
 			
 			<p>
 				<strong> <fmt:message key="label.learning.reportMessage" />
@@ -107,11 +120,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:if>
 			</ul>
 
-			<div class="small-space-top button-inside">
-				<button name="redoQuestions" class="button" onclick="submitMethod('redoQuestions');" data-icon="back">
-					<fmt:message key="label.retake" />
-				</button>				
-			</div>
+			<c:if test="${hasEditRight}">
+				<div class="small-space-top button-inside">
+					<button name="redoQuestions" class="button" onclick="submitMethod('redoQuestions');" data-icon="back">
+						<fmt:message key="label.retake" />
+					</button>				
+				</div>
+			</c:if>
 		</html:form>
 	</div>
 	
@@ -125,7 +140,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</button>
 					</c:when>
 					
-					<c:when test="${voteGeneralLearnerFlowDTO.reflection != 'true'}">
+					<c:when test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
 						<span class="right-buttons">
 							<a href="#nogo" name="learnerFinished" id="finishButton"
 								onclick="javascript:submitMethod('learnerFinished');return false"

@@ -28,21 +28,20 @@ import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p>Persistent  object/bean that defines the content for the Voting tool.
- * Provides accessors and mutators to get/set attributes
- * It maps to database table: tl_lavote11_session
+ * <p>
+ * Persistent object/bean that defines the content for the Voting tool. Provides accessors and mutators to get/set
+ * attributes It maps to database table: tl_lavote11_session
  * </p>
  * 
  * @author Ozgur Demirtas
  */
 public class VoteSession implements Serializable {
 
-	public final static String INCOMPLETE = "INCOMPLETE";
-    
+    public final static String INCOMPLETE = "INCOMPLETE";
+
     public static final String COMPLETED = "COMPLETED";
-    
+
     /** identifier field */
     private Long uid;
 
@@ -57,166 +56,179 @@ public class VoteSession implements Serializable {
 
     /** nullable persistent field */
     private String sessionStatus;
-    
+
     private String session_name;
 
     /** nullable persistent field */
     private Long voteContentId;
 
     /** nullable persistent field */
-    private org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent;
+    private VoteContent voteContent;
 
     /** persistent field */
     private Set voteQueUsers;
+    
+    /** persistent field */
+    private VoteQueUsr groupLeader;
 
-    /** full constructor */
-    public VoteSession(Long voteSessionId, Date sessionStartDate, Date sessionEndDate, String sessionStatus, org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent, Set voteQueUsers) {
-        this.voteSessionId = voteSessionId;
-        this.sessionStartDate = sessionStartDate;
-        this.sessionEndDate = sessionEndDate;
-        this.sessionStatus = sessionStatus;
-        this.voteContent = voteContent;
-        this.voteQueUsers = voteQueUsers;
+    public VoteSession(Long voteSessionId, Date sessionStartDate, String sessionStatus, String session_name,
+	    VoteContent voteContent, Set voteQueUsers) {
+	this.voteSessionId = voteSessionId;
+	this.sessionStartDate = sessionStartDate;
+	this.sessionStatus = sessionStatus;
+	this.session_name = session_name;
+	this.voteContent = voteContent;
+	this.voteQueUsers = voteQueUsers;
     }
-    
-    public VoteSession(Long voteSessionId, Date sessionStartDate, String sessionStatus, String session_name, org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent, Set voteQueUsers) {
-        this.voteSessionId = voteSessionId;
-        this.sessionStartDate = sessionStartDate;
-        this.sessionStatus = sessionStatus;
-        this.session_name = session_name;
-        this.voteContent = voteContent;
-        this.voteQueUsers = voteQueUsers;
-    }
-    
-    public VoteSession(Long voteSessionId, Date sessionStartDate, String sessionStatus, org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent, Set voteQueUsers) {
-        this.voteSessionId = voteSessionId;
-        this.sessionStartDate = sessionStartDate;
-        this.sessionStatus = sessionStatus;
-        this.voteContent = voteContent;
-        this.voteQueUsers = voteQueUsers;
-    }
-    
+
     /** default constructor */
     public VoteSession() {
     }
 
-    /** minimal constructor */
-    public VoteSession(Long voteSessionId, Set voteQueUsers) {
-        this.voteSessionId = voteSessionId;
-        this.voteQueUsers = voteQueUsers;
-    }
-
     public Long getUid() {
-        return this.uid;
+	return this.uid;
     }
 
     public void setUid(Long uid) {
-        this.uid = uid;
+	this.uid = uid;
     }
-
 
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("uid", getUid())
-            .toString();
+	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
 
-	/**
-	 * @return Returns the sessionEndDate.
-	 */
-	public Date getSessionEndDate() {
-		return sessionEndDate;
-	}
-	/**
-	 * @param sessionEndDate The sessionEndDate to set.
-	 */
-	public void setSessionEndDate(Date sessionEndDate) {
-		this.sessionEndDate = sessionEndDate;
-	}
-	/**
-	 * @return Returns the sessionStartDate.
-	 */
-	public Date getSessionStartDate() {
-		return sessionStartDate;
-	}
-	/**
-	 * @param sessionStartDate The sessionStartDate to set.
-	 */
-	public void setSessionStartDate(Date sessionStartDate) {
-		this.sessionStartDate = sessionStartDate;
-	}
-	/**
-	 * @return Returns the sessionStatus.
-	 */
-	public String getSessionStatus() {
-		return sessionStatus;
-	}
-	/**
-	 * @param sessionStatus The sessionStatus to set.
-	 */
-	public void setSessionStatus(String sessionStatus) {
-		this.sessionStatus = sessionStatus;
-	}
-	
-	/**
-	 * @return Returns the session_name.
-	 */
-	public String getSession_name() {
-		return session_name;
-	}
-	/**
-	 * @param session_name The session_name to set.
-	 */
-	public void setSession_name(String session_name) {
-		this.session_name = session_name;
-	}
+    /**
+     * @return Returns the sessionEndDate.
+     */
+    public Date getSessionEndDate() {
+	return sessionEndDate;
+    }
+
+    /**
+     * @param sessionEndDate
+     *            The sessionEndDate to set.
+     */
+    public void setSessionEndDate(Date sessionEndDate) {
+	this.sessionEndDate = sessionEndDate;
+    }
+
+    /**
+     * @return Returns the sessionStartDate.
+     */
+    public Date getSessionStartDate() {
+	return sessionStartDate;
+    }
+
+    /**
+     * @param sessionStartDate
+     *            The sessionStartDate to set.
+     */
+    public void setSessionStartDate(Date sessionStartDate) {
+	this.sessionStartDate = sessionStartDate;
+    }
+
+    /**
+     * @return Returns the sessionStatus.
+     */
+    public String getSessionStatus() {
+	return sessionStatus;
+    }
+
+    /**
+     * @param sessionStatus
+     *            The sessionStatus to set.
+     */
+    public void setSessionStatus(String sessionStatus) {
+	this.sessionStatus = sessionStatus;
+    }
+
+    /**
+     * @return Returns the session_name.
+     */
+    public String getSession_name() {
+	return session_name;
+    }
+
+    /**
+     * @param session_name
+     *            The session_name to set.
+     */
+    public void setSession_name(String session_name) {
+	this.session_name = session_name;
+    }
+
     /**
      * @return Returns the voteSessionId.
      */
     public Long getVoteSessionId() {
-        return voteSessionId;
+	return voteSessionId;
     }
+
     /**
-     * @param voteSessionId The voteSessionId to set.
+     * @param voteSessionId
+     *            The voteSessionId to set.
      */
     public void setVoteSessionId(Long voteSessionId) {
-        this.voteSessionId = voteSessionId;
+	this.voteSessionId = voteSessionId;
     }
+
     /**
      * @return Returns the voteContentId.
      */
     public Long getVoteContentId() {
-        return voteContentId;
+	return voteContentId;
     }
+
     /**
-     * @param voteContentId The voteContentId to set.
+     * @param voteContentId
+     *            The voteContentId to set.
      */
     public void setVoteContentId(Long voteContentId) {
-        this.voteContentId = voteContentId;
+	this.voteContentId = voteContentId;
     }
+
     /**
      * @return Returns the voteContent.
      */
-    public org.lamsfoundation.lams.tool.vote.pojos.VoteContent getVoteContent() {
-        return voteContent;
+    public VoteContent getVoteContent() {
+	return voteContent;
     }
+
     /**
-     * @param voteContent The voteContent to set.
+     * @param voteContent
+     *            The voteContent to set.
      */
-    public void setVoteContent(
-            org.lamsfoundation.lams.tool.vote.pojos.VoteContent voteContent) {
-        this.voteContent = voteContent;
+    public void setVoteContent(VoteContent voteContent) {
+	this.voteContent = voteContent;
     }
+
     /**
      * @return Returns the voteQueUsers.
      */
     public Set getVoteQueUsers() {
-        return voteQueUsers;
+	return voteQueUsers;
     }
+
     /**
-     * @param voteQueUsers The voteQueUsers to set.
+     * @param voteQueUsers
+     *            The voteQueUsers to set.
      */
     public void setVoteQueUsers(Set voteQueUsers) {
-        this.voteQueUsers = voteQueUsers;
+	this.voteQueUsers = voteQueUsers;
+    }
+    
+    /**
+     * @return Returns the groupLeader.
+     */
+    public VoteQueUsr getGroupLeader() {
+	return this.groupLeader;
+    }
+
+    /**
+     * @param groupLeader
+     *            The groupLeader to set.
+     */
+    public void setGroupLeader(VoteQueUsr groupLeader) {
+	this.groupLeader = groupLeader;
     }
 }

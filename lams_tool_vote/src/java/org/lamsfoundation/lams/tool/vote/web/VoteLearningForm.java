@@ -34,824 +34,983 @@ import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 
 /**
- * <p> ActionForm for the Learning environment </p>
+ * <p>
+ * ActionForm for the Learning environment
+ * </p>
  * 
  * @author Ozgur Demirtas
  */
 public class VoteLearningForm extends ActionForm implements VoteAppConstants {
-	protected String optionCheckBoxSelected;
-	protected String questionIndex;
-	protected String optionIndex;
-	protected String optionValue;
-	protected String checked;
-	
+    protected String optionCheckBoxSelected;
+    protected String questionIndex;
+    protected String optionIndex;
+    protected String optionValue;
+    protected String checked;
+
     protected String sbmtSuccess;
-    
-	protected String userEntry;
-	protected String dispatch;
-	protected String toolContentID;
-	
-	protected String maxNominationCount;
-	protected String minNominationCount;
-	protected String allowTextEntry;
-	protected String showResults;
-	protected String lockOnFinish;
-	protected String activityRunOffline;
-	protected String activityRetries;
-	protected String activityTitle;
-	protected String activityInstructions;
-	
-	protected String continueOptions;
-	protected String nextOptions;
-	protected String castVotes;
-	
-	protected String continueOptionsCombined;
-	protected String redoQuestions;
-	protected String viewSummary;
-	protected String viewAnswers;
-	protected String learnerFinished;
-	protected String redoQuestionsOk;
-	protected String donePreview;
-	protected String doneLearnerProgress;
-	protected String viewAllResults;
-	
-	protected String responseId;
-	protected String method;
-	protected String answer;
-	protected String submitAnswersContent;
-	protected String getNextQuestion;
-	protected String getPreviousQuestion;
-	protected String endLearning;
-	protected String refreshVotes;
-	protected String submitReflection;
-	protected String forwardtoReflection;
-	
-	protected String reflection;
-	
-	protected String nominationsSubmited;
-	protected String revisitingUser;
-	protected String maxNominationCountReached;
-	protected String minNominationCountReached;
-	protected int 	 castVoteCount;
-	
-	protected Map     mapGeneralCheckedOptionsContent;
-	
-	protected String entryText;
-	protected String  userID;
-	protected String  toolSessionID;
-	protected String  learningMode;
-	protected String  toolContentUID;
-	protected String  previewOnly;
-	protected String  reportViewOnly;
-	
+
+    protected String userEntry;
+    protected String dispatch;
+    protected String toolContentID;
+
+    protected String useSelectLeaderToolOuput;
+    protected String maxNominationCount;
+    protected String minNominationCount;
+    protected String allowTextEntry;
+    protected String showResults;
+    protected String lockOnFinish;
+    protected String activityRunOffline;
+    protected String activityRetries;
+    protected String activityTitle;
+    protected String activityInstructions;
+
+    protected String continueOptions;
+    protected String nextOptions;
+    protected String castVotes;
+
+    protected String continueOptionsCombined;
+    protected String redoQuestions;
+    protected String viewSummary;
+    protected String viewAnswers;
+    protected String learnerFinished;
+    protected String redoQuestionsOk;
+    protected String donePreview;
+    protected String doneLearnerProgress;
+    protected String viewAllResults;
+
+    protected String responseId;
+    protected String method;
+    protected String answer;
+    protected String submitAnswersContent;
+    protected String getNextQuestion;
+    protected String getPreviousQuestion;
+    protected String endLearning;
+    protected String refreshVotes;
+    protected String submitReflection;
+    protected String forwardtoReflection;
+
+    protected String reflection;
+
+    protected String nominationsSubmited;
+    protected String revisitingUser;
+    protected String maxNominationCountReached;
+    protected String minNominationCountReached;
+    protected int castVoteCount;
+
+    protected Map mapGeneralCheckedOptionsContent;
+
+    protected String entryText;
+    protected String userID;
+    protected String toolSessionID;
+    protected String learningMode;
+    protected String toolContentUID;
+    protected String previewOnly;
+    protected String reportViewOnly;
+
+    protected boolean isUserLeader;
+    protected String groupLeaderName;
 
     /**
      * @return Returns the learningMode.
      */
     public String getLearningMode() {
-        return learningMode;
-    }
-    /**
-     * @param learningMode The learningMode to set.
-     */
-    public void setLearningMode(String learningMode) {
-        this.learningMode = learningMode;
-    }
-/** The check boxes selected on the first voting screen */
-	protected String[] checkedVotes;
-	
-	public void reset(ActionMapping mapping, HttpServletRequest request) {
-		checkedVotes = new String[0];
-	}
-	
-	protected void resetUserActions()
-    {
-    	this.getNextQuestion=null;
-    	this.getPreviousQuestion=null;
-    	this.endLearning=null;
-    	this.viewAllResults=null;
+	return learningMode;
     }
 
-	
+    /**
+     * @param learningMode
+     *            The learningMode to set.
+     */
+    public void setLearningMode(String learningMode) {
+	this.learningMode = learningMode;
+    }
+
+    /** The check boxes selected on the first voting screen */
+    protected String[] checkedVotes;
+
+    public void reset(ActionMapping mapping, HttpServletRequest request) {
+	checkedVotes = new String[0];
+    }
+
+    protected void resetUserActions() {
+	this.getNextQuestion = null;
+	this.getPreviousQuestion = null;
+	this.endLearning = null;
+	this.viewAllResults = null;
+    }
+
     /**
      * @return Returns the answer.
      */
     public String getAnswer() {
-        return answer;
+	return answer;
     }
+
     /**
-     * @param answer The answer to set.
+     * @param answer
+     *            The answer to set.
      */
     public void setAnswer(String answer) {
-        this.answer = answer;
+	this.answer = answer;
     }
+
     /**
      * @return Returns the endLearning.
      */
     public String getEndLearning() {
-        return endLearning;
+	return endLearning;
     }
+
     /**
-     * @param endLearning The endLearning to set.
+     * @param endLearning
+     *            The endLearning to set.
      */
     public void setEndLearning(String endLearning) {
-        this.endLearning = endLearning;
+	this.endLearning = endLearning;
     }
+
     /**
      * @return Returns the getNextQuestion.
      */
     public String getGetNextQuestion() {
-        return getNextQuestion;
+	return getNextQuestion;
     }
+
     /**
-     * @param getNextQuestion The getNextQuestion to set.
+     * @param getNextQuestion
+     *            The getNextQuestion to set.
      */
     public void setGetNextQuestion(String getNextQuestion) {
-        this.getNextQuestion = getNextQuestion;
+	this.getNextQuestion = getNextQuestion;
     }
+
     /**
      * @return Returns the getPreviousQuestion.
      */
     public String getGetPreviousQuestion() {
-        return getPreviousQuestion;
+	return getPreviousQuestion;
     }
+
     /**
-     * @param getPreviousQuestion The getPreviousQuestion to set.
+     * @param getPreviousQuestion
+     *            The getPreviousQuestion to set.
      */
     public void setGetPreviousQuestion(String getPreviousQuestion) {
-        this.getPreviousQuestion = getPreviousQuestion;
+	this.getPreviousQuestion = getPreviousQuestion;
     }
+
     /**
      * @return Returns the method.
      */
     public String getMethod() {
-        return method;
+	return method;
     }
+
     /**
-     * @param method The method to set.
+     * @param method
+     *            The method to set.
      */
     public void setMethod(String method) {
-        this.method = method;
+	this.method = method;
     }
+
     /**
      * @return Returns the responseId.
      */
     public String getResponseId() {
-        return responseId;
+	return responseId;
     }
+
     /**
-     * @param responseId The responseId to set.
+     * @param responseId
+     *            The responseId to set.
      */
     public void setResponseId(String responseId) {
-        this.responseId = responseId;
+	this.responseId = responseId;
     }
+
     /**
      * @return Returns the submitAnswersContent.
      */
     public String getSubmitAnswersContent() {
-        return submitAnswersContent;
+	return submitAnswersContent;
     }
+
     /**
-     * @param submitAnswersContent The submitAnswersContent to set.
+     * @param submitAnswersContent
+     *            The submitAnswersContent to set.
      */
     public void setSubmitAnswersContent(String submitAnswersContent) {
-        this.submitAnswersContent = submitAnswersContent;
+	this.submitAnswersContent = submitAnswersContent;
     }
-	
-    	
-	public void resetCommands()
-	{
-		this.setContinueOptions(null);
-		this.setNextOptions(null);
-		this.setContinueOptionsCombined(null);
-		this.setRedoQuestions( null); 
-		this.setViewSummary(null);
-		this.setViewAnswers(null);
-		this.setRedoQuestionsOk(null);
-		this.setLearnerFinished(null);
-		this.setDonePreview(null);
-		this.setDoneLearnerProgress(null);
-		this.setRefreshVotes(null);
-		this.setSubmitReflection(null);
-		this.setForwardtoReflection(null);
-	}
 
-	public void resetParameters()
-	{
-		this.setOptionCheckBoxSelected(null);
-		this.setQuestionIndex(null);
-		this.setOptionIndex(null);
-		this.setChecked(null);
-		this.setOptionValue(null);
-	}
+    public void resetCommands() {
+	this.setContinueOptions(null);
+	this.setNextOptions(null);
+	this.setContinueOptionsCombined(null);
+	this.setRedoQuestions(null);
+	this.setViewSummary(null);
+	this.setViewAnswers(null);
+	this.setRedoQuestionsOk(null);
+	this.setLearnerFinished(null);
+	this.setDonePreview(null);
+	this.setDoneLearnerProgress(null);
+	this.setRefreshVotes(null);
+	this.setSubmitReflection(null);
+	this.setForwardtoReflection(null);
+    }
 
+    public void resetParameters() {
+	this.setOptionCheckBoxSelected(null);
+	this.setQuestionIndex(null);
+	this.setOptionIndex(null);
+	this.setChecked(null);
+	this.setOptionValue(null);
+    }
 
-	/**
-	 * @return Returns the continueOptions.
-	 */
-	public String getContinueOptions() {
-		return continueOptions;
-	}
-	/**
-	 * @param continueOptions The continueOptions to set.
-	 */
-	public void setContinueOptions(String continueOptions) {
-		this.continueOptions = continueOptions;
-	}
-	/**
-	 * @return Returns the checked.
-	 */
-	public String getChecked() {
-		return checked;
-	}
-	/**
-	 * @param checked The checked to set.
-	 */
-	public void setChecked(String checked) {
-		this.checked = checked;
-	}
-	/**
-	 * @return Returns the optionCheckBoxSelected.
-	 */
-	public String getOptionCheckBoxSelected() {
-		return optionCheckBoxSelected;
-	}
-	/**
-	 * @param optionCheckBoxSelected The optionCheckBoxSelected to set.
-	 */
-	public void setOptionCheckBoxSelected(String optionCheckBoxSelected) {
-		this.optionCheckBoxSelected = optionCheckBoxSelected;
-	}
-	    /**
+    /**
+     * @return Returns the continueOptions.
+     */
+    public String getContinueOptions() {
+	return continueOptions;
+    }
+
+    /**
+     * @param continueOptions
+     *            The continueOptions to set.
+     */
+    public void setContinueOptions(String continueOptions) {
+	this.continueOptions = continueOptions;
+    }
+
+    /**
+     * @return Returns the checked.
+     */
+    public String getChecked() {
+	return checked;
+    }
+
+    /**
+     * @param checked
+     *            The checked to set.
+     */
+    public void setChecked(String checked) {
+	this.checked = checked;
+    }
+
+    /**
+     * @return Returns the optionCheckBoxSelected.
+     */
+    public String getOptionCheckBoxSelected() {
+	return optionCheckBoxSelected;
+    }
+
+    /**
+     * @param optionCheckBoxSelected
+     *            The optionCheckBoxSelected to set.
+     */
+    public void setOptionCheckBoxSelected(String optionCheckBoxSelected) {
+	this.optionCheckBoxSelected = optionCheckBoxSelected;
+    }
+
+    /**
      * @return Returns the refreshVotes.
      */
     public String getRefreshVotes() {
-        return refreshVotes;
+	return refreshVotes;
     }
+
     /**
-     * @param refreshVotes The refreshVotes to set.
+     * @param refreshVotes
+     *            The refreshVotes to set.
      */
     public void setRefreshVotes(String refreshVotes) {
-        this.refreshVotes = refreshVotes;
+	this.refreshVotes = refreshVotes;
     }
-/**
-	 * @return Returns the optionIndex.
-	 */
-	public String getOptionIndex() {
-		return optionIndex;
-	}
-	/**
-	 * @param optionIndex The optionIndex to set.
-	 */
-	public void setOptionIndex(String optionIndex) {
-		this.optionIndex = optionIndex;
-	}
-	/**
-	 * @return Returns the questionIndex.
-	 */
-	public String getQuestionIndex() {
-		return questionIndex;
-	}
-	/**
-	 * @param questionIndex The questionIndex to set.
-	 */
-	public void setQuestionIndex(String questionIndex) {
-		this.questionIndex = questionIndex;
-	}
-	
-	/**
-	 * @return Returns the viewSummary.
-	 */
-	public String getViewSummary() {
-		return viewSummary;
-	}
-	/**
-	 * @param viewSummary The viewSummary to set.
-	 */
-	public void setViewSummary(String viewSummary) {
-		this.viewSummary = viewSummary;
-	}
-	/**
-	 * @return Returns the continueOptionsCombined.
-	 */
-	public String getContinueOptionsCombined() {
-		return continueOptionsCombined;
-	}
-	/**
-	 * @param continueOptionsCombined The continueOptionsCombined to set.
-	 */
-	public void setContinueOptionsCombined(String continueOptionsCombined) {
-		this.continueOptionsCombined = continueOptionsCombined;
-	}
-	/**
-	 * @return Returns the redoQuestions.
-	 */
-	public String getRedoQuestions() {
-		return redoQuestions;
-	}
-	/**
-	 * @param redoQuestions The redoQuestions to set.
-	 */
-	public void setRedoQuestions(String redoQuestions) {
-		this.redoQuestions = redoQuestions;
-	}
-	/**
-	 * @return Returns the optionValue.
-	 */
-	public String getOptionValue() {
-		return optionValue;
-	}
-	/**
-	 * @param optionValue The optionValue to set.
-	 */
-	public void setOptionValue(String optionValue) {
-		this.optionValue = optionValue;
-	}
-	/**
-	 * @return Returns the viewAnswers.
-	 */
-	public String getViewAnswers() {
-		return viewAnswers;
-	}
-	/**
-	 * @param viewAnswers The viewAnswers to set.
-	 */
-	public void setViewAnswers(String viewAnswers) {
-		this.viewAnswers = viewAnswers;
-	}
-	/**
-	 * @return Returns the redoQuestionsOk.
-	 */
-	public String getRedoQuestionsOk() {
-		return redoQuestionsOk;
-	}
-	/**
-	 * @param redoQuestionsOk The redoQuestionsOk to set.
-	 */
-	public void setRedoQuestionsOk(String redoQuestionsOk) {
-		this.redoQuestionsOk = redoQuestionsOk;
-	}
-	/**
-	 * @return Returns the nextOptions.
-	 */
-	public String getNextOptions() {
-		return nextOptions;
-	}
-	/**
-	 * @param nextOptions The nextOptions to set.
-	 */
-	public void setNextOptions(String nextOptions) {
-		this.nextOptions = nextOptions;
-	}
-	/**
-	 * @return Returns the learnerFinished.
-	 */
-	public String getLearnerFinished() {
-		return learnerFinished;
-	}
-	/**
-	 * @param learnerFinished The learnerFinished to set.
-	 */
-	public void setLearnerFinished(String learnerFinished) {
-		this.learnerFinished = learnerFinished;
-	}
-	/**
-	 * @return Returns the donePreview.
-	 */
-	public String getDonePreview() {
-		return donePreview;
-	}
-	/**
-	 * @param donePreview The donePreview to set.
-	 */
-	public void setDonePreview(String donePreview) {
-		this.donePreview = donePreview;
-	}
-	/**
-	 * @return Returns the doneLearnerProgress.
-	 */
-	public String getDoneLearnerProgress() {
-		return doneLearnerProgress;
-	}
-	/**
-	 * @param doneLearnerProgress The doneLearnerProgress to set.
-	 */
-	public void setDoneLearnerProgress(String doneLearnerProgress) {
-		this.doneLearnerProgress = doneLearnerProgress;
-	}
-	
+
+    /**
+     * @return Returns the optionIndex.
+     */
+    public String getOptionIndex() {
+	return optionIndex;
+    }
+
+    /**
+     * @param optionIndex
+     *            The optionIndex to set.
+     */
+    public void setOptionIndex(String optionIndex) {
+	this.optionIndex = optionIndex;
+    }
+
+    /**
+     * @return Returns the questionIndex.
+     */
+    public String getQuestionIndex() {
+	return questionIndex;
+    }
+
+    /**
+     * @param questionIndex
+     *            The questionIndex to set.
+     */
+    public void setQuestionIndex(String questionIndex) {
+	this.questionIndex = questionIndex;
+    }
+
+    /**
+     * @return Returns the viewSummary.
+     */
+    public String getViewSummary() {
+	return viewSummary;
+    }
+
+    /**
+     * @param viewSummary
+     *            The viewSummary to set.
+     */
+    public void setViewSummary(String viewSummary) {
+	this.viewSummary = viewSummary;
+    }
+
+    /**
+     * @return Returns the continueOptionsCombined.
+     */
+    public String getContinueOptionsCombined() {
+	return continueOptionsCombined;
+    }
+
+    /**
+     * @param continueOptionsCombined
+     *            The continueOptionsCombined to set.
+     */
+    public void setContinueOptionsCombined(String continueOptionsCombined) {
+	this.continueOptionsCombined = continueOptionsCombined;
+    }
+
+    /**
+     * @return Returns the redoQuestions.
+     */
+    public String getRedoQuestions() {
+	return redoQuestions;
+    }
+
+    /**
+     * @param redoQuestions
+     *            The redoQuestions to set.
+     */
+    public void setRedoQuestions(String redoQuestions) {
+	this.redoQuestions = redoQuestions;
+    }
+
+    /**
+     * @return Returns the optionValue.
+     */
+    public String getOptionValue() {
+	return optionValue;
+    }
+
+    /**
+     * @param optionValue
+     *            The optionValue to set.
+     */
+    public void setOptionValue(String optionValue) {
+	this.optionValue = optionValue;
+    }
+
+    /**
+     * @return Returns the viewAnswers.
+     */
+    public String getViewAnswers() {
+	return viewAnswers;
+    }
+
+    /**
+     * @param viewAnswers
+     *            The viewAnswers to set.
+     */
+    public void setViewAnswers(String viewAnswers) {
+	this.viewAnswers = viewAnswers;
+    }
+
+    /**
+     * @return Returns the redoQuestionsOk.
+     */
+    public String getRedoQuestionsOk() {
+	return redoQuestionsOk;
+    }
+
+    /**
+     * @param redoQuestionsOk
+     *            The redoQuestionsOk to set.
+     */
+    public void setRedoQuestionsOk(String redoQuestionsOk) {
+	this.redoQuestionsOk = redoQuestionsOk;
+    }
+
+    /**
+     * @return Returns the nextOptions.
+     */
+    public String getNextOptions() {
+	return nextOptions;
+    }
+
+    /**
+     * @param nextOptions
+     *            The nextOptions to set.
+     */
+    public void setNextOptions(String nextOptions) {
+	this.nextOptions = nextOptions;
+    }
+
+    /**
+     * @return Returns the learnerFinished.
+     */
+    public String getLearnerFinished() {
+	return learnerFinished;
+    }
+
+    /**
+     * @param learnerFinished
+     *            The learnerFinished to set.
+     */
+    public void setLearnerFinished(String learnerFinished) {
+	this.learnerFinished = learnerFinished;
+    }
+
+    /**
+     * @return Returns the donePreview.
+     */
+    public String getDonePreview() {
+	return donePreview;
+    }
+
+    /**
+     * @param donePreview
+     *            The donePreview to set.
+     */
+    public void setDonePreview(String donePreview) {
+	this.donePreview = donePreview;
+    }
+
+    /**
+     * @return Returns the doneLearnerProgress.
+     */
+    public String getDoneLearnerProgress() {
+	return doneLearnerProgress;
+    }
+
+    /**
+     * @param doneLearnerProgress
+     *            The doneLearnerProgress to set.
+     */
+    public void setDoneLearnerProgress(String doneLearnerProgress) {
+	this.doneLearnerProgress = doneLearnerProgress;
+    }
+
     /**
      * @return Returns the userEntry.
      */
     public String getUserEntry() {
-        return userEntry;
+	return userEntry;
     }
+
     /**
-     * @param userEntry The userEntry to set.
+     * @param userEntry
+     *            The userEntry to set.
      */
     public void setUserEntry(String userEntry) {
-        this.userEntry = userEntry;
+	this.userEntry = userEntry;
     }
-    
+
     /**
      * @return Returns the dispatch.
      */
     public String getDispatch() {
-        return dispatch;
+	return dispatch;
     }
+
     /**
-     * @param dispatch The dispatch to set.
+     * @param dispatch
+     *            The dispatch to set.
      */
     public void setDispatch(String dispatch) {
-        this.dispatch = dispatch;
+	this.dispatch = dispatch;
     }
 
     /**
      * @return Returns the toolContentID.
      */
     public String getToolContentID() {
-        return toolContentID;
-    }
-    /**
-     * @param toolContentID The toolContentID to set.
-     */
-    public void setToolContentID(String toolContentID) {
-        this.toolContentID = toolContentID;
+	return toolContentID;
     }
 
-	
+    /**
+     * @param toolContentID
+     *            The toolContentID to set.
+     */
+    public void setToolContentID(String toolContentID) {
+	this.toolContentID = toolContentID;
+    }
+
     /**
      * @return Returns the viewAllResults.
      */
     public String getViewAllResults() {
-        return viewAllResults;
+	return viewAllResults;
     }
+
     /**
-     * @param viewAllResults The viewAllResults to set.
+     * @param viewAllResults
+     *            The viewAllResults to set.
      */
     public void setViewAllResults(String viewAllResults) {
-        this.viewAllResults = viewAllResults;
+	this.viewAllResults = viewAllResults;
     }
-    
+
     /**
      * @return Returns the activityInstructions.
      */
     public String getActivityInstructions() {
-        return activityInstructions;
+	return activityInstructions;
     }
+
     /**
-     * @param activityInstructions The activityInstructions to set.
+     * @param activityInstructions
+     *            The activityInstructions to set.
      */
     public void setActivityInstructions(String activityInstructions) {
-        this.activityInstructions = activityInstructions;
+	this.activityInstructions = activityInstructions;
     }
+
     /**
      * @return Returns the activityTitle.
      */
     public String getActivityTitle() {
-        return activityTitle;
+	return activityTitle;
     }
+
     /**
-     * @param activityTitle The activityTitle to set.
+     * @param activityTitle
+     *            The activityTitle to set.
      */
     public void setActivityTitle(String activityTitle) {
-        this.activityTitle = activityTitle;
-    }    
+	this.activityTitle = activityTitle;
+    }
 
     /**
      * @return Returns the activityRetries.
      */
     public String getActivityRetries() {
-        return activityRetries;
+	return activityRetries;
     }
+
     /**
-     * @param activityRetries The activityRetries to set.
+     * @param activityRetries
+     *            The activityRetries to set.
      */
     public void setActivityRetries(String activityRetries) {
-        this.activityRetries = activityRetries;
+	this.activityRetries = activityRetries;
     }
+
     /**
      * @return Returns the activityRunOffline.
      */
     public String getActivityRunOffline() {
-        return activityRunOffline;
+	return activityRunOffline;
     }
+
     /**
-     * @param activityRunOffline The activityRunOffline to set.
+     * @param activityRunOffline
+     *            The activityRunOffline to set.
      */
     public void setActivityRunOffline(String activityRunOffline) {
-        this.activityRunOffline = activityRunOffline;
+	this.activityRunOffline = activityRunOffline;
     }
 
     /**
      * @return Returns the lockOnFinish.
      */
     public String getLockOnFinish() {
-        return lockOnFinish;
+	return lockOnFinish;
     }
+
     /**
-     * @param lockOnFinish The lockOnFinish to set.
+     * @param lockOnFinish
+     *            The lockOnFinish to set.
      */
     public void setLockOnFinish(String lockOnFinish) {
-        this.lockOnFinish = lockOnFinish;
+	this.lockOnFinish = lockOnFinish;
     }
+
+    /**
+     * @return Returns the useSelectLeaderToolOuput.
+     */
+    public String getUseSelectLeaderToolOuput() {
+	return useSelectLeaderToolOuput;
+    }
+
+    /**
+     * @param allowTextEntry
+     *            The useSelectLeaderToolOuput to set.
+     */
+    public void setUseSelectLeaderToolOuput(String useSelectLeaderToolOuput) {
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+    }
+
     /**
      * @return Returns the allowTextEntry.
      */
     public String getAllowTextEntry() {
-        return allowTextEntry;
+	return allowTextEntry;
     }
+
     /**
-     * @param allowTextEntry The allowTextEntry to set.
+     * @param allowTextEntry
+     *            The allowTextEntry to set.
      */
     public void setAllowTextEntry(String allowTextEntry) {
-        this.allowTextEntry = allowTextEntry;
+	this.allowTextEntry = allowTextEntry;
     }
+
     /**
      * @return Returns the maxNominationCount.
      */
     public String getMaxNominationCount() {
-        return maxNominationCount;
+	return maxNominationCount;
     }
+
     /**
-     * @param maxNominationCount The maxNominationCount to set.
+     * @param maxNominationCount
+     *            The maxNominationCount to set.
      */
     public void setMaxNominationCount(String maxNominationCount) {
-        this.maxNominationCount = maxNominationCount;
+	this.maxNominationCount = maxNominationCount;
     }
+
     /**
      * @return Returns the minNominationCount.
      */
     public String getMinNominationCount() {
-        return minNominationCount;
+	return minNominationCount;
     }
+
     /**
-     * @param minNominationCount The minNominationCount to set.
+     * @param minNominationCount
+     *            The minNominationCount to set.
      */
     public void setMinNominationCount(String minNominationCount) {
-        this.minNominationCount = minNominationCount;
-    }    
+	this.minNominationCount = minNominationCount;
+    }
 
     /**
      * @return Returns the nominationsSubmited.
      */
     public String getNominationsSubmited() {
-        return nominationsSubmited;
+	return nominationsSubmited;
     }
+
     /**
-     * @param nominationsSubmited The nominationsSubmited to set.
+     * @param nominationsSubmited
+     *            The nominationsSubmited to set.
      */
     public void setNominationsSubmited(String nominationsSubmited) {
-        this.nominationsSubmited = nominationsSubmited;
+	this.nominationsSubmited = nominationsSubmited;
     }
 
     /**
      * @return Returns the revisitingUser.
      */
     public String getRevisitingUser() {
-        return revisitingUser;
+	return revisitingUser;
     }
+
     /**
-     * @param revisitingUser The revisitingUser to set.
+     * @param revisitingUser
+     *            The revisitingUser to set.
      */
     public void setRevisitingUser(String revisitingUser) {
-        this.revisitingUser = revisitingUser;
+	this.revisitingUser = revisitingUser;
     }
 
     /**
      * @return Returns the castVoteCount.
      */
     public int getCastVoteCount() {
-        return castVoteCount;
+	return castVoteCount;
     }
+
     /**
-     * @param castVoteCount The castVoteCount to set.
+     * @param castVoteCount
+     *            The castVoteCount to set.
      */
     public void setCastVoteCount(int castVoteCount) {
-        this.castVoteCount = castVoteCount;
+	this.castVoteCount = castVoteCount;
     }
-    
+
     /**
      * @return Returns the castVotes.
      */
     public String getCastVotes() {
-        return castVotes;
+	return castVotes;
     }
+
     /**
-     * @param castVotes The castVotes to set.
+     * @param castVotes
+     *            The castVotes to set.
      */
     public void setCastVotes(String castVotes) {
-        this.castVotes = castVotes;
+	this.castVotes = castVotes;
     }
+
     /**
      * @return Returns the maxNominationCountReached.
      */
     public String getMaxNominationCountReached() {
-        return maxNominationCountReached;
+	return maxNominationCountReached;
     }
+
     /**
-     * @param maxNominationCountReached The maxNominationCountReached to set.
+     * @param maxNominationCountReached
+     *            The maxNominationCountReached to set.
      */
     public void setMaxNominationCountReached(String maxNominationCountReached) {
-        this.maxNominationCountReached = maxNominationCountReached;
+	this.maxNominationCountReached = maxNominationCountReached;
     }
+
     /**
      * @return Returns the minNominationCountReached.
      */
     public String getMinNominationCountReached() {
-        return minNominationCountReached;
+	return minNominationCountReached;
     }
+
     /**
-     * @param minNominationCountReached The minNominationCountReached to set.
+     * @param minNominationCountReached
+     *            The minNominationCountReached to set.
      */
     public void setMinNominationCountReached(String minNominationCountReached) {
-        this.minNominationCountReached = minNominationCountReached;
-    }    
-    
+	this.minNominationCountReached = minNominationCountReached;
+    }
+
     /**
      * @return Returns the sbmtSuccess.
      */
     public String getSbmtSuccess() {
-        return sbmtSuccess;
+	return sbmtSuccess;
     }
+
     /**
-     * @param sbmtSuccess The sbmtSuccess to set.
+     * @param sbmtSuccess
+     *            The sbmtSuccess to set.
      */
     public void setSbmtSuccess(String sbmtSuccess) {
-        this.sbmtSuccess = sbmtSuccess;
+	this.sbmtSuccess = sbmtSuccess;
     }
 
-
     /** Get the votes based on the checkboxes */
-	public String[] getCheckedVotes() {
-		return checkedVotes;
-	}
+    public String[] getCheckedVotes() {
+	return checkedVotes;
+    }
 
     /** Get the votes based on the checkboxes as a collection */
-	public Collection<String> votesAsCollection() {
-		ArrayList<String> votes = new ArrayList<String>();
-		for ( String vote: checkedVotes) {
-			votes.add(vote);
-		}		
-		return votes;
+    public Collection<String> votesAsCollection() {
+	ArrayList<String> votes = new ArrayList<String>();
+	for (String vote : checkedVotes) {
+	    votes.add(vote);
 	}
+	return votes;
+    }
 
-	/** Set the votes based on the checkboxes */
-	public void setCheckedVotes(String[] checkedVotes) {
-		this.checkedVotes = checkedVotes;
-	}
-	
+    /** Set the votes based on the checkboxes */
+    public void setCheckedVotes(String[] checkedVotes) {
+	this.checkedVotes = checkedVotes;
+    }
 
     /**
      * @return Returns the mapGeneralCheckedOptionsContent.
      */
     public Map getMapGeneralCheckedOptionsContent() {
-        return mapGeneralCheckedOptionsContent;
+	return mapGeneralCheckedOptionsContent;
     }
+
     /**
-     * @param mapGeneralCheckedOptionsContent The mapGeneralCheckedOptionsContent to set.
+     * @param mapGeneralCheckedOptionsContent
+     *            The mapGeneralCheckedOptionsContent to set.
      */
-    public void setMapGeneralCheckedOptionsContent(
-            Map mapGeneralCheckedOptionsContent) {
-        this.mapGeneralCheckedOptionsContent = mapGeneralCheckedOptionsContent;
+    public void setMapGeneralCheckedOptionsContent(Map mapGeneralCheckedOptionsContent) {
+	this.mapGeneralCheckedOptionsContent = mapGeneralCheckedOptionsContent;
     }
+
     /**
      * @return Returns the userID.
      */
     public String getUserID() {
-        return userID;
+	return userID;
     }
+
     /**
-     * @param userID The userID to set.
+     * @param userID
+     *            The userID to set.
      */
     public void setUserID(String userID) {
-        this.userID = userID;
+	this.userID = userID;
     }
-    
-     /**
+
+    /**
      * @return Returns the reportViewOnly.
      */
     public String getReportViewOnly() {
-        return reportViewOnly;
+	return reportViewOnly;
     }
+
     /**
-     * @param reportViewOnly The reportViewOnly to set.
+     * @param reportViewOnly
+     *            The reportViewOnly to set.
      */
     public void setReportViewOnly(String reportViewOnly) {
-        this.reportViewOnly = reportViewOnly;
+	this.reportViewOnly = reportViewOnly;
     }
-/**
+
+    /**
      * @return Returns the toolSessionID.
      */
     public String getToolSessionID() {
-        return toolSessionID;
+	return toolSessionID;
     }
+
     /**
-     * @param toolSessionID The toolSessionID to set.
+     * @param toolSessionID
+     *            The toolSessionID to set.
      */
     public void setToolSessionID(String toolSessionID) {
-        this.toolSessionID = toolSessionID;
+	this.toolSessionID = toolSessionID;
     }
+
     /**
      * @return Returns the toolContentUID.
      */
     public String getToolContentUID() {
-        return toolContentUID;
+	return toolContentUID;
     }
+
     /**
-     * @param toolContentUID The toolContentUID to set.
+     * @param toolContentUID
+     *            The toolContentUID to set.
      */
     public void setToolContentUID(String toolContentUID) {
-        this.toolContentUID = toolContentUID;
+	this.toolContentUID = toolContentUID;
     }
-    
+
     /**
      * @return Returns the previewOnly.
      */
     public String getPreviewOnly() {
-        return previewOnly;
+	return previewOnly;
     }
+
     /**
-     * @param previewOnly The previewOnly to set.
+     * @param previewOnly
+     *            The previewOnly to set.
      */
     public void setPreviewOnly(String previewOnly) {
-        this.previewOnly = previewOnly;
+	this.previewOnly = previewOnly;
     }
-    
+
     /**
      * @return Returns the forwardtoReflection.
      */
     public String getForwardtoReflection() {
-        return forwardtoReflection;
+	return forwardtoReflection;
     }
+
     /**
-     * @param forwardtoReflection The forwardtoReflection to set.
+     * @param forwardtoReflection
+     *            The forwardtoReflection to set.
      */
     public void setForwardtoReflection(String forwardtoReflection) {
-        this.forwardtoReflection = forwardtoReflection;
+	this.forwardtoReflection = forwardtoReflection;
     }
+
     /**
      * @return Returns the submitReflection.
      */
     public String getSubmitReflection() {
-        return submitReflection;
+	return submitReflection;
     }
+
     /**
-     * @param submitReflection The submitReflection to set.
+     * @param submitReflection
+     *            The submitReflection to set.
      */
     public void setSubmitReflection(String submitReflection) {
-        this.submitReflection = submitReflection;
+	this.submitReflection = submitReflection;
     }
-    
-    
+
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("activityInstructions: ", activityInstructions)
-            .append("activityTitle: ", activityTitle)
-            .append("revisitingUser: ", revisitingUser)
-            .append("userEntry: ", userEntry)
-            .append("castVoteCount: ", castVoteCount)
-            .append("maxNominationCountReached: ", maxNominationCountReached)            
-            .append("activityRunOffline: ", activityRunOffline)
-            .append("toolSessionID: ", toolSessionID)
-            .append("learningMode: ", learningMode)
-            .append("toolContentID: ", toolContentID)
-            .append("nominationsSubmited: ", nominationsSubmited)            
-            .append("toolContentUID: ", toolContentUID)
-            .append("previewOnly: ", previewOnly)            
-            .append("reportViewOnly: ", reportViewOnly)
-            .append("mapGeneralCheckedOptionsContent: ", mapGeneralCheckedOptionsContent)
-            .toString();
+	return new ToStringBuilder(this).append("activityInstructions: ", activityInstructions)
+		.append("activityTitle: ", activityTitle).append("revisitingUser: ", revisitingUser)
+		.append("userEntry: ", userEntry).append("castVoteCount: ", castVoteCount)
+		.append("maxNominationCountReached: ", maxNominationCountReached)
+		.append("activityRunOffline: ", activityRunOffline).append("toolSessionID: ", toolSessionID)
+		.append("learningMode: ", learningMode).append("toolContentID: ", toolContentID)
+		.append("nominationsSubmited: ", nominationsSubmited).append("toolContentUID: ", toolContentUID)
+		.append("previewOnly: ", previewOnly).append("reportViewOnly: ", reportViewOnly)
+		.append("mapGeneralCheckedOptionsContent: ", mapGeneralCheckedOptionsContent).toString();
     }
-    
+
     /**
      * @return Returns the entryText.
      */
     public String getEntryText() {
-        return entryText;
+	return entryText;
     }
+
     /**
-     * @param entryText The entryText to set.
+     * @param entryText
+     *            The entryText to set.
      */
     public void setEntryText(String entryText) {
-        this.entryText = entryText;
+	this.entryText = entryText;
     }
+
     /**
      * @return Returns the reflection.
      */
     public String getReflection() {
-        return reflection;
+	return reflection;
     }
+
     /**
-     * @param reflection The reflection to set.
+     * @param reflection
+     *            The reflection to set.
      */
     public void setReflection(String reflection) {
-        this.reflection = reflection;
+	this.reflection = reflection;
     }
-	public String getShowResults() {
-		return showResults;
-	}
-	public void setShowResults(String showResults) {
-		this.showResults = showResults;
-	}
+
+    public String getShowResults() {
+	return showResults;
+    }
+
+    public void setShowResults(String showResults) {
+	this.showResults = showResults;
+    }
+
+    public String getGroupLeaderName() {
+	return groupLeaderName;
+    }
+
+    public void setGroupLeaderName(String groupLeaderName) {
+	this.groupLeaderName = groupLeaderName;
+    }
+    
+    public boolean isUserLeader() {
+	return isUserLeader;
+    }
+
+    public void setIsUserLeader(boolean isUserLeader) {
+	this.isUserLeader = isUserLeader;
+    }
+
 }

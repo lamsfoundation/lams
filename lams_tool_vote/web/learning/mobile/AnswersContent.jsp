@@ -95,11 +95,46 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		var msg = "<fmt:message key="error.maxNominationCount.reached"/> "+maxVotes+" <fmt:message key="label.nominations"/>";
 		alert(msg);
 	}
-	function submitMethod() 	{
+	
+	function submitMethod() {
 		if (validate()) {
 			document.VoteLearningForm.submit();	
 		}
-	}	
+	}
+
+	function checkLeaderProgress() {
+		
+        $.ajax({
+        	async: false,
+            url: '<c:url value="/learning.do"/>',
+            data: 'dispatch=checkLeaderProgress&toolSessionID=' + $('[name="toolSessionID"]').val(),
+            dataType: 'json',
+            type: 'post',
+            success: function (json) {
+            	if (json.isLeaderResponseFinalized) {
+            		location.reload();
+            	}
+            }
+       	});
+	}
+	
+	$(document).ready(function(){
+		
+		var mode = "${voteGeneralLearnerFlowDTO.learningMode}"; 
+		var isUserLeader = ($('[name="userLeader"]').val() === "true");
+		var isLeadershipEnabled = ($('[name="useSelectLeaderToolOuput"]').val() === "true");
+		var hasEditRight = !isLeadershipEnabled || isLeadershipEnabled && isUserLeader;
+		
+		if (!hasEditRight && (mode != "teacher")) {
+			setInterval("checkLeaderProgress();",60000);// Auto-Refresh every 1 minute for non-leaders
+		}
+		
+		if (!hasEditRight) {
+			$('[name="userEntry"]').prop('disabled', true);
+			$('[name="checkedVotes"]').prop('disabled', true);
+			$('#continue-options-combined-button').hide();
+		}
+	});	
 	</script>
 </lams:head>
 
@@ -115,6 +150,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div data-role="content">
 
 		<html:form action="/learning?validate=false&dispatch=continueOptionsCombined" method="POST" target="_self">
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 			<html:hidden property="dispatch" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="userID" />
@@ -126,7 +162,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="lockOnFinish" />
 			<html:hidden property="reportViewOnly" />
 			<html:hidden property="showResults" />
+			<html:hidden property="userLeader" />
+			<html:hidden property="groupLeaderName" />
+			<html:hidden property="useSelectLeaderToolOuput" />
 			
+			<c:if test="${formBean.useSelectLeaderToolOuput}">
+				<h4>
+					<fmt:message key="label.group.leader" >
+						<fmt:param>${formBean.groupLeaderName}</fmt:param>
+					</fmt:message>
+				</h4>
+			</c:if>
+
 			<c:if test="${not empty voteGeneralLearnerFlowDTO.submissionDeadline}">
 				<div class="info">
 					<fmt:message key="authoring.info.teacher.set.restriction" >
@@ -170,8 +217,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<ul data-role="listview" data-inset="true">
 					<table class="alternative-color" style="margin-top: 20px; margin-bottom: 10px;">
 	
-						<c:forEach var="subEntry" varStatus="status"
-							items="${requestScope.mapQuestionContentLearner}">
+						<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
 	
 							<tr>
 								<td width="50px" style="font-size: 13px;">
@@ -194,7 +240,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<html:hidden property="donePreview" />
 
-				<div class="space-top button-inside">
+				<div class="space-top button-inside" id="continue-options-combined-button">
 					<button onclick="javascript:submitMethod();return false;" name="continueOptionsCombined" class="button" data-icon="arrow-r" data-theme="b">
 						<fmt:message key="label.submit.vote" />
 					</button>

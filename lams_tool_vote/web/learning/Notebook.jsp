@@ -49,26 +49,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </lams:head>
 
 <body class="stripes">
-	<html:form action="/learning?validate=false"
-		enctype="multipart/form-data" method="POST" target="_self">
+	<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 
 		<html:hidden property="dispatch" />
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="userID" />
+		<html:hidden property="userLeader" />
+		<html:hidden property="groupLeaderName" />
+		<html:hidden property="useSelectLeaderToolOuput" />
 
 		<div id="content">
 			<h1>
-				<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}"
-					escapeXml="false" />
+				<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 			</h1>
 
 			<p>
-				<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}"
-					escapeXml="false" />
+				<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />
 			</p>
 
-			<html:textarea cols="60" rows="8" property="entryText"
-				styleClass="text-area"></html:textarea>
+			<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area"></html:textarea>
 
 			<div class="space-bottom-top align-right">
 				<html:link href="#" property="submitReflection"

@@ -161,6 +161,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -178,6 +179,7 @@ import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.VoteComparator;
@@ -194,11 +196,14 @@ import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 public class VoteLearningStarterAction extends Action implements VoteAppConstants {
-    static Logger logger = Logger.getLogger(VoteLearningStarterAction.class.getName());
+    private static Logger logger = Logger.getLogger(VoteLearningStarterAction.class.getName());
+    
+    private static IVoteService voteService;
 
     /*
      * By now, the passed tool session id MUST exist in the db through the calling of: public void
@@ -212,11 +217,13 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    HttpServletResponse response) throws IOException, ServletException, VoteApplicationException {
 
 	VoteUtils.cleanUpSessionAbsolute(request);
+	
+	if (voteService == null) {
+	    voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
+	}
 
 	Map mapQuestionsContent = new TreeMap(new VoteComparator());
-	Map mapAnswers = new TreeMap(new VoteComparator());
 
-	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
 	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
 
@@ -280,78 +287,61 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	voteLearningForm.setToolContentUID(voteContent.getUid().toString());
 	voteGeneralLearnerFlowDTO.setToolContentUID(voteContent.getUid().toString());
 
-	String userID = voteLearningForm.getUserID();
 	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
 	String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
 	voteGeneralLearnerFlowDTO.setReflectionSubject(reflectionSubject);
 
-	/*
-	 * Is the request for a preview by the author? Preview The tool must be able to show the specified content as if
-	 * it was running in a lesson. It will be the learner url with tool access mode set to ToolAccessMode.AUTHOR 3
-	 * modes are: author teacher learner
-	 */
-	/* ? CHECK THIS: how do we determine whether preview is requested? Mode is not enough on its own. */
+	String mode = voteLearningForm.getLearningMode();
+	voteGeneralLearnerFlowDTO.setLearningMode(mode);
+	
+	String userId = voteLearningForm.getUserID();
+	NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID),
+		CoreNotebookConstants.NOTEBOOK_TOOL, VoteAppConstants.MY_SIGNATURE, new Integer(userId));
+	if (notebookEntry != null) {
+	    String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
+	    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
+	}
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
 	/* handle PREVIEW mode */
-	String mode = voteLearningForm.getLearningMode();
 	if (mode != null && mode.equals("author")) {
 	    commonContentSetup(request, voteService, voteContent, voteGeneralLearnerFlowDTO);
 	    request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 	}
-
-	/*
-	 * by now, we know that the mode is either teacher or learner check if the mode is teacher and request is for
-	 * Learner Progress
-	 */
-
-	String learnerProgressUserId = request.getParameter(VoteAppConstants.USER_ID);
-
-	if (learnerProgressUserId != null && mode.equals("teacher")) {
-	    VoteQueUsr voteQueUsr = voteService.getVoteUserBySession(new Long(learnerProgressUserId), voteSession
-		    .getUid());
-
-	    if (voteQueUsr != null) {
-
-		Long sessionUid = voteQueUsr.getVoteSessionId();
-
-		String toolContentId = voteLearningForm.getToolContentID();
-		putMapQuestionsContentIntoRequest(request, voteService, voteQueUsr);
-		Set userAttempts = voteService.getAttemptsForUserAndSessionUseOpenAnswer(voteQueUsr.getUid(),
-			sessionUid);
-		request.setAttribute(VoteAppConstants.LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
-
-	    } else {
-		request.setAttribute(VoteAppConstants.MAP_GENERAL_CHECKED_OPTIONS_CONTENT, new TreeMap(
-			new VoteComparator()));
-		request.setAttribute(VoteAppConstants.LIST_GENERAL_CHECKED_OPTIONS_CONTENT, new HashSet());
-	    }
-
-	    //since this is progress view, present a screen which can not be edited
-	    voteLearningForm.setReportViewOnly(new Boolean(true).toString());
-	    voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
-	    voteGeneralLearnerFlowDTO.setLearningMode(mode);
-	    putNotebookEntryIntoVoteGeneralLearnerFlowDTO(voteService, voteGeneralLearnerFlowDTO, toolSessionID,
-		    learnerProgressUserId);
-
-	    VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
-	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(),
-		    voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO,
-		    getMessageService());
-	    
-	    boolean isGroupedActivity = voteService.isGroupedActivity(new Long(voteLearningForm.getToolContentID()));
-		request.setAttribute("isGroupedActivity", isGroupedActivity);
-
-	    return mapping.findForward(VoteAppConstants.EXIT_PAGE);
+	
+	VoteQueUsr user = null;
+	if ((mode != null) && mode.equals(ToolAccessMode.TEACHER.toString())) {
+	    // monitoring mode - user is specified in URL
+	    // user may be null if the user was force completed.
+	    user = getSpecifiedUser(toolSessionID, WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
+	} else {
+	    user = getCurrentUser(toolSessionID);
 	}
+	
+	// check if there is submission deadline
+	Date submissionDeadline = voteContent.getSubmissionDeadline();
 
-	/* by now, we know that the mode is learner */
-	putNotebookEntryIntoVoteGeneralLearnerFlowDTO(voteService, voteGeneralLearnerFlowDTO, toolSessionID, userID);
+	if (submissionDeadline != null) {
+
+	    request.setAttribute(VoteAppConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+	    voteGeneralLearnerFlowDTO.setSubmissionDeadline(tzSubmissionDeadline);
+
+	    // calculate whether deadline has passed, and if so forward to "runOffline"
+	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
+		return mapping.findForward(RUN_OFFLINE);
+
+	    }
+	}
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
 		.getServletContext());
-	
+
 	/*
 	 * find out if the content is set to run offline or online. If it is set to run offline , the learners are
 	 * informed about that.
@@ -359,7 +349,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	boolean isRunOffline = VoteUtils.isRunOffline(voteContent);
 	if (isRunOffline == true) {
 	    VoteUtils.cleanUpSessionAbsolute(request);
-	    //warning to learner: the activity is offline
+	    // warning to learner: the activity is offline
 	    voteLearningForm.setActivityRunOffline(new Boolean(true).toString());
 	    voteGeneralLearnerFlowDTO.setActivityRunOffline(new Boolean(true).toString());
 
@@ -374,28 +364,62 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    VoteUtils.cleanUpSessionAbsolute(request);
 	    return mapping.findForward(VoteAppConstants.DEFINE_LATER);
 	}
+	
+	//process group leader
+	VoteQueUsr groupLeader = null;
+	if (voteContent.isUseSelectLeaderToolOuput()) {
+	    groupLeader = voteService.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionID));
+	    
+	    // forwards to the leaderSelection page
+	    if (groupLeader == null && !mode.equals(ToolAccessMode.TEACHER.toString())) {
 
-    //	check if there is submission deadline
-    Date submissionDeadline = voteContent.getSubmissionDeadline();
-    
-    if (submissionDeadline != null) {
-    	
-    	request.setAttribute(VoteAppConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
-    	HttpSession ss = SessionManager.getSession();
-    	UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-    	TimeZone learnerTimeZone = learnerDto.getTimeZone();
-    	Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
-    	Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
-    	voteGeneralLearnerFlowDTO.setSubmissionDeadline(tzSubmissionDeadline);	 
-    	
-    	//calculate whether deadline has passed, and if so forward to "runOffline"
-    	if (currentLearnerDate.after(tzSubmissionDeadline)) {
-    		return mapping.findForward(RUN_OFFLINE);
-    		
-    	}
-    	
-    }
-  
+		Set<VoteQueUsr> groupUsers = voteSession.getVoteQueUsers();
+		request.setAttribute(ATTR_GROUP_USERS, groupUsers);
+		request.setAttribute(TOOL_SESSION_ID, toolSessionID);
+		request.setAttribute(ATTR_CONTENT, voteContent);
+
+		return mapping.findForward(WAIT_FOR_LEADER);
+	    }
+
+	    // check if leader has submitted all answers
+	    if (groupLeader.isResponseFinalised() && !mode.equals(ToolAccessMode.TEACHER.toString())) {
+
+		// in case user joins the lesson after leader has answers some answers already - we need to make sure
+		// he has the same scratches as leader
+		voteService.copyAnswersFromLeader(user, groupLeader);
+
+		user.setFinalScreenRequested(true);
+		user.setResponseFinalised(true);
+		voteService.updateVoteUser(user);
+	    }
+	    
+	    // store group leader information
+	    voteLearningForm.setGroupLeaderName(groupLeader.getFullname());
+	    boolean isUserLeader = voteService.isUserGroupLeader(user, new Long(toolSessionID));
+	    voteLearningForm.setIsUserLeader(isUserLeader);
+	}
+
+	if (mode.equals("teacher")) {
+
+	    Long sessionUid = user.getVoteSessionId();
+	    putMapQuestionsContentIntoRequest(request, voteService, user);
+	    Set userAttempts = voteService.getAttemptsForUserAndSessionUseOpenAnswer(user.getUid(), sessionUid);
+	    request.setAttribute(VoteAppConstants.LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
+
+	    // since this is progress view, present a screen which can not be edited
+	    voteLearningForm.setReportViewOnly(new Boolean(true).toString());
+	    voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
+
+	    VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
+	    MonitoringUtil.prepareChartData(request, voteService, null, voteContent.getVoteContentId().toString(),
+		    voteSession.getUid().toString(), voteGeneralLearnerFlowDTO, voteGeneralMonitoringDTO,
+		    getMessageService());
+
+	    boolean isGroupedActivity = voteService.isGroupedActivity(new Long(voteLearningForm.getToolContentID()));
+	    request.setAttribute("isGroupedActivity", isGroupedActivity);
+
+	    return mapping.findForward(VoteAppConstants.EXIT_PAGE);
+	}
 
 	/*
 	 * fetch question content from content
@@ -405,41 +429,27 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	request.setAttribute(VoteAppConstants.MAP_OPTIONS_CONTENT, mapQuestionsContent);
 
 	/*
-	 * verify that userId does not already exist in the db. If it does exist, that means, that user already
-	 * responded to the content and his answers must be displayed read-only
-	 * 
-	 */
-	VoteQueUsr voteQueUsr = voteService.getVoteUserBySession(new Long(userID), voteSession.getUid());
-	if (voteQueUsr != null) {
-	    Long queUsrId = voteQueUsr.getUid();
-	} else {
-	    //voteQueUsr is not available in the db
-	}
-
-	String learningMode = voteLearningForm.getLearningMode();
-
-	/*
 	 * the user's session id AND user id exists in the tool tables goto this screen if the OverAll Results scren has
 	 * been already called up by this user
 	 */
-	if (voteQueUsr != null && voteQueUsr.isFinalScreenRequested()) {
-	    Long sessionUid = voteQueUsr.getVoteSessionId();
+	if (user.isFinalScreenRequested()) {
+	    Long sessionUid = user.getVoteSessionId();
 	    VoteSession voteUserSession = voteService.getVoteSessionByUID(sessionUid);
 	    String userSessionId = voteUserSession.getVoteSessionId().toString();
 
 	    if (toolSessionID.toString().equals(userSessionId)) {
-		//the learner has already responsed to this content, just generate a read-only report. Use redo questions for this
-		String toolContentId = voteLearningForm.getToolContentID();
-		putMapQuestionsContentIntoRequest(request, voteService, voteQueUsr);
+		// the learner has already responsed to this content, just generate a read-only report. Use redo
+		// questions for this
+		putMapQuestionsContentIntoRequest(request, voteService, user);
 
-		boolean isResponseFinalised = voteQueUsr.isResponseFinalised();
+		boolean isResponseFinalised = user.isResponseFinalised();
 		if (isResponseFinalised) {
-		    //since the response is finalised present a screen which can not be edited
+		    // since the response is finalised present a screen which can not be edited
 		    voteLearningForm.setReportViewOnly(new Boolean(true).toString());
 		    voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
 		}
 
-		Set userAttempts = voteService.getAttemptsForUserAndSessionUseOpenAnswer(voteQueUsr.getUid(),
+		Set userAttempts = voteService.getAttemptsForUserAndSessionUseOpenAnswer(user.getUid(),
 			sessionUid);
 		request.setAttribute(VoteAppConstants.LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
 
@@ -450,7 +460,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 
 		String isContentLockOnFinish = voteLearningForm.getLockOnFinish();
 		if (isContentLockOnFinish.equals(new Boolean(true).toString()) && isResponseFinalised == true) {
-		    //user with session id:  userSessionId should not redo votes. session  is locked
+		    // user with session id: userSessionId should not redo votes. session is locked
 		    return mapping.findForward(VoteAppConstants.EXIT_PAGE);
 		}
 
@@ -459,26 +469,15 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 		request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
 		if (isContentLockOnFinish.equals(new Boolean(false).toString()) && isResponseFinalised == true) {
-		   //isContentLockOnFinish is false, enable redo of votes
+		    // isContentLockOnFinish is false, enable redo of votes
 		    return mapping.findForward(VoteAppConstants.REVISITED_ALL_NOMINATIONS);
 		}
 
 		return mapping.findForward(VoteAppConstants.ALL_NOMINATIONS);
 	    }
 	}
-	//presenting standard learner screen..
+	// presenting standard learner screen..
 	return mapping.findForward(VoteAppConstants.LOAD_LEARNER);
-    }
-
-    private void putNotebookEntryIntoVoteGeneralLearnerFlowDTO(IVoteService voteService,
-	    VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO, String toolSessionID, String userID) {
-	NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID),
-		CoreNotebookConstants.NOTEBOOK_TOOL, VoteAppConstants.MY_SIGNATURE, new Integer(userID));
-
-	if (notebookEntry != null) {
-	    String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
-	    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
-	}
     }
 
     /**
@@ -486,10 +485,10 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
      * will be set but it will be empty TODO This shouldn't go in the request, it should go in our special session map.
      */
     private void putMapQuestionsContentIntoRequest(HttpServletRequest request, IVoteService voteService,
-	    VoteQueUsr voteQueUsr) {
+	    VoteQueUsr user) {
 	List attempts = null;
-	if (voteQueUsr != null) {
-	    attempts = voteService.getAttemptsForUser(voteQueUsr.getUid());
+	if (user != null) {
+	    attempts = voteService.getAttemptsForUser(user.getUid());
 	}
 	Map localMapQuestionsContent = new TreeMap(new VoteComparator());
 
@@ -504,7 +503,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 		if (voteQueContent != null) {
 		    String entry = voteQueContent.getQuestion();
 
-		    String voteQueContentId = attempt.getVoteQueContentId().toString();
+		    String voteQueContentId = attempt.getVoteQueContent().getUid().toString();
 		    if (entry != null) {
 			if (entry.equals("sample nomination") && voteQueContentId.equals("1")) {
 			    localMapQuestionsContent.put(new Integer(order).toString(), attempt.getUserEntry());
@@ -554,7 +553,8 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	voteLearningForm.setActivityInstructions(voteContent.getInstructions());
 	voteLearningForm.setActivityRunOffline(new Boolean(voteContent.isRunOffline()).toString());
 	voteLearningForm.setMaxNominationCount(voteContent.getMaxNominationCount());
-	voteLearningForm.setMinNominationCount(voteContent.getMinNominationCount());	
+	voteLearningForm.setMinNominationCount(voteContent.getMinNominationCount());
+	voteLearningForm.setUseSelectLeaderToolOuput(new Boolean(voteContent.isUseSelectLeaderToolOuput()).toString());
 	voteLearningForm.setAllowTextEntry(new Boolean(voteContent.isAllowText()).toString());
 	voteLearningForm.setShowResults(new Boolean(voteContent.isShowResults()).toString());
 	voteLearningForm.setLockOnFinish(new Boolean(voteContent.isLockOnFinish()).toString());
@@ -563,7 +563,9 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
 	voteGeneralLearnerFlowDTO.setActivityRunOffline(new Boolean(voteContent.isRunOffline()).toString());
 	voteGeneralLearnerFlowDTO.setMaxNominationCount(voteContent.getMaxNominationCount());
-	voteGeneralLearnerFlowDTO.setMinNominationCount(voteContent.getMinNominationCount());	
+	voteGeneralLearnerFlowDTO.setMinNominationCount(voteContent.getMinNominationCount());
+	voteGeneralLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(voteContent.isUseSelectLeaderToolOuput())
+		.toString());
 	voteGeneralLearnerFlowDTO.setAllowTextEntry(new Boolean(voteContent.isAllowText()).toString());
 	voteGeneralLearnerFlowDTO.setLockOnFinish(new Boolean(voteContent.isLockOnFinish()).toString());
 	voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
@@ -645,6 +647,36 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	ActionMessages errors = new ActionMessages();
 	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
 	saveErrors(request, errors);
+    }
+    
+    private VoteQueUsr getCurrentUser(String toolSessionId) {
+
+	// get back login user DTO
+	HttpSession ss = SessionManager.getSession();
+	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userId = new Long(toolUser.getUserID().longValue());
+
+	VoteSession session = voteService.retrieveVoteSession(new Long(toolSessionId));
+	VoteQueUsr user = voteService.getVoteUserBySession(userId, session.getUid());
+	if (user == null) {
+	    String userName = toolUser.getLogin();
+	    String fullName = toolUser.getFirstName() + " " + toolUser.getLastName();
+
+	    user = new VoteQueUsr(userId, userName, fullName, session, new TreeSet());
+	    voteService.createVoteQueUsr(user);
+	}
+
+	return user;
+    }
+
+    private VoteQueUsr getSpecifiedUser(String toolSessionId, Integer userId) {
+	VoteSession session = voteService.retrieveVoteSession(new Long(toolSessionId));
+	VoteQueUsr user = voteService.getVoteUserBySession(new Long(userId.intValue()), session.getUid());
+	if (user == null) {
+	    logger.error("Unable to find specified user for Vote activity. Screens are likely to fail. SessionId="
+		    + new Long(toolSessionId) + " UserId=" + userId);
+	}
+	return user;
     }
 
     /**

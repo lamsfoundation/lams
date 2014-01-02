@@ -72,8 +72,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</div><!-- /header -->
 
 	<div data-role="content">
-		<html:form action="/learning?validate=false"
-			enctype="multipart/form-data" method="POST" target="_self">
+		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<c:set var="isUserLeader" value="${formBean.userLeader}" />
+			<c:set var="isLeadershipEnabled" value="${formBean.useSelectLeaderToolOuput}" />
+			<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
+			
 			<html:hidden property="dispatch" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="userID" />
@@ -86,6 +90,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="reportViewOnly" />
 			<html:hidden property="userEntry" />
 			<html:hidden property="showResults" />
+			<html:hidden property="userLeader" />
+			<html:hidden property="groupLeaderName" />
+			<html:hidden property="useSelectLeaderToolOuput" />
+
+			<c:if test="${isLeadershipEnabled}">
+				<h4>
+					<fmt:message key="label.group.leader" >
+						<fmt:param>${formBean.groupLeaderName}</fmt:param>
+					</fmt:message>
+				</h4>
+			</c:if>
 
 			<h2>
 				<fmt:message key="label.progressiveResults" />
@@ -103,20 +118,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</th>
 				</tr>
 
-				<c:forEach var="currentNomination"
-					items="${voteGeneralLearnerFlowDTO.mapStandardNominationsHTMLedContent}">
-					<c:set var="currentNominationKey" scope="request"
-						value="${currentNomination.key}" />
+				<c:forEach var="currentNomination" items="${voteGeneralLearnerFlowDTO.mapStandardNominationsHTMLedContent}">
+					<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}" />
 					<tr class="ui-btn-up-c">
 						<td class="space">
 							<c:out value="${currentNomination.value}" escapeXml="false" />
 						</td>
 
 						<td>
-							<c:forEach var="currentUserCount"
-								items="${voteGeneralLearnerFlowDTO.mapStandardUserCount}">
-								<c:set var="currentUserKey" scope="request"
-									value="${currentUserCount.key}" />
+							<c:forEach var="currentUserCount" items="${voteGeneralLearnerFlowDTO.mapStandardUserCount}">
+								<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}" />
 								<c:if test="${currentNominationKey == currentUserKey}">
 
 									<c:if test="${currentUserCount.value != '0' }">
@@ -246,7 +257,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<fmt:message key="label.refresh" />
 					</button>
 
-					<c:if test="${VoteLearningForm.lockOnFinish != 'true'}">
+					<c:if test="${VoteLearningForm.lockOnFinish != 'true' && hasEditRight}">
 						<button name="redoQuestionsOk"
 							onclick="submitMethod('redoQuestionsOk');" data-icon="back">
 							<fmt:message key="label.retake" />
@@ -261,7 +272,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div data-role="footer" data-theme="b" class="ui-bar">
 		<c:if test="${voteGeneralLearnerFlowDTO.reportViewOnly != 'true' }">
 			<span class="ui-finishbtn-right">
-				<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true'}">
+				<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
 					<a href="#" name="learnerFinished"
 						onclick="javascript:submitMethod('learnerFinished');return false"
 						style="float:right" id="finishButton" data-role="button" data-icon="arrow-r" data-theme="b">
@@ -278,7 +289,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</a>
 				</c:if>
 	
-				<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}">
+				<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true' && hasEditRight}">
 					<button name="forwardtoReflection"
 						onclick="javascript:submitMethod('forwardtoReflection');" data-icon="arrow-r" data-theme="b">
 						<fmt:message key="label.continue" />

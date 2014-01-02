@@ -31,35 +31,35 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 /**
  * @author Ozgur Demirtas
  * 
- * <p>Interface that defines the contract for VoteSession access </p>
+ *         <p>
+ *         Interface that defines the contract for VoteSession access
+ *         </p>
  */
 public interface IVoteSessionDAO {
-    public VoteSession getVoteSessionByUID(Long uid);
-	
-    public VoteSession findVoteSessionById(Long voteSessionId);
-    
-    public int countSessionComplete();
+    VoteSession getVoteSessionByUID(Long uid);
 
-    public int countSessionIncomplete();
-    
-    public void saveVoteSession(VoteSession voteSession);
-    
-    public void updateVoteSession(VoteSession voteSession);
-   
-    public void removeVoteSessionByUID(Long uid);
-    
-    public void removeVoteSessionById(Long voteSessionId);
+    VoteSession findVoteSessionById(Long voteSessionId);
 
-    public void removeVoteSession(VoteSession voteSession);
+    int countSessionComplete();
 
-    public VoteSession getVoteSessionByUser(final Long userId);
-	 
-    public void removeVoteUsers(VoteSession voteSession);
-	
-    public void addVoteUsers(Long voteSessionId, VoteQueUsr user);
-	
-	public List getSessionsFromContent(VoteContent voteContent);
-	
-	public List getSessionNamesFromContent(VoteContent voteContent);
+    void saveVoteSession(VoteSession voteSession);
+
+    void updateVoteSession(VoteSession voteSession);
+
+    void removeVoteSessionByUID(Long uid);
+
+    void removeVoteSessionById(Long voteSessionId);
+
+    void removeVoteSession(VoteSession voteSession);
+
+    VoteSession getVoteSessionByUser(final Long userId);
+
+    void removeVoteUsers(VoteSession voteSession);
+
+    void addVoteUsers(Long voteSessionId, VoteQueUsr user);
+
+    List getSessionsFromContent(VoteContent voteContent);
+
+    List getSessionNamesFromContent(VoteContent voteContent);
 
 }

@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
@@ -44,6 +45,9 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * 
@@ -97,43 +101,12 @@ public class LearningUtil implements VoteAppConstants {
 	return mapQuestionsContent;
     }
 
-    /**
-     * determines if a user is already in the tool's tables
-     * 
-     * @param request
-     * @return
-     */
-    public static boolean doesUserExists(HttpServletRequest request, IVoteService voteService) {
-	Long queUsrId = VoteUtils.getUserId();
-	VoteQueUsr voteQueUsr = voteService.retrieveVoteQueUsr(queUsrId);
-
-	if (voteQueUsr != null) {
-	    return true;
-	}
-
-	return false;
-    }
-
-    /**
-     * creates a new user for the tool
-     * 
-     * @param request
-     * @return
-     */
-    public static VoteQueUsr createUser(HttpServletRequest request, IVoteService voteService, Long toolSessionID) {
-
-	Long queUsrId = VoteUtils.getUserId();
-	String username = VoteUtils.getUserName();
-	String fullname = VoteUtils.getUserFullName();
-	VoteSession voteSession = voteService.retrieveVoteSession(toolSessionID);
-	VoteQueUsr voteQueUsr = new VoteQueUsr(queUsrId, username, fullname, voteSession, new TreeSet());
-	voteService.createVoteQueUsr(voteQueUsr);
-	return voteQueUsr;
-    }
-
-    public static VoteQueUsr getUser(HttpServletRequest request, IVoteService voteService) {
-	Long queUsrId = VoteUtils.getUserId();
-	VoteQueUsr voteQueUsr = voteService.retrieveVoteQueUsr(queUsrId);
+    public static VoteQueUsr getUser(IVoteService voteService) {
+	/* get back login user DTO */
+	HttpSession ss = SessionManager.getSession();
+	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	long userId = toolUser.getUserID().longValue();
+	VoteQueUsr voteQueUsr = voteService.retrieveVoteQueUsr(userId);
 	return voteQueUsr;
     }
 
@@ -144,20 +117,18 @@ public class LearningUtil implements VoteAppConstants {
      * @param voteQueUsr
      * @param mapGeneralCheckedOptionsContent
      * @param userEntry
-     * @param singleUserEntry
      * @param voteSession
      */
-    public static void createAttempt(HttpServletRequest request, IVoteService voteService, VoteQueUsr voteQueUsr,
-	    Map mapGeneralCheckedOptionsContent, String userEntry, boolean singleUserEntry, VoteSession voteSession,
-	    Long toolContentUID) {
+    public static void createAttempt(IVoteService voteService, VoteQueUsr voteQueUsr,
+	    Map mapGeneralCheckedOptionsContent, String userEntry, VoteSession voteSession, Long toolContentUID) {
 
 	Date attempTime = VoteUtils.getGMTDateTime();
 	String timeZone = VoteUtils.getCurrentTimeZone();
 
 	if (mapGeneralCheckedOptionsContent.size() == 0) {
 	    VoteQueContent localVoteQueContent = voteService.getToolDefaultQuestionContent(1);
-	    createIndividualOptions(request, voteService, localVoteQueContent, voteQueUsr, attempTime, timeZone,
-		    userEntry, singleUserEntry, voteSession);
+	    createIndividualOptions(voteService, localVoteQueContent, voteQueUsr, attempTime, timeZone, userEntry,
+		    voteSession);
 
 	} else {
 	    if (toolContentUID != null) {
@@ -169,8 +140,8 @@ public class LearningUtil implements VoteAppConstants {
 		    VoteQueContent voteQueContent = voteService.getQuestionContentByDisplayOrder(questionDisplayOrder,
 			    toolContentUID);
 		    if (voteQueContent != null) {
-			createIndividualOptions(request, voteService, voteQueContent, voteQueUsr, attempTime, timeZone,
-				userEntry, false, voteSession);
+			createIndividualOptions(voteService, voteQueContent, voteQueUsr, attempTime, timeZone,
+				userEntry, voteSession);
 		    }
 		}
 	    }
@@ -178,12 +149,11 @@ public class LearningUtil implements VoteAppConstants {
 
     }
 
-    public static void createIndividualOptions(HttpServletRequest request, IVoteService voteService,
-	    VoteQueContent voteQueContent, VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry,
-	    boolean singleUserEntry, VoteSession voteSession) {
+    public static void createIndividualOptions(IVoteService voteService, VoteQueContent voteQueContent,
+	    VoteQueUsr voteQueUsr, Date attempTime, String timeZone, String userEntry, VoteSession voteSession) {
 
 	if (voteQueContent != null) {
-	    VoteUsrAttempt existingVoteUsrAttempt = voteService.getAttemptsForUserAndQuestionContentAndSession(
+	    VoteUsrAttempt existingVoteUsrAttempt = voteService.getAttemptForUserAndQuestionContentAndSession(
 		    voteQueUsr.getQueUsrId(), voteQueContent.getVoteContentId(), voteSession.getUid());
 
 	    if (existingVoteUsrAttempt != null) {
@@ -193,7 +163,7 @@ public class LearningUtil implements VoteAppConstants {
 		voteService.updateVoteUsrAttempt(existingVoteUsrAttempt);
 	    } else {
 		VoteUsrAttempt voteUsrAttempt = new VoteUsrAttempt(attempTime, timeZone, voteQueContent, voteQueUsr,
-			userEntry, singleUserEntry, true);
+			userEntry, true);
 		voteService.createVoteUsrAttempt(voteUsrAttempt);
 	    }
 	}
@@ -272,10 +242,14 @@ public class LearningUtil implements VoteAppConstants {
     }
 
     private static void createQuestionsFromToolInput(VoteContent voteContent, IVoteService voteService) {
+	
+	/* get back login user DTO */
+	HttpSession ss = SessionManager.getSession();
+	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	long userId = toolUser.getUserID().longValue();
+	
 	// We get whatever the source tool provides us with and try to create questions out of it
-	DataFlowObject dataFlowObject = voteService.getAssignedDataFlowObject(voteContent.getVoteContentId());
-	ToolOutput toolInput = voteService.getToolInput(voteContent.getVoteContentId(), VoteUtils.getUserId()
-		.intValue());
+	ToolOutput toolInput = voteService.getToolInput(voteContent.getVoteContentId(), new Long(userId).intValue());
 
 	Object value = toolInput.getValue().getComplex();
 	short inputsAdded = voteContent.getExternalInputsAdded() == null ? 0 : voteContent.getExternalInputsAdded();

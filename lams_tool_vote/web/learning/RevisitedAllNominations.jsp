@@ -66,12 +66,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="content">
 
 		<h1>
-			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}"
-				escapeXml="false" />
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
 		</h1>
 
-		<html:form action="/learning?validate=false"
-			enctype="multipart/form-data" method="POST" target="_self">
+		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<c:set var="isUserLeader" value="${formBean.userLeader}" />
+			<c:set var="isLeadershipEnabled" value="${formBean.useSelectLeaderToolOuput}" />
+			<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
+			
 			<html:hidden property="dispatch" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="userID" />
@@ -84,6 +87,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="reportViewOnly" />
 			<html:hidden property="userEntry" />
 			<html:hidden property="showResults" />
+			<html:hidden property="userLeader" />
+			<html:hidden property="groupLeaderName" />
+			<html:hidden property="useSelectLeaderToolOuput" />
+			
+			<c:if test="${isLeadershipEnabled}">
+				<h4>
+					<fmt:message key="label.group.leader" >
+						<fmt:param>${formBean.groupLeaderName}</fmt:param>
+					</fmt:message>
+				</h4>
+			</c:if>
 
 			<c:if test="${VoteLearningForm.showResults == 'true'}">
 				<jsp:include page="/learning/RevisitedDisplay.jsp" />
@@ -100,7 +114,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:out value="${voteGeneralLearnerFlowDTO.notebookEntry}"
 					escapeXml="false" />
 			
-				<c:if test="${voteGeneralLearnerFlowDTO.lockOnFinish == 'true' }">					
+				<c:if test="${voteGeneralLearnerFlowDTO.lockOnFinish == 'true' && hasEditRight}">					
 				<br>
 						<html:button property="forwardtoReflection" styleClass="button"
 							onclick="submitMethod('forwardtoReflection');"> 
@@ -110,14 +124,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<div class="space-bottom-top">
 
-				<html:submit property="redoQuestionsOk" styleClass="button"
-					onclick="submitMethod('redoQuestionsOk');">
-					<fmt:message key="label.retake" />
-				</html:submit>
+				<c:if test="${hasEditRight}">
+					<html:submit property="redoQuestionsOk" styleClass="button"
+						onclick="submitMethod('redoQuestionsOk');">
+						<fmt:message key="label.retake" />
+					</html:submit>
+				</c:if>
 
 				<html:link href="#nogo" property="learnerFinished" styleId="finishButton"
 					onclick="javascript:submitMethod('learnerFinished');return false"
-					styleClass="button">
+					styleClass="button big-space-top">
 					<span class="nextActivity">
 						<c:choose>
 							<c:when test="${activityPosition.last}">

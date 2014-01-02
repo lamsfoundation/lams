@@ -539,6 +539,8 @@ public class AuthoringUtil implements VoteAppConstants {
 	String showResults = request.getParameter("showResults");
 
 	String maxInputs = request.getParameter("maxInputs");
+	
+	String useSelectLeaderToolOuput = request.getParameter("useSelectLeaderToolOuput");
 
 	String reflect = request.getParameter(VoteAppConstants.REFLECT);
 
@@ -558,6 +560,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	boolean allowTextBoolean = false;
 	boolean reflectBoolean = false;
 	boolean showResultsBoolean = false;
+	boolean useSelectLeaderToolOuputBoolean = false;
 	short maxInputsShort = 0;
 
 	if (lockOnFinish != null && lockOnFinish.equalsIgnoreCase("1")) {
@@ -574,6 +577,10 @@ public class AuthoringUtil implements VoteAppConstants {
 
 	if (showResults != null && showResults.equalsIgnoreCase("1")) {
 	    showResultsBoolean = true;
+	}
+	
+	if (useSelectLeaderToolOuput != null && useSelectLeaderToolOuput.equalsIgnoreCase("1")) {
+	    useSelectLeaderToolOuputBoolean = true;
 	}
 
 	if (maxInputs != null && !"0".equals(maxInputs)) {
@@ -615,6 +622,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	    voteContent.setLockOnFinish(lockedOnFinishBoolean);
 	    voteContent.setAllowText(allowTextBoolean);
 	    voteContent.setShowResults(showResultsBoolean);
+	    voteContent.setUseSelectLeaderToolOuput(useSelectLeaderToolOuputBoolean);
 	    voteContent.setReflect(reflectBoolean);
 	    voteContent.setReflectionSubject(reflectionSubject);
 	    voteContent.setMaxNominationCount(maxNomcount);
@@ -970,6 +978,8 @@ public class AuthoringUtil implements VoteAppConstants {
 	String showResults = request.getParameter("showResults");
 
 	String maxInputs = request.getParameter("maxInputs");
+	
+	String useSelectLeaderToolOuput = request.getParameter("useSelectLeaderToolOuput");
 
 	String reflect = request.getParameter(VoteAppConstants.REFLECT);
 
@@ -994,6 +1004,7 @@ public class AuthoringUtil implements VoteAppConstants {
 
 	boolean lockOnFinishBoolean = false;
 	boolean allowTextEntryBoolean = false;
+	boolean useSelectLeaderToolOuputBoolean = false;
 	boolean reflectBoolean = false;
 	boolean showResultsBoolean = false;
 	short maxInputsShort = 0;
@@ -1004,6 +1015,10 @@ public class AuthoringUtil implements VoteAppConstants {
 
 	if (allowTextEntry != null && allowTextEntry.equalsIgnoreCase("1")) {
 	    allowTextEntryBoolean = true;
+	}
+	
+	if (useSelectLeaderToolOuput != null && useSelectLeaderToolOuput.equalsIgnoreCase("1")) {
+	    useSelectLeaderToolOuputBoolean = true;
 	}
 
 	if (reflect != null && reflect.equalsIgnoreCase("1")) {
@@ -1049,6 +1064,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	    voteContent.setLockOnFinish(lockOnFinishBoolean);
 	    voteContent.setAllowText(allowTextEntryBoolean);
 	    voteContent.setShowResults(showResultsBoolean);
+	    voteContent.setUseSelectLeaderToolOuput(useSelectLeaderToolOuputBoolean);
 	    voteContent.setReflect(reflectBoolean);
 	    voteContent.setMaxNominationCount(maxNomcount);
 	    voteContent.setMinNominationCount(minNomcount);

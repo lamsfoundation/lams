@@ -65,6 +65,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <div class="monitoring-advanced" id="advancedDiv" style="display:none">
 <table class="alternative-color">
+
+	<tr>
+		<td>
+			<fmt:message key="label.use.select.leader.tool.output" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${useSelectLeaderToolOuput}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+
 	<tr>
 		<td>
 			<fmt:message key="label.vote.lockedOnFinish" />

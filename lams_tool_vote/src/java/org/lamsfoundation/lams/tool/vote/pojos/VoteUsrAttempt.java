@@ -27,11 +27,10 @@ import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
 /**
- * <p>Persistent  object/bean that defines the user attempt for the MCQ tool.
- * Provides accessors and mutators to get/set attributes
- * It maps to database table: tl_lavote11_usr_attempt
+ * <p>
+ * Persistent object/bean that defines the user attempt for the MCQ tool. Provides accessors and mutators to get/set
+ * attributes It maps to database table: tl_lavote11_usr_attempt
  * </p>
  * 
  * @author Ozgur Demirtas
@@ -49,222 +48,178 @@ public class VoteUsrAttempt implements Serializable {
 
     /** nullable persistent field */
     private String timeZone;
-    
+
     private String userEntry;
-    
+
     private Long queUsrId;
-    
+
     private boolean visible;
-    
+
     private boolean singleUserEntry;
-    
+
     private Long voteQueContentId;
 
     /** persistent field */
-    private org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent;
+    private VoteQueContent voteQueContent;
 
     /** persistent field */
-    private org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr;
+    private VoteQueUsr voteQueUsr;
 
-    
-    /** full constructor */
-    public VoteUsrAttempt(Long attemptId, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
-    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
-        this.attemptId = attemptId;
-        this.attemptTime = attemptTime;
-        this.timeZone = timeZone;
-        this.voteQueContent = voteQueContent;
-        this.voteQueUsr = voteQueUsr;
+    public VoteUsrAttempt(Date attemptTime, String timeZone, VoteQueContent voteQueContent, VoteQueUsr voteQueUsr,
+	    String userEntry, boolean visible) {
+	this.attemptTime = attemptTime;
+	this.timeZone = timeZone;
+	this.voteQueContent = voteQueContent;
+	this.voteQueContentId = voteQueContent.getVoteQueContentId();
+	this.voteQueUsr = voteQueUsr;
+	this.userEntry = userEntry;
+	this.visible = visible;
     }
 
-    public VoteUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
-    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
-        this.attemptTime = attemptTime;
-        this.timeZone = timeZone;
-        this.voteQueContent = voteQueContent;
-        this.voteQueUsr = voteQueUsr;
-    }
-
-    public VoteUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
-    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, String userEntry) {
-        this.attemptTime = attemptTime;
-        this.timeZone = timeZone;
-        this.voteQueContent = voteQueContent;
-        this.voteQueUsr = voteQueUsr;
-        this.userEntry=userEntry;
-    }
-
-
-    public VoteUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
-    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, String userEntry, boolean singleUserEntry) {
-        this.attemptTime = attemptTime;
-        this.timeZone = timeZone;
-        this.voteQueContent = voteQueContent;
-        this.voteQueUsr = voteQueUsr;
-        this.userEntry=userEntry;
-        this.singleUserEntry=singleUserEntry;
-    }
-
-    public VoteUsrAttempt(Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
-    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr, String userEntry, boolean singleUserEntry, boolean visible) {
-        this.attemptTime = attemptTime;
-        this.timeZone = timeZone;
-        this.voteQueContent = voteQueContent;
-        this.voteQueUsr = voteQueUsr;
-        this.userEntry=userEntry;
-        this.visible=visible;
-    }
-
-    public VoteUsrAttempt(String userEntry, Date attemptTime, String timeZone, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
-    		org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
-        this.userEntry=userEntry;
-        this.attemptTime = attemptTime;
-        this.timeZone = timeZone;
-        this.voteQueContent = voteQueContent;
-        this.voteQueUsr = voteQueUsr;
-    }
-
-    
     /** default constructor */
     public VoteUsrAttempt() {
     }
 
-    /** minimal constructor */
-    public VoteUsrAttempt(Long attemptId, org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent, 
-            org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
-        this.attemptId = attemptId;
-        this.voteQueContent = voteQueContent;
-        this.voteQueUsr = voteQueUsr;
-    }
-
     public Long getUid() {
-        return this.uid;
+	return this.uid;
     }
 
     public void setUid(Long uid) {
-        this.uid = uid;
+	this.uid = uid;
     }
 
     public Long getAttemptId() {
-        return this.attemptId;
+	return this.attemptId;
     }
 
     public void setAttemptId(Long attemptId) {
-        this.attemptId = attemptId;
+	this.attemptId = attemptId;
     }
 
     public Date getAttemptTime() {
-        return this.attemptTime;
+	return this.attemptTime;
     }
 
     public void setAttemptTime(Date attemptTime) {
-        this.attemptTime = attemptTime;
+	this.attemptTime = attemptTime;
     }
 
     public String getTimeZone() {
-        return this.timeZone;
+	return this.timeZone;
     }
 
     public void setTimeZone(String timeZone) {
-        this.timeZone = timeZone;
+	this.timeZone = timeZone;
     }
 
-    
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("nomination:", voteQueContent.getQuestion())
-            .append("userEntry:", userEntry)
-            .toString();
+	return new ToStringBuilder(this).append("nomination:", voteQueContent.getQuestion())
+		.append("userEntry:", userEntry).toString();
     }
 
-	/**
-	 * @return Returns the queUsrId.
-	 */
-	public Long getQueUsrId() {
-		return queUsrId;
-	}
-	/**
-	 * @param queUsrId The queUsrId to set.
-	 */
-	public void setQueUsrId(Long queUsrId) {
-		this.queUsrId = queUsrId;
-	}
+    /**
+     * @return Returns the queUsrId.
+     */
+    public Long getQueUsrId() {
+	return queUsrId;
+    }
+
+    /**
+     * @param queUsrId
+     *            The queUsrId to set.
+     */
+    public void setQueUsrId(Long queUsrId) {
+	this.queUsrId = queUsrId;
+    }
+
     /**
      * @return Returns the voteQueContentId.
      */
     public Long getVoteQueContentId() {
-        return voteQueContentId;
+	return voteQueContentId;
     }
+
     /**
-     * @param voteQueContentId The voteQueContentId to set.
+     * @param voteQueContentId
+     *            The voteQueContentId to set.
      */
     public void setVoteQueContentId(Long voteQueContentId) {
-        this.voteQueContentId = voteQueContentId;
+	this.voteQueContentId = voteQueContentId;
     }
+
     /**
      * @return Returns the voteQueContent.
      */
-    public org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent getVoteQueContent() {
-        return voteQueContent;
+    public VoteQueContent getVoteQueContent() {
+	return voteQueContent;
     }
+
     /**
-     * @param voteQueContent The voteQueContent to set.
+     * @param voteQueContent
+     *            The voteQueContent to set.
      */
-    public void setVoteQueContent(
-            org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent voteQueContent) {
-        this.voteQueContent = voteQueContent;
+    public void setVoteQueContent(VoteQueContent voteQueContent) {
+	this.voteQueContent = voteQueContent;
     }
+
     /**
      * @return Returns the voteQueUsr.
      */
-    public org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr getVoteQueUsr() {
-        return voteQueUsr;
+    public VoteQueUsr getVoteQueUsr() {
+	return voteQueUsr;
     }
+
     /**
-     * @param voteQueUsr The voteQueUsr to set.
+     * @param voteQueUsr
+     *            The voteQueUsr to set.
      */
-    public void setVoteQueUsr(
-            org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr voteQueUsr) {
-        this.voteQueUsr = voteQueUsr;
+    public void setVoteQueUsr(VoteQueUsr voteQueUsr) {
+	this.voteQueUsr = voteQueUsr;
     }
-    
+
     /**
      * @return Returns the userEntry.
      */
     public String getUserEntry() {
-        return userEntry;
+	return userEntry;
     }
+
     /**
-     * @param userEntry The userEntry to set.
+     * @param userEntry
+     *            The userEntry to set.
      */
     public void setUserEntry(String userEntry) {
-        this.userEntry = userEntry;
+	this.userEntry = userEntry;
     }
 
     /**
      * @return Returns the singleUserEntry.
      */
     public boolean isSingleUserEntry() {
-        return singleUserEntry;
+	return singleUserEntry;
     }
+
     /**
-     * @param singleUserEntry The singleUserEntry to set.
+     * @param singleUserEntry
+     *            The singleUserEntry to set.
      */
     public void setSingleUserEntry(boolean singleUserEntry) {
-        this.singleUserEntry = singleUserEntry;
+	this.singleUserEntry = singleUserEntry;
     }
-    
+
     /**
      * @return Returns the visible.
      */
     public boolean isVisible() {
-        return visible;
+	return visible;
     }
+
     /**
-     * @param visible The visible to set.
+     * @param visible
+     *            The visible to set.
      */
     public void setVisible(boolean visible) {
-        this.visible = visible;
-    }    
-    
+	this.visible = visible;
+    }
+
 }

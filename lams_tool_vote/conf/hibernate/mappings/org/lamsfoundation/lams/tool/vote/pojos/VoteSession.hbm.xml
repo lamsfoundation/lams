@@ -96,6 +96,22 @@
             class="org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr"
         />
     </set>
+    
+    <many-to-one
+        name="groupLeader"
+        class="org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr"
+        not-null="true"        
+        cascade="all"
+        outer-join="auto"
+        update="true"
+        insert="true"
+        access="property"
+    >
+        <column
+            name="group_leader_uid" 
+        />
+    </many-to-one>
+    
 
 </class>
 </hibernate-mapping>

@@ -27,16 +27,14 @@ import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-
 /**
- * <p> DTO that holds authoring properties for authoring jsps
+ * <p>
+ * DTO that holds authoring properties for authoring jsps
  * </p>
  * 
  * @author Ozgur Demirtas
  */
-public class VoteGeneralAuthoringDTO implements Comparable
-{
+public class VoteGeneralAuthoringDTO implements Comparable {
     protected String activeModule;
     protected String defineLaterInEditMode;
     protected String submissionAttempt;
@@ -48,699 +46,827 @@ public class VoteGeneralAuthoringDTO implements Comparable
     protected String isDefineLater;
     protected String activityTitle;
     protected String activityInstructions;
-    protected int 	maxOptionIndex;
+    protected int maxOptionIndex;
     protected String defaultOptionContent;
     protected String richTextOfflineInstructions;
     protected String richTextOnlineInstructions;
-    
-    protected List 	listUploadedOfflineFileNames;
-    protected List 	listUploadedOnlineFileNames;
-    protected List 	listOfflineFilesMetadata;
-    protected List 	listOnlineFilesMetadata;
-    
-    protected String onlineInstructions;
-	protected String offlineInstructions;
-	
-	protected String allowText;
-	protected String showResults;
-	protected String lockOnFinish;
-	protected String maxNominationCount;
-	protected String minNominationCount;
-	
-	protected String editActivityEditMode;
-	protected Map mapOptionsContent;
-	protected String userExceptionMaxNominationInvalid;
-	protected String userExceptionNoToolSessions;
-	protected String userExceptionFilenameEmpty;
-	protected String isMonitoredContentInUse;
-	protected String validationError;
-	protected String userExceptionOptionsDuplicate;
-	protected String httpSessionID;
 
-	protected String contentFolderID;
+    protected List listUploadedOfflineFileNames;
+    protected List listUploadedOnlineFileNames;
+    protected List listOfflineFilesMetadata;
+    protected List listOnlineFilesMetadata;
+
+    protected String onlineInstructions;
+    protected String offlineInstructions;
+
+    protected String useSelectLeaderToolOuput;
+    protected String allowText;
+    protected String showResults;
+    protected String lockOnFinish;
+    protected String maxNominationCount;
+    protected String minNominationCount;
+
+    protected String editActivityEditMode;
+    protected Map mapOptionsContent;
+    protected String userExceptionMaxNominationInvalid;
+    protected String userExceptionNoToolSessions;
+    protected String userExceptionFilenameEmpty;
+    protected String isMonitoredContentInUse;
+    protected String validationError;
+    protected String userExceptionOptionsDuplicate;
+    protected String httpSessionID;
+
+    protected String contentFolderID;
     protected String editableQuestionText;
     protected String editableQuestionFeedback;
-    
+
     protected List attachmentList;
     protected List deletedAttachmentList;
     protected String reflect;
     protected String reflectionSubject;
-    
+
     protected Map mapNominationContent;
     protected String editableNominationText;
     protected String editableNominationFeedback;
     protected String isToolSessionChanged;
     protected String responseId;
     protected String currentUid;
-    protected List<String> dataFlowObjectNames;	
-    
+    protected List<String> dataFlowObjectNames;
+
     public List<String> getDataFlowObjectNames() {
-        return dataFlowObjectNames;
+	return dataFlowObjectNames;
     }
+
     public void setDataFlowObjectNames(List<String> dataFlowObjectNames) {
-        this.dataFlowObjectNames = dataFlowObjectNames;
+	this.dataFlowObjectNames = dataFlowObjectNames;
     }
+
     /**
      * @return Returns the httpSessionID.
      */
     public String getHttpSessionID() {
-        return httpSessionID;
+	return httpSessionID;
     }
+
     /**
-     * @param httpSessionID The httpSessionID to set.
+     * @param httpSessionID
+     *            The httpSessionID to set.
      */
     public void setHttpSessionID(String httpSessionID) {
-        this.httpSessionID = httpSessionID;
+	this.httpSessionID = httpSessionID;
     }
+
     /**
      * @return Returns the maxNominationCount.
      */
     public String getMaxNominationCount() {
-        return maxNominationCount;
+	return maxNominationCount;
     }
+
     /**
-     * @param maxNominationCount The maxNominationCount to set.
+     * @param maxNominationCount
+     *            The maxNominationCount to set.
      */
     public void setMaxNominationCount(String maxNominationCount) {
-        this.maxNominationCount = maxNominationCount;
+	this.maxNominationCount = maxNominationCount;
     }
+
     /**
      * @return Returns the minNominationCount.
      */
     public String getMinNominationCount() {
-        return minNominationCount;
+	return minNominationCount;
     }
+
     /**
-     * @param minNominationCount The minNominationCount to set.
+     * @param minNominationCount
+     *            The minNominationCount to set.
      */
     public void setMinNominationCount(String minNominationCount) {
-        this.minNominationCount = minNominationCount;
-    }    
+	this.minNominationCount = minNominationCount;
+    }
+
     /**
      * @return Returns the activeModule.
      */
     public String getActiveModule() {
-        return activeModule;
+	return activeModule;
     }
+
     /**
-     * @param listOfflineFilesMetadata The listOfflineFilesMetadata to set.
+     * @param listOfflineFilesMetadata
+     *            The listOfflineFilesMetadata to set.
      */
     public void setListOfflineFilesMetadata(List listOfflineFilesMetadata) {
-        this.listOfflineFilesMetadata = listOfflineFilesMetadata;
+	this.listOfflineFilesMetadata = listOfflineFilesMetadata;
     }
+
     /**
-     * @param listOnlineFilesMetadata The listOnlineFilesMetadata to set.
+     * @param listOnlineFilesMetadata
+     *            The listOnlineFilesMetadata to set.
      */
     public void setListOnlineFilesMetadata(List listOnlineFilesMetadata) {
-        this.listOnlineFilesMetadata = listOnlineFilesMetadata;
+	this.listOnlineFilesMetadata = listOnlineFilesMetadata;
     }
+
     /**
-     * @param listUploadedOnlineFileNames The listUploadedOnlineFileNames to set.
+     * @param listUploadedOnlineFileNames
+     *            The listUploadedOnlineFileNames to set.
      */
     public void setListUploadedOnlineFileNames(List listUploadedOnlineFileNames) {
-        this.listUploadedOnlineFileNames = listUploadedOnlineFileNames;
+	this.listUploadedOnlineFileNames = listUploadedOnlineFileNames;
     }
-    
-    
+
     /**
      * @return Returns the isMonitoredContentInUse.
      */
     public String getIsMonitoredContentInUse() {
-        return isMonitoredContentInUse;
+	return isMonitoredContentInUse;
     }
+
     /**
-     * @param isMonitoredContentInUse The isMonitoredContentInUse to set.
+     * @param isMonitoredContentInUse
+     *            The isMonitoredContentInUse to set.
      */
     public void setIsMonitoredContentInUse(String isMonitoredContentInUse) {
-        this.isMonitoredContentInUse = isMonitoredContentInUse;
+	this.isMonitoredContentInUse = isMonitoredContentInUse;
     }
+
     /**
-     * @param activeModule The activeModule to set.
+     * @param activeModule
+     *            The activeModule to set.
      */
     public void setActiveModule(String activeModule) {
-        this.activeModule = activeModule;
+	this.activeModule = activeModule;
     }
+
     /**
      * @return Returns the activityInstructions.
      */
     public String getActivityInstructions() {
-        return activityInstructions;
+	return activityInstructions;
     }
+
     /**
-     * @param activityInstructions The activityInstructions to set.
+     * @param activityInstructions
+     *            The activityInstructions to set.
      */
     public void setActivityInstructions(String activityInstructions) {
-        this.activityInstructions = activityInstructions;
+	this.activityInstructions = activityInstructions;
     }
+
     /**
      * @return Returns the activityTitle.
      */
     public String getActivityTitle() {
-        return activityTitle;
+	return activityTitle;
     }
+
     /**
-     * @param activityTitle The activityTitle to set.
+     * @param activityTitle
+     *            The activityTitle to set.
      */
     public void setActivityTitle(String activityTitle) {
-        this.activityTitle = activityTitle;
+	this.activityTitle = activityTitle;
     }
+
     /**
      * @return Returns the defaultContentId.
      */
     public String getDefaultContentId() {
-        return defaultContentId;
+	return defaultContentId;
     }
+
     /**
-     * @param defaultContentId The defaultContentId to set.
+     * @param defaultContentId
+     *            The defaultContentId to set.
      */
     public void setDefaultContentId(String defaultContentId) {
-        this.defaultContentId = defaultContentId;
+	this.defaultContentId = defaultContentId;
     }
+
     /**
      * @return Returns the defaultContentIdStr.
      */
     public String getDefaultContentIdStr() {
-        return defaultContentIdStr;
+	return defaultContentIdStr;
     }
+
     /**
-     * @param defaultContentIdStr The defaultContentIdStr to set.
+     * @param defaultContentIdStr
+     *            The defaultContentIdStr to set.
      */
     public void setDefaultContentIdStr(String defaultContentIdStr) {
-        this.defaultContentIdStr = defaultContentIdStr;
+	this.defaultContentIdStr = defaultContentIdStr;
     }
+
     /**
      * @return Returns the defaultOptionContent.
      */
     public String getDefaultOptionContent() {
-        return defaultOptionContent;
+	return defaultOptionContent;
     }
+
     /**
-     * @param defaultOptionContent The defaultOptionContent to set.
+     * @param defaultOptionContent
+     *            The defaultOptionContent to set.
      */
     public void setDefaultOptionContent(String defaultOptionContent) {
-        this.defaultOptionContent = defaultOptionContent;
+	this.defaultOptionContent = defaultOptionContent;
     }
+
     /**
      * @return Returns the defineLaterInEditMode.
      */
     public String getDefineLaterInEditMode() {
-        return defineLaterInEditMode;
+	return defineLaterInEditMode;
     }
+
     /**
-     * @param defineLaterInEditMode The defineLaterInEditMode to set.
+     * @param defineLaterInEditMode
+     *            The defineLaterInEditMode to set.
      */
     public void setDefineLaterInEditMode(String defineLaterInEditMode) {
-        this.defineLaterInEditMode = defineLaterInEditMode;
+	this.defineLaterInEditMode = defineLaterInEditMode;
     }
+
     /**
      * @return Returns the exceptionMaxNominationInvalid.
      */
     public String getExceptionMaxNominationInvalid() {
-        return exceptionMaxNominationInvalid;
+	return exceptionMaxNominationInvalid;
     }
+
     /**
-     * @param exceptionMaxNominationInvalid The exceptionMaxNominationInvalid to set.
+     * @param exceptionMaxNominationInvalid
+     *            The exceptionMaxNominationInvalid to set.
      */
-    public void setExceptionMaxNominationInvalid(
-            String exceptionMaxNominationInvalid) {
-        this.exceptionMaxNominationInvalid = exceptionMaxNominationInvalid;
+    public void setExceptionMaxNominationInvalid(String exceptionMaxNominationInvalid) {
+	this.exceptionMaxNominationInvalid = exceptionMaxNominationInvalid;
     }
+
     /**
      * @return Returns the isDefineLater.
      */
     public String getIsDefineLater() {
-        return isDefineLater;
+	return isDefineLater;
     }
+
     /**
-     * @param isDefineLater The isDefineLater to set.
+     * @param isDefineLater
+     *            The isDefineLater to set.
      */
     public void setIsDefineLater(String isDefineLater) {
-        this.isDefineLater = isDefineLater;
+	this.isDefineLater = isDefineLater;
     }
-    
+
     /**
      * @return Returns the listUploadedOfflineFileNames.
      */
     public List getListUploadedOfflineFileNames() {
-        return listUploadedOfflineFileNames;
+	return listUploadedOfflineFileNames;
     }
+
     /**
-     * @param listUploadedOfflineFileNames The listUploadedOfflineFileNames to set.
+     * @param listUploadedOfflineFileNames
+     *            The listUploadedOfflineFileNames to set.
      */
-    public void setListUploadedOfflineFileNames(
-            List listUploadedOfflineFileNames) {
-        this.listUploadedOfflineFileNames = listUploadedOfflineFileNames;
+    public void setListUploadedOfflineFileNames(List listUploadedOfflineFileNames) {
+	this.listUploadedOfflineFileNames = listUploadedOfflineFileNames;
     }
+
     /**
      * @return Returns the maxOptionIndex.
      */
     public int getMaxOptionIndex() {
-        return maxOptionIndex;
+	return maxOptionIndex;
     }
+
     /**
-     * @param maxOptionIndex The maxOptionIndex to set.
+     * @param maxOptionIndex
+     *            The maxOptionIndex to set.
      */
     public void setMaxOptionIndex(int maxOptionIndex) {
-        this.maxOptionIndex = maxOptionIndex;
+	this.maxOptionIndex = maxOptionIndex;
     }
+
     /**
      * @return Returns the richTextOfflineInstructions.
      */
     public String getRichTextOfflineInstructions() {
-        return richTextOfflineInstructions;
+	return richTextOfflineInstructions;
     }
+
     /**
-     * @param richTextOfflineInstructions The richTextOfflineInstructions to set.
+     * @param richTextOfflineInstructions
+     *            The richTextOfflineInstructions to set.
      */
-    public void setRichTextOfflineInstructions(
-            String richTextOfflineInstructions) {
-        this.richTextOfflineInstructions = richTextOfflineInstructions;
+    public void setRichTextOfflineInstructions(String richTextOfflineInstructions) {
+	this.richTextOfflineInstructions = richTextOfflineInstructions;
     }
+
     /**
      * @return Returns the richTextOnlineInstructions.
      */
     public String getRichTextOnlineInstructions() {
-        return richTextOnlineInstructions;
+	return richTextOnlineInstructions;
     }
+
     /**
-     * @param richTextOnlineInstructions The richTextOnlineInstructions to set.
+     * @param richTextOnlineInstructions
+     *            The richTextOnlineInstructions to set.
      */
     public void setRichTextOnlineInstructions(String richTextOnlineInstructions) {
-        this.richTextOnlineInstructions = richTextOnlineInstructions;
+	this.richTextOnlineInstructions = richTextOnlineInstructions;
     }
+
     /**
      * @return Returns the sbmtSuccess.
      */
     public String getSbmtSuccess() {
-        return sbmtSuccess;
+	return sbmtSuccess;
     }
+
     /**
-     * @param sbmtSuccess The sbmtSuccess to set.
+     * @param sbmtSuccess
+     *            The sbmtSuccess to set.
      */
     public void setSbmtSuccess(String sbmtSuccess) {
-        this.sbmtSuccess = sbmtSuccess;
+	this.sbmtSuccess = sbmtSuccess;
     }
+
     /**
      * @return Returns the submissionAttempt.
      */
     public String getSubmissionAttempt() {
-        return submissionAttempt;
+	return submissionAttempt;
     }
+
     /**
-     * @param submissionAttempt The submissionAttempt to set.
+     * @param submissionAttempt
+     *            The submissionAttempt to set.
      */
     public void setSubmissionAttempt(String submissionAttempt) {
-        this.submissionAttempt = submissionAttempt;
+	this.submissionAttempt = submissionAttempt;
     }
+
     /**
      * @return Returns the toolContentID.
      */
     public String getToolContentID() {
-        return toolContentID;
+	return toolContentID;
     }
+
     /**
-     * @param toolContentID The toolContentID to set.
+     * @param toolContentID
+     *            The toolContentID to set.
      */
     public void setToolContentID(String toolContentID) {
-        this.toolContentID = toolContentID;
+	this.toolContentID = toolContentID;
     }
-    
+
     /**
      * @return Returns the offlineInstructions.
      */
     public String getOfflineInstructions() {
-        return offlineInstructions;
+	return offlineInstructions;
     }
+
     /**
-     * @param offlineInstructions The offlineInstructions to set.
+     * @param offlineInstructions
+     *            The offlineInstructions to set.
      */
     public void setOfflineInstructions(String offlineInstructions) {
-        this.offlineInstructions = offlineInstructions;
+	this.offlineInstructions = offlineInstructions;
     }
+
     /**
      * @return Returns the onlineInstructions.
      */
     public String getOnlineInstructions() {
-        return onlineInstructions;
+	return onlineInstructions;
     }
+
     /**
-     * @param onlineInstructions The onlineInstructions to set.
+     * @param onlineInstructions
+     *            The onlineInstructions to set.
      */
     public void setOnlineInstructions(String onlineInstructions) {
-        this.onlineInstructions = onlineInstructions;
+	this.onlineInstructions = onlineInstructions;
     }
+
     /**
      * @return Returns the listOfflineFilesMetadata.
      */
     public List getListOfflineFilesMetadata() {
-        return listOfflineFilesMetadata;
+	return listOfflineFilesMetadata;
     }
+
     /**
      * @return Returns the listOnlineFilesMetadata.
      */
     public List getListOnlineFilesMetadata() {
-        return listOnlineFilesMetadata;
+	return listOnlineFilesMetadata;
     }
+
     /**
      * @return Returns the listUploadedOnlineFileNames.
      */
     public List getListUploadedOnlineFileNames() {
-        return listUploadedOnlineFileNames;
+	return listUploadedOnlineFileNames;
+    }
+    
+    /**
+     * @return Returns the useSelectLeaderToolOuput.
+     */
+    public String getUseSelectLeaderToolOuput() {
+	return useSelectLeaderToolOuput;
     }
 
-    
+    /**
+     * @param useSelectLeaderToolOuput
+     *            The useSelectLeaderToolOuput to set.
+     */
+    public void setUseSelectLeaderToolOuput(String useSelectLeaderToolOuput) {
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+    }
+
     /**
      * @return Returns the allowText.
      */
     public String getAllowText() {
-        return allowText;
+	return allowText;
     }
+
     /**
-     * @param allowText The allowText to set.
+     * @param allowText
+     *            The allowText to set.
      */
     public void setAllowText(String allowText) {
-        this.allowText = allowText;
+	this.allowText = allowText;
     }
+
     /**
      * @return Returns the lockOnFinish.
      */
     public String getLockOnFinish() {
-        return lockOnFinish;
+	return lockOnFinish;
     }
+
     /**
-     * @param lockOnFinish The lockOnFinish to set.
+     * @param lockOnFinish
+     *            The lockOnFinish to set.
      */
     public void setLockOnFinish(String lockOnFinish) {
-        this.lockOnFinish = lockOnFinish;
+	this.lockOnFinish = lockOnFinish;
     }
 
     /**
      * @return Returns the mapOptionsContent.
      */
     public Map getMapOptionsContent() {
-        return mapOptionsContent;
+	return mapOptionsContent;
     }
+
     /**
-     * @param mapOptionsContent The mapOptionsContent to set.
+     * @param mapOptionsContent
+     *            The mapOptionsContent to set.
      */
     public void setMapOptionsContent(Map mapOptionsContent) {
-        this.mapOptionsContent = mapOptionsContent;
+	this.mapOptionsContent = mapOptionsContent;
     }
-    
+
     /**
      * @return Returns the userExceptionMaxNominationInvalid.
      */
     public String getUserExceptionMaxNominationInvalid() {
-        return userExceptionMaxNominationInvalid;
+	return userExceptionMaxNominationInvalid;
     }
+
     /**
-     * @param userExceptionMaxNominationInvalid The userExceptionMaxNominationInvalid to set.
+     * @param userExceptionMaxNominationInvalid
+     *            The userExceptionMaxNominationInvalid to set.
      */
-    public void setUserExceptionMaxNominationInvalid(
-            String userExceptionMaxNominationInvalid) {
-        this.userExceptionMaxNominationInvalid = userExceptionMaxNominationInvalid;
+    public void setUserExceptionMaxNominationInvalid(String userExceptionMaxNominationInvalid) {
+	this.userExceptionMaxNominationInvalid = userExceptionMaxNominationInvalid;
     }
+
     /**
      * @return Returns the userExceptionOptionsDuplicate.
      */
     public String getUserExceptionOptionsDuplicate() {
-        return userExceptionOptionsDuplicate;
+	return userExceptionOptionsDuplicate;
     }
+
     /**
-     * @param userExceptionOptionsDuplicate The userExceptionOptionsDuplicate to set.
+     * @param userExceptionOptionsDuplicate
+     *            The userExceptionOptionsDuplicate to set.
      */
-    public void setUserExceptionOptionsDuplicate(
-            String userExceptionOptionsDuplicate) {
-        this.userExceptionOptionsDuplicate = userExceptionOptionsDuplicate;
+    public void setUserExceptionOptionsDuplicate(String userExceptionOptionsDuplicate) {
+	this.userExceptionOptionsDuplicate = userExceptionOptionsDuplicate;
     }
+
     /**
      * @return Returns the validationError.
      */
     public String getValidationError() {
-        return validationError;
+	return validationError;
     }
+
     /**
-     * @param validationError The validationError to set.
+     * @param validationError
+     *            The validationError to set.
      */
     public void setValidationError(String validationError) {
-        this.validationError = validationError;
+	this.validationError = validationError;
     }
-    
+
     /**
      * @return Returns the editActivityEditMode.
      */
     public String getEditActivityEditMode() {
-        return editActivityEditMode;
+	return editActivityEditMode;
     }
-    
+
     /**
-     * @param editActivityEditMode The editActivityEditMode to set.
+     * @param editActivityEditMode
+     *            The editActivityEditMode to set.
      */
     public void setEditActivityEditMode(String editActivityEditMode) {
-        this.editActivityEditMode = editActivityEditMode;
+	this.editActivityEditMode = editActivityEditMode;
     }
+
     /**
      * @return Returns the userExceptionNoToolSessions.
      */
     public String getUserExceptionNoToolSessions() {
-        return userExceptionNoToolSessions;
+	return userExceptionNoToolSessions;
     }
+
     /**
-     * @param userExceptionNoToolSessions The userExceptionNoToolSessions to set.
+     * @param userExceptionNoToolSessions
+     *            The userExceptionNoToolSessions to set.
      */
-    public void setUserExceptionNoToolSessions(
-            String userExceptionNoToolSessions) {
-        this.userExceptionNoToolSessions = userExceptionNoToolSessions;
+    public void setUserExceptionNoToolSessions(String userExceptionNoToolSessions) {
+	this.userExceptionNoToolSessions = userExceptionNoToolSessions;
     }
 
     /**
      * @return Returns the userExceptionFilenameEmpty.
      */
     public String getUserExceptionFilenameEmpty() {
-        return userExceptionFilenameEmpty;
-    }
-    /**
-     * @param userExceptionFilenameEmpty The userExceptionFilenameEmpty to set.
-     */
-    public void setUserExceptionFilenameEmpty(String userExceptionFilenameEmpty) {
-        this.userExceptionFilenameEmpty = userExceptionFilenameEmpty;
-    }    
-	public int compareTo(Object o)
-    {
-	    VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = (VoteGeneralAuthoringDTO) o;
-     
-        if (voteGeneralAuthoringDTO == null)
-        	return 1;
-		else
-			return 0;
+	return userExceptionFilenameEmpty;
     }
 
-	public String toString() {
-        return new ToStringBuilder(this)
-            .append("activeModule: ", activeModule)
-            .append("contentFolderID: ", contentFolderID)
-            .append("editableQuestionText: ", editableQuestionText)            
-            .append("defineLaterInEditMode: ", defineLaterInEditMode)
-            .append("reflectionSubject: ", reflectionSubject)            
-            .append("submissionAttempt: ", submissionAttempt)
-            .append("mapNominationContent: ", mapNominationContent)            
-            .append("sbmtSuccess: ", sbmtSuccess)
-            .append("exceptionMaxNominationInvalid: ", exceptionMaxNominationInvalid)
-            .append("toolContentID: ", toolContentID)
-            .append("defaultContentId: ", defaultContentId)
-            .append("defaultContentIdStr: ", defaultContentIdStr)
-            .append("reflect: ", reflect)            
-            .append("isDefineLater: ", isDefineLater)
-            .append("allowText: ", allowText)
-            .append("showResults: ", showResults)
-            .append("lockOnFinish: ", lockOnFinish)
-            .append("maxNominationCount: ", maxNominationCount)
-            .append("minNominationCount: ", minNominationCount)
-            .append("activityTitle: ", activityTitle)
-            .append("activityInstructions: ", activityInstructions)
-            .append("maxOptionIndex: ", maxOptionIndex)
-            .append("defaultOptionContent: ", defaultOptionContent)
-            .append("richTextOfflineInstructions: ", richTextOfflineInstructions)
-            .append("richTextOnlineInstructions: ", richTextOnlineInstructions)
-            .append("listUploadedOfflineFileNames: ", listUploadedOfflineFileNames)            
-            .append("listUploadedOnlineFileNames: ", listUploadedOnlineFileNames)
-            .append("listOfflineFilesMetadata: ", listOfflineFilesMetadata)
-            .append("listOnlineFilesMetadata: ", listOnlineFilesMetadata)
-            .append("mapOptionsContent: ", mapOptionsContent)
-            .append("onlineInstructions: ", onlineInstructions)
-            .append("offlineInstructions: ", offlineInstructions)
-			.append("userExceptionMaxNominationInvalid: ", userExceptionMaxNominationInvalid)
-			.append("userExceptionFilenameEmpty: ", userExceptionFilenameEmpty)
-			.append("isMonitoredContentInUse: ", isMonitoredContentInUse)
-			.append("validationError: ", validationError)
-			.append("userExceptionOptionsDuplicate: ", userExceptionOptionsDuplicate)
-			.append("userExceptionNoToolSessions: ", userExceptionNoToolSessions)
-			.append("httpSessionID: ", httpSessionID)
-			.append("editActivityEditMode: ", editActivityEditMode)
-            .toString();
+    /**
+     * @param userExceptionFilenameEmpty
+     *            The userExceptionFilenameEmpty to set.
+     */
+    public void setUserExceptionFilenameEmpty(String userExceptionFilenameEmpty) {
+	this.userExceptionFilenameEmpty = userExceptionFilenameEmpty;
     }
-	
+
+    public int compareTo(Object o) {
+	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = (VoteGeneralAuthoringDTO) o;
+
+	if (voteGeneralAuthoringDTO == null)
+	    return 1;
+	else
+	    return 0;
+    }
+
+    public String toString() {
+	return new ToStringBuilder(this).append("activeModule: ", activeModule)
+		.append("contentFolderID: ", contentFolderID).append("editableQuestionText: ", editableQuestionText)
+		.append("defineLaterInEditMode: ", defineLaterInEditMode)
+		.append("reflectionSubject: ", reflectionSubject).append("submissionAttempt: ", submissionAttempt)
+		.append("mapNominationContent: ", mapNominationContent).append("sbmtSuccess: ", sbmtSuccess)
+		.append("exceptionMaxNominationInvalid: ", exceptionMaxNominationInvalid)
+		.append("toolContentID: ", toolContentID).append("defaultContentId: ", defaultContentId)
+		.append("defaultContentIdStr: ", defaultContentIdStr).append("reflect: ", reflect)
+		.append("isDefineLater: ", isDefineLater).append("allowText: ", allowText)
+		.append("showResults: ", showResults).append("lockOnFinish: ", lockOnFinish)
+		.append("maxNominationCount: ", maxNominationCount).append("minNominationCount: ", minNominationCount)
+		.append("activityTitle: ", activityTitle).append("activityInstructions: ", activityInstructions)
+		.append("maxOptionIndex: ", maxOptionIndex).append("defaultOptionContent: ", defaultOptionContent)
+		.append("richTextOfflineInstructions: ", richTextOfflineInstructions)
+		.append("richTextOnlineInstructions: ", richTextOnlineInstructions)
+		.append("listUploadedOfflineFileNames: ", listUploadedOfflineFileNames)
+		.append("listUploadedOnlineFileNames: ", listUploadedOnlineFileNames)
+		.append("listOfflineFilesMetadata: ", listOfflineFilesMetadata)
+		.append("listOnlineFilesMetadata: ", listOnlineFilesMetadata)
+		.append("mapOptionsContent: ", mapOptionsContent).append("onlineInstructions: ", onlineInstructions)
+		.append("offlineInstructions: ", offlineInstructions)
+		.append("userExceptionMaxNominationInvalid: ", userExceptionMaxNominationInvalid)
+		.append("userExceptionFilenameEmpty: ", userExceptionFilenameEmpty)
+		.append("isMonitoredContentInUse: ", isMonitoredContentInUse)
+		.append("validationError: ", validationError)
+		.append("userExceptionOptionsDuplicate: ", userExceptionOptionsDuplicate)
+		.append("userExceptionNoToolSessions: ", userExceptionNoToolSessions)
+		.append("httpSessionID: ", httpSessionID).append("editActivityEditMode: ", editActivityEditMode)
+		.toString();
+    }
+
     /**
      * @return Returns the contentFolderID.
      */
     public String getContentFolderID() {
-        return contentFolderID;
+	return contentFolderID;
     }
+
     /**
-     * @param contentFolderID The contentFolderID to set.
+     * @param contentFolderID
+     *            The contentFolderID to set.
      */
     public void setContentFolderID(String contentFolderID) {
-        this.contentFolderID = contentFolderID;
+	this.contentFolderID = contentFolderID;
     }
+
     /**
      * @return Returns the editableQuestionFeedback.
      */
     public String getEditableQuestionFeedback() {
-        return editableQuestionFeedback;
+	return editableQuestionFeedback;
     }
+
     /**
-     * @param editableQuestionFeedback The editableQuestionFeedback to set.
+     * @param editableQuestionFeedback
+     *            The editableQuestionFeedback to set.
      */
     public void setEditableQuestionFeedback(String editableQuestionFeedback) {
-        this.editableQuestionFeedback = editableQuestionFeedback;
+	this.editableQuestionFeedback = editableQuestionFeedback;
     }
+
     /**
      * @return Returns the editableQuestionText.
      */
     public String getEditableQuestionText() {
-        return editableQuestionText;
+	return editableQuestionText;
     }
+
     /**
-     * @param editableQuestionText The editableQuestionText to set.
+     * @param editableQuestionText
+     *            The editableQuestionText to set.
      */
     public void setEditableQuestionText(String editableQuestionText) {
-        this.editableQuestionText = editableQuestionText;
+	this.editableQuestionText = editableQuestionText;
     }
-    
+
     /**
      * @return Returns the attachmentList.
      */
     public List getAttachmentList() {
-        return attachmentList;
+	return attachmentList;
     }
+
     /**
-     * @param attachmentList The attachmentList to set.
+     * @param attachmentList
+     *            The attachmentList to set.
      */
     public void setAttachmentList(List attachmentList) {
-        this.attachmentList = attachmentList;
+	this.attachmentList = attachmentList;
     }
+
     /**
      * @return Returns the deletedAttachmentList.
      */
     public List getDeletedAttachmentList() {
-        return deletedAttachmentList;
+	return deletedAttachmentList;
     }
+
     /**
-     * @param deletedAttachmentList The deletedAttachmentList to set.
+     * @param deletedAttachmentList
+     *            The deletedAttachmentList to set.
      */
     public void setDeletedAttachmentList(List deletedAttachmentList) {
-        this.deletedAttachmentList = deletedAttachmentList;
+	this.deletedAttachmentList = deletedAttachmentList;
     }
+
     /**
      * @return Returns the reflect.
      */
     public String getReflect() {
-        return reflect;
+	return reflect;
     }
+
     /**
-     * @param reflect The reflect to set.
+     * @param reflect
+     *            The reflect to set.
      */
     public void setReflect(String reflect) {
-        this.reflect = reflect;
+	this.reflect = reflect;
     }
+
     /**
      * @return Returns the reflectionSubject.
      */
     public String getReflectionSubject() {
-        return reflectionSubject;
+	return reflectionSubject;
     }
+
     /**
-     * @param reflectionSubject The reflectionSubject to set.
+     * @param reflectionSubject
+     *            The reflectionSubject to set.
      */
     public void setReflectionSubject(String reflectionSubject) {
-        this.reflectionSubject = reflectionSubject;
+	this.reflectionSubject = reflectionSubject;
     }
+
     /**
      * @return Returns the editableNominationFeedback.
      */
     public String getEditableNominationFeedback() {
-        return editableNominationFeedback;
+	return editableNominationFeedback;
     }
+
     /**
-     * @param editableNominationFeedback The editableNominationFeedback to set.
+     * @param editableNominationFeedback
+     *            The editableNominationFeedback to set.
      */
     public void setEditableNominationFeedback(String editableNominationFeedback) {
-        this.editableNominationFeedback = editableNominationFeedback;
+	this.editableNominationFeedback = editableNominationFeedback;
     }
+
     /**
      * @return Returns the editableNominationText.
      */
     public String getEditableNominationText() {
-        return editableNominationText;
+	return editableNominationText;
     }
+
     /**
-     * @param editableNominationText The editableNominationText to set.
+     * @param editableNominationText
+     *            The editableNominationText to set.
      */
     public void setEditableNominationText(String editableNominationText) {
-        this.editableNominationText = editableNominationText;
+	this.editableNominationText = editableNominationText;
     }
+
     /**
      * @return Returns the mapNominationContent.
      */
     public Map getMapNominationContent() {
-        return mapNominationContent;
+	return mapNominationContent;
     }
+
     /**
-     * @param mapNominationContent The mapNominationContent to set.
+     * @param mapNominationContent
+     *            The mapNominationContent to set.
      */
     public void setMapNominationContent(Map mapNominationContent) {
-        this.mapNominationContent = mapNominationContent;
+	this.mapNominationContent = mapNominationContent;
     }
+
     /**
      * @return Returns the isToolSessionChanged.
      */
     public String getIsToolSessionChanged() {
-        return isToolSessionChanged;
+	return isToolSessionChanged;
     }
+
     /**
-     * @param isToolSessionChanged The isToolSessionChanged to set.
+     * @param isToolSessionChanged
+     *            The isToolSessionChanged to set.
      */
     public void setIsToolSessionChanged(String isToolSessionChanged) {
-        this.isToolSessionChanged = isToolSessionChanged;
+	this.isToolSessionChanged = isToolSessionChanged;
     }
+
     /**
      * @return Returns the currentUid.
      */
     public String getCurrentUid() {
-        return currentUid;
+	return currentUid;
     }
+
     /**
-     * @param currentUid The currentUid to set.
+     * @param currentUid
+     *            The currentUid to set.
      */
     public void setCurrentUid(String currentUid) {
-        this.currentUid = currentUid;
+	this.currentUid = currentUid;
     }
+
     /**
      * @return Returns the responseId.
      */
     public String getResponseId() {
-        return responseId;
+	return responseId;
     }
+
     /**
-     * @param responseId The responseId to set.
+     * @param responseId
+     *            The responseId to set.
      */
     public void setResponseId(String responseId) {
-        this.responseId = responseId;
+	this.responseId = responseId;
     }
-	public String getShowResults() {
-		return showResults;
-	}
-	public void setShowResults(String showResults) {
-		this.showResults = showResults;
-	}
+
+    public String getShowResults() {
+	return showResults;
+    }
+
+    public void setShowResults(String showResults) {
+	this.showResults = showResults;
+    }
 }

@@ -206,7 +206,7 @@ public class MonitoringUtil implements VoteAppConstants {
 		    VoteQueUsr voteQueUsr = (VoteQueUsr) itUsers.next();
 
 		    if (voteQueUsr != null) {
-			List listUserAttempts = voteService.getAttemptsListForUserAndQuestionContent(voteQueUsr
+			List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr
 				.getUid(), new Long(questionUid));
 
 			Iterator itAttempts = listUserAttempts.iterator();
@@ -227,7 +227,8 @@ public class MonitoringUtil implements VoteAppConstants {
 				VoteQueContent voteQueContent = voteUsrResp.getVoteQueContent();
 				String entry = voteQueContent.getQuestion();
 
-				String voteQueContentId = voteUsrResp.getVoteQueContentId().toString();
+				Long voteQuestionUid = voteUsrResp.getVoteQueContent().getUid();
+				String voteQueContentId = voteQuestionUid.toString();
 
 				VoteSession localUserSession = voteUsrResp.getVoteQueUsr().getVoteSession();
 				if (voteContent.getVoteContentId().toString().equals(
@@ -256,7 +257,7 @@ public class MonitoringUtil implements VoteAppConstants {
 		    voteQueUsr = (VoteQueUsr) itUsers.next();
 
 		    if (voteQueUsr != null) {
-			List listUserAttempts = voteService.getAttemptsListForUserAndQuestionContent(voteQueUsr
+			List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr
 				.getUid(), new Long(questionUid));
 
 			Iterator itAttempts = listUserAttempts.iterator();
@@ -304,7 +305,7 @@ public class MonitoringUtil implements VoteAppConstants {
 		    VoteQueUsr voteQueUsr = (VoteQueUsr) itUsers.next();
 
 		    if (voteQueUsr != null) {
-			List listUserAttempts = voteService.getAttemptsListForUserAndQuestionContent(voteQueUsr
+			List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr
 				.getUid(), new Long(questionUid));
 
 			Iterator itAttempts = listUserAttempts.iterator();
@@ -360,7 +361,7 @@ public class MonitoringUtil implements VoteAppConstants {
 		VoteQueUsr voteQueUsr = (VoteQueUsr) itUsers.next();
 
 		if (voteQueUsr != null) {
-		    List listUserAttempts = voteService.getAttemptsListForUserAndQuestionContent(voteQueUsr.getUid(),
+		    List listUserAttempts = voteService.getAttemptsForUserAndQuestionContent(voteQueUsr.getUid(),
 			    new Long(questionUid));
 
 		    Iterator itAttempts = listUserAttempts.iterator();
@@ -835,6 +836,7 @@ public class MonitoringUtil implements VoteAppConstants {
 	request.setAttribute(VOTE_STATS_DTO, voteStatsDTO);
 	
 	// setting up the advanced summary for LDEV-1662
+	request.setAttribute("useSelectLeaderToolOuput", voteContent.isUseSelectLeaderToolOuput());
 	request.setAttribute("lockOnFinish", voteContent.isLockOnFinish());
 	request.setAttribute("allowText", voteContent.isAllowText());
 	request.setAttribute("maxNominationCount", voteContent.getMaxNominationCount());

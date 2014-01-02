@@ -42,8 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script src="${lams}includes/javascript/jquery.js"></script>
 	<script src="${lams}includes/javascript/jquery.mobile.js"></script>	
 	<script language="JavaScript" type="text/JavaScript">
-		function submitMethod(actionMethod) 
-		{
+		function submitMethod(actionMethod) {
 			document.VoteLearningForm.dispatch.value=actionMethod; 
 			document.VoteLearningForm.submit();
 		}
@@ -54,14 +53,49 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <body>
 <div data-role="page" data-cache="false">
 
+	<div data-role="header" data-theme="b" data-nobackbtn="true">
+		<h1>
+			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+		</h1>
+	</div>
 
+	<div data-role="content">
 
-		<div data-role="content">
+		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+	
+			<html:hidden property="dispatch" />
+			<html:hidden property="toolSessionID" />
+			<html:hidden property="userID" />
+			<html:hidden property="userLeader" />
+			<html:hidden property="groupLeaderName" />
+			<html:hidden property="useSelectLeaderToolOuput" />
+	
+				<p>
+					<c:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />
+				</p>
+	
+				<html:textarea cols="60" rows="8" property="entryText" styleClass="text-area"></html:textarea>
+	
+		</html:form>
+	</div>
 
-aaaaaaaaaaaaaaaaaaaaaa
+	<div data-role="footer" data-theme="b">
+		<div class="finishButtonDiv">
+			<button name="submitReflection" id="finishButton" onclick="javascript:submitMethod('submitReflection');return false"
+					data-theme="b" data-icon="arrow-r">
+				<span class="nextActivity">								
+					<c:choose>
+	 					<c:when test="${sessionMap.activityPosition.last}">
+	 						<fmt:message key="button.submit" />
+	 					</c:when>
+	 					<c:otherwise>
+	 		 				<fmt:message key="button.endLearning" />
+	 					</c:otherwise>
+	 				</c:choose>
+	 			</span>
+			</button>
 		</div>
-
-
+	</div>
 
 </div>	
 </body>

@@ -68,7 +68,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:out value="${voteGeneralLearnerFlowDTO.activityTitle}"
 				escapeXml="false" />
 		</h1>
-
 		
 		<c:if test="${VoteLearningForm.lockOnFinish and voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
 			<div class="info space-bottom">
@@ -76,8 +75,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</div>
 		</c:if>
 
-		<html:form action="/learning?validate=false"
-			enctype="multipart/form-data" method="POST" target="_self">
+		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+			<c:set var="isUserLeader" value="${formBean.userLeader}" />
+			<c:set var="isLeadershipEnabled" value="${formBean.useSelectLeaderToolOuput}" />
+			<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
+			
 			<html:hidden property="dispatch" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="userID" />
@@ -90,6 +93,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<html:hidden property="reportViewOnly" />
 			<html:hidden property="userEntry" />
 			<html:hidden property="showResults" />
+			<html:hidden property="userLeader" />
+			<html:hidden property="groupLeaderName" />
+			<html:hidden property="useSelectLeaderToolOuput" />
+			
+			<c:if test="${isLeadershipEnabled}">
+				<h4>
+					<fmt:message key="label.group.leader" >
+						<fmt:param>${formBean.groupLeaderName}</fmt:param>
+					</fmt:message>
+				</h4>
+			</c:if>
 
 			<c:if test="${VoteLearningForm.showResults == 'true'}">
 				<jsp:include page="/learning/RevisitedDisplay.jsp" />
@@ -109,7 +123,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<c:if test="${voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
 				<br>
-					<c:if test="${voteGeneralLearnerFlowDTO.reflection}">
+					<c:if test="${voteGeneralLearnerFlowDTO.reflection && hasEditRight}">
 						<html:button property="forwardtoReflection" styleClass="button"
 							onclick="submitMethod('forwardtoReflection');"> 
 							<fmt:message key="label.edit" />

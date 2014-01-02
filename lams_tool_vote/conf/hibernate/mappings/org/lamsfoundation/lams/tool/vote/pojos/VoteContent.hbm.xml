@@ -68,6 +68,14 @@
         column="update_date"
         length="20"
     />
+    
+    <property
+        name="useSelectLeaderToolOuput"
+        type="boolean"
+        access="property"
+        column="use_select_leader_tool_ouput"
+        length="1"        
+   />
 
    <property
         name="reflect"

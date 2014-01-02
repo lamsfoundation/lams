@@ -66,6 +66,7 @@ public interface VoteAppConstants {
     public static final String MIN_NOMINATION_COUNT = "minNominationCount";
     public static final String MAX_NOMINATION_COUNT = "maxNominationCount";
     public static final String ALLOW_TEXT = "allowText";
+    public static final String USE_SELECT_LEADER_TOOL_OUTPUT = "useSelectLeaderToolOuput";
     public static final String ALLOW_TEXT_ENTRY = "allowTextEntry";
     public static final String SHOW_RESULTS = "showResults";
     public static final String LOCK_ON_FINISH = "lockOnFinish";
@@ -135,6 +136,7 @@ public interface VoteAppConstants {
     public static final String TOOL_CONTENT_ID = "toolContentID";
     public static final String TOOL_CONTENT_UID = "toolContentUID";
     public static final String TOOL_SESSION_ID = "toolSessionID";
+    public static final String ATTR_CONTENT = "content";
     public static final String USER_ID = "userID";
     public static final String MAX_OPTION_INDEX = "maxOptionIndex";
     public static final String COPY_TOOL_CONTENT = "copyToolContent";
@@ -143,9 +145,11 @@ public interface VoteAppConstants {
 
     public static final String RUN_OFFLINE = "runOffline";
     
-    // 	for submission deadline LDEV-2657
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
+    public static final String ATTR_GROUP_USERS = "groupUsers";
+    public static final String ATTR_IS_USER_LEADER = "isUserLeader";
+    public static final String ATTR_GROUP_LEADER_NAME = "groupLeaderName";
 
     /*
      * refers to number of questions presented initially, we have a single record for default content
@@ -203,6 +207,7 @@ public interface VoteAppConstants {
     public static final String CREATION_DATE = "creationDate";
     public static final String DEFINE_LATER = "defineLater";
     public static final String VIEW_ANSWERS = "viewAnswers";
+    public static final String WAIT_FOR_LEADER = "waitForLeader";
 
     public static final String EDIT_ACTIVITY_DTO = "editActivityDTO";
 
@@ -354,4 +359,8 @@ public interface VoteAppConstants {
     public static final String SUCCESS = "success";
 
     public static final Integer DATA_FLOW_OBJECT_ASSIGMENT_ID = 0;
+    
+    //Leader selection tool Constants
+    public static final String LEADER_SELECTION_TOOL_SIGNATURE = "lalead11";
+    public static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
 }
