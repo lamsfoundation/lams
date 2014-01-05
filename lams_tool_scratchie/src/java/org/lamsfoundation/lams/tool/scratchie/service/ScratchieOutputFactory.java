@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.scratchie.service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -32,8 +33,9 @@ import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
+import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
+import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
-import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 
 public class ScratchieOutputFactory extends OutputFactory {
 
@@ -44,8 +46,25 @@ public class ScratchieOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
 	    throws ToolException {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-	ToolOutputDefinition definition = buildRangeDefinition(ScratchieConstants.LEARNER_MARK, new Long(0), null, true);
-	definitionMap.put(ScratchieConstants.LEARNER_MARK, definition);
+
+	if (toolContentObject != null) {
+
+	    // calculate totalMarksPossible
+	    Scratchie scratchie = (Scratchie) toolContentObject;
+	    Set<ScratchieItem> items = scratchie.getScratchieItems();
+	    Long totalMarksPossible = 0L;
+	    for (ScratchieItem item : items) {
+		totalMarksPossible += item.getAnswers().size();
+	    }
+	    if (scratchie.isExtraPoint()) {
+		totalMarksPossible += items.size();
+	    }
+
+	    ToolOutputDefinition definition = buildRangeDefinition(ScratchieConstants.LEARNER_MARK, new Long(0),
+		    totalMarksPossible, true);
+	    definitionMap.put(ScratchieConstants.LEARNER_MARK, definition);
+
+	}
 
 	return definitionMap;
     }
