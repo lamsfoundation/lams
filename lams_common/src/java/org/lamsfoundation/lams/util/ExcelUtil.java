@@ -140,6 +140,8 @@ public class ExcelUtil {
 	}
 
 	if (data != null) {
+	    int maxColumnSize = 0;
+	    
 	    // Print data
 	    for (int rowIndex = 0; rowIndex < data.length; rowIndex++) {
 
@@ -148,12 +150,25 @@ public class ExcelUtil {
 
 		Row row = sheet.createRow(rowIndex + rowIndexOffset);
 
-		for (int columnIndex = 0; columnIndex < data[rowIndex].length; columnIndex++) {
+		int columnSize = data[rowIndex].length;
+		for (int columnIndex = 0; columnIndex < columnSize; columnIndex++) {
 		    ExcelCell excelCell = data[rowIndex][columnIndex];
 		    createCell(excelCell, columnIndex, row);
 		}
+		
+		//calculate max column size
+		if (columnSize > maxColumnSize) {
+		    maxColumnSize = columnSize;
+		}
 	    }
+	    
+	    //autoSizeColumns
+	    for (int i=0; i < maxColumnSize; i++) {
+		sheet.autoSizeColumn(i);
+	    }
+	    
 	}
+	
     }
 
     public static void createCell(ExcelCell excelCell, int cellnum, Row row) {
