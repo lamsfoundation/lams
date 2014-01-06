@@ -615,6 +615,11 @@ public class LearningAction extends Action {
 	    while (refIterator.hasNext()) {
 		ReflectDTO reflection = refIterator.next();
 		if (toolSession.getSessionName().equals(reflection.getGroupName())) {
+		    
+		    //store for displaying purposes
+		    sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, reflection.getReflection());
+		    
+		    //remove from list to display other groups' notebooks
 		    refIterator.remove();
 		    break;
 		}
