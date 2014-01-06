@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.tool.commonCartridge.service.ICommonCartridgeServ
 import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeToolContentHandler;
 import org.lamsfoundation.lams.tool.commonCartridge.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -102,7 +103,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error("Cannot perform export for commonCartridge tool.");
 	}
 
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+	String basePath = WebUtil.getBaseServerURL()
 		+ request.getContextPath();
 	writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID=" + sessionMap.getSessionID(),
 		directoryName, FILENAME, cookies);

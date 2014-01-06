@@ -64,6 +64,7 @@ import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
@@ -106,8 +107,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			map = teacher(request, response, directoryName, cookies, sessionMap);
 		}
 
-		String basePath = request.getScheme() + "://" + request.getServerName()
-				+ ":" + request.getServerPort() + request.getContextPath();
+		String basePath =WebUtil.getBaseServerURL() + request.getContextPath();
 
 		// Writing learner submitted files to disk. A folder is generated for
 		// each

@@ -117,20 +117,20 @@ public class CSSBundler extends Bundler {
 		File cssDirectoryFile = new File(cssDirectory);
 		cssDirectoryFile.mkdirs();
 		
-		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort();
+		String basePath = Configuration.get(ConfigurationKeys.SERVER_URL);
 
 		for ( Theme theme : themes) {
 			String themeName = theme.getName();
 			
-			String url = (!rtl)? basePath + "/lams/css/" + themeName + ".css" : basePath + "/lams/css/" + themeName + "_" + RTL_DIR + ".css";
+			String url = (!rtl)? basePath + "css/" + themeName + ".css" : basePath + "css/" + themeName + "_" + RTL_DIR + ".css";
 			HttpUrlConnectionUtil.writeResponseToFile(url, cssDirectory, (!rtl)? themeName + ".css" :  themeName + "_" + RTL_DIR + ".css", cookies); //cookies aren't really needed here.
 
-			url = (!rtl)? basePath + "/lams/css/" + themeName + "_learner.css" : basePath + "/lams/css/" + themeName + "_" + RTL_DIR + "_learner.css" ;
+			url = (!rtl)? basePath + "css/" + themeName + "_learner.css" : basePath + "css/" + themeName + "_" + RTL_DIR + "_learner.css" ;
 			HttpUrlConnectionUtil.writeResponseToFile(url, cssDirectory, (!rtl)? themeName + "_learner.css" : themeName + "_" + RTL_DIR + "_learner.css", cookies); //cookies aren't really needed here.
 		}
 		
 		// include the special IE stylesheet
-		String url = basePath + "/lams/css/ie-styles.css";
+		String url = basePath + "css/ie-styles.css";
 		HttpUrlConnectionUtil.writeResponseToFile(url, cssDirectory, "ie-styles.css", cookies); //cookies aren't really needed here.
 		
 	}

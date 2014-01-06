@@ -24,69 +24,58 @@ package org.lamsfoundation.lams.web.tag;
 
 import java.io.IOException;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.util.WebUtil;
 
 /**
- * Output the base part of the current web app url (e.g. http://server/lams/tool/nb11/)
- * based on the current servlet details. 
+ * Output the base part of the current web app url (e.g. http://server/lams/tool/nb11/) based on the current servlet
+ * details.
  * 
- * @jsp.tag name="WebAppURL"
- * 			body-content="empty"
- * 			display-name="Base URL for the current web app"
- * 			description="Output the basic URL for the current webapp. e.g. http://server/lams/tool/nb11/"
- * 	
+ * @jsp.tag name="WebAppURL" body-content="empty" display-name="Base URL for the current web app"
+ *          description="Output the basic URL for the current webapp. e.g. http://server/lams/tool/nb11/"
+ * 
  * @author Fiona Malikoff
  */
 public class WebAppURLTag extends TagSupport {
 
-	private static final long serialVersionUID = -3773379475085729642L;
+    private static final long serialVersionUID = -3773379475085729642L;
 
-	private static final Logger log = Logger.getLogger(WebAppURLTag.class);
+    private static final Logger log = Logger.getLogger(WebAppURLTag.class);
 
-	/**
+    /**
 	 * 
 	 */
-	public WebAppURLTag() {
-		super();
+    public WebAppURLTag() {
+	super();
+    }
+
+    @Override
+    public int doStartTag() throws JspException {
+	HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
+
+	String path = WebUtil.getBaseServerURL() + request.getContextPath();
+	if (!path.endsWith("/")) {
+	    path += "/";
 	}
-	
-	public int doStartTag() throws JspException {
-		ServletRequest sr = pageContext.getRequest();
-		if ( HttpServletRequest.class.isInstance(sr) ) {
-			HttpServletRequest request = (HttpServletRequest) sr;
-			
-			String protocol;
-			if(request.isSecure()){
-				protocol = "https://";
-			}else{
-				protocol = "http://";
-			}
-			
-			String path = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
-			if ( ! path.endsWith("/") )
-					path = path + "/";
 
-   			try {
-   				JspWriter writer = pageContext.getOut();
-   				writer.print(path);
-   			} catch ( IOException e ) {
-   				log.error("ServerURLTag unable to write out server URL due to IOException. ", e);
-   				throw new JspException(e);
-   			}
-
-   		} else {
-	   		log.warn("ServerURLTag unable to write out server URL as the servlet request is not an HttpServletRequest.");
-   		}
-    	return SKIP_BODY;	}
-
-	public int doEndTag() {
-		return EVAL_PAGE;
+	try {
+	    JspWriter writer = pageContext.getOut();
+	    writer.print(path);
+	} catch (IOException e) {
+	    WebAppURLTag.log.error("ServerURLTag unable to write out server URL due to IOException. ", e);
+	    throw new JspException(e);
 	}
-	
+	return Tag.SKIP_BODY;
+    }
+
+    @Override
+    public int doEndTag() {
+	return Tag.EVAL_PAGE;
+    }
 }

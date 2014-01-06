@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceProxy;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieBundler;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -105,7 +106,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		    "Could not export spreadsheet javascript files, some files may be missing in export portfolio", e);
 	}
 
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+	String basePath = WebUtil.getBaseServerURL()
 		+ request.getContextPath();
 	writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID=" + sessionMap.getSessionID(),
 		directoryName, FILENAME, cookies);

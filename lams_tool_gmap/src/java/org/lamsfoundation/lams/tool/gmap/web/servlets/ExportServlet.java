@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.tool.gmap.util.GmapConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -92,7 +93,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    request.getSession().setAttribute(GmapConstants.ATTR_GMAP_KEY, gmapKey.getConfigValue());
 	}
 
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+	String basePath = WebUtil.getBaseServerURL()
 		+ request.getContextPath();
 
 	// Attempting to export required images

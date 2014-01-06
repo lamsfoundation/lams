@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.tool.chat.service.IChatService;
 import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.util.ChatException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -85,8 +86,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error("Cannot perform export for chat tool.");
 		}
 
-		String basePath = request.getScheme() + "://" + request.getServerName()
-				+ ":" + request.getServerPort() + request.getContextPath();
+		String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
 		writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp",
 				directoryName, FILENAME, cookies);
 

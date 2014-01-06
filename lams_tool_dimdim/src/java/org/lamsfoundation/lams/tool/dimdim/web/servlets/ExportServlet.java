@@ -36,6 +36,7 @@ import org.lamsfoundation.lams.tool.dimdim.model.DimdimSession;
 import org.lamsfoundation.lams.tool.dimdim.service.DimdimServiceProxy;
 import org.lamsfoundation.lams.tool.dimdim.service.IDimdimService;
 import org.lamsfoundation.lams.tool.dimdim.util.DimdimException;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -66,7 +67,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error("Cannot perform export for dimdim tool.");
 	}
 
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+	String basePath = WebUtil.getBaseServerURL()
 		+ request.getContextPath();
 	writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName, FILENAME, cookies);
 

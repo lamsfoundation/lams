@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentBundler;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentToolContentHandler;
 import org.lamsfoundation.lams.tool.assessment.util.ReflectDTOComparator;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -104,8 +105,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error("Cannot perform export for assessment tool.");
 	}
 
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-		+ request.getContextPath();
+	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
 
 	// Attempting to export required js and image files
 	try {

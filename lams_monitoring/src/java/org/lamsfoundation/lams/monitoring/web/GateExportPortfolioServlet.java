@@ -56,7 +56,7 @@ public class GateExportPortfolioServlet  extends AbstractExportPortfolioServlet 
         Long lessonId = WebUtil.readLongParam(request,AttributeNames.PARAM_LESSON_ID);
         Long gateId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 
-		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
+		String basePath = WebUtil.getBaseServerURL()+request.getContextPath();
 		writeResponseToFile(
 				basePath+"/gate.do?method=exportPortfolio&lessonID="+lessonId+"&activityID="+gateId,
 				directoryName,FILENAME,cookies);

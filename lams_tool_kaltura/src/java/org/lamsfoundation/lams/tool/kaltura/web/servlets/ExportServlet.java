@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.tool.kaltura.model.KalturaSession;
 import org.lamsfoundation.lams.tool.kaltura.service.IKalturaService;
 import org.lamsfoundation.lams.tool.kaltura.service.KalturaServiceProxy;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaException;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -69,7 +70,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error("Cannot perform export for kaltura tool.");
 	}
 
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+	String basePath =WebUtil.getBaseServerURL()
 		+ request.getContextPath();
 	writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName, FILENAME, cookies);
 

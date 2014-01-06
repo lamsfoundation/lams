@@ -42,6 +42,7 @@ import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.util.QaBundler;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 
 /**
@@ -59,7 +60,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 
     public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+	String basePath =WebUtil.getBaseServerURL()
 		+ request.getContextPath();
 
 	if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {

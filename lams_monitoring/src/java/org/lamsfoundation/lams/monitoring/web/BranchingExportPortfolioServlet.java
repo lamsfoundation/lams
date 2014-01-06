@@ -59,7 +59,7 @@ public class BranchingExportPortfolioServlet  extends AbstractExportPortfolioSer
 
         // should really be a different URL for each type of branching, but really it goes to the same method not matter what
         // so just use the simplest one!
-		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
+		String basePath = WebUtil.getBaseServerURL()+request.getContextPath();
 		writeResponseToFile(
 				basePath+"/chosenBranching.do?method=exportPortfolio&lessonID="+lessonId+"&activityID="+gateId,
 				directoryName,FILENAME,cookies);

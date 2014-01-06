@@ -26,62 +26,48 @@ package org.lamsfoundation.lams.tool.bbb.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.codec.digest.DigestUtils;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.lamsfoundation.lams.util.WebUtil;
 
 public class BbbUtil {
-	
+
     public static String getMeetingKey(Long toolSessionId, String attendeePassword) {
-    	
+
 	/*    
 	 * We hash the attendee's password to be used as part of the meetingKey.
 	 *  The main reason for this is so we can keep this unique in case there are many 
 	 *  other instances that use the same BBB server
-	*/  
-    return "bbb_" + DigestUtils.shaHex(attendeePassword) + "-" + toolSessionId;
+	*/
+	return "bbb_" + DigestUtils.shaHex(attendeePassword) + "-" + toolSessionId;
     }
 
     public static String getReturnURL(HttpServletRequest request) {
-	String protocol;
-	if (request.isSecure()) {
-	    protocol = "https://";
-	} else {
-	    protocol = "http://";
-	}
-
-	String path = protocol + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-	if (!path.endsWith("/")) {
-	    path = path + "/";
-	}
-
-	path += "endMeeting.do";
-	
-
-	return path;
+	return WebUtil.getBaseServerURL() + "endMeeting.do";
     }
 
     // helper functions to extract info from XML response.
-    
+
     // get result -- standard version
     private static Pattern patternResult = Pattern.compile("result:\"(.*?)\"");
-    
+
     public static String getResult(String json) {
 	Matcher matcher = patternResult.matcher(json);
 	matcher.find();
 	return matcher.group(1);
     }
-    
+
     public static String getResponse(String response) throws Exception {
-    	
-    	if (response.contains(Constants.RESPONSE_SUCCESS)) {
-    		return Constants.RESPONSE_SUCCESS;
-    	} else {
-    		return Constants.RESPONSE_FAIL;
-    		
-    	}
-    	
-    	
+
+	if (response.contains(Constants.RESPONSE_SUCCESS)) {
+	    return Constants.RESPONSE_SUCCESS;
+	} else {
+	    return Constants.RESPONSE_FAIL;
+
+	}
+
     }
-    
+
 }

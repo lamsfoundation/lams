@@ -650,4 +650,10 @@ public class WebUtil {
 	userJSON.put("login", user.getLogin());
 	return userJSON;
     }
+
+    public static String getBaseServerURL() {
+	String serverURL = Configuration.get(ConfigurationKeys.SERVER_URL);
+	// "https://" is 8 characters, so next "/" should be context
+	return serverURL.substring(0, serverURL.indexOf('/', 9));
+    }
 }

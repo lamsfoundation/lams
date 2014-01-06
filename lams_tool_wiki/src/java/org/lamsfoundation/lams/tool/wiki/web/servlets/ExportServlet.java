@@ -57,6 +57,7 @@ import org.lamsfoundation.lams.tool.wiki.util.WikiException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -88,7 +89,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    wikiService = WikiServiceProxy.getWikiService(getServletContext());
 	}
 
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+	String basePath = WebUtil.getBaseServerURL()
 		+ request.getContextPath();
 
 	try {

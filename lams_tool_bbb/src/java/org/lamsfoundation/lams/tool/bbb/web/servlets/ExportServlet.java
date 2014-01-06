@@ -36,6 +36,7 @@ import org.lamsfoundation.lams.tool.bbb.model.BbbSession;
 import org.lamsfoundation.lams.tool.bbb.service.BbbServiceProxy;
 import org.lamsfoundation.lams.tool.bbb.service.IBbbService;
 import org.lamsfoundation.lams.tool.bbb.util.BbbException;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -66,7 +67,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error("Cannot perform export for bbb tool.");
 	}
 
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+	String basePath = WebUtil.getBaseServerURL()
 		+ request.getContextPath();
 	writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName, FILENAME, cookies);
 

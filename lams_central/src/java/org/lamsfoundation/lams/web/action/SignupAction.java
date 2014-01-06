@@ -138,8 +138,7 @@ public class SignupAction extends Action {
 		String context = signupForm.getString("context");
 		signupService.signinUser(login, context);
 
-		String redirectUrl = request.getScheme() + "://" + request.getServerName() + ":"
-			+ request.getServerPort() + "/lams/";	
+		String redirectUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 		
 		//check if user is logged in already
 		if (SessionManager.getSession() == null || SessionManager.getSession().getAttribute(AttributeNames.USER) == null) {

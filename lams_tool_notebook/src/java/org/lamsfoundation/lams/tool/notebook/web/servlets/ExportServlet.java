@@ -80,8 +80,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error("Cannot perform export for notebook tool.");
 		}
 
-		String basePath = request.getScheme() + "://" + request.getServerName()
-				+ ":" + request.getServerPort() + request.getContextPath();
+		String basePath =WebUtil.getBaseServerURL() + request.getContextPath();
 		writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp",
 				directoryName, FILENAME, cookies);
 

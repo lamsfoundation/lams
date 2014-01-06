@@ -72,7 +72,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     protected String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
 	String basePath = 
-	    request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+		WebUtil.getBaseServerURL() + request.getContextPath();
 
 	if (mindmapService == null) {
 	    mindmapService = MindmapServiceProxy.getMindmapService(getServletContext());

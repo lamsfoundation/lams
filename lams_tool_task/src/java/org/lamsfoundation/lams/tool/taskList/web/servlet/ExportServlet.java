@@ -105,7 +105,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			logger.error("Cannot perform export for taskList tool.");
 		}
 
-		String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+		String basePath = WebUtil.getBaseServerURL()
 				+ request.getContextPath();
 		writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID="+sessionMap.getSessionID()
 				, directoryName, FILENAME, cookies);

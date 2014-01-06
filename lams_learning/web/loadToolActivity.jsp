@@ -28,37 +28,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<%
-String protocol;
-if(request.isSecure()){
-	protocol = "https://";
-}else{
-	protocol = "http://";
-}
-String pathToRoot = protocol+request.getServerName()+":"+request.getServerPort()+request.getContextPath()+"/";
-
-%>
 <div id="content">
-
 	<c:if test="${!empty activityForm.activityURLs}">
 		
-		<script language="JavaScript" type="text/JavaScript"><!--
+		<script  type="text/javascript">
 			function redirectPage() {
 				setTimeout("doRedirect()", 1000);
 			}
+			
 			function doRedirect() {
 				var url = "<c:out value='${activityForm.activityURLs[0].url}' escapeXml="false" />";
 				if ( url.substring(0,4)!="http" ) {
 					if ( url.substring(0,1)=="/" ) {
-						url = "<%=pathToRoot%>.."+url;
+						url = "<lams:WebAppURL/>.."+url;
 					} else {
-						url = "<%=pathToRoot%>../"+url;
+						url = "<lams:WebAppURL/>../"+url;
 					}
 				}
 				window.location.href = url;
 			}
-			
-			//-->
 		</script>
 
 		<script language="JavaScript" type="text/JavaScript">
@@ -73,6 +61,3 @@ String pathToRoot = protocol+request.getServerName()+":"+request.getServerPort()
 
 <div id="footer">
 </div><!--closes footer-->
-
-
-			

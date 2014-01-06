@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.tool.daco.service.DacoServiceProxy;
 import org.lamsfoundation.lams.tool.daco.service.IDacoService;
 import org.lamsfoundation.lams.tool.daco.util.DacoToolContentHandler;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -75,7 +76,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		handler = getToolContentHandler();
 		SessionMap sessionMap = new SessionMap();
 		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-		String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+		String basePath = WebUtil.getBaseServerURL()
 				+ request.getContextPath();
 		try {
 			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {

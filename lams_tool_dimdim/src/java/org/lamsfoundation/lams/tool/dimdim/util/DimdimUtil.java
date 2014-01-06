@@ -29,6 +29,8 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.lamsfoundation.lams.util.WebUtil;
+
 public class DimdimUtil {
 
     public static String getMeetingKey(Long toolSessionId) {
@@ -36,35 +38,9 @@ public class DimdimUtil {
     }
 
     public static String getReturnURL(HttpServletRequest request) {
-	String protocol = request.getProtocol();
-	if (protocol.startsWith("HTTPS")) {
-	    protocol = "https://";
-	} else {
-	    protocol = "http://";
-	}
-
-	String path = protocol + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-	if (!path.endsWith("/")) {
-	    path = path + "/";
-	}
-
-	path += "endMeeting.do";
-
-	return path;
+	return WebUtil.getBaseServerURL() + "endMeeting.do";
     }
 
-    // helper functions to extract info from json response.
-    //TODO remove commented part  if tool works ok
-//
-//    // get return code -- enterprise version
-//    private static Pattern patternCode = Pattern.compile("code:\"(.*?)\"");
-//
-//    public static String getCode(String json) {
-//	Matcher matcher = patternCode.matcher(json);
-//	matcher.find();
-//	return matcher.group(1);
-//    }
-    
     // get result -- standard version
     private static Pattern patternResult = Pattern.compile("result:\"(.*?)\"");
     

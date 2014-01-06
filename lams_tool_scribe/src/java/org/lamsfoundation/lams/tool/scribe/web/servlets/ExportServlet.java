@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.tool.scribe.service.ScribeServiceProxy;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeException;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -69,8 +70,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 					.getScribeService(getServletContext());
 		}
 
-		String basePath = request.getScheme() + "://" + request.getServerName()
-		+ ":" + request.getServerPort() + request.getContextPath();
+		String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
 		try {
 			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
 				request.getSession().setAttribute(AttributeNames.ATTR_MODE,

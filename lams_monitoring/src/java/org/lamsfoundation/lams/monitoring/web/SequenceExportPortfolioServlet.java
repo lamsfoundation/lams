@@ -53,7 +53,7 @@ public class SequenceExportPortfolioServlet  extends AbstractExportPortfolioServ
 
         // should really be a different URL for each type of branching, but really it goes to the same method not matter what
         // so just use the simplest one!
-		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
+		String basePath = WebUtil.getBaseServerURL()+request.getContextPath();
 		writeResponseToFile(
 				basePath+"/sequence.do?method=exportPortfolio&lessonID="+lessonId+"&activityID="+gateId,
 				directoryName,FILENAME,cookies);

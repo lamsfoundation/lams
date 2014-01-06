@@ -76,7 +76,7 @@ public class NbExportServlet extends AbstractExportPortfolioServlet {
 	
 		String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE);
 		//Long toolContentId, toolSessionId, userId;
-		String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
+		String basePath =WebUtil.getBaseServerURL()+request.getContextPath();
 
 		String url = basePath + "/exportPortfolio.do";
 		String urlWithParameters = null;
