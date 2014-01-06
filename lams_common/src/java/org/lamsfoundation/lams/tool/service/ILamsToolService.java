@@ -87,4 +87,9 @@ public interface ILamsToolService {
      * @return
      */
     Boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Returns leader's UserId from the nearest Leader Selection Tool, null if none available. 
+     */
+    Long getLeaderUserId(Long toolSessionId, Integer learnerId);
 }

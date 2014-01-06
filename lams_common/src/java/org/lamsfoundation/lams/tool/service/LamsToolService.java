@@ -29,10 +29,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dao.IToolContentDAO;
 import org.lamsfoundation.lams.tool.dao.IToolDAO;
@@ -52,10 +56,15 @@ import org.lamsfoundation.lams.util.FileUtilException;
  */
 public class LamsToolService implements ILamsToolService {
     private static Logger log = Logger.getLogger(LamsToolService.class);
+    
+    //Leader selection tool Constants
+    private static final String LEADER_SELECTION_TOOL_SIGNATURE = "lalead11";
+    private static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
 
     public IToolDAO toolDAO;
     public IToolSessionDAO toolSessionDAO;
     public IToolContentDAO toolContentDAO;
+    private ILamsCoreToolService lamsCoreToolService;
 
     @Override
     public Set<User> getAllPotentialLearners(long toolSessionId) throws LamsToolServiceException {
@@ -134,6 +143,73 @@ public class LamsToolService implements ILamsToolService {
 	    return null;
 	}
     }
+    
+    @Override
+    public Long getLeaderUserId(Long toolSessionId, Integer learnerId) {
+	Long leaderUserId = null;
+	
+	ToolSession toolSession = this.getToolSession(toolSessionId);
+	ToolActivity mcqActivity = toolSession.getToolActivity();
+	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(mcqActivity);
+
+	// check if there is leaderSelectionTool available
+	if (leaderSelectionActivity != null) {
+	    User learner = (User) toolContentDAO.find(User.class, learnerId);
+	    String outputName = LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID;
+	    ToolSession leaderSelectionSession = toolSessionDAO.getToolSessionByLearner(learner,
+		    leaderSelectionActivity);
+	    ToolOutput output = lamsCoreToolService.getOutputFromTool(outputName, leaderSelectionSession, null);
+
+	    // check if tool produced output
+	    if (output != null && output.getValue() != null) {
+		leaderUserId = output.getValue().getLong();
+	    }
+	}
+
+	return leaderUserId;
+    }
+
+    /**
+     * Finds the nearest Leader Select activity. Works recursively. Tries to find Leader Select activity in the previous
+     * activities set first, and then inside the parent set.
+     */
+    private static Activity getNearestLeaderSelectionActivity(Activity activity) {
+
+	// check if current activity is Leader Select one. if so - stop searching and return it.
+	Class activityClass = Hibernate.getClass(activity);
+	if (activityClass.equals(ToolActivity.class)) {
+	    ToolActivity toolActivity;
+
+	    // activity is loaded as proxy due to lazy loading and in order to prevent quering DB we just re-initialize
+	    // it here again
+	    Hibernate.initialize(activity);
+	    if (activity instanceof HibernateProxy) {
+		toolActivity = (ToolActivity) ((HibernateProxy) activity).getHibernateLazyInitializer()
+			.getImplementation();
+	    } else {
+		toolActivity = (ToolActivity) activity;
+	    }
+
+	    if (LEADER_SELECTION_TOOL_SIGNATURE.equals(toolActivity.getTool().getToolSignature())) {
+		return activity;
+	    }
+	}
+
+	// check previous activity
+	Transition transitionTo = activity.getTransitionTo();
+	if (transitionTo != null) {
+	    Activity fromActivity = transitionTo.getFromActivity();
+	    return getNearestLeaderSelectionActivity(fromActivity);
+	}
+
+	// check parent activity
+	Activity parent = activity.getParentActivity();
+	if (parent != null) {
+	    return getNearestLeaderSelectionActivity(parent);
+	}
+
+	return null;
+    }
 
     /**
      * @return Returns the toolDAO.
@@ -172,5 +248,13 @@ public class LamsToolService implements ILamsToolService {
      */
     public void setToolContentDAO(IToolContentDAO toolContentDAO) {
 	this.toolContentDAO = toolContentDAO;
+    }
+    
+    /**
+     * 
+     * @param toolContentDAO
+     */
+    public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
+	this.lamsCoreToolService = lamsCoreToolService;
     }
 }
