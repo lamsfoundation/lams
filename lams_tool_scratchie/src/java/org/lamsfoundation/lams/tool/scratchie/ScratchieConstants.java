@@ -164,8 +164,4 @@ public class ScratchieConstants {
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 
     public static final String LEARNER_MARK = "learner.mark";
-    
-    //Leader selection tool Constants
-    public static final String LEADER_SELECTION_TOOL_SIGNATURE = "lalead11";
-    public static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
 }

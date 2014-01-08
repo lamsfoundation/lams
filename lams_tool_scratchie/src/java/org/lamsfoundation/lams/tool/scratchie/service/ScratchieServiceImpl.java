@@ -156,10 +156,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 
     private IEventNotificationService eventNotificationService;
 
-    private ILamsCoreToolService lamsCoreToolService;
-
-    private IActivityDAO activityDAO;
-
     private ScratchieOutputFactory scratchieOutputFactory;
 
     // *******************************************************************************
@@ -338,57 +334,31 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 	// check leader select tool for a leader only in case scratchie tool doesn't know it. As otherwise it will screw
 	// up previous scratches done
 	if (leader == null) {
+	    
 	    if (ScratchieServiceImpl.log.isDebugEnabled()) {
 		ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			+ "]: getting ToolSession by ID: " + toolSessionId);
+			+ "]: getting LeaderUserId by toolSessionId: " + toolSessionId + " and userId: "
+			+ user.getUserId().intValue());
 	    }
-	    ToolSession toolSession = toolService.getToolSession(toolSessionId);
-	    ToolActivity qaActivity = toolSession.getToolActivity();
-	    Activity leaderSelectionActivity = ScratchieServiceImpl.getNearestLeaderSelectionActivity(qaActivity);
+	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getUserId().intValue());
+	    if (leaderUserId != null) {
+		leader = getUserByIDAndSession(leaderUserId, toolSessionId);
 
-	    // check if there is leaderSelectionTool available
-	    if (leaderSelectionActivity != null) {
-		if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|"
-			    + Thread.activeCount() + "]: getting User by ID: " + user.getUserId());
-		}
-		User learner = (User) getUserManagementService().findById(User.class, user.getUserId().intValue());
-		String outputName = ScratchieConstants.LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID;
-		if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|"
-			    + Thread.activeCount() + "]: getting ToolSession by User: " + learner.getUserId()
-			    + " and activity ID: " + leaderSelectionActivity.getActivityId());
-		}
-		ToolSession leaderSelectionSession = lamsCoreToolService.getToolSessionByLearner(learner,
-			leaderSelectionActivity);
-		if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|"
-			    + Thread.activeCount() + "]: getting ToolOutput by session ID: "
-			    + leaderSelectionSession.getToolSessionId());
-		}
-		ToolOutput output = lamsCoreToolService.getOutputFromTool(outputName, leaderSelectionSession, null);
-
-		// check if tool produced output
-		if ((output != null) && (output.getValue() != null)) {
-		    Long userId = output.getValue().getLong();
-		    leader = getUserByIDAndSession(userId, toolSessionId);
-
-		    // create new user in a DB
-		    if (leader == null) {
-			ScratchieServiceImpl.log.debug("creating new user with userId: " + userId);
-			if (ScratchieServiceImpl.log.isDebugEnabled()) {
-			    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|"
-				    + Thread.activeCount() + "]: getting User by ID: " + userId);
-			}
-			User leaderDto = (User) getUserManagementService().findById(User.class, userId.intValue());
-			leader = new ScratchieUser(leaderDto.getUserDTO(), scratchieSession);
-			this.createUser(leader);
+		// create new user in a DB
+		if (leader == null) {
+		    ScratchieServiceImpl.log.debug("creating new user with userId: " + leaderUserId);
+		    if (ScratchieServiceImpl.log.isDebugEnabled()) {
+			ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|"
+				+ Thread.activeCount() + "]: getting User by ID: " + leaderUserId);
 		    }
-
-		    // set group leader
-		    scratchieSession.setGroupLeader(leader);
-		    saveOrUpdateScratchieSession(scratchieSession);
+		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
+		    leader = new ScratchieUser(leaderDto.getUserDTO(), scratchieSession);
+		    this.createUser(leader);
 		}
+
+		// set group leader
+		scratchieSession.setGroupLeader(leader);
+		saveOrUpdateScratchieSession(scratchieSession);
 	    }
 	}
 
@@ -397,65 +367,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
 		    + "]: leaving checkLeaderSelectToolForSessionLeader()");
 	}
 	return leader;
-    }
-
-    /**
-     * Finds the nearest Leader Select activity. Works recursively. Tries to find Leader Select activity in the previous
-     * activities set first, and then inside the parent set.
-     */
-    private static Activity getNearestLeaderSelectionActivity(Activity activity) {
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: entered getNearestLeaderSelectionActivity() for activity ID: " + activity.getActivityId());
-	}
-	// check if current activity is Leader Select one. if so - stop searching and return it.
-	Class activityClass = Hibernate.getClass(activity);
-	if (activityClass.equals(ToolActivity.class)) {
-	    ToolActivity toolActivity;
-
-	    if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-			+ "]: doing strange stuff with Hibernate in  getNearestLeaderSelectionActivity()");
-	    }
-	    // activity is loaded as proxy due to lazy loading and in order to prevent quering DB we just re-initialize
-	    // it here again
-	    Hibernate.initialize(activity);
-	    if (activity instanceof HibernateProxy) {
-		toolActivity = (ToolActivity) ((HibernateProxy) activity).getHibernateLazyInitializer()
-			.getImplementation();
-	    } else {
-		toolActivity = (ToolActivity) activity;
-	    }
-
-	    if (ScratchieConstants.LEADER_SELECTION_TOOL_SIGNATURE.equals(toolActivity.getTool().getToolSignature())) {
-		if (ScratchieServiceImpl.log.isDebugEnabled()) {
-		    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|"
-			    + Thread.activeCount()
-			    + "]: leaving getNearestLeaderSelectionActivity() with activity found ID: "
-			    + activity.getActivityId());
-		}
-		return activity;
-	    }
-	}
-
-	// check previous activity
-	Transition transitionTo = activity.getTransitionTo();
-	if (transitionTo != null) {
-	    Activity fromActivity = transitionTo.getFromActivity();
-	    return ScratchieServiceImpl.getNearestLeaderSelectionActivity(fromActivity);
-	}
-
-	// check parent activity
-	Activity parent = activity.getParentActivity();
-	if (parent != null) {
-	    return ScratchieServiceImpl.getNearestLeaderSelectionActivity(parent);
-	}
-
-	if (ScratchieServiceImpl.log.isDebugEnabled()) {
-	    ScratchieServiceImpl.log.debug("LKC:[" + Thread.currentThread().getId() + "|" + Thread.activeCount()
-		    + "]: leaving getNearestLeaderSelectionActivity() with no result");
-	}
-	return null;
     }
 
     @Override
@@ -2248,14 +2159,6 @@ public class ScratchieServiceImpl implements IScratchieService, ToolContentManag
      */
     public String getMessage(String key, Object[] args) {
 	return messageService.getMessage(key, args);
-    }
-
-    public void setActivityDAO(IActivityDAO activityDAO) {
-	this.activityDAO = activityDAO;
-    }
-
-    public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {
-	this.lamsCoreToolService = lamsCoreToolService;
     }
 
     @Override

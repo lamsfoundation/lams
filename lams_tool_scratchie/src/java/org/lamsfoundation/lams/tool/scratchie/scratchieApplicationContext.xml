@@ -99,13 +99,7 @@
 		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>   
 		<property name="eventNotificationService">
 			<ref bean="eventNotificationService"/>
-		</property>   
-		<property name="lamsCoreToolService">
-   			<ref bean="lamsCoreToolService"/>
-   		</property>
-   		<property name="activityDAO">
-   			<ref bean="activityDAO"/>
-   		</property>
+		</property>
 		<property name="scratchieOutputFactory"><ref bean="scratchieOutputFactory"/></property>
     </bean>
 
