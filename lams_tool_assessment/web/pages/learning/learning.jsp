@@ -31,6 +31,9 @@
 			<c:set var="secondsLeft" value="${assessment.timeLimit * 60}" />		
 		</c:otherwise>
 	</c:choose>	
+	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
+	<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
+	<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}"/>
 	
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<style media="screen,projection" type="text/css">
@@ -101,7 +104,7 @@
 		</c:if>
 		
 		//autosave feature
-		<c:if test="${(!finishedLock) && (mode != 'teacher')}">
+		<c:if test="${hasEditRight && !finishedLock && (mode != 'teacher')}">
 			var autosaveInterval = "30000"; // 30 seconds interval
 			window.setInterval(
 				function(){
@@ -182,6 +185,26 @@
 					}
 			);		    
 		}		
+		
+		if (${!hasEditRight && mode != "teacher"}) {
+			setInterval("checkLeaderProgress();",15000);// Auto-Refresh every 15 seconds for non-leaders
+		}
+		
+		function checkLeaderProgress() {
+			
+	        $.ajax({
+	        	async: false,
+	            url: '<c:url value="/learning/checkLeaderProgress.do"/>',
+	            data: 'toolSessionID=${toolSessionID}',
+	            dataType: 'json',
+	            type: 'post',
+	            success: function (json) {
+	            	if (json.isLeaderResponseFinalized) {
+	            		location.reload();
+	            	}
+	            }
+	       	});
+		}
 	-->        
     </script>
 </lams:head>
@@ -191,12 +214,6 @@
 		<h1>
 			${assessment.title}
 		</h1>
-
-		<c:if test="${not finishedLock}">
-			<p>
-				${assessment.instructions}
-			</p>
-		</c:if>
 		
 		<c:if test="${not empty sessionMap.submissionDeadline && (sessionMap.mode == 'author' || sessionMap.mode == 'learner')}">
 			<div class="info">
@@ -212,6 +229,20 @@
 					<fmt:param>${assessment.passingMark}</fmt:param>
 				</fmt:message>
 			</div>
+		</c:if>
+		
+		<c:if test="${isLeadershipEnabled}">
+			<h4>
+				<fmt:message key="label.group.leader" >
+					<fmt:param>${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}</fmt:param>
+				</fmt:message>
+			</h4>
+		</c:if>
+
+		<c:if test="${not finishedLock}">
+			<p>
+				${assessment.instructions}
+			</p>
 		</c:if>
 		
 		<div id="question" style="display:none; cursor: default"> 
@@ -232,7 +263,7 @@
 		</c:if>
 		
 		<%-- Reflection entry --%>
-		<c:if test="${sessionMap.reflectOn && sessionMap.userFinished && finishedLock}">
+		<c:if test="${sessionMap.reflectOn && (sessionMap.userFinished || !hasEditRight ) && finishedLock}">
 			<div class="small-space-top">
 				<h2>
 					${sessionMap.reflectInstructions}
@@ -251,7 +282,7 @@
 					</c:otherwise>
 				</c:choose>
 
-				<c:if test="${mode != 'teacher'}">
+				<c:if test="${(mode != 'teacher') && hasEditRight}">
 					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
 						<fmt:message key="label.edit" />
 					</html:button>
@@ -262,13 +293,17 @@
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-right">
 				<c:choose>
-					<c:when	test="${not finishedLock}">					
+					<c:when	test="${not finishedLock && hasEditRight}">					
 						<html:button property="submitAll" onclick="return submitAll();" styleClass="button">
 							<fmt:message key="label.learning.submit.all" />
 						</html:button>	
 					</c:when>
+					
+					<c:when	test="${not finishedLock && !hasEditRight}">
+					</c:when>
+					
 					<c:otherwise>
-						<c:if test="${isResubmitAllowed}">
+						<c:if test="${isResubmitAllowed && hasEditRight}">
 							<html:link href="javascript:;" property="resubmit" onclick="return resubmit()" styleClass="button">
 								<fmt:message key="label.learning.resubmit" />
 							</html:link>
@@ -277,7 +312,7 @@
 						<c:if test="${! sessionMap.isUserFailed}">
 						
 							<c:choose>
-								<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
+								<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished) && hasEditRight}">
 									<html:button property="FinishButton" onclick="return continueReflect()" styleClass="button">
 										<fmt:message key="label.continue" />
 									</html:button>

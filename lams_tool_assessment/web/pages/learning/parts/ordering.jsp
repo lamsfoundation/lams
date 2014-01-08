@@ -19,7 +19,7 @@
 					<c:out value="${option.optionString}" escapeXml="false" />
 				</td>
 				
-				<c:if test="${mode != 'teacher'}">
+				<c:if test="${(mode != 'teacher') || !hasEditRight}">
 					<td width="20px" style="padding:5px 0px 2px 15px; vertical-align:middle; text-align: center; background:none; border-bottom:0px;">
 						<c:if test="${not ordStatus.first and !finishedLock}">
 							<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"

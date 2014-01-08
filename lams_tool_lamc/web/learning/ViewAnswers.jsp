@@ -9,6 +9,11 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
+<c:set var="mode" value="${sessionMap.mode}" />
+<c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" />
+<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
 
 <lams:html>
 <lams:head>
@@ -35,6 +40,14 @@
 		<h1>
 			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}"	escapeXml="false" />
 		</h1>
+		
+		<c:if test="${isLeadershipEnabled}">
+			<h4>
+				<fmt:message key="label.group.leader" >
+					<fmt:param>${sessionMap.groupLeader.fullname}</fmt:param>
+				</fmt:message>
+			</h4>
+		</c:if>
 
 		<html:form action="/learning?method=displayMc&validate=false"
 			method="POST" target="_self" onsubmit="disableFinishButton();"  styleId="Form1">
@@ -68,17 +81,18 @@
 					<div style="overflow: auto;">
 						<span class="float-left space-right">
 							${status.count})
-						</span>
+						</span>					
 						<c:out value="${questionEntry.value}" escapeXml="false" />
-					</div>
+					</div>																			  								
+
 
 					<!--  CANDIDATE ANSWERS  -->
 					<c:set var="queIndex" scope="request" value="0" />
-					<c:forEach var="mainEntry" items="${mcGeneralLearnerFlowDTO.mapGeneralOptionsContent}">
+					<c:forEach var="mainEntry"
+						items="${mcGeneralLearnerFlowDTO.mapGeneralOptionsContent}">
 						<c:set var="queIndex" scope="request" value="${queIndex +1}" />
 
 						<c:if test="${requestScope.mainQueIndex == requestScope.queIndex}">
-							<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
 								<ul>
 									<c:forEach var="subEntry" items="${mainEntry.value}">
 										<li>
@@ -86,8 +100,7 @@
 										</li>
 									</c:forEach>
 								</ul>
-							</c:if>
-							
+						
 							<p>
 								<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
 									<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
@@ -104,8 +117,8 @@
 												</c:when>
 												<c:otherwise>
 													<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
-												</c:otherwise>	
-											</c:choose>								
+												</c:otherwise>
+											</c:choose>									
 										</c:if>
 									</c:forEach>
 								</c:if>
@@ -156,13 +169,13 @@
 					</table>
 				</c:if>				
 
-			<c:if test="${(mcGeneralLearnerFlowDTO.learnerProgress != 'true') && (mcGeneralLearnerFlowDTO.retries == 'true')}">
+			<c:if test="${(mcGeneralLearnerFlowDTO.learnerProgress != 'true') && (mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight}">
 				<html:submit property="redoQuestions" styleClass="button">
 					<fmt:message key="label.redo.questions" />
 				</html:submit>
 			</c:if>
 									
-			<c:if test="${mcGeneralLearnerFlowDTO.reflection}">
+			<c:if test="${mcGeneralLearnerFlowDTO.reflection && hasEditRight}">
 				<h2>
 					<c:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />											
 				</h2>
@@ -184,7 +197,7 @@
 				<c:if test="${(mcGeneralLearnerFlowDTO.retries != 'true') || (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true')}">
 
 					<div class="space-bottom-top align-right">
-						<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
+						<c:if test="${(mcGeneralLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
 							<html:hidden property="learnerFinished" value="Finished" />
 									
 							<html:link href="#nogo" styleClass="button" styleId="finishButton" onclick="submitForm('finish'); return false;">
@@ -201,7 +214,7 @@
 							</html:link>
 						</c:if>
 
-						<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}">
+						<c:if test="${(mcGeneralLearnerFlowDTO.reflection == 'true') && hasEditRight}">
 							<html:submit property="forwardtoReflection" styleClass="button">
 								<fmt:message key="label.continue" />
 							</html:submit>

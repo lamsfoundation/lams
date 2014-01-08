@@ -158,6 +158,24 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</c:choose>	
 		</td>
 	</tr>
+
+	<tr>
+		<td>
+			<fmt:message key="label.use.select.leader.tool.output" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${content.useSelectLeaderToolOuput}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+
 </table>
 </div>	
 

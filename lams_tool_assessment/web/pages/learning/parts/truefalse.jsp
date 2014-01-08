@@ -29,7 +29,7 @@
 			<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; width: 5px; border-bottom:0px; ">
 						<input type="radio" name="question${status.index}" value="${true}" styleClass="noBorder"
 	 						<c:if test="${question.answerBoolean}">checked="checked"</c:if>
-							<c:if test="${finishedLock}">disabled="disabled"</c:if>					 
+							<c:if test="${finishedLock || !hasEditRight}">disabled="disabled"</c:if>					 
 						/>
 			</td>
 			<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px;">
@@ -59,7 +59,7 @@
 			<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; width: 5px; border-bottom:0px; ">
 						<input type="radio" name="question${status.index}" value="${false}" styleClass="noBorder"
 	 						<c:if test="${(!question.answerBoolean) and (question.answerString != null)}">checked="checked"</c:if>
-							<c:if test="${finishedLock}">disabled="disabled"</c:if>					 
+							<c:if test="${finishedLock || !hasEditRight}">disabled="disabled"</c:if>					 
 						/>
 			</td>
 			<td style="padding:5px 10px 2px; vertical-align:middle; background:none; border-bottom:0px;">

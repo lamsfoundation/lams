@@ -51,6 +51,7 @@ public class AssessmentSession {
     // assessment Questions
     private Set assessmentQuestions;
     private Set<AssessmentUser> assessmentUsers;
+    private AssessmentUser groupLeader;
 
     // **********************************************************
     // Get/Set methods
@@ -164,8 +165,6 @@ public class AssessmentSession {
 
     
     /**
-     * 
-     * 
      * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="last_name asc"
      * @hibernate.collection-key column="session_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.assessment.model.AssessmentUser"
@@ -180,6 +179,16 @@ public class AssessmentSession {
         this.assessmentUsers = assessmentUsers;
     }
     
-    
+    /**
+     * @hibernate.many-to-one column="group_leader_uid" cascade="all"
+     * @return
+     */
+    public AssessmentUser getGroupLeader() {
+	return this.groupLeader;
+    }
+
+    public void setGroupLeader(AssessmentUser groupLeader) {
+	this.groupLeader = groupLeader;
+    }
 
 }

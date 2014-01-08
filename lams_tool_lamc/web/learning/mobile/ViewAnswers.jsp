@@ -3,6 +3,12 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
+<c:set var="mode" value="${sessionMap.mode}" />
+<c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" />
+<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
+
 <lams:html>
 <lams:head>
 	<title><fmt:message key="activity.title" /></title>
@@ -54,6 +60,14 @@
 					<fmt:message key="label.learner.viewAnswers" />
 				</c:if>
 			</h2>
+			
+			<c:if test="${isLeadershipEnabled}">
+				<h4>
+					<fmt:message key="label.group.leader" >
+						<fmt:param>${sessionMap.groupLeader.fullname}</fmt:param>
+					</fmt:message>
+				</h4>
+			</c:if>
 
 			<!--  QUESTIONS  -->
 			<ul data-role="listview" data-inset="true" data-theme="d" >
@@ -74,12 +88,10 @@
 
 					<!--  CANDIDATE ANSWERS  -->
 					<c:set var="queIndex" scope="request" value="0" />
-					<c:forEach var="mainEntry"
-						items="${mcGeneralLearnerFlowDTO.mapGeneralOptionsContent}">
+					<c:forEach var="mainEntry" items="${mcGeneralLearnerFlowDTO.mapGeneralOptionsContent}">
 						<c:set var="queIndex" scope="request" value="${queIndex +1}" />
 
 						<c:if test="${requestScope.mainQueIndex == requestScope.queIndex}">
-							<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
 								<ul>
 									<c:forEach var="subEntry" items="${mainEntry.value}">
 										<li>
@@ -87,8 +99,7 @@
 										</li>
 									</c:forEach>
 								</ul>
-							</c:if>
-							
+						
 							<p>
 								<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
 									<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
@@ -159,7 +170,7 @@
 					</table>
 				</c:if>				
 
-			<c:if test="${(mcGeneralLearnerFlowDTO.learnerProgress != 'true') && (mcGeneralLearnerFlowDTO.retries == 'true')}">
+			<c:if test="${(mcGeneralLearnerFlowDTO.learnerProgress != 'true') && (mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight}">
 				<div class="small-space-top button-inside" >
 					<button type="submit" name="redoQuestions" data-icon="back">
 						<fmt:message key="label.redo.questions" />
@@ -167,7 +178,7 @@
 				</div>
 			</c:if>
 									
-			<c:if test="${mcGeneralLearnerFlowDTO.reflection}">
+			<c:if test="${mcGeneralLearnerFlowDTO.reflection && hasEditRight}">
 				<h2>
 							<c:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeXml="false" />											
 				</h2>
@@ -191,7 +202,7 @@
 			<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
 				<c:if test="${(mcGeneralLearnerFlowDTO.retries != 'true') || (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true')}">
 
-					<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
+					<c:if test="${(mcGeneralLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
 						<html:hidden property="learnerFinished" value="Finished" />
 									
 						<button id="finishButton" name="finishButton" onclick="submitForm('finish');return false" data-icon="arrow-r" data-theme="b">
@@ -208,7 +219,7 @@
 						</button>
 					</c:if>
 
-					<c:if test="${mcGeneralLearnerFlowDTO.reflection == 'true'}">
+					<c:if test="${(mcGeneralLearnerFlowDTO.reflection == 'true') && hasEditRight}">
 						<button name="forwardtoReflection" type="submit" data-icon="arrow-r" data-theme="b">
 							<fmt:message key="label.continue" />
 						</button>

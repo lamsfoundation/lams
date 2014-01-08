@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.assessment.web.action;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,6 +52,8 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -91,7 +94,7 @@ public class LearningAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException, JSONException {
 
 	String param = mapping.getParameter();
 	if (param.equals("start")) {
@@ -118,6 +121,9 @@ public class LearningAction extends Action {
 	if (param.equals("autoSaveAnswers")) {
 	    return autoSaveAnswers(mapping, form, request, response);
 	}
+	if (param.equals("checkLeaderProgress")) {
+	    return checkLeaderProgress(mapping, form, request, response);
+	}
 	// ================ Reflection =======================
 	if (param.equals("newReflection")) {
 	    return newReflection(mapping, form, request, response);
@@ -135,11 +141,15 @@ public class LearningAction extends Action {
      * 
      * This method will avoid read database again and lost un-saved resouce question lost when user "refresh page",
      * @throws ServletException 
+     * @throws NoSuchMethodException 
+     * @throws InvocationTargetException 
+     * @throws InstantiationException 
+     * @throws IllegalAccessException 
      * 
      */
     @SuppressWarnings("unchecked")
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+	    HttpServletResponse response) throws ServletException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 
 	// initialize Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
@@ -165,8 +175,43 @@ public class LearningAction extends Action {
 	} else {
 	    assessmentUser = getCurrentUser(service, toolSessionId);
 	}
-
+	
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
+	
+	//*LKC* added the next chunk
+	AssessmentUser groupLeader = null;
+	if (assessment.isUseSelectLeaderToolOuput()) {
+	    groupLeader = service.checkLeaderSelectToolForSessionLeader(assessmentUser, new Long(toolSessionId).longValue());
+
+	    // forwards to the leaderSelection page
+	    if (groupLeader == null && !mode.isTeacher()) {
+
+		List<AssessmentUser> groupUsers = service.getUsersBySession(new Long(toolSessionId).longValue());
+		request.setAttribute(AssessmentConstants.ATTR_GROUP_USERS, groupUsers);
+		request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT, assessment);
+
+		return mapping.findForward(AssessmentConstants.WAIT_FOR_LEADER);
+	    }
+
+	    // check if leader has submitted all answers
+	    if (groupLeader.isSessionFinished() && !mode.equals(ToolAccessMode.TEACHER.toString())) {
+
+		// in case user joins the lesson after leader has answers some answers already - we need to make sure
+		// he has the same scratches as leader
+		service.copyAnswersFromLeader(assessmentUser, groupLeader);
+
+		//service.finishToolSession(toolSessionId, assessmentUser.getUserId());
+//		user.setSessionFinished(true);
+//		assessmentUserDao.saveObject(user);
+//		assessmentUser.setSessionFinished(true);
+//		service.saupdateAssessmentUser(assessmentUser);
+	    }
+	}
+	
+	sessionMap.put(AssessmentConstants.ATTR_GROUP_LEADER, groupLeader);
+	boolean isUserLeader = service.isUserGroupLeader(assessmentUser, new Long(toolSessionId));
+	sessionMap.put(AssessmentConstants.ATTR_IS_USER_LEADER, isUserLeader);
+
 	Set<QuestionReference> questionReferences = new TreeSet<QuestionReference>(new SequencableComparator());
 	questionReferences.addAll(assessment.getQuestionReferences());
 	HashMap<Long, AssessmentQuestion> questionToReferenceMap = new HashMap<Long, AssessmentQuestion>();
@@ -200,6 +245,7 @@ public class LearningAction extends Action {
 	boolean isResubmitAllowed = ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0));
 	
 	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());
+	boolean hasEditRight = !assessment.isUseSelectLeaderToolOuput() || assessment.isUseSelectLeaderToolOuput() && isUserLeader;
 	boolean isLastResultFinished = (lastResult != null) && (lastResult.getFinishDate() != null);
 	//finishedLockForMonitor is a lock for displaying results page for teacher only if user see it, and displaying learner page if user see it accordingly
 	boolean finishedLockForMonitor =  (mode != null) && mode.isTeacher() && isLastResultFinished;	
@@ -207,10 +253,11 @@ public class LearningAction extends Action {
 
 	// get notebook entry
 	String entryText = new String();
-	    NotebookEntry notebookEntry = service.getEntry(toolSessionId, assessmentUser.getUserId().intValue());
-	    if (notebookEntry != null) {
-		entryText = notebookEntry.getEntry();
-	    }
+	AssessmentUser notebookCreator = (groupLeader == null) ? assessmentUser : groupLeader;
+	NotebookEntry notebookEntry = service.getEntry(toolSessionId, notebookCreator.getUserId().intValue());
+	if (notebookEntry != null) {
+	    entryText = notebookEntry.getEntry();
+	}
 	
 	// basic information
 	sessionMap.put(AssessmentConstants.ATTR_TITLE, assessment.getTitle());
@@ -299,13 +346,13 @@ public class LearningAction extends Action {
 	}
 	
 	//setAttemptStarted
-	if (!finishedLock) {
+	if (!finishedLock && hasEditRight) {
 	    service.setAttemptStarted(assessment, assessmentUser, toolSessionId);
 	}
 	
 	//paging
 	ArrayList<LinkedHashSet<AssessmentQuestion>> pagedQuestions = new ArrayList<LinkedHashSet<AssessmentQuestion>>();
-	int maxQuestionsPerPage = (assessment.getQuestionsPerPage() != 0) ? assessment.getQuestionsPerPage()
+	int maxQuestionsPerPage = ((assessment.getQuestionsPerPage() != 0) && hasEditRight) ? assessment.getQuestionsPerPage()
 		: questionList.size();
 	LinkedHashSet<AssessmentQuestion> questionsForOnePage = new LinkedHashSet<AssessmentQuestion>();
 	pagedQuestions.add(questionsForOnePage);
@@ -336,6 +383,28 @@ public class LearningAction extends Action {
 
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
+    
+    /**
+     * Checks Leader Progress
+     */
+    private ActionForward checkLeaderProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	
+	IAssessmentService service = getAssessmentService();
+	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+
+	AssessmentSession session = service.getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentUser leader = session.getGroupLeader();
+	
+	boolean isLeaderResponseFinalized = leader.isSessionFinished();
+	
+	JSONObject JSONObject = new JSONObject();
+	JSONObject.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
+	response.setContentType("application/x-json;charset=utf-8");
+	response.getWriter().print(JSONObject);
+	return null;
+    }
+
     
     /**
      * Display same entire authoring page content from HttpSession variable.
@@ -722,7 +791,7 @@ public class LearningAction extends Action {
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	//get the latest result (it can be unfinished one)
 	AssessmentResult lastResult = service.getLastAssessmentResult(assessmentUid,userId);
-	//if there is no results yet - no action required 
+	//if there is no results yet - no action required
 	if (lastResult == null) {
 	    return;
 	}

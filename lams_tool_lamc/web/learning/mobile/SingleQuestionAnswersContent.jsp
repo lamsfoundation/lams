@@ -26,7 +26,7 @@
 <html:hidden property="questionIndex" value="${mcGeneralLearnerFlowDTO.questionIndex}" />
 
 <ul data-role="listview" data-inset="true" data-theme="d">
-<c:forEach var="dto" varStatus="status"	items="${requestScope.learnerAnswersDTOList}">
+<c:forEach var="dto" varStatus="status" items="${requestScope.learnerAnswersDTOList}">
 	<c:if test="${dto.displayOrder == mcGeneralLearnerFlowDTO.questionIndex}">
 		
 		<li>
@@ -47,11 +47,19 @@
 				</div>
 			</legend>
 			
-			<c:forEach var="option" items="${dto.options}">
+			<c:forEach var="option" varStatus="status" items="${dto.options}">
 				<div class="indent">
 					<input type="radio" name="checkedCa" class="noBorder" value="${dto.questionUid}-${option.uid}" id="checkedCa${option.uid}"
 						<c:if test="${option.selected}">checked="checked"</c:if>>
+	
 					<label for="checkedCa${option.uid}">
+						<c:if test="${isPrefixAnswersWithLetters}">
+							<c:set var="seqLetter" value="${status.index}"/>
+							<span class="float-left">
+								<%=Character.toChars(97 + (Integer)pageContext.getAttribute("seqLetter"))%>)
+							</span>
+						</c:if>
+							
 						<c:out value="${option.mcQueOptionText}" escapeXml="false" />
 					</label>
 				</div>

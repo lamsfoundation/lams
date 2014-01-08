@@ -72,6 +72,8 @@ public class QaSession implements Serializable, Comparable, Nullable {
 
     /** persistent field */
     private Set qaQueUsers;
+    
+    private QaQueUsr groupLeader;
 
     public QaSession() {
     };
@@ -200,5 +202,13 @@ public class QaSession implements Serializable, Comparable, Nullable {
      */
     public void setSession_name(String session_name) {
 	this.session_name = session_name;
+    }
+    
+    public QaQueUsr getGroupLeader() {
+	return this.groupLeader;
+    }
+
+    public void setGroupLeader(QaQueUsr groupLeader) {
+	this.groupLeader = groupLeader;
     }
 }

@@ -366,6 +366,8 @@ public class MonitoringUtil implements McAppConstants {
 	request.setAttribute(ATTR_CONTENT, content);
 	request.setAttribute("questionsSequenced", content.isQuestionsSequenced());
 	request.setAttribute("showMarks", content.isShowMarks());
+	request.setAttribute("useSelectLeaderToolOuput", content.isUseSelectLeaderToolOuput());
+	request.setAttribute("prefixAnswersWithLetters", content.isPrefixAnswersWithLetters());
 	request.setAttribute("randomize", content.isRandomize());
 	request.setAttribute("displayAnswers", content.isDisplayAnswers());
 	request.setAttribute("retries", content.isRetries());

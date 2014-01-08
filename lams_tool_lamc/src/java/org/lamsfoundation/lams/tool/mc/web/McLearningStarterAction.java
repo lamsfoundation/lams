@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -140,6 +141,16 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    mcLearnerStarterDTO.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_COMBINED);
 	    mcLearningForm.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_COMBINED);
 	}
+	
+	String mode = request.getParameter(McAppConstants.MODE);
+	McQueUsr user = null;
+	if ((mode != null) && mode.equals(ToolAccessMode.TEACHER.toString())) {
+	    // monitoring mode - user is specified in URL
+	    // user may be null if the user was force completed.
+	    user = getSpecifiedUser(toolSessionID, WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
+	} else {
+	    user = getCurrentUser(toolSessionID);
+	}
 
 	/*
 	 * Is there a deadline set?
@@ -161,16 +172,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 		return mapping.findForward(McAppConstants.RUN_OFFLINE);
 	    }
-	}
-	
-	String mode = request.getParameter(McAppConstants.MODE);
-	McQueUsr user = null;
-	if ((mode != null) && mode.equals(ToolAccessMode.TEACHER.toString())) {
-	    // monitoring mode - user is specified in URL
-	    // user may be null if the user was force completed.
-	    user = getSpecifiedUser(toolSessionID, WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
-	} else {
-	    user = getCurrentUser(toolSessionID);
 	}
 
 	/*
@@ -223,6 +224,41 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	if (isDefineLater == true) {
 	    return (mapping.findForward(McAppConstants.DEFINE_LATER));
 	}
+	
+	McQueUsr groupLeader = null;
+	if (mcContent.isUseSelectLeaderToolOuput()) {
+	    groupLeader = mcService.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionID));
+	    
+	    // forwards to the leaderSelection page
+	    if (groupLeader == null && !mode.equals(ToolAccessMode.TEACHER.toString())) {
+
+		Set<McQueUsr> groupUsers = mcSession.getMcQueUsers();// mcService.getUsersBySession(new
+								     // Long(toolSessionID).longValue());
+		request.setAttribute(ATTR_GROUP_USERS, groupUsers);
+		request.setAttribute(TOOL_SESSION_ID, toolSessionID);
+		request.setAttribute(ATTR_CONTENT, mcContent);
+
+		return mapping.findForward(WAIT_FOR_LEADER);
+	    }
+
+	    // check if leader has submitted all answers
+	    if (groupLeader.isResponseFinalised() && !mode.equals(ToolAccessMode.TEACHER.toString())) {
+
+		// in case user joins the lesson after leader has answers some answers already - we need to make sure
+		// he has the same scratches as leader
+		mcService.copyAnswersFromLeader(user, groupLeader);
+
+		user.setResponseFinalised(true);
+		mcService.updateMcQueUsr(user);
+	    }
+	}
+	
+	sessionMap.put(ATTR_GROUP_LEADER, groupLeader);
+	boolean isUserLeader = mcService.isUserGroupLeader(user, new Long(toolSessionID));
+	sessionMap.put(ATTR_IS_USER_LEADER, isUserLeader);
+	sessionMap.put(AttributeNames.ATTR_MODE, mode);
+	sessionMap.put(ATTR_CONTENT, mcContent);
+	request.setAttribute("sessionMapID", sessionMap.getSessionID());
 
 	if (mode.equals("teacher")) {
 

@@ -1,5 +1,25 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<p>
+	<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput" onclick="clickSelectLeaderToolOuputHandler();"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="useSelectLeaderToolOuput">
+		<fmt:message key="label.use.select.leader.tool.output" />
+	</label>
+</p>
+
+
+<p class="small-space-top">
+	<html:checkbox property="prefixAnswersWithLetters" value="1" styleId="prefixAnswersWithLetters"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="prefixAnswersWithLetters">
+		<fmt:message key="label.prefix.sequential.letters.for.each.answer" />
+	</label>
+</p>
+
+
 <p class="small-space-top">
 	<html:checkbox property="questionsSequenced" value="1" styleId="questionsSequenced"
 		styleClass="noBorder">

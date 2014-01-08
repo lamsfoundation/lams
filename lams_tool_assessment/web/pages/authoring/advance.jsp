@@ -23,13 +23,31 @@
 			$('#allowHistoryResponsesAfterAttempt').prop("checked", false);
 		});
 		
+		$("#useSelectLeaderToolOuput").click(function() {
+			if ($("#useSelectLeaderToolOuput").is(':checked')) {
+				$("#display-summary").prop("checked", true).prop("disabled", true);
+				$('#display-summary-area').show('slow');
+				
+			} else {
+				$("#display-summary").prop("disabled", false);
+			}		
+		});
+		
 		<c:if test="${formBean.assessment.passingMark == 0}">$("#passingMark").prop("disabled", true);</c:if>
 		<c:if test="${formBean.assessment.passingMark > 0}">$("#attemptsAllowed").prop("disabled", true);</c:if>
+		<c:if test="${formBean.assessment.useSelectLeaderToolOuput}">$("#display-summary").prop("disabled", true);</c:if>
 	});
 
 </script>
 
 <!-- Advance Tab Content -->
+<p>
+	<html:checkbox property="assessment.useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput" styleClass="noBorder"/>
+	<label for="useSelectLeaderToolOuput">
+		<fmt:message key="label.use.select.leader.tool.output" />
+	</label>
+</p>
+
 <p class="small-space-top">
 	<html:text property="assessment.timeLimit" size="3" styleId="timeLimit"></html:text>
 	<label for="timeLimit">

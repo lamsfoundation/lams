@@ -93,7 +93,8 @@
 					<property name="qaOutputFactory"><ref bean="qaOutputFactory"/></property>
 					<property name="qaToolContentHandler"><ref bean="qaToolContentHandler"/></property>								
 					<property name="exportContentService"><ref bean="exportToolContentService"/></property>											
-			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>				
+			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+			   		<property name="userManagementService"><ref bean="userManagementService"/></property>
 				</bean>
 			</property>
 			<property name="transactionAttributes">
@@ -102,10 +103,10 @@
 					<prop key="copy*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="save*">PROPAGATION_REQUIRED, -QaApplicationException</prop>
 					<prop key="update*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<prop key="get*">PROPAGATION_REQUIRED, -QacpApplicationException</prop>
+					<prop key="get*">PROPAGATION_REQUIRED, -QaApplicationException</prop>
 					<prop key="remove*">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="persistFile">PROPAGATION_REQUIRED,-QaApplicationException</prop>
-					<!--  <prop key="configureContentRepository">PROPAGATION_REQUIRED,-QaApplicationException</prop> -->
+					<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="importToolContent">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="exportToolContent">PROPAGATION_REQUIRED,-QaApplicationException</prop>
 					<prop key="import102ToolContent">PROPAGATION_REQUIRED,-QaApplicationException</prop>

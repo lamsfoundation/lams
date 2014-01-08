@@ -58,6 +58,30 @@ import org.lamsfoundation.lams.usermanagement.User;
  *         Interface that defines the contract that all MCQ service provider must follow.
  */
 public interface IMcService {
+    
+    /**
+     * @param user
+     * @param toolSessionId
+     * @return
+     */
+    boolean isUserGroupLeader(McQueUsr user, Long toolSessionId);
+    
+    /**
+     * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
+     * 
+     * @param userId
+     * @param toolSessionID
+     */
+    McQueUsr checkLeaderSelectToolForSessionLeader(McQueUsr user, Long toolSessionID);
+    
+    /**
+     * Check user has the same answers logs as group leader. If not - creates missing ones. 
+     * 
+     * @param user
+     * @param leader
+     */
+    void copyAnswersFromLeader(McQueUsr user, McQueUsr leader);
+    
     void configureContentRepository() throws McApplicationException;
 
     void createMc(McContent mcContent) throws McApplicationException;

@@ -251,6 +251,23 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	return (mapping.findForward(forwardName));
     }
     
+    public ActionForward checkLeaderProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	
+	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+
+	QaSession session = qaService.getSessionById(toolSessionId);
+	QaQueUsr leader = session.getGroupLeader();
+	
+	boolean isLeaderResponseFinalized = leader.isResponseFinalized();
+	
+	JSONObject JSONObject = new JSONObject();
+	JSONObject.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
+	response.setContentType("application/x-json;charset=utf-8");
+	response.getWriter().print(JSONObject);
+	return null;
+    }
+    
     /**
      * auto saves responses 
      * 
@@ -413,6 +430,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
 	
+	boolean useSelectLeaderToolOuput = qaContent.isUseSelectLeaderToolOuput();
+	generalLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(useSelectLeaderToolOuput).toString());
+	
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
 	
@@ -509,6 +529,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
+	
+	boolean useSelectLeaderToolOuput = qaContent.isUseSelectLeaderToolOuput();
+	generalLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(useSelectLeaderToolOuput).toString());
 	
 	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 
@@ -849,6 +872,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	
 	boolean allowRichEditor = qaContent.isAllowRichEditor();
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
+	
+	boolean useSelectLeaderToolOuput = qaContent.isUseSelectLeaderToolOuput();
+	generalLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(useSelectLeaderToolOuput).toString());
 	
 	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
 

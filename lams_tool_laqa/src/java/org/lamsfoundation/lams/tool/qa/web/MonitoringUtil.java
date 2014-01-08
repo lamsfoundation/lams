@@ -181,7 +181,16 @@ public class MonitoringUtil implements QaAppConstants {
 				    .longValue());
 
 			    if (qaSession != null) {
-				List listUsers = qaService.getUserBySessionOnly(qaSession);
+				List<QaQueUsr> listUsers = new LinkedList<QaQueUsr>();
+				if (qaContent.isUseSelectLeaderToolOuput()) {
+				    QaQueUsr groupLeader = qaSession.getGroupLeader();
+				    if (groupLeader != null) {
+					listUsers.add(groupLeader);
+				    }
+				} else {
+				    listUsers = qaService.getUserBySessionOnly(qaSession);
+				}
+				    
 				Map<String, QaMonitoredUserDTO> sessionUsersAttempts = populateSessionUsersAttempts(
 					qaService, qaSession.getQaSessionId(), listUsers, questionUid,
 					isUserNamesVisible, isLearnerRequest, userId);
@@ -193,7 +202,15 @@ public class MonitoringUtil implements QaAppConstants {
 		    QaSession qaSession = qaService
 			    .retrieveQaSession(new Long(currentSessionId.toString()).longValue());
 
-		    List listUsers = qaService.getUserBySessionOnly(qaSession);
+		    List<QaQueUsr> listUsers = new LinkedList<QaQueUsr>();
+		    if (qaContent.isUseSelectLeaderToolOuput()) {
+			QaQueUsr groupLeader = qaSession.getGroupLeader();
+			if (groupLeader != null) {
+			    listUsers.add(groupLeader);
+			}
+		    } else {
+			listUsers = qaService.getUserBySessionOnly(qaSession);
+		    }
 
 		    Map sessionUsersAttempts = populateSessionUsersAttempts(qaService, new Long(
 			    currentSessionId), listUsers, questionUid, isUserNamesVisible, isLearnerRequest, userId);

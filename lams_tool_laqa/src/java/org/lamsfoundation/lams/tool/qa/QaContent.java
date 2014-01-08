@@ -102,6 +102,8 @@ public class QaContent implements Serializable {
     private boolean showOtherAnswers;
     
     private boolean allowRichEditor;
+    
+    private boolean useSelectLeaderToolOuput;
 
     /** nullable persistent field */
     private boolean usernameVisible;
@@ -143,7 +145,7 @@ public class QaContent implements Serializable {
 	    boolean defineLater, boolean runOffline, boolean questionsSequenced, boolean usernameVisible,
 	    boolean allowRateAnswers, boolean synchInMonitor, boolean lockWhenFinished, boolean contentLocked,
 	    boolean showOtherAnswers, boolean reflect, String reflectionSubject, Date creationDate, Date updateDate,
-	    Set qaQueContents, Set qaSessions, Set qaUploadedFiles, Set<QaCondition> conditions, boolean allowRichEditor) {
+	    Set qaQueContents, Set qaSessions, Set qaUploadedFiles, Set<QaCondition> conditions, boolean allowRichEditor, boolean useSelectLeaderToolOuput) {
 	this.qaContentId = qaContentId;
 	this.content = content;
 	this.title = title;
@@ -171,6 +173,7 @@ public class QaContent implements Serializable {
 	this.qaUploadedFiles = qaUploadedFiles;
 	this.conditions = conditions;
 	this.allowRichEditor = allowRichEditor;
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 
     /**
@@ -192,7 +195,7 @@ public class QaContent implements Serializable {
 		qa.isQuestionsSequenced(), qa.isUsernameVisible(), qa.isAllowRateAnswers(), qa.isSynchInMonitor(),
 		qa.isLockWhenFinished(), qa.isContentLocked(), qa.isShowOtherAnswers(), qa.isReflect(),
 		qa.getReflectionSubject(), qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(),
-		new TreeSet(), new TreeSet<QaCondition>(new TextSearchConditionComparator()), qa.isAllowRichEditor());
+		new TreeSet(), new TreeSet<QaCondition>(new TextSearchConditionComparator()), qa.isAllowRichEditor(), qa.isUseSelectLeaderToolOuput());
 
 	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
 
@@ -658,6 +661,14 @@ public class QaContent implements Serializable {
 
     public void setAllowRichEditor(boolean allowRichEditor) {
         this.allowRichEditor = allowRichEditor;
+    }
+    
+    public boolean isUseSelectLeaderToolOuput() {
+        return useSelectLeaderToolOuput;
+    }
+
+    public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
+        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 
     /**

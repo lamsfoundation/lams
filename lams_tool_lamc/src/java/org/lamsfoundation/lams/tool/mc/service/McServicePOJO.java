@@ -107,8 +107,8 @@ import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.pojos.McUploadedFile;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.util.McSessionComparator;
-import org.lamsfoundation.lams.tool.mc.web.MonitoringUtil;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -161,6 +161,85 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     private MessageService messageService;
 
     public McServicePOJO() {
+    }
+    
+    @Override
+    public boolean isUserGroupLeader(McQueUsr user, Long toolSessionId) {
+
+	McSession session = this.getMcSessionById(toolSessionId);
+	McQueUsr groupLeader = session.getGroupLeader();
+	
+	boolean isUserLeader = (groupLeader != null) && user.getUid().equals(groupLeader.getUid());
+	return isUserLeader;
+    }
+    
+    @Override
+    public McQueUsr checkLeaderSelectToolForSessionLeader(McQueUsr user, Long toolSessionId) {
+	if (user == null || toolSessionId == null) {
+	    return null;
+	}
+
+	McSession mcSession = mcSessionDAO.getMcSessionById(toolSessionId);
+	McQueUsr leader = mcSession.getGroupLeader();
+	// check leader select tool for a leader only in case QA tool doesn't know it. As otherwise it will screw
+	// up previous scratches done
+	if (leader == null) {
+
+	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getQueUsrId().intValue());
+	    if (leaderUserId != null) {
+		
+		leader = getMcUserBySession(leaderUserId, mcSession.getUid());
+
+		// create new user in a DB
+		if (leader == null) {
+		    logger.debug("creating new user with userId: " + leaderUserId);
+		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
+		    String userName = leaderDto.getLogin();
+		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
+		    leader = new McQueUsr(leaderUserId, userName, fullName, mcSession, new TreeSet());
+		    mcUserDAO.saveMcUser(user);
+		}
+
+		// set group leader
+		mcSession.setGroupLeader(leader);
+		this.updateMcSession(mcSession);
+	    }
+	}
+
+	return leader;
+    }
+    
+    @Override
+    public void copyAnswersFromLeader(McQueUsr user, McQueUsr leader) {
+
+	if ((user == null) || (leader == null) || user.getUid().equals(leader.getUid())) {
+	    return;
+	}
+
+	List<McUsrAttempt> leaderAttempts = this.getFinalizedUserAttempts(leader);
+	for (McUsrAttempt leaderAttempt : leaderAttempts) {
+	    
+	    McQueContent question = leaderAttempt.getMcQueContent();
+	    McUsrAttempt userAttempt = mcUsrAttemptDAO.getUserAttemptByQuestion(user.getUid(), question.getUid());
+
+	    // if response doesn't exist - created mcUsrAttempt in the db
+	    if (userAttempt == null) {
+		userAttempt = new McUsrAttempt(leaderAttempt.getAttemptTime(), question, user,
+			leaderAttempt.getMcOptionsContent(), leaderAttempt.getMark(), leaderAttempt.isPassed(),
+			leaderAttempt.isAttemptCorrect());
+		mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
+
+	    // if it's been changed by the leader 
+	    } else if (leaderAttempt.getAttemptTime().compareTo(userAttempt.getAttemptTime()) != 0) {
+		userAttempt.setMcOptionsContent(leaderAttempt.getMcOptionsContent());
+		userAttempt.setAttemptTime(leaderAttempt.getAttemptTime());
+		this.updateMcUsrAttempt(userAttempt);
+	    }
+
+	    user.setNumberOfAttempts(leader.getNumberOfAttempts());
+	    user.setLastAttemptTotalMark(leader.getLastAttemptTotalMark());
+	    this.updateMcQueUsr(user);
+	}
     }
 
     public void configureContentRepository() throws McApplicationException {
@@ -2062,6 +2141,8 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 	toolContentObj.setQuestionsSequenced(false);
 	toolContentObj.setShowMarks(false);
 	toolContentObj.setRandomize(false);
+	toolContentObj.setUseSelectLeaderToolOuput(false);
+	toolContentObj.setPrefixAnswersWithLetters(true);
 	toolContentObj.setDisplayAnswers(false);
 	// I can't find a use for setShowReport anywhere
 	toolContentObj.setShowReport(false);

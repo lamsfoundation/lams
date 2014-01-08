@@ -61,6 +61,8 @@ public class Assessment implements Cloneable {
     private String instructions;
 
     // advance
+    private boolean useSelectLeaderToolOuput;
+    
     private int timeLimit;
 
     private int questionsPerPage;
@@ -423,6 +425,20 @@ public class Assessment implements Cloneable {
      */
     public void setRunOffline(boolean forceOffline) {
 	runOffline = forceOffline;
+    }
+    
+    /**
+     * If the tool utilizes leaders from Select Leader tool.
+     * 
+     * @return
+     * @hibernate.property column="use_select_leader_tool_ouput"
+     */
+    public boolean isUseSelectLeaderToolOuput() {
+        return useSelectLeaderToolOuput;
+    }
+
+    public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
+        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 
     /**

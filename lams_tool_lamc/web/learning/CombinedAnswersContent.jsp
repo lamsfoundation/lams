@@ -19,7 +19,7 @@
 			<fmt:param><lams:Date value="${mcLearnerStarterDTO.submissionDeadline}" /></fmt:param>
 		</fmt:message>	
 	</div>
-</c:if>	
+</c:if>
 
 <c:if test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
 
@@ -32,13 +32,13 @@
 
 </c:if>
 
-<c:forEach var="dto" varStatus="status" items="${requestScope.learnerAnswersDTOList}">
+<c:forEach var="dto" items="${requestScope.learnerAnswersDTOList}">
 
 	<div class="shading-bg">
 		<div style="overflow: auto;">
 			<span class="float-left space-right">
 				${dto.displayOrder})
-			</span> 
+			</span>		
 			<c:out value="${dto.question}" escapeXml="false" />
 
 			<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">			
@@ -49,17 +49,35 @@
 			</c:if>							
 		</div>
 	</div>
-
+	
 	<table class="indent">
 		<tbody>
-			<c:forEach var="option" items="${dto.options}">
+			<c:forEach var="option" items="${dto.options}" varStatus="status">
+			
 				<tr>
 		
 					<td>
-						<input type="radio" name="checkedCa${dto.questionUid}" class="noBorder" value="${dto.questionUid}-${option.uid}"
-							<c:if test="${option.selected}">checked="checked"</c:if>>
+						<c:choose>
+							<c:when test="${hasEditRight}">		
+								<input type="radio" name="checkedCa${dto.questionUid}" class="noBorder" value="${dto.questionUid}-${option.uid}"
+									<c:if test="${option.selected}">checked="checked"</c:if>>
+							</c:when>
+							
+							<c:otherwise>
+								<input type="radio" name="checkedCa${dto.questionUid}" class="noBorder" value="${dto.questionUid}-${option.uid}" 
+									<c:if test="${option.selected}">checked="checked"</c:if> disabled="disabled">
+							</c:otherwise>
+						</c:choose>
 					</td>
+		
 					<td width="100%">
+						<c:if test="${isPrefixAnswersWithLetters}">
+							<c:set var="seqLetter" value="${status.index}"/>
+							<span class="float-left">
+								<%=Character.toChars(97 + (Integer)pageContext.getAttribute("seqLetter"))%>)
+							</span>
+						</c:if>
+								
 						<c:out value="${option.mcQueOptionText}" escapeXml="false" />
 					</td>
 					
@@ -75,9 +93,11 @@
 <div class="space-bottom-top align-right">
 	<html:hidden property="continueOptionsCombined" value="Continue" />
 
-	<html:button property="continueButton" styleClass="button" onclick="doSubmit();" styleId="continueButton">
-		<fmt:message key="button.continue" />
-	</html:button>
+	<c:if test="${hasEditRight}">
+		<html:button property="continueButton" styleClass="button" onclick="doSubmit();" styleId="continueButton">
+			<fmt:message key="button.continue" />
+		</html:button>
+	</c:if>
 </div>
 
 <!--options content ends here-->

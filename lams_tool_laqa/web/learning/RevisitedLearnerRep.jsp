@@ -10,6 +10,10 @@
 	<lams:WebAppURL />
 </c:set>
 <c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
+<c:set var="mode" value="${sessionMap.mode}" />
+<c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" />
+<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
 
 <lams:html>
 <lams:head>
@@ -117,7 +121,15 @@
 					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
 				</fmt:message>
 			</div>
-		</c:if>			
+		</c:if>	
+		
+		<c:if test="${isLeadershipEnabled}">
+			<h4>
+				<fmt:message key="label.group.leader" >
+					<fmt:param>${sessionMap.groupLeader.fullname}</fmt:param>
+				</fmt:message>
+			</h4>
+		</c:if>		
 
 		<h2>
 			<fmt:message key="label.learnerReport" />
@@ -158,7 +170,7 @@
 		</c:forEach>
 				
 		<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
-			<c:if test="${generalLearnerFlowDTO.lockWhenFinished != 'true'}">
+			<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
 				<br>
 				<html:button property="redoQuestions" styleClass="button" onclick="submitMethod('redoQuestions');">
 					<fmt:message key="label.redo" />
@@ -266,10 +278,12 @@
 			</h2>
 
 			<p><c:out value="${QaLearningForm.entryText}" escapeXml="false" /></p>
-
-			<html:button property="forwardtoReflection" styleClass="button" onclick="submitMethod('forwardtoReflection');"> 
-				<fmt:message key="label.edit" />
-			</html:button>
+			
+			<c:if test="${hasEditRight}">
+				<html:button property="forwardtoReflection" styleClass="button" onclick="submitMethod('forwardtoReflection');"> 
+					<fmt:message key="label.edit" />
+				</html:button>
+			</c:if>
 		</c:if>													
 				
 		<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">

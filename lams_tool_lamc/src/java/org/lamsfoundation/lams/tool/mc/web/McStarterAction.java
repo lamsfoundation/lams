@@ -365,6 +365,8 @@ public class McStarterAction extends Action implements McAppConstants {
 	mcAuthoringForm.setRandomize(mcContent.isRandomize() ? "1" : "0");
 	mcAuthoringForm.setDisplayAnswers(mcContent.isDisplayAnswers() ? "1" : "0");
 	mcAuthoringForm.setShowMarks(mcContent.isShowMarks() ? "1" : "0");
+	mcAuthoringForm.setUseSelectLeaderToolOuput(mcContent.isUseSelectLeaderToolOuput() ? "1" : "0");
+	mcAuthoringForm.setPrefixAnswersWithLetters(mcContent.isPrefixAnswersWithLetters() ? "1" : "0");
 
 	mcAuthoringForm.setRetries(mcContent.isRetries() ? "1" : "0");
 	mcAuthoringForm.setReflect(mcContent.isReflect() ? "1" : "0");

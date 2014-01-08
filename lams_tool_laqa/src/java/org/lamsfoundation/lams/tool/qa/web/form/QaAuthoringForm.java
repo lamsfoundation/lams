@@ -98,6 +98,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     protected IQaService qaService;
     
     protected boolean allowRichEditor;
+    protected boolean useSelectLeaderToolOuput;
 
     public void resetUserAction() {
 	this.addContent = null;
@@ -114,6 +115,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.statsMonitoring = null;
 	this.edit = null;
 	this.allowRichEditor = false;
+	this.useSelectLeaderToolOuput = false;
     }
 
     public void reset() {
@@ -146,6 +148,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.lockWhenFinished = null;
 	this.reflect = null;
 	this.allowRichEditor = false;
+	this.useSelectLeaderToolOuput = false;
 
 	this.summaryMonitoring = null;
 	this.instructionsMonitoring = null;
@@ -165,6 +168,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 	this.reflect = OPTION_OFF;
 	this.allowRichEditor = false;
 	this.required = false;
+	this.useSelectLeaderToolOuput = false;
     }
 
     public String toString() {
@@ -892,6 +896,14 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     public void setAllowRichEditor(boolean allowRichEditor) {
         this.allowRichEditor = allowRichEditor;
+    }
+    
+    public boolean isUseSelectLeaderToolOuput() {
+        return useSelectLeaderToolOuput;
+    }
+
+    public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
+        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 
     public boolean isRequired() {

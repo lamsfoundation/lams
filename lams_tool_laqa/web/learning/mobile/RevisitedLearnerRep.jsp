@@ -11,12 +11,16 @@
 	<lams:WebAppURL />
 </c:set>
 <c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
+<c:set var="mode" value="${sessionMap.mode}" />
+<c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" />
+<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
 
 <lams:html>
 <lams:head>
 	<html:base />
 	<title><fmt:message key="activity.title" /></title>
-
+	
 	<link rel="stylesheet" href="${lams}css/jquery.mobile.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.jRating.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
@@ -123,6 +127,14 @@
 				</fmt:message>
 			</div>
 		</c:if>
+		
+		<c:if test="${isLeadershipEnabled}">
+			<h4>
+				<fmt:message key="label.group.leader" >
+					<fmt:param>${sessionMap.groupLeader.fullname}</fmt:param>
+				</fmt:message>
+			</h4>
+		</c:if>
 
 		<h2 class="space-top">
 			<fmt:message key="label.learnerReport" />
@@ -162,7 +174,7 @@
 		</ul>
 				
 		<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
-			<c:if test="${generalLearnerFlowDTO.lockWhenFinished != 'true'}">
+			<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
 				<br>
 				<span class="button-inside">
 					<html:button property="redoQuestions" styleClass="button" onclick="submitMethod('redoQuestions');">
@@ -279,11 +291,13 @@
 
 			<p><c:out value="${QaLearningForm.entryText}" escapeXml="false" /></p>
 
-			<span class="button-inside">
-				<html:button property="forwardtoReflection"	onclick="submitMethod('forwardtoReflection');"> 
-					<fmt:message key="label.edit" />
-				</html:button>
-			</span>	
+			<c:if test="${hasEditRight}">
+				<span class="button-inside">
+					<html:button property="forwardtoReflection"	onclick="submitMethod('forwardtoReflection');"> 
+						<fmt:message key="label.edit" />
+					</html:button>
+				</span>	
+			</c:if>
 		</c:if>		
 
 		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">

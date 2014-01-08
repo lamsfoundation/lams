@@ -28,8 +28,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.IToolVO;
@@ -55,6 +53,38 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
  * @author Ozgur Demirtas
  */
 public interface IQaService {
+    
+    /**
+     * @param user
+     * @param toolSessionId
+     * @return
+     */
+    boolean isUserGroupLeader(QaQueUsr user, Long toolSessionId);
+    
+    /**
+     * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
+     * 
+     * @param userId
+     * @param toolSessionID
+     */
+    QaQueUsr checkLeaderSelectToolForSessionLeader(QaQueUsr user, Long toolSessionID);
+    
+    /**
+     * Check user has the same answers logs as group leader. If not - creates missing ones. 
+     * 
+     * @param user
+     * @param leader
+     */
+    void copyAnswersFromLeader(QaQueUsr user, QaQueUsr leader);
+    
+    /**
+     * Get users by given toolSessionID.
+     * 
+     * @param toolSessionID
+     * @return
+     */
+    List<QaQueUsr> getUsersBySession(Long toolSessionID);
+    
     /**
      * Return the qa object according to the requested content id.
      * 

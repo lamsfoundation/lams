@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -135,6 +136,33 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	}
 	Long userId = qaUser.getQueUsrId();
 	qaLearningForm.setUserID(qaUser.getQueUsrId().toString());
+	
+	QaQueUsr groupLeader = null;
+	if (qaContent.isUseSelectLeaderToolOuput()) {
+	    groupLeader = qaService.checkLeaderSelectToolForSessionLeader(qaUser, new Long(toolSessionID).longValue());
+
+	    // forwards to the leaderSelection page
+	    if (groupLeader == null && !mode.equals(ToolAccessMode.TEACHER.toString())) {
+
+		List<QaQueUsr> groupUsers = qaService.getUsersBySession(new Long(toolSessionID).longValue());
+		request.setAttribute(ATTR_GROUP_USERS, groupUsers);
+		request.setAttribute(TOOL_SESSION_ID, toolSessionID);
+		request.setAttribute(ATTR_CONTENT, qaContent);
+
+		return mapping.findForward(WAIT_FOR_LEADER);
+	    }
+
+	    // check if leader has submitted all answers
+	    if (groupLeader.isResponseFinalized() && !mode.equals(ToolAccessMode.TEACHER.toString())) {
+
+		// in case user joins the lesson after leader has answers some answers already - we need to make sure
+		// he has the same scratches as leader
+		qaService.copyAnswersFromLeader(qaUser, groupLeader);
+
+		qaUser.setResponseFinalized(true);
+		qaService.updateQaQueUsr(qaUser);
+	    }
+	}
 
 	/* holds the question contents for a given tool session and relevant content */
 	Map mapQuestionStrings = new TreeMap(new QaComparator());
@@ -152,6 +180,12 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    sessionMap.put(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
 		    qaService.getLearnerContentFolder(new Long(toolSessionID), qaUser.getQueUsrId()));
 	}
+	
+	sessionMap.put(ATTR_GROUP_LEADER, groupLeader);
+	boolean isUserLeader = qaService.isUserGroupLeader(qaUser, new Long(toolSessionID));
+	sessionMap.put(ATTR_IS_USER_LEADER, isUserLeader);
+	sessionMap.put(AttributeNames.ATTR_MODE, mode);
+	sessionMap.put(ATTR_CONTENT, qaContent);
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
 	generalLearnerFlowDTO.setUserUid(qaUser.getQueUsrId().toString());
@@ -232,7 +266,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	*/
 	/*handling PREVIEW mode*/
 
-	if ((qaSession.getQaQueUsers() != null) && (qaSession.getQaQueUsers().size() > 1)) {
+	if ((qaSession.getQaQueUsers() != null) && (qaSession.getQaQueUsers().size() > 1) && !qaContent.isUseSelectLeaderToolOuput()) {
 	    //there are multiple user responses
 	    generalLearnerFlowDTO.setExistMultipleUserResponses(new Boolean(true).toString());
 	}

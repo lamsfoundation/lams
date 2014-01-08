@@ -12,6 +12,40 @@
 
 	<tr>
 		<td>
+			<fmt:message key="label.use.select.leader.tool.output" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${useSelectLeaderToolOuput}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.prefix.sequential.letters.for.each.answer" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${prefixAnswersWithLetters}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+
+	<tr>
+		<td>
 			<fmt:message key="radiobox.onepq" />
 		</td>
 		

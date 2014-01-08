@@ -47,6 +47,8 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     protected String editOptionsMode;
 
     protected String showMarks;
+    protected String useSelectLeaderToolOuput;
+    protected String prefixAnswersWithLetters;
     protected String randomize;
     protected String displayAnswers;
 
@@ -171,6 +173,8 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	this.offlineFile = null;
 
 	this.showMarks = null;
+	this.useSelectLeaderToolOuput = null;
+	this.prefixAnswersWithLetters = null;
 
 	this.dispatch = null;
 
@@ -1191,6 +1195,36 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
      */
     public void setShowMarks(String showMarks) {
 	this.showMarks = showMarks;
+    }
+    
+    /**
+     * @return Returns the useSelectLeaderToolOuput.
+     */
+    public String getUseSelectLeaderToolOuput() {
+	return useSelectLeaderToolOuput;
+    }
+
+    /**
+     * @param useSelectLeaderToolOuput
+     *            The useSelectLeaderToolOuput to set.
+     */
+    public void setUseSelectLeaderToolOuput(String useSelectLeaderToolOuput) {
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+    }
+    
+    /**
+     * @return Returns the prefixAnswersWithLetters.
+     */
+    public String getPrefixAnswersWithLetters() {
+	return prefixAnswersWithLetters;
+    }
+
+    /**
+     * @param prefixAnswersWithLetters
+     *            The prefixAnswersWithLetters to set.
+     */
+    public void setPrefixAnswersWithLetters(String prefixAnswersWithLetters) {
+	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
     }
 
     /**

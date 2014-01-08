@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
@@ -305,7 +304,8 @@ public class AuthoringUtil implements QaAppConstants {
 	String lockWhenFinished = request.getParameter("lockWhenFinished");
 	
 	String allowRichEditor = request.getParameter("allowRichEditor");
-	    
+	
+	String useSelectLeaderToolOuput = request.getParameter("useSelectLeaderToolOuput");
 
 	String richTextOfflineInstructions = request.getParameter(QaAppConstants.OFFLINE_INSTRUCTIONS);
 	String richTextOnlineInstructions = request.getParameter(QaAppConstants.ONLINE_INSTRUCTIONS);
@@ -323,6 +323,7 @@ public class AuthoringUtil implements QaAppConstants {
 	boolean showOtherAnswersBoolean = false;
 	boolean reflectBoolean = false;
 	boolean allowRichEditorBoolean = false;
+	boolean useSelectLeaderToolOuputBoolean = false;
 
 	if (questionsSequenced != null && questionsSequenced.equalsIgnoreCase("1")) {
 	    questionsSequencedBoolean = true;
@@ -350,6 +351,10 @@ public class AuthoringUtil implements QaAppConstants {
 	
 	if (allowRichEditor != null && allowRichEditor.equalsIgnoreCase("1")) {
 	    allowRichEditorBoolean = true;
+	}
+	
+	if (useSelectLeaderToolOuput != null && useSelectLeaderToolOuput.equalsIgnoreCase("1")) {
+	    useSelectLeaderToolOuputBoolean = true;
 	}
 
 	if (reflect != null && reflect.equalsIgnoreCase("1")) {
@@ -394,6 +399,7 @@ public class AuthoringUtil implements QaAppConstants {
 	    qaContent.setReflect(reflectBoolean);
 	    qaContent.setReflectionSubject(reflectionSubject);
 	    qaContent.setAllowRichEditor(allowRichEditorBoolean);
+	    qaContent.setUseSelectLeaderToolOuput(useSelectLeaderToolOuputBoolean);
 
 	}
 

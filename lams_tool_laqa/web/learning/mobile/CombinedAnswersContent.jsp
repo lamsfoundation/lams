@@ -32,7 +32,16 @@
 				</p>
 					
 				<div class="small-space-bottom">
-					<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
+					<c:choose>
+						<c:when test="${hasEditRight}">
+							<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area" ><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
+						</c:when>
+						
+						<c:otherwise>
+							<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area" disabled="disabled"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
+						</c:otherwise>
+					</c:choose>
+
 				</div>
 			</li>
 			
@@ -41,11 +50,13 @@
 	</c:forEach>
 </ul>
 
-<div class="space-top button-inside">
-	<button name="btnCombined" onclick="javascript:submitMethod('submitAnswersContent');" data-theme="b">
-		<fmt:message key="button.submitAllContent" />
-	</button>
-</div>
+<c:if test="${hasEditRight}">
+	<div class="space-top button-inside">
+		<button name="btnCombined" onclick="javascript:submitMethod('submitAnswersContent');" data-theme="b">
+			<fmt:message key="button.submitAllContent" />
+		</button>
+	</div>
+</c:if>
 
 </div><!-- /page div -->
 

@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +48,6 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.LoginException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
@@ -58,9 +58,13 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
+import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -69,6 +73,7 @@ import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
@@ -104,6 +109,9 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.SessionDataExistsException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -111,9 +119,7 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
- * 
  * @author Andrey Balan
- * 
  */
 public class AssessmentServiceImpl implements IAssessmentService, ToolContentManager, ToolSessionManager,
 	ToolContentImport102Manager {
@@ -146,7 +152,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     private ILamsToolService toolService;
 
     private ILearnerService learnerService;
-    
+
     private IAuditService auditService;
 
     private IUserManagementService userManagementService;
@@ -160,10 +166,139 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     private IEventNotificationService eventNotificationService;
 
     private ILessonService lessonService;
+    
+    private IActivityDAO activityDAO;
+    
+    private IUserManagementService userService;
 
     // *******************************************************************************
     // Service method
     // *******************************************************************************
+    @Override
+    public boolean isUserGroupLeader(AssessmentUser user, Long toolSessionId) {
+
+	AssessmentSession session = this.getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentUser groupLeader = session.getGroupLeader();
+	
+	boolean isUserLeader = (groupLeader != null) && user.getUid().equals(groupLeader.getUid());
+	return isUserLeader;
+    }
+    
+    @Override
+    public AssessmentUser checkLeaderSelectToolForSessionLeader(AssessmentUser user, Long toolSessionId) {
+	if (user == null || toolSessionId == null) {
+	    return null;
+	}
+
+	AssessmentSession assessmentSession = this.getAssessmentSessionBySessionId(toolSessionId);
+	AssessmentUser leader = assessmentSession.getGroupLeader();
+	// check leader select tool for a leader only in case QA tool doesn't know it. As otherwise it will screw
+	// up previous scratches done
+	if (leader == null) {
+
+	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getUserId().intValue());
+	    if (leaderUserId != null) {
+		leader = this.getUserByIDAndSession(leaderUserId, toolSessionId);
+
+		// create new user in a DB
+		if (leader == null) {
+		    log.debug("creating new user with userId: " + leaderUserId);
+		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
+		    String userName = leaderDto.getLogin();
+		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
+		    leader = new AssessmentUser(leaderDto.getUserDTO(), assessmentSession);
+		    this.createUser(leader);
+		}
+
+		// set group leader
+		assessmentSession.setGroupLeader(leader);
+		assessmentSessionDao.saveObject(assessmentSession);
+	    }
+	}
+
+	return leader;
+    }
+    
+    @Override
+    public void copyAnswersFromLeader(AssessmentUser user, AssessmentUser leader) {
+
+	if ((user == null) || (leader == null) || user.getUid().equals(leader.getUid())) {
+	    return;
+	}
+	Long assessmentUid = leader.getSession().getAssessment().getUid();
+
+	AssessmentResult leaderResult = assessmentResultDao.getLastFinishedAssessmentResult(assessmentUid, leader.getUserId());
+	AssessmentResult userResult = assessmentResultDao.getLastAssessmentResult(assessmentUid, user.getUserId());
+	Set<AssessmentQuestionResult> leaderQuestionResults = leaderResult.getQuestionResults();
+
+	// if response doesn't exist create new empty objects which we populate on the next step
+	if (userResult == null) {
+	    userResult = new AssessmentResult();
+	    userResult.setAssessment(leaderResult.getAssessment());
+	    userResult.setUser(user);
+	    userResult.setSessionId(leaderResult.getSessionId());
+	    
+	    Set<AssessmentQuestionResult> userQuestionResults = userResult.getQuestionResults();
+	    for (AssessmentQuestionResult leaderQuestionResult: leaderQuestionResults) {
+		AssessmentQuestionResult userQuestionResult = new AssessmentQuestionResult();
+		userQuestionResult.setAssessmentQuestion(leaderQuestionResult.getAssessmentQuestion());
+		userQuestionResult.setAssessmentResult(userResult);
+		userQuestionResults.add(userQuestionResult);
+		
+		Set<AssessmentOptionAnswer> leaderOptionAnswers = leaderQuestionResult.getOptionAnswers();
+		Set<AssessmentOptionAnswer> userOptionAnswers = userQuestionResult.getOptionAnswers();
+		for (AssessmentOptionAnswer leaderOptionAnswer: leaderOptionAnswers) {
+		    AssessmentOptionAnswer userOptionAnswer = new AssessmentOptionAnswer();
+		    userOptionAnswer.setQuestionOptionUid(leaderOptionAnswer.getQuestionOptionUid());
+		    userOptionAnswers.add(userOptionAnswer);
+		}
+	    }
+	}
+
+	//copy results from leader to user in both cases (when there is no userResult yet and when if it's been changed by the leader)
+	userResult.setStartDate(leaderResult.getStartDate());
+	userResult.setFinishDate(leaderResult.getFinishDate());
+	userResult.setMaximumGrade(leaderResult.getMaximumGrade());
+	userResult.setGrade(leaderResult.getGrade());
+	
+	Set<AssessmentQuestionResult> userQuestionResults = userResult.getQuestionResults();
+	for (AssessmentQuestionResult leaderQuestionResult : leaderQuestionResults) {
+	    for (AssessmentQuestionResult userQuestionResult : userQuestionResults) {
+		if (userQuestionResult.getAssessmentQuestion().getUid().equals(leaderQuestionResult.getAssessmentQuestion().getUid())) {
+		    
+		    userQuestionResult.setAnswerString(leaderQuestionResult.getAnswerString());
+		    userQuestionResult.setAnswerFloat(leaderQuestionResult.getAnswerFloat());
+		    userQuestionResult.setAnswerBoolean(leaderQuestionResult.getAnswerBoolean());
+		    userQuestionResult.setSubmittedOptionUid(leaderQuestionResult.getSubmittedOptionUid());
+		    userQuestionResult.setMark(leaderQuestionResult.getMark());
+		    userQuestionResult.setMaxMark(leaderQuestionResult.getMaxMark());
+		    userQuestionResult.setPenalty(leaderQuestionResult.getPenalty());
+
+		    Set<AssessmentOptionAnswer> leaderOptionAnswers = leaderQuestionResult.getOptionAnswers();
+		    Set<AssessmentOptionAnswer> userOptionAnswers = userQuestionResult.getOptionAnswers();
+		    for (AssessmentOptionAnswer leaderOptionAnswer : leaderOptionAnswers) {
+			for (AssessmentOptionAnswer userOptionAnswer : userOptionAnswers) {
+			    if (userOptionAnswer.getQuestionOptionUid().equals(leaderOptionAnswer.getQuestionOptionUid())) {
+				
+				userOptionAnswer.setAnswerBoolean(leaderOptionAnswer.getAnswerBoolean());
+				userOptionAnswer.setAnswerInt(leaderOptionAnswer.getAnswerInt());
+				
+			    }
+			}
+
+		    }
+		    
+		}
+	    }
+	}
+	
+	assessmentResultDao.saveObject(userResult);
+    }
+    
+    @Override
+    public List<AssessmentUser> getUsersBySession(Long toolSessionID) {
+	return assessmentUserDao.getBySessionID(toolSessionID);
+    }
 
     /**
      * This method verifies the credentials of the Assessment Tool and gives it the <code>Ticket</code> to login and
@@ -608,10 +743,20 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
 	for (AssessmentSession session : sessionList) {
 	    Long sessionId = session.getSessionId();
+	    Assessment assessment = session.getAssessment();
 	    // one new summary for one session.
 	    Summary summary = new Summary(sessionId, session.getSessionName());
 
-	    List<AssessmentUser> users = assessmentUserDao.getBySessionID(sessionId);
+	    List<AssessmentUser> users = new LinkedList<AssessmentUser>();
+	    if (assessment.isUseSelectLeaderToolOuput()) {
+		AssessmentUser groupLeader = session.getGroupLeader();
+		if (groupLeader != null) {
+		    users.add(groupLeader);
+		}
+	    } else {
+		users = assessmentUserDao.getBySessionID(sessionId);
+	    }
+	    
 	    ArrayList<AssessmentResult> assessmentResults = new ArrayList<AssessmentResult>();
 	    for (AssessmentUser user : users) {
 		AssessmentResult assessmentResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(
@@ -709,11 +854,23 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	List<List<AssessmentQuestionResult>> questionResults = new ArrayList<List<AssessmentQuestionResult>>();
 	SortedSet<AssessmentSession> sessionList = new TreeSet<AssessmentSession>(new AssessmentSessionComparator());
 	sessionList.addAll(assessmentSessionDao.getByContentId(contentId));
+	
 	for (AssessmentSession session : sessionList) {
+	    
+	    Assessment assessment = session.getAssessment();
 	    Long sessionId = session.getSessionId();
-	    List<AssessmentUser> users = assessmentUserDao.getBySessionID(sessionId);
-	    // Set<AssessmentQuestionResult> sessionQuestionResults = new TreeSet<AssessmentQuestionResult>(
-	    // new AssessmentQuestionResultComparator());
+	    List<AssessmentUser> users = new ArrayList<AssessmentUser>();
+	    
+	    //in case of leader aware tool show only leaders' responses
+	    if (assessment.isUseSelectLeaderToolOuput()) {
+		AssessmentUser leader = session.getGroupLeader();
+		if (leader != null) {
+		    users.add(leader);
+		}
+	    } else {
+		users = assessmentUserDao.getBySessionID(sessionId);
+	    }
+	    
 	    ArrayList<AssessmentQuestionResult> sessionQuestionResults = new ArrayList<AssessmentQuestionResult>();
 	    for (AssessmentUser user : users) {
 		AssessmentResult assessmentResult = assessmentResultDao.getLastFinishedAssessmentResultBySessionId(
@@ -763,22 +920,145 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	AssessmentQuestionResult questionResult = assessmentQuestionResultDao
 		.getAssessmentQuestionResultByUid(questionResultUid);
 	float oldMark = questionResult.getMark();
-	questionResult.setMark(newMark);
-	assessmentQuestionResultDao.saveObject(questionResult);
-
-	AssessmentResult result = questionResult.getAssessmentResult();
-	float totalMark = result.getGrade() - oldMark + newMark;
-	result.setGrade(totalMark);
-	assessmentResultDao.saveObject(result);
-
-	// propagade changes to Gradebook
-	Integer userId = result.getUser().getUserId().intValue();
-	Long toolSessionId = result.getUser().getSession().getSessionId();
-	gradebookService.updateActivityMark(new Double(totalMark), null, userId, toolSessionId, true);
+	AssessmentResult assessmentResult = questionResult.getAssessmentResult();
+	float totalMark = assessmentResult.getGrade() - oldMark + newMark;
 	
-	//records mark change with audit service
-	auditService.logMarkChange(AssessmentConstants.TOOL_SIGNATURE, result.getUser().getUserId(), result.getUser()
-		.getLoginName(), "" + oldMark, "" + totalMark);
+	Long toolSessionId = questionResult.getAssessmentResult().getSessionId();
+	Assessment assessment = questionResult.getAssessmentResult().getAssessment();
+	Long questionUid = questionResult.getAssessmentQuestion().getUid();
+	
+	// When changing a mark for user and isUseSelectLeaderToolOuput is true, the mark should be propagated to all
+	// students within the group
+	List<AssessmentUser> users = new ArrayList<AssessmentUser>();
+	if (assessment.isUseSelectLeaderToolOuput()) {
+	    users = this.getUsersBySession(toolSessionId);
+	} else {
+	    users = new ArrayList<AssessmentUser>();
+	    AssessmentUser leader = questionResult.getUser();
+	    users.add(leader);
+	}
+	
+	for (AssessmentUser user : users) {
+	    Long userId = user.getUserId();
+	    
+	    List<Object[]> questionResults = assessmentQuestionResultDao
+		    .getAssessmentQuestionResultList(assessment.getUid(), userId, questionUid);
+
+	    if (questionResults == null || questionResults.isEmpty()) {
+		log.warn("User with uid: " + user.getUid() + " doesn't have any results despite the fact group leader has some.");
+		continue;
+	    }
+	    
+	    Object[] lastAssessmentQuestionResultObj = questionResults.get(questionResults.size() - 1);
+	    AssessmentQuestionResult lastAssessmentQuestionResult = (AssessmentQuestionResult) lastAssessmentQuestionResultObj[0];
+	    
+	    lastAssessmentQuestionResult.setMark(newMark);
+	    assessmentQuestionResultDao.saveObject(lastAssessmentQuestionResult);
+
+	    AssessmentResult result = lastAssessmentQuestionResult.getAssessmentResult();
+	    result.setGrade(totalMark);
+	    assessmentResultDao.saveObject(result);
+
+	    // propagade changes to Gradebook
+	    gradebookService.updateActivityMark(new Double(totalMark), null, userId.intValue(), toolSessionId, true);
+
+	    // records mark change with audit service
+	    auditService.logMarkChange(AssessmentConstants.TOOL_SIGNATURE, userId, user.getLoginName(), "" + oldMark,
+		    "" + totalMark);
+	}
+
+    }
+    
+    @Override
+    public void recalculateMarkForLesson(UserDTO requestUserDTO, Long lessonId) {
+	
+	User requestUser = userService.getUserByLogin(requestUserDTO.getLogin());
+	Lesson lesson = lessonService.getLesson(lessonId);
+	Organisation organisation = lesson.getOrganisation();
+	
+	// skip doing anything if the user doesn't have permission
+	Integer organisationToCheckPermission = (organisation.getOrganisationType().getOrganisationTypeId()
+		.equals(OrganisationType.COURSE_TYPE)) ? organisation.getOrganisationId() : organisation
+		.getParentOrganisation().getOrganisationId();
+	boolean isGroupManager = userService.isUserInRole(requestUser.getUserId(), organisationToCheckPermission,
+		Role.GROUP_MANAGER);
+	if (!(lesson.getLessonClass().isStaffMember(requestUser) || isGroupManager)) {
+	    return;
+	}
+
+	//get all lesson activities
+	Set<Activity> lessonActivities = new TreeSet<Activity>();
+	/*
+	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
+	 * reason Causes a ClassCastException when you try to cast it, even if it is a ToolActivity.
+	 * 
+	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
+	 * one
+	 */
+	Activity firstActivity = activityDAO.getActivityByActivityId(lesson.getLearningDesign().getFirstActivity()
+		.getActivityId());
+	lessonActivities.add(firstActivity);
+	lessonActivities.addAll(lesson.getLearningDesign().getActivities());
+
+	//iterate through all assessment activities in the lesson
+	for (Activity activity : lessonActivities) {
+	    
+	    // check if it's assessment activity
+	    if ((activity instanceof ToolActivity)
+		    && ((ToolActivity) activity).getTool().getToolSignature()
+			    .equals(AssessmentConstants.TOOL_SIGNATURE)) {
+		ToolActivity assessmentActivity = (ToolActivity) activity;
+
+		for (ToolSession toolSession : (Set<ToolSession>) assessmentActivity.getToolSessions()) {
+		    Long toolSessionId = toolSession.getToolSessionId();
+		    AssessmentSession assessmentSession = this.getAssessmentSessionBySessionId(toolSessionId);
+		    Assessment assessment = assessmentSession.getAssessment();
+
+		    if (assessment.isUseSelectLeaderToolOuput()) {
+
+			AssessmentUser leader = assessmentSession.getGroupLeader();
+			if (leader == null) {
+			    continue;
+			}
+
+			AssessmentResult leaderLastResult = this.getLastFinishedAssessmentResult(assessment.getUid(),
+				leader.getUserId());
+			if (leaderLastResult == null) {
+			    continue;
+			}
+			Double mark = new Double(leaderLastResult.getGrade());
+
+			// update marks for all learners in a group
+			List<AssessmentUser> users = this.getUsersBySession(toolSessionId);
+			for (AssessmentUser user : users) {
+			    this.copyAnswersFromLeader(user, leader);
+
+			    // propagade total mark to Gradebook
+			    gradebookService.updateActivityMark(mark, null, user.getUserId().intValue(), toolSessionId,
+				    true);
+			}
+		    } else {
+
+			// update marks for all learners in a group
+			List<AssessmentUser> users = this.getUsersBySession(toolSessionId);
+			for (AssessmentUser user : users) {
+			    AssessmentResult userLastResult = this.getLastFinishedAssessmentResult(assessment.getUid(),
+				    user.getUserId());
+			    if (userLastResult == null) {
+				continue;
+			    }
+			    Double mark = new Double(userLastResult.getGrade());
+
+			    // propagade total mark to Gradebook
+			    gradebookService.updateActivityMark(mark, null, user.getUserId().intValue(), toolSessionId,
+				    true);
+			}
+		    }
+
+		}
+	    }
+	}
+
     }
 
     @Override
@@ -1283,5 +1563,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     public String getToolContentTitle(Long toolContentId) {
 	return getAssessmentByContentId(toolContentId).getTitle();
+    }
+
+    
+    public void setActivityDAO(IActivityDAO activityDAO) {
+	this.activityDAO = activityDAO;
+    }
+    
+    public void setUserService(IUserManagementService userService) {
+	this.userService = userService;
     }
 }

@@ -37,7 +37,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -96,6 +95,7 @@ import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
 import org.lamsfoundation.lams.tool.qa.util.QaSessionComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaUtils;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -153,6 +153,82 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     private ICoreNotebookService coreNotebookService;
 
     private Random generator = new Random();
+    
+    @Override
+    public boolean isUserGroupLeader(QaQueUsr user, Long toolSessionId) {
+
+	QaSession session = this.getSessionById(toolSessionId);
+	QaQueUsr groupLeader = session.getGroupLeader();
+	
+	boolean isUserLeader = (groupLeader != null) && user.getUid().equals(groupLeader.getUid());
+	return isUserLeader;
+    }
+    
+    @Override
+    public QaQueUsr checkLeaderSelectToolForSessionLeader(QaQueUsr user, Long toolSessionId) {
+	if (user == null || toolSessionId == null) {
+	    return null;
+	}
+
+	QaSession qaSession = this.getSessionById(toolSessionId);
+	QaQueUsr leader = qaSession.getGroupLeader();
+	// check leader select tool for a leader only in case QA tool doesn't know it. As otherwise it will screw
+	// up previous scratches done
+	if (leader == null) {
+
+	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getQueUsrId().intValue());
+	    if (leaderUserId != null) {
+		leader = getUserByIdAndSession(leaderUserId, toolSessionId);
+
+		// create new user in a DB
+		if (leader == null) {
+		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
+		    String userName = leaderDto.getLogin();
+		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
+		    leader = new QaQueUsr(leaderUserId, userName, fullName, qaSession, new TreeSet());
+		    qaQueUsrDAO.createUsr(user);
+		}
+
+		// set group leader
+		qaSession.setGroupLeader(leader);
+		this.updateQaSession(qaSession);
+	    }
+	}
+
+	return leader;
+    }
+    
+    @Override
+    public void copyAnswersFromLeader(QaQueUsr user, QaQueUsr leader) {
+
+	if ((user == null) || (leader == null) || user.getUid().equals(leader.getUid())) {
+	    return;
+	}
+
+	for (QaUsrResp leaderResponse : (Set<QaUsrResp>)leader.getQaUsrResps()) {
+	    QaQueContent question = leaderResponse.getQaQuestion();
+	    QaUsrResp response = qaUsrRespDAO.getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
+
+	    // if response doesn't exist
+	    if (response == null) {
+		response = new QaUsrResp(leaderResponse.getAnswer(), leaderResponse.getAttemptTime(), "", question, user, true);
+		createQaUsrResp(response);
+
+	    // if it's been changed by the leader 
+	    } else if (leaderResponse.getAttemptTime().compareTo(response.getAttemptTime()) != 0) {
+		response.setAnswer(leaderResponse.getAnswer());
+		response.setAttemptTime(leaderResponse.getAttemptTime());
+		response.setTimezone("");
+		updateUserResponse(response);
+	    }
+	}
+    }
+    
+    @Override
+    public List<QaQueUsr> getUsersBySession(Long toolSessionID) {
+	QaSession session = qaSessionDAO.getQaSessionById(toolSessionID);
+	return qaQueUsrDAO.getUserBySessionOnly(session);
+    }
 
     public void createQa(QaContent qaContent) throws QaApplicationException {
 	try {

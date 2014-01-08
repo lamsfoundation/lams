@@ -45,9 +45,11 @@
         
         function serializeOverallFeedbackForm() {
         	$("#overallFeedbackList").val($('#advancedInputArea').contents().find('#overallFeedbackForm').serialize(true));
+        	
+        	//enable checkbox to allow its value been submitted
+        	$("#display-summary").removeAttr("disabled", "disabled");
         	return true;
-        }        
-        
+        }
     </script>
 </lams:head>
 <body class="stripes" onLoad="init()">

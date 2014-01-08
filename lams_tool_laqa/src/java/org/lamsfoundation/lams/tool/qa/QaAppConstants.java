@@ -22,7 +22,6 @@
  */
 
 /* $$Id$$ */
-/* $$Id$$ */
 package org.lamsfoundation.lams.tool.qa;
 
 /**
@@ -93,6 +92,7 @@ public interface QaAppConstants {
     public static final String SHOW_AUTHORING_TABS = "showAuthoringTabs";
     public static final String MONITORING_ORIGINATED_DEFINELATER = "monitoringOriginatedDefineLater";
     public static final String DEFINE_LATER = "defineLater";
+    public static final String WAIT_FOR_LEADER = "waitForLeader";
     public static final String REQUESTED_MODULE = "requestedModule";
     public static final String SYNC_IN_MONITOR = "synchInMonitor";
     public static final String USERNAME_VISIBLE = "usernameVisible";
@@ -257,6 +257,10 @@ public interface QaAppConstants {
     public static final String ATTR_RUN_OFFLINE = "runOffline";
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
+    public static final String ATTR_GROUP_USERS = "groupUsers";
+    public static final String ATTR_IS_USER_LEADER = "isUserLeader";
+    public static final String ATTR_GROUP_LEADER = "groupLeader";
+    
    
     public static final String TIMEZONE = "timeZone";
     public static final String TIMEZONE_ID = "timeZoneId";

@@ -68,6 +68,8 @@ public class AuthoringUtil implements McAppConstants {
 	mcAuthoringForm.setRandomize(mcContent.isRandomize() ? "1" : "0");
 	mcAuthoringForm.setDisplayAnswers(mcContent.isDisplayAnswers() ? "1" : "0");
 	mcAuthoringForm.setShowMarks(mcContent.isShowMarks() ? "1" : "0");
+	mcAuthoringForm.setUseSelectLeaderToolOuput(mcContent.isUseSelectLeaderToolOuput() ? "1" : "0");
+	mcAuthoringForm.setPrefixAnswersWithLetters(mcContent.isPrefixAnswersWithLetters() ? "1" : "0");
 	mcAuthoringForm.setRetries(mcContent.isRetries() ? "1" : "0");
 	mcAuthoringForm.setSln(mcContent.isShowReport() ? "1" : "0");
 	mcAuthoringForm.setReflect(mcContent.isReflect() ? "1" : "0");
@@ -994,6 +996,10 @@ public class AuthoringUtil implements McAppConstants {
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
 
 	String sln = request.getParameter("sln");
+	
+	String useSelectLeaderToolOuput = request.getParameter("useSelectLeaderToolOuput");
+	
+	String prefixAnswersWithLetters = request.getParameter("prefixAnswersWithLetters");
 
 	String questionsSequenced = request.getParameter("questionsSequenced");
 
@@ -1025,6 +1031,8 @@ public class AuthoringUtil implements McAppConstants {
 	boolean displayAnswersBoolean = false;
 	boolean showMarksBoolean = false;
 	boolean slnBoolean = false;
+	boolean useSelectLeaderToolOuputBoolean = false;
+	boolean prefixAnswersWithLettersBoolean = false;
 	boolean retriesBoolean = false;
 	boolean reflectBoolean = false;
 
@@ -1046,6 +1054,14 @@ public class AuthoringUtil implements McAppConstants {
 
 	if ((sln != null) && (sln.equalsIgnoreCase("1"))) {
 	    slnBoolean = true;
+	}
+	
+	if ((useSelectLeaderToolOuput != null) && (useSelectLeaderToolOuput.equalsIgnoreCase("1"))) {
+	    useSelectLeaderToolOuputBoolean = true;
+	}
+	
+	if ((prefixAnswersWithLetters != null) && (prefixAnswersWithLetters.equalsIgnoreCase("1"))) {
+	    prefixAnswersWithLettersBoolean = true;
 	}
 
 	if ((retries != null) && (retries.equalsIgnoreCase("1"))) {
@@ -1107,6 +1123,9 @@ public class AuthoringUtil implements McAppConstants {
 	    mcContent.setShowMarks(showMarksBoolean);
 	    mcContent.setRetries(retriesBoolean);
 	    mcContent.setShowReport(slnBoolean);
+	    mcContent.setUseSelectLeaderToolOuput(useSelectLeaderToolOuputBoolean);
+	    mcContent.setPrefixAnswersWithLetters(prefixAnswersWithLettersBoolean);
+	    
 	    mcContent.setReflect(reflectBoolean);
 	    mcContent.setReflectionSubject(reflectionSubject);
 

@@ -25,22 +25,48 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	 * Processes mouse click event on showOtherAnswers ckeckbox
 	 */
 	function doShowOtherAnswers() {
-		document.QaAuthoringForm.usernameVisible.disabled = ! eval(document.QaAuthoringForm.usernameVisible.disabled); 
-		document.QaAuthoringForm.allowRateAnswers.disabled = ! eval(document.QaAuthoringForm.allowRateAnswers.disabled);
+		document.QaAuthoringForm.usernameVisible.disabled = ! eval(document.QaAuthoringForm.showOtherAnswers.checked); 
+		document.QaAuthoringForm.allowRateAnswers.disabled = ! eval(document.QaAuthoringForm.showOtherAnswers.checked);
 		if (document.QaAuthoringForm.showOtherAnswers.checked) {
 			document.QaAuthoringForm.usernameVisible.checked = true;
 		} else {
 			document.QaAuthoringForm.usernameVisible.checked = false;
 			document.QaAuthoringForm.allowRateAnswers.checked = false;
 		}		
-	}	
+	}
+	
+	function clickSelectLeaderToolOuputHandler() {
+		if (document.QaAuthoringForm.useSelectLeaderToolOuput.checked) {
+			//uncheck checkboxes
+			document.QaAuthoringForm.showOtherAnswers.checked = false;
+			document.QaAuthoringForm.usernameVisible.checked = false;
+			document.QaAuthoringForm.allowRateAnswers.checked = false;
+			//disable checkboxes
+			document.QaAuthoringForm.showOtherAnswers.disabled = true;
+			document.QaAuthoringForm.usernameVisible.disabled = true;
+			document.QaAuthoringForm.allowRateAnswers.disabled = true;
+		} else {
+			//enable checkboxes
+			document.QaAuthoringForm.showOtherAnswers.disabled = false;
+		}		
+	}
+	
 </script>
 
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
+<p>
+	<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput" onclick="clickSelectLeaderToolOuputHandler();"
+		styleClass="noBorder">
+	</html:checkbox>
+	<label for="useSelectLeaderToolOuput">
+		<fmt:message key="label.use.select.leader.tool.output" />
+	</label>
+</p>
+
 <p class="small-space-top">
 	<html:checkbox property="showOtherAnswers" value="1" styleId="showOtherAnswers" onclick="doShowOtherAnswers();"
-		styleClass="noBorder">
+		styleClass="noBorder" disabled="${formBean.useSelectLeaderToolOuput}">
 	</html:checkbox>
 	<label for="showOtherAnswers">
 		<fmt:message key="label.learner.answer" />
@@ -123,10 +149,3 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<fmt:message key="label.allowRichEditor" />
 	</label>
 </p>
-
-
-
-
-
-
-

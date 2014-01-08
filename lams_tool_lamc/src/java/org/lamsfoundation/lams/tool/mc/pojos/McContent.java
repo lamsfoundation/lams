@@ -97,7 +97,11 @@ public class McContent implements Serializable {
     private boolean displayAnswers;
 
     private boolean showMarks;
-
+    
+    private boolean useSelectLeaderToolOuput;
+    
+    private boolean prefixAnswersWithLetters;
+    
     /* LDEV-2657 */
     private Date submissionDeadline;
 
@@ -119,8 +123,9 @@ public class McContent implements Serializable {
     public McContent(Long mcContentId, String content, String title, String instructions, boolean defineLater,
 	    boolean runOffline, Date creationDate, Date updateDate, boolean questionsSequenced, long createdBy,
 	    boolean contentInUse, String offlineInstructions, String onlineInstructions, Integer passMark,
-	    boolean showReport, boolean randomize, boolean displayAnswers, boolean showMarks, boolean retries,
-	    boolean reflect, String reflectionSubject, Set mcQueContents, Set mcSessions, Set mcAttachments) {
+	    boolean showReport, boolean randomize, boolean displayAnswers, boolean showMarks,
+	    boolean useSelectLeaderToolOuput, boolean prefixAnswersWithLetters, boolean retries, boolean reflect,
+	    String reflectionSubject, Set mcQueContents, Set mcSessions, Set mcAttachments) {
 
 	this.mcContentId = mcContentId;
 	this.content = content;
@@ -143,6 +148,8 @@ public class McContent implements Serializable {
 	this.randomize = randomize;
 	this.displayAnswers = displayAnswers;
 	this.showMarks = showMarks;
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
 	this.mcQueContents = mcQueContents;
 	this.mcSessions = mcSessions;
 	this.mcAttachments = mcAttachments;
@@ -150,6 +157,13 @@ public class McContent implements Serializable {
 
     /** default constructor */
     public McContent() {
+    }
+
+    /** minimal constructor */
+    public McContent(Long mcContentId, Set mcQueContents, Set mcSessions) {
+	this.mcContentId = mcContentId;
+	this.mcQueContents = mcQueContents;
+	this.mcSessions = mcSessions;
     }
 
     /**
@@ -170,7 +184,8 @@ public class McContent implements Serializable {
 		mc.isDefineLater(), mc.isRunOffline(), mc.getCreationDate(), mc.getUpdateDate(),
 		mc.isQuestionsSequenced(), mc.getCreatedBy(), mc.isContentInUse(), mc.getOfflineInstructions(),
 		mc.getOnlineInstructions(), mc.getPassMark(), mc.isShowReport(), mc.isRandomize(),
-		mc.isDisplayAnswers(), mc.isShowMarks(), mc.isRetries(), mc.isReflect(), mc.getReflectionSubject(),
+		mc.isDisplayAnswers(), mc.isShowMarks(), mc.isUseSelectLeaderToolOuput(),
+		mc.isPrefixAnswersWithLetters(), mc.isRetries(), mc.isReflect(), mc.getReflectionSubject(),
 		new TreeSet(), new TreeSet(), new TreeSet());
 	newContent.setMcQueContents(mc.deepCopyMcQueContent(newContent));
 	newContent.setMcAttachments(mc.deepCopyMcAttachments(toolContentHandler, newContent));
@@ -463,6 +478,35 @@ public class McContent implements Serializable {
      */
     public void setShowMarks(boolean showMarks) {
 	this.showMarks = showMarks;
+    }
+    
+    
+    /**
+     * @return
+     */
+    public boolean isUseSelectLeaderToolOuput() {
+        return useSelectLeaderToolOuput;
+    }
+
+    /**
+     * @param useSelectLeaderToolOuput
+     */
+    public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
+        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+    }
+    
+    /**
+     * @return
+     */
+    public boolean isPrefixAnswersWithLetters() {
+        return prefixAnswersWithLetters;
+    }
+
+    /**
+     * @param prefixAnswersWithLetters
+     */
+    public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
+        this.prefixAnswersWithLetters = prefixAnswersWithLetters;
     }
 
     /**

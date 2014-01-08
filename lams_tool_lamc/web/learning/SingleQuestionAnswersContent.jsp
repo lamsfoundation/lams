@@ -22,10 +22,10 @@
 </c:if>
 
 <c:if test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
-
 	<strong> <fmt:message key="label.learner.message" /> ( <c:out
-			value="${mcGeneralLearnerFlowDTO.passMark}" /> ) </strong>
-	</c:if>
+			value="${mcGeneralLearnerFlowDTO.passMark}" /> ) 
+	</strong>
+</c:if>
 
 <html:hidden property="nextQuestionSelected" />
 <html:hidden property="continueOptionsCombined" />
@@ -51,14 +51,22 @@
 		
 		<table class="indent">
 			<tbody>
-				<c:forEach var="option" items="${dto.options}">
+				<c:forEach var="option" varStatus="status" items="${dto.options}">
 					<tr>
 					
 						<td>
 							<input type="radio" name="checkedCa" class="noBorder" value="${dto.questionUid}-${option.uid}"
 								<c:if test="${option.selected}">checked="checked"</c:if>>
 						</td>
+		
 						<td width="100%">
+							<c:if test="${isPrefixAnswersWithLetters}">
+								<c:set var="seqLetter" value="${status.index}"/>
+								<span class="float-left">
+									<%=Character.toChars(97 + (Integer)pageContext.getAttribute("seqLetter"))%>)
+								</span>
+							</c:if>
+								
 							<c:out value="${option.mcQueOptionText}" escapeXml="false" />
 						</td>
 					

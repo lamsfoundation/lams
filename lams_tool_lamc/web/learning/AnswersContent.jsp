@@ -9,6 +9,12 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" scope="request"/>
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" scope="request"/>
+<c:set var="mode" value="${sessionMap.mode}" scope="request"/>
+<c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" scope="request"/>
+<c:set var="isPrefixAnswersWithLetters" value="${sessionMap.content.prefixAnswersWithLetters}" scope="request"/>
+<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" scope="request"/>
 
 <lams:html>
 <lams:head>
@@ -28,6 +34,8 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
 	<script language="JavaScript" type="text/JavaScript">
 
+		//autoSaveAnswers if hasEditRight
+		if (${hasEditRight}) {
 			var interval = "30000"; // = 30 seconds
 			window.setInterval(
 				function(){
@@ -40,7 +48,8 @@
 					});
 	        	}, interval
 	        );
-		
+		}
+			
 			function submitNextQuestionSelected() {
 				if (verifyAllQuestionsAnswered()) {
 					++document.McLearningForm.questionIndex.value;
@@ -85,15 +94,35 @@
 				}				
 			}
 			
-	</script>
+			if (${!hasEditRight && mode != "teacher"}) {
+				setInterval("checkLeaderProgress();",60000);// Auto-Refresh every 1 minute for non-leaders
+			}
+			
+			function checkLeaderProgress() {
+				
+		        $.ajax({
+		        	async: false,
+		            url: '<c:url value="/learning.do"/>',
+		            data: 'method=checkLeaderProgress&toolSessionID=' + $("#tool-session-id").val(),
+		            dataType: 'json',
+		            type: 'post',
+		            success: function (json) {
+		            	if (json.isLeaderResponseFinalized) {
+		            		location.reload();
+		            	}
+		            }
+		       	});
+			}
+			
+		</script>
 </lams:head>
 
 <body class="stripes">
 
 <div id="content">
-	<html:form  styleId="learningForm" action="/learning?method=displayMc&validate=false" enctype="multipart/form-data" method="POST" target="_self">
+	<html:form styleId="learningForm" action="/learning?method=displayMc&validate=false" enctype="multipart/form-data" method="POST" target="_self">
 		<html:hidden property="toolContentID"/>						
-		<html:hidden property="toolSessionID"/>						
+		<html:hidden property="toolSessionID" styleId="tool-session-id"/>						
 		<html:hidden property="httpSessionID"/>			
 		<html:hidden property="userID"/>								
 		<html:hidden property="userOverPassMark"/>						
@@ -107,9 +136,17 @@
 		</h1>
 		
 		<%@ include file="/common/messages.jsp"%>
+				
+		<c:if test="${isLeadershipEnabled}">
+			<h4>
+				<fmt:message key="label.group.leader" >
+					<fmt:param>${sessionMap.groupLeader.fullname}</fmt:param>
+				</fmt:message>
+			</h4>
+		</c:if>
 		
 		<c:choose> 
-		  <c:when test="${mcGeneralLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}" > 
+		  <c:when test="${(mcGeneralLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}" > 
 				<jsp:include page="/learning/SingleQuestionAnswersContent.jsp" /> 
 		  </c:when> 
 		  <c:otherwise>

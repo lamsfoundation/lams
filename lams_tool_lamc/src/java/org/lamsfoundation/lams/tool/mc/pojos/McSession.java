@@ -65,6 +65,9 @@ public class McSession implements Serializable {
 
     /** persistent field */
     private Set mcQueUsers;
+    
+    /** persistent field */
+    private McQueUsr groupLeader;
 
     /** full constructor */
     public McSession(Long mcSessionId, Date sessionStartDate, Date sessionEndDate, String sessionStatus,
@@ -210,5 +213,20 @@ public class McSession implements Serializable {
      */
     public void setSession_name(String session_name) {
 	this.session_name = session_name;
+    }
+    
+    
+    /**
+     * @return groupLeader
+     */
+    public McQueUsr getGroupLeader() {
+	return this.groupLeader;
+    }
+
+    /**
+     * @param groupLeader
+     */
+    public void setGroupLeader(McQueUsr groupLeader) {
+	this.groupLeader = groupLeader;
     }
 }

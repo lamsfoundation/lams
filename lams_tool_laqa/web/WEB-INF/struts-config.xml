@@ -272,6 +272,13 @@
 		    name="notebook"
 		    path="/learning/Notebook.jsp"
 		    redirect="false"
+	  	/>
+	  	
+	  	
+	  	<forward
+		    name="waitForLeader"
+	        path="/learning/WaitForLeader.jsp"
+		    redirect="false"
 	  	/>   
 	  	   
 	</action>  

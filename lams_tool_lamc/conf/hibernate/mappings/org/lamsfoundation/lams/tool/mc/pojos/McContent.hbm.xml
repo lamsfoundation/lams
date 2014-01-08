@@ -158,7 +158,22 @@
         column="show_report"
         length="1"        
    />
+
+    <property
+        name="useSelectLeaderToolOuput"
+        type="boolean"
+        access="property"        
+        column="use_select_leader_tool_ouput"
+        length="1"
+    />
     
+    <property
+        name="prefixAnswersWithLetters"
+        type="boolean"
+        access="property"        
+        column="prefix_answers_with_letters"
+        length="1"
+    />
 
    <property
         name="showMarks"

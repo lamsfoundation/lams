@@ -86,6 +86,21 @@
             class="org.lamsfoundation.lams.tool.mc.pojos.McQueUsr"
         />
     </set>
+    
+	<many-to-one
+        name="groupLeader"
+        class="org.lamsfoundation.lams.tool.mc.pojos.McQueUsr"
+        not-null="true"        
+        cascade="all"
+        outer-join="auto"
+        update="true"
+        insert="true"
+        access="property"
+    >
+        <column
+            name="mc_group_leader_uid" 
+        />
+    </many-to-one>
 
 </class>
 </hibernate-mapping>

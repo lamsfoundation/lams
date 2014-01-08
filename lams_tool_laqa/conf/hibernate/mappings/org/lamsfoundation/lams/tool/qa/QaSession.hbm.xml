@@ -90,6 +90,21 @@
         />
     </set>
     
+   <many-to-one
+        name="groupLeader"
+        class="org.lamsfoundation.lams.tool.qa.QaQueUsr"
+        not-null="true"        
+        cascade="all"
+        outer-join="auto"
+        update="true"
+        insert="true"
+        access="property"
+    >
+        <column
+            name="qa_group_leader_uid" 
+        />
+    </many-to-one>
+    
 
 </class>
 </hibernate-mapping>

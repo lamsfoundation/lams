@@ -31,27 +31,38 @@
 					<strong><fmt:message key="label.answer" /></strong>
 				</p>
 				
-				<c:choose>
+			<c:choose>
+				<c:when test="${hasEditRight}">
+				
+					<c:choose>
 						<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
 							<lams:CKEditor id="answer${questionEntry.key}" value="${answerEntry.value}"
 								contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
 							</lams:CKEditor>
 						</c:when>
-			
+				
 						<c:otherwise>
 							<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
 						</c:otherwise>
-				</c:choose>
+					</c:choose>
+					
+				</c:when>
+				
+				<c:otherwise>
+					<lams:textarea name="answer${questionEntry.key}" rows="5" cols="60" class="text-area" disabled="disabled"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
+				</c:otherwise>
+			</c:choose>
 			</div>
 		
 		</c:if>
 	
 	</c:forEach>
 </c:forEach>
- 
+
+<c:if test="${hasEditRight}">
 	<div class="space-bottom-top align-right">
 		<html:button property="btnCombined" onclick="javascript:submitMethod('submitAnswersContent');"	styleClass="button">
 			<fmt:message key="button.submitAllContent" />
 		</html:button>
 	</div>
-
+</c:if>

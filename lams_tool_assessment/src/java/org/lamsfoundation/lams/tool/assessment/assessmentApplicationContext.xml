@@ -123,7 +123,13 @@
    		</property>
    		<property name="assessmentOutputFactory">
    			<ref bean="assessmentOutputFactory"/>
-   		</property> 
+   		</property>
+		<property name="activityDAO">
+			<ref bean="activityDAO"/>
+		</property>
+		<property name="userService">
+			<ref bean="userManagementService"/>
+		</property>
 				
     </bean>
 
@@ -157,6 +163,9 @@
                 <prop key="exportToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>                      
 				<prop key="import102ToolContent">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
 				<prop key="setReflectiveData">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="copyAnswersFromLeader">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
+				<prop key="recalculateMarkForLesson">PROPAGATION_REQUIRED,+java.lang.Exception</prop>
             </props>
         </property>
     </bean>

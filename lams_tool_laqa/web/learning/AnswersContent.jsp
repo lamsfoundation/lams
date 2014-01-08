@@ -10,6 +10,10 @@
 	<lams:WebAppURL />
 </c:set>
 <c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" scope="request"/>
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" scope="request"/>
+<c:set var="mode" value="${sessionMap.mode}" scope="request"/>
+<c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" scope="request"/>
+<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" scope="request"/>
 
 <lams:html>
 <lams:head>
@@ -29,22 +33,6 @@
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
 	<script language="JavaScript" type="text/JavaScript">
-	
-		var interval = "30000"; // = 30 seconds
-		
-		window.setInterval(
-			function(){
-				//fire onchange event for lams:textarea
-				$("[id$=__lamstextarea]").change();
-				//ajax form submit
-				$('#learningForm').ajaxSubmit({
-					url: "<c:url value='/learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
-	                success: function() {
-	                	$.growlUI('<fmt:message key="label.learning.draft.autosaved" />');
-	                }
-				});
-        	}, interval
-        );
 	
 		function submitMethod(actionMethod) {
 			var submit = true;
@@ -71,6 +59,45 @@
 			document.QaLearningForm.submit();
 		}
 		
+		if (${!hasEditRight && mode != "teacher"}) {
+			setInterval("checkLeaderProgress();",60000);// Auto-Refresh every 1 minute for non-leaders
+		}
+		
+		function checkLeaderProgress() {
+			
+	        $.ajax({
+	        	async: false,
+	            url: '<c:url value="/learning.do"/>',
+	            data: 'method=checkLeaderProgress&toolSessionID=' + $("#tool-session-id").val(),
+	            dataType: 'json',
+	            type: 'post',
+	            success: function (json) {
+	            	if (json.isLeaderResponseFinalized) {
+	            		location.reload();
+	            	}
+	            }
+	       	});
+		}
+		
+		//autoSaveAnswers if hasEditRight
+		if (${hasEditRight}) {
+				
+			var interval = "30000"; // = 30 seconds
+			window.setInterval(
+				function(){
+					//fire onchange event for lams:textarea
+					$("[id$=__lamstextarea]").change();
+					//ajax form submit
+					$('#learningForm').ajaxSubmit({
+						url: "<c:url value='/learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
+			               success: function() {
+			               	$.growlUI('<fmt:message key="label.learning.draft.autosaved" />');
+			               }
+					});
+		       	}, interval
+		   );
+		}
+		
 	</script>
 </lams:head>
 
@@ -89,6 +116,14 @@
 				</fmt:message>
 			</div>
 		</c:if>	
+		
+		<c:if test="${isLeadershipEnabled}">
+			<h4>
+				<fmt:message key="label.group.leader" >
+					<fmt:param>${sessionMap.groupLeader.fullname}</fmt:param>
+				</fmt:message>
+			</h4>
+		</c:if>
 
 		<html:form action="/learning?validate=false"
 			enctype="multipart/form-data" method="POST" target="_self" styleId="learningForm">
@@ -101,7 +136,7 @@
 				</c:otherwise>
 			</c:choose>
 				
-			<html:hidden property="toolSessionID" />
+			<html:hidden property="toolSessionID" styleId="tool-session-id"/>
 			<html:hidden property="userID" />
 			<html:hidden property="httpSessionID" />
 			<html:hidden property="questionIndex" />
@@ -130,7 +165,7 @@
 				<c:choose>
 
 					<c:when
-						test="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}">
+						test="${(generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}">
 
 						<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
 							<c:if test="${generalLearnerFlowDTO.initialScreen == 'true'}">

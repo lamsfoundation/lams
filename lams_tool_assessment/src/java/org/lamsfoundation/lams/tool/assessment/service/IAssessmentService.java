@@ -23,6 +23,7 @@
 /* $$Id$$ */
 package org.lamsfoundation.lams.tool.assessment.service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -44,6 +45,7 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * @author Andrey Balan
@@ -51,6 +53,41 @@ import org.lamsfoundation.lams.usermanagement.User;
  *         Interface that defines the contract that all ShareAssessment service provider must follow.
  */
 public interface IAssessmentService {
+    
+    /**
+     * @param user
+     * @param toolSessionId
+     * @return
+     */
+    boolean isUserGroupLeader(AssessmentUser user, Long toolSessionId);
+    
+    /**
+     * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
+     * 
+     * @param userId
+     * @param toolSessionID
+     */
+    AssessmentUser checkLeaderSelectToolForSessionLeader(AssessmentUser user, Long toolSessionID);
+    
+    /**
+     * Check user has the same answers logs as group leader. If not - creates missing ones. 
+     * 
+     * @param user
+     * @param leader
+     * @throws NoSuchMethodException 
+     * @throws InvocationTargetException 
+     * @throws InstantiationException 
+     * @throws IllegalAccessException 
+     */
+    void copyAnswersFromLeader(AssessmentUser user, AssessmentUser leader) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException;
+    
+    /**
+     * Get users by given toolSessionID.
+     * 
+     * @param toolSessionID
+     * @return
+     */
+    List<AssessmentUser> getUsersBySession(Long toolSessionID);
 
     /**
      * Get <code>Assessment</code> by toolContentID.
@@ -307,14 +344,23 @@ public interface IAssessmentService {
     boolean isGroupedActivity(long toolContentID);
     
     /**
-     * Return content folder (unique to each learner and lesson) which is used for storing user generated content.
-     * It's been used by CKEditor.
+     * Return content folder (unique to each learner and lesson) which can be used for storing user generated content.
+     * Currently is used for CKEditor.
      * 
      * @param toolSessionId
      * @param userId
      * @return
      */
     String getLearnerContentFolder(Long toolSessionId, Long userId);
+    
+    /**
+     * Recalculate mark for leader and sets it to all members of a group. Authentication check: user must be either lesson stuff or group manager.
+     * 
+     * @param requestUserDTO
+     * @param lessonId
+     */
+    void recalculateMarkForLesson(UserDTO requestUserDTO, Long lessonId);
+
 }
 
 

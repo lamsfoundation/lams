@@ -187,6 +187,7 @@ public interface McAppConstants {
     public static final String INSTRUCTIONS = "instructions";
     public static final String CREATION_DATE = "creationDate";
     public static final String DEFINE_LATER = "defineLater";
+    public static final String WAIT_FOR_LEADER = "waitForLeader";    
     public static final String RUN_OFFLINE = "runOffline";
     public static final String RETRIES = "retries";
     public static final String PASSMARK = "passMark";
@@ -224,6 +225,9 @@ public interface McAppConstants {
     /* Date time restriction LDEV-2657 */
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
+    public static final String ATTR_GROUP_USERS = "groupUsers";
+    public static final String ATTR_IS_USER_LEADER = "isUserLeader";
+    public static final String ATTR_GROUP_LEADER = "groupLeader";
 
     /*
      * the learner or monitoring environment provides toolSessionId

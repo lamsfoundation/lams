@@ -85,7 +85,8 @@
 					<property name="gradebookService"><ref bean="gradebookService" /></property>
 			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>										
 			   		<property name="mcOutputFactory"><ref bean="mcOutputFactory"/></property>	
-			   		<property name="messageService"><ref bean="lamcMessageService"/></property>									
+			   		<property name="messageService"><ref bean="lamcMessageService"/></property>
+			   		<property name="userManagementService"><ref bean="userManagementService"/></property>
 				</bean>
 			</property>
 			<property name="transactionAttributes">
@@ -101,6 +102,7 @@
 					<prop key="exportToolContent">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="import102ToolContent">PROPAGATION_REQUIRED,-McApplicationException</prop>
 					<prop key="setReflectiveData">PROPAGATION_REQUIRED,-McApplicationException</prop>
+					<prop key="checkLeaderSelectToolForSessionLeader">PROPAGATION_REQUIRED,-McApplicationException</prop>
 				</props>
 			</property>
 	</bean>  

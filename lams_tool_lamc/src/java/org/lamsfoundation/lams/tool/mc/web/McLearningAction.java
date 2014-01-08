@@ -41,6 +41,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -61,6 +63,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -426,6 +429,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
 		.getServletContext());
+	
+	request.setAttribute("sessionMapID", sessionMap.getSessionID());
 
 	return mapping.findForward(McAppConstants.LOAD_LEARNER);
     }
@@ -596,8 +601,33 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	Boolean showMarks = LearningUtil.isShowMarksOnQuestion(learnerAnswersDTOList);
 	mcGeneralLearnerFlowDTO.setShowMarks(showMarks.toString());
 	
+	request.setAttribute("sessionMapID", mcLearningForm.getHttpSessionID());
+
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 	return mapping.findForward(McAppConstants.LOAD_LEARNER);
+    }
+    
+    /**
+     * checks Leader Progress
+     */
+    public ActionForward checkLeaderProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	
+	if (mcService == null) {
+	    mcService = McServiceProxy.getMcService(getServlet().getServletContext());
+	}
+	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+
+	McSession session = mcService.getMcSessionById(toolSessionId);
+	McQueUsr leader = session.getGroupLeader();
+	
+	boolean isLeaderResponseFinalized = leader.isResponseFinalised();
+	
+	JSONObject JSONObject = new JSONObject();
+	JSONObject.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
+	response.setContentType("application/x-json;charset=utf-8");
+	response.getWriter().print(JSONObject);
+	return null;
     }
 
     /**

@@ -32,13 +32,13 @@
 					<c:when test="${question.multipleAnswersAllowed}">
 						<input type="checkbox" name="question${status.index}_${option.sequenceId}" value="${true}" styleClass="noBorder"
 	 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
-							<c:if test="${finishedLock}">disabled="disabled"</c:if>
+							<c:if test="${finishedLock || !hasEditRight}">disabled="disabled"</c:if>
 						/>			
 					</c:when>
 					<c:otherwise>
 						<input type="radio" name="question${status.index}" value="${option.sequenceId}" styleClass="noBorder"
 	 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
-	 						<c:if test="${finishedLock}">disabled="disabled"</c:if>
+	 						<c:if test="${finishedLock || !hasEditRight}">disabled="disabled"</c:if>
 						/>
 					</c:otherwise>
 				</c:choose>

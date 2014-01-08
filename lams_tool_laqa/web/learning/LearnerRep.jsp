@@ -10,6 +10,10 @@
 	<lams:WebAppURL />
 </c:set>
 <c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
+<c:set var="mode" value="${sessionMap.mode}" />
+<c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" />
+<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
 
 <lams:html>
 <lams:head>
@@ -116,6 +120,14 @@
 					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
 				</fmt:message>
 			</div>
+		</c:if>
+		
+		<c:if test="${isLeadershipEnabled}">
+			<h4>
+				<fmt:message key="label.group.leader" >
+					<fmt:param>${sessionMap.groupLeader.fullname}</fmt:param>
+				</fmt:message>
+			</h4>
 		</c:if>
 
 		<h2>
@@ -261,7 +273,7 @@
 			<c:choose>
 				<c:when test="${generalLearnerFlowDTO.requestLearningReportProgress != 'true'}">
 					<c:choose>
-						<c:when test="${generalLearnerFlowDTO.reflection != 'true'}">
+						<c:when test="${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
 							<html:hidden property="method" value="endLearning"/>
 						</c:when>
 						<c:otherwise>
@@ -282,14 +294,14 @@
 						<fmt:message key="label.refresh" />
 					</html:button>
 
-					<c:if test="${generalLearnerFlowDTO.lockWhenFinished != 'true'}">
+					<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
 						<html:button property="redoQuestions" styleClass="button" onclick="submitMethod('redoQuestions');">
 							<fmt:message key="label.redo" />
 						</html:button>
 					</c:if>	
 						
 					<div class="space-bottom-top" align="right">
-						<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
+						<c:if test="${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
 							<html:link href="#nogo" property="endLearning" styleId="finishButton"
 								onclick="javascript:submitMethod('endLearning'); return false;"
 								styleClass="button">
@@ -306,7 +318,7 @@
 							</html:link>
 						</c:if>
 
-						<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
+						<c:if test="${(generalLearnerFlowDTO.reflection == 'true') && hasEditRight}">
 							<html:button property="forwardtoReflection"
 								onclick="javascript:submitMethod('forwardtoReflection');"
 								styleClass="button">

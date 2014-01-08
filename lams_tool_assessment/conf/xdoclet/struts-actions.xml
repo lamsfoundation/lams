@@ -218,7 +218,8 @@
 			parameter="start" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
-			<forward name="runOffline" path="/pages/learning/runoffline.jsp" />			
+			<forward name="runOffline" path="/pages/learning/runoffline.jsp" />
+			<forward name="waitForLeader" path="/pages/learning/waitforleader.jsp" />
 		</action>
 		<action path="/learning/nextPage"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
@@ -230,6 +231,11 @@
 			parameter="submitAll" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
 		</action>
+		<action path="/learning/checkLeaderProgress"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
+			parameter="checkLeaderProgress" >
+			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>		
 		<action path="/learning/resubmit"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
 			parameter="resubmit" >

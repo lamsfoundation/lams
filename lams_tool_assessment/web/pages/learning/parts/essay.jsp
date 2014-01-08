@@ -8,14 +8,14 @@
 	<tr>
 		<td style="padding:5px 0px 2px 15px; vertical-align:middle; background:none; border-bottom:0px; ">
 			<c:choose>
-				<c:when test="${question.allowRichEditor && !finishedLock}">
+				<c:when test="${question.allowRichEditor && !finishedLock && hasEditRight}">
 					<lams:CKEditor id="question${status.index}" value="${question.answerString}" contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner"></lams:CKEditor>
 				</c:when>
 				<c:when test="${question.allowRichEditor && finishedLock}">
 					${question.answerString}
 				</c:when>				
 				<c:otherwise>
-					<lams:STRUTS-textarea property="question${status.index}" rows="7" cols="60" value="${question.answerString}" disabled="${finishedLock}" />
+					<lams:STRUTS-textarea property="question${status.index}" rows="7" cols="60" value="${question.answerString}" disabled="${finishedLock || !hasEditRight}" />
 				</c:otherwise>
 			</c:choose>
 		</td>

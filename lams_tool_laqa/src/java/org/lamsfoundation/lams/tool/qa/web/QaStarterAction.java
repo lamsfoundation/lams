@@ -172,7 +172,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
 	QaUtils.cleanUpSessionAbsolute(request);
 	QaAuthoringForm qaAuthoringForm = (QaAuthoringForm) form;
-	
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	qaAuthoringForm.setContentFolderID(contentFolderID);
@@ -188,7 +187,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	} else {
 	    qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	}
-	
 
 	qaGeneralAuthoringDTO.setCurrentTab("1");
 
@@ -324,10 +322,13 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	
 	qaGeneralAuthoringDTO.setAllowRichEditor(qaContent.isAllowRichEditor());
 	qaAuthoringForm.setAllowRichEditor(qaContent.isAllowRichEditor());
+	
+	qaGeneralAuthoringDTO.setUseSelectLeaderToolOuput(qaContent.isUseSelectLeaderToolOuput());
+	qaAuthoringForm.setUseSelectLeaderToolOuput(qaContent.isUseSelectLeaderToolOuput());
+	
 	sessionMap.put(QaAppConstants.ATTR_QA_AUTHORING_FORM, qaAuthoringForm);
 
 	String destination = QaUtils.getDestination(sourceMcStarter, requestedModule);
-
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
@@ -337,10 +338,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
     /**
      * retrives the existing content information from the db and prepares the
-     * data for presentation purposes. ActionForward
-     * retrieveExistingContent(HttpServletRequest request, ActionMapping
-     * mapping, QaAuthoringForm qaAuthoringForm, long
-     * toolContentID)
+     * data for presentation purposes. 
      * 
      * @param request
      * @param mapping
@@ -352,6 +350,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
     protected QaContent retrieveContent(HttpServletRequest request, ActionMapping mapping,
 	    QaAuthoringForm qaAuthoringForm, long toolContentID, boolean isDefaultContent,
 	    IQaService qaService, QaGeneralAuthoringDTO qaGeneralAuthoringDTO, SessionMap sessionMap) {
+	
 	QaContent qaContent = qaService.getQa(toolContentID);
 	if (isDefaultContent && qaContent.getConditions().isEmpty()) {
 	    qaContent.getConditions().add(qaService.createDefaultComplexCondition(qaContent));
@@ -457,8 +456,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
      * in this method. if all the default content has been setup properly the
      * method persists DEFAULT_CONTENT_ID in the session.
      * 
-     * readSignature(HttpServletRequest request, ActionMapping mapping)
-     * 
      * @param request
      * @param mapping
      * @return ActionForward
@@ -525,10 +522,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
     /**
      * bridges define later url request to authoring functionality
-     * 
-     * executeDefineLater(ActionMapping mapping, ActionForm form,
-     * HttpServletRequest request, HttpServletResponse response, IQaService
-     * qaService) throws IOException, ServletException, QaApplicationException
      * 
      * @param mapping
      * @param form

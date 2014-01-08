@@ -241,6 +241,12 @@
 		    redirect="false"
 	  	/>   
 	  	
+	  	<forward
+		    name="waitForLeader"
+	        path="/learning/WaitForLeader.jsp"
+		    redirect="false"
+	  	/>
+	  	
 	</action>  
 	
 	<!-- ==========  Authroing Definitions: Pedagogical Planner methods ========== -->
