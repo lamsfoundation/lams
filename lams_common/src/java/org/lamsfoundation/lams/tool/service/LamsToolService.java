@@ -149,8 +149,8 @@ public class LamsToolService implements ILamsToolService {
 	Long leaderUserId = null;
 	
 	ToolSession toolSession = this.getToolSession(toolSessionId);
-	ToolActivity mcqActivity = toolSession.getToolActivity();
-	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(mcqActivity);
+	ToolActivity specifiedActivity = toolSession.getToolActivity();
+	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity);
 
 	// check if there is leaderSelectionTool available
 	if (leaderSelectionActivity != null) {

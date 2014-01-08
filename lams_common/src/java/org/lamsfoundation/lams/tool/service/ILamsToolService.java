@@ -89,7 +89,14 @@ public interface ILamsToolService {
     Boolean isGroupedActivity(long toolContentID);
     
     /**
-     * Returns leader's UserId from the nearest Leader Selection Tool, null if none available. 
+     * Returns leader's UserId from the nearest Leader Selection Tool (the nearest to the specified activity) , and null
+     * if no Leader Selection Tools available.
+     * 
+     * @param toolSessionId
+     *            sessionId of the specified activity
+     * @param learnerId
+     *            userId (used to get appropriate Leader Selection Tool's session)
+     * @return
      */
     Long getLeaderUserId(Long toolSessionId, Integer learnerId);
 }
