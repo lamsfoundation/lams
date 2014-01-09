@@ -1423,8 +1423,8 @@ function showLearnerGroupDialog(activityId, dialogTitle, learners, allowForceCom
 	if (learners) {
 		$.each(learners, function(learnerIndex, learner) {
 			var viewUrl = LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
-            				       + learner.id + '&activityID=' + activityId + '&lessonID' + lessonId;
-			var learnerDiv = $('<div />').attr({
+            				       + learner.id + '&activityID=' + activityId + '&lessonID=' + lessonId,
+				learnerDiv = $('<div />').attr({
 									'userId'  : learner.id,
 									'viewUrl'    : viewUrl
 									})
