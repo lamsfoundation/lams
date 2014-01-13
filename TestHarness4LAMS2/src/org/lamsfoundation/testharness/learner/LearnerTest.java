@@ -26,20 +26,19 @@ import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.testharness.AbstractTest;
-import org.lamsfoundation.testharness.Call.CallType;
 
 /**
  * @version
- *
- * <p>
- * <a href="LearnerTest.java.html"><i>View Source</i></a>
- * </p>
- *
+ * 
+ *          <p>
+ *          <a href="LearnerTest.java.html"><i>View Source</i></a>
+ *          </p>
+ * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class LearnerTest extends AbstractTest {
-	
-	private static final Logger log = Logger.getLogger(LearnerTest.class);
+
+    private static final Logger log = Logger.getLogger(LearnerTest.class);
 
     protected String getLessonURL;
     protected String getLearningDesignURL;
@@ -47,94 +46,88 @@ public class LearnerTest extends AbstractTest {
     protected String getFlashProgressDataURL;
     protected String lessonEntryURL;
     protected String[] filesToUpload;
-    protected String subContextRoot; //  usually "/learning/", this is set to figure out passon.swf url 
+    protected String subContextRoot; // usually "/learning/", this is set to figure out passon.swf url
     protected CountDownLatch allDoneSignal;
-    
+
     /**
      * LearnerTest Constructor
-     *
+     * 
      */
-    public LearnerTest(String testName, CallType callType, String rmiRegistryName, String webServiceAddress, Integer minDelay, Integer maxDelay, String getLessonURL, String getLearningDesignURL, String joinLessonURL, String getFlashProgressDataURL, String lessonEntryURL, String[] filesToUpload) {
-        super(testName,callType,rmiRegistryName,webServiceAddress, minDelay, maxDelay);
-        this.getLessonURL = getLessonURL;
-        this.getLearningDesignURL = getLearningDesignURL;
-        this.joinLessonURL = joinLessonURL;
-        this.getFlashProgressDataURL = getFlashProgressDataURL;
-        this.lessonEntryURL = lessonEntryURL;
-        this.subContextRoot = '/'+ getLessonURL.split("/")[1] + '/';
-        this.filesToUpload = filesToUpload;
+    public LearnerTest(String testName,
+	    Integer minDelay, Integer maxDelay, String getLessonURL, String getLearningDesignURL, String joinLessonURL,
+	    String getFlashProgressDataURL, String lessonEntryURL, String[] filesToUpload) {
+	super(testName, minDelay, maxDelay);
+	this.getLessonURL = getLessonURL;
+	this.getLearningDesignURL = getLearningDesignURL;
+	this.joinLessonURL = joinLessonURL;
+	this.getFlashProgressDataURL = getFlashProgressDataURL;
+	this.lessonEntryURL = lessonEntryURL;
+	this.subContextRoot = '/' + getLessonURL.split("/")[1] + '/';
+	this.filesToUpload = filesToUpload;
     }
 
-	@Override
-	protected void startWEB(){
-		log.info(users.length+(users.length==1? " learner begins studying..." : " learners begin studying..."));
-		allDoneSignal = new CountDownLatch(users.length);
-		for(int i=0; i<users.length; i++){
-			MockLearner learner = (MockLearner)users[i];
-			new Thread(learner, learner.getUsername()).start();
-		}
-		try {
-			allDoneSignal.await();
-			log.info(composeEndInfo());
-		} catch (InterruptedException e) {
-			log.debug(e.getMessage(), e);
-			// what to do?
-		}
+    @Override
+    protected void startTest() {
+	log.info(users.length + (users.length == 1 ? " learner begins studying..." : " learners begin studying..."));
+	allDoneSignal = new CountDownLatch(users.length);
+	for (int i = 0; i < users.length; i++) {
+	    MockLearner learner = (MockLearner) users[i];
+	    new Thread(learner, learner.getUsername()).start();
 	}
+	try {
+	    allDoneSignal.await();
+	    log.info(composeEndInfo());
+	} catch (InterruptedException e) {
+	    log.debug(e.getMessage(), e);
+	    // what to do?
+	}
+    }
 
-	private String composeEndInfo(){
-		int abortedCounter = countAborted();
-		int finishedCounter = countFinished();
-		if(finishedCounter == 0){
-			return composeSubject(users.length)+" aborted on the lesson";
-		}
-		if(abortedCounter == 0){
-			return composeSubject(users.length)+" finished the lesson";
-		}
-		return finishedCounter + (finishedCounter==1? " learner finished the lesson while " : " learners finished the lesson while ")
-			+ abortedCounter + (abortedCounter==1? "learner aborted on the lesson" : "learners aborted on the lesson");
-		
+    private String composeEndInfo() {
+	int abortedCounter = countAborted();
+	int finishedCounter = countFinished();
+	if (finishedCounter == 0) {
+	    return composeSubject(users.length) + " aborted on the lesson";
 	}
-	
-	private String composeSubject(int length){
-		switch(length){
-		case 1:
-			return "The only learner";
-		case 2:
-			return "Both the learners";
-		default:
-			return "All the "+length+" learners";
-		}
+	if (abortedCounter == 0) {
+	    return composeSubject(users.length) + " finished the lesson";
 	}
-	
-	public int countAborted(){
-		int amount = 0;
-		for(MockLearner learner: (MockLearner[])users){
-			if(!learner.isFinished())
-				amount++;
-		}
-		return amount;
-	}
-	
-	public int countFinished(){
-		return users.length - countAborted();
-	}
-	
-	public int countLearners(){
-		return users==null? 0 : users.length;
-	}
-	
-	@Override
-	protected void startWS(){
-		//TODO implement me
-	}
+	return finishedCounter
+		+ (finishedCounter == 1 ? " learner finished the lesson while "
+			: " learners finished the lesson while ") + abortedCounter
+		+ (abortedCounter == 1 ? "learner aborted on the lesson" : "learners aborted on the lesson");
 
-	@Override
-	protected void startRMI(){
-		//TODO implement me
-	}
+    }
 
-	public final String[] getFilesToUpload() {
-		return filesToUpload;
+    private String composeSubject(int length) {
+	switch (length) {
+	case 1:
+	    return "The only learner";
+	case 2:
+	    return "Both the learners";
+	default:
+	    return "All the " + length + " learners";
 	}
+    }
+
+    public int countAborted() {
+	int amount = 0;
+	for (MockLearner learner : (MockLearner[]) users) {
+	    if (!learner.isFinished())
+		amount++;
+	}
+	return amount;
+    }
+
+    public int countFinished() {
+	return users.length - countAborted();
+    }
+
+    public int countLearners() {
+	return users == null ? 0 : users.length;
+    }
+
+    public final String[] getFilesToUpload() {
+	return filesToUpload;
+    }
 }

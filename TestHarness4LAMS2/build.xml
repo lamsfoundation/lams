@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="run" name="TestHarness4LAMS2">
+
+<project name="LAMS TestHarness" basedir="." default="run">
 
 	<property name="build" value="./build"/>
 	<property name="src" value="./src"/>

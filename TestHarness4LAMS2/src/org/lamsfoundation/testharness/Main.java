@@ -29,47 +29,40 @@ import org.apache.log4j.PropertyConfigurator;
 import com.meterware.httpunit.HttpUnitOptions;
 
 /**
- * @version
- *
- * <p>
- * <a href="Main.java.html"><i>View Source</i></a>
- * </p>
- *
- * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- *
+ * @author Fei Yang, Marcin Cieslak
+ * 
  */
 public class Main {
 
-	static {
-		// configure log4j
-		PropertyConfigurator.configure("log.properties");
-		// configure HttpUnit
-		// stops the unsupported javascript stuff from throwing an exception
-		HttpUnitOptions.setExceptionsThrownOnScriptError(false);
-		//WebClient.getResponse does not throw an exception when it receives an error status.
-		HttpUnitOptions.setExceptionsThrownOnErrorStatus(false);
-	}
+    private static final Logger log = Logger.getLogger(Main.class);
+    
+    static {
+	// configure log4j
+	PropertyConfigurator.configure("log.properties");
+	// configure HttpUnit
+	// stops the unsupported javascript stuff from throwing an exception
+	HttpUnitOptions.setExceptionsThrownOnScriptError(false);
+	// WebClient.getResponse does not throw an exception when it receives an error status.
+	HttpUnitOptions.setExceptionsThrownOnErrorStatus(false);
+    }
 
-	private static final Logger log = Logger.getLogger(Main.class);
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		log.info("Starting...");
-		if (args.length == 0) {
-			log.error("No argument supplied! Please refer to readme.txt");
-			System.exit(1);
-		}
-		// create test manager and hand over the control to him.
-		AbstractTestManager manager = new PropertyFileTestManager(args[0]);
-		try{
-			manager.kickOff();
-			TestReporter.generateReport(manager);
-			log.info("It's done, anyway");
-		}catch(Exception e){
-			log.error(e.getMessage(),e);
-			System.exit(1);
-		}
+    public static void main(String[] args) {
+	Main.log.info("Starting...");
+	if (args.length == 0) {
+	    Main.log.error("No argument supplied! Please refer to readme.txt");
+	    System.exit(1);
 	}
+	
+	// create test manager and hand over the control to him.
+	TestManager manager = new TestManager(args[0]);
+	try {
+	    manager.start();
+	    TestReporter.generateReportLog(manager);
+	    TestReporter.generateReportFile(manager);
+	    Main.log.info("Test suite finished");
+	} catch (Exception e) {
+	    Main.log.error("Error in tests", e);
+	    System.exit(1);
+	}
+    }
 }

@@ -31,148 +31,139 @@ import org.lamsfoundation.testharness.learner.LearnerTest;
 import org.lamsfoundation.testharness.monitor.MonitorTest;
 
 /**
- * @version
- *
- * <p>
- * <a href="TestSuite.java.html"><i>View Source</i></a>
- * </p>
- *
- * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
+ * @author Fei Yang, Marcin Cieslak
  */
 public class TestSuite implements Runnable {
 
-	private static final Logger log = Logger.getLogger(TestSuite.class);
+    private static final Logger log = Logger.getLogger(TestSuite.class);
+
+    private TestManager manager;
+    private int suiteIndex;
+    private String targetServer;
+    private String contextRoot;
+    private Integer httpPort;
+    private AdminTest adminTest;
+    private AuthorTest authorTest;
+    private MonitorTest monitorTest;
+    private LearnerTest learnerTest;
+    private boolean finished = false;
+
+    public TestSuite(TestManager manager, int suiteIndex, String targetServer, String contextRoot, Integer httpPort,
+	    AdminTest adminTest, AuthorTest authorTest, MonitorTest monitorTest, LearnerTest learnerTest) {
+	this.manager = manager;
+	this.suiteIndex = suiteIndex;
+	this.targetServer = targetServer == null ? "localhost" : targetServer;
+	this.contextRoot = (contextRoot == null) || contextRoot.equals("/") ? "" : contextRoot;
+	this.httpPort = httpPort == null ? 80 : httpPort;
 	
-	private AbstractTestManager manager;
-	private int suiteIndex;
-	private String targetServer;
-	private String contextRoot;
-	private Integer rmiRegistryServicePort;
-	private Integer httpPort;
-	private AdminTest adminTest;
-	private AuthorTest authorTest;
-	private MonitorTest monitorTest;
-	private LearnerTest learnerTest;
-	private boolean finished = false;
+	this.adminTest = adminTest;
+	adminTest.setTestSuite(this);
+	this.authorTest = authorTest;
+	authorTest.setTestSuite(this);
+	this.monitorTest = monitorTest;
+	monitorTest.setTestSuite(this);
+	this.learnerTest = learnerTest;
+	learnerTest.setTestSuite(this);
+    }
 
-	public TestSuite(AbstractTestManager manager, int suiteIndex, String targetServer, String contextRoot, Integer rmiRegistryServicePort, Integer httpPort, AdminTest adminTest, AuthorTest authorTest, MonitorTest monitorTest,
-			LearnerTest learnerTest) {
-		this.manager = manager;
-		this.suiteIndex = suiteIndex;
-		this.targetServer = targetServer == null ? "localhost" : targetServer;
-		this.contextRoot = contextRoot == null || contextRoot.equals("/") ? "" : contextRoot;
-		this.rmiRegistryServicePort = rmiRegistryServicePort == null ? 1099 : rmiRegistryServicePort;
-		this.httpPort = httpPort == null ? 80 : httpPort;
-		this.adminTest = adminTest;
-		adminTest.setTestSuite(this);
-		this.authorTest = authorTest;
-		authorTest.setTestSuite(this);
-		this.monitorTest = monitorTest;
-		monitorTest.setTestSuite(this);
-		this.learnerTest = learnerTest;
-		learnerTest.setTestSuite(this);
-	}
+    /**
+     * @return Returns the adminTest.
+     */
+    public final AdminTest getAdminTest() {
+	return adminTest;
+    }
 
-	/**
-	 * The order is important, not to be changed
-	 */
-	public void run() {
-		try{
-			log.info("Starting test suite " + suiteIndex + "...");
-			if (adminTest != null)
-				adminTest.start();
-			if (authorTest != null)
-				authorTest.start();
-			if (monitorTest != null)
-				monitorTest.start();
-			if ((learnerTest != null)&&(monitorTest != null))
-				learnerTest.start();
-			if(monitorTest != null){
-				CountDownLatch stopSignal = new CountDownLatch(1);
-				monitorTest.notifyMonitorToStop(stopSignal);
-				stopSignal.await();
-			}
-			finished = true;
-			log.info("Finished test suite "+suiteIndex);
-		} catch(Exception e) {//All the exceptions which happened during test stop propagation here
-			log.debug(e.getMessage(),e);
-			log.info("Test suite " + suiteIndex + " aborted");
-			//Exception is not propagated so that other testsuite will not be affected
-		}finally{
-			manager.allDoneSignal.countDown();
-		}
-	}
+    /**
+     * @return Returns the authorTest.
+     */
+    public final AuthorTest getAuthorTest() {
+	return authorTest;
+    }
 
-	public final int getSuiteIndex() {
-		return suiteIndex;
-	}
+    public final String getContextRoot() {
+	return contextRoot;
+    }
 
-	/**
-	 * @return Returns the adminTest.
-	 */
-	public final AdminTest getAdminTest() {
-		return adminTest;
-	}
+    /**
+     * @return Returns the httpPort.
+     */
+    public final int getHttpPort() {
+	return httpPort;
+    }
 
-	/**
-	 * @return Returns the authorTest.
-	 */
-	public final AuthorTest getAuthorTest() {
-		return authorTest;
-	}
+    /**
+     * @return Returns the learnerTest.
+     */
+    public final LearnerTest getLearnerTest() {
+	return learnerTest;
+    }
 
-	/**
-	 * @return Returns the httpPort.
-	 */
-	public final int getHttpPort() {
-		return httpPort;
-	}
+    public final TestManager getManager() {
+	return manager;
+    }
 
-	/**
-	 * @return Returns the learnerTest.
-	 */
-	public final LearnerTest getLearnerTest() {
-		return learnerTest;
-	}
+    /**
+     * @return Returns the monitorTest.
+     */
+    public final MonitorTest getMonitorTest() {
+	return monitorTest;
+    }
 
-	/**
-	 * @return Returns the rmiRegistryServicePort.
-	 */
-	public final int getRmiRegistryServicePort() {
-		return rmiRegistryServicePort;
-	}
+    public final int getSuiteIndex() {
+	return suiteIndex;
+    }
 
-	/**
-	 * @return Returns the monitorTest.
-	 */
-	public final MonitorTest getMonitorTest() {
-		return monitorTest;
-	}
+    /**
+     * @return Returns the targetServer.
+     */
+    public final String getTargetServer() {
+	return targetServer;
+    }
 
-	/**
-	 * @return Returns the targetServer.
-	 */
-	public final String getTargetServer() {
-		return targetServer;
-	}
+    public final boolean isFinished() {
+	return finished;
+    }
 
-	public final String getContextRoot() {
-		return contextRoot;
+    /**
+     * The order is important, not to be changed
+     */
+    @Override
+    public void run() {
+	try {
+	    TestSuite.log.info("Starting test suite " + suiteIndex);
+	    if (adminTest != null) {
+		adminTest.start();
+	    }
+	    if (authorTest != null) {
+		authorTest.start();
+	    }
+	    if (monitorTest != null) {
+		monitorTest.start();
+	    }
+	    if ((learnerTest != null) && (monitorTest != null)) {
+		learnerTest.start();
+	    }
+	    if (monitorTest != null) {
+		CountDownLatch stopSignal = new CountDownLatch(1);
+		monitorTest.notifyMonitorToStop(stopSignal);
+		stopSignal.await();
+	    }
+	    finished = true;
+	    TestSuite.log.info("Finished test suite " + suiteIndex);
+	} catch (Exception e) {// All the exceptions which happened during test stop propagation here
+	    TestSuite.log.error("Test suite " + suiteIndex + " aborted", e);
+	    // Exception is not propagated so that other testsuite will not be affected
+	} finally {
+	    manager.allDoneSignal.countDown();
 	}
+    }
 
-	public final void setContextRoot(String contextRoot) {
-		this.contextRoot = contextRoot;
-	}
-	
-	public String toString(){
-		return "suiteIndex:"+suiteIndex+" targetServer:"+targetServer;
-	}
+    public final void setContextRoot(String contextRoot) {
+	this.contextRoot = contextRoot;
+    }
 
-	public final AbstractTestManager getManager() {
-		return manager;
-	}
-
-	public final boolean isFinished() {
-		return finished;
-	}
+    @Override
+    public String toString() {
+	return "suiteIndex:" + suiteIndex + " targetServer:" + targetServer;
+    }
 }

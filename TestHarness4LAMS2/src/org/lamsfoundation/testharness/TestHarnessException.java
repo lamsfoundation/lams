@@ -23,48 +23,42 @@
 package org.lamsfoundation.testharness;
 
 /**
- * @version
- *
- * <p>
- * <a href="TestHarnessException.java.html"><i>View Source</i></a>
- * </p>
- *
- * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
+ * @author Fei Yang
  */
 public class TestHarnessException extends RuntimeException {
 
-    private static final long serialVersionUID = 6481839981681761094L;
+    /**
+     * Constructor for TestHarnessException.
+     */
+    public TestHarnessException() {
+	super();
+    }
 
-	/**
-	 * Constructor for TestHarnessException.
-	 */
-	public TestHarnessException() {
-		super();
-	}
+    /**
+     * Constructor for TestHarnessException.
+     * 
+     * @param message
+     */
+    public TestHarnessException(String message) {
+	super(message);
+    }
 
-	/**
-	 * Constructor for TestHarnessException.
-	 * @param message
-	 */
-	public TestHarnessException(String message) {
-		super(message);
-	}
+    /**
+     * Constructor for TestHarnessException.
+     * 
+     * @param message
+     * @param cause
+     */
+    public TestHarnessException(String message, Throwable cause) {
+	super(message, cause);
+    }
 
-	/**
-	 * Constructor for TestHarnessException.
-	 * @param message
-	 * @param cause
-	 */
-	public TestHarnessException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	/**
-	 * Constructor for TestHarnessException.
-	 * @param cause
-	 */
-	public TestHarnessException(Throwable cause) {
-		super(cause);
-	}
-
+    /**
+     * Constructor for TestHarnessException.
+     * 
+     * @param cause
+     */
+    public TestHarnessException(Throwable cause) {
+	super(cause);
+    }
 }

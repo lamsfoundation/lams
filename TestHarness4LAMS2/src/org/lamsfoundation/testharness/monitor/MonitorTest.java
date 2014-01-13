@@ -25,7 +25,6 @@ package org.lamsfoundation.testharness.monitor;
 import java.util.concurrent.CountDownLatch;
 
 import org.lamsfoundation.testharness.AbstractTest;
-import org.lamsfoundation.testharness.Call.CallType;
 import org.lamsfoundation.testharness.TestUtil;
 
 /**
@@ -42,34 +41,25 @@ public class MonitorTest extends AbstractTest {
     public static final String DEFAULT_LESSON_NAME = "Lesson";
 
     private String initLessonURL;
-
     private String createLessonClassURL;
-
     private String startLessonURL;
-
     private String getLessonDetailsURL;
-
     private String getContributeActivitiesURL;
-
     private String getLearningDesignDetailsURL;
-
     private String getAllLearnersProgressURL;
-
     private String lessonName;
-
     private String lsId;
-
     private Thread monitorThread;
 
     /**
      * MonitorTest Construtor
      * 
      */
-    public MonitorTest(String testName, CallType callType, String rmiRegistryName, String webServiceAddress,
+    public MonitorTest(String testName,
 	    Integer minDelay, Integer maxDelay, String initLessonURL, String createLessonClassURL,
 	    String startLessonURL, String getLessonDetailsURL, String getContributeActivitiesURL,
 	    String getLearningDesignDetailsURL, String getAllLearnersProgressURL, String lessonName, String lsId) {
-	super(testName, callType, rmiRegistryName, webServiceAddress, minDelay, maxDelay);
+	super(testName, minDelay, maxDelay);
 	this.initLessonURL = initLessonURL;
 	this.createLessonClassURL = createLessonClassURL;
 	this.startLessonURL = startLessonURL;
@@ -83,7 +73,7 @@ public class MonitorTest extends AbstractTest {
     }
 
     @Override
-    protected void startWEB() {
+    protected void startTest() {
 	MockMonitor monitor = (MockMonitor) users[0];
 	if (lsId == null) {
 	    monitor.login();
@@ -96,16 +86,6 @@ public class MonitorTest extends AbstractTest {
 	// monitor learners progress
 	monitorThread = new Thread(monitor, monitor.getUsername());
 	monitorThread.start();
-    }
-
-    @Override
-    protected void startWS() {
-	// TODO implement me
-    }
-
-    @Override
-    protected void startRMI() {
-	// TODO implement me
     }
 
     public void notifyMonitorToStop(CountDownLatch stopSignal) {
@@ -163,5 +143,4 @@ public class MonitorTest extends AbstractTest {
     public final String getGetLessonDetailsURL() {
 	return getLessonDetailsURL;
     }
-
 }

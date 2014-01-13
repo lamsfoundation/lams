@@ -39,13 +39,7 @@ import com.meterware.httpunit.WebResponse;
 import com.meterware.httpunit.protocol.UploadFileSpec;
 
 /**
- * @version
- * 
- * <p>
- * <a href="MockUser.java.html"><i>View Source</i></a>
- * </p>
- * 
- * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
+ * @author Fei Yang, Marcin Cieslak
  */
 public class MockUser {
 
@@ -75,29 +69,51 @@ public class MockUser {
 	this.userId = userId;
     }
 
-    public static final void setIndexPage(String indexPageURL) {
+    public static void setIndexPage(String indexPageURL) {
 	MockUser.indexPage = indexPageURL;
+    }
+
+    private static String sha1(String plaintext) throws NoSuchAlgorithmException {
+	MessageDigest md = MessageDigest.getInstance("SHA1");
+	return new String(Hex.encodeHex(md.digest(plaintext.getBytes())));
+    }
+
+    protected static boolean checkPageContains(WebResponse resp, String flag) throws IOException {
+	return resp.getText().indexOf(flag) != -1;
+    }
+
+    public final String getPassword() {
+	return password;
+    }
+
+    public final String getUserId() {
+	return userId;
+    }
+
+    public final String getUsername() {
+	return username;
     }
 
     /**
      * Login to the system.
      * 
-     * @exception TestHarnessException:failure
+     * @exception TestHarnessException
+     *                :failure
      */
-    public final void login() {
+    public void login() {
 	try {
 	    wc = new WebConversation();
 	    WebResponse resp = (WebResponse) new Call(wc, test, username + " fetch index page", MockUser.indexPage)
 		    .execute();
-	    if (!checkPageContains(resp, MockUser.LOGIN_PAGE_FLAG)) {
+	    if (!MockUser.checkPageContains(resp, MockUser.LOGIN_PAGE_FLAG)) {
 		MockUser.log.debug(resp.getText());
-		throw new TestHarnessException(username + " didn't get login page when hitting LAMS the first time!");
+		throw new TestHarnessException(username + " didn't get login page when hitting LAMS the first time");
 	    }
 	    Map<String, Object> params = new HashMap<String, Object>();
 	    params.put(MockUser.USERNAME, username);
-	    params.put(MockUser.PASSWORD, HashUtil.sha1(password));
+	    params.put(MockUser.PASSWORD, MockUser.sha1(password));
 	    resp = (WebResponse) new Call(wc, test, "User login", fillForm(resp, 0, params)).execute();
-	    if (!checkPageContains(resp, MockUser.INDEX_PAGE_FLAG)) {
+	    if (!MockUser.checkPageContains(resp, MockUser.INDEX_PAGE_FLAG)) {
 		MockUser.log.debug(resp.getText());
 		throw new TestHarnessException(username + " failed to login with password " + password);
 	    }
@@ -110,13 +126,37 @@ public class MockUser {
 	}
     }
 
-    protected final WebForm fillForm(WebResponse resp, int formIndex, Map<String, Object> params) throws SAXException,
+    public final void setUserId(String userId) {
+	this.userId = userId;
+    }
+
+    protected void delay() {
+	try {
+	    int seconds = 0;
+	    if (test.getMaxDelay() <= test.getMinDelay()) {// to avoid IllegalArgumentException in nextInt method on
+							   // Random object
+		seconds = test.getMinDelay();
+	    } else {
+		seconds = test.getMinDelay()
+			+ TestUtil.generateRandomNumber((test.getMaxDelay() - test.getMinDelay()) + 1);
+	    }
+	    if (seconds > 0) {
+		MockUser.log.info(username
+			+ MockUser.DELAY_MESSAGES[TestUtil.generateRandomNumber(MockUser.DELAY_MESSAGES.length)]
+			+ seconds + " seconds");
+		Thread.sleep(seconds * 1000);
+	    }
+	} catch (InterruptedException e) {
+	    MockUser.log.error("Interrupted exception");
+	}
+    }
+
+    protected WebForm fillForm(WebResponse resp, int formIndex, Map<String, Object> params) throws SAXException,
 	    IOException {
 	WebForm[] forms = resp.getForms();
-	if (forms == null || forms.length <= formIndex) {
+	if ((forms == null) || (forms.length <= formIndex)) {
 	    MockUser.log.debug(resp.getText());
-	    throw new TestHarnessException(username + " cannot find the form whose index is " + formIndex
-		    + " in the page");
+	    throw new TestHarnessException(username + " cannot find a form with index " + formIndex);
 	}
 	WebForm form = forms[formIndex];
 	if (params != null) {
@@ -138,63 +178,4 @@ public class MockUser {
 	}
 	return form;
     }
-
-    protected final boolean checkPageContains(WebResponse resp, String flag) throws IOException {
-	return resp.getText().indexOf(flag) != -1;
-    }
-
-    protected final void delay() {
-	try {
-	    int seconds;
-	    if (test.getMaxDelay() <= test.getMinDelay()) {// to avoid IllegalArgumentException in nextInt method on
-							    // Random object
-		seconds = test.getMinDelay();
-	    } else {
-		seconds = test.getMinDelay()
-			+ TestUtil.generateRandomIndex(test.getMaxDelay() - test.getMinDelay() + 1);
-	    }
-	    if (seconds > 0) {
-		MockUser.log.info(composeDelayInfo(seconds));
-		Thread.sleep(seconds * 1000);
-	    }
-	} catch (InterruptedException e) {
-	    // ignore
-	}
-    }
-
-    private String composeDelayInfo(int seconds) {
-	return username + MockUser.DELAY_MESSAGES[TestUtil.generateRandomIndex(MockUser.DELAY_MESSAGES.length)]
-		+ seconds + (seconds == 1 ? " second" : " seconds");
-    }
-
-    private static class HashUtil {
-
-	static String sha1(String plaintext) throws NoSuchAlgorithmException {
-	    MessageDigest md = MessageDigest.getInstance("SHA1");
-	    return new String(Hex.encodeHex(md.digest(plaintext.getBytes())));
-	}
-
-	static String md5(String plaintext) throws NoSuchAlgorithmException {
-	    MessageDigest md = MessageDigest.getInstance("MD5");
-	    return new String(Hex.encodeHex(md.digest(plaintext.getBytes())));
-	}
-
-    }
-
-    public final String getPassword() {
-	return password;
-    }
-
-    public final String getUsername() {
-	return username;
-    }
-
-    public final String getUserId() {
-	return userId;
-    }
-
-    public final void setUserId(String userId) {
-	this.userId = userId;
-    }
-
 }

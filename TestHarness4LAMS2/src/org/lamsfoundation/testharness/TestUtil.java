@@ -37,100 +37,91 @@ import com.allaire.wddx.WddxDeserializer;
 import com.allaire.wddx.WddxSerializer;
 
 /**
- * @version
- *
- * <p>
- * <a href="TestUtil.java.html"><i>View Source</i></a>
- * </p>
- *
- * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
+ * @author Fei Yang, Marcin Cieslak
  */
 public class TestUtil {
+    private static final Logger log = Logger.getLogger(TestUtil.class);
+    protected static final char NAME_SEPERATOR = '_';
 
-	private static final Logger log = Logger.getLogger(TestUtil.class);
-	
-	private static String machineName;
+    private static String machineName;
 
-	protected static final char NAME_SEPERATOR = '_';
+    public static String buildName(String testName, String simpleName) {
+	return TestUtil.getMachineName() + TestUtil.NAME_SEPERATOR + testName + TestUtil.NAME_SEPERATOR + simpleName;
+    }
 
-	public static String getMachineName() {
-		try {
-			if (machineName == null)
-				return machineName = InetAddress.getLocalHost().getHostName();
-			else
-				return machineName;
-		} catch (UnknownHostException e) {
-			return "UnknownHost";
-		}
+    public static String buildName(String testName, String simpleName, int maxLength) {
+	return TestUtil.truncate(TestUtil.buildName(TestUtil.truncate(testName, 1, true), simpleName), maxLength, true);
+    }
 
+    public static Object deserialize(String wddxPacket) throws WddxDeserializationException {
+
+	TestUtil.log.debug("WDDX packet from the server:" + wddxPacket);
+
+	// Create an input source (org.xml.sax.InputSource) bound to the packet
+	InputSource tempSource = new InputSource(new StringReader(wddxPacket));
+
+	// Create a WDDX deserializer (com.allaire.wddx.WddxDeserializer)
+	WddxDeserializer tempDeserializer = new WddxDeserializer("org.apache.xerces.parsers.SAXParser");
+
+	// Deserialize the WDDX packet
+	Object result;
+	try {
+	    result = tempDeserializer.deserialize(tempSource);
+	    TestUtil.log.debug("Object deserialized from the WDDX packet:" + result);
+	} catch (IOException e) {
+	    throw new WddxDeserializationException(e);
 	}
 
-	public static String serialize(Object data) throws IOException {
-		WddxSerializer tempws = new WddxSerializer();
-		StringWriter tempsw = new StringWriter();
-		tempws.serialize(data, tempsw);
-		return tempsw.toString();
+	return result;
+    }
+
+    public static String extractString(String text, String startFlag, char endFlag) {
+	String target = null;
+	try {
+	    int index = text.indexOf(startFlag);
+	    if (index != -1) {
+		int startIndex = index + startFlag.length();
+		int endIndex = text.indexOf(endFlag, startIndex);
+		target = text.substring(startIndex, endIndex);
+	    }
+	} catch (IndexOutOfBoundsException e) {
+	    TestUtil.log.error("Index out of bounds. StartFlag: " + startFlag + ", endFlag: " + endFlag + ", text: "
+		    + text);
 	}
+	return target;
+    }
 
-	public static Object deserialize(String wddxPacket) throws WddxDeserializationException {
-		
-		log.debug("WDDX packet from the server:"+wddxPacket);
-		
-		// Create an input source (org.xml.sax.InputSource) bound to the packet
-		InputSource tempSource = new InputSource(new StringReader(wddxPacket));
+    public static int generateRandomNumber(int length) {
+	return new Random().nextInt(length);
+    }
 
-		// Create a WDDX deserializer (com.allaire.wddx.WddxDeserializer)
-		WddxDeserializer tempDeserializer = new WddxDeserializer("org.apache.xerces.parsers.SAXParser");
-
-		// Deserialize the WDDX packet
-		Object result;
-		try {
-			result = tempDeserializer.deserialize(tempSource);
-			log.debug("Object deserialized from the WDDX packet:"+result);
-		} catch (IOException e) {
-			throw new WddxDeserializationException(e);
-		}
-
-		return result;
+    public static String getMachineName() {
+	try {
+	    if (TestUtil.machineName == null) {
+		return TestUtil.machineName = InetAddress.getLocalHost().getHostName();
+	    } else {
+		return TestUtil.machineName;
+	    }
+	} catch (UnknownHostException e) {
+	    return "UnknownHost";
 	}
+    }
 
-	public static String buildName(String testName, String simpleName) {
-		return TestUtil.getMachineName() + NAME_SEPERATOR + testName + NAME_SEPERATOR + simpleName;
+    public static String serialize(Object data) throws IOException {
+	WddxSerializer tempws = new WddxSerializer();
+	StringWriter tempsw = new StringWriter();
+	tempws.serialize(data, tempsw);
+	return tempsw.toString();
+    }
+
+    private static String truncate(String name, int length, boolean leftToRight) {
+	if (name.length() <= length) {
+	    return name;
 	}
-
-	public static String buildName(String testName, String simpleName, int maxLength) {
-		return truncate(buildName(truncate(testName,1,true),simpleName), maxLength, true);
+	if (leftToRight) {
+	    return name.substring(name.length() - length);
+	} else {
+	    return name.substring(0, length);
 	}
-
-	private static String truncate(String name, int length, boolean leftToRight) {
-		if(name.length()<=length)
-			return name;
-		if(leftToRight)
-			return name.substring(name.length()-length);
-		else
-			return name.substring(0,length);
-	}
-
-	public static String extractString(String text, String startFlag, char endFlag){
-		String target = null;
-		try{
-			int index = text.indexOf(startFlag);
-			if(index!=-1){
-				int startIndex = index + startFlag.length();
-				int endIndex = text.indexOf(endFlag, startIndex);
-				target = text.substring(startIndex, endIndex);
-			}
-		}catch(IndexOutOfBoundsException e){
-			log.debug(e.getMessage());
-			log.debug("startFlag: "+startFlag+" endFlag: "+endFlag);
-			log.debug(text);
-		}
-		return target;
-	}
-
-	public static int generateRandomIndex(int length){
-		return new Random().nextInt(length);
-	}
-	
-
+    }
 }

@@ -23,122 +23,72 @@
 package org.lamsfoundation.testharness;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.testharness.Call.CallType;
-
 
 /**
- * @version
- *
- * <p>
- * <a href="AbstractTest.java.html"><i>View Source</i></a>
- * </p>
- *
- * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
+ * @author Fei Yang, Marcin Cieslak
  */
-public abstract class AbstractTest
-{
+public abstract class AbstractTest {
+    private static final Logger log = Logger.getLogger(AbstractTest.class);
 
-	private static final Logger log = Logger.getLogger(AbstractTest.class);
-	
-    protected TestSuite testSuite;
     protected final String testName;
-    protected final CallType callType;
-    protected String rmiRegistryName;
-    protected String webServiceAddress;
     protected final Integer minDelay;
     protected final Integer maxDelay;
+
+    protected TestSuite testSuite;
     protected MockUser[] users;
     protected boolean finished = false;
 
-    protected AbstractTest(String name, CallType type, String rmiRegistryName, String address, Integer minDelay, Integer maxDelay) {
-        this.testName = name;
-        this.callType = type;
-        this.rmiRegistryName = rmiRegistryName;
-        this.webServiceAddress = address;
-        this.minDelay = minDelay==null? 0 : minDelay;
-        this.maxDelay = maxDelay==null? 0 : maxDelay;
+    protected AbstractTest(String name, Integer minDelay, Integer maxDelay) {
+	this.testName = name;
+	this.minDelay = minDelay == null ? 0 : minDelay;
+	this.maxDelay = maxDelay == null ? 0 : maxDelay;
     }
 
-    public final void start(){
-    	try{
-    		log.info("Starting "+testName+"...");
-			switch (callType) {
-				case WEB: 
-					startWEB();
-					break;
-				case WS:
-					startWS();
-					break;
-				case RMI:
-					startRMI();
-					break;
-				default:
-					break;
-			}
-			finished = true;
-			log.info(testName+" is finished");
-    	}catch(RuntimeException e){
-    		log.info(testName+" aborted");
-    		//Since latter tests depend on precedent tests in a test suite, 
-    		//propagate the exception to let the test suite stop executing the latter tests
-    		throw e;
-    	}
+    public final Integer getMaxDelay() {
+	return maxDelay;
     }
 
-    protected abstract void startWEB();
+    public final Integer getMinDelay() {
+	return minDelay;
+    }
 
-    protected abstract void startWS();
+    public final String getTestName() {
+	return testName;
+    }
 
-    protected abstract void startRMI();
-
-    /**
-     * @return Returns the testSuite.
-     */
     public final TestSuite getTestSuite() {
-        return testSuite;
+	return testSuite;
     }
 
-    /**
-     * @param testSuite The testSuite to set.
-     */
+    public final MockUser[] getUsers() {
+	return users;
+    }
+
+    public final boolean isFinished() {
+	return finished;
+    }
+
     public final void setTestSuite(TestSuite testSuite) {
-        this.testSuite = testSuite;
+	this.testSuite = testSuite;
     }
 
-	public final MockUser[] getUsers() {
-		return users;
-	}
+    public final void setUsers(MockUser[] users) {
+	this.users = users;
+    }
 
-	public final void setUsers(MockUser[] users) {
-		this.users = users;
+    protected final void start() {
+	try {
+	    AbstractTest.log.info("Starting " + testName);
+	    startTest();
+	    finished = true;
+	    AbstractTest.log.info(testName + " is finished");
+	} catch (RuntimeException e) {
+	    AbstractTest.log.info(testName + " aborted");
+	    // Since latter tests depend on precedent tests in a test suite,
+	    // propagate the exception to let the test suite stop executing the latter tests
+	    throw e;
 	}
+    }
 
-	public final CallType getCallType() {
-		return callType;
-	}
-
-	public final String getRmiRegistryName() {
-		return rmiRegistryName;
-	}
-
-	public final String getTestName() {
-		return testName;
-	}
-
-	public final String getWebServiceAddress() {
-		return webServiceAddress;
-	}
-
-	public final Integer getMaxDelay() {
-		return maxDelay;
-	}
-
-	public final Integer getMinDelay() {
-		return minDelay;
-	}
-
-	public final boolean isFinished() {
-		return finished;
-	}
-
+    protected abstract void startTest();
 }

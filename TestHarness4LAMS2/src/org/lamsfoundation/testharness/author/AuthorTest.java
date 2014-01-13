@@ -25,23 +25,22 @@ package org.lamsfoundation.testharness.author;
 import java.io.File;
 
 import org.lamsfoundation.testharness.AbstractTest;
-import org.lamsfoundation.testharness.Call.CallType;
 
 /**
  * @version
- *
- * <p>
- * <a href="AuthorTest.java.html"><i>View Source</i></a>
- * </p>
- *
+ * 
+ *          <p>
+ *          <a href="AuthorTest.java.html"><i>View Source</i></a>
+ *          </p>
+ * 
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class AuthorTest extends AbstractTest {
-    
+
     private String learningDesignUploadURL;
-    
+
     private String learningDesignFile;
-    
+
     private String ldId;
 
     /**
@@ -55,55 +54,45 @@ public class AuthorTest extends AbstractTest {
      * @param learningDesignFile
      * @param ldId
      */
-    public AuthorTest(String testName, CallType callType, String rmiRegistryName, String webServiceAddress, Integer minDelay, Integer maxDelay, String learningDesignUploadURL, String learningDesignFile, String ldId) {
-        super(testName,callType,rmiRegistryName,webServiceAddress, minDelay, maxDelay);
-        this.learningDesignUploadURL = learningDesignUploadURL;
-        this.learningDesignFile = learningDesignFile;
-        this.ldId = ldId;
+    public AuthorTest(String testName, Integer minDelay, Integer maxDelay, String learningDesignUploadURL,
+	    String learningDesignFile, String ldId) {
+	super(testName, minDelay, maxDelay);
+	this.learningDesignUploadURL = learningDesignUploadURL;
+	this.learningDesignFile = learningDesignFile;
+	this.ldId = ldId;
+    }
+
+    public final String getLdId() {
+	return ldId;
+    }
+
+    public final String getLearningDesignFile() {
+	return learningDesignFile;
+    }
+
+    public final String getLearningDesignUploadURL() {
+	return learningDesignUploadURL;
+    }
+
+    public final void setLdId(String ldId) {
+	this.ldId = ldId;
+    }
+
+    public final void setLearningDesignFile(String learningDesignFile) {
+	this.learningDesignFile = learningDesignFile;
+    }
+
+    public final void setLearningDesignUploadURL(String learningDesignUploadURL) {
+	this.learningDesignUploadURL = learningDesignUploadURL;
     }
 
     @Override
-    protected void startWEB(){
-    	if(ldId==null){
-	        MockAuthor author = (MockAuthor) users[0];
-	        author.login();
-	        File file = new File(learningDesignFile);
-	        ldId = author.importLearningDesign(learningDesignUploadURL,file);
-    	}
+    protected void startTest() {
+	if (ldId == null) {
+	    MockAuthor author = (MockAuthor) users[0];
+	    author.login();
+	    File file = new File(learningDesignFile);
+	    ldId = author.importLearningDesign(learningDesignUploadURL, file);
+	}
     }
-
-	@Override
-	protected void startWS(){
-		//TODO implement me
-	}
-
-	@Override
-	protected void startRMI(){
-		//TODO implement me
-	}
-
-	public final String getLearningDesignFile() {
-		return learningDesignFile;
-	}
-
-	public final void setLearningDesignFile(String learningDesignFile) {
-		this.learningDesignFile = learningDesignFile;
-	}
-
-	public final String getLearningDesignUploadURL() {
-		return learningDesignUploadURL;
-	}
-
-	public final void setLearningDesignUploadURL(String learningDesignUploadURL) {
-		this.learningDesignUploadURL = learningDesignUploadURL;
-	}
-
-	public final String getLdId() {
-		return ldId;
-	}
-
-	public final void setLdId(String ldId) {
-		this.ldId = ldId;
-	}
-
 }
