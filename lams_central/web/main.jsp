@@ -253,8 +253,14 @@
 	</div>
 </div>
 
-<div id="dialogContainer">
+<div id="dialogContainer" class="dialogContainer">
 	<iframe id="dialogFrame"></iframe>
+</div>
+
+<!-- There has to be a separate dialog for notifications
+	 as it can be opened from within monitor lesson dialog -->
+<div id="notificationsDialogContainer" class="dialogContainer">
+	<iframe id="notificationsDialogFrame"></iframe>
 </div>
 
 </body>

@@ -294,7 +294,7 @@ function showAddSingleActivityLessonDialog(orgID, toolID) {
 }
 
 function showNotificationsDialog(orgID, lessonID) {
-	$('#dialogContainer').dialog({
+	$('#notificationsDialogContainer').dialog({
 		'orgID' : orgID,
 		'lessonID' : lessonID,
 		'autoOpen' : false,
@@ -310,18 +310,18 @@ function showNotificationsDialog(orgID, lessonID) {
 			// use course view
 			if (lessonID) {
 				// load contents after opening the dialog
-				$('#dialogFrame').attr('src', LAMS_URL
+				$('#notificationsDialogFrame').attr('src', LAMS_URL
 					+ 'monitoring/emailNotifications.do?method=getLessonView&lessonID='
 					+ lessonID);
 			} else {
 				var orgID = $(this).dialog('option', 'orgID');
-				$('#dialogFrame').attr('src', LAMS_URL
+				$('#notificationsDialogFrame').attr('src', LAMS_URL
 					+ 'monitoring/emailNotifications.do?method=getCourseView&organisationID='
 					+ orgID);
 			}
 		},
 		'beforeClose' : function(){
-			$('#dialogFrame').attr('src', null);
+			$('#notificationsDialogFrame').attr('src', null);
 		},
 		'close' : function() {
 			$(this).dialog('destroy');

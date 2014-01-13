@@ -30,6 +30,12 @@ var learnerProgressCurrentPageNumber = 1;
 // search phrase in Learners tab
 var learnersSearchPhrase = null;
 
+//auto refresh all tabs every 30 seconds
+var autoRefreshInterval = 30 * 1000;
+var autoRefreshIntervalObject = null;
+// when user is doing something, do not auto refresh
+var autoRefreshBlocked = false;
+
 // ********* GENERAL TABS FUNCTIONS *********
 
 function initTabs(){
@@ -139,6 +145,7 @@ function initLessonTab(){
 		'show'      : 'fold',
 		'hide'      : 'fold',
 		'open'      : function(){
+			autoRefreshBlocked = true;
 			// reset sort order
 			sortOrderAsc['classLearner'] = false;
 			sortOrderAsc['classMonitor'] = false;
@@ -149,6 +156,9 @@ function initLessonTab(){
 			
 			var selectedLearners = getSelectedClassUserList('classLearnerList');
 			$(this).dialog('option', 'initSelectedLearners', selectedLearners);
+		},
+		'close' : function(){
+			autoRefreshBlocked = false;
 		},
 		'buttons' : [
 		             {
@@ -222,9 +232,13 @@ function initLessonTab(){
 		'hide'      : 'fold',
 		'title'     : EMAIL_BUTTON_LABEL,
 		'open'      : function(){
+			autoRefreshBlocked = true;
 			$('#emailFrame').attr('src',
 					LAMS_URL + 'emailUser.do?method=composeMail&lessonID=' + lessonId
 					+ '&userID=' + $(this).dialog('option', 'userId'));
+		},
+		'close' : function(){
+			autoRefreshBlocked = false;
 		}
 	});
 }
@@ -249,7 +263,6 @@ function showLessonLearnersDialog() {
 		}
 	});
 }
-
 
 /**
  * Changes lesson state and updates widgets.
@@ -517,6 +530,7 @@ function initSequenceTab(){
 			'show'      : 'fold',
 			'hide'      : 'fold',
 			'open'      : function(){
+				autoRefreshBlocked = true;
 				// reset sort order
 				sortOrderAsc['learnerGroup'] = false;
 				sortDialogList('learnerGroup');
@@ -524,6 +538,9 @@ function initSequenceTab(){
 				// until operator selects an user, buttons remain disabled
 				$('button.learnerGroupDialogSelectableButton').blur().removeClass('ui-state-hover')
 					.attr('disabled', 'disabled');
+			},
+			'close' 	: function(){
+				autoRefreshBlocked = false;
 			},
 			'buttons' : [
 			             {
@@ -745,6 +762,7 @@ function updateSequenceTab() {
  * Forces given learner to move to activity indicated on SVG by coordinated (drag-drop)
  */
 function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
+	autoRefreshBlocked = true;
 	// check all activities and "users who finished lesson" bar
 	$('rect[id^="act"], g polygon', sequenceCanvas).add('#completedLearnersContainer').each(function(){
 		// find which activity learner was dropped on
@@ -808,6 +826,8 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 			return false;
 		}
 	});
+	
+	autoRefreshBlocked = false;
 }
 
 
@@ -919,6 +939,9 @@ function addLearnerIconsHandlers(activity) {
 				// copy of the icon for dragging
 				return $('<img />').attr('src', LAMS_URL + 'images/icons/user.png');
 			},
+			'start' : function(){
+				autoRefreshBlocked = true;
+			},
 			'stop' : function(event, ui) {
 				// jQuery droppable does not work for SVG, so this is a workaround
 				forceComplete(activity.id, learner.id, getLearnerDisplayName(learner),
@@ -984,6 +1007,9 @@ function addCompletedLearnerIcons(learners, learnerTotalCount) {
 					'helper'      : function(event){
 						// copy of the icon for dragging
 						return $('<img />').attr('src', LAMS_URL + 'images/icons/user.png');
+					},
+					'start' : function(){
+						autoRefreshBlocked = true;
 					},
 					'stop' : function(event, ui) {
 						// jQuery droppable does not work for SVG, so this is a workaround
@@ -1393,7 +1419,20 @@ function learnersClearSearchPhrase(){
 /**
  * Updates all changeable elements of monitoring screen.
  */
-function refreshMonitor(tabName){
+function refreshMonitor(tabName, isAuto){
+	if (autoRefreshIntervalObject && !isAuto) {
+		clearInterval(autoRefreshIntervalObject);
+		autoRefreshIntervalObject = null;
+	}
+
+	if (!autoRefreshIntervalObject) {
+		autoRefreshIntervalObject = setInterval(function(){
+			if (!autoRefreshBlocked) {
+				refreshMonitor(null, true);
+			}
+		}, autoRefreshInterval);
+	}
+	
 	if (!tabName) {
 		// update Lesson tab widgets (state, number of learners etc.)
 		updateLessonTab();

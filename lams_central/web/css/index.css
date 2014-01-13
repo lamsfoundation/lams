@@ -22,11 +22,11 @@ td#messageCell {
 	margin: 0 5px 5px 0;
 }
 
-#dialogContainer {
+.dialogContainer {
 	display: none;
 }
 
-#dialogFrame {
+.dialogContainer iframe {
 	width: 100%;
 	height: 99%;
 	border: none;
