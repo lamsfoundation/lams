@@ -105,7 +105,7 @@
 		
 		<h4>
 			<fmt:message key="label.group.leader" >
-				<fmt:param>${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}</fmt:param>
+				<fmt:param>${sessionMap.groupLeaderName}</fmt:param>
 			</fmt:message>
 		</h4>
 

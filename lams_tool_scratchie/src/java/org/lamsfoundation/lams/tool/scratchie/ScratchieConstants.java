@@ -157,6 +157,8 @@ public class ScratchieConstants {
     
     public static final String ATTR_GROUP_LEADER = "groupLeader";
     
+    public static final String ATTR_GROUP_LEADER_NAME = "groupLeaderName";
+    
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
     
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";

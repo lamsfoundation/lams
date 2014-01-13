@@ -224,7 +224,8 @@ public class LearningAction extends Action {
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_INSTRUCTION, scratchie.getInstructions());
 	sessionMap.put(ScratchieConstants.ATTR_USER_ID, user.getUserId());
 	sessionMap.put(ScratchieConstants.ATTR_USER_UID, user.getUid());
-	sessionMap.put(ScratchieConstants.ATTR_GROUP_LEADER, groupLeader);
+	String groupLeaderName = groupLeader.getFirstName() + " " + groupLeader.getLastName();
+	sessionMap.put(ScratchieConstants.ATTR_GROUP_LEADER_NAME, groupLeaderName);
 	boolean isUserLeader = toolSession.isUserGroupLeader(user.getUid());
 	sessionMap.put(ScratchieConstants.ATTR_IS_USER_LEADER, isUserLeader);
 	boolean isUserFinished = (user != null) && user.isSessionFinished();
