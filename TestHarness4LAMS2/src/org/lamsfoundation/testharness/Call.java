@@ -23,8 +23,18 @@
 package org.lamsfoundation.testharness;
 
 import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.log4j.Logger;
 
@@ -35,10 +45,13 @@ import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebForm;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
+import com.sun.net.ssl.HostnameVerifier;
+import com.sun.net.ssl.HttpsURLConnection;
 
 /**
  * @author Fei Yang, Marcin Cieslak
  */
+@SuppressWarnings("deprecation")
 public class Call {
 
     static class CallRecord {
@@ -100,14 +113,50 @@ public class Call {
     }
 
     private static final Logger log = Logger.getLogger(Call.class);
+
     private WebConversation wc;
     private AbstractTest test;
     private String description;
     private String url;
     private WebForm form;
     private InputStream is;
-
     private String contentType; // for WEB POST method
+
+    static {
+
+	TrustManager defaultTrustManager = new X509TrustManager() {
+	    @Override
+	    public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+	    }
+
+	    @Override
+	    public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+	    }
+
+	    @Override
+	    public X509Certificate[] getAcceptedIssuers() {
+		return null;
+	    }
+	};
+
+	try {
+	    SSLContext ctx = SSLContext.getInstance("TLS");
+	    ctx.init(new KeyManager[0], new TrustManager[] { defaultTrustManager }, new SecureRandom());
+	    SSLContext.setDefault(ctx);
+
+	    HostnameVerifier hv = new HostnameVerifier() {
+		@Override
+		public boolean verify(String urlHostName, String other) {
+		    return true;
+		}
+	    };
+	    HttpsURLConnection.setDefaultHostnameVerifier(hv);
+	} catch (NoSuchAlgorithmException e) {
+	    Call.log.error("Error while setting Trust Manager", e);
+	} catch (KeyManagementException e) {
+	    Call.log.error("Error while setting Trust Manager", e);
+	}
+    }
 
     public Call(WebConversation wc, AbstractTest test, String description, String url) {
 	this.wc = wc;
@@ -236,18 +285,17 @@ public class Call {
     }
 
     private String getAbsoluteURL(String url) {
-	if (url.startsWith("http://")) {
+	if (url.startsWith("http")) {
 	    return url;
 	}
 
 	String withSlash = url.startsWith("/") ? url : "/" + url;
 	String context = url.startsWith(test.getTestSuite().getContextRoot()) ? "" : test.getTestSuite()
 		.getContextRoot();
-	if (test.getTestSuite().getHttpPort() != 80) {
-	    return "http://" + test.getTestSuite().getTargetServer() + ":" + test.getTestSuite().getHttpPort()
-		    + context + withSlash;
-	} else {
-	    return "http://" + test.getTestSuite().getTargetServer() + context + withSlash;
+	String targetServer = test.getTestSuite().getTargetServer();
+	if (!targetServer.startsWith("http")) {
+	    targetServer = "http://" + targetServer;
 	}
+	return targetServer + context + withSlash;
     }
 }

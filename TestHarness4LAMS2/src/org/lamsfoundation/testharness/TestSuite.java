@@ -41,20 +41,18 @@ public class TestSuite implements Runnable {
     private int suiteIndex;
     private String targetServer;
     private String contextRoot;
-    private Integer httpPort;
     private AdminTest adminTest;
     private AuthorTest authorTest;
     private MonitorTest monitorTest;
     private LearnerTest learnerTest;
     private boolean finished = false;
 
-    public TestSuite(TestManager manager, int suiteIndex, String targetServer, String contextRoot, Integer httpPort,
+    public TestSuite(TestManager manager, int suiteIndex, String targetServer, String contextRoot,
 	    AdminTest adminTest, AuthorTest authorTest, MonitorTest monitorTest, LearnerTest learnerTest) {
 	this.manager = manager;
 	this.suiteIndex = suiteIndex;
 	this.targetServer = targetServer == null ? "localhost" : targetServer;
 	this.contextRoot = (contextRoot == null) || contextRoot.equals("/") ? "" : contextRoot;
-	this.httpPort = httpPort == null ? 80 : httpPort;
 	
 	this.adminTest = adminTest;
 	adminTest.setTestSuite(this);
@@ -82,13 +80,6 @@ public class TestSuite implements Runnable {
 
     public final String getContextRoot() {
 	return contextRoot;
-    }
-
-    /**
-     * @return Returns the httpPort.
-     */
-    public final int getHttpPort() {
-	return httpPort;
     }
 
     /**

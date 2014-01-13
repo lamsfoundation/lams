@@ -59,7 +59,6 @@ class TestManager {
     private static final String NUMBER_OF_TEST_SUITES = "NumberOfTestSuites";
     private static final String TARGET_SERVER = "TargetServer";
     private static final String CONTEXT_ROOT = "ContextRoot";
-    private static final String HTTP_PORT = "HttpPort";
     private static final String ADMIN_PROPERTY_FILE = "AdminTestPropertyFile";
     private static final String AUTHOR_PROPERTY_FILE = "AuthorTestPropertyFile";
     private static final String MONITOR_PROPERTY_FILE = "MonitorTestPropertyFile";
@@ -306,7 +305,7 @@ class TestManager {
 
 	LearnerTest test = new LearnerTest(testName, minDelay, maxDelay, getLessonURL, getLearningDesignURL,
 		joinLessonURL, getProgressURL, lessonEntryURL, filesToUpload == null ? null : filesToUpload.split(";"));
-	
+
 	if (userIdOffset != null) {
 	    userIdOffset--;
 	}
@@ -376,8 +375,6 @@ class TestManager {
 		TestManager.buildPropertyKey(TestManager.TARGET_SERVER, suiteIndex), true);
 	String contextRoot = TestManager.getStringProperty(testPropertyFileName, testProperties,
 		TestManager.buildPropertyKey(TestManager.CONTEXT_ROOT, suiteIndex), true);
-	Integer httpPort = TestManager.getIntegerProperty(testPropertyFileName, testProperties,
-		TestManager.buildPropertyKey(TestManager.HTTP_PORT, suiteIndex), true);
 	String adminTestPropertyFileName = TestManager.getStringProperty(testPropertyFileName, testProperties,
 		TestManager.buildPropertyKey(TestManager.ADMIN_PROPERTY_FILE, suiteIndex), true);
 	AdminTest adminTest = adminTestPropertyFileName == null ? null : createAdminTest(adminTestPropertyFileName);
@@ -394,7 +391,7 @@ class TestManager {
 	LearnerTest learnerTest = learnerTestPropertyFileName == null ? null
 		: createLearnerTest(learnerTestPropertyFileName);
 
-	TestSuite suite = new TestSuite(this, suiteIndex, targetServer, contextRoot, httpPort, adminTest, authorTest,
+	TestSuite suite = new TestSuite(this, suiteIndex, targetServer, contextRoot, adminTest, authorTest,
 		monitorTest, learnerTest);
 
 	TestManager.log.info("Finished creating test suite " + suite.toString());
