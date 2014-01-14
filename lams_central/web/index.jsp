@@ -2,14 +2,9 @@
 	"http://www.w3.org/TR/html4/loose.dtd">
 
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
-<%@ page import="org.lamsfoundation.lams.security.JspRedirectStrategy"%>
-<%@ page import="org.lamsfoundation.lams.web.util.HttpSessionManager"%>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c"%>
-
-<%JspRedirectStrategy.welcomePageStatusUpdate(request, response);%>
-<%HttpSessionManager.getInstance().updateHttpSessionByLogin(request.getSession(),request.getRemoteUser());%>
 
 <lams:html>
 <lams:head>
