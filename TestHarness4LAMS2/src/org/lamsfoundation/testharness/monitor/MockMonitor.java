@@ -35,6 +35,7 @@ import org.lamsfoundation.testharness.Call;
 import org.lamsfoundation.testharness.MockUser;
 import org.lamsfoundation.testharness.TestHarnessException;
 import org.lamsfoundation.testharness.TestUtil;
+import org.lamsfoundation.testharness.admin.MockAdmin;
 
 import com.allaire.wddx.WddxDeserializationException;
 import com.meterware.httpunit.WebResponse;
@@ -82,7 +83,7 @@ public class MockMonitor extends MockUser implements Runnable {
      * @param
      */
     public MockMonitor(MonitorTest test, String username, String password, String userId) {
-	super(test, username, password, userId);
+	super(test, username, password, MockAdmin.MONITOR_ROLE, userId);
     }
 
     public void createLessonClass(String createLessonClassURL, String userId) {

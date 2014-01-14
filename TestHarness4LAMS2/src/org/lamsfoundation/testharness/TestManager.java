@@ -22,13 +22,21 @@
  */
 package org.lamsfoundation.testharness;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
@@ -44,7 +52,7 @@ import org.lamsfoundation.testharness.monitor.MonitorTest;
 /**
  * @author Fei Yang, Marcin Cieslak
  */
-class TestManager {
+public class TestManager {
     private static final Logger log = Logger.getLogger(TestManager.class);
 
     List<TestSuite> testSuites = new LinkedList<TestSuite>();
@@ -63,6 +71,7 @@ class TestManager {
     private static final String AUTHOR_PROPERTY_FILE = "AuthorTestPropertyFile";
     private static final String MONITOR_PROPERTY_FILE = "MonitorTestPropertyFile";
     private static final String LEARNER_PROPERTY_FILE = "LearnerTestPropertyFile";
+    private static final String STORED_USERS_FILE = "UsersFile";
 
     // common property keys of all the single tests(admin test, author test, monitor test, learner test)
     private static final String MIN_DELAY = "MinDelay";
@@ -73,7 +82,6 @@ class TestManager {
     private static final String CREATE_USER_URL = "CreateUserURL";
     private static final String COURSE_NAME = "CourseName";
     private static final String COURSE_ID = "CourseId";
-    private static final String USER_CREATED = "UserCreated";
     private static final String SYSADMIN_USERNAME = "SysadminUsername";
     private static final String SYSADMIN_PASSWORD = "SysadminPassword";
 
@@ -89,7 +97,6 @@ class TestManager {
     private static final String START_LESSON_URL = "StartLessonURL";
     private static final String LESSON_ID = "LessonId";
     private static final String LESSON_NAME = "LessonName";
-    private static final String USER_ID = "UserId";
     private static final String BASE_MONITOR_NAME = "BaseMonitorName";
     private static final String GET_LESSON_DETAILS_URL = "GetLessonDetailsURL";
     private static final String GET_CA_URL = "GetContributeActivitiesURL";
@@ -106,7 +113,6 @@ class TestManager {
     private static final String GET_PROGRESS_URL = "GetFlashProgressDataURL";
     private static final String LESSON_ENTRY_URL = "LessonEntryURL";
     private static final String FILES_TO_UPLOAD = "FilesToUpload";
-    private static final String USER_ID_OFFSET = "UserIdOffset";
 
     public TestManager(String name) {
 	this.testPropertyFileName = name;
@@ -209,15 +215,13 @@ class TestManager {
 	TestManager.log.info(finishedCount + " test suites finished and " + abortedCount + " aborted");
     }
 
-    private AdminTest createAdminTest(String adminTestPropertyFileName) {
+    private AdminTest createAdminTest(String adminTestPropertyFileName, String storedUsersFileName) {
 	String testName = TestManager.extractTestName(adminTestPropertyFileName);
 	TestManager.log.info("Creating admin test " + testName);
 
 	Properties adminTestProperties = TestManager.loadProperties(adminTestPropertyFileName);
 	Integer courseId = TestManager.getIntegerProperty(adminTestPropertyFileName, adminTestProperties,
 		TestManager.COURSE_ID, true);
-	Boolean userCreated = new Boolean(TestManager.getStringProperty(adminTestPropertyFileName, adminTestProperties,
-		TestManager.USER_CREATED, true));
 	Integer minDelay = TestManager.getIntegerProperty(adminTestPropertyFileName, adminTestProperties,
 		TestManager.MIN_DELAY, true);
 	Integer maxDelay = TestManager.getIntegerProperty(adminTestPropertyFileName, adminTestProperties,
@@ -225,7 +229,7 @@ class TestManager {
 	String createCourseURL = TestManager.getStringProperty(adminTestPropertyFileName, adminTestProperties,
 		TestManager.CREATE_COURSE_URL, courseId != null);
 	String createUserURL = TestManager.getStringProperty(adminTestPropertyFileName, adminTestProperties,
-		TestManager.CREATE_USER_URL, userCreated);
+		TestManager.CREATE_USER_URL, false);
 	String courseName = TestManager.getStringProperty(adminTestPropertyFileName, adminTestProperties,
 		TestManager.COURSE_NAME, true);
 	String sysadminUsername = TestManager.getStringProperty(adminTestPropertyFileName, adminTestProperties,
@@ -234,15 +238,15 @@ class TestManager {
 		TestManager.SYSADMIN_PASSWORD, false);
 
 	AdminTest test = new AdminTest(testName, minDelay, maxDelay, createCourseURL, createUserURL,
-		courseId == null ? null : courseId.toString(), userCreated, courseName);
+		courseId == null ? null : courseId.toString(), courseName, storedUsersFileName);
 
-	test.setUsers(new MockAdmin[] { new MockAdmin(test, sysadminUsername, sysadminPassword, null) });
+	test.setUsers(new MockAdmin[] { new MockAdmin(test, sysadminUsername, sysadminPassword) });
 
 	TestManager.log.info("Finished creating admin test " + testName);
 	return test;
     }
 
-    private AuthorTest createAuthorTest(String authorTestPropertyFileName) {
+    private AuthorTest createAuthorTest(String authorTestPropertyFileName, Map<String, String> storedUsers) {
 	String testName = TestManager.extractTestName(authorTestPropertyFileName);
 	TestManager.log.info("Creating author test " + testName);
 
@@ -265,13 +269,14 @@ class TestManager {
 
 	baseAuthorName = baseAuthorName == null ? MockAuthor.DEFAULT_NAME : baseAuthorName;
 	String username = TestUtil.buildName(testName, baseAuthorName, TestManager.MAX_USERNAME_LENGTH);
-	test.setUsers(new MockAuthor[] { new MockAuthor(test, username, username, null) });
+	String userId = storedUsers.get(username);
+	test.setUsers(new MockAuthor[] { new MockAuthor(test, username, username, userId) });
 
 	TestManager.log.info("Finished creating author test " + testName);
 	return test;
     }
 
-    private LearnerTest createLearnerTest(String learnerTestPropertyFileName) {
+    private LearnerTest createLearnerTest(String learnerTestPropertyFileName, Map<String, String> storedUsers) {
 	String testName = TestManager.extractTestName(learnerTestPropertyFileName);
 	TestManager.log.info("Creating learner test:" + testName);
 
@@ -300,22 +305,17 @@ class TestManager {
 		TestManager.LESSON_ENTRY_URL, false);
 	String filesToUpload = TestManager.getStringProperty(learnerTestPropertyFileName, learnerTestProperties,
 		TestManager.FILES_TO_UPLOAD, false);
-	Integer userIdOffset = TestManager.getIntegerProperty(learnerTestPropertyFileName, learnerTestProperties,
-		TestManager.USER_ID_OFFSET, true);
 
 	LearnerTest test = new LearnerTest(testName, minDelay, maxDelay, getLessonURL, getLearningDesignURL,
 		joinLessonURL, getProgressURL, lessonEntryURL, filesToUpload == null ? null : filesToUpload.split(";"));
 
-	if (userIdOffset != null) {
-	    userIdOffset--;
-	}
 	MockLearner[] learners = new MockLearner[numberOfLearners];
 	for (int i = 0; i < numberOfLearners; i++) {
 	    baseLearnerName = baseLearnerName == null ? MockLearner.DEFAULT_NAME : baseLearnerName;
 	    String username = TestUtil.buildName(testName, baseLearnerName + (learnerOffset + i),
 		    TestManager.MAX_USERNAME_LENGTH);
 
-	    String userId = userIdOffset == null ? null : (++userIdOffset).toString();
+	    String userId = storedUsers.get(username);
 	    learners[i] = new MockLearner(test, username, username, userId);
 	}
 	test.setUsers(learners);
@@ -324,7 +324,7 @@ class TestManager {
 	return test;
     }
 
-    private MonitorTest createMonitorTest(String monitorTestPropertyFileName) {
+    private MonitorTest createMonitorTest(String monitorTestPropertyFileName, Map<String, String> storedUsers) {
 	String testName = TestManager.extractTestName(monitorTestPropertyFileName);
 	TestManager.log.info("Creating monitor test " + testName);
 
@@ -353,8 +353,6 @@ class TestManager {
 		TestManager.LESSON_NAME, true);
 	String baseMonitorName = TestManager.getStringProperty(monitorTestPropertyFileName, monitorTestProperties,
 		TestManager.BASE_MONITOR_NAME, true);
-	Integer userId = TestManager.getIntegerProperty(monitorTestPropertyFileName, monitorTestProperties,
-		TestManager.USER_ID, true);
 
 	MonitorTest test = new MonitorTest(testName, minDelay, maxDelay, initLessonURL, createLessonClassURL,
 		startLessonURL, getLessonDetailsURL, getContributeActivitiesURL, getLearningDesignDetailsURL,
@@ -362,8 +360,8 @@ class TestManager {
 
 	baseMonitorName = baseMonitorName == null ? MockMonitor.DEFAULT_NAME : baseMonitorName;
 	String username = TestUtil.buildName(testName, baseMonitorName, TestManager.MAX_USERNAME_LENGTH);
-	test.setUsers(new MockMonitor[] { new MockMonitor(test, username, username, userId == null ? null : userId
-		.toString()) });
+	String userId = storedUsers.get(username);
+	test.setUsers(new MockMonitor[] { new MockMonitor(test, username, username, userId) });
 
 	TestManager.log.info("Finished creating monitor test " + testName);
 	return test;
@@ -371,25 +369,31 @@ class TestManager {
 
     private TestSuite createTestSuite(Properties testProperties, int suiteIndex) {
 	TestManager.log.info("Creating test suite " + suiteIndex);
+
 	String targetServer = TestManager.getStringProperty(testPropertyFileName, testProperties,
 		TestManager.buildPropertyKey(TestManager.TARGET_SERVER, suiteIndex), true);
 	String contextRoot = TestManager.getStringProperty(testPropertyFileName, testProperties,
 		TestManager.buildPropertyKey(TestManager.CONTEXT_ROOT, suiteIndex), true);
+	String storedUsersFileName = TestManager.getStringProperty(testPropertyFileName, testProperties,
+		TestManager.buildPropertyKey(TestManager.STORED_USERS_FILE, suiteIndex), true);
+	Map<String, String> storedUsers = TestManager.getStoredUsers(storedUsersFileName);
+
 	String adminTestPropertyFileName = TestManager.getStringProperty(testPropertyFileName, testProperties,
 		TestManager.buildPropertyKey(TestManager.ADMIN_PROPERTY_FILE, suiteIndex), true);
-	AdminTest adminTest = adminTestPropertyFileName == null ? null : createAdminTest(adminTestPropertyFileName);
+	AdminTest adminTest = adminTestPropertyFileName == null ? null : createAdminTest(adminTestPropertyFileName,
+		storedUsersFileName);
 	String authorTestPropertyFileName = TestManager.getStringProperty(testPropertyFileName, testProperties,
 		TestManager.buildPropertyKey(TestManager.AUTHOR_PROPERTY_FILE, suiteIndex), true);
-	AuthorTest authorTest = authorTestPropertyFileName == null ? null
-		: createAuthorTest(authorTestPropertyFileName);
+	AuthorTest authorTest = authorTestPropertyFileName == null ? null : createAuthorTest(
+		authorTestPropertyFileName, storedUsers);
 	String monitorTestPropertyFileName = TestManager.getStringProperty(testPropertyFileName, testProperties,
 		TestManager.buildPropertyKey(TestManager.MONITOR_PROPERTY_FILE, suiteIndex), true);
-	MonitorTest monitorTest = monitorTestPropertyFileName == null ? null
-		: createMonitorTest(monitorTestPropertyFileName);
+	MonitorTest monitorTest = monitorTestPropertyFileName == null ? null : createMonitorTest(
+		monitorTestPropertyFileName, storedUsers);
 	String learnerTestPropertyFileName = TestManager.getStringProperty(testPropertyFileName, testProperties,
 		TestManager.buildPropertyKey(TestManager.LEARNER_PROPERTY_FILE, suiteIndex), true);
-	LearnerTest learnerTest = learnerTestPropertyFileName == null ? null
-		: createLearnerTest(learnerTestPropertyFileName);
+	LearnerTest learnerTest = learnerTestPropertyFileName == null ? null : createLearnerTest(
+		learnerTestPropertyFileName, storedUsers);
 
 	TestSuite suite = new TestSuite(this, suiteIndex, targetServer, contextRoot, adminTest, authorTest,
 		monitorTest, learnerTest);
@@ -404,8 +408,6 @@ class TestManager {
 	Properties testProperties = TestManager.loadProperties(testPropertyFileName);
 	TestReporter.setFileName(TestManager.getStringProperty(testPropertyFileName, testProperties,
 		TestManager.REPORT_FILE_NAME, false));
-	MockUser.setIndexPage(TestManager.getStringProperty(testPropertyFileName, testProperties,
-		TestManager.INDEX_PAGE_URL, false));
 	String fileTemplate = TestManager.getStringProperty(testPropertyFileName, testProperties,
 		TestManager.REPORT_FILE_TEMPLATE, false);
 	TestReporter.setFileTemplate(fileTemplate);
@@ -417,5 +419,70 @@ class TestManager {
 	}
 
 	TestManager.log.info("Finished initialization");
+    }
+
+    private static Map<String, String> getStoredUsers(String storedUsersFileName) {
+	Map<String, String> result = new TreeMap<String, String>();
+
+	if (storedUsersFileName != null) {
+	    BufferedReader reader = null;
+	    try {
+		File file = new File(storedUsersFileName);
+		if (file.canRead()) {
+		    reader = new BufferedReader(new FileReader(storedUsersFileName));
+		    String line = null;
+		    do {
+			line = reader.readLine();
+			if (line != null) {
+			    String[] userData = line.split(",");
+			    if ((userData[0] != null) && (userData[1] != null)) {
+				result.put(userData[0], userData[1]);
+			    }
+			}
+		    } while (line != null);
+		}
+	    } catch (Exception e) {
+		TestManager.log.warn("Error while trying to read users file: " + storedUsersFileName, e);
+	    } finally {
+		if (reader != null) {
+		    try {
+			reader.close();
+		    } catch (IOException e) {
+			TestManager.log.warn("Error while trying to read users file: " + storedUsersFileName, e);
+		    }
+		}
+	    }
+	}
+
+	return result;
+    }
+
+    public static void storeUsers(String storedUsersFileName, Collection<MockUser> storedUsers) {
+	if (storedUsersFileName != null) {
+	    BufferedWriter writer = null;
+
+	    try {
+		File file = new File(storedUsersFileName);
+		file.delete();
+
+		writer = new BufferedWriter(new FileWriter(file));
+		for (MockUser user : storedUsers) {
+		    if (user.getUserId() != null) {
+			writer.append(user.getUsername() + "," + user.getUserId());
+			writer.newLine();
+		    }
+		}
+	    } catch (Exception e) {
+		TestManager.log.warn("Error while trying to write users file: " + storedUsersFileName, e);
+	    } finally {
+		if (writer != null) {
+		    try {
+			writer.close();
+		    } catch (IOException e) {
+			TestManager.log.warn("Error while trying to write users file: " + storedUsersFileName, e);
+		    }
+		}
+	    }
+	}
     }
 }

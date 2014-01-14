@@ -52,25 +52,21 @@ public class MockUser {
     private static final String INDEX_PAGE_FLAG = "images/loading.gif";
 
     private static final String USERNAME = "j_username";
-    private static final String PASSWORD = "j_password";
-
-    private static String indexPage;
+    private static final String PASSWORD = "j_password";;
 
     protected AbstractTest test;
     protected String userId;
     protected String username;
     protected String password;
+    protected String role;
     protected WebConversation wc;
 
-    public MockUser(AbstractTest test, String username, String password, String userId) {
+    public MockUser(AbstractTest test, String username, String password, String role, String userId) {
 	this.test = test;
 	this.username = username;
+	this.role = role;
 	this.password = password;
 	this.userId = userId;
-    }
-
-    public static void setIndexPage(String indexPageURL) {
-	MockUser.indexPage = indexPageURL;
     }
 
     private static String sha1(String plaintext) throws NoSuchAlgorithmException {
@@ -103,8 +99,7 @@ public class MockUser {
     public void login() {
 	try {
 	    wc = new WebConversation();
-	    WebResponse resp = (WebResponse) new Call(wc, test, username + " fetch index page", MockUser.indexPage)
-		    .execute();
+	    WebResponse resp = (WebResponse) new Call(wc, test, username + " fetch index page", "").execute();
 	    if (!MockUser.checkPageContains(resp, MockUser.LOGIN_PAGE_FLAG)) {
 		MockUser.log.debug(resp.getText());
 		throw new TestHarnessException(username + " didn't get login page when hitting LAMS the first time");
@@ -177,5 +172,17 @@ public class MockUser {
 	    }
 	}
 	return form;
+    }
+    
+    public boolean equals(Object o){
+	return username.equals(((MockUser) o).username);
+    }
+    
+    public int hashCode(){
+	return username.hashCode();
+    }
+
+    public String getRole() {
+        return role;
     }
 }

@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.testharness.Call;
 import org.lamsfoundation.testharness.MockUser;
 import org.lamsfoundation.testharness.TestHarnessException;
+import org.lamsfoundation.testharness.admin.MockAdmin;
 import org.xml.sax.SAXException;
 
 import com.meterware.httpunit.WebResponse;
@@ -62,7 +63,7 @@ public class MockAuthor extends MockUser {
      * @param
      */
     public MockAuthor(AuthorTest test, String username, String password, String userId) {
-	super(test, username, password, userId);
+	super(test, username, password, MockAdmin.AUTHOR_ROLE, userId);
     }
 
     public String importLearningDesign(String learningDesignUploadURL, File file) {

@@ -40,19 +40,19 @@ public class AdminTest extends AbstractTest {
 
     private String createCourseURL;
     private String createUserURL;
-    private Boolean userCreated;
     private String courseName;
     private String courseId;
+    private String storedUsersFileName;
 
     public AdminTest(String testName, Integer minDelay, Integer maxDelay, String createCourseURL, String createUserURL,
-	    String courseId, Boolean userCreated, String courseName) {
+	    String courseId, String courseName, String storedUsersFileName) {
 	super(testName, minDelay, maxDelay);
 	this.createCourseURL = createCourseURL;
 	this.createUserURL = createUserURL;
 	this.courseName = courseName == null ? TestUtil.buildName(testName, AdminTest.DEFAULT_COURSE_NAME) : TestUtil
 		.buildName(testName, courseName);
 	this.courseId = courseId;
-	this.userCreated = userCreated;
+	this.storedUsersFileName = storedUsersFileName;
     }
 
     public final String getCourseId() {
@@ -71,20 +71,12 @@ public class AdminTest extends AbstractTest {
 	return createUserURL;
     }
 
-    public final Boolean getUserCreated() {
-	return userCreated;
-    }
-
     public final void setCourseId(String courseId) {
 	this.courseId = courseId;
     }
 
     public final void setCourseName(String courseName) {
 	this.courseName = courseName;
-    }
-
-    public final void setUserCreated(Boolean userCreated) {
-	this.userCreated = userCreated;
     }
 
     /**
@@ -95,14 +87,11 @@ public class AdminTest extends AbstractTest {
      */
     @Override
     protected void startTest() {
-	if ((courseId != null) && userCreated) {
-	    return;
-	}
 	MockAdmin admin = (MockAdmin) users[0];
 	admin.login();
 	if (courseId == null) {
 	    setCourseId(admin.createCourse(createCourseURL, courseName));
 	}
-	admin.createUsers(createUserURL, courseId);
+	admin.createUsers(createUserURL, courseId, storedUsersFileName);
     }
 }

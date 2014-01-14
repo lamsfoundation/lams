@@ -39,6 +39,7 @@ import org.lamsfoundation.testharness.Call;
 import org.lamsfoundation.testharness.MockUser;
 import org.lamsfoundation.testharness.TestHarnessException;
 import org.lamsfoundation.testharness.TestUtil;
+import org.lamsfoundation.testharness.admin.MockAdmin;
 import org.xml.sax.SAXException;
 
 import com.allaire.wddx.WddxDeserializationException;
@@ -117,7 +118,7 @@ public class MockLearner extends MockUser implements Runnable {
      * MockLearner Constructor
      */
     public MockLearner(LearnerTest test, String username, String password, String userId) {
-	super(test, username, password, userId);
+	super(test, username, password, MockAdmin.LEARNER_ROLE, userId);
 
     }
 

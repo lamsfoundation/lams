@@ -24,15 +24,19 @@ package org.lamsfoundation.testharness.admin;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.testharness.AbstractTest;
 import org.lamsfoundation.testharness.Call;
 import org.lamsfoundation.testharness.MockUser;
 import org.lamsfoundation.testharness.TestHarnessException;
+import org.lamsfoundation.testharness.TestManager;
 import org.lamsfoundation.testharness.author.AuthorTest;
 import org.lamsfoundation.testharness.learner.LearnerTest;
 import org.lamsfoundation.testharness.monitor.MonitorTest;
@@ -53,16 +57,9 @@ import com.meterware.httpunit.WebTable;
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class MockAdmin extends MockUser {
-
-    private static class MockUserWithRoles {
-	MockUser user;
-	String role;
-
-	public MockUserWithRoles(MockUser user, String roles) {
-	    this.user = user;
-	    this.role = roles;
-	}
-    }
+    public static final String AUTHOR_ROLE = "3";
+    public static final String MONITOR_ROLE = "4";
+    public static final String LEARNER_ROLE = "5";
 
     private static final Logger log = Logger.getLogger(MockAdmin.class);
     private static final String COURSE_FORM_FLAG = "OrganisationForm";
@@ -77,37 +74,14 @@ public class MockAdmin extends MockUser {
     private static final String EMAIL = "email";
     private static final String COMMON_LAST_NAME = "Testharness";
     private static final String ROLES = "roles";
-    private static final String AUTHOR_ROLE = "3";
-    private static final String MONITOR_ROLE = "4";
-    private static final String LEARNER_ROLE = "5";
     private static final String USER_ID_START_FLAG = "userId=";
     private static final char USER_ID_END_FLAG = '&';
 
     private static final String LOGIN_TAKEN_ERROR = "Login is already taken.";
+    private static final Pattern EXISTING_USER_ID_PATTERN = Pattern.compile(", ID: (\\d+)");
 
-    public MockAdmin(AbstractTest test, String username, String password, String userId) {
-	super(test, username, password, userId);
-    }
-
-    private static MockUserWithRoles[] getMockUsersWithRoles(AbstractTest[] tests) {
-	List<MockUserWithRoles> users = new ArrayList<MockUserWithRoles>();
-	for (AbstractTest test : tests) {
-	    if (test != null) {
-		MockUser[] mockUsers = test.getUsers();
-		String role;
-		if (test instanceof AuthorTest) {
-		    role = MockAdmin.AUTHOR_ROLE;
-		} else if (test instanceof MonitorTest) {
-		    role = MockAdmin.MONITOR_ROLE;
-		} else {
-		    role = MockAdmin.LEARNER_ROLE;
-		}
-		for (MockUser mockUser : mockUsers) {
-		    users.add(new MockUserWithRoles(mockUser, role));
-		}
-	    }
-	}
-	return users.toArray(new MockUserWithRoles[] {});
+    public MockAdmin(AbstractTest test, String username, String password) {
+	super(test, username, password, null, null);
     }
 
     public String createCourse(String createCourseURL, String courseName) {
@@ -151,20 +125,26 @@ public class MockAdmin extends MockUser {
 	}
     }
 
-    public void createUsers(String createUserURL, String courseId) {
+    public void createUsers(String createUserURL, String courseId, String storedUsersFileName) {
 	try {
 	    String url = createUserURL.replace(MockAdmin.COURSE_ID_PATTERN, courseId.toString());
+	    List<MockUser> mockUsers = new ArrayList<MockUser>();
 	    AuthorTest authorTest = test.getTestSuite().getAuthorTest();
+	    Collections.addAll(mockUsers, authorTest.getUsers());
 	    MonitorTest monitorTest = test.getTestSuite().getMonitorTest();
+	    Collections.addAll(mockUsers, monitorTest.getUsers());
 	    LearnerTest learnerTest = test.getTestSuite().getLearnerTest();
-	    AbstractTest[] tests = new AbstractTest[] { authorTest, monitorTest, learnerTest };
-	    MockUserWithRoles[] mockUsers = MockAdmin.getMockUsersWithRoles(tests);
+	    Collections.addAll(mockUsers, learnerTest.getUsers());
 
-	    for (MockUserWithRoles mockUser : mockUsers) {
+	    for (MockUser mockUser : mockUsers) {
+		String name = mockUser.getUsername();
+		if (mockUser.getUserId() != null) {
+		    log.debug("User " + name + " already exists, skipping creation");
+		    continue;
+		}
+
 		delay();
-
 		// create the user
-		String name = mockUser.user.getUsername();
 		MockAdmin.log.info(username + " creating user " + name);
 		WebResponse resp = (WebResponse) new Call(wc, test, username + " creating user " + name, url).execute();
 		if (!MockUser.checkPageContains(resp, MockAdmin.USER_FORM_FLAG)) {
@@ -183,14 +163,23 @@ public class MockAdmin extends MockUser {
 			params)).execute();
 
 		// add the roles
-		if (resp.getText().indexOf(MockAdmin.LOGIN_TAKEN_ERROR) != -1) {
-		    log.warn("Login " + name + " already taken.");
+		String respText = resp.getText();
+		if (respText.indexOf(MockAdmin.LOGIN_TAKEN_ERROR) != -1) {
+		    Matcher m = MockAdmin.EXISTING_USER_ID_PATTERN.matcher(respText);
+		    if (m.find()) {
+			String userId = m.group(1);
+			mockUser.setUserId(userId);
+			MockAdmin.log.debug("User " + name + " already exists with ID: " + userId);
+		    } else {
+			throw new TestHarnessException("User " + name
+				+ " already exists, but could not retrieve his ID");
+		    }
 		    continue;
 		}
 
 		MockAdmin.log.info(username + " adding roles to user " + name);
 		params = new HashMap<String, Object>();
-		params.put(MockAdmin.ROLES, new String[] { mockUser.role });
+		params.put(MockAdmin.ROLES, new String[] { mockUser.getRole() });
 		resp = (WebResponse) new Call(wc, test, username + " submit user rolesform", fillForm(resp, 0, params))
 			.execute();
 		WebTable[] tables = resp.getTables();
@@ -220,8 +209,10 @@ public class MockAdmin extends MockUser {
 		    throw new TestHarnessException("Failed to get the user id for " + name);
 		}
 		MockAdmin.log.info(username + " created user " + name + " and the id is " + idAsString);
-		mockUser.user.setUserId(idAsString);
+		mockUser.setUserId(idAsString);
 	    }
+
+	    TestManager.storeUsers(storedUsersFileName, mockUsers);
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
 	} catch (SAXException e) {

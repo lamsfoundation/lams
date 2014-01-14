@@ -59,8 +59,7 @@ import org.lamsfoundation.lams.util.HashUtil;
 /**
  * struts doclets
  * 
- * @struts:action path="/usersave" name="UserForm" input=".user" scope="request"
- *                validate="false"
+ * @struts:action path="/usersave" name="UserForm" input=".user" scope="request" validate="false"
  * 
  * @struts:action-forward name="user" path="/user.do?method=edit"
  * @struts:action-forward name="userlist" path="/usermanage.do"
@@ -73,8 +72,8 @@ public class UserSaveAction extends Action {
     private static IUserManagementService service;
 
     @Override
-    @SuppressWarnings("unchecked")
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
 	UserSaveAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
 
@@ -87,14 +86,15 @@ public class UserSaveAction extends Action {
 	UserSaveAction.log.debug("orgId: " + orgId);
 	Boolean edit = false;
 	Boolean passwordChanged = true;
-	SupportedLocale locale = (SupportedLocale) UserSaveAction.service.findById(SupportedLocale.class, (Integer) userForm.get("localeId"));
-	AuthenticationMethod authenticationMethod = (AuthenticationMethod) UserSaveAction.service.findById(AuthenticationMethod.class, (Integer) userForm
-		.get("authenticationMethodId"));
+	SupportedLocale locale = (SupportedLocale) UserSaveAction.service.findById(SupportedLocale.class,
+		(Integer) userForm.get("localeId"));
+	AuthenticationMethod authenticationMethod = (AuthenticationMethod) UserSaveAction.service.findById(
+		AuthenticationMethod.class, (Integer) userForm.get("authenticationMethodId"));
 	UserSaveAction.log.debug("locale: " + locale);
 	UserSaveAction.log.debug("authenticationMethod:" + authenticationMethod);
 
 	if (isCancelled(request)) {
-	    if (orgId == null || orgId == 0) {
+	    if ((orgId == null) || (orgId == 0)) {
 		return mapping.findForward("usersearch");
 	    }
 	    request.setAttribute("org", orgId);
@@ -108,33 +108,42 @@ public class UserSaveAction extends Action {
 	}
 
 	// (dyna)form validation
-	userForm.set("login", userForm.getString("login").trim());
-	if (userForm.get("login") == null || userForm.getString("login").length() == 0) {
-	    errors.add("login", new ActionMessage("error.login.required"));
+	String login = userForm.getString("login");
+	if (login != null) {
+	    login = login.trim();
 	}
-	if (UserSaveAction.service.getUserByLogin(userForm.getString("login")) != null) {
-	    if (user != null && StringUtils.equals(user.getLogin(), userForm.getString("login"))) {
-		// login exists - it's the user's current login
-	    } else {
-		errors.add("login", new ActionMessage("error.login.unique", "(" + userForm.getString("login") + ")"));
+	if ((login == null) || (login.length() == 0)) {
+	    errors.add("login", new ActionMessage("error.login.required"));
+	} else {
+	    userForm.set("login", login);
+	    User existingUser = UserSaveAction.service.getUserByLogin(login);
+	    if (existingUser != null) {
+		if ((user != null) && StringUtils.equals(user.getLogin(), login)) {
+		    // login exists - it's the user's current login
+		} else {
+		    errors.add("login",
+			    new ActionMessage("error.login.unique", "(" + login + ", ID: " + existingUser.getUserId()
+				    + ")"));
+		}
 	    }
 	}
+
 	if (!StringUtils.equals((String) userForm.get("password"), ((String) userForm.get("password2")))) {
 	    errors.add("password", new ActionMessage("error.newpassword.mismatch"));
 	}
-	if (userForm.get("password") == null || userForm.getString("password").trim().length() == 0) {
+	if ((userForm.get("password") == null) || (userForm.getString("password").trim().length() == 0)) {
 	    passwordChanged = false;
 	    if (!edit) {
 		errors.add("password", new ActionMessage("error.password.required"));
 	    }
 	}
-	if (userForm.get("firstName") == null || userForm.getString("firstName").trim().length() == 0) {
+	if ((userForm.get("firstName") == null) || (userForm.getString("firstName").trim().length() == 0)) {
 	    errors.add("firstName", new ActionMessage("error.firstname.required"));
 	}
-	if (userForm.get("lastName") == null || userForm.getString("lastName").trim().length() == 0) {
+	if ((userForm.get("lastName") == null) || (userForm.getString("lastName").trim().length() == 0)) {
 	    errors.add("lastName", new ActionMessage("error.lastname.required"));
 	}
-	if (userForm.get("email") == null || userForm.getString("email").trim().length() == 0) {
+	if ((userForm.get("email") == null) || (userForm.getString("email").trim().length() == 0)) {
 	    errors.add("email", new ActionMessage("error.email.required"));
 	} else {
 	    Pattern p = Pattern.compile(".+@.+\\.[a-z]+");
@@ -158,10 +167,12 @@ public class UserSaveAction extends Action {
 		user.setLocale(locale);
 		user.setAuthenticationMethod(authenticationMethod);
 
-		Theme cssTheme = (Theme) service.findById(Theme.class, (Long) userForm.get("userCSSTheme"));
+		Theme cssTheme = (Theme) UserSaveAction.service.findById(Theme.class,
+			(Long) userForm.get("userCSSTheme"));
 		user.setHtmlTheme(cssTheme);
 
-		Theme flashTheme = (Theme) service.findById(Theme.class, (Long) userForm.get("userFlashTheme"));
+		Theme flashTheme = (Theme) UserSaveAction.service.findById(Theme.class,
+			(Long) userForm.get("userFlashTheme"));
 		user.setFlashTheme(flashTheme);
 
 		UserSaveAction.service.save(user);
@@ -177,15 +188,17 @@ public class UserSaveAction extends Action {
 		    user.setHtmlTheme(UserSaveAction.service.getDefaultHtmlTheme());
 		    user.setDisabledFlag(false);
 		    user.setCreateDate(new Date());
-		    user.setAuthenticationMethod((AuthenticationMethod) UserSaveAction.service.findByProperty(AuthenticationMethod.class,
-			    "authenticationMethodName", "LAMS-Database").get(0));
+		    user.setAuthenticationMethod((AuthenticationMethod) UserSaveAction.service.findByProperty(
+			    AuthenticationMethod.class, "authenticationMethodName", "LAMS-Database").get(0));
 		    user.setUserId(null);
 		    user.setLocale(locale);
 
-		    Theme cssTheme = (Theme) service.findById(Theme.class, (Long) userForm.get("userCSSTheme"));
+		    Theme cssTheme = (Theme) UserSaveAction.service.findById(Theme.class,
+			    (Long) userForm.get("userCSSTheme"));
 		    user.setHtmlTheme(cssTheme);
 
-		    Theme flashTheme = (Theme) service.findById(Theme.class, (Long) userForm.get("userFlashTheme"));
+		    Theme flashTheme = (Theme) UserSaveAction.service.findById(Theme.class,
+			    (Long) userForm.get("userFlashTheme"));
 		    user.setFlashTheme(flashTheme);
 
 		    UserSaveAction.service.save(user);
@@ -199,7 +212,7 @@ public class UserSaveAction extends Action {
 	}
 
 	if (errors.isEmpty()) {
-	    if (orgId == null || orgId == 0) {
+	    if ((orgId == null) || (orgId == 0)) {
 		return mapping.findForward("usersearch");
 	    }
 	    if (edit) {
