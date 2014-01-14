@@ -120,6 +120,11 @@
 <body class="stripes">
 
 <div id="content">
+
+	<h1>
+		<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
+	</h1>
+
 	<html:form styleId="learningForm" action="/learning?method=displayMc&validate=false" enctype="multipart/form-data" method="POST" target="_self">
 		<html:hidden property="toolContentID"/>						
 		<html:hidden property="toolSessionID" styleId="tool-session-id"/>						
@@ -129,11 +134,7 @@
 		<html:hidden property="passMarkApplicable"/>										
 		<html:hidden property="learnerProgress"/>										
 		<html:hidden property="learnerProgressUserId"/>										
-		<html:hidden property="questionListingMode"/>					
-		
-		<h1>
-			<c:out value="${mcGeneralLearnerFlowDTO.activityTitle}" escapeXml="false" />
-		</h1>
+		<html:hidden property="questionListingMode"/>
 		
 		<%@ include file="/common/messages.jsp"%>
 				

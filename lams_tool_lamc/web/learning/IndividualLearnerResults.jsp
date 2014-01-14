@@ -79,8 +79,7 @@
 			
 			<p>
 				<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
-					<c:if
-						test="${mcGeneralLearnerFlowDTO.userOverPassMark != 'true' && 
+					<c:if test="${mcGeneralLearnerFlowDTO.userOverPassMark != 'true' && 
 									mcGeneralLearnerFlowDTO.passMarkApplicable == 'true' }">
 
 						<fmt:message key="label.notEnoughMarks">
@@ -102,28 +101,24 @@
 				<fmt:message key="label.yourAnswers" />
 			</h4>
 
-
-
-			<c:forEach var="dto" varStatus="status"
-				items="${requestScope.listSelectedQuestionCandidateAnswersDto}">
+			<c:forEach var="dto" varStatus="status" items="${requestScope.listSelectedQuestionCandidateAnswersDto}">
 
 				<div class="shading-bg">
 
+					<div style="overflow: auto;">
 						<span class="float-left space-right">
 							${dto.displayOrder})
 						</span>
-						<strong> <fmt:message key="label.question.col" /> </strong>
-						
-						<div style="overflow: auto;">
-							<c:out value="${dto.question}" escapeXml="false" />
-						</div>									
 
-                    <c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
-						[
-						<strong> <fmt:message key="label.mark" /> </strong>
-						<c:out value="${dto.mark}" /> 
-						]
-					</c:if>
+						<strong> <fmt:message key="label.question.col" /> </strong>
+					
+						<c:out value="${dto.question}" escapeXml="false" />
+						
+						<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
+							<strong> <fmt:message key="label.mark" /> </strong>
+							<c:out value="${dto.mark}" /> 
+						</c:if>
+					</div>		
 
 						<p>
 							<c:out value="${dto.answerOption.mcQueOptionText}" escapeXml="false" />
@@ -142,8 +137,7 @@
 							<div style="overflow: auto;">
 								<strong> <fmt:message key="label.feedback.simple" /> </strong> <c:out value="${dto.feedback}" escapeXml="false" /> 
 							</div>		
-						</c:if>												
-					
+						</c:if>	
 				</div>
 			</c:forEach>
 

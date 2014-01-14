@@ -211,7 +211,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
 
 						<tr>
-							<td width="50px">
+							<td width="1px">
 								<input type="checkbox" name="checkedVotes" class="noBorder"
 									value="${subEntry.key}" onClick="updateCount(this);">
 							</td>

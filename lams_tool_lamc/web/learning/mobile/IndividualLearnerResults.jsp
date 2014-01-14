@@ -113,12 +113,10 @@
 							<c:out value="${dto.question}" escapeXml="false" />
 						</div>									
 
-                    <c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
-						[
-						<strong> <fmt:message key="label.mark" /> </strong>
-						<c:out value="${dto.mark}" /> 
-						]
-					</c:if>
+	                    <c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
+							<strong> <fmt:message key="label.mark" /> </strong>
+							<c:out value="${dto.mark}" />
+						</c:if>
 
 						<p>
 							<c:out value="${dto.answerOption.mcQueOptionText}" escapeXml="false" />
