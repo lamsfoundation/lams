@@ -193,10 +193,10 @@ public class Call {
 	long end = 0;
 	try {
 	    WebResponse resp = null;
+	    WebRequest req = null;
 	    if (form != null) {
 		SubmitButton[] submitButtons = filterCancelButton(form.getSubmitButtons());
 		Call.log.debug(submitButtons.length + " non-cancel submit buttons in the form");
-		WebRequest req = null;
 		if (submitButtons.length <= 1) {
 		    req = form.getRequest();
 		} else {
@@ -209,7 +209,6 @@ public class Call {
 		end = System.currentTimeMillis();
 	    } else {
 		String absoluteURL = getAbsoluteURL(url);
-		WebRequest req;
 		if (is == null) {
 		    callee = "GET " + url;
 		    req = new GetMethodWebRequest(absoluteURL);
@@ -222,17 +221,20 @@ public class Call {
 		resp = wc.getResponse(req);
 		end = System.currentTimeMillis();
 	    }
+	    
 	    httpStatusCode = resp.getResponseCode();
-	    message = resp.getResponseMessage();
-
-	    /*if(callee.indexOf("passon.swf")==-1)
-	    	log.debug(resp.getText());*/
-
-	    if (resp.getResponseCode() >= 400) {
-		Call.log.debug(resp.getText());
-		throw new TestHarnessException(test.testName + " got http error code " + httpStatusCode);
+	    if (httpStatusCode >= 400) {
+		log.debug("Got " + httpStatusCode + " HTTP code. Retrying call: " + callee);
+		resp = wc.getResponse(req);
+		end = System.currentTimeMillis();
+		httpStatusCode = resp.getResponseCode();
+		if (httpStatusCode >= 400) {
+		    Call.log.debug(resp.getText());
+		    throw new TestHarnessException(test.testName + " got HTTP code " + httpStatusCode);
+		}
 	    }
-
+	    
+	    message = resp.getResponseMessage();
 	    for (String headerFieldName : resp.getHeaderFieldNames()) {
 		if (headerFieldName.equalsIgnoreCase("SET-COOKIE")) {
 		    for (String headerFieldValue : resp.getHeaderFields(headerFieldName)) {
