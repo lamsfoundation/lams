@@ -86,7 +86,6 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.util.wddx.FlashMessage;
 import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
-import org.lamsfoundation.lams.web.servlet.AbstractStoreWDDXPacketServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -180,7 +179,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * Initializes a lesson for specific learning design with the given lesson title and lesson description. If
-     * initialization is successed, this method will return a WDDX message which includes the ID of new lesson.
+     * initialization is successful, this method will the ID of new lesson.
      * 
      * Currently used only in TestHarness.
      */
@@ -189,36 +188,27 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
-	FlashMessage flashMessage = null;
 
-	try {
-	    String title = WebUtil.readStrParam(request, "lessonName");
-	    if (title == null) {
-		title = "lesson";
-	    }
-	    String desc = WebUtil.readStrParam(request, "lessonDescription", true);
-	    if (desc == null) {
-		desc = "description";
-	    }
-	    Integer organisationId = WebUtil.readIntParam(request, "organisationID", true);
-	    long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
-	    Boolean learnerExportAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
-	    Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresenceAvailable", false);
-	    Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImAvailable", false);
-	    Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
-	    Lesson newLesson = monitoringService.initializeLesson(title, desc, ldId, organisationId, getUserId(), null,
-		    Boolean.FALSE, Boolean.FALSE, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
-		    liveEditEnabled, Boolean.FALSE, null, null);
-
-	    flashMessage = new FlashMessage("initializeLesson", newLesson.getLessonId());
-	} catch (Exception e) {
-	    flashMessage = handleException(e, "initializeLesson", monitoringService);
+	String title = WebUtil.readStrParam(request, "lessonName");
+	if (title == null) {
+	    title = "lesson";
 	}
-
-	String message = flashMessage.serializeMessage();
+	String desc = WebUtil.readStrParam(request, "lessonDescription", true);
+	if (desc == null) {
+	    desc = "description";
+	}
+	Integer organisationId = WebUtil.readIntParam(request, "organisationID", true);
+	long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
+	Boolean learnerExportAvailable = WebUtil.readBooleanParam(request, "learnerExportPortfolio", false);
+	Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresenceAvailable", false);
+	Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImAvailable", false);
+	Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
+	Lesson newLesson = monitoringService.initializeLesson(title, desc, ldId, organisationId, getUserId(), null,
+		Boolean.FALSE, Boolean.FALSE, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
+		liveEditEnabled, Boolean.FALSE, null, null);
 
 	PrintWriter writer = response.getWriter();
-	writer.println(message);
+	writer.println(newLesson.getLessonId());
 	return null;
     }
 
@@ -257,13 +247,23 @@ public class MonitoringAction extends LamsDispatchAction {
 
     public ActionForward createLessonClass(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
+	int organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+	Integer userID = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID);
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+
 	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
 		.getServletContext());
+	IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet()
+		.getServletContext());
 
-	Integer userID = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID);
-	String lessonPacket = AbstractStoreWDDXPacketServlet.getBody(request);
+	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
+	String learnerGroupName = organisation.getName() + " learners";
+	String staffGroupName = organisation.getName() + " staff";
+	List<User> learners = parseUserList(request, "learners");
+	List<User> staff = parseUserList(request, "monitors");
 
-	monitoringService.createLessonClassForLessonWDDX(userID, lessonPacket);
+	monitoringService.createLessonClassForLesson(lessonId, organisation, learnerGroupName, learners,
+		staffGroupName, staff, userID);
 
 	return null;
     }

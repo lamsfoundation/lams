@@ -73,7 +73,6 @@ import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
-import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -88,7 +87,6 @@ import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
-import org.lamsfoundation.lams.monitoring.dto.LearnerProgressBatchDTO;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -222,6 +220,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	this.messageService = messageService;
     }
 
+    @Override
     public MessageService getMessageService() {
 	return messageService;
     }
@@ -345,6 +344,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     /**
      * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
      */
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 	this.applicationContext = applicationContext;
     }
@@ -374,6 +374,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	auditService.log("Monitoring", message);
     }
 
+    @Override
     public void checkOwnerOrStaffMember(Integer userId, Long lessonId, String actionDescription) {
 	checkOwnerOrStaffMember(userId, lessonDAO.getLesson(lessonId), actionDescription);
     }
@@ -382,6 +383,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * Checks whether the user is a staff member for the lesson, the creator of the lesson or simply a group manager. If
      * not, throws a UserAccessDeniedException exception
      */
+    @Override
     public void checkOwnerOrStaffMember(Integer userId, Lesson lesson, String actionDescription) {
 	User user = (User) baseDAO.find(User.class, userId);
 
@@ -418,6 +420,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#initializeLesson(String, String, long,
      *      Integer)
      */
+    @Override
     public Lesson initializeLesson(String lessonName, String lessonDescription, long learningDesignId,
 	    Integer organisationId, Integer userID, String customCSV, Boolean enableLessonIntro,
 	    Boolean displayDesignImage, Boolean learnerExportAvailable, Boolean learnerPresenceAvailable,
@@ -471,6 +474,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * Create new lesson according to the learning design specified by the user, but for a preview session rather than a
      * normal learning session. The design is not assigned to any workspace folder.
      */
+    @Override
     public Lesson initializeLessonForPreview(String lessonName, String lessonDescription, long learningDesignId,
 	    Integer userID, String customCSV, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
 	    Boolean liveEditEnabled) {
@@ -489,6 +493,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     /**
      * Intialise lesson without creating Learning Design copy, i.e. the original LD will be used.
      */
+    @Override
     public Lesson initializeLessonWithoutLDcopy(String lessonName, String lessonDescription, long learningDesignID,
 	    User user, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
 	    Boolean learnerExportAvailable, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
@@ -538,6 +543,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#initializeLesson(java.util.Integer,
      *      java.lang.String)
      */
+    @Override
     public String initializeLesson(Integer creatorUserId, String lessonPacket) throws Exception {
 	FlashMessage flashMessage = null;
 
@@ -593,104 +599,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    MonitoringService.log.error("Exception occured trying to create a lesson class ", e);
 	    throw new Exception(e);
 	}
-
-    }
-
-    /**
-     * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLessonClassForLessonWDDX(Integer,
-     *      String, java.util.Integer)
-     */
-    public String createLessonClassForLessonWDDX(Integer creatorUserId, String lessonPacket)
-	    throws UserAccessDeniedException {
-	FlashMessage flashMessage = null;
-
-	try {
-	    Hashtable table = (Hashtable) WDDXProcessor.deserialize(lessonPacket);
-
-	    // todo: convert:data type:
-	    Integer orgId = WDDXProcessor.convertToInteger(MonitoringConstants.KEY_ORGANISATION_ID,
-		    table.get(MonitoringConstants.KEY_ORGANISATION_ID));
-	    long lessonId = WDDXProcessor.convertToLong(MonitoringConstants.KEY_LESSON_ID,
-		    table.get(MonitoringConstants.KEY_LESSON_ID)).longValue();
-
-	    // get leaner group info
-	    Hashtable learnerMap = (Hashtable) table.get(MonitoringConstants.KEY_LEARNER);
-	    List learners = (List) learnerMap.get(MonitoringConstants.KEY_USERS);
-	    String learnerGroupName = WDDXProcessor.convertToString(learnerMap, MonitoringConstants.KEY_GROUP_NAME);
-
-	    // get staff group info
-	    Hashtable staffMap = (Hashtable) table.get(MonitoringConstants.KEY_STAFF);
-	    List staffs = (List) staffMap.get(MonitoringConstants.KEY_USERS);
-	    String staffGroupName = WDDXProcessor.convertToString(staffMap, MonitoringConstants.KEY_GROUP_NAME);
-
-	    Organisation organisation = (Organisation) baseDAO.find(Organisation.class, orgId);
-	    User creator = (User) baseDAO.find(User.class, creatorUserId);
-
-	    if ((learners == null) || (learners.size() <= 0)) {
-		learners = new LinkedList();
-		Vector<User> learnersList = userManagementService.getUsersFromOrganisationByRole(orgId, Role.LEARNER,
-			false, true);
-		learners.addAll(learnersList);
-	    }
-
-	    if ((staffs == null) || (staffs.size() <= 0)) {
-		staffs = new LinkedList();
-	    }
-
-	    // create the lesson class - add all the users in this organisation
-	    // to the lesson class
-	    // add user as staff
-	    List<User> learnerList = new LinkedList<User>();
-	    Iterator iter = learners.iterator();
-	    while (iter.hasNext()) {
-		try {
-		    Object user = iter.next();
-
-		    if (user instanceof User) {
-			learnerList.add((User) user);
-		    } else {
-			int id = ((Double) user).intValue();
-			learnerList.add((User) baseDAO.find(User.class, id));
-		    }
-
-		} catch (Exception e) {
-		    MonitoringService.log.error("Error parsing learner ID from " + lessonPacket);
-		    continue;
-		}
-	    }
-	    // get staff user info
-	    List<User> staffList = new LinkedList<User>();
-	    staffList.add(creator);
-	    iter = staffs.iterator();
-
-	    while (iter.hasNext()) {
-		try {
-		    int id = ((Double) iter.next()).intValue();
-		    staffList.add((User) baseDAO.find(User.class, id));
-		} catch (Exception e) {
-		    MonitoringService.log.error("Error parsing staff ID from " + lessonPacket);
-		    continue;
-		}
-	    }
-
-	    // Create Lesson class
-	    createLessonClassForLesson(lessonId, organisation, learnerGroupName, learnerList, staffGroupName,
-		    staffList, creatorUserId);
-
-	    flashMessage = new FlashMessage("createLesson", Boolean.TRUE);
-	} catch (Exception e) {
-	    MonitoringService.log.error("Exception occured trying to create a lesson class ", e);
-	    flashMessage = new FlashMessage("createLesson", e.getMessage(), FlashMessage.ERROR);
-	}
-
-	String message = "Failed on creating flash message:" + flashMessage;
-	try {
-	    message = flashMessage.serializeMessage();
-	} catch (IOException e) {
-	    MonitoringService.log.error(message);
-	}
-
-	return message;
     }
 
     /**
@@ -708,6 +616,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#createLessonClassForLesson(long,
      *      org.lamsfoundation.lams.usermanagement.Organisation, java.util.List, java.util.List, java.util.Integer)
      */
+    @Override
+    @SuppressWarnings("unchecked")
     public Lesson createLessonClassForLesson(long lessonId, Organisation organisation, String learnerGroupName,
 	    List<User> organizationUsers, String staffGroupName, List<User> staffs, Integer userId) {
 	Lesson newLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -718,13 +628,11 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	checkOwnerOrStaffMember(userId, newLesson, "create lesson class");
 
 	// if lesson isn't started recreate the lesson class
-	if (!newLesson.isLessonStarted()) {
+	if (newLesson.isLessonStarted()) {
+	    lessonService.setLearners(newLesson, organizationUsers);
+	    lessonService.setStaffMembers(newLesson, staffs);
 
-	    if (newLesson == null) {
-		throw new MonitoringServiceException("Lesson for id=" + lessonId
-			+ " is missing. Unable to create class for lesson.");
-	    }
-
+	} else {
 	    LessonClass oldLessonClass = newLesson.getLessonClass();
 
 	    LessonClass newLessonClass = this.createLessonClass(organisation, learnerGroupName, organizationUsers,
@@ -738,10 +646,6 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    if (oldLessonClass != null) {
 		lessonClassDAO.deleteLessonClass(oldLessonClass);
 	    }
-
-	} else {
-	    lessonService.setLearners(newLesson, organizationUsers);
-	    lessonService.setStaffMembers(newLesson, staffs);
 	}
 
 	return newLesson;
@@ -756,6 +660,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      *            : checks that this user is a staff member for this lesson
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startLessonOnSchedule(long , Date, User)
      */
+    @Override
     public void startLessonOnSchedule(long lessonId, Date startDate, Integer userId) {
 
 	// we get the lesson just created
@@ -819,6 +724,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @param endDate
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#finishLessonOnSchedule(long , Date , User)
      */
+    @Override
     public void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId) {
 	// we get the lesson want to finish
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
@@ -906,6 +812,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#startlesson(long)
      */
+    @Override
     public void startLesson(long lessonId, Integer userId) {
 	// System.out.println(messageService.getMessage("NO.SUCH.LESSON",new
 	// Object[]{new Long(lessonId)}));
@@ -945,7 +852,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		design.setMaxID(newMaxId);
 		designModified = true;
 	    }
-	    
+
 	    activity.setInitialised(Boolean.TRUE);
 	    activityDAO.update(activity);
 	}
@@ -970,6 +877,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * activities added during a Live Edit. Returns a new MaxID for the design if needed. If MaxID is returned, update
      * the design with this new value and save the whole design (as initialiseSystemActivities has changed the design).
      */
+    @Override
     public Integer startSystemActivity(Activity activity, Integer currentMaxId, Date lessonStartTime, String lessonName) {
 	Integer newMaxId = null;
 
@@ -1019,6 +927,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      *            the name lesson incorporating this gate - used for the description of the Quartz job. Optional.
      * @returns An updated gate, that should be saved by the calling code.
      */
+    @Override
     public ScheduleGateActivity runGateScheduler(ScheduleGateActivity scheduleGate, Date schedulingStartTime,
 	    String lessonName) {
 
@@ -1067,6 +976,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#finishLesson(long)
      */
+    @Override
     public void finishLesson(long lessonId, Integer userId) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	if (requestedLesson == null) {
@@ -1083,6 +993,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @param lessonId
      *            the specified the lesson id.
      */
+    @Override
     public void archiveLesson(long lessonId, Integer userId) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	if (requestedLesson == null) {
@@ -1102,6 +1013,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @param lessonId
      *            the specified the lesson id.
      */
+    @Override
     public void unarchiveLesson(long lessonId, Integer userId) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	if (requestedLesson == null) {
@@ -1117,6 +1029,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#suspendLesson(long)
      */
+    @Override
     public void suspendLesson(long lessonId, Integer userId) {
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	checkOwnerOrStaffMember(userId, lesson, "suspend lesson");
@@ -1133,6 +1046,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#unsuspendLesson(long)
      */
+    @Override
     public void unsuspendLesson(long lessonId, Integer userId) {
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	checkOwnerOrStaffMember(userId, lesson, "unsuspend lesson");
@@ -1205,6 +1119,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#removeLesson(long)
      */
+    @Override
     public void removeLesson(long lessonId, Integer userId) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	if (requestedLesson == null) {
@@ -1221,6 +1136,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#setLearnerPortfolioAvailable(long,
      *      java.lang.Integer, boolean)
      */
+    @Override
     public Boolean setLearnerPortfolioAvailable(long lessonId, Integer userId, Boolean learnerExportAvailable) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	if (requestedLesson == null) {
@@ -1240,6 +1156,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#setPresenceAvailable(long, java.lang.Integer,
      *      boolean)
      */
+    @Override
     public Boolean setPresenceAvailable(long lessonId, Integer userId, Boolean presenceAvailable) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	if (requestedLesson == null) {
@@ -1256,6 +1173,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#setPresenceImAvailable(long,
      *      java.lang.Integer, boolean)
      */
+    @Override
     public Boolean setPresenceImAvailable(long lessonId, Integer userId, Boolean presenceImAvailable) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	if (requestedLesson == null) {
@@ -1272,6 +1190,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#setLiveEditEnabled(long, java.lang.Integer,
      *      boolean)
      */
+    @Override
     public Boolean setLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	if (requestedLesson == null) {
@@ -1287,6 +1206,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#openGate(org.lamsfoundation.lams.learningdesign.GateActivity)
      */
+    @Override
     public GateActivity openGate(Long gateId) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
 	if (gate != null) {
@@ -1313,6 +1233,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return gate;
     }
 
+    @Override
     public Boolean openTimeChart(long lessonId, Integer userId) {
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	if (requestedLesson == null) {
@@ -1324,6 +1245,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return true;
     }
 
+    @Override
     public GateActivity openGateForSingleUser(Long gateId, Integer userId) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
 	if ((gate != null) && (userId != null) && (userId >= 0)) {
@@ -1337,6 +1259,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#closeGate(org.lamsfoundation.lams.learningdesign.GateActivity)
      */
+    @Override
     public GateActivity closeGate(Long gateId) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
 	gate.setGateOpen(new Boolean(false));
@@ -1348,6 +1271,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @throws LamsToolServiceException
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#forceCompleteLessonByUser(Integer,long,long)
      */
+    @Override
     public String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId) {
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	checkOwnerOrStaffMember(requesterId, lesson, "force complete");
@@ -1638,8 +1562,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 		    for (Activity childActivity : (Set<Activity>) ((ComplexActivity) currentActivity).getActivities()) {
 			uncompleteActivities.add(childActivity);
 			if (childActivity.isComplexActivity()) {
-			    uncompleteActivities.addAll((Set<Activity>) ((ComplexActivity) childActivity)
-				    .getActivities());
+			    uncompleteActivities.addAll(((ComplexActivity) childActivity).getActivities());
 			}
 
 			// mark the activity to be "unbranched"
@@ -1757,6 +1680,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonDetails(java.lang.Long)
      */
+    @Override
     public String getLessonDetails(Long lessonID, Integer userID) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonID));
 	checkOwnerOrStaffMember(userID, lesson, "get lesson deatils");
@@ -1803,6 +1727,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonLearners(java.lang.Long)
      */
+    @Override
     public String getLessonLearners(Long lessonID, Integer userID) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
 	checkOwnerOrStaffMember(userID, lesson, "get lesson learners");
@@ -1828,6 +1753,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLessonStaff(java.lang.Long)
      */
+    @Override
     public String getLessonStaff(Long lessonID, Integer userID) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
 	checkOwnerOrStaffMember(userID, lesson, "get lesson staff");
@@ -1848,6 +1774,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return flashMessage.serializeMessage();
     }
 
+    @Override
     public Collection<User> getUsersByEmailNotificationSearchType(int searchType, Long lessonId, String[] lessonIds,
 	    Long activityId, Integer xDaystoFinish, Integer orgId) {
 
@@ -1959,6 +1886,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
 
 	Set<User> sortedUsers = new TreeSet<User>(new Comparator<User>() {
+	    @Override
 	    public int compare(User usr0, User usr1) {
 		return ((usr0.getFirstName() + usr0.getLastName() + usr0.getLogin()).compareTo(usr1.getFirstName()
 			+ usr1.getLastName() + usr1.getLogin()));
@@ -1992,6 +1920,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLearningDesignDetails(java.lang.Long)
      */
+    @Override
     public String getLearningDesignDetails(Long lessonID) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
 	return authoringService.getLearningDesignDetails(lesson.getLearningDesign().getLearningDesignId(), "");
@@ -2000,6 +1929,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityById(Long)
      */
+    @Override
     public Activity getActivityById(Long activityId) {
 	return activityDAO.getActivityByActivityId(activityId);
     }
@@ -2010,6 +1940,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getAllLearnersProgress(java.lang.Long,
      *      java.lang.Integer)
      */
+    @Override
     public String getAllLearnersProgress(Long lessonID, Integer userID, Boolean completedDataOnly) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
 	FlashMessage flashMessage;
@@ -2034,7 +1965,8 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
 	return flashMessage.serializeMessage();
     }
-    
+
+    @Override
     public String getAllCompletedActivities(Long lessonID, Long learnerID, Integer userID) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
 	FlashMessage flashMessage;
@@ -2058,10 +1990,11 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	}
 	return flashMessage.serializeMessage();
     }
-    
+
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityById(Long, Class)
      */
+    @Override
     public Activity getActivityById(Long activityId, Class clasz) {
 	return activityDAO.getActivityByActivityId(activityId, clasz);
     }
@@ -2069,6 +2002,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     /**
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getGroupingActivityById(Long)
      */
+    @Override
     public GroupingActivity getGroupingActivityById(Long activityID) {
 	Activity activity = getActivityById(activityID);
 	if (activity == null) {
@@ -2085,6 +2019,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	return (GroupingActivity) activity;
     }
 
+    @Override
     public List<ContributeActivityDTO> getAllContributeActivityDTO(Long lessonID) {
 	List<ContributeActivityDTO> result = null;
 	Lesson lesson = lessonDAO.getLesson(lessonID);
@@ -2103,6 +2038,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getLearnerActivityURL(java.lang.Long,
      *      java.lang.Integer)
      */
+    @Override
     public String getLearnerActivityURL(Long lessonID, Long activityID, Integer learnerUserID, Integer requestingUserId)
 	    throws IOException, LamsToolServiceException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
@@ -2133,6 +2069,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityDefineLaterURL(java.lang.Long)
      */
+    @Override
     public String getActivityDefineLaterURL(Long lessonID, Long activityID, Integer userID) throws IOException,
 	    LamsToolServiceException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
@@ -2156,6 +2093,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#getActivityMonitorURL(java.lang.Long)
      */
+    @Override
     public String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID, Integer userID)
 	    throws IOException, LamsToolServiceException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
@@ -2179,6 +2117,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#moveLesson(java.lang.Long, java.lang.Integer,
      *      java.lang.Integer)
      */
+    @Override
     public String moveLesson(Long lessonID, Integer targetWorkspaceFolderID, Integer userID) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
 	FlashMessage flashMessage;
@@ -2212,6 +2151,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#renameLesson(java.lang.Long, java.lang.String,
      *      java.lang.Integer)
      */
+    @Override
     public String renameLesson(Long lessonID, String newName, Integer userID) throws IOException {
 	Lesson lesson = lessonDAO.getLesson(lessonID);
 	FlashMessage flashMessage;
@@ -2236,6 +2176,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#checkGateStatus(java.lang.Long,
      *      java.lang.Long)
      */
+    @Override
     public String checkGateStatus(Long activityID, Long lessonID) throws IOException {
 	FlashMessage flashMessage;
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(activityID);
@@ -2258,6 +2199,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * 
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#releaseGate(java.lang.Long)
      */
+    @Override
     public String releaseGate(Long activityID) throws IOException {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(activityID);
 	FlashMessage flashMessage;
@@ -2279,6 +2221,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @throws LessonServiceException
      * @see org.lamsfoundation.lams.monitoring.service.IMonitoringService#performChosenGrouping(GroupingActivity,java.util.List)
      */
+    @Override
     public void performChosenGrouping(GroupingActivity groupingActivity, List groups) throws LessonServiceException {
 	Grouping grouping = groupingActivity.getCreateGrouping();
 
@@ -2292,6 +2235,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	    // try to sorted group list by orderID.
 	    Iterator iter = groups.iterator();
 	    Map sortedMap = new TreeMap(new Comparator() {
+		@Override
 		public int compare(Object arg0, Object arg1) {
 		    return ((Long) arg0).compareTo((Long) arg1);
 		}
@@ -2435,6 +2379,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @throws LamsToolServiceException
      *             the exception when lams is talking to tool.
      */
+    @Override
     public void initToolSessionIfSuitable(ToolActivity activity, Lesson lesson) {
 	if (activity.getApplyGrouping().equals(Boolean.FALSE) && (activity.getParentBranch() == null)) {
 	    activity.setToolSessions(new HashSet());
@@ -2530,6 +2475,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @seeorg.lamsfoundation.lams.preview.service.IMonitoringService#
      * createPreviewClassForLesson(long, long)
      */
+    @Override
     public Lesson createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException {
 
 	User user = (User) baseDAO.find(User.class, userID);
@@ -2553,6 +2499,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * integrity if it is done to any other type of lesson. See removeLesson() for hiding lessons from a teacher's view
      * without removing them from the database. TODO remove the related tool data.
      */
+    @Override
     public void deletePreviewLesson(long lessonID) {
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonID));
 	deletePreviewLesson(lesson);
@@ -2595,6 +2542,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @seeorg.lamsfoundation.lams.preview.service.IMonitoringService#
      * deleteAllOldPreviewLessons(int)
      */
+    @Override
     public int deleteAllOldPreviewLessons() {
 
 	int numDays = Configuration.getAsInt(ConfigurationKeys.PREVIEW_CLEANUP_NUM_DAYS);
@@ -2610,7 +2558,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 	int numDeleted = 0;
 
 	// calculate comparison date
-	long newestDateToKeep = System.currentTimeMillis() - numDays * MonitoringService.numMilliSecondsInADay;
+	long newestDateToKeep = System.currentTimeMillis() - (numDays * MonitoringService.numMilliSecondsInADay);
 	Date date = new Date(newestDateToKeep);
 	// convert data to UTC
 	MonitoringService.log.info("Deleting all preview lessons before " + date.toString() + " (server time) ("
@@ -2649,6 +2597,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      *            true/false for GroupingActivities, always false for non-GroupingActivities
      * @return Sorted set of Users, sorted by surname
      */
+    @Override
     public SortedSet<User> getClassMembersNotGrouped(Long lessonID, Long activityID, boolean useCreateGrouping) {
 	Activity activity = getActivityById(activityID);
 	Grouping grouping = getGroupingForActivity(activity, useCreateGrouping, "getClassMembersNotGrouped");
@@ -2740,6 +2689,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @throws LessonServiceException
      *             , MonitoringServiceException
      */
+    @Override
     public Group addGroup(Long activityID, String name, boolean overrideMaxNumberOfGroups)
 	    throws LessonServiceException, MonitoringServiceException {
 	Activity activity = getActivityById(activityID);
@@ -2790,6 +2740,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      *            group name
      * @throws LessonServiceException
      **/
+    @Override
     public void removeGroup(Long activityID, Long groupId) throws LessonServiceException {
 	Activity activity = getActivityById(activityID);
 	Grouping grouping = getGroupingForActivity(activity, true, "removeGroup");
@@ -2799,6 +2750,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     /**
      * Add learners to a group. Doesn't necessarily check if the user is already in another group.
      */
+    @Override
     public void addUsersToGroup(Long activityID, Long groupId, String learnerIDs[]) throws LessonServiceException {
 	Activity activity = getActivityById(activityID);
 	Grouping grouping = getGroupingForActivity(activity, true, "addUsersToGroup");
@@ -2839,6 +2791,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @param learnerIDs
      *            the IDS of the learners to be added.
      */
+    @Override
     public void addUsersToBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException {
 
 	SequenceActivity branch = (SequenceActivity) getActivityById(sequenceActivityID);
@@ -2892,6 +2845,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * 
      * @throws LessonServiceException
      */
+    @Override
     public void removeUsersFromGroup(Long activityID, Long groupId, String learnerIDs[]) throws LessonServiceException {
 	Activity activity = getActivityById(activityID);
 	Grouping grouping = getGroupingForActivity(activity, true, "removeUsersFromGroup");
@@ -2908,6 +2862,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @param learnerIDs
      *            the IDS of the learners to be added.
      */
+    @Override
     public void removeUsersFromBranch(Long sequenceActivityID, String learnerIDs[]) throws LessonServiceException {
 
 	SequenceActivity branch = (SequenceActivity) getActivityById(sequenceActivityID);
@@ -2939,6 +2894,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @param learnerIDs
      *            the IDS of the learners to be added.
      */
+    @Override
     public void addGroupToBranch(Long sequenceActivityID, String groupIDs[]) throws LessonServiceException {
 
 	SequenceActivity branch = (SequenceActivity) getActivityById(sequenceActivityID);
@@ -2996,6 +2952,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @param learnerIDs
      *            the IDS of the learners to be added.
      */
+    @Override
     public void removeGroupFromBranch(Long sequenceActivityID, String groupIDs[]) throws LessonServiceException {
 
 	SequenceActivity branch = (SequenceActivity) getActivityById(sequenceActivityID);
@@ -3050,6 +3007,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * Has anyone started this branch / branching activity ? Irrespective of the groups. Used to determine if a branch
      * mapping can be removed.
      */
+    @Override
     public boolean isActivityAttempted(Activity activity) {
 	Integer numAttempted = lessonService.getCountLearnersHaveAttemptedActivity(activity);
 	if (MonitoringService.log.isDebugEnabled()) {
@@ -3065,6 +3023,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @param branchingActivityID
      *            Activity id of the branchingActivity
      */
+    @Override
     public SortedSet<Group> getGroupsNotAssignedToBranch(Long branchingActivityID) throws LessonServiceException {
 
 	BranchingActivity branchingActivity = (BranchingActivity) getActivityById(branchingActivityID);
@@ -3095,10 +3054,12 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * give the users in all tool sessions for an activity (if it is a tool activity) or it will give all the users who
      * have attempted an activity that doesn't have any tool sessions, i.e. system activities such as branching.
      */
+    @Override
     public List<User> getLearnersHaveAttemptedActivity(Activity activity) throws LessonServiceException {
 	return lessonService.getLearnersHaveAttemptedActivity(activity);
     }
 
+    @Override
     public LearnerProgress getLearnerProgress(Integer learnerId, Long lessonId) {
 	return learnerService.getProgress(learnerId, lessonId);
     }
@@ -3106,12 +3067,14 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     /**
      * Set a group's name
      */
+    @Override
     public void setGroupName(Long groupID, String name) {
 	Group group = groupDAO.getGroupById(groupID);
 	group.setGroupName(name);
 	groupDAO.saveGroup(group);
     }
 
+    @Override
     public Organisation getOrganisation(Integer organisationId) {
 	return (Organisation) baseDAO.find(Organisation.class, organisationId);
     }
@@ -3129,6 +3092,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
      * @return number of lessons created.
      * @throws MonitoringServiceException
      */
+    @Override
     public int cloneLessons(String[] lessonIds, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
 	    String[] learnerIds, Organisation group) throws MonitoringServiceException {
 	int result = 0;
