@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -35,6 +34,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.testharness.Call;
 import org.lamsfoundation.testharness.MockUser;
 import org.lamsfoundation.testharness.TestHarnessException;
@@ -42,7 +43,6 @@ import org.lamsfoundation.testharness.TestUtil;
 import org.lamsfoundation.testharness.admin.MockAdmin;
 import org.xml.sax.SAXException;
 
-import com.allaire.wddx.WddxDeserializationException;
 import com.meterware.httpunit.Button;
 import com.meterware.httpunit.FormControl;
 import com.meterware.httpunit.WebForm;
@@ -134,9 +134,7 @@ public class MockLearner extends MockUser implements Runnable {
 	    LearnerTest learnerTest = (LearnerTest) test;
 	    String lsId = test.getTestSuite().getMonitorTest().getLsId();
 	    String ldId = getLesson(learnerTest.getLessonURL, lsId);
-	    getLearningDesign(learnerTest.getLearningDesignURL, ldId);
 	    joinLesson(learnerTest.joinLessonURL, lsId);
-	    getFlashProgessData(learnerTest.getFlashProgressDataURL, lsId);
 	    progressThroughActivities(learnerTest.lessonEntryURL, lsId);
 	    finished = true;
 	    MockLearner.log.info(username + " finished the lesson");
@@ -147,11 +145,11 @@ public class MockLearner extends MockUser implements Runnable {
 	    // other RuntimeException will still get propagated so that the
 	    // application will halt, but that's expected, since those exceptions
 	    // should be serious system errors
-	} catch (WddxDeserializationException e) {
-	    throw new RuntimeException(e);
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
 	} catch (SAXException e) {
+	    throw new RuntimeException(e);
+	} catch (JSONException e) {
 	    throw new RuntimeException(e);
 	} finally {
 	    ((LearnerTest) test).allDoneSignal.countDown();
@@ -285,26 +283,13 @@ public class MockLearner extends MockUser implements Runnable {
 	return null;
     }
 
-    private void getFlashProgessData(String getFlashProgressDataURL, String lsId) {
-	delay();
-	String url = getFlashProgressDataURL.replace(MockLearner.LESSON_ID_PATTERN, lsId);
-	new Call(wc, test, username + " get flash progress data", url).execute();
-    }
-
-    private void getLearningDesign(String getLearningDesignURL, String ldId) {
-	delay();
-	String url = getLearningDesignURL.replace(MockLearner.LD_ID_PATTERN, ldId);
-	new Call(wc, test, username + " get learning design", url).execute();
-    }
-
-    @SuppressWarnings("rawtypes")
-    private String getLesson(String getLessonURL, String lsId) throws WddxDeserializationException, IOException {
+    private String getLesson(String getLessonURL, String lsId) throws IOException, JSONException {
 	delay();
 	String url = getLessonURL.replace(MockLearner.LESSON_ID_PATTERN, lsId);
 	WebResponse resp = (WebResponse) new Call(wc, test, username + " get lesson", url).execute();
-	Hashtable hashtable = (Hashtable) TestUtil.deserialize(resp.getText());
-	hashtable = (Hashtable) hashtable.get(MockLearner.MESSAGE_VALUE_KEY);
-	return new Integer(((Double) hashtable.get(MockLearner.LD_ID_KEY)).intValue()).toString();
+	JSONObject responseJson = new JSONObject(resp.getText());
+
+	return responseJson.getString(MockLearner.LD_ID_KEY);
     }
 
     private Map<String, List<Button>> groupButtonsByName(Button[] btns, String buttonType) {

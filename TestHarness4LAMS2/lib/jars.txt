@@ -1,8 +1,0 @@
-Jars used:
-
-(runtime)
-httpunit 1.7
-junit   3.8.1
-servlet 2.3
-jtidy   04aug2000r7-dev
-rhino(js.jar)   1.5R4.1

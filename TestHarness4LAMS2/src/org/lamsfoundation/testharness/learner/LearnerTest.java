@@ -41,28 +41,21 @@ public class LearnerTest extends AbstractTest {
     private static final Logger log = Logger.getLogger(LearnerTest.class);
 
     protected String getLessonURL;
-    protected String getLearningDesignURL;
     protected String joinLessonURL;
-    protected String getFlashProgressDataURL;
     protected String lessonEntryURL;
     protected String[] filesToUpload;
-    protected String subContextRoot; // usually "/learning/", this is set to figure out passon.swf url
     protected CountDownLatch allDoneSignal;
 
     /**
      * LearnerTest Constructor
      * 
      */
-    public LearnerTest(String testName,
-	    Integer minDelay, Integer maxDelay, String getLessonURL, String getLearningDesignURL, String joinLessonURL,
-	    String getFlashProgressDataURL, String lessonEntryURL, String[] filesToUpload) {
+    public LearnerTest(String testName, Integer minDelay, Integer maxDelay, String getLessonURL, String joinLessonURL,
+	    String lessonEntryURL, String[] filesToUpload) {
 	super(testName, minDelay, maxDelay);
 	this.getLessonURL = getLessonURL;
-	this.getLearningDesignURL = getLearningDesignURL;
 	this.joinLessonURL = joinLessonURL;
-	this.getFlashProgressDataURL = getFlashProgressDataURL;
 	this.lessonEntryURL = lessonEntryURL;
-	this.subContextRoot = '/' + getLessonURL.split("/")[1] + '/';
 	this.filesToUpload = filesToUpload;
     }
 

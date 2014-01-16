@@ -22,19 +22,11 @@
  */
 package org.lamsfoundation.testharness;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.InputSource;
-
-import com.allaire.wddx.WddxDeserializationException;
-import com.allaire.wddx.WddxDeserializer;
-import com.allaire.wddx.WddxSerializer;
 
 /**
  * @author Fei Yang, Marcin Cieslak
@@ -51,28 +43,6 @@ public class TestUtil {
 
     public static String buildName(String testName, String simpleName, int maxLength) {
 	return TestUtil.truncate(TestUtil.buildName(TestUtil.truncate(testName, 1, true), simpleName), maxLength, true);
-    }
-
-    public static Object deserialize(String wddxPacket) throws WddxDeserializationException {
-
-	TestUtil.log.debug("WDDX packet from the server:" + wddxPacket);
-
-	// Create an input source (org.xml.sax.InputSource) bound to the packet
-	InputSource tempSource = new InputSource(new StringReader(wddxPacket));
-
-	// Create a WDDX deserializer (com.allaire.wddx.WddxDeserializer)
-	WddxDeserializer tempDeserializer = new WddxDeserializer("org.apache.xerces.parsers.SAXParser");
-
-	// Deserialize the WDDX packet
-	Object result;
-	try {
-	    result = tempDeserializer.deserialize(tempSource);
-	    TestUtil.log.debug("Object deserialized from the WDDX packet:" + result);
-	} catch (IOException e) {
-	    throw new WddxDeserializationException(e);
-	}
-
-	return result;
     }
 
     public static String extractString(String text, String startFlag, char endFlag) {
@@ -105,13 +75,6 @@ public class TestUtil {
 	} catch (UnknownHostException e) {
 	    return "UnknownHost";
 	}
-    }
-
-    public static String serialize(Object data) throws IOException {
-	WddxSerializer tempws = new WddxSerializer();
-	StringWriter tempsw = new StringWriter();
-	tempws.serialize(data, tempsw);
-	return tempsw.toString();
     }
 
     private static String truncate(String name, int length, boolean leftToRight) {

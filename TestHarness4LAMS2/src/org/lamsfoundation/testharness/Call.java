@@ -120,7 +120,6 @@ public class Call {
     private String url;
     private WebForm form;
     private InputStream is;
-    private String contentType; // for WEB POST method
 
     static {
 
@@ -165,14 +164,12 @@ public class Call {
 	this.url = url;
     }
 
-    public Call(WebConversation wc, AbstractTest test, String description, String url, InputStream is,
-	    String contentType) {
+    public Call(WebConversation wc, AbstractTest test, String description, String url, InputStream is) {
 	this.wc = wc;
 	this.test = test;
 	this.description = description;
 	this.url = url;
 	this.is = is;
-	this.contentType = contentType;
     }
 
     public Call(WebConversation wc, AbstractTest test, String description, WebForm form) {
@@ -218,7 +215,7 @@ public class Call {
 		    req = new GetMethodWebRequest(absoluteURL);
 		} else {
 		    callee = "POST " + url;
-		    req = new PostMethodWebRequest(absoluteURL, is, contentType);
+		    req = new PostMethodWebRequest(absoluteURL, is, "application/x-www-form-urlencoded;charset=utf-8");
 		}
 		Call.log.debug(callee);
 		start = System.currentTimeMillis();

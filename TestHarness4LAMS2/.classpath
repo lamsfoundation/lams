@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/httpunit.jar" sourcepath="/3rdParty_sources/httpunit"/>
 	<classpathentry exported="true" kind="lib" path="lib/nekohtml-0.9.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/wddx.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/BrowserLauncher2-all-10rc4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.13.jar"/>

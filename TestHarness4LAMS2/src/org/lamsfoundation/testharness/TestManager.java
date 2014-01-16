@@ -108,9 +108,7 @@ public class TestManager {
     private static final String LEARNER_OFFSET = "LearnerOffset";
     private static final String BASE_LEARNER_NAME = "BaseLearnerName";
     private static final String GET_LESSON_URL = "GetLessonURL";
-    private static final String GET_LD_URL = "GetLearningDesignURL";
     private static final String JOIN_LESSON_URL = "JoinLessonURL";
-    private static final String GET_PROGRESS_URL = "GetFlashProgressDataURL";
     private static final String LESSON_ENTRY_URL = "LessonEntryURL";
     private static final String FILES_TO_UPLOAD = "FilesToUpload";
 
@@ -295,19 +293,15 @@ public class TestManager {
 		TestManager.BASE_LEARNER_NAME, true);
 	String getLessonURL = TestManager.getStringProperty(learnerTestPropertyFileName, learnerTestProperties,
 		TestManager.GET_LESSON_URL, false);
-	String getLearningDesignURL = TestManager.getStringProperty(learnerTestPropertyFileName, learnerTestProperties,
-		TestManager.GET_LD_URL, false);
 	String joinLessonURL = TestManager.getStringProperty(learnerTestPropertyFileName, learnerTestProperties,
 		TestManager.JOIN_LESSON_URL, false);
-	String getProgressURL = TestManager.getStringProperty(learnerTestPropertyFileName, learnerTestProperties,
-		TestManager.GET_PROGRESS_URL, false);
 	String lessonEntryURL = TestManager.getStringProperty(learnerTestPropertyFileName, learnerTestProperties,
 		TestManager.LESSON_ENTRY_URL, false);
 	String filesToUpload = TestManager.getStringProperty(learnerTestPropertyFileName, learnerTestProperties,
 		TestManager.FILES_TO_UPLOAD, false);
 
-	LearnerTest test = new LearnerTest(testName, minDelay, maxDelay, getLessonURL, getLearningDesignURL,
-		joinLessonURL, getProgressURL, lessonEntryURL, filesToUpload == null ? null : filesToUpload.split(";"));
+	LearnerTest test = new LearnerTest(testName, minDelay, maxDelay, getLessonURL, joinLessonURL, lessonEntryURL,
+		filesToUpload == null ? null : filesToUpload.split(";"));
 
 	MockLearner[] learners = new MockLearner[numberOfLearners];
 	for (int i = 0; i < numberOfLearners; i++) {

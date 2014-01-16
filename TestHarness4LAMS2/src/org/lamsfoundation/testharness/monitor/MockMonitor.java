@@ -25,19 +25,15 @@ package org.lamsfoundation.testharness.monitor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Hashtable;
+import java.net.URLEncoder;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
-import org.apache.tomcat.util.json.JSONException;
-import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.testharness.Call;
 import org.lamsfoundation.testharness.MockUser;
 import org.lamsfoundation.testharness.TestHarnessException;
-import org.lamsfoundation.testharness.TestUtil;
 import org.lamsfoundation.testharness.admin.MockAdmin;
 
-import com.allaire.wddx.WddxDeserializationException;
 import com.meterware.httpunit.WebResponse;
 
 /**
@@ -54,8 +50,6 @@ public class MockMonitor extends MockUser implements Runnable {
     private static final Logger log = Logger.getLogger(MockMonitor.class);
 
     public static final String DEFAULT_NAME = "Monitor";
-
-    private static final String WDDX_CONTENT_TYPE = "text/xml; charset=utf-8";
 
     private static final String LDID_PATTERN = "%ldId%";
 
@@ -89,8 +83,21 @@ public class MockMonitor extends MockUser implements Runnable {
     public void createLessonClass(String createLessonClassURL, String userId) {
 	try {
 	    String url = createLessonClassURL.replace(MockMonitor.USER_ID_PATTERN, userId);
-	    InputStream postBodyIS = buildPostBody();
-	    new Call(wc, test, "Create Lesson Class", url, postBodyIS, MockMonitor.WDDX_CONTENT_TYPE).execute();
+	    StringBuilder bodyBuilder = new StringBuilder();
+	    bodyBuilder.append("lessonID=").append(((MonitorTest) test).getLsId()).append("&organisationID=")
+		    .append(test.getTestSuite().getAdminTest().getCourseId()).append("&userID=").append(userId)
+		    .append("&learners=");
+
+	    MockUser[] mockLearners = test.getTestSuite().getLearnerTest().getUsers();
+
+	    for (MockUser mockLearner : mockLearners) {
+		bodyBuilder.append(mockLearner.getUserId()).append(",");
+	    }
+	    bodyBuilder.append("&monitors=").append(test.getTestSuite().getMonitorTest().getUsers()[0].getUserId());
+
+	    String body = URLEncoder.encode(bodyBuilder.toString(), "UTF-8");
+	    InputStream is = new ByteArrayInputStream(body.getBytes("UTF-8"));
+	    new Call(wc, test, "Create Lesson Class", url, is).execute();
 	    MockMonitor.log.info(username + " set the lesson class");
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
@@ -110,12 +117,10 @@ public class MockMonitor extends MockUser implements Runnable {
 		    .replace(MockMonitor.ORGANISATION_ID_PATTERN, organisationID)
 		    .replace(MockMonitor.USER_ID_PATTERN, userId).replace(MockMonitor.LESSON_NAME_PATTERN, name);
 	    WebResponse resp = (WebResponse) new Call(wc, test, "Init Lesson", url).execute();
-	    Hashtable hashtable = (Hashtable) TestUtil.deserialize(resp.getText());
-	    String idAsString = new Integer(((Double) hashtable.get(MockMonitor.LESSON_ID_KEY)).intValue()).toString();
+
+	    String idAsString = resp.getText().trim();
 	    MockMonitor.log.info(username + " initialized the lesson " + name + " and the id is " + idAsString);
 	    return idAsString;
-	} catch (WddxDeserializationException e) {
-	    throw new RuntimeException(e);
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
 	}
@@ -126,9 +131,7 @@ public class MockMonitor extends MockUser implements Runnable {
 	try {
 	    MockMonitor.log.info(username + " is monitoring...");
 	    MonitorTest monitorTest = (MonitorTest) test;
-	    String ldId = getLessonDetails(monitorTest.getGetLessonDetailsURL(), monitorTest.getLsId());
-	    getContributeActivities(monitorTest.getGetContributeActivitiesURL(), monitorTest.getLsId());
-	    getLearningDesignDetails(monitorTest.getGetLearningDesignDetailsURL(), ldId);
+
 	    while (stopSignal == null) {
 		delay();
 		MockMonitor.log.info(username + " is refreshing all learners progress");
@@ -161,54 +164,9 @@ public class MockMonitor extends MockUser implements Runnable {
 	}
     }
 
-    private InputStream buildPostBody() throws IOException {
-	Hashtable<String, Object> learners = new Hashtable<String, Object>();
-	MockUser[] mockLearners = test.getTestSuite().getLearnerTest().getUsers();
-	String courseName = test.getTestSuite().getAdminTest().getCourseName();
-	Integer[] users = new Integer[mockLearners.length];
-	for (int i = 0; i < mockLearners.length; i++) {
-	    users[i] = new Integer(mockLearners[i].getUserId());
-	}
-	learners.put("users", users);
-	learners.put("groupName", courseName + "_learners");
-	Hashtable<String, Object> staff = new Hashtable<String, Object>();
-	staff.put("users",
-		new Integer[] { new Integer(test.getTestSuite().getMonitorTest().getUsers()[0].getUserId()) });
-	staff.put("groupName", courseName + "_staff");
-	Hashtable<String, Object> lessonClassInfo = new Hashtable<String, Object>();
-	lessonClassInfo.put("learners", learners);
-	lessonClassInfo.put("staff", staff);
-	lessonClassInfo.put("organisationID", new Integer(test.getTestSuite().getAdminTest().getCourseId()));
-	lessonClassInfo.put("lessonID", new Integer(((MonitorTest) test).getLsId()));
-	String lessonClassWDDX = TestUtil.serialize(lessonClassInfo);
-	MockMonitor.log.debug("Generated LessonClass WDDX packet:" + lessonClassWDDX);
-	return new ByteArrayInputStream(lessonClassWDDX.getBytes("UTF-8"));
-    }
-
     private void getAllLearnersProgress(String getAllLearnersProgressURL, String lsId) throws IOException {
 	String url = getAllLearnersProgressURL.replace(MockMonitor.LESSON_ID_PATTERN, lsId);
 	WebResponse resp = (WebResponse) new Call(wc, test, username + " get all learners progress", url).execute();
 	MockMonitor.log.debug("Learner progress: " + resp.getText());
-    }
-
-    private void getContributeActivities(String getContributeActivitiesURL, String lsId) throws IOException {
-	String url = getContributeActivitiesURL.replace(MockMonitor.LESSON_ID_PATTERN, lsId);
-	WebResponse resp = (WebResponse) new Call(wc, test, username + " get contribute activities", url).execute();
-	MockMonitor.log.debug("Contribute activities: " + resp.getText());
-    }
-
-    private void getLearningDesignDetails(String getLearningDesignDetailsURL, String ldId)
-	    throws WddxDeserializationException, IOException {
-	String url = getLearningDesignDetailsURL.replace(MockMonitor.LDID_PATTERN, ldId);
-	WebResponse resp = (WebResponse) new Call(wc, test, username + " get learning design details", url).execute();
-	TestUtil.deserialize(resp.getText());
-    }
-
-    private String getLessonDetails(String getLessonDetailsURL, String lsId) throws JSONException, IOException {
-	String url = getLessonDetailsURL.replace(MockMonitor.LESSON_ID_PATTERN, lsId);
-	WebResponse resp = (WebResponse) new Call(wc, test, username + " get lesson", url).execute();
-	MockMonitor.log.debug("Lesson details: " + resp.getText());
-	JSONObject jsonObject = new JSONObject(resp.getText());
-	return String.valueOf(jsonObject.getLong(MockMonitor.LD_ID_KEY));
     }
 }
